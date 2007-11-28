@@ -1,0 +1,153 @@
+// Re-opened
+IGNORE    : File created by JFD as a new spec for WHATIF check.db files
+ID        : 1tgq001.pdb
+CheckID   : NAMCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Atom nomenclature errors
+ DocURL   : http://www.cmbi.kun.nl/whatif/chap23.html
+ Date     : 2007-06-03
+  Level   : RESIDUE   
+   LText  : Some nomenclature problems will be listed here. If atoms have a
+   LText  : non-IUPAC name they will be listed as bad or missing in another
+   LText  : place.  If they have an existing but incorrect IUPAC name they are
+   LText  : listed here.  Chemical errors (e.g. valine Cgammas swapped) are
+   LText  : called bad.  Other nomenclature errors are called poor.
+   Type   : TEXT      
+   Name   : A-  11-GLU
+    Value : TORSION   
+    Qual  : POOR1      
+   Name   : A-  13-GLU
+    Value : TORSION   
+    Qual  : POOR2      
+   Name   : A-  34-GLU
+    Value : TORSION   
+    Qual  : POOR3      
+   Name   : A-  50-TYR
+    Value : TORSION   
+    Qual  : POOR4      
+   Name   : A-  57-PHE
+    Value : TORSION   
+    Qual  : POOR5           
+//
+ID        : 1tgq002.pdb
+CheckID   : HNDCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Chirality check
+ DocURL   : http://www.cmbi.kun.nl/whatif/
+ Date     : 2007-06-03
+  Level   : ATOM      
+   LText  : The values in the table characterize the deviations from the expected value
+   LText  : for the improper dihedral centered at the atom.
+   Type   : FLOAT     
+   Poor   : >    3.00
+   Bad    : >    4.00
+   Name   : A-   9-MET- CA 
+    Value :  0.514
+   Name   : A-   9-MET- C  nv
+    Value :  0.009
+   Name   : A-  10-ALA- CA 
+    Value : -0.372
+   Name   : A-  10-ALA- C  
+    Value : -0.031
+   Name   : A-  11-GLU- CA 
+    Value : -0.471
+   Name   : A-  11-GLU- C  
+    Value : -0.003
+   Name   : A-  11-GLU- CD 
+    Value : -0.056
+//
+ID        : 1tgq002.pdb
+CheckID   : WGTCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Atomic occupancy check
+ DocURL   : http://www.cmbi.kun.nl/whatif/
+ Date     : 2007-06-03
+  Level   : ATOM      
+   LText  : Atoms that are listed here as 'OVER' have an atomic occupancy
+   LText  : bigger than 1.0, if listed as 'HIGH' even bigger than 1.1.  Atoms
+   LText  : labeled as 'NEGATIVE' have an atomic occupancy smaller than
+   LText  : 0.0. Obviously, in any crystal the occupancies (or 'weights')
+   LText  : should be between 0.0 and 1.0. Any atom mentioned here is
+   LText  : indicative of severe refinement problems, HIGH and NEGATIVE
+   LText  : being worse than OVER.
+   Type   : TEXT             
+//
+// Re-opened
+ID        : 1tgq002.pdb
+CheckID   : NAMCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Atom nomenclature errors
+ DocURL   : http://www.cmbi.kun.nl/whatif/chap23.html
+ Date     : 2007-06-03
+  Level   : RESIDUE   
+   LText  : Some nomenclature problems will be listed here. If atoms have a
+   LText  : non-IUPAC name they will be listed as bad or missing in another
+   LText  : place.  If they have an existing but incorrect IUPAC name they are
+   LText  : listed here.  Chemical errors (e.g. valine Cgammas swapped) are
+   LText  : called bad.  Other nomenclature errors are called poor.
+   Type   : TEXT      
+   Name   : A-  11-GLU
+    Value : TORSION   
+    Qual  : POOR1      
+   Name   : A-  13-GLU
+    Value : TORSION   
+    Qual  : POOR2      
+   Name   : A-  34-GLU
+    Value : TORSION   
+    Qual  : POOR3      
+   Name   : A-  50-TYR
+    Value : TORSION   
+    Qual  : POOR4      
+   Name   : A-  57-PHE
+    Value : TORSION   
+    Qual  : POOR5           
+//
+ID        : 1tgq002.pdb
+CheckID   : HNDCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Chirality check
+ DocURL   : http://www.cmbi.kun.nl/whatif/
+ Date     : 2007-06-03
+  Level   : ATOM      
+   LText  : The values in the table characterize the deviations from the expected value
+   LText  : for the improper dihedral centered at the atom.
+   Type   : FLOAT     
+   Poor   : >    3.00
+   Bad    : >    4.00
+   Name   : A-   9-MET- CA 
+    Value :  0.514
+   Name   : A-   9-MET- C  nv
+    Value :  0.009
+   Name   : A-  10-ALA- CA 
+    Value : -0.372
+   Name   : A-  10-ALA- C  
+    Value : -0.031
+   Name   : A-  11-GLU- CA 
+    Value : -0.471
+   Name   : A-  11-GLU- C  
+    Value : -0.003
+   Name   : A-  11-GLU- CD 
+    Value : -0.056
+//
+ID        : 1tgq002.pdb
+CheckID   : WGTCHK
+ Program  : WHAT IF
+ Version  : 4.99 (20030601-1154)
+ Text     : Atomic occupancy check
+ DocURL   : http://www.cmbi.kun.nl/whatif/
+ Date     : 2007-06-03
+  Level   : ATOM      
+   LText  : Atoms that are listed here as 'OVER' have an atomic occupancy
+   LText  : bigger than 1.0, if listed as 'HIGH' even bigger than 1.1.  Atoms
+   LText  : labeled as 'NEGATIVE' have an atomic occupancy smaller than
+   LText  : 0.0. Obviously, in any crystal the occupancies (or 'weights')
+   LText  : should be between 0.0 and 1.0. Any atom mentioned here is
+   LText  : indicative of severe refinement problems, HIGH and NEGATIVE
+   LText  : being worse than OVER.
+   Type   : TEXT             
+//

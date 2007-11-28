@@ -1,0 +1,52 @@
+#------------------------------------------------------------------------------
+ refine.py
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+To setup: in cing directory:
+> ./setup.py
+Generates cing.csh to source in your .cshrc file
+Adjust if needed.
+Uses 'which xplor' to determine initial xplor executable; make sure it is in your 
+path when you run setup.
+
+#------------------------------------------------------------------------------
+To get help:
+> refine.py -h
+
+
+usage: refine.py [options]
+
+options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  --doc                 print extended documentation to stdout
+  -n NAME, --name=NAME  NAME of the refinement run (required)
+  -s, --setup           Generate directory structure and parameter file
+  -f, --psf             Generate PSF file (default: no PSF)
+  -a, --analyze         Initial analysis (default: no analysis)
+  -r, --refine          Refine the structures (default: no refine)
+  -p, --print           Print script before running (default: no print)
+  --models=MODELS       Model indices (e.g. 0,2-5,7,10-13)
+  --parse               Parse the output of the refine run (default: no parse)
+  --sort=SORTFIELD      sort field for parse option
+  --best=BESTMODELS     Number of best models for parse option
+  
+#------------------------------------------------------------------------------
+to get more help:
+> refine.py -doc
+
+ refine.py
+ 
+ GWV 23 February/March 2005: waterrefinement
+ GWV March 2007: Adapted for usage with cing
+ - Model indices [0,Nmodels>
+ - General directory structure using --setup
+ - Inclusion of parsing of refine result using --parse
+
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+Files and Directories:
+
