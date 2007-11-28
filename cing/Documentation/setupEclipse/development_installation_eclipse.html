@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>How to install CING for development on Eclipse</title>
+</head>
+<body>
+Install the requirements:<br><br>
+<ol>
+<li><b>Install Fink</b>
+<br>Make sure
+you have the unstable trees in your fink.conf too. I had to add:
+        /unstable/main and /unstable/fink        
+    <br>Do: <PRE>fink selfupdate</PRE>.<li><b>Install Biggle plotting utilities</b><br>Do: <pre>fink install biggles-py25</pre><br>Note that this also installs the python 2.5 plotlib and numeric dependancies.<li><b>Install </b>
+
+<li>
+<b>Biggles</b>
+<br>installing biggles thru fink
+    
+        <hr>
+
+
+<li>Register with sourceforge to get a user account. Check out the CING project from CVS.<br>
+<img src="cvs_setup.png">
+<hr>
+The project tree with the python code expanded should look something like:<br>
+<img src="project_overview.png">
+<hr>
+Add the local python dir to your PYTHONPATH inside eclipse. The ccpn is mandatory too.
+The wattos is really optional.
+<img src="python_path_setup.png">
+<hr>
+<ol>
+</body>
+</html>

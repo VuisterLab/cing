@@ -1,0 +1,95 @@
+Design considerations:
+
+Definitions contained MolDef, ResidueDef, AtomDef, DihedralDef classes
+Export to pyhton-readable code;
+  Methods: printit()
+
+Import/export of atom naming conventions from/to flat-atom table file is possible:
+  to faciltate updating
+  Methods: MolDef.importNameDefs( fileName )
+           Moldef.exportNameDefs( fileName )
+           
+Internal naming is essential and cannot be changed easily
+Internally now use CYANA nomenclature (from cyana.lib): 
+- closest to IUPAC but complete in its table, 
+- plus HN rather then H, and 'Q' rather then 'M' for methyls is preferable.
+- Note that for Gly CYANA uses HA1,HA2 and BMRB uses HA2,HA3!! Other than that, the stereo
+  nomenclature is the same (I think).
+
+First atom table list generated from  
+  cyana.lib 
+  protein translation table of BMRB
+  rna.pdb from BMRB
+  dna.pdb from BMRB
+Script: mkatomTable.py > file atomTable.def
+
+Edited DNA/RNA entries atomTable.def manually
+
+Used atomTable.def and cyana.lib data to generate first residueDefs database structure
+Script: mkresidueDefs.py > residueDefs.py
+
+* 24 Feb 2004:
+Edited aa name defs for ARG+, GLU-, ASP-, HIST, HIS+ in atomTable.def
+
+ py updateResidueDefs.py > tmp
+ mv tmp residueDefs.py
+ 
+* 24 Feb 2004:
+Scripts used initially now in INITIAL_SCRIPTS directory
+
+
+* To Do: 
+Clean-up referencing: everything follwing the NTstruct dictionary method
+Nomenclature atoms DNA/RNA
+
+20-25 Sep 2005
+Restructuring using NTtree and saving to different file format.
+1. Read residueDefs and converted to 'keyword format': dbTable.py
+2. Redefined the MolDef, ResidueDef, AtomDef and DihedralDef classes; based on
+   NTtree, 
+   used nameDict attribute to store the different names
+3. File 'NTdb.py': contains classes and parser of dbTable. 
+   Yields NTdb as root of database
+4. Conversion dictionaries initialised from nameDict entries of NTdb
+
+Note that updating dict and list types requires first initialisation of the 
+NTdb-tree and then updating it. Otherwise, the changes are discarded as parsing
+the dbTable involves blunt assignment of the corresponding attributes.
+
+28 Nov 2005:
+* dbTable now contains dbTable entry: update proprams that write this table.
+* Using dbTableNew, added spin system SS
+
+* Need to update initBMRB and initDynamo.
+
+* Need to update Peaks class and routines depending on it:
+exportPeaks2Xeasy, exportPeaks2sparky, updateResonancesFromPeaks .....
+
+20-22 Jan 2006: implementing removing residue for Mark H.
+* Chain.removeResidue
+* Tree.removeChild
+* Tree.youngerSiblings
+* Tree.olderSiblings
+* General rule: all refs using instances, strings only on initializing    ...
+
+
+30 Jan 2006.
+Included shifts info from BMRB using the addSHIFTS.py routine.
+Residues CYSS, HIS+, HIST, and DNA/RNA are not yet included.
+
+31 Jan 2006
+Major overhaul of the dictonairy routines. Removed resNameTranslations, 
+atomNameTranslations, resNameTable, and resName2internal routine.
+Now everything works from the residueDict and atomDict dictionaries.
+Defined a LOOSE convention to allow for shortname or Partially caps
+residue name translation
+new routines:
+translateAtomName, translateResidueName, NTdbGetResidue, NTdbGetAtom
+
+31 Jan 2006
+Added ION residue, to accomodate the Ca2+ in CBD structures.
+
+23 Feb 2006:
+When importing peaks from Xeasy, I now update the peak index with the 
+peakid from the original file
+
