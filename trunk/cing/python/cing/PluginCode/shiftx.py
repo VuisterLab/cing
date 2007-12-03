@@ -13,6 +13,7 @@ from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
 from cing.core.constants import NOSHIFT
 from cing.core.parameters import cingPaths
+import cing
 import os
 
 def parseShiftxOutput( fileName, molecule ):
@@ -23,7 +24,7 @@ def parseShiftxOutput( fileName, molecule ):
 format file:    
 
 # Entries marked with a * may have inaccurate shift predictions.
-# Entries marked with a value < -600 should be igonored
+# Entries marked with a value < -600 should be ignored
   501   H  N      116.3173
   501   H  CA      55.4902
   501   H  CB      29.9950
@@ -93,24 +94,25 @@ def predictWithShiftx( project, model=None, verbose = True ):
     #end for
         
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx,  )
-    shiftx = ExecuteProgram( pathToProgram=os.path.join(cingPaths.bin,'shiftx'), 
+    shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
                              rootPath = root, redirectOutput = False, verbose = verbose )
     for model in models:
         # set filenames
         rootname =  sprintf('model%03d', model)
-        fullname =  os.path.join( root, rootname )
+        model_base_name =  os.path.join( root, rootname )
         
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC, verbose = verbose )       
-        if pdbFile: 
-         
-            pdbFile.save( fullname + '.pdb', verbose = False )   
-            shiftx('A', rootname + '.pdb', rootname + '.out' )
-            
-            if verbose:
-                NTmessage('==> Parsing %s\n', fullname + '.out' )
-            parseShiftxOutput( fullname + '.out', project.molecule )
-            del( pdbFile )
-        #end if
+        if not pdbFile:
+            NTerror("Failed to generate a pdb file for model: " + `model`)
+            return None 
+        
+        pdbFile.save( model_base_name + '.pdb', verbose = False )   
+        shiftx('A', rootname + '.pdb', rootname + '.out' )
+        
+        if verbose:
+            NTmessage('==> Parsing %s\n', model_base_name + '.out' )
+        parseShiftxOutput( model_base_name + '.out', project.molecule )
+        del( pdbFile )
     #end for
     
     # Restore the 'default' state

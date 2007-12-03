@@ -97,7 +97,7 @@ class Xplor( NTstruct ):
     def newPath( self, *args):
         """Check existance of joined path, relative to basePath, 
            remove if exists and overwrite
-           Return joined path
+           Return joined path or do a system exit.
         """
         path = self.joinPath( *args )
         if os.path.exists( path ):

@@ -2967,7 +2967,7 @@ def formatList( theList, fmt = '%s\n' ):
 #end def
 
 ######################################################################################################
-# This code is repeated in __init__.py and NTutils.py please keep it sync-ed
+# This code is repeated in cing/setup.py and cing/Libs/NTutils.py please keep it sync-ed
 ######################################################################################################
 def NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""

@@ -66,6 +66,7 @@ from cing.core.constants import UNDEFINED_FLOAT
 from cing.core.molecule import dots
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.core.molecule import Residue
 import cing
 import math
 import os
@@ -664,7 +665,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     summary.types = zip( types,counts)
     return summary
 #end def
-cing.Residue.checkSaltbridge = validateSaltbridge
+Residue.checkSaltbridge = validateSaltbridge
 
 #==============================================================================
 def checkHbond( donorH, acceptor, 
@@ -1842,7 +1843,7 @@ def validate( project, verbose=True ):
         
     # populate Molecule (Procheck) and Residues
     if 1:
-        NTerror("code failes for JFD; please fix")
+        NTerror("the code for populating the html failes for JFD; please fix")
     else:
         if not populateHtmlMolecules(project):
             printError("Failed to populateHtmlMolecules")

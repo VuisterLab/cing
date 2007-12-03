@@ -2,7 +2,6 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import strip
 import os
-import sys
 
 """
 python YOUR_CING_PATH_HERE/python/cing/setup.py
@@ -64,7 +63,7 @@ cingRoot = os.path.split(cingPythonDir)[0]
 ######################################################################################################
 
 ######################################################################################################
-# This code is repeated in __init__.py and NTutils.py please keep it sync-ed
+# This code is repeated in cing/setup.py and cing/Libs/NTutils.py please keep it sync-ed
 ######################################################################################################
 def NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
@@ -79,8 +78,6 @@ def NTgetoutput( cmd ):
     out.close()
     err.close()
     return (output,errors)
-#end def
-
 def printWarning(msg):
     print "WARNING:",msg
 def printMessage(msg):
@@ -158,10 +155,7 @@ if __name__ == '__main__':
 #    use tcsh. Better ask a question once.
     answer = None     
     while answer not in ["y","n"]:
-        printMessage("Do you use tcsh/csh [y] or bash/sh/ksh/zsh/ash [n]; please enter y or n:")
-        answer = sys.stdin.read(1)
-    isTcsh = False
-    if answer == "y":
-        isTcsh = True
+        answer = raw_input("Do you use tcsh/csh [y] or bash/sh/ksh/zsh/ash etc. [n]; please enter y or n:")
+    isTcsh = answer == "y"
         
     _writeCingShellFile(isTcsh)

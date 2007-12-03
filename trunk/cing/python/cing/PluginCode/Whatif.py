@@ -84,6 +84,7 @@ class Whatif( NTdict ):
                 ('TO2CHK', 'Missing C-terminal groups'),
                 ('TOPPOS', 'Ligand without know topology'),
                 ('WGTCHK', 'Atomic occupancy check'),
+                ('Hand',   '(Pro-)chirality or handness check')
                ]
     
     nameDict = NTdict()
@@ -490,8 +491,8 @@ def runWhatif( project, tmp=None ):
         printError("Failed whatif checks with exit code: " + `whatifExitCode`)
         return None
 
-#    for model in models:
-    for model in (0,1):
+    for model in models:
+#    for model in (0,1):
         modelNumber = model + 1
         modelNumberString = sprintf('%03d', modelNumber)
         fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', modelNumber), '.pdb' )
@@ -501,7 +502,9 @@ def runWhatif( project, tmp=None ):
         modelCheckDbFullFileName =  os.path.join( whatifDir, modelCheckDbFileName )
         whatif._parseCheckdb( modelCheckDbFullFileName, model )
     #end for model
-    return None
+    
+    printWarning("Processing is to be continued from here on.")
+    return 1
     if not whatif._processCheckdb():
         printError("Failed to process check db")
         return None

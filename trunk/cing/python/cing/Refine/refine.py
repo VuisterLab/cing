@@ -34,6 +34,7 @@ from string import find
 from cing.Refine import config
 from cing.core.constants import XPLOR
 from cing.Refine.config import refConfig
+from cing.Libs.NTutils import printDebug
 import os
 import sys
 
@@ -401,7 +402,9 @@ if __name__ == '__main__':
     project = None
     if options.project:
         project = Project.open(options.project, status = 'old', restore=False, verbose=False )
-        if project==None: sys.exit(1)
+        if project==None:
+            NTerror("Failed to get a project") 
+            sys.exit(1)
         # modify the basePath
         options.name = project.path( project.directories.refine, options.name )
     #end if
@@ -411,6 +414,7 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     if options.doSetup:
         doSetup( config, options.name )
+        printDebug("done with refine.doSetup now doing a system exit")
         sys.exit(0)
     #end if
     

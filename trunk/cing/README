@@ -9,8 +9,9 @@ To setup:
 Generates cing.csh or cing.sh that you need to adjust if needed and source in 
 your .cshrc or .bashrc file
 
-Uses 'which xplor' to determine initial xplor executable; make sure it is in your 
-path when you run setup.
+The setup.py script uses 'which xplor' etc. to determine the various locations for
+executables; make sure it is in your path when you run setup. More setup instructions
+available in: cing/Documentation/setupEclipse/development_installation_eclipse.html
 
 #------------------------------------------------------------------------------
 To get help:

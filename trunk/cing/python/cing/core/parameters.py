@@ -64,12 +64,13 @@ cingPaths = NTstruct(
     project      = 'project.xml',
     plugins      = 'PluginCode',
     scripts      = '../Scripts',
-    bin          = '../bin',
+    bin          = 'bin',
     html         = 'HTML',
     css          = 'cing.css',
     xplor        = os.getenv('xplorPath'),
     profit       = os.getenv('profitPath'),
     procheck_nmr = os.getenv('procheckPath'),
+    whatif       = os.getenv('whatifPath'),
 )
 
 cingPaths.keysformat() #define a format string for 'pretty' output
