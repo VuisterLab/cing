@@ -21,7 +21,7 @@ def parseShiftxOutput( fileName, molecule ):
     Parse shiftx generated output (gv_version!).
     Store result in shiftx attribute (which is a NTlist type) of each atom
 
-format file:    
+format file:     
 
 # Entries marked with a * may have inaccurate shift predictions.
 # Entries marked with a value < -600 should be ignored
@@ -96,6 +96,9 @@ def predictWithShiftx( project, model=None, verbose = True ):
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx,  )
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
                              rootPath = root, redirectOutput = False, verbose = verbose )
+    if verbose:
+        NTmessage('==> Running shiftx ' )
+        NTmessage.flush()
     for model in models:
         # set filenames
         rootname =  sprintf('model%03d', model)
@@ -114,6 +117,11 @@ def predictWithShiftx( project, model=None, verbose = True ):
         parseShiftxOutput( model_base_name + '.out', project.molecule )
         del( pdbFile )
     #end for
+    
+    if verbose:
+        NTmessage(' averaging ...')
+        NTmessage.flush()
+    #end if
     
     # Restore the 'default' state
     for atm in skippedAtoms:
@@ -159,6 +167,10 @@ def predictWithShiftx( project, model=None, verbose = True ):
             atm.shiftx.sd = 0.0
         #end if
     #end for        
+    if verbose:
+        NTmessage(' done\n')
+        NTmessage.flush()
+    #end if
     
     return project
 #end def

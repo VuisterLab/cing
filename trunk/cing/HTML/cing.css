@@ -234,6 +234,15 @@ a.green:hover, a.green:active {
 	padding-left: 5px;
 }
 
+#main h3 {
+	color: #0ca0ad;
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 3px;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
 #main p {
 	padding-right: 5px;
 	padding-left: 5px;
