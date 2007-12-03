@@ -125,11 +125,15 @@ def summary( project, verbose=True ):
     if project.molecule:
         mprintf( fps, '%s\n', project.molecule.format() )
         if project.molecule.has_key('rmsd' ):
-            mprintf( fps, '%s\n', project.molecule.rmsd.format() )
+            mprintf( fps, '\n%s\n', project.molecule.rmsd.format() )
         #end if
         for drl in project.distances + project.dihedrals + project.rdcs:
-            mprintf( fps, '%s\n', drl.format() )
+            mprintf( fps, '\n%s\n', drl.format() )
         #end for
+        # No procheck summary added yet.
+#        if project.molecule.has_key('procheck'):
+#            if project.molecule.procheck.has_key('summary'):
+#                mprintf( fps, '%s\n', project.molecule.procheck.summary )
     #end if
     fp.close()
 #end def
@@ -669,9 +673,19 @@ Residue.checkSaltbridge = validateSaltbridge
 
 #==============================================================================
 def checkHbond( donorH, acceptor, 
-                minAngle = 100.0, maxAngle=225.0, maxDistance = 2.4,
+                minAngle = 100.0, maxAngle=225.0, maxDistance = 3.0,
                 fraction = 0.5
               ):
+    """
+    Check for presence of H-bond between donorH proton and acceptor.
+    
+    H-bond is present for a particular conformer if:
+        heavyAtom-donorH-acceptor angle between minAngle and maxAngle 
+        and adonorH-acceptor distance < maxDistance.
+        
+    H-bond is accpeted when H-bond is present in at least fraction of
+    the models in the ensemble.    
+    """
     
     if not donorH or not donorH.isProton():
         NTerror('ERROR checkHbond: non-proton donor %s\n', donorH )
@@ -821,8 +835,11 @@ def validateAssignments( project, toFile = True, verbose = True ):
                     result.append( atm )
                     atm.validateAssignment.append(string)
                 #end if
-            #end if
-        #end if
+            #end if atm.isProton()
+       #end if atm.isAssigned():
+       if len(atm.validateAssignment) > 0:
+            atm.colorLabel = COLOR_ORANGE
+       #end if
     #end for
     if verbose:
         for atm in result:
@@ -1034,13 +1051,14 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
     # Let's check if for this 'angle' is a dihedral restraint
     aAv  = angle.cav
     width = 4.0
-    dd = 3.0
+#    dd = 3.0
     dr = _matchDihedrals(residue, dihedralName)
 
     if dr:
         lower, upper = dr.lower, dr.upper
-    else:
-        lower, upper = plotparams.min+dd, plotparams.max-dd        
+
+    #else:
+    #    lower, upper = plotparams.min+dd, plotparams.max-dd        
             
     plot.line( (lower, 0), (lower, hight), 
                NTplot.lineAttributes(color=plotparams.lower, width=width) )
@@ -1207,6 +1225,9 @@ def setupHtml(project):
         try: next = project[project.molecules[index+1]]
         except: pass
 
+        molecule.html.insertHtmlLink( molecule.html.header, molecule, project, 
+                                      text = 'Home' )
+
         if previous:
             molecule.html.insertHtmlLink( molecule.html.header, molecule,
                                           previous, text='Previous' )
@@ -1258,6 +1279,9 @@ def setupHtml(project):
             chainHeader = chain.html.header
             chainHeader('h1', '%s %s' % (molecule.name, chain.name))
     
+            chain.html.insertHtmlLink( chainHeader, chain, project, 
+                                       text = 'Home' )
+
             # Refs to move to previous, next chain or UP
             previous = chain.sister(-1)
             next = chain.sister(1)
@@ -1331,6 +1355,9 @@ def setupHtml(project):
                 resHeader = res.html.header
                 resHeader('h1', res._Cname(-1) )
         
+                res.html.insertHtmlLink( resHeader, res, project, 
+                                       text = 'Home' )
+        
                 # Refs to move to previous, next residue or UP
                 previous = res.sister(-1)
                 next = res.sister(1)
@@ -1353,6 +1380,10 @@ def setupHtml(project):
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',
                                             href='models.html', newLine=False) )
+
+        molecule.html.main('h1', 'Structure-based analysis')
+        molecule.html.main( 'p', molecule.html._generateTag('a', 'Salt bridges',
+                                            href='../../../'+project.moleculePath('analysis')+'/saltbridges.txt', newLine=False) )
     #end for
 
     # TODO: setup Models page
@@ -1383,6 +1414,9 @@ def setupHtml(project):
         
         try: next = project.peaks[index+1]
         except: pass
+
+        peakList.html.insertHtmlLink( peakHeader, peakList, project, 
+                                       text = 'Home' )
 
         if previous:
             peakList.html.insertHtmlLink( peakHeader, peakList, previous,
@@ -1467,6 +1501,9 @@ def setupHtml(project):
         try: next = allRestraintList[index+1]
         except: pass
 
+        restraintList.html.insertHtmlLink( restrHeader, restraintList, project, 
+                                           text = 'Home' )
+
         if previous:
             restraintList.html.insertHtmlLink( restrHeader, restraintList, 
                                                previous, text = 'Previous' )
@@ -1485,6 +1522,8 @@ def setupHtml(project):
         else:
             project.mainPageObjects['Restraints'] = [restraintList]
         #end if
+
+        restraintList.html.main('h3', restraintList.formatHtml())
 
         if str(type(restraintList)).count('DistanceRestraintList'):
             #count = 0
@@ -1570,6 +1609,25 @@ def setupHtml(project):
     #end for
     
     # Do Project HTML page    
+
+    project.html.main('h1', 'Summary')    
+    project.html.main('ul', closeTag=False)
+    project.html.main('li', closeTag=False)
+    project.html.main('a', 'Open',
+                       href = '../'+project.moleculePath('analysis')+'/summary.txt'
+                      )
+    project.html.main('li', openTag=False)
+    project.html.main('ul', openTag=False)
+
+    project.html.main('h1', 'Assignments')
+    project.html.main('ul', closeTag=False)
+    project.html.main('li', closeTag=False)
+    project.html.main('a', 'Open',
+                      href = '../'+project.moleculePath('analysis')+'/validateAssignments.txt'
+                      )
+    project.html.main('li', openTag=False)
+    project.html.main('ul', openTag=False)
+
     for key in project.mainPageObjects.keys():
         projectMain = project.html.main
         projectMain('h1', key)
@@ -1735,8 +1793,11 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
     resRight('p', closeTag=False)
     for k in RLists:
         RLobj = project[k]
+        resRight('h3', closeTag=False)
         residue.html.insertHtmlLink(resRight, residue, RLobj, text=k)
-        resRight('br')
+        resRight('h3', openTag=False)
+        resRight('p', closeTag=False)
+        #resRight('br')
         resRL = tmpDict[k]
         # sort list by 'violCount3' reverse order (higher to lower values)
         NTsort(resRL, 'violCount3', inplace=True)
@@ -1780,13 +1841,14 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                 residue.html.insertHtmlLink( resRight, residue, residue,
                                              text=angleName, id=angleName )
             #end if
-            resRight( 'a', 'Lower/Av/Upper: %.2f/ %.2f / %.2f' % (dr.lower, av,
-                                                                  dr.upper) )
+            resRight('br')
+            resRight( 'a', type + ': Lower/Av/Upper: %.2f/ %.2f / %.2f' % 
+                      (dr.lower, av, dr.upper) )
+            resRight('br')
             #resRight('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
             #                 % (restraint.av, restraint.min, restraint.max))
-            resRight( 'a', 'ViolCount3: %i' % dr.violCount3)
-            resRight( 'a', 'Viol Average / SD / Max: %.2f / %.2f / %.2f' % 
-                      (dr.violAv, dr.violSd, dr.violMax) )
+            resRight( 'a', 'Violations: violCount3 / Average / SD / Max: %d / %.2f / %.2f / %.2f' % 
+                           (dr.violCount3, dr.violAv, dr.violSd, dr.violMax) )
             #resRight('ul', openTag=False)
             resRight('br')
             if resRL.index(dr) + 1 == toShow:
@@ -1799,6 +1861,7 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                 break
             #end if
         #end for
+        resRight('p', openTag=False)    
         #if RLists.index(k) != RLists.index(RLists[-1]): resRight('br')
     #end for
     resRight('p', openTag=False)    
@@ -1813,6 +1876,13 @@ def populateHtmlModels(project):
         molecule.modelPage = HTMLfile( project.htmlPath( 'models.html' ),
                                             title = 'outliers' )
         molecule.modelPage.header('h1', molecule.name + ' models' )
+        
+        molecule.modelPage.header('a', 'Home', href='../../index.html' )
+
+        #molecule.modelPage.insertHtmlLink( molecule.modelPage.header, 
+        #                                   restraintList, project, 
+        #                                   text = 'Home' )
+
         ########################
         
         plot = NTplot( xLabel = 'Model',
@@ -1833,11 +1903,11 @@ def populateHtmlModels(project):
 
 #end def
 
-def validate( project, verbose=True ):
-    """Validatation tests returns None on error.
+def validate( project, ranges=None, htmlOnly = False, verbose=True ):
+    """Validatation tests
     """
     #validateSetup(project)
-    setupValidation( project )
+    if not htmlOnly: setupValidation( project, ranges=ranges )
 
     setupHtml(project)
         

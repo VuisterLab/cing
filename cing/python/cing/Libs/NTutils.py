@@ -10,8 +10,6 @@ import os
 import sys
 
 
-
-
 #import HyperText.Documents
 
 def splitpdb( fileName = None, modelNum = None ):
@@ -403,6 +401,17 @@ class NTlist( list ):
             #end if
         #end for
         return string
+    #end def
+    
+    def formatHtml(self):
+        if not self.format(): 
+            return ''
+        #end if
+        htmlLine = ''
+        for item in  self.format().split('\n'):
+            htmlLine = htmlLine + '<a> %s</a><br>' % item
+        #end for
+        return htmlLine
     #end def
     
     def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
