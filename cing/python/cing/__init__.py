@@ -10,7 +10,7 @@ programName     = 'CING'
 programVersion  = cingVersion
 header = """
 ======================================================================================================
-|   CING: python NMR/molecule package, version """+cingVersion+""" (c) GWV,AW,JFD 2004-2007    |
+|   CING: python NMR/molecule package, version """+cingVersion+""" (c) AW,JFD,GWV 2004-2007    |
 ======================================================================================================
 """ 
 footer = """------------------------------------------------------------------------------------------------------
@@ -28,6 +28,9 @@ cingPythonDir = os.path.split(cingPythonCingDir)[0]
 cingRoot = os.path.split(cingPythonDir)[0]
 #printDebug("cingRoot        : " + cingRoot)
 ######################################################################################################
+cingDirTests       = os.path.join( cingRoot,            "Tests")
+cingDirTestsData   = os.path.join( cingDirTests,        "data")
+cingDirTestsTmp    = os.path.join( cingDirTestsData,    "tmp")
 
 
 
@@ -36,6 +39,6 @@ from cing.Libs.peirceTest import peirceTest
 from cing.core.classes import *
 from cing.core.database import NTdb
 from cing.core.dictionaries import *
-from cing.core.importPlugin import importPlugin
 from cing.core.molecule import *
 from cing.core.parameters import * 
+from cing.core.importPlugin import importPlugin # This imports all plugins.

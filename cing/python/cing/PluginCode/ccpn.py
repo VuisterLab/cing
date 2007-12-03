@@ -167,25 +167,28 @@ from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
+from cing.core.molecule import Molecule as CingMolecule
 from cing.main import format
+from cing.Libs.NTutils import printDebug
 import os
 import string
 
 # The next import is possible but inside the cing package JFD prefers to
 # have unspecified Classes to be from within cing and name the outside 
 # classes for eg CcpnMolecule. But that's up to you Alan. 
-from cing.core.molecule import Molecule as CingMolecule
 # Ccpn imports below
 # Try importing and catch error to print message
 # Raise error again in order to exit the import process
 # This error is then caught by the importPlugin routine
+printDebug("Trying import of readXmlProjectFile; which is impossible")
 try:
     from memops.general.Io import readXmlProjectFile #@UnresolvedImport
 except:
     NTerror("Import Error: CCPN framework not defined\n")
-    raise ImportError
+    raise ImportError("Failed to import readXmlProjectFile")
 #end try
     
+printDebug("Done importing readXmlProjectFile; which is impossible")
 namingSystem = 'DIANA' #'DIANA' #CYANA2.1
 convention = 'INTERNAL' #'CYANA2'
 

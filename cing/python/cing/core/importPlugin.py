@@ -2,16 +2,13 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTstruct
-from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printMessage
+from cing.Libs.NTutils import printWarning
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import printWarning
-import cing
 import glob
 import os
-import traceback
 
 #-----------------------------------------------------------------------------
 # import the plugins
@@ -22,47 +19,57 @@ def importPlugin( pluginName ):
     Returns None on error
     """
 #    printDebug('==> Importing plugin ' + pluginName)
-    try:
-        plugin = plugins[pluginName]
-        reload( plugin.module )
-    except KeyError, AttributeError:
-        moduleName = 'cing.' + cingPaths.plugins + '.' + pluginName
+    # Reloading the plugin modules is a typical case of overoptimalization
+    # it hardly takes time to do an import.
+#    try:
+#        plugin = plugins[pluginName]
+#        reload( plugin.module )
+#    except KeyError, AttributeError:
 #        printDebug('A reload failed for ' + pluginName)
-        try:
-            module = __import__( moduleName, globals(), locals(), [] )
-        except ImportError:
-            NTerror('ERROR importPlugin: plugin "%s"\n', pluginName )
-            traceback.print_exc()
-            return None
-        #end try
-        # set p to plugin module
-        print module
-        print dir(module)
-        p = getattr( module, pluginName )
-        plugin = NTstruct( module = p, name = pluginName)
+
+    pluginCodeModule = 'cing.' + cingPaths.plugins
+#    moduleName = cingPaths.plugins + '.' + pluginName
+#    module = __import__( moduleName, globals(), locals(), [] )
+#    printMessage('==> Attempting import plugin ' + pluginName )
+# by the manuals words: 
+# "However, when a non-empty fromlist argument is given, the module named by name is returned." 
+    pluginCodeModulePackage = __import__( name = pluginCodeModule, 
+                         globals = globals(), 
+                         locals = locals(), 
+                         fromlist = [pluginName], 
+                         level = 0 ) #JFD changed from default to zero which means to only try absolute imports. 
+
+#    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
+    printMessage('==> Imported plugin ' + pluginName )
+    if not hasattr(pluginCodeModulePackage, pluginName):
+        NTerror("Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
+        return None            
+#     set p to plugin module
+    pluginModule = getattr( pluginCodeModulePackage, pluginName )
+#    printDebug("pluginModule looks like: " + `pluginModule`)
+    
+    plugin = NTstruct( module = pluginModule, name = pluginName)
     #end try
 #    printDebug('==> Staging plugin ' + pluginName)
     plugins[pluginName] = plugin
 
     # update the methods, saves, restores and exports
-    # plugin.methods        list of tuples (methods-function, object) 
-    # plugin.saves          list of tuples (save-function, object)
-    # plugin.restores       list of tuples (restore-function, object)
-    # plugin.exports        list of tuples (export-function, object)
-
     for attributeName in ['methods', 'saves', 'restores', 'exports']:
+#        printDebug("Now working on attribute: " + attributeName)
         plugin[attributeName] = []
         if attributeName in dir(plugin.module):
-            for f,o in getattr(plugin.module, attributeName):
-                setattr( Project, f.__name__, f )
-                plugin[attributeName].append( (f, o) )
+#            printDebug("Now working on attributeName: " + attributeName)
+            for function, other in getattr(plugin.module, attributeName):
+#                printDebug("Now working on function: " + function.__name__)
+                setattr( Project, function.__name__, function )
+                plugin[attributeName].append( (function, other) )
             #end for
         #end if
     #end for
 
 #    plugin.printAttr()
        
-    printMessage('==> Imported plugin ' + plugin.module.__file__ )
+#    printMessage('==> Staged plugin ' + plugin.module.__file__ )
     #end if
     return plugin
 
@@ -75,11 +82,12 @@ pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 printWarning("TODO: reintroduce the ccpn plugin code here once fixed")
 pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
-printWarning("TODO: reintroduce the validate plugin code here once fixed")
-pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
+#printWarning("TODO: reintroduce the validate plugin code here once fixed")
+#pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
 for p in pluginFileList:
     d,pname,e = NTpath(p)
-    importPlugin( pname )
+    if not importPlugin( pname ):
+        raise Exception("Failed to import plugin: " + pname)
 #end for
 del( pluginDir )
 del( pluginFileList)

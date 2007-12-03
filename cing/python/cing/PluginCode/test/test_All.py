@@ -6,14 +6,11 @@ python testAll.py
 """
 if __name__ == "__main__":
     modList = ( 
-               # Prerequisites general setup
-               "PluginCode.test.test_Biggles", 
-#               "PluginCode.test.test_ExternalImports", 
-               # Prerequisites external structural biology programs
-               "PluginCode.test.test_Procheck", 
-#               "PluginCode.test.test_Whatif", 
-               # Prerequisites internal Cing code
-               
+               "cing.PluginCode.test.test_Biggles", 
+               "cing.PluginCode.test.test_Procheck", 
+               "cing.PluginCode.test.test_validate", 
+               "cing.PluginCode.test.test_Procheck", 
+               "cing.PluginCode.test.test_Whatif", 
                )
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None

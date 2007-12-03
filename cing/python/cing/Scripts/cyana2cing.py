@@ -13,6 +13,7 @@
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import OptionParser
 from cing.core.classes import Project
+from cing.Libs.NTutils import printDebug
 import os
 import sys
 
@@ -137,6 +138,7 @@ if (len(args) >= 1):
         sys.exit(1)
     #end if
 #end if
+printDebug("Doing a hard system exit")
 sys.exit(0)
 
 
