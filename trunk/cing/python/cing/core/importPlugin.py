@@ -36,8 +36,7 @@ def importPlugin( pluginName ):
     pluginCodeModulePackage = __import__( pluginCodeModule, 
                          globals(), 
                          locals(), 
-                         [pluginName], 
-                         -1 ) #JFD changed from default to zero which means to only try absolute imports. 
+                         [pluginName] ) #JFD changed from default to zero which means to only try absolute imports. 
 
 #    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
     printMessage('==> Imported plugin ' + pluginName )
