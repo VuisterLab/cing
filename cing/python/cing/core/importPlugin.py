@@ -33,11 +33,11 @@ def importPlugin( pluginName ):
 #    printMessage('==> Attempting import plugin ' + pluginName )
 # by the manuals words: 
 # "However, when a non-empty fromlist argument is given, the module named by name is returned." 
-    pluginCodeModulePackage = __import__( name = pluginCodeModule, 
-                         globals = globals(), 
-                         locals = locals(), 
-                         fromlist = [pluginName], 
-                         level = 0 ) #JFD changed from default to zero which means to only try absolute imports. 
+    pluginCodeModulePackage = __import__( pluginCodeModule, 
+                         globals(), 
+                         locals(), 
+                         [pluginName], 
+                         -1 ) #JFD changed from default to zero which means to only try absolute imports. 
 
 #    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
     printMessage('==> Imported plugin ' + pluginName )

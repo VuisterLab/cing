@@ -44,12 +44,13 @@ CING_SHELL_TEMPLATE = \
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
 
 if %(conditional)s then
-    %(export)s PYTHONPATH%(equals)s.:%(cingPythonDir)s:$PYTHONPATH
+    %(export)s PYTHONPATH%(equals)s.:$CINGROOT/python:$PYTHONPATH
 else
-    %(export)s PYTHONPATH%(equals)s.:%(cingPythonDir)s
+    %(export)s PYTHONPATH%(equals)s.:$CINGROOT/python
 %(close_if)s
 
-alias cing 'python %(cingPythonDir)s/cing/main.py'
+alias cing 'python $CINGROOT/python/cing/main.py'
+
 '''
 #------------------------------------------------------------------------------------
 
@@ -101,7 +102,8 @@ def _writeCingShellFile(isTcsh):
         parametersDict['close_if'] = 'fi'
         cname = 'cing.sh'
     text = CING_SHELL_TEMPLATE % parametersDict
-
+    if isTcsh:
+        text += "\nrehash\n"
     cname = os.path.join( cingRoot, cname )
     fp = open(cname,'w')
     fp.write(text)
