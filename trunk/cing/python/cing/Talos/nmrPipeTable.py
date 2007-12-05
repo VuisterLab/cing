@@ -8,15 +8,15 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 import sys
 
-class nmrPipeTabRow( NTstruct ):
+class nmrPipeTabRow( NTdict ):
 
     def __init__( self, table, id, **kwds ):
-        NTstruct.__init__( self, __CLASS__  = 'nmrPipeTabRow', 
+        NTdict.__init__( self, __CLASS__  = 'nmrPipeTabRow', 
                                  table      = table,
                                  id         = id, 
                                  name       = 'row'+str(id), 
@@ -65,10 +65,10 @@ class nmrPipeTabRow( NTstruct ):
     #end def
 #end class
 
-class nmrPipeTable( NTstruct ):
+class nmrPipeTable( NTdict ):
     """
     nmrPipeTable class
-    implemented as NTstruct of NTstruct's, i.e.
+    implemented as NTdict of NTdict's, i.e.
     
     element (row-0, INDEX) indexed as 
         tab[0].INDEX   or tab[0]['INDEX']
@@ -102,7 +102,7 @@ class nmrPipeTable( NTstruct ):
     """
 
     def __init__( self, tabFile=None, verbose=1, **kwds ):
-        NTstruct.__init__( self, __CLASS__ = 'nmrPipeTab', **kwds )
+        NTdict.__init__( self, __CLASS__ = 'nmrPipeTab', **kwds )
         self.__FORMAT__ = '=== nmrPipeTab ===\n' +\
                           '... tabFile:     %(tabFile)s \n' +\
                           '... columnDefs:  %(columnDefs)s\n' +\
@@ -111,11 +111,11 @@ class nmrPipeTable( NTstruct ):
         self.setdefault('noneIndicator', '-') # character to identify the None value
                           
         self.columnDefs = NTlist()          # list of column definitions, implemented 
-                                            # as NTstruct 
+                                            # as NTdict 
         self.rows       = NTlist()
         self.nrows      = 0
         self.remarks    = NTlist()
-        self.data       = NTstruct()
+        self.data       = NTdict()
         self.tabFile    = tabFile
         
         if (tabFile):
@@ -144,7 +144,7 @@ class nmrPipeTable( NTstruct ):
             return None
         #end if
             
-        col = NTstruct( name=name,
+        col = NTdict( name=name,
                         fmt=fmt,
                         id=len(self.columnDefs),
                         hide=False,

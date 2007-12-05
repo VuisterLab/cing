@@ -2,7 +2,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTstruct # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
+from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
 from cing import cingPythonCingDir
@@ -247,7 +247,7 @@ class AtomDef( NTtree ):
 
                            type     = None,     # Cyana type of atom
                            spinType = None,     # NMR spin type; i.e. 1H, 13C ...
-                           shift    = None,      # NTstruct with average and sd
+                           shift    = None,      # NTdict with average and sd
                            
                            hetatm   = False,    # PDB HETATM type
                            

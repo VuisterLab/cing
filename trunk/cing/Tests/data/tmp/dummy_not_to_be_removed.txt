@@ -1,1 +1,3 @@
 for cvs happiness
+having this file here will always checkout a directory even if it's empty
+as it's supposed to be.

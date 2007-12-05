@@ -1,6 +1,6 @@
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 
-params = NTstruct(
+params = NTdict(
 
       baseName          = 'H2_AD_EDTA%03d.pdb',
       models            = range( 0, 20 ),		# any python list here allows to select the model(s) to refine
@@ -25,14 +25,14 @@ params = NTstruct(
       noeMaxRestraints  = 30000,
       noeCeiling        = 100,    
       noeRestraints     = [
-                           NTstruct(
+                           NTdict(
                                     name      = 'HH',
                                     averaging = 'sum',
                                     scale     = 50,
                                     accept    = 0.5,
                                     fileName  = 'final.tbl' # should be in the Tables directory
                                    ),
-#                            NTstruct(
+#                            NTdict(
 #                                     name      = 'Ca',
 #                                     averaging = 'sum',
 #                                     accept    = 0.5,
@@ -43,7 +43,7 @@ params = NTstruct(
       dihedralMaxRestraints = 10000,
       dihedralScale      = 200,
       dihedralRestraints = [
-                            NTstruct(
+                            NTdict(
                                      name      = 'talos',
                                      accept    = 5.0,
                                      fileName  = 'talos.tbl' # should be in the Tables directory
@@ -57,15 +57,15 @@ params = NTstruct(
       # The water refinement uses the OPLSX parameters 
       nonBonded         = 'OPLSX',
       temp              = 500,                          # temperature (K); 500 initially
-      mdheat            = NTstruct( # 100,0.003 initially with Chris
+      mdheat            = NTdict( # 100,0.003 initially with Chris
                                     nstep  = 100,       # number of MD steps
                                     timest = 0.003,     # timestep of MD (ps)
                                   ),
-      mdhot             = NTstruct( # 2000, 0.004 initially with Chris
+      mdhot             = NTdict( # 2000, 0.004 initially with Chris
                                     nstep  = 2000,      # number of MD steps
                                     timest = 0.004,     # timestep of MD (ps)
                                   ),
-      mdcool            = NTstruct( # 200, 0.004 initially with Chris
+      mdcool            = NTdict( # 200, 0.004 initially with Chris
                                     nstep  = 200,       # number of MD steps
                                     timest = 0.004,     # timestep of MD (ps)
                                   ),

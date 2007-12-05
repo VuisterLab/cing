@@ -1,7 +1,7 @@
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import printWarning
 from cing.core.classes import Project
@@ -36,7 +36,7 @@ def importPlugin( pluginName ):
     pluginCodeModulePackage = __import__( pluginCodeModule, 
                          globals(), 
                          locals(), 
-                         [pluginName] ) #JFD changed from default to zero which means to only try absolute imports. 
+                         [pluginName]) #JFD changed from default to zero which means to only try absolute imports. 
 
 #    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
     printMessage('==> Imported plugin ' + pluginName )
@@ -47,7 +47,7 @@ def importPlugin( pluginName ):
     pluginModule = getattr( pluginCodeModulePackage, pluginName )
 #    printDebug("pluginModule looks like: " + `pluginModule`)
     
-    plugin = NTstruct( module = pluginModule, name = pluginName)
+    plugin = NTdict( module = pluginModule, name = pluginName)
     #end try
 #    printDebug('==> Staging plugin ' + pluginName)
     plugins[pluginName] = plugin

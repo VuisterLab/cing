@@ -1,3 +1,10 @@
+Version 0.71: 05 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
+    - reformatted the version/copyright formatting
+    - redid the determination of the CINGROOT and checks in setup.py
+    - added --test option to main.py but needs beautification;-)
+    - renamed NTstruct to NTdict (including in the dbTable)
+    - exercised the feature request system in sf.net.
+     
 Version 0.70: 03 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
     - Removed wild imports to accommodate the imports as PyDev suggests.
     - Organized import statements by PyDev.

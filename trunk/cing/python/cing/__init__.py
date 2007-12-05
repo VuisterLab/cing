@@ -4,15 +4,15 @@ import sys
 # Molecule related stuff (former NTmol)
 #from constants      import *
 
-
-cingVersion     = '0.70 alfa'
+cingVersion     = '0.71 alfa'
 programName     = 'CING'
 programVersion  = cingVersion
+
 header = """
 ======================================================================================================
-|   CING: python NMR/molecule package, version """+cingVersion+""" (c) AW,JFD,GWV 2004-2007    |
+|   CING: python NMR/molecule package, version %-25s (c) AW,JFD,GWV 2004-2007    |
 ======================================================================================================
-""" 
+""" % (cingVersion,)
 footer = """------------------------------------------------------------------------------------------------------
 """
 sys.stdout.write( header )

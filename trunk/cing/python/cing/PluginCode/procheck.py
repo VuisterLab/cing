@@ -21,7 +21,7 @@ from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
@@ -83,7 +83,7 @@ class Procheck:
       96TYR!B 205   999.90 -55.02-171.34-143.34 -89.71 999.90 999.90   0.00   0.00  34.80   0.00  0.000  0.000  2  5  0.000  0.000
       97LEU B 206    61.37 179.80 171.30-145.66  66.98 999.90 999.90   0.00   0.00  31.07   0.00  0.000  0.000  3  5  0.000  0.000
     """        
-    procheckDefs = NTstruct(
+    procheckDefs = NTdict(
     #   field       (startChar, endChar, conversionFunction)
         line      = (  0,  4, int ),
         resName   = (  4,  7, str ),
@@ -169,7 +169,7 @@ class Procheck:
     
     def parseResult( self ):
         """
-        Parse procheck files and store result in procheck NTstruct
+        Parse procheck files and store result in procheck NTdict
         of each residue of mol
         
         """
@@ -186,7 +186,7 @@ class Procheck:
                     NTerror('ERROR Procheck.parseResult: residue not found (%s,%d)\n', chain, resNum )
                 else:
                 
-                    residue.setdefault( 'procheck', NTstruct() )
+                    residue.setdefault( 'procheck', NTdict() )
                     for field,value in result.iteritems():
                         residue.procheck.setdefault( field, NTlist() )
                         residue.procheck[field].append( value )

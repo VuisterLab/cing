@@ -58,7 +58,8 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-import os
+from cing.PluginCode.test.test_All import testAll
+import os 
 import sys
 
 
@@ -125,6 +126,11 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------------
     
     parser = OptionParser(usage=usage, version=programVersion)
+    parser.add_option("--test", 
+                      action="store_true", 
+                      dest="test", 
+                      help="Run set of test routines to verify installations"
+                     )
     parser.add_option("--doc", 
                       action="store_true", 
                       dest="doc", 
@@ -224,6 +230,10 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
     
 #    parameters.verbose.set( not options.quiet )
+
+    if options.test:
+        testAll()
+        sys.exit(0)
     
     #------------------------------------------------------------------------------------
     # Extended documentation

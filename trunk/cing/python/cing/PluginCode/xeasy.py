@@ -19,7 +19,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.core.classes import Peak
@@ -36,12 +36,12 @@ from cing.core.molecule import allResidues
 import os
 
 #==============================================================================
-class Xeasy( NTstruct ):
+class Xeasy( NTdict ):
     """Class to parse and store some Xeasy stuff
        Read seqFile, prot file and peaks file 
     """
     def __init__( self, seqFile, protFile, convention, verbose=1 ):
-        NTstruct.__init__( self )
+        NTdict.__init__( self )
         
         # parse the seqFile
         self.seq = {}
@@ -97,7 +97,7 @@ class Xeasy( NTstruct ):
                                ) 
                         self.error = 1
                     else:
-                        p = NTstruct(index     = index,
+                        p = NTdict(index     = index,
                                      shift     = f.float( 2 ),
                                      error     = f.float( 3 ),
                                      atomName  = atomName,

@@ -3,8 +3,9 @@ import unittest
 """
 Call by:
 python testAll.py
+        # TODO: report a summary at beginning of what will be tested and at the end what works.
 """
-if __name__ == "__main__":
+def testAll():    
     modList = ( 
                "cing.PluginCode.test.test_Biggles", 
                "cing.PluginCode.test.test_Procheck", 
@@ -20,3 +21,6 @@ if __name__ == "__main__":
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name,))
         print "Testing"
         unittest.TextTestRunner(verbosity=2).run(suite)
+
+if __name__ == '__main__':
+    testAll()

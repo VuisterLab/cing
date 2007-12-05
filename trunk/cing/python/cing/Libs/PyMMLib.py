@@ -5,7 +5,7 @@
 ## Adjusted by gv for specific purpose of NTmol
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import printMessage
 from types import ListType
@@ -46,7 +46,7 @@ class PDBValueError(PDBError):
         return self.text
 
 
-class PDBRecord( NTstruct ):
+class PDBRecord( NTdict ):
     """Base class for all PDB file records.
     """
     def __str__(self):
