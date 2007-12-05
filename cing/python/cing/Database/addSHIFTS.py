@@ -1,5 +1,5 @@
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import printf
 from cing.core.constants import BMRBd
 from cing.core.database import NTdb
@@ -368,7 +368,7 @@ for line in AwkLikeS( shifts ):
 	    
 	    atm = NTdbGetAtom( resName, line.dollar[2], BMRBd )
 	    if atm != None:
-		atm.shift = NTstruct( average=line.float(7), sd=line.float(8) )
+		atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
 	    else:
 	        printf( '>>> line %d: %s\n', line.NR, line.dollar[0] )
 	    #end if
@@ -391,7 +391,7 @@ for res in NTdb:
 	    #end if
 	#end for
 	if n > 0:
-	    atm.shift = NTstruct( average = ave/float(n), sd = sd/float(n) )
+	    atm.shift = NTdict( average = ave/float(n), sd = sd/float(n) )
 	#end if
     #end for
 #edn for

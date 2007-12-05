@@ -34,7 +34,6 @@ Atom:
     
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd                
 """
-from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -43,7 +42,6 @@ from cing.Libs.NTutils import NTlimit
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTstruct
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTvector
 from cing.Libs.NTutils import NTwarning
@@ -63,10 +61,11 @@ from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import NOSHIFT
 from cing.core.constants import UNDEFINED_FLOAT
+from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.core.molecule import Residue
+from cing.Libs import NTplot
 import cing
 import math
 import os
@@ -697,7 +696,7 @@ def checkHbond( donorH, acceptor,
         return None
     #end if
     
-    result = NTstruct( __FORMAT__ = '=== H-bond %(donor)s - %(donorH)s - %(acceptor)s ===\n' +\
+    result = NTdict( __FORMAT__ = '=== H-bond %(donor)s - %(donorH)s - %(acceptor)s ===\n' +\
                                     'accepted: %(accepted)s (%(acceptedCount)d out of %(modelCount)d)\n' +\
                                     'distance: %(distance).2f  +- %(distanceSD).2f\n' +\
                                     'angle:    %(angle).1f  cv: %(angleCV).2f\n'
@@ -969,7 +968,7 @@ def validateModels( self, verbose=True ):
 
 #    self.validateDihedrals( verbose=False )
 
-    self.models = NTstruct()
+    self.models = NTdict()
     for m in range(self.molecule.modelCount):
         self.models[m] = 0
     #end for
@@ -1093,7 +1092,7 @@ def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
     d1cav = d1.cav
     d2cav = d2.cav
 
-    plot = NTplot.NTplot( title  = residue._Cname(1),
+    plot = NTplot( title  = residue._Cname(1),
 
                           xRange = (plotparams1.min, plotparams1.max),
                           xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),

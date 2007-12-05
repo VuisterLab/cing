@@ -1,5 +1,6 @@
-#-----------------------------------------------------------------------------
-
+from cing import cingRoot
+from cing import cingVersion
+from cing import programName
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -9,7 +10,6 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTstruct
 from cing.Libs.NTutils import NTtoXML
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
@@ -17,6 +17,7 @@ from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
+from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
@@ -32,10 +33,6 @@ from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from cing.core.sml import SMLhandler
-from cing.core.constants import COLOR_GREEN
-from cing import cingVersion
-from cing import programName
-from cing import cingRoot
 import math
 import os
 import shutil
@@ -43,14 +40,11 @@ import sys
 import time
 
 
-#-----------------------------------------------------------------------------
-
 projects = NTlist()
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
 #-----------------------------------------------------------------------------
-
 class Project( NTdict ):
     
     """
@@ -710,7 +704,7 @@ def decode( nameTuples, molecule ):
 #-----------------------------------------------------------------------------
 
 PeakIndex = 1
-class Peak( NTstruct ):
+class Peak( NTdict ):
     """Peak class:
        Peaks point to resonances
        Resonances point to atoms
@@ -726,7 +720,7 @@ class Peak( NTstruct ):
                   **kwds
                 ):
 
-        NTstruct.__init__( self, __CLASS__  = 'Peak', **kwds )
+        NTdict.__init__( self, __CLASS__  = 'Peak', **kwds )
 #       several external programs need an index
         global PeakIndex
         self.peakIndex = PeakIndex

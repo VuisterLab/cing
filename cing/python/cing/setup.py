@@ -2,7 +2,6 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import strip
 from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printDebug
 import sys
 import os
 
@@ -63,7 +62,7 @@ cingPythonDir = os.path.split(cingPythonCingDir)[0]
 # environment variable CINGROOT is defined the same this is the prefered 
 # source for the info within the CING python code.
 cingRoot = os.path.split(cingPythonDir)[0]
-printDebug("cingRoot        : " + cingRoot)
+#printDebug("cingRoot        : " + cingRoot)
 ######################################################################################################
 
 ######################################################################################################
@@ -121,6 +120,10 @@ if __name__ == '__main__':
         printError("Failed to derive the CINGROOT from this setup.py script; are there other setup.py or code confusing me here?")
         sys.exit(1)
         
+    if not os.path.exists(cingRoot):
+        printError("The derived CINGROOT doesn't exist: ["  + cingRoot + "]")
+        sys.exit(1)
+
     if not cingPythonDir:
         printError("Failed to derive the CING python directory from this setup.py script. No clue why?")
         sys.exit(1)
@@ -146,15 +149,19 @@ if __name__ == '__main__':
         parametersDict['profitPath'] = strip(profitPath)
        
 #    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
-    procheckPath = None
     if os.environ.has_key("prodir"):
         procheckPath = os.path.join( os.environ["prodir"], "procheck_nmr.scr")
-    if not procheckPath:
-        printWarning("Couldn't find 'procheck_nmr'")
-        parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        if not os.path.exists(procheckPath):
+            printWarning("Found the system variable prodir but the script below wasn't found")
+            printWarning( procheckPath )
+            printWarning("Couldn't find 'procheck_nmr'")
+            parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"        
+        else:
+            printMessage("Found 'procheck_nmr'")
+            parametersDict['procheckPath'] = procheckPath
     else:
-        printMessage("Found 'procheck_nmr'")
-        parametersDict['procheckPath'] = procheckPath
+        printWarning("Couldn't find 'procheck_nmr'")
+        parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"        
     
     whatifPath,err  = NTgetoutput('which DO_WHATIF.COM')
     if not whatifPath:

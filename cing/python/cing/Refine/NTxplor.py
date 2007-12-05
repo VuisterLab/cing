@@ -1,6 +1,6 @@
 #
 #
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import removedir
@@ -34,11 +34,11 @@ Cluster issues
 
 
 
-class Xplor( NTstruct ):
+class Xplor( NTdict ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-        NTstruct.__init__( self )
+        NTdict.__init__( self )
         self.update( config )
         for arg in args:
             self.update( arg )
@@ -384,17 +384,17 @@ class WaterRefine( Xplor ):
         Xplor.__init__( self, config, *args, **kwds )
         # set default values if not supplied through args or kwds 
         self.setdefault( 'temp',    500 )
-        self.setdefault( 'mdheat',  NTstruct( 
+        self.setdefault( 'mdheat',  NTdict( 
                                              nstep  = 100,      # number of MD steps
                                              timest = 0.003,    # timestep of MD (ps)
                                             )
                        )
-        self.setdefault( 'mdhot',   NTstruct( 
+        self.setdefault( 'mdhot',   NTdict( 
                                              nstep  = 2000,     # number of MD steps
                                              timest = 0.004,    # timestep of MD (ps)
                                             )
                        )
-        self.setdefault( 'mdcool',  NTstruct( 
+        self.setdefault( 'mdcool',  NTdict( 
                                              nstep  = 200,      # number of MD steps
                                              timest = 0.004,    # timestep of MD (ps)
                                             )

@@ -16,6 +16,7 @@
 #				  THR CHI22, renamed CHI21 to CHI2; VAL CHI21, CHI22
 # 26 Sep    2007: Gave Cyana pseudo residues the cyanaPseudoResidue property
 # 10 Oct    2007: OMEGA IUPAC
+# 05 Dec    2007: Renamed NTdict to NTdict
 #=======================================================================
 #
 #
@@ -59,7 +60,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 123.26000000000001, sd = 4.6100000000000003 )
+		shift = NTdict( average = 123.26000000000001, sd = 4.6100000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -70,7 +71,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.1899999999999995, sd = 0.63 )
+		shift = NTdict( average = 8.1899999999999995, sd = 0.63 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -81,7 +82,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 53.200000000000003, sd = 2.1400000000000001 )
+		shift = NTdict( average = 53.200000000000003, sd = 2.1400000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -92,7 +93,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.2599999999999998, sd = 0.45000000000000001 )
+		shift = NTdict( average = 4.2599999999999998, sd = 0.45000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -103,7 +104,7 @@ RESIDUE	ALA      A
 		real = ['HB1', 'HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3700000000000001, sd = 0.28000000000000003 )
+		shift = NTdict( average = 1.3700000000000001, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -114,7 +115,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 19.039999999999999, sd = 2.5800000000000001 )
+		shift = NTdict( average = 19.039999999999999, sd = 2.5800000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB1     
@@ -158,7 +159,7 @@ RESIDUE	ALA      A
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 177.77000000000001, sd = 2.7000000000000002 )
+		shift = NTdict( average = 177.77000000000001, sd = 2.7000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -232,7 +233,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.72, sd = 4.0099999999999998 )
+		shift = NTdict( average = 120.72, sd = 4.0099999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -243,7 +244,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2400000000000002, sd = 0.60999999999999999 )
+		shift = NTdict( average = 8.2400000000000002, sd = 0.60999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -254,7 +255,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.840000000000003, sd = 2.52 )
+		shift = NTdict( average = 56.840000000000003, sd = 2.52 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -265,7 +266,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.29, sd = 0.47999999999999998 )
+		shift = NTdict( average = 4.29, sd = 0.47999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -276,7 +277,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.710000000000001, sd = 2.6000000000000001 )
+		shift = NTdict( average = 30.710000000000001, sd = 2.6000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -287,7 +288,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.8, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.8, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -298,7 +299,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.78, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.78, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -309,7 +310,7 @@ RESIDUE	ARGx      R
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.79, sd = 0.29499999999999998 )
+		shift = NTdict( average = 1.79, sd = 0.29499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -320,7 +321,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 27.379999999999999, sd = 2.5899999999999999 )
+		shift = NTdict( average = 27.379999999999999, sd = 2.5899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -331,7 +332,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5800000000000001, sd = 0.28000000000000003 )
+		shift = NTdict( average = 1.5800000000000001, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -342,7 +343,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5600000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.5600000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -353,7 +354,7 @@ RESIDUE	ARGx      R
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5700000000000001, sd = 0.29000000000000004 )
+		shift = NTdict( average = 1.5700000000000001, sd = 0.29000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -364,7 +365,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 43.210000000000001, sd = 2.27 )
+		shift = NTdict( average = 43.210000000000001, sd = 2.27 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -375,7 +376,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1200000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 3.1200000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -386,7 +387,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1099999999999999, sd = 0.28000000000000003 )
+		shift = NTdict( average = 3.1099999999999999, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -397,7 +398,7 @@ RESIDUE	ARGx      R
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1150000000000002, sd = 0.29000000000000004 )
+		shift = NTdict( average = 3.1150000000000002, sd = 0.29000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NE      
@@ -408,7 +409,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 93.790000000000006, sd = 15.460000000000001 )
+		shift = NTdict( average = 93.790000000000006, sd = 15.460000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE      
@@ -419,7 +420,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.3300000000000001, sd = 0.64000000000000001 )
+		shift = NTdict( average = 7.3300000000000001, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ      
@@ -430,7 +431,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 159.16, sd = 1.0 )
+		shift = NTdict( average = 159.16, sd = 1.0 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NH1     
@@ -441,7 +442,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 74.219999999999999, sd = 7.7000000000000002 )
+		shift = NTdict( average = 74.219999999999999, sd = 7.7000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH1     
@@ -452,7 +453,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.8499999999999996, sd = 0.51000000000000001 )
+		shift = NTdict( average = 6.8499999999999996, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NH2     
@@ -463,7 +464,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 75.180000000000007, sd = 10.68 )
+		shift = NTdict( average = 75.180000000000007, sd = 10.68 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH21    
@@ -474,7 +475,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.79, sd = 0.46999999999999997 )
+		shift = NTdict( average = 6.79, sd = 0.46999999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH22    
@@ -485,7 +486,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7699999999999996, sd = 0.5 )
+		shift = NTdict( average = 6.7699999999999996, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QH2     
@@ -496,7 +497,7 @@ RESIDUE	ARGx      R
 		real = ['HH21', 'HH22']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7799999999999994, sd = 0.48499999999999999 )
+		shift = NTdict( average = 6.7799999999999994, sd = 0.48499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -507,7 +508,7 @@ RESIDUE	ARGx      R
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.43000000000001, sd = 4.2999999999999998 )
+		shift = NTdict( average = 176.43000000000001, sd = 4.2999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -581,7 +582,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.72, sd = 4.0099999999999998 )
+		shift = NTdict( average = 120.72, sd = 4.0099999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -592,7 +593,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2400000000000002, sd = 0.60999999999999999 )
+		shift = NTdict( average = 8.2400000000000002, sd = 0.60999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -603,7 +604,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.840000000000003, sd = 2.52 )
+		shift = NTdict( average = 56.840000000000003, sd = 2.52 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -614,7 +615,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.29, sd = 0.47999999999999998 )
+		shift = NTdict( average = 4.29, sd = 0.47999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -625,7 +626,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.710000000000001, sd = 2.6000000000000001 )
+		shift = NTdict( average = 30.710000000000001, sd = 2.6000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -636,7 +637,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.8, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.8, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -647,7 +648,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.78, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.78, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -658,7 +659,7 @@ RESIDUE	ARG     R
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.79, sd = 0.29499999999999998 )
+		shift = NTdict( average = 1.79, sd = 0.29499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -669,7 +670,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 27.379999999999999, sd = 2.5899999999999999 )
+		shift = NTdict( average = 27.379999999999999, sd = 2.5899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -680,7 +681,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5800000000000001, sd = 0.28000000000000003 )
+		shift = NTdict( average = 1.5800000000000001, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -691,7 +692,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5600000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.5600000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -702,7 +703,7 @@ RESIDUE	ARG     R
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.5700000000000001, sd = 0.29000000000000004 )
+		shift = NTdict( average = 1.5700000000000001, sd = 0.29000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -713,7 +714,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 43.210000000000001, sd = 2.27 )
+		shift = NTdict( average = 43.210000000000001, sd = 2.27 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -724,7 +725,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1200000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 3.1200000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -735,7 +736,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1099999999999999, sd = 0.28000000000000003 )
+		shift = NTdict( average = 3.1099999999999999, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -746,7 +747,7 @@ RESIDUE	ARG     R
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1150000000000002, sd = 0.29000000000000004 )
+		shift = NTdict( average = 3.1150000000000002, sd = 0.29000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NE      
@@ -757,7 +758,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 93.790000000000006, sd = 15.460000000000001 )
+		shift = NTdict( average = 93.790000000000006, sd = 15.460000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE      
@@ -768,7 +769,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.3300000000000001, sd = 0.64000000000000001 )
+		shift = NTdict( average = 7.3300000000000001, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ      
@@ -779,7 +780,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 159.16, sd = 1.0 )
+		shift = NTdict( average = 159.16, sd = 1.0 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NH1     
@@ -790,7 +791,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'N_AMO'
 		spinType = '15N'
-		shift = NTstruct( average = 74.219999999999999, sd = 7.7000000000000002 )
+		shift = NTdict( average = 74.219999999999999, sd = 7.7000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH11    
@@ -801,7 +802,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.8499999999999996, sd = 0.51000000000000001 )
+		shift = NTdict( average = 6.8499999999999996, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH12    
@@ -812,7 +813,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.79, sd = 0.47999999999999998 )
+		shift = NTdict( average = 6.79, sd = 0.47999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QH1     
@@ -823,7 +824,7 @@ RESIDUE	ARG     R
 		real = ['HH11', 'HH12']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.8200000000000003, sd = 0.495 )
+		shift = NTdict( average = 6.8200000000000003, sd = 0.495 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NH2     
@@ -834,7 +835,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'N_AMO'
 		spinType = '15N'
-		shift = NTstruct( average = 75.180000000000007, sd = 10.68 )
+		shift = NTdict( average = 75.180000000000007, sd = 10.68 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH21    
@@ -845,7 +846,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.79, sd = 0.46999999999999997 )
+		shift = NTdict( average = 6.79, sd = 0.46999999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH22    
@@ -856,7 +857,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7699999999999996, sd = 0.5 )
+		shift = NTdict( average = 6.7699999999999996, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QH2     
@@ -867,7 +868,7 @@ RESIDUE	ARG     R
 		real = ['HH21', 'HH22']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7799999999999994, sd = 0.48499999999999999 )
+		shift = NTdict( average = 6.7799999999999994, sd = 0.48499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -878,7 +879,7 @@ RESIDUE	ARG     R
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.43000000000001, sd = 4.2999999999999998 )
+		shift = NTdict( average = 176.43000000000001, sd = 4.2999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -940,7 +941,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 119.08, sd = 4.2699999999999996 )
+		shift = NTdict( average = 119.08, sd = 4.2699999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -951,7 +952,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.4100000000000001, sd = 5.0 )
+		shift = NTdict( average = 8.4100000000000001, sd = 5.0 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -962,7 +963,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 53.520000000000003, sd = 2.25 )
+		shift = NTdict( average = 53.520000000000003, sd = 2.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -973,7 +974,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6799999999999997, sd = 0.38 )
+		shift = NTdict( average = 4.6799999999999997, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -984,7 +985,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 38.770000000000003, sd = 2.9199999999999999 )
+		shift = NTdict( average = 38.770000000000003, sd = 2.9199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -995,7 +996,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.8100000000000001, sd = 0.34999999999999998 )
+		shift = NTdict( average = 2.8100000000000001, sd = 0.34999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1006,7 +1007,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.7599999999999998, sd = 0.35999999999999999 )
+		shift = NTdict( average = 2.7599999999999998, sd = 0.35999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1017,7 +1018,7 @@ RESIDUE	ASN      N
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.7850000000000001, sd = 0.35499999999999998 )
+		shift = NTdict( average = 2.7850000000000001, sd = 0.35499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -1028,7 +1029,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.69, sd = 3.2000000000000002 )
+		shift = NTdict( average = 176.69, sd = 3.2000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OD1     
@@ -1050,7 +1051,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 112.86, sd = 3.4199999999999999 )
+		shift = NTdict( average = 112.86, sd = 3.4199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD21    
@@ -1061,7 +1062,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.3300000000000001, sd = 0.54000000000000004 )
+		shift = NTdict( average = 7.3300000000000001, sd = 0.54000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD22    
@@ -1072,7 +1073,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.1699999999999999, sd = 0.55000000000000004 )
+		shift = NTdict( average = 7.1699999999999999, sd = 0.55000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD2     
@@ -1083,7 +1084,7 @@ RESIDUE	ASN      N
 		real = ['HD21', 'HD22']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.25, sd = 0.54500000000000004 )
+		shift = NTdict( average = 7.25, sd = 0.54500000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -1094,7 +1095,7 @@ RESIDUE	ASN      N
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.31, sd = 3.3700000000000001 )
+		shift = NTdict( average = 175.31, sd = 3.3700000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -1163,7 +1164,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.78, sd = 4.25 )
+		shift = NTdict( average = 120.78, sd = 4.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -1174,7 +1175,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -1185,7 +1186,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 54.659999999999997, sd = 2.1299999999999999 )
+		shift = NTdict( average = 54.659999999999997, sd = 2.1299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -1196,7 +1197,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6100000000000003, sd = 0.34000000000000002 )
+		shift = NTdict( average = 4.6100000000000003, sd = 0.34000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -1207,7 +1208,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 40.880000000000003, sd = 2.5699999999999998 )
+		shift = NTdict( average = 40.880000000000003, sd = 2.5699999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -1218,7 +1219,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.77, sd = 1.04 )
+		shift = NTdict( average = 2.77, sd = 1.04 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1229,7 +1230,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.71, sd = 1.05 )
+		shift = NTdict( average = 2.71, sd = 1.05 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1240,7 +1241,7 @@ RESIDUE	ASPH      D
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.7400000000000002, sd = 1.0449999999999999 )
+		shift = NTdict( average = 2.7400000000000002, sd = 1.0449999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -1251,7 +1252,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 179.34, sd = 1.4399999999999999 )
+		shift = NTdict( average = 179.34, sd = 1.4399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OD1     
@@ -1295,7 +1296,7 @@ RESIDUE	ASPH      D
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.47999999999999, sd = 1.76 )
+		shift = NTdict( average = 176.47999999999999, sd = 1.76 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -1357,7 +1358,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.78, sd = 4.25 )
+		shift = NTdict( average = 120.78, sd = 4.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -1368,7 +1369,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -1379,7 +1380,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 54.659999999999997, sd = 2.1299999999999999 )
+		shift = NTdict( average = 54.659999999999997, sd = 2.1299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -1390,7 +1391,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6100000000000003, sd = 0.34000000000000002 )
+		shift = NTdict( average = 4.6100000000000003, sd = 0.34000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -1401,7 +1402,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 40.880000000000003, sd = 2.5699999999999998 )
+		shift = NTdict( average = 40.880000000000003, sd = 2.5699999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -1412,7 +1413,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.77, sd = 1.04 )
+		shift = NTdict( average = 2.77, sd = 1.04 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1423,7 +1424,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.71, sd = 1.05 )
+		shift = NTdict( average = 2.71, sd = 1.05 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1434,7 +1435,7 @@ RESIDUE	ASP     D
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.7400000000000002, sd = 1.0449999999999999 )
+		shift = NTdict( average = 2.7400000000000002, sd = 1.0449999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -1445,7 +1446,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 179.34, sd = 1.4399999999999999 )
+		shift = NTdict( average = 179.34, sd = 1.4399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OD1     
@@ -1478,7 +1479,7 @@ RESIDUE	ASP     D
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.47999999999999, sd = 1.76 )
+		shift = NTdict( average = 176.47999999999999, sd = 1.76 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -1540,7 +1541,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 119.97, sd = 4.7000000000000002 )
+		shift = NTdict( average = 119.97, sd = 4.7000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -1551,7 +1552,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.4100000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 8.4100000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -1562,7 +1563,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 57.740000000000002, sd = 3.4700000000000002 )
+		shift = NTdict( average = 57.740000000000002, sd = 3.4700000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -1573,7 +1574,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.8099999999999996, sd = 1.7 )
+		shift = NTdict( average = 4.8099999999999996, sd = 1.7 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -1584,7 +1585,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 33.859999999999999, sd = 6.6399999999999997 )
+		shift = NTdict( average = 33.859999999999999, sd = 6.6399999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -1595,7 +1596,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.27, sd = 4.4800000000000004 )
+		shift = NTdict( average = 3.27, sd = 4.4800000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1606,7 +1607,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.23, sd = 4.6799999999999997 )
+		shift = NTdict( average = 3.23, sd = 4.6799999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1617,7 +1618,7 @@ RESIDUE	CYSS      C
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.25, sd = 4.5800000000000001 )
+		shift = NTdict( average = 3.25, sd = 4.5800000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM SG      
@@ -1639,7 +1640,7 @@ RESIDUE	CYSS      C
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 174.75999999999999, sd = 4.9900000000000002 )
+		shift = NTdict( average = 174.75999999999999, sd = 4.9900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -1702,7 +1703,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 119.97, sd = 4.7000000000000002 )
+		shift = NTdict( average = 119.97, sd = 4.7000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -1713,7 +1714,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.4100000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 8.4100000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -1724,7 +1725,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 57.740000000000002, sd = 3.4700000000000002 )
+		shift = NTdict( average = 57.740000000000002, sd = 3.4700000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -1735,7 +1736,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.8099999999999996, sd = 1.7 )
+		shift = NTdict( average = 4.8099999999999996, sd = 1.7 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -1746,7 +1747,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 33.859999999999999, sd = 6.6399999999999997 )
+		shift = NTdict( average = 33.859999999999999, sd = 6.6399999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -1757,7 +1758,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.27, sd = 4.4800000000000004 )
+		shift = NTdict( average = 3.27, sd = 4.4800000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1768,7 +1769,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.23, sd = 4.6799999999999997 )
+		shift = NTdict( average = 3.23, sd = 4.6799999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1779,7 +1780,7 @@ RESIDUE	CYS      C
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.25, sd = 4.5800000000000001 )
+		shift = NTdict( average = 3.25, sd = 4.5800000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM SG      
@@ -1801,7 +1802,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'H_SUL'
 		spinType = '1H'
-		shift = NTstruct( average = 2.4300000000000002, sd = 1.6899999999999999 )
+		shift = NTdict( average = 2.4300000000000002, sd = 1.6899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -1812,7 +1813,7 @@ RESIDUE	CYS      C
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 174.75999999999999, sd = 4.9900000000000002 )
+		shift = NTdict( average = 174.75999999999999, sd = 4.9900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -1880,7 +1881,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 119.84, sd = 4.0300000000000002 )
+		shift = NTdict( average = 119.84, sd = 4.0300000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -1891,7 +1892,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2100000000000009, sd = 0.62 )
+		shift = NTdict( average = 8.2100000000000009, sd = 0.62 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -1902,7 +1903,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.560000000000002, sd = 2.3199999999999998 )
+		shift = NTdict( average = 56.560000000000002, sd = 2.3199999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -1913,7 +1914,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.29, sd = 0.45000000000000001 )
+		shift = NTdict( average = 4.29, sd = 0.45000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -1924,7 +1925,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 29.260000000000002, sd = 2.4399999999999999 )
+		shift = NTdict( average = 29.260000000000002, sd = 2.4399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -1935,7 +1936,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0499999999999998, sd = 0.28000000000000003 )
+		shift = NTdict( average = 2.0499999999999998, sd = 0.28000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -1946,7 +1947,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.04, sd = 0.40000000000000002 )
+		shift = NTdict( average = 2.04, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -1957,7 +1958,7 @@ RESIDUE	GLN      Q
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0449999999999999, sd = 0.34000000000000002 )
+		shift = NTdict( average = 2.0449999999999999, sd = 0.34000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -1968,7 +1969,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 33.810000000000002, sd = 2.5899999999999999 )
+		shift = NTdict( average = 33.810000000000002, sd = 2.5899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -1979,7 +1980,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.3199999999999998, sd = 0.29999999999999999 )
+		shift = NTdict( average = 2.3199999999999998, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -1990,7 +1991,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.2999999999999998, sd = 0.32000000000000001 )
+		shift = NTdict( average = 2.2999999999999998, sd = 0.32000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -2001,7 +2002,7 @@ RESIDUE	GLN      Q
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.3099999999999996, sd = 0.31 )
+		shift = NTdict( average = 2.3099999999999996, sd = 0.31 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -2012,7 +2013,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 179.63, sd = 1.4099999999999999 )
+		shift = NTdict( average = 179.63, sd = 1.4099999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OE1     
@@ -2034,7 +2035,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 111.79000000000001, sd = 3.3999999999999999 )
+		shift = NTdict( average = 111.79000000000001, sd = 3.3999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE21    
@@ -2045,7 +2046,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.1900000000000004, sd = 0.51000000000000001 )
+		shift = NTdict( average = 7.1900000000000004, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE22    
@@ -2056,7 +2057,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0499999999999998, sd = 0.5 )
+		shift = NTdict( average = 7.0499999999999998, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QE2     
@@ -2067,7 +2068,7 @@ RESIDUE	GLN      Q
 		real = ['HE21', 'HE22']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.1200000000000001, sd = 0.505 )
+		shift = NTdict( average = 7.1200000000000001, sd = 0.505 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -2078,7 +2079,7 @@ RESIDUE	GLN      Q
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.38, sd = 1.95 )
+		shift = NTdict( average = 176.38, sd = 1.95 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -2153,7 +2154,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.73999999999999, sd = 5.4900000000000002 )
+		shift = NTdict( average = 120.73999999999999, sd = 5.4900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -2164,7 +2165,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3499999999999996, sd = 0.90000000000000002 )
+		shift = NTdict( average = 8.3499999999999996, sd = 0.90000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -2175,7 +2176,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 57.450000000000003, sd = 2.2400000000000002 )
+		shift = NTdict( average = 57.450000000000003, sd = 2.2400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -2186,7 +2187,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.25, sd = 0.5 )
+		shift = NTdict( average = 4.25, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -2197,7 +2198,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.079999999999998, sd = 2.7400000000000002 )
+		shift = NTdict( average = 30.079999999999998, sd = 2.7400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -2208,7 +2209,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.04, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.04, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -2219,7 +2220,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.02, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.02, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -2230,7 +2231,7 @@ RESIDUE	GLUH      E
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0300000000000002, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.0300000000000002, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -2241,7 +2242,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 36.130000000000003, sd = 2.6099999999999999 )
+		shift = NTdict( average = 36.130000000000003, sd = 2.6099999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -2252,7 +2253,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.2999999999999998, sd = 0.23000000000000001 )
+		shift = NTdict( average = 2.2999999999999998, sd = 0.23000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -2263,7 +2264,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.2799999999999998, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.2799999999999998, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -2274,7 +2275,7 @@ RESIDUE	GLUH      E
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.29, sd = 0.23499999999999999 )
+		shift = NTdict( average = 2.29, sd = 0.23499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -2285,7 +2286,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 181.63, sd = 12.57 )
+		shift = NTdict( average = 181.63, sd = 12.57 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OE1     
@@ -2329,7 +2330,7 @@ RESIDUE	GLUH      E
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.96000000000001, sd = 3.3900000000000001 )
+		shift = NTdict( average = 176.96000000000001, sd = 3.3900000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -2397,7 +2398,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.73999999999999, sd = 5.4900000000000002 )
+		shift = NTdict( average = 120.73999999999999, sd = 5.4900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -2408,7 +2409,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3499999999999996, sd = 0.90000000000000002 )
+		shift = NTdict( average = 8.3499999999999996, sd = 0.90000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -2419,7 +2420,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 57.450000000000003, sd = 2.2400000000000002 )
+		shift = NTdict( average = 57.450000000000003, sd = 2.2400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -2430,7 +2431,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.25, sd = 0.5 )
+		shift = NTdict( average = 4.25, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -2441,7 +2442,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.079999999999998, sd = 2.7400000000000002 )
+		shift = NTdict( average = 30.079999999999998, sd = 2.7400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -2452,7 +2453,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.04, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.04, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -2463,7 +2464,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.02, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.02, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -2474,7 +2475,7 @@ RESIDUE	GLU     E
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0300000000000002, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.0300000000000002, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -2485,7 +2486,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 36.130000000000003, sd = 2.6099999999999999 )
+		shift = NTdict( average = 36.130000000000003, sd = 2.6099999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -2496,7 +2497,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.2999999999999998, sd = 0.23000000000000001 )
+		shift = NTdict( average = 2.2999999999999998, sd = 0.23000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -2507,7 +2508,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.2799999999999998, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.2799999999999998, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -2518,7 +2519,7 @@ RESIDUE	GLU     E
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.29, sd = 0.23499999999999999 )
+		shift = NTdict( average = 2.29, sd = 0.23499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -2529,7 +2530,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 181.63, sd = 12.57 )
+		shift = NTdict( average = 181.63, sd = 12.57 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OE1     
@@ -2562,7 +2563,7 @@ RESIDUE	GLU     E
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.96000000000001, sd = 3.3900000000000001 )
+		shift = NTdict( average = 176.96000000000001, sd = 3.3900000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -2612,7 +2613,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 109.70999999999999, sd = 4.79 )
+		shift = NTdict( average = 109.70999999999999, sd = 4.79 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -2623,7 +2624,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3300000000000001, sd = 1.28 )
+		shift = NTdict( average = 8.3300000000000001, sd = 1.28 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -2634,7 +2635,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 45.420000000000002, sd = 2.23 )
+		shift = NTdict( average = 45.420000000000002, sd = 2.23 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA1     
@@ -2645,7 +2646,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.96, sd = 0.44 )
+		shift = NTdict( average = 3.96, sd = 0.44 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA2     
@@ -2656,7 +2657,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.8900000000000001, sd = 0.47999999999999998 )
+		shift = NTdict( average = 3.8900000000000001, sd = 0.47999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QA      
@@ -2667,7 +2668,7 @@ RESIDUE	GLY      G
 		real = ['HA1', 'HA2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.9249999999999998, sd = 0.45999999999999996 )
+		shift = NTdict( average = 3.9249999999999998, sd = 0.45999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -2678,7 +2679,7 @@ RESIDUE	GLY      G
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 173.97, sd = 4.1200000000000001 )
+		shift = NTdict( average = 173.97, sd = 4.1200000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -3227,7 +3228,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 119.52, sd = 4.3399999999999999 )
+		shift = NTdict( average = 119.52, sd = 4.3399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -3238,7 +3239,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2699999999999996, sd = 0.81999999999999995 )
+		shift = NTdict( average = 8.2699999999999996, sd = 0.81999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -3249,7 +3250,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.490000000000002, sd = 3.0499999999999998 )
+		shift = NTdict( average = 56.490000000000002, sd = 3.0499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -3260,7 +3261,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6500000000000004, sd = 0.77000000000000002 )
+		shift = NTdict( average = 4.6500000000000004, sd = 0.77000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -3271,7 +3272,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.25, sd = 2.9399999999999999 )
+		shift = NTdict( average = 30.25, sd = 2.9399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -3282,7 +3283,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.3700000000000001, sd = 2.23 )
+		shift = NTdict( average = 3.3700000000000001, sd = 2.23 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -3293,7 +3294,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.2799999999999998, sd = 2.0299999999999998 )
+		shift = NTdict( average = 3.2799999999999998, sd = 2.0299999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -3304,7 +3305,7 @@ RESIDUE	HIS      H
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.3250000000000002, sd = 2.1299999999999999 )
+		shift = NTdict( average = 3.3250000000000002, sd = 2.1299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -3315,7 +3316,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 130.40000000000001, sd = 8.3399999999999999 )
+		shift = NTdict( average = 130.40000000000001, sd = 8.3399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM ND1     
@@ -3326,7 +3327,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 189.56, sd = 36.140000000000001 )
+		shift = NTdict( average = 189.56, sd = 36.140000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD2     
@@ -3337,7 +3338,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 119.2, sd = 7.5 )
+		shift = NTdict( average = 119.2, sd = 7.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD1     
@@ -3348,7 +3349,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 12.970000000000001, sd = 14.199999999999999 )
+		shift = NTdict( average = 12.970000000000001, sd = 14.199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE1     
@@ -3359,7 +3360,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 135.97999999999999, sd = 8.4199999999999999 )
+		shift = NTdict( average = 135.97999999999999, sd = 8.4199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NE2     
@@ -3370,7 +3371,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 176.81, sd = 24.539999999999999 )
+		shift = NTdict( average = 176.81, sd = 24.539999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -3381,7 +3382,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.9400000000000004, sd = 7.0499999999999998 )
+		shift = NTdict( average = 7.9400000000000004, sd = 7.0499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE1     
@@ -3392,7 +3393,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.6500000000000004, sd = 4.29 )
+		shift = NTdict( average = 7.6500000000000004, sd = 4.29 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -3403,7 +3404,7 @@ RESIDUE	HIS      H
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.16999999999999, sd = 4.5099999999999998 )
+		shift = NTdict( average = 175.16999999999999, sd = 4.5099999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -3477,7 +3478,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.59, sd = 4.8600000000000003 )
+		shift = NTdict( average = 121.59, sd = 4.8600000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -3488,7 +3489,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2799999999999994, sd = 0.70999999999999996 )
+		shift = NTdict( average = 8.2799999999999994, sd = 0.70999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -3499,7 +3500,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 61.600000000000001, sd = 2.7799999999999998 )
+		shift = NTdict( average = 61.600000000000001, sd = 2.7799999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -3510,7 +3511,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.1900000000000004, sd = 0.57999999999999996 )
+		shift = NTdict( average = 4.1900000000000004, sd = 0.57999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -3521,7 +3522,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 38.659999999999997, sd = 2.75 )
+		shift = NTdict( average = 38.659999999999997, sd = 2.75 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB      
@@ -3532,7 +3533,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.8, sd = 0.54000000000000004 )
+		shift = NTdict( average = 1.8, sd = 0.54000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG2     
@@ -3543,7 +3544,7 @@ RESIDUE	ILE      I
 		real = ['HG21', 'HG22', 'HG23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.78000000000000003, sd = 0.40000000000000002 )
+		shift = NTdict( average = 0.78000000000000003, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG2     
@@ -3554,7 +3555,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 17.670000000000002, sd = 2.9199999999999999 )
+		shift = NTdict( average = 17.670000000000002, sd = 2.9199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG21    
@@ -3598,7 +3599,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 27.800000000000001, sd = 3.8100000000000001 )
+		shift = NTdict( average = 27.800000000000001, sd = 3.8100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG12    
@@ -3609,7 +3610,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.26, sd = 0.62 )
+		shift = NTdict( average = 1.26, sd = 0.62 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG13    
@@ -3620,7 +3621,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.22, sd = 0.72999999999999998 )
+		shift = NTdict( average = 1.22, sd = 0.72999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG1     
@@ -3631,7 +3632,7 @@ RESIDUE	ILE      I
 		real = ['HG12', 'HG13']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.24, sd = 0.67500000000000004 )
+		shift = NTdict( average = 1.24, sd = 0.67500000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD1     
@@ -3642,7 +3643,7 @@ RESIDUE	ILE      I
 		real = ['HD11', 'HD12', 'HD13']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.67000000000000004, sd = 0.45000000000000001 )
+		shift = NTdict( average = 0.67000000000000004, sd = 0.45000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD1     
@@ -3653,7 +3654,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 13.69, sd = 3.6000000000000001 )
+		shift = NTdict( average = 13.69, sd = 3.6000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD11    
@@ -3697,7 +3698,7 @@ RESIDUE	ILE      I
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.94, sd = 1.9299999999999999 )
+		shift = NTdict( average = 175.94, sd = 1.9299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -3771,7 +3772,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.95, sd = 7.5999999999999996 )
+		shift = NTdict( average = 121.95, sd = 7.5999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -3782,7 +3783,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2200000000000006, sd = 0.67000000000000004 )
+		shift = NTdict( average = 8.2200000000000006, sd = 0.67000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -3793,7 +3794,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 55.630000000000003, sd = 2.21 )
+		shift = NTdict( average = 55.630000000000003, sd = 2.21 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -3804,7 +3805,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.3200000000000003, sd = 0.48999999999999999 )
+		shift = NTdict( average = 4.3200000000000003, sd = 0.48999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -3815,7 +3816,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 42.32, sd = 2.4399999999999999 )
+		shift = NTdict( average = 42.32, sd = 2.4399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -3826,7 +3827,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.6399999999999999, sd = 0.40000000000000002 )
+		shift = NTdict( average = 1.6399999999999999, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -3837,7 +3838,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.55, sd = 0.40000000000000002 )
+		shift = NTdict( average = 1.55, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -3848,7 +3849,7 @@ RESIDUE	LEU      L
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.595, sd = 0.40000000000000002 )
+		shift = NTdict( average = 1.595, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -3859,7 +3860,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 26.800000000000001, sd = 2.46 )
+		shift = NTdict( average = 26.800000000000001, sd = 2.46 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG      
@@ -3870,7 +3871,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.52, sd = 0.37 )
+		shift = NTdict( average = 1.52, sd = 0.37 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD1     
@@ -3881,7 +3882,7 @@ RESIDUE	LEU      L
 		real = ['HD11', 'HD12', 'HD13']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.76000000000000001, sd = 0.38 )
+		shift = NTdict( average = 0.76000000000000001, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD2     
@@ -3892,7 +3893,7 @@ RESIDUE	LEU      L
 		real = ['HD21', 'HD22', 'HD23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.72999999999999998, sd = 0.40000000000000002 )
+		shift = NTdict( average = 0.72999999999999998, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD1     
@@ -3903,7 +3904,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 24.710000000000001, sd = 2.8599999999999999 )
+		shift = NTdict( average = 24.710000000000001, sd = 2.8599999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD11    
@@ -3947,7 +3948,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 24.219999999999999, sd = 2.8700000000000001 )
+		shift = NTdict( average = 24.219999999999999, sd = 2.8700000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD21    
@@ -3991,7 +3992,7 @@ RESIDUE	LEU      L
 		real = ['HD11', 'HD12', 'HD13', 'HD21', 'HD22', 'HD23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.745, sd = 0.39000000000000001 )
+		shift = NTdict( average = 0.745, sd = 0.39000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -4002,7 +4003,7 @@ RESIDUE	LEU      L
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 177.0, sd = 2.02 )
+		shift = NTdict( average = 177.0, sd = 2.02 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -4083,7 +4084,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.13, sd = 4.3799999999999999 )
+		shift = NTdict( average = 121.13, sd = 4.3799999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -4094,7 +4095,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.1899999999999995, sd = 0.64000000000000001 )
+		shift = NTdict( average = 8.1899999999999995, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -4105,7 +4106,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.899999999999999, sd = 2.29 )
+		shift = NTdict( average = 56.899999999999999, sd = 2.29 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -4116,7 +4117,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.2699999999999996, sd = 0.46999999999999997 )
+		shift = NTdict( average = 4.2699999999999996, sd = 0.46999999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -4127,7 +4128,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 32.82, sd = 2.4900000000000002 )
+		shift = NTdict( average = 32.82, sd = 2.4900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -4138,7 +4139,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.79, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.79, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -4149,7 +4150,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.76, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.76, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -4160,7 +4161,7 @@ RESIDUE	LYSx      K
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.7749999999999999, sd = 0.29499999999999998 )
+		shift = NTdict( average = 1.7749999999999999, sd = 0.29499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -4171,7 +4172,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 24.989999999999998, sd = 2.52 )
+		shift = NTdict( average = 24.989999999999998, sd = 2.52 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -4182,7 +4183,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3799999999999999, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.3799999999999999, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -4193,7 +4194,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3600000000000001, sd = 0.31 )
+		shift = NTdict( average = 1.3600000000000001, sd = 0.31 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -4204,7 +4205,7 @@ RESIDUE	LYSx      K
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3700000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.3700000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -4215,7 +4216,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 28.969999999999999, sd = 2.4100000000000001 )
+		shift = NTdict( average = 28.969999999999999, sd = 2.4100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -4226,7 +4227,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.6299999999999999, sd = 1.4299999999999999 )
+		shift = NTdict( average = 1.6299999999999999, sd = 1.4299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -4237,7 +4238,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.6000000000000001, sd = 0.27000000000000002 )
+		shift = NTdict( average = 1.6000000000000001, sd = 0.27000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -4248,7 +4249,7 @@ RESIDUE	LYSx      K
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.615, sd = 0.84999999999999998 )
+		shift = NTdict( average = 1.615, sd = 0.84999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE      
@@ -4259,7 +4260,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 41.920000000000002, sd = 2.2599999999999998 )
+		shift = NTdict( average = 41.920000000000002, sd = 2.2599999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE2     
@@ -4270,7 +4271,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9300000000000002, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.9300000000000002, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE3     
@@ -4281,7 +4282,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9199999999999999, sd = 0.25 )
+		shift = NTdict( average = 2.9199999999999999, sd = 0.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QE      
@@ -4292,7 +4293,7 @@ RESIDUE	LYSx      K
 		real = ['HE2', 'HE3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9249999999999998, sd = 0.245 )
+		shift = NTdict( average = 2.9249999999999998, sd = 0.245 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NZ      
@@ -4303,7 +4304,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 48.170000000000002, sd = 36.380000000000003 )
+		shift = NTdict( average = 48.170000000000002, sd = 36.380000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ1     
@@ -4314,7 +4315,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.4299999999999997, sd = 1.1399999999999999 )
+		shift = NTdict( average = 7.4299999999999997, sd = 1.1399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ2     
@@ -4336,7 +4337,7 @@ RESIDUE	LYSx      K
 		real = ['HZ1', 'HZ2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.4299999999999997, sd = 1.1399999999999999 )
+		shift = NTdict( average = 7.4299999999999997, sd = 1.1399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -4347,7 +4348,7 @@ RESIDUE	LYSx      K
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.81, sd = 10.32 )
+		shift = NTdict( average = 176.81, sd = 10.32 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -4427,7 +4428,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.13, sd = 4.3799999999999999 )
+		shift = NTdict( average = 121.13, sd = 4.3799999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -4438,7 +4439,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.1899999999999995, sd = 0.64000000000000001 )
+		shift = NTdict( average = 8.1899999999999995, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -4449,7 +4450,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.899999999999999, sd = 2.29 )
+		shift = NTdict( average = 56.899999999999999, sd = 2.29 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -4460,7 +4461,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.2699999999999996, sd = 0.46999999999999997 )
+		shift = NTdict( average = 4.2699999999999996, sd = 0.46999999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -4471,7 +4472,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 32.82, sd = 2.4900000000000002 )
+		shift = NTdict( average = 32.82, sd = 2.4900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -4482,7 +4483,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.79, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.79, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -4493,7 +4494,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.76, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.76, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -4504,7 +4505,7 @@ RESIDUE	LYS     K
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.7749999999999999, sd = 0.29499999999999998 )
+		shift = NTdict( average = 1.7749999999999999, sd = 0.29499999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -4515,7 +4516,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 24.989999999999998, sd = 2.52 )
+		shift = NTdict( average = 24.989999999999998, sd = 2.52 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -4526,7 +4527,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3799999999999999, sd = 0.28999999999999998 )
+		shift = NTdict( average = 1.3799999999999999, sd = 0.28999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -4537,7 +4538,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3600000000000001, sd = 0.31 )
+		shift = NTdict( average = 1.3600000000000001, sd = 0.31 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -4548,7 +4549,7 @@ RESIDUE	LYS     K
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.3700000000000001, sd = 0.29999999999999999 )
+		shift = NTdict( average = 1.3700000000000001, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -4559,7 +4560,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 28.969999999999999, sd = 2.4100000000000001 )
+		shift = NTdict( average = 28.969999999999999, sd = 2.4100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -4570,7 +4571,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.6299999999999999, sd = 1.4299999999999999 )
+		shift = NTdict( average = 1.6299999999999999, sd = 1.4299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -4581,7 +4582,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.6000000000000001, sd = 0.27000000000000002 )
+		shift = NTdict( average = 1.6000000000000001, sd = 0.27000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -4592,7 +4593,7 @@ RESIDUE	LYS     K
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.615, sd = 0.84999999999999998 )
+		shift = NTdict( average = 1.615, sd = 0.84999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE      
@@ -4603,7 +4604,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 41.920000000000002, sd = 2.2599999999999998 )
+		shift = NTdict( average = 41.920000000000002, sd = 2.2599999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE2     
@@ -4614,7 +4615,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9300000000000002, sd = 0.23999999999999999 )
+		shift = NTdict( average = 2.9300000000000002, sd = 0.23999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE3     
@@ -4625,7 +4626,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9199999999999999, sd = 0.25 )
+		shift = NTdict( average = 2.9199999999999999, sd = 0.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QE      
@@ -4636,7 +4637,7 @@ RESIDUE	LYS     K
 		real = ['HE2', 'HE3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9249999999999998, sd = 0.245 )
+		shift = NTdict( average = 2.9249999999999998, sd = 0.245 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NZ      
@@ -4647,7 +4648,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'N_AMO'
 		spinType = '15N'
-		shift = NTstruct( average = 48.170000000000002, sd = 36.380000000000003 )
+		shift = NTdict( average = 48.170000000000002, sd = 36.380000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ1     
@@ -4658,7 +4659,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 7.4299999999999997, sd = 1.1399999999999999 )
+		shift = NTdict( average = 7.4299999999999997, sd = 1.1399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ2     
@@ -4691,7 +4692,7 @@ RESIDUE	LYS     K
 		real = ['HZ1', 'HZ2', 'HZ3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.4299999999999997, sd = 1.1399999999999999 )
+		shift = NTdict( average = 7.4299999999999997, sd = 1.1399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -4702,7 +4703,7 @@ RESIDUE	LYS     K
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.81, sd = 10.32 )
+		shift = NTdict( average = 176.81, sd = 10.32 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -4776,7 +4777,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.08, sd = 4.2400000000000002 )
+		shift = NTdict( average = 120.08, sd = 4.2400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -4787,7 +4788,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2599999999999998, sd = 0.60999999999999999 )
+		shift = NTdict( average = 8.2599999999999998, sd = 0.60999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -4798,7 +4799,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 56.229999999999997, sd = 2.4100000000000001 )
+		shift = NTdict( average = 56.229999999999997, sd = 2.4100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -4809,7 +4810,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.3799999999999999, sd = 0.51000000000000001 )
+		shift = NTdict( average = 4.3799999999999999, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -4820,7 +4821,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 33.07, sd = 2.9700000000000002 )
+		shift = NTdict( average = 33.07, sd = 2.9700000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -4831,7 +4832,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0499999999999998, sd = 0.97999999999999998 )
+		shift = NTdict( average = 2.0499999999999998, sd = 0.97999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -4842,7 +4843,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.04, sd = 0.77000000000000002 )
+		shift = NTdict( average = 2.04, sd = 0.77000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -4853,7 +4854,7 @@ RESIDUE	MET      M
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0449999999999999, sd = 0.875 )
+		shift = NTdict( average = 2.0449999999999999, sd = 0.875 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -4864,7 +4865,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 32.060000000000002, sd = 2.4700000000000002 )
+		shift = NTdict( average = 32.060000000000002, sd = 2.4700000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -4875,7 +4876,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.1800000000000002, sd = 3.6400000000000001 )
+		shift = NTdict( average = 2.1800000000000002, sd = 3.6400000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -4886,7 +4887,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.1099999999999999, sd = 3.9199999999999999 )
+		shift = NTdict( average = 2.1099999999999999, sd = 3.9199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -4897,7 +4898,7 @@ RESIDUE	MET      M
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.145, sd = 3.7800000000000002 )
+		shift = NTdict( average = 2.145, sd = 3.7800000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM SD      
@@ -4919,7 +4920,7 @@ RESIDUE	MET      M
 		real = ['HE1', 'HE2', 'HE3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.1299999999999999, sd = 4.0099999999999998 )
+		shift = NTdict( average = 1.1299999999999999, sd = 4.0099999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE      
@@ -4930,7 +4931,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 17.449999999999999, sd = 3.9100000000000001 )
+		shift = NTdict( average = 17.449999999999999, sd = 3.9100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE1     
@@ -4974,7 +4975,7 @@ RESIDUE	MET      M
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.16999999999999, sd = 4.6399999999999997 )
+		shift = NTdict( average = 176.16999999999999, sd = 4.6399999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -5036,7 +5037,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 120.72, sd = 4.8300000000000001 )
+		shift = NTdict( average = 120.72, sd = 4.8300000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -5047,7 +5048,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3699999999999992, sd = 0.72999999999999998 )
+		shift = NTdict( average = 8.3699999999999992, sd = 0.72999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -5058,7 +5059,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 58.170000000000002, sd = 2.7400000000000002 )
+		shift = NTdict( average = 58.170000000000002, sd = 2.7400000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -5069,7 +5070,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6299999999999999, sd = 1.6699999999999999 )
+		shift = NTdict( average = 4.6299999999999999, sd = 1.6699999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -5080,7 +5081,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 40.009999999999998, sd = 2.8199999999999998 )
+		shift = NTdict( average = 40.009999999999998, sd = 2.8199999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -5091,7 +5092,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9900000000000002, sd = 0.40000000000000002 )
+		shift = NTdict( average = 2.9900000000000002, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -5102,7 +5103,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.96, sd = 0.42999999999999999 )
+		shift = NTdict( average = 2.96, sd = 0.42999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -5113,7 +5114,7 @@ RESIDUE	PHE      F
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9750000000000001, sd = 0.41500000000000004 )
+		shift = NTdict( average = 2.9750000000000001, sd = 0.41500000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -5124,7 +5125,7 @@ RESIDUE	PHE      F
 		real = ['HD1', 'HD2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.9850000000000003, sd = 0.62 )
+		shift = NTdict( average = 6.9850000000000003, sd = 0.62 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QE      
@@ -5135,7 +5136,7 @@ RESIDUE	PHE      F
 		real = ['HE1', 'HE2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0199999999999996, sd = 0.72999999999999998 )
+		shift = NTdict( average = 7.0199999999999996, sd = 0.72999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QR      
@@ -5146,7 +5147,7 @@ RESIDUE	PHE      F
 		real = ['HD1', 'HD2', 'HE1', 'HE2', 'HZ']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0049999999999999, sd = 0.8666666666666667 )
+		shift = NTdict( average = 7.0049999999999999, sd = 0.8666666666666667 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -5157,7 +5158,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 135.56999999999999, sd = 14.85 )
+		shift = NTdict( average = 135.56999999999999, sd = 14.85 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD1     
@@ -5168,7 +5169,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 131.02000000000001, sd = 5.71 )
+		shift = NTdict( average = 131.02000000000001, sd = 5.71 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD1     
@@ -5179,7 +5180,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.9900000000000002, sd = 0.59999999999999998 )
+		shift = NTdict( average = 6.9900000000000002, sd = 0.59999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE1     
@@ -5190,7 +5191,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 130.02000000000001, sd = 6.4000000000000004 )
+		shift = NTdict( average = 130.02000000000001, sd = 6.4000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE1     
@@ -5201,7 +5202,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0199999999999996, sd = 0.70999999999999996 )
+		shift = NTdict( average = 7.0199999999999996, sd = 0.70999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ      
@@ -5212,7 +5213,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 128.50999999999999, sd = 6.8300000000000001 )
+		shift = NTdict( average = 128.50999999999999, sd = 6.8300000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ      
@@ -5223,7 +5224,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0099999999999998, sd = 1.25 )
+		shift = NTdict( average = 7.0099999999999998, sd = 1.25 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE2     
@@ -5234,7 +5235,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 129.94, sd = 7.5999999999999996 )
+		shift = NTdict( average = 129.94, sd = 7.5999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE2     
@@ -5245,7 +5246,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.0199999999999996, sd = 0.75 )
+		shift = NTdict( average = 7.0199999999999996, sd = 0.75 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD2     
@@ -5256,7 +5257,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 130.86000000000001, sd = 6.7199999999999998 )
+		shift = NTdict( average = 130.86000000000001, sd = 6.7199999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -5267,7 +5268,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.9800000000000004, sd = 0.64000000000000001 )
+		shift = NTdict( average = 6.9800000000000004, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -5278,7 +5279,7 @@ RESIDUE	PHE      F
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.56, sd = 2.1899999999999999 )
+		shift = NTdict( average = 175.56, sd = 2.1899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -5328,7 +5329,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 132.86000000000001, sd = 19.460000000000001 )
+		shift = NTdict( average = 132.86000000000001, sd = 19.460000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -5339,7 +5340,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 50.380000000000003, sd = 3.5899999999999999 )
+		shift = NTdict( average = 50.380000000000003, sd = 3.5899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -5350,7 +5351,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 63.25, sd = 1.8899999999999999 )
+		shift = NTdict( average = 63.25, sd = 1.8899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -5361,7 +5362,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.4000000000000004, sd = 0.38 )
+		shift = NTdict( average = 4.4000000000000004, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -5373,7 +5374,7 @@ RESIDUE	cPRO      P
 		type = 'C_ALI'
 		spinType = '13C'
 		# ave: 34.16;  sd: 1.15; min 30.74; max 36.23; Schubert et al, JBNMR 24, 149-54, 2002
-		shift = NTstruct( average = 34.16, sd = 1.15 )
+		shift = NTdict( average = 34.16, sd = 1.15 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -5384,7 +5385,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0699999999999998, sd = 0.40999999999999998 )
+		shift = NTdict( average = 2.0699999999999998, sd = 0.40999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -5395,7 +5396,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.02, sd = 0.44 )
+		shift = NTdict( average = 2.02, sd = 0.44 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -5406,7 +5407,7 @@ RESIDUE	cPRO      P
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0449999999999999, sd = 0.42499999999999999 )
+		shift = NTdict( average = 2.0449999999999999, sd = 0.42499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -5418,7 +5419,7 @@ RESIDUE	cPRO      P
 		type = 'C_ALI'
 		spinType = '13C'
 		# ave: 24.52;  sd: 1.09; min 22.1; max 27.1; Schubert et al, JBNMR 24, 149-54, 2002
-		shift = NTstruct( average = 24.52, sd = 1.09 )
+		shift = NTdict( average = 24.52, sd = 1.09 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -5429,7 +5430,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.9199999999999999, sd = 0.38 )
+		shift = NTdict( average = 1.9199999999999999, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -5440,7 +5441,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.8999999999999999, sd = 0.40000000000000002 )
+		shift = NTdict( average = 1.8999999999999999, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -5451,7 +5452,7 @@ RESIDUE	cPRO      P
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.9099999999999999, sd = 0.39000000000000001 )
+		shift = NTdict( average = 1.9099999999999999, sd = 0.39000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -5462,7 +5463,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.6000000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.6000000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -5473,7 +5474,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.5800000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.5800000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -5484,7 +5485,7 @@ RESIDUE	cPRO      P
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.5899999999999999, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.5899999999999999, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -5495,7 +5496,7 @@ RESIDUE	cPRO      P
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.75, sd = 1.6899999999999999 )
+		shift = NTdict( average = 176.75, sd = 1.6899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -5545,7 +5546,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 132.86000000000001, sd = 19.460000000000001 )
+		shift = NTdict( average = 132.86000000000001, sd = 19.460000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD      
@@ -5556,7 +5557,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 50.380000000000003, sd = 3.5899999999999999 )
+		shift = NTdict( average = 50.380000000000003, sd = 3.5899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -5567,7 +5568,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 63.25, sd = 1.8899999999999999 )
+		shift = NTdict( average = 63.25, sd = 1.8899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -5578,7 +5579,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.4000000000000004, sd = 0.38 )
+		shift = NTdict( average = 4.4000000000000004, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -5590,7 +5591,7 @@ RESIDUE	PRO      P
 		type = 'C_ALI'
 		spinType = '13C'
 		# ave: 31.75;  sd: 0.98; min 26.30; max 35.83; Schubert et al, JBNMR 24, 149-54, 2002
-		shift = NTstruct( average = 31.75, sd = 0.98 )
+		shift = NTdict( average = 31.75, sd = 0.98 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -5601,7 +5602,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0699999999999998, sd = 0.40999999999999998 )
+		shift = NTdict( average = 2.0699999999999998, sd = 0.40999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -5612,7 +5613,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.02, sd = 0.44 )
+		shift = NTdict( average = 2.02, sd = 0.44 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -5623,7 +5624,7 @@ RESIDUE	PRO      P
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.0449999999999999, sd = 0.42499999999999999 )
+		shift = NTdict( average = 2.0449999999999999, sd = 0.42499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -5635,7 +5636,7 @@ RESIDUE	PRO      P
 		type = 'C_ALI'
 		spinType = '13C'
 		# ave: 27.26;  sd: 1.05; min 19.31; max 33.39; Schubert et al, JBNMR 24, 149-54, 2002
-		shift = NTstruct( average = 27.26, sd = 1.05 )
+		shift = NTdict( average = 27.26, sd = 1.05 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG2     
@@ -5646,7 +5647,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.9199999999999999, sd = 0.38 )
+		shift = NTdict( average = 1.9199999999999999, sd = 0.38 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG3     
@@ -5657,7 +5658,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.8999999999999999, sd = 0.40000000000000002 )
+		shift = NTdict( average = 1.8999999999999999, sd = 0.40000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG      
@@ -5668,7 +5669,7 @@ RESIDUE	PRO      P
 		real = ['HG2', 'HG3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.9099999999999999, sd = 0.39000000000000001 )
+		shift = NTdict( average = 1.9099999999999999, sd = 0.39000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -5679,7 +5680,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.6000000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.6000000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD3     
@@ -5690,7 +5691,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.5800000000000001, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.5800000000000001, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -5701,7 +5702,7 @@ RESIDUE	PRO      P
 		real = ['HD2', 'HD3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.5899999999999999, sd = 0.68999999999999995 )
+		shift = NTdict( average = 3.5899999999999999, sd = 0.68999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -5712,7 +5713,7 @@ RESIDUE	PRO      P
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.75, sd = 1.6899999999999999 )
+		shift = NTdict( average = 176.75, sd = 1.6899999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -5774,7 +5775,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 116.34999999999999, sd = 3.9900000000000002 )
+		shift = NTdict( average = 116.34999999999999, sd = 3.9900000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -5785,7 +5786,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2899999999999991, sd = 0.67000000000000004 )
+		shift = NTdict( average = 8.2899999999999991, sd = 0.67000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -5796,7 +5797,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 58.640000000000001, sd = 2.21 )
+		shift = NTdict( average = 58.640000000000001, sd = 2.21 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -5807,7 +5808,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.5, sd = 0.42999999999999999 )
+		shift = NTdict( average = 4.5, sd = 0.42999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -5818,7 +5819,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 63.810000000000002, sd = 2.4399999999999999 )
+		shift = NTdict( average = 63.810000000000002, sd = 2.4399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -5829,7 +5830,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.8799999999999999, sd = 0.29999999999999999 )
+		shift = NTdict( average = 3.8799999999999999, sd = 0.29999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -5840,7 +5841,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.8500000000000001, sd = 0.31 )
+		shift = NTdict( average = 3.8500000000000001, sd = 0.31 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -5851,7 +5852,7 @@ RESIDUE	SER      S
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.8650000000000002, sd = 0.30499999999999999 )
+		shift = NTdict( average = 3.8650000000000002, sd = 0.30499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OG      
@@ -5873,7 +5874,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'H_OXY'
 		spinType = '1H'
-		shift = NTstruct( average = 5.6500000000000004, sd = 1.54 )
+		shift = NTdict( average = 5.6500000000000004, sd = 1.54 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -5884,7 +5885,7 @@ RESIDUE	SER      S
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 174.69, sd = 1.79 )
+		shift = NTdict( average = 174.69, sd = 1.79 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -5952,7 +5953,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 115.66, sd = 5.4000000000000004 )
+		shift = NTdict( average = 115.66, sd = 5.4000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -5963,7 +5964,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2599999999999998, sd = 0.66000000000000003 )
+		shift = NTdict( average = 8.2599999999999998, sd = 0.66000000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -5974,7 +5975,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 62.189999999999998, sd = 2.75 )
+		shift = NTdict( average = 62.189999999999998, sd = 2.75 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -5985,7 +5986,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.4699999999999998, sd = 0.5 )
+		shift = NTdict( average = 4.4699999999999998, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -5996,7 +5997,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 69.620000000000005, sd = 7.5300000000000002 )
+		shift = NTdict( average = 69.620000000000005, sd = 7.5300000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB      
@@ -6007,7 +6008,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.1900000000000004, sd = 1.0900000000000001 )
+		shift = NTdict( average = 4.1900000000000004, sd = 1.0900000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG2     
@@ -6018,7 +6019,7 @@ RESIDUE	THR      T
 		real = ['HG21', 'HG22', 'HG23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 1.1599999999999999, sd = 0.40999999999999998 )
+		shift = NTdict( average = 1.1599999999999999, sd = 0.40999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OG1     
@@ -6040,7 +6041,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'H_OXY'
 		spinType = '1H'
-		shift = NTstruct( average = 5.2400000000000002, sd = 1.9299999999999999 )
+		shift = NTdict( average = 5.2400000000000002, sd = 1.9299999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG2     
@@ -6051,7 +6052,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 21.609999999999999, sd = 2.7999999999999998 )
+		shift = NTdict( average = 21.609999999999999, sd = 2.7999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG21    
@@ -6095,7 +6096,7 @@ RESIDUE	THR      T
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 174.63, sd = 1.79 )
+		shift = NTdict( average = 174.63, sd = 1.79 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -6157,7 +6158,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.72, sd = 5.5 )
+		shift = NTdict( average = 121.72, sd = 5.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -6168,7 +6169,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2799999999999994, sd = 0.80000000000000004 )
+		shift = NTdict( average = 8.2799999999999994, sd = 0.80000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -6179,7 +6180,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 57.659999999999997, sd = 2.6000000000000001 )
+		shift = NTdict( average = 57.659999999999997, sd = 2.6000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -6190,7 +6191,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.7199999999999998, sd = 0.56999999999999995 )
+		shift = NTdict( average = 4.7199999999999998, sd = 0.56999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -6201,7 +6202,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 30.260000000000002, sd = 3.79 )
+		shift = NTdict( average = 30.260000000000002, sd = 3.79 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -6212,7 +6213,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.2000000000000002, sd = 0.35999999999999999 )
+		shift = NTdict( average = 3.2000000000000002, sd = 0.35999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -6223,7 +6224,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1600000000000001, sd = 0.37 )
+		shift = NTdict( average = 3.1600000000000001, sd = 0.37 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -6234,7 +6235,7 @@ RESIDUE	TRP      W
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 3.1800000000000002, sd = 0.36499999999999999 )
+		shift = NTdict( average = 3.1800000000000002, sd = 0.36499999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -6245,7 +6246,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 108.98999999999999, sd = 9.3200000000000003 )
+		shift = NTdict( average = 108.98999999999999, sd = 9.3200000000000003 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD1     
@@ -6256,7 +6257,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 125.86, sd = 5.0300000000000002 )
+		shift = NTdict( average = 125.86, sd = 5.0300000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD2     
@@ -6267,7 +6268,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 127.56, sd = 1.4199999999999999 )
+		shift = NTdict( average = 127.56, sd = 1.4199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE3     
@@ -6278,7 +6279,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 119.52, sd = 6.96 )
+		shift = NTdict( average = 119.52, sd = 6.96 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE2     
@@ -6289,7 +6290,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 137.63999999999999, sd = 6.1699999999999999 )
+		shift = NTdict( average = 137.63999999999999, sd = 6.1699999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM NE1     
@@ -6300,7 +6301,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 129.46000000000001, sd = 6.5099999999999998 )
+		shift = NTdict( average = 129.46000000000001, sd = 6.5099999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD1     
@@ -6311,7 +6312,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.1500000000000004, sd = 0.34999999999999998 )
+		shift = NTdict( average = 7.1500000000000004, sd = 0.34999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE3     
@@ -6322,7 +6323,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.2599999999999998, sd = 0.76000000000000001 )
+		shift = NTdict( average = 7.2599999999999998, sd = 0.76000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ3     
@@ -6333,7 +6334,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 120.48, sd = 7.7999999999999998 )
+		shift = NTdict( average = 120.48, sd = 7.7999999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ2     
@@ -6344,7 +6345,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 113.45, sd = 7.3700000000000001 )
+		shift = NTdict( average = 113.45, sd = 7.3700000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE1     
@@ -6355,7 +6356,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 10.1, sd = 0.68000000000000005 )
+		shift = NTdict( average = 10.1, sd = 0.68000000000000005 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ3     
@@ -6366,7 +6367,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7800000000000002, sd = 0.73999999999999999 )
+		shift = NTdict( average = 6.7800000000000002, sd = 0.73999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CH2     
@@ -6377,7 +6378,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 122.79000000000001, sd = 6.2599999999999998 )
+		shift = NTdict( average = 122.79000000000001, sd = 6.2599999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HZ2     
@@ -6388,7 +6389,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 7.2199999999999998, sd = 0.64000000000000001 )
+		shift = NTdict( average = 7.2199999999999998, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HH2     
@@ -6399,7 +6400,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.9000000000000004, sd = 0.70999999999999996 )
+		shift = NTdict( average = 6.9000000000000004, sd = 0.70999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -6410,7 +6411,7 @@ RESIDUE	TRP      W
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 176.22999999999999, sd = 1.9199999999999999 )
+		shift = NTdict( average = 176.22999999999999, sd = 1.9199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -6478,7 +6479,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.13, sd = 12.289999999999999 )
+		shift = NTdict( average = 121.13, sd = 12.289999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -6489,7 +6490,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.3399999999999999, sd = 0.75 )
+		shift = NTdict( average = 8.3399999999999999, sd = 0.75 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -6500,7 +6501,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 58.049999999999997, sd = 2.79 )
+		shift = NTdict( average = 58.049999999999997, sd = 2.79 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -6511,7 +6512,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.6299999999999999, sd = 0.57999999999999996 )
+		shift = NTdict( average = 4.6299999999999999, sd = 0.57999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -6522,7 +6523,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 39.399999999999999, sd = 3.0800000000000001 )
+		shift = NTdict( average = 39.399999999999999, sd = 3.0800000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB2     
@@ -6533,7 +6534,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.9100000000000001, sd = 0.5 )
+		shift = NTdict( average = 2.9100000000000001, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB3     
@@ -6544,7 +6545,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 2.8799999999999999, sd = 0.5 )
+		shift = NTdict( average = 2.8799999999999999, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QB      
@@ -6555,7 +6556,7 @@ RESIDUE	TYR      Y
 		real = ['HB2', 'HB3']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 2.895, sd = 0.5 )
+		shift = NTdict( average = 2.895, sd = 0.5 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QD      
@@ -6566,7 +6567,7 @@ RESIDUE	TYR      Y
 		real = ['HD1', 'HD2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.8949999999999996, sd = 0.54499999999999993 )
+		shift = NTdict( average = 6.8949999999999996, sd = 0.54499999999999993 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QE      
@@ -6577,7 +6578,7 @@ RESIDUE	TYR      Y
 		real = ['HE1', 'HE2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.6749999999999998, sd = 0.48999999999999999 )
+		shift = NTdict( average = 6.6749999999999998, sd = 0.48999999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QR      
@@ -6588,7 +6589,7 @@ RESIDUE	TYR      Y
 		real = ['HD1', 'HD2', 'HE1', 'HE2']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 6.7850000000000001, sd = 0.51749999999999996 )
+		shift = NTdict( average = 6.7850000000000001, sd = 0.51749999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG      
@@ -6599,7 +6600,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 129.12, sd = 2.5299999999999998 )
+		shift = NTdict( average = 129.12, sd = 2.5299999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD1     
@@ -6610,7 +6611,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 131.94999999999999, sd = 7.4100000000000001 )
+		shift = NTdict( average = 131.94999999999999, sd = 7.4100000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD1     
@@ -6621,7 +6622,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.9000000000000004, sd = 0.52000000000000002 )
+		shift = NTdict( average = 6.9000000000000004, sd = 0.52000000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE1     
@@ -6632,7 +6633,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 117.56999999999999, sd = 4.5199999999999996 )
+		shift = NTdict( average = 117.56999999999999, sd = 4.5199999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE1     
@@ -6643,7 +6644,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.6799999999999997, sd = 0.46999999999999997 )
+		shift = NTdict( average = 6.6799999999999997, sd = 0.46999999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CZ      
@@ -6654,7 +6655,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_VIN'
 		spinType = '13C'
-		shift = NTstruct( average = 153.34, sd = 18.84 )
+		shift = NTdict( average = 153.34, sd = 18.84 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CE2     
@@ -6665,7 +6666,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 117.45999999999999, sd = 5.1799999999999997 )
+		shift = NTdict( average = 117.45999999999999, sd = 5.1799999999999997 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HE2     
@@ -6676,7 +6677,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.6699999999999999, sd = 0.51000000000000001 )
+		shift = NTdict( average = 6.6699999999999999, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CD2     
@@ -6687,7 +6688,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_ARO'
 		spinType = '13C'
-		shift = NTstruct( average = 131.52000000000001, sd = 9.2599999999999998 )
+		shift = NTdict( average = 131.52000000000001, sd = 9.2599999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HD2     
@@ -6698,7 +6699,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTstruct( average = 6.8899999999999997, sd = 0.56999999999999995 )
+		shift = NTdict( average = 6.8899999999999997, sd = 0.56999999999999995 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM OH      
@@ -6720,7 +6721,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'H_OXY'
 		spinType = '1H'
-		shift = NTstruct( average = 9.0800000000000001, sd = 3.0299999999999998 )
+		shift = NTdict( average = 9.0800000000000001, sd = 3.0299999999999998 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -6731,7 +6732,7 @@ RESIDUE	TYR      Y
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.41, sd = 3.96 )
+		shift = NTdict( average = 175.41, sd = 3.96 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       
@@ -6799,7 +6800,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'N_AMI'
 		spinType = '15N'
-		shift = NTstruct( average = 121.36, sd = 9.4499999999999993 )
+		shift = NTdict( average = 121.36, sd = 9.4499999999999993 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HN      
@@ -6810,7 +6811,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'H_AMI'
 		spinType = '1H'
-		shift = NTstruct( average = 8.2799999999999994, sd = 0.70999999999999996 )
+		shift = NTdict( average = 8.2799999999999994, sd = 0.70999999999999996 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CA      
@@ -6821,7 +6822,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 62.5, sd = 2.9500000000000002 )
+		shift = NTdict( average = 62.5, sd = 2.9500000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HA      
@@ -6832,7 +6833,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 4.1600000000000001, sd = 0.64000000000000001 )
+		shift = NTdict( average = 4.1600000000000001, sd = 0.64000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CB      
@@ -6843,7 +6844,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 32.710000000000001, sd = 2.48 )
+		shift = NTdict( average = 32.710000000000001, sd = 2.48 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HB      
@@ -6854,7 +6855,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'H_ALI'
 		spinType = '1H'
-		shift = NTstruct( average = 1.99, sd = 0.51000000000000001 )
+		shift = NTdict( average = 1.99, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG1     
@@ -6865,7 +6866,7 @@ RESIDUE	VAL      V
 		real = ['HG11', 'HG12', 'HG13']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.82999999999999996, sd = 0.51000000000000001 )
+		shift = NTdict( average = 0.82999999999999996, sd = 0.51000000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM QG2     
@@ -6876,7 +6877,7 @@ RESIDUE	VAL      V
 		real = ['HG21', 'HG22', 'HG23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.80000000000000004, sd = 0.54000000000000004 )
+		shift = NTdict( average = 0.80000000000000004, sd = 0.54000000000000004 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM CG1     
@@ -6887,7 +6888,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 21.629999999999999, sd = 3.1600000000000001 )
+		shift = NTdict( average = 21.629999999999999, sd = 3.1600000000000001 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG11    
@@ -6931,7 +6932,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'C_ALI'
 		spinType = '13C'
-		shift = NTstruct( average = 21.469999999999999, sd = 3.04 )
+		shift = NTdict( average = 21.469999999999999, sd = 3.04 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM HG21    
@@ -6975,7 +6976,7 @@ RESIDUE	VAL      V
 		real = ['HG11', 'HG12', 'HG13', 'HG21', 'HG22', 'HG23']
 		type = 'PSEUD'
 		spinType = '1H'
-		shift = NTstruct( average = 0.81499999999999995, sd = 0.52500000000000002 )
+		shift = NTdict( average = 0.81499999999999995, sd = 0.52500000000000002 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM C       
@@ -6986,7 +6987,7 @@ RESIDUE	VAL      V
 		real = []
 		type = 'C_BYL'
 		spinType = '13C'
-		shift = NTstruct( average = 175.75999999999999, sd = 1.9399999999999999 )
+		shift = NTdict( average = 175.75999999999999, sd = 1.9399999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
 	ATOM O       

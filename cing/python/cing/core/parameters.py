@@ -1,6 +1,5 @@
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTparameter
-from cing.Libs.NTutils import NTstruct
 import os
  
 #-----------------------------------------------------------------------------
@@ -11,7 +10,7 @@ import os
 # These directories get created. They are defined relative to project root path,
 # available through Project.rootPath( name ) method, or can be joined relative
 # to project root by Project.path( *args ) method.
-directories = NTstruct(
+directories = NTdict(
                        
     data       = 'Data',
     molecules  = 'Data/Molecules',
@@ -60,7 +59,7 @@ htmlDirectories.keysformat() #define a format string for 'pretty' output
 
 
 # These files and directories are just definitions
-cingPaths = NTstruct(    
+cingPaths = NTdict(    
     project      = 'project.xml',
     plugins      = 'PluginCode',
     scripts      = '../Scripts',
@@ -75,9 +74,9 @@ cingPaths = NTstruct(
 
 cingPaths.keysformat() #define a format string for 'pretty' output
     
-plotParameters = NTstruct(
+plotParameters = NTdict(
     #default
-    dihedralDefault = NTstruct(
+    dihedralDefault = NTdict(
         min      =    0.0,
         max      =  360.0,
         ticksize =   60,
@@ -87,7 +86,7 @@ plotParameters = NTstruct(
         lower    = 'orange',
         upper    = 'orange'
     ),
-    PHI = NTstruct(
+    PHI = NTdict(
         min      = -180.0,
         max      =  180.0,
         ticksize =   60,
@@ -97,7 +96,7 @@ plotParameters = NTstruct(
         lower    = 'orange',
         upper    = 'orange'
     ),
-    PSI = NTstruct(
+    PSI = NTdict(
         min      = -180.0,
         max      =  180.0,
         ticksize =   60,
@@ -162,4 +161,4 @@ parameters.programs.procheck_nmr.value   = 'procheck_nmr'
 
 
 # Define globals
-plugins = NTstruct()
+plugins = NTdict()

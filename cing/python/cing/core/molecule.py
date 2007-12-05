@@ -5,7 +5,6 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
-from cing.Libs.NTutils import NTstruct
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTvector
@@ -111,7 +110,7 @@ Molecule class: defines the holder for molecule items
         sister( relativeIndex ) :
         traverse()              :
         
-    Methods inherited from NTstruct:
+    Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         printAttr(stream)       : Print a list of all attributes and their values.       
         
@@ -839,7 +838,7 @@ Chain class: defines chain properties and methods
         sister( relativeIndex ) :
         traverse()              :
         
-    Methods inherited from NTstruct:
+    Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         printAttr(stream)       : Print a list of all attributes and their values.       
         
@@ -1022,7 +1021,7 @@ Residue class: Defines residue properties
         sister( relativeIndex ) :
         traverse()              :
         
-    Methods inherited from NTstruct:
+    Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         printAttr(stream)       : Print a list of all attributes and their values.       
         
@@ -1412,7 +1411,7 @@ Atom class: Defines object for storing atom properties
         sister( relativeIndex ) :
         traverse()              :
         
-    Methods inherited from NTstruct:
+    Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         printAttr(stream)       : Print a list of all attributes and their values.       
         
@@ -1984,7 +1983,7 @@ class XMLAtomHandler( XMLhandler ):
 atomhandler = XMLAtomHandler()
 
 #==============================================================================
-class Coordinate( NTstruct ):
+class Coordinate( NTdict ):
     """
 -------------------------------------------------------------------------------
 Coordinate class
@@ -1993,7 +1992,7 @@ Coordinate class
     Calling generates NTvector(x,y,z) Instance
     """
     def __init__( self, x, y, z, Bfac=0.0, atom = None ):
-        NTstruct.__init__(   self,
+        NTdict.__init__(   self,
                              CLASS    = 'Coordinate', 
                            __FORMAT__ = '(%(x)6.2f,%(y)6.2f,%(z)6.2f)'
                          )

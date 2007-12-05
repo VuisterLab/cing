@@ -17,7 +17,7 @@ from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTstruct
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
@@ -92,7 +92,7 @@ def analyze( config, params, doPrint = 0 ):
                         fileNum    = i,
                         
                         molecules  = [
-                                      NTstruct(
+                                      NTdict(
                                                 psfFile        = params.psfFile,
                                                 pdbFile        = params.baseName%i,
                                                 selectionCode  = '(not resn TIP3 and not resn ANI)'
@@ -133,7 +133,7 @@ def refine( config, params, doPrint = 0 ):
                    fileNum    = i,
 
                    molecules  = [
-                                 NTstruct(
+                                 NTdict(
                                     psfFile        = params.psfFile,
                                     pdbFile        = params.baseName%i,
                                     selectionCode  = '(not resn TIP3 and not resn ANI)'
@@ -169,7 +169,7 @@ def parseRefineOutput( params, options ):
         file = params.checkPath( params.directories.jobs, 'refine_%d.log'%i )
         NTmessage('==> Parsing %s\n', file )
         
-        data = NTstruct( fileName = file,
+        data = NTdict( fileName = file,
                          model = i
                        )
         foundEnergy = 0

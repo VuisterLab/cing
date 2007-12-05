@@ -909,21 +909,21 @@ class odict(dict):
 
 # -----------------------------------------------------------------------------
 #
-NTstructObjectId = 0
+NTdictObjectId = 0
 #NTstructObjects  = {}
 # Variables to limit recursion and prevent cycles in __repr__() call
-NTstructDepth    = 0
-NTstructMaxDepth = 1
-NTstructCycles   = []
+NTdictDepth    = 0
+NTdictMaxDepth = 1
+NTdictCycles   = []
 
-class NTstruct(dict):
+class NTdict(dict):
   """
-      class NTstruct: Base class for all mapping NT objects.
+      class NTdict: Base class for all mapping NT objects.
       
       create a 'structure' from keywords to group things. Keys can be referenced as
       in dictionary methods, or as an attribute; e.g.
       
-          aap = NTstruct( noot=3, mies=4, kees='not awake' )      
+          aap = NTdict( noot=3, mies=4, kees='not awake' )      
           print aap['noot']
           > 3
           print aap.noot
@@ -966,17 +966,17 @@ class NTstruct(dict):
         will result in objects persisting even if they could be deleted (i.e. a memory leak).
   """  
   def __init__( self, *args, **kwds ):
-     global NTstructObjectId
+     global NTdictObjectId
 
      #print '>>>', args, kwds
      dict.__init__( self, *args, **kwds )
-     self.setdefault('__CLASS__',  'NTstruct' )
+     self.setdefault('__CLASS__',  'NTdict' )
      self.setdefault('__FORMAT__',  None )      # set to None, which means by default not shown in repr() and toXML() methods
      self.setdefault('__SAVEXML__', None )      # set to None, which means by default not shown in repr() and toXML() methods
      self.setdefault('__SAVEALLXML__', False )  # when True, save all attributes in toXML() methods
 
-     self.__OBJECTID__ = NTstructObjectId
-     NTstructObjectId += 1
+     self.__OBJECTID__ = NTdictObjectId
+     NTdictObjectId += 1
      self.__HIDDEN__  = ['__HIDDEN__','__OBJECTID__','__CLASS__','__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
   #end def
 
@@ -1030,21 +1030,21 @@ class NTstruct(dict):
   def __repr__( self ):
 #     return dict.__repr__( self )
 #     return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
-     global NTstructDepth, NTstructMaxDepth, NTstructCycles
+     global NTdictDepth, NTdictMaxDepth, NTdictCycles
      
      #prevent cycles
-     if (NTstructDepth == 0):
-         NTstructCycles = []
+     if (NTdictDepth == 0):
+         NTdictCycles = []
      #end if
      
-     if (self.__OBJECTID__ in NTstructCycles):
+     if (self.__OBJECTID__ in NTdictCycles):
          return  '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
      #end if
-     NTstructCycles.append( self.__OBJECTID__ )
+     NTdictCycles.append( self.__OBJECTID__ )
 
-     NTstructDepth += 1     
-     if (NTstructDepth > NTstructMaxDepth):
-         NTstructDepth -= 1
+     NTdictDepth += 1     
+     if (NTdictDepth > NTdictMaxDepth):
+         NTdictDepth -= 1
          return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
      #end if
      
@@ -1065,7 +1065,7 @@ class NTstruct(dict):
      # append closing paren
      string = string + ' )'
      
-     NTstructDepth -= 1
+     NTdictDepth -= 1
      return string
   #end def
   
@@ -1293,7 +1293,8 @@ class NTstruct(dict):
 
 #end class  
 
-NTdict = NTstruct
+# Discouraged name for NTdict; please replace in your scripts asap.
+NTstruct = NTdict
 
 class NoneObjectClass( NTdict ):
     """
@@ -1350,14 +1351,14 @@ noneobject = NoneObject
 #
 # -----------------------------------------------------------------------------
 #
-class NTtree( NTstruct ):
+class NTtree( NTdict ):
     """NTTree class
        Linked tree-like structure class
     """
     
     def __init__(self, name, **kwds ):  
         kwds.setdefault('__CLASS__','NTtree')   
-        NTstruct.__init__( self, **kwds )
+        NTdict.__init__( self, **kwds )
         self._parent   = None
         self._children = NTlist()
 
@@ -1581,7 +1582,7 @@ class NTparameter( NTtree ):
                                         the 'active' parameters
         allBranches()                   Return all the branches of parameter tree
         
-    Methods inherited form NTtree and NTstruct
+    Methods inherited form NTtree and NTdict
     
     """
     
@@ -2061,7 +2062,7 @@ class XMLhandler:
        handle                   : to be implemented in specific handler
        handleSingleElement      : for float,int,string etc)
        handleMultipleElements   : for list, tuple
-       handleDictElements       : for dict, NTstruct and the like
+       handleDictElements       : for dict, NTdict and the like
            
     """
     def __init__( self, name ):
@@ -2320,15 +2321,15 @@ class XMLdictHandler( XMLhandler ):
 
 
 class XMLNTstructHandler( XMLhandler ):
-    """NTstruct handler class"""
+    """NTdict handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='NTstruct') 
+        XMLhandler.__init__( self, name='NTdict') 
     #end def
     
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
-        result = NTstruct()
+        result = NTdict()
         result.update( attrs )
         return result
     #end def
@@ -3069,7 +3070,7 @@ class OptionParser (optparse.OptionParser):
 
 if __name__ == '__main__':
 
-  s = NTstruct(aap='noot', mies=1)
+  s = NTdict(aap='noot', mies=1)
   #print s
   #print s.aap
   #print s.mies
@@ -3122,8 +3123,8 @@ if __name__ == '__main__':
   od2.append(('aap', 10), ('noot', 112), ('mies', 20))
   print od2
   
-  for obj in NTstructObjects.iteritems(): #@UndefinedVariable
-      print repr( obj )
+#  for obj in NTstructObjects.iteritems(): #@UndefinedVariable
+#      print repr( obj )
   #d = dict()
   #print dir(d)
   
