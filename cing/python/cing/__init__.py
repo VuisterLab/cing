@@ -15,7 +15,7 @@ header = """
 """ % (cingVersion,)
 footer = """------------------------------------------------------------------------------------------------------
 """
-sys.stdout.write( header )
+sys.stdout.write(header)
 
 ######################################################################################################
 # This code is repeated in __init__.py and setup.py please keep it sync-ed
@@ -28,9 +28,9 @@ cingPythonDir = os.path.split(cingPythonCingDir)[0]
 cingRoot = os.path.split(cingPythonDir)[0]
 #printDebug("cingRoot        : " + cingRoot)
 ######################################################################################################
-cingDirTests       = os.path.join( cingRoot,            "Tests")
-cingDirTestsData   = os.path.join( cingDirTests,        "data")
-cingDirTestsTmp    = os.path.join( cingDirTestsData,    "tmp")
+cingDirTests       = os.path.join(cingRoot, "Tests")
+cingDirTestsData   = os.path.join(cingDirTests, "data")
+cingDirTestsTmp    = os.path.join(cingDirTestsData, "tmp")
 
 
 
@@ -41,4 +41,5 @@ from cing.core.database import NTdb
 from cing.core.dictionaries import *
 from cing.core.molecule import *
 from cing.core.parameters import * 
-from cing.core.importPlugin import importPlugin # This imports all plugins.
+from cing.core.importPlugin import importPlugin # This imports all plugins
+

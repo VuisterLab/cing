@@ -42,8 +42,8 @@ from cing.core.molecule import Molecule
 #==============================================================================
 def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None, verbose=True ):
     """Import coordinates from pdbFile (optionally: first nmodels)
-       convention eq PDB, CYANA, CYANA2 or XPLOR
-       return molecule or None on error
+convention eq PDB, CYANA, CYANA2 or XPLOR
+return molecule or None on error
     """
     if not molecule: return None
 
@@ -134,8 +134,8 @@ Molecule.importFromPDB = importFromPDB
 
 def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None, verbose=True ):
     """Initialise  from pdbFile
-       Return molecule instance
-       convention eq PDB, CYANA, CYANA2 or XPLOR
+Return molecule instance
+convention eq PDB, CYANA, CYANA2 or XPLOR
     """
 
     if verbose:
@@ -227,8 +227,8 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None, verbose=True 
                 atom = mol[cname][fullName][atmName]
                 atom.addCoordinate( record.x, record.y, record.z, record.tempFactor )
 
- #               record.atom = atom
- #               atom.pdbRecord = record
+#               record.atom = atom
+#               atom.pdbRecord = record
                 
             #end if
         #end if
@@ -267,9 +267,7 @@ Molecule.toPDBfile = moleculeToPDBfile
 
 
 def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
-    """Initialise Molecule from pdbFile.
-       returns molecule instance           
-    """
+    """Initialise Molecule from pdbFile. returns molecule instance"""
     if not name: 
         dummy_path,name,dummy_ext  = NTpath( pdbFile )
     #end if
