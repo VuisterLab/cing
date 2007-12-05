@@ -1,7 +1,6 @@
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import strip
-from cing.Libs.NTutils import printError
 import sys
 import os
 
@@ -117,15 +116,15 @@ def _writeCingShellFile(isTcsh):
 if __name__ == '__main__':
     
     if not cingRoot:
-        printError("Failed to derive the CINGROOT from this setup.py script; are there other setup.py or code confusing me here?")
+        print "Failed to derive the CINGROOT from this setup.py script; are there other setup.py or code confusing me here?"
         sys.exit(1)
         
     if not os.path.exists(cingRoot):
-        printError("The derived CINGROOT doesn't exist: ["  + cingRoot + "]")
+        print "The derived CINGROOT doesn't exist: ["  + cingRoot + "]"
         sys.exit(1)
 
     if not cingPythonDir:
-        printError("Failed to derive the CING python directory from this setup.py script. No clue why?")
+        print "Failed to derive the CING python directory from this setup.py script. No clue why?"
         sys.exit(1)
         
     parametersDict = {}
