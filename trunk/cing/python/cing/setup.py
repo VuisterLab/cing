@@ -47,7 +47,7 @@ else
     %(export)s PYTHONPATH%(equals)s.:$CINGROOT/python
 %(close_if)s
 
-alias cing 'python $CINGROOT/python/cing/main.py'
+alias cing%(equals)s'python $CINGROOT/python/cing/main.py'
 
 '''
 #------------------------------------------------------------------------------------
@@ -92,12 +92,16 @@ def _writeCingShellFile(isTcsh):
         parametersDict['equals'] = ' '
         parametersDict['conditional'] = '($?PYTHONPATH)'
         parametersDict['close_if'] = 'endif'
+        parametersDict['equals'] = ' '
+        sourceCommand = 'source' 
         cname = 'cing.csh'
     else:
         parametersDict['export'] = 'export'
         parametersDict['equals'] = '='
         parametersDict['conditional'] = '[ ! -z "${PYTHONPATH}" ];'
         parametersDict['close_if'] = 'fi'
+        parametersDict['equals'] = '='
+        sourceCommand = '.' 
         cname = 'cing.sh'
     text = CING_SHELL_TEMPLATE % parametersDict
     if isTcsh:
@@ -109,6 +113,7 @@ def _writeCingShellFile(isTcsh):
     print '==> Done'
     print ' Please check/modify %s' % (cname,)
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
+    print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
 #end def
 #------------------------------------------------------------------------------------
 
