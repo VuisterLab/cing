@@ -100,7 +100,6 @@ def _writeCingShellFile(isTcsh):
         parametersDict['equals'] = '='
         parametersDict['conditional'] = '[ ! -z "${PYTHONPATH}" ];'
         parametersDict['close_if'] = 'fi'
-        parametersDict['equals'] = '='
         sourceCommand = '.' 
         cname = 'cing.sh'
     text = CING_SHELL_TEMPLATE % parametersDict
