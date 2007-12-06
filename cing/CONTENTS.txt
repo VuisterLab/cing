@@ -1,0 +1,13 @@
+Files and Directories:
+
+CONTENTS        This file.
+Documentation   Directory with help and related files.
+HISTORY         Changes between versions.
+HTML            Directory with style sheets for HTML output from CING.
+README          Read this first.
+Tests           Directory with (temporary) data for testing.
+bin             Directory with shiftx binaries for mac os x.
+cing.csh        setup file to source in your shell settings (.cshrc or .bashrc).
+cing.sh         See cing.csh.
+java            Directory with java libraries (e.g. for using Wattos) .
+python          Directory with cing code directory.

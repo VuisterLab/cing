@@ -3,15 +3,19 @@
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-To setup:
-> ./setup.py
+Go to your CING installations directory. This directory will identified by the
+CINGROOT environment variable.
+python python/cing/setup.py
 
-Generates cing.csh or cing.sh that you need to adjust if needed and source in 
-your .cshrc or .bashrc file
+
+Generates cing.csh or cing.sh in CINGROOT that you need to check and adjust if 
+needed. Then source it in your .cshrc or .bashrc file
 
 The setup.py script uses 'which xplor' etc. to determine the various locations for
-executables; make sure it is in your path when you run setup. More setup instructions
-available in: cing/Documentation/setupEclipse/development_installation_eclipse.html
+executables; make sure it is in your path when you run setup. 
+
+Setup instructions for working with CING in Eclipse/PyDev are available in:
+Documentation/setupEclipse/development_installation_eclipse.html
 
 #------------------------------------------------------------------------------
 To get help:
@@ -53,14 +57,17 @@ options:
 to get more help:
 > cing -doc
 
+to test the installation type:
+> cing --test
+
 --------------------------------------------------------------------------------
-cing: commandline interface to the cing utilities:
+cing: command line interface to the cing utilities:
 --------------------------------------------------------------------------------
 
 Some examples; all assume a project named 'test':
 
 - To start a new Project:
-cing.py --name test --new
+cing --name test --new
 
 - To start a new Project from a xeasy seq file:
 cing --name test --init AD.seq,CYANA 
@@ -102,20 +109,6 @@ project.listPredefinedExperiments() # list all predefined experiments
 peaks = project.generatePeaks('hncaha','HN:HA:N')
 format(peaks)
 
-
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-Files and Directories:
-python          Directory with cing code directory.
-bin             Directory with shiftx binaries for mac os x and a type of Linux.
-Documentation   Directory with help and related files.
-HTML            Directory with style sheets for HTML output from CING.
-java            Directory with java libraries (e.g. for using Wattos) .
-Tests           Directory with (temporary) data for testing.
-cing.csh        setup file to source in your shell settings (.cshrc or .bashrc).
-cing.sh         See cing.csh.
-HISTORY         Changes between versions.
-README          This file.
-
+== Print list of parameters:
+    formatall( project.molecule.A.residues[0].procheck ) # Adjust for your mols
+    formatall( project.molecule.A.VAL171.C )

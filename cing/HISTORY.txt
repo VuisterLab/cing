@@ -1,3 +1,6 @@
+Version 0.72: 05 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
+    - Changed DOS eol in cing/__init__.py to Unix.
+
 Version 0.71: 05 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
     - reformatted the version/copyright formatting
     - redid the determination of the CINGROOT and checks in setup.py
