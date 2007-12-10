@@ -1,6 +1,8 @@
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import strip
+from string import atoi
+import time
 import sys
 import os
 
@@ -173,6 +175,23 @@ if __name__ == '__main__':
     else:
         printMessage("Found 'what if'")
         parametersDict['whatifPath'] = strip(whatifPath)
+
+    
+    time = 0
+    try:
+        wattosAtTheReady,err  = NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
+        #    printDebug("wattosAtTheReady: " + wattosAtTheReady)
+        #    printDebug("err: " + err)
+        time = atoi(wattosAtTheReady)
+    except:
+        pass
+#    printDebug("time: " + `time`)
+    if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
+        printWarning("Wattos is not configured.'")   
+        printMessage("Failed to get epoch time. This was a test of Wattos installation.'")
+    else:
+        printMessage("Found Wattos")   
+            
     
 #    userShell = os.environ.get('SHELL')
 #    Better not use the above as this gives on JFD's mac: /bin/bash and actually
