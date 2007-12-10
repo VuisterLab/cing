@@ -10,7 +10,7 @@ class AllChecks(TestCase):
         
     def testparse(self):
         """(Singing) Make a little plot, do a little ouptut"""
-        
+        print "Make sure you have an X11 server running; quit this test if you hadn't"
         os.chdir(cingDirTestsTmp)
         x = numpy.arange( 0, 3*math.pi, math.pi/30 )
         c = numpy.cos(x)

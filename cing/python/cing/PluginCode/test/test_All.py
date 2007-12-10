@@ -12,6 +12,7 @@ def testAll():
                "cing.PluginCode.test.test_validate", 
                "cing.PluginCode.test.test_Procheck", 
                "cing.PluginCode.test.test_Whatif", 
+               "cing.PluginCode.test.test_STAR", 
                )
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None

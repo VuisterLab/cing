@@ -1,10 +1,6 @@
 import unittest
 
-"""
-Call by:
-python testAll.py
-"""
-if __name__ == "__main__":
+def testAll():
     modList = ( 
                "cing.STAR.TextTest", 
                "cing.STAR.UtilsTest", 
@@ -18,5 +14,11 @@ if __name__ == "__main__":
         print "Importing ", mod_name
         exec("import %s" % (mod_name,))
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name,))
-        print "Testing"
         unittest.TextTestRunner(verbosity=2).run(suite)
+    
+"""
+Call by:
+python testAll.py
+"""
+if __name__ == "__main__":
+    testAll()
