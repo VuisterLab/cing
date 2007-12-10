@@ -468,8 +468,8 @@ def runWhatif( project, tmp=None ):
     #end for model
     scriptComplete += Whatif.scriptQuit
     # Let's ask the user to be nice and not kill us
-    # estimate to do 400 residues per minutes as with entry 1bus on dual core intel Mac.
-    timeRunEstimated = 0.0025 *project.molecule.modelCount * len(project.molecule.allResidues())
+    # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
+    timeRunEstimated = 7*0.0025 *project.molecule.modelCount * len(project.molecule.allResidues())
     timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimated*60)
     printMessage('==> Running What If checks for an estimated (5,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
     scriptFileName = "whatif.script"
