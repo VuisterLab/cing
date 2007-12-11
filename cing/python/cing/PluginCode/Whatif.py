@@ -475,6 +475,8 @@ def runWhatif( project, tmp=None ):
     timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimatedInSeconds)
     printMessage('==> Running What If checks on '+`totalNumberOfResidues`+
                  " residues for an estimated (13 protonated residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    if totalNumberOfResidues < 100:
+        printDebug("It takes longer per residue for small molecules and few models")
     scriptFileName = "whatif.script"
     scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
