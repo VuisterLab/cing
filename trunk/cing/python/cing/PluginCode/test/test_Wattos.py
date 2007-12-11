@@ -5,7 +5,7 @@ python $cingPath/PluginCode/test/test_Whatif.py
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing.Libs.NTutils import SetupError
-from cing.PluginCode.Whatif import runWhatif
+from cing.PluginCode.Wattos import runWattos
 from cing.core.classes import Project
 from unittest import TestCase
 import os
@@ -31,7 +31,7 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
         print project.save()
         print project.cingPaths.format()
-        self.assertTrue(runWhatif(project))                                    
+        self.assertTrue(runWattos(project))                                    
 
 if __name__ == "__main__":
     unittest.main()

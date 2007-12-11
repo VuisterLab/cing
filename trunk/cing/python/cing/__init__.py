@@ -28,8 +28,8 @@ cingPythonDir = os.path.split(cingPythonCingDir)[0]
 cingRoot = os.path.split(cingPythonDir)[0]
 #printDebug("cingRoot        : " + cingRoot)
 ######################################################################################################
-cingDirTests       = os.path.join(cingRoot, "Tests")
-cingDirTestsData   = os.path.join(cingDirTests, "data")
+cingDirTests       = os.path.join(cingRoot,         "Tests")
+cingDirTestsData   = os.path.join(cingDirTests,     "data")
 cingDirTestsTmp    = os.path.join(cingDirTestsData, "tmp")
 
 

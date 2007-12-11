@@ -716,8 +716,10 @@ Return an Molecule instance or None on error
         
         """
         
-        if self.modelCount == 0: return None
-        if model and model >= self.modelCount: return None
+        if self.modelCount == 0: 
+            return None
+        if model and model >= self.modelCount: 
+            return None
         
         if (model!=None):
             models = NTlist( model )
@@ -742,7 +744,7 @@ Return an Molecule instance or None on error
  
             if ( len(models) > 1 ):
                 record = PyMMLib.MODEL()
-                record.serial = model
+                record.serial = model + 1# JFD is curious as to why this was wrong?
                 pdbFile.append( record )
             #end if
             

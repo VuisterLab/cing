@@ -14,6 +14,7 @@ from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import printError
 from cing.Libs.NTutils import NTwarning
+from glob import glob
 import os
 import time
 
@@ -436,7 +437,7 @@ def runWhatif( project, tmp=None ):
     
     for res in project.molecule.allResidues():
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-            NTwarning('Warning predictWithShiftx: non-standard residue %s will found\n', res)   
+            NTwarning('Warning predictWithShiftx: non-standard residue %s will found\n' % `res`)   
         
     models = NTlist(*range( project.molecule.modelCount ))
             
@@ -469,9 +470,11 @@ def runWhatif( project, tmp=None ):
     scriptComplete += Whatif.scriptQuit
     # Let's ask the user to be nice and not kill us
     # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
-    timeRunEstimated = 7*0.0025 *project.molecule.modelCount * len(project.molecule.allResidues())
-    timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimated*60)
-    printMessage('==> Running What If checks for an estimated (5,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
+    timeRunEstimatedInSeconds    = totalNumberOfResidues / 13.
+    timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimatedInSeconds)
+    printMessage('==> Running What If checks on '+`totalNumberOfResidues`+
+                 " residues for an estimated (13 protonated residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
     scriptFileName = "whatif.script"
     scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
@@ -490,7 +493,14 @@ def runWhatif( project, tmp=None ):
     if whatifExitCode:
         printError("Failed whatif checks with exit code: " + `whatifExitCode`)
         return None
-
+    removeList = []
+    for extension in [ "*.eps", "*.pdb", "*.LOG", "*.PDB", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
+        for fn in glob(os.path.join(whatifDir,extension)):
+            removeList.append(fn)
+    for fn in removeList:
+        printDebug("Removing: " + fn)
+        os.unlink(fn)
+        
     for model in models:
 #    for model in (0,1):
         modelNumber = model + 1

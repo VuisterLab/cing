@@ -2999,13 +2999,18 @@ class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
     """
-    def __init__(self, pathToProgram, rootPath = None, redirectOutput= True, 
-                 redirectInputFromDummy = False,
+    def __init__(self, pathToProgram, rootPath = None, 
+                 redirectOutput= True, 
+                 redirectOutputToFile = False,
+                 redirectInputFromDummy = False, 
+                 redirectInputFromFile = False,
                  verbose=True, *args, **kwds):
         NTdict.__init__( self, pathToProgram  = pathToProgram,
                                rootPath       = rootPath,
                                redirectOutput = redirectOutput,
+                               redirectOutputToFile   = redirectOutputToFile,
                                redirectInputFromDummy = redirectInputFromDummy,
+                               redirectInputFromFile  = redirectInputFromFile,
                                verbose        = verbose,
                                *args, **kwds
                        )
@@ -3026,15 +3031,28 @@ class ExecuteProgram( NTdict ):
             cmd = sprintf('%s %s', self.pathToProgram, " ".join(args))
         #end if
         
+        if self.redirectInputFromDummy and self.redirectInputFromFile:
+            printError("Can't redirect from dummy and from a file at the same time")
+            return 1
+        
+        if self.redirectOutputToFile and self.redirectOutput:
+            printDebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
+            self.redirectOutput = False
+            
+
+        if self.redirectInputFromDummy:
+            cmd = sprintf('%s < /dev/null', cmd)
+        elif self.redirectInputFromFile:
+            cmd = '%s < %s' % ( cmd, self.redirectInputFromFile)
+            
         if self.redirectOutput:
             dir,name,dummy_ext = NTpath( self.pathToProgram )
             cmd = sprintf('%s >& %s.out%d', cmd, name, self.jobcount)
             self.jobcount += 1
-        #endif
-        if self.redirectInputFromDummy:
-            dir,name,dummy_ext = NTpath( self.pathToProgram )
-            cmd = sprintf('%s < /dev/null', cmd)
-        #endif
+        elif self.redirectOutputToFile:
+            cmd = sprintf('%s >& %s%d', cmd, self.redirectOutputToFile, self.jobcount)
+            self.jobcount += 1
+
         if (self.verbose): 
             NTmessage('==> Executing (%s) ... ', cmd)
             NTmessage.flush()
