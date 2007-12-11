@@ -173,8 +173,8 @@ class Procheck:
         of each residue of mol
         
         """
-        for i in range(0,self.molecule.modelCount):
-            path = os.path.join( self.rootPath, sprintf('%s_%03d.rin', self.molecule.name, i) )            
+        for i in range(1,self.molecule.modelCount+1):
+            path = os.path.join( self.rootPath, '%s_%03d.rin' % ( self.molecule.name, i ) )           
             print '> parsing >', path
     
             for line in AwkLike( path, minLength = 64, commentString = "#" ):

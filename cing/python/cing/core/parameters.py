@@ -40,7 +40,8 @@ directories.keysformat() #define a format string for 'pretty' output
 moleculeDirectories = NTdict(     
     # Directories generated 
     procheck   = 'Procheck',
-    whatif  = 'Whatif',
+    whatif     = 'Whatif',
+    wattos     = 'Wattos',
     analysis   = 'Cing',
 #    profit     = 'Profit',
     shiftx     = 'Shiftx', 
@@ -53,7 +54,7 @@ htmlDirectories = NTdict(
     # Directories generated 
     procheck= 'Models',
     whatif  = 'Restraints',
-    peaks      = 'Peaks'
+    peaks   = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output
 

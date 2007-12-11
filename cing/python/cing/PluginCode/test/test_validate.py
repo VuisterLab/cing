@@ -13,7 +13,7 @@ import unittest
 class AllChecks(TestCase):
         
     def testrun(self):
-        """wattos run check"""
+        """valiate run check"""
 #        SETUP FIRST
         if os.chdir(cingDirTestsTmp):
             raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
