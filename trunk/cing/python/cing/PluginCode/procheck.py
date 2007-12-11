@@ -18,12 +18,11 @@ Residue
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
 import os

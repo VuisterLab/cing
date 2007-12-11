@@ -1,7 +1,9 @@
 from cing import cingPythonCingDir
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import printError
 from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import printWarning
 from cing.core.classes import Project
@@ -18,17 +20,17 @@ def importPlugin( pluginName ):
     Import a plugin
     Returns None on error
     """
-#    printDebug('==> Importing plugin ' + pluginName)
-    # Reloading the plugin modules is a typical case of overoptimalization
-    # it hardly takes time to do an import.
-#    try:
-#        plugin = plugins[pluginName]
-#        reload( plugin.module )
-#    except KeyError, AttributeError:
-#        printDebug('A reload failed for ' + pluginName)
-
+    printDebug('==> Importing plugin ' + pluginName)
     pluginCodeModule = 'cing.' + cingPaths.plugins
 #    moduleName = cingPaths.plugins + '.' + pluginName
+    if plugins.has_key(pluginName):
+        try:
+            plugin = plugins[pluginName]
+#            printDebug("reloading same module just to see it change") 
+            reload( plugin.module )
+        except:
+            printError('A reload failed for ' + pluginName)
+            return None
 #    module = __import__( moduleName, globals(), locals(), [] )
 #    printMessage('==> Attempting import plugin ' + pluginName )
 # by the manuals words: 
