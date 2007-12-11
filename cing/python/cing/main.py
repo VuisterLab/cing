@@ -61,7 +61,7 @@ from cing.core.parameters import plugins
 from cing.PluginCode.test.test_All import testAll
 import os 
 import sys
-
+import cing #@UnusedImport
 
 
 
