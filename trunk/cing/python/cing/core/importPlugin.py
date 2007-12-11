@@ -26,29 +26,29 @@ def importPlugin( pluginName ):
     if plugins.has_key(pluginName):
         try:
             plugin = plugins[pluginName]
-#            printDebug("reloading same module just to see it change") 
+#            printDebug("reloading same module just to see it change")
             reload( plugin.module )
         except:
             printError('A reload failed for ' + pluginName)
             return None
 #    module = __import__( moduleName, globals(), locals(), [] )
 #    printMessage('==> Attempting import plugin ' + pluginName )
-# by the manuals words: 
-# "However, when a non-empty fromlist argument is given, the module named by name is returned." 
-    pluginCodeModulePackage = __import__( pluginCodeModule, 
-                         globals(), 
-                         locals(), 
-                         [pluginName]) #JFD changed from default to zero which means to only try absolute imports. 
+# by the manuals words:
+# "However, when a non-empty fromlist argument is given, the module named by name is returned."
+    pluginCodeModulePackage = __import__( pluginCodeModule,
+                         globals(),
+                         locals(),
+                         [pluginName]) #JFD changed from default to zero which means to only try absolute imports.
 
 #    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
     printMessage('==> Imported plugin ' + pluginName )
     if not hasattr(pluginCodeModulePackage, pluginName):
         NTerror("Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
-        return None            
+        return None
 #     set p to plugin module
     pluginModule = getattr( pluginCodeModulePackage, pluginName )
 #    printDebug("pluginModule looks like: " + `pluginModule`)
-    
+
     plugin = NTdict( module = pluginModule, name = pluginName)
     #end try
 #    printDebug('==> Staging plugin ' + pluginName)
@@ -69,7 +69,7 @@ def importPlugin( pluginName ):
     #end for
 
 #    plugin.printAttr()
-       
+
 #    printMessage('==> Staged plugin ' + plugin.module.__file__ )
     #end if
     return plugin
@@ -81,8 +81,8 @@ pluginDir = os.path.join(cingPythonCingDir, cingPaths.plugins)
 pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #printDebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
-printWarning("TODO: reintroduce the ccpn plugin code here once fixed")
-pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
+#printWarning("TODO: reintroduce the ccpn plugin code here once fixed")
+#pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
 #printWarning("TODO: reintroduce the validate plugin code here once fixed")
 #pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
 for p in pluginFileList:
