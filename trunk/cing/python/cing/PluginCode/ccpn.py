@@ -194,6 +194,7 @@ except:
     except:
         NTerror("Import Error: CCPN framework not defined\n")
         raise ImportError
+    #end try
 #end try
 
 #printDebug("Done importing readXmlProjectFile; which is impossible")
@@ -282,8 +283,9 @@ def loadCcpn( cingProject = None, ccpnFile = None ):
     funcName = loadCcpn.func_name
 
     _checkCingProject( cingProject, funcName )
-    if not cingProject: 
+    if not cingProject:
         return None
+    #end if
 
     if ( not ccpnFile or not os.path.exists(ccpnFile) ):
         NTerror("ERROR '%s': ccpnFile '%s' not found\n", funcName, ccpnFile)
@@ -294,6 +296,7 @@ def loadCcpn( cingProject = None, ccpnFile = None ):
         ccpnProject = readXmlProjectFile(file = ccpnFile)
     else:
         ccpnProject = loadProject(ccpnFile)
+    #end if
 
     if ( ccpnProject ):
 
@@ -320,7 +323,9 @@ def initCcpn( cingProject, ccpnFile = None ):
     funcName = initCcpn.func_name
 
     _checkCingProject( cingProject, funcName )
-    if not cingProject: return None
+    if not cingProject:
+        return None
+    #end fi
 
     if not ccpnFile:
         NTerror("ERROR initCcpn: ccpnFile not given")

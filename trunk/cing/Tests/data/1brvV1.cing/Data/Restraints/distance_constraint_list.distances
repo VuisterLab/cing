@@ -1,0 +1,1324 @@
+<SML> 0.1
+<DistanceRestraintList> distance_constraint_list keep
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.1419999999999999
+    atomPairs       = [(('INTERNAL', 'A', 171, 'HB'), ('INTERNAL', 'A', 171, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.9779999999999998
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 171, 'HA')), (('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 171, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.5300000000000002
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 171, 'HN')), (('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 171, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.4550000000000001
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QB'), ('INTERNAL', 'A', 172, 'QD'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7069999999999999
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QG'), ('INTERNAL', 'A', 172, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.556
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 173, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2759999999999998
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 173, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0800000000000001
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 173, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.839
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HB'), ('INTERNAL', 'A', 175, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7799999999999998
+    atomPairs       = [(('INTERNAL', 'A', 175, 'QG2'), ('INTERNAL', 'A', 175, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0060000000000002
+    atomPairs       = [(('INTERNAL', 'A', 175, 'QG2'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8839999999999999
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 176, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4830000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9369999999999998
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.5640000000000001
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HA'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.4950000000000001
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QB'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0670000000000002
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QG'), ('INTERNAL', 'A', 177, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.694
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QG'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.726
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.911
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.1859999999999999
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 179, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8410000000000002
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.871
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 179, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8900000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2359999999999998
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0569999999999999
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 180, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.919
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.859
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 180, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.7210000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 180, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.407
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2670000000000003
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QD2'), ('INTERNAL', 'A', 180, 'HA')), (('INTERNAL', 'A', 180, 'QD1'), ('INTERNAL', 'A', 180, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3879999999999999
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QD1'), ('INTERNAL', 'A', 180, 'QB')), (('INTERNAL', 'A', 180, 'QD2'), ('INTERNAL', 'A', 180, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.4470000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QD1'), ('INTERNAL', 'A', 180, 'QB')), (('INTERNAL', 'A', 180, 'QD2'), ('INTERNAL', 'A', 180, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.2350000000000003
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QD2'), ('INTERNAL', 'A', 180, 'HN')), (('INTERNAL', 'A', 180, 'QD1'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4119999999999999
+    atomPairs       = [(('INTERNAL', 'A', 181, 'QB'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0590000000000002
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9580000000000002
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9369999999999998
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 182, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.919
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.839
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8159999999999998
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QB'), ('INTERNAL', 'A', 183, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2170000000000001
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3099999999999996
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 183, 'HA')), (('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 183, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.9359999999999999
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 183, 'HN')), (('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2140000000000004
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 183, 'QB')), (('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.327
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 183, 'QB')), (('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8900000000000001
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HG'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8300000000000001
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HG'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.847
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0339999999999998
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QB'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.75
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QD1'), ('INTERNAL', 'A', 185, 'HA')), (('INTERNAL', 'A', 185, 'QD2'), ('INTERNAL', 'A', 185, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.4539999999999997
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QD2'), ('INTERNAL', 'A', 185, 'QB')), (('INTERNAL', 'A', 185, 'QD1'), ('INTERNAL', 'A', 185, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.6799999999999997
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QD2'), ('INTERNAL', 'A', 185, 'HN')), (('INTERNAL', 'A', 185, 'QD1'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9830000000000001
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HG'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2690000000000001
+    atomPairs       = [(('INTERNAL', 'A', 186, 'QB'), ('INTERNAL', 'A', 186, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7450000000000001
+    atomPairs       = [(('INTERNAL', 'A', 186, 'QB'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9510000000000001
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 187, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6240000000000001
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 187, 'HD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2440000000000002
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0620000000000003
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 187, 'HD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.589
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.931
+    atomPairs       = [(('INTERNAL', 'A', 187, 'HD2'), ('INTERNAL', 'A', 187, 'HE1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.5590000000000002
+    atomPairs       = [(('INTERNAL', 'A', 187, 'HD2'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1550000000000002
+    atomPairs       = [(('INTERNAL', 'A', 188, 'QG1'), ('INTERNAL', 'A', 188, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1340000000000003
+    atomPairs       = [(('INTERNAL', 'A', 188, 'QG1'), ('INTERNAL', 'A', 188, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3230000000000004
+    atomPairs       = [(('INTERNAL', 'A', 189, 'QB'), ('INTERNAL', 'A', 189, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3150000000000004
+    atomPairs       = [(('INTERNAL', 'A', 189, 'QG'), ('INTERNAL', 'A', 189, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7949999999999999
+    atomPairs       = [(('INTERNAL', 'A', 189, 'QG'), ('INTERNAL', 'A', 189, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.5230000000000001
+    atomPairs       = [(('INTERNAL', 'A', 171, 'HA'), ('INTERNAL', 'A', 172, 'QD'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.9779999999999998
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 172, 'QD')), (('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 172, 'QD'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.3369999999999997
+    atomPairs       = [(('INTERNAL', 'A', 171, 'HN'), ('INTERNAL', 'A', 172, 'QD'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3159999999999998
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QB'), ('INTERNAL', 'A', 173, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1920000000000002
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HA'), ('INTERNAL', 'A', 174, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.4969999999999999
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 174, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7200000000000002
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 174, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.5099999999999998
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 174, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.577
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HA'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0570000000000004
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HA'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3029999999999999
+    atomPairs       = [(('INTERNAL', 'A', 174, 'QB'), ('INTERNAL', 'A', 175, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.1559999999999997
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HN'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8769999999999998
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HN'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8700000000000001
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HA'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6879999999999997
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HB'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.625
+    atomPairs       = [(('INTERNAL', 'A', 175, 'QG2'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9620000000000002
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HN'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3010000000000002
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HA'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.343
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8420000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.9699999999999998
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 177, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4289999999999998
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.1710000000000003
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QG'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.319
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 178, 'QA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.226
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 178, 'QA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2349999999999999
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.754
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.633
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2090000000000001
+    atomPairs       = [(('INTERNAL', 'A', 178, 'HN'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.077
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 180, 'QD2')), (('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 180, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.597
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.2060000000000004
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.2889999999999997
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8490000000000002
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2450000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4279999999999999
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.157
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QD2'), ('INTERNAL', 'A', 181, 'HN')), (('INTERNAL', 'A', 180, 'QD1'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.6440000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HN'), ('INTERNAL', 'A', 181, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.1709999999999998
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HN'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.0419999999999998
+    atomPairs       = [(('INTERNAL', 'A', 181, 'QB'), ('INTERNAL', 'A', 182, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8599999999999999
+    atomPairs       = [(('INTERNAL', 'A', 181, 'QB'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7810000000000001
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.9729999999999999
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6110000000000002
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2650000000000001
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.5169999999999999
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3010000000000002
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HN'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8260000000000001
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HN'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8620000000000001
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HA'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.496
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QB'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8170000000000002
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QB'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.1970000000000001
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 184, 'HN')), (('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2719999999999998
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HN'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.875
+    atomPairs       = [(('INTERNAL', 'A', 184, 'HA'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.6900000000000004
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 185, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.5549999999999997
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 185, 'QD2')), (('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 185, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7709999999999999
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 185, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6219999999999999
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.1779999999999999
+    atomPairs       = [(('INTERNAL', 'A', 184, 'HN'), ('INTERNAL', 'A', 185, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.798
+    atomPairs       = [(('INTERNAL', 'A', 184, 'HN'), ('INTERNAL', 'A', 185, 'QD2')), (('INTERNAL', 'A', 184, 'HN'), ('INTERNAL', 'A', 185, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.028
+    atomPairs       = [(('INTERNAL', 'A', 184, 'HN'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8929999999999998
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HA'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.944
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QB'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.3470000000000004
+    atomPairs       = [(('INTERNAL', 'A', 185, 'QD2'), ('INTERNAL', 'A', 186, 'HN')), (('INTERNAL', 'A', 185, 'QD1'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.1459999999999999
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HN'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.7130000000000001
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HN'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8679999999999999
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HN'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.9340000000000002
+    atomPairs       = [(('INTERNAL', 'A', 186, 'HA'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0529999999999999
+    atomPairs       = [(('INTERNAL', 'A', 186, 'QB'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0880000000000001
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 188, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.597
+    atomPairs       = [(('INTERNAL', 'A', 187, 'QB'), ('INTERNAL', 'A', 188, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2830000000000004
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QB'), ('INTERNAL', 'A', 174, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.492
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QB'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.383
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QB'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.5620000000000003
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QD'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.6669999999999998
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QD'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.6459999999999999
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QG'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.8109999999999999
+    atomPairs       = [(('INTERNAL', 'A', 172, 'QG'), ('INTERNAL', 'A', 175, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 9.2739999999999991
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HN'), ('INTERNAL', 'A', 175, 'QG2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0430000000000001
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HA'), ('INTERNAL', 'A', 176, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.9720000000000004
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HA'), ('INTERNAL', 'A', 176, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6130000000000004
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HA'), ('INTERNAL', 'A', 176, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.859
+    atomPairs       = [(('INTERNAL', 'A', 174, 'HA'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.4219999999999997
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HA'), ('INTERNAL', 'A', 177, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.5949999999999998
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HA'), ('INTERNAL', 'A', 177, 'QG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7629999999999999
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HA'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.8780000000000001
+    atomPairs       = [(('INTERNAL', 'A', 175, 'QG2'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2759999999999998
+    atomPairs       = [(('INTERNAL', 'A', 175, 'HN'), ('INTERNAL', 'A', 177, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.6849999999999996
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HA'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.9830000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8180000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 178, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7830000000000004
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HA'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0499999999999998
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 179, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4409999999999998
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.5220000000000002
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QB'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.8239999999999998
+    atomPairs       = [(('INTERNAL', 'A', 177, 'QG'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3159999999999998
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3250000000000002
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.1269999999999998
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 181, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.1660000000000004
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.0149999999999997
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 182, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2949999999999999
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QD2'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1289999999999996
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 182, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.0659999999999998
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.484
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 8.2690000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1609999999999996
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 8.6989999999999998
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.1600000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.2839999999999998
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.1609999999999996
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.4870000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6070000000000002
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 182, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2919999999999998
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.5430000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7759999999999998
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.5990000000000002
+    atomPairs       = [(('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 180, 'QB'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.5709999999999997
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HN'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 180, 'HN'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 9.3320000000000007
+    atomPairs       = [(('INTERNAL', 'A', 181, 'HN'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 181, 'HN'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8809999999999998
+    atomPairs       = [(('INTERNAL', 'A', 181, 'HA'), ('INTERNAL', 'A', 184, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6819999999999999
+    atomPairs       = [(('INTERNAL', 'A', 181, 'HA'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.9740000000000002
+    atomPairs       = [(('INTERNAL', 'A', 181, 'QB'), ('INTERNAL', 'A', 184, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.0599999999999996
+    atomPairs       = [(('INTERNAL', 'A', 181, 'QB'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.609
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HN'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6959999999999997
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 185, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0119999999999996
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.6310000000000002
+    atomPairs       = [(('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 185, 'QD2')), (('INTERNAL', 'A', 182, 'QB'), ('INTERNAL', 'A', 185, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.6660000000000004
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HA'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7839999999999998
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HN'), ('INTERNAL', 'A', 185, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0739999999999998
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HA'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.0410000000000004
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 186, 'QB')), (('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 8.1920000000000002
+    atomPairs       = [(('INTERNAL', 'A', 183, 'QD2'), ('INTERNAL', 'A', 186, 'HN')), (('INTERNAL', 'A', 183, 'QD1'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.9809999999999999
+    atomPairs       = [(('INTERNAL', 'A', 184, 'QB'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.4009999999999998
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 186, 'HA')), (('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 186, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.8099999999999996
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 186, 'QB')), (('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.8330000000000002
+    atomPairs       = [(('INTERNAL', 'A', 171, 'QG2'), ('INTERNAL', 'A', 186, 'QB')), (('INTERNAL', 'A', 171, 'QG1'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.8159999999999998
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.0979999999999999
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4590000000000001
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HA'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.7480000000000002
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.726
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HN'), ('INTERNAL', 'A', 186, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.923
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 188, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.7599999999999998
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 188, 'QG1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3579999999999997
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 188, 'QG1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 7.5579999999999998
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HN'), ('INTERNAL', 'A', 188, 'QG1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1479999999999997
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 182, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.0970000000000004
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 182, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7779999999999996
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.335
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.8920000000000003
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.024
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8559999999999999
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.5679999999999996
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.8200000000000003
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.2240000000000002
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3620000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'QB'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 8.1289999999999996
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 9.3379999999999992
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 183, 'QD1')), (('INTERNAL', 'A', 177, 'HN'), ('INTERNAL', 'A', 183, 'QD2'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.6749999999999998
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.1639999999999997
+    atomPairs       = [(('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 178, 'QA'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 6.5860000000000003
+    atomPairs       = [(('INTERNAL', 'A', 178, 'HN'), ('INTERNAL', 'A', 183, 'QD2')), (('INTERNAL', 'A', 178, 'HN'), ('INTERNAL', 'A', 183, 'QD1'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.5129999999999999
+    atomPairs       = [(('INTERNAL', 'A', 181, 'HN'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8719999999999999
+    atomPairs       = [(('INTERNAL', 'A', 188, 'HB'), ('INTERNAL', 'A', 188, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8180000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.4100000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HA'), ('INTERNAL', 'A', 183, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.948
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HA'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.6850000000000001
+    atomPairs       = [(('INTERNAL', 'A', 180, 'HG'), ('INTERNAL', 'A', 180, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0590000000000002
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HN'), ('INTERNAL', 'A', 174, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.8700000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.4589999999999996
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 182, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.375
+    atomPairs       = [(('INTERNAL', 'A', 173, 'QB'), ('INTERNAL', 'A', 188, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.0529999999999999
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HG'), ('INTERNAL', 'A', 183, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1890000000000001
+    atomPairs       = [(('INTERNAL', 'A', 184, 'HN'), ('INTERNAL', 'A', 185, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.387
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 185, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.5190000000000001
+    atomPairs       = [(('INTERNAL', 'A', 176, 'HN'), ('INTERNAL', 'A', 177, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.8740000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 180, 'QB'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.8819999999999997
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HA'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9460000000000002
+    atomPairs       = [(('INTERNAL', 'A', 188, 'HB'), ('INTERNAL', 'A', 188, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.1500000000000004
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HG'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3479999999999999
+    atomPairs       = [(('INTERNAL', 'A', 182, 'HN'), ('INTERNAL', 'A', 183, 'HG'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.843
+    atomPairs       = [(('INTERNAL', 'A', 178, 'HN'), ('INTERNAL', 'A', 179, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6440000000000001
+    atomPairs       = [(('INTERNAL', 'A', 173, 'HN'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6779999999999999
+    atomPairs       = [(('INTERNAL', 'A', 171, 'HB'), ('INTERNAL', 'A', 186, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.9089999999999998
+    atomPairs       = [(('INTERNAL', 'A', 181, 'HA'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3369999999999997
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HN'), ('INTERNAL', 'A', 181, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3360000000000003
+    atomPairs       = [(('INTERNAL', 'A', 177, 'HA'), ('INTERNAL', 'A', 179, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.5230000000000001
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HG'), ('INTERNAL', 'A', 185, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 2.8399999999999999
+    atomPairs       = [(('INTERNAL', 'A', 189, 'HA'), ('INTERNAL', 'A', 189, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 3.6640000000000001
+    atomPairs       = [(('INTERNAL', 'A', 187, 'HE1'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.0190000000000001
+    atomPairs       = [(('INTERNAL', 'A', 179, 'HA'), ('INTERNAL', 'A', 180, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.431
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HG'), ('INTERNAL', 'A', 184, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3339999999999996
+    atomPairs       = [(('INTERNAL', 'A', 179, 'QB'), ('INTERNAL', 'A', 180, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 5.3959999999999999
+    atomPairs       = [(('INTERNAL', 'A', 183, 'HA'), ('INTERNAL', 'A', 186, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3159999999999998
+    atomPairs       = [(('INTERNAL', 'A', 186, 'HN'), ('INTERNAL', 'A', 187, 'HN'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.3899999999999997
+    atomPairs       = [(('INTERNAL', 'A', 185, 'HA'), ('INTERNAL', 'A', 186, 'HA'))]
+</DistanceRestraint>
+<DistanceRestraint>
+    lower           = 1.8
+    upper           = 4.7069999999999999
+    atomPairs       = [(('INTERNAL', 'A', 171, 'HA'), ('INTERNAL', 'A', 186, 'HN'))]
+</DistanceRestraint>
+</DistanceRestraintList>
+</SML>

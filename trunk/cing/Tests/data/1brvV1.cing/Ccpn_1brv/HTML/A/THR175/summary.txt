@@ -1,0 +1,6 @@
+----- <Residue THR175> -----
+PHI   : average:  -103.5   cv: 0.009  ||  outliers:-999 (models -999)
+PSI   : average:   -21.7   cv: 0.002  ||  outliers: 8 (models [14, 42, 20, 12, 62, 90, 68, 60])
+CHI1  : average:    71.7   cv: 0.001  ||  outliers:-999 (models -999)
+CHI2  : average:   317.0   cv: 0.013  ||  outliers:-999 (models -999)
+OMEGA : average:   177.3   cv: 0.000  ||  outliers:-999 (models -999)

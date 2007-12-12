@@ -1,0 +1,6 @@
+----- <Residue SER174> -----
+PHI   : average:   -56.4   cv: 0.001  ||  outliers:-999 (models -999)
+PSI   : average:   -18.5   cv: 0.010  ||  outliers:-999 (models -999)
+CHI1  : average:    63.8   cv: 0.001  ||  outliers: 5 (models [0, 46, 48, 20, 94])
+CHI2  : average:    86.6   cv: 0.347  ||  outliers: 6 (models [33, 44, 46, 81, 92, 94])
+OMEGA : average:   167.5   cv: 0.000  ||  outliers:-999 (models -999)
