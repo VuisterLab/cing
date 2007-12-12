@@ -1,0 +1,2188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit time="Fri Aug 24 10:30:47 2007" release="1.0.213" 
+ packageName="ccp.MolSystem" root="1brv" originator="CCPN Python XmlIO">
+ 
+<MolSystem _ID="_1" code="1brv">
+  <Chain _ID="_2">
+    <code>A</code>
+    <pdbOneLetterCode>A</pdbOneLetterCode>
+    <molecule>
+      <key1 tag="name">PROTEIN G</key1>
+    </molecule>
+    <ChainFragment _ID="_3" serial="1" isLinearPolymer="true" molType="protein">
+      <residues _IDREF="_4"/>
+      <residues _IDREF="_5"/>
+      <residues _IDREF="_6"/>
+      <residues _IDREF="_7"/>
+      <residues _IDREF="_8"/>
+      <residues _IDREF="_9"/>
+      <residues _IDREF="_10"/>
+      <residues _IDREF="_11"/>
+      <residues _IDREF="_12"/>
+      <residues _IDREF="_13"/>
+      <residues _IDREF="_14"/>
+      <residues _IDREF="_15"/>
+      <residues _IDREF="_16"/>
+      <residues _IDREF="_17"/>
+      <residues _IDREF="_18"/>
+      <residues _IDREF="_19"/>
+      <residues _IDREF="_20"/>
+      <residues _IDREF="_21"/>
+      <residues _IDREF="_22"/>
+      <residues _IDREF="_23"/>
+      <residues _IDREF="_24"/>
+      <residues _IDREF="_25"/>
+      <residues _IDREF="_26"/>
+      <residues _IDREF="_27"/>
+      <residues _IDREF="_28"/>
+      <residues _IDREF="_29"/>
+      <residues _IDREF="_30"/>
+      <residues _IDREF="_31"/>
+      <residues _IDREF="_32"/>
+      <residues _IDREF="_33"/>
+      <residues _IDREF="_34"/>
+      <residues _IDREF="_35"/>
+    </ChainFragment>
+    <Residue _ID="_4" seqId="1" seqCode="158" linking="start" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:H3</descriptor>
+      <Atom _ID="_36" name="C">
+      </Atom>
+      <Atom _ID="_37" name="ND2">
+      </Atom>
+      <Atom _ID="_38" name="HD22">
+      </Atom>
+      <Atom _ID="_39" name="HD21">
+      </Atom>
+      <Atom _ID="_40" name="H2">
+      </Atom>
+      <Atom _ID="_41" name="H3">
+      </Atom>
+      <Atom _ID="_42" name="CA">
+      </Atom>
+      <Atom _ID="_43" name="H1">
+      </Atom>
+      <Atom _ID="_44" name="CG">
+      </Atom>
+      <Atom _ID="_45" name="O">
+      </Atom>
+      <Atom _ID="_46" name="N">
+      </Atom>
+      <Atom _ID="_47" name="OD1">
+      </Atom>
+      <Atom _ID="_48" name="CB">
+      </Atom>
+      <Atom _ID="_49" name="HA">
+      </Atom>
+      <Atom _ID="_50" name="HB3">
+      </Atom>
+      <Atom _ID="_51" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_5" seqId="2" seqCode="159" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HD1,HE2</descriptor>
+      <Atom _ID="_52" name="C">
+      </Atom>
+      <Atom _ID="_53" name="HE2">
+      </Atom>
+      <Atom _ID="_54" name="CE1">
+      </Atom>
+      <Atom _ID="_55" name="HD1">
+      </Atom>
+      <Atom _ID="_56" name="H">
+      </Atom>
+      <Atom _ID="_57" name="CA">
+      </Atom>
+      <Atom _ID="_58" name="CG">
+      </Atom>
+      <Atom _ID="_59" name="O">
+      </Atom>
+      <Atom _ID="_60" name="HE1">
+      </Atom>
+      <Atom _ID="_61" name="N">
+      </Atom>
+      <Atom _ID="_62" name="HD2">
+      </Atom>
+      <Atom _ID="_63" name="CD2">
+      </Atom>
+      <Atom _ID="_64" name="CB">
+      </Atom>
+      <Atom _ID="_65" name="ND1">
+      </Atom>
+      <Atom _ID="_66" name="HA">
+      </Atom>
+      <Atom _ID="_67" name="NE2">
+      </Atom>
+      <Atom _ID="_68" name="HB3">
+      </Atom>
+      <Atom _ID="_69" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_6" seqId="3" seqCode="160" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_70" name="HG2">
+      </Atom>
+      <Atom _ID="_71" name="C">
+      </Atom>
+      <Atom _ID="_72" name="H">
+      </Atom>
+      <Atom _ID="_73" name="CA">
+      </Atom>
+      <Atom _ID="_74" name="CG">
+      </Atom>
+      <Atom _ID="_75" name="HG3">
+      </Atom>
+      <Atom _ID="_76" name="O">
+      </Atom>
+      <Atom _ID="_77" name="CD">
+      </Atom>
+      <Atom _ID="_78" name="N">
+      </Atom>
+      <Atom _ID="_79" name="CB">
+      </Atom>
+      <Atom _ID="_80" name="HE22">
+      </Atom>
+      <Atom _ID="_81" name="HE21">
+      </Atom>
+      <Atom _ID="_82" name="HA">
+      </Atom>
+      <Atom _ID="_83" name="NE2">
+      </Atom>
+      <Atom _ID="_84" name="OE1">
+      </Atom>
+      <Atom _ID="_85" name="HB3">
+      </Atom>
+      <Atom _ID="_86" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_7" seqId="4" seqCode="161" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>deprot:HD2</descriptor>
+      <Atom _ID="_87" name="C">
+      </Atom>
+      <Atom _ID="_88" name="H">
+      </Atom>
+      <Atom _ID="_89" name="CA">
+      </Atom>
+      <Atom _ID="_90" name="CG">
+      </Atom>
+      <Atom _ID="_91" name="O">
+      </Atom>
+      <Atom _ID="_92" name="N">
+      </Atom>
+      <Atom _ID="_93" name="OD1">
+      </Atom>
+      <Atom _ID="_94" name="CB">
+      </Atom>
+      <Atom _ID="_95" name="HA">
+      </Atom>
+      <Atom _ID="_96" name="OD2">
+      </Atom>
+      <Atom _ID="_97" name="HB3">
+      </Atom>
+      <Atom _ID="_98" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_8" seqId="5" seqCode="162" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HD1,HE2</descriptor>
+      <Atom _ID="_99" name="C">
+      </Atom>
+      <Atom _ID="_100" name="HE2">
+      </Atom>
+      <Atom _ID="_101" name="CE1">
+      </Atom>
+      <Atom _ID="_102" name="HD1">
+      </Atom>
+      <Atom _ID="_103" name="H">
+      </Atom>
+      <Atom _ID="_104" name="CA">
+      </Atom>
+      <Atom _ID="_105" name="CG">
+      </Atom>
+      <Atom _ID="_106" name="O">
+      </Atom>
+      <Atom _ID="_107" name="HE1">
+      </Atom>
+      <Atom _ID="_108" name="N">
+      </Atom>
+      <Atom _ID="_109" name="HD2">
+      </Atom>
+      <Atom _ID="_110" name="CD2">
+      </Atom>
+      <Atom _ID="_111" name="CB">
+      </Atom>
+      <Atom _ID="_112" name="ND1">
+      </Atom>
+      <Atom _ID="_113" name="HA">
+      </Atom>
+      <Atom _ID="_114" name="NE2">
+      </Atom>
+      <Atom _ID="_115" name="HB3">
+      </Atom>
+      <Atom _ID="_116" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_9" seqId="6" seqCode="163" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_117" name="C">
+      </Atom>
+      <Atom _ID="_118" name="ND2">
+      </Atom>
+      <Atom _ID="_119" name="HD22">
+      </Atom>
+      <Atom _ID="_120" name="HD21">
+      </Atom>
+      <Atom _ID="_121" name="H">
+      </Atom>
+      <Atom _ID="_122" name="CA">
+      </Atom>
+      <Atom _ID="_123" name="CG">
+      </Atom>
+      <Atom _ID="_124" name="O">
+      </Atom>
+      <Atom _ID="_125" name="N">
+      </Atom>
+      <Atom _ID="_126" name="OD1">
+      </Atom>
+      <Atom _ID="_127" name="CB">
+      </Atom>
+      <Atom _ID="_128" name="HA">
+      </Atom>
+      <Atom _ID="_129" name="HB3">
+      </Atom>
+      <Atom _ID="_130" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_10" seqId="7" seqCode="164" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_131" name="C">
+      </Atom>
+      <Atom _ID="_132" name="ND2">
+      </Atom>
+      <Atom _ID="_133" name="HD22">
+      </Atom>
+      <Atom _ID="_134" name="HD21">
+      </Atom>
+      <Atom _ID="_135" name="H">
+      </Atom>
+      <Atom _ID="_136" name="CA">
+      </Atom>
+      <Atom _ID="_137" name="CG">
+      </Atom>
+      <Atom _ID="_138" name="O">
+      </Atom>
+      <Atom _ID="_139" name="N">
+      </Atom>
+      <Atom _ID="_140" name="OD1">
+      </Atom>
+      <Atom _ID="_141" name="CB">
+      </Atom>
+      <Atom _ID="_142" name="HA">
+      </Atom>
+      <Atom _ID="_143" name="HB3">
+      </Atom>
+      <Atom _ID="_144" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_11" seqId="8" seqCode="165" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_145" name="HZ">
+      </Atom>
+      <Atom _ID="_146" name="C">
+      </Atom>
+      <Atom _ID="_147" name="CD2">
+      </Atom>
+      <Atom _ID="_148" name="H">
+      </Atom>
+      <Atom _ID="_149" name="CA">
+      </Atom>
+      <Atom _ID="_150" name="CG">
+      </Atom>
+      <Atom _ID="_151" name="O">
+      </Atom>
+      <Atom _ID="_152" name="N">
+      </Atom>
+      <Atom _ID="_153" name="CE2">
+      </Atom>
+      <Atom _ID="_154" name="CE1">
+      </Atom>
+      <Atom _ID="_155" name="HA">
+      </Atom>
+      <Atom _ID="_156" name="HE1">
+      </Atom>
+      <Atom _ID="_157" name="CD1">
+      </Atom>
+      <Atom _ID="_158" name="HD1">
+      </Atom>
+      <Atom _ID="_159" name="HE2">
+      </Atom>
+      <Atom _ID="_160" name="CZ">
+      </Atom>
+      <Atom _ID="_161" name="HD2">
+      </Atom>
+      <Atom _ID="_162" name="CB">
+      </Atom>
+      <Atom _ID="_163" name="HB3">
+      </Atom>
+      <Atom _ID="_164" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_12" seqId="9" seqCode="166" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_165" name="HG2">
+      </Atom>
+      <Atom _ID="_166" name="C">
+      </Atom>
+      <Atom _ID="_167" name="H">
+      </Atom>
+      <Atom _ID="_168" name="CA">
+      </Atom>
+      <Atom _ID="_169" name="CG">
+      </Atom>
+      <Atom _ID="_170" name="HG3">
+      </Atom>
+      <Atom _ID="_171" name="O">
+      </Atom>
+      <Atom _ID="_172" name="CD">
+      </Atom>
+      <Atom _ID="_173" name="N">
+      </Atom>
+      <Atom _ID="_174" name="CB">
+      </Atom>
+      <Atom _ID="_175" name="HE22">
+      </Atom>
+      <Atom _ID="_176" name="HE21">
+      </Atom>
+      <Atom _ID="_177" name="HA">
+      </Atom>
+      <Atom _ID="_178" name="NE2">
+      </Atom>
+      <Atom _ID="_179" name="OE1">
+      </Atom>
+      <Atom _ID="_180" name="HB3">
+      </Atom>
+      <Atom _ID="_181" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_13" seqId="10" seqCode="167" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HG1</descriptor>
+      <Atom _ID="_182" name="C">
+      </Atom>
+      <Atom _ID="_183" name="CG2">
+      </Atom>
+      <Atom _ID="_184" name="HG22">
+      </Atom>
+      <Atom _ID="_185" name="H">
+      </Atom>
+      <Atom _ID="_186" name="CA">
+      </Atom>
+      <Atom _ID="_187" name="OG1">
+      </Atom>
+      <Atom _ID="_188" name="O">
+      </Atom>
+      <Atom _ID="_189" name="HG1">
+      </Atom>
+      <Atom _ID="_190" name="HB">
+      </Atom>
+      <Atom _ID="_191" name="N">
+      </Atom>
+      <Atom _ID="_192" name="CB">
+      </Atom>
+      <Atom _ID="_193" name="HG21">
+      </Atom>
+      <Atom _ID="_194" name="HG23">
+      </Atom>
+      <Atom _ID="_195" name="HA">
+      </Atom>
+    </Residue>
+    <Residue _ID="_14" seqId="11" seqCode="168" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_196" name="C">
+      </Atom>
+      <Atom _ID="_197" name="HD22">
+      </Atom>
+      <Atom _ID="_198" name="HD23">
+      </Atom>
+      <Atom _ID="_199" name="HD21">
+      </Atom>
+      <Atom _ID="_200" name="H">
+      </Atom>
+      <Atom _ID="_201" name="CA">
+      </Atom>
+      <Atom _ID="_202" name="CG">
+      </Atom>
+      <Atom _ID="_203" name="O">
+      </Atom>
+      <Atom _ID="_204" name="N">
+      </Atom>
+      <Atom _ID="_205" name="CD1">
+      </Atom>
+      <Atom _ID="_206" name="CD2">
+      </Atom>
+      <Atom _ID="_207" name="HD13">
+      </Atom>
+      <Atom _ID="_208" name="HD12">
+      </Atom>
+      <Atom _ID="_209" name="HD11">
+      </Atom>
+      <Atom _ID="_210" name="HA">
+      </Atom>
+      <Atom _ID="_211" name="HG">
+      </Atom>
+      <Atom _ID="_212" name="CB">
+      </Atom>
+      <Atom _ID="_213" name="HB3">
+      </Atom>
+      <Atom _ID="_214" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_15" seqId="12" seqCode="169" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_215" name="C">
+      </Atom>
+      <Atom _ID="_216" name="HD3">
+      </Atom>
+      <Atom _ID="_217" name="HD2">
+      </Atom>
+      <Atom _ID="_218" name="CB">
+      </Atom>
+      <Atom _ID="_219" name="CA">
+      </Atom>
+      <Atom _ID="_220" name="HG2">
+      </Atom>
+      <Atom _ID="_221" name="HG3">
+      </Atom>
+      <Atom _ID="_222" name="O">
+      </Atom>
+      <Atom _ID="_223" name="CD">
+      </Atom>
+      <Atom _ID="_224" name="N">
+      </Atom>
+      <Atom _ID="_225" name="CG">
+      </Atom>
+      <Atom _ID="_226" name="HA">
+      </Atom>
+      <Atom _ID="_227" name="HB3">
+      </Atom>
+      <Atom _ID="_228" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_16" seqId="13" seqCode="170" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HH</descriptor>
+      <Atom _ID="_229" name="C">
+      </Atom>
+      <Atom _ID="_230" name="CD2">
+      </Atom>
+      <Atom _ID="_231" name="H">
+      </Atom>
+      <Atom _ID="_232" name="CA">
+      </Atom>
+      <Atom _ID="_233" name="CG">
+      </Atom>
+      <Atom _ID="_234" name="O">
+      </Atom>
+      <Atom _ID="_235" name="N">
+      </Atom>
+      <Atom _ID="_236" name="HH">
+      </Atom>
+      <Atom _ID="_237" name="CE2">
+      </Atom>
+      <Atom _ID="_238" name="CE1">
+      </Atom>
+      <Atom _ID="_239" name="HA">
+      </Atom>
+      <Atom _ID="_240" name="HE1">
+      </Atom>
+      <Atom _ID="_241" name="CD1">
+      </Atom>
+      <Atom _ID="_242" name="HD1">
+      </Atom>
+      <Atom _ID="_243" name="HE2">
+      </Atom>
+      <Atom _ID="_244" name="OH">
+      </Atom>
+      <Atom _ID="_245" name="CZ">
+      </Atom>
+      <Atom _ID="_246" name="HD2">
+      </Atom>
+      <Atom _ID="_247" name="CB">
+      </Atom>
+      <Atom _ID="_248" name="HB3">
+      </Atom>
+      <Atom _ID="_249" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_17" seqId="14" seqCode="171" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_250" name="C">
+      </Atom>
+      <Atom _ID="_251" name="CG2">
+      </Atom>
+      <Atom _ID="_252" name="HG22">
+      </Atom>
+      <Atom _ID="_253" name="H">
+      </Atom>
+      <Atom _ID="_254" name="CA">
+      </Atom>
+      <Atom _ID="_255" name="HG21">
+      </Atom>
+      <Atom _ID="_256" name="O">
+      </Atom>
+      <Atom _ID="_257" name="N">
+      </Atom>
+      <Atom _ID="_258" name="CG1">
+      </Atom>
+      <Atom _ID="_259" name="HG11">
+      </Atom>
+      <Atom _ID="_260" name="HG12">
+      </Atom>
+      <Atom _ID="_261" name="HG13">
+      </Atom>
+      <Atom _ID="_262" name="CB">
+      </Atom>
+      <Atom _ID="_263" name="HB">
+      </Atom>
+      <Atom _ID="_264" name="HG23">
+      </Atom>
+      <Atom _ID="_265" name="HA">
+      </Atom>
+    </Residue>
+    <Residue _ID="_18" seqId="15" seqCode="172" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_266" name="C">
+      </Atom>
+      <Atom _ID="_267" name="HD3">
+      </Atom>
+      <Atom _ID="_268" name="HD2">
+      </Atom>
+      <Atom _ID="_269" name="CB">
+      </Atom>
+      <Atom _ID="_270" name="CA">
+      </Atom>
+      <Atom _ID="_271" name="HG2">
+      </Atom>
+      <Atom _ID="_272" name="HG3">
+      </Atom>
+      <Atom _ID="_273" name="O">
+      </Atom>
+      <Atom _ID="_274" name="CD">
+      </Atom>
+      <Atom _ID="_275" name="N">
+      </Atom>
+      <Atom _ID="_276" name="CG">
+      </Atom>
+      <Atom _ID="_277" name="HA">
+      </Atom>
+      <Atom _ID="_278" name="HB3">
+      </Atom>
+      <Atom _ID="_279" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_19" seqId="16" seqCode="173" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>deprot:HG</descriptor>
+      <Atom _ID="_280" name="C">
+      </Atom>
+      <Atom _ID="_281" name="H">
+      </Atom>
+      <Atom _ID="_282" name="CA">
+      </Atom>
+      <Atom _ID="_283" name="O">
+      </Atom>
+      <Atom _ID="_284" name="N">
+      </Atom>
+      <Atom _ID="_285" name="CB">
+      </Atom>
+      <Atom _ID="_286" name="HA">
+      </Atom>
+      <Atom _ID="_287" name="SG">
+      </Atom>
+      <Atom _ID="_288" name="HB3">
+      </Atom>
+      <Atom _ID="_289" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_20" seqId="17" seqCode="174" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HG</descriptor>
+      <Atom _ID="_290" name="C">
+      </Atom>
+      <Atom _ID="_291" name="OG">
+      </Atom>
+      <Atom _ID="_292" name="H">
+      </Atom>
+      <Atom _ID="_293" name="CA">
+      </Atom>
+      <Atom _ID="_294" name="O">
+      </Atom>
+      <Atom _ID="_295" name="N">
+      </Atom>
+      <Atom _ID="_296" name="CB">
+      </Atom>
+      <Atom _ID="_297" name="HA">
+      </Atom>
+      <Atom _ID="_298" name="HG">
+      </Atom>
+      <Atom _ID="_299" name="HB3">
+      </Atom>
+      <Atom _ID="_300" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_21" seqId="18" seqCode="175" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HG1</descriptor>
+      <Atom _ID="_301" name="C">
+      </Atom>
+      <Atom _ID="_302" name="CG2">
+      </Atom>
+      <Atom _ID="_303" name="HG22">
+      </Atom>
+      <Atom _ID="_304" name="H">
+      </Atom>
+      <Atom _ID="_305" name="CA">
+      </Atom>
+      <Atom _ID="_306" name="OG1">
+      </Atom>
+      <Atom _ID="_307" name="O">
+      </Atom>
+      <Atom _ID="_308" name="HG1">
+      </Atom>
+      <Atom _ID="_309" name="HB">
+      </Atom>
+      <Atom _ID="_310" name="N">
+      </Atom>
+      <Atom _ID="_311" name="CB">
+      </Atom>
+      <Atom _ID="_312" name="HG21">
+      </Atom>
+      <Atom _ID="_313" name="HG23">
+      </Atom>
+      <Atom _ID="_314" name="HA">
+      </Atom>
+    </Residue>
+    <Residue _ID="_22" seqId="19" seqCode="176" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>deprot:HG</descriptor>
+      <Atom _ID="_315" name="C">
+      </Atom>
+      <Atom _ID="_316" name="H">
+      </Atom>
+      <Atom _ID="_317" name="CA">
+      </Atom>
+      <Atom _ID="_318" name="O">
+      </Atom>
+      <Atom _ID="_319" name="N">
+      </Atom>
+      <Atom _ID="_320" name="CB">
+      </Atom>
+      <Atom _ID="_321" name="HA">
+      </Atom>
+      <Atom _ID="_322" name="SG">
+      </Atom>
+      <Atom _ID="_323" name="HB3">
+      </Atom>
+      <Atom _ID="_324" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_23" seqId="20" seqCode="177" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HE2</descriptor>
+      <Atom _ID="_325" name="C">
+      </Atom>
+      <Atom _ID="_326" name="HE2">
+      </Atom>
+      <Atom _ID="_327" name="H">
+      </Atom>
+      <Atom _ID="_328" name="CA">
+      </Atom>
+      <Atom _ID="_329" name="HG2">
+      </Atom>
+      <Atom _ID="_330" name="HG3">
+      </Atom>
+      <Atom _ID="_331" name="O">
+      </Atom>
+      <Atom _ID="_332" name="CD">
+      </Atom>
+      <Atom _ID="_333" name="N">
+      </Atom>
+      <Atom _ID="_334" name="CB">
+      </Atom>
+      <Atom _ID="_335" name="CG">
+      </Atom>
+      <Atom _ID="_336" name="HA">
+      </Atom>
+      <Atom _ID="_337" name="OE2">
+      </Atom>
+      <Atom _ID="_338" name="OE1">
+      </Atom>
+      <Atom _ID="_339" name="HB3">
+      </Atom>
+      <Atom _ID="_340" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_24" seqId="21" seqCode="178" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_341" name="C">
+      </Atom>
+      <Atom _ID="_342" name="H">
+      </Atom>
+      <Atom _ID="_343" name="HA2">
+      </Atom>
+      <Atom _ID="_344" name="HA3">
+      </Atom>
+      <Atom _ID="_345" name="CA">
+      </Atom>
+      <Atom _ID="_346" name="O">
+      </Atom>
+      <Atom _ID="_347" name="N">
+      </Atom>
+    </Residue>
+    <Residue _ID="_25" seqId="22" seqCode="179" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_348" name="C">
+      </Atom>
+      <Atom _ID="_349" name="ND2">
+      </Atom>
+      <Atom _ID="_350" name="HD22">
+      </Atom>
+      <Atom _ID="_351" name="HD21">
+      </Atom>
+      <Atom _ID="_352" name="H">
+      </Atom>
+      <Atom _ID="_353" name="CA">
+      </Atom>
+      <Atom _ID="_354" name="CG">
+      </Atom>
+      <Atom _ID="_355" name="O">
+      </Atom>
+      <Atom _ID="_356" name="N">
+      </Atom>
+      <Atom _ID="_357" name="OD1">
+      </Atom>
+      <Atom _ID="_358" name="CB">
+      </Atom>
+      <Atom _ID="_359" name="HA">
+      </Atom>
+      <Atom _ID="_360" name="HB3">
+      </Atom>
+      <Atom _ID="_361" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_26" seqId="23" seqCode="180" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_362" name="C">
+      </Atom>
+      <Atom _ID="_363" name="HD22">
+      </Atom>
+      <Atom _ID="_364" name="HD23">
+      </Atom>
+      <Atom _ID="_365" name="HD21">
+      </Atom>
+      <Atom _ID="_366" name="H">
+      </Atom>
+      <Atom _ID="_367" name="CA">
+      </Atom>
+      <Atom _ID="_368" name="CG">
+      </Atom>
+      <Atom _ID="_369" name="O">
+      </Atom>
+      <Atom _ID="_370" name="N">
+      </Atom>
+      <Atom _ID="_371" name="CD1">
+      </Atom>
+      <Atom _ID="_372" name="CD2">
+      </Atom>
+      <Atom _ID="_373" name="HD13">
+      </Atom>
+      <Atom _ID="_374" name="HD12">
+      </Atom>
+      <Atom _ID="_375" name="HD11">
+      </Atom>
+      <Atom _ID="_376" name="HA">
+      </Atom>
+      <Atom _ID="_377" name="HG">
+      </Atom>
+      <Atom _ID="_378" name="CB">
+      </Atom>
+      <Atom _ID="_379" name="HB3">
+      </Atom>
+      <Atom _ID="_380" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_27" seqId="24" seqCode="181" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_381" name="C">
+      </Atom>
+      <Atom _ID="_382" name="H">
+      </Atom>
+      <Atom _ID="_383" name="CA">
+      </Atom>
+      <Atom _ID="_384" name="O">
+      </Atom>
+      <Atom _ID="_385" name="N">
+      </Atom>
+      <Atom _ID="_386" name="CB">
+      </Atom>
+      <Atom _ID="_387" name="HA">
+      </Atom>
+      <Atom _ID="_388" name="HB1">
+      </Atom>
+      <Atom _ID="_389" name="HB3">
+      </Atom>
+      <Atom _ID="_390" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_28" seqId="25" seqCode="182" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>deprot:HG</descriptor>
+      <Atom _ID="_391" name="C">
+      </Atom>
+      <Atom _ID="_392" name="H">
+      </Atom>
+      <Atom _ID="_393" name="CA">
+      </Atom>
+      <Atom _ID="_394" name="O">
+      </Atom>
+      <Atom _ID="_395" name="N">
+      </Atom>
+      <Atom _ID="_396" name="CB">
+      </Atom>
+      <Atom _ID="_397" name="HA">
+      </Atom>
+      <Atom _ID="_398" name="SG">
+      </Atom>
+      <Atom _ID="_399" name="HB3">
+      </Atom>
+      <Atom _ID="_400" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_29" seqId="26" seqCode="183" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_401" name="C">
+      </Atom>
+      <Atom _ID="_402" name="HD22">
+      </Atom>
+      <Atom _ID="_403" name="HD23">
+      </Atom>
+      <Atom _ID="_404" name="HD21">
+      </Atom>
+      <Atom _ID="_405" name="H">
+      </Atom>
+      <Atom _ID="_406" name="CA">
+      </Atom>
+      <Atom _ID="_407" name="CG">
+      </Atom>
+      <Atom _ID="_408" name="O">
+      </Atom>
+      <Atom _ID="_409" name="N">
+      </Atom>
+      <Atom _ID="_410" name="CD1">
+      </Atom>
+      <Atom _ID="_411" name="CD2">
+      </Atom>
+      <Atom _ID="_412" name="HD13">
+      </Atom>
+      <Atom _ID="_413" name="HD12">
+      </Atom>
+      <Atom _ID="_414" name="HD11">
+      </Atom>
+      <Atom _ID="_415" name="HA">
+      </Atom>
+      <Atom _ID="_416" name="HG">
+      </Atom>
+      <Atom _ID="_417" name="CB">
+      </Atom>
+      <Atom _ID="_418" name="HB3">
+      </Atom>
+      <Atom _ID="_419" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_30" seqId="27" seqCode="184" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HG</descriptor>
+      <Atom _ID="_420" name="C">
+      </Atom>
+      <Atom _ID="_421" name="OG">
+      </Atom>
+      <Atom _ID="_422" name="H">
+      </Atom>
+      <Atom _ID="_423" name="CA">
+      </Atom>
+      <Atom _ID="_424" name="O">
+      </Atom>
+      <Atom _ID="_425" name="N">
+      </Atom>
+      <Atom _ID="_426" name="CB">
+      </Atom>
+      <Atom _ID="_427" name="HA">
+      </Atom>
+      <Atom _ID="_428" name="HG">
+      </Atom>
+      <Atom _ID="_429" name="HB3">
+      </Atom>
+      <Atom _ID="_430" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_31" seqId="28" seqCode="185" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_431" name="C">
+      </Atom>
+      <Atom _ID="_432" name="HD22">
+      </Atom>
+      <Atom _ID="_433" name="HD23">
+      </Atom>
+      <Atom _ID="_434" name="HD21">
+      </Atom>
+      <Atom _ID="_435" name="H">
+      </Atom>
+      <Atom _ID="_436" name="CA">
+      </Atom>
+      <Atom _ID="_437" name="CG">
+      </Atom>
+      <Atom _ID="_438" name="O">
+      </Atom>
+      <Atom _ID="_439" name="N">
+      </Atom>
+      <Atom _ID="_440" name="CD1">
+      </Atom>
+      <Atom _ID="_441" name="CD2">
+      </Atom>
+      <Atom _ID="_442" name="HD13">
+      </Atom>
+      <Atom _ID="_443" name="HD12">
+      </Atom>
+      <Atom _ID="_444" name="HD11">
+      </Atom>
+      <Atom _ID="_445" name="HA">
+      </Atom>
+      <Atom _ID="_446" name="HG">
+      </Atom>
+      <Atom _ID="_447" name="CB">
+      </Atom>
+      <Atom _ID="_448" name="HB3">
+      </Atom>
+      <Atom _ID="_449" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_32" seqId="29" seqCode="186" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>deprot:HG</descriptor>
+      <Atom _ID="_450" name="C">
+      </Atom>
+      <Atom _ID="_451" name="H">
+      </Atom>
+      <Atom _ID="_452" name="CA">
+      </Atom>
+      <Atom _ID="_453" name="O">
+      </Atom>
+      <Atom _ID="_454" name="N">
+      </Atom>
+      <Atom _ID="_455" name="CB">
+      </Atom>
+      <Atom _ID="_456" name="HA">
+      </Atom>
+      <Atom _ID="_457" name="SG">
+      </Atom>
+      <Atom _ID="_458" name="HB3">
+      </Atom>
+      <Atom _ID="_459" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_33" seqId="30" seqCode="187" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HE2;deprot:HD1</descriptor>
+      <Atom _ID="_460" name="C">
+      </Atom>
+      <Atom _ID="_461" name="HD2">
+      </Atom>
+      <Atom _ID="_462" name="HE2">
+      </Atom>
+      <Atom _ID="_463" name="H">
+      </Atom>
+      <Atom _ID="_464" name="CA">
+      </Atom>
+      <Atom _ID="_465" name="CG">
+      </Atom>
+      <Atom _ID="_466" name="O">
+      </Atom>
+      <Atom _ID="_467" name="HE1">
+      </Atom>
+      <Atom _ID="_468" name="CE1">
+      </Atom>
+      <Atom _ID="_469" name="N">
+      </Atom>
+      <Atom _ID="_470" name="CD2">
+      </Atom>
+      <Atom _ID="_471" name="CB">
+      </Atom>
+      <Atom _ID="_472" name="ND1">
+      </Atom>
+      <Atom _ID="_473" name="HA">
+      </Atom>
+      <Atom _ID="_474" name="NE2">
+      </Atom>
+      <Atom _ID="_475" name="HB3">
+      </Atom>
+      <Atom _ID="_476" name="HB2">
+      </Atom>
+    </Residue>
+    <Residue _ID="_34" seqId="31" seqCode="188" linking="middle" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>neutral</descriptor>
+      <Atom _ID="_477" name="C">
+      </Atom>
+      <Atom _ID="_478" name="H">
+      </Atom>
+      <Atom _ID="_479" name="CA">
+      </Atom>
+      <Atom _ID="_480" name="O">
+      </Atom>
+      <Atom _ID="_481" name="N">
+      </Atom>
+      <Atom _ID="_482" name="CD1">
+      </Atom>
+      <Atom _ID="_483" name="CG1">
+      </Atom>
+      <Atom _ID="_484" name="HD12">
+      </Atom>
+      <Atom _ID="_485" name="HD11">
+      </Atom>
+      <Atom _ID="_486" name="CG2">
+      </Atom>
+      <Atom _ID="_487" name="HA">
+      </Atom>
+      <Atom _ID="_488" name="HB">
+      </Atom>
+      <Atom _ID="_489" name="HG12">
+      </Atom>
+      <Atom _ID="_490" name="HG13">
+      </Atom>
+      <Atom _ID="_491" name="HD13">
+      </Atom>
+      <Atom _ID="_492" name="CB">
+      </Atom>
+      <Atom _ID="_493" name="HG21">
+      </Atom>
+      <Atom _ID="_494" name="HG23">
+      </Atom>
+      <Atom _ID="_495" name="HG22">
+      </Atom>
+    </Residue>
+    <Residue _ID="_35" seqId="32" seqCode="189" linking="end" chainFragment="_3">
+      <seqInsertCode> </seqInsertCode>
+      <descriptor>prot:HE2;deprot:H''</descriptor>
+      <Atom _ID="_496" name="HG2">
+      </Atom>
+      <Atom _ID="_497" name="C">
+      </Atom>
+      <Atom _ID="_498" name="HE2">
+      </Atom>
+      <Atom _ID="_499" name="O'">
+      </Atom>
+      <Atom _ID="_500" name="H">
+      </Atom>
+      <Atom _ID="_501" name="CA">
+      </Atom>
+      <Atom _ID="_502" name="CG">
+      </Atom>
+      <Atom _ID="_503" name="HG3">
+      </Atom>
+      <Atom _ID="_504" name="CD">
+      </Atom>
+      <Atom _ID="_505" name="N">
+      </Atom>
+      <Atom _ID="_506" name="CB">
+      </Atom>
+      <Atom _ID="_507" name="O''">
+      </Atom>
+      <Atom _ID="_508" name="HA">
+      </Atom>
+      <Atom _ID="_509" name="OE2">
+      </Atom>
+      <Atom _ID="_510" name="OE1">
+      </Atom>
+      <Atom _ID="_511" name="HB3">
+      </Atom>
+      <Atom _ID="_512" name="HB2">
+      </Atom>
+    </Residue>
+  </Chain>
+  <Structure _ID="_513" serial="1">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="48"/>
+    </contentStorage>
+    <AppDataString _ID="_514" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_515" serial="2">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="49"/>
+    </contentStorage>
+    <AppDataString _ID="_516" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_517" serial="3">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="50"/>
+    </contentStorage>
+    <AppDataString _ID="_518" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_519" serial="4">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="51"/>
+    </contentStorage>
+    <AppDataString _ID="_520" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_521" serial="5">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="52"/>
+    </contentStorage>
+    <AppDataString _ID="_522" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_523" serial="6">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="53"/>
+    </contentStorage>
+    <AppDataString _ID="_524" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_525" serial="7">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="54"/>
+    </contentStorage>
+    <AppDataString _ID="_526" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_527" serial="8">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="55"/>
+    </contentStorage>
+    <AppDataString _ID="_528" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_529" serial="9">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="56"/>
+    </contentStorage>
+    <AppDataString _ID="_530" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_531" serial="10">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="57"/>
+    </contentStorage>
+    <AppDataString _ID="_532" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_533" serial="11">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="58"/>
+    </contentStorage>
+    <AppDataString _ID="_534" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_535" serial="12">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="59"/>
+    </contentStorage>
+    <AppDataString _ID="_536" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_537" serial="13">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="60"/>
+    </contentStorage>
+    <AppDataString _ID="_538" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_539" serial="14">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="61"/>
+    </contentStorage>
+    <AppDataString _ID="_540" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_541" serial="15">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="62"/>
+    </contentStorage>
+    <AppDataString _ID="_542" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_543" serial="16">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="63"/>
+    </contentStorage>
+    <AppDataString _ID="_544" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_545" serial="17">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="64"/>
+    </contentStorage>
+    <AppDataString _ID="_546" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_547" serial="18">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="65"/>
+    </contentStorage>
+    <AppDataString _ID="_548" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_549" serial="19">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="66"/>
+    </contentStorage>
+    <AppDataString _ID="_550" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_551" serial="20">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="67"/>
+    </contentStorage>
+    <AppDataString _ID="_552" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_553" serial="21">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="68"/>
+    </contentStorage>
+    <AppDataString _ID="_554" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_555" serial="22">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="69"/>
+    </contentStorage>
+    <AppDataString _ID="_556" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_557" serial="23">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="70"/>
+    </contentStorage>
+    <AppDataString _ID="_558" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_559" serial="24">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="71"/>
+    </contentStorage>
+    <AppDataString _ID="_560" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_561" serial="25">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="72"/>
+    </contentStorage>
+    <AppDataString _ID="_562" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_563" serial="26">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="73"/>
+    </contentStorage>
+    <AppDataString _ID="_564" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_565" serial="27">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="74"/>
+    </contentStorage>
+    <AppDataString _ID="_566" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_567" serial="28">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="75"/>
+    </contentStorage>
+    <AppDataString _ID="_568" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_569" serial="29">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="76"/>
+    </contentStorage>
+    <AppDataString _ID="_570" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_571" serial="30">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="77"/>
+    </contentStorage>
+    <AppDataString _ID="_572" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_573" serial="31">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="78"/>
+    </contentStorage>
+    <AppDataString _ID="_574" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_575" serial="32">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="79"/>
+    </contentStorage>
+    <AppDataString _ID="_576" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_577" serial="33">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="80"/>
+    </contentStorage>
+    <AppDataString _ID="_578" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_579" serial="34">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="81"/>
+    </contentStorage>
+    <AppDataString _ID="_580" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_581" serial="35">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="82"/>
+    </contentStorage>
+    <AppDataString _ID="_582" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_583" serial="36">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="83"/>
+    </contentStorage>
+    <AppDataString _ID="_584" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_585" serial="37">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="84"/>
+    </contentStorage>
+    <AppDataString _ID="_586" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_587" serial="38">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="85"/>
+    </contentStorage>
+    <AppDataString _ID="_588" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_589" serial="39">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="86"/>
+    </contentStorage>
+    <AppDataString _ID="_590" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_591" serial="40">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="87"/>
+    </contentStorage>
+    <AppDataString _ID="_592" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_593" serial="41">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="88"/>
+    </contentStorage>
+    <AppDataString _ID="_594" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_595" serial="42">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="89"/>
+    </contentStorage>
+    <AppDataString _ID="_596" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_597" serial="43">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="90"/>
+    </contentStorage>
+    <AppDataString _ID="_598" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_599" serial="44">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="91"/>
+    </contentStorage>
+    <AppDataString _ID="_600" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_601" serial="45">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="92"/>
+    </contentStorage>
+    <AppDataString _ID="_602" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_603" serial="46">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="93"/>
+    </contentStorage>
+    <AppDataString _ID="_604" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_605" serial="47">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="94"/>
+    </contentStorage>
+    <AppDataString _ID="_606" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_607" serial="48">
+    <atomNamingSystem>IUPAC</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="95"/>
+    </contentStorage>
+    <AppDataString _ID="_608" serial="1">
+      <value>pdb</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_609" serial="49">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="96"/>
+    </contentStorage>
+    <AppDataString _ID="_610" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_611" serial="50">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="97"/>
+    </contentStorage>
+    <AppDataString _ID="_612" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_613" serial="51">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="98"/>
+    </contentStorage>
+    <AppDataString _ID="_614" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_615" serial="52">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="99"/>
+    </contentStorage>
+    <AppDataString _ID="_616" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_617" serial="53">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="100"/>
+    </contentStorage>
+    <AppDataString _ID="_618" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_619" serial="54">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="101"/>
+    </contentStorage>
+    <AppDataString _ID="_620" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_621" serial="55">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="102"/>
+    </contentStorage>
+    <AppDataString _ID="_622" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_623" serial="56">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="103"/>
+    </contentStorage>
+    <AppDataString _ID="_624" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_625" serial="57">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="104"/>
+    </contentStorage>
+    <AppDataString _ID="_626" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_627" serial="58">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="105"/>
+    </contentStorage>
+    <AppDataString _ID="_628" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_629" serial="59">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="106"/>
+    </contentStorage>
+    <AppDataString _ID="_630" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_631" serial="60">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="107"/>
+    </contentStorage>
+    <AppDataString _ID="_632" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_633" serial="61">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="108"/>
+    </contentStorage>
+    <AppDataString _ID="_634" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_635" serial="62">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="109"/>
+    </contentStorage>
+    <AppDataString _ID="_636" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_637" serial="63">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="110"/>
+    </contentStorage>
+    <AppDataString _ID="_638" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_639" serial="64">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="111"/>
+    </contentStorage>
+    <AppDataString _ID="_640" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_641" serial="65">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="112"/>
+    </contentStorage>
+    <AppDataString _ID="_642" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_643" serial="66">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="113"/>
+    </contentStorage>
+    <AppDataString _ID="_644" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_645" serial="67">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="114"/>
+    </contentStorage>
+    <AppDataString _ID="_646" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_647" serial="68">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="115"/>
+    </contentStorage>
+    <AppDataString _ID="_648" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_649" serial="69">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="116"/>
+    </contentStorage>
+    <AppDataString _ID="_650" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_651" serial="70">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="117"/>
+    </contentStorage>
+    <AppDataString _ID="_652" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_653" serial="71">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="118"/>
+    </contentStorage>
+    <AppDataString _ID="_654" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_655" serial="72">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="119"/>
+    </contentStorage>
+    <AppDataString _ID="_656" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_657" serial="73">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="120"/>
+    </contentStorage>
+    <AppDataString _ID="_658" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_659" serial="74">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="121"/>
+    </contentStorage>
+    <AppDataString _ID="_660" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_661" serial="75">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="122"/>
+    </contentStorage>
+    <AppDataString _ID="_662" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_663" serial="76">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="123"/>
+    </contentStorage>
+    <AppDataString _ID="_664" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_665" serial="77">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="124"/>
+    </contentStorage>
+    <AppDataString _ID="_666" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_667" serial="78">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="125"/>
+    </contentStorage>
+    <AppDataString _ID="_668" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_669" serial="79">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="126"/>
+    </contentStorage>
+    <AppDataString _ID="_670" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_671" serial="80">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="127"/>
+    </contentStorage>
+    <AppDataString _ID="_672" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_673" serial="81">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="128"/>
+    </contentStorage>
+    <AppDataString _ID="_674" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_675" serial="82">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="129"/>
+    </contentStorage>
+    <AppDataString _ID="_676" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_677" serial="83">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="130"/>
+    </contentStorage>
+    <AppDataString _ID="_678" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_679" serial="84">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="131"/>
+    </contentStorage>
+    <AppDataString _ID="_680" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_681" serial="85">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="132"/>
+    </contentStorage>
+    <AppDataString _ID="_682" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_683" serial="86">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="133"/>
+    </contentStorage>
+    <AppDataString _ID="_684" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_685" serial="87">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="134"/>
+    </contentStorage>
+    <AppDataString _ID="_686" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_687" serial="88">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="135"/>
+    </contentStorage>
+    <AppDataString _ID="_688" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_689" serial="89">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="136"/>
+    </contentStorage>
+    <AppDataString _ID="_690" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_691" serial="90">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="137"/>
+    </contentStorage>
+    <AppDataString _ID="_692" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_693" serial="91">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="138"/>
+    </contentStorage>
+    <AppDataString _ID="_694" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_695" serial="92">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="139"/>
+    </contentStorage>
+    <AppDataString _ID="_696" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_697" serial="93">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="140"/>
+    </contentStorage>
+    <AppDataString _ID="_698" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_699" serial="94">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="141"/>
+    </contentStorage>
+    <AppDataString _ID="_700" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_701" serial="95">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="142"/>
+    </contentStorage>
+    <AppDataString _ID="_702" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+  <Structure _ID="_703" serial="96">
+    <atomNamingSystem>AQUA</atomNamingSystem>
+    <contentStorage>
+      <key1 serial="143"/>
+    </contentStorage>
+    <AppDataString _ID="_704" serial="1">
+      <value>nmrStar</value>
+      <application>ccpNmr</application>
+      <keyword>originalFormat</keyword>
+    </AppDataString>
+  </Structure>
+</MolSystem>
+
+</_StorageUnit>
+<!--End of Memops Data-->

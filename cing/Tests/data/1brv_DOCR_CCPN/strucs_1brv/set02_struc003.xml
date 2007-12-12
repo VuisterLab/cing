@@ -1,0 +1,1643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit time="Fri Aug 24 10:28:39 2007" release="1.0.213" 
+ packageName="ccp.Coordinates" root="1brv" originator="CCPN Python XmlIO">
+ 
+<parent>
+  <key1 tag="code">1brv</key1>
+  <key2 serial="51"/>
+</parent>
+
+<Chain _ID="_1">
+  <code>A</code>
+  <AppDataString _ID="_2" serial="1">
+    <value>A</value>
+    <application>nmrStar</application>
+    <keyword>originalCode</keyword>
+  </AppDataString>
+  <Residue _ID="_3" seqId="14" seqCode="171">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_4" value="171" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_5" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_6" serial="3">
+      <value>VAL</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_7" name="N">
+      <Coord _ID="_8" x="5.3620000000000001" y="-1.0860000000000001" z="4.4359999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_9" name="CA">
+      <Coord _ID="_10" x="4.7190000000000003" y="-0.29199999999999998" z="3.3620000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_11" name="C">
+      <Coord _ID="_12" x="3.3100000000000001" y="-0.875" z="2.948" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_13" name="O">
+      <Coord _ID="_14" x="3.2029999999999998" y="-1.492" z="1.8799999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_15" name="CB">
+      <Coord _ID="_16" x="5.7789999999999999" y="-0.13" z="2.2200000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_17" name="CG1">
+      <Coord _ID="_18" x="6.9409999999999998" y="0.82999999999999996" z="2.5640000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_19" name="CG2">
+      <Coord _ID="_20" x="6.3760000000000003" y="-1.4119999999999999" z="1.589" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_21" name="HA">
+      <Coord _ID="_22" x="4.5039999999999996" y="0.72999999999999998" z="3.7269999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_23" name="HB">
+      <Coord _ID="_24" x="5.2169999999999996" y="0.34899999999999998" z="1.4199999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_25" name="HG11">
+      <Coord _ID="_26" x="6.577" y="1.794" z="2.9630000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_27" name="HG12">
+      <Coord _ID="_28" x="7.6239999999999997" y="0.40200000000000002" z="3.3220000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_29" name="HG13">
+      <Coord _ID="_30" x="7.5519999999999996" y="1.0649999999999999" z="1.671" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_31" name="HG21">
+      <Coord _ID="_32" x="5.5860000000000003" y="-2.1240000000000001" z="1.2929999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_33" name="HG22">
+      <Coord _ID="_34" x="6.9550000000000001" y="-1.181" z="0.67300000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_35" name="HG23">
+      <Coord _ID="_36" x="7.0540000000000003" y="-1.946" z="2.2799999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_37" seqId="15" seqCode="172">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_38" value="172" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_39" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_40" serial="3">
+      <value>PRO</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_41" name="N">
+      <Coord _ID="_42" x="2.1840000000000002" y="-0.68400000000000005" z="3.714" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_43" name="CA">
+      <Coord _ID="_44" x="0.85499999999999998" y="-1.2470000000000001" z="3.3530000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_45" name="C">
+      <Coord _ID="_46" x="-0.151" y="-0.20399999999999999" z="2.7490000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_47" name="O">
+      <Coord _ID="_48" x="-0.64100000000000001" y="0.69499999999999995" z="3.4420000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_49" name="CB">
+      <Coord _ID="_50" x="0.42399999999999999" y="-1.8260000000000001" z="4.7160000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_51" name="CG">
+      <Coord _ID="_52" x="1.101" y="-0.97599999999999998" z="5.8010000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_53" name="CD">
+      <Coord _ID="_54" x="2.2050000000000001" y="-0.17499999999999999" z="5.1040000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_55" name="HA">
+      <Coord _ID="_56" x="0.95399999999999996" y="-2.101" z="2.6509999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_57" name="HB2">
+      <Coord _ID="_58" x="-0.67400000000000004" y="-1.877" z="4.8399999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_59" name="HB3">
+      <Coord _ID="_60" x="0.78500000000000003" y="-2.871" z="4.7969999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_61" name="HG2">
+      <Coord _ID="_62" x="0.38200000000000001" y="-0.29699999999999999" z="6.2939999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_63" name="HG3">
+      <Coord _ID="_64" x="1.5169999999999999" y="-1.6160000000000001" z="6.6020000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_65" name="HD2">
+      <Coord _ID="_66" x="1.9810000000000001" y="0.91000000000000003" z="5.1189999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_67" name="HD3">
+      <Coord _ID="_68" x="3.1680000000000001" y="-0.314" z="5.6299999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_69" seqId="16" seqCode="173">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_70" value="173" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_71" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_72" serial="3">
+      <value>CYS</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_73" name="N">
+      <Coord _ID="_74" x="-0.51100000000000001" y="-0.36799999999999999" z="1.464" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_75" name="CA">
+      <Coord _ID="_76" x="-1.4990000000000001" y="0.49299999999999999" z="0.746" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_77" name="C">
+      <Coord _ID="_78" x="-2.931" y="0.60099999999999998" z="1.3819999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_79" name="O">
+      <Coord _ID="_80" x="-3.5270000000000001" y="1.6819999999999999" z="1.3440000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_81" name="CB">
+      <Coord _ID="_82" x="-1.4530000000000001" y="0.034000000000000002" z="-0.71699999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_83" name="SG">
+      <Coord _ID="_84" x="-0.47399999999999998" y="1.0720000000000001" z="-1.7989999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_85" name="H">
+      <Coord _ID="_86" x="0.035999999999999997" y="-1.0409999999999999" z="0.91400000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_87" name="HA">
+      <Coord _ID="_88" x="-1.143" y="1.526" z="0.70699999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_89" name="HB2">
+      <Coord _ID="_90" x="-0.95199999999999996" y="-0.92900000000000005" z="-0.84899999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_91" name="HB3">
+      <Coord _ID="_92" x="-2.4670000000000001" y="-0.029000000000000001" z="-1.0940000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_93" seqId="17" seqCode="174">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_94" value="174" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_95" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_96" serial="3">
+      <value>SER</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_97" name="N">
+      <Coord _ID="_98" x="-3.444" y="-0.47399999999999998" z="2.016" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_99" name="CA">
+      <Coord _ID="_100" x="-4.6790000000000003" y="-0.41599999999999998" z="2.8650000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_101" name="C">
+      <Coord _ID="_102" x="-4.7149999999999999" y="0.58699999999999997" z="4.069" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_103" name="O">
+      <Coord _ID="_104" x="-5.7699999999999996" y="0.83099999999999996" z="4.6559999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_105" name="CB">
+      <Coord _ID="_106" x="-4.9669999999999996" y="-1.845" z="3.3759999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_107" name="OG">
+      <Coord _ID="_108" x="-3.948" y="-2.3290000000000002" z="4.258" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_109" name="H">
+      <Coord _ID="_110" x="-2.8290000000000002" y="-1.2949999999999999" z="1.998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_111" name="HA">
+      <Coord _ID="_112" x="-5.516" y="-0.097000000000000003" z="2.2400000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_113" name="HB2">
+      <Coord _ID="_114" x="-5.9420000000000002" y="-1.8540000000000001" z="3.9039999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_115" name="HB3">
+      <Coord _ID="_116" x="-5.085" y="-2.5369999999999999" z="2.524" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_117" name="HG">
+      <Coord _ID="_118" x="-4.0190000000000001" y="-1.823" z="5.0759999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_119" seqId="18" seqCode="175">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_120" value="175" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_121" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_122" serial="3">
+      <value>THR</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_123" name="N">
+      <Coord _ID="_124" x="-3.5539999999999998" y="1.127" z="4.4390000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_125" name="CA">
+      <Coord _ID="_126" x="-3.3940000000000001" y="2.1499999999999999" z="5.5090000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_127" name="C">
+      <Coord _ID="_128" x="-3.1459999999999999" y="3.6080000000000001" z="4.9660000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_129" name="O">
+      <Coord _ID="_130" x="-3.3929999999999998" y="4.5759999999999996" z="5.6859999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_131" name="CB">
+      <Coord _ID="_132" x="-2.2999999999999998" y="1.671" z="6.5129999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_133" name="OG1">
+      <Coord _ID="_134" x="-0.99299999999999999" y="1.75" z="5.9480000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_135" name="CG2">
+      <Coord _ID="_136" x="-2.5030000000000001" y="0.22900000000000001" z="7.0229999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_137" name="H">
+      <Coord _ID="_138" x="-2.7679999999999998" y="0.80700000000000005" z="3.8599999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_139" name="HA">
+      <Coord _ID="_140" x="-4.3410000000000002" y="2.2010000000000001" z="6.0789999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_141" name="HB">
+      <Coord _ID="_142" x="-2.3300000000000001" y="2.351" z="7.3890000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_143" name="HG1">
+      <Coord _ID="_144" x="-1.0169999999999999" y="1.298" z="5.0910000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_145" name="HG21">
+      <Coord _ID="_146" x="-3.536" y="0.078" z="7.3929999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_147" name="HG22">
+      <Coord _ID="_148" x="-2.3559999999999999" y="-0.50800000000000001" z="6.2089999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_149" name="HG23">
+      <Coord _ID="_150" x="-1.8009999999999999" y="-0.028000000000000001" z="7.8300000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_151" seqId="19" seqCode="176">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_152" value="176" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_153" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_154" serial="3">
+      <value>CYS</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_155" name="N">
+      <Coord _ID="_156" x="-2.6640000000000001" y="3.778" z="3.7130000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_157" name="CA">
+      <Coord _ID="_158" x="-2.5150000000000001" y="5.0890000000000004" z="3.0409999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_159" name="C">
+      <Coord _ID="_160" x="-3.8860000000000001" y="5.7110000000000003" z="2.6000000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_161" name="O">
+      <Coord _ID="_162" x="-4.1050000000000004" y="6.9100000000000001" z="2.7749999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_163" name="CB">
+      <Coord _ID="_164" x="-1.5169999999999999" y="4.7649999999999997" z="1.9059999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_165" name="SG">
+      <Coord _ID="_166" x="0.045999999999999999" y="4.226" z="2.6259999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_167" name="H">
+      <Coord _ID="_168" x="-2.738" y="2.948" z="3.1179999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_169" name="HA">
+      <Coord _ID="_170" x="-2.0459999999999998" y="5.8129999999999997" z="3.7360000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_171" name="HB2">
+      <Coord _ID="_172" x="-1.8640000000000001" y="4.0339999999999998" z="1.181" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_173" name="HB3">
+      <Coord _ID="_174" x="-1.319" y="5.6159999999999997" z="1.2350000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_175" seqId="20" seqCode="177">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_176" value="177" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_177" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_178" serial="3">
+      <value>GLU</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_179" name="N">
+      <Coord _ID="_180" x="-4.7839999999999998" y="4.8929999999999998" z="2.0139999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_181" name="CA">
+      <Coord _ID="_182" x="-6.202" y="5.2359999999999998" z="1.7050000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_183" name="C">
+      <Coord _ID="_184" x="-6.4980000000000002" y="6.5439999999999996" z="0.91400000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_185" name="O">
+      <Coord _ID="_186" x="-7.375" y="7.3470000000000004" z="1.2450000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_187" name="CB">
+      <Coord _ID="_188" x="-7.0700000000000003" y="5.0759999999999996" z="2.996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_189" name="CG">
+      <Coord _ID="_190" x="-7.1319999999999997" y="3.669" z="3.6499999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_191" name="CD">
+      <Coord _ID="_192" x="-7.7789999999999999" y="2.5760000000000001" z="2.802" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_193" name="OE1">
+      <Coord _ID="_194" x="-7.2000000000000002" y="1.9690000000000001" z="1.907" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_195" name="OE2">
+      <Coord _ID="_196" x="-9.0749999999999993" y="2.351" z="3.145" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_197" name="H">
+      <Coord _ID="_198" x="-4.399" y="3.9870000000000001" z="1.738" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_199" name="HA">
+      <Coord _ID="_200" x="-6.5069999999999997" y="4.4500000000000002" z="1.0009999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_201" name="HB2">
+      <Coord _ID="_202" x="-6.7130000000000001" y="5.806" z="3.7490000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_203" name="HB3">
+      <Coord _ID="_204" x="-8.109" y="5.3970000000000002" z="2.782" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_205" name="HG2">
+      <Coord _ID="_206" x="-6.1150000000000002" y="3.3340000000000001" z="3.9239999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_207" name="HG3">
+      <Coord _ID="_208" x="-7.6689999999999996" y="3.7330000000000001" z="4.6150000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_209" name="HE2">
+      <Coord _ID="_210" x="-9.4120000000000008" y="1.6519999999999999" z="2.585" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_211" seqId="21" seqCode="178">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_212" value="178" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_213" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_214" serial="3">
+      <value>GLY</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_215" name="N">
+      <Coord _ID="_216" x="-5.7699999999999996" y="6.6950000000000003" z="-0.193" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_217" name="CA">
+      <Coord _ID="_218" x="-5.8570000000000002" y="7.9020000000000001" z="-1.0389999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_219" name="C">
+      <Coord _ID="_220" x="-4.7519999999999998" y="8.9700000000000006" z="-0.88500000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_221" name="O">
+      <Coord _ID="_222" x="-4.7789999999999999" y="9.9659999999999993" z="-1.6100000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_223" name="H">
+      <Coord _ID="_224" x="-4.875" y="6.2069999999999999" z="-0.104" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_225" name="HA2">
+      <Coord _ID="_226" x="-5.827" y="7.5460000000000003" z="-2.0790000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_227" name="HA3">
+      <Coord _ID="_228" x="-6.8319999999999999" y="8.3870000000000005" z="-0.91900000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_229" seqId="22" seqCode="179">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_230" value="179" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_231" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_232" serial="3">
+      <value>ASN</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_233" name="N">
+      <Coord _ID="_234" x="-3.7690000000000001" y="8.7750000000000004" z="0.014" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_235" name="CA">
+      <Coord _ID="_236" x="-2.6040000000000001" y="9.6690000000000005" z="0.13300000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_237" name="C">
+      <Coord _ID="_238" x="-1.579" y="9.1219999999999999" z="-0.84399999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_239" name="O">
+      <Coord _ID="_240" x="-0.94499999999999995" y="8.0820000000000007" z="-0.63" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_241" name="CB">
+      <Coord _ID="_242" x="-2.0150000000000001" y="9.5909999999999993" z="1.5529999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_243" name="CG">
+      <Coord _ID="_244" x="-1.115" y="10.766999999999999" z="1.8939999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_245" name="OD1">
+      <Coord _ID="_246" x="0.055" y="10.813000000000001" z="1.536" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_247" name="ND2">
+      <Coord _ID="_248" x="-1.6419999999999999" y="11.762" z="2.5489999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_249" name="H">
+      <Coord _ID="_250" x="-3.6880000000000002" y="7.8010000000000002" z="0.32500000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_251" name="HA">
+      <Coord _ID="_252" x="-2.855" y="10.691000000000001" z="-0.21299999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_253" name="HB2">
+      <Coord _ID="_254" x="-2.79" y="9.4410000000000007" z="2.331" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_255" name="HB3">
+      <Coord _ID="_256" x="-1.3740000000000001" y="8.6850000000000005" z="1.548" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_257" name="HD21">
+      <Coord _ID="_258" x="-2.6309999999999998" y="11.669" z="2.794" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_259" name="HD22">
+      <Coord _ID="_260" x="-0.996" y="12.532" z="2.7290000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_261" seqId="23" seqCode="180">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_262" value="180" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_263" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_264" serial="3">
+      <value>LEU</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_265" name="N">
+      <Coord _ID="_266" x="-1.4079999999999999" y="9.8480000000000008" z="-1.923" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_267" name="CA">
+      <Coord _ID="_268" x="-0.59799999999999998" y="9.343" z="-3.0209999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_269" name="C">
+      <Coord _ID="_270" x="0.93100000000000005" y="9.1210000000000004" z="-2.7949999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_271" name="O">
+      <Coord _ID="_272" x="1.544" y="8.3030000000000008" z="-3.4750000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_273" name="CB">
+      <Coord _ID="_274" x="-0.98199999999999998" y="10.255000000000001" z="-4.1909999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_275" name="CG">
+      <Coord _ID="_276" x="-2.1819999999999999" y="9.8399999999999999" z="-5.0510000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_277" name="CD1">
+      <Coord _ID="_278" x="-2.589" y="10.965" z="-6.0149999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_279" name="CD2">
+      <Coord _ID="_280" x="-1.9550000000000001" y="8.5410000000000004" z="-5.8460000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_281" name="H">
+      <Coord _ID="_282" x="-1.9950000000000001" y="10.680999999999999" z="-2.0129999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_283" name="HA">
+      <Coord _ID="_284" x="-1.024" y="8.3330000000000002" z="-3.0979999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_285" name="HB2">
+      <Coord _ID="_286" x="-1.109" y="11.300000000000001" z="-3.8199999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_287" name="HB3">
+      <Coord _ID="_288" x="-0.13300000000000001" y="10.243" z="-4.8419999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_289" name="HG">
+      <Coord _ID="_290" x="-2.98" y="9.6899999999999995" z="-4.3259999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_291" name="HD11">
+      <Coord _ID="_292" x="-2.819" y="11.904999999999999" z="-5.4800000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_293" name="HD12">
+      <Coord _ID="_294" x="-1.7929999999999999" y="11.194000000000001" z="-6.7489999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_295" name="HD13">
+      <Coord _ID="_296" x="-3.496" y="10.702999999999999" z="-6.5899999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_297" name="HD21">
+      <Coord _ID="_298" x="-1.7110000000000001" y="7.6840000000000002" z="-5.1929999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_299" name="HD22">
+      <Coord _ID="_300" x="-2.855" y="8.2509999999999994" z="-6.4189999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_301" name="HD23">
+      <Coord _ID="_302" x="-1.125" y="8.6400000000000006" z="-6.5720000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_303" seqId="24" seqCode="181">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_304" value="181" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_305" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_306" serial="3">
+      <value>ALA</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_307" name="N">
+      <Coord _ID="_308" x="1.5" y="9.8290000000000006" z="-1.8240000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_309" name="CA">
+      <Coord _ID="_310" x="2.859" y="9.5679999999999996" z="-1.2969999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_311" name="C">
+      <Coord _ID="_312" x="2.9390000000000001" y="8.2840000000000007" z="-0.40400000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_313" name="O">
+      <Coord _ID="_314" x="3.8159999999999998" y="7.452" z="-0.626" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_315" name="CB">
+      <Coord _ID="_316" x="3.3130000000000002" y="10.804" z="-0.53200000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_317" name="H">
+      <Coord _ID="_318" x="0.78000000000000003" y="10.4" z="-1.383" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_319" name="HA">
+      <Coord _ID="_320" x="3.5299999999999998" y="9.4339999999999993" z="-2.1589999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_321" name="HB1">
+      <Coord _ID="_322" x="3.3100000000000001" y="11.696" z="-1.179" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_323" name="HB2">
+      <Coord _ID="_324" x="2.6619999999999999" y="10.986000000000001" z="0.34399999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_325" name="HB3">
+      <Coord _ID="_326" x="4.3419999999999996" y="10.648" z="-0.16" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_327" seqId="25" seqCode="182">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_328" value="182" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_329" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_330" serial="3">
+      <value>CYS</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_331" name="N">
+      <Coord _ID="_332" x="2.0259999999999998" y="8.1080000000000005" z="0.57799999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_333" name="CA">
+      <Coord _ID="_334" x="1.873" y="6.8300000000000001" z="1.3440000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_335" name="C">
+      <Coord _ID="_336" x="1.665" y="5.577" z="0.437" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_337" name="O">
+      <Coord _ID="_338" x="2.3220000000000001" y="4.54" z="0.56699999999999995" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_339" name="CB">
+      <Coord _ID="_340" x="0.79600000000000004" y="7.117" z="2.3809999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_341" name="SG">
+      <Coord _ID="_342" x="0.72099999999999997" y="5.8120000000000003" z="3.6150000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_343" name="H">
+      <Coord _ID="_344" x="1.208" y="8.7200000000000006" z="0.46400000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_345" name="HA">
+      <Coord _ID="_346" x="2.7189999999999999" y="6.5990000000000002" z="1.9570000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_347" name="HB2">
+      <Coord _ID="_348" x="0.93100000000000005" y="8.0990000000000002" z="2.847" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_349" name="HB3">
+      <Coord _ID="_350" x="-0.17699999999999999" y="7.165" z="1.8979999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_351" seqId="26" seqCode="183">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_352" value="183" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_353" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_354" serial="3">
+      <value>LEU</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_355" name="N">
+      <Coord _ID="_356" x="0.76200000000000001" y="5.7469999999999999" z="-0.52100000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_357" name="CA">
+      <Coord _ID="_358" x="0.52200000000000002" y="4.8200000000000003" z="-1.629" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_359" name="C">
+      <Coord _ID="_360" x="1.7070000000000001" y="4.5709999999999997" z="-2.6200000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_361" name="O">
+      <Coord _ID="_362" x="1.8500000000000001" y="3.4609999999999999" z="-3.1280000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_363" name="CB">
+      <Coord _ID="_364" x="-0.70599999999999996" y="5.4349999999999996" z="-2.3050000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_365" name="CG">
+      <Coord _ID="_366" x="-2.0819999999999999" y="5.3120000000000003" z="-1.6539999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_367" name="CD1">
+      <Coord _ID="_368" x="-3.1120000000000001" y="5.9829999999999997" z="-2.5699999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_369" name="CD2">
+      <Coord _ID="_370" x="-2.4980000000000002" y="3.8399999999999999" z="-1.4470000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_371" name="H">
+      <Coord _ID="_372" x="0.22800000000000001" y="6.6230000000000002" z="-0.45300000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_373" name="HA">
+      <Coord _ID="_374" x="0.26800000000000002" y="3.851" z="-1.206" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_375" name="HB2">
+      <Coord _ID="_376" x="-0.48199999999999998" y="6.4710000000000001" z="-2.585" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_377" name="HB3">
+      <Coord _ID="_378" x="-0.82799999999999996" y="4.9649999999999999" z="-3.2330000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_379" name="HG">
+      <Coord _ID="_380" x="-1.9750000000000001" y="5.8719999999999999" z="-0.70999999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_381" name="HD11">
+      <Coord _ID="_382" x="-3.077" y="5.5679999999999996" z="-3.5960000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_383" name="HD12">
+      <Coord _ID="_384" x="-4.1390000000000002" y="5.8369999999999997" z="-2.206" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_385" name="HD13">
+      <Coord _ID="_386" x="-2.9319999999999999" y="7.0700000000000003" z="-2.6549999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_387" name="HD21">
+      <Coord _ID="_388" x="-1.7729999999999999" y="3.2770000000000001" z="-0.83499999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_389" name="HD22">
+      <Coord _ID="_390" x="-3.4710000000000001" y="3.742" z="-0.93500000000000005" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_391" name="HD23">
+      <Coord _ID="_392" x="-2.5659999999999998" y="3.2890000000000001" z="-2.4039999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_393" seqId="27" seqCode="184">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_394" value="184" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_395" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_396" serial="3">
+      <value>SER</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_397" name="N">
+      <Coord _ID="_398" x="2.5299999999999998" y="5.5949999999999998" z="-2.883" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_399" name="CA">
+      <Coord _ID="_400" x="3.8149999999999999" y="5.4320000000000004" z="-3.641" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_401" name="C">
+      <Coord _ID="_402" x="4.9080000000000004" y="4.5800000000000001" z="-2.895" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_403" name="O">
+      <Coord _ID="_404" x="5.7720000000000002" y="3.9929999999999999" z="-3.5489999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_405" name="CB">
+      <Coord _ID="_406" x="4.3849999999999998" y="6.8109999999999999" z="-4.048" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_407" name="OG">
+      <Coord _ID="_408" x="3.5179999999999998" y="7.5019999999999998" z="-4.9459999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_409" name="H">
+      <Coord _ID="_410" x="2.2970000000000002" y="6.3899999999999997" z="-2.2709999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_411" name="HA">
+      <Coord _ID="_412" x="3.6019999999999999" y="4.8810000000000002" z="-4.5789999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_413" name="HB2">
+      <Coord _ID="_414" x="4.593" y="7.4320000000000004" z="-3.1560000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_415" name="HB3">
+      <Coord _ID="_416" x="5.3659999999999997" y="6.6779999999999999" z="-4.5469999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_417" name="HG">
+      <Coord _ID="_418" x="2.7080000000000002" y="7.7050000000000001" z="-4.4480000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_419" seqId="28" seqCode="185">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_420" value="185" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_421" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_422" serial="3">
+      <value>LEU</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_423" name="N">
+      <Coord _ID="_424" x="4.8890000000000002" y="4.5270000000000001" z="-1.546" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_425" name="CA">
+      <Coord _ID="_426" x="5.7510000000000003" y="3.5910000000000002" z="-0.75800000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_427" name="C">
+      <Coord _ID="_428" x="5.2789999999999999" y="2.1139999999999999" z="-0.86199999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_429" name="O">
+      <Coord _ID="_430" x="6.0990000000000002" y="1.202" z="-1.008" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_431" name="CB">
+      <Coord _ID="_432" x="5.8609999999999998" y="4.0590000000000002" z="0.72399999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_433" name="CG">
+      <Coord _ID="_434" x="6.258" y="5.5279999999999996" z="1.0009999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_435" name="CD1">
+      <Coord _ID="_436" x="6.1539999999999999" y="5.8449999999999998" z="2.5009999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_437" name="CD2">
+      <Coord _ID="_438" x="7.673" y="5.8620000000000001" z="0.502" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_439" name="H">
+      <Coord _ID="_440" x="4.048" y="4.9610000000000003" z="-1.133" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_441" name="HA">
+      <Coord _ID="_442" x="6.7539999999999996" y="3.524" z="-1.1970000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_443" name="HB2">
+      <Coord _ID="_444" x="4.8869999999999996" y="3.8679999999999999" z="1.2150000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_445" name="HB3">
+      <Coord _ID="_446" x="6.5750000000000002" y="3.3959999999999999" z="1.246" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_447" name="HG">
+      <Coord _ID="_448" x="5.524" y="6.1639999999999997" z="0.46400000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_449" name="HD11">
+      <Coord _ID="_450" x="5.1340000000000003" y="5.6600000000000001" z="2.887" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_451" name="HD12">
+      <Coord _ID="_452" x="6.8520000000000003" y="5.2359999999999998" z="3.1059999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_453" name="HD13">
+      <Coord _ID="_454" x="6.3819999999999997" y="6.9080000000000004" z="2.7080000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_455" name="HD21">
+      <Coord _ID="_456" x="7.7629999999999999" y="5.7080000000000002" z="-0.58999999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_457" name="HD22">
+      <Coord _ID="_458" x="7.9349999999999996" y="6.9199999999999999" z="0.68999999999999995" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_459" name="HD23">
+      <Coord _ID="_460" x="8.4469999999999992" y="5.2380000000000004" z="0.98599999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_461" seqId="29" seqCode="186">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_462" value="186" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_463" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_464" serial="3">
+      <value>CYS</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_465" name="N">
+      <Coord _ID="_466" x="3.964" y="1.885" z="-0.76500000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_467" name="CA">
+      <Coord _ID="_468" x="3.3719999999999999" y="0.57399999999999995" z="-0.93400000000000005" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_469" name="C">
+      <Coord _ID="_470" x="3.109" y="0.076999999999999999" z="-2.3969999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_471" name="O">
+      <Coord _ID="_472" x="3.2639999999999998" y="0.749" z="-3.419" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_473" name="CB">
+      <Coord _ID="_474" x="2.0659999999999998" y="0.64800000000000002" z="-0.127" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_475" name="SG">
+      <Coord _ID="_476" x="0.97199999999999998" y="1.873" z="-0.72099999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_477" name="H">
+      <Coord _ID="_478" x="3.395" y="2.6760000000000002" z="-0.47599999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_479" name="HA">
+      <Coord _ID="_480" x="4.0700000000000003" y="-0.111" z="-0.45600000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_481" name="HB2">
+      <Coord _ID="_482" x="1.5600000000000001" y="-0.30499999999999999" z="-0.20000000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_483" name="HB3">
+      <Coord _ID="_484" x="2.1099999999999999" y="0.84899999999999998" z="0.93799999999999994" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_485" seqId="30" seqCode="187">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_486" value="187" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_487" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_488" serial="3">
+      <value>HIS</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_489" name="N">
+      <Coord _ID="_490" x="2.5990000000000002" y="-1.1519999999999999" z="-2.4180000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_491" name="CA">
+      <Coord _ID="_492" x="2.1899999999999999" y="-1.8839999999999999" z="-3.641" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_493" name="C">
+      <Coord _ID="_494" x="0.65400000000000003" y="-1.661" z="-3.823" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_495" name="O">
+      <Coord _ID="_496" x="-0.14899999999999999" y="-2.0720000000000001" z="-2.9769999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_497" name="CB">
+      <Coord _ID="_498" x="2.5350000000000001" y="-3.4089999999999998" z="-3.5619999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_499" name="CG">
+      <Coord _ID="_500" x="3.5870000000000002" y="-3.907" z="-2.5619999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_501" name="ND1">
+      <Coord _ID="_502" x="4.9080000000000004" y="-3.5009999999999999" z="-2.6259999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_503" name="CD2">
+      <Coord _ID="_504" x="3.2610000000000001" y="-4.3330000000000002" z="-1.2609999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_505" name="CE1">
+      <Coord _ID="_506" x="5.2539999999999996" y="-3.6709999999999998" z="-1.3140000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_507" name="NE2">
+      <Coord _ID="_508" x="4.3570000000000002" y="-4.2060000000000004" z="-0.42799999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_509" name="H">
+      <Coord _ID="_510" x="2.7730000000000001" y="-1.619" z="-1.5249999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_511" name="HA">
+      <Coord _ID="_512" x="2.7400000000000002" y="-1.476" z="-4.5119999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_513" name="HB2">
+      <Coord _ID="_514" x="1.6180000000000001" y="-4.0049999999999999" z="-3.4119999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_515" name="HB3">
+      <Coord _ID="_516" x="2.8740000000000001" y="-3.6829999999999998" z="-4.5670000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_517" name="HD2">
+      <Coord _ID="_518" x="2.2490000000000001" y="-4.5099999999999998" z="-0.92100000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_519" name="HE1">
+      <Coord _ID="_520" x="6.1299999999999999" y="-3.1589999999999998" z="-0.94999999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_521" name="HE2">
+      <Coord _ID="_522" x="4.3780000000000001" y="-4.1550000000000002" z="0.59699999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_523" seqId="31" seqCode="188">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_524" value="188" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_525" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_526" serial="3">
+      <value>ILE</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_527" name="N">
+      <Coord _ID="_528" x="0.24099999999999999" y="-1.054" z="-4.9429999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_529" name="CA">
+      <Coord _ID="_530" x="-1.194" y="-0.66600000000000004" z="-5.1580000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_531" name="C">
+      <Coord _ID="_532" x="-1.968" y="-1.7869999999999999" z="-5.9459999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_533" name="O">
+      <Coord _ID="_534" x="-2.9089999999999998" y="-2.367" z="-5.399" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_535" name="CB">
+      <Coord _ID="_536" x="-1.3100000000000001" y="0.77200000000000002" z="-5.7939999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_537" name="CG1">
+      <Coord _ID="_538" x="-0.55700000000000005" y="1.9119999999999999" z="-5.0369999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_539" name="CG2">
+      <Coord _ID="_540" x="-2.7879999999999998" y="1.2130000000000001" z="-5.984" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_541" name="CD1">
+      <Coord _ID="_542" x="-0.251" y="3.1600000000000001" z="-5.8869999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_543" name="H">
+      <Coord _ID="_544" x="1.018" y="-0.69199999999999995" z="-5.5039999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_545" name="HA">
+      <Coord _ID="_546" x="-1.694" y="-0.57499999999999996" z="-4.1749999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_547" name="HB">
+      <Coord _ID="_548" x="-0.85399999999999998" y="0.68300000000000005" z="-6.7919999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_549" name="HG12">
+      <Coord _ID="_550" x="-1.1140000000000001" y="2.2090000000000001" z="-4.1280000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_551" name="HG13">
+      <Coord _ID="_552" x="0.41499999999999998" y="1.548" z="-4.649" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_553" name="HG21">
+      <Coord _ID="_554" x="-3.359" y="0.50700000000000001" z="-6.6139999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_555" name="HG22">
+      <Coord _ID="_556" x="-3.3260000000000001" y="1.292" z="-5.0199999999999996" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_557" name="HG23">
+      <Coord _ID="_558" x="-2.875" y="2.194" z="-6.4859999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_559" name="HD11">
+      <Coord _ID="_560" x="0.32800000000000001" y="2.9060000000000001" z="-6.7949999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_561" name="HD12">
+      <Coord _ID="_562" x="-1.165" y="3.6890000000000001" z="-6.2110000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_563" name="HD13">
+      <Coord _ID="_564" x="0.35899999999999999" y="3.8889999999999998" z="-5.3200000000000003" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+  <Residue _ID="_565" seqId="32" seqCode="189">
+    <seqInsertCode> </seqInsertCode>
+    <AppDataInt _ID="_566" value="189" serial="1">
+      <application>nmrStar</application>
+      <keyword>originalSeqCode</keyword>
+    </AppDataInt>
+    <AppDataString _ID="_567" serial="2">
+      <value> </value>
+      <application>nmrStar</application>
+      <keyword>originalSeqInsertCode</keyword>
+    </AppDataString>
+    <AppDataString _ID="_568" serial="3">
+      <value>GLU</value>
+      <application>nmrStar</application>
+      <keyword>originalLabel</keyword>
+    </AppDataString>
+    <Atom _ID="_569" name="N">
+      <Coord _ID="_570" x="-1.6120000000000001" y="-2.0750000000000002" z="-7.2140000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_571" name="CA">
+      <Coord _ID="_572" x="-2.2450000000000001" y="-3.1429999999999998" z="-8.0280000000000005" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_573" name="C">
+      <Coord _ID="_574" x="-1.169" y="-3.8719999999999999" z="-8.8819999999999997" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_575" name="CB">
+      <Coord _ID="_576" x="-3.3849999999999998" y="-2.5790000000000002" z="-8.9239999999999995" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_577" name="CG">
+      <Coord _ID="_578" x="-4.6879999999999997" y="-2.1930000000000001" z="-8.1760000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_579" name="CD">
+      <Coord _ID="_580" x="-5.7869999999999999" y="-1.645" z="-9.0790000000000006" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_581" name="OE1">
+      <Coord _ID="_582" x="-5.9649999999999999" y="-0.45200000000000001" z="-9.2949999999999999" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_583" name="OE2">
+      <Coord _ID="_584" x="-6.5529999999999999" y="-2.6299999999999999" z="-9.6189999999999998" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_585" name="H">
+      <Coord _ID="_586" x="-0.72599999999999998" y="-1.6699999999999999" z="-7.5030000000000001" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_587" name="HA">
+      <Coord _ID="_588" x="-2.6539999999999999" y="-3.899" z="-7.343" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_589" name="HB2">
+      <Coord _ID="_590" x="-3.0070000000000001" y="-1.7110000000000001" z="-9.5020000000000007" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_591" name="HB3">
+      <Coord _ID="_592" x="-3.6499999999999999" y="-3.335" z="-9.6899999999999995" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_593" name="HG2">
+      <Coord _ID="_594" x="-5.0839999999999996" y="-3.0590000000000002" z="-7.6150000000000002" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_595" name="HG3">
+      <Coord _ID="_596" x="-4.4779999999999998" y="-1.427" z="-7.4080000000000004" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+    <Atom _ID="_597" name="HE2">
+      <Coord _ID="_598" x="-7.2240000000000002" y="-2.214" z="-10.16" bFactor="0.0" occupancy="1.0">
+        <altLocationCode> </altLocationCode>
+      </Coord>
+    </Atom>
+  </Residue>
+</Chain>
+
+</_StorageUnit>
+<!--End of Memops Data-->

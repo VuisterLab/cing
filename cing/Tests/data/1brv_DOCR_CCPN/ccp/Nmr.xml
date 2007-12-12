@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit time="Fri Aug 24 10:30:47 2007" release="1.0.213" 
+ packageName="ccp.Nmr" root="1brv" originator="CCPN Python XmlIO">
+ 
+<NmrConstraintHead _ID="_1" serial="1">
+  <structureGenerations _IDREF="_2"/>
+  <structureGenerations _IDREF="_3"/>
+  <contentStorage>
+    <key1 serial="30"/>
+  </contentStorage>
+</NmrConstraintHead>
+<NmrConstraintHead _ID="_4" serial="2">
+  <contentStorage>
+    <key1 serial="31"/>
+  </contentStorage>
+</NmrConstraintHead>
+<NmrConstraintHead _ID="_5" serial="3">
+  <structureGenerations _IDREF="_6"/>
+  <contentStorage>
+    <key1 serial="144"/>
+  </contentStorage>
+</NmrConstraintHead>
+<StructureGeneration _ID="_2" serial="1" generationType="denovo" nmrConstraintHead="_1">
+  <name>Original constraints and reprotonated structures</name>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="1"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="2"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="3"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="4"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="5"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="6"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="7"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="8"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="9"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="10"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="11"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="12"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="13"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="14"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="15"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="16"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="17"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="18"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="19"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="20"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="21"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="22"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="23"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="24"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="25"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="26"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="27"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="28"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="29"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="30"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="31"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="32"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="33"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="34"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="35"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="36"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="37"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="38"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="39"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="40"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="41"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="42"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="43"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="44"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="45"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="46"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="47"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="48"/>
+  </structures>
+</StructureGeneration>
+<StructureGeneration _ID="_3" serial="2" generationType="denovo" nmrConstraintHead="_1">
+  <name>Original constraints and reprotonated structures</name>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="49"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="50"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="51"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="52"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="53"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="54"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="55"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="56"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="57"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="58"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="59"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="60"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="61"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="62"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="63"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="64"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="65"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="66"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="67"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="68"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="69"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="70"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="71"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="72"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="73"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="74"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="75"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="76"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="77"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="78"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="79"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="80"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="81"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="82"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="83"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="84"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="85"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="86"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="87"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="88"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="89"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="90"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="91"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="92"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="93"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="94"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="95"/>
+  </structures>
+  <structures>
+    <key1 tag="code">1brv</key1>
+    <key2 serial="96"/>
+  </structures>
+</StructureGeneration>
+<StructureGeneration _ID="_6" serial="3" generationType="denovo" nmrConstraintHead="_5">
+  <name>Final constraints and structures</name>
+</StructureGeneration>
+
+</_StorageUnit>
+<!--End of Memops Data-->
