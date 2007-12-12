@@ -2,10 +2,8 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printError
 from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
@@ -20,7 +18,7 @@ def importPlugin( pluginName ):
     Import a plugin
     Returns None on error
     """
-    printDebug('==> Importing plugin ' + pluginName)
+#    printDebug('==> Importing plugin ' + pluginName)
     pluginCodeModule = 'cing.' + cingPaths.plugins
 #    moduleName = cingPaths.plugins + '.' + pluginName
     if plugins.has_key(pluginName):

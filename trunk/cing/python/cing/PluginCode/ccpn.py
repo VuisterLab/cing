@@ -181,10 +181,11 @@ import string
 # Raise error again in order to exit the import process
 # This error is then caught by the importPlugin routine
 #printDebug("Trying import of readXmlProjectFile; which is impossible")
+ccpnVersion = 1 # Moved outside so it's always defined; pydev extensions code
+# analysis likes this for good reasons.
 try:
-    from memops.general.Io import readXmlProjectFile
+    from memops.general.Io import readXmlProjectFile #@UnresolvedImport
     NTmessage("Using CCPN version 1.x\n")
-    ccpnVersion = 1
 except:
     try:
         from memops.general.Io import loadProject
@@ -281,7 +282,8 @@ def loadCcpn( cingProject = None, ccpnFile = None ):
     funcName = loadCcpn.func_name
 
     _checkCingProject( cingProject, funcName )
-    if not cingProject: return None
+    if not cingProject: 
+        return None
 
     if ( not ccpnFile or not os.path.exists(ccpnFile) ):
         NTerror("ERROR '%s': ccpnFile '%s' not found\n", funcName, ccpnFile)
@@ -320,7 +322,10 @@ def initCcpn( cingProject, ccpnFile = None ):
     _checkCingProject( cingProject, funcName )
     if not cingProject: return None
 
-    if ( not ccpnFile or not os.path.exists(ccpnFile) ):
+    if not ccpnFile:
+        NTerror("ERROR initCcpn: ccpnFile not given")
+        return None
+    if not os.path.exists(ccpnFile):
         NTerror("ERROR initCcpn: ccpnFile '%s' not found\n", ccpnFile)
         return None
     #end if
@@ -330,8 +335,7 @@ def initCcpn( cingProject, ccpnFile = None ):
     else:
         ccpnProject = loadProject(ccpnFile)
 
-    if ( ccpnProject ):
-
+    if ccpnProject:
         cingProject.ccpn = ccpnProject
         ccpnProject.cing = cingProject
 
