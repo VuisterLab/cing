@@ -1,0 +1,7 @@
+----------- Molecule: Ccpn_1brv -----------
+chains:     1 [<Chain A>]
+residues:   32
+atoms:      542
+resonances: 1 per atom
+models:     96
+-------------------------------------------

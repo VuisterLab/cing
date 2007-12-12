@@ -1,0 +1,5 @@
+----- <Residue CYS173> -----
+PHI   : average:   -56.7   cv: 0.001  ||  outliers:-999 (models -999)
+PSI   : average:   -33.8   cv: 0.001  ||  outliers:-999 (models -999)
+CHI1  : average:   258.2   cv: 0.001  ||  outliers:-999 (models -999)
+OMEGA : average:   179.8   cv: 0.002  ||  outliers:-999 (models -999)

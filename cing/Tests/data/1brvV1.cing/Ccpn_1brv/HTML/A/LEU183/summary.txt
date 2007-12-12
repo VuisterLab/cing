@@ -1,0 +1,6 @@
+----- <Residue LEU183> -----
+PHI   : average:   -60.2   cv: 0.001  ||  outliers:-999 (models -999)
+PSI   : average:   -33.5   cv: 0.000  ||  outliers: 5 (models [42, 40, 37, 90, 88])
+CHI1  : average:   285.2   cv: 0.000  ||  outliers: 2 (models [55, 63])
+CHI2  : average:   180.6   cv: 0.000  ||  outliers:-999 (models -999)
+OMEGA : average:   170.8   cv: 0.000  ||  outliers:-999 (models -999)

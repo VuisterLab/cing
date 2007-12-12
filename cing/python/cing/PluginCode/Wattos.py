@@ -1,5 +1,6 @@
-"""Wattos Module
-  First version: jfd Dec 11, 2007
+"""
+    Wattos Module
+    First version: jfd Dec 11, 2007
 """
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdict
@@ -12,13 +13,13 @@ from cing.Libs.NTutils import sprintf
 import os
 import time
 
- 
+
 class Wattos( NTdict ):
     """
     Class to use Wattos checks.
     First adding completeness check.
     """
-    
+
     scriptTemplate = """
 InitAll
 
@@ -39,26 +40,26 @@ INPUT_PDB_FILE
 # Using same defaults as for FRED (NMR Restraints Grid) analysis.
 CheckCompleteness
 4
-2               
-6                  
+2
+6
 8
 2
 9
 14
 1.0
 1
-1 
+1
 n
-ob_standard.str             
+ob_standard.str
 wattos_completeness_chk.str
 n
 wattos_completeness_chk
 
 Quit
 """
-    
+
     def __init__( self, rootPath = '.', molecule = None, **kwds ):
-        NTdict.__init__( self, __CLASS__ = 'Wattos', **kwds )        
+        NTdict.__init__( self, __CLASS__ = 'Wattos', **kwds )
         self.checks                = None
         self.molSpecificChecks     = None
         self.residueSpecificChecks = None
@@ -68,21 +69,22 @@ Quit
         self.molecule              = molecule
         self.rootPath              = rootPath
     #end def
-    
- 
+
+
 def runWattos( project, tmp=None ):
-    """Run and import the wattos results per model.
-    All models in the ensemble of the molecule will be checked.
-       Set wattos references for Molecule, Chain, Residue and Atom instances
-       or None if no wattos results exist
-       returns 1 on success or None on any failure.
     """
-    if not project.molecule: 
+        Run and import the wattos results per model.
+        All models in the ensemble of the molecule will be checked.
+        Set wattos references for Molecule, Chain, Residue and Atom instances
+        or None if no wattos results exist
+        returns 1 on success or None on any failure.
+    """
+    if not project.molecule:
         NTerror("No project molecule in runWattos")
         return None
 
     path = project.path( project.molecule.name, project.moleculeDirectories.wattos )
-    if not os.path.exists( path ): 
+    if not os.path.exists( path ):
         project.molecule.wattos = None
         for chain in project.molecule.allChains():
             chain.wattos = None
@@ -97,10 +99,10 @@ def runWattos( project, tmp=None ):
         NTerror('in runWattos: no molecule defined\n')
         return None
 
-    if project.molecule.modelCount == 0: 
+    if project.molecule.modelCount == 0:
         NTerror('in runWattos: no models for "%s"\n', project.molecule)
         return None
-    
+
     wattosDir = project.mkdir( project.molecule.name, project.moleculeDirectories.wattos  )
     pdbFileName = 'project.pdb'
     fullname =  os.path.join( wattosDir, pdbFileName )
@@ -108,8 +110,8 @@ def runWattos( project, tmp=None ):
     if not pdbFile:
         printError("Failed to write a temporary PDB formatted coordinate file for ensemble.")
         return None
-    pdbFile.save( fullname, verbose = False )   
-        
+    pdbFile.save( fullname, verbose = False )
+
     scriptComplete = Wattos.scriptTemplate
     scriptComplete = scriptComplete.replace("INPUT_PDB_FILE", pdbFileName)
 
@@ -123,18 +125,18 @@ def runWattos( project, tmp=None ):
     open(scriptFullFileName,"w").write(scriptComplete)
     wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
     logFileName = "wattos_compl.log"
-    wattosProgram = ExecuteProgram( wattosPath, rootPath = wattosDir, 
-                             redirectOutputToFile  = logFileName, 
+    wattosProgram = ExecuteProgram( wattosPath, rootPath = wattosDir,
+                             redirectOutputToFile  = logFileName,
                              redirectInputFromFile = scriptFileName )
     # The last argument becomes a necessary redirection into fouling Wattos into
     # thinking it's running interactively.
-    now = time.time() 
+    now = time.time()
     if True:
         wattosExitCode = wattosProgram()
-    else:      
+    else:
         printDebug("Skipping actual wattos execution for testing")
         wattosExitCode = 0
-        
+
     printDebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if wattosExitCode:
         printError("Failed wattos checks with exit code: " + `wattosExitCode`)
@@ -143,7 +145,7 @@ def runWattos( project, tmp=None ):
     printMessage('==> Parsing checks')
 #    modelCheckDbFullFileName =  os.path.join( wattosDir, modelCheckDbFileName )
 #    wattos._parseCheckdb( modelCheckDbFullFileName, 999 )
-    
+
     printWarning("Processing is to be continued from here on.")
     return 1
     if not wattos._processCheckdb():
@@ -151,7 +153,7 @@ def runWattos( project, tmp=None ):
         return None
     # TODO: finish this code.
 #    wattos.map2molecule()
-    
+
     return wattos # Success
 #end def
 

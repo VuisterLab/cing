@@ -1030,39 +1030,38 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
                           hardcopySize= (600,300),
                           aspectRatio = 0.5
                         )
+
+    hight = 5.0
+
     if angle.good:
         plot.histogram( angle.good.zap(1),
                         plotparams.min, plotparams.max, bins,
                         attributes = NTplot.boxAttributes( fillColor=plotparams.color )
                       )
+        hight = plot.maxY
     else:
         NTwarning("No angle.good plots made")
-
-    if not plot.maxY:
-        NTerror("Failed to get a plot.maxY set")
-        return None
-
-    hight = plot.maxY
+    #end if
 
     if angle.outliers:
         plot.histogram( angle.outliers.zap(1),
                     plotparams.min, plotparams.max, bins,
                     attributes = NTplot.boxAttributes( fillColor=plotparams.outlier )
                   )
+        if not hight:
+            hight = plot.maxY
     else:
         NTwarning("No angle.outliers plots made")
+    #end if
+
     # AWSS
     # Let's check if for this 'angle' is a dihedral restraint
     aAv  = angle.cav
     width = 4.0
-#    dd = 3.0
     dr = _matchDihedrals(residue, dihedralName)
 
     if dr:
         lower, upper = dr.lower, dr.upper
-
-    #else:
-    #    lower, upper = plotparams.min+dd, plotparams.max-dd
 
         plot.line( (lower, 0), (lower, hight),
                    NTplot.lineAttributes(color=plotparams.lower, width=width) )

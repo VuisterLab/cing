@@ -1,0 +1,294 @@
+----------- Project: 1brvV1 -----------
+created:    Tue Dec 11 19:03:19 2007
+molecules:  [Ccpn_1brv]
+peaks:      []
+distances:  [<DistanceRestraintList "distance_constraint_list" (keep,264)>, <DistanceRestraintList "distance_constraint_list_1" (keep,237)>]
+dihedrals:  [<DihedralRestraintList "dihedral_constraint_list" (keep,29)>, <DihedralRestraintList "dihedral_constraint_list_1" (keep,29)>]
+rdcs:       []
+---------------------------------------
+----------- DistanceRestraintList "distance_constraint_list" (keep,264) -----------
+rmsd:   0.029  0.001        Violations > 0.1,0.3,0.5: 722, 0, 0
+
+----------- Sorted on Maximum Violations -----------
+<DistanceRestraint 263>   (Target:  1.8  4.7)  (Models: av  4.6 sd  0.4 min  3.3 max  5.0)  (Violations: av  0.1 max  0.3 counts 18, 0, 0) (VAL171.HA   -   CYS186.HN)
+<DistanceRestraint 262>   (Target:  1.8  4.4)  (Models: av  4.6 sd  0.0 min  4.5 max  4.6)  (Violations: av  0.2 max  0.2 counts 96, 0, 0) (LEU185.HA   -   CYS186.HA)
+<DistanceRestraint 261>   (Target:  1.8  4.3)  (Models: av  4.5 sd  0.0 min  4.4 max  4.5)  (Violations: av  0.1 max  0.2 counts 86, 0, 0) (CYS186.HN   -   HIS187.HN)
+<DistanceRestraint 260>   (Target:  1.8  5.4)  (Models: av  5.4 sd  0.1 min  5.2 max  5.6)  (Violations: av  0.1 max  0.2 counts 30, 0, 0) (LEU183.HA   -   CYS186.HA)
+<DistanceRestraint 259>   (Target:  1.8  4.3)  (Models: av  4.5 sd  0.0 min  4.5 max  4.5)  (Violations: av  0.2 max  0.2 counts 96, 0, 0) (ASN179.QB   -   LEU180.HA)
+<DistanceRestraint 258>   (Target:  1.8  4.4)  (Models: av  4.6 sd  0.0 min  4.5 max  4.6)  (Violations: av  0.1 max  0.2 counts 96, 0, 0) (LEU183.HG   -   SER184.HN)
+<DistanceRestraint 257>   (Target:  1.8  4.0)  (Models: av  4.2 sd  0.0 min  4.1 max  4.2)  (Violations: av  0.1 max  0.2 counts 96, 0, 0) (ASN179.HA   -   LEU180.HA)
+<DistanceRestraint 256>   (Target:  1.8  3.7)  (Models: av  3.7 sd  0.0 min  3.7 max  3.8)  (Violations: av  0.1 max  0.1 counts 12, 0, 0) (HIS187.HE1  -   HIS187.HN)
+<DistanceRestraint 255>   (Target:  1.8  2.8)  (Models: av  2.8 sd  0.2 min  2.3 max  3.0)  (Violations: av  0.1 max  0.1 counts 22, 0, 0) (GLU189.HA   -   GLU189.HN)
+<DistanceRestraint 254>   (Target:  1.8  3.5)  (Models: av  3.4 sd  0.1 min  3.3 max  3.7)  (Violations: av  0.0 max  0.1 counts  4, 0, 0) (LEU185.HG   -   LEU185.HA)
+<DistanceRestraint 253>   (Target:  1.8  4.3)  (Models: av  4.4 sd  0.0 min  4.4 max  4.5)  (Violations: av  0.1 max  0.1 counts  8, 0, 0) (GLU177.HA   -   ASN179.HN)
+<DistanceRestraint 252>   (Target:  1.8  5.3)  (Models: av  5.4 sd  0.0 min  5.4 max  5.5)  (Violations: av  0.1 max  0.1 counts 96, 0, 0) (ASN179.HN   -   ALA181.HN)
+<DistanceRestraint 251>   (Target:  1.8  2.9)  (Models: av  3.0 sd  0.0 min  3.0 max  3.0)  (Violations: av  0.1 max  0.1 counts 52, 0, 0) (ALA181.HA   -   ALA181.HN)
+<DistanceRestraint 250>   (Target:  1.8  3.7)  (Models: av  2.8 sd  0.7 min  2.2 max  3.8)  (Violations: av  0.0 max  0.1 counts  8, 0, 0) (VAL171.HB   -   CYS186.HA)
+<DistanceRestraint 249>   (Target:  1.8  3.6)  (Models: av  3.6 sd  0.1 min  3.2 max  3.7)  (Violations: av  0.0 max  0.1 counts  2, 0, 0) (CYS173.HN   -   HIS187.HN)
+<DistanceRestraint 248>   (Target:  1.8  4.8)  (Models: av  4.9 sd  0.0 min  4.9 max  4.9)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (GLY178.HN   -   ASN179.HA)
+<DistanceRestraint 247>   (Target:  1.8  4.3)  (Models: av  4.4 sd  0.0 min  4.4 max  4.4)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (CYS182.HN   -   LEU183.HG)
+<DistanceRestraint 246>   (Target:  1.8  4.2)  (Models: av  4.2 sd  0.2 min  3.2 max  4.2)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (LEU185.HG   -   CYS186.HN)
+<DistanceRestraint 245>   (Target:  1.8  2.9)  (Models: av  2.9 sd  0.2 min  2.5 max  3.0)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (ILE188.HB   -   ILE188.HA)
+<DistanceRestraint 244>   (Target:  1.8  4.9)  (Models: av  4.6 sd  0.2 min  4.3 max  5.0)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS182.HA   -   CYS186.HN)
+<DistanceRestraint 243>   (Target:  1.8  3.9)  (Models: av  3.9 sd  0.0 min  3.9 max  3.9)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (ASN179.HA   -   LEU180.QB)
+<DistanceRestraint 242>   (Target:  1.8  4.5)  (Models: av  4.6 sd  0.0 min  4.6 max  4.6)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (CYS176.HN   -   GLU177.HA)
+<DistanceRestraint 241>   (Target:  1.8  3.4)  (Models: av  3.3 sd  0.3 min  2.2 max  3.4)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS182.HA   -   LEU185.HG)
+<DistanceRestraint 240>   (Target:  1.8  4.2)  (Models: av  4.2 sd  0.0 min  4.1 max  4.3)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (SER184.HN   -   LEU185.HG)
+<DistanceRestraint 239>   (Target:  1.8  3.1)  (Models: av  3.1 sd  0.0 min  3.0 max  3.1)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (LEU183.HG   -   LEU183.HA)
+<DistanceRestraint 238>   (Target:  1.8  3.4)  (Models: av  3.0 sd  0.2 min  2.7 max  3.4)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS173.QB   -   ILE188.HA)
+<DistanceRestraint 237>   (Target:  1.8  4.5)  (Models: av  4.5 sd  0.0 min  4.5 max  4.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QB   -   CYS182.HA)
+<DistanceRestraint 236>   (Target:  1.8  4.9)  (Models: av  4.9 sd  0.0 min  4.8 max  4.9)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS176.HN   -   LEU183.HG)
+<DistanceRestraint 235>   (Target:  1.8  3.1)  (Models: av  3.0 sd  0.1 min  2.8 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -   SER174.HN)
+<DistanceRestraint 234>   (Target:  1.8  2.7)  (Models: av  2.7 sd  0.0 min  2.7 max  2.7)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.HG   -   LEU180.HN)
+
+----------- Sorted on Violations > 0.3 A -----------
+<DistanceRestraint 0>     (Target:  1.8  3.1)  (Models: av  0.0 sd  0.0 min  0.0 max  0.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.HB   -   VAL171.HN)
+<DistanceRestraint 1>     (Target:  1.8  5.0)  (Models: av  2.3 sd  0.1 min  2.1 max  2.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG1  -   VAL171.HA)   (VAL171.QG2  -   VAL171.HA)
+<DistanceRestraint 2>     (Target:  1.8  5.5)  (Models: av  0.0 sd  0.0 min  0.0 max  0.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG1  -   VAL171.HN)   (VAL171.QG2  -   VAL171.HN)
+<DistanceRestraint 3>     (Target:  1.8  6.5)  (Models: av  2.9 sd  0.1 min  2.7 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QB   -   PRO172.QD)
+<DistanceRestraint 4>     (Target:  1.8  4.7)  (Models: av  3.4 sd  0.3 min  2.8 max  3.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QG   -   PRO172.HA)
+<DistanceRestraint 5>     (Target:  1.8  2.6)  (Models: av  2.5 sd  0.0 min  2.5 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   CYS173.HA)
+<DistanceRestraint 6>     (Target:  1.8  3.3)  (Models: av  2.0 sd  0.0 min  2.0 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   CYS173.HN)
+<DistanceRestraint 7>     (Target:  1.8  3.1)  (Models: av  2.0 sd  0.0 min  2.0 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   CYS173.HN)
+<DistanceRestraint 8>     (Target:  1.8  2.8)  (Models: av  2.4 sd  0.0 min  2.4 max  2.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (THR175.HB   -   THR175.HA)
+<DistanceRestraint 9>     (Target:  1.8  3.8)  (Models: av  2.5 sd  0.0 min  2.5 max  2.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (THR175.QG2  -   THR175.HA)
+<DistanceRestraint 10>    (Target:  1.8  4.0)  (Models: av  2.6 sd  0.1 min  2.3 max  2.8)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (THR175.QG2  -   THR175.HN)
+<DistanceRestraint 11>    (Target:  1.8  2.9)  (Models: av  2.5 sd  0.0 min  2.4 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS176.QB   -   CYS176.HA)
+<DistanceRestraint 12>    (Target:  1.8  3.5)  (Models: av  2.3 sd  0.0 min  2.3 max  2.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS176.QB   -   CYS176.HN)
+<DistanceRestraint 13>    (Target:  1.8  2.9)  (Models: av  2.3 sd  0.0 min  2.3 max  2.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS176.QB   -   CYS176.HN)
+<DistanceRestraint 14>    (Target:  1.8  2.6)  (Models: av  2.3 sd  0.0 min  2.3 max  2.3)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLU177.HA   -   GLU177.HN)
+<DistanceRestraint 15>    (Target:  1.8  4.5)  (Models: av  3.2 sd  0.2 min  2.8 max  3.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLU177.QB   -   GLU177.HN)
+<DistanceRestraint 16>    (Target:  1.8  4.1)  (Models: av  2.9 sd  0.4 min  2.5 max  3.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLU177.QG   -   GLU177.HA)
+<DistanceRestraint 17>    (Target:  1.8  4.7)  (Models: av  3.2 sd  0.5 min  2.7 max  4.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLU177.QG   -   GLU177.HN)
+<DistanceRestraint 18>    (Target:  1.8  2.7)  (Models: av  2.4 sd  0.0 min  2.4 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLY178.QA   -   GLY178.HN)
+<DistanceRestraint 19>    (Target:  1.8  2.9)  (Models: av  2.4 sd  0.0 min  2.4 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (GLY178.QA   -   GLY178.HN)
+<DistanceRestraint 20>    (Target:  1.8  5.2)  (Models: av  3.1 sd  0.0 min  3.0 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.HA   -  ASN179.QD2)
+<DistanceRestraint 21>    (Target:  1.8  2.8)  (Models: av  2.4 sd  0.0 min  2.4 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QB   -   ASN179.HN)
+<DistanceRestraint 22>    (Target:  1.8  2.9)  (Models: av  2.6 sd  0.0 min  2.6 max  2.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QB   -   ASN179.HA)
+<DistanceRestraint 23>    (Target:  1.8  2.9)  (Models: av  2.4 sd  0.0 min  2.4 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QB   -   ASN179.HN)
+<DistanceRestraint 24>    (Target:  1.8  5.2)  (Models: av  4.5 sd  0.0 min  4.5 max  4.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QD2  -   ASN179.HN)
+<DistanceRestraint 25>    (Target:  1.8  3.1)  (Models: av  2.6 sd  0.0 min  2.5 max  2.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.QB   -   LEU180.HA)
+<DistanceRestraint 26>    (Target:  1.8  2.9)  (Models: av  2.1 sd  0.0 min  2.1 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.QB   -   LEU180.HN)
+<DistanceRestraint 27>    (Target:  1.8  2.9)  (Models: av  2.6 sd  0.0 min  2.5 max  2.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.QB   -   LEU180.HA)
+<DistanceRestraint 28>    (Target:  1.8  2.7)  (Models: av  2.4 sd  0.0 min  2.4 max  2.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.QB   -   LEU180.HG)
+<DistanceRestraint 29>    (Target:  1.8  3.4)  (Models: av  2.1 sd  0.0 min  2.1 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.QB   -   LEU180.HN)
+
+----------- DistanceRestraintList "distance_constraint_list_1" (keep,237) -----------
+rmsd:   0.031  0.001        Violations > 0.1,0.3,0.5: 722, 0, 0
+
+----------- Sorted on Maximum Violations -----------
+<DistanceRestraint 236>   (Target:  1.8  4.7)  (Models: av  4.6 sd  0.4 min  3.3 max  5.0)  (Violations: av  0.1 max  0.3 counts 18, 0, 0) (VAL171.HA   -   CYS186.HN)
+<DistanceRestraint 235>   (Target:  1.8  4.4)  (Models: av  4.6 sd  0.0 min  4.5 max  4.6)  (Violations: av  0.2 max  0.2 counts 96, 0, 0) (LEU185.HA   -   CYS186.HA)
+<DistanceRestraint 234>   (Target:  1.8  4.3)  (Models: av  4.5 sd  0.0 min  4.4 max  4.5)  (Violations: av  0.1 max  0.2 counts 86, 0, 0) (CYS186.HN   -   HIS187.HN)
+<DistanceRestraint 233>   (Target:  1.8  5.4)  (Models: av  5.4 sd  0.1 min  5.2 max  5.6)  (Violations: av  0.1 max  0.2 counts 30, 0, 0) (LEU183.HA   -   CYS186.HA)
+<DistanceRestraint 232>   (Target:  1.8  4.3)  (Models: av  4.5 sd  0.0 min  4.5 max  4.5)  (Violations: av  0.2 max  0.2 counts 96, 0, 0) (ASN179.QB   -   LEU180.HA)
+<DistanceRestraint 231>   (Target:  1.8  4.4)  (Models: av  4.6 sd  0.0 min  4.5 max  4.6)  (Violations: av  0.1 max  0.2 counts 96, 0, 0) (LEU183.HG   -   SER184.HN)
+<DistanceRestraint 230>   (Target:  1.8  4.0)  (Models: av  4.2 sd  0.0 min  4.1 max  4.2)  (Violations: av  0.1 max  0.2 counts 96, 0, 0) (ASN179.HA   -   LEU180.HA)
+<DistanceRestraint 229>   (Target:  1.8  3.7)  (Models: av  3.7 sd  0.0 min  3.7 max  3.8)  (Violations: av  0.1 max  0.1 counts 12, 0, 0) (HIS187.HN   -  HIS187.HE1)
+<DistanceRestraint 228>   (Target:  1.8  2.8)  (Models: av  2.8 sd  0.2 min  2.3 max  3.0)  (Violations: av  0.1 max  0.1 counts 22, 0, 0) (GLU189.HN   -   GLU189.HA)
+<DistanceRestraint 227>   (Target:  1.8  3.5)  (Models: av  3.4 sd  0.1 min  3.3 max  3.7)  (Violations: av  0.0 max  0.1 counts  4, 0, 0) (LEU185.HA   -   LEU185.HG)
+<DistanceRestraint 226>   (Target:  1.8  4.3)  (Models: av  4.4 sd  0.0 min  4.4 max  4.5)  (Violations: av  0.1 max  0.1 counts  8, 0, 0) (GLU177.HA   -   ASN179.HN)
+<DistanceRestraint 225>   (Target:  1.8  5.3)  (Models: av  5.4 sd  0.0 min  5.4 max  5.5)  (Violations: av  0.1 max  0.1 counts 96, 0, 0) (ASN179.HN   -   ALA181.HN)
+<DistanceRestraint 224>   (Target:  1.8  2.9)  (Models: av  3.0 sd  0.0 min  3.0 max  3.0)  (Violations: av  0.1 max  0.1 counts 52, 0, 0) (ALA181.HN   -   ALA181.HA)
+<DistanceRestraint 223>   (Target:  1.8  3.7)  (Models: av  2.8 sd  0.7 min  2.2 max  3.8)  (Violations: av  0.0 max  0.1 counts  8, 0, 0) (VAL171.HB   -   CYS186.HA)
+<DistanceRestraint 222>   (Target:  1.8  3.6)  (Models: av  3.6 sd  0.1 min  3.2 max  3.7)  (Violations: av  0.0 max  0.1 counts  2, 0, 0) (CYS173.HN   -   HIS187.HN)
+<DistanceRestraint 221>   (Target:  1.8  4.8)  (Models: av  4.9 sd  0.0 min  4.9 max  4.9)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (GLY178.HN   -   ASN179.HA)
+<DistanceRestraint 220>   (Target:  1.8  4.3)  (Models: av  4.4 sd  0.0 min  4.4 max  4.4)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (CYS182.HN   -   LEU183.HG)
+<DistanceRestraint 219>   (Target:  1.8  4.2)  (Models: av  4.2 sd  0.2 min  3.2 max  4.2)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (LEU185.HG   -   CYS186.HN)
+<DistanceRestraint 218>   (Target:  1.8  2.9)  (Models: av  2.9 sd  0.2 min  2.5 max  3.0)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (ILE188.HA   -   ILE188.HB)
+<DistanceRestraint 217>   (Target:  1.8  4.9)  (Models: av  4.6 sd  0.2 min  4.3 max  5.0)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS182.HA   -   CYS186.HN)
+<DistanceRestraint 216>   (Target:  1.8  3.9)  (Models: av  3.9 sd  0.0 min  3.9 max  3.9)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (ASN179.HA   -   LEU180.QB)
+<DistanceRestraint 215>   (Target:  1.8  4.5)  (Models: av  4.6 sd  0.0 min  4.6 max  4.6)  (Violations: av  0.1 max  0.1 counts  0, 0, 0) (CYS176.HN   -   GLU177.HA)
+<DistanceRestraint 214>   (Target:  1.8  3.4)  (Models: av  3.3 sd  0.3 min  2.2 max  3.4)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS182.HA   -   LEU185.HG)
+<DistanceRestraint 213>   (Target:  1.8  4.2)  (Models: av  4.2 sd  0.0 min  4.1 max  4.3)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (SER184.HN   -   LEU185.HG)
+<DistanceRestraint 212>   (Target:  1.8  3.1)  (Models: av  3.1 sd  0.0 min  3.0 max  3.1)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (LEU183.HA   -   LEU183.HG)
+<DistanceRestraint 211>   (Target:  1.8  3.4)  (Models: av  3.0 sd  0.2 min  2.7 max  3.4)  (Violations: av  0.0 max  0.1 counts  0, 0, 0) (CYS173.QB   -   ILE188.HA)
+<DistanceRestraint 210>   (Target:  1.8  4.5)  (Models: av  4.5 sd  0.0 min  4.5 max  4.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (ASN179.QB   -   CYS182.HA)
+<DistanceRestraint 209>   (Target:  1.8  4.9)  (Models: av  4.9 sd  0.0 min  4.8 max  4.9)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS176.HN   -   LEU183.HG)
+<DistanceRestraint 208>   (Target:  1.8  3.1)  (Models: av  3.0 sd  0.1 min  2.8 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -   SER174.HN)
+<DistanceRestraint 207>   (Target:  1.8  2.7)  (Models: av  2.7 sd  0.0 min  2.7 max  2.7)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (LEU180.HN   -   LEU180.HG)
+
+----------- Sorted on Violations > 0.3 A -----------
+<DistanceRestraint 0>     (Target:  1.8  3.5)  (Models: av  2.9 sd  0.5 min  2.1 max  3.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.HA   -   PRO172.QD)
+<DistanceRestraint 1>     (Target:  1.8  8.0)  (Models: av  3.2 sd  0.5 min  2.2 max  3.7)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG1  -   PRO172.QD)   (VAL171.QG2  -   PRO172.QD)
+<DistanceRestraint 2>     (Target:  1.8  7.4)  (Models: av  2.4 sd  0.3 min  2.0 max  3.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG1  -   CYS186.HA)   (VAL171.QG2  -   CYS186.HA)
+<DistanceRestraint 3>     (Target:  1.8  5.8)  (Models: av  3.4 sd  0.4 min  2.2 max  3.8)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG2  -   CYS186.QB)   (VAL171.QG1  -   CYS186.QB)
+<DistanceRestraint 4>     (Target:  1.8  5.8)  (Models: av  3.4 sd  0.4 min  2.2 max  3.8)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (VAL171.QG2  -   CYS186.QB)   (VAL171.QG1  -   CYS186.QB)
+<DistanceRestraint 5>     (Target:  1.8  5.3)  (Models: av  3.6 sd  0.2 min  3.2 max  3.9)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QB   -   CYS173.HN)
+<DistanceRestraint 6>     (Target:  1.8  5.3)  (Models: av  3.4 sd  0.1 min  3.2 max  3.8)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QB   -   SER174.HN)
+<DistanceRestraint 7>     (Target:  1.8  5.4)  (Models: av  3.4 sd  0.3 min  2.8 max  3.9)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QB   -   THR175.HN)
+<DistanceRestraint 8>     (Target:  1.8  5.5)  (Models: av  2.6 sd  0.3 min  2.3 max  3.3)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QB   -  THR175.QG2)
+<DistanceRestraint 9>     (Target:  1.8  5.7)  (Models: av  4.8 sd  0.2 min  4.2 max  5.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QD   -   THR175.HN)
+<DistanceRestraint 10>    (Target:  1.8  5.6)  (Models: av  3.8 sd  0.2 min  3.5 max  4.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QD   -  THR175.QG2)
+<DistanceRestraint 11>    (Target:  1.8  5.8)  (Models: av  4.2 sd  0.6 min  3.3 max  5.2)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QG   -   THR175.HN)
+<DistanceRestraint 12>    (Target:  1.8  5.6)  (Models: av  2.7 sd  0.5 min  2.2 max  3.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (PRO172.QG   -  THR175.QG2)
+<DistanceRestraint 13>    (Target:  1.8  3.1)  (Models: av  2.0 sd  0.0 min  2.0 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -   CYS173.QB)
+<DistanceRestraint 14>    (Target:  1.8  3.3)  (Models: av  2.0 sd  0.0 min  2.0 max  2.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -   CYS173.QB)
+<DistanceRestraint 15>    (Target:  1.8  9.3)  (Models: av  5.5 sd  0.1 min  5.3 max  5.7)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -  THR175.QG2)
+<DistanceRestraint 16>    (Target:  1.8  4.7)  (Models: av  2.1 sd  0.1 min  1.9 max  2.3)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -   CYS186.QB)
+<DistanceRestraint 17>    (Target:  1.8  7.6)  (Models: av  5.4 sd  0.6 min  3.5 max  6.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HN   -  ILE188.QG1)
+<DistanceRestraint 18>    (Target:  1.8  2.6)  (Models: av  2.5 sd  0.0 min  2.5 max  2.5)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HA   -   CYS173.QB)
+<DistanceRestraint 19>    (Target:  1.8  4.2)  (Models: av  3.5 sd  0.0 min  3.5 max  3.6)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HA   -   SER174.HN)
+<DistanceRestraint 20>    (Target:  1.8  4.0)  (Models: av  2.5 sd  0.1 min  2.3 max  2.7)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HA   -   CYS176.QB)
+<DistanceRestraint 21>    (Target:  1.8  3.5)  (Models: av  2.9 sd  0.1 min  2.8 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.HA   -   CYS186.QB)
+<DistanceRestraint 22>    (Target:  1.8  3.5)  (Models: av  3.1 sd  0.0 min  3.0 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   SER174.HN)
+<DistanceRestraint 23>    (Target:  1.8  6.1)  (Models: av  2.9 sd  0.0 min  2.8 max  3.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -  LEU183.QD1)   (CYS173.QB   -  LEU183.QD2)
+<DistanceRestraint 24>    (Target:  1.8  3.7)  (Models: av  2.8 sd  0.1 min  2.6 max  3.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   CYS186.QB)
+<DistanceRestraint 25>    (Target:  1.8  5.4)  (Models: av  3.5 sd  0.5 min  2.4 max  4.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -  ILE188.QG1)
+<DistanceRestraint 26>    (Target:  1.8  3.7)  (Models: av  3.1 sd  0.0 min  3.0 max  3.1)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   SER174.HN)
+<DistanceRestraint 27>    (Target:  1.8  4.5)  (Models: av  4.4 sd  0.0 min  4.3 max  4.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   SER174.HA)
+<DistanceRestraint 28>    (Target:  1.8  6.8)  (Models: av  2.9 sd  0.0 min  2.8 max  3.0)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -  LEU183.QD1)   (CYS173.QB   -  LEU183.QD2)
+<DistanceRestraint 29>    (Target:  1.8  3.9)  (Models: av  3.0 sd  0.2 min  2.7 max  3.4)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) (CYS173.QB   -   ILE188.HA)
+
+----------- DihedralRestraintList "dihedral_constraint_list" (keep,29) -----------
+rmsd:   4.899  0.204        Violations > 1,3,5 degree: 1686, 1356, 986
+
+----------- Sorted on Maximum Violations -----------
+<DihedralRestraint 6>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.8 counts 96,96,96) <Atom CYS173.CA> <Atom CYS173.C> <Atom SER174.N> <Atom SER174.CA> 
+<DihedralRestraint 5>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.0 counts 96,96,96) <Atom LEU180.CA> <Atom LEU180.C> <Atom ALA181.N> <Atom ALA181.CA> 
+<DihedralRestraint 11>    (Target:  178.0  182.0)  (Models: cav  173.5 cv 0.00)  (Violations: av -4.7 max 10.9 counts 74,66,56) <Atom CYS186.CA> <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> 
+<DihedralRestraint 10>    (Target: -140.0 -100.0)  (Models: cav  -97.6 cv 0.02)  (Violations: av  4.5 max 10.1 counts 90,72,46) <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> <Atom ILE188.C> 
+<DihedralRestraint 4>     (Target:  178.0  182.0)  (Models: cav  169.9 cv 0.00)  (Violations: av -8.1 max 10.1 counts 96,96,96) <Atom CYS176.CA> <Atom CYS176.C> <Atom GLU177.N> <Atom GLU177.CA> 
+<DihedralRestraint 12>    (Target:  178.0  182.0)  (Models: cav  183.5 cv 0.01)  (Violations: av  2.9 max  9.5 counts 88,64,42) <Atom LEU185.CA> <Atom LEU185.C> <Atom CYS186.N> <Atom CYS186.CA> 
+<DihedralRestraint 3>     (Target:  178.0  182.0)  (Models: cav  171.5 cv 0.00)  (Violations: av -6.5 max  8.9 counts 96,96,92) <Atom LEU183.CA> <Atom LEU183.C> <Atom SER184.N> <Atom SER184.CA> 
+<DihedralRestraint 8>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.4 counts 96,94,88) <Atom SER184.CA> <Atom SER184.C> <Atom LEU185.N> <Atom LEU185.CA> 
+<DihedralRestraint 2>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.3 counts 96,96,96) <Atom ALA181.CA> <Atom ALA181.C> <Atom CYS182.N> <Atom CYS182.CA> 
+<DihedralRestraint 9>     (Target:  178.0  182.0)  (Models: cav  172.8 cv 0.00)  (Violations: av -5.2 max  8.2 counts 94,88,54) <Atom THR175.CA> <Atom THR175.C> <Atom CYS176.N> <Atom CYS176.CA> 
+<DihedralRestraint 1>     (Target:  178.0  182.0)  (Models: cav  170.8 cv 0.00)  (Violations: av -7.2 max  8.2 counts 96,96,96) <Atom CYS182.CA> <Atom CYS182.C> <Atom LEU183.N> <Atom LEU183.CA> 
+<DihedralRestraint 13>    (Target: -140.0 -100.0)  (Models: cav  -97.7 cv 0.00)  (Violations: av  3.4 max  7.7 counts 80,60,22) <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.C> 
+<DihedralRestraint 17>    (Target:  260.0  340.0)  (Models: cav  324.8 cv 0.03)  (Violations: av  0.9 max  7.7 counts 22,12, 6) <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.CB> <Atom HIS187.CG> 
+<DihedralRestraint 14>    (Target:  178.0  182.0)  (Models: cav  185.1 cv 0.00)  (Violations: av  3.3 max  7.5 counts 84,58,16) <Atom HIS187.CA> <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> 
+<DihedralRestraint 15>    (Target:  178.0  182.0)  (Models: cav  178.5 cv 0.00)  (Violations: av -1.2 max  7.4 counts 50,32, 8) <Atom VAL171.CA> <Atom VAL171.C> <Atom PRO172.N> <Atom PRO172.CA> 
+<DihedralRestraint 16>    (Target:  260.0  340.0)  (Models: cav  258.2 cv 0.00)  (Violations: av -2.0 max  7.2 counts 54,28,10) <Atom CYS173.N> <Atom CYS173.CA> <Atom CYS173.CB> <Atom CYS173.SG> 
+<DihedralRestraint 0>     (Target:  178.0  182.0)  (Models: cav  187.5 cv 0.00)  (Violations: av  5.5 max  6.6 counts 96,96,66) <Atom ASN179.CA> <Atom ASN179.C> <Atom LEU180.N> <Atom LEU180.CA> 
+<DihedralRestraint 7>     (Target:  178.0  182.0)  (Models: cav  174.1 cv 0.00)  (Violations: av -3.9 max  5.0 counts 96,94, 0) <Atom GLY178.CA> <Atom GLY178.C> <Atom ASN179.N> <Atom ASN179.CA> 
+<DihedralRestraint 18>    (Target:  178.0  182.0)  (Models: cav  179.8 cv 0.00)  (Violations: av  0.2 max  4.3 counts 52, 8, 0) <Atom PRO172.CA> <Atom PRO172.C> <Atom CYS173.N> <Atom CYS173.CA> 
+<DihedralRestraint 19>    (Target:  178.0  182.0)  (Models: cav  180.7 cv 0.00)  (Violations: av  0.2 max  3.8 counts 36, 6, 0) <Atom ILE188.CA> <Atom ILE188.C> <Atom GLU189.N> <Atom GLU189.CA> 
+<DihedralRestraint 20>    (Target:  178.0  182.0)  (Models: cav  183.4 cv 0.00)  (Violations: av  1.4 max  3.1 counts 64, 2, 0) <Atom GLU177.CA> <Atom GLU177.C> <Atom GLY178.N> <Atom GLY178.CA> 
+<DihedralRestraint 28>    (Target:  178.0  182.0)  (Models: cav  177.3 cv 0.00)  (Violations: av -0.8 max  2.4 counts 34, 0, 0) <Atom SER174.CA> <Atom SER174.C> <Atom THR175.N> <Atom THR175.CA> 
+<DihedralRestraint 27>    (Target:   20.0  100.0)  (Models: cav   80.1 cv 0.03)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS186.N> <Atom CYS186.CA> <Atom CYS186.CB> <Atom CYS186.SG> 
+<DihedralRestraint 26>    (Target:  260.0  340.0)  (Models: cav  285.2 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU183.N> <Atom LEU183.CA> <Atom LEU183.CB> <Atom LEU183.CG> 
+<DihedralRestraint 25>    (Target:  140.0  220.0)  (Models: cav  191.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS182.N> <Atom CYS182.CA> <Atom CYS182.CB> <Atom CYS182.SG> 
+<DihedralRestraint 24>    (Target:  260.0  340.0)  (Models: cav  270.3 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU180.N> <Atom LEU180.CA> <Atom LEU180.CB> <Atom LEU180.CG> 
+<DihedralRestraint 23>    (Target:  140.0  220.0)  (Models: cav  199.1 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom ASN179.N> <Atom ASN179.CA> <Atom ASN179.CB> <Atom ASN179.CG> 
+<DihedralRestraint 22>    (Target:  260.0  340.0)  (Models: cav  297.0 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS176.N> <Atom CYS176.CA> <Atom CYS176.CB> <Atom CYS176.SG> 
+<DihedralRestraint 21>    (Target:   20.0  100.0)  (Models: cav   63.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom SER174.N> <Atom SER174.CA> <Atom SER174.CB> <Atom SER174.OG> 
+
+----------- Sorted on Violations > 3 degree -----------
+<DihedralRestraint 0>     (Target:  178.0  182.0)  (Models: cav  187.5 cv 0.00)  (Violations: av  5.5 max  6.6 counts 96,96,66) <Atom ASN179.CA> <Atom ASN179.C> <Atom LEU180.N> <Atom LEU180.CA> 
+<DihedralRestraint 1>     (Target:  178.0  182.0)  (Models: cav  170.8 cv 0.00)  (Violations: av -7.2 max  8.2 counts 96,96,96) <Atom CYS182.CA> <Atom CYS182.C> <Atom LEU183.N> <Atom LEU183.CA> 
+<DihedralRestraint 2>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.3 counts 96,96,96) <Atom ALA181.CA> <Atom ALA181.C> <Atom CYS182.N> <Atom CYS182.CA> 
+<DihedralRestraint 3>     (Target:  178.0  182.0)  (Models: cav  171.5 cv 0.00)  (Violations: av -6.5 max  8.9 counts 96,96,92) <Atom LEU183.CA> <Atom LEU183.C> <Atom SER184.N> <Atom SER184.CA> 
+<DihedralRestraint 4>     (Target:  178.0  182.0)  (Models: cav  169.9 cv 0.00)  (Violations: av -8.1 max 10.1 counts 96,96,96) <Atom CYS176.CA> <Atom CYS176.C> <Atom GLU177.N> <Atom GLU177.CA> 
+<DihedralRestraint 5>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.0 counts 96,96,96) <Atom LEU180.CA> <Atom LEU180.C> <Atom ALA181.N> <Atom ALA181.CA> 
+<DihedralRestraint 6>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.8 counts 96,96,96) <Atom CYS173.CA> <Atom CYS173.C> <Atom SER174.N> <Atom SER174.CA> 
+<DihedralRestraint 7>     (Target:  178.0  182.0)  (Models: cav  174.1 cv 0.00)  (Violations: av -3.9 max  5.0 counts 96,94, 0) <Atom GLY178.CA> <Atom GLY178.C> <Atom ASN179.N> <Atom ASN179.CA> 
+<DihedralRestraint 8>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.4 counts 96,94,88) <Atom SER184.CA> <Atom SER184.C> <Atom LEU185.N> <Atom LEU185.CA> 
+<DihedralRestraint 9>     (Target:  178.0  182.0)  (Models: cav  172.8 cv 0.00)  (Violations: av -5.2 max  8.2 counts 94,88,54) <Atom THR175.CA> <Atom THR175.C> <Atom CYS176.N> <Atom CYS176.CA> 
+<DihedralRestraint 10>    (Target: -140.0 -100.0)  (Models: cav  -97.6 cv 0.02)  (Violations: av  4.5 max 10.1 counts 90,72,46) <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> <Atom ILE188.C> 
+<DihedralRestraint 11>    (Target:  178.0  182.0)  (Models: cav  173.5 cv 0.00)  (Violations: av -4.7 max 10.9 counts 74,66,56) <Atom CYS186.CA> <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> 
+<DihedralRestraint 12>    (Target:  178.0  182.0)  (Models: cav  183.5 cv 0.01)  (Violations: av  2.9 max  9.5 counts 88,64,42) <Atom LEU185.CA> <Atom LEU185.C> <Atom CYS186.N> <Atom CYS186.CA> 
+<DihedralRestraint 13>    (Target: -140.0 -100.0)  (Models: cav  -97.7 cv 0.00)  (Violations: av  3.4 max  7.7 counts 80,60,22) <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.C> 
+<DihedralRestraint 14>    (Target:  178.0  182.0)  (Models: cav  185.1 cv 0.00)  (Violations: av  3.3 max  7.5 counts 84,58,16) <Atom HIS187.CA> <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> 
+<DihedralRestraint 15>    (Target:  178.0  182.0)  (Models: cav  178.5 cv 0.00)  (Violations: av -1.2 max  7.4 counts 50,32, 8) <Atom VAL171.CA> <Atom VAL171.C> <Atom PRO172.N> <Atom PRO172.CA> 
+<DihedralRestraint 16>    (Target:  260.0  340.0)  (Models: cav  258.2 cv 0.00)  (Violations: av -2.0 max  7.2 counts 54,28,10) <Atom CYS173.N> <Atom CYS173.CA> <Atom CYS173.CB> <Atom CYS173.SG> 
+<DihedralRestraint 17>    (Target:  260.0  340.0)  (Models: cav  324.8 cv 0.03)  (Violations: av  0.9 max  7.7 counts 22,12, 6) <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.CB> <Atom HIS187.CG> 
+<DihedralRestraint 18>    (Target:  178.0  182.0)  (Models: cav  179.8 cv 0.00)  (Violations: av  0.2 max  4.3 counts 52, 8, 0) <Atom PRO172.CA> <Atom PRO172.C> <Atom CYS173.N> <Atom CYS173.CA> 
+<DihedralRestraint 19>    (Target:  178.0  182.0)  (Models: cav  180.7 cv 0.00)  (Violations: av  0.2 max  3.8 counts 36, 6, 0) <Atom ILE188.CA> <Atom ILE188.C> <Atom GLU189.N> <Atom GLU189.CA> 
+<DihedralRestraint 20>    (Target:  178.0  182.0)  (Models: cav  183.4 cv 0.00)  (Violations: av  1.4 max  3.1 counts 64, 2, 0) <Atom GLU177.CA> <Atom GLU177.C> <Atom GLY178.N> <Atom GLY178.CA> 
+<DihedralRestraint 21>    (Target:   20.0  100.0)  (Models: cav   63.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom SER174.N> <Atom SER174.CA> <Atom SER174.CB> <Atom SER174.OG> 
+<DihedralRestraint 22>    (Target:  260.0  340.0)  (Models: cav  297.0 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS176.N> <Atom CYS176.CA> <Atom CYS176.CB> <Atom CYS176.SG> 
+<DihedralRestraint 23>    (Target:  140.0  220.0)  (Models: cav  199.1 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom ASN179.N> <Atom ASN179.CA> <Atom ASN179.CB> <Atom ASN179.CG> 
+<DihedralRestraint 24>    (Target:  260.0  340.0)  (Models: cav  270.3 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU180.N> <Atom LEU180.CA> <Atom LEU180.CB> <Atom LEU180.CG> 
+<DihedralRestraint 25>    (Target:  140.0  220.0)  (Models: cav  191.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS182.N> <Atom CYS182.CA> <Atom CYS182.CB> <Atom CYS182.SG> 
+<DihedralRestraint 26>    (Target:  260.0  340.0)  (Models: cav  285.2 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU183.N> <Atom LEU183.CA> <Atom LEU183.CB> <Atom LEU183.CG> 
+<DihedralRestraint 27>    (Target:   20.0  100.0)  (Models: cav   80.1 cv 0.03)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS186.N> <Atom CYS186.CA> <Atom CYS186.CB> <Atom CYS186.SG> 
+<DihedralRestraint 28>    (Target:  178.0  182.0)  (Models: cav  177.3 cv 0.00)  (Violations: av -0.8 max  2.4 counts 34, 0, 0) <Atom SER174.CA> <Atom SER174.C> <Atom THR175.N> <Atom THR175.CA> 
+
+----------- DihedralRestraintList "dihedral_constraint_list_1" (keep,29) -----------
+rmsd:   4.899  0.204        Violations > 1,3,5 degree: 1686, 1356, 986
+
+----------- Sorted on Maximum Violations -----------
+<DihedralRestraint 6>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.8 counts 96,96,96) <Atom CYS173.CA> <Atom CYS173.C> <Atom SER174.N> <Atom SER174.CA> 
+<DihedralRestraint 5>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.0 counts 96,96,96) <Atom LEU180.CA> <Atom LEU180.C> <Atom ALA181.N> <Atom ALA181.CA> 
+<DihedralRestraint 11>    (Target:  178.0  182.0)  (Models: cav  173.5 cv 0.00)  (Violations: av -4.7 max 10.9 counts 74,66,56) <Atom CYS186.CA> <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> 
+<DihedralRestraint 10>    (Target: -140.0 -100.0)  (Models: cav  -97.6 cv 0.02)  (Violations: av  4.5 max 10.1 counts 90,72,46) <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> <Atom ILE188.C> 
+<DihedralRestraint 4>     (Target:  178.0  182.0)  (Models: cav  169.9 cv 0.00)  (Violations: av -8.1 max 10.1 counts 96,96,96) <Atom CYS176.CA> <Atom CYS176.C> <Atom GLU177.N> <Atom GLU177.CA> 
+<DihedralRestraint 12>    (Target:  178.0  182.0)  (Models: cav  183.5 cv 0.01)  (Violations: av  2.9 max  9.5 counts 88,64,42) <Atom LEU185.CA> <Atom LEU185.C> <Atom CYS186.N> <Atom CYS186.CA> 
+<DihedralRestraint 3>     (Target:  178.0  182.0)  (Models: cav  171.5 cv 0.00)  (Violations: av -6.5 max  8.9 counts 96,96,92) <Atom LEU183.CA> <Atom LEU183.C> <Atom SER184.N> <Atom SER184.CA> 
+<DihedralRestraint 8>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.4 counts 96,94,88) <Atom SER184.CA> <Atom SER184.C> <Atom LEU185.N> <Atom LEU185.CA> 
+<DihedralRestraint 2>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.3 counts 96,96,96) <Atom ALA181.CA> <Atom ALA181.C> <Atom CYS182.N> <Atom CYS182.CA> 
+<DihedralRestraint 9>     (Target:  178.0  182.0)  (Models: cav  172.8 cv 0.00)  (Violations: av -5.2 max  8.2 counts 94,88,54) <Atom THR175.CA> <Atom THR175.C> <Atom CYS176.N> <Atom CYS176.CA> 
+<DihedralRestraint 1>     (Target:  178.0  182.0)  (Models: cav  170.8 cv 0.00)  (Violations: av -7.2 max  8.2 counts 96,96,96) <Atom CYS182.CA> <Atom CYS182.C> <Atom LEU183.N> <Atom LEU183.CA> 
+<DihedralRestraint 13>    (Target: -140.0 -100.0)  (Models: cav  -97.7 cv 0.00)  (Violations: av  3.4 max  7.7 counts 80,60,22) <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.C> 
+<DihedralRestraint 17>    (Target:  260.0  340.0)  (Models: cav  324.8 cv 0.03)  (Violations: av  0.9 max  7.7 counts 22,12, 6) <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.CB> <Atom HIS187.CG> 
+<DihedralRestraint 14>    (Target:  178.0  182.0)  (Models: cav  185.1 cv 0.00)  (Violations: av  3.3 max  7.5 counts 84,58,16) <Atom HIS187.CA> <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> 
+<DihedralRestraint 15>    (Target:  178.0  182.0)  (Models: cav  178.5 cv 0.00)  (Violations: av -1.2 max  7.4 counts 50,32, 8) <Atom VAL171.CA> <Atom VAL171.C> <Atom PRO172.N> <Atom PRO172.CA> 
+<DihedralRestraint 16>    (Target:  260.0  340.0)  (Models: cav  258.2 cv 0.00)  (Violations: av -2.0 max  7.2 counts 54,28,10) <Atom CYS173.N> <Atom CYS173.CA> <Atom CYS173.CB> <Atom CYS173.SG> 
+<DihedralRestraint 0>     (Target:  178.0  182.0)  (Models: cav  187.5 cv 0.00)  (Violations: av  5.5 max  6.6 counts 96,96,66) <Atom ASN179.CA> <Atom ASN179.C> <Atom LEU180.N> <Atom LEU180.CA> 
+<DihedralRestraint 7>     (Target:  178.0  182.0)  (Models: cav  174.1 cv 0.00)  (Violations: av -3.9 max  5.0 counts 96,94, 0) <Atom GLY178.CA> <Atom GLY178.C> <Atom ASN179.N> <Atom ASN179.CA> 
+<DihedralRestraint 18>    (Target:  178.0  182.0)  (Models: cav  179.8 cv 0.00)  (Violations: av  0.2 max  4.3 counts 52, 8, 0) <Atom PRO172.CA> <Atom PRO172.C> <Atom CYS173.N> <Atom CYS173.CA> 
+<DihedralRestraint 19>    (Target:  178.0  182.0)  (Models: cav  180.7 cv 0.00)  (Violations: av  0.2 max  3.8 counts 36, 6, 0) <Atom ILE188.CA> <Atom ILE188.C> <Atom GLU189.N> <Atom GLU189.CA> 
+<DihedralRestraint 20>    (Target:  178.0  182.0)  (Models: cav  183.4 cv 0.00)  (Violations: av  1.4 max  3.1 counts 64, 2, 0) <Atom GLU177.CA> <Atom GLU177.C> <Atom GLY178.N> <Atom GLY178.CA> 
+<DihedralRestraint 28>    (Target:  178.0  182.0)  (Models: cav  177.3 cv 0.00)  (Violations: av -0.8 max  2.4 counts 34, 0, 0) <Atom SER174.CA> <Atom SER174.C> <Atom THR175.N> <Atom THR175.CA> 
+<DihedralRestraint 27>    (Target:   20.0  100.0)  (Models: cav   80.1 cv 0.03)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS186.N> <Atom CYS186.CA> <Atom CYS186.CB> <Atom CYS186.SG> 
+<DihedralRestraint 26>    (Target:  260.0  340.0)  (Models: cav  285.2 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU183.N> <Atom LEU183.CA> <Atom LEU183.CB> <Atom LEU183.CG> 
+<DihedralRestraint 25>    (Target:  140.0  220.0)  (Models: cav  191.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS182.N> <Atom CYS182.CA> <Atom CYS182.CB> <Atom CYS182.SG> 
+<DihedralRestraint 24>    (Target:  260.0  340.0)  (Models: cav  270.3 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU180.N> <Atom LEU180.CA> <Atom LEU180.CB> <Atom LEU180.CG> 
+<DihedralRestraint 23>    (Target:  140.0  220.0)  (Models: cav  199.1 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom ASN179.N> <Atom ASN179.CA> <Atom ASN179.CB> <Atom ASN179.CG> 
+<DihedralRestraint 22>    (Target:  260.0  340.0)  (Models: cav  297.0 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS176.N> <Atom CYS176.CA> <Atom CYS176.CB> <Atom CYS176.SG> 
+<DihedralRestraint 21>    (Target:   20.0  100.0)  (Models: cav   63.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom SER174.N> <Atom SER174.CA> <Atom SER174.CB> <Atom SER174.OG> 
+
+----------- Sorted on Violations > 3 degree -----------
+<DihedralRestraint 0>     (Target:  178.0  182.0)  (Models: cav  187.5 cv 0.00)  (Violations: av  5.5 max  6.6 counts 96,96,66) <Atom ASN179.CA> <Atom ASN179.C> <Atom LEU180.N> <Atom LEU180.CA> 
+<DihedralRestraint 1>     (Target:  178.0  182.0)  (Models: cav  170.8 cv 0.00)  (Violations: av -7.2 max  8.2 counts 96,96,96) <Atom CYS182.CA> <Atom CYS182.C> <Atom LEU183.N> <Atom LEU183.CA> 
+<DihedralRestraint 2>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.3 counts 96,96,96) <Atom ALA181.CA> <Atom ALA181.C> <Atom CYS182.N> <Atom CYS182.CA> 
+<DihedralRestraint 3>     (Target:  178.0  182.0)  (Models: cav  171.5 cv 0.00)  (Violations: av -6.5 max  8.9 counts 96,96,92) <Atom LEU183.CA> <Atom LEU183.C> <Atom SER184.N> <Atom SER184.CA> 
+<DihedralRestraint 4>     (Target:  178.0  182.0)  (Models: cav  169.9 cv 0.00)  (Violations: av -8.1 max 10.1 counts 96,96,96) <Atom CYS176.CA> <Atom CYS176.C> <Atom GLU177.N> <Atom GLU177.CA> 
+<DihedralRestraint 5>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.0 counts 96,96,96) <Atom LEU180.CA> <Atom LEU180.C> <Atom ALA181.N> <Atom ALA181.CA> 
+<DihedralRestraint 6>     (Target:  178.0  182.0)  (Models: cav  167.5 cv 0.00)  (Violations: av -10.5 max 11.8 counts 96,96,96) <Atom CYS173.CA> <Atom CYS173.C> <Atom SER174.N> <Atom SER174.CA> 
+<DihedralRestraint 7>     (Target:  178.0  182.0)  (Models: cav  174.1 cv 0.00)  (Violations: av -3.9 max  5.0 counts 96,94, 0) <Atom GLY178.CA> <Atom GLY178.C> <Atom ASN179.N> <Atom ASN179.CA> 
+<DihedralRestraint 8>     (Target:  178.0  182.0)  (Models: cav  171.4 cv 0.00)  (Violations: av -6.6 max  8.4 counts 96,94,88) <Atom SER184.CA> <Atom SER184.C> <Atom LEU185.N> <Atom LEU185.CA> 
+<DihedralRestraint 9>     (Target:  178.0  182.0)  (Models: cav  172.8 cv 0.00)  (Violations: av -5.2 max  8.2 counts 94,88,54) <Atom THR175.CA> <Atom THR175.C> <Atom CYS176.N> <Atom CYS176.CA> 
+<DihedralRestraint 10>    (Target: -140.0 -100.0)  (Models: cav  -97.6 cv 0.02)  (Violations: av  4.5 max 10.1 counts 90,72,46) <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> <Atom ILE188.C> 
+<DihedralRestraint 11>    (Target:  178.0  182.0)  (Models: cav  173.5 cv 0.00)  (Violations: av -4.7 max 10.9 counts 74,66,56) <Atom CYS186.CA> <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> 
+<DihedralRestraint 12>    (Target:  178.0  182.0)  (Models: cav  183.5 cv 0.01)  (Violations: av  2.9 max  9.5 counts 88,64,42) <Atom LEU185.CA> <Atom LEU185.C> <Atom CYS186.N> <Atom CYS186.CA> 
+<DihedralRestraint 13>    (Target: -140.0 -100.0)  (Models: cav  -97.7 cv 0.00)  (Violations: av  3.4 max  7.7 counts 80,60,22) <Atom CYS186.C> <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.C> 
+<DihedralRestraint 14>    (Target:  178.0  182.0)  (Models: cav  185.1 cv 0.00)  (Violations: av  3.3 max  7.5 counts 84,58,16) <Atom HIS187.CA> <Atom HIS187.C> <Atom ILE188.N> <Atom ILE188.CA> 
+<DihedralRestraint 15>    (Target:  178.0  182.0)  (Models: cav  178.5 cv 0.00)  (Violations: av -1.2 max  7.4 counts 50,32, 8) <Atom VAL171.CA> <Atom VAL171.C> <Atom PRO172.N> <Atom PRO172.CA> 
+<DihedralRestraint 16>    (Target:  260.0  340.0)  (Models: cav  258.2 cv 0.00)  (Violations: av -2.0 max  7.2 counts 54,28,10) <Atom CYS173.N> <Atom CYS173.CA> <Atom CYS173.CB> <Atom CYS173.SG> 
+<DihedralRestraint 17>    (Target:  260.0  340.0)  (Models: cav  324.8 cv 0.03)  (Violations: av  0.9 max  7.7 counts 22,12, 6) <Atom HIS187.N> <Atom HIS187.CA> <Atom HIS187.CB> <Atom HIS187.CG> 
+<DihedralRestraint 18>    (Target:  178.0  182.0)  (Models: cav  179.8 cv 0.00)  (Violations: av  0.2 max  4.3 counts 52, 8, 0) <Atom PRO172.CA> <Atom PRO172.C> <Atom CYS173.N> <Atom CYS173.CA> 
+<DihedralRestraint 19>    (Target:  178.0  182.0)  (Models: cav  180.7 cv 0.00)  (Violations: av  0.2 max  3.8 counts 36, 6, 0) <Atom ILE188.CA> <Atom ILE188.C> <Atom GLU189.N> <Atom GLU189.CA> 
+<DihedralRestraint 20>    (Target:  178.0  182.0)  (Models: cav  183.4 cv 0.00)  (Violations: av  1.4 max  3.1 counts 64, 2, 0) <Atom GLU177.CA> <Atom GLU177.C> <Atom GLY178.N> <Atom GLY178.CA> 
+<DihedralRestraint 21>    (Target:   20.0  100.0)  (Models: cav   63.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom SER174.N> <Atom SER174.CA> <Atom SER174.CB> <Atom SER174.OG> 
+<DihedralRestraint 22>    (Target:  260.0  340.0)  (Models: cav  297.0 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS176.N> <Atom CYS176.CA> <Atom CYS176.CB> <Atom CYS176.SG> 
+<DihedralRestraint 23>    (Target:  140.0  220.0)  (Models: cav  199.1 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom ASN179.N> <Atom ASN179.CA> <Atom ASN179.CB> <Atom ASN179.CG> 
+<DihedralRestraint 24>    (Target:  260.0  340.0)  (Models: cav  270.3 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU180.N> <Atom LEU180.CA> <Atom LEU180.CB> <Atom LEU180.CG> 
+<DihedralRestraint 25>    (Target:  140.0  220.0)  (Models: cav  191.8 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS182.N> <Atom CYS182.CA> <Atom CYS182.CB> <Atom CYS182.SG> 
+<DihedralRestraint 26>    (Target:  260.0  340.0)  (Models: cav  285.2 cv 0.00)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom LEU183.N> <Atom LEU183.CA> <Atom LEU183.CB> <Atom LEU183.CG> 
+<DihedralRestraint 27>    (Target:   20.0  100.0)  (Models: cav   80.1 cv 0.03)  (Violations: av  0.0 max  0.0 counts  0, 0, 0) <Atom CYS186.N> <Atom CYS186.CA> <Atom CYS186.CB> <Atom CYS186.SG> 
+<DihedralRestraint 28>    (Target:  178.0  182.0)  (Models: cav  177.3 cv 0.00)  (Violations: av -0.8 max  2.4 counts 34, 0, 0) <Atom SER174.CA> <Atom SER174.C> <Atom THR175.N> <Atom THR175.CA> 
+
+----------- Per residue scores -----------
+--- RESIDUE ---        --- PHI ---      --- PSI ---   -- dist 0.1A 0.3A 0.5A   rmsd --
+<Residue VAL171>    -888.9 -888.89     30.5    0.42       18   52    0    0   0.037
+<Residue PRO172>     -83.0    0.07    122.9    0.02       23    0    0    0   0.000
+<Residue CYS173>     -56.7    0.00    -33.8    0.00       44    4    0    0   0.011
+<Residue SER174>     -56.4    0.00    -18.5    0.01       28    0    0    0   0.003
+<Residue THR175>    -103.5    0.01    -21.7    0.00       47    0    0    0   0.000
+<Residue CYS176>     -70.4    0.00    -41.3    0.00       70    0    0    0   0.011
+<Residue GLU177>      50.8    0.00     48.8    0.00       48   16    0    0   0.022
+<Residue GLY178>     100.9    0.00     -1.1    0.00       34    0    0    0   0.018
+<Residue ASN179>     -88.0    0.00    106.6    0.00       79  592    0    0   0.044
+<Residue LEU180>     -64.4    0.00    -24.5    0.00       58  384    0    0   0.041
+<Residue ALA181>     -70.5    0.00    -50.9    0.00       40  296    0    0   0.034
+<Residue CYS182>     -54.7    0.00    -48.6    0.00       56    0    0    0   0.017
+<Residue LEU183>     -60.2    0.00    -33.5    0.00      122  252    0    0   0.024
+<Residue SER184>     -69.7    0.00    -31.2    0.00       44  192    0    0   0.031
+<Residue LEU185>     -72.9    0.00    -30.6    0.02       56  200    0    0   0.042
+<Residue CYS186>     -73.7    0.01    173.2    0.01       55  476    0    0   0.055
+<Residue HIS187>     -97.7    0.00    124.9    0.17       27  200    0    0   0.046
+--- RESIDUE ---        --- PHI ---      --- PSI ---   -- dist 0.1A 0.3A 0.5A   rmsd --
+<Residue ILE188>     -97.6    0.02     74.9    0.56       21    0    0    0   0.019
+<Residue GLU189>     -88.5    0.50   -888.9 -888.89        6   44    0    0   0.047

@@ -1,0 +1,4 @@
+----- <Residue PRO172> -----
+PHI   : average:   -83.0   cv: 0.074  ||  outliers:-999 (models -999)
+PSI   : average:   122.9   cv: 0.020  ||  outliers:-999 (models -999)
+OMEGA : average:   178.5   cv: 0.003  ||  outliers:-999 (models -999)
