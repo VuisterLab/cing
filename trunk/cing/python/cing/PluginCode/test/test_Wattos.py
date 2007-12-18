@@ -15,7 +15,7 @@ import unittest
 class AllChecks(TestCase):
         
     def testparse(self):
-        """whatif db parse"""
+        """wattos parse"""
         
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
         entryId = "1brv" # Small much studied PDB NMR entry; 48 models 

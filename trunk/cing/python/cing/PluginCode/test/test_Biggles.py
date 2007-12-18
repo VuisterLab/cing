@@ -34,14 +34,14 @@ class AllChecks(TestCase):
         # from the shell command instead of from the Dock in Mac OS X.
         p.write_eps( "example1.eps" )
         print "done writing eps file"
-        p.write_img( 400, 400, "example1.gif" )
+        p.write_img( 'gif', 400, 400, "example1.gif" )
         print "done writing gif file"
         #print "Note that the last line of code here used to cause a core dump on Jurgen's 
         # installation on a Intel Mac OSX 10.4"
-        #print "Apparently it has problems with jpg and png files so gif it is."
-#        print "Trying to write png file"
-#        p.write_img( 'png', 400, 400, "example1.png" )
-#        print "done writing png file"
+        print "Apparently Biggles can have a problem with jpg and png files but not gif, let's see..."
+        print "Trying to write png file"
+        p.write_img( 'png', 400, 400, "example1.png" )
+        print "done writing png file"
         
 if __name__ == "__main__":
     unittest.main()

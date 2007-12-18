@@ -7,6 +7,8 @@ from cing.core.classes import Project
 from unittest import TestCase
 from cing import cingDirTestsTmp
 from cing import cingDirTestsData
+from shutil import rmtree
+from cing.Libs.NTutils import printWarning
 import os
 import unittest
 from shutil import copytree
@@ -25,6 +27,9 @@ class AllChecks(TestCase):
 
         if os.chdir(cingDirTestsTmp):
             raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        if os.path.exists(cingProjectFolder):
+            printWarning("Removing existing cing project")
+            rmtree( cingProjectFolder )
         copytree(cingProjectFilePath, cingProjectFolder)
         project = Project.open( cingProjectEntry, status='old' )
         print project.cingPaths.format()
