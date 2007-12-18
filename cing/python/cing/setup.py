@@ -2,6 +2,7 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import strip
 from string import atoi
+from cing.Libs.disk import chmod
 import time
 import sys
 import os
@@ -44,9 +45,9 @@ CING_SHELL_TEMPLATE = \
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
 
 if %(conditional)s then
-    %(export)s PYTHONPATH%(equals)s.:$CINGROOT/python:$PYTHONPATH
+    %(export)s PYTHONPATH%(equals)s${PYTHONPATH}:$CINGROOT/python
 else
-    %(export)s PYTHONPATH%(equals)s.:$CINGROOT/python
+    %(export)s PYTHONPATH%(equals)s$CINGROOT/python
 %(close_if)s
 
 alias cing%(equals)s'python $CINGROOT/python/cing/main.py'
@@ -111,6 +112,8 @@ def _writeCingShellFile(isTcsh):
     fp = open(cname,'w')
     fp.write(text)
     fp.close()
+    # for bash it's necessary that the file be executable for this user.
+    chmod(cname, 0755) 
     print '==> Done'
     print ' Please check/modify %s' % (cname,)
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'

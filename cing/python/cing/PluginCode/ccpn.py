@@ -192,8 +192,7 @@ except:
         NTmessage("Using CCPN version 2.x\n")
         ccpnVersion = 2
     except:
-        NTerror("Import Error: CCPN framework not defined\n")
-        raise ImportError
+        raise ImportError("Import Error: CCPN framework not defined\n")
     #end try
 #end try
 
