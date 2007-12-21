@@ -1,0 +1,53 @@
+ HOWTO:
+- check if your installation is ok. First setup as described in REAME.txt in this directory.
+    python $cingRoot/testBiggles.py
+- check if you got all external python modules:
+    python $cingRoot/testExternalImports.py
+- run procheck
+    cing.py -n 1tgq --ipython
+    project.procheck
+- print the first model's chi 1 as reported by procheck of residue 77 in chain A.
+    format project.molecule.A.GLU77.procheck.CHI1[0]
+    Not very useful as it's already part of cing itself; just like PHI, etc.
+    format project.molecule.A.GLU77.CHI1[0]
+    more useful might be:
+    format project.molecule.A.GLU77.procheck.secStruct
+    NB. 
+    format object
+    is equivalent with 
+    print object.format()
+    format is a method that most of cing's objects have and that give more user friendly/human
+    readable output (sometimes over multiple lines)
+    
+- print list of parameters:- print list of parameters:
+    formatall( project.plotparameters.PHI )
+    formatall( project.molecule.A.residues[0].procheck )
+    formatall( project.molecule.A.VAL171.C )
+
+    formatall( project.plotparameters.PHI )
+    formatall( project.molecule.A.residues[0].procheck )
+    formatall( project.molecule.A.VAL171.C )
+    
+    
+NEW FEATURE REQUESTS:
+- Where are the restraints info tables/visualizations?
+- Put files in more temporary location e.g. off of /tmp instead of within project to save.
+- Get global properties; in the check.db now there are only Atom and Residue props listed and there are only 51
+    present. Whereas the pdbout.txt file contains over 80 check results..
+- Convert Procheck postscript data to gifs as on pdbsum pages with summary info in html. Template can be 
+    exactly how they did it: The Procheck analyses for 1brv as an example:
+    http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/RunPROCHECK.pl?pdb=1brv
+    For explanations we should refer to: http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/GetPage.pl?doc=TRUE&pdbcode=n/a&template=doc_procheck.html
+    after verifying with Roman.
+    
+    
+    
+- Rename $cingRoot/cing to $cingRoot/src as it confuses the heck out everything.
+    Then refactor the code so that only -ONE- path needs to be added to PYTHONPATH for everything in cing.
+    Now there's ${cingRoot}:${cingPath}:${cingLibs}:${refinePath}:
+    parametersDict['cingPath']    = os.path.join( cingRoot, 'cing')
+    parametersDict['cingLibs']    = os.path.join( cingRoot, 'Libs')
+    parametersDict['refinePath']  = os.path.join( cingRoot, 'Refine')
+
+    
+    
