@@ -184,11 +184,11 @@ import string
 ccpnVersion = 1 # Moved outside so it's always defined; pydev extensions code
 # analysis likes this for good reasons.
 try:
-    from memops.general.Io import readXmlProjectFile #@UnresolvedImport
+    from memops.general.Io import readXmlProjectFile 
     NTmessage("Using CCPN version 1.x\n")
 except:
     try:
-        from memops.general.Io import loadProject
+        from memops.general.Io import loadProject #@UnresolvedImport
         NTmessage("Using CCPN version 2.x\n")
         ccpnVersion = 2
     except:

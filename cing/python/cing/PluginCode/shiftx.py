@@ -74,7 +74,7 @@ def predictWithShiftx( project, model=None, verbose = True ):
     skippedAtoms = [] # Keep a list of skipped atoms for later
     for res in project.molecule.allResidues():
         if not res.hasProperties('protein'):
-            NTwarning('Warning predictWithShiftx: non-protein residue %s will be skipped\n', res)
+            NTwarning('Warning predictWithShiftx: non-protein residue %s will be skipped\n' % (res,))
             for atm in res.allAtoms():
                 atm.pdbSkipRecord = True
                 skippedAtoms.append( atm )

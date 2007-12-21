@@ -2,6 +2,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.core.constants import INTERNAL
 from cing.core.constants import LOOSE
 from cing.core.database import NTdb
+from cing.Libs.NTutils import printWarning
 
 NTmessage("==> Creating translation dictionaries ... ")
 
@@ -65,26 +66,26 @@ def isValidResidueName( resName, convention = INTERNAL ):
 #  print '>>', resName, atomName
 
   rn = resName.strip()
-  if (rn in NTdb.residueDict[convention]):
+  if rn in NTdb.residueDict[convention]:
       return 1
-  return 0
-#end def
+  return
     
-#
-#==============================================================================
-#
+
 def isValidAtomName( resName, atomName, convention = INTERNAL):
-  """return 1 if resName,atomName is a valid for convention"""
+  """Only return 1 if resName,atomName is a valid for convention
+  Otherwise the default return of zero on invalid.
+  """
 #  print '>>', resName, atomName
 
   rn = resName.strip()
   an = atomName.strip()
   if not isValidResidueName( rn, convention ):
-    return 0
+      printWarning("Residue name is not valid in cing.core.dictionaries#isValidAtomName for: ["+rn+"]")
+      return
   res = NTdb.residueDict[convention][rn]
   if an in res.atomDict[convention]:
       return 1 
-  return 0
+#  return 0
 #end def
     
 #print isValidAtomName( 'Y', 'HN', 'BMRB')
