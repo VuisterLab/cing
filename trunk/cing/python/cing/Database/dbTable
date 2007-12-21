@@ -1,4 +1,6 @@
 #=======================================================================
+#  19 Dec   2007: remapped BMRB nucleic acid residue names to reflect PDB;
+#                   added Zn, His HE2, with BMRB map. Added nucleic prop to n.a.
 #  17 April 2007: fixed error in QE topology (was SD, should be CE)
 #  18 April 2007: changed defs QR for PHE and TYR, now similar to VAL QQG and LEU QQD
 #  24 May   2007: Reordered dihedrals for more useful output during validation:
@@ -2735,7 +2737,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM N       
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'N', 'BMRBd': None, 'INTERNAL': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'N', 'BMRBd': None, 'INTERNAL': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': None, 'BMRB': 'N'}
 		topology = [(-1, 'C'), (0, 'HN'), (0, 'CA')]
 		pseudo = None
 		real = []
@@ -2746,7 +2748,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HN      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HN', 'BMRBd': None, 'INTERNAL': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HN', 'BMRBd': None, 'INTERNAL': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': 'HN'}
 		topology = [(0, 'N')]
 		pseudo = None
 		real = []
@@ -2757,7 +2759,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM CA      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'CA', 'BMRBd': None, 'INTERNAL': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'CA', 'BMRBd': None, 'INTERNAL': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': None, 'BMRB': 'CA'}
 		topology = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
 		pseudo = None
 		real = []
@@ -2768,7 +2770,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HA      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HA', 'BMRBd': None, 'INTERNAL': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HA', 'BMRBd': None, 'INTERNAL': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': None, 'BMRB': 'HA'}
 		topology = [(0, 'CA')]
 		pseudo = None
 		real = []
@@ -2779,7 +2781,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM CB      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'CB', 'BMRBd': None, 'INTERNAL': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'CB', 'BMRBd': None, 'INTERNAL': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': None, 'BMRB': 'CB'}
 		topology = [(0, 'CA'), (0, 'HB2'), (0, 'HB3'), (0, 'CG')]
 		pseudo = None
 		real = []
@@ -2790,7 +2792,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HB2     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HB2', 'BMRBd': None, 'INTERNAL': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HB2', 'BMRBd': None, 'INTERNAL': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HB2'}
 		topology = [(0, 'CB')]
 		pseudo = 'QB'
 		real = []
@@ -2801,7 +2803,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HB3     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HB3', 'BMRBd': None, 'INTERNAL': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HB3', 'BMRBd': None, 'INTERNAL': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': None, 'BMRB': 'HB3'}
 		topology = [(0, 'CB')]
 		pseudo = 'QB'
 		real = []
@@ -2812,7 +2814,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM QB      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'QB', 'BMRBd': None, 'INTERNAL': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'QB', 'BMRBd': None, 'INTERNAL': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': None, 'BMRB': 'QB'}
 		topology = [(0, 'CB')]
 		pseudo = None
 		real = ['HB2', 'HB3']
@@ -2823,7 +2825,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM CG      
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'CG', 'BMRBd': None, 'INTERNAL': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'CG', 'BMRBd': None, 'INTERNAL': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': None, 'BMRB': 'CG'}
 		topology = [(0, 'CB'), (0, 'ND1'), (0, 'CD2')]
 		pseudo = None
 		real = []
@@ -2834,7 +2836,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM ND1     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'ND1', 'BMRBd': None, 'INTERNAL': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'ND1', 'BMRBd': None, 'INTERNAL': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': None, 'BMRB': 'ND1'}
 		topology = [(0, 'CG'), (0, 'CE1')]
 		pseudo = None
 		real = []
@@ -2845,7 +2847,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM CD2     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'CD2', 'BMRBd': None, 'INTERNAL': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'CD2', 'BMRBd': None, 'INTERNAL': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': None, 'BMRB': 'CD2'}
 		topology = [(0, 'CG'), (0, 'HD2'), (0, 'NE2')]
 		pseudo = None
 		real = []
@@ -2856,7 +2858,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HD2     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HD2', 'BMRBd': None, 'INTERNAL': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HD2', 'BMRBd': None, 'INTERNAL': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HD2'}
 		topology = [(0, 'CD2')]
 		pseudo = None
 		real = []
@@ -2867,7 +2869,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM NE2     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'NE2', 'BMRBd': None, 'INTERNAL': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'NE2', 'BMRBd': None, 'INTERNAL': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': None, 'BMRB': 'NE2'}
 		topology = [(0, 'CD2'), (0, 'CE1'), (0, 'HE2')]
 		pseudo = None
 		real = []
@@ -2889,7 +2891,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HE1     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HE1', 'BMRBd': None, 'INTERNAL': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HE1', 'BMRBd': None, 'INTERNAL': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'HE1'}
 		topology = [(0, 'CE1')]
 		pseudo = None
 		real = []
@@ -2900,7 +2902,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM HE2     
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HE2', 'BMRBd': None, 'INTERNAL': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'HE2', 'BMRBd': None, 'INTERNAL': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HE2'}
 		topology = [(0, 'NE2')]
 		pseudo = None
 		real = []
@@ -2911,7 +2913,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM C       
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'C', 'BMRBd': None, 'INTERNAL': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'C', 'BMRBd': None, 'INTERNAL': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': None, 'BMRB': 'C'}
 		topology = [(0, 'CA'), (0, 'O'), (1, 'N')]
 		pseudo = None
 		real = []
@@ -2922,7 +2924,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 	ATOM O       
 	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'O', 'BMRBd': None, 'INTERNAL': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+		nameDict = {'CYANA': 'O', 'BMRBd': None, 'INTERNAL': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': None, 'BMRB': 'O'}
 		topology = [(0, 'C')]
 		pseudo = None
 		real = []
@@ -3374,7 +3376,7 @@ RESIDUE	HIS      H
 		shift = NTdict( average = 176.81, sd = 24.539999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
-	ATOM HD2     
+	ATOM HD2     assumed shift same as HE1 which is false of course. TODO: FIXME:
 	#---------------------------------------------------------------
 		nameDict = {'CYANA': 'HD2', 'BMRBd': 'HD2', 'INTERNAL': 'HD2', 'CYANA2': 'HD2', 'PDB': 'HD2', 'XPLOR': 'HD2', 'BMRB': 'HD2'}
 		topology = [(0, 'CD2')]
@@ -3382,20 +3384,31 @@ RESIDUE	HIS      H
 		real = []
 		type = 'H_ARO'
 		spinType = '1H'
-		shift = NTdict( average = 7.9400000000000004, sd = 7.0499999999999998 )
+		shift = NTdict( average = 12.970000000000001, sd = 14.199999999999999 )
 	END_ATOM
 	#---------------------------------------------------------------
-	ATOM HE1     
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'HE1', 'BMRBd': 'HE1', 'INTERNAL': 'HE1', 'CYANA2': 'HE1', 'PDB': 'HE1', 'XPLOR': 'HE1', 'BMRB': 'HE1'}
-		topology = [(0, 'CE1')]
-		pseudo = None
-		real = []
-		type = 'H_ARO'
-		spinType = '1H'
-		shift = NTdict( average = 7.6500000000000004, sd = 4.29 )
-	END_ATOM
-	#---------------------------------------------------------------
+    ATOM HE1     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'HE1', 'BMRBd': 'HE1', 'INTERNAL': 'HE1', 'CYANA2': 'HE1', 'PDB': 'HE1', 'XPLOR': 'HE1', 'BMRB': 'HE1'}
+        topology = [(0, 'CE1')]
+        pseudo = None
+        real = []
+        type = 'H_ARO'
+        spinType = '1H'
+        shift = NTdict( average = 7.6500000000000004, sd = 4.29 )
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM HE2
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'HE2', 'BMRBd': 'HE2', 'INTERNAL': 'HE2', 'CYANA2': 'HE2', 'PDB': 'HE2', 'XPLOR': 'HE2', 'BMRB': 'HE2'}
+        topology = [(0, 'NE2')]
+        pseudo = None
+        real = []
+        type = 'H_ARO'
+        spinType = '1H'
+        shift = NTdict( average = 7.6500000000000004, sd = 4.29 )
+    END_ATOM
+    #---------------------------------------------------------------
 	ATOM C       
 	#---------------------------------------------------------------
 		nameDict = {'CYANA': 'C', 'BMRBd': 'C', 'INTERNAL': 'C', 'CYANA2': 'C', 'PDB': 'C', 'XPLOR': 'C', 'BMRB': 'C'}
@@ -7007,7 +7020,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	ADE      a       
 #=======================================================================
-	nameDict = {'CYANA': 'ADE', 'BMRBd': 'ADE', 'INTERNAL': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE', 'BMRB': 'ADE'}
+	nameDict = {'CYANA': 'ADE', 'BMRBd': 'ADE', 'INTERNAL': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE', 'BMRB': 'DA'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -7454,7 +7468,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	RADE     ra      
 #=======================================================================
-	nameDict = {'CYANA': 'RADE', 'BMRBd': 'RADE', 'INTERNAL': 'RADE', 'CYANA2': 'RADE', 'PDB': 'RADE', 'XPLOR': 'RADE', 'BMRB': 'RADE'}
+	nameDict = {'CYANA': 'RADE', 'BMRBd': 'RADE', 'INTERNAL': 'RADE', 'CYANA2': 'RADE', 'PDB': 'RADE', 'XPLOR': 'RADE', 'BMRB': 'A' }
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -7907,7 +7922,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	CYT      c       
 #=======================================================================
-	nameDict = {'CYANA': 'CYT', 'BMRBd': 'CYT', 'INTERNAL': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT', 'BMRB': 'CYT'}
+	nameDict = {'CYANA': 'CYT', 'BMRBd': 'CYT', 'INTERNAL': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT', 'BMRB': 'DC'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -8332,7 +8348,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	RCYT     rc      
 #=======================================================================
-	nameDict = {'CYANA': 'RCYT', 'BMRBd': 'RCYT', 'INTERNAL': 'RCYT', 'CYANA2': 'RCYT', 'PDB': 'RCYT', 'XPLOR': 'RCYT', 'BMRB': 'RCYT'}
+	nameDict = {'CYANA': 'RCYT', 'BMRBd': 'RCYT', 'INTERNAL': 'RCYT', 'CYANA2': 'RCYT', 'PDB': 'RCYT', 'XPLOR': 'RCYT', 'BMRB': 'C'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -8763,7 +8780,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	GUA      g       
 #=======================================================================
-	nameDict = {'CYANA': 'GUA', 'BMRBd': 'GUA', 'INTERNAL': 'GUA', 'CYANA2': 'GUA', 'PDB': 'GUA', 'XPLOR': 'GUA', 'BMRB': 'GUA'}
+	nameDict = {'CYANA': 'GUA', 'BMRBd': 'GUA', 'INTERNAL': 'GUA', 'CYANA2': 'GUA', 'PDB': 'GUA', 'XPLOR': 'GUA', 'BMRB': 'DG'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -9221,7 +9239,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	RGUA     rg      
 #=======================================================================
-	nameDict = {'CYANA': 'RGUA', 'BMRBd': 'RGUA', 'INTERNAL': 'RGUA', 'CYANA2': 'RGUA', 'PDB': 'RGUA', 'XPLOR': 'RGUA', 'BMRB': 'RGUA'}
+	nameDict = {'CYANA': 'RGUA', 'BMRBd': 'RGUA', 'INTERNAL': 'RGUA', 'CYANA2': 'RGUA', 'PDB': 'RGUA', 'XPLOR': 'RGUA', 'BMRB': 'G'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -9685,7 +9704,8 @@ END_RESIDUE
 #	internal short   
 RESIDUE	THY      t       
 #=======================================================================
-	nameDict = {'CYANA': 'THY', 'BMRBd': 'THY', 'INTERNAL': 'THY', 'CYANA2': 'THY', 'PDB': 'THY', 'XPLOR': 'THY', 'BMRB': 'THY'}
+	nameDict = {'CYANA': 'THY', 'BMRBd': 'THY', 'INTERNAL': 'THY', 'CYANA2': 'THY', 'PDB': 'THY', 'XPLOR': 'THY', 'BMRB': 'DT'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -10135,10 +10155,12 @@ END_RESIDUE
 #=======================================================================
 
 #=======================================================================
-#	internal short   
-RESIDUE	URA      u       
+#	internal short 
+# Use RURA just like PDB uses DT instead of the more logical T (there is no RT).  
+RESIDUE	RURA      u       
 #=======================================================================
-	nameDict = {'CYANA': 'URA', 'BMRBd': 'URA', 'INTERNAL': 'URA', 'CYANA2': 'URA', 'PDB': 'U', 'XPLOR': 'URA', 'BMRB': 'URA'}
+	nameDict = {'CYANA': 'URA', 'BMRBd': 'URA', 'INTERNAL': 'URA', 'CYANA2': 'URA', 'PDB': 'U', 'XPLOR': 'URA', 'BMRB': 'U'}
+    properties = ['nucleic']
 	#---------------------------------------------------------------
 	DIHEDRAL EPSI    
 	#---------------------------------------------------------------
@@ -11645,96 +11667,190 @@ END_RESIDUE
 #=======================================================================
 
 #=======================================================================
-#	internal short   
-RESIDUE	CA2P      CA2P     
+#   internal short   
+RESIDUE CA2P      CA2P     
 #=======================================================================
-	nameDict = {'CYANA': 'ION', 'BMRBd': None, 'INTERNAL': 'CA2P', 'CYANA2': 'ION', 'PDB': 'CA', 'XPLOR': 'CA2', 'BMRB': 'CA'}
-	comment = 'Calcium 2plus ion' 
-	properties = ['ion','charged']
-	#---------------------------------------------------------------
-	DIHEDRAL LB      
-	#---------------------------------------------------------------
-		atoms = [(-1, 'Q2'), (0, 'Q3'), (0, 'Q1'), (0, 'Q2')]
-		karplus = None
-	END_DIHEDRAL
-	#---------------------------------------------------------------
-	ATOM CA2P      
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'ME', 'BMRBd': None, 'INTERNAL': 'CA2P', 'CYANA2': 'ME', 'PDB': 'CA', 'XPLOR': 'CA+2', 'BMRB': 'CA'}
-		topology = []
-		pseudo = None
-		real = []
-		type = None
-		spinType = '45Ca'
-		shift = None
-		hetatm = True
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q3      
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'Q3', 'BMRBd': None, 'INTERNAL': 'Q3', 'CYANA2': 'Q3', 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q3'     
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': "Q3'", 'BMRBd': None, 'INTERNAL': "Q3'", 'CYANA2': "Q3'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q1      
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'Q1', 'BMRBd': None, 'INTERNAL': 'Q1', 'CYANA2': 'Q1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q1'     
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': "Q1'", 'BMRBd': None, 'INTERNAL': "Q1'", 'CYANA2': "Q1'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q2      
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': 'Q2', 'BMRBd': None, 'INTERNAL': 'Q2', 'CYANA2': 'Q2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
-	#---------------------------------------------------------------
-	ATOM Q2'     
-	#---------------------------------------------------------------
-		nameDict = {'CYANA': "Q2'", 'BMRBd': None, 'INTERNAL': "Q2'", 'CYANA2': "Q2'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
-		topology = []
-		pseudo = None
-		real = []
-		type = 'PSEUD'
-		spinType = '1H'
-		shift = None
-	END_ATOM
+    nameDict = {'CYANA': 'ION', 'BMRBd': None, 'INTERNAL': 'CA2P', 'CYANA2': 'ION', 'PDB': 'CA', 'XPLOR': 'CA2', 'BMRB': 'CA'}
+    comment = 'Calcium 2plus ion' 
+    properties = ['ion','charged']
+    #---------------------------------------------------------------
+    DIHEDRAL LB      
+    #---------------------------------------------------------------
+        atoms = [(-1, 'Q2'), (0, 'Q3'), (0, 'Q1'), (0, 'Q2')]
+        karplus = None
+    END_DIHEDRAL
+    #---------------------------------------------------------------
+    ATOM CA2P      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'ME', 'BMRBd': None, 'INTERNAL': 'CA2P', 'CYANA2': 'ME', 'PDB': 'CA', 'XPLOR': 'CA+2', 'BMRB': 'CA'}
+        topology = []
+        pseudo = None
+        real = []
+        type = None
+        spinType = '45Ca'
+        shift = None
+        hetatm = True
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q3      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q3', 'BMRBd': None, 'INTERNAL': 'Q3', 'CYANA2': 'Q3', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q3'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q3'", 'BMRBd': None, 'INTERNAL': "Q3'", 'CYANA2': "Q3'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q1      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q1', 'BMRBd': None, 'INTERNAL': 'Q1', 'CYANA2': 'Q1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q1'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q1'", 'BMRBd': None, 'INTERNAL': "Q1'", 'CYANA2': "Q1'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q2      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q2', 'BMRBd': None, 'INTERNAL': 'Q2', 'CYANA2': 'Q2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q2'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q2'", 'BMRBd': None, 'INTERNAL': "Q2'", 'CYANA2': "Q2'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+END_RESIDUE
+#=======================================================================
+
+#=======================================================================
+#   internal short   
+RESIDUE ZN2P      ZN2P     
+#=======================================================================
+    nameDict = {'CYANA': 'ZN', 'BMRBd': None, 'INTERNAL': 'ZN2P', 'CYANA2': 'ZN', 'PDB': 'ZN', 'XPLOR': 'ZN2', 'BMRB': 'ZN'}
+    comment = 'Zinc 2plus ion' 
+    properties = ['ion','charged']
+    #---------------------------------------------------------------
+    DIHEDRAL LB      
+    #---------------------------------------------------------------
+        atoms = [(-1, 'Q2'), (0, 'Q3'), (0, 'Q1'), (0, 'Q2')]
+        karplus = None
+    END_DIHEDRAL
+    #---------------------------------------------------------------
+    ATOM ZN2P      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'ME', 'BMRBd': None, 'INTERNAL': 'ZN2P', 'CYANA2': 'ME', 'PDB': 'ZN', 'XPLOR': 'ZN+2', 'BMRB': 'ZN'}
+        topology = []
+        pseudo = None
+        real = []
+        type = None
+        spinType = '??Zn'
+        shift = None
+        hetatm = True
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q3      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q3', 'BMRBd': None, 'INTERNAL': 'Q3', 'CYANA2': 'Q3', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q3'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q3'", 'BMRBd': None, 'INTERNAL': "Q3'", 'CYANA2': "Q3'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q1      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q1', 'BMRBd': None, 'INTERNAL': 'Q1', 'CYANA2': 'Q1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q1'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q1'", 'BMRBd': None, 'INTERNAL': "Q1'", 'CYANA2': "Q1'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q2      
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'Q2', 'BMRBd': None, 'INTERNAL': 'Q2', 'CYANA2': 'Q2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM Q2'     
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': "Q2'", 'BMRBd': None, 'INTERNAL': "Q2'", 'CYANA2': "Q2'", 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        topology = []
+        pseudo = None
+        real = []
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+    END_ATOM
 END_RESIDUE
 #=======================================================================
 

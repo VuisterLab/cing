@@ -15,6 +15,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import printError
 from cing.Libs.NTutils import NTwarning
 from glob import glob
+from shutil import copy
 import os
 import time
 
@@ -46,8 +47,10 @@ class Whatif( NTdict ):
     BUGS:   - ALTATM and TOPPOS occurs twice in 1ai0 check_001.db.
     """
     #define some more user friendly names
-    # JFD found list of defs at: http://www.yasara.org/pdbfinder_file.py.txt
-    # JFD all are in text record of file to be parsed so they're kind of redundant.
+    # List of defs at: 
+    # http://www.yasara.org/pdbfinder_file.py.txt
+    # http://swift.cmbi.ru.nl/whatif/html/chap23.html 
+    # All are in text record of file to be parsed so they're kind of redundant.
     nameDefs =[ 
                 ('ACCLST', 'Relative accessibility'),
                 ('ALTATM', 'Amino acids inside ligands check/Attached group check'),
@@ -75,6 +78,7 @@ class Whatif( NTdict ):
                 ('PC2CHK', 'Proline puckers'),
                 ('PDBLST', 'List of residues'),
                 ('PL2CHK', 'Connections to aromatic rings'),
+                ('PL3CHK', 'Side chain planarity with hydrogens attached'),
                 ('PLNCHK', 'Protein side chain planarities'),
                 ('PRECHK', 'Missing backbone atoms.'),
                 ('PUCCHK', 'Ring puckering in Prolines'),
@@ -138,7 +142,6 @@ SETWIF 1012 0
 %fulchk
 $pdb_file
 xxx
-EOD
 
 $mv check.db check_$modelNumberString.db
 
@@ -437,14 +440,19 @@ def runWhatif( project, tmp=None ):
     
     for res in project.molecule.allResidues():
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-            NTwarning('Warning predictWithShiftx: non-standard residue %s will found\n' % `res`)   
+            NTwarning('non-standard residue %s found and will be written out for What If' % `res`)   
         
     models = NTlist(*range( project.molecule.modelCount ))
             
     whatifDir = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
 #    TODO: check how to move this to a configurable location.
-    whatifPath = os.path.join("/home","vriend","whatif", "DO_WHATIF.COM")
 
+    whatifPath       = os.path.join("/home","vriend","whatif")
+    whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
+    whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
+
+    copy(whatifTopology, os.path.join(whatifDir,"TOPOLOGY.FIL"))
+    
     for model in models:
         modelNumber = model + 1
         fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', modelNumber) )
@@ -472,15 +480,15 @@ def runWhatif( project, tmp=None ):
     # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
     totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
     timeRunEstimatedInSeconds    = totalNumberOfResidues / 13.
-    timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimatedInSeconds)
+    timeRunEstimatedInSecondsStr = sprintf("%.0f",timeRunEstimatedInSeconds)
     printMessage('==> Running What If checks on '+`totalNumberOfResidues`+
                  " residues for an estimated (13 protonated residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
     if totalNumberOfResidues < 100:
-        printDebug("It takes longer per residue for small molecules and few models")
+        printMessage("It takes longer per residue for small molecules and few models")
     scriptFileName = "whatif.script"
     scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
-    whatifProgram = ExecuteProgram( whatifPath, rootPath = whatifDir, 
+    whatifProgram = ExecuteProgram( whatifExecutable, rootPath = whatifDir, 
                              redirectOutput = True, redirectInputFromDummy = True )
     # The last argument becomes a necessary redirection into fouling What If into
     # thinking it's running interactively.
@@ -495,16 +503,27 @@ def runWhatif( project, tmp=None ):
     if whatifExitCode:
         printError("Failed whatif checks with exit code: " + `whatifExitCode`)
         return None
-    removeList = []
-    for extension in [ "*.eps", "*.pdb", "*.LOG", "*.PDB", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
-        for fn in glob(os.path.join(whatifDir,extension)):
-            removeList.append(fn)
-    for fn in removeList:
-        printDebug("Removing: " + fn)
-        os.unlink(fn)
-        
+
+    try:
+        removeListLocal = ["PDBFILE", "pdbout.tex"]
+        removeList = []
+        for fn in removeListLocal:
+            removeList.append( os.path.join(whatifDir, fn) )
+    
+#        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.PDB", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
+        for extension in [ "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
+            for fn in glob(os.path.join(whatifDir,extension)):
+                removeList.append(fn)
+        for fn in removeList:
+            if not os.path.exists(fn):
+                printDebug("Expected to find a file to be removed but it doesn't exist: " + fn )
+                continue
+            printDebug("Removing: " + fn)
+            os.unlink(fn)
+    except:
+        printWarning("Failed to remove all temporary what if files that were expected")
+                
     for model in models:
-#    for model in (0,1):
         modelNumber = model + 1
         modelNumberString = sprintf('%03d', modelNumber)
         fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', modelNumber), '.pdb' )
@@ -515,12 +534,12 @@ def runWhatif( project, tmp=None ):
         whatif._parseCheckdb( modelCheckDbFullFileName, model )
     #end for model
     
-    printWarning("Processing is to be continued from here on.")
+    printWarning("TODO: Processing is to be continued from here on.")
     return 1
     if not whatif._processCheckdb():
         printError("Failed to process check db")
         return None
-    # TODO: finish this code.
+
 #    whatif.map2molecule()
     
     return whatif # Success

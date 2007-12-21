@@ -11,15 +11,15 @@ from unittest import TestCase
 import os
 import unittest
 
-
 class AllChecks(TestCase):
         
     def testparse(self):
         """whatif db parse"""
         
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-        entryId = "1brv" # Small much studied PDB NMR entry; 48 models 
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
+        entryId = "2hgh" # Small much PDB NMR entry
         pdbFileName = entryId+"_small.pdb"
         pdbFilePath = os.path.join( cingDirTestsData, pdbFileName)
         

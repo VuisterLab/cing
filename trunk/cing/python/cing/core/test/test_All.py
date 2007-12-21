@@ -3,16 +3,10 @@ import unittest
 """
 Call by:
 python testAll.py
-        # TODO: report a summary at beginning of what will be tested and at the end what works.
 """
 def testAll():    
     modList = ( 
-               "cing.PluginCode.test.test_Biggles", 
-#               "cing.PluginCode.test.test_Procheck", 
-#               "cing.PluginCode.test.test_validate", 
-#               "cing.PluginCode.test.test_Procheck", 
-#               "cing.PluginCode.test.test_Whatif", 
-#               "cing.PluginCode.test.test_STAR", 
+               "cing.core.test.test_classes",
                )
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None

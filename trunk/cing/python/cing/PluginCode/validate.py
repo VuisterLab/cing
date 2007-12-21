@@ -95,18 +95,13 @@ def setupValidation( project, ranges=None ):
 
     validateModels( project, verbose=project.parameters.verbose() )
 
-    project.predictWithShiftx( verbose=project.parameters.verbose() )
-    project.validateAssignments( toFile=True, verbose=project.parameters.verbose() )
-
-    project.checkForSaltbridges( toFile=True, verbose=project.parameters.verbose() )
-
-    project.validateRestraints( toFile = True, verbose=project.parameters.verbose() )
-
-    project.calculateRmsd( ranges=ranges, verbose = project.parameters.verbose() )
-
-    project.procheck( ranges=ranges, verbose = project.parameters.verbose() )
-
-    project.summary( verbose = project.parameters.verbose() )
+    project.predictWithShiftx(                      verbose=project.parameters.verbose() )
+    project.validateAssignments(toFile=True,        verbose=project.parameters.verbose() )
+    project.checkForSaltbridges(toFile=True,        verbose=project.parameters.verbose() )
+    project.validateRestraints( toFile=True,        verbose=project.parameters.verbose() )
+    project.calculateRmsd(      ranges=ranges,      verbose=project.parameters.verbose() )
+    project.procheck(           ranges=ranges,      verbose=project.parameters.verbose() )
+    project.summary(                                verbose=project.parameters.verbose() )
 #end def
 
 def summary( project, verbose=True ):
@@ -865,7 +860,8 @@ def validateAssignments( project, toFile = True, verbose = True ):
                    'shiftx:   %7.2f %7.2f \n' +\
                    'database: %7.2f %7.2f \n',
                    dots, atm, dots,
-                   atm.resonances().value, atm.resonances().error,
+                   atm.resonances().value, 
+                   atm.resonances().error,
                    sav, ssd,
                    dav, dsd
                   )
@@ -901,9 +897,15 @@ def validateAssignments( project, toFile = True, verbose = True ):
                 dav = -999.0
                 dsd = 0
             #end if
-            fprintf(fp,'%-18s (%7.2f %6.2f)   (shiftx: %7.2f %6.2f)   (delta: %6.2f %6.2f)   (db: %7.2f %6.2f)   %s\n',
+            value = '.' # JFD probably entered a bug in dbTable causing a problem here.
+            error = '.'
+            if atm.resonances():
+                value = '%7.2f' % ( atm.resonances().value, )
+                error = '%6.2f' % ( atm.resonances().error, )
+            fprintf(fp,'%-18s (%7s %6s)   (shiftx: %7.2f %6.2f)   (delta: %6.2f %6.2f)   (db: %7.2f %6.2f)   %s\n',
                     atm,
-                    atm.resonances().value, atm.resonances().error,
+                    value, 
+                    error,
                     sav, ssd, delta, rdelta,
                     dav, dsd,
                     atm.validateAssignment.format()
@@ -1891,6 +1893,7 @@ def populateHtmlModels(project):
 
         outliers = [project.models[i] for i in range(molecule.modelCount)]
         print '>>', molecule.modelCount, outliers
+        
         plot.barChart( project.models.items(),
                        0.05, 0.95,
                        attributes = boxAttributes( fillColor='green' )
@@ -1905,7 +1908,8 @@ def validate( project, ranges=None, htmlOnly = False, verbose=True ):
     """Validatation tests
     """
     #validateSetup(project)
-    if not htmlOnly: setupValidation( project, ranges=ranges )
+    if not htmlOnly: 
+        setupValidation( project, ranges=ranges )
 
     setupHtml(project)
 
@@ -1913,9 +1917,9 @@ def validate( project, ranges=None, htmlOnly = False, verbose=True ):
     if not populateHtmlMolecules(project):
         printError("Failed to populateHtmlMolecules")
         return None
-    if not populateHtmlModels(project):
-        printError("Failed to populateHtmlModels")
-        return None
+#    if not populateHtmlModels(project):
+#        printError("Failed to populateHtmlModels")
+#        return None
     if not renderHtml(project):
         printError("Failed to renderHtml")
         return None

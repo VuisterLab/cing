@@ -2232,8 +2232,10 @@ class HTMLfile:
         self.stream.writelines(self._footer)
         self.stream.write(self._generateTag( 'p', 
                      programName + ' ' + cingVersion, 
-                     ' (c) Geerten Vuister ', 
-                     '<a href="mailto:g.vuister@science.ru.nl">Contact Me</a>'
+                     ' (c) ', 
+                     '<a href="mailto:g.vuister@science.ru.nl"> Geerten Vuister</a>, ',
+                     '<a href="mailto:alanwilter@gmail.com">    Alan Wilter Sousa da Silva</a>, ',
+                     '<a href="mailto:jurgend@cmbi.ru.nl">      Jurgen F. Doreleijers</a>, ',
                       ))
         self.stream.write(self.closeTag('div', '<!-- end footer -->'))
 

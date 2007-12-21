@@ -36,6 +36,7 @@ from cing.core.constants import CYANA2
 from cing.core.constants import IUPAC
 from cing.core.dictionaries import NTdbGetAtom
 from cing.core.molecule import Molecule
+from cing.Libs.NTutils import printWarning
 
 #==============================================================================
 # PDB stuff
@@ -99,7 +100,7 @@ return molecule or None on error
             atom  = molecule.decodeNameTuple( (convention, cname, resID, atmName) )
 
             if (atom == None):
-                NTerror('WARNING: %s, model %d incompatible record (%s)\n', 
+                NTerror('WARNING in cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)\n', 
                          convention, modelCount, record 
                        )         
                 #print '>>', convention, cname, resID, atmName
@@ -135,7 +136,7 @@ Molecule.importFromPDB = importFromPDB
 def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None, verbose=True ):
     """Initialise  from pdbFile
 Return molecule instance
-convention eq PDB, CYANA, CYANA2 or XPLOR
+convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
 
     if verbose:
@@ -174,39 +175,30 @@ convention eq PDB, CYANA, CYANA2 or XPLOR
          
         elif recordName == "ATOM" or recordName == "HETATM":
             # see if we can find a definition for this residue, atom name in the database
-       
-            if (convention == CYANA):
+            a = record.name
+            if convention == CYANA or convention == CYANA2:
                 # the residue names are in Cyana1.x convention (i.e. for GLU-)
                 # atm names of the Cyana1.x PDB files are in messed-up Cyana format
+                # So: 1HD2 becomes HD21
                 a = record.name[1:4] + record.name[0:1]
-                atm = NTdbGetAtom( record.resName, a, CYANA )
-            elif (convention == CYANA2):
-                # the residue names are in Cyana2.x convention (i.e. for GLU)
-                # atm names of the Cyana2.x PDB files are in messed-up Cyana format
-                a = record.name[1:4] + record.name[0:1]
-                atm = NTdbGetAtom( record.resName, a, CYANA2 )
-            else:
-                atm = NTdbGetAtom( record.resName.strip(), record.name.strip(), convention )
+            # strip is already done in function
+            atm = NTdbGetAtom( record.resName, a, convention )
             #end if    
 
-            if (atm == None):
-                NTerror('WARNING: %s, model %d incompatible record (%s)\n', 
-                         convention, mol.modelCount, record 
-                       )         
-#                printf('res>%s<  atm>%s<\n',record.resName.strip(), record.name.strip())
+            if not atm:
+                printWarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
+                         convention, mol.modelCount, record))
             
-            elif (atm.residueDef.hasProperties('cyanaPseudoResidue')):
+            elif atm.residueDef.hasProperties('cyanaPseudoResidue'):
                 # skip CYANA pseudo residues
                 pass
-
             else:
                 # we did find a match in the database
 
                 # Not all PDB files have chainID's !@%^&*
+                cname = 'A'
                 if record.has_key('chainID'):
                     cname = record.chainID.strip()
-                else:
-                    cname = 'A'
                 #end if
                 resID    = record.resSeq
                 resName  = atm.residueDef.name
@@ -215,11 +207,11 @@ convention eq PDB, CYANA, CYANA2 or XPLOR
                 
                 # check if this chain,fullName,atmName already exists in the molecule
                 # if not, add chain or residue                 
-                if (not cname in mol):
+                if not cname in mol:
                     mol.addChain( cname )
                 #end if
                 
-                if (not fullName in mol[cname]):
+                if not fullName in mol[cname]:
                     res = mol[cname].addResidue( resName, resID )
                     res.addAllAtoms()
                 #end if
@@ -235,7 +227,8 @@ convention eq PDB, CYANA, CYANA2 or XPLOR
     #end for
     
     # Patch to get modelCount right for X-ray structures with only one model
-    if (not foundModel): mol.modelCount += 1
+    if not foundModel: 
+        mol.modelCount += 1
     
     if verbose:
         NTmessage( '==> PDB2Molecule: completed, added %d structure models\n', mol.modelCount )  
