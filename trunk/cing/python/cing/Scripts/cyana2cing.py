@@ -12,20 +12,13 @@
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import OptionParser
+from cing.Libs.NTutils import printError
 from cing.core.classes import Project
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import printWarning
 import os
 import sys
 
-usage = 'cyana2cing.py [options] cyanaDirectory\n\nUse -h or --help for full options.'
-programVersion = '0.50'
-
-
-#------------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------------
-
-parser = OptionParser(usage=usage, version=programVersion)
+parser = OptionParser(usage="cyana2cing.py [options] cyanaDirectory Use -h or --help for full options.")
 
 parser.add_option("-o","--overwrite", 
                   action="store_true", 
@@ -85,60 +78,68 @@ parser.add_option("--export",
                  
 (options, args) = parser.parse_args()
 
-if not options.seqFile:   options.seqFile = None
-if not options.protFile:  options.protFile = None
-if not options.pdbFile:   options.pdbFile = None
+if not options.seqFile:   
+    options.seqFile = None
+if not options.protFile:  
+    options.protFile = None
+if not options.pdbFile:   
+    options.pdbFile = None
+    
 if not options.peakFiles: 
     options.peakFiles = []
 else:
     options.peakFiles = options.peakFiles.split(',')
-#end if
+
 if not options.uplFiles:  
     options.uplFiles = []
 else:
     options.uplFiles = options.uplFiles.split(',')
-#end if
+
 if not options.acoFiles:  
     options.acoFiles = []
 else:
     options.acoFiles = options.acoFiles.split(',')
-#end if
 
-if (len(args) >= 1):
-    if (os.path.exists( args[0] ) ):
-        projectRoot = Project.rootPath( args[0] )
-        if (os.path.exists( projectRoot )) and not options.overwrite:
-            NTerror('ERROR: output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
-            sys.exit(1)
-        else:
-            project = Project.open(args[0], 'new', verbose=False )
-            project.cyana2cing( args[0], convention=options.convention,
-                                seqFile   = options.seqFile,
-                                protFile  = options.protFile,
-                                peakFiles = options.peakFiles,
-                                uplFiles  = options.uplFiles,
-                                acoFiles  = options.acoFiles,
-                                pdbFile   = options.pdbFile,
-                                nmodels   = int(options.nmodels),
-                                copy2sources = True
-            )
-            
-            if project:
-                if options.refine: 
-                    project.export2refine( options.refine )
-                #end if
-                if options.export: 
-                    project.export()
-                #end if
-                project.save()
-            #end if
-        #end if
-    else:
-        NTerror('ERROR: directory "%s" not found\n', args[0] )
-        sys.exit(1)
-    #end if
-#end if
-printDebug("Doing a hard system exit")
-sys.exit(0)
+
+#if (len(args) >= 1):
+if not args:
+    printError('no arguments found')
+    sys.exit(1)
+    
+if not os.path.exists( args[0] ):
+    NTerror('ERROR: directory "%s" not found\n', args[0] )
+    sys.exit(1)
+
+projectRoot = Project.rootPath( args[0] )
+if os.path.exists( projectRoot ) and not options.overwrite:
+    NTerror('ERROR: output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
+    sys.exit(1)
+    
+project = Project.open(args[0], 'new', verbose=False )
+project.cyana2cing( args[0], convention=options.convention,
+                    seqFile   = options.seqFile,
+                    protFile  = options.protFile,
+                    peakFiles = options.peakFiles,
+                    uplFiles  = options.uplFiles,
+                    acoFiles  = options.acoFiles,
+                    pdbFile   = options.pdbFile,
+                    nmodels   = int(options.nmodels),
+                    copy2sources = True
+)
+
+if not project:
+    printWarning("No project generated. Aborting further execution.")
+    sys.exit(0)
+    
+if options.refine: 
+    project.export2refine( options.refine )
+
+if options.export: 
+    project.export()
+
+project.save()
+
+#printDebug("Doing a hard system exit")
+#sys.exit(0)
 
 

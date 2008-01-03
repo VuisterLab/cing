@@ -6,12 +6,7 @@ python test_All.py
 """
 def testAll():    
     modList = ( 
-               "cing.PluginCode.test.test_Biggles", 
-               "cing.PluginCode.test.test_Procheck", 
-               "cing.PluginCode.test.test_STAR",
-               "cing.PluginCode.test.test_validate", 
-               "cing.PluginCode.test.test_Wattos", 
-               "cing.PluginCode.test.test_Whatif" 
+               "cing.Scripts.test.test_cyana2cing",
                )
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None

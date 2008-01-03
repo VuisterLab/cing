@@ -1,8 +1,20 @@
 tmp
     - directory that is empty at checkout of this project
         Meant to be filled with temporary data not to go into CVS.
-
-1ai0 is a nice example for it's a divers molecular system.
+xeasy_project
+    - directory with a XEASY project including distance and dihedral angle
+        restraints.
+        
+        
+QuitBeforeBegun.wcf
+    - Little Wattos command file.
+    
+README.txt
+    - This file.
+    
+    
+    
+1ai0_small.pdb is a nice example for it's a divers molecular system.
     - Mol.Sys.  - 2 models (truncated to for speed reason)
                 - 12 proteins (chains)
                 - 6 ligands
@@ -15,8 +27,11 @@ tmp
                     - TODO: actually add them to the project.
                     
                     
-1brv 
+1brv_small.pdb 
     - small system of only 19 AA
+    
+2hgh_small.pdb
+    - larger system of a protein/RNA complex
     
     
                         
