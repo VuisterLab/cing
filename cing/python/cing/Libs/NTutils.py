@@ -1,4 +1,5 @@
 from cing.Libs.AwkLike import AwkLike
+from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
@@ -3148,3 +3149,19 @@ if __name__ == '__main__':
   
   l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
   print l.average(), l(0)
+
+"""
+Taken from O'Reilly book
+"""
+def find(pattern, startdir=os.curdir):
+    matches = []
+    os.path.walk(startdir, findvisitor, (matches, pattern))
+    matches.sort()
+    return matches
+
+def findvisitor((matches, pattern), thisdir, nameshere):
+    for name in nameshere:
+        if fnmatch(name, pattern):
+            fullpath = os.path.join(thisdir, name)
+            matches.append(fullpath)
+

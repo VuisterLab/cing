@@ -58,10 +58,10 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.test.test_All import testAll
+from cing.test.test_All import testOverall
+import cing #@UnusedImport
 import os 
 import sys
-import cing #@UnusedImport
 
 
 
@@ -232,7 +232,7 @@ if __name__ == '__main__':
 #    parameters.verbose.set( not options.quiet )
 
     if options.test:
-        testAll()
+        testOverall()
         sys.exit(0)
     
     #------------------------------------------------------------------------------------
@@ -345,14 +345,14 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------------
     # Merge resonances
     #------------------------------------------------------------------------------------
-    if (options.merge):
+    if options.merge:
         project.mergeResonances()
     #end if
     
     #------------------------------------------------------------------------------------
     # Generate peaks
     #------------------------------------------------------------------------------------
-    if (options.generatePeaks):
+    if options.generatePeaks:
         gp = options.generatePeaks.split(',')
         if (len(gp) != 2):
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required\n")
@@ -364,20 +364,20 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------------
     # Script
     #------------------------------------------------------------------------------------
-    if (options.script):
+    if options.script:
         script( options.script )
     
     #------------------------------------------------------------------------------------
     # Validate
     #------------------------------------------------------------------------------------
-    if (options.validate):
+    if options.validate:
         project.validate()
     #end if
     
     #------------------------------------------------------------------------------------
     # ipython
     #------------------------------------------------------------------------------------
-    if (options.ipython):
+    if options.ipython:
          # JFD The below gets flagged as unfound by pydev extensions code analysis but
          # if you move the conflicting Shell class down in the PYTHONPATH it's ok.
         from IPython.Shell import IPShellEmbed
@@ -389,13 +389,13 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------------
     # Optionally export project 
     #------------------------------------------------------------------------------------
-    if (project and  options.export): 
+    if project and options.export: 
         project.export()
     
     #------------------------------------------------------------------------------------
     # CLose and optionally not save project
     #------------------------------------------------------------------------------------
-    if (project and not options.nosave): 
+    if project and not options.nosave: 
         project.close()
     #------------------------------------------------------------------------------------
 

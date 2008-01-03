@@ -185,7 +185,7 @@ ccpnVersion = 1 # Moved outside so it's always defined; pydev extensions code
 # analysis likes this for good reasons.
 try:
     from memops.general.Io import readXmlProjectFile 
-    NTmessage("Using CCPN version 1.x\n")
+#    NTmessage("Using CCPN version 1.x\n")
 except:
     try:
         from memops.general.Io import loadProject #@UnresolvedImport

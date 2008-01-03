@@ -11,13 +11,14 @@ from cing.core.classes import Project
 from shutil import copytree
 from shutil import rmtree
 from unittest import TestCase
+from cing.Libs.NTutils import find
 import os
 import unittest
 
 class AllChecks(TestCase):
 
     def testrun(self):
-        """validate run check"""
+        """validate run check taking too long at 100 s. TODO: reduce size of project."""
 #        SETUP FIRST
         if os.chdir(cingDirTestsTmp):
             raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
@@ -34,6 +35,13 @@ class AllChecks(TestCase):
                 printError("Failed to remove existing cing project")
                 return True
         copytree(cingProjectFilePath, cingProjectFolder)
+        # Remove the CVS subdirs as even the temp path is under CVS scrutiny and we don't want to upset it.
+        cvsFolders = find("CVS", cingProjectFolder)
+        if cvsFolders:
+            printMessage("Removing the CVS folders") 
+        for name in cvsFolders:
+            rmtree(name, True)
+#        sys.exit(1)
         project = Project.open( cingProjectEntry, status='old' )
         print project.cingPaths.format()
         project.validate()
