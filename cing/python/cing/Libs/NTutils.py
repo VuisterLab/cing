@@ -3,6 +3,7 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+import string
 import array
 import inspect
 import math
@@ -2039,7 +2040,10 @@ def NTzap( theList, byItem ):
 #end def
 
 def NTsq( value ):
-    return math.pow(value, 2)
+    return value*value # fastest
+    # only problem might be the returned type which is not garanteed
+    # to be a double like below.
+#    return math.pow(value, 2)
 #end def
 # -----------------------------------------------------------------------------
 # XML code
@@ -2596,19 +2600,16 @@ NTsort = Sorter()
 #
 #------------------------------------------------------------------------------
 #
-def quote( string ): 
+def quote( inputString ): 
     "return a single or double quoted string"
-    single = (find( string, "'" ) >= 0)
-    double = (find( string, '"' ) >= 0)
-    if (single and double):
-        NTerror("ERROR quote: both single and double quotes in %s\n", string)
+    single = (find( inputString, "'" ) >= 0)
+    double = (find( inputString, '"' ) >= 0)
+    if single and double:
+        printError("in quote: both single and double quotes in [%s]" % inputString)
         return None
-    elif double:
-        return "'" + string + "'"
-    else:
-        return '"' + string + '"'
-    #end if
-#end def
+    if double:
+        return "'" + inputString + "'"
+    return '"' + inputString + '"'
 #
 #------------------------------------------------------------------------------
 #
@@ -3153,7 +3154,7 @@ if __name__ == '__main__':
 """
 Taken from O'Reilly book
 """
-def find(pattern, startdir=os.curdir):
+def findFiles(pattern, startdir=os.curdir):
     matches = []
     os.path.walk(startdir, findvisitor, (matches, pattern))
     matches.sort()

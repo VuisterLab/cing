@@ -25,6 +25,8 @@ from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import fprintf
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printDebug
 import os
 
 def procheckString2float( string ):
@@ -104,9 +106,13 @@ class Procheck:
         """
         self.molecule     = project.molecule
         self.rootPath     = project.mkdir( project.molecule.name, project.moleculeDirectories.procheck  )
+        redirectOutput = True
+        if project.parameters.verbose():
+            redirectOutput=False
+        printDebug("Will redirect procheck output: " + `redirectOutput`)
         self.procheck  = ExecuteProgram( cingPaths.procheck_nmr,
                                             rootPath = self.rootPath, 
-                                            redirectOutput= False
+                                            redirectOutput= redirectOutput
                                           )
         self.ranges = None
     #end def
@@ -126,22 +132,21 @@ class Procheck:
             #end if
         #end for        
         self.ranges.append(selectedResidues[-1])
-        print '>ranges', self.ranges
+#        print '>ranges (just the boundaries)', self.ranges
         #generate the ranges file
         path = os.path.join( self.rootPath, 'ranges')
         fp = open( path, 'w' )
         for i in range(0,len(self.ranges),2):
-            fprintf( fp, 'RESIDUES %3d %2s  %3d %2s\n', self.ranges[i].resNum, self.ranges[i].chain.name, 
-                                                        self.ranges[i+1].resNum, self.ranges[i+1].chain.name
-                   )
-        #end for
+            singleRange = 'RESIDUES %3d %2s  %3d %2s' % ( self.ranges[i].resNum, self.ranges[i].chain.name, 
+                                                            self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
+            fprintf( fp, singleRange+"\n" )
+            print ">range: " + singleRange
         fp.close()
         
         path = os.path.join( self.rootPath, self.molecule.name + '.pdb')
         if export: 
             self.molecule.toPDBfile( path, convention=IUPAC, verbose=verbose )
         self.procheck( self.molecule.name +'.pdb ranges' )
-        
         self.parseResult()
     #end def
         
@@ -211,7 +216,9 @@ def procheck( project, ranges=None, verbose=True ):
     #end if
     
     pcheck = Procheck( project )
-    if not pcheck: return None
+    if not pcheck:
+        printError("Failed to get procheck instance of project") 
+        return None
     
     pcheck.run( ranges=ranges, verbose=verbose )
     project.molecule.procheck = pcheck
