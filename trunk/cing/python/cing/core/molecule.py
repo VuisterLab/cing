@@ -52,7 +52,16 @@ dots = '-----------'
 class Molecule( NTtree ):
     """
 -------------------------------------------------------------------------------
-Molecule class: defines the holder for molecule items
+Molecule class: defines the holder for molecule items.
+
+Just noting the mapping between this data model and the NMR-STAR 
+Molecule -> Molecular system
+Chain    -> Assembly entity
+Residue  -> Chemical component
+
+There are things that will be difficult to map from one to the other.
+A Zinc ion will usually be part of the same chain in CING whereas it will be
+in a different assembly entity in NMR-STAR. This has consequences for numbering.
 -------------------------------------------------------------------------------
     
                                      Coordinate
@@ -244,16 +253,21 @@ Molecule class: defines the holder for molecule items
         """Convert 
               either a residue ranges string, e.g. '10-20,34,50-60', 
               or a list with residue number or residue instances,
-              or None,
-              
+              or None,      
            to a NTlist instance with residue objects.
            
            Return the list or None upon error.
+           When the input for ranges is None then the output will be all residues. 
         """
         if ranges == None:
-            result = self.allResidues()
+            return self.allResidues()
             
-        elif type(ranges) == str:
+        if type(ranges) == str:
+            # self.allResidues() is a list of NTtree with residue instances
+            # .zap('resNum') returns the items collapsed by residue number
+            # if two residues in the same chain have the same residue number then 
+            #  the resulting list will have the one of the 2 residues in there
+            #  twice; which is a bug JFD thinks. 
             resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
             ranges =  asci2list(ranges)
             ranges.sort()
@@ -262,11 +276,10 @@ Molecule class: defines the holder for molecule items
                 if resnumDict.has_key(resNum):
                     result.append(resnumDict[resNum])
                 else:
-                    NTerror('Error Molecule.ranges2list: invalid residue number %d\n', resNum )
-                #end if
-            #end for
+                    NTerror('Error Molecule.ranges2list: invalid residue number [%d]\n', resNum )
+            return result
             
-        elif isinstance( ranges, list ):
+        if isinstance( ranges, list ):
             resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
             result = NTlist()
             for item in ranges:
@@ -274,22 +287,15 @@ Molecule class: defines the holder for molecule items
                     if resnumDict.has_key(item):
                         result.append(resnumDict[item])
                     else:
-                        NTerror('Error Molecule.ranges2list: invalid residue number %d\n', resNum )
-                    #end if
+                        NTerror('Error Molecule.ranges2list: invalid residue number [%d]\n', resNum )
                 elif isinstance( item, Residue ):
                     result.append( item )
                 else:
-                    NTerror('Error Molecule.ranges2list: invalid item "%s" in ranges list\n', item )
-                #end if
-            #end for
-                
-        else :
-            NTerror('Error Molecule.ranges2list: undefined ranges type %s\n', type(ranges) )
-            return None
-        #end if
-        
-        return result
-    #end def  
+                    NTerror('Error Molecule.ranges2list: invalid item [%s] in ranges list\n', item )
+            return result        
+
+        NTerror('Error Molecule.ranges2list: undefined ranges type [%s]\n', type(ranges) )
+        return None
     
     
     def models2list( self, models ):
@@ -819,7 +825,7 @@ class Chain( NTtree ):
 Chain class: defines chain properties and methods
 -------------------------------------------------------------------------------
     Initiating attributes:
-        name                    : Molecule name
+        name                    : Molecule name; JFD guesses this is a chain identifier such as 'A'. Not the molecule name.
       
     Derived attributes:
         residues                : NTlist of Residue instances (identical to _children)
@@ -996,7 +1002,7 @@ Residue class: Defines residue properties
 -------------------------------------------------------------------------------
     Initiating attributes:
         resName                 : Residue name according to the nomenclature list.
-        resNum                  : Unique residue number for this chain.
+        resNum                  : Unique residue number within this chain.
       
     Derived attributes:
         atoms                   : NTlist of Atom instances.

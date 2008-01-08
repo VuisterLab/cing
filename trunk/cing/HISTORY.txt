@@ -1,14 +1,16 @@
-Version 0.72: 05 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
-    - Changed DOS eol in cing/__init__.py to Unix.
+Version 0.72: xx Jan 2008: 
+    - Added extensive test cases.
 
-Version 0.71: 05 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
+Version 0.71: 05 Dec 2007: 
     - reformatted the version/copyright formatting
     - redid the determination of the CINGROOT and checks in setup.py
     - added --test option to main.py but needs beautification;-)
     - renamed NTstruct to NTdict (including in the dbTable)
     - exercised the feature request system in sf.net.
+    - Changed DOS eol in cing/__init__.py to Unix.
      
-Version 0.70: 03 Dec 2007: Reorganized for easy integration with Eclipse/PyDev
+Version 0.70: 03 Dec 2007: 
+    - Reorganized for easy integration with Eclipse/PyDev
     - Removed wild imports to accommodate the imports as PyDev suggests.
     - Organized import statements by PyDev.
     - Replaced many variable names to dummy if their values aren't used anymore after assignment.

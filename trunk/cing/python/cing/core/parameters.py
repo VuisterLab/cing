@@ -153,7 +153,7 @@ parameters = NTparameter( name = 'parameters', branch = True,
 )
 # Read definition file
 #JFD moved these defs into source here.
-parameters.verbose.value                 = 1
+parameters.verbose.value                 = 0
 parameters.programs.procheck_nmr.value   = 'procheck_nmr'
 
 #if os.path.exists( 'cing.par'): 

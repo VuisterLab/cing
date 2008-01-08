@@ -4,7 +4,7 @@ import sys
 # Molecule related stuff (former NTmol)
 #from constants      import *
 
-cingVersion     = '0.71 alfa'
+cingVersion     = '0.72 alfa'
 programName     = 'CING'
 programVersion  = cingVersion
 

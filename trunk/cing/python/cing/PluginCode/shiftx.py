@@ -13,6 +13,7 @@ from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
 from cing.core.constants import NOSHIFT
 from cing.core.parameters import cingPaths
+from cing.Libs.NTutils import printWarning
 import cing
 import os
 
@@ -72,15 +73,18 @@ def predictWithShiftx( project, model=None, verbose = True ):
     #end if
     
     skippedAtoms = [] # Keep a list of skipped atoms for later
+    skippedResidues = []
     for res in project.molecule.allResidues():
         if not res.hasProperties('protein'):
-            NTwarning('Warning predictWithShiftx: non-protein residue %s will be skipped\n' % (res,))
+            skippedResidues.append(res)
             for atm in res.allAtoms():
                 atm.pdbSkipRecord = True
                 skippedAtoms.append( atm )
             #end for
         #end if
     #end for
+    if skippedResidues:
+        printWarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
         
     if (model!=None):
         models = NTlist( model )

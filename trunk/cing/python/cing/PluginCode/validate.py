@@ -34,6 +34,7 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
+from cing.Libs import NTplot
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -49,7 +50,9 @@ from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import mprintf
+from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
@@ -65,7 +68,6 @@ from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs import NTplot
 import cing
 import math
 import os
@@ -90,18 +92,19 @@ def setupValidation( project, ranges=None ):
     """
     Run the initial validation calculations or programs
     """
+    # take a convenience variable.
+    verbose=project.parameters.verbose() 
+    validateDihedrals( project, verbose=verbose )
 
-    validateDihedrals( project, verbose=project.parameters.verbose() )
+    validateModels( project, verbose=verbose )
 
-    validateModels( project, verbose=project.parameters.verbose() )
-
-    project.predictWithShiftx(                      verbose=project.parameters.verbose() )
-    project.validateAssignments(toFile=True,        verbose=project.parameters.verbose() )
-    project.checkForSaltbridges(toFile=True,        verbose=project.parameters.verbose() )
-    project.validateRestraints( toFile=True,        verbose=project.parameters.verbose() )
-    project.calculateRmsd(      ranges=ranges,      verbose=project.parameters.verbose() )
-    project.procheck(           ranges=ranges,      verbose=project.parameters.verbose() )
-    project.summary(                                verbose=project.parameters.verbose() )
+    project.predictWithShiftx(                      verbose=verbose )
+    project.validateAssignments(toFile=True,        verbose=verbose )
+    project.checkForSaltbridges(toFile=True,        verbose=verbose )
+    project.validateRestraints( toFile=True,        verbose=verbose )
+    project.calculateRmsd(      ranges=ranges,      verbose=verbose )
+    project.procheck(           ranges=ranges,      verbose=verbose )
+    project.summary(                                verbose=verbose )
 #end def
 
 def summary( project, verbose=True ):
@@ -110,7 +113,8 @@ def summary( project, verbose=True ):
     """
 
     fps = []
-    if verbose: fps.append( sys.stdout )
+    if verbose: 
+        fps.append( sys.stdout )
     fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
     fp = open( fname, 'w' )
     printf( '==> summary, output to %s\n', fname)
@@ -217,7 +221,8 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
         res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
     #end for
 
-    if verbose: NTmessage("==> Calculating rmsd's ")
+    if verbose: 
+        NTmessage("==> Calculating rmsd's ")
 
     num = 0 # number of evaluated models (does not have to coincinde with model
             # since we may supply an external list
@@ -443,8 +448,10 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
         fp = None
     #end if
 
-    if toFile: fprintf( fp, '%s\n', project.molecule.format() )
-    if verbose: printf(     '%s\n', project.molecule.format() )
+    if toFile: 
+        fprintf( fp, '%s\n', project.molecule.format() )
+    if verbose: 
+        printf(     '%s\n', project.molecule.format() )
 
     residues1 = project.molecule.residuesWithProperties('E') + \
                 project.molecule.residuesWithProperties('D')
@@ -477,8 +484,10 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
     #end for
 
     if s:
-        if toFile: fprintf( fp, '%s\n', s.comment )
-        if verbose: printf(     '%s\n', s.comment )
+        if toFile: 
+            fprintf( fp, '%s\n', s.comment )
+        if verbose: 
+            printf(     '%s\n', s.comment )
     #end if
 
     if toFile:
@@ -1041,8 +1050,8 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
                         attributes = NTplot.boxAttributes( fillColor=plotparams.color )
                       )
         hight = plot.maxY
-    else:
-        NTwarning("No angle.good plots made")
+#    else:
+#        NTwarning("No angle.good plots made")
     #end if
 
     if angle.outliers:
@@ -1052,8 +1061,8 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
                   )
         if not hight:
             hight = plot.maxY
-    else:
-        NTwarning("No angle.outliers plots made")
+#    else:
+#        NTwarning("No angle.outliers plots made")
     #end if
 
     # AWSS
@@ -1659,8 +1668,16 @@ def populateHtmlMolecules( project ):
 
     for molecule in [project[mol] for mol in project.molecules]:
         for chain in molecule.allChains():
+            chainId = chain.name
+            printMessage("\nGenerating dihedral angle plots for chain: " + chainId)
+            printedDots = 0            
             for res in chain.allResidues():
-
+                print '.', # print progress for each residue a char.
+                printedDots += 1
+                resNum = res.resNum
+                if not printedDots % 20:
+                    print
+                    printedDots = 0
                 resdir = os.path.dirname(res.htmlLocation[0])
 
                 fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
@@ -1670,7 +1687,7 @@ def populateHtmlMolecules( project ):
                 if plot:
                     plot.hardcopy( fileName = os.path.join(resdir, 'PHI_PSI' ),
                                    graphicsFormat = graphicsFormat )
-                    del( plot )
+                    del plot
                     #generate HTML code for plot
                     res.html.left( 'h2', 'Ramanchandran', id='Ramanchandran')
                     res.html.left( 'img', src = 'PHI_PSI', alt="" )
@@ -1680,7 +1697,7 @@ def populateHtmlMolecules( project ):
                 if plot:
                     plot.hardcopy( fileName = os.path.join(resdir, 'CHI1_CHI2'),
                                    graphicsFormat = graphicsFormat )
-                    del( plot )
+                    del plot
                     #generate HTML code for plot
                     res.html.left( 'h2','CHI1-CHI2', id='CHI1-CHI2')
                     res.html.left( 'img', src = 'CHI1_CHI2', alt="" )
@@ -1692,21 +1709,18 @@ def populateHtmlMolecules( project ):
                         d = res[dihed]
 
                         # summarize the results
-                        phrase = \
-                            '%-6s: average: %7.1f   cv: %4.3f  ||  outliers:' +\
-                            '%2d (models %s)'
-                        lenOutliers = -999 # JFD adds: Indicating None
-                        outlierList = -999
+                        lenOutliers = '.' # JFD adds: Indicating None
+                        outlierList = '.'
                         if d.outliers:
                             NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
-                            lenOutliers = len(d.outliers)
+                            lenOutliers = `len(d.outliers)`
                             outlierList = d.outliers.zap(0)
-                        summary = sprintf( phrase, dihed, d.cav, d.cv,
-                                           lenOutliers, outlierList
+                        summary = '%-2s %3d %-6s: average: %5d   cv: %6.4f  ||  outliers: %3s (models %s)' % (
+                            chainId, resNum, dihed, d.cav, d.cv, lenOutliers, outlierList
                                          )
                         fprintf( fp, '%s\n', summary )
-                        print summary
-
+#                        print summary
+                            
                         #generate a dihedral histogram plot
                         plot = makeDihedralHistogramPlot( project, res, dihed )
                         tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormat)
@@ -1731,10 +1745,13 @@ def populateHtmlMolecules( project ):
             #end for residue
         #end for chain
 
-        # Procheck
+        printMessage("\n") # Done printing progress.
+        
+        printDebug("linking to Procheck plots")
         molecule.html.main('h1','Procheck_NMR')
         molecule.html.main('ul', closeTag=False)
-        for p,d in [
+        #TODO correct the names of these plots and/or run procheck using a parameter file it reads for determining this
+        for p,d in [ 
              ('_01.ps','Ramanchandran (all models)'),
              ('_02.ps','Ramanchandran (residue types)'),
              ('_03.ps','chi1-chi2'),
