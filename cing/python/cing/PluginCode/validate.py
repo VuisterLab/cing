@@ -68,6 +68,7 @@ from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.Libs.NTutils import printWarning
 import cing
 import math
 import os
@@ -256,7 +257,8 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
                 # rmsd over backbone atms for this residue
                 if atm.hasProperties('backbone','notproton'):
                     if (d==None):
-                        NTerror('Error calculateRmsd: expected coordinates for atom %s\n', atm)
+                        #TODO: combine these messages to just a couple of lines.
+                        NTerror('Error calculateRmsd: expected coordinates for atom %s\n', atm) 
                     else:
                         res.rmsd.backbone[num] += d
                         res.rmsd.backboneCount += 1
@@ -266,6 +268,7 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
                 # rmsd over all atms for this residue
                 if atm.hasProperties('notproton'):
                     if (d==None):
+                        #TODO: combine these messages to just a couple of lines.
                         NTerror('Error calculateRmsd: expected coordinates for atom %s\n', atm)
                     else:
                         res.rmsd.heavyAtoms[num] += d
@@ -1712,7 +1715,7 @@ def populateHtmlMolecules( project ):
                         lenOutliers = '.' # JFD adds: Indicating None
                         outlierList = '.'
                         if d.outliers:
-                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
+#                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
                             lenOutliers = `len(d.outliers)`
                             outlierList = d.outliers.zap(0)
                         summary = '%-2s %3d %-6s: average: %5d   cv: %6.4f  ||  outliers: %3s (models %s)' % (
@@ -1750,7 +1753,7 @@ def populateHtmlMolecules( project ):
         printDebug("linking to Procheck plots")
         molecule.html.main('h1','Procheck_NMR')
         molecule.html.main('ul', closeTag=False)
-        #TODO correct the names of these plots and/or run procheck using a parameter file it reads for determining this
+        anyProcheckPlotsGenerated = False
         for p,d in [ 
              ('_01.ps','Ramanchandran (all models)'),
              ('_02.ps','Ramanchandran (residue types)'),
@@ -1760,16 +1763,32 @@ def populateHtmlMolecules( project ):
              ('_06.ps','Ramanchandran (per residue)'),
              ('_07.ps','Ensemble chi1-chi2'),
              ('_08.ps','Residue properties'),
-             ('_09.ps','Equivalent resolution')
+             ('_09.ps','Equivalent resolution'),
+             ('_10.ps','Model-by-model secondary structures')
+#             ('_01_ramachand.ps','Ramanchandran (all models)'),
+#             ('_02_allramach.ps','Ramanchandran (residue types)'),
+#             ('_03_chi1_chi2.ps','chi1-chi2'),
+#             ('_04_ch1distrb.ps','chi1'),
+#             ('_05_ch2distrb.ps','chi2'),
+#             ('_06_ensramach.ps','Ramanchandran (per residue)'),
+#             ('_07_ensch1ch2.ps','Ensemble chi1-chi2'),
+#             ('_08_residprop.ps','Residue properties'),
+#             ('_09_equivresl.ps','Equivalent resolution'),
+#             ('_10_modelsecs.ps','Model-by-model secondary structures')
             ]:
-            molecule.html.main('li', closeTag=False)
             procheckLink = os.path.join('..',
                         project.moleculeDirectories.procheck, molecule.name + p)
-
+            if not os.path.exists( procheckLink ):
+                printWarning("Expected procheck plot: " + procheckLink)
+#                continue
+            anyProcheckPlotsGenerated = True
+            molecule.html.main('li', closeTag=False)
             molecule.html.main('a', d, href = procheckLink )
             molecule.html.main('li', openTag=False)
         #end for
         molecule.html.main('ul', openTag=False)
+        if not anyProcheckPlotsGenerated:
+            molecule.html.main('h2', "No procheck plots found at all")
 
     #end for molecule
     return True

@@ -54,10 +54,13 @@ class Molecule( NTtree ):
 -------------------------------------------------------------------------------
 Molecule class: defines the holder for molecule items.
 
-Just noting the mapping between this data model and the NMR-STAR 
-Molecule -> Molecular system
-Chain    -> Assembly entity
-Residue  -> Chemical component
+Mapping between the CING data model and NMR-STAR:
+
+CING     | NMR-STAR
+-------------------------------- 
+Molecule | Molecular system
+Chain    | Assembly entity
+Residue  | Chemical component
 
 There are things that will be difficult to map from one to the other.
 A Zinc ion will usually be part of the same chain in CING whereas it will be
@@ -142,22 +145,19 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.chainCount   = 0
         self.residueCount = 0
         self.atomCount    = 0
-        
         self.resonanceCount = 0
-
         self.modelCount   = 0
-        
         self.xeasy        = None # reference to xeasy class, used in parsing
-
         self.saveXML('chainCount','residueCount','atomCount')
 
-        if (verbose>0):
+        if verbose:
             NTmessage("%s\n", self.format() )       
         #end if
     #end def
     
     def __str__(self):
-        return sprintf('<Molecule "%s" (C:%d,R:%d,A:%d,M:%d)>', self.name,self.chainCount,self.residueCount,self.atomCount,self.modelCount)
+        return sprintf('<Molecule "%s" (C:%d,R:%d,A:%d,M:%d)>', 
+            self.name,self.chainCount,self.residueCount,self.atomCount,self.modelCount)
     #end def
     
     def __repr__(self):
@@ -172,7 +172,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
            Return Chain instance or None upon error
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
-        if (name==None):
+        if name==None:
             chainNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
                           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
                          ]
@@ -207,27 +207,44 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def decodeNameTuple( self, nameTuple ):
         """Decode a (convention, chainName, resNum, atomName) tuple
            generated with the nameTuple methos of Chain, Residue, or Atom Classes.
-           Return an Chain, Residue or Atom instance or None on error.
+           Return a Molecule, Chain, Residue or Atom instance on success or 
+           None on error.
+           
+           If no chain is given then the whole molecule is returned.
+           If no residue is given then the whole chain is returned.
+           ..etc..
         """
         convention, chainName, resNum, atomName = nameTuple
         
-        if (chainName == None): return self
-        if (not chainName in self): return None        
+        if chainName == None: 
+            return self
+        # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
+#        if not chainName in self: 
+        if not self.has_key(chainName): 
+            return None
+           
         chain = self[chainName]
         
-        if (resNum == None): return chain
-        if (not resNum in chain): return None
+        if resNum == None: 
+            return chain
+        
+        if not chain.has_key(resNum): 
+            return None
         res = chain[resNum]
         
-        if (atomName == None): return res        
+        if atomName == None: 
+            return res
+          
         an = translateAtomName( convention, res.translate(convention), atomName, INTERNAL )
 #        if (not an or (an not in res)): return None
         if not an:
-            printError("Failed to translateAtomName")
+            printError("in Molecule.decodeNameTuple failed to translateAtomName")
             return None
-        if  an not in res: 
-            printError("Atom not in residue")
+        
+        if not res.has_key(an): 
+            printError("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
             return None
+        
         return res[an]
     #end def
 

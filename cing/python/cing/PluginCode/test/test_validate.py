@@ -11,13 +11,13 @@ from cing.core.classes import Project
 from shutil import copytree
 from shutil import rmtree
 from unittest import TestCase
-from cing.Libs.NTutils import find
+from cing.Libs.NTutils import findFiles
 import os
 import unittest
 
 class AllChecks(TestCase):
-
-    def ttttestrun(self): # disabled by extra t's at the beginning of the function. TODO: enable it again.
+    def testrun(self): # Can be disabled by extra t's at the beginning of the function name so unittest
+        # doesn't pick it up anymore.
         """validate run check taking too long at 100 s. TODO: reduce size of project."""
 #        SETUP FIRST
         if os.chdir(cingDirTestsTmp):
@@ -36,17 +36,17 @@ class AllChecks(TestCase):
                 return True
         copytree(cingProjectFilePath, cingProjectFolder)
         # Remove the CVS subdirs as even the temp path is under CVS scrutiny and we don't want to upset it.
-        cvsFolders = find("CVS", cingProjectFolder)
+        cvsFolders = findFiles("CVS", cingProjectFolder)
         if cvsFolders:
             printMessage("Removing the CVS folders") 
-        for name in cvsFolders:
-            rmtree(name, True)
+            for name in cvsFolders:
+                rmtree(name, True)
 #        sys.exit(1)
         project = Project.open( cingProjectEntry, status='old' )
         print project.cingPaths.format()
         project.validate()
 
-    def testrunPDB(self):
+    def ttttestrunPDB(self):
         """validate run based off pdb file"""
         entryId = "2hgh" # Small much studied PDB NMR entry 
         pdbFileName = entryId+"_small.pdb"

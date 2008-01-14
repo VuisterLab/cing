@@ -38,6 +38,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  xplorPath%(equals)s%(xplorPath)s
 %(export)s  profitPath%(equals)s%(profitPath)s
 %(export)s  procheckPath%(equals)s%(procheckPath)s
+%(export)s  aqpcPath%(equals)s%(aqpcPath)s
 %(export)s  whatifPath%(equals)s%(whatifPath)s
 #############################################
 # No changes needed below this line.
@@ -105,6 +106,7 @@ def _writeCingShellFile(isTcsh):
         parametersDict['close_if'] = 'fi'
         sourceCommand = '.' 
         cname = 'cing.sh'
+#    printDebug("pars:" + `parametersDict`)
     text = CING_SHELL_TEMPLATE % parametersDict
     if isTcsh:
         text += "\nrehash\n"
@@ -171,6 +173,21 @@ if __name__ == '__main__':
         printWarning("Couldn't find 'procheck_nmr'")
         parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"        
     
+#    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
+    if os.environ.has_key("aquaroot"):
+        aqpcPath = os.path.join( os.environ["aquaroot"], "scripts", "aqpc")
+        if not os.path.exists(aqpcPath):
+            printWarning("Found the system variable aquaroot but the script below wasn't found")
+            printWarning( aqpcPath )
+            printWarning("Couldn't find 'aqua'")
+            parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"        
+        else:
+            printMessage("Found 'aqua'")
+            parametersDict['aqpcPath'] = aqpcPath
+    else:
+        printWarning("Couldn't find 'aqua'")
+        parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"        
+    
     whatifPath,err  = NTgetoutput('which DO_WHATIF.COM')
     if not whatifPath:
         printWarning("Couldn't find 'what if'")   
@@ -193,7 +210,7 @@ if __name__ == '__main__':
         printWarning("Wattos is not configured.'")   
         printMessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
-        printMessage("Found Wattos")   
+        printMessage("Found 'wattos'")   
             
     
 #    userShell = os.environ.get('SHELL')

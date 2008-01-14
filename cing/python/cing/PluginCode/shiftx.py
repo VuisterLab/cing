@@ -8,7 +8,6 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
 from cing.core.constants import NOSHIFT

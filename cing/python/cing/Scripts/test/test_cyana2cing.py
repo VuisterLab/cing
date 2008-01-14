@@ -44,6 +44,7 @@ class AllChecks(TestCase):
         if not project:
             printWarning("No project generated. Aborting further execution.")
             sys.exit(0)
+        project.save()
 
 if __name__ == "__main__":
     unittest.main()

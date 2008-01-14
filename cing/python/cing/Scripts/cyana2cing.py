@@ -8,7 +8,7 @@
 
   Uses the CING API to convert cyana run to cing framework.
   Optionally export on-the-fly to a xplor refine setup.
-
+ 
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import OptionParser
