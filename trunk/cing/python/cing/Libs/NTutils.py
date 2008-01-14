@@ -3,7 +3,6 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-import string
 import array
 import inspect
 import math
@@ -897,13 +896,15 @@ class odict(dict):
         return (key, val)
 
     def setdefault(self, key, failobj = None):
-        if key not in self._keys: self._keys.append(key)
+        if key not in self._keys: 
+            self._keys.append(key)
         return dict.setdefault(self, key, failobj)
 
     def update(self, dict):
         dict.update(self, dict)
         for key in dict.keys():
-            if key not in self._keys: self._keys.append(key)
+            if key not in self._keys: 
+                self._keys.append(key)
                 
     def append( self, *items):
         for key, value in items:

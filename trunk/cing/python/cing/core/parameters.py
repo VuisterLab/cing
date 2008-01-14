@@ -26,6 +26,7 @@ directories = NTdict(
     sparky     = 'Export/Sparky',
     PDB        = 'Export/PDB',
     xplor      = 'Export/Xplor',
+    aqua       = 'Export/Aqua',
 
     queen      = 'Queen',
 
@@ -70,6 +71,7 @@ cingPaths = NTdict(
     xplor        = os.getenv('xplorPath'),
     profit       = os.getenv('profitPath'),
     procheck_nmr = os.getenv('procheckPath'),
+    aqpc         = os.getenv('aqpcPath'),
     whatif       = os.getenv('whatifPath'),
 )
 

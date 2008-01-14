@@ -1,33 +1,38 @@
  HOWTO:
 - check if your installation is ok. First setup as described in REAME.txt in this directory.
-    python $cingRoot/testBiggles.py
-- check if you got all external python modules:
-    python $cingRoot/testExternalImports.py
-- run procheck
-    cing.py -n 1tgq --ipython
-    project.procheck
+    cing --test
+- run procheck on a small example.
+    cing -n 2hgh_small --initPDB $CINGROOT/Tests/data/2hgh_small.pdb --ipython
+    project.procheck()
+- convert some cyana data to cing:
+    python -u $CINGROOT/python/cing/Scripts/cyana2cing.py --pdbFile $CINGROOT/Tests/data/2hgh_small
+    
 - print the first model's chi 1 as reported by procheck of residue 77 in chain A.
     format project.molecule.A.GLU77.procheck.CHI1[0]
     Not very useful as it's already part of cing itself; just like PHI, etc.
-    format project.molecule.A.GLU77.CHI1[0]
+    format project.molecule.A.GLU77.CHI1[0] or:
+    formatall( project.molecule.A.residues[0].CHI1 )
     more useful might be:
     format project.molecule.A.GLU77.procheck.secStruct
+    
     NB. 
     format object
     is equivalent with 
     print object.format()
-    format is a method that most of cing's objects have and that give more user friendly/human
-    readable output (sometimes over multiple lines)
+    format is a method that most of cing's objects have and that give more user friendly
+    output (sometimes over multiple lines)
     
 - print list of parameters:- print list of parameters:
+    formatall( project.plotparameters.PHI )
+    formatall( project.molecule.A.residues[0].C.coordinates )
     formatall( project.plotparameters.PHI )
     formatall( project.molecule.A.residues[0].procheck )
     formatall( project.molecule.A.VAL171.C )
 
-    formatall( project.plotparameters.PHI )
-    formatall( project.molecule.A.residues[0].procheck )
-    formatall( project.molecule.A.VAL171.C )
-    
+FOR PROGRAMMERS:
+- reload a plugin:
+    cing.core.importPlugin.importPlugin("procheck") or shorthand:
+    importPlugin("procheck") if defined.
     
 NEW FEATURE REQUESTS:
 - Where are the restraints info tables/visualizations?
