@@ -1,9 +1,9 @@
 """
-Adds methods: 
+Adds methods:
     Atom.export2aqua()
     Project.export2aqua()
-    
-Unit testing is done thru procheck. 
+
+Unit testing is done thru procheck.
 """
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import printError
@@ -15,16 +15,17 @@ import string
 import time
 #-----------------------------------------------------------------------------
 def exportAtom2aqua( atom ):
-    """returns string in aqua format from the manual:
-     NOEULD  [CHAIN id]  residue_name  residue_number  [INSERT code]  atom_name
-          ...[CHAIN id]  residue_name  residue_number  [INSERT code]  atom_name
-          ...bound_1  [ bound_2 ]
-    
+    """
+        returns string in aqua format from the manual:
+        NOEULD  [CHAIN id]  residue_name  residue_number  [INSERT code]  atom_name
+        ...[CHAIN id]  residue_name  residue_number  [INSERT code]  atom_name
+        ...bound_1  [ bound_2 ]
+
     """
     residue = atom.residue
     chain = residue.chain
     return 'CHAIN %-3s %-4s %4d %-5s' % (
-                      chain.name, 
+                      chain.name,
                       residue.resName,
                       residue.resNum,
                       atom.translate(IUPAC))
@@ -33,11 +34,12 @@ def exportAtom2aqua( atom ):
 Atom.export2aqua = exportAtom2aqua
 #-----------------------------------------------------------------------------
 def export2aqua( project, tmp=None ):
-    """export distanceRestraintLists to aqua
-       export Molecules to PDB files in aqua format
-       returns None on success and True on failure.
-    """    
-    
+    """
+        export distanceRestraintLists to aqua
+        export Molecules to PDB files in aqua format
+        returns None on success and True on failure.
+    """
+
     drLoLoL = [ project.distances, project.dihedrals ]
     typeId = -1
     extensionList = [ 'noe', 'tor' ]
@@ -45,7 +47,7 @@ def export2aqua( project, tmp=None ):
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
-            printMessage("No DR lists to export")    
+            printMessage("No DR lists to export")
         count = 0
         for drl in drLoL:
             count += len(drl)
@@ -53,11 +55,11 @@ def export2aqua( project, tmp=None ):
             printWarning("Skipping export of empty restraint list")
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
-        exportPath = project.directories.aqua        
+        exportPath = project.directories.aqua
         path = project.path( exportPath, project.name +'.' + extensionList[typeId] )
         printMessage("Writing to: " + path )
         fp = open( path, 'w' )
-        if not fp: 
+        if not fp:
             printError('Unable to open: ' + path )
             return
         countActual = 0
@@ -72,9 +74,9 @@ def export2aqua( project, tmp=None ):
                     result = 'NOEUPLO %s %s  %8.3f  %8.3f' % (
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
-                                 dr.upper, 
+                                 dr.upper,
                                  dr.lower )
-                     
+
                     if len(dr.atomPairs) > 1:
                         if warningCount == warningCountMax+1:
                             printWarning("And so on")
@@ -89,7 +91,7 @@ def export2aqua( project, tmp=None ):
                     # Dihderal
                     """Return string with restraint in Aqua format
                         ANGLE  [CHAIN id]  residue_name  residue_number  [INSERT code]
-                          ...angle_name  bound_high  bound_low
+                        ...angle_name  bound_high  bound_low
                     """
                     # (<Residue>, angleName, <AngleDef>) tuple
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()
@@ -100,18 +102,18 @@ def export2aqua( project, tmp=None ):
                             printWarning("Skipping dihedral angle restraint because angle name could not be retrieved.")
                         warningCountAngle += 1
                         return None
-                    
+
                     atom = dr.atoms[1] # this is true except for Omega? TODO correct!
                     if angleName == "OMEGA":
                         atom = dr.atoms[2]
                     residue = atom.residue
                     chain = residue.chain
                     result = 'ANGLE CHAIN %-3s %-4s %4d %-10s %8.2f %8.2f' % (
-                                      chain.name, 
+                                      chain.name,
                                       residue.resName,
                                       residue.resNum,
                                       angleName,
-                                      dr.lower, 
+                                      dr.lower,
                                       dr.upper)
                 if result:
                     countActual += 1
@@ -124,7 +126,7 @@ def export2aqua( project, tmp=None ):
             printWarning("Dihedral angle restraint not exported                for Aqua for count: ["+`warningCountAngle`+"]")
         if countActual:
             # Important to let the join do this as one for optimalization.
-            restraintListTextCombined = string.join( restraintListText, '\n')                               
+            restraintListTextCombined = string.join( restraintListText, '\n')
             fprintf( fp, 'Restraint list generated by CING for Aqua on: %s\n', time.asctime() )
             fprintf( fp, 'count %d type aqua\n', count )
             fprintf( fp, restraintListTextCombined )
