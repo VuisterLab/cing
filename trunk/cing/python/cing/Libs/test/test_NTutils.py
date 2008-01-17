@@ -17,8 +17,10 @@ class AllChecks(TestCase):
         self.failIf( os.chdir(cingDirTestsData), msg=
             "Failed to change to test directory for data: "+cingDirTestsData)
         namepattern, startdir = "CVS", cingDirTestsData
-        for name in findFiles(namepattern, startdir):
-            print name
+        nameList = findFiles(namepattern, startdir)
+        self.assertTrue( len(nameList) > 10 ) 
+#        for name in nameList:
+#            print name
             
 if __name__ == "__main__":
     unittest.main()

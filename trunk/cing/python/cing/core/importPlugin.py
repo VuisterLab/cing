@@ -2,11 +2,11 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import printError
 from cing.Libs.NTutils import printMessage
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from cing.Libs.NTutils import printException
 import glob
 import os
 
@@ -26,8 +26,8 @@ def importPlugin( pluginName ):
             plugin = plugins[pluginName]
 #            printDebug("reloading same module just to see it change")
             reload( plugin.module )
-        except:
-            printError('A reload failed for ' + pluginName)
+        except Exception:
+            printException('A reload failed for ' + pluginName)
             return None
 #    module = __import__( moduleName, globals(), locals(), [] )
 #    printMessage('==> Attempting import plugin ' + pluginName )
