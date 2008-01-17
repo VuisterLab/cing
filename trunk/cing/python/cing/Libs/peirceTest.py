@@ -4,20 +4,21 @@ from cing.Libs.NTutils import printCodeError
 import math
 
 
-"""Perform a Peirce test for outliers.
-   2 < len( valueList ) <= 60
-       
-   Based upon:
-       Ross, S.M., "Peirce's criterion for the elimination of suspect 
-       experimental data" J. Engineering Technology, 2003
-   
-   AWSS: since it's limited to 60 elements, now valueList breaks down in 
-         lists of 60 elements (if less, no problem), and if there's remainder
-         from len(valueList) % 60, then a list with the last 60 elements is
-         appended to listOfnewValues. So a pierceTest is done over each list
-         of 60 elements and newValues and outliers list are updated 
-         accordingly.
-         
+"""
+    Perform a Peirce test for outliers.
+    2 < len( valueList ) <= 60
+
+    Based upon:
+        Ross, S.M., "Peirce's criterion for the elimination of suspect
+        experimental data" J. Engineering Technology, 2003
+
+    AWSS: since it's limited to 60 elements, now valueList breaks down in
+        lists of 60 elements (if less, no problem), and if there's remainder
+        from len(valueList) % 60, then a list with the last 60 elements is
+        appended to listOfnewValues. So a pierceTest is done over each list
+        of 60 elements and newValues and outliers list are updated
+        accordingly.
+
     JFD: I think the previous workaround for the lack of Peirce data beyond
         the 60th element should be improved. In the previous workaround it
         could happen that a small sublist gets analyzed and an
@@ -25,8 +26,8 @@ import math
         was considered in the scope of the full list.
         Since the shape of the items are so monotomous a simple extrapolation
         was implemented.
-        
-        Let the "Number of doubtful observations" be called y and the number of 
+
+        Let the "Number of doubtful observations" be called y and the number of
         total observations is called x.
 
         A- R[x][y] is approximately 1 sigma at the right hand side of the table.
@@ -34,18 +35,18 @@ import math
             with delta(x) defined such that R[x][x/2]=1.
             Only extend the table on the right to have x/2 number of columns.
             x/2 is less wide than the first rows suggest. Extending the table
-            only starts at row 20.                 
+            only starts at row 20.
         B- R[x][y] can be estimated to be R[60][y] for x over 60. This results in
-            only slightly fewer outliers to be identified than when the serie 
+            only slightly fewer outliers to be identified than when the serie
             would be correctly expanded.
-            E.g. when x = 10E6 R[10E6][1] is equated to R[60][1] (2.663)        
+            E.g. when x = 10E6 R[10E6][1] is equated to R[60][1] (2.663)
         C- For calculating the missing values such as R[10E6][10E2] the above
             is combined.
-            
+
         Obviously, also this workaround might report less outliers but it will
         report more than the first workaround as higher R's are used.
 """
-class Peirce():
+class Peirce:
     def __init__(self):
         #
         # PEIRCE'S CRITERION TABLE, R; ONE MEASURED QUANTITY
@@ -72,7 +73,7 @@ class Peirce():
         [2.076, 1.775, 1.889, 1.453, 1.344, 1.249, 1.164, 1.078]         , #15
         [2.106, 1.807, 1.622, 1.486, 1.378, 1.285, 1.202, 1.122, 1.039]  , #16
         [2.134, 1.836, 1.652, 1.517, 1.409, 1.318, 1.237, 1.161, 1.084]  ,
-        [2.161, 1.364, 1.680, 1.546, 1.438, 1.348, 1.268, 1.195, 1.123]  , #18 
+        [2.161, 1.364, 1.680, 1.546, 1.438, 1.348, 1.268, 1.195, 1.123]  , #18
         [2.185, 1.890, 1.707, 1.573, 1.466, 1.377, 1.298, 1.228, 1.158]  ,
         [2.209, 1.914, 1.732, 1.599, 1.492, 1.404, 1.326, 1.255, 1.190]  , #20
         [2.230, 1.938, 1.756, 1.623, 1.517, 1.429, 1.352, 1.282, 1.218]  ,
@@ -117,57 +118,57 @@ class Peirce():
         [2.663, 2.401, 2.237, 2.116, 2.019, 1.939, 1.869, 1.808, 1.753]  ,
         ]
         self.peirceLength = len(self.peirce)-1 # 60
-        
+
     def _getR(self,x,y):
         'May not be called by x<3, returns None if y >= x-2.'
         if x < 3:
             return None
-        
+
         # Simple things first; does it fall within the paper's table.
         row = x
         if x>self.peirceLength:
             row = self.peirceLength
         if y<=len(self.peirce[row]):
             return self.peirce[row][y-1]
-        
+
         if row < 20: # dont extend the width before this.
             return self.peirce[row][-1]
-        
+
         # At this point the row,y combination falls to the right of the table
         # row>=20 and we need delta to get a R value close to 1.
         if y >= x/2:
             printCodeError("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
             return None
-        
-        lastValue = self.peirce[row][-1] 
+
+        lastValue = self.peirce[row][-1]
         maxWidth = x/2
         delta = (lastValue - 1.)/(maxWidth-9) # float semantics needs to be enforced.
         R = lastValue - (y-9)*delta
 #        printDebug("delta: "+`delta`)
 #        printDebug("R    : "+`R`)
         return R
-            
-        
-        
-            
-    def peirceTestOld( self, valueList ):    
+
+
+
+
+    def peirceTestOld( self, valueList ):
         l = len( valueList )
-        
+
         if l<3: return (None, None)
-            
+
         newValues = NTlist()
         outliers  = NTlist()
-        
+
         i = 0
         for v in valueList:
             newValues.append( [i,v] )
             i += 1
         #end for
-        
+
         ngroups, reminder = l / 60, l % 60
-        
+
         listOfnewValues = []
-        
+
         if ngroups == 0:
             listOfnewValues = [newValues]
         else:
@@ -175,10 +176,10 @@ class Peirce():
                 listOfnewValues.append(newValues[ngroup*60:(ngroup+1)*60])
             if reminder:
                 listOfnewValues.append(newValues[-60:])
-        
+
         #newValues.sort() #Why sort?
         #newValues.average(byItem=1)
-        
+
         for newValuesList in listOfnewValues:
 #            printDebug(newValuesList)
             newValuesList.average(byItem=1)
@@ -204,11 +205,11 @@ class Peirce():
                         #end try
                         nOutliers += 1
                         n += 1
-                    #end if        
+                    #end if
                 #end for
                 notDone = (n>0)
             #end while
-        
+
         newValues.average(byItem=1)
         return (newValues,outliers)
     #end def
@@ -220,20 +221,20 @@ class Peirce():
             Returns True on error.
         """
         x = len( valueList )
-        
+
         if x<3:
             printDebug("Peirce test called with less than 3 values.")
             printDebug("For less than 3 values no outliers can be identified by this mehtodology")
             return (None, None)
-                
+
         newValues = NTlist()
         outliers  = NTlist()
-        
+
         i = 0
         for v in valueList:
             newValues.append( [i,v] )
             i += 1
-            
+
         y = len(outliers) # Number of outliers is zero to start with
         newValues.average(byItem=1)
         sd = newValues.sd # not to be changed until the end.
@@ -243,7 +244,7 @@ class Peirce():
 
         done = False # At least give it a try.
         while not done:
-            done = True # Quit if no outliers were identified.            
+            done = True # Quit if no outliers were identified.
             R = self._getR(x, y)
             if not R:
                 printCodeError("Failed to get a Peirce constant R; giving up")
@@ -251,7 +252,7 @@ class Peirce():
             maxDeviation = R * sd
 #            printDebug("R : " + `R`)
 #            printDebug("md: " + `maxDeviation`)
-          
+
             c = len(newValues)-1 # Start at the end of the list because deletions in lists are easiest (optimal) that way.
             while c>=0:
                 item = newValues[c]
