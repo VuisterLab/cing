@@ -7,6 +7,7 @@ python test_All.py
 def testAll():    
     modList = ( 
                "cing.Libs.test.test_NTutils",
+               "cing.Libs.test.test_PeirceTest",
                )
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None

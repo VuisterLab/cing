@@ -173,11 +173,12 @@ class ResidueDef( NTtree ):
     
     def atomsWithProperties(self, *properties ):
         """
-        Return a NTlist instance with atomDefs that have propeties
+        Return a NTlist instance with atomDefs that have All properties
         """  
         result = NTlist()
         
-        if len(properties) == 0: return result
+        if not len(properties):
+            return result
         for atm in self.subNodes(depth=1):
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -188,9 +189,10 @@ class ResidueDef( NTtree ):
                     
     def hasProperties(self, *properties):
         """
-        Returns True if ResidueDef has properties, False otherwise
+        Returns True if ResidueDef has All properties, False otherwise
         """
-        if len(properties) == 0: return False
+        if not len(properties): 
+            return False
         
         for p in properties:
             if not p in self.properties:

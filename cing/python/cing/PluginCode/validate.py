@@ -45,7 +45,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTvector
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import list2asci
@@ -68,7 +67,6 @@ from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs.NTutils import printWarning
 import cing
 import math
 import os
@@ -227,6 +225,8 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
 
     num = 0 # number of evaluated models (does not have to coincinde with model
             # since we may supply an external list
+    shownWarningCount1 = 0
+#            shownWarningCount2 = 0
     for model in selectedModels:
 
         if verbose:
@@ -256,9 +256,12 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
 
                 # rmsd over backbone atms for this residue
                 if atm.hasProperties('backbone','notproton'):
-                    if (d==None):
-                        #TODO: combine these messages to just a couple of lines.
-                        NTerror('Error calculateRmsd: expected coordinates for atom %s\n', atm) 
+                    if d==None:
+                        if shownWarningCount1 < 10:
+                            NTerror('Error calculateRmsd: expected coordinates1 for atom %s\n', atm)
+                        elif shownWarningCount1 == 10:
+                            NTerror('and so on\n')
+                        shownWarningCount1 += 1
                     else:
                         res.rmsd.backbone[num] += d
                         res.rmsd.backboneCount += 1
@@ -267,9 +270,13 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
 
                 # rmsd over all atms for this residue
                 if atm.hasProperties('notproton'):
-                    if (d==None):
-                        #TODO: combine these messages to just a couple of lines.
-                        NTerror('Error calculateRmsd: expected coordinates for atom %s\n', atm)
+                    if d==None:
+#                        shownWarningCount2 += 1
+#                        if shownWarningCount2 < 10:
+#                            NTerror('Error calculateRmsd: expected coordinates2 for atom %s\n', atm)
+#                        elif shownWarningCount2 == 10:
+#                            NTerror('and so on\n')
+                        pass
                     else:
                         res.rmsd.heavyAtoms[num] += d
                         res.rmsd.heavyAtomsCount += 1
@@ -297,6 +304,10 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
         # Increment the evaluated number of models
         num += 1
     #end for
+    if shownWarningCount1 > 10:
+        NTerror('Error calculateRmsd: expected coordinates1 for '+`shownWarningCount1`+' atoms\n')
+#            if shownWarningCount2 > 10:
+#                NTerror('Error calculateRmsd: expected coordinates2 for '+`shownWarningCount2`+' atoms')
 
     # get the closest to mean models and averages
     for res in project.molecule.allResidues():
@@ -954,7 +965,8 @@ def validateDihedrals( self, verbose=True ):
 
                 d.good,d.outliers = peirceTest( d )
 
-                if not d.good: continue
+                if not d.good: 
+                    continue
 
                 d.limit( plotpars.min, plotpars.max ).cAverage(min=plotpars.min,
                                                                max=plotpars.max)
@@ -1675,6 +1687,8 @@ def populateHtmlMolecules( project ):
             printMessage("\nGenerating dihedral angle plots for chain: " + chainId)
             printedDots = 0            
             for res in chain.allResidues():
+#                write without extra space
+#                sys.stdout.write('.')
                 print '.', # print progress for each residue a char.
                 printedDots += 1
                 resNum = res.resNum
@@ -1754,32 +1768,36 @@ def populateHtmlMolecules( project ):
         molecule.html.main('h1','Procheck_NMR')
         molecule.html.main('ul', closeTag=False)
         anyProcheckPlotsGenerated = False
+        i = 0
         for p,d in [ 
-             ('_01.ps','Ramanchandran (all models)'),
-             ('_02.ps','Ramanchandran (residue types)'),
-             ('_03.ps','chi1-chi2'),
-             ('_04.ps','chi1'),
-             ('_05.ps','chi2'),
-             ('_06.ps','Ramanchandran (per residue)'),
-             ('_07.ps','Ensemble chi1-chi2'),
-             ('_08.ps','Residue properties'),
-             ('_09.ps','Equivalent resolution'),
-             ('_10.ps','Model-by-model secondary structures')
-#             ('_01_ramachand.ps','Ramanchandran (all models)'),
-#             ('_02_allramach.ps','Ramanchandran (residue types)'),
-#             ('_03_chi1_chi2.ps','chi1-chi2'),
-#             ('_04_ch1distrb.ps','chi1'),
-#             ('_05_ch2distrb.ps','chi2'),
-#             ('_06_ensramach.ps','Ramanchandran (per residue)'),
-#             ('_07_ensch1ch2.ps','Ensemble chi1-chi2'),
-#             ('_08_residprop.ps','Residue properties'),
-#             ('_09_equivresl.ps','Equivalent resolution'),
-#             ('_10_modelsecs.ps','Model-by-model secondary structures')
+             ('_01_ramachand.ps','Ramanchandran (all models)'),
+             ('_02_allramach.ps','Ramanchandran (residue types)'),
+             ('_03_chi1_chi2.ps','chi1-chi2'),
+             ('_04_ch1distrb.ps','chi1'),
+             ('_05_ch2distrb.ps','chi2'),
+             ('_06_ensramach.ps','Ramanchandran (per residue)'),
+             ('_07_ensch1ch2.ps','Ensemble chi1-chi2'),
+             ('_08_residprop.ps','Residue properties'),
+             ('_09_equivresl.ps','Equivalent resolution'),
+             ('_10_modelsecs.ps','Model-by-model secondary structures'),
+             ('_11_rstraints.ps','Distance restraints plot'),
+             ('_12_restdiffs.ps','Restraint differences plot'),
+             ('_13_restrnsum.ps','Numbers of distance restraints'),
+             ('_14_resdifsum.ps','Actual distance - restraint summary'),
+             ('_15_resvifreq.ps','Violation frequency summary'),
+             ('_16_restatist.ps','Restraint statistics'),
+             ('_17_restrviol.ps','Residue-by-residue restraint violations'),
+             ('_18_modelcomp.ps','Model-by-model violations')
             ]:
+            i += 1
             procheckLink = os.path.join('..',
                         project.moleculeDirectories.procheck, molecule.name + p)
-            if not os.path.exists( procheckLink ):
-                printWarning("Expected procheck plot: " + procheckLink)
+            procheckLinkReal = os.path.join( project.rootPath( project.name),
+                        project.moleculeDirectories.procheck, molecule.name + p)
+            printDebug('procheck real path: ' + procheckLinkReal)
+            if not os.path.exists( procheckLinkReal ):
+                if i < 11:
+                    printError("Failed to find regular procheck plot: " + procheckLink)
 #                continue
             anyProcheckPlotsGenerated = True
             molecule.html.main('li', closeTag=False)
@@ -1973,6 +1991,7 @@ methods  = [(validateDihedrals, None),
             (checkForSaltbridges, None),
             (validateRestraints, None),
             (setupValidation, None),
+            (populateHtmlMolecules, None), # for debugging.
             (calculateRmsd, None),
             (summary, None),
             (makeDihedralHistogramPlot, None),

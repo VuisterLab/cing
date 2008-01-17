@@ -16,6 +16,7 @@ Residue
     procheck: NTdict instance with procheck values for this residue 
 
 """
+from cing import cingPythonCingDir
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdict
@@ -23,15 +24,18 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import printCodeError
+from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printMessage
+from cing.Libs.NTutils import printWarning
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printDebug
 import os
 
-def procheckString2float( string ):
+def procheckString2float(string):
     """Convert a string to float, return None in case of value of 999.90"""
-    result = float( string )
+    result = float(string)
     if result > 999.8 and result < 999.99:
         return None
     return result
@@ -127,61 +131,62 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                           # Keep rucksack from filling up over the years.
     #   field       (startChar, endChar, conversionFunction, store)
 #        line      = (  0,  4, int, False ), # unique residue id over all models in NMR ensemble. No need to capture.
-        chain     = (  0,  1, str, False ),
-        resNum    = (  1,  5, int, False ),
-        resName   = (  6,  9, str, False ),
+        chain     = (0, 1, str, False), 
+        resNum    = (1, 5, int, False), 
+        resName   = (6, 9, str, False), 
         # ignore 6 cv values and 2 deviation values.
-        gfPHIPSI  = ( 74, 80, procheckString2float, True ),
-        gfCHI12   = ( 81, 87, procheckString2float, True ),
-        gfCHI1    = ( 88, 94, procheckString2float, True ),
-        gf        = ( 95,101, procheckString2float, True ) # note it's zero for nucleic acids.
+        gfPHIPSI  = (74, 80, procheckString2float, True), 
+        gfCHI12   = (81, 87, procheckString2float, True), 
+        gfCHI1    = (88, 94, procheckString2float, True), 
+        gf        = (95, 101, procheckString2float, True) # note it's zero for nucleic acids.
     )
     procheckDefs = NTdict(
                           # Keep rucksack from filling up over the years.
     #   field       (startChar, endChar, conversionFunction, store)
 #        line      = (  0,  4, int, False ), # unique residue id over all models in NMR ensemble. No need to capture.
-        resName   = (  4,  7, str, False ),
-        chain     = (  8,  9, str, False ),
-        resNum    = ( 10, 13, int, False ),
-        secStruct = ( 14, 15, str, True ),
-        PHI       = ( 15, 22, procheckString2float, False ), # Already calculated internally.
-        PSI       = ( 22, 29, procheckString2float, False ),
-        OMEGA     = ( 29, 36, procheckString2float, False ),
-        CHI1      = ( 36, 43, procheckString2float, False ),
-        CHI2      = ( 43, 50, procheckString2float, False ),
-        CHI3      = ( 50, 57, procheckString2float, False ),
-        CHI4      = ( 57, 64, procheckString2float, False )
+        resName   = (4, 7, str, False), 
+        chain     = (8, 9, str, False), 
+        resNum    = (10, 13, int, False), 
+        secStruct = (14, 15, str, True), 
+        PHI       = (15, 22, procheckString2float, False), # Already calculated internally.
+        PSI       = (22, 29, procheckString2float, False), 
+        OMEGA     = (29, 36, procheckString2float, False), 
+        CHI1      = (36, 43, procheckString2float, False), 
+        CHI2      = (43, 50, procheckString2float, False), 
+        CHI3      = (50, 57, procheckString2float, False), 
+        CHI4      = (57, 64, procheckString2float, False)
     )
     
-    def __init__(self, project ):
+    def __init__(self, project):
         """
         Procheck class allows running procheck_nmr and parsing of results
         """
-        self.project        = project
+        self.project      = project
         self.molecule     = project.molecule
-        self.rootPath     = project.mkdir( project.molecule.name, project.moleculeDirectories.procheck  )
+        self.rootPath     = project.mkdir(project.molecule.name, project.moleculeDirectories.procheck)
         self.redirectOutput = True
         if project.parameters.verbose():
             self.redirectOutput=False
-        printDebug("Will redirect procheck output: " + `self.redirectOutput`)
-        self.procheck  = ExecuteProgram( cingPaths.procheck_nmr,
+#        printDebug("Will redirect procheck output: " + `self.redirectOutput`)
+        self.procheck  = ExecuteProgram(cingPaths.procheck_nmr, 
                                             rootPath = self.rootPath, 
                                             redirectOutput= self.redirectOutput
                                           )
-        self.aqpc = ExecuteProgram( cingPaths.aqpc,
+        self.aqpc      = ExecuteProgram(cingPaths.aqpc, 
                                     rootPath = self.rootPath, 
                                     redirectOutput= self.redirectOutput
                                           )
         self.ranges = None
     #end def
     
-    def run(self, ranges=None, export = True, verbose=True ):
+    # Return True on error ( None on success; Python default)
+    def run(self, ranges=None, export = True, verbose=True):
         # Convert the ranges and translate into procheck format
-        selectedResidues = self.molecule.ranges2list( ranges )
+        selectedResidues = self.molecule.ranges2list(ranges)
         NTsort(selectedResidues, 'resNum', inplace=True)
         # reduce this sorted list to pairs start, stop
         self.ranges = selectedResidues[0:1]
-        for i in range(0,len(selectedResidues)-1):
+        for i in range(0, len(selectedResidues)-1):
             if ((selectedResidues[i].resNum < selectedResidues[i+1].resNum - 1) or 
                 (selectedResidues[i].chain != selectedResidues[i+1].chain)
                ):
@@ -192,42 +197,83 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         self.ranges.append(selectedResidues[-1])
 #        print '>ranges (just the boundaries)', self.ranges
         #generate the ranges file
-        path = os.path.join( self.rootPath, 'ranges')
-        fp = open( path, 'w' )
-        for i in range(0,len(self.ranges),2):
-            singleRange = 'RESIDUES %3d %2s  %3d %2s' % ( self.ranges[i].resNum, self.ranges[i].chain.name, 
+        path = os.path.join(self.rootPath, 'ranges')
+        fp = open(path, 'w')
+        for i in range(0, len(self.ranges), 2):
+            singleRange = 'RESIDUES %3d %2s  %3d %2s' % (self.ranges[i].resNum, self.ranges[i].chain.name, 
                                                             self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
-            fprintf( fp, singleRange+"\n" )
+            fprintf(fp, singleRange+"\n")
             print ">range: " + singleRange
         fp.close()
 
-#        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', 'procheck_nmr.prm')
-#        pcNmrParameterFileDestination = os.path.join(self.rootPath, 'procheck_nmr.prm')
-#        if os.path.exists(pcNmrParameterFileDestination):
-#            os.unlink(pcNmrParameterFileDestination)
-#        os.link(pcNmrParameterFile, pcNmrParameterFileDestination)
+        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', 'procheck_nmr.prm')
+        pcNmrParameterFileDestination = os.path.join(self.rootPath, 'procheck_nmr.prm')
+        if os.path.exists(pcNmrParameterFileDestination):
+            printDebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
+            os.unlink(pcNmrParameterFileDestination)
+        printDebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+        if os.link(pcNmrParameterFile, pcNmrParameterFileDestination):
+            printError("Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+            return True
         
-        path = os.path.join( self.rootPath, self.molecule.name + '.pdb')
-        if export: 
-            self.molecule.toPDBfile( path, convention=IUPAC, verbose=verbose )
+        path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
+        if export:
+#            project.molecule.modelCount
+            self.molecule.toPDBfile(path, convention=IUPAC, verbose=verbose)
             
-#        # Save restraints for Aqua
-#        if not self.project.export2aqua():
-#            printError( "Failed to export restraints to Aqua; will run pc without restraints")
-#            for extensionRestraintFile in [ "dis", "tor" ]:
-#                path = os.path.join( self.rootPath, self.molecule.name + extensionRestraintFile)                
-##                if os.path.exists(path):
-##                    if not os.unlink(path):
-##                        printError("Failed to unlink potentially wrong output for Aqua: " + path)
-#        else:
-#            # run aqpc
-#            pass
-
-        self.procheck( self.molecule.name +'.pdb ranges' )
+        canAqpc = True
+        # Save restraints for Aqua
+        if self.project.export2aqua():
+            canAqpc = False
+            printWarning("Failed to export restraints to Aqua; will run pc without restraints")
+        else:
+            hasRestraints = False
+            for extensionRestraintFile in [ "noe", "tor" ]:
+                srcDir = os.path.join(self.project.rootPath(self.project.name), self.project.directories.aqua )
+                if not os.path.exists(srcDir):
+                    printCodeError("Aqua export dir is absent")
+                    return True
+                fileName = self.project.name +'.' + extensionRestraintFile
+                path = os.path.join(srcDir, fileName )                
+                if not os.path.exists(path):                    
+                    printDebug("No "+ path+" file found (in Aqua export dir)")
+                    pass
+                else:
+                    # Map from Aqua per project file to Cing per molecule file.
+                    dstFileName = self.molecule.name + '.' + extensionRestraintFile
+                    dstPath = os.path.join( self.rootPath, dstFileName )
+                    if os.path.exists(dstPath):
+                        printDebug("Removing existing copy: " + dstPath)    
+                        os.unlink(dstPath)
+                    printDebug("Trying to copy from: " + path+" to: "+dstPath)
+                    if os.link(path, dstPath):
+                        printCodeError("Failed to copy from: " + path+" to: "+self.rootPath)
+                        return True
+                    hasRestraints = True
+            # run aqpc 
+            if not canAqpc:
+                printWarning("Skipping aqpc because failed to convert restraints to Aqua")
+            elif not hasRestraints:
+                printWarning("Skipping qapc because no Aqua restraints were copied for Aqua")
+            else:
+                printMessage("Trying aqpc")
+                if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
+                    printCodeError("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
+                    return True
+                else:
+                    printMessage("Finished aqpc successfully")
+                    
+        printMessage("Trying pc")
+        if self.procheck(self.molecule.name +'.pdb ranges'):
+            printError("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
+            return True
+        printMessage("Finished procheck_nmr successfully")
         self.parseResult()
+        return True
     #end def
-        
-    def _parseProcheckLine( self, line, defs ):
+    
+    
+    def _parseProcheckLine(self, line, defs):
         """
         Internal routine to parse a single line
         Return result, which is a dict type or None
@@ -238,62 +284,63 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         result = {}
         if len(line) < 65:
             return None
-        for field,fieldDef in defs.iteritems():
-            c1,c2,func, dummyStore = fieldDef
+        for field, fieldDef in defs.iteritems():
+            c1, c2, func, dummyStore = fieldDef
             result[ field ] = func(line[c1:c2]) 
         return result
     #end def
     
-    def parseResult( self ):
+    def parseResult(self):
         """
         Parse procheck files and store result in procheck NTdict
         of each residue of mol
         """
-        
-        for i in range(1,self.molecule.modelCount+1):
-            path = os.path.join( self.rootPath, '%s_%03d.rin' % ( self.molecule.name, i ) )           
-            print '> parsing rin >', path
+        modelCount = self.molecule.modelCount
+        printMessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
+        for i in range(1, modelCount+1):
+            path = os.path.join(self.rootPath, '%s_%03d.rin' % (self.molecule.name, i))           
+#            print '> parsing rin >', path
     
-            for line in AwkLike( path, minLength = 64, commentString = "#" ):
-                result = self._parseProcheckLine( line.dollar[0], self.procheckDefs )
+            for line in AwkLike(path, minLength = 64, commentString = "#"):
+                result = self._parseProcheckLine(line.dollar[0], self.procheckDefs)
                 if not result:
                     printError("Failed to parse procheck rin file the below line; giving up.")
                     printError(line.dollar[0])
                     return 
                 chain   = result['chain']
                 resNum  = result['resNum']
-                residue = self.molecule.decodeNameTuple((None,chain,resNum,None))
+                residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
                 if not residue:
-                    printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % ( chain, resNum ))
+                    printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
                     return
-                residue.setdefault( 'procheck', NTdict() )
-                for field,value in result.iteritems():
+                residue.setdefault('procheck', NTdict())
+                for field, value in result.iteritems():
                     if not self.procheckDefs[field][3]: # Checking store parameter.
                         continue
                     # Insert for key: "field" if missing an zero lenght list.
-                    residue.procheck.setdefault( field, NTlist() ) 
-                    residue.procheck[field].append( value )
+                    residue.procheck.setdefault(field, NTlist()) 
+                    residue.procheck[field].append(value)
 #                del( result ) # redundant to remove reference to this local variable.
             #end for
         #end for
         
-        path = os.path.join( self.rootPath, '%s.edt' % self.molecule.name )           
+        path = os.path.join(self.rootPath, '%s.edt' % self.molecule.name)           
         print '> parsing edt >', path
 
-        for line in AwkLike( path, minLength = 64, commentString = "#" ):
-            result = self._parseProcheckLine( line.dollar[0], self.procheckEnsembleDefs )
+        for line in AwkLike(path, minLength = 64, commentString = "#"):
+            result = self._parseProcheckLine(line.dollar[0], self.procheckEnsembleDefs)
             if not result:
                 printError("Failed to parse procheck edt file the below line; giving up.")
                 printError(line.dollar[0])
                 return 
             chain   = result['chain']
             resNum  = result['resNum']
-            residue = self.molecule.decodeNameTuple((None,chain,resNum,None))
+            residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
             if not residue:
-                printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % ( chain, resNum ))
+                printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
                 return
-            residue.setdefault( 'procheck', NTdict() )
-            for field,value in result.iteritems():
+            residue.setdefault('procheck', NTdict())
+            for field, value in result.iteritems():
                 if not self.procheckEnsembleDefs[field][3]: # Checking store parameter.
                     continue
 #                residue.procheck.setdefault( field, value ) 
@@ -302,7 +349,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #end def    
 #end class
 
-def procheck( project, ranges=None, verbose=True ):
+def procheck(project, ranges=None, verbose=True):
     """
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
@@ -315,12 +362,12 @@ def procheck( project, ranges=None, verbose=True ):
         del(project.molecule.procheck)
     #end if
     
-    pcheck = Procheck( project )
+    pcheck = Procheck(project)
     if not pcheck:
         printError("Failed to get procheck instance of project") 
         return None
     
-    pcheck.run( ranges=ranges, verbose=verbose )
+    pcheck.run(ranges=ranges, verbose=verbose)
     project.molecule.procheck = pcheck
     
     return project.molecule.procheck
@@ -332,4 +379,3 @@ methods  = [(procheck, None)
 #saves    = []
 #restores = []
 #exports  = []
-

@@ -3,6 +3,7 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+import traceback
 import array
 import inspect
 import math
@@ -2860,6 +2861,12 @@ def printMessage(msg):
     print msg
 def printDebug(msg):
     print "DEBUG:", msg
+def printCodeError(msg):
+    print "ERROR: in code:", msg
+def printException(msg):
+    print "ERROR: exception caught", msg
+    traceback.print_exc()
+    
     
 class NTfile( file ):    
     """File class with a binary read/write
@@ -3065,6 +3072,7 @@ class ExecuteProgram( NTdict ):
             NTmessage('done\n')
             NTmessage.flush()
         #end if
+#        printDebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
 #
