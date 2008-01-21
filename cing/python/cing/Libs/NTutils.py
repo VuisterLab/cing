@@ -2865,7 +2865,7 @@ def printCodeError(msg):
     print "ERROR: in code:", msg
 def printException(msg):
     print "ERROR: exception caught", msg
-    traceback.print_exc()
+    traceback.print_exc() # Just prints None on my Mac. Strange.
     
     
 class NTfile( file ):    
@@ -3046,7 +3046,7 @@ class ExecuteProgram( NTdict ):
             return 1
         
         if self.redirectOutputToFile and self.redirectOutput:
-            printDebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
+#            printDebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
             self.redirectOutput = False
             
 
@@ -3055,21 +3055,20 @@ class ExecuteProgram( NTdict ):
         elif self.redirectInputFromFile:
             cmd = '%s < %s' % ( cmd, self.redirectInputFromFile)
             
+        
         if self.redirectOutput:
-            dir,name,dummy_ext = NTpath( self.pathToProgram )
+            dir,name,_ext = NTpath( self.pathToProgram )
             cmd = sprintf('%s >& %s.out%d', cmd, name, self.jobcount)
             self.jobcount += 1
         elif self.redirectOutputToFile:
-            cmd = sprintf('%s >& %s%d', cmd, self.redirectOutputToFile, self.jobcount)
+            cmd = sprintf('%s >& %s', cmd, self.redirectOutputToFile)
             self.jobcount += 1
 
-        if (self.verbose): 
-            NTmessage('==> Executing (%s) ... ', cmd)
-            NTmessage.flush()
+#        printDebug('==> Executing ('+cmd+') ... ')
         #end if
         code = os.system( cmd )
         if (self.verbose): 
-            NTmessage('done\n')
+#            printDebug('done')
             NTmessage.flush()
         #end if
 #        printDebug( "Got back from system the exit code: " + `code` )
@@ -3093,73 +3092,6 @@ class OptionParser (optparse.OptionParser):
       if getattr(self.values, option.dest) is None:
           self.error("%s option not supplied" % option)
 
-#-----------------------------------------------------------------------
-# testing from here-on
-#-----------------------------------------------------------------------
-
-if __name__ == '__main__':
-
-  s = NTdict(aap='noot', mies=1)
-  #print s
-  #print s.aap
-  #print s.mies
-  #print hasattr( s, 'aap')
-  s.setdefault('mies',2)
-  s.setdefault('kees',[])
-  s.printAttr()
-  s.kees = [0, 1, 3]
-  s.name ='ss'
-  s.printAttr()
-  
-  print 's=s>', (s==s), (s!=s)
-  
-  print s.items()
-  print s.keys()
-  print s.values()
-  
-  for i in s.iteritems():
-      print 'i>',i
-
-  print len(s)
-#  print dir(s)
-  
-  f = [ ('mies', 'mies: %3d '),
-        ('aap' , 'aap: %10s'),
-        ('kees', ' %d ')
-      ]
-  print '>>', s.format(f)
-
-  b = s.copy()
-  b.printAttr()
- 
-  p = s.popitem() 
-  while p:
-      print "p>", p
-      p = s.popitem()
-  s.printAttr()
-  
-  s.update( b  )
-  s.printAttr()
-  
-  
-  od = odict( ('aap', 10), ('noot', 112), ('mies', 20))
-  
-  for item in od.iteritems():
-      print 'od>', item
-      
-
-  od2 = odict()
-  od2.append(('aap', 10), ('noot', 112), ('mies', 20))
-  print od2
-  
-#  for obj in NTstructObjects.iteritems(): #@UndefinedVariable
-#      print repr( obj )
-  #d = dict()
-  #print dir(d)
-  
-  l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
-  print l.average(), l(0)
-
 """
 Taken from O'Reilly book
 """
@@ -3175,3 +3107,97 @@ def findvisitor((matches, pattern), thisdir, nameshere):
             fullpath = os.path.join(thisdir, name)
             matches.append(fullpath)
 
+
+def convertImageMagick(convertPath, inputPath,outputPath,options,extraOptions=None):
+    convert = ExecuteProgram(convertPath, redirectOutput=False) # No output expected
+    cmd = options 
+    if extraOptions:
+        cmd += " " + extraOptions
+    cmd += " " + inputPath + " " + outputPath  
+    if convert( cmd ):
+        printError("Failed to run conversion: " + cmd)
+        return True
+    
+def convertPs2Pdf(ps2dfPath, inputPath,outputPath,options,extraOptions=None):
+    convert = ExecuteProgram(ps2dfPath, redirectOutput=False) # No output expected
+    cmd = options 
+    if extraOptions:
+        cmd += " " + extraOptions
+    cmd += " " + inputPath + " " + outputPath  
+    if convert( cmd ):
+        printError("Failed to run conversion: " + cmd)
+        return True
+    
+def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
+    """Using the system convert from ImageMagick several pieces of imagery will be created:
+        a- pinup (smallish gif usable as an preview; 100 width by 1xx for A4 aspect ratio)
+        b- full size 1(gif of 1000 width )
+        c- printable version (pdf)
+       
+       The output file names are automatically generated. If the outputDir is set it will be 
+       used.
+       Returns None for error and list of output files otherwise. A None in the list means\
+       the plot was not generated.
+       Gif files are multipaged with 2 second intervals.
+       Input can be anything ImageMagick reads, e.g. Postscript produced by Procheck_NMR.
+       The input path can be with or without directory and can be 
+       an absolute or relative path.
+       The
+        
+    """
+    optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width 
+    optionsFull  = "-delay 200 -geometry 1024"
+    optionsPrint = ""
+    
+    doPinUp = True
+    doFull  = True
+    doPrint = True
+
+    if not os.path.exists(path):
+        printError("Failed to find input")
+        return True
+    # Next time use: NTpath for this.
+#    path = "/Users/jd/t.pdf"
+    head, tail = os.path.split(path)             # split is on last /
+    root, extension = os.path.splitext(tail)     # splitext is on last .
+
+    if outputDir:
+        if os.path.exists(outputDir) and os.path.isdir(outputDir):
+            head = outputDir
+        else:
+            printError("Given output directory: " + outputDir + " is absent or is not a dir")
+            return None
+        
+    if extension == "pdf":
+        printDebug("Will skip generating printable version as input is also a pdf")
+        doPrint = False
+        
+    if extension == "gif":
+        printDebug("Will skip generating full size gif version as input is also a gif")
+        doFull = False
+        
+    pinupPath = None
+    fullPath  = None
+    printPath = None
+    # Algorithm below can be speeded up by not rereading the input but scripting the 
+    #     generation of 3 outputs.
+    if doPinUp:
+        pinupPath = os.path.join( head, root+"_pin.gif")
+        if convertImageMagick(convertPath, path, pinupPath, optionsPinUp):
+            printError("Failed to generated pinup")
+            pinupPath = None
+    if doFull:
+        fullPath  = os.path.join( head, root+".gif")
+        if convertImageMagick(convertPath, path, fullPath, optionsFull):
+            printError("Failed to generated full gif")
+            fullPath = None
+    if doPrint:
+        printPath = os.path.join( head, root+".pdf")
+        if convertPs2Pdf(ps2pdfPath, path, printPath, optionsPrint):
+            printError("Failed to generated print")
+            printPath = None
+    result = ( pinupPath, fullPath, printPath )
+    if  pinupPath or fullPath or printPath:
+        return result
+    return None 
+    

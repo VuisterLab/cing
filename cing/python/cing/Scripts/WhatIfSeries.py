@@ -29,7 +29,7 @@ if os.chdir(cingDirTestsTmp):
 
 for pdbFilePath in fileSet:
     pdbFileName = os.path.split(os.path.abspath(pdbFilePath))[0]
-    dummy_dir,entryId,dummy_ext = NTpath( pdbFilePath )
+    _dir,entryId,_ext = NTpath( pdbFilePath )
     project = Project.open( entryId, status='new' )
     project.initPDB( pdbFile=pdbFilePath, convention = pdbFileAtomNomenclatureConvention )
     status = runWhatif(project)

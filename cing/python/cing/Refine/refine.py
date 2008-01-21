@@ -259,7 +259,7 @@ def parseRefineOutput( params, options ):
         for key in keys:
             getKey = Key( key )
             values = map( getKey, results )
-            av,sd,dummy_n = NTaverage( values )
+            av,sd,_n = NTaverage( values )
             printf('%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
             fprintf(resultFile,'%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
         #end for

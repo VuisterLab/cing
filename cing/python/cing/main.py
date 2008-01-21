@@ -102,7 +102,7 @@ def script( scriptFile, *a, **k ):
     args = a
     kwds = k
     if os.path.exists( scriptFile ):
-        printMessage('==> Executing script "%s"\n', scriptFile )
+        printMessage('==> Executing script '+ scriptFile )
         execfile( scriptFile, globals() )
     else:
         scriptFile2 = os.path.join( root, cingPaths.scripts, scriptFile)        
@@ -313,7 +313,7 @@ if __name__ == '__main__':
         project = Project.open( options.name, status='create' )
     #end if
     
-    if (project == None):
+    if not project:
         printDebug("Doing a hard system exit")
         sys.exit(2)
     #end if

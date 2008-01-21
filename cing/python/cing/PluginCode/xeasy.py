@@ -172,7 +172,7 @@ class Xeasy( NTdict ):
         
         self.map2molecule( molecule )
     
-        dummy_path,name,dummy_ext = NTpath( peakFile )
+        _path,name,_ext = NTpath( peakFile )
         peaks = PeakList( name=name, status=status ) 
 
 
@@ -207,7 +207,7 @@ class Xeasy( NTdict ):
                 cur += 1
 
                 peakpos = []
-                for dummy_i in range(X_AXIS, dimension):
+                for _i in range(X_AXIS, dimension):
                     p = f.float( cur )
                     if (p == None): return None
                     peakpos.append( p )
@@ -225,7 +225,7 @@ class Xeasy( NTdict ):
                 resonances = []
                 error = 0
                 cur += 2 # skip two fields
-                for dummy_i in range(X_AXIS, dimension):
+                for _i in range(X_AXIS, dimension):
                     aIndex = f.int( cur )
                     if aIndex == None: return None
                     cur += 1                         

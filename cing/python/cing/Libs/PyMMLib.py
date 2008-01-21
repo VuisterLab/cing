@@ -123,7 +123,7 @@ class PDBRecord( NTdict ):
         """Read the PDB record line and convert the fields to the appropriate
         dictionary values for this class.
         """
-        for (field, start, end, ftype, just, dummy_get_func) in self._field_list:
+        for (field, start, end, ftype, just, _get_func) in self._field_list:
             s = line[start-1:end]
 
             ## ignore blank fields

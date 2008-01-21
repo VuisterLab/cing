@@ -69,7 +69,7 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
                  distanceRestraint.atomPairs[0][1].export2xplor(),
                  distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
                )
-    for dummy_pair in distanceRestraint.atomPairs[1:]:
+    for _pair in distanceRestraint.atomPairs[1:]:
         s = s + sprintf( '\n  or %-30s %-30s',
                         distanceRestraint.atomPairs[0][0].export2xplor(),
                         distanceRestraint.atomPairs[0][1].export2xplor(),

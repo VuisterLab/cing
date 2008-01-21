@@ -73,6 +73,10 @@ cingPaths = NTdict(
     procheck_nmr = os.getenv('procheckPath'),
     aqpc         = os.getenv('aqpcPath'),
     whatif       = os.getenv('whatifPath'),
+    convert      = os.getenv('convertPath'),
+    ps2pdf       = os.getenv('ps2pdfPath'),
+    molmol       = os.getenv('molmolPath'),
+    povray       = os.getenv('povrayPath'),
 )
 
 cingPaths.keysformat() #define a format string for 'pretty' output

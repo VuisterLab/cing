@@ -46,5 +46,6 @@ class AllChecks(TestCase):
             sys.exit(0)
         project.save()
 
+
 if __name__ == "__main__":
     unittest.main()

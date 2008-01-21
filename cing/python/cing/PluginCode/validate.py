@@ -45,6 +45,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTvector
+from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import list2asci
@@ -65,8 +66,11 @@ from cing.core.constants import NOSHIFT
 from cing.core.constants import UNDEFINED_FLOAT
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
+from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import printException
 import cing
 import math
 import os
@@ -74,7 +78,7 @@ import sys
 
 #TODO: better place this parameter elsewhere
 graphicsFormat = 'png'
-
+NotAvailableText = 'Not available'
 #def printm( fps, fmt, *args ):
 #    """
 #    Print to list of filepointers (fps) using format and args.
@@ -168,8 +172,8 @@ class RmsdResult( NTdict ):
     def _average(self):
         """Calculate the averages
         """
-        self.backboneAverage.value, self.backboneAverage.error, dummy_n = self.backbone.average()
-        self.heavyAtomsAverage.value, self.heavyAtomsAverage.error, dummy_n = self.heavyAtoms.average()
+        self.backboneAverage.value, self.backboneAverage.error, _n = self.backbone.average()
+        self.heavyAtomsAverage.value, self.heavyAtomsAverage.error, _n = self.heavyAtoms.average()
     #end def
 
     def __str__(self):
@@ -684,7 +688,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     summary.rAv, summary.rSd, summary.modelCount = result.zap('r').average()
     summary.min   = min( result.zap('r') )
     summary.max   = max( result.zap('r') )
-    summary.thetaAv, summary.thetaSd, dummy_n = result.zap('theta').average()
+    summary.thetaAv, summary.thetaSd, _n = result.zap('theta').average()
     summary.types = zip( types,counts)
     return summary
 #end def
@@ -734,7 +738,7 @@ def checkHbond( donorH, acceptor,
     result.angleCV       = 0.0
     result.accepted      = False
 
-    result.av, result.sd, dummy_mind, dummy_maxd = donorH.distance( acceptor )
+    result.av, result.sd, _mind, _maxd = donorH.distance( acceptor )
     result.cav, result.cv = donorH.angle( result.donor, acceptor,
                                           radians=False
                                         )
@@ -754,8 +758,8 @@ def checkHbond( donorH, acceptor,
         #end if
         result.modelCount += 1
     #end for
-    if len(distances) > 0: result.distance, result.distanceSD, dummy_n = distances.average()
-    if len(angles) > 0: result.angle, result.angleCV, dummy_n = angles.cAverage()
+    if len(distances) > 0: result.distance, result.distanceSD, _n = distances.average()
+    if len(angles) > 0: result.angle, result.angleCV, _n = angles.cAverage()
     result.accepted = ((float(len( result.acceptedModels)) / float(len( result.data ))) >= fraction)
     del distances
     del angles
@@ -869,7 +873,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
             else:
                 sav = -NOSHIFT
                 ssd = 0.0
-                dummy_sn  = 0
+                _sn  = 0
             #end if
             if atm.db.shift:
                 dav = atm.db.shift.average
@@ -960,12 +964,16 @@ def validateDihedrals( self, verbose=True ):
 
                 plotpars = self.plotParameters.getdefault(dihed,'dihedralDefault')
 
-                cav, dummy_cv, dummy_n = d.cAverage(min=plotpars.min, max=plotpars.max)
+                cav, _cv, _n = d.cAverage(min=plotpars.min, max=plotpars.max)
                 NTlimit( d, cav-180.0, cav+180.0 )
 
+                if len(d) < 3:
+                    continue
+                
                 d.good,d.outliers = peirceTest( d )
 
-                if not d.good: 
+                if not d.good: # None returned which indicates an error
+                    printError("Failed to run peirceTest")
                     continue
 
                 d.limit( plotpars.min, plotpars.max ).cAverage(min=plotpars.min,
@@ -1010,8 +1018,12 @@ def validateModels( self, verbose=True ):
 #            print res, dihed
 #            if dihed in res and res[dihed] != None:
             if dihed in res and res[dihed]:
-                d = res[dihed]
-                if not d.good: continue
+                d = res[dihed] # NTlist object
+                try: # Looks like d doesn't always have good; TODO check why this can be so.
+                    if not d.good:
+                        continue
+                except:
+                    continue
                 for m in d.outliers.zap( 0 ):    #get all modelId of outliers
                     #print res, dihed, d.outliers, m
                     self.models[m] += 1
@@ -1037,69 +1049,73 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
     #NTerror("TODO: make makeDihedralHistogramPlot work on JFD's install.")
     #return None
     #AWSS: it's ok now
+    try:
 
-    if project == None or dihedralName not in residue or residue[dihedralName] == None:
-        return None
-    #end if
-
-
-    bins       = 360/binsize
-    plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
-
-    angle = residue[dihedralName]
-
-    plot = NTplot.NTplot( title  = residue._Cname(1),
-                          xRange = (plotparams.min, plotparams.max),
-                          xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
-                          xLabel = dihedralName,
-                          yLabel = 'Occurence',
-                          hardcopySize= (600,300),
-                          aspectRatio = 0.5
-                        )
-
-    hight = 5.0
-
-    if angle.good:
-        plot.histogram( angle.good.zap(1),
-                        plotparams.min, plotparams.max, bins,
-                        attributes = NTplot.boxAttributes( fillColor=plotparams.color )
-                      )
-        hight = plot.maxY
-#    else:
-#        NTwarning("No angle.good plots made")
-    #end if
-
-    if angle.outliers:
-        plot.histogram( angle.outliers.zap(1),
-                    plotparams.min, plotparams.max, bins,
-                    attributes = NTplot.boxAttributes( fillColor=plotparams.outlier )
-                  )
-        if not hight:
+        if project == None or dihedralName not in residue or residue[dihedralName] == None:
+            return None
+        #end if
+    
+    
+        bins       = 360/binsize
+        plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
+    
+        angle = residue[dihedralName]
+    
+        plot = NTplot.NTplot( title  = residue._Cname(1),
+                              xRange = (plotparams.min, plotparams.max),
+                              xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
+                              xLabel = dihedralName,
+                              yLabel = 'Occurence',
+                              hardcopySize= (600,300),
+                              aspectRatio = 0.5
+                            )
+    
+        hight = 5.0
+    
+        if angle.good:
+            plot.histogram( angle.good.zap(1),
+                            plotparams.min, plotparams.max, bins,
+                            attributes = NTplot.boxAttributes( fillColor=plotparams.color )
+                          )
             hight = plot.maxY
-#    else:
-#        NTwarning("No angle.outliers plots made")
-    #end if
+        else:
+            printWarning("No angle.good plots made")
+            
+    
+        if angle.outliers:
+            plot.histogram( angle.outliers.zap(1),
+                        plotparams.min, plotparams.max, bins,
+                        attributes = NTplot.boxAttributes( fillColor=plotparams.outlier )
+                      )
+            if not hight:
+                hight = plot.maxY
+    #    else:
+    #        NTwarning("No angle.outliers plots made")
+        #end if
+    
+        # AWSS
+        # Let's check if for this 'angle' is a dihedral restraint
+        aAv  = angle.cav
+        width = 4.0
+        dr = _matchDihedrals(residue, dihedralName)
+    
+        if dr:
+            lower, upper = dr.lower, dr.upper
+    
+            plot.line( (lower, 0), (lower, hight),
+                       NTplot.lineAttributes(color=plotparams.lower, width=width) )
+            plot.line( (upper, 0), (upper, hight),
+                       NTplot.lineAttributes(color=plotparams.upper, width=width) )
+        #end if
+    
+        # Always plot the cav line
+        plot.line( (aAv, 0), (aAv, hight), NTplot.lineAttributes(
+                                            color=plotparams.average, width=width) )
+        return plot
+    except:
+        printError("Failed to makeDihedralHistogramPlot. TODO: check")
 
-    # AWSS
-    # Let's check if for this 'angle' is a dihedral restraint
-    aAv  = angle.cav
-    width = 4.0
-    dr = _matchDihedrals(residue, dihedralName)
 
-    if dr:
-        lower, upper = dr.lower, dr.upper
-
-        plot.line( (lower, 0), (lower, hight),
-                   NTplot.lineAttributes(color=plotparams.lower, width=width) )
-        plot.line( (upper, 0), (upper, hight),
-                   NTplot.lineAttributes(color=plotparams.upper, width=width) )
-    #end if
-
-    # Always plot the cav line
-    plot.line( (aAv, 0), (aAv, hight), NTplot.lineAttributes(
-                                        color=plotparams.average, width=width) )
-    return plot
-#end def
 
 def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
     '''Return NTplot instance with plot of dihedralName1 vrs dihedralName2 or
@@ -1137,7 +1153,7 @@ def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
                         )
     plot.points( zip( d1, d2 ), attributes=NTplot.plusPoint )
 
-    dummy_width = 4.0
+    _width = 4.0
 
     dr1 = _matchDihedrals(residue, dihedralName1)
     dr2 = _matchDihedrals(residue, dihedralName2)
@@ -1208,7 +1224,7 @@ def setupHtml(project):
     for molecule in project.molecules:
         molecule = project[molecule]
 
-        if (project.molecule.modelCount == 0):
+        if not project.molecule.modelCount:
             NTerror('ERROR setupHtml(): No structural models\n' )
             return
         #end if
@@ -1225,7 +1241,8 @@ def setupHtml(project):
                            subdir )
         #end for
 
-        if hasattr(molecule, 'html'): del(molecule['html'])
+        if hasattr(molecule, 'html'): 
+            del(molecule['html'])
 
         molecule.htmlLocation = (project.htmlPath('index.html'), top)
         molecule.html = HTMLfile( molecule.htmlLocation[0],
@@ -1601,7 +1618,7 @@ def setupHtml(project):
                 restrMain('li', 'Viol Average / SD / Max: %.2f / %.2f / %.2f' %
                         (restraint.violAv, restraint.violSd, restraint.violMax))
 
-                val1, val2, dummy_val3 = restraint.retrieveDefinition()
+                val1, val2, _val3 = restraint.retrieveDefinition()
                 restraint.residue = val1
                 restraint.angle = '%s_%i' % (val2, val1.resNum)
 
@@ -1629,37 +1646,52 @@ def setupHtml(project):
             #end for
         #end if
     #end for
+    refSum = '../'+project.moleculePath('analysis')+'/summary.txt'
+    refSumText = 'Open'
+    if not os.path.exists(refSum):
+        refSumText = NotAvailableText 
+
+    refAss = '../'+project.moleculePath('analysis')+'/validateAssignments.txt'
+    refAssText = 'Open'
+    if not os.path.exists(refAss):
+        refAssText = NotAvailableText
 
     # Do Project HTML page
-
-    project.html.main('h1', 'Summary')
-    project.html.main('ul', closeTag=False)
-    project.html.main('li', closeTag=False)
-    project.html.main('a', 'Open',
-                       href = '../'+project.moleculePath('analysis')+'/summary.txt'
-                      )
-    project.html.main('li', openTag=False)
-    project.html.main('ul', openTag=False)
-
-    project.html.main('h1', 'Assignments')
-    project.html.main('ul', closeTag=False)
-    project.html.main('li', closeTag=False)
-    project.html.main('a', 'Open',
-                      href = '../'+project.moleculePath('analysis')+'/validateAssignments.txt'
-                      )
-    project.html.main('li', openTag=False)
-    project.html.main('ul', openTag=False)
-
+    main = project.html.main
+    
+    main('table', closeTag=False)
+    main('tr', closeTag=False)
+    main('td', closeTag=False)
+    
+    main('h1', 'Summary')
+    main('ul', closeTag=False)
+    main('li', closeTag=False)
+    main('a',  refSumText, href = refSum) 
+    main('li', openTag=False)
+    main('ul', openTag=False)
+    
+    main('h1', 'Assignments')
+    main('ul', closeTag=False)
+    main('li', closeTag=False)
+    main('a',  refAssText, href = refAss) 
+    main('li', openTag=False)
+    main('ul', openTag=False)
+    
     for key in project.mainPageObjects.keys():
-        projectMain = project.html.main
-        projectMain('h1', key)
+        main('h1', key)
         for item in project.mainPageObjects[key]:
-            projectMain('ul', closeTag=False)
-            project.html.insertHtmlLinkInTag( 'li', projectMain, project, item,
+            main('ul', closeTag=False)
+            project.html.insertHtmlLinkInTag( 'li', main, project, item,
                                               text=item.name )
-            projectMain('ul', openTag=False)
+            main('ul', openTag=False)
         #end for
     #end for
+    main('td', openTag=False)
+    main('td', closeTag=False)
+    main('img', src = 'mol.gif')
+    main('td', openTag=False)
+    main('tr', openTag=False)
+    main('table', openTag=False)
 #end def
 
 def renderHtml(project):
@@ -1675,138 +1707,167 @@ def renderHtml(project):
     return True
 #end def
 
-def populateHtmlMolecules( project ):
+def populateHtmlMolecules( project, skipFirstPart=False ):
     '''Descrn: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project.
        Output:
+       If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
+    
+    molGifFileName = "mol.gif"
+    pathMolGif = project.path(molGifFileName)
+    printDebug("Trying to create : " + pathMolGif)
+    if project.molecule.export2gif(pathMolGif):
+        printError("Failed to generated a Molmol picture; continuelng.")                                    
 
-    for molecule in [project[mol] for mol in project.molecules]:
-        for chain in molecule.allChains():
-            chainId = chain.name
-            printMessage("\nGenerating dihedral angle plots for chain: " + chainId)
-            printedDots = 0            
-            for res in chain.allResidues():
-#                write without extra space
-#                sys.stdout.write('.')
-                print '.', # print progress for each residue a char.
-                printedDots += 1
-                resNum = res.resNum
-                if not printedDots % 20:
-                    print
-                    printedDots = 0
-                resdir = os.path.dirname(res.htmlLocation[0])
-
-                fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
-                fprintf(fp, '----- %5s -----\n', res)
-
-                plot = makeDihedralPlot( project, res, 'PHI', 'PSI' )
-                if plot:
-                    plot.hardcopy( fileName = os.path.join(resdir, 'PHI_PSI' ),
-                                   graphicsFormat = graphicsFormat )
-                    del plot
-                    #generate HTML code for plot
-                    res.html.left( 'h2', 'Ramanchandran', id='Ramanchandran')
-                    res.html.left( 'img', src = 'PHI_PSI', alt="" )
-                #endif
-
-                plot = makeDihedralPlot( project, res, 'CHI1', 'CHI2' )
-                if plot:
-                    plot.hardcopy( fileName = os.path.join(resdir, 'CHI1_CHI2'),
-                                   graphicsFormat = graphicsFormat )
-                    del plot
-                    #generate HTML code for plot
-                    res.html.left( 'h2','CHI1-CHI2', id='CHI1-CHI2')
-                    res.html.left( 'img', src = 'CHI1_CHI2', alt="" )
-                #endif
-
-                for dihed in res.db.dihedrals.zap('name'):
-                    if dihed in res and res[dihed]:
-                        #print '------>>>>>', dihed, res, res[dihed]
-                        d = res[dihed]
-
-                        # summarize the results
-                        lenOutliers = '.' # JFD adds: Indicating None
-                        outlierList = '.'
-                        if d.outliers:
-#                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
-                            lenOutliers = `len(d.outliers)`
-                            outlierList = d.outliers.zap(0)
-                        summary = '%-2s %3d %-6s: average: %5d   cv: %6.4f  ||  outliers: %3s (models %s)' % (
-                            chainId, resNum, dihed, d.cav, d.cv, lenOutliers, outlierList
-                                         )
-                        fprintf( fp, '%s\n', summary )
-#                        print summary
-                            
-                        #generate a dihedral histogram plot
-                        plot = makeDihedralHistogramPlot( project, res, dihed )
-                        tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormat)
-#                        printDebug("Will write to: "+tmpPath)
-                        if not os.path.isdir(resdir):
-                            printError("Failed to find an existing location in: " + resdir)
-                            return None
-                        plot.hardcopy( fileName = tmpPath, graphicsFormat = graphicsFormat )
-                        del( plot )
-
-                        #generate HTML code for plot and text
-                        res.html.left( 'h2', dihed, id=dihed),
-                        res.html.left( 'img', src = dihed + '.' + graphicsFormat, alt=""  )
-                        res.html.left( 'p', summary )
-                    #end if
-                #end for
-                # Right side
-                # Distance Restraints
-                _generateHtmlResidueRestraints(project, res, type = 'Distance')
-                # Dihedral Restraints
-                _generateHtmlResidueRestraints(project, res, type = 'Dihedral')
-            #end for residue
-        #end for chain
-
-        printMessage("\n") # Done printing progress.
-        
+    for molecule in [project[mol] for mol in project.molecules]:        
+        if not skipFirstPart:
+            for chain in molecule.allChains():
+                chainId = chain.name
+                printMessage("\nGenerating dihedral angle plots for chain: " + chainId)
+                printedDots = 0            
+                for res in chain.allResidues():
+    #                write without extra space
+                    if not printedDots % 10:
+                        digit = printedDots / 10
+                        sys.stdout.write(`digit`)
+                    else:
+                        sys.stdout.write('.')
+#                    print '.', # print progress for each residue a char.
+                    printedDots += 1
+                    resNum = res.resNum
+                    if not printedDots % 80:
+                        print
+                        printedDots = 0
+                    resdir = os.path.dirname(res.htmlLocation[0])
+    
+                    fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
+                    fprintf(fp, '----- %5s -----\n', res)
+    
+    
+                    plotList = [
+                                ['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI'],
+                                ['CHI1', 'CHI2', 'CHI1-CHI2',     'CHI1_CHI2'],
+                                ]
+                    for plotItem in plotList:
+                        plot = makeDihedralPlot( project, res, plotItem[0], plotItem[1] )
+                        if plot:
+                            plot.hardcopy( fileName = os.path.join(resdir, plotItem[3] ),
+                                           graphicsFormat = graphicsFormat )
+                            res.html.left( 'h2', plotItem[2], id=plotItem[2])
+                            res.html.left( 'img', src = plotItem[3], alt="" )
+    
+    
+                    for dihed in res.db.dihedrals.zap('name'):
+                        if dihed in res and res[dihed]:
+    #                        printDebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
+                            d = res[dihed] # List of values with outliers etc attached.
+    
+                            # summarize the results
+                            lenOutliers = '.' # JFD adds: Indicating None
+                            outlierList = '.'
+                            try: # TODO: check why this is possible.
+                                if d.outliers:
+        #                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
+                                    lenOutliers = `len(d.outliers)`
+                                    outlierList = d.outliers.zap(0)
+                            except: 
+                                pass
+                            summary = '%-2s %3d %-6s: average: %5d   cv: %6.4f  ||  outliers: %3s (models %s)' % (
+                                chainId, resNum, dihed, d.cav, d.cv, lenOutliers, outlierList
+                                             )
+                            fprintf( fp, '%s\n', summary )
+    #                        print summary
+                                
+                            #generate a dihedral histogram plot
+                            plot = makeDihedralHistogramPlot( project, res, dihed )
+                            tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormat)
+    #                        printDebug("Will write to: "+tmpPath)
+                            if not os.path.isdir(resdir):
+                                printError("Failed to find an existing location in: " + resdir)
+                                return None
+                            plot.hardcopy( fileName = tmpPath, graphicsFormat = graphicsFormat )
+    #                        del( plot )
+    
+                            #generate HTML code for plot and text
+                            res.html.left( 'h2', dihed, id=dihed),
+                            res.html.left( 'img', src = dihed + '.' + graphicsFormat, alt=""  )
+                            res.html.left( 'p', summary )
+                        #end if
+                    #end for
+                    # Right side
+                    # Distance Restraints
+                    _generateHtmlResidueRestraints(project, res, type = 'Distance')
+                    # Dihedral Restraints
+                    _generateHtmlResidueRestraints(project, res, type = 'Dihedral')
+                #end for residue
+            #end for chain
+    
+            printMessage("\n") # Done printing progress.
+        # end of skip test.
+    
         printDebug("linking to Procheck plots")
         molecule.html.main('h1','Procheck_NMR')
         molecule.html.main('ul', closeTag=False)
         anyProcheckPlotsGenerated = False
         i = 0
         for p,d in [ 
-             ('_01_ramachand.ps','Ramanchandran (all models)'),
-             ('_02_allramach.ps','Ramanchandran (residue types)'),
-             ('_03_chi1_chi2.ps','chi1-chi2'),
-             ('_04_ch1distrb.ps','chi1'),
-             ('_05_ch2distrb.ps','chi2'),
-             ('_06_ensramach.ps','Ramanchandran (per residue)'),
-             ('_07_ensch1ch2.ps','Ensemble chi1-chi2'),
-             ('_08_residprop.ps','Residue properties'),
-             ('_09_equivresl.ps','Equivalent resolution'),
-             ('_10_modelsecs.ps','Model-by-model secondary structures'),
-             ('_11_rstraints.ps','Distance restraints plot'),
-             ('_12_restdiffs.ps','Restraint differences plot'),
-             ('_13_restrnsum.ps','Numbers of distance restraints'),
-             ('_14_resdifsum.ps','Actual distance - restraint summary'),
-             ('_15_resvifreq.ps','Violation frequency summary'),
-             ('_16_restatist.ps','Restraint statistics'),
-             ('_17_restrviol.ps','Residue-by-residue restraint violations'),
-             ('_18_modelcomp.ps','Model-by-model violations')
+             ('_01_ramachand','Ramanchandran (all models)'),
+             ('_02_allramach','Ramanchandran (residue types)'),
+             ('_03_chi1_chi2','chi1-chi2'),
+             ('_04_ch1distrb','chi1'),
+             ('_05_ch2distrb','chi2'),
+             ('_06_ensramach','Ramanchandran (per residue)'),
+             ('_07_ensch1ch2','Ensemble chi1-chi2'),
+             ('_08_residprop','Residue properties'),
+             ('_09_equivresl','Equivalent resolution'),
+             ('_10_modelsecs','Model-by-model secondary structures'),
+             ('_11_rstraints','Distance restraints plot'),
+             ('_12_restdiffs','Restraint differences plot'),
+             ('_13_restrnsum','Numbers of distance restraints'),
+             ('_14_resdifsum','Actual distance - restraint summary'),
+             ('_15_resvifreq','Violation frequency summary'),
+             ('_16_restatist','Restraint statistics'),
+             ('_17_restrviol','Residue-by-residue restraint violations'),
+             ('_18_modelcomp','Model-by-model violations')
             ]:
             i += 1
             procheckLink = os.path.join('..',
-                        project.moleculeDirectories.procheck, molecule.name + p)
-            procheckLinkReal = os.path.join( project.rootPath( project.name),
-                        project.moleculeDirectories.procheck, molecule.name + p)
-            printDebug('procheck real path: ' + procheckLinkReal)
+                        project.moleculeDirectories.procheck, molecule.name + p + ".ps")
+            procheckLinkReal = os.path.join( project.rootPath( project.name), molecule.name,
+                        project.moleculeDirectories.procheck, molecule.name + p + ".ps")
+#            printDebug('procheck real path: ' + procheckLinkReal)            
             if not os.path.exists( procheckLinkReal ):
+                # Expect the first 10 plots that require only coordinates.
                 if i < 11:
                     printError("Failed to find regular procheck plot: " + procheckLink)
-#                continue
+                continue # Skip their inclusion.
+            
+            fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, procheckLinkReal )
+            printDebug( "Got back from convert2Web output file names: " + `fileList`)
+            if fileList == True:
+                printError( "Failed to convert2Web input file: " + procheckLinkReal)
+                continue
+#            _pinupPath, _fullPath, _printPath = fileList
+            pinupLink = os.path.join('..',
+                        project.moleculeDirectories.procheck, molecule.name + p + "_pin.gif" )
+            fullLink = os.path.join('..',
+                        project.moleculeDirectories.procheck, molecule.name + p + ".gif" )
+            printLink = os.path.join('..',
+                        project.moleculeDirectories.procheck, molecule.name + p + ".pdf" )
             anyProcheckPlotsGenerated = True
-            molecule.html.main('li', closeTag=False)
-            molecule.html.main('a', d, href = procheckLink )
-            molecule.html.main('li', openTag=False)
+            main = molecule.html.main
+            main('li',  closeTag=False)
+            main('a',   "",         href = fullLink, closeTag=False )
+            main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+            main('a',   "",         openTag=False )
+            main('a',   "print",    href = printLink )
+            main('a',   d,          href = procheckLink )
+            main('li',  openTag=False)
         #end for
-        molecule.html.main('ul', openTag=False)
+        main('ul', openTag=False)
         if not anyProcheckPlotsGenerated:
-            molecule.html.main('h2', "No procheck plots found at all")
+            main('h2', "No procheck plots found at all")
 
     #end for molecule
     return True
@@ -1961,26 +2022,28 @@ def populateHtmlModels(project):
 def validate( project, ranges=None, htmlOnly = False, verbose=True ):
     """Validatation tests
     """
-    #validateSetup(project)
-    if not htmlOnly: 
-        setupValidation( project, ranges=ranges )
-
-    setupHtml(project)
-
-    # populate Molecule (Procheck) and Residues
-    if not populateHtmlMolecules(project):
-        printError("Failed to populateHtmlMolecules")
-        return None
-#    if not populateHtmlModels(project):
-#        printError("Failed to populateHtmlModels")
-#        return None
-    if not renderHtml(project):
-        printError("Failed to renderHtml")
-        return None
-
-    if verbose:
-        NTmessage('done\n' )
-
+    try:
+        #validateSetup(project)
+        if not htmlOnly: 
+            setupValidation( project, ranges=ranges )
+    
+        setupHtml(project)
+    
+        # populate Molecule (Procheck) and Residues
+        if not populateHtmlMolecules(project):
+            printError("Failed to populateHtmlMolecules")
+            return None
+    #    if not populateHtmlModels(project):
+    #        printError("Failed to populateHtmlModels")
+    #        return None
+        if not renderHtml(project):
+            printError("Failed to renderHtml")
+            return None
+    
+        if verbose:
+            NTmessage('done\n' )
+    except:
+        printException("Failed to validate completely")
 #end def
 
 # register the functions
