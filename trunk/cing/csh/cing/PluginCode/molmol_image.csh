@@ -14,6 +14,7 @@ set backcolor      = $5
 set executableMm   = $6
 set try            = 1
 set mul            = 1
+setenv MOLMOLHOME $6
 
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
@@ -92,9 +93,9 @@ echo "Precision for pov file:           $precision" >> $log_file
 
 # Notes for the macro file:
 # -1- No empty lines allowed.
-echo "InitAll yes" > $mac_file 
-echo "PathNames '' '' '' '' '/Users/jd/progs/molmol/setup/PdbAtoms' '' '/Users/jd/progs/molmol/setup/pdb.lib' '' ''" >> $mac_file 
-if ( $backcolor == "bmrb_yellow" ) then                          
+echo "InitAll yes" > $mac_file
+echo "PathNames '' '' '' '' '/Users/jd/progs/molmol/setup/PdbAtoms' '' '/Users/jd/progs/molmol/setup/pdb.lib' '' ''" >> $mac_file
+if ( $backcolor == "bmrb_yellow" ) then
     echo "BackColor 1 1 0.79688" >> $mac_file
 else
     if ( $backcolor == "white" ) then
@@ -109,23 +110,23 @@ else
         endif
     endif
 endif
-    
-cat >> $mac_file << EOD  
+
+cat >> $mac_file << EOD
 Rendering 1 1 0 1 1 1 1 1
 DrawPrec $precision $precision
 PlotPar 21 29.7 1500 1000 950 0 1 1 0 $precision 1 50
 ReadPdb $pdb_file
-SelectAtom '' 
-SelectBond '' 
+SelectAtom ''
+SelectBond ''
 SelectRes  ''
 SelectMol  ''
 EOD
 
 # Don't show the terminii residues. ACE and NH2; put on a kill list.
 if ( $try == 1 ) then
-    cat >> $mac_file << EOD  
+    cat >> $mac_file << EOD
 CalcAtom 'H'
-CalcAtom 'HN'  
+CalcAtom 'HN'
 DefPropRes 'aa'     ':ALA*,ARG*,ASN*,ASP*,CYS*,GLN*,GLU*,GLY*,HIS*,ILE*,LEU*,LYS*,MET*,PHE*,PRO*,SER*,THR*,TRP*,TYR*,VAL*'
 DefPropRes 'na'     ':A,C,T,G,U,DA,DC,DT,DU,DG'
 DefPropRes 'kill'   ':ACE,NH2'
@@ -134,18 +135,18 @@ DefPropRes 'cation' ':AG,AU,AU3,AL,CA,CD,CU,CU1,FE,FE2,K,LI,MG,MN,MN3,MO,NA,NI,P
 DefPropRes 'anion'  ':F,CL,BR'
 DefPropRes 'ion'    'cation | anion'
 DefPropRes 'ligand' '! (aa | na | kill | hoh | ion  )'
-SelectBond '' 
-StyleBond invisible 
-SelectAtom '' 
-SelectBond '' 
+SelectBond ''
+StyleBond invisible
+SelectAtom ''
+SelectBond ''
 SelectRes  'aa'
 CalcSecondary
 XMacStand ribbon.mac
 SelectRes  'na'
-XMacStand schem_dna.mac           
-SelectAtom 'res.cation' 
+XMacStand schem_dna.mac
+SelectAtom 'res.cation'
 ColorAtom 0 1 0
-SelectAtom 'res.anion' 
+SelectAtom 'res.anion'
 ColorAtom 1 0 0
 SelectAtom 'res.hoh'
 ColorAtom 0.498 1 0.831
@@ -154,27 +155,27 @@ SelectAtom 'res.ion'
 RadiusAtom 1
 SelectAtom 'res.ion | res.hoh'
 StyleAtom sphere
-SelectAtom 'res.ligand' 
-CalcBond 1 1 1   
+SelectAtom 'res.ligand'
+CalcBond 1 1 1
 SelectBond 'res1.ligand | res2.ligand'
 XMacStand ball_stick.mac
 EOD
-else 
-    cat >> $mac_file << EOD  
+else
+    cat >> $mac_file << EOD
 StyleAtom invisible
 StyleBond invisible
-SelectAtom 'bb' 
-SelectBond 'bb' 
+SelectAtom 'bb'
+SelectBond 'bb'
 XMacStand ball_stick.mac
 EOD
 endif
- 
-cat >> $mac_file << EOD  
-AutoScale     
-PlotPov $tmp_dir/$id.pov     
+
+cat >> $mac_file << EOD
+AutoScale
+PlotPov $tmp_dir/$id.pov
 Quit no
 EOD
-#WriteDump $tmp_dir/$id.mml     
+#WriteDump $tmp_dir/$id.mml
 
 if ( -e $MOLMOLHOME/dump ) then
     \rm -f $MOLMOLHOME/dump
@@ -225,9 +226,9 @@ error:
 usage:
     echo "# USE: molmol_image.csh pdb_file tmp_dir pdb_id scripts_dir back_ground_color molmolExecutable"
     exit 2
-    
-    
+
+
 ####
 
-  
+
 
