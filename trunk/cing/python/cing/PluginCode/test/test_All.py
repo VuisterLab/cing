@@ -7,6 +7,7 @@ python test_All.py
 def testAll():    
     modList = ( 
                "cing.PluginCode.test.test_Biggles", 
+               "cing.PluginCode.test.test_Molgrap", 
                "cing.PluginCode.test.test_Procheck", 
                "cing.PluginCode.test.test_STAR",
                "cing.PluginCode.test.test_validate", 

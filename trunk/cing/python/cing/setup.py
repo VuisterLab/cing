@@ -40,6 +40,10 @@ CING_SHELL_TEMPLATE = \
 %(export)s  procheckPath%(equals)s%(procheckPath)s
 %(export)s  aqpcPath%(equals)s%(aqpcPath)s
 %(export)s  whatifPath%(equals)s%(whatifPath)s
+%(export)s  convertPath%(equals)s%(convertPath)s
+%(export)s  ps2pdfPath%(equals)s%(ps2pdfPath)s
+%(export)s  molmolPath%(equals)s%(molmolPath)s
+%(export)s  povrayPath%(equals)s%(povrayPath)s
 #############################################
 # No changes needed below this line.
 #############################################
@@ -212,6 +216,38 @@ if __name__ == '__main__':
     else:
         printMessage("Found 'wattos'")   
             
+    convertPath,err  = NTgetoutput('which convert')
+    if not convertPath:
+        printWarning("Couldn't find 'convert' (from ImageMagick)")   
+        parametersDict['convertPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    else:
+        printMessage("Found 'convert'")
+        parametersDict['convertPath'] = strip(convertPath)
+    
+    ps2pdfPath,err  = NTgetoutput('which ps2pdf14')
+    if not ps2pdfPath:
+        printWarning("Couldn't find 'ps2pdfPath' (from Ghostscript)")   
+        parametersDict['ps2pdfPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    else:
+        printMessage("Found 'ps2pdf'")
+        parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
+    
+    molmolPath,err  = NTgetoutput('which molmol')
+    if not molmolPath:
+        printWarning("Couldn't find 'molmol'")   
+        parametersDict['molmolPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    else:
+        printMessage("Found 'molmol'")
+        parametersDict['molmolPath'] = strip(molmolPath)
+    
+    povrayPath,err  = NTgetoutput('which povray')
+    if not povrayPath:
+        printWarning("Couldn't find 'povray'")   
+        parametersDict['povrayPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    else:
+        printMessage("Found 'povray'")
+        parametersDict['povrayPath'] = strip(povrayPath)
+    
     
 #    userShell = os.environ.get('SHELL')
 #    Better not use the above as this gives on JFD's mac: /bin/bash and actually

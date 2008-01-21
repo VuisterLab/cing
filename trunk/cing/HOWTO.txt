@@ -35,24 +35,11 @@ FOR PROGRAMMERS:
     importPlugin("procheck") if defined.
     
 NEW FEATURE REQUESTS:
-- Where are the restraints info tables/visualizations?
-- Put files in more temporary location e.g. off of /tmp instead of within project to save.
 - Get global properties; in the check.db now there are only Atom and Residue props listed and there are only 51
     present. Whereas the pdbout.txt file contains over 80 check results..
-- Convert Procheck postscript data to gifs as on pdbsum pages with summary info in html. Template can be 
-    exactly how they did it: The Procheck analyses for 1brv as an example:
-    http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/RunPROCHECK.pl?pdb=1brv
-    For explanations we should refer to: http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/GetPage.pl?doc=TRUE&pdbcode=n/a&template=doc_procheck.html
-    after verifying with Roman.
     
     
     
-- Rename $cingRoot/cing to $cingRoot/src as it confuses the heck out everything.
-    Then refactor the code so that only -ONE- path needs to be added to PYTHONPATH for everything in cing.
-    Now there's ${cingRoot}:${cingPath}:${cingLibs}:${refinePath}:
-    parametersDict['cingPath']    = os.path.join( cingRoot, 'cing')
-    parametersDict['cingLibs']    = os.path.join( cingRoot, 'Libs')
-    parametersDict['refinePath']  = os.path.join( cingRoot, 'Refine')
 
     
     

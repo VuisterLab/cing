@@ -763,7 +763,7 @@ def _getCcpnCoordinates( molecule ):
 
         for ccpnResidue in ccpnChain.sortedResidues():
 
-            dummy_residue = ccpnResidue.cing
+            _residue = ccpnResidue.cing
 
             # Get coord info for residues from Ccpn
             ccpnCoordResidues = []
@@ -976,7 +976,7 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList, verbose = True ):
 
         # This should always be OK
         residue = molecule[chainCode][seqCode]
-        dummy_atoms = residue.atoms
+        _atoms = residue.atoms
 
         for atomName in atomNames:
             # Bit of debugging, atomName (from DIANA namingSystem) may not be
@@ -1162,7 +1162,7 @@ def importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None,
 
             for ccpnDistanceConstraint in ccpnDistanceList.constraints:
 
-                lower, upper, dummy_value, dummy_error = _restraintsValues \
+                lower, upper, _value, _error = _restraintsValues \
                                                         (ccpnDistanceConstraint)
 
                 atomPairs = _getConstraintAtoms(ccpnDistanceConstraint)
@@ -1233,7 +1233,7 @@ def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None,
             for ccpnDihedralConstraint in ccpnDihedralList.constraints:
 
                 dihConsItem = ccpnDihedralConstraint.findFirstItem()
-                lower, upper, dummy_value, dummy_error = _restraintsValues(dihConsItem)
+                lower, upper, _value, _error = _restraintsValues(dihConsItem)
 
 
                 atoms = _getConstraintAtoms(ccpnDihedralConstraint)
@@ -1309,7 +1309,7 @@ def importFromCcpnRdcRestraints( cingProject = None, ccpnProject = None,
 
             for ccpnRdcConstraint in ccpnRdcList.constraints:
 
-                lower, upper, dummy_value, dummy_error = _restraintsValues \
+                lower, upper, _value, _error = _restraintsValues \
                                                         (ccpnRdcConstraint)
                 atomPairs = _getConstraintAtoms(ccpnRdcConstraint)
 
@@ -1348,7 +1348,7 @@ def _getTorsionAngleName(atoms, molSysTorsions):
     #print angle
     #return angle.pop()
 
-    dummy_atom1, dummy_atom2, atom3, dummy_atom4 = atoms
+    _atom1, _atom2, atom3, _atom4 = atoms
     molSystem = atom3.ccpn.residue.chain.molSystem #getTopObject()
     ccpnMol = atom3.ccpn.residue.chain.molecule
     ccpnRes = atom3.ccpn.residue.molResidue
@@ -1666,7 +1666,7 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
     ccpnProject = _checkCcpnProject( ccpnProject, cingProject, funcName )
     if not ccpnProject: return None
 
-    dummy_moleculeList = []
+    _moleculeList = []
 
     #if 'moleculeName' is not specified, it'll export all Cing.Molecules
     if ( moleculeName ):
@@ -1695,7 +1695,7 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
         molSystem.cing = molecule
         molecule.ccpn = molSystem
 
-        dummy_ccpnChains = []
+        _ccpnChains = []
         for chain in molecule.chains:
 
             moleculeChainName = moleculeName+'_'+chain.name
@@ -1756,7 +1756,7 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
 
                         if nextLink:
 
-                            dummy_molResLink = Molecule.MolResLink( ccpnMolecule,
+                            _molResLink = Molecule.MolResLink( ccpnMolecule,
                                          molResLinkEnds = [nextLink, prevLink] )
                         #endif
                     #end if
@@ -1801,7 +1801,7 @@ def createCcpnStructures( cingProject = None, ccpnProject = None,
     ccpnProject = _checkCcpnProject( ccpnProject, cingProject, funcName )
     if not ccpnProject: return None
 
-    dummy_moleculeList = []
+    _moleculeList = []
 
     #if 'moleculeName' is not specified, it'll export all Cing.Molecules
     if ( moleculeName ):
@@ -1889,7 +1889,7 @@ def createCcpnRestraints( cingProject = None, ccpnProject = None,
         ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList( name =
                                                     distanceRestraintList.name )
         for distanceRestraint in distanceRestraintList:
-            dummy_ccpnDistanceConstraint = ccpnDistanceList.newDistanceConstraint(
+            _ccpnDistanceConstraint = ccpnDistanceList.newDistanceConstraint(
                                            lowerLimit = distanceRestraint.lower,
                                            upperLimit = distanceRestraint.upper)
             #print distanceRestraint.atomPairs[0][0].ccpn
@@ -1897,9 +1897,9 @@ def createCcpnRestraints( cingProject = None, ccpnProject = None,
     #end for
 
     for dihedralRestraintList in cingProject.dihedrals:
-        dummy_ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList( name =
+        _ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList( name =
                                                     dihedralRestraintList.name )
-        for dummy_dihedralRestraint in dihedralRestraintList:
+        for _dihedralRestraint in dihedralRestraintList:
             pass
             #ccpnDihedralList.newDihedralConstraint()
         #end for
@@ -1931,7 +1931,7 @@ def _makeNmrConstraintStore(nmrProject):
     dict = nmrProject.__dict__.get('serialDict') or {} #hack
     if dict.get('nmrConstraintStores') is None:
         # need to make sure that the Nmr package is loaded and that we have a serialDict
-        dummy_nmrConstraintStores = project.nmrConstraintStores
+        _nmrConstraintStores = project.nmrConstraintStores
 
     n = dict.get('nmrConstraintStores',0) + 1
 

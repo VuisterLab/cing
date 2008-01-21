@@ -30,8 +30,9 @@ import zipfile
 # MAKE PATH ABSOLUTE
 # ==================
 def abspath(path):
-  if (not os.path.isabs(path)): path=os.path.join(os.getcwd(),path)
-  return(path)
+  if not os.path.isabs(path): 
+      path=os.path.join(os.getcwd(),path)
+  return path
 
 # COPY FILE
 # =========

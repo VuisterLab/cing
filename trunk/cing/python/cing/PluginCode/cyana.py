@@ -58,7 +58,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
         return None
     #end if
     
-    res, angleName, dummy_db = dr.retrieveDefinition()    
+    res, angleName, _db = dr.retrieveDefinition()    
     if res:
         return sprintf( '%4d %-4s %-6s %6.1f %6.1f',
                         res.resNum, res.db.translate( convention ), 
@@ -117,7 +117,7 @@ def importAco( project, acoFile, convention ):
         return None
     #end if
          
-    dir,name,dummy_ext = NTpath( acoFile )
+    dir,name,_ext = NTpath( acoFile )
     result       = project.dihedrals.new( name=name, status='keep', verbose=False )
     
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
@@ -167,7 +167,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         return None
     #end if
    
-    dir,name,dummy_ext = NTpath( uplFile )
+    dir,name,_ext = NTpath( uplFile )
 #    result       = project.newDistanceRestraintList( name )
     result       = project.distances.new( name=name, status='keep', verbose=False )
     

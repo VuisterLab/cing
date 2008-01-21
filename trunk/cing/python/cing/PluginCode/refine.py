@@ -72,7 +72,7 @@ def importFromRefine( project, name ):
     print params
           
     # little misery to check for presence of files
-    path,b,dummy_ext = NTpath(params.baseName)
+    path,b,_ext = NTpath(params.baseName)
     basenames = [b+'.fitted.pdb', b+'.pdb']    
     found = True
     for b in basenames:

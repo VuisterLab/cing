@@ -46,7 +46,7 @@ class Xplor( NTdict ):
         
         # check for directories relative to basePath
         self.setdefault( 'basePath', '.')
-        for dummy_dirname, dirpath in self.directories.items():
+        for _dirname, dirpath in self.directories.items():
             self.makePath( self.joinPath( dirpath ) )
         #end for
         

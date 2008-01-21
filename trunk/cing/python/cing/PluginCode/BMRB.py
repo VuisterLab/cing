@@ -9,12 +9,17 @@ from cing.Libs.NTutils import NTmessage
 from cing.core.constants import BMRBd
 from cing.core.molecule import Molecule
 
+class NMRrestraintsGrid():
+    def __init__(self):
+        self.bmrbUrl = "http://www.bmrb.wisc.edu"
+        
 #==============================================================================
 def initBMRB( project, bmrbFile, moleculeName, verbose = None ):
     """Initialise from edited BMRB file
        Return molecule instance
     """
-    if verbose == None: verbose = project.parameters.verbose()
+    if verbose == None: 
+        verbose = project.parameters.verbose()
     
     mol = Molecule( name=moleculeName , verbose=False )
     project.appendMolecule( mol )
@@ -80,7 +85,7 @@ def importBMRB( project, bmrbFile, verbose=None ):
         atomName= f.dollar[4]
         shift   = f.float(6)
         serror  = f.float(7)
-        dummy_ambig   = f.int(8)
+        _ambig   = f.int(8)
       
         atm = mol.decodeNameTuple( (BMRBd, 'A', resNum, atomName) )
 

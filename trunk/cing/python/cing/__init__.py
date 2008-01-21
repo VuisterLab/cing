@@ -31,15 +31,20 @@ cingRoot = os.path.split(cingPythonDir)[0]
 cingDirTests       = os.path.join(cingRoot,         "Tests")
 cingDirTestsData   = os.path.join(cingDirTests,     "data")
 cingDirTestsTmp    = os.path.join(cingDirTestsData, "tmp")
+cingDirCsh         = os.path.join(cingRoot,         "csh")
+cingDirTmp         = os.path.join("/tmp" , "cing")
+if not os.path.exists(cingDirTmp):
+    if os.mkdir(cingDirTmp):
+        print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)
+        sys.exit(1)
 
-
-
+# Define some we are used to use from the toplevel Cing api
 # dont move these to the top as they become circular.
 from cing.Libs.peirceTest import peirceTest
+from cing.Libs.NTutils import NTlist
 from cing.core.classes import *
 from cing.core.database import NTdb
 from cing.core.dictionaries import *
 from cing.core.molecule import *
 from cing.core.parameters import * 
 from cing.core.importPlugin import importPlugin # This imports all plugins
-

@@ -46,10 +46,10 @@ class AllChecks(TestCase):
         print project.cingPaths.format()
         project.validate()
 
-    def ttttestrunPDB(self):
+    def tttestrunPDB(self):
         """validate run based off pdb file"""
-        entryId = "2hgh" # Small much studied PDB NMR entry 
-        pdbFileName = entryId+"_small.pdb"
+        entryId = "2hgh_small" # Small much studied PDB NMR entry 
+        pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cingDirTestsData, pdbFileName)
         
         self.failIf( os.chdir(cingDirTestsTmp), msg=
@@ -58,6 +58,7 @@ class AllChecks(TestCase):
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
         project.validate()
+#        project.save( )
 
 if __name__ == "__main__":
     unittest.main()

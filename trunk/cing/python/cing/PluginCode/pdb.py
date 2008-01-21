@@ -138,7 +138,8 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None, verbose=True 
 Return molecule instance
 convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
-
+    showMaxNumberOfWarnings = 100
+    shownWarnings = 0
     if verbose:
         NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
         NTmessage.flush()
@@ -186,9 +187,13 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             #end if    
 
             if not atm:
-                printWarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
-                         convention, mol.modelCount, record))
-            
+                if shownWarnings <= showMaxNumberOfWarnings:
+                    printWarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
+                             convention, mol.modelCount, record))
+                    if shownWarnings == showMaxNumberOfWarnings:
+                        printWarning('And so on.')
+                    shownWarnings += 1
+                    
             elif atm.residueDef.hasProperties('cyanaPseudoResidue'):
                 # skip CYANA pseudo residues
                 pass
@@ -225,6 +230,8 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             #end if
         #end if
     #end for
+    if shownWarnings:
+        printWarning('Total number of warnings: ' + `shownWarnings`)
     
     # Patch to get modelCount right for X-ray structures with only one model
     if not foundModel: 
@@ -262,7 +269,7 @@ Molecule.toPDBfile = moleculeToPDBfile
 def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
     """Initialise Molecule from pdbFile. returns molecule instance"""
     if not name: 
-        dummy_path,name,dummy_ext  = NTpath( pdbFile )
+        _path,name,_ext  = NTpath( pdbFile )
     #end if
     molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels,
                              verbose = project.parameters.verbose()
