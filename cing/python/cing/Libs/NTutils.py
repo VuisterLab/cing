@@ -23,28 +23,28 @@ def splitpdb( fileName = None, modelNum = None ):
     # maybe we have an awk version not supporting it.
     Moved to Python on 19 nov 2007.
     """
-    usage = """usage: splitpdb [modelnum=?] file 
- 
-Split a multi-model PDB file into separate PDB files, named xxx_001.yyy etc. 
-where xxx is the name of the input file (minus directory path) 
-and yyy its extension (if present). 
- 
+    usage = """usage: splitpdb [modelnum=?] file
+
+Split a multi-model PDB file into separate PDB files, named xxx_001.yyy etc.
+where xxx is the name of the input file (minus directory path)
+and yyy its extension (if present).
+
 Returns None on error and 1 for success.
- 
-If modelnum is given, only the model with the corresponding model number 
-is extracted. 
- 
-Everything before the first MODEL (except JRNL and REMARK records) 
-is removed and does not occur in any output file. 
-Everything between MODEL and ENDMDL is copied. 
-The MODEL records are replaced by a REMARK. 
-The ENDMDL records are replaced by END. 
-Everything after the last ENDMDL (including CONECT's) is discarded. 
-A MASTER record is not added. 
- 
-If no MODEL records are present no new PDB files are produced 
-and the script exits with status 1 
-A MODEL 0 record (as in entry 1CRQ) is ignored by the script. 
+
+If modelnum is given, only the model with the corresponding model number
+is extracted.
+
+Everything before the first MODEL (except JRNL and REMARK records)
+is removed and does not occur in any output file.
+Everything between MODEL and ENDMDL is copied.
+The MODEL records are replaced by a REMARK.
+The ENDMDL records are replaced by END.
+Everything after the last ENDMDL (including CONECT's) is discarded.
+A MASTER record is not added.
+
+If no MODEL records are present no new PDB files are produced
+and the script exits with status 1
+A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
 """
     printError("Don't use this code until completed")
     return None
@@ -61,7 +61,7 @@ A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
     file = open( fileNameModel, 'w')
     for line in AwkLike(fileName):
 #         if line.NF > 1:
-#             print line.dollar[0], line.dollar[1]  
+#             print line.dollar[0], line.dollar[1]
         if line.dollar[0].startsWith("JRNL"):
             continue
         if line.dollar[0].startsWith("REMARK"):
@@ -71,7 +71,7 @@ A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
             ## and       Special case for entry 1crr with MODEL 21 record
             ## Skip the whole model, treat it as if it is not an ensemble.
             ## if the first model listed is not number 1
-            if line.NF < 2: 
+            if line.NF < 2:
                 printError("Add special case for when model record doesn't contain model number")
                 return None
 
@@ -92,23 +92,23 @@ A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
             continue
         if line.dollar[0].startsWith("MASTER"):
             continue
-                        
+
         file.write (line.dollar[0] )
 
 """ Returns new file name for a given model number
 or None for Error.
 """
-def _fileNameModel( fileName=None, modelId=None ):    
+def _fileNameModel( fileName=None, modelId=None ):
     if modelId is None:
         return None
     if not os.path.exists(fileName):
         return None
-#    modelFileNamePart = "" 
+#    modelFileNamePart = ""
 #    ext = os.path.getExtension(fileName)
 #    base = os.path.getBase(fileName)
 #    return base + "_" + sprintf( "%03i", modelId ) + ext
 
-    
+
 
 #
 # -----------------------------------------------------------------------------
@@ -118,11 +118,11 @@ class NTlist( list ):
     NTlist: list which is callable:
       __call__(index=-1) index<0: returns last item added or None for empty list
                          index>=0: returns item 'index'
-    
-    Methods: 
+
+    Methods:
       index( item ):    returns -1 when item is not present
       push( item ):     pushes item at position 0 (front) of list
-      pop( index=0 ):   pops item at position index 
+      pop( index=0 ):   pops item at position index
       last():           returns last element of list or None on empty list
       replace(item, newItem ):
                         replaces item with newItem
@@ -141,7 +141,7 @@ class NTlist( list ):
       sumsq( start=0 )  Return squared sum of list.
       limit( min, max): limit between min and max by adding/subtracting
                         (max-min)
-    
+
     Other methods as in list
 
     """
@@ -158,7 +158,7 @@ class NTlist( list ):
         self.sd = None
         self.n = 0
     #end def
-            
+
     def __call__( self, index=-1 ):
         if (index < 0):
             return self.current
@@ -166,12 +166,12 @@ class NTlist( list ):
             return self[ index ]
         #end if
     #end def
-    
+
     def __getslice__( self, i, j ):
         """To implement slicing"""
         return NTlist( *list.__getslice__( self, i, j) )
     #end def
-    
+
     def __getitem__( self, item ):
         """To implement extended slicing"""
         if type(item) == slice:
@@ -179,11 +179,11 @@ class NTlist( list ):
         else:
             return list.__getitem__( self, item)
     #end def
-    
+
     def __add__( self, other ):
         return NTlist( *list.__add__(self,other) )
     #end def
-        
+
     def append( self, *items ):
         for item in items:
             list.append( self, item )
@@ -201,27 +201,27 @@ class NTlist( list ):
             #end if
         #end for
     #end def
-        
+
     def insert( self, i, item ):
         list.insert( self, i, item )
         self.current = item
     #end def
-        
+
     def remove( self, item ):
         list.remove( self, item )
         if item == self.current:
             self.current = self.last()
         #end if
     #end def
-                
+
     def replace( self, item, newItem ):
         index = self.index( item )
-        if (index < 0): 
+        if (index < 0):
             return
         self.remove( item )
         self.insert( index, newItem )
     #end def
-        
+
     def index( self, item ):
         # JFD notest that this method can be twice as fast; rewritten
 #        return list.index( self, item )
@@ -232,7 +232,7 @@ class NTlist( list ):
             return -1
         #end if
     #end def
-    
+
     def last( self ):
         l = len(self)
         if (l == 0):
@@ -244,7 +244,7 @@ class NTlist( list ):
     def push( self, item ):
         self.insert( 0, item )
     #end def
-    
+
     def pop( self, index=0 ):
         """Return index'ed item from list or None on empty list
         """
@@ -262,7 +262,7 @@ class NTlist( list ):
         """
         return NTzap( self, byItem )
     #end def
-    
+
     def removeDuplicates( self ):
         if len(self) <= 1: return
         i = 1
@@ -275,19 +275,19 @@ class NTlist( list ):
             #end if
         #end while
     #end def
-    
+
     def reorder( self, indices ):
         """Return a new NTlist, ordered according to indices or None on error
         """
         if (len(indices) != len(self)): return None
-        
+
         result = NTlist()
         for idx in indices:
             result.append( self[idx] )
         #end for
         return result
     #end def
-    
+
     def setCurrent( self, item ):
         if item in self:
             self.current = item
@@ -301,40 +301,40 @@ class NTlist( list ):
            Store av,sd,n as attributes of self
            Assumes numeric list, None elements ignored
            See also NTaverage routine
-        """            
+        """
         self.av, self.sd, self.n = NTaverage( self, byItem )
         return ( self.av, self.sd, self.n )
     #end def
-    
+
     def cAverage( self, min=0.0, max=360.0, radians = 0, byItem=None ):
         """return (cav,cv,cn) tuple of a list
-           return cav on min-max interval (that has to be spaced 
+           return cav on min-max interval (that has to be spaced
            360 or 2pi depending on radians )
            Store cav,cv,cn as attributes of self
            Assumes numeric list, None elements ignored
            See also NTcAverage routine
-        """        
+        """
         self.cav, self.cv, self.cn = NTcAverage( self, min, max, radians, byItem )
         return ( self.cav, self.cv, self.cn )
     #end def
-    
+
     def min(self):
         if len(self) == 0: return None
         else: return min(self)
     #end def
-    
+
     def max(self):
         if len(self) == 0: return None
         else: return max(self)
     #end def
-    
+
     def minItem(self):
         if len(self) == 0: return (None,None)
         c = zip(self,range(len(self)))
         c.sort()
         return (c[0][1],c[0][0])
     #end def
-    
+
     def maxItem(self):
         if len(self) == 0: return (None,None)
         c = zip(self,range(len(self)))
@@ -345,7 +345,7 @@ class NTlist( list ):
     def sum(self, start=0):
         return sum(self, start)
     #end def
-    
+
     def sumsq(self, start=0):
         return sum( map( NTsq, self), start)
     #end def
@@ -360,11 +360,11 @@ class NTlist( list ):
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
-    def __str__( self ): 
+    def __str__( self ):
         if len(self) == 0:
             return '[]'
         #end if
-        
+
         string = '['
         for item in self:
             string = string + str( item ) +', '
@@ -372,12 +372,12 @@ class NTlist( list ):
         string = string[:-2]+']'
         return string
     #end def
-    
-    def __repr__( self ): 
+
+    def __repr__( self ):
         if len(self) == 0:
             return 'NTlist()'
         #end if
-        
+
         string = 'NTlist('
         for item in self:
             string = string + repr( item ) +', '
@@ -385,12 +385,12 @@ class NTlist( list ):
         string = string[:-2]+')'
         return string
     #end def
-    
+
     def format( self, fmt = None ):
         if len(self) == 0:
             return ''
         #end if
-        
+
         if (fmt == None and hasattr( self, '__FORMAT__')):
             fmt = self.__FORMAT__
         #end if
@@ -404,18 +404,19 @@ class NTlist( list ):
         #end for
         return string
     #end def
-    
+
     def formatHtml(self):
-        if not self.format(): 
+        if not self.format():
             return ''
         #end if
         htmlLine = ''
-        for item in  self.format().split('\n'):
-            htmlLine = htmlLine + '<a> %s</a><br>' % item
+        formatLine = self.format().split('\n')[:-1]
+        for item in formatLine:
+            htmlLine = htmlLine + '<a> %s</a><br/>' % item
         #end for
         return htmlLine
     #end def
-    
+
     def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         NTindent( depth, stream, indent )
         fprintf( stream, "<NTlist>")
@@ -432,7 +433,7 @@ class NTlist( list ):
 
 def NTfill( value, n ):
     """Return a NTlist instance with n elements of value
-       
+
     """
     result = NTlist()
     i=0
@@ -459,7 +460,7 @@ def NThistogram( theList, low, high, bins ):
 
     tmp = theList[:]
     tmp.sort()
-    
+
 
     bin = 0
     for item in tmp:
@@ -474,7 +475,7 @@ def NThistogram( theList, low, high, bins ):
     #end for
     return his
 #end def
-    
+
 #
 # -----------------------------------------------------------------------------
 #
@@ -491,34 +492,34 @@ class NTvector( list ):
         list.__init__( self )
         for v in values:
             self.append( v )
-        #end for        
+        #end for
         self.fmt = '%.2f'
     #end def
-    
+
     def length( self ):
         result = 0
         for i in range(0, len(self)):
             result += self[i]*self[i]
         #end for
-        return math.sqrt(result)    
+        return math.sqrt(result)
     #end def
-    
+
     def norm( self ):
         lgth = 1.0/self.length()
         result = NTvector()
         for i in range(0, len(self)):
             result.append( self[i]*lgth )
         #end for
-        return result   
+        return result
     #end def
-    
+
     def polar( self, radians = False ):
         """
         return triple of polar coordinates (r,u,v)
         with:
           -pi<=u<=pi
           -pi/2<=v<=pi/2
-          
+
           x = rcos(v)cos(u)
           y = rcos(v)sin(u)
           z = rsin(v)
@@ -531,16 +532,16 @@ class NTvector( list ):
         u = math.atan2( self[1], self[0] )
 #        if u<0: u+=math.pi*2.0
         v = math.asin( self[2]/r )
-        return r, u*fac, v*fac 
+        return r, u*fac, v*fac
     #end def
-    
+
     def setFromPolar( self, polarCoordinates, radians = False ):
         """
         set vector using polarCoordinates (r,u,v)
         with:
           0<=u<=2pi
           -pi/2<=v<=pi/2
-          
+
           x = rcos(v)cos(u)
           y = rcos(v)sin(u)
           z = rsin(v)
@@ -554,7 +555,7 @@ class NTvector( list ):
         self[1] = r*math.cos(v*fac)*math.sin(u*fac)
         self[2] = r*math.sin(v*fac)
     #end def
-   
+
     def rotX( self, angle, radians=False ):
         if len(self) != 3: return None
 
@@ -570,7 +571,7 @@ class NTvector( list ):
         #end for
         return result
     #end def
-            
+
     def rotY( self, angle, radians=False ):
         if len(self) != 3: return None
 
@@ -586,7 +587,7 @@ class NTvector( list ):
         #end for
         return result
     #end def
-        
+
     def rotZ( self, angle, radians=False ):
         """rotate clockwise along z-axis
         """
@@ -614,18 +615,18 @@ class NTvector( list ):
             result += self[i]*other[i]
         #end for
         return result
-    #end def    
-    
+    #end def
+
     def cross( self, other ):
         """
         return cross vector spanned by self and other
 
           result = self x other
-          
+
         or None on error
 
         Definitions from Kreyszig, Advanced Enginering Mathematics, 4th edition, Wiley and Sons, p273
-        
+
         NB: Only 3D vectors
         """
         l = len(self)
@@ -643,7 +644,7 @@ class NTvector( list ):
         """
         return triple product of self,b,c
         or None on error
-        """        
+        """
         l = len(self)
         if l != 3: return None
         if l != len(b): return None
@@ -662,30 +663,30 @@ class NTvector( list ):
         range = [0, pi]
         positive angle is counterclockwise (to be in-line with 'polar' methods
         and atan2 routines).
-        """        
+        """
         l = len(self)
         if l != len(other): return None
 
         fac = 1.0
         if not radians: fac = 180.0/math.pi
-        
+
 
         c = self.dot(other) /(self.length()*other.length())
         c = min( c, 1.0 )
         c = max( c, -1.0 )
         angle = math.acos( c )
-        return (angle * fac)    
+        return (angle * fac)
     #end def
 
     def distance( self, other ):
         """
         return distance between self and other
         or None on error
-        """        
+        """
         l = len(self)
         if l != len(other): return None
         diff = self-other
-        return diff.length()    
+        return diff.length()
     #end def
 
     def __add__( self, other ):
@@ -697,7 +698,7 @@ class NTvector( list ):
         #end for
         return result
     #end def
-    
+
     def __radd__( self, other ):
         l = len(self)
         if l != len(other): return None
@@ -707,12 +708,12 @@ class NTvector( list ):
         #end for
         return result
     #end def
-        
+
     def __iadd__( self, other ):
         l = len(self)
         if l != len(other): return None
         for i in range(0, l):
-            self[i] += other[i] 
+            self[i] += other[i]
         #end for
         return self
     #end def
@@ -726,7 +727,7 @@ class NTvector( list ):
         #end for
         return result
     #end def
-    
+
     def __rsub__( self, other ):
         l = len(self)
         if l != len(other): return None
@@ -736,16 +737,16 @@ class NTvector( list ):
         #end for
         return result
     #end def
-    
+
     def __isub__( self, other ):
         l = len(self)
         if l != len(other): return None
         for i in range(0, l):
-            self[i] -= other[i] 
+            self[i] -= other[i]
         #end for
         return self
     #end def
-    
+
     def __neg__( self ):
         l = len(self)
         result = NTvector()
@@ -754,7 +755,7 @@ class NTvector( list ):
         #end for
         return result
     #end def
-    
+
     def __pos__( self ):
         l = len(self)
         result = NTvector()
@@ -766,11 +767,11 @@ class NTvector( list ):
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
-    def __str__( self ): 
+    def __str__( self ):
         if len(self) == 0:
             return '(V:)'
         #end if
-        
+
         string = '(V: '
         for item in self:
             string = string + sprintf(self.fmt, item) +', '
@@ -788,7 +789,7 @@ class NTset( NTlist ):
     Class to define sets; i.e. list of objects
     A set is equal to another set if they have at least one element in common
     """
-    
+
     def __eq__( self, other):
         if other == None:
             return False
@@ -800,23 +801,23 @@ class NTset( NTlist ):
             return False
         #end if
     #end def
-  
+
     def __ne__( self, other):
         return not (self == other)
     #end def
 
     def __str__( self ):
-        
+
         if len(self) == 0:
             return '//'
-        
+
         string = '/'
         for item in self:
             string = string + str( item ) +', '
         string = string[:-2]+'/'
         return string
     #end def
-    
+
     def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         NTindent( depth, stream, indent )
         fprintf( stream, "<NTset>")
@@ -829,7 +830,7 @@ class NTset( NTlist ):
         fprintf( stream, "</NTset>")
         fprintf( stream, lineEnd )
     #end def
-    
+
 #end class
 
 #
@@ -843,7 +844,7 @@ class odict(dict):
         self._keys = []
         dict.__init__(self)
         self.append( *args )
- 
+
     def __delitem__(self, key):
         dict.__delitem__(self, key)
         self._keys.remove(key)
@@ -866,21 +867,21 @@ class odict(dict):
 # now all decend from method keys().
     def keys(self):
         return self._keys
-    
+
     def iterkeys( self ):
         for key in self.keys():
             yield key
-    
+
     def values( self ):
         return map( self.get, self.keys() )
 
     def itervalues( self ):
         for value in self.values():
            yield value
-    
+
     def items( self ):
         return zip( self.keys(), self.values() )
-    
+
     def iteritems( self ):
         for item in self.items():
             yield item
@@ -897,16 +898,16 @@ class odict(dict):
         return (key, val)
 
     def setdefault(self, key, failobj = None):
-        if key not in self._keys: 
+        if key not in self._keys:
             self._keys.append(key)
         return dict.setdefault(self, key, failobj)
 
     def update(self, dict):
         dict.update(self, dict)
         for key in dict.keys():
-            if key not in self._keys: 
+            if key not in self._keys:
                 self._keys.append(key)
-                
+
     def append( self, *items):
         for key, value in items:
            self.__setitem__( key, value )
@@ -923,22 +924,22 @@ NTdictCycles   = []
 class NTdict(dict):
   """
       class NTdict: Base class for all mapping NT objects.
-      
+
       create a 'structure' from keywords to group things. Keys can be referenced as
       in dictionary methods, or as an attribute; e.g.
-      
-          aap = NTdict( noot=3, mies=4, kees='not awake' )      
+
+          aap = NTdict( noot=3, mies=4, kees='not awake' )
           print aap['noot']
           > 3
           print aap.noot
           > 3
-      
+
       Hashing and compare implemented.
-      
+
       Methods:
           __call__( **kwds )                            Calling will update kwds and return self
-          
-          format( format=None ):                        Format the object according to format or __FORMAT__ (when 
+
+          format( format=None ):                        Format the object according to format or __FORMAT__ (when
                                                         format == None) attribute.
           printAttr( stream=sys.stdout, hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
                                                         Also print 'hidden' attributes when hidden!=0.
@@ -948,7 +949,7 @@ class NTdict(dict):
           saveXML( *attrs ):                            Add attrs to the list to save in XML format.
           toXML( stream=sys.stdout )                    Write XML code of object to stream; recursively decend; i.e.
                                                         cycles will wreck this routine.
-                                           
+
       Inherited methods:
           most methods defined as in dict()
 
@@ -957,18 +958,18 @@ class NTdict(dict):
           Hence when subclassing, overriding the keys() method effectively implements the other methods
 
           popitem() returns None upon empty dictionary
-          
+
       Reserved attributes:
           attribute '__CLASS__'                         is reserved to store a class identifier; usefull for subtyping
           attribute '__OBJECTID__'                      is reserved to store an unique object id
           attribute '__FORMAT__'                        is reserved to store format for method format()
           attribute '__HIDDEN__'                        is reserved to store the hidden attributes
           attribute '__SAVEXML__'                       is reserved to store the name of attributes saved as XML
-     
-      GV 12 Sep 2007: 
+
+      GV 12 Sep 2007:
         removed implementation with global storage in NTstructObjects since it was never used and
         will result in objects persisting even if they could be deleted (i.e. a memory leak).
-  """  
+  """
   def __init__( self, *args, **kwds ):
      global NTdictObjectId
 
@@ -992,7 +993,7 @@ class NTdict(dict):
 
   def __setattr__(self, attr, value):
     self[attr] = value
-    
+
   def __delattr__(self, attr):
     del( self[attr] )
 
@@ -1005,20 +1006,20 @@ class NTdict(dict):
           return 0
       #end if
   #end def
-  
+
   def __hash__( self ):
       return hash( self.__OBJECTID__ )
   #end def
-    
+
   def __eq__( self, other):
     if other == None:
         return False
-    else:       
+    else:
         return self.__OBJECTID__ == other.__OBJECTID__
-    
+
   def __ne__( self, other):
     return not (self == other)
-     
+
   #------------------------------------------------------------------
   # Print/repr/output routines
   #------------------------------------------------------------------
@@ -1026,32 +1027,32 @@ class NTdict(dict):
 #    return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
 #    return self.format()
     return '<%s-object (%d)>' % ( self._className(), self.__OBJECTID__ )
-    
+
   def _className( self ):
     return str(self.__class__)[7:-2].split('.')[-1:][0]
   #end def
-  
+
   def __repr__( self ):
 #     return dict.__repr__( self )
 #     return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
      global NTdictDepth, NTdictMaxDepth, NTdictCycles
-     
+
      #prevent cycles
      if (NTdictDepth == 0):
          NTdictCycles = []
      #end if
-     
+
      if (self.__OBJECTID__ in NTdictCycles):
          return  '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
      #end if
      NTdictCycles.append( self.__OBJECTID__ )
 
-     NTdictDepth += 1     
+     NTdictDepth += 1
      if (NTdictDepth > NTdictMaxDepth):
          NTdictDepth -= 1
          return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
      #end if
-     
+
      string = self.__CLASS__ + '( '
      remove2chars = 0
      for k in self.keys():
@@ -1060,7 +1061,7 @@ class NTdict(dict):
      #end for
      #check if we also need to store some internals
      for k in ['__FORMAT__','__SAVEXML__']:
-         if self[k] != None: 
+         if self[k] != None:
              string = string + k + ' = ' + repr( self[k] ) + ', '
              remove2chars = 1
      #end for
@@ -1068,26 +1069,26 @@ class NTdict(dict):
      if remove2chars: string = string[0:len(string)-2]
      # append closing paren
      string = string + ' )'
-     
+
      NTdictDepth -= 1
      return string
   #end def
-  
+
   def format( self, format=None ):
-    """Return a formatted string of the items 
+    """Return a formatted string of the items
        Uses format or stored attribute __FORMAT__ or default
     """
     # use __FORMAT__  if none given
     if (format == None):
         format = self.__FORMAT__
     #end if
-    
+
     # use the default format if None
     if (format == None):
-        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>' 
+        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
     #end if
-    
-    return format % self 
+
+    return format % self
   #end def
 
   def keysformat( self, dots='-'*20 ):
@@ -1096,13 +1097,13 @@ class NTdict(dict):
     fmt = self.header(dots) + '\n'
     for key in self.keys():
         s = '%-' + str(len(dots)) + 's '
-        fmt = fmt +  s%(str(key)+':') + '%(' + str(key) + ')s\n' 
+        fmt = fmt +  s%(str(key)+':') + '%(' + str(key) + ')s\n'
     #end for
     fmt = fmt + self.footer(dots)
     self.__FORMAT__ = fmt
   #end def
 
-            
+
   def printAttr( self, stream=sys.stdout, hidden=0 ):
     """Print attributes of structure
     """
@@ -1113,13 +1114,13 @@ class NTdict(dict):
 #    print '>>',keys
     for key in keys:
       fprintf( stream, '%-12s : %s\n', key, str(self[key]))
-    
+
   def header( self, dots = '-'*20  ):
     """Generate a header using __CLASS__ and dots.
     """
     return sprintf('%s %s %s', dots, self.__CLASS__, dots )
   #end def
-    
+
   def footer( self, dots = '-'*20  ):
     """Generate a footer using dots of the same length as header.
     """
@@ -1143,7 +1144,7 @@ class NTdict(dict):
         newInstance[k] = self[k]
     #end for
     return newInstance
-    
+
   def __call__( self, **kwds ):
       self.update( kwds )
       return self
@@ -1154,7 +1155,7 @@ class NTdict(dict):
       if self.has_key( key ): return self[key]
       else: return self[defaultKey]
   #end def
-  
+
   def uniqueKey( self, key ):
       """return a unique key derived from key"""
       i = 1
@@ -1165,45 +1166,45 @@ class NTdict(dict):
       #end while
       return newkey
   #end def
-  
+
   #------------------------------------------------------------------
-  # methods __iter__(), iterkeys(), 
-  #         values(),   itervalues(), 
+  # methods __iter__(), iterkeys(),
+  #         values(),   itervalues(),
   #         items(),    iteritems()
-  #         len(),      popitem(),     clear(),   update() 
+  #         len(),      popitem(),     clear(),   update()
   # now all decend from method keys().
   #------------------------------------------------------------------
   def keys( self ):
     keys = dict.keys( self )
-    # i.e. we only need to remove the 'local' stuff here  
+    # i.e. we only need to remove the 'local' stuff here
     # remove keys that should be hidden
     for key in self.__HIDDEN__:
       keys.remove(key)
     # sort keys as well
     keys.sort()
     return keys
-    
+
   def __iter__( self ):
-    """__iter__ returns keys       
+    """__iter__ returns keys
     """
     for key in self.keys():
       yield key
   #end def
-    
+
   def iterkeys( self ):
     for key in self.keys():
         yield key
-    
+
   def values( self ):
     return map( self.get, self.keys() )
 
   def itervalues( self ):
     for value in self.values():
         yield value
-    
+
   def items( self ):
     return zip( self.keys(), self.values() )
-    
+
   def iteritems( self ):
     for item in self.items():
         yield item
@@ -1221,7 +1222,7 @@ class NTdict(dict):
     val = self[key]
     del self[key]
     return (key, val)
-    
+
   def clear( self ):
     p = self.popitem()
     while p:
@@ -1230,7 +1231,7 @@ class NTdict(dict):
   def update( self, fromDict ):
     for key,value in fromDict.iteritems():
       self[key] = value
-   
+
   #------------------------------------------------------------------
   # XML routines
   #------------------------------------------------------------------
@@ -1239,7 +1240,7 @@ class NTdict(dict):
         fprintf( stream, "<%s>", self.__CLASS__ )
         fprintf( stream, lineEnd )
 #       print node
-        
+
         # check for what we need to write out
         if (self.__SAVEALLXML__):
             keys = self.keys()
@@ -1248,12 +1249,12 @@ class NTdict(dict):
         else:
             keys = []
         #end if
-        
+
         for a in keys:
             NTindent( depth+1, stream, indent )
             fprintf( stream, "<Attr name=%s>", quote( a) )
             fprintf( stream, lineEnd )
-            
+
             NTtoXML( self[a], depth+2, stream, indent, lineEnd )
 
             NTindent( depth+1, stream, indent )
@@ -1264,7 +1265,7 @@ class NTdict(dict):
         fprintf( stream, "</%s>", self.__CLASS__ )
         fprintf( stream, lineEnd )
   #end def
-  
+
   def saveXML( self, *attrs ):
       """add attrributes to save list
       """
@@ -1276,7 +1277,7 @@ class NTdict(dict):
           #end if
       #end for
   #end def
-  
+
   def removeXML( self, *attrs ):
       """remove attrributes from __SAVEXML__ list
       """
@@ -1295,7 +1296,7 @@ class NTdict(dict):
       self.__SAVEALLXML__ = True
   #end def
 
-#end class  
+#end class
 
 # Discouraged name for NTdict; please replace in your scripts asap.
 NTstruct = NTdict
@@ -1303,17 +1304,17 @@ NTstruct = NTdict
 class NoneObjectClass( NTdict ):
     """
     Class representing None; based on NTdict
-    
+
     Allows attribute assignment, extraction, deletion
     Allows iteration
     Allows calling
-    
+
     Returns self where ever appropriate
-    
-    NB: Only one instance should be used: 
-    
+
+    NB: Only one instance should be used:
+
         from NTutils import NoneObject
-    
+
     Experimental
     """
     def __init__( self ):
@@ -1325,33 +1326,33 @@ class NoneObjectClass( NTdict ):
 
     def __setattr__(self, attr, value):
         pass
-    
+
     def __delattr__(self, attr):
         pass
     #end def
-    
+
     # To allow iteration
     def keys(self):
         return []
     #end def
-    
+
     def __call__(self, *args, **kwds ):
         return self
     #end def
-    
+
     def __str__(self):
         return 'NoneObject'
-    
+
     def __repr__(self):
         return 'NoneObject'
-    
+
     def format(self,*args,**kwds):
         return '<NoneObject>'
 #end def
 NoneObject = NoneObjectClass()
 noneobject = NoneObject
 
-  
+
 #
 # -----------------------------------------------------------------------------
 #
@@ -1359,9 +1360,9 @@ class NTtree( NTdict ):
     """NTTree class
        Linked tree-like structure class
     """
-    
-    def __init__(self, name, **kwds ):  
-        kwds.setdefault('__CLASS__','NTtree')   
+
+    def __init__(self, name, **kwds ):
+        kwds.setdefault('__CLASS__','NTtree')
         NTdict.__init__( self, **kwds )
         self._parent   = None
         self._children = NTlist()
@@ -1370,9 +1371,9 @@ class NTtree( NTdict ):
         self.name = name        # keeping name is essential for later referencing
 
         # saving name and children will allow to save the tree as XML and reconstruct
-        self.saveXML('name','_children')                
+        self.saveXML('name','_children')
     #end def
-        
+
     def _Cname( self, depth=0 ):
         """Return name constructor with 'depth' levels"""
         result = self.name
@@ -1384,7 +1385,7 @@ class NTtree( NTdict ):
         #end while
         return result
     #end def
-        
+
     def _Cname2( self, depth=0 ):
         """Return name constructor using ['name']
            with 'depth' levels
@@ -1398,7 +1399,7 @@ class NTtree( NTdict ):
         #end while
         return result
     #end def
-                
+
     def __str__( self ):
         return '<%s %s>' % ( self._className(), self.name )
 #        return self.name
@@ -1407,21 +1408,21 @@ class NTtree( NTdict ):
 #    def __repr__( self ):
 #        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
 #    #end def
-        
+
     def addChild( self, name, **kwds ):
         child = NTtree( name=name, **kwds )
         self._addChild( child )
         return child
     #end def
-                        
+
     def _addChild( self, child ):
         "Internal routine"
         self._children.append( child )
-        self[child.name] = child 
+        self[child.name] = child
         child._parent = self
         return child
     #end def
-    
+
     def removeChild( self, child ):
         if (not child in self._children): return None
         if child.name in self: del( self[ child.name ] )
@@ -1429,7 +1430,7 @@ class NTtree( NTdict ):
         child._parent = None
         return child
     #end def
-    
+
     def renameChild( self, child, newName ):
         if (not child in self._children): return None
         if child.name in self: del( self[ child.name ] )
@@ -1437,7 +1438,7 @@ class NTtree( NTdict ):
         self[child.name] = child
         return child
     #end def
-    
+
     def replaceChild( self, child, newChild ):
         if (not child in self._children): return None
         if child.name in self: del( self[ child.name ] )
@@ -1447,13 +1448,13 @@ class NTtree( NTdict ):
         newChild._parent = self
         return newChild
     #end def
-    
+
     def _sister( self, relativeIndex ):
         """Internal routine: Return index relative to self
            or -1 if it does not exist
         """
         if (self._parent == None): return -1
-        
+
         selfIndex = self._parent._children.index( self )
         if (selfIndex < 0):
             #This should not happen!
@@ -1462,12 +1463,12 @@ class NTtree( NTdict ):
                    )
             return -1
         #end if
-        
+
         targetIndex = selfIndex + relativeIndex
         if ( targetIndex < 0 or targetIndex >= len(self._parent._children) ): return -1
 
         return targetIndex
-    #end def    
+    #end def
 
     def sister( self, relativeIndex ):
         """Return NTtree instance (relative to self)
@@ -1475,12 +1476,12 @@ class NTtree( NTdict ):
         """
 
         targetIndex = self._sister( relativeIndex )
-        if (targetIndex < 0): 
+        if (targetIndex < 0):
             return None
         else:
             return self._parent._children[targetIndex]
         #end if
-    #end def    
+    #end def
 
     def youngerSiblings( self ):
         """return NTlist of elements following self
@@ -1501,7 +1502,7 @@ class NTtree( NTdict ):
         if (sister == None): return []
         return self._parent._children[0:sister+1]
     #end def
-    
+
 #    def set( self, value ):
 #        self._value = [value]
 #    #end def
@@ -1513,18 +1514,18 @@ class NTtree( NTdict ):
     def __iter__( self ):
         """iteration routine: loop of children"""
         self._iter = 0
-        return self 
-    #end def  
-    
+        return self
+    #end def
+
     def next( self ):
         if self._iter >= len(self._children):
             raise StopIteration
-            return None      
+            return None
         s = self._children[self._iter]
         self._iter += 1
         return s
-    #end def 
-        
+    #end def
+
     def traverse( self, depthFirst=1, result = None, depth = -1 ):
         """Traverse the tree,
            infinite depth recursion for depth < 0
@@ -1532,15 +1533,15 @@ class NTtree( NTdict ):
         """
 #        print '>>', self, depth
         if (result == None):
-            result = NTlist()   
+            result = NTlist()
         #end if
         result.append( self )
         for child in self._children:
             if (depth != 0) :
-                child.traverse( depthFirst=depthFirst, result = result, depth = depth-1 ) 
+                child.traverse( depthFirst=depthFirst, result = result, depth = depth-1 )
             #end if
         #end for
-        return result   
+        return result
     #end def
 
     def subNodes( self, result = None, depth = -1 ):
@@ -1549,24 +1550,24 @@ class NTtree( NTdict ):
 #        print '>>', self, depth
 
         if (result == None):
-            result = NTlist()   
+            result = NTlist()
         #end if
         if (depth == 0):
             result.append( self )
         elif (depth > 0):
             for child in self._children:
-                child.subNodes( result = result, depth = depth-1 ) 
+                child.subNodes( result = result, depth = depth-1 )
             #end for
         #end if
-        return result   
+        return result
     #end def
-        
+
     def header( self, dots = '---------'  ):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
     #end def
-    
+
 #end class
 #
 # -----------------------------------------------------------------------------
@@ -1574,24 +1575,24 @@ class NTtree( NTdict ):
 class NTparameter( NTtree ):
     """
     Class to generate a parameter tree
-    
+
     Methods:
-    
+
         set( value )                    Set value of parameter
         __call__()                      Calling returns value of parameter
-        
+
         setDefault( recursion = True )  Set parameters to default value
-        
+
         allLeaves()                     Return all leaves of parameter tree, i.e.
                                         the 'active' parameters
         allBranches()                   Return all the branches of parameter tree
-        
+
     Methods inherited form NTtree and NTdict
-    
+
     """
-    
+
     def __init__( self, name, **kwds ):
-        NTtree.__init__(  self, 
+        NTtree.__init__(  self,
                            __CLASS__ = 'NTparameter',
                            branch    =  False,     # branch=True indicate a node
                                                    # without a value
@@ -1617,23 +1618,23 @@ class NTparameter( NTtree ):
         for key,value in fromDict.iteritems():
 #            print '>>', repr(self), type(self), repr(value), type(value)
             if (type(self) == type(value) and not self.has_key( key ) ):
-                self._addChild( value )                
+                self._addChild( value )
             else:
                 self[key] = value
             #end if
-        #end for    
+        #end for
     #end def
-    
+
     def set( self, value ):
         if ( self.mutable ):
             self.value = value
         #end if
     #end def
-    
+
     def __call__( self ):
         return self.value
     #end def
-    
+
     def setDefault( self, recursion = True ):
         if (recursion):
             for p in self.allLeaves():
@@ -1643,7 +1644,7 @@ class NTparameter( NTtree ):
                 self.set( self.default )
         #end if
     #end def
-    
+
     def allLeaves( self ):
         leaves = NTlist()
         for p in self.traverse():
@@ -1653,7 +1654,7 @@ class NTparameter( NTtree ):
         #end for
         return leaves
     #end def
-    
+
     def allBranches( self ):
         branches = NTlist()
         for p in self.traverse():
@@ -1663,7 +1664,7 @@ class NTparameter( NTtree ):
         #end for
         return branches
     #end def
-    
+
     def writeFile( self, fileName, verbose=1 ):
         fp = open( fileName, 'w' )
         for p in self.allLeaves():
@@ -1671,15 +1672,15 @@ class NTparameter( NTtree ):
         #end for
         fp.close()
     #end def
-    
+
     def __str__( self ):
         return self._Cname( -1 )
     #end def
-    
+
     def __repr__( self ):
         return repr( self.value )
     #end def
-    
+
     def format( self ):
         if self.branch:
             return str( self )
@@ -1698,46 +1699,46 @@ class NTvalue( NTdict ):
     Simple arithmic: +, -, *, /, ==, !=, >, >=, <, <=,
     """
     def __init__( self, value, error=0.0, fmt='%s (+- %s)', **kwds ):
-        kwds.setdefault('__CLASS__','NTvalue')  
+        kwds.setdefault('__CLASS__','NTvalue')
         NTdict.__init__( self, value=value, error=error, fmt=fmt, **kwds )
         self.saveXML( 'value', 'error', 'fmt' )
     #end def
-    
+
     def __call__( self ):
         return self.value
     #end def
-    
+
     def __str__( self ):
         return  self.fmt % ( self.value, self.error )
     #end def
-    
+
     def __repr__(self):
-        return sprintf('NTvalue( value = %s, error = %s, fmt = %s )', 
-                       repr(self.value), repr(self.error), self.fmt 
+        return sprintf('NTvalue( value = %s, error = %s, fmt = %s )',
+                       repr(self.value), repr(self.error), self.fmt
                       )
     #end def
-    
+
     def __add__( self, other ):
         if hasattr(other,'value'):
                 v = self.value+other.value
                 e = math.sqrt(self.error**2+other.error**2)
         else:
                 v = self.value+other
-                e = self.error  
+                e = self.error
         return NTvalue( v, e, self.fmt )
     #end def
-    
+
     def __radd__( self, other ):
         v = other + self.value
         return NTvalue( v, self.error, self.fmt )
     #end def
-    
+
     def __iadd__( self, other ):
         if hasattr(other,'value'):
                 self.value += other.value
                 self.error = math.sqrt(self.error**2+other.error**2)
         else:
-                self.value += other     
+                self.value += other
         return self
     #end def
 
@@ -1747,21 +1748,21 @@ class NTvalue( NTdict ):
                 e = math.sqrt(self.error**2+other.error**2)
         else:
                 v = self.value-other
-                e = self.error  
+                e = self.error
         return NTvalue( v, e, self.fmt )
     #end def
-    
+
     def __rsub__( self, other ):
         v = other - self.value
         return NTvalue( v, self.error, self.fmt )
     #end def
-    
+
     def __isub__( self, other ):
         if hasattr(other,'value'):
                 self.value -= other.value
                 self.error = math.sqrt(self.error**2+other.error**2)
         else:
-                self.value -= other     
+                self.value -= other
         return self
     #end def
 
@@ -1771,16 +1772,16 @@ class NTvalue( NTdict ):
                 e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
                 v = self.value*other
-                e = self.error*other    
+                e = self.error*other
         return NTvalue( v, e, self.fmt )
     #end def
-    
+
     def __rmul__( self, other ):
         v = other * self.value
         e = v*self.error/self.value
         return NTvalue( v, e, self.fmt )
     #end def
-    
+
     def __imul__( self, other ):
         if hasattr(other,'value'):
                 v = self.value
@@ -1788,7 +1789,7 @@ class NTvalue( NTdict ):
                 self.error = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
                 self.value *= other
-                self.error *= other     
+                self.error *= other
         return self
     #end def
 
@@ -1798,10 +1799,10 @@ class NTvalue( NTdict ):
                 e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
                 v = self.value/other
-                e = self.error/other    
+                e = self.error/other
         return NTvalue( v, e, self.fmt )
     #end def
-    
+
     def __rdiv__( self, other ):
         v = other / self.value
         e = v*self.error/self.value
@@ -1815,7 +1816,7 @@ class NTvalue( NTdict ):
                 self.error = self.value*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
                 self.value /= other
-                self.error /= other     
+                self.error /= other
         return self
     #end def
 
@@ -1835,8 +1836,8 @@ class NTvalue( NTdict ):
         v = abs(self.value)
         e = self.error
         return NTvalue( v, e, self.fmt )
-    #end def 
-       
+    #end def
+
     def __cmp__( self, other ):
         if isinstance( other, NTvalue ):
             value = other.value
@@ -1851,28 +1852,28 @@ class NTvalue( NTdict ):
             return 0
         #end if
     #end def
-    
+
     def __eq__( self, other):
         if other == None:
             return False
         elif isinstance( other, NTvalue ):
             return self.value == other.value
-        else:       
+        else:
             return self.value == other
         #end if
     #end def
-    
+
     def __ne__( self, other):
         if other == None:
             return True
         elif isinstance( other, NTvalue ):
             return self.value != other.value
-        else:       
+        else:
             return self.value != other
         #end if
     #end def
 #end class
-    
+
 #
 # -----------------------------------------------------------------------------
 #
@@ -1915,7 +1916,7 @@ def NTlimit( theList, min, max, byItem=None ):
 # -----------------------------------------------------------------------------
 #
 def NTaverage( theList, byIndex=None ):
-    """returns (av, sd, n) tuple of theList or 
+    """returns (av, sd, n) tuple of theList or
        (None, None, 0) in case of zero elements in theList
        Assumes numeric list, None elements are ignored
        byIndex allows for list of tuples r other elements
@@ -1923,7 +1924,7 @@ def NTaverage( theList, byIndex=None ):
     sum = 0.0
     sumsq = 0.0
     n = 0
-    for item in theList:        
+    for item in theList:
         if item != None:
             if byIndex == None:
                 val = item
@@ -1937,7 +1938,7 @@ def NTaverage( theList, byIndex=None ):
             pass
         #end if
     #endif
-    
+
     if n == 0:
         return ( None, None, 0 )
     elif n == 1:
@@ -1946,12 +1947,12 @@ def NTaverage( theList, byIndex=None ):
         theList.n  = 1
         return ( sum, 0.0, 1 )
     #endif
-    
+
     fn = float(n)
-#    print '>>', n, sum, sumsq, sumsq/(fn-1.0), (sum*sum)/(fn*(fn-1.0)) 
+#    print '>>', n, sum, sumsq, sumsq/(fn-1.0), (sum*sum)/(fn*(fn-1.0))
     av = sum/fn
     # some python implementations (Linux) crash in case of all same numbers,
-    # => zero sd, but roundoffs likely generate a very small negative number 
+    # => zero sd, but roundoffs likely generate a very small negative number
     # here
     sd = sumsq/(fn-1.0) - (sum*sum)/(fn*(fn-1.0))
     if sd <= 0.0:
@@ -1963,9 +1964,9 @@ def NTaverage( theList, byIndex=None ):
 #end def
 
 def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
-    """return (circularAverage,circularVariance,n) tuple of thelist or 
+    """return (circularAverage,circularVariance,n) tuple of thelist or
        (None, None, 0) in case of zero elements in theList
-       return circularMean on min-max interval (that has to be spaced 
+       return circularMean on min-max interval (that has to be spaced
        360 or 2pi depending on radians )
        Assumes numeric list, None elements ignored
        byIndex allows for list of tuples
@@ -1980,7 +1981,7 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
         fac = math.pi/180.0
         fac2 = 360.0
     #end if
-    for item in theList:        
+    for item in theList:
         if item != None:
             if byIndex == None:
                 v = item
@@ -1994,21 +1995,21 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
             #end if
         #end if
     #end for
-    
+
     if (n == 0):
         return( None, None, 0 )
     #end if
-    
+
     #calculate cmean, avoid zero divisions
     if (math.fabs( csum ) < 1e-10 ):
          csum = 1e-10
     #end if
-    cav = math.atan( ssum/csum ) 
+    cav = math.atan( ssum/csum )
     if (csum < 0):
         cav += math.pi
     #end if
     cav /= fac
-        
+
     #now scale on min-max interval
     while (cav < min):
         cav += fac2
@@ -2016,12 +2017,12 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
     while (cav > max):
         cav -= fac2
     #end while
-    
+
     #calculate cv
-    cv = 1.0 - math.sqrt( csum*csum + ssum*ssum ) / n 
-    
+    cv = 1.0 - math.sqrt( csum*csum + ssum*ssum ) / n
+
     return (cav, cv, n)
-#end def 
+#end def
 
 def NTzap( theList, byItem ):
     """yield a new list from theList, extracting byItem from each
@@ -2057,20 +2058,20 @@ def NTindent( depth, stream, indent ):
     for dummy in range( depth ):
         fprintf(stream,indent)
     #end for
-#end def   
+#end def
 
 XMLhandlers             = {}
 
 class XMLhandler:
     """Generic handler class
-    
+
        methods:
        __init__                 : will register the handler in XMLhandlers
        handle                   : to be implemented in specific handler
        handleSingleElement      : for float,int,string etc)
        handleMultipleElements   : for list, tuple
        handleDictElements       : for dict, NTdict and the like
-           
+
     """
     def __init__( self, name ):
         global XMLhandlers
@@ -2078,11 +2079,11 @@ class XMLhandler:
         XMLhandlers[name] = self
         self.verbose = 0
     #end def
-    
+
     def handle( self, node ):
         pass
     #end def
-    
+
     def handleSingleElement( self, node ):
         """Returns single element below node from DOM tree"""
         if (self.verbose): self.printNode( node )
@@ -2100,23 +2101,23 @@ class XMLhandler:
         #end if
         result = node.childNodes[0].nodeValue
         if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
-        return result       
+        return result
     #end def
-    
+
     def handleMultipleElements( self, node ):
         if (self.verbose): self.printNode( node )
         if node.nodeName != self.name:
             NTerror('ERROR XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
-        #end if 
+        #end if
         result = []
         for subNode in node.childNodes:
             if subNode.nodeType == Node.ELEMENT_NODE:
                 result.append( NThandle( subNode) )
             #end if
-        #end for        
+        #end for
         if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
-        return  result  
+        return  result
     #end def
 
     def handleDictElements( self, node ):
@@ -2125,12 +2126,12 @@ class XMLhandler:
             NTerror('ERROR XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
         #end if
-        
+
         result = {}
-        
+
 # We have two dict formats
 # original 'NT' format:
-##        
+##
 ##<dict>
 ##    <key name="noot">
 ##        <int>2</int>
@@ -2160,12 +2161,12 @@ class XMLhandler:
             if n.nodeType == Node.ELEMENT_NODE: subNodes.append( n )
         #end for
         if len( subNodes) == 0: return result
-        
+
         #append all keys, checking for 'format' as outlined above
         i = 0
         while (i < len(subNodes)):
             if (self.verbose): self.printNode( subNodes[i] )
-            
+
             try:
                 keyName = subNodes[i].attributes.get('name').nodeValue
                 value = NThandle( subNodes[i].childNodes[1] )
@@ -2174,12 +2175,12 @@ class XMLhandler:
                 keyName = subNodes[i].childNodes[0].nodeValue
                 value = NThandle( subNodes[i+1] )
                 i += 2
-                                  
+
 #            print ">>", keyName, value
-            result[keyName] = value 
-        #end while        
+            result[keyName] = value
+        #end while
         if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
-        return result   
+        return result
     #end def
 
     def printNode( self, node ):
@@ -2190,92 +2191,92 @@ class XMLhandler:
 class XMLNoneHandler( XMLhandler ):
     """None handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='None') 
+        XMLhandler.__init__( self, name='None')
     #end def
-    
+
     def handle( self, node ):
-        return None     
+        return None
     #end def
 #end class
 
 class XMLintHandler( XMLhandler ):
     """int handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='int') 
+        XMLhandler.__init__( self, name='int')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleSingleElement( node )
         if result == None:  return None
-        return int( result )    
+        return int( result )
     #end def
 #end class
 
 class XMLboolHandler( XMLhandler ):
     """bool handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='bool') 
+        XMLhandler.__init__( self, name='bool')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleSingleElement( node )
         if result == None:  return None
         # NB: bool('False') returns True!
-        return bool( result=='True' )    
+        return bool( result=='True' )
     #end def
 #end class
 
 class XMLfloatHandler( XMLhandler ):
     """float handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='float') 
+        XMLhandler.__init__( self, name='float')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleSingleElement( node )
         if result == None:  return None
-        return float( result )  
+        return float( result )
     #end def
 #end class
 
 class XMLstringHandler( XMLhandler ):
     """string handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='string') 
+        XMLhandler.__init__( self, name='string')
     #end def
-    
+
     def handle( self, node ):
         # strings can be empty
         if len( node.childNodes ) == 0: return ''
 
         result = self.handleSingleElement( node )
         if result == None:  return None
-        return str(saxutils.unescape( result )) 
+        return str(saxutils.unescape( result ))
     #end def
 #end class
 
 class XMLunicodeHandler( XMLhandler ):
     """unicode handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='unicode') 
+        XMLhandler.__init__( self, name='unicode')
     #end def
-    
+
     def handle( self, node ):
         # strings can be empty
         if len( node.childNodes ) == 0: return unicode('')
 
         result = self.handleSingleElement( node )
         if result == None:  return None
-        return unicode(saxutils.unescape( result )) 
+        return unicode(saxutils.unescape( result ))
     #end def
 #end class
 
 class XMLlistHandler( XMLhandler ):
     """list handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='list') 
+        XMLhandler.__init__( self, name='list')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleMultipleElements( node )
         if result == None: return None
@@ -2286,29 +2287,29 @@ class XMLlistHandler( XMLhandler ):
 class XMLNTlistHandler( XMLhandler ):
     """NTlist handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='NTlist') 
+        XMLhandler.__init__( self, name='NTlist')
     #end def
-    
+
     def handle( self, node ):
         items = self.handleMultipleElements( node )
         if items == None: return None
         result = NTlist()
         for item in items:
             result.append( item )
-        return result   
+        return result
     #end def
 #end class
 
 class XMLtupleHandler( XMLhandler ):
     """tuple handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='tuple') 
+        XMLhandler.__init__( self, name='tuple')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleMultipleElements( node )
         if result == None: return None
-        return tuple(result)    
+        return tuple(result)
     #end def
 #end class
 
@@ -2316,13 +2317,13 @@ class XMLtupleHandler( XMLhandler ):
 class XMLdictHandler( XMLhandler ):
     """dict handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='dict') 
+        XMLhandler.__init__( self, name='dict')
     #end def
-    
+
     def handle( self, node ):
         result = self.handleDictElements( node )
         if result == None: return None
-        return result   
+        return result
     #end def
 #end class
 
@@ -2330,9 +2331,9 @@ class XMLdictHandler( XMLhandler ):
 class XMLNTstructHandler( XMLhandler ):
     """NTdict handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='NTdict') 
+        XMLhandler.__init__( self, name='NTdict')
     #end def
-    
+
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -2345,9 +2346,9 @@ class XMLNTstructHandler( XMLhandler ):
 class XMLNTtreeHandler( XMLhandler ):
     """NTtree handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='NTtree') 
+        XMLhandler.__init__( self, name='NTtree')
     #end def
-    
+
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -2356,7 +2357,7 @@ class XMLNTtreeHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-            
+
         # restore the tree structure
         for child in result._children:
 #           print '>child>', repr(child)
@@ -2370,9 +2371,9 @@ class XMLNTtreeHandler( XMLhandler ):
 class XMLNTvalueHandler( XMLhandler ):
     """NTvalue handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='NTvalue') 
+        XMLhandler.__init__( self, name='NTvalue')
     #end def
-    
+
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -2385,9 +2386,9 @@ class XMLNTvalueHandler( XMLhandler ):
 class XMLNTplistHandler( XMLhandler ):
     """NTplist handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='plist') 
+        XMLhandler.__init__( self, name='plist')
     #end def
-    
+
     def handle( self, node ):
         result = NTplist()
         for subNode in node.childNodes:
@@ -2424,11 +2425,11 @@ def NThandle( node ):
     if ( node == None ):
         NTerror("ERROR NThandle: None node\n")
         return None
-    #end if    
+    #end if
     if ( node.nodeName not in XMLhandlers ):
         NTerror('ERROR NThandle: no handler for XML <%s>\n', node.nodeName)
         return None
-    #end if    
+    #end if
     return XMLhandlers[node.nodeName].handle( node )
 #end def
 
@@ -2474,7 +2475,7 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         #end for
         NTindent( depth, stream, indent )
         fprintf( stream, "</list>" )
-        fprintf( stream, lineEnd )       
+        fprintf( stream, lineEnd )
     elif ( type( obj) == tuple ):
         NTindent( depth, stream, indent )
         fprintf( stream, "<tuple>" )
@@ -2484,7 +2485,7 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         #end for
         NTindent( depth, stream, indent )
         fprintf( stream, "</tuple>" )
-        fprintf( stream, lineEnd )       
+        fprintf( stream, lineEnd )
     elif ( type( obj ) == dict ):
         NTindent( depth, stream, indent )
         fprintf( stream, "<dict>" )
@@ -2500,7 +2501,7 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         #end for
         NTindent( depth, stream, indent )
         fprintf( stream, "</dict>" )
-        fprintf( stream, lineEnd )       
+        fprintf( stream, lineEnd )
     else:
         NTerror('ERROR NTtoXML: undefined object "%s": cannot generate XML\n', obj )
     #end if
@@ -2518,7 +2519,7 @@ def obj2XML( obj, stream=None, path=None ):
         NTerror("ERROR obj2XML: no output defined\n")
         return
     #end if
-    
+
     closeFile = 0
     if (stream == None):
         stream = open( path, 'w')
@@ -2527,7 +2528,7 @@ def obj2XML( obj, stream=None, path=None ):
 
     fprintf( stream, '<?xml version="1.0" encoding="ISO-8859-1"?>\n' )
     NTtoXML( obj, depth=0, stream=stream, indent='    ' )
-    
+
     if closeFile:
         stream.close()
     #end if
@@ -2541,22 +2542,22 @@ def XML2obj( path=None, string=None ):
         NTerror("ERROR XML2obj: no input defined\n")
         return None
     #end if
-    
+
     if (path):
         doc = minidom.parse( path )
     else:
         doc = minidom.parseString( string )
     #end if
     root = doc.documentElement
-    
+
     result = NThandle( root )
     doc.unlink()
     return result
-    
+
 #end def
 
 class Sorter:
-    def _helper (self, data, aux, inplace):        
+    def _helper (self, data, aux, inplace):
 #        print 'data', data
 #        print 'aux>', aux
         aux.sort()
@@ -2565,7 +2566,7 @@ class Sorter:
         if inplace: data[:] = result
         return result
     #end def
-    
+
     def byItem(self, data, itemindex=None, inplace=False):
         if itemindex is None:
             if inplace:
@@ -2579,7 +2580,7 @@ class Sorter:
         else:
             aux = []
             for i in range(len(data)):
-                 try: 
+                 try:
                      aux.append((data[i][itemindex], i))
                  except KeyError:
                      aux.append( (None, i) )
@@ -2588,11 +2589,11 @@ class Sorter:
 #           aux = [(data[i][itemindex], i) for i in range(len(data))]
             return self._helper(data, aux, inplace)
         #end if
-    
+
     # a couple of handy synonyms
     sort = byItem
     __call__ = byItem
-            
+
     def byAttribute(self, data, attributename, inplace=False):
         aux = [(getattr(data[i],attributename),i) for i in range(len(data))]
         return self._helper(data, aux, inplace)
@@ -2602,7 +2603,7 @@ NTsort = Sorter()
 #
 #------------------------------------------------------------------------------
 #
-def quote( inputString ): 
+def quote( inputString ):
     "return a single or double quoted string"
     single = (find( inputString, "'" ) >= 0)
     double = (find( inputString, '"' ) >= 0)
@@ -2625,7 +2626,7 @@ def asci2list( string ):
         return result
     elif len(string) == 0:
         return result
-    
+
     for elm in string.split(','):
         tmp = elm.split('-')
         if len( tmp ) == 1:
@@ -2636,7 +2637,7 @@ def asci2list( string ):
         else:
             NTerror('ERROR asci2list: invalid construct "%s"\n', string )
         #end if
-    #end for 
+    #end for
 
     return result
 #end def
@@ -2648,13 +2649,13 @@ def list2asci( theList ):
     returns '' for empty list
     """
     if len(theList) == 0: return ''
-    
+
     l = theList[:]
     l.sort()
-    
+
     # reduce this sorted list l to pairs start, stop
     ls = l[0:1]
-    #print '>>',ls    
+    #print '>>',ls
     for i in range(0,len(l)-1):
         if l[i] < l[i+1]-1:
             ls.append(l[i])
@@ -2662,7 +2663,7 @@ def list2asci( theList ):
         #end if
     #end for
     ls.append(l[-1])
-    
+
     #print '>>',ls
 
     # generate the string from ls
@@ -2724,7 +2725,7 @@ def object2list( object ):
       return object
     else:
       return [object]
- 
+
 def NTsetNone( var ):
   """Set var to None
   """
@@ -2736,12 +2737,12 @@ class CommandWrap:
   """Wrapper for command callbacks
      From Python Cookbook, section 9.1 (p. 302)
   """
-  
+
   def __init__(self, callback, *args, **kwargs):
     self.callback = callback
     self.args = args
     self.kwargs = kwargs
-    
+
   def __call__(self):
     return self.callback( *self.args, **self.kwargs)
 #
@@ -2751,12 +2752,12 @@ class EventWrap:
   """Wrapper for event callbacks
        Adapted from Python Cookbook, section 9.1 (p. 302)
   """
-  
+
   def __init__(self, callback, *args, **kwargs):
     self.callback = callback
     self.args = args
     self.kwargs = kwargs
-    
+
   def __call__(self, event):
     return self.callback( event, *self.args, **self.kwargs)
 
@@ -2767,12 +2768,12 @@ class EventSkip:
   """Wrapper for callbacks, skipping the event argument
        Adapted from Python Cookbook, section 9.1 (p. 302)
   """
-  
+
   def __init__(self, callback, *args, **kwargs):
     self.callback = callback
     self.args = args
     self.kwargs = kwargs
-    
+
   def __call__(self, event):
     return self.callback( *self.args, **self.kwargs)
 #
@@ -2788,7 +2789,7 @@ def NTinspect( something ):
 def fprintf( stream, format, *args ):
   """C's fprintf routine"""
   stream.write( (format) % (args) )
-  
+
 #
 # -----------------------------------------------------------------------------
 #
@@ -2808,13 +2809,13 @@ def mprintf( fps, fmt, *args ):
 #
 def printf( format, *args ):
   """C's printf routine"""
-  sys.stdout.write( (format) % (args) ) 
+  sys.stdout.write( (format) % (args) )
 #
 # -----------------------------------------------------------------------------
 #
 def sprintf( format, *args ):
   """return a string according to C's sprintf routine"""
-  return ( (format) % (args) ) 
+  return ( (format) % (args) )
 #
 # -----------------------------------------------------------------------------
 #
@@ -2823,7 +2824,7 @@ class PrintWrap:
         self.stream = stream
         self.autoFlush = autoFlush
     #end def
-    
+
     def __call__( self, format, *args ):
         if (self.autoFlush):
             sys.stdout.flush()
@@ -2832,11 +2833,11 @@ class PrintWrap:
             self.flush()
         #end if
     #end def
-    
+
     def flush( self ):
         self.stream.flush()
     #end def
-    
+
 #end class
 
 # report a message, optionally later as graphics output
@@ -2852,7 +2853,7 @@ class SetupError( Exception ):
 
 class CodeError( Exception ):
     "Program code error"
- 
+
 def printError(msg):
     print "ERROR:",msg
 def printWarning(msg):
@@ -2866,40 +2867,40 @@ def printCodeError(msg):
 def printException(msg):
     print "ERROR: exception caught", msg
     traceback.print_exc() # Just prints None on my Mac. Strange.
-    
-    
-class NTfile( file ):    
+
+
+class NTfile( file ):
     """File class with a binary read/write
            typecode as defined for array module:
-           
- This module defines an object type which can efficiently represent an array of basic values: characters, integers, 
-floating point numbers. Arrays are sequence types and behave very much like lists, except that the type of objects 
-stored in them is constrained. The type is specified at object creation time by using a type code, which is a single 
-character. The following type codes are defined: 
 
- Type code  C-Type          Python-Type         Minimum size in bytes 
-'c'         char            character           1 
-'b'         signed char     int                 1 
-'B'         unsigned char   int                 1 
-'u'         Py UNICODE      Unicode character   2 
-'h'         signed short    int                 2 
-'H'         unsigned short  int                 2 
-'i'         signed int      int                 2 
-'I'         unsigned int    long                2 
-'l'         signed long     int                 4 
-'L'         unsigned long   long                4 
-'f'         float           float               4 
-'d'         double          float               8 
+ This module defines an object type which can efficiently represent an array of basic values: characters, integers,
+floating point numbers. Arrays are sequence types and behave very much like lists, except that the type of objects
+stored in them is constrained. The type is specified at object creation time by using a type code, which is a single
+character. The following type codes are defined:
 
-The actual representation of values is determined by the machine architecture (strictly speaking, by the C imple- 
-mentation). The actual size can be accessed through the itemsize attribute. The values stored for 'L' and 
-'I' items will be represented as Python long integers when retrieved, because Python's plain integer type cannot 
-represent the full range of C's unsigned (long) integers. 
+ Type code  C-Type          Python-Type         Minimum size in bytes
+'c'         char            character           1
+'b'         signed char     int                 1
+'B'         unsigned char   int                 1
+'u'         Py UNICODE      Unicode character   2
+'h'         signed short    int                 2
+'H'         unsigned short  int                 2
+'i'         signed int      int                 2
+'I'         unsigned int    long                2
+'l'         signed long     int                 4
+'L'         unsigned long   long                4
+'f'         float           float               4
+'d'         double          float               8
+
+The actual representation of values is determined by the machine architecture (strictly speaking, by the C imple-
+mentation). The actual size can be accessed through the itemsize attribute. The values stored for 'L' and
+'I' items will be represented as Python long integers when retrieved, because Python's plain integer type cannot
+represent the full range of C's unsigned (long) integers.
     """
     def __init__( self, *args, **kwds ):
         file.__init__( self, *args, **kwds )
     #end def
-    
+
     def binaryWrite( self, typecode, *numbers ):
         """Binary write of numbers
            typecode as defined for array module
@@ -2907,7 +2908,7 @@ represent the full range of C's unsigned (long) integers.
         n = array.array(typecode,numbers)
         self.write(n.tostring())
     #end def
-    
+
     def binaryRead( self, typecode, size ):
         """Return a list of numbers
         """
@@ -2928,22 +2929,22 @@ NTopen = NTfile
 #
 def removedir(path):
       while (1):
-            try: 
+            try:
                 filelist=os.listdir(path)
-            except: 
+            except:
                 NTerror("ERROR: Subdirectory %s could not be entered\n", path)
             # DELETE ALL THE FILES
             for file in filelist:
               file=os.path.join(path,file)
-              try: 
+              try:
                   os.remove(file)
               except:
-                    if os.path.isdir(file): 
+                    if os.path.isdir(file):
                         removedir(file)
-            try: 
+            try:
                 os.rmdir(path)
             except:
-                NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.\n")  
+                NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.\n")
                 continue
             break
 
@@ -2977,7 +2978,7 @@ def show( NTobject=None ):
 def formatList( theList, fmt = '%s\n' ):
     """
     Apply the format method to every element of theList,
-    and return their joined strings.    
+    and return their joined strings.
     """
     result = []
     for element in theList:
@@ -3009,10 +3010,10 @@ class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
     """
-    def __init__(self, pathToProgram, rootPath = None, 
-                 redirectOutput= True, 
+    def __init__(self, pathToProgram, rootPath = None,
+                 redirectOutput= True,
                  redirectOutputToFile = False,
-                 redirectInputFromDummy = False, 
+                 redirectInputFromDummy = False,
                  redirectInputFromFile = False,
                  verbose=True, *args, **kwds):
         NTdict.__init__( self, pathToProgram  = pathToProgram,
@@ -3026,7 +3027,7 @@ class ExecuteProgram( NTdict ):
                        )
         self.jobcount = 0
     #end def
-    
+
     def __call__(self, *args):
         """
         Execute the program.
@@ -3034,28 +3035,28 @@ class ExecuteProgram( NTdict ):
         """
         if not self.pathToProgram:
             raise SetupError("No program given for arguments: "+`args`)
-          
+
         if self.rootPath:
             cmd = sprintf('cd %s; %s %s', self.rootPath, self.pathToProgram, " ".join(args))
         else:
             cmd = sprintf('%s %s', self.pathToProgram, " ".join(args))
         #end if
-        
+
         if self.redirectInputFromDummy and self.redirectInputFromFile:
             printError("Can't redirect from dummy and from a file at the same time")
             return 1
-        
+
         if self.redirectOutputToFile and self.redirectOutput:
 #            printDebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
             self.redirectOutput = False
-            
+
 
         if self.redirectInputFromDummy:
             cmd = sprintf('%s < /dev/null', cmd)
         elif self.redirectInputFromFile:
             cmd = '%s < %s' % ( cmd, self.redirectInputFromFile)
-            
-        
+
+
         if self.redirectOutput:
             dir,name,_ext = NTpath( self.pathToProgram )
             cmd = sprintf('%s >& %s.out%d', cmd, name, self.jobcount)
@@ -3067,7 +3068,7 @@ class ExecuteProgram( NTdict ):
 #        printDebug('==> Executing ('+cmd+') ... ')
         #end if
         code = os.system( cmd )
-        if (self.verbose): 
+        if (self.verbose):
 #            printDebug('done')
             NTmessage.flush()
         #end if
@@ -3110,45 +3111,45 @@ def findvisitor((matches, pattern), thisdir, nameshere):
 
 def convertImageMagick(convertPath, inputPath,outputPath,options,extraOptions=None):
     convert = ExecuteProgram(convertPath, redirectOutput=False) # No output expected
-    cmd = options 
+    cmd = options
     if extraOptions:
         cmd += " " + extraOptions
-    cmd += " " + inputPath + " " + outputPath  
+    cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
         printError("Failed to run conversion: " + cmd)
         return True
-    
+
 def convertPs2Pdf(ps2dfPath, inputPath,outputPath,options,extraOptions=None):
     convert = ExecuteProgram(ps2dfPath, redirectOutput=False) # No output expected
-    cmd = options 
+    cmd = options
     if extraOptions:
         cmd += " " + extraOptions
-    cmd += " " + inputPath + " " + outputPath  
+    cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
         printError("Failed to run conversion: " + cmd)
         return True
-    
+
 def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
     """Using the system convert from ImageMagick several pieces of imagery will be created:
         a- pinup (smallish gif usable as an preview; 100 width by 1xx for A4 aspect ratio)
         b- full size 1(gif of 1000 width )
         c- printable version (pdf)
-       
-       The output file names are automatically generated. If the outputDir is set it will be 
+
+       The output file names are automatically generated. If the outputDir is set it will be
        used.
        Returns None for error and list of output files otherwise. A None in the list means\
        the plot was not generated.
        Gif files are multipaged with 2 second intervals.
        Input can be anything ImageMagick reads, e.g. Postscript produced by Procheck_NMR.
-       The input path can be with or without directory and can be 
+       The input path can be with or without directory and can be
        an absolute or relative path.
        The
-        
+
     """
-    optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width 
+    optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width
     optionsFull  = "-delay 200 -geometry 1024"
     optionsPrint = ""
-    
+
     doPinUp = True
     doFull  = True
     doPrint = True
@@ -3167,19 +3168,19 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
         else:
             printError("Given output directory: " + outputDir + " is absent or is not a dir")
             return None
-        
+
     if extension == "pdf":
         printDebug("Will skip generating printable version as input is also a pdf")
         doPrint = False
-        
+
     if extension == "gif":
         printDebug("Will skip generating full size gif version as input is also a gif")
         doFull = False
-        
+
     pinupPath = None
     fullPath  = None
     printPath = None
-    # Algorithm below can be speeded up by not rereading the input but scripting the 
+    # Algorithm below can be speeded up by not rereading the input but scripting the
     #     generation of 3 outputs.
     if doPinUp:
         pinupPath = os.path.join( head, root+"_pin.gif")
@@ -3199,5 +3200,4 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
     result = ( pinupPath, fullPath, printPath )
     if  pinupPath or fullPath or printPath:
         return result
-    return None 
-    
+    return None
