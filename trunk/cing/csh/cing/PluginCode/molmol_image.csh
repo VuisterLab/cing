@@ -14,7 +14,7 @@ set backcolor      = $5
 set executableMm   = $6
 set try            = 1
 set mul            = 1
-setenv MOLMOLHOME $6
+#setenv MOLMOLHOME $6 needs to be set to a directory and done outside of Cing, e.g. in .cshrc
 
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
