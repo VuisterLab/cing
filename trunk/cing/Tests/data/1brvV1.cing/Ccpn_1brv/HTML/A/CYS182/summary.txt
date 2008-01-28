@@ -1,5 +1,0 @@
------ <Residue CYS182> -----
-PHI   : average:   -54.7   cv: 0.000  ||  outliers: 4 (models [11, 29, 59, 77])
-PSI   : average:   -48.6   cv: 0.000  ||  outliers:-999 (models -999)
-CHI1  : average:   191.8   cv: 0.000  ||  outliers:-999 (models -999)
-OMEGA : average:   171.4   cv: 0.000  ||  outliers:-999 (models -999)

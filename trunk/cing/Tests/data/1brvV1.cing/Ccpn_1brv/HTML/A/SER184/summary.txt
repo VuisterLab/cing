@@ -1,6 +1,0 @@
------ <Residue SER184> -----
-PHI   : average:   -69.7   cv: 0.001  ||  outliers: 8 (models [14, 42, 26, 37, 62, 74, 90, 56])
-PSI   : average:   -31.2   cv: 0.004  ||  outliers:-999 (models -999)
-CHI1  : average:   208.6   cv: 0.401  ||  outliers:-999 (models -999)
-CHI2  : average:   346.9   cv: 0.312  ||  outliers:-999 (models -999)
-OMEGA : average:   171.5   cv: 0.000  ||  outliers:-999 (models -999)

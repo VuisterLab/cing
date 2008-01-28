@@ -1,3 +1,0 @@
------ <Residue VAL171> -----
-PSI   : average:    30.5   cv: 0.422  ||  outliers:-999 (models -999)
-CHI1  : average:   280.4   cv: 0.511  ||  outliers:-999 (models -999)

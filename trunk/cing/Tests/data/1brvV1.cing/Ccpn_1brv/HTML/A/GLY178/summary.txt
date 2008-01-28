@@ -1,4 +1,0 @@
------ <Residue GLY178> -----
-PHI   : average:   100.9   cv: 0.004  ||  outliers: 7 (models [37, 42, 11, 20, 59, 90, 85])
-PSI   : average:    -1.1   cv: 0.001  ||  outliers: 4 (models [42, 11, 59, 90])
-OMEGA : average:   183.4   cv: 0.000  ||  outliers:-999 (models -999)

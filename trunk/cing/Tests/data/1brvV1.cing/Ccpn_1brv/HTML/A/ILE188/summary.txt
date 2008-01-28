@@ -1,6 +1,0 @@
------ <Residue ILE188> -----
-PHI   : average:   -97.6   cv: 0.018  ||  outliers: 6 (models [8, 14, 33, 56, 62, 81])
-PSI   : average:    74.9   cv: 0.560  ||  outliers:-999 (models -999)
-CHI1  : average:   285.2   cv: 0.230  ||  outliers:-999 (models -999)
-CHI2  : average:   174.6   cv: 0.481  ||  outliers:-999 (models -999)
-OMEGA : average:   185.1   cv: 0.001  ||  outliers: 8 (models [33, 38, 8, 56, 13, 45, 81, 86])
