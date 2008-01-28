@@ -1,7 +1,0 @@
------ <Residue GLU177> -----
-PHI   : average:    50.8   cv: 0.001  ||  outliers: 4 (models [14, 42, 62, 90])
-PSI   : average:    48.8   cv: 0.000  ||  outliers: 5 (models [33, 37, 42, 81, 85])
-CHI1  : average:   304.9   cv: 0.465  ||  outliers:-999 (models -999)
-CHI2  : average:   233.9   cv: 0.744  ||  outliers:-999 (models -999)
-CHI3  : average:    69.3   cv: 0.690  ||  outliers:-999 (models -999)
-OMEGA : average:   169.9   cv: 0.000  ||  outliers:-999 (models -999)

@@ -1,6 +1,0 @@
------ <Residue HIS187> -----
-PHI   : average:   -97.7   cv: 0.004  ||  outliers: 6 (models [8, 33, 56, 46, 81, 94])
-PSI   : average:   124.9   cv: 0.171  ||  outliers: 8 (models [8, 9, 14, 33, 56, 57, 62, 81])
-CHI1  : average:   324.8   cv: 0.025  ||  outliers:-999 (models -999)
-CHI2  : average:    67.9   cv: 0.329  ||  outliers:-999 (models -999)
-OMEGA : average:   173.5   cv: 0.002  ||  outliers: 7 (models [33, 29, 8, 40, 56, 81, 88])

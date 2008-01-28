@@ -1,6 +1,0 @@
------ <Residue ASN179> -----
-PHI   : average:   -88.0   cv: 0.000  ||  outliers:-999 (models -999)
-PSI   : average:   106.6   cv: 0.000  ||  outliers:-999 (models -999)
-CHI1  : average:   199.1   cv: 0.000  ||  outliers: 5 (models [20, 11, 59, 68, 81])
-CHI2  : average:   279.2   cv: 0.000  ||  outliers:-999 (models -999)
-OMEGA : average:   174.1   cv: 0.000  ||  outliers: 4 (models [42, 40, 90, 88])
