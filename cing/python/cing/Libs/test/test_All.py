@@ -6,6 +6,7 @@ python test_All.py
 """
 def testAll():    
     modList = ( 
+               "cing.Libs.test.test_NTplot",
                "cing.Libs.test.test_NTutils",
                "cing.Libs.test.test_PeirceTest",
                )

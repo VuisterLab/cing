@@ -9,6 +9,9 @@ ___date__     = "$Date$"
 
 """
 $Log$
+Revision 1.2  2008/02/06 13:48:23  jurgenfd
+Started to switch to different plot api.
+
 Revision 1.1  2007/11/28 12:01:33  jurgenfd
 *** empty log message ***
 
@@ -50,6 +53,7 @@ class Lister:
             else:
                 result = result + "\tname %s=%s\n" % (attr, self.__dict__[attr])
         return result        
+
 
 
 """

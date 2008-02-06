@@ -23,8 +23,8 @@ from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
-from cing.core.molecule import NTdihedral
-from cing.core.molecule import NTdistance
+from cing.core.molecule import NTdihedral 
+from cing.core.molecule import NTdistance 
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
@@ -33,6 +33,10 @@ from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from cing.core.sml import SMLhandler
+from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import printMessage
+from shutil import rmtree
+from cing.Libs.NTutils import printError
 import math
 import os
 import shutil
@@ -565,7 +569,20 @@ _____________________________________________________________________________
                              self.footer( dots )
         return NTdict.format( self )
     #end def
-
+    
+    def removeFromDisk(self):
+        """Removes True on error. If no cing project is found on disk None (Success) will
+        still be returned. Note that you should set the nosave option on the project
+        before exiting."""
+        pathString = self.rootPath(self.name)
+        if not os.path.exists(pathString):
+            printWarning("No cing project is found at: " + pathString)
+            return None
+        printMessage("Removing existing cing project")
+        if rmtree( pathString ):
+            printError("Failed to remove existing cing project")
+            return True
+ 
 #end class
 
 #-----------------------------------------------------------------------------

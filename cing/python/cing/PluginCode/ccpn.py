@@ -169,7 +169,6 @@ from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule as CingMolecule
 from cing.main import format
-#from cing.Libs.NTutils import printDebug
 import os
 import string
 
@@ -184,10 +183,12 @@ import string
 ccpnVersion = 1 # Moved outside so it's always defined; pydev extensions code
 # analysis likes this for good reasons.
 try:
+#    printDebug("Trying to: from memops.general.Io import readXmlProjectFile" )
     from memops.general.Io import readXmlProjectFile 
-#    NTmessage("Using CCPN version 1.x\n")
+    NTmessage("Using CCPN version 1.x\n")
 except:
     try:
+#        printDebug("Trying to: from memops.general.Io import loadProject" )
         from memops.general.Io import loadProject #@UnresolvedImport
         NTmessage("Using CCPN version 2.x\n")
         ccpnVersion = 2

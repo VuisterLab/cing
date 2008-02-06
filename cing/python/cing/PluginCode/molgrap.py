@@ -9,10 +9,12 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printWarning
+from cing.Libs.TypeChecking import check_string
+from cing.Libs.TypeChecking import check_type
 from cing.core.constants import CYANA
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
-from cing.Libs.NTutils import printWarning
 import os
 import string
 
@@ -50,7 +52,8 @@ class Molgrap(NTdict):
             export = True
 
         if export:
-            printDebug("First looking for atoms that should not be fed to molmol; curiously it failed on the Calcium in the xeasy project example.")
+            printDebug("First looking for atoms that should not be fed to molmol")
+            printDebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
             skippedAtoms = [] # Keep a list of skipped atoms for later
             skippedResidues = []
             for res in molecule.allResidues():
@@ -180,7 +183,7 @@ class Molgrap(NTdict):
         if program(""):
             printError( "Failed shell command: " + script_file_name)
             return True    
-#        try:
+#        try: 
 #            os.unlink(script_file_name)
 #            os.unlink(log_file_name)
 #        except:
@@ -216,6 +219,9 @@ class Molgrap(NTdict):
         open( file_name_out, 'w' ).write( output_text )
 
 def export2gif(molecule, path ):
+    check_type(molecule,'Molecule')
+    check_string(path)
+    
 #    printDebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap()
     m.run(molecule, path)

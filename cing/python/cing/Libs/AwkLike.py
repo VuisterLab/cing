@@ -48,7 +48,10 @@ class AwkLike:
     if (len(self.line) > 0):
       self.NR += 1
       for f in self.line.split():
-      	self.dollar.append( f )
+          # Skip everything after the comment?
+          if self.commentString and f.startswith(self.commentString):
+              break
+      	  self.dollar.append( f )
       self.NF = len(self.dollar)-1
 
       # check if we need to skip this line

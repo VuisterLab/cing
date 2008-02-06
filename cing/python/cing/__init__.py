@@ -40,11 +40,15 @@ if not os.path.exists(cingDirTmp):
 
 # Define some we are used to use from the toplevel Cing api
 # dont move these to the top as they become circular.
-from cing.Libs.peirceTest import peirceTest
-from cing.Libs.NTutils import NTlist
+# The order within this list is important too. For one thing, pydev extensions code analysis can't
+# track imports well if not correct.
+#from cing.Libs.NTutils import NTlist
+#from cing.Libs.NTutils import NTdict
 from cing.core.classes import *
+from cing.core.parameters import * 
 from cing.core.database import NTdb
 from cing.core.dictionaries import *
 from cing.core.molecule import *
-from cing.core.parameters import * 
 from cing.core.importPlugin import importPlugin # This imports all plugins
+from cing.Libs.peirceTest import peirceTest
+#from cing.Libs.TypeChecking import *

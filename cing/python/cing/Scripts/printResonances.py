@@ -11,8 +11,9 @@
    Can be easily adapted
    
 """
-from cing.Libs.NTutils import printf
 from cing.core.molecule import translateTopology
+from cing.Libs.NTutils import printf
+from cing.main import project
 
 #===========================================================================
 # parameters
@@ -31,7 +32,7 @@ for index,name in resonances:
 printf('\n')
 
 # Generate peaks for all residues
-for residue in project.molecule.allResidues(): #@UndefinedVariable
+for residue in project.molecule.allResidues(): 
     atoms = translateTopology( residue, resonances )
     printf('%-8s  ', residue.name)
     for atm in atoms:

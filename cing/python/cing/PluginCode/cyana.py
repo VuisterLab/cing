@@ -39,6 +39,9 @@ from cing.core.classes import DistanceRestraint
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.molecule import translateTopology
+from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printMessage
+from cing.Libs.NTutils import printDebug
 import os
 import shutil
 
@@ -104,7 +107,8 @@ def importAco( project, acoFile, convention ):
        convention = CYANA or CYANA2
        return a DihedralRestraintList or None on error
     """
-  
+    maxErrorCount = 50
+    errorCount = 0
     # check the molecule
     if (not project or not project.molecule ):
         NTerror("ERROR importAco: initialise molecule first\n")
@@ -120,6 +124,7 @@ def importAco( project, acoFile, convention ):
     dir,name,_ext = NTpath( acoFile )
     result       = project.dihedrals.new( name=name, status='keep', verbose=False )
     
+    printDebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
         resNum = line.int(1)
         res    = molecule.decodeNameTuple( (convention, 'A', resNum, None ) )
@@ -128,9 +133,14 @@ def importAco( project, acoFile, convention ):
         upper  = line.float(5)
         if res and angle in res.db:
             atoms = translateTopology( res, res.db[angle].atoms )
-            #print '>', atoms, res, res.db[angle]
-            if (None in atoms):
-                NTerror('ERROR importAco: invalid restraint on line %d (%s)\n', line.NR, line.dollar[0] )
+#            print '>', atoms, res, res.db[angle]
+            if None in atoms:
+                if errorCount <= maxErrorCount:
+                    printError("Failed to decode all atoms from line:"+ line.dollar[0])
+                if errorCount == (maxErrorCount+1):
+                    printError("And so on")
+                errorCount += 1
+                continue
             else:
                 r = DihedralRestraint( atoms = atoms, lower=lower, upper=upper, 
                                             angle = angle, residue = res
@@ -141,10 +151,11 @@ def importAco( project, acoFile, convention ):
         #end if
     #end for 
   
+    if errorCount:
+        printError("Found number of errors importing upl file: " + `errorCount`)
+    printMessage("Imported items: " + `len(result)`)
     if project.parameters.verbose():
-        NTmessage('==> importAco: new %s from "%s"\n', result, acoFile )
-    #end if
-  
+        NTmessage('==> importAco: new %s from "%s"\n', result, acoFile )  
     return result
 #end def
 
@@ -154,9 +165,11 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     """Read Cyana upl file
        return a DistanceRestraintList or None on error
     """
+    maxErrorCount = 50
+    errorCount = 0
   
     # check the molecule
-    if (not project or not project.molecule ):
+    if not project or not project.molecule:
         NTerror("ERROR importUpl: initialise molecule first\n")
         return None
     #end if
@@ -171,35 +184,48 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 #    result       = project.newDistanceRestraintList( name )
     result       = project.distances.new( name=name, status='keep', verbose=False )
     
-    for line in AwkLike( uplFile ):
-        if (not line.isComment() and line.NF >= 7):
+    for line in AwkLike( uplFile, commentString="#" ):
+        if not line.isComment() and line.NF >= 7:
         
             atm1 = molecule.decodeNameTuple( (convention, 'A', line.int(1), line.dollar[3]) )
-            atm2 = molecule.decodeNameTuple( (convention, 'A', line.int(4), line.dollar[6]) )           
+            atm2 = molecule.decodeNameTuple( (convention, 'A', line.int(4), line.dollar[6]) )
+
+            if not atm1 or not atm2:
+                if errorCount <= maxErrorCount:
+                    printError("Failed to decode name tuple using residue number and atom name from line:"+ line.dollar[0])
+                if errorCount == (maxErrorCount+1):
+                    printError("And so on")
+                errorCount += 1
+                continue
+            
             upper = line.float(7)
 
-            if (upper == 0.0 and atm1 != None and atm2 != None):
+            if upper == 0.0 and atm1 != None and atm2 != None:
                 # ambigious restraint, should be append to last one
                 result().appendPair( (atm1,atm2) )
-            elif (atm1 != None and atm2 != None):
+            elif atm1 != None and atm2 != None:
                 r = DistanceRestraint( atomPairs= [(atm1, atm2)], lower=lower, upper=upper )
                 # also store the Candid info if present
                 if (line.NF >= 9):
                     r.peak = line.int( 9 ) 
-                #endif
                 if (line.NF >= 11):
                     r.SUP = line.float( 11 ) 
-                #endif
                 if (line.NF >= 13):
                     r.QF = line.float( 13 ) 
-                #endif
                 result.append( r )
             else:
-                NTerror('ERROR importUpl: invalid restraint on line %d (%s)\n', line.NR, line.dollar[0] )
+                if errorCount <= maxErrorCount:
+                    printError("invalid restraint on line:"+ line.dollar[0])
+                if errorCount == (maxErrorCount+1):
+                    printError("And so on")
+                errorCount += 1
+                continue
             #end if
         #end if
     #end for 
-  
+    if errorCount:
+        printError("Found number of errors importing upl file: " + `errorCount`)
+    printMessage("Imported upl items: " + `len(result)`)
     if project.parameters.verbose():
         NTmessage('==> importUpl: new %s from "%s"\n', result, uplFile )
     #end if
@@ -314,7 +340,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
     #end if
     for f in kwds['uplFiles']:
         uplFile = os.path.join( cyanaDirectory, f + '.upl')    
-        if (project.importUpl( uplFile, convention )):
+        if project.importUpl( uplFile, convention ):
             sources.append( uplFile ) 
 #            project.patch.upl.append( uplFile ) 
         #end if                    
@@ -336,7 +362,8 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
         #end for
     #end if
     
-    if project.parameters.verbose(): print project.format()
+    if project.parameters.verbose(): 
+        print project.format()
     return sources
 #end def
 

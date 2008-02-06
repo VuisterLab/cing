@@ -1,8 +1,7 @@
+from cing.Libs.test.test_All import testAll as testLibs
 from cing.PluginCode.test.test_All import testAll as testPluginCode
 from cing.Scripts.test.test_All import testAll as testScripts
-from cing.Libs.test.test_All import testAll as testLibs
-
-from cing.core.test.test_All import testAll #@UnresolvedImport
+from cing.core.test.test_All import testAll as testCore
 
 """
 Call by:
@@ -10,7 +9,7 @@ python testAll.py
 """
 
 def testOverall():
-    testAll()  
+    testCore()  
     testPluginCode()
     testScripts()
     testLibs()

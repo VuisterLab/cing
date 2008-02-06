@@ -1,7 +1,5 @@
 from cing.Libs.NTutils import NTlist
-#from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printCodeError
-from cing.Libs.NTutils import printWarning
 import math
 
 
@@ -217,16 +215,15 @@ class Peirce:
 
 
     def peirceTest( self, valueList ):
-        """Return a tuple of two NTlists:    (newValues, outliers)
-            Input data is not modified by this routine.
-            Returns (None, None) on error, eg. when called with less than 3 values.
+        """Return a tuple of two NTlists:    (newValues, outliers). The newvalues NTlist
+        contains elements that are the index and the value at that index. The outliers NTlist
+        contains the same.
+            Input data is not modified by this routine. Input is of type NTlist.
+            Returns None on error, eg. when called with less than 3 values.
+            (Used to return (None, None) on error.)
         """
         x = len( valueList )
 
-        if x<3:
-            printWarning("Peirce test called with less than 3 values.")
-            printWarning("For less than 3 values no outliers can be identified by this mehtodology")
-            return (None, None)
 
         newValues = NTlist()
         outliers  = NTlist()
@@ -242,6 +239,11 @@ class Peirce:
         av = newValues.av # not to be changed until the end.
 #        printDebug("av: " + `av`)
 #        printDebug("sd: " + `sd`)
+
+        if x<3:
+#            printDebug("Peirce test called with less than 3 values.")
+#            printDebug("For less than 3 values no outliers can be identified by this methodology")
+            return (newValues, outliers)
 
         done = False # At least give it a try.
         while not done:

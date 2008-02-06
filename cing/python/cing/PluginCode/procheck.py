@@ -21,7 +21,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTlist 
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import printCodeError
@@ -169,10 +169,10 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             self.redirectOutput=False
 #        printDebug("Will redirect procheck output: " + `self.redirectOutput`)
         self.procheck  = ExecuteProgram(cingPaths.procheck_nmr, 
-                                            rootPath = self.rootPath, 
+                                            rootPath = self.rootPath,  
                                             redirectOutput= self.redirectOutput
                                           )
-        self.aqpc      = ExecuteProgram(cingPaths.aqpc, 
+        self.aqpc      = ExecuteProgram(cingPaths.aqpc,
                                     rootPath = self.rootPath, 
                                     redirectOutput= self.redirectOutput
                                           )
