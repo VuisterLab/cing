@@ -1,6 +1,6 @@
 """
 --------------------------------------------------------------------------------
-main.py: commandline interface to the cing utilities:
+main.py: command line interface to the cing utilities:
 --------------------------------------------------------------------------------
 
 Some examples; all assume a project named 'test':

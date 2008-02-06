@@ -16,7 +16,7 @@ class NMRrestraintsGrid:
 #==============================================================================
 def initBMRB( project, bmrbFile, moleculeName, verbose = None ):
     """
-        Initialise from edited BMRB file
+        Initialize from edited BMRB file
         Return molecule instance
     """
     if verbose == None:

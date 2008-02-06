@@ -14,7 +14,7 @@ class AllChecks(TestCase):
         v,_o = peirceTest.peirceTest( values )
 #        print 'v=',v
 #        print v.av, v.sd
-#        print 'o=',o
+#        print 'o=',_o
     
         self.assertTrue( vOld == v )
 
@@ -58,6 +58,19 @@ class AllChecks(TestCase):
 #            print 'number of outliers at size: '+`n`+ ' =',len(o)
             self.assertTrue(len(o)<=m)
             n -= 1
+                    
+    def testPeirceTest4(self):
+        values = []    
+        n = 2   # Default value 200. Tested up to 10,000 once before.
+        for i in range(n):
+            values.append(i)        
+                
+        result = peirceTest.peirceTest( values )
+        self.failUnless(result)
+        v,o = result
+#        print 'number of outliers at size: '+`n`+ ' =',len(o)
+        self.assertTrue(len(v) == n)
+        self.assertTrue(len(o) == 0)
                     
 if __name__ == "__main__":
     unittest.main()

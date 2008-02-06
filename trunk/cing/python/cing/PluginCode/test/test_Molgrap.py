@@ -15,9 +15,10 @@ class AllChecks(TestCase):
         
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-        entryId = "xeasy_small" # Small much studied PDB NMR entry 
+        entryId = "1brv" # Small much studied PDB NMR entry         
+        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cingDirTestsData, pdbFileName)
+        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTestsTmp)

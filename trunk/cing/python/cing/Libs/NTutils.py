@@ -1,118 +1,15 @@
-from cing.Libs.AwkLike import AwkLike
 from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-import traceback
 import array
 import inspect
 import math
 import optparse
 import os
 import sys
+import traceback
 
-
-#import HyperText.Documents
-
-def splitpdb( fileName = None, modelNum = None ):
-    """
-    Author: Ton Rullmann
-    Adapted by JFD
-    # jfd@Fri Jan 14 14:43:02 CST 2000
-    # Moved the file name generation outside the BEGIN statement
-    # maybe we have an awk version not supporting it.
-    Moved to Python on 19 nov 2007.
-    """
-    usage = """usage: splitpdb [modelnum=?] file
-
-Split a multi-model PDB file into separate PDB files, named xxx_001.yyy etc.
-where xxx is the name of the input file (minus directory path)
-and yyy its extension (if present).
-
-Returns None on error and 1 for success.
-
-If modelnum is given, only the model with the corresponding model number
-is extracted.
-
-Everything before the first MODEL (except JRNL and REMARK records)
-is removed and does not occur in any output file.
-Everything between MODEL and ENDMDL is copied.
-The MODEL records are replaced by a REMARK.
-The ENDMDL records are replaced by END.
-Everything after the last ENDMDL (including CONECT's) is discarded.
-A MASTER record is not added.
-
-If no MODEL records are present no new PDB files are produced
-and the script exits with status 1
-A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
-"""
-    printError("Don't use this code until completed")
-    return None
-    if not fileName:
-        printWarning(usage)
-        return None
-
-    if not os.path.exists( fileName ):
-        printError("Input file : "+fileName+" doesn't exist")
-        return None
-
-    modelId = 1
-    fileNameModel = _fileNameModel( fileName, modelId )
-    file = open( fileNameModel, 'w')
-    for line in AwkLike(fileName):
-#         if line.NF > 1:
-#             print line.dollar[0], line.dollar[1]
-        if line.dollar[0].startsWith("JRNL"):
-            continue
-        if line.dollar[0].startsWith("REMARK"):
-            continue
-        if line.dollar[0].startsWith("MODEL"):
-            ## JFD to add perhaps: Special case for entry 1crq with MODEL 0 record
-            ## and       Special case for entry 1crr with MODEL 21 record
-            ## Skip the whole model, treat it as if it is not an ensemble.
-            ## if the first model listed is not number 1
-            if line.NF < 2:
-                printError("Add special case for when model record doesn't contain model number")
-                return None
-
-            modelStr = line.dollar[2]
-            modelId = `modelStr`
-#            modelFileNamePart = sprintf( "%03i", modelId )
-            fileNameModel = _fileNameModel( fileName=fileName, modelId=modelId )
-            printMessage( "copying model" + modelId +  "to" + fileNameModel )
-            if modelId > 1:
-                file.write( "END")
-            # Normally the first file will be closed and reopened here for multimodel files.
-            # In some cases the first model is not numbered 1!
-            file.close()
-            file = open( fileNameModel, 'w')
-            file.write ("REMARK model" + modelId )
-            continue
-        if line.dollar[0].startsWith("CONECT"):
-            continue
-        if line.dollar[0].startsWith("MASTER"):
-            continue
-
-        file.write (line.dollar[0] )
-
-""" Returns new file name for a given model number
-or None for Error.
-"""
-def _fileNameModel( fileName=None, modelId=None ):
-    if modelId is None:
-        return None
-    if not os.path.exists(fileName):
-        return None
-#    modelFileNamePart = ""
-#    ext = os.path.getExtension(fileName)
-#    base = os.path.getBase(fileName)
-#    return base + "_" + sprintf( "%03i", modelId ) + ext
-
-
-
-#
-# -----------------------------------------------------------------------------
-#
 class NTlist( list ):
     """
     NTlist: list which is callable:
@@ -199,6 +96,13 @@ class NTlist( list ):
                 list.append( self, item )
                 self.current = item
             #end if
+        #end for
+    #end def
+
+    def addList( self, list_new ):
+        for item in list_new:
+            list.append( self, item )
+            self.current = item
         #end for
     #end def
 
@@ -307,7 +211,8 @@ class NTlist( list ):
     #end def
 
     def cAverage( self, min=0.0, max=360.0, radians = 0, byItem=None ):
-        """return (cav,cv,cn) tuple of a list
+        """ Circular average.
+           return (cav,cv,cn) tuple of a list
            return cav on min-max interval (that has to be spaced
            360 or 2pi depending on radians )
            Store cav,cv,cn as attributes of self
@@ -373,17 +278,17 @@ class NTlist( list ):
         return string
     #end def
 
-    def __repr__( self ):
-        if len(self) == 0:
-            return 'NTlist()'
-        #end if
-
-        string = 'NTlist('
-        for item in self:
-            string = string + repr( item ) +', '
-        #end for
-        string = string[:-2]+')'
-        return string
+#    def __repr__( self ):
+#        if len(self) == 0:
+#            return 'NTlist()'
+#        #end if
+#
+#        string = 'NTlist('
+#        for item in self:
+#            string = string + repr( item ) +', '
+#        #end for
+#        string = string[:-2]+')'
+#        return string
     #end def
 
     def format( self, fmt = None ):
@@ -447,9 +352,10 @@ def NTfill( value, n ):
 def NThistogram( theList, low, high, bins ):
     """Return a histogram of theList
     """
-    if bins < 1: return None
+    if bins < 1: 
+        return None
 
-    his = NTfill( 0, bins)
+    his = NTfill( 0, bins) # Returns NTlist
     binSize = (high-low)/bins
 
     his.low = low
@@ -458,21 +364,25 @@ def NThistogram( theList, low, high, bins ):
     his.binSize= binSize
 
 
-    tmp = theList[:]
+    tmp = theList[:] # creates a copy.
     tmp.sort()
 
-
+    # reworked logic a bit.
     bin = 0
+    currentBinlow  = low+bin*binSize
+    currentBinhigh = currentBinlow + binSize
     for item in tmp:
-        if item < low+bin*binSize:
-            pass
-        elif item >= low+bin*binSize and item < low+(bin+1)*binSize:
+        if item < currentBinlow:
+            continue
+        if item >= currentBinlow and item < currentBinhigh:
             his[bin] += 1
-        else:
-            while (bin < bins and item > low+(bin+1)*binSize): bin += 1
-            if bin < bins: his[bin] += 1
-        #end if
-    #end for
+            continue
+        while bin < bins and item > currentBinhigh: 
+            bin += 1
+            currentBinlow  = low+bin*binSize
+            currentBinhigh = currentBinlow + binSize
+        if bin < bins: 
+            his[bin] += 1
     return his
 #end def
 
@@ -640,21 +550,19 @@ class NTvector( list ):
         return result
     #end def
 
-    def triple( self, b, c):
-        """
-        return triple product of self,b,c
-        or None on error
-        """
-        l = len(self)
-        if l != 3: return None
-        if l != len(b): return None
-        if l != len(c): return None
-        return (  self[0] * (b[1]*c[2]-b[2]*c[1] )
-                - self[1] * (b[0]*c[2]-b[2]*c[0] )
-                + self[2] * (b[0]*c[1]-b[1]*c[0] )
-               )
-        return diff.length()    #@UndefinedVariable
-    #end def
+#    def triple( self, b, c):
+#        """
+#        return triple product of self,b,c
+#        or None on error
+#        """
+#        l = len(self)
+#        if l != 3: return None
+#        if l != len(b): return None
+#        if l != len(c): return None
+#        return    self[0] * (b[1]*c[2]-b[2]*c[1] )
+#                - self[1] * (b[0]*c[2]-b[2]*c[0] )
+#                + self[2] * (b[0]*c[1]-b[1]*c[0] )
+               
 
     def angle( self, other, radians = False ):
         """
@@ -836,81 +744,81 @@ class NTset( NTlist ):
 #
 # -----------------------------------------------------------------------------
 #
-class odict(dict):
-    """ Ordered dictionary.
-        Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747
-    """
-    def __init__(self, *args):
-        self._keys = []
-        dict.__init__(self)
-        self.append( *args )
-
-    def __delitem__(self, key):
-        dict.__delitem__(self, key)
-        self._keys.remove(key)
-
-    def __setitem__(self, key, item):
-        dict.__setitem__(self, key, item)
-        if key not in self._keys: self._keys.append(key)
-
-    def clear(self):
-        dict.clear(self)
-        self._keys = []
-
-    def copy(self):
-
-        newInstance = odict()
-        newInstance.update(self)
-        return newInstance
-
-# methods iterkeys(), values(), itervalues(), items() and iteritems()
-# now all decend from method keys().
-    def keys(self):
-        return self._keys
-
-    def iterkeys( self ):
-        for key in self.keys():
-            yield key
-
-    def values( self ):
-        return map( self.get, self.keys() )
-
-    def itervalues( self ):
-        for value in self.values():
-           yield value
-
-    def items( self ):
-        return zip( self.keys(), self.values() )
-
-    def iteritems( self ):
-        for item in self.items():
-            yield item
-
-    def popitem(self):
-        try:
-            key = self._keys[-1]
-        except IndexError:
-            raise KeyError('dictionary is empty')
-
-        val = self[key]
-        del self[key]
-
-        return (key, val)
-
-    def setdefault(self, key, failobj = None):
-        if key not in self._keys:
-            self._keys.append(key)
-        return dict.setdefault(self, key, failobj)
-
-    def update(self, dict):
-        dict.update(self, dict)
-        for key in dict.keys():
-            if key not in self._keys:
-                self._keys.append(key)
-
-    def append( self, *items):
-        for key, value in items:
-           self.__setitem__( key, value )
+#class odict(dict):
+#    """ Ordered dictionary.
+#        Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747
+#    """
+#    def __init__(self, *args):
+#        self._keys = []
+#        dict.__init__(self)
+#        self.append( *args )
+#
+#    def __delitem__(self, key):
+#        dict.__delitem__(self, key)
+#        self._keys.remove(key)
+#
+#    def __setitem__(self, key, item):
+#        dict.__setitem__(self, key, item)
+#        if key not in self._keys: self._keys.append(key)
+#
+#    def clear(self):
+#        dict.clear(self)
+#        self._keys = []
+#
+#    def copy(self):
+#
+#        newInstance = odict()
+#        newInstance.update(self)
+#        return newInstance
+#
+## methods iterkeys(), values(), itervalues(), items() and iteritems()
+## now all decend from method keys().
+#    def keys(self):
+#        return self._keys
+#
+#    def iterkeys( self ):
+#        for key in self.keys():
+#            yield key
+#
+#    def values( self ):
+#        return map( self.get, self.keys() )
+#
+#    def itervalues( self ):
+#        for value in self.values():
+#           yield value
+#
+#    def items( self ):
+#        return zip( self.keys(), self.values() )
+#
+#    def iteritems( self ):
+#        for item in self.items():
+#            yield item
+#
+#    def popitem(self):
+#        try:
+#            key = self._keys[-1]
+#        except IndexError:
+#            raise KeyError('dictionary is empty')
+#
+#        val = self[key]
+#        del self[key]
+#
+#        return (key, val)
+#
+#    def setdefault(self, key, failobj = None):
+#        if key not in self._keys:
+#            self._keys.append(key)
+#        return dict.setdefault(self, key, failobj)
+#
+#    def update(self, dict):
+#        dict.update(self, dict)
+#        for key in dict.keys():
+#            if key not in self._keys:
+#                self._keys.append(key)
+#
+#    def append( self, *items):
+#        for key, value in items:
+#           self.__setitem__( key, value )
 
 # -----------------------------------------------------------------------------
 #
@@ -919,7 +827,7 @@ NTdictObjectId = 0
 # Variables to limit recursion and prevent cycles in __repr__() call
 NTdictDepth    = 0
 NTdictMaxDepth = 1
-NTdictCycles   = []
+NTdictCycles   = [] 
 
 class NTdict(dict):
   """
@@ -1903,11 +1811,15 @@ def NTlimit( theList, min, max, byItem=None ):
     for i in range(0, l):
         if (theList[i] != None):
             if byItem == None:
-                while theList[i] < min: theList[i] += listRange
-                while theList[i] > max: theList[i] -= listRange
+                while theList[i] < min: 
+                    theList[i] += listRange
+                while theList[i] > max: 
+                    theList[i] -= listRange
             else:
-                while theList[i][byItem] < min: theList[i][byItem] += listRange
-                while theList[i][byItem] > max: theList[i][byItem] -= listRange
+                while theList[i][byItem] < min: 
+                    theList[i][byItem] += listRange
+                while theList[i][byItem] > max: 
+                    theList[i][byItem] -= listRange
         #end if
     #end for
 #end def
@@ -1974,7 +1886,7 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
     n    = 0
     csum = 0.0
     ssum = 0.0
-    if (radians):
+    if radians:
         fac = 1.0
         fac2 = math.pi
     else:
@@ -1996,7 +1908,7 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
         #end if
     #end for
 
-    if (n == 0):
+    if not n:
         return( None, None, 0 )
     #end if
 
@@ -2726,10 +2638,10 @@ def object2list( object ):
     else:
       return [object]
 
-def NTsetNone( var ):
-  """Set var to None
-  """
-  var = None; #@UnusedVariable
+#def NTsetNone( var ):
+#  """Set var to None
+#  """
+#  var = None
 #
 # -----------------------------------------------------------------------------
 #
@@ -3201,3 +3113,99 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
     if  pinupPath or fullPath or printPath:
         return result
     return None
+
+#
+#def splitpdb( fileName = None, modelNum = None ):
+#    """
+#    Author: Ton Rullmann
+#    Adapted by JFD
+#    # jfd@Fri Jan 14 14:43:02 CST 2000
+#    # Moved the file name generation outside the BEGIN statement
+#    # maybe we have an awk version not supporting it.
+#    Moved to Python on 19 nov 2007.
+#    """
+#    usage = """usage: splitpdb [modelnum=?] file
+#
+#Split a multi-model PDB file into separate PDB files, named xxx_001.yyy etc.
+#where xxx is the name of the input file (minus directory path)
+#and yyy its extension (if present).
+#
+#Returns None on error and 1 for success.
+#
+#If modelnum is given, only the model with the corresponding model number
+#is extracted.
+#
+#Everything before the first MODEL (except JRNL and REMARK records)
+#is removed and does not occur in any output file.
+#Everything between MODEL and ENDMDL is copied.
+#The MODEL records are replaced by a REMARK.
+#The ENDMDL records are replaced by END.
+#Everything after the last ENDMDL (including CONECT's) is discarded.
+#A MASTER record is not added.
+#
+#If no MODEL records are present no new PDB files are produced
+#and the script exits with status 1
+#A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
+#"""
+#    printError("Don't use this code until completed")
+#    return None
+#    if not fileName:
+#        printWarning(usage)
+#        return None
+#
+#    if not os.path.exists( fileName ):
+#        printError("Input file : "+fileName+" doesn't exist")
+#        return None
+#
+#    modelId = 1
+#    fileNameModel = _fileNameModel( fileName, modelId )
+#    file = open( fileNameModel, 'w')
+#    for line in AwkLike(fileName):
+##         if line.NF > 1:
+##             print line.dollar[0], line.dollar[1]
+#        if line.dollar[0].startsWith("JRNL"):
+#            continue
+#        if line.dollar[0].startsWith("REMARK"):
+#            continue
+#        if line.dollar[0].startsWith("MODEL"):
+#            ## JFD to add perhaps: Special case for entry 1crq with MODEL 0 record
+#            ## and       Special case for entry 1crr with MODEL 21 record
+#            ## Skip the whole model, treat it as if it is not an ensemble.
+#            ## if the first model listed is not number 1
+#            if line.NF < 2:
+#                printError("Add special case for when model record doesn't contain model number")
+#                return None
+#
+#            modelStr = line.dollar[2]
+#            modelId = `modelStr`
+##            modelFileNamePart = sprintf( "%03i", modelId )
+#            fileNameModel = _fileNameModel( fileName=fileName, modelId=modelId )
+#            printMessage( "copying model" + modelId +  "to" + fileNameModel )
+#            if modelId > 1:
+#                file.write( "END")
+#            # Normally the first file will be closed and reopened here for multimodel files.
+#            # In some cases the first model is not numbered 1!
+#            file.close()
+#            file = open( fileNameModel, 'w')
+#            file.write ("REMARK model" + modelId )
+#            continue
+#        if line.dollar[0].startsWith("CONECT"):
+#            continue
+#        if line.dollar[0].startsWith("MASTER"):
+#            continue
+#
+#        file.write (line.dollar[0] )
+#
+#""" Returns new file name for a given model number
+#or None for Error.
+#"""
+#def _fileNameModel( fileName=None, modelId=None ):
+#    if modelId is None:
+#        return None
+#    if not os.path.exists(fileName):
+#        return None
+##    modelFileNamePart = ""
+##    ext = os.path.getExtension(fileName)
+##    base = os.path.getBase(fileName)
+##    return base + "_" + sprintf( "%03i", modelId ) + ext
+

@@ -31,6 +31,7 @@ from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
 from database     import NTdb
 from parameters   import plotParameters
+from cing.Libs.NTutils import printMessage
 import math
 import os
 
@@ -237,10 +238,11 @@ _____________________________________________________________________________
         if atomName == None:
             return res
 
+        resTranslated = res.translate(convention)
         an = translateAtomName( convention, res.translate(convention), atomName, INTERNAL )
 #        if (not an or (an not in res)): return None
         if not an:
-            printError("in Molecule.decodeNameTuple failed to translateAtomName")
+            printError("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
             return None
 
         if not res.has_key(an):
@@ -573,9 +575,7 @@ _____________________________________________________________________________
         """Calculate the dihedral angles for all residues
         """
         if self.modelCount > 0:
-            if verbose:
-                NTmessage('==> Calculating dihedral angles ... ')
-                NTmessage.flush()
+            printMessage('==> Calculating dihedral angles ... ')
             #end if
             self.dihedralDict = {} # will be filled by calling dihedral method of residue
             for res in self.allResidues():
@@ -583,9 +583,7 @@ _____________________________________________________________________________
                     res.dihedral( dihedral.name )
                 #end for
             #end for
-            if verbose:
-                NTmessage('done\n')
-                NTmessage.flush()
+            printMessage('done')
             #end if
         #end if
     #end def
@@ -1270,7 +1268,7 @@ Residue class: Defines residue properties
 
         plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
         self[dihedralName].limit( plotpars.min, plotpars.max )
-        cav,cv,dummy =self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
+        cav,cv,_n =self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
 
         return cav,cv
     #end def

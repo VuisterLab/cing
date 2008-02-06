@@ -1,24 +1,22 @@
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTparameter
+from cing.Libs.NTutils import NTparameter 
 import os
  
 #-----------------------------------------------------------------------------
 # Global program parameters (non-user)
 #-----------------------------------------------------------------------------
-
+ 
 
 # These directories get created. They are defined relative to project root path,
 # available through Project.rootPath( name ) method, or can be joined relative
 # to project root by Project.path( *args ) method.
 directories = NTdict(
-                       
     data       = 'Data',
     molecules  = 'Data/Molecules',
     peaklists  = 'Data/Peaklists',
     restraints = 'Data/Restraints',
     ccpn       = 'Data/CCPN',
     sources    = 'Data/Sources',
-   
     export     = 'Export',
     xeasy      = 'Export/Xeasy',
     xeasy2     = 'Export/Xeasy2',
@@ -27,13 +25,11 @@ directories = NTdict(
     PDB        = 'Export/PDB',
     xplor      = 'Export/Xplor',
     aqua       = 'Export/Aqua',
-
     queen      = 'Queen',
-
     refine     = 'Refine'    
 )
 directories.keysformat() #define a format string for 'pretty' output
-
+ 
 # These directories get created upon opening/appending a molecule to project
 # Can be accessed as:
 # e.g.
@@ -44,7 +40,6 @@ moleculeDirectories = NTdict(
     whatif     = 'Whatif',
     wattos     = 'Wattos',
     analysis   = 'Cing',
-#    profit     = 'Profit',
     shiftx     = 'Shiftx', 
     html       = 'HTML',
 )
@@ -52,7 +47,7 @@ moleculeDirectories.keysformat() #define a format string for 'pretty' output
 
 #These directories get generated below the HLML root of a molecule 
 htmlDirectories = NTdict(     
-    # Directories generated 
+    # Directories generated  
     procheck= 'Models',
     whatif  = 'Restraints',
     peaks   = 'Peaks'
@@ -61,7 +56,7 @@ htmlDirectories.keysformat() #define a format string for 'pretty' output
 
 
 # These files and directories are just definitions
-cingPaths = NTdict(    
+cingPaths = NTdict(     
     project      = 'project.xml',
     plugins      = 'PluginCode',
     scripts      = '../Scripts',
@@ -78,44 +73,39 @@ cingPaths = NTdict(
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
 )
-
 cingPaths.keysformat() #define a format string for 'pretty' output
-    
+
+outlierColor = 'red'
 plotParameters = NTdict(
     #default
     dihedralDefault = NTdict(
         min      =    0.0,
         max      =  360.0,
+        mticksize=   10,
         ticksize =   60,
-        color    = 'green',
-        outlier  = 'red',
+        color    = 'green', # use names that are html legal here so matplot knows them.
+        outlier  = outlierColor,
         average  = 'blue',
         lower    = 'orange',
         upper    = 'orange'
     ),
-    PHI = NTdict(
-        min      = -180.0,
-        max      =  180.0,
-        ticksize =   60,
-        color    = 'green',
-        outlier  = 'red',
-        average  = 'blue',
-        lower    = 'orange',
-        upper    = 'orange'
-    ),
-    PSI = NTdict(
-        min      = -180.0,
-        max      =  180.0,
-        ticksize =   60,
-        color    = 'green',
-        outlier  = 'red',
-        average  = 'blue',
-        lower    = 'orange',
-        upper    = 'orange'
-    ),
-
 )
+plotParameters.PHI     = plotParameters.dihedralDefault.copy()
+plotParameters.PHI.min = -180
+plotParameters.PHI.max =  180
+plotParameters.PHI.xlabelLat = '$\phi 1$' # Latex
 
+plotParameters.PSI  = plotParameters.PHI.copy() 
+plotParameters.PHI.xlabelLat = '$\psi 1$' # Latex
+
+plotParameters.CHI1 = plotParameters.dihedralDefault.copy() 
+plotParameters.CHI1.xlabelLat = '$\chi 1$' 
+
+plotParameters.CHI2 = plotParameters.dihedralDefault.copy() 
+plotParameters.CHI2.xlabelLat = '$\chi 2$' 
+
+plotParameters.CHI3 = plotParameters.dihedralDefault.copy() 
+plotParameters.CHI3.xlabelLat = '$\chi 3$' 
 
 #-----------------------------------------------------------------------------
 # Parameter definitions (value user adaptable)
