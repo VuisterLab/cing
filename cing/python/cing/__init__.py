@@ -10,12 +10,30 @@ programVersion  = cingVersion
 
 header = """
 ======================================================================================================
-|   CING: python NMR/molecule package, version %-25s (c) AW,JFD,GWV 2004-2007    |
+| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
 ======================================================================================================
 """ % (cingVersion,)
 footer = """------------------------------------------------------------------------------------------------------
 """
-sys.stdout.write(header)
+
+
+verbosityNothing  = 0 # Even errors will be suppressed
+verbosityError    = 1 # show only errors
+verbosityWarning  = 2 # show errors and warnings
+verbosityOutput   = 3 # and regular output DEFAULT 
+verbosityDetail   = 4 # show more details
+verbosityDebug    = 9 # add debugging info (not recommended for casual user)  
+"""How much text is printed to stdout/sstderr streams
+Reference to it as cing.verbosity if you want to see non-default behavior
+"""
+verbosity = verbosityOutput
+prefixError     = "ERROR:"
+prefixWarning   = "WARNING:"
+prefixDetail    = "DETAIL:"
+prefixDebug     = "DEBUG:"
+
+#if verbosity >= verbosityOutput:
+#  sys.stdout.write(header)
 
 ######################################################################################################
 # This code is repeated in __init__.py and setup.py please keep it sync-ed

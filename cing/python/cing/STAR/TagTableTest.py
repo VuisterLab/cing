@@ -1,8 +1,7 @@
+from cing import verbosityNothing
 from cing.STAR.TagTable import TagTable
 from unittest import TestCase
 import unittest
-#from TagTable import *
-#from SaveFrame import *
 
 
 class AllChecks(TestCase):
@@ -47,10 +46,10 @@ e
 
    stop_
 """        
-#        print exp
-#        print tt.star_text()
         self.assertEqual(exp,tt.star_text())
     
 
 if __name__ == "__main__":
+    verbosity = verbosityNothing
     unittest.main()
+    

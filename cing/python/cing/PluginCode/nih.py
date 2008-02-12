@@ -675,7 +675,7 @@ def parseNMRPipeHeader( data ):
 #-----------------------------------------------------------------------------
 # NIH routines
 #-----------------------------------------------------------------------------
-def exportShifts2Talos( molecule, fileName=None, verbose=1 ):
+def exportShifts2Talos( molecule, fileName=None,   ):
     """Export shifts to talos format
     """
 
@@ -719,8 +719,7 @@ def exportShifts2Talos( molecule, fileName=None, verbose=1 ):
       
     f.close()
   
-    if verbose:
-        NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"\n', count, fileName )
+    NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"\n', count, fileName )
     #end if
 #end def    
 
@@ -734,13 +733,13 @@ def export2NIH( project, tmp=None ):
         fileName = project.path( project.directories.nih, project[molName].name+'.talos' )        
         exportShifts2Talos(  project[molName], 
                              fileName=fileName, 
-                             verbose=project.parameters.verbose()
+                              
                            )
     #end for
 
 #     for pl in project.peakLists:
 #         peakFile = project.path( directories.sparky, pl.name+'.peaks' )
-#         exportPeaks2Sparky( pl, peakFile, verbose = project.parameters.verbose() )
+#         exportPeaks2Sparky( pl, peakFile,   )
     #end for
 #end def
 #-----------------------------------------------------------------------------

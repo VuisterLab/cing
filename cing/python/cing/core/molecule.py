@@ -23,7 +23,7 @@ from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
-from cing.core.constants import LOOSE
+from cing.core.constants import LOOSE 
 from cing.core.constants import NOSHIFT
 from cing.core.constants import UNDEFINED_FLOAT
 from cing.core.constants import XPLOR
@@ -57,11 +57,11 @@ Molecule class: defines the holder for molecule items.
 
 Mapping between the CING data model and NMR-STAR:
 
-CING     | NMR-STAR
+CING     | NMR-STAR             CCPN
 --------------------------------
-Molecule | Molecular system
-Chain    | Assembly entity
-Residue  | Chemical component
+Molecule | Molecular system     MolSystem (from ccp.api.molecule.MolSystem)
+Chain    | Assembly entity      Chain   
+Residue  | Chemical component   Residue
 
 There are things that will be difficult to map from one to the other.
 A Zinc ion will usually be part of the same chain in CING whereas it will be
@@ -125,13 +125,13 @@ _____________________________________________________________________________
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        printAttr(stream)       : Print a list of all attributes and their values.
+        getAttr()       : Print a list of all attributes and their values.
 
     all dict methods
 
 """
 
-    def __init__( self, name, verbose=0, **kwds ):
+    def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
@@ -151,8 +151,7 @@ _____________________________________________________________________________
         self.xeasy        = None # reference to xeasy class, used in parsing
         self.saveXML('chainCount','residueCount','atomCount')
 
-        if verbose:
-            NTmessage("%s\n", self.format() )
+        NTmessage("%s\n", self.format() )
         #end if
     #end def
 
@@ -375,7 +374,7 @@ _____________________________________________________________________________
     #end def
 
 
-    def save( self, path = None, verbose=True ):
+    def save( self, path = None,    ):
         """Create a directory path (or use name.NTmol)
            Save sequence, resonances and coordinates so it can be restored by
            restore.
@@ -393,12 +392,11 @@ _____________________________________________________________________________
         self.saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self.saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
 
-        if verbose:
-            NTmessage('==> Saved %s to "%s"\n', self, path)
+        NTmessage('==> Saved %s to "%s"\n', self, path)
         #end if
     #end def
 
-    def open( path, verbose=True ):
+    def open( path,    ):
         """Static method to restore molecule from directory path
            return self or None on error
         """
@@ -415,9 +413,8 @@ _____________________________________________________________________________
             return None
         #end if
 
-        if verbose:
-            NTmessage('==> Restoring Molecule from "%s" ... ', path )
-            NTmessage.flush()
+        NTmessage('==> Restoring Molecule from "%s" ... ', path )
+               
         #end if
 
         mol = Molecule( name = content.name )
@@ -429,11 +426,10 @@ _____________________________________________________________________________
         mol.restoreSequence(    os.path.join( path, content.sequenceFile   ) )
         mol.restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False )
         mol.restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
-        if verbose: NTmessage('done\n')
 
-        mol.updateAll( verbose=verbose )
+        mol.updateAll(   )
 
-        if verbose: NTmessage('%s\n', mol.format())
+        NTmessage('%s\n', mol.format())
 
         return mol
     #end def
@@ -495,7 +491,7 @@ _____________________________________________________________________________
             return None
         #end if
         if not append:
-            self.initResonances( verbose = False )
+            self.initResonances(   )
         #end if
 
         #execfile( fileName )
@@ -519,15 +515,14 @@ _____________________________________________________________________________
         self.resonanceCount += 1
     #end def
 
-    def initResonances( self, verbose=True ):
+    def initResonances( self,    ):
         """ Initialize resonances for all the atoms
         """
         for atom in self.allAtoms():
             atom.resonances = NTlist()
         #end for
         self.resonanceCount = 0
-        if verbose:
-            NTmessage("==> Initialized resonances\n")
+        NTmessage("==> Initialized resonances\n")
         #end if
     #end def
 
@@ -571,53 +566,36 @@ _____________________________________________________________________________
         return self
     #end def
 
-    def updateDihedrals( self, verbose=False ):
+    def updateDihedrals( self,    ):
         """Calculate the dihedral angles for all residues
         """
         if self.modelCount > 0:
             printMessage('==> Calculating dihedral angles ... ')
-            #end if
             self.dihedralDict = {} # will be filled by calling dihedral method of residue
             for res in self.allResidues():
                 for dihedral in res.db.dihedrals:
                     res.dihedral( dihedral.name )
-                #end for
-            #end for
-            printMessage('done')
-            #end if
-        #end if
-    #end def
 
-    def updateMean( self, verbose=False ):
+    def updateMean( self,    ):
         """Calculate mean coordinates for all atoms
         """
-        if self.modelCount > 0:
-            if verbose:
-                NTmessage('==> Calculating mean coordinates ... ')
-                NTmessage.flush()
-            #end if
+        if self.modelCount:
+            NTmessage('==> Calculating mean coordinates ... \n')
             for atm in self.allAtoms():
                 atm.meanCoordinates()
-            #end for
-            if verbose:
-                NTmessage('done\n')
-                NTmessage.flush()
-            #end if
-        #end if
-    #end def
 
-    def updateAll( self, verbose=True ):
+    def updateAll( self,    ):
         """Calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
         """
         if self.modelCount > 0:
-            self.updateDihedrals( verbose=verbose )
-            self.updateMean( verbose=verbose )
+            self.updateDihedrals(   )
+            self.updateMean(   )
         #end if
     #end def
 
     #--------------------------------------------------------------------------
-    def initialize( name, path = None, convention=LOOSE, verbose = True ):
+    def initialize( name, path = None, convention=LOOSE   ):
 
         """
 Static method to initialize a Molecule from a file
@@ -663,15 +641,10 @@ Return an Molecule instance or None on error
                 #endif
 
                 molecule._addResidue( chainId, resName, resNum, convention )
-            #end if
-        #end for
-
-        if verbose:
-            NTmessage("%s\n", molecule.format())
-        #end if
-
+        NTmessage("%s\n", molecule.format())
         return molecule
     #end def
+    
     initialize = staticmethod( initialize )
 
     def _addResidue( self, chainId, resName, resNum, convention ):
@@ -736,7 +709,7 @@ Return an Molecule instance or None on error
         return result
     #end def
 
-    def toPDB( self, model = None, convention = IUPAC, verbose = False ):
+    def toPDB( self, model = None, convention = IUPAC   ):
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
@@ -755,11 +728,10 @@ Return an Molecule instance or None on error
             models = NTlist(*range( self.modelCount ))
         #end if
 
-        if verbose:
-            NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
-                       convention, models[0], models.last()
-                     )
-            NTmessage.flush()
+        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
+                   convention, models[0], models.last()
+                 )
+               
         #end if
 
         pdbFile = PDBFile()
@@ -805,9 +777,6 @@ Return an Molecule instance or None on error
         #end for
         record = PyMMLib.END()
         pdbFile.append( record )
-
-        if verbose: NTmessage('done\n')
-
         return pdbFile
     #end def
 #end class
@@ -870,7 +839,7 @@ Chain class: defines chain properties and methods
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        printAttr(stream)       : Print a list of all attributes and their values.
+        getAttr()       : Print a list of all attributes and their values.
 
     all dict methods
     """
@@ -905,7 +874,7 @@ Chain class: defines chain properties and methods
         return res
     #end def
 
-    def removeResidue( self, residue, verbose=True ):
+    def removeResidue( self, residue,    ):
         if (not residue in self._children):
             NTerror( 'ERROR Chain.removeResidue: residue "%s" not present in chain %s\n',
                      residue, self
@@ -927,7 +896,7 @@ Chain class: defines chain properties and methods
             return None
         else:
             res.chain = None
-            if verbose: NTmessage('==> Removed residue %s from %s\n', residue, self )
+            NTmessage('==> Removed residue %s from %s\n', residue, self )
             return res
         #end if
     #end def
@@ -1054,7 +1023,7 @@ Residue class: Defines residue properties
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        printAttr(stream)       : Print a list of all attributes and their values.
+        getAttr()       : Print a list of all attributes and their values.
 
     all dict methods
 
@@ -1137,7 +1106,7 @@ Residue class: Defines residue properties
     #end def
 
 
-    def mutate( self, resName, verbose = True ):
+    def mutate( self, resName   ):
         """
         Mutate residue to resName
         Return self or None on error
@@ -1150,9 +1119,7 @@ Residue class: Defines residue properties
         #end if
         newRes  = Residue( resName, self.resNum )
 
-        if verbose:
-            NTmessage('==> Mutating %s to %s\n', self._Cname(-1), newRes._Cname(-1) )
-        #end fi
+        NTmessage('==> Mutating %s to %s\n', self._Cname(-1), newRes._Cname(-1) )
 
         # remove old name references
         del( self._parent[self.name] )
@@ -1335,21 +1302,16 @@ Residue class: Defines residue properties
 
     def hasProperties(self, *properties):
         """
-        Returns True if Residue has properties, False otherwise
+        Returns True if Residue has the argument properties, False otherwise.
+        Special case: if no properties are set return True
         """
-        if len(properties) == 0: return False
-
+        if not len(properties): 
+          return True
         props = NTlist( self.db.name, self.db.shortName, *self.db.properties)
-
-#        print '>>', props
-
         for p in properties:
             if not p in props:
                 return False
-            #end if
-        #end for
         return True
-    #end def
 
     def residuesWithProperties(self, *properties ):
         """
@@ -1449,7 +1411,7 @@ Atom class: Defines object for storing atom properties
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        printAttr(stream)       : Print a list of all attributes and their values.
+        getAttr()       : Print a list of all attributes and their values.
 
     all dict methods
 
@@ -2201,7 +2163,7 @@ def allResidues( molecule ):
 #end def
 
 #==============================================================================
-def updateResonancesFromPeaks( peaks, axes = None, verbose = 1 ):
+def updateResonancesFromPeaks( peaks, axes = None,   ):
     """Update the resonance entries using the peak shifts"""
     for peak in peaks:
         if (axes == None):
@@ -2210,7 +2172,7 @@ def updateResonancesFromPeaks( peaks, axes = None, verbose = 1 ):
         for i in axes:
             if (peak.resonances[i] != None):
                 peak.resonances[i].value = peak.positions[i]
-                if (verbose and peak.resonances[i].atom != None):
+                if peak.resonances[i].atom != None:
                     NTmessage("Updating resonance %s\n", peak.resonances[i].atom)
                 #end if
             #end if
@@ -2219,7 +2181,7 @@ def updateResonancesFromPeaks( peaks, axes = None, verbose = 1 ):
 #end def
 
 #==============================================================================
-def saveMolecule( molecule, fileName=None, verbose=1 ):
+def saveMolecule( molecule, fileName=None,   ):
     """save to fileName for restoring with restoreMolecule"""
     if not fileName:
         fileName = molecule.name + '.xml'
@@ -2232,13 +2194,12 @@ def saveMolecule( molecule, fileName=None, verbose=1 ):
 
     obj2XML( molecule, path=fileName )
 
-    if verbose:
-        NTmessage( '==> saveMolecule: saved to %s\n', fileName )
+    NTmessage( '==> saveMolecule: saved to %s\n', fileName )
     #end if
 #end def
 
 #==============================================================================
-def restoreMolecule( fileName, verbose=1 ):
+def restoreMolecule( fileName,   ):
     """restore from fileName, return Molecule instance """
 
     mol = XML2obj( path=fileName )
@@ -2246,8 +2207,7 @@ def restoreMolecule( fileName, verbose=1 ):
 
     mol.source = fileName
 
-    if verbose:
-        NTmessage( '==> restoreMolecule: restored %s', mol.format())
+    NTmessage( '==> restoreMolecule: restored %s', mol.format())
     #end if
 
     return mol
@@ -2268,12 +2228,3 @@ def rmsd( atomList ):
     #end for
     return (math.sqrt( result/n ), n)
 #end def
-
-
-#==============================================================================
-# Testing from here-on
-#==============================================================================
-#
-if __name__ == '__main__':
-#    db.ALA.printAttr()
-    pass

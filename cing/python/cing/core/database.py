@@ -1,11 +1,11 @@
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
 from cing import cingPythonCingDir
+from cing.Libs.NTutils import printDebug
 import os
 import sys
 
@@ -358,13 +358,10 @@ class DihedralDef( NTtree ):
 #end class    
 
         
-def importNameDefs( tableFile, name, verbose=1 ):
+def importNameDefs( tableFile, name,   ):
     "Import residue and atoms name defs from tableFile"
     
-    if verbose:
-        NTmessage('==> Importing database file "%s" ... ', tableFile )
-        NTmessage.flush()
-    #end if
+    printDebug('==> Importing database file '+ tableFile )
     
     mol = MolDef( name = 'mol' )
     obj = mol # object point to 'active' object, mol, residue, dihedral or atom
@@ -389,7 +386,7 @@ def importNameDefs( tableFile, name, verbose=1 ):
          elif (r.dollar[1] == 'END_ATOM'):
              obj = res
          elif (r.NF > 2):
-#            printf( '=> %s',repr(obj))
+#            NTmessage( '=> %s',repr(obj))
 #             # Get a mol representing constructor 
 #              cname = obj._Cname( -1 ).split(".")
 #              result= cname[0]
@@ -400,14 +397,14 @@ def importNameDefs( tableFile, name, verbose=1 ):
 #                                    repr(r.dollar[1].strip()),
 #                                    "".join( r.dollar[2:] )
 #                                   )
-# #            printf( ' >%s<\n',cmd )
+# #            NTmessage( ' >%s<\n',cmd )
 #
 ##  19 Feb 2007: much simpler
 #             cmd = "obj[%s] = %s " % (repr(r.dollar[1].strip()),
 #                                      " ".join( r.dollar[3:] )
 #                                     )
 #
-#            printf( ' >%s<\n',cmd )
+#            NTmessage( ' >%s<\n',cmd )
 #             exec( cmd )
 ##  17 Sep 2007; even simpler
              obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) )
@@ -415,13 +412,7 @@ def importNameDefs( tableFile, name, verbose=1 ):
              pass
          #endif
     #end for
-    mol.name=name
-    
-    if verbose:
-        NTmessage("done\n")
-        NTmessage.flush()
-    #end if
-    
+    mol.name=name    
     return mol
 #end def
 
@@ -429,7 +420,7 @@ def importNameDefs( tableFile, name, verbose=1 ):
 path, fname, ext = NTpath( __file__ )
 #print '>>', __file__, path
 # import the database table and generate the db-tree
-NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb', verbose=1 )
+NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb',   )
 
 
 # Patches for attributes

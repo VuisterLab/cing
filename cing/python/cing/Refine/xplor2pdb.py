@@ -83,8 +83,6 @@ if options.convention != None:
     convention = options.convention
 #end if
 
-verbose = 1
-
 #=======================================================================
 #
 # Start of routine
@@ -106,7 +104,7 @@ pass
 modelCount = 0
 for fName in files:
     # parse this xplor pdbfile
-    pdbfile = PDBFile( fName, verbose=verbose )
+    pdbfile = PDBFile( fName )
     
     # print a MODEL record
     modelCount += 1

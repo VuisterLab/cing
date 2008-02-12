@@ -1,8 +1,19 @@
+from cing import prefixDebug
+from cing import prefixDetail
+from cing import prefixError
+from cing import prefixWarning
+from cing import verbosityDebug
+from cing import verbosityDetail
+from cing import verbosityError
+from cing import verbosityNothing
+from cing import verbosityOutput
+from cing import verbosityWarning
 from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 import array
+import cing
 import inspect
 import math
 import optparse
@@ -849,7 +860,7 @@ class NTdict(dict):
 
           format( format=None ):                        Format the object according to format or __FORMAT__ (when
                                                         format == None) attribute.
-          printAttr( stream=sys.stdout, hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
+          getAttr( hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
                                                         Also print 'hidden' attributes when hidden!=0.
 
           getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise
@@ -1012,16 +1023,18 @@ class NTdict(dict):
   #end def
 
 
-  def printAttr( self, stream=sys.stdout, hidden=0 ):
-    """Print attributes of structure
+  def getAttr( self, stream=sys.stdout, hidden=0 ):
+    """Get attributes of structure
     """
-    fprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
+    msg = sprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
     # append hidden keys if asked for
     keys = self.keys()
-    if hidden: keys = keys + self.__HIDDEN__
+    if hidden: 
+        keys = keys + self.__HIDDEN__
 #    print '>>',keys
     for key in keys:
-      fprintf( stream, '%-12s : %s\n', key, str(self[key]))
+        msg += sprintf( '%-12s : %s\n', key, str(self[key]))
+    return msg
 
   def header( self, dots = '-'*20  ):
     """Generate a header using __CLASS__ and dots.
@@ -1573,7 +1586,7 @@ class NTparameter( NTtree ):
         return branches
     #end def
 
-    def writeFile( self, fileName, verbose=1 ):
+    def writeFile( self, fileName,   ):
         fp = open( fileName, 'w' )
         for p in self.allLeaves():
             fprintf( fp, '%-40s = %s\n', p._Cname(-1) + '.value', repr( p ) )
@@ -1989,8 +2002,6 @@ class XMLhandler:
         global XMLhandlers
         self.name = name
         XMLhandlers[name] = self
-        self.verbose = 0
-    #end def
 
     def handle( self, node ):
         pass
@@ -1998,7 +2009,7 @@ class XMLhandler:
 
     def handleSingleElement( self, node ):
         """Returns single element below node from DOM tree"""
-        if (self.verbose): self.printNode( node )
+        self.printNode( node )
         if node.nodeName != self.name:
             NTerror('ERROR XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
@@ -2012,12 +2023,12 @@ class XMLhandler:
             return None
         #end if
         result = node.childNodes[0].nodeValue
-        if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
+        NTerror("==>%s %s\n",repr(node), result)
         return result
     #end def
 
     def handleMultipleElements( self, node ):
-        if (self.verbose): self.printNode( node )
+        self.printNode( node )
         if node.nodeName != self.name:
             NTerror('ERROR XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
@@ -2028,12 +2039,12 @@ class XMLhandler:
                 result.append( NThandle( subNode) )
             #end if
         #end for
-        if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
+        NTerror("==>%s %s\n",repr(node), result)
         return  result
     #end def
 
     def handleDictElements( self, node ):
-        if (self.verbose): self.printNode( node )
+        self.printNode( node )
         if node.nodeName != self.name:
             NTerror('ERROR XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
@@ -2077,7 +2088,7 @@ class XMLhandler:
         #append all keys, checking for 'format' as outlined above
         i = 0
         while (i < len(subNodes)):
-            if (self.verbose): self.printNode( subNodes[i] )
+            self.printNode( subNodes[i] )
 
             try:
                 keyName = subNodes[i].attributes.get('name').nodeValue
@@ -2091,7 +2102,7 @@ class XMLhandler:
 #            print ">>", keyName, value
             result[keyName] = value
         #end while
-        if (self.verbose): NTerror("==>%s %s\n",repr(node), result)
+        NTerror("==>%s %s\n",repr(node), result)
         return result
     #end def
 
@@ -2702,83 +2713,98 @@ def fprintf( stream, format, *args ):
   """C's fprintf routine"""
   stream.write( (format) % (args) )
 
-#
-# -----------------------------------------------------------------------------
-#
 def mprintf( fps, fmt, *args ):
     """
     Print to list of filepointers (fps) using format and args.
-    Skip element of fp if it is None
+    Use fp only if it evaluates to True.
     """
     for fp in fps:
-        if fp != None:
+        if fp:
             fprintf( fp, fmt, *args )
-        #end if
-    #end for
-#end def
-#
-# -----------------------------------------------------------------------------
-#
-def printf( format, *args ):
-  """C's printf routine"""
-  sys.stdout.write( (format) % (args) )
-#
-# -----------------------------------------------------------------------------
-#
+
 def sprintf( format, *args ):
   """return a string according to C's sprintf routine"""
   return ( (format) % (args) )
-#
-# -----------------------------------------------------------------------------
-#
+
 class PrintWrap:
-    def __init__( self, stream, autoFlush = 0 ):
-        self.stream = stream
+    def __init__( self, stream = None, autoFlush = True, verbose=verbosityOutput ):
         self.autoFlush = autoFlush
-    #end def
-
+        self.verbose = verbose
+        if self.verbose > verbosityError:
+            self.stream = sys.stdout
+        else:
+            self.stream = sys.stderr
+        if stream: # Allow override.
+            self.stream = stream
+        self.prefix = ""
+        if self.verbose == verbosityError:
+            self.prefix = prefixError
+        elif self.verbose == verbosityWarning:
+            self.prefix = prefixWarning
+        elif self.verbose == verbosityDetail:
+            self.prefix = prefixDetail
+        elif self.verbose == verbosityDebug:
+            self.prefix = prefixDebug
     def __call__( self, format, *args ):
-        if (self.autoFlush):
-            sys.stdout.flush()
+        if self.verbose > cing.verbosity: # keep my mouth shut per request.
+            return
+        if self.autoFlush:
+            self.stream.flush()
+        format = self.prefix + format
+        
         fprintf( self.stream, format, *args )
-        if (self.autoFlush):
+        if self.autoFlush:
             self.flush()
-        #end if
-    #end def
-
     def flush( self ):
         self.stream.flush()
-    #end def
+    def setVerbosity(self,verbose):
+        self.verbose=verbose
 
-#end class
+def printError(msg, *msgList):
+  if cing.verbosity >= verbosityError:
+    msgTot = ''
+    for msg in msgList:
+        msgTot += " " + msg
+    print prefixError,msgTot
+def printWarning(msg):
+  if cing.verbosity >= verbosityWarning:
+    print prefixWarning,msg
+def printMessage(msg):
+  if cing.verbosity >= verbosityOutput:
+    print msg
+def printDebug(msg):
+  if cing.verbosity >= verbosityDebug:
+    print prefixDebug, msg
+def printCodeError(msg):
+  if cing.verbosity >= verbosityError:
+    print prefixError+" in code:", msg
+def printException(msg):
+  if cing.verbosity >= verbosityError:
+    print prefixError+" exception caught: ["+ msg + "]"
+    traceback.print_exc() # Just prints None on my Mac. Strange.
 
-# report a message, optionally later as graphics output
-NTmessage = PrintWrap( stream = sys.stdout, autoFlush = 1 )
-# report a error, optionally later as graphics output
-NTerror   = PrintWrap( stream = sys.stderr, autoFlush = 1 )
-def NTwarning( string ):
-   NTerror( "WARNING: %s\n", string )
+NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly 
+NTerror   = PrintWrap(verbose=verbosityError)
+NTwarning = PrintWrap(verbose=verbosityWarning)
+NTmessage = PrintWrap(verbose=verbosityOutput)
+NTdetail  = PrintWrap(verbose=verbosityDetail)
+NTdebug   = PrintWrap(verbose=verbosityDebug)
 
-
+#def setVerbosity(verbosity):
+#    cing.verbosity = verbosity
+#    # Notify instances.
+#    NTnothing.setVerbosity(verbosity):
+#    NTerror.setVerbosity(verbosity):
+#    NTwarning.setVerbosity(verbosity):
+#    NTmessage.setVerbosity(verbosity):
+#    NTdetail.setVerbosity(verbosity):
+#    NTdebug.setVerbosity(verbosity):
+    
 class SetupError( Exception ):
     "Setup check error"
 
 class CodeError( Exception ):
     "Program code error"
-
-def printError(msg):
-    print "ERROR:",msg
-def printWarning(msg):
-    print "WARNING:",msg
-def printMessage(msg):
-    print msg
-def printDebug(msg):
-    print "DEBUG:", msg
-def printCodeError(msg):
-    print "ERROR: in code:", msg
-def printException(msg):
-    print "ERROR: exception caught", msg
-    traceback.print_exc() # Just prints None on my Mac. Strange.
 
 
 class NTfile( file ):
@@ -2927,14 +2953,13 @@ class ExecuteProgram( NTdict ):
                  redirectOutputToFile = False,
                  redirectInputFromDummy = False,
                  redirectInputFromFile = False,
-                 verbose=True, *args, **kwds):
+                 *args, **kwds):
         NTdict.__init__( self, pathToProgram  = pathToProgram,
                                rootPath       = rootPath,
                                redirectOutput = redirectOutput,
                                redirectOutputToFile   = redirectOutputToFile,
                                redirectInputFromDummy = redirectInputFromDummy,
                                redirectInputFromFile  = redirectInputFromFile,
-                               verbose        = verbose,
                                *args, **kwds
                        )
         self.jobcount = 0
@@ -2976,15 +3001,9 @@ class ExecuteProgram( NTdict ):
         elif self.redirectOutputToFile:
             cmd = sprintf('%s >& %s', cmd, self.redirectOutputToFile)
             self.jobcount += 1
-
-#        printDebug('==> Executing ('+cmd+') ... ')
-        #end if
+        printDebug('==> Executing ('+cmd+') ... ')
         code = os.system( cmd )
-        if (self.verbose):
-#            printDebug('done')
-            NTmessage.flush()
-        #end if
-#        printDebug( "Got back from system the exit code: " + `code` )
+        printDebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
 #

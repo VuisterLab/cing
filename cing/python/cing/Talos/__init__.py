@@ -8,7 +8,6 @@
 # ====================================
 # 
 # """
-# sys.stdout.write( header )
 from cing.Talos.nmrPipeTable import nmrPipeTable
 import  os
 

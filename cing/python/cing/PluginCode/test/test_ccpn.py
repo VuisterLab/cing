@@ -1,45 +1,55 @@
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
-from cing.Libs.NTutils import SetupError
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
+from cing import verbosityError
+from cing.Libs.NTutils import printDebug
+from cing.PluginCode.ccpn import initCcpn
 from cing.core.classes import Project
-from shutil import copytree
-from shutil import rmtree
+from cing.core.constants import CYANA
 from unittest import TestCase
-from cing.Libs.NTutils import findFiles
+import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
-    def testrun(self): # Can be disabled by extra t's at the beginning of the function name so unittest
-        # doesn't pick it up anymore.
-        """validate run check taking too long at 100 s. TODO: reduce size of project."""
-#        SETUP FIRST
-        if os.chdir(cingDirTestsTmp):
-            raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
 
-        cingProjectEntry = "1brvV1" # cing project created from a ccpn project via CCPN API branch 4
-        cingProjectFolder = cingProjectEntry+".cing"
-        cingProjectFilePath = os.path.join( cingDirTestsData, cingProjectFolder)
+    def ttttestExport2Ccpn(self):         
+        entryId = "1brv" # Small much studied PDB NMR entry 
+        self.failIf( os.chdir(cingDirTestsTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        project = Project( entryId )
+        self.failIf( project.removeFromDisk() )
+        project = Project.open( entryId, status='new' )
+        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+        pdbFileName = entryId+".pdb"
+        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+        project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
+        printDebug("Reading files from directory: " + cyanaDirectory)
+        project.cyana2cing(cyanaDirectory=cyanaDirectory, convention=CYANA,
+                    uplFiles  = [ entryId ],
+                    acoFiles  = [ entryId],
+                    copy2sources = True
+        )
+#        project.save()
+#        self.assertFalse( project.validate())
+#        project.save( )
+        self.failIf(project.export2Ccpn() is None)                                    
+        self.failIf(project.save())
+        
+        del(project)
 
-        if os.chdir(cingDirTestsTmp):
-            raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
-        if os.path.exists(cingProjectFolder):
-            printMessage("Removing existing cing project")
-            if rmtree( cingProjectFolder ):
-                printError("Failed to remove existing cing project")
-                return True
-        copytree(cingProjectFilePath, cingProjectFolder)
-        # Remove the CVS subdirs as even the temp path is under CVS scrutiny and we don't want to upset it.
-        cvsFolders = findFiles("CVS", cingProjectFolder)
-        if cvsFolders:
-            printMessage("Removing the CVS folders") 
-            for name in cvsFolders:
-                rmtree(name, True)
-#        sys.exit(1)
-        project = Project.open( cingProjectEntry, status='old' )
-        print project.cingPaths.format()
+        entryId = "1brv" # Small much studied PDB NMR entry 
+        self.failIf( os.chdir(cingDirTestsTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        
+    def tttestInitCcpn(self):         
+        entryId = "1brv" # Small much studied PDB NMR entry 
+        self.failIf( os.chdir(cingDirTestsTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        project = Project( "test_for_ccpn_cing_project" )
+        ccpnFile = os.path.join(entryId+".cing", "Data", "CCPN", entryId+".xml")
+        project = initCcpn(cingProject=project, ccpnFile=ccpnFile)
+        self.failIf(project)
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
     unittest.main()

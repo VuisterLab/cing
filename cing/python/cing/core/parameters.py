@@ -59,7 +59,7 @@ htmlDirectories.keysformat() #define a format string for 'pretty' output
 cingPaths = NTdict(     
     project      = 'project.xml',
     plugins      = 'PluginCode',
-    scripts      = '../Scripts',
+    scripts      = 'Scripts',
     bin          = 'bin',
     html         = 'HTML',
     css          = 'cing.css',
@@ -136,24 +136,12 @@ parameters = NTparameter( name = 'parameters', branch = True,
                                     __FORMAT__ = '%(value)s'
         ),
     
-    ),
-    
-    verbose = NTparameter( name       = 'verbose',
-                           partype    = 'integer',
-                           default    =  1,
-                           prettyS    = 'verbose flag',
-                           help       = 'Verbose flag',
-                           __FORMAT__ = '%(value)d'
-    ),
-
+    )
 )
-# Read definition file
-#JFD moved these defs into source here.
-parameters.verbose.value                 = 0
 parameters.programs.procheck_nmr.value   = 'procheck_nmr'
 
-#if os.path.exists( 'cing.par'): 
-#    execfile('cing.par')
+if os.path.exists( 'cing.par'): 
+    execfile('cing.par')
 
 
 

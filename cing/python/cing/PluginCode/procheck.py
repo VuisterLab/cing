@@ -3,7 +3,7 @@ Adds procheck methods
 ----------------  Methods  ----------------
 
 
-procheck( ranges=None, verbose = True )  
+procheck( ranges=None   )  
 
 
 ----------------  Attributes generated  ----------------
@@ -31,6 +31,8 @@ from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import printWarning
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing import verbosityDetail
+import cing
 import os
 
 def procheckString2float(string):
@@ -165,7 +167,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         self.molecule     = project.molecule
         self.rootPath     = project.mkdir(project.molecule.name, project.moleculeDirectories.procheck)
         self.redirectOutput = True
-        if project.parameters.verbose():
+        if cing.verbosity >= verbosityDetail:
             self.redirectOutput=False
 #        printDebug("Will redirect procheck output: " + `self.redirectOutput`)
         self.procheck  = ExecuteProgram(cingPaths.procheck_nmr, 
@@ -180,7 +182,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #end def
     
     # Return True on error ( None on success; Python default)
-    def run(self, ranges=None, export = True, verbose=True):
+    def run(self, ranges=None, export = True,   ):
         # Convert the ranges and translate into procheck format
         selectedResidues = self.molecule.ranges2list(ranges)
         NTsort(selectedResidues, 'resNum', inplace=True)
@@ -203,7 +205,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             singleRange = 'RESIDUES %3d %2s  %3d %2s' % (self.ranges[i].resNum, self.ranges[i].chain.name, 
                                                             self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
             fprintf(fp, singleRange+"\n")
-            print ">range: " + singleRange
+            printDebug( ">range: " + singleRange)
         fp.close()
 
         pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', 'procheck_nmr.prm')
@@ -219,7 +221,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
 #            project.molecule.modelCount
-            self.molecule.toPDBfile(path, convention=IUPAC, verbose=verbose)
+            self.molecule.toPDBfile(path, convention=IUPAC,  )
             
         canAqpc = True
         # Save restraints for Aqua
@@ -256,14 +258,14 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             elif not hasRestraints:
                 printWarning("Skipping qapc because no Aqua restraints were copied for Aqua")
             else:
-                printMessage("Trying aqpc")
+                printDebug("Trying aqpc")
                 if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
                     printCodeError("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
                     return True
                 else:
                     printMessage("Finished aqpc successfully")
                     
-        printMessage("Trying pc")
+        printDebug("Trying pc")
         if self.procheck(self.molecule.name +'.pdb ranges'):
             printError("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
             return True
@@ -325,7 +327,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         #end for
         
         path = os.path.join(self.rootPath, '%s.edt' % self.molecule.name)           
-        print '> parsing edt >', path
+        printDebug( '> parsing edt >'+ path)
 
         for line in AwkLike(path, minLength = 64, commentString = "#"):
             result = self._parseProcheckLine(line.dollar[0], self.procheckEnsembleDefs)
@@ -349,7 +351,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #end def    
 #end class
 
-def procheck(project, ranges=None, verbose=True):
+def procheck(project, ranges=None,   ):
     """
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
@@ -367,7 +369,7 @@ def procheck(project, ranges=None, verbose=True):
         printError("Failed to get procheck instance of project") 
         return None
     
-    pcheck.run(ranges=ranges, verbose=verbose)
+    pcheck.run(ranges=ranges,  )
     project.molecule.procheck = pcheck
     
     return project.molecule.procheck

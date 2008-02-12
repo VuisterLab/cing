@@ -1,7 +1,7 @@
 """
 Classes for dealing with STAR syntax
 """
-from cing.STAR import verbosity
+from cing import verbosity
 
 __author__    = "$Author$"
 ___revision__ = "$Revision$"

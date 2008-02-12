@@ -4,27 +4,30 @@ python $cingPath/PluginCode/test/test_Procheck.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
-from unittest import TestCase
+from cing import verbosityError
+from cing.Libs.NTutils import printDebug
 from cing.core.classes import Project
+from unittest import TestCase
+import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
         
-    def testparse(self):
-        """procheck parse"""
-        
-#        SETUP FIRST
+    def testparse(self):        
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
         entryId = "2hgh" # Small much studied PDB NMR entry 
-        pdbFileName = entryId+"_small.pdb"
-        pdbFilePath = os.path.join( cingDirTestsData, pdbFileName)
-        
+
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
-        # does it matter to import it just now?
+        project = Project( entryId )
+        self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
+        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+        pdbFileName = entryId+".pdb"
+        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
+        printDebug("Reading files from directory: " + cyanaDirectory)
         # Note that CING doesn't support chain ids in range selection for procheck. TODO
         # in the case of 2hgh this is not a problem because the residue numbering doesn't
         # overlap between the chain A protein and chain B RNA.
@@ -46,4 +49,5 @@ class AllChecks(TestCase):
         self.failIf(project.procheck(ranges = ranges) is None, msg)                                    
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
     unittest.main()

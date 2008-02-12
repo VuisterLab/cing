@@ -10,7 +10,7 @@ class AllChecks(TestCase):
         self.assertRaises(TypeError, check_int, i)
         i=1
         self.assertFalse( check_int( i ))
-        i=s
+#        i=s
 #        self.assertFalse( check_int( i )) # causes a TypeError
         
 if __name__ == "__main__":

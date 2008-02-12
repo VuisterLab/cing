@@ -1,9 +1,9 @@
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import printf
 from cing.core.constants import BMRBd
 from cing.core.database import NTdb
 from cing.core.dictionaries import NTdbGetAtom
+from cing.Libs.NTutils import NTmessage
 
 shifts = """
 # Statistics Calculated for All Chemical Shifts from Atoms in the 20 Common Amino Acids
@@ -370,7 +370,7 @@ for line in AwkLikeS( shifts ):
 	    if atm != None:
 		atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
 	    else:
-	        printf( '>>> line %d: %s\n', line.NR, line.dollar[0] )
+	        NTmessage( '>>> line %d: %s\n', line.NR, line.dollar[0] )
 	    #end if
 	#end if
     #end if

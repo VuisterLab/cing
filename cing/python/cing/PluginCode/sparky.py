@@ -21,7 +21,7 @@ from cing.core.parameters import directories
 #-----------------------------------------------------------------------------
 # Sparky routines
 #-----------------------------------------------------------------------------
-def exportShifts2Sparky( molecule, fileName=None, onlyAssigned=1, verbose=1 ):
+def exportShifts2Sparky( molecule, fileName=None, onlyAssigned=1,   ):
     """Export shifts to sparky format
     """
 
@@ -53,12 +53,11 @@ def exportShifts2Sparky( molecule, fileName=None, onlyAssigned=1, verbose=1 ):
     #end for 
     f.close()
   
-    if verbose:
-        NTmessage('==> exportShifts2Sparky: %-4d shifts   written to "%s"\n', count, fileName)
+    NTmessage('==> exportShifts2Sparky: %-4d shifts   written to "%s"\n', count, fileName)
     #end if
 #end def
 
-def exportPeaks2Sparky( peaks, peakFile, verbose=1 ):
+def exportPeaks2Sparky( peaks, peakFile,   ):
   """Export peaks to Sparky fileName
   """
   if (peaks==None):
@@ -104,8 +103,7 @@ def exportPeaks2Sparky( peaks, peakFile, verbose=1 ):
   #end for   
   fout.close()
       
-  if verbose:
-    NTmessage( '==> exportPeaks2Sparky:  %-4d peaks    written to "%s"\n', count, peakFile )
+  NTmessage( '==> exportPeaks2Sparky:  %-4d peaks    written to "%s"\n', count, peakFile )
   #end if
 #end def
 
@@ -120,14 +118,14 @@ def export2Sparky( project, tmp=None ):
         exportShifts2Sparky( project[molName], 
                              fileName=fileName, 
                              onlyAssigned=True, 
-                             verbose=project.parameters.verbose()
+                              
                            )
     #end for
 
     for pl in project.peaks:
         if (pl.status == 'keep'):
             peakFile = project.path( directories.sparky, pl.name+'.peaks' )
-            exportPeaks2Sparky( pl, peakFile, verbose = project.parameters.verbose() )
+            exportPeaks2Sparky( pl, peakFile,   )
         #end if
     #end for
 #end def

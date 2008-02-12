@@ -1,8 +1,8 @@
-Version 0.72: xx Jan 2008: 
-    - Added extensive test cases.
+Version 0.72: 12 Jan 2008: 
+    - Added extensive test cases. Call all by cing --test.
 	- Added integration with Aqua, Molmol, Povray, convert and ps2pdf
-		Needs more testing.
-		
+	- Started migration to matlibplot away from biggles. Needs more testing.
+	
 Version 0.71: 05 Dec 2007: 
     - reformatted the version/copyright formatting
     - redid the determination of the CINGROOT and checks in setup.py

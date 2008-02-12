@@ -1,11 +1,14 @@
-from cing.STAR.Utils import Lister
+from cing import verbosityDebug
+from cing import verbosityError
+from cing.Libs.NTutils import printDebug
 from unittest import TestCase
 import Utils
+import cing
 import unittest
 
 
 
-class AllChecks(TestCase, Lister):
+class AllChecks(TestCase):
         
     def testTranspose(self):
         m1 = [ [1,2], [3,4] ]
@@ -14,9 +17,11 @@ class AllChecks(TestCase, Lister):
         self.assertTrue(m1t==m2)
     def testLister(self):
         self.dummy = "dumb"
-        print self
+        printDebug( self )
         
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
+    cing.verbosity = verbosityDebug
     unittest.main() 
 #    a = AllChecks()
 #    a.testLister()

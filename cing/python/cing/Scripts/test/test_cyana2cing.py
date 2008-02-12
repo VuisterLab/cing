@@ -4,11 +4,13 @@ python $cingPath/Scripts/test/test_cyana2cing.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
+from cing import verbosityError
 from cing.Libs.NTutils import printWarning
 from cing.core.classes import Project
 from unittest import TestCase
-import shutil
+import cing
 import os
+import shutil
 import sys
 import unittest
 
@@ -18,8 +20,8 @@ class AllChecks(TestCase):
         """cyana conversion should take less than 10s"""
         
 #        SETUP FIRST
-        projectId = "xeasy_project" # Small much studied PDB NMR entry 
-        cyanaDirectory = os.path.join( cingDirTestsData, projectId )
+        projectId = "1pdb" # Small much studied PDB NMR entry 
+        cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
         self.assertTrue( os.path.exists( cyanaDirectory) and os.path.isdir(cyanaDirectory ) )
         
         self.failIf( os.chdir(cingDirTestsTmp), msg=
@@ -31,12 +33,12 @@ class AllChecks(TestCase):
             printWarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )
             
-        project = Project.open(projectRootPath, 'new', verbose=False )
+        project = Project.open(projectRootPath, 'new',    )
         project.cyana2cing( #project=project,
                             cyanaDirectory=cyanaDirectory, 
-                            uplFiles  = ["final"],
-                            acoFiles  = ["final","talos"],
-                            pdbFile   = "final",
+                            uplFiles  = [projectId],
+                            acoFiles  = [projectId,"talos"],
+                            pdbFile   = projectId,
                             nmodels   = 2,
                             copy2sources = True
         )
@@ -48,4 +50,5 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
     unittest.main()

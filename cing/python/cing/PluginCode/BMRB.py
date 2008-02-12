@@ -14,15 +14,12 @@ class NMRrestraintsGrid:
         self.bmrbUrl = "http://www.bmrb.wisc.edu"
 
 #==============================================================================
-def initBMRB( project, bmrbFile, moleculeName, verbose = None ):
+def initBMRB( project, bmrbFile, moleculeName  = None ):
     """
         Initialize from edited BMRB file
         Return molecule instance
     """
-    if verbose == None:
-        verbose = project.parameters.verbose()
-
-    mol = Molecule( name=moleculeName , verbose=False )
+    mol = Molecule( name=moleculeName ,    )
     project.appendMolecule( mol )
 
     error = False
@@ -46,22 +43,21 @@ def initBMRB( project, bmrbFile, moleculeName, verbose = None ):
         #end if
     #end for
 
-    error = error or (project.importBMRB( bmrbFile, verbose=False ) == None)
-    if verbose:
-        if error:
-            NTmessage( '==> initBMRB: completed with error(s)\n' )
-        else:
-            NTmessage( '==> initBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
-        #end if
-        NTmessage("%s\n", mol.format() )
+    error = error or (project.importBMRB( bmrbFile,    ) == None)
+    if error:
+        NTmessage( '==> initBMRB: completed with error(s)\n' )
+    else:
+        NTmessage( '==> initBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
     #end if
+    NTmessage("%s\n", mol.format() )
 
-    if error: return None
-    else: return mol
+    if error: 
+        return None
+    return mol
 #end def
 
 #==============================================================================
-def importBMRB( project, bmrbFile, verbose=None ):
+def importBMRB( project, bmrbFile =None ):
     """
         Import chemical shifts from edited BMRB file
         No reassigned Pseudo atoms yet;
@@ -72,8 +68,6 @@ def importBMRB( project, bmrbFile, verbose=None ):
         NTerror("Error importBMRB: no molecule defined\n" )
         return None
     #end if
-
-    if verbose == None: verbose = project.parameters.verbose()
 
     mol = project.molecule
     mol.newResonances()
@@ -102,17 +96,16 @@ def importBMRB( project, bmrbFile, verbose=None ):
         #end if
     #end for
 
-    if verbose:
-        if error:
-            NTmessage( '==> importBMRB: completed with error(s)\n' )
-        else:
-            NTmessage( '==> importBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
-        #end if
-        NTmessage("%s\n", mol.format() )
+    if error:
+        NTmessage( '==> importBMRB: completed with error(s)\n' )
+    else:
+        NTmessage( '==> importBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
     #end if
+    NTmessage("%s\n", mol.format() )
 
-    if error: return None
-    else: return mol
+    if error: 
+        return None
+    return mol
 #end def
 
 # register the functions

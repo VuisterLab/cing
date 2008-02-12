@@ -58,7 +58,6 @@ class Xplor( NTdict ):
         self.setdefault( 'seed',          12397 )
         
         self.setdefault( 'overwrite', False )
-        self.setdefault( 'verbose', True )
 
     #------------------------------------------------------------------------
     def cleanPath( self, path ):
@@ -95,7 +94,7 @@ class Xplor( NTdict ):
         
     #------------------------------------------------------------------------
     def newPath( self, *args):
-        """Check existance of joined path, relative to basePath, 
+        """Check existence of joined path, relative to basePath, 
            remove if exists and overwrite
            Return joined path or do a system exit.
         """
@@ -334,8 +333,7 @@ end if
         scriptFile = open( scriptFileName, 'w' )
         self.printScript( scriptFile )
         scriptFile.close()
-        if self.verbose:
-            NTmessage('==> Created script "%s"\n',  scriptFileName)
+        NTmessage('==> Created script "%s"\n',  scriptFileName)
 
         # Create job/log file
         jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh') 
@@ -353,8 +351,7 @@ end if
         jobFile.close()
 
         os.system('/bin/chmod +x %s' % jobFileName)
-        if self.verbose:
-            NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
+        NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
 
         if self.useCluster:
             NTmessage( 'Sending job to the queu %s\n', self.queu_cluster )
@@ -402,9 +399,8 @@ class WaterRefine( Xplor ):
         self.setdefault( 'inPath',  self.directories.analyzed )
         self.setdefault( 'outPath', self.directories.refined )
 
-        if self.verbose:
-            self.keysformat()
-            NTmessage('%s\n', self.format())
+        self.keysformat()
+        NTmessage('%s\n', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -693,9 +689,8 @@ class Analyze( Xplor ):
         self.setdefault( 'inPath',  self.directories.converted )
         self.setdefault( 'outPath', self.directories.analyzed )
 
-        if self.verbose:
-            self.keysformat()
-            NTmessage('%s\n', self.format())
+        self.keysformat()
+        NTmessage('%s\n', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -821,10 +816,8 @@ class GeneratePSF( Xplor ):
         self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
 
-        if self.verbose:
-            self.keysformat()
-            NTmessage('%s\n', self.format())
-        #end if        
+        self.keysformat()
+        NTmessage('%s\n', self.format())
     #endif
 
     #------------------------------------------------------------------------

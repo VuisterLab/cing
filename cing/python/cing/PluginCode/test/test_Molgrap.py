@@ -4,15 +4,16 @@ python $cingPath/PluginCode/test/test_Procheck.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
-from unittest import TestCase
+from cing import verbosityError
 from cing.core.classes import Project
+from unittest import TestCase
+import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
         
     def testMolgrapRun(self):
-        
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
         entryId = "1brv" # Small much studied PDB NMR entry         
@@ -30,4 +31,5 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif))                                    
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
     unittest.main()

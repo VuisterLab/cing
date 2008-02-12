@@ -4,17 +4,18 @@ python $cingPath/PluginCode/test/test_validate.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
-from cing.core.classes import Project
-from unittest import TestCase
+from cing import verbosityError
 from cing.Libs.NTutils import printDebug
+from cing.core.classes import Project
 from cing.core.constants import CYANA
+from unittest import TestCase
+import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
 
-    def testRunCyana(self):
-        """validate run based off pdb file"""
+    def testRun(self):
 #        entryId = "2hgh" # RNA-protein complex.
         entryId = "1brv" # Small much studied PDB NMR entry 
         self.failIf( os.chdir(cingDirTestsTmp), msg=
@@ -38,4 +39,5 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityError
     unittest.main()
