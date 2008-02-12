@@ -9,7 +9,7 @@ Version 0.48 will overhaul the routines in this file.
 ----------------  Methods  ----------------
 
 
-validate( verbose = True )
+validate(   )
 
 checkForSaltbridges( toFile = False )
 
@@ -34,6 +34,12 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
+from cing.Libs.NTplot import NTplot
+from cing.Libs.NTplot import NTplotAttributes
+from cing.Libs.NTplot import boxAttributes
+from cing.Libs.NTplot import lineAttributes
+from cing.Libs.NTplot import plusPoint
+from cing.Libs.NTplot import pointAttributes
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
@@ -47,11 +53,12 @@ from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import list2asci
-from cing.Libs.NTutils import mprintf
+from cing.Libs.NTutils import printCodeError
 from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printException
 from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printf
+from cing.Libs.NTutils import printWarning
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.peirceTest import peirceTest
@@ -67,15 +74,6 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs.NTutils import printWarning
-from cing.Libs.NTutils import printException
-from cing.Libs.NTplot import boxAttributes
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTplot import NTplotAttributes
-from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTplot import pointAttributes
-from cing.Libs.NTutils import printCodeError
 import cing
 import math
 import os
@@ -101,42 +99,38 @@ def setupValidation( project, ranges=None ):
     returns None on success or True on failure.
     """
     # take a convenience variable.
-    verbose=project.parameters.verbose()
-    validateDihedrals( project, verbose=verbose )
+     
+    validateDihedrals( project  )
 
-    validateModels( project, verbose=verbose )
+    validateModels( project  )
 
-    project.predictWithShiftx(                      verbose=verbose )
-    project.validateAssignments(toFile=True,        verbose=verbose )
-    project.checkForSaltbridges(toFile=True,        verbose=verbose )
-    project.validateRestraints( toFile=True,        verbose=verbose )
-    project.calculateRmsd(      ranges=ranges,      verbose=verbose )
-    project.procheck(           ranges=ranges,      verbose=verbose )
-    project.summary(                                verbose=verbose )
+    project.predictWithShiftx(                        )
+    project.validateAssignments(toFile=True,          )
+    project.checkForSaltbridges(toFile=True,          )
+    project.validateRestraints( toFile=True,          )
+    project.calculateRmsd(      ranges=ranges,        )
+    project.procheck(           ranges=ranges,        )
+    project.summary(                                  )
 #end def
 
-def summary( project, verbose=True ):
+def summary( project ):
     """
     Generate a summary
     """
-
-    fps = []
-    if verbose:
-        fps.append( sys.stdout )
+    
     fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
     fp = open( fname, 'w' )
-    printf( '==> summary, output to %s\n', fname)
-    fps.append( fp )
+    NTmessage( '==> summary, output to %s\n', fname)
 
-    mprintf( fps, '%s\n', project.format() )
+    msg = sprintf( '%s\n', project.format() )
 
     if project.molecule:
-        mprintf( fps, '%s\n', project.molecule.format() )
+        msg += sprintf( '%s\n', project.molecule.format() )
         if project.molecule.has_key('rmsd' ):
-            mprintf( fps, '\n%s\n', project.molecule.rmsd.format() )
+            msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
         #end if
         for drl in project.distances + project.dihedrals + project.rdcs:
-            mprintf( fps, '\n%s\n', drl.format() )
+            msg += sprintf( '\n%s\n', drl.format() )
         #end for
         # No procheck summary added yet.
 #        if project.molecule.has_key('procheck'):
@@ -204,7 +198,7 @@ class RmsdResult( NTdict ):
 #end class
 
 
-def calculateRmsd( project, ranges=None, models = None, verbose = True ):
+def calculateRmsd( project, ranges=None, models = None   ):
     """
     Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
     return rmsd result of molecule, or None on error
@@ -229,8 +223,7 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
         res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
     #end for
 
-    if verbose:
-        NTmessage("==> Calculating rmsd's ")
+    NTmessage("==> Calculating rmsd's ")
 
     num = 0 # number of evaluated models (does not have to coincinde with model
             # since we may supply an external list
@@ -238,9 +231,8 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
 #            shownWarningCount2 = 0
     for model in selectedModels:
 
-        if verbose:
-            NTmessage(".")
-            NTmessage.flush()
+        NTmessage(".")
+               
         #end if
         project.molecule.rmsd.backbone[num]   = 0.0
         project.molecule.rmsd.backboneCount   = 0
@@ -332,22 +324,16 @@ def calculateRmsd( project, ranges=None, models = None, verbose = True ):
 #end def
 
 
-def validateRestraints( project, toFile = True, verbose=True ):
+def validateRestraints( project, toFile = True,    ):
     """
     Calculate rmsd's and violation on restraints
     """ 
 
-    fps = []
-    if verbose: fps.append( sys.stdout )
-    if toFile:
-        #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
-        fp = open( fname, 'w' )
-        printf( '==> validateRestraints, output to %s\n', fname)
-        fps.append( fp )
-    #end if
-
-    mprintf( fps, '%s\n', project.format() )
+#    fps = []
+#    fps.append( sys.stdout )
+    
+    msg = ""
+    msg += sprintf('%s\n', project.format() )
 
     # distances and dihedrals
     for res in project.molecule.allResidues():
@@ -358,14 +344,14 @@ def validateRestraints( project, toFile = True, verbose=True ):
     # distances
     for drl in project.distances:
         drl.analyze()
-        mprintf( fps, '%s\n', drl.format())
+        msg += sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
-        mprintf( fps, '%s Sorted on Maximum Violations %s\n', dots, dots)
-        mprintf( fps, '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
+        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         drl.sort('violCount3').reverse()
-        mprintf( fps, '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
-        mprintf( fps, '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf( '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
+        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         # Sort restraints on a per-residue basis
         for restraint in drl:
@@ -379,14 +365,14 @@ def validateRestraints( project, toFile = True, verbose=True ):
     # dihedrals
     for drl in project.dihedrals:
         drl.analyze()
-        mprintf( fps, '%s\n', drl.format())
+        msg += sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
-        mprintf( fps, '%s Sorted on Maximum Violations %s\n', dots, dots)
-        mprintf( fps, '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
+        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         drl.sort('violCount3').reverse()
-        mprintf( fps, '%s Sorted on Violations > 3 degree %s\n', dots, dots)
-        mprintf( fps, '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf( '%s Sorted on Violations > 3 degree %s\n', dots, dots)
+        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         # sort the restraint on a per residue basis
         for restraint in drl:
@@ -395,7 +381,7 @@ def validateRestraints( project, toFile = True, verbose=True ):
     #end for
 
     # Process the per residue restraints data
-    mprintf( fps, '%s Per residue scores %s\n', dots, dots )
+    msg += sprintf( '%s Per residue scores %s\n', dots, dots )
     count = 0
     for res in project.molecule.allResidues():
 
@@ -424,8 +410,8 @@ def validateRestraints( project, toFile = True, verbose=True ):
         #end if
 
         # print every 10 lines
-        if (not count%30):
-            mprintf(fps, '%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd --')
+        if not count % 30:
+            msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd --')
         #end if
         if res.has_key('PHI'):
             phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f' )
@@ -438,7 +424,7 @@ def validateRestraints( project, toFile = True, verbose=True ):
             psi = NTvalue( '-', '-', fmt='%7s %7s' )
         #end if
         try:
-            mprintf( fps,    '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f\n',
+            msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f\n',
                  res, phi, psi,
                  len(res.distanceRestraints), res.distanceRestraints.violCount1, res.distanceRestraints.violCount3,
                  res.distanceRestraints.violCount5, res.distanceRestraints.rmsd
@@ -447,9 +433,17 @@ def validateRestraints( project, toFile = True, verbose=True ):
             NTerror("No coordinates for residue %s\n", res)
         count += 1
     #end for
+    printDebug(msg)
+    if toFile:
+        #project.mkdir(project.directories.analysis, project.molecule.name)
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
+        fp = open( fname, 'w' )
+        NTmessage( '==> validateRestraints, output to %s\n', fname)
+        fprintf(fp, msg)
+    #end if    
 #end def
 
-def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
+def checkForSaltbridges( project, cutoff = 5, toFile=False,    ):
     """
     Routine to analyze all potential saltbridges involving E,D,R,K and H residues.
     Initiates an NTlist instances as saltbridges attribute for all residues.
@@ -463,15 +457,14 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
         #project.mkdir(project.directories.analysis, project.molecule.name)
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')
         fp = open( fname, 'w' )
-        printf( '==> checkSaltbridges, output to %s\n', fname)
+        NTmessage( '==> checkSaltbridges, output to %s\n', fname)
     else:
         fp = None
     #end if
 
     if toFile:
         fprintf( fp, '%s\n', project.molecule.format() )
-    if verbose:
-        printf(     '%s\n', project.molecule.format() )
+    NTmessage(     '%s\n', project.molecule.format() )
 
     residues1 = project.molecule.residuesWithProperties('E') + \
                 project.molecule.residuesWithProperties('D')
@@ -493,8 +486,9 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
 
             if s:
                 if (s.types[4][1] <= cutoff):    # less then cutoff 'not observed'
-                    if toFile: fprintf(fp, '%s\n', s.format() )
-                    if verbose: printf(    '%s\n', s.format() )
+                    if toFile: 
+                        fprintf(fp, '%s\n', s.format() )
+                    NTmessage(    '%s\n', s.format() )
                     res1.saltbridges.append( s )
                     res2.saltbridges.append( s )
                     result.append( s )
@@ -506,14 +500,12 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False, verbose=True ):
     if s:
         if toFile:
             fprintf( fp, '%s\n', s.comment )
-        if verbose:
-            printf(     '%s\n', s.comment )
+        NTmessage(     '%s\n', s.comment )
     #end if
 
     if toFile:
         fp.close()
-    if verbose:
-        sys.stdout.flush()
+    sys.stdout.flush()
     #end if
 
     return result
@@ -770,7 +762,7 @@ def checkHbond( donorH, acceptor,
 cing.Atom.checkHbond = checkHbond
 
 
-def validateAssignments( project, toFile = True, verbose = True ):
+def validateAssignments( project, toFile = True   ):
     """
     Validate the assignments; check for potential problems and inconsistencies
     Add's NTlist instance with string's with warning description to each atom as
@@ -814,7 +806,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
                 string = sprintf('%s: %.2f ppm is %.1f*sd away from average (%.2f,%.2f)',
                                  'SHIFT', shift, delta, av, sd
                                 )
-#                if verbose: printf('%-20s %s\n', atm, string)
+#                NTmessage('%-20s %s\n', atm, string)
                 result.append( atm )
                 atm.validateAssignment.append(string)
             #end if
@@ -822,7 +814,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
             # Check if not both realAtom and pseudoAtom are assigned
             if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
                 string = sprintf('%s: atm also has %s assigned', 'MULTIPLE_ASSIGNMENT', atm.pseudoAtom() )
- #               if verbose: printf('%-20s %s\n', atm, string)
+ #               NTmessage('%-20s %s\n', atm, string)
                 result.append( atm )
                 atm.validateAssignment.append(string)
             #end if
@@ -832,7 +824,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
                 for a in atm.realAtoms():
                     if a.isAssigned():
                         string = sprintf('%s: atm also has %s assigned', 'MULTIPLE_ASSIGNMENT', a )
-#                        if verbose: printf('%-20s %s\n', atm, string)
+#                        NTmessage('%-20s %s\n', atm, string)
                         result.append( atm )
                         atm.validateAssignment.append(string)
                  #end if
@@ -844,7 +836,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
                 for a in atm.pseudoAtom().realAtoms():
                     if not a.isAssigned():
                         string = sprintf('%s: expected also %s to be assigned.', 'MISSING_PROTON_ASSIGNMENT', a )
-#                        if verbose: printf('%-20s %s\n', atm, string )
+#                        NTmessage('%-20s %s\n', atm, string )
                         result.append( atm )
                         atm.validateAssignment.append(string)
                     #end if
@@ -856,7 +848,7 @@ def validateAssignments( project, toFile = True, verbose = True ):
                 heavyAtm = atm.topology()[0]
                 if not heavyAtm.isAssigned():
                     string = sprintf('%s: expected %s to be assigned', 'MISSING_HEAVY_ATOM_ASSIGNMENT', heavyAtm )
-#                    if verbose: printf('%-20s %s\n', atm, string )
+#                    NTmessage('%-20s %s\n', atm, string )
                     result.append( atm )
                     atm.validateAssignment.append(string)
                 #end if
@@ -866,37 +858,35 @@ def validateAssignments( project, toFile = True, verbose = True ):
             atm.colorLabel = COLOR_ORANGE
        #end if
     #end for
-    if verbose:
-        for atm in result:
-            # check for shiftx averages
-            if atm.has_key('shiftx'):
-                sav = atm.shiftx.av
-                ssd = atm.shiftx.sd
-            else:
-                sav = -NOSHIFT
-                ssd = 0.0
-                _sn  = 0
-            #end if
-            if atm.db.shift:
-                dav = atm.db.shift.average
-                dsd = atm.db.shift.sd
-            else:
-                dav = -999.0
-                dsd = 0.0
-            #end if
-            printf('%s %s %s\n' +\
-                   'shift:    %7.2f %7.2f \n' +\
-                   'shiftx:   %7.2f %7.2f \n' +\
-                   'database: %7.2f %7.2f \n',
-                   dots, atm, dots,
-                   atm.resonances().value,
-                   atm.resonances().error,
-                   sav, ssd,
-                   dav, dsd
-                  )
-            printf('\n%s\n', atm.validateAssignment.format('Warning %s\n') )
-        #end for
-    #end if
+    for atm in result:
+        # check for shiftx averages
+        if atm.has_key('shiftx'):
+            sav = atm.shiftx.av
+            ssd = atm.shiftx.sd
+        else:
+            sav = -NOSHIFT
+            ssd = 0.0
+            _sn  = 0
+        #end if
+        if atm.db.shift:
+            dav = atm.db.shift.average
+            dsd = atm.db.shift.sd
+        else:
+            dav = -999.0
+            dsd = 0.0
+        #end if
+        NTmessage('%s %s %s\n' +\
+               'shift:    %7.2f %7.2f \n' +\
+               'shiftx:   %7.2f %7.2f \n' +\
+               'database: %7.2f %7.2f \n',
+               dots, atm, dots,
+               atm.resonances().value,
+               atm.resonances().error,
+               sav, ssd,
+               dav, dsd
+              )
+        NTmessage('\n%s\n', atm.validateAssignment.format('Warning %s\n') )
+    #end for
     if toFile:
         #path = project.mkdir( project.directories.analysis, project.molecule.name )
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'validateAssignments.txt')
@@ -941,14 +931,13 @@ def validateAssignments( project, toFile = True, verbose = True ):
                    )
         #end for
         fp.close()
-        if verbose:
-            NTmessage('==> validateAssignments: result to "%s"\n', fname)
+        NTmessage('==> validateAssignments: result to "%s"\n', fname)
     #end if
 
     return result
 #end def
 
-def validateDihedrals( self, verbose=True ):
+def validateDihedrals( self,    ):
     """Validate the dihedrals of dihedralList for outliers and cv using pierceTest.
     Return True on error.
     """
@@ -987,15 +976,14 @@ def validateDihedrals( self, verbose=True ):
             d.good.cAverage(  plotpars.min, plotpars.max, byItem=1 )
             d.outliers.limit( plotpars.min, plotpars.max, byItem=1 )
 
-            if verbose:
-                NTmessage( '--- Residue %s, %s ---\n', res, dihed )
-                NTmessage( 'good:     %2d %6.1f %4.3f\n',
-                           d.good.n, d.good.cav, d.good.cv )
-                NTmessage( 'outliers: %2d models: %s\n',
-                           len(d.outliers), d.outliers.zap(0) )
+            NTmessage( '--- Residue %s, %s ---\n', res, dihed )
+            NTmessage( 'good:     %2d %6.1f %4.3f\n',
+                       d.good.n, d.good.cav, d.good.cv )
+            NTmessage( 'outliers: %2d models: %s\n',
+                       len(d.outliers), d.outliers.zap(0) )
 #end def
 
-def validateModels( self, verbose=True ):
+def validateModels( self,    ):
     """Validate the models on the basis of the dihedral outliers
     """
 
@@ -1008,7 +996,7 @@ def validateModels( self, verbose=True ):
 
     backbone = ['PHI','PSI','OMEGA']
 
-#    self.validateDihedrals( verbose=False )
+#    self.validateDihedrals(    )
     # self.models keeps track of the number of outliers per model.
     self.models = NTdict()
     for m in range(self.molecule.modelCount):
@@ -1036,10 +1024,8 @@ def validateModels( self, verbose=True ):
             #end if
         #end for
     #end for
-    if verbose:
-        for m, count in self.models.items():
-            NTmessage('Model %s: %2d backbone dihedral outliers\n', str(m), count )
-        #end for
+    for m, count in self.models.items():
+        NTmessage('Model %s: %2d backbone dihedral outliers\n', str(m), count )
     #end if
 
 #end def
@@ -1198,7 +1184,7 @@ def _matchDihedrals(residue, dihedralName):
 #end def
 
 def setupHtml(project):
-    '''Descrn: create all folders and subfolders related to a Cing.Molecule
+    '''Description: create all folders and subfolders related to a Cing.Molecule
                under Molecul/HTML directory and initiatilise attribute html
                for the due Cing objects.
        Inputs: list of Cing.Molecules, Cing.Peaks, Cing.Distances and
@@ -1705,7 +1691,7 @@ def setupHtml(project):
 #end def
 
 def renderHtml(project):
-    '''Descrn: render HTML content for a Cing.Molecule or for just a
+    '''Description: render HTML content for a Cing.Molecule or for just a
                Cing.Chain, Cing.Residue or Cing.Atom.
        Inputs: a Cing.Molecule, Cing.Chain, Cing.Residue or Cing.Atom.
        Output: return None for success is standard.
@@ -1718,7 +1704,7 @@ def renderHtml(project):
             
 
 def populateHtmlMolecules( project, skipFirstPart=False ):
-    '''Descrn: generate the Html content for Molecules and Residues pages.
+    '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project.
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
@@ -1737,27 +1723,26 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
         if not skipFirstPart:
             for chain in molecule.allChains():
                 chainId = chain.name
-                printMessage("\nGenerating dihedral angle plots for chain: " + chainId)
+                printMessage("Generating dihedral angle plots for chain: " + chainId)
                 printedDots = 0
                 for res in chain.allResidues():
     #                write without extra space
                     if not printedDots % 10:
                         digit = printedDots / 10
-                        sys.stdout.write(`digit`)
+                        NTmessage(`digit`)
                     else:
-                        sys.stdout.write('.')
-#                    print '.', # print progress for each residue a char.
+                        NTmessage('.')
                     printedDots += 1
                     resNum = res.resNum
                     if not printedDots % 80:
-                        print
+                        printMessage()
                         printedDots = 0
                     resdir = os.path.dirname(res.htmlLocation[0])
 
                     fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
-                    fprintf(fp, '----- %5s -----\n', res)
-
-
+                    msg = sprintf('----- %5s -----\n', res)
+                    fprintf(fp, msg)
+                    printDebug(msg)
                     plotList = [
                                 ['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI'],
                                 ['CHI1', 'CHI2', 'CHI1-CHI2',     'CHI1_CHI2'],
@@ -1894,7 +1879,7 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
 #end def
 
 def _generateHtmlResidueRestraints( project, residue, type = None ):
-    '''Descrn: internal routine to generate the Html content for restraints
+    '''Description: internal routine to generate the Html content for restraints
                linked to a particular residue.
        Inputs: Cing.Residue, string type of restraint: 'Distance', 'Dihedral',
                'RDC' (?).
@@ -2025,7 +2010,7 @@ def populateHtmlModels(project):
 #        project.models[i] holds the number of outliers for model i.
 #        models is a NTdict.
         outliers = [project.models[i] for i in range(molecule.modelCount)]
-        print '>> modelCount, outliers:', molecule.modelCount, outliers
+        printDebug( '>> modelCount, outliers:' + `molecule.modelCount` +", "+ `outliers`)
         # This fails for some (or all) cases
         plot.barChart( project.models.items(),
                        0.05, 0.95,
@@ -2036,7 +2021,7 @@ def populateHtmlModels(project):
     #end for
 #end def
 
-def validate( project, ranges=None, htmlOnly = False, verbose=True ):
+def validate( project, ranges=None, htmlOnly = False,    ):
     """Validatation tests returns None on success or True on failure.
     """
     try:

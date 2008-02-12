@@ -3,12 +3,12 @@ Adds initialise/import/export from/to PDB files
 
 
 Methods:
-    Molecule.importFromPDB( pdbFile, convention='PDB', verbose=True ):
+    Molecule.importFromPDB( pdbFile, convention='PDB',    ):
         Import coordinates from pdbFile
         convention eq PDB, CYANA, CYANA2 or XPLOR
         return molecule or None on error
     
-    Molecule.PDB2Molecule(pdbFile, moleculeName, convention, verbose=True ):
+    Molecule.PDB2Molecule(pdbFile, moleculeName, convention,    ):
         Initialise  from pdbFile
         Return molecule instance
         convention eq PDB, CYANA, CYANA2 or XPLOR 
@@ -41,19 +41,18 @@ from cing.Libs.NTutils import printWarning
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None, verbose=True ):
+def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None,    ):
     """Import coordinates from pdbFile (optionally: first nmodels)
 convention eq PDB, CYANA, CYANA2 or XPLOR
 return molecule or None on error
     """
     if not molecule: return None
 
-    if verbose:
-        NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
-        NTmessage.flush()
+    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
+           
     #end if
     
-    pdb = PyMMLib.PDBFile( pdbFile, verbose=False )
+    pdb = PyMMLib.PDBFile( pdbFile,    )
 #    molecule.pdb = pdb; no longer save it: it eats massive memory and we don't use it
     
     foundModel = False
@@ -122,8 +121,7 @@ return molecule or None on error
     #end if
     molecule.modelCount += modelCount
     
-    if verbose:
-        NTmessage( 'read %d records; added %d structure models\n', len(pdb), modelCount )  
+    NTmessage( 'read %d records; added %d structure models\n', len(pdb), modelCount )  
     #end if
     
     del( pdb )
@@ -133,23 +131,17 @@ return molecule or None on error
 # Add as a method to Molecule class
 Molecule.importFromPDB = importFromPDB
 
-def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None, verbose=True ):
+def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None,    ):
     """Initialise  from pdbFile
 Return molecule instance
 convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
     showMaxNumberOfWarnings = 100
     shownWarnings = 0
-    if verbose:
-        NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
-        NTmessage.flush()
+    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
+           
     #end if
-    pdb = PyMMLib.PDBFile( pdbFile, verbose=False )
-    if verbose:
-        NTmessage('done\n' ) 
-        NTmessage.flush()
-    #end if
-    
+    pdb = PyMMLib.PDBFile( pdbFile,    )
     mol = Molecule( name=moleculeName )
     
 
@@ -237,8 +229,7 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     if not foundModel: 
         mol.modelCount += 1
     
-    if verbose:
-        NTmessage( '==> PDB2Molecule: completed, added %d structure models\n', mol.modelCount )  
+    NTmessage( '==> PDB2Molecule: completed, added %d structure models\n', mol.modelCount )  
     #end if
     
     # delete the PyMMlib pdbFile instance
@@ -250,7 +241,7 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
 Molecule.PDB2Molecule = staticmethod( PDB2Molecule )
 
 
-def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC, verbose=True ):
+def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC,    ):
     """
     Save a molecule instance to PDB file.
     Convention eq PDB, CYANA, CYANA2, XPLOR.
@@ -259,8 +250,8 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC, verbose=Tru
     This routine should eventually replace toPDB.
     
     """
-    pdbFile = molecule.toPDB( model=model, convention = IUPAC, verbose = verbose )
-    pdbFile.save( path, verbose = verbose )   
+    pdbFile = molecule.toPDB( model=model, convention = IUPAC,    )
+    pdbFile.save( path,    )   
     del(pdbFile)
 #end def
 Molecule.toPDBfile = moleculeToPDBfile
@@ -272,11 +263,11 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
         _path,name,_ext  = NTpath( pdbFile )
     #end if
     molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels,
-                             verbose = project.parameters.verbose()
+                              
                            )
     project.appendMolecule( molecule )
 
-    project.molecule.updateAll( verbose = project.parameters.verbose() )
+    project.molecule.updateAll(   )
         
     project.addHistory( sprintf('initPDB from "%s"\n', pdbFile ) )
     project.updateProject()
@@ -293,16 +284,15 @@ def importPDB( project, pdbFile, convention = IUPAC, nmodels=None ):
         NTerror("ERROR importPDB: no molecule defined\n")
         return None
     #end if
-    if (not importFromPDB( project.molecule, pdbFile, convention, nmodels=nmodels, verbose = project.parameters.verbose() )):
+    if (not importFromPDB( project.molecule, pdbFile, convention, nmodels=nmodels,   )):
         return None
     #end if
 
-    project.molecule.updateAll( verbose = project.parameters.verbose() )
+    project.molecule.updateAll(   )
 
     project.addHistory( sprintf('importPDB from "%s"\n', pdbFile ) )
     project.updateProject()
-    if project.parameters.verbose(): 
-        NTmessage( '%s\n', project.molecule.format() )
+    NTmessage( '%s\n', project.molecule.format() )
     #end if
     return pdbFile
 #end def
@@ -314,8 +304,8 @@ def export2PDB( project, tmp=None ):
         mol   = project[molName]
         if (mol.modelCount > 0):
             fname = project.path( project.directories.PDB, mol.name + '.pdb' )
-            pdbFile = mol.toPDB( convention = IUPAC, verbose = project.parameters.verbose() )
-            pdbFile.save( fname, verbose = project.parameters.verbose() )   
+            pdbFile = mol.toPDB( convention = IUPAC,   )
+            pdbFile.save( fname,   )   
             del(pdbFile)
         #end if
     #end for

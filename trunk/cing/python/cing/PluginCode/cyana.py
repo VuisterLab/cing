@@ -20,7 +20,7 @@ Methods:
         Return string with distanceRestraint (dr) in cyana format or None on error
         convention = CYANA or CYANA2
 
-  DihedralRestraintList.export2cyana( path, convention verbose=True ):
+  DihedralRestraintList.export2cyana( path, convention    ):
         Export a dihedralRestraintList (drl) to cyana format:
         convention = CYANA or CYANA2
         return drl or None on error
@@ -77,7 +77,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
 DihedralRestraint.export2cyana = exportDihedralRestraint2cyana
 
 #-----------------------------------------------------------------------------
-def exportDihedralRestraintList2cyana( drl, path, convention, verbose=True ):
+def exportDihedralRestraintList2cyana( drl, path, convention,    ):
     """Export a dihedralRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
        return drl or None on error
@@ -92,8 +92,7 @@ def exportDihedralRestraintList2cyana( drl, path, convention, verbose=True ):
     #end for
     
     fp.close()
-    if verbose:
-        NTmessage('==> Exported %s in %s format to "%s"\n', drl, convention, path)
+    NTmessage('==> Exported %s in %s format to "%s"\n', drl, convention, path)
     #end if
     return drl
 #end def
@@ -122,7 +121,7 @@ def importAco( project, acoFile, convention ):
     #end if
          
     dir,name,_ext = NTpath( acoFile )
-    result       = project.dihedrals.new( name=name, status='keep', verbose=False )
+    result       = project.dihedrals.new( name=name, status='keep',    )
     
     printDebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
@@ -154,8 +153,7 @@ def importAco( project, acoFile, convention ):
     if errorCount:
         printError("Found number of errors importing upl file: " + `errorCount`)
     printMessage("Imported items: " + `len(result)`)
-    if project.parameters.verbose():
-        NTmessage('==> importAco: new %s from "%s"\n', result, acoFile )  
+    NTmessage('==> importAco: new %s from "%s"\n', result, acoFile )  
     return result
 #end def
 
@@ -182,7 +180,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
    
     dir,name,_ext = NTpath( uplFile )
 #    result       = project.newDistanceRestraintList( name )
-    result       = project.distances.new( name=name, status='keep', verbose=False )
+    result       = project.distances.new( name=name, status='keep',    )
     
     for line in AwkLike( uplFile, commentString="#" ):
         if not line.isComment() and line.NF >= 7:
@@ -226,8 +224,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     if errorCount:
         printError("Found number of errors importing upl file: " + `errorCount`)
     printMessage("Imported upl items: " + `len(result)`)
-    if project.parameters.verbose():
-        NTmessage('==> importUpl: new %s from "%s"\n', result, uplFile )
+    NTmessage('==> importUpl: new %s from "%s"\n', result, uplFile )
     #end if
   
     return result
@@ -241,10 +238,10 @@ def export2cyana( project, tmp=None ):
         if (drl.status == 'keep'):
             #Xeasy/Cyana 1.x format
             drlFile = project.path( project.directories.xeasy, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA, verbose = project.parameters.verbose() )
+            drl.export2cyana( drlFile, convention=CYANA,   )
             #Cyana 2.x format
             drlFile = project.path( project.directories.xeasy2, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA2, verbose = project.parameters.verbose() )
+            drl.export2cyana( drlFile, convention=CYANA2,   )
         #end if
     #end for
 #end def
@@ -282,7 +279,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
             kwds[f] = kwds[f].split(',')
         #end if
     #end for
-    print '>>', kwds
+    printDebug( '>>'+ `kwds` )
         
 
     #print '>>',kwds
@@ -362,8 +359,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
         #end for
     #end if
     
-    if project.parameters.verbose(): 
-        print project.format()
+    printDebug( project.format())
     return sources
 #end def
 

@@ -210,7 +210,7 @@ class TagTable (Lister):
     - Parses text into a tagtable.
     - Returns the position in the string with the first non-white space
     character after the tagtable or the length of the text in case all
-    was parsed. Just to be verbose, if the tagtable is ended by a save_
+    was parsed. Just to be explicit, if the tagtable is ended by a save_
     then the starting position of the save_ will be returned.
     - Assumption here is that ;; blocks are collapsed, see Text functions
     - For speed purposes I scan ahead to see how far I can go before

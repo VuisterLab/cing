@@ -200,7 +200,7 @@ fullstop y
         return l
     #end def
 
-    def _parseCheckdb( self, modelCheckDbFileName = None, model = None, verbose = True ):
+    def _parseCheckdb( self, modelCheckDbFileName = None, model = None   ):
         """
             Parse check_001.db etc. Generate references to
             all checks. Storing the check data according to residue and atom.
@@ -282,7 +282,7 @@ fullstop y
 
     """ Put parsed data of all models into CING data model.
     """
-    def _processCheckdb( self, verbose = True ):
+    def _processCheckdb( self   ):
         printMessage("Now processing the check results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
@@ -343,8 +343,7 @@ fullstop y
 #                entity.keysformat()
 #            levelEntity.keysformat()
 
-        if verbose:
-            printMessage('done with _processCheckdb')
+        printMessage('done with _processCheckdb')
         return 1 # for success
     #end def
 
@@ -420,11 +419,11 @@ def runWhatif( project, tmp=None ):
         All models in the ensemble of the molecule will be checked.
         Set whatif references for Molecule, Chain, Residue and Atom instances
         or None if no whatif results exist
-        returns 1 on success or None on any failure.
+        returns 1 on success
     """
     if not project.molecule:
         NTerror("No project molecule in runWhatCheck")
-        return None
+        return True
 
     path = project.path( project.molecule.name, project.moleculeDirectories.whatif )
     if not os.path.exists( path ):
@@ -435,27 +434,24 @@ def runWhatif( project, tmp=None ):
             res.whatif = None
         for atm in project.molecule.allAtoms():
             atm.whatif = None
-        return None
+        return True
 
     whatif = Whatif( rootPath = path, molecule = project.molecule )
     if project.molecule == None:
         NTerror('in runWhatif: no molecule defined\n')
-        return None
+        return True
 
     if project.molecule.modelCount == 0:
         NTerror('in runWhatif: no models for "%s"\n', project.molecule)
-        return None
+        return True
 
     for res in project.molecule.allResidues():
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-            NTwarning('non-standard residue %s found and will be written out for What If' % `res`)
+            NTwarning('non-standard residue %s found and will be written out for What If\n' % `res`)
 
     models = NTlist(*range( project.molecule.modelCount ))
 
     whatifDir = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-#    TODO: check how to move this to a configurable location.
-
-    #whatifPath       = os.path.join("/home","vriend","whatif")
     whatifPath       = os.path.dirname(cingPaths.whatif)
     whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
     whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
@@ -470,20 +466,17 @@ def runWhatif( project, tmp=None ):
         pdbFile = project.molecule.toPDB( model=model, convention = "BMRB" )
         if not pdbFile:
             printError("Failed to write a temporary file with a model's coordinate")
-            return None
-        pdbFile.save( fullname, verbose = False )
-    #end for model
+            return True
+        pdbFile.save( fullname   )
 
     scriptComplete = Whatif.scriptBegin
     for model in models:
         modelNumber = model + 1
         modelNumberString = sprintf('%03d', modelNumber)
         modelFileName = 'model_'+modelNumberString+".pdb"
-#        fullname =  os.path.join( whatifDir, modelFileName )
         scriptModel = Whatif.scriptPerModel.replace("$pdb_file", modelFileName)
         scriptModel = scriptModel.replace("$modelNumberString", modelNumberString)
         scriptComplete += scriptModel
-    #end for model
     scriptComplete += Whatif.scriptQuit
     # Let's ask the user to be nice and not kill us
     # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
@@ -511,7 +504,7 @@ def runWhatif( project, tmp=None ):
     printDebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if whatifExitCode:
         printError("Failed whatif checks with exit code: " + `whatifExitCode`)
-        return None
+        return True
 
     try:
         removeListLocal = ["PDBFILE", "pdbout.tex"]
@@ -544,14 +537,14 @@ def runWhatif( project, tmp=None ):
     #end for model
 
     printWarning("TODO: Processing is to be continued from here on.")
-    return 1
+    return None
     if not whatif._processCheckdb():
         printError("Failed to process check db")
-        return None
+        return True
 
 #    whatif.map2molecule()
 
-    return whatif # Success
+    return None # Success
 #end def
 
 # register the functions

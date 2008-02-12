@@ -7,7 +7,6 @@ params = NTdict(
                                                 # can also be modified as command-line argument
 
       overwrite         = True,                 # Overwrite existing files
-      verbose           = True,                 # verbose on/off
       useCluster        = False,                # use cluster; not yet implemented     
 
       # PSF generation

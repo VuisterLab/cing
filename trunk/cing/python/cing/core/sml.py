@@ -1,5 +1,4 @@
 from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import NTlist
@@ -63,7 +62,7 @@ Example file:
         Returns listObj or None on error.
         """
         line = SMLhandler.readline( fp )
-        if self.debug: printf('%s> %s\n', self, line)
+        if self.debug: NTmessage('%s> %s\n', self, line)
         while (line):
             if len(line) > 0 and SMLendhandlers.has_key(line[1]):
                 handler = SMLendhandlers[line[1]]
@@ -80,7 +79,7 @@ Example file:
                 listObj.append( eval(line[0]) )
             #end if
             line = SMLhandler.readline( fp )    
-            if self.debug: printf('%s> %s\n', self, line)
+            if self.debug: NTmessage('%s> %s\n', self, line)
         #end while
         # we should not be here
         NTerror('Error SMLhandler.listHandler: unterminated list\n')
@@ -95,7 +94,7 @@ Example file:
         Returns dictObj or None on error.
         """
         line = SMLhandler.readline( fp )
-        if self.debug: printf('%s> %s\n', self, line)
+        if self.debug: NTmessage('%s> %s\n', self, line)
         while (line):
             if len(line) > 0 and SMLendhandlers.has_key(line[1]):
                 handler = SMLendhandlers[line[1]]
@@ -111,7 +110,7 @@ Example file:
                 NTerror('Error SMLhandler.dictHandler: incomplete line "%s"\n', line[0])
             #end if
             line = SMLhandler.readline( fp )    
-            if self.debug: printf('%s> %s\n', self, line)
+            if self.debug: NTmessage('%s> %s\n', self, line)
         #end while    
         # we should not be here
         NTerror('Error SMLhandler.dictHandler: unterminated dict\n')
@@ -133,7 +132,7 @@ Example file:
         #print 'entering>', self.startTag
         obj  = None
         line = SMLhandler.readline( fp )
-        if self.debug: printf('%s> %s\n', self, line)
+        if self.debug: NTmessage('%s> %s\n', self, line)
         while (line):
             #rint '>>>', len(line), SMLendhandlers.has_key(line[1])
             if len(line) > 0 and SMLendhandlers.has_key(line[1]):
@@ -152,7 +151,7 @@ Example file:
                 NTerror('Error SMLhandler.handle: incomplete line "%s"\n', line[0])
             #end if
             line = SMLhandler.readline( fp )
-            if self.debug: printf('%s> %s\n', self, line)
+            if self.debug: NTmessage('%s> %s\n', self, line)
         #end while
         return obj
     #end def
@@ -199,7 +198,7 @@ Example file:
     #end def
     readline = staticmethod( readline )
     
-    def fromFile( fileName, project=None, verbose=True ):
+    def fromFile( fileName, project=None,    ):
         """
         Static method to restore object from SML file.
         Returns obj or None on error.
@@ -211,14 +210,14 @@ Example file:
         fp   = open( fileName, 'r' )
         obj  = smlhandler.handle( None, fp, project )
         fp.close()
-        if obj and verbose:
+        if obj:
             NTmessage('==> Restored %s from "%s"\n', obj, fileName )
         #end if
         return obj
     #end def
     fromFile = staticmethod( fromFile )
             
-    def toFile(self, object, fileName, verbose=True):
+    def toFile(self, object, fileName,   ):
         """
         Save element of theList to fileName for restoring later with fromFile method
         Returns theList or None on error.
@@ -232,8 +231,7 @@ Example file:
         object.SMLhandler.toSML( object, fp )
         fprintf( fp, '%s\n', smlhandler.endTag )
                 
-        if verbose:
-            NTmessage('==> Saved %s to "%s"\n', object, fileName )
+        NTmessage('==> Saved %s to "%s"\n', object, fileName )
         #end if
         return object
     #end def

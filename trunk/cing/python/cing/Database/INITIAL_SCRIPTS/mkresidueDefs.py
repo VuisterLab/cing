@@ -1416,12 +1416,9 @@ def saveDefs( stream = sys.stdout ):
 #-----------------------------------------------------------------------
 
 if __name__ == '__main__':
-
-
-
-#    residueDefs['GLU'].printAttr()
+#    residueDefs['GLU'].getAttr()
 #    for aname in residueDefs.GLU.atoms:
-#        residueDefs.GLU[aname].printAttr()
+#        residueDefs.GLU[aname].getAttr()
 
     
 #    residueDefs['GLU'].printit()

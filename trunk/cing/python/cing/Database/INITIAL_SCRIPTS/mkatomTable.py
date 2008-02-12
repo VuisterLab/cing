@@ -2273,15 +2273,15 @@
 #            for i in range(0, ndihed):
 #                r.next()
 #
-#            printf('\n#-----------------------------------------------------------------------\n')
-#            printf('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('\n#-----------------------------------------------------------------------\n')
+#            NTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
 #                   'internal', 'short', BMRB, BMRBd, PDB, CYANA, XPLOR
 #                  )
-#            printf('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
 #                    resname, shortName, resname, resname, resname, resname, resname
 #                  )
-#            printf('\n#-----------------------------------------------------------------------\n')
-#            printf('#\t%-8s          %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('\n#-----------------------------------------------------------------------\n')
+#            NTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s\n',
 #                   'internal', BMRB, BMRBd, PDB, CYANA, XPLOR
 #                  )
 #           # parse data from the atom lines
@@ -2302,11 +2302,11 @@
 #                    nameDefs[CYANA] = r.dollar[2]
 #                    nameDefs[INTERNAL] = r.dollar[2]
 #                                       
-#                    printf( '\t%-8s          ', nameDefs['INTERNAL'] )
+#                    NTmessage( '\t%-8s          ', nameDefs['INTERNAL'] )
 #                    for n in [BMRB, BMRBd, PDB, CYANA, XPLOR]:
-#                        printf( '%-8s ', nameDefs[n] )
-#                    printf('\n')
-#            printf( 'END_RESIDUE\n')
+#                        NTmessage( '%-8s ', nameDefs[n] )
+#                    NTmessage('\n')
+#            NTmessage( 'END_RESIDUE\n')
 #
 ##-----------------------------------------------------------------------
 ## main

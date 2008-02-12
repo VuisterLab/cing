@@ -249,7 +249,7 @@ class File (Lister):
                                 tagnames  = [], 
                                 tagvalues = [], 
                                 verbosity = self.verbosity))
-            tt = dn[-1] # Just to be verbose for the beloved reader
+            tt = dn[-1] # Just to be explicit for the beloved reader
             pos = tt.parse(text=text, pos=pos)
             
             if pos ==  None:

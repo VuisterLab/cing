@@ -45,7 +45,7 @@ format file:
     #end for
 #end def
 
-def predictWithShiftx( project, model=None, verbose = True ):
+def predictWithShiftx( project, model=None   ):
     """
     Use shiftx program to predict chemical shifts
     Works only for protein residues.
@@ -98,32 +98,29 @@ def predictWithShiftx( project, model=None, verbose = True ):
         
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx,  )
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
-                             rootPath = root, redirectOutput = False, verbose = verbose )
-    if verbose:
-        NTmessage('==> Running shiftx ' )
-        NTmessage.flush()
+                             rootPath = root, redirectOutput = False,    )
+    NTmessage('==> Running shiftx ' )
+           
     for model in models:
         # set filenames
         rootname =  sprintf('model%03d', model)
         model_base_name =  os.path.join( root, rootname )
         
-        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC, verbose = verbose )       
+        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC,    )       
         if not pdbFile:
             NTerror("Failed to generate a pdb file for model: " + `model`)
             return None 
         
-        pdbFile.save( model_base_name + '.pdb', verbose = False )   
+        pdbFile.save( model_base_name + '.pdb'   )   
         shiftx('A', rootname + '.pdb', rootname + '.out' )
         
-        if verbose:
-            NTmessage('==> Parsing %s\n', model_base_name + '.out' )
+        NTmessage('==> Parsing %s\n', model_base_name + '.out' )
         parseShiftxOutput( model_base_name + '.out', project.molecule )
         del( pdbFile )
     #end for
     
-    if verbose:
-        NTmessage(' averaging ...')
-        NTmessage.flush()
+    NTmessage(' averaging ...')
+           
     #end if
     
     # Restore the 'default' state
@@ -168,12 +165,6 @@ def predictWithShiftx( project, model=None, verbose = True ):
         if atm.shiftx.av == None:
             atm.shiftx.av = -NOSHIFT
             atm.shiftx.sd = 0.0
-        #end if
-    #end for        
-    if verbose:
-        NTmessage(' done\n')
-        NTmessage.flush()
-    #end if
     
     return project
 #end def

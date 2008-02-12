@@ -75,6 +75,3 @@ N. Spadacinni and C. B. Hall. Star_base: accessing STAR file data.
 J. Westbrook and P. E. Bourne. STAR/mmCIF: An ontologoy for macromolecular structure.
     Bioinformatics. 16 (2):159-168, 2000.
 """
-
-## Public attributes
-verbosity               = 2

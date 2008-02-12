@@ -1,11 +1,12 @@
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
-from string import strip
+from cing import header
 from string import atoi
-#from cing.Libs.disk import chmod #AWSS, importing cing stuff here is not fine.
-import time
-import sys
+from string import strip
 import os
+import sys
+import time
+#from cing.Libs.disk import chmod #AWSS, importing cing stuff here is not fine.
 
 """
 python YOUR_CING_PATH_HERE/python/cing/setup.py
@@ -130,6 +131,8 @@ def _writeCingShellFile(isTcsh):
 
 
 if __name__ == '__main__':
+#    cing.verbosity = verbosityOutput # Default is no output of anything.
+    printMessage(header)
 
     if not cingRoot:
         print "Failed to derive the CINGROOT from this setup.py script; are there other setup.py or code confusing me here?"

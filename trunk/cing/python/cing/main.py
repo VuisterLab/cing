@@ -47,21 +47,25 @@ format(peaks)
 
 """
 #==============================================================================
+from cing import cingPythonDir
+from cing import header
 from cing import programVersion
+from cing import verbosityError
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import OptionParser
+from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printf
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.test.test_All import testOverall
-import cing #@UnusedImport
+import cing
 import os 
+import string
 import sys
+import unittest
 
 
 
@@ -88,7 +92,7 @@ def formatall( object ):
         #end for
     elif isinstance( object, dict ):
         for key,value in object.items():
-            printf("%-15s : ", key )
+            NTmessage("%-15s : ", key )
             format(value)
         #end for
     else:
@@ -105,7 +109,7 @@ def script( scriptFile, *a, **k ):
         printMessage('==> Executing script '+ scriptFile )
         execfile( scriptFile, globals() )
     else:
-        scriptFile2 = os.path.join( root, cingPaths.scripts, scriptFile)        
+        scriptFile2 = os.path.join( cingPythonDir, cingPaths.scripts, scriptFile)        
         if os.path.exists( scriptFile2 ):
             printMessage('==> Executing script "%s"\n', scriptFile2 )
             #end if
@@ -116,9 +120,48 @@ def script( scriptFile, *a, **k ):
     #end if
 #end def
 
-if __name__ == '__main__':
-    
-    root,file,ext  = NTpath( __file__ )
+
+def testOverall():
+    # Use silent testing from top level.
+    cing.verbosity = verbosityError
+    # Add the ones you don't want to test (perhaps you know they don't work yet)
+    excludedModuleList = ( "cing.PluginCode.test.test_ccpn",
+#                           "cing.PluginCode.test.test_Procheck",
+#                           "cing.PluginCode.test.test_Whatif",
+#                           "cing.Scripts.test.test_cyana2cing",
+#                           "cing.STAR.FileTest",
+                          ) 
+    namepattern, startdir = "test_*.py", cingPythonDir
+    nameList = findFiles(namepattern, startdir)
+    namepattern = "*Test.py"
+    nameList2 = findFiles(namepattern, startdir)
+    for name in nameList2:
+      nameList.append(name) 
+#    printDebug("found tests: " + `nameList`)
+    # translate: '/Users/jd/workspace/cing/python/cing/Libs/test/test_NTplot.py'
+    # to: cing.Libs.test.test_NTplot
+    lenCingPythonDirStr = len(cingPythonDir)
+    # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
+    suite = None
+    for name in nameList:
+      tailPathStr = name[lenCingPythonDirStr+1:-3]
+      mod_name = string.join(tailPathStr.split('/'), '.')      
+      if mod_name in excludedModuleList:
+        print "Skipping module:  " + mod_name
+        continue      
+      print "Importing ", mod_name
+      exec("import %s" % (mod_name,))
+      exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name,))
+#      print "Testing"
+      unittest.TextTestRunner(verbosity=2).run(suite)
+
+
+project = None # after running main it will be filled.
+ 
+def main():
+#    cing.verbosity = verbosityOutput # Default is no output of anything.
+    printMessage(header)
+#    root,file,ext  = NTpath( __file__ )
     usage          = "usage: cing [options]       use -h or --help for listing"
     
     #------------------------------------------------------------------------------------
@@ -227,10 +270,8 @@ if __name__ == '__main__':
                       help="Export before exit (default: noexport)"
                      )
     
-    (options, args) = parser.parse_args()
+    (options, _args) = parser.parse_args()
     
-#    parameters.verbose.set( not options.quiet )
-
     if options.test:
         testOverall()
         sys.exit(0)
@@ -254,7 +295,7 @@ if __name__ == '__main__':
     
         print Project.__doc__
         for p in plugins.values():
-            printf(    '-------------------------------------------------------------------------------\n' +
+            NTmessage(    '-------------------------------------------------------------------------------\n' +
                        'Plugin %s\n' +
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
@@ -272,18 +313,18 @@ if __name__ == '__main__':
     #check for the required name option  
     parser.check_required('-n')
 
-    args = []
-    kwds = {}
+#    args = []
+    _kwds = {}
     
      
     #------------------------------------------------------------------------------------
     # open project
     #------------------------------------------------------------------------------------
-    if (options.new):    
+    if options.new:    
         project = Project.open( options.name, status='new' )
     elif (options.old):    
         project = Project.open( options.name, status='old' )
-    elif (options.init):    
+    elif options.init:    
         init = options.init.split(',')
         if (len(init) == 2):
             project = Project.open( options.name, status='new' )
@@ -292,7 +333,7 @@ if __name__ == '__main__':
             project = Project.open( options.name, status='new' )
             project.newMolecule( options.name, sequenceFile=init[0] )
         #end if
-    elif (options.initPDB):
+    elif options.initPDB:
         init = options.initPDB.split(',')
         if (len(init) == 2):
             project = Project.open( options.name, status='new' )
@@ -300,23 +341,19 @@ if __name__ == '__main__':
         else:
             project = Project.open( options.name, status='new' )
             project.initPDB( pdbFile=init[0] )
-        #end if
-    elif (options.initBMRB):
+    elif options.initBMRB:
         project = Project.open( options.name, status='new' )
         project.initBMRB( bmrbFile = options.initBMRB, moleculeName = project.name )
     elif (options.initCcpn):
     ##    init = options.initCcpn.split(',')
         project = Project.open( options.name, status='new' )
         project.initCcpn( ccpnFile = options.initCcpn )
-        #end if
     else:
         project = Project.open( options.name, status='create' )
-    #end if
     
     if not project:
         printDebug("Doing a hard system exit")
         sys.exit(2)
-    #end if
     
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
@@ -327,8 +364,6 @@ if __name__ == '__main__':
             NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required\n")
         else:
             project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
-        #end if
-    #end if
     
     #------------------------------------------------------------------------------------
     # Import xeasy peakFile
@@ -339,52 +374,28 @@ if __name__ == '__main__':
             NTerror("--xeasyPEaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
-        #end if
-    #end if
     
-    #------------------------------------------------------------------------------------
-    # Merge resonances
-    #------------------------------------------------------------------------------------
     if options.merge:
         project.mergeResonances()
-    #end if
     
-    #------------------------------------------------------------------------------------
-    # Generate peaks
-    #------------------------------------------------------------------------------------
     if options.generatePeaks:
         gp = options.generatePeaks.split(',')
         if (len(gp) != 2):
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required\n")
         else:
-            peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] )
-        #end if
-    #end if
-    
-    #------------------------------------------------------------------------------------
-    # Script
-    #------------------------------------------------------------------------------------
+            project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] )
+
     if options.script:
         script( options.script )
     
-    #------------------------------------------------------------------------------------
-    # Validate
-    #------------------------------------------------------------------------------------
     if options.validate:
         project.validate()
-    #end if
     
-    #------------------------------------------------------------------------------------
-    # ipython
-    #------------------------------------------------------------------------------------
     if options.ipython:
-         # JFD The below gets flagged as unfound by pydev extensions code analysis but
-         # if you move the conflicting Shell class down in the PYTHONPATH it's ok.
         from IPython.Shell import IPShellEmbed
         ipshell = IPShellEmbed('',  banner   = '--------Dropping to IPython--------',
                                     exit_msg = '--------Leaving IPython--------')
         ipshell()
-    #end if
      
     #------------------------------------------------------------------------------------
     # Optionally export project 
@@ -399,3 +410,5 @@ if __name__ == '__main__':
         project.close()
     #------------------------------------------------------------------------------------
 
+if __name__ == '__main__':
+    main() # Just to get a name

@@ -2,11 +2,11 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import printMessage
+from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import printException
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import printException
 import glob
 import os
 
@@ -39,7 +39,7 @@ def importPlugin( pluginName ):
                          [pluginName]) #JFD changed from default to zero which means to only try absolute imports.
 
 #    printDebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
-    printMessage('==> Imported plugin ' + pluginName )
+    printDebug('==> Imported plugin ' + pluginName )
     if not hasattr(pluginCodeModulePackage, pluginName):
         NTerror("Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
         return None
@@ -66,7 +66,7 @@ def importPlugin( pluginName ):
         #end if
     #end for
 
-#    plugin.printAttr()
+    # msg = plugin.getAttr()
 
 #    printMessage('==> Staged plugin ' + plugin.module.__file__ )
     #end if
@@ -80,7 +80,7 @@ pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #printDebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 #printWarning("TODO: reintroduce the ccpn plugin code here once fixed")
-#pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
+pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
 #printWarning("TODO: reintroduce the validate plugin code here once fixed")
 #pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
 for p in pluginFileList:

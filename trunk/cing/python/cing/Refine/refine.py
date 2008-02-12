@@ -21,7 +21,6 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import removedir
 from cing.Libs.disk import copy
 from cing.Refine.NTxplor import Analyze
@@ -229,41 +228,41 @@ def parseRefineOutput( params, options ):
 
     # print results to file and screen
     resultFile = open( params.joinPath('parsedOutput.txt'), 'w' )
-    printf('\n=== Results: sorted on "%s" ===\n', options.sortField)
+    NTmessage('\n=== Results: sorted on "%s" ===\n', options.sortField)
     fprintf(resultFile, '=== Results: sorted on "%s" ===\n', options.sortField)
     fmt = '%-10s '
     for k in keys:
-        printf( fmt, str(k))
+        NTmessage( fmt, str(k))
         fprintf( resultFile, fmt, str(k))
     #end for
-    printf('\n')
+    NTmessage('\n')
     fprintf(resultFile,'\n')
     for data in results:
         for k in keys:
             if k in data:
-                printf(fmt, str(data[k]))
+                NTmessage(fmt, str(data[k]))
                 fprintf(resultFile, fmt, str(data[k]))
             else:
-                printf(fmt, '-')
+                NTmessage(fmt, '-')
                 fprintf( resultFile, fmt, '-')
         #end for
-        printf('\n')
+        NTmessage('\n')
         fprintf(resultFile,'\n')
     #end for
 
     # best results
     bestModels = int(options.bestModels)
     if bestModels > 0:
-        printf('\n=== Averages best %d models ===\n', bestModels)
+        NTmessage('\n=== Averages best %d models ===\n', bestModels)
         fprintf( resultFile, '\n=== Averages best %d models ===\n', bestModels)
         for key in keys:
             getKey = Key( key )
             values = map( getKey, results )
             av,sd,_n = NTaverage( values )
-            printf('%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
+            NTmessage('%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
             fprintf(resultFile,'%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
         #end for
-        printf('\n\n')
+        NTmessage('\n\n')
         fprintf(resultFile, '\n\n')
 
         fname = params.joinPath('best%dModels.list' % bestModels)
@@ -401,7 +400,7 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     project = None
     if options.project:
-        project = Project.open(options.project, status = 'old', restore=False, verbose=False )
+        project = Project.open(options.project, status = 'old', restore=False,    )
         if project==None:
             NTerror("Failed to get a project") 
             sys.exit(1)

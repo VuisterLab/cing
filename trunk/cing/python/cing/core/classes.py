@@ -241,27 +241,27 @@ _____________________________________________________________________________
     # actions open/restore/save/close/export/updateProject
     #-------------------------------------------------------------------------
 
-    def open( name, status = 'create', restore=True, verbose = parameters.verbose() ):
+    def open( name, status = 'create', restore=True ):
         """Static method open returns a new/existing Project instance depending on status
            Project data is restored when restore == True.
         """
         global projects
 
-        if (status == 'new'):
+        if status == 'new':
             root = Project.rootPath( name )
             if os.path.exists( root ):
                 removedir( root )
 
             pr = Project( name )
             pr.addHistory( 'New project'  )
-        elif (status == 'create'):
+        elif status == 'create':
             root = Project.rootPath( name )
             if os.path.exists( root ):
                 return Project.open( name, 'old')
             else:
                 return Project.open( name, 'new')
             #end if
-        elif (status == 'old'):
+        elif status == 'old':
             root = Project.rootPath( name )
             if not os.path.exists( root ):
                 NTerror('ERROR Project.open: unable to open Project "%s"\n', name )
@@ -288,7 +288,7 @@ _____________________________________________________________________________
 
         projects.append( pr )
 
-        if verbose: NTmessage('%s\n', pr.format())
+        NTmessage('%s\n', pr.format())
 
         return pr
     #end def
@@ -302,18 +302,13 @@ _____________________________________________________________________________
         return None
     #end def
 
-    def save( self, verbose = parameters.verbose() ):
-        if verbose:
-            NTmessage('\n' + dots*5 +'\n' )
-            NTmessage(   '==> Saving %s\n', self )
-        #end if
+    def save( self):
+        NTmessage('\n' + dots*5 +'\n' )
+        NTmessage(   '==> Saving %s\n', self )
 
         # Save the molecules
         for molName in self.molecules:
-            self[molName].save( path = self.path( directories.molecules, molName ),
-                                verbose = verbose
-                              )
-        #end for
+            self[molName].save( path = self.path( directories.molecules, molName ))
 
         # Save the lists
         for pl, nameList in [(self.peaks,     'peakListNames'),
@@ -358,7 +353,7 @@ _____________________________________________________________________________
         self.addHistory( 'Saved project' )
     #end def
 
-    def restore(self, verbose = parameters.verbose):
+    def restore(self ):
         """
         Restore the project: molecules and lists
         """
@@ -378,7 +373,7 @@ _____________________________________________________________________________
                              (self.dihedrals, 'dihedralListNames'),
                              (self.rdcs,      'rdcListNames' )
                             ]:
-            pl.restore( self[nameList], verbose=verbose )
+            pl.restore( self[nameList]  )
         #end for
 
         # Plugin registered functions
@@ -391,14 +386,11 @@ _____________________________________________________________________________
         self.updateProject()
     #end def
 
-    def export( self, verbose = parameters.verbose() ):
+    def export( self):
         """Call export routines from the plugins to export the project
         """
-
-        if verbose  :
-            NTmessage('\n' + dots*5 +'\n' )
-            NTmessage(   '==> Exporting %s\n', self )
-        #end if
+        NTmessage('\n' + dots*5 +'\n' )
+        NTmessage(   '==> Exporting %s\n', self )
 
         for p in self.plugins.values():
             for f,o in p.exports:
@@ -430,21 +422,21 @@ _____________________________________________________________________________
         self[molecule.name] = self.molecule
 
         # Save it to make sure we can restore it later
-        self.molecule.save( path = self.path( directories.molecules, molecule.name ), verbose = False )
+        self.molecule.save( path = self.path( directories.molecules, molecule.name )   )
         return self.molecule
 
     #end def
 
-    def newMolecule( self, name, sequenceFile, convention = LOOSE, verbose=parameters.verbose() ):
+    def newMolecule( self, name, sequenceFile, convention = LOOSE ):
         """Return Molecule instance or None on error
         """
         uname = self.uniqueKey(name)
         molecule = Molecule.initialize( uname,
                                         path = sequenceFile,
-                                        convention=convention,
-                                        verbose=verbose
+                                        convention=convention
                                        )
-        if not molecule: return None
+        if not molecule: 
+            return None
         self.appendMolecule( molecule )
 
         self.addHistory( sprintf('Initialized molecule "%s" from "%s"', uname, sequenceFile ) )
@@ -502,24 +494,15 @@ _____________________________________________________________________________
                 self.molecule.resonanceCount = 1
             else:
                 self.molecule.resonanceCount = len( atom.resonances )
-            #end if
-        #end for
-
-        if parameters.verbose():
-            NTmessage("==> Merged resonances\n")
-        #end if
-    #end def
+        NTmessage("==> Merged resonances\n")
 
     def initResonances( self ):
-
         """ Initialize resonances for all the atoms
         """
         if not self.molecule:
             NTerror('ERROR Project.initResonances: No molecule defined\n')
             return
-        #end if
-        self.molecule.initResonances( verbose = parameters.verbose() )
-    #end def
+        self.molecule.initResonances()
 
     #-------------------------------------------------------------------------
     # actions other
@@ -529,13 +512,13 @@ _____________________________________________________________________________
         self.history( line, timeStamp )
     #end def
 
-    def newPeakList( self, name, status='keep', verbose = parameters.verbose() ):
+    def newPeakList( self, name, status='keep'):
         """Dummy for compatibility
         """
-        return self.peaks.new( name = name, status=status, verbose=verbose )
+        return self.peaks.new( name = name, status=status)
     #end def
 
-    def appendPeakList( self, peaklist, verbose = parameters.verbose() ):
+    def appendPeakList( self, peaklist):
         """Append peaklist; dummy for compatibility
         """
         self.peaks.append( peaklist )
@@ -632,7 +615,7 @@ class ProjectList( NTlist ):
         #end for
     #end def
 
-    def new( self, name, verbose=parameters.verbose(),*args, **kwds ):
+    def new( self, name,*args, **kwds ):
         """Create a new classDef instance, append to self
         """
         uname = self.project.uniqueKey(name)
@@ -640,8 +623,7 @@ class ProjectList( NTlist ):
         self.append ( instance )
         s = sprintf('New "%s" instance named "%s"', self.className(), uname )
         self.project.history( s )
-        if verbose:
-            NTmessage('==> %s\n', s )
+        NTmessage('==> %s\n', s )
         #end if
         return instance
     #end def
@@ -659,20 +641,20 @@ class ProjectList( NTlist ):
         for l in self:
             if l.status == 'keep':
                 fname = self.project.path( self.savePath, l.name + self.extention )
-                self.classDef.SMLhandler.toFile( l, fname, verbose=parameters.verbose() )
+                self.classDef.SMLhandler.toFile( l, fname )
                 saved.append(l.name)
         #end for
         return saved
     #end def
 
-    def restore(self, names, verbose=parameters.verbose() ):
+    def restore(self, names ):
         """
         Use the SMLhandler instance of classDef to restore the list.
         Names is a list instance containing the names to of the lists to restore.
         """
         for name in names:
             fname = self.project.path( self.savePath, name + self.extention )
-            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project, verbose = verbose )
+            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project,    )
         #end for
     #end def
 
@@ -793,27 +775,6 @@ class Peak( NTdict ):
         return None
     #end def
 
-#    def toStream(self, stream = sys.stdout):
-#        """
-#        """
-#        fprintf( stream, "<Peak>\n")
-#        for a in ['dimension','positions',
-#                  'height','heightError','hasHeight',
-#                  'volume','volumeError','hasVolume'
-#                 ]:
-#            fprintf( stream, '    %-15s = %s\n', a, repr(self[a]) )
-#        #end for
-#        rl = []
-#        for r in self.resonances.zap('atom'):
-#            if (r != None):
-#                rl.append(r.nameTuple())
-#            else:
-#                rl.append(None)
-#            #endif
-#        fprintf( stream, '    %-15s = %s\n', 'atoms', repr( rl ) )
-#        fprintf( stream, "</Peak>\n")
-#    #end def
-
     def __str__( self ):
         return sprintf( 'Peak %4d (%dD)   %s   %10.3e %10.3e %10.3e %10.3e   %s',
                          self.peakIndex, self.dimension,
@@ -874,7 +835,7 @@ class SMLPeakHandler( SMLhandler ):
                  ]:
             fprintf( fp, '    %-15s = %s\n', a, repr(peak[a]) )
         #end for
-        rl = []
+        rl = [] 
         for r in peak.resonances.zap('atom'):
             if (r != None):
                 rl.append(r.nameTuple())
@@ -924,7 +885,7 @@ class PeakList( NTlist ):
         return None
     #end def
 #
-#    def toFile(self, fileName, verbose=True):
+#    def toFile(self, fileName,   ):
 #        """
 #        Save peaks to fileName for restoring later with fromFile method
 #        """
@@ -941,8 +902,7 @@ class PeakList( NTlist ):
 #        fprintf( fp, '</PeakList>\n' )
 #
 #
-#        if verbose:
-#            NTmessage('==> Saved %s to "%s"\n', str(self), fileName )
+#        NTmessage('==> Saved %s to "%s"\n', str(self), fileName )
 #        #end if
 #    #end def
 
@@ -963,16 +923,16 @@ class PeakList( NTlist ):
         return s
     #end def
 
-#    def toSMLfile(self, fileName, verbose=True):
-#        return self.SMLhandler.list2SMLfile( self, fileName, verbose )
+#    def toSMLfile(self, fileName,   ):
+#        return self.SMLhandler.list2SMLfile( self, fileName  )
 #    #end def
 #
-#    def fromSMLfile(fileName, project, verbose=True):
+#    def fromSMLfile(fileName, project,   ):
 #        """
 #        Restore PeakList from SMLfile fileName
 #        """
 #        pl = PeakList.SMLhandler.fromFile( fileName, project )
-#        if pl and verbose:
+#        if pl:
 #            NTmessage('==> Restored %s from "%s"\n', pl, fileName )
 #        #end if
 #        return pl
@@ -1109,7 +1069,7 @@ class DistanceRestraint( NTdict ):
                 try:
                     self.distances.append( math.pow(d, -0.166666666666666667) )
                 except:
-                    NTerror( "Warning: AtomPair (%s,%s) without coordinates\n",
+                    NTerror( "AtomPair (%s,%s) without coordinates\n",
                              atm1, atm2)
                     self.error = True
                     self.colorLabel = COLOR_RED
@@ -1192,23 +1152,6 @@ class DistanceRestraint( NTdict ):
                         self._names()
                        )
     #end def
-
-#    def toStream(self, stream = sys.stdout):
-#        """
-#        """
-#        fprintf( stream, "<DistanceRestraint>\n")
-#        for a in ['lower','upper' ]:
-#            fprintf( stream, '    %-15s = %s\n', a, repr(self[a]) )
-#        #end for
-#
-#        rl = []
-#        for r in self.atomPairs:
-#            rl.append((r[0].nameTuple(),r[1].nameTuple()))
-#        #end for
-#        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
-#        fprintf( stream, "</DistanceRestraint>\n")
-#    #end def
-
 #end class
 
 class SMLDistanceRestraintHandler( SMLhandler ):
@@ -1351,7 +1294,7 @@ class DistanceRestraintList( NTlist ):
         return s
     #end def
 
-#    def toFile(self, fileName, verbose=True):
+#    def toFile(self, fileName,   ):
 #        """
 #        Save dihedralRestraints to fileName for restoring later with fromFile method
 #        """
@@ -1368,7 +1311,6 @@ class DistanceRestraintList( NTlist ):
 #        fprintf( fp, '</DistanceRestraintList>\n' )
 #
 #
-#        if verbose:
 #            NTmessage('==> Saved %s to "%s"\n', str(self), fileName )
 #        #end if
 #    #end def
@@ -1415,7 +1357,7 @@ class DihedralRestraint( NTdict ):
                               **kwds
                        )
         self.id         = -1       # Undefined index number
-        self.dihedrals  = None     # list with dihedral values for each model, None indicates no alalysis done
+        self.dihedrals  = None     # list with dihedral values for each model, None indicates no analysis done
         self.cav        = 0.0      # Average dihedral value
         self.cv         = 0.0      # cv on dihedral
 #        self.min        = 0.0      # Minimum dihedral
@@ -2044,7 +1986,7 @@ historyhandler = XMLHistoryHandler()
 htmlObjects = NTlist() # A list of all htmlobject for rendering purposes
 
 class HTMLfile:
-    '''Descrn: Class to create a Html file; to be used with cing.css layout.
+    '''Description: Class to create a Html file; to be used with cing.css layout.
        Inputs: file name, title
        Output: a Html file.
     '''
@@ -2053,7 +1995,7 @@ class HTMLfile:
     #htmlObjects = NTlist() # Local track-keeping list
 
     def __init__( self, fileName, title = None ):
-        '''Descrn: __init__ for HTMLfile class.
+        '''Description: __init__ for HTMLfile class.
            Inputs: file name, title
            Output: an instanciated HTMLfile obj.
         '''
@@ -2107,7 +2049,7 @@ class HTMLfile:
     killHtmlObjects = staticmethod( killHtmlObjects)
 
     def _appendTag( self, htmlList, tag, *args, **kwds ):
-        '''Descrn: core routine for generating Tags.
+        '''Description: core routine for generating Tags.
            Inputs: HTMLfile obj, list, tag, openTag, closeTag, *args, **kwds.
            Output: list.
         '''
@@ -2117,7 +2059,7 @@ class HTMLfile:
     #end def
 
     def _generateTag( self, tag, *args, **kwds ):
-        '''Descrn: core routine for generating Tags.
+        '''Description: core routine for generating Tags.
            Inputs: HTMLfile obj, tag, openTag, closeTag,
                    newLine, *args, **kwds.
            Output: list.
@@ -2195,7 +2137,7 @@ class HTMLfile:
     #end def
 
     def render(self):
-        '''Descrn: write container to file Html.
+        '''Description: write container to file Html.
            Inputs: a HTMLfile obj.
            Output: written lines and close file.
         '''
@@ -2301,7 +2243,7 @@ class HTMLfile:
     #end def
 
     def findHtmlLocation(self, source, destination, id=None ):
-        '''Descrn: given 2 Cing objects returns the relative path between them.
+        '''Description: given 2 Cing objects returns the relative path between them.
            Inputs: Cing objects souce, destination
            Output: string path or None or error
         '''
@@ -2342,7 +2284,7 @@ class HTMLfile:
     #end def
 
     def insertHtmlLink( self, section, source, destination, text=None, id=None ):
-        '''Descrn: create the html command for linking Cing objects.
+        '''Description: create the html command for linking Cing objects.
            Inputs: section (main, header, left etc.), source obj., destination
                    obj., html text, id.
            Output: <a class="red" href="link">text</a> inside section
@@ -2373,7 +2315,7 @@ class HTMLfile:
 
     def insertHtmlLinkInTag( self, tag, section, source, destination, text=None,
                              id=None):
-        '''Descrn: create the html command for linking Cing objs inside a tag.
+        '''Description: create the html command for linking Cing objs inside a tag.
            Inputs: tag, section (main, header, left etc.), source obj.,
                    destination obj., html text, id.
            Output: <h1><a class="red" href="link">text</a></h1> inside section

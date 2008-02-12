@@ -1,9 +1,9 @@
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import printDebug
 from cing.core.constants import INTERNAL
 from cing.core.constants import LOOSE
 from cing.core.database import NTdb
 
-NTmessage("==> Creating translation dictionaries ... ")
+printDebug("==> Creating translation dictionaries ... ")
 
 #
 #==============================================================================
@@ -150,5 +150,3 @@ def NTdbGetAtom( resName, atmName, convention = INTERNAL ):
   return None
 #end def
 
-
-NTmessage("done\n")

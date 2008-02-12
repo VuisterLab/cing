@@ -23,9 +23,8 @@ import os
 def export2refine( project, name ):    
     basePath = project.path( project.directories.refine, name)
     
-    if project.parameters.verbose():
-        NTmessage('\n' + dots*5 +'\n' )
-        NTmessage(   '==> Exporting %s to for refinement\n', project )
+    NTmessage('\n' + dots*5 +'\n' )
+    NTmessage(   '==> Exporting %s to for refinement\n', project )
     #end if
 
     doSetup( refConfig, basePath )
@@ -36,17 +35,17 @@ def export2refine( project, name ):
     # Dang; even writting this out doesn't help. Ok, used a slightly different name to work this out.
     for drl in project.distances:
         fname = project.path( project.directories.refine, name, tablesConfig, drl.name +'.tbl')
-        drl.export2xplor( fname, verbose = project.parameters.verbose() )
+        drl.export2xplor( fname,   )
     #end for 
     
     for drl in project.dihedrals:
         fname = project.path( project.directories.refine, name, tablesConfig, drl.name +'.tbl')
-        drl.export2xplor( fname, verbose = project.parameters.verbose() )
+        drl.export2xplor( fname,   )
     #end for
 
     # export structures in PDB format
     path = project.path( project.directories.refine, name, convertedConfig, 'model%03d.pdb' )
-    project.molecule.export2xplor( path, verbose = project.parameters.verbose() )
+    project.molecule.export2xplor( path,   )
 
 #end def
 

@@ -90,18 +90,18 @@ class nmrPipeTable( NTdict ):
     addRow( **kwds ):
         Add row to table, optional kwds can be used to set values
         
-    readFile( tabFile, verbose ):
+    readFile( tabFile  ):
         Read table from tabFile
 
     write( stream=sys.stdout ):
         Write table to stream
 
-    writeFile( tabFile, verbose=1 ):
+    writeFile( tabFile,   ):
         Open tabFile, write table and close tabFile
     
     """
 
-    def __init__( self, tabFile=None, verbose=1, **kwds ):
+    def __init__( self, tabFile=None, **kwds ):
         NTdict.__init__( self, __CLASS__ = 'nmrPipeTab', **kwds )
         self.__FORMAT__ = '=== nmrPipeTab ===\n' +\
                           '... tabFile:     %(tabFile)s \n' +\
@@ -119,7 +119,7 @@ class nmrPipeTable( NTdict ):
         self.tabFile    = tabFile
         
         if (tabFile):
-            self.readFile( tabFile, verbose )
+            self.readFile( tabFile  )
         #end if
     #end def
     
@@ -197,13 +197,12 @@ class nmrPipeTable( NTdict ):
         #end for
     #end def
 
-    def readFile( self, tabFile, verbose ):
+    def readFile( self, tabFile  ):
         """
         Read table from tabFile
         """
-        if (verbose):
-            NTmessage('==> Reading nmrPipe table file ... ' )
-            NTmessage.flush()
+        NTmessage('==> Reading nmrPipe table file ... ' )
+               
         #end if
         
         for line in AwkLike( tabFile, minNF = 1, commentString = '#' ):
@@ -246,11 +245,7 @@ class nmrPipeTable( NTdict ):
                 pass
             #end if
         #end for
-        self.tabFile = tabFile
-        
-        if (verbose):
-            NTmessage('done\n%s\n', str( self ))
-        #end if        
+        self.tabFile = tabFile        
     #end def
         
     def write( self, stream=sys.stdout):
@@ -284,15 +279,14 @@ class nmrPipeTable( NTdict ):
         
     #end def
 
-    def writeFile( self, tabFile, verbose=1 ):
+    def writeFile( self, tabFile,   ):
         """
         Write table to tabFile
         """
         file = open( tabFile, 'w' )
         self.write( file )
         file.close()
-        if (verbose):
-            NTmessage('==> Written nmrPipe table file "%s"\n', tabFile )
+        NTmessage('==> Written nmrPipe table file "%s"\n', tabFile )
         #end if
     #end def
     

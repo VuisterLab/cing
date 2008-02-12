@@ -40,7 +40,7 @@ class Xeasy( NTdict ):
     """Class to parse and store some Xeasy stuff
        Read seqFile, prot file and peaks file 
     """
-    def __init__( self, seqFile, protFile, convention, verbose=1 ):
+    def __init__( self, seqFile, protFile, convention,   ):
         NTdict.__init__( self )
         
         # parse the seqFile
@@ -113,8 +113,7 @@ class Xeasy( NTdict ):
         #end for
         
         self.protFile = protFile
-        if verbose:
-            NTmessage('==> Xeasy: parsed %d residues, %d atoms from %s, %s\n', 
+        NTmessage('==> Xeasy: parsed %d residues, %d atoms from %s, %s\n', 
                       self.resCount, self.protCount, self.seqFile,self.protFile 
                      )
         #end if
@@ -141,7 +140,7 @@ class Xeasy( NTdict ):
         #end for
     #end def
     
-    def appendShifts( self, molecule, verbose = 1 ):
+    def appendShifts( self, molecule,   ):
         """append the shifts to molecule
         """
         self.map2molecule( molecule )
@@ -157,18 +156,17 @@ class Xeasy( NTdict ):
             #end if
         #end for
         
-        if verbose:
-            NTmessage('==> Xeasy.appendShifts: appended shifts to molecule %s\n', molecule )
+        NTmessage('==> Xeasy.appendShifts: appended shifts to molecule %s\n', molecule )
         #end if
 
     #end def
     
 
-    def importPeaks( self, molecule, peakFile, status='keep', verbose=True ):
+    def importPeaks( self, molecule, peakFile, status='keep',    ):
         """Read Xeasy peak file
            returns a PeaksList instance or None on error
         """
-        #print '>>', molecule, peakFile, verbose 
+        #print '>>', molecule, peakFile  
         
         self.map2molecule( molecule )
     
@@ -259,8 +257,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-        if verbose:
-            NTmessage('==> Xeasy.importPeaks: extracted %d peaks from %s\n', len(peaks), peakFile )
+        NTmessage('==> Xeasy.importPeaks: extracted %d peaks from %s\n', len(peaks), peakFile )
         #end if
   
         return peaks
@@ -268,7 +265,7 @@ class Xeasy( NTdict ):
 #end class
 
 #==============================================================================
-def exportShifts2Xeasy( molecule, seqFile, protFile, convention, verbose=1 ):
+def exportShifts2Xeasy( molecule, seqFile, protFile, convention,   ):
     """Export shifts to Xeasy prot and seq file
        not be called directly: use export2xeasy
 
@@ -309,14 +306,13 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention, verbose=1 ):
     #end for
     fout.close()
       
-    if verbose:
-        NTmessage( '==> Exported %s in %s format to "%s" and "%s"\n', molecule, convention, seqFile, protFile )
+    NTmessage( '==> Exported %s in %s format to "%s" and "%s"\n', molecule, convention, seqFile, protFile )
     #end if
 #end def
     
 
 #==============================================================================
-def exportPeaks2Xeasy( peakList, peakFile, verbose=True ):
+def exportPeaks2Xeasy( peakList, peakFile,    ):
   """Export peaks to peakFile in xeasy format; 
      routine assumes that exportShifts2xeasy is called first: this sets the 
      xeasyIndex value of each atom and generates matching seq and prot-files.
@@ -383,8 +379,7 @@ def exportPeaks2Xeasy( peakList, peakFile, verbose=True ):
       
   fout.close()
       
-  if verbose:
-    NTmessage( '==> Exported %s to "%s"\n', peakList, peakFile )
+  NTmessage( '==> Exported %s to "%s"\n', peakList, peakFile )
   #end if
   
 #end def
@@ -413,20 +408,19 @@ def importXeasy( project, seqFile, protFile, convention ):
         #end if
 
 #       Parse the seq file and prot file
-        project.xeasy = Xeasy( seqFile, protFile, convention = convention, verbose = False )
+        project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Append the shifts to molecule
-        project.xeasy.appendShifts( project.molecule, verbose = False )
+        project.xeasy.appendShifts( project.molecule   )
 
         project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
         
-        if project.parameters.verbose():
-            if project.xeasy.error:
-                NTmessage( '==> importXeasy: error(s) appending resonances from "%s"\n', protFile )
-            else:
-                NTmessage( '==> importXeasy: appended resonances from "%s"\n', protFile )   
-            #end if
-#            NTmessage( '%s\n', project.molecule.format() )
+
+        if project.xeasy.error:
+            NTmessage( '==> importXeasy: error(s) appending resonances from "%s"\n', protFile )
+        else:
+            NTmessage( '==> importXeasy: appended resonances from "%s"\n', protFile )   
         #end if
+#            NTmessage( '%s\n', project.molecule.format() )
         return project.molecule.resonanceCount-1
 #end def
 
@@ -460,20 +454,18 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
         #end if
 
 #       Parse the seq file and prot file
-        project.xeasy = Xeasy( seqFile, protFile, convention = convention, verbose = False )
+        project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Extract the peaks
-        peaks = project.xeasy.importPeaks( project.molecule, peakFile, verbose = False )
+        peaks = project.xeasy.importPeaks( project.molecule, peakFile   )
 #       Append to project
-        project.appendPeakList( peaks, verbose = False )
+        project.appendPeakList( peaks   )
         
         project.addHistory( sprintf('Imported Xeasy peaks from "%s"', peakFile ) )
         
-        if project.parameters.verbose():
-            if project.xeasy.error:
-                NTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)\n', peaks, peakFile )
-            else:
-                NTmessage( '==> importXeasyPeaks: new %s from "%s"\n', peaks, peakFile )   
-            #end if
+        if project.xeasy.error:
+            NTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)\n', peaks, peakFile )
+        else:
+            NTmessage( '==> importXeasyPeaks: new %s from "%s"\n', peaks, peakFile )   
         #end if
         return peaks
 #end def
@@ -488,7 +480,7 @@ def export2Xeasy( project, tmp=None ):
                                  seqFile=fileName+'.seq', 
                                  protFile=fileName+'.prot', 
                                  convention=CYANA,
-                                 verbose=project.parameters.verbose()
+                                  
                               )
             #Cyana 2.x format
             fileName = project.path( project.directories.xeasy2, project[molName].name )        
@@ -496,7 +488,7 @@ def export2Xeasy( project, tmp=None ):
                                  seqFile=fileName+'.seq', 
                                  protFile=fileName+'.prot', 
                                  convention=CYANA2,
-                                 verbose=project.parameters.verbose()
+                                  
                               )
         #end if
 
@@ -514,10 +506,10 @@ def export2Xeasy( project, tmp=None ):
                 
                 #Xeasy/Cyana 1.x format
                 peakFile = project.path( project.directories.xeasy, pl.name+'.peaks' )
-                exportPeaks2Xeasy( pl, peakFile, verbose = project.parameters.verbose() )
+                exportPeaks2Xeasy( pl, peakFile,   )
                 #Cyana 2.x format
                 peakFile = project.path( project.directories.xeasy2, pl.name+'.peaks' )
-                exportPeaks2Xeasy( pl, peakFile, verbose = project.parameters.verbose() )
+                exportPeaks2Xeasy( pl, peakFile,   )
             #end if
         #end for
 #end def

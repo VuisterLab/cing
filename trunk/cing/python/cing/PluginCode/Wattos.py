@@ -110,7 +110,7 @@ def runWattos( project, tmp=None ):
     if not pdbFile:
         printError("Failed to write a temporary PDB formatted coordinate file for ensemble.")
         return None
-    pdbFile.save( fullname, verbose = False )
+    pdbFile.save( fullname   )
 
     scriptComplete = Wattos.scriptTemplate
     scriptComplete = scriptComplete.replace("INPUT_PDB_FILE", pdbFileName)
@@ -123,7 +123,8 @@ def runWattos( project, tmp=None ):
     scriptFileName = "wattos.script"
     scriptFullFileName =  os.path.join( wattosDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
-    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+#    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+    wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
     logFileName = "wattos_compl.log"
     wattosProgram = ExecuteProgram( wattosPath, rootPath = wattosDir,
                              redirectOutputToFile  = logFileName,
