@@ -13,7 +13,10 @@ from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import printCodeError
+from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import quote
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
@@ -31,7 +34,6 @@ from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
 from database     import NTdb
 from parameters   import plotParameters
-from cing.Libs.NTutils import printMessage
 import math
 import os
 
@@ -130,7 +132,6 @@ _____________________________________________________________________________
     all dict methods
 
 """
-
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
@@ -151,7 +152,7 @@ _____________________________________________________________________________
         self.xeasy        = None # reference to xeasy class, used in parsing
         self.saveXML('chainCount','residueCount','atomCount')
 
-        NTmessage("%s\n", self.format() )
+        printDebug(self.format() )
         #end if
     #end def
 
@@ -332,49 +333,54 @@ _____________________________________________________________________________
 
             Returns empty list if modelCount == 0,
             Returns the list or None upon error.
+            
+            Note that model number start at 1 and not zero as before.
         """
         if models == None:
-            result = NTlist( *range(self.modelCount))
+            return NTlist( *range(1,self.modelCount+1))
 
-        elif self.modelCount == 0:
-            result = NTlist()
+        if self.modelCount == 0:
+            return NTlist()
 
-        elif type(models) == str:
+        if type(models) == str:
             models = asci2list(models)
             models.sort()
             result = NTlist()
             for model in models:
-                if model >= 0 and model < self.modelCount:
-                    result.append(model)
-                else:
-                    NTerror('Error Molecule.models2list: invalid model number %d\n', model )
-                #end if
+                if model == 0:
+                    NTerror('Error Molecule.models2list: invalid model number %d (zero)\n', model )
+                    return None
+                if model > self.modelCount:
+                    NTerror('Error Molecule.models2list: invalid model number %d (larger than modelCount: %d)\n', 
+                            (model, self.modelCount ))
+                    return None
+                result.append(model)
             #end for
+            return result
 
-        elif isinstance( models, list ):
+        if isinstance( models, list ):
             models.sort()
             result = NTlist()
             for model in models:
-                if isinstance( model, int):
-                    if model >= 0 and model < self.modelCount:
-                        result.append(model)
-                    else:
-                        NTerror('Error Molecule.models2list: invalid model number %d\n', model )
-                    #end if
-                else:
+                if not isinstance( model, int):
                     NTerror('Error Molecule.models2list: invalid model "%s" in models list\n', model )
+                    return None
+                if model == 0:
+                    NTerror('Error Molecule.models2list: Invalid model number %d (zero)\n', model )
+                    return None
+                if model > self.modelCount:
+                    NTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n', 
+                                (model, self.modelCount ))
+                    return None
+                result.append(model)
             #end for
-
-        else :
-            NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
-            return None
-        #end if
-
-        return result
+            return result
+        NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
+        return None
     #end def
 
 
-    def save( self, path = None,    ):
+    def save( self, path = None)   :
         """Create a directory path (or use name.NTmol)
            Save sequence, resonances and coordinates so it can be restored by
            restore.
@@ -384,7 +390,7 @@ _____________________________________________________________________________
         os.mkdir( path )
 
         content = NTdict( name = self.name, convention = INTERNAL )
-        content.update( NTmolParameters )
+        content.update( NTmolParameters ) 
         content.saveAllXML()
         obj2XML( content, path=os.path.join( path, NTmolParameters.contentFile ) )
 
@@ -396,7 +402,7 @@ _____________________________________________________________________________
         #end if
     #end def
 
-    def open( path,    ):
+    def open( path)   :
         """Static method to restore molecule from directory path
            return self or None on error
         """
@@ -515,7 +521,7 @@ _____________________________________________________________________________
         self.resonanceCount += 1
     #end def
 
-    def initResonances( self,    ):
+    def initResonances( self)   :
         """ Initialize resonances for all the atoms
         """
         for atom in self.allAtoms():
@@ -566,7 +572,7 @@ _____________________________________________________________________________
         return self
     #end def
 
-    def updateDihedrals( self,    ):
+    def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
         if self.modelCount > 0:
@@ -576,7 +582,7 @@ _____________________________________________________________________________
                 for dihedral in res.db.dihedrals:
                     res.dihedral( dihedral.name )
 
-    def updateMean( self,    ):
+    def updateMean( self)   :
         """Calculate mean coordinates for all atoms
         """
         if self.modelCount:
@@ -584,7 +590,7 @@ _____________________________________________________________________________
             for atm in self.allAtoms():
                 atm.meanCoordinates()
 
-    def updateAll( self,    ):
+    def updateAll( self)   :
         """Calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
         """
@@ -713,38 +719,38 @@ Return an Molecule instance or None on error
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
-        Only export model if specified
-
+        Only export model if specified.
+        Note that model starts not at zero but at one.
         """
 
         if self.modelCount == 0:
+            printError("modelCount is zero in Molecule instance: " + `self`)
             return None
-        if model and model >= self.modelCount:
+        if model==0:
+            printError("model number is zero in Molecule instance: " + `self`)
+            return None
+        if model > self.modelCount:
+            printError("model number is larger than modelCount in Molecule instance: " + `self`)
             return None
 
-        if (model!=None):
+        if model!=None:
             models = NTlist( model )
         else:
-            models = NTlist(*range( self.modelCount ))
-        #end if
+            models = NTlist(*range( 1,self.modelCount+1 ))
 
-        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
-                   convention, models[0], models.last()
-                 )
+        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... \n",
+                   convention, models[0], models.last()                 )
                
-        #end if
-
         pdbFile = PDBFile()
-
+ 
         record = PyMMLib.REMARK()
         record.text = sprintf('PDB file of molecule %s', self.name )
         pdbFile.append( record )
 
         for model in models:
-
-            if ( len(models) > 1 ):
+            if len(models) > 1:
                 record = PyMMLib.MODEL()
-                record.serial = model + 1# JFD is curious as to why this was wrong?
+                record.serial = model # JFD is curious as to why this was wrong?
                 pdbFile.append( record )
             #end if
 
@@ -753,13 +759,18 @@ Return an Molecule instance or None on error
                 lastAtm = None
                 for atm in chain.allAtoms():
                     atm.setdefault('pdbSkipRecord',False)
-                    if (not atm.pdbSkipRecord and model < len(atm.coordinates)):
-                        record = atm.toPDB( pdbIndex=atmCount, model=model, convention=convention )
-                        if record:
-                            pdbFile.append( record )
-                            atmCount += 1
-                            lastAtm = atm
-                        #end if
+                    if atm.pdbSkipRecord:
+                        continue
+#                    if not atm.pdbSkipRecord and model < len(atm.coordinates):
+                    record = atm.toPDB( pdbIndex=atmCount, model=model, convention=convention )
+                    if not record:
+                        # this happens for all Q and even for like Cys HG which aren't always present in actual structure
+                        # but are defined in db.
+#                        printWarning("Failed to get PDB atom record for atom: " + `atm`)
+                        continue
+                    pdbFile.append( record )
+                    atmCount += 1
+                    lastAtm = atm
                     #end if
                 #end for
                 if lastAtm and convention != XPLOR:
@@ -874,7 +885,7 @@ Chain class: defines chain properties and methods
         return res
     #end def
 
-    def removeResidue( self, residue,    ):
+    def removeResidue( self, residue)   :
         if (not residue in self._children):
             NTerror( 'ERROR Chain.removeResidue: residue "%s" not present in chain %s\n',
                      residue, self
@@ -1893,18 +1904,23 @@ Atom class: Defines object for storing atom properties
            16 Oct 2007: GV Fixed bug: model=0 would also invoke
                         The "current" setting; i.e would map to last
                         coordinate added.
+            Changed model to start from 1 instead of from zero.
         """
-#        if not model:
-#            coor = self.coordinates()
-#            if not coor: return None
-#        else:
-#            if (model >= length(self.coordinates) ): return None
-#            coor = self.coordinates[model]
-#        #end if
-        coor = self.coordinates[model]
+        if model > len(self.coordinates):
+            # this happens for all pseudos and atoms like Cys HG which aren't always present
+            # but are defined in the db.
+#            printDebug("Trying to Atom.toPDB for model: " + `model`)
+#            printDebug("but only found coordinates length: " + `len(self.coordinates)`)
+            return None
+        if model < 1:
+            printCodeError("In Atom.toPDB found model to be <1: " + `model`)
+            return None
+        modelId = model - 1
+        coor = self.coordinates[modelId]
 
         pdbAtmName = self.translate( convention )
-        if not pdbAtmName: return None
+        if not pdbAtmName: 
+            return None
 
         pdbResName = self.residue.translate( convention )
         if not pdbResName: return None
@@ -2016,7 +2032,8 @@ class XMLCoordinateHandler( XMLhandler ):
 
     def handle( self, node ):
         attrs = self.handleDictElements( node )
-        if attrs == None: return None
+        if attrs == None: 
+            return None
         result = Coordinate( x = attrs['x'], y = attrs['y'], z=attrs['z'] )
         # update the attrs values
         result.update( attrs )

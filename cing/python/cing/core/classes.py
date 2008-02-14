@@ -1,3 +1,4 @@
+from cing import authorList
 from cing import cingRoot
 from cing import cingVersion
 from cing import programName
@@ -15,8 +16,13 @@ from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import printMessage
+from cing.Libs.NTutils import printWarning
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import val2Str
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
@@ -33,10 +39,7 @@ from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from cing.core.sml import SMLhandler
-from cing.Libs.NTutils import printWarning
-from cing.Libs.NTutils import printMessage
 from shutil import rmtree
-from cing.Libs.NTutils import printError
 import math
 import os
 import shutil
@@ -280,16 +283,11 @@ _____________________________________________________________________________
             # Restore the molecules
             if restore:
                 pr.restore()
-            #end if
         else:
             NTerror('ERROR Project.open: invalid status option "%s"\n', status )
             return None
-        #end if
-
         projects.append( pr )
-
-        NTmessage('%s\n', pr.format())
-
+        printDebug(pr.format())
         return pr
     #end def
     open = staticmethod( open )
@@ -654,7 +652,7 @@ class ProjectList( NTlist ):
         """
         for name in names:
             fname = self.project.path( self.savePath, name + self.extention )
-            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project,    )
+            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project)   
         #end for
     #end def
 
@@ -1038,12 +1036,11 @@ class DistanceRestraint( NTdict ):
         self.violCount5 = 0        # Number of violations over 0.5A
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
-        self.violSd     = 0.0      # Sd of violations
+        self.violSd     = None     # Sd of violations
         self.error      = False    # Indicates if an error was encountered when
                                    # analyzing restraint
 
-        if (modelCount > 0):
-
+        if modelCount:
             for i in range(0, modelCount):
                 d = 0.0
                 for atm1,atm2 in self.atomPairs:
@@ -1100,8 +1097,9 @@ class DistanceRestraint( NTdict ):
                 if ( dabs > 0.3): self.violCount3 += 1
                 if ( dabs > 0.5): self.violCount5 += 1
             #end for
-            self.violAv, self.violSd, dummy = NTaverage( map(math.fabs,self.violations) )
-            self.violMax = max( map(math.fabs,self.violations) )
+            if self.violations:
+                self.violAv, self.violSd, dummy = NTaverage( map(math.fabs,self.violations) )
+                self.violMax = max( map(math.fabs,self.violations) )
         #end if
 
         return (self.av,self.sd,self.min,self.max )
@@ -1143,14 +1141,17 @@ class DistanceRestraint( NTdict ):
     #end def
 
     def format( self ):
-
-        return  sprintf('%-25s (Target: %4.1f %4.1f)  (Models: av %4.1f sd %4.1f min %4.1f max %4.1f)  (Violations: av %4.1f max %4.1f counts %2d,%2d,%2d) %s',
-                        str(self),
-                        self.lower, self.upper,
-                        self.av, self.sd, self.min, self.max,
-                        self.violAv, self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                        self._names()
-                       )
+        return  \
+            sprintf('%-25s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f)'+\
+                    '(Violations: av %6s max %6.1f counts %2d,%2d,%2d) %s',
+                str(self),
+                self.lower, self.upper,
+                val2Str(self.av,         "%6.1f", 6),
+                val2Str(self.sd,         "%7.3f", 7),
+                self.min, self.max,
+                val2Str(self.violAv,     "%4.1f", 4),
+                self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                self._names())
     #end def
 #end class
 
@@ -1229,7 +1230,7 @@ class DistanceRestraintList( NTlist ):
         or (None, None, None, None, None) on error
         """
 
-        if (len( self ) == 0):
+        if not len( self ):
             NTerror('ERROR DistanceRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
@@ -1286,12 +1287,13 @@ class DistanceRestraintList( NTlist ):
     #end def
 
     def format( self ):
-        s = sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n' +\
-                     'rmsd: %7.3f %6.3f        Violations > 0.1,0.3,0.5: %d, %d, %d\n',
+         return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n'+\
+                        'rmsd: %7s %6s        Violations > 0.1,0.3,0.5: %d, %d, %d\n',
                       dots, self.name,self.status,len(self), dots,
-                      self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5
-                   )
-        return s
+                      val2Str(self.rmsdAv,         "%7.3f", 7),
+                      val2Str(self.rmsdSd,         "%6.3f", 6),
+                      self.violCount1, self.violCount3, self.violCount5)
+
     #end def
 
 #    def toFile(self, fileName,   ):
@@ -1349,7 +1351,8 @@ class DihedralRestraint( NTdict ):
     """
     def __init__( self, atoms, lower, upper, **kwds ):
 
-        if (upper<lower): upper+=360.0
+        if upper<lower: 
+            upper+=360.0
         NTdict.__init__(self, __CLASS__  = 'DihedralRestraint',
                               atoms      = NTlist( *atoms ),
                               lower      = lower,
@@ -1377,16 +1380,15 @@ class DihedralRestraint( NTdict ):
         """
 
         modelCount = 0
-        if (len(self.atoms) > 0):
-            modelCount = self.atoms[0].residue.chain.molecule.modelCount
-        #end if
+        if len(self.atoms):
+            modelCount = self.atoms[0].residue.chain.molecule.modelCount        #end if
 
-        if (modelCount == 0):
+        if not modelCount:
             NTerror('Error DihedralRestraint: no structure models\n' )
             return (None,None)
         #end if
 
-        if len(self.atoms) != 4 or None in self.atoms:
+        if len(self.atoms) != 4 or (None in self.atoms):
             NTerror('Error DihedralRestraint: invalid dihedral definition %s\n', self.atoms )
             return (None,None)
         #end if
@@ -1435,7 +1437,7 @@ class DihedralRestraint( NTdict ):
             l.limit(self.lower, self.lower+360.0) # list circular with lower as lowest value
             h = NTlist(self.lower, self.upper, d) # list circular with upper as highest value
             h.limit(self.upper-360, self.upper)
-            if ( l[0]<=l[2] and l[2]<=l[1]): # between lower and upper
+            if l[0]<=l[2] and l[2]<=l[1]: # between lower and upper
                 self.violations.append( 0.0 )
             else: # there is a violation
                 if math.fabs(l[2]-l[1]) < math.fabs( h[2]-h[0] ): # find smallest to either upper or lower bound
@@ -1451,8 +1453,7 @@ class DihedralRestraint( NTdict ):
             #end if
         #end for
         self.violAv,self.violSd,dummy_n = self.violations.average()
-
-        self.cav,self.cv,dummy_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
+        self.cav,   self.cv,    dummy_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
         return( self.cav, self.cv )
     #end def
 
@@ -1498,17 +1499,16 @@ class DihedralRestraint( NTdict ):
     #end def
 
     def format( self ):
-#        s = '('
-#        for p in self.atoms:
-#            s = s + sprintf('%-11s ', p._Cname(1) )
-#        #end for
-#        s = s.strip() + ')'
-        return  sprintf('%-25s (Target: %6.1f %6.1f)  (Models: cav %6.1f cv %4.2f)  (Violations: av %4.1f max %4.1f counts %2d,%2d,%2d) %s',
-                        self, self.lower, self.upper,
-                        self.cav, self.cv,
-                        self.violAv, self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                        self.atoms.format('%-11s ')
-                       )
+        return  \
+            sprintf('%-25s (Target: %6.1f %6.1f)  (Models: cav %6s cv %4s)  '+\
+                    '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
+                self, self.lower, self.upper,
+                val2Str(self.cav,         "%6.1f", 6),
+                val2Str(self.cv,          "%4.1f", 4),
+                val2Str(self.violAv,      "%4.1f", 4),
+                self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                self.atoms.format('%-11s ')
+               )
 
     #end def
 #end class
@@ -1563,7 +1563,6 @@ class DihedralRestraintList( NTlist ):
         self.name       = name
         self.status     = status
         self.currentId  = 0       # Id for each element of list
-
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
@@ -1571,7 +1570,7 @@ class DihedralRestraintList( NTlist ):
         self.violCount3 = 0       # Total violations over 3 degrees
         self.violCount5 = 0       # Total violations over 5 degrees
     #end def
-
+ 
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
         NTlist.append( self, dihedralRestraint )
@@ -1584,7 +1583,7 @@ class DihedralRestraintList( NTlist ):
         Return <rmsd>, sd and total violations over 1, 3, and 5 degrees as tuple
         or (None, None, None, None, None) on error
         """
-        if (len( self ) == 0):
+        if not len( self ):
             NTerror('ERROR DihedralRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
@@ -1604,7 +1603,10 @@ class DihedralRestraintList( NTlist ):
         self.violCount3 =  0
         self.violCount5 =  0
         for dr in self:
-            if calculateFirst: dr.calculateAverage()
+            if calculateFirst: 
+                (cav, _cv) = dr.calculateAverage()
+                if not cav:
+                    printDebug("Failed to calculate average for: "+self.format())
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5
@@ -1617,7 +1619,7 @@ class DihedralRestraintList( NTlist ):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/len(self))
         #end for
 
-        self.rmsdAv, self.rmsdSd, dummy_n = NTaverage( self.rmsd )
+        self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
 
@@ -1634,12 +1636,12 @@ class DihedralRestraintList( NTlist ):
     #end def
 
     def format( self ):
-        s = sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n' +\
-                     'rmsd: %7.3f %6.3f        Violations > 1,3,5 degree: %d, %d, %d\n',
+        return sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n'+\
+                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d\n',
                       dots, self.name,self.status,len(self), dots,
-                      self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5
-                   )
-        return s
+                      val2Str(self.rmsdAv,         "%7.3f", 7),
+                      val2Str(self.rmsdSd,         "%6.3f", 6),
+                      self.violCount1, self.violCount3, self.violCount5)
     #end def
 #end class
 
@@ -2141,27 +2143,19 @@ class HTMLfile:
            Inputs: a HTMLfile obj.
            Output: written lines and close file.
         '''
-
         self.stream = open( self.fileName, 'w' )
-
         self.indent = 0
-
         self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
         self.stream.write(self.openTag('html'))
         self.stream.write(self.openTag('head'))
         if self.title:
             self.stream.write( self._generateTag( 'title', self.title ))
-
         self.stream.write(self._generateTag( 'link',
-                                             rel="stylesheet", type="text/css",
-                                             media="screen", href=cingPaths.css
-                                           )
-                         )
+            rel="stylesheet", type="text/css", media="screen", href=cingPaths.css))
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
         self.stream.write(self.openTag('div', id="container"))
         self.indent += 1
-
         self.stream.write( self.openTag('div', id = 'header') )
         self.stream.writelines(self._header)
         self.stream.write(self.closeTag('div', '<!-- end header -->'))
@@ -2170,7 +2164,6 @@ class HTMLfile:
         self.stream.writelines(self._call + self._main)
 
         for divId, htmlList in [ ('left', self._left), ('right', self._right) ]:
-
             if htmlList:
                 self.indent += 1
 
@@ -2179,32 +2172,28 @@ class HTMLfile:
                 self.stream.write(self.closeTag('div',sprintf('<!-- end %s -->',
                                                               divId)))
                 self.indent -= 1
-            #end if
-
         self.stream.write(self.closeTag('div', '<!-- end main -->'))
         self.stream.write(self._generateTag( 'br', style="clear: both;" ))
-
         self.indent = 0
-
         self.stream.write(self.closeTag('div', '<!-- end container -->'))
-
         self.stream.write(self.openTag('div', id = 'footer'))
         #self.defaultFooter()
         self.stream.writelines(self._footer)
-        self.stream.write(self._generateTag( 'p',
-                     programName + ' ' + cingVersion,
-                     ' (c) ',
-                     '<a href="mailto:g.vuister@science.ru.nl"> Geerten Vuister</a>, ',
-                     '<a href="mailto:alanwilter@gmail.com">    Alan Wilter Sousa da Silva</a>, ',
-                     '<a href="mailto:jurgend@cmbi.ru.nl">      Jurgen F. Doreleijers</a>',
-                      ))
+        msg = programName + ' ' + cingVersion + ' '
+        i=0
+        n=len(authorList)
+        for author in authorList:
+            i+=1
+            msg +=  '<a href="mailto:%s">%s</a>' % ( author[1],author[0])
+            if i==(n-1):
+                msg += ' and '
+            elif i<n:
+                msg += ', '
+        self.stream.write(self._generateTag( 'p', msg))
         self.stream.write(self.closeTag('div', '<!-- end footer -->'))
-
         self.stream.write(self.closeTag('body'))
         self.stream.write(self.closeTag('html'))
-
         self.stream.close()
-    #end def
 
     def tag( self, tag, *args, **kwds ):
         "Return (openingTag, content, closingTag) triple"

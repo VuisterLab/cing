@@ -65,7 +65,7 @@ def NTplotAttributes( **kwds ):
     # text
     a.textAlign  = 'left'
     
-    a.alpha = 1 # Takes a value in range [0,1] for transparency/blending.
+    a.alpha = 1. # Takes a value in range [0,1] for transparency/blending.
 
     # update
     a.update( kwds )
@@ -73,21 +73,21 @@ def NTplotAttributes( **kwds ):
     return a
 #end def
 
-def lineAttributes( type='solid', width=1.0, color='black', alpha=1 ):
+def lineAttributes( type='solid', width=1.0, color='black', alpha=1. ):
     return NTplotAttributes( lineType=type, lineWidth=width, lineColor=color, alpha=alpha )
 #end def
 
-def boxAttributes( fill=True, fillColor='black', line=False, lineColor='black', alpha=1 ):
+def boxAttributes( fill=True, fillColor='black', line=False, lineColor='black', alpha=1. ):
     return NTplotAttributes( lineType='solid', lineColor=lineColor, line=line,
                              fill=fill, fillColor=fillColor, alpha=alpha
                            )
 #end def
 
-def fontAttributes( font='Helvetica', size=12, color='black', alpha=1 ):
+def fontAttributes( font='Helvetica', size=12, color='black', alpha=1. ):
     return NTplotAttributes( font=font, fontSize=size, fontColor=color, alpha=alpha )
 #end def
 
-def pointAttributes( type='circle', size=2.0, color='black', alpha=1 ):
+def pointAttributes( type='circle', size=2.0, color='black', alpha=1. ):
     return NTplotAttributes( pointType=type, pointSize=size, pointColor=color, alpha=alpha )
 #end def
 
@@ -219,7 +219,7 @@ class NTplot( NTdict ):
 
         self.hardcopySize = (400,400)
         self.font         = 'Helvetica'
-        self.graphicsOutputFormat   = 'png'
+        self.graphicsOutputFormat = 'png'
         
         self.title        = None
         self.xLabel       = None
@@ -297,9 +297,6 @@ class NTplot( NTdict ):
 #        printDebug("ydata: " + `ydata`)
         if self.useMatPlotLib:
             ax = gca()
-#            linestyle=None
-#            if attributes.has_key('lineType'):
-#                linestyle = mappingLineType2MatLibPlot[attributes.lineType]
             line2D = Line2D(xdata, ydata)
             attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
             self.setMatLibPlotLine2DPropsPoint(line2D, attributesMatLibPlot)
@@ -336,15 +333,14 @@ class NTplot( NTdict ):
     def box( self, point, sizes, attributes=None ):
         if not attributes:
             attributes=defaultAttributes
+        
         if self.useMatPlotLib:
+            attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)            
             ax = gca()
             rectangle = Rectangle(point, 
                 width=sizes[0], 
                 height=sizes[1],
-                fill=attributes.fill,
-                facecolor=attributes.fillColor,
-                edgecolor=attributes.lineColor,                
-                )            
+                **attributesMatLibPlot )            
             ax.add_artist(rectangle)
         else:
             self.move(  point )
@@ -435,6 +431,36 @@ class NTplot( NTdict ):
             result.alpha           =  attributes.alpha
 #        printDebug("result attributes: " + `result`)
         return result
+
+    def mapAttributes2MatLibPatches(self, attributes=defaultAttributes):
+        if not attributes:
+            attributes=defaultAttributes
+        result = {}
+        # Patch attributes.
+#                 edgecolor=None,
+#                 facecolor=None,
+#                 linewidth=None,
+#                 antialiased = None,
+#                 hatch = None,
+#                 fill=1,
+        # Input
+#                facecolor=attributes.fillColor,
+#                edgecolor=attributes.lineColor,
+#                fill=attributes.fill,
+        
+        keys = attributes.keys()
+        if 'alpha' in keys:
+            result['alpha']                =  attributes.alpha
+        if 'fill' in keys:
+            result['fill']                =  attributes.fill
+        if 'fillColor' in keys:
+            result['facecolor']           =  attributes.fillColor
+        if 'lineColor' in keys:
+            result['edgecolor']           =  attributes.lineColor
+#        printDebug("input  mapAttributes2MatLibPatches: " + `attributes`)
+#        printDebug("result mapAttributes2MatLibPatches: " + `result`)
+        return result
+
 
     def setMatLibPlotLine2DPropsPoint( self,line2D, attributesMatLibPlot):
         line2D.set_color(attributesMatLibPlot['color'])
@@ -642,6 +668,10 @@ class NTplot( NTdict ):
         if not attributes:
             attributes=defaultAttributes
 #        printDebug("Creating number of bins: " + `bins`)
+#        printDebug("theList: " + `theList`)
+        if not theList:
+#            printDebug("empty input not adding histogram")
+            return # Nothing to add.
         his = NThistogram( theList, low, high, bins ) # A NTlist
         self.maxY = max(his)
         if self.useMatPlotLib:

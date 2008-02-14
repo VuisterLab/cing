@@ -5,8 +5,8 @@ main.py: command line interface to the cing utilities:
 
 Some examples; all assume a project named 'test':
 
-- To start a new Project:
-cing --name test --new
+- To start a new Project using most verbose messaging:
+cing --name test --new --verbosity 9
 
 - To start a new Project from a xeasy seq file:
 cing --name test --init AD.seq,CYANA 
@@ -50,7 +50,6 @@ format(peaks)
 from cing import cingPythonDir
 from cing import header
 from cing import programVersion
-from cing import verbosityError
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import OptionParser
@@ -61,6 +60,7 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from cing.Libs.NTutils import printError
 import cing
 import os 
 import string
@@ -123,7 +123,7 @@ def script( scriptFile, *a, **k ):
 
 def testOverall():
     # Use silent testing from top level.
-    cing.verbosity = verbosityError
+#    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
     excludedModuleList = ( "cing.PluginCode.test.test_ccpn",
 #                           "cing.PluginCode.test.test_Procheck",
@@ -149,7 +149,7 @@ def testOverall():
       if mod_name in excludedModuleList:
         print "Skipping module:  " + mod_name
         continue      
-      print "Importing ", mod_name
+#      print "Importing ", mod_name
       exec("import %s" % (mod_name,))
       exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name,))
 #      print "Testing"
@@ -158,16 +158,12 @@ def testOverall():
 
 project = None # after running main it will be filled.
  
-def main():
-#    cing.verbosity = verbosityOutput # Default is no output of anything.
-    printMessage(header)
-#    root,file,ext  = NTpath( __file__ )
-    usage          = "usage: cing [options]       use -h or --help for listing"
-    
+def main():    
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
     
+    usage  = "usage: cing [options]       use -h (or --help) for listing"
     parser = OptionParser(usage=usage, version=programVersion)
     parser.add_option("--test", 
                       action="store_true", 
@@ -254,10 +250,10 @@ def main():
                       dest="validate", 
                       help="Do validation"
                      )
-    parser.add_option("-q", "--quiet",
-                      action="store_true", 
-                      dest="quiet", 
-                      help="quiet: no/less messages to stdout (default: not quiet)"
+    parser.add_option("-v", "--verbosity",
+                      action="store_true", default=cing.verbosity,
+                      dest="verbosity", 
+                      help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
     parser.add_option( "--nosave",
                       action="store_true", 
@@ -271,7 +267,16 @@ def main():
                      )
     
     (options, _args) = parser.parse_args()
+    if options.verbosity:
+        if options.verbosity >= 0 and options.verbosity <= 9:
+            cing.verbosity = options.verbosity 
+        else:
+            printError("set verbosity is outside range [0-9] at: " + options.verbosity)
+            printError("Ignoring setting")
     
+    printMessage(header)
+#    root,file,ext  = NTpath( __file__ )
+
     if options.test:
         testOverall()
         sys.exit(0)
@@ -322,7 +327,7 @@ def main():
     #------------------------------------------------------------------------------------
     if options.new:    
         project = Project.open( options.name, status='new' )
-    elif (options.old):    
+    elif options.old:    
         project = Project.open( options.name, status='old' )
     elif options.init:    
         init = options.init.split(',')
@@ -344,7 +349,7 @@ def main():
     elif options.initBMRB:
         project = Project.open( options.name, status='new' )
         project.initBMRB( bmrbFile = options.initBMRB, moleculeName = project.name )
-    elif (options.initCcpn):
+    elif options.initCcpn:
     ##    init = options.initCcpn.split(',')
         project = Project.open( options.name, status='new' )
         project.initCcpn( ccpnFile = options.initCcpn )
@@ -358,7 +363,7 @@ def main():
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
-    if (options.xeasy):
+    if options.xeasy:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 3):
             NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required\n")
@@ -380,7 +385,7 @@ def main():
     
     if options.generatePeaks:
         gp = options.generatePeaks.split(',')
-        if (len(gp) != 2):
+        if len(gp) != 2:
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required\n")
         else:
             project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] )

@@ -162,7 +162,7 @@ class Xeasy( NTdict ):
     #end def
     
 
-    def importPeaks( self, molecule, peakFile, status='keep',    ):
+    def importPeaks( self, molecule, peakFile, status='keep')   :
         """Read Xeasy peak file
            returns a PeaksList instance or None on error
         """
@@ -312,7 +312,7 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention,   ):
     
 
 #==============================================================================
-def exportPeaks2Xeasy( peakList, peakFile,    ):
+def exportPeaks2Xeasy( peakList, peakFile)   :
   """Export peaks to peakFile in xeasy format; 
      routine assumes that exportShifts2xeasy is called first: this sets the 
      xeasyIndex value of each atom and generates matching seq and prot-files.

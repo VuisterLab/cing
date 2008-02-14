@@ -77,7 +77,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
 DihedralRestraint.export2cyana = exportDihedralRestraint2cyana
 
 #-----------------------------------------------------------------------------
-def exportDihedralRestraintList2cyana( drl, path, convention,    ):
+def exportDihedralRestraintList2cyana( drl, path, convention)   :
     """Export a dihedralRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
        return drl or None on error
@@ -121,7 +121,7 @@ def importAco( project, acoFile, convention ):
     #end if
          
     dir,name,_ext = NTpath( acoFile )
-    result       = project.dihedrals.new( name=name, status='keep',    )
+    result       = project.dihedrals.new( name=name, status='keep')   
     
     printDebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
@@ -180,7 +180,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
    
     dir,name,_ext = NTpath( uplFile )
 #    result       = project.newDistanceRestraintList( name )
-    result       = project.distances.new( name=name, status='keep',    )
+    result       = project.distances.new( name=name, status='keep')   
     
     for line in AwkLike( uplFile, commentString="#" ):
         if not line.isComment() and line.NF >= 7:

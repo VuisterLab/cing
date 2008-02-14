@@ -4,10 +4,10 @@ python $cingPath/PluginCode/test/test_Procheck.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
-from cing import verbosityError
+#from cing import verbosityError
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
+#import cing
 import os
 import unittest
 
@@ -31,5 +31,5 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif))                                    
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
+#    cing.verbosity = verbosityError
     unittest.main()

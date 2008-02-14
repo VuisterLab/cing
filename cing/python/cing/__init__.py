@@ -15,7 +15,9 @@ header = """
 """ % (cingVersion,)
 footer = """------------------------------------------------------------------------------------------------------
 """
-
+authorList = [  ('Geerten Vuister',             'vuister@science.ru.nl'),
+                ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
+                ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl')]
 
 verbosityNothing  = 0 # Even errors will be suppressed
 verbosityError    = 1 # show only errors
@@ -32,8 +34,15 @@ prefixWarning   = "WARNING:"
 prefixDetail    = "DETAIL:"
 prefixDebug     = "DEBUG:"
 
+#NaNstring = "\\N"
+try:
+    from localConstants import NaNstring #@UnresolvedImport
+except:
+    NaNstring = "NaN" # default if not set in localConstants.
+    
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
+
 
 ######################################################################################################
 # This code is repeated in __init__.py and setup.py please keep it sync-ed

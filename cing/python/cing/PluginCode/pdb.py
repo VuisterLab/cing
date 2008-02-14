@@ -3,12 +3,12 @@ Adds initialise/import/export from/to PDB files
 
 
 Methods:
-    Molecule.importFromPDB( pdbFile, convention='PDB',    ):
+    Molecule.importFromPDB( pdbFile, convention='PDB')   :
         Import coordinates from pdbFile
         convention eq PDB, CYANA, CYANA2 or XPLOR
         return molecule or None on error
     
-    Molecule.PDB2Molecule(pdbFile, moleculeName, convention,    ):
+    Molecule.PDB2Molecule(pdbFile, moleculeName, convention)   :
         Initialise  from pdbFile
         Return molecule instance
         convention eq PDB, CYANA, CYANA2 or XPLOR 
@@ -41,18 +41,18 @@ from cing.Libs.NTutils import printWarning
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None,    ):
+def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
     """Import coordinates from pdbFile (optionally: first nmodels)
 convention eq PDB, CYANA, CYANA2 or XPLOR
 return molecule or None on error
     """
     if not molecule: return None
 
-    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
+    NTmessage('==> Parsing pdbFile "%s" ... \n', pdbFile ) 
            
     #end if
     
-    pdb = PyMMLib.PDBFile( pdbFile,    )
+    pdb = PyMMLib.PDBFile( pdbFile)   
 #    molecule.pdb = pdb; no longer save it: it eats massive memory and we don't use it
     
     foundModel = False
@@ -116,7 +116,7 @@ return molecule or None on error
     #end for
     
     # Patch to get modelCount right for X-ray or XPLOR structures with only one model
-    if (not foundModel): 
+    if not foundModel: 
         modelCount += 1
     #end if
     molecule.modelCount += modelCount
@@ -131,42 +131,37 @@ return molecule or None on error
 # Add as a method to Molecule class
 Molecule.importFromPDB = importFromPDB
 
-def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None,    ):
+def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
     """Initialise  from pdbFile
 Return molecule instance
 convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
     showMaxNumberOfWarnings = 100
     shownWarnings = 0
-    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
+    NTmessage('==> Parsing pdbFile "%s" ... \n', pdbFile ) 
            
-    #end if
-    pdb = PyMMLib.PDBFile( pdbFile,    )
+    pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
     
-
 #    mol.pdb = pdb
     mol.modelCount  = 0
     foundModel = False
     
     for record in pdb:
-
-#        print '>', record
-        recordName = record._name.strip()
-        
+        recordName = record._name.strip()        
         if  recordName == 'REMARK':
             pass
         
-        elif recordName == "MODEL":
+        if recordName == "MODEL":
             foundModel = True
-        
-        elif recordName == "ENDMDL":
+            continue
+        if recordName == "ENDMDL":
             mol.modelCount += 1
             if nmodels and mol.modelCount >= nmodels:
                 break
-            #end if
+            continue
          
-        elif recordName == "ATOM" or recordName == "HETATM":
+        if recordName == "ATOM" or recordName == "HETATM":
             # see if we can find a definition for this residue, atom name in the database
             a = record.name
             if convention == CYANA or convention == CYANA2:
@@ -176,8 +171,6 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
                 a = record.name[1:4] + record.name[0:1]
             # strip is already done in function
             atm = NTdbGetAtom( record.resName, a, convention )
-            #end if    
-
             if not atm:
                 if shownWarnings <= showMaxNumberOfWarnings:
                     printWarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
@@ -185,41 +178,34 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
                     if shownWarnings == showMaxNumberOfWarnings:
                         printWarning('And so on.')
                     shownWarnings += 1
-                    
-            elif atm.residueDef.hasProperties('cyanaPseudoResidue'):
+                continue
+            if atm.residueDef.hasProperties('cyanaPseudoResidue'):
                 # skip CYANA pseudo residues
-                pass
-            else:
-                # we did find a match in the database
-
-                # Not all PDB files have chainID's !@%^&*
-                cname = 'A'
-                if record.has_key('chainID'):
-                    cname = record.chainID.strip()
-                #end if
-                resID    = record.resSeq
-                resName  = atm.residueDef.name
-                fullName = resName+str(resID)
-                atmName  = atm.name
-                
-                # check if this chain,fullName,atmName already exists in the molecule
-                # if not, add chain or residue                 
-                if not cname in mol:
-                    mol.addChain( cname )
-                #end if
-                
-                if not fullName in mol[cname]:
-                    res = mol[cname].addResidue( resName, resID )
-                    res.addAllAtoms()
-                #end if
-                
-                atom = mol[cname][fullName][atmName]
-                atom.addCoordinate( record.x, record.y, record.z, record.tempFactor )
-
-#               record.atom = atom
-#               atom.pdbRecord = record
-                
+                continue
+            # we did find a match in the database
+            # Not all PDB files have chainID's !@%^&*
+            cname = 'A'
+            if record.has_key('chainID'):
+                cname = record.chainID.strip()
             #end if
+            resID    = record.resSeq
+            resName  = atm.residueDef.name
+            fullName = resName+str(resID)
+            atmName  = atm.name
+            
+            # check if this chain,fullName,atmName already exists in the molecule
+            # if not, add chain or residue                 
+            if not cname in mol:
+                mol.addChain( cname )
+            #end if
+            
+            if not fullName in mol[cname]:
+                res = mol[cname].addResidue( resName, resID )
+                res.addAllAtoms()
+            #end if
+            
+            atom = mol[cname][fullName][atmName]
+            atom.addCoordinate( record.x, record.y, record.z, record.tempFactor )
         #end if
     #end for
     if shownWarnings:
@@ -228,20 +214,16 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     # Patch to get modelCount right for X-ray structures with only one model
     if not foundModel: 
         mol.modelCount += 1
-    
     NTmessage( '==> PDB2Molecule: completed, added %d structure models\n', mol.modelCount )  
-    #end if
-    
-    # delete the PyMMlib pdbFile instance
+    # delete the PyMMlib pdbFile instance # JFD: why?
     del(pdb)
-
     return mol
 #end def
 # Add as a staticmethod to Molecule class
 Molecule.PDB2Molecule = staticmethod( PDB2Molecule )
 
 
-def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC,    ):
+def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     """
     Save a molecule instance to PDB file.
     Convention eq PDB, CYANA, CYANA2, XPLOR.
@@ -249,9 +231,11 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC,    ):
     For speedup reasons, this routine should be explicitly coded.
     This routine should eventually replace toPDB.
     
+    NB model should be 1 for the first model. Not zero.
     """
-    pdbFile = molecule.toPDB( model=model, convention = IUPAC,    )
-    pdbFile.save( path,    )   
+    pdbFile = molecule.toPDB( model=model, convention = convention)
+    
+    pdbFile.save( path)   
     del(pdbFile)
 #end def
 Molecule.toPDBfile = moleculeToPDBfile
@@ -261,17 +245,11 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
     """Initialise Molecule from pdbFile. returns molecule instance"""
     if not name: 
         _path,name,_ext  = NTpath( pdbFile )
-    #end if
-    molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels,
-                              
-                           )
+    molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
     project.appendMolecule( molecule )
-
-    project.molecule.updateAll(   )
-        
+    project.molecule.updateAll()
     project.addHistory( sprintf('initPDB from "%s"\n', pdbFile ) )
     project.updateProject()
-
     return molecule
 #end def
 

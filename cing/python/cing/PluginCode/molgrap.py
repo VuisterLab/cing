@@ -221,7 +221,6 @@ class Molgrap(NTdict):
 def export2gif(molecule, path ):
     check_type(molecule,'Molecule')
     check_string(path)
-    
 #    printDebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap()
     m.run(molecule, path)

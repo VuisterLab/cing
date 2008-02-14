@@ -19,7 +19,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
         Initialize from edited BMRB file
         Return molecule instance
     """
-    mol = Molecule( name=moleculeName ,    )
+    mol = Molecule( name=moleculeName )   
     project.appendMolecule( mol )
 
     error = False
@@ -43,7 +43,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
         #end if
     #end for
 
-    error = error or (project.importBMRB( bmrbFile,    ) == None)
+    error = error or (project.importBMRB( bmrbFile)    == None)
     if error:
         NTmessage( '==> initBMRB: completed with error(s)\n' )
     else:
