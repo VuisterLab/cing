@@ -198,7 +198,7 @@ Example file:
     #end def
     readline = staticmethod( readline )
     
-    def fromFile( fileName, project=None,    ):
+    def fromFile( fileName, project=None)   :
         """
         Static method to restore object from SML file.
         Returns obj or None on error.

@@ -206,6 +206,7 @@ fullstop y
             all checks. Storing the check data according to residue and atom.
             Return self on succes or None on error.
         """
+        modelId = model - 1
         checkID = None # Just to keep pydev from complaining.
         isTypeFloat = False
         if not self.checks: # This will be called multiple times so don't overwrite.
@@ -261,16 +262,16 @@ fullstop y
                     valueNTList.append(None)
                 self[checkID].setdefault(key,valueNTList)
             if isTypeFloat and key == "Value":
-                self[checkID][key][model] = float(value)
+                self[checkID][key][modelId] = float(value)
             else:
-                self[checkID][key][model] = value
+                self[checkID][key][modelId] = value
 #            printDebug("For checkID   : "+checkID)
 #            printDebug("For key       : "+key)
 #            printDebug("For modelID   : "+`model`)
 #            printDebug("For value     : "+value)
 #            printDebug("For check     : "+`self[checkID]`)
 #            printDebug("For keyed list: "+`self[checkID][key]`)
-#            printDebug("For stored key: "+`self[checkID][key][model]`)
+#            printDebug("For stored key: "+`self[checkID][key][modelId]`)
         #end for each line.
 
         # TODO: finish code hre.
@@ -449,7 +450,7 @@ def runWhatif( project, tmp=None ):
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
             NTwarning('non-standard residue %s found and will be written out for What If\n' % `res`)
 
-    models = NTlist(*range( project.molecule.modelCount ))
+    models = NTlist(*range( 1,project.molecule.modelCount+1 ))
 
     whatifDir = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
     whatifPath       = os.path.dirname(cingPaths.whatif)
@@ -459,10 +460,9 @@ def runWhatif( project, tmp=None ):
     copy(whatifTopology, os.path.join(whatifDir,"TOPOLOGY.FIL"))
 
     for model in models:
-        modelNumber = model + 1
-        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', modelNumber) )
+        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
         # WI prefers IUPAC like PDB now. In CING the closest is BMRBd?
-        printMessage('==> Materializing model '+`modelNumber`+" to disk" )
+        printMessage('==> Materializing model '+`model`+" to disk" )
         pdbFile = project.molecule.toPDB( model=model, convention = "BMRB" )
         if not pdbFile:
             printError("Failed to write a temporary file with a model's coordinate")
@@ -471,8 +471,7 @@ def runWhatif( project, tmp=None ):
 
     scriptComplete = Whatif.scriptBegin
     for model in models:
-        modelNumber = model + 1
-        modelNumberString = sprintf('%03d', modelNumber)
+        modelNumberString = sprintf('%03d', model)
         modelFileName = 'model_'+modelNumberString+".pdb"
         scriptModel = Whatif.scriptPerModel.replace("$pdb_file", modelFileName)
         scriptModel = scriptModel.replace("$modelNumberString", modelNumberString)
@@ -526,9 +525,8 @@ def runWhatif( project, tmp=None ):
         printWarning("Failed to remove all temporary what if files that were expected")
 
     for model in models:
-        modelNumber = model + 1
-        modelNumberString = sprintf('%03d', modelNumber)
-        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', modelNumber), '.pdb' )
+        modelNumberString = sprintf('%03d', model)
+        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model), '.pdb' )
         del( fullname ) #TODO: isn't it os.unlink?
         modelCheckDbFileName = "check_"+modelNumberString+".db"
         printMessage('==> Parsing checks for model '+modelCheckDbFileName)

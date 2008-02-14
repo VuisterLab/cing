@@ -63,10 +63,8 @@ def generatePSF( config, params, doPrint = 0 ):
     psfJob = GeneratePSF(
                          config,
                          params,
-
 #                         inPath     = config.directories.converted,
-                         pdbFile    = params.baseName%params.models[0],
-
+                         pdbFile    = params.baseName % params.models[0],
                          jobName    = 'generatePSF',
 
                         )
@@ -80,20 +78,16 @@ def generatePSF( config, params, doPrint = 0 ):
 
 #------------------------------------------------------------------------------
 def analyze( config, params, doPrint = 0 ):
-
     # first create the jobs, run later    
     analyzeJobs = []
     for i in params.models:
         job = Analyze(
                         config,
                         params,
-                   
-                        fileNum    = i,
-                        
+                        fileNum    = i,                        
                         molecules  = [
-                                      NTdict(
-                                                psfFile        = params.psfFile,
-                                                pdbFile        = params.baseName%i,
+                                      NTdict(   psfFile        = params.psfFile,
+                                                pdbFile        = params.baseName % i,
                                                 selectionCode  = '(not resn TIP3 and not resn ANI)'
                                               ),
                                      ],
@@ -127,21 +121,18 @@ def refine( config, params, doPrint = 0 ):
         refineJobs.append(
             WaterRefine(
                    config,
-                   params,
-                   
+                   params,                  
                    fileNum    = i,
-
                    molecules  = [
                                  NTdict(
                                     psfFile        = params.psfFile,
-                                    pdbFile        = params.baseName%i,
+                                    pdbFile        = params.baseName % i,
                                     selectionCode  = '(not resn TIP3 and not resn ANI)'
                                  ),
                                 ],
 #                   inPath     = config.directories.analyzed,
 #                   outPath    = config.directories.refined,
-                   
-                   jobName    = 'refine_%d'%i,       
+                   jobName    = 'refine_%d' % i,       
             )
         )
 
@@ -400,7 +391,7 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     project = None
     if options.project:
-        project = Project.open(options.project, status = 'old', restore=False,    )
+        project = Project.open(options.project, status = 'old', restore=False)   
         if project==None:
             NTerror("Failed to get a project") 
             sys.exit(1)

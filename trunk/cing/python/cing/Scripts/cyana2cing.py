@@ -115,7 +115,7 @@ if os.path.exists( projectRoot ) and not options.overwrite:
     NTerror('ERROR: output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
     sys.exit(1)
 
-project = Project.open(args[0], 'new',    )
+project = Project.open(args[0], 'new')   
 project.cyana2cing( args[0], convention=options.convention,
                     seqFile   = options.seqFile,
                     protFile  = options.protFile,

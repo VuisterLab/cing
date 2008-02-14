@@ -1,0 +1,6 @@
+JFD @ Tue Feb 12 15:43:13 CET 2008
+
+Restraint violations
+    - Note that rmsd listed for e.g. distance restraint lists are -averaged- over the
+        models. The given sd over the rmsd is over the models. 
+        This is different than Wattos and Aqua.

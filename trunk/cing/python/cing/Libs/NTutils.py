@@ -12,6 +12,8 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+from cing import NaNstring
+import string
 import array
 import cing
 import inspect
@@ -997,16 +999,12 @@ class NTdict(dict):
     """Return a formatted string of the items
        Uses format or stored attribute __FORMAT__ or default
     """
-    # use __FORMAT__  if none given
     if (format == None):
         format = self.__FORMAT__
-    #end if
-
     # use the default format if None
-    if (format == None):
-        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
-    #end if
-
+#    if (format == None):
+#        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
+#    #end if
     return format % self
   #end def
 
@@ -1630,6 +1628,11 @@ class NTvalue( NTdict ):
     #end def
 
     def __str__( self ):
+        # Note that the below cases for None value/error loose fixed width formatting.
+        if self.value == None:
+            return '%s (+- %s)' % (NaNstring, NaNstring)
+        if self.error == None:
+            return `self.value`+' (+- %s)' % (NaNstring)
         return  self.fmt % ( self.value, self.error )
     #end def
 
@@ -1847,45 +1850,42 @@ def NTaverage( theList, byIndex=None ):
        byIndex allows for list of tuples r other elements
     """
     sum = 0.0
-    sumsq = 0.0
-    n = 0
+    sumsqd = 0.0
+    n = 0.0
     for item in theList:
-        if item != None:
+        if item:
             if byIndex == None:
                 val = item
             else:
                 val = item[byIndex]
-            #end if
-            sum += val
-            sumsq += val*val
+            sum   += val
             n += 1
-        else:
-            pass
-        #end if
-    #endif
+    #end fpr
 
     if n == 0:
         return ( None, None, 0 )
-    elif n == 1:
-        theList.av = sum
-        theList.sd = 0.0
-        theList.n  = 1
-        return ( sum, 0.0, 1 )
-    #endif
-
-    fn = float(n)
+    if n == 1:
+        return ( sum, None, 1 ) # sd not defined for serie of length one.
+#    fn = float(n)
 #    print '>>', n, sum, sumsq, sumsq/(fn-1.0), (sum*sum)/(fn*(fn-1.0))
-    av = sum/fn
+    av = sum/n
+    # routine below makes it much slower but easier to read than one pass.
+    for item in theList:
+        if item:
+            if byIndex == None:
+                val = item
+            else:
+                val = item[byIndex]
+            sumsqd += (val-av)*(val-av) # sum of squared deviations.
+    
     # some python implementations (Linux) crash in case of all same numbers,
     # => zero sd, but roundoffs likely generate a very small negative number
     # here
-    sd = sumsq/(fn-1.0) - (sum*sum)/(fn*(fn-1.0))
+    sd = sumsqd/(n-1)
     if sd <= 0.0:
         sd = 0.0
-    else:
-        sd = math.sqrt( sd )
-    #end if
-    return ( av, sd, n )
+    sd = math.sqrt( sd )
+    return ( av, sd, int(round(n)) )
 #end def
 
 def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
@@ -2461,16 +2461,17 @@ def XML2obj( path=None, string=None ):
     """Convert XML file to object
        returns object or None on error
     """
-    if (path == None and string==None):
+    if path == None and string==None:
         NTerror("ERROR XML2obj: no input defined\n")
         return None
     #end if
 
-    if (path):
+    printDebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
+    if path:
         doc = minidom.parse( path )
     else:
         doc = minidom.parseString( string )
-    #end if
+    printDebug("Done reading XML")
     root = doc.documentElement
 
     result = NThandle( root )
@@ -2920,9 +2921,9 @@ def formatList( theList, fmt = '%s\n' ):
     """
     result = []
     for element in theList:
+#        printDebug("Doing element: " +`element`)
         result.append( fmt%element.format()  )
-    #end for
-    return ''.join(result)
+    return string.join(result,'')
 #end def
 
 ######################################################################################################
@@ -3003,7 +3004,7 @@ class ExecuteProgram( NTdict ):
             self.jobcount += 1
         printDebug('==> Executing ('+cmd+') ... ')
         code = os.system( cmd )
-        printDebug( "Got back from system the exit code: " + `code` )
+#        printDebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
 #
@@ -3133,6 +3134,17 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
         return result
     return None
 
+def val2Str( value, fmt, count=None):
+    """Utility for translating numeric values to strings allowing the value
+    to be a None and returning the NaNstring in such case. When the value is 
+    None the count determines how long the return string will be.
+    Regular formatting is used otherwise."""
+    if value == None:
+        if not count:
+            return NaNstring
+        return ("%"+`count`+"s") % NaNstring
+    return fmt % value
+ 
 #
 #def splitpdb( fileName = None, modelNum = None ):
 #    """

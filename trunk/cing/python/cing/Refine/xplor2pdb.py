@@ -121,7 +121,7 @@ for fName in files:
             atm = NTdbGetAtom( record.resName, record.name, XPLOR )
             
             # we found a match
-            if (atm != None):
+            if atm != None:
                 # check if there is an convention equivalent; skip otherwise
                 if (atm.translate(convention) != None and atm.residueDef.translate(convention) != None):
                     atomCount     += 1

@@ -16,9 +16,7 @@ import unittest
 
 class AllChecks(TestCase):
         
-    def testConversion(self):
-        """cyana conversion should take less than 10s"""
-        
+    def testConversion(self):        
 #        SETUP FIRST
         projectId = "1pdb" # Small much studied PDB NMR entry 
         cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
@@ -33,7 +31,7 @@ class AllChecks(TestCase):
             printWarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )
             
-        project = Project.open(projectRootPath, 'new',    )
+        project = Project.open(projectRootPath, 'new')   
         project.cyana2cing( #project=project,
                             cyanaDirectory=cyanaDirectory, 
                             uplFiles  = [projectId],

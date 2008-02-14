@@ -1571,7 +1571,7 @@ class PDBFile(list):
         fil.flush()
 
 ### gv added 26 Jan 2007
-    def save( self, path,    ):
+    def save( self, path)   :
 	"""Save PDBFile records to path
 	"""
 	fp = file( path, 'w' )

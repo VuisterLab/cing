@@ -82,7 +82,7 @@ DistanceRestraint.export2xplor = exportDistanceRestraint2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportDistanceRestraintList2xplor( drl, path,    ):
+def exportDistanceRestraintList2xplor( drl, path)   :
     """Export a distanceRestraintList (DRL) to xplor format:
        return drl or None on error
     """
@@ -125,7 +125,7 @@ def exportDihedralRestraint2xplor( dihedralRestraint ):
 DihedralRestraint.export2xplor = exportDihedralRestraint2xplor
 
 #-----------------------------------------------------------------------------
-def exportDihedralRestraintList2xplor( drl, path,    ):
+def exportDihedralRestraintList2xplor( drl, path)   :
     """Export a dihedralRestraintList (DRL) to xplor format:
        return drl or None on error
     """
@@ -148,7 +148,7 @@ DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportMolecule2xplor( molecule, path,    ):
+def exportMolecule2xplor( molecule, path)   :
     """Export coordinates of molecule to pdbFile in XPLOR convention; 
        generate modelCount files,
        path should be in the form name%03d.pdb, to allow for multiple files
@@ -157,7 +157,7 @@ def exportMolecule2xplor( molecule, path,    ):
        return Molecule or None on error
     """
     for model in range(molecule.modelCount):
-        pdbFile = molecule.toPDB( model=model, convention = XPLOR,    )
+        pdbFile = molecule.toPDB( model=model, convention = XPLOR)   
         if not pdbFile: return None
         pdbFile.save( sprintf( path, model )   )  
         del(pdbFile) 
@@ -177,6 +177,8 @@ def newMoleculeFromXplor( project, path, name, models=None ):
        models is a optional list of model numbers, otherwise it scans for files.
        
        return Molecule or None on error
+       
+       NB model_000.pdb becomes model number 1. Ie model=1
     """
     print '>', path, name, models
 #    NTmessage(name,models[0])
@@ -186,9 +188,9 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         model = 0
         xplorFile = sprintf(path,model)
         #print '>>', xplorFile
-        while (os.path.exists( xplorFile )):
-            models.append( model )
+        while os.path.exists( xplorFile ):
             model += 1
+            models.append( model )
             xplorFile = sprintf(path,model)
             #print '>>', xplorFile
         #end while
@@ -201,7 +203,8 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end if
     
     # first one:
-    xplorFile = sprintf( path, models[0] )
+    modelId = models[0] - 1
+    xplorFile = sprintf( path, modelId )
     if not os.path.exists(xplorFile):
         NTerror('ERROR newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
@@ -213,13 +216,14 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 
     # now the other models:
     for model in models[1:]:
-        xplorFile = sprintf( path, model )
-        if (not molecule.importFromPDB( xplorFile, XPLOR, nmodels=1,   )):
+        modelId = model - 1
+        xplorFile = sprintf( path, modelId )
+        if not molecule.importFromPDB( xplorFile, XPLOR, nmodels=1):
             return None
         #end if
     #end for
     
-    project.molecule.updateAll(   )
+    project.molecule.updateAll()
         
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()

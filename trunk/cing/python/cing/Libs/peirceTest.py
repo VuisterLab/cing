@@ -219,7 +219,8 @@ class Peirce:
         contains elements that are the index and the value at that index. The outliers NTlist
         contains the same.
             Input data is not modified by this routine. Input is of type NTlist.
-            Returns None on error, eg. when called with less than 3 values.
+            Returns None on error.
+            When called with less than 3 values returns all those values as expected.
             (Used to return (None, None) on error.)
         """
         x = len( valueList )
@@ -251,7 +252,7 @@ class Peirce:
             R = self._getR(x, y)
             if not R:
                 printCodeError("Failed to get a Peirce constant R; giving up")
-                return (None, None)
+                return None
             maxDeviation = R * sd
 #            printDebug("R : " + `R`)
 #            printDebug("md: " + `maxDeviation`)

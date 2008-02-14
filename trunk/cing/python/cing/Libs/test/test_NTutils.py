@@ -2,6 +2,7 @@
 Unit test execute as:
 python $cingPath/Scripts/test/test_cyana2cing.py
 """
+from cing import NaNstring
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing import cingPythonDir
@@ -11,6 +12,7 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import val2Str
 from cing.core.parameters import cingPaths
 from unittest import TestCase
 import cing
@@ -102,10 +104,51 @@ class AllChecks(TestCase):
             p = s.popitem()
         s.update( b  )
 
+        
+    def testNTaverage(self):
         l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
-        #return (av,sd,n)
-        self.assertAlmostEqual( l.average()[0], 10.22, places=1) 
+        (av,sd,n) = l.average()
+        printDebug((av,sd,n))
+        self.assertAlmostEqual( av, 10.22, places=1) # verified in Excel stddev function.
+        self.assertAlmostEqual( sd,  4.18, places=1) 
+        self.assertEquals(       n, 9) 
+
+        l = NTlist( 1,None,1,1 )
+        (av,sd,n) = l.average()
+        printDebug((av,sd,n))
+        self.assertAlmostEqual( av,   1.0, places=1) 
+        self.assertAlmostEqual( sd,   0.0, places=1) 
+        self.assertEquals(       n, 3) 
+        
+        l = NTlist( 1,2 )
+        (av,sd,n) = l.average()
+        printDebug((av,sd,n))
+        self.assertAlmostEqual( av,   1.5, places=1) 
+        self.assertAlmostEqual( sd, 0.707, places=2) 
+        self.assertEquals(       n, 2) 
+        
+        l = NTlist( 1 )
+        (av,sd,n) = l.average()
+        printDebug((av,sd,n))
+        self.assertAlmostEqual( av,   1.0, places=1) 
+        self.assertEquals(      sd,  None) 
+        self.assertEquals(       n,   1) 
+        
+        l = NTlist()
+        (av,sd,n) = l.average()
+        printDebug((av,sd,n))
+        self.assertEquals(      av,  None) 
+        self.assertEquals(      sd,  None) 
+        self.assertEquals(       n,   0) 
+
+    def testValueToFormattedString(self):
+        self.assertEquals( val2Str(None,"%5.2f",None),NaNstring)
+        self.assertEquals( val2Str(None,"%5.2f",5),   "%5s" % NaNstring)
+        self.assertEquals( val2Str(6.3, "%5.2f",5),   " 6.30")
+        self.assertEquals( val2Str(6.3, "%.2f"),      "6.30")
+        self.assertEquals( val2Str(6.3, "%03d"),      "006")
         
 if __name__ == "__main__":
     cing.verbosity = verbosityError
+#    cing.verbosity = verbosityDebug
     unittest.main()

@@ -1,8 +1,7 @@
-from memops.general import Io as genIo
-from ccp.general.Util import createMoleculeTorsionDict
+from memops.general import Io as genIo #@UnresolvedImport
+from ccp.general.Util import createMoleculeTorsionDict #@UnresolvedImport
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printException
 from cing.Libs.NTutils import printWarning
 from cing.Libs.NTutils import sprintf
 from cing.core.classes import DihedralRestraint
@@ -11,7 +10,7 @@ from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule
 from cing.main import format
-from ccp.util.Molecule import makeMolecule
+from ccp.util.Molecule import makeMolecule #@UnresolvedImport
 import os
 import string
 
@@ -175,12 +174,6 @@ def matchCing2Ccpn( cingProject = None, ccpnProject = None,
 
 """
 
-    # it should be done only if Ccpn.Project has dihedral constraints
-
-try:
-    from memops.general.Io import loadProject 
-except:
-    printException("Failed to import ccpn api")
 
 #printDebug("Done importing readXmlProjectFile; which is impossible")
 namingSystem = 'DIANA' #'DIANA' #CYANA2.1
@@ -267,8 +260,8 @@ def loadCcpn(cingProject = None, ccpnFile = None):
     if not ccpnFile or not os.path.exists(ccpnFile):
         printError("ERROR '%s': ccpnFile '%s' not found\n", funcName, ccpnFile)
         return None
-
-    ccpnProject = loadProject(ccpnFile)
+    ccpnProject = None # TODO:
+#    ccpnProject = loadProject(ccpnFile)
     if ccpnProject:
         # Make mutual linkages between Ccpn and Cing objects
         cingProject.ccpn = ccpnProject
@@ -303,7 +296,8 @@ def initCcpn(cingProject, ccpnFile = None):
         printError("ERROR initCcpn: ccpnFile '%s' not found\n", ccpnFile)
         return None
 
-    ccpnProject = loadProject(ccpnFile)
+    ccpnProject = None # TODO:
+#    ccpnProject = loadProject(ccpnFile)
 
     if not ccpnProject:
         printError("ERROR initCcpn: ccpn project from file '%s' not loaded\n", 

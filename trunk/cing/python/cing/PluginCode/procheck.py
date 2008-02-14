@@ -300,7 +300,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         modelCount = self.molecule.modelCount
         printMessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
         for i in range(1, modelCount+1):
-            path = os.path.join(self.rootPath, '%s_%03d.rin' % (self.molecule.name, i))           
+            modelCountStr = "%03d" % i
+            if modelCount == 1:
+                # special case in procheck_nmr
+                modelCountStr = "***"
+            path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))           
 #            print '> parsing rin >', path
     
             for line in AwkLike(path, minLength = 64, commentString = "#"):

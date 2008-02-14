@@ -11,12 +11,15 @@ from pylab import * #@UnusedWildImport
 from unittest import TestCase
 from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import lineAttributes
+from cing.Libs.NTutils import printDebug
+from cing import verbosityDebug
+import cing
 import os #@Reimport
 import unittest
 
 class AllChecks(TestCase):
 
-    def testPlotVaria(self):
+    def tttestPlotVaria(self):
         p = NTplot( title = 'test', xRange=(0,10), yRange=(0,10), xLabel='aap' )
     
         p.box( (1,0), (0.9,2), boxAttributes( lineColor='black', line=True, fillColor='blue', fill=True) )
@@ -38,7 +41,7 @@ class AllChecks(TestCase):
 #        p.show()
 
 
-    def testPlotModelHisto(self):
+    def tttestPlotModelHisto(self):
         modelCount = 2
         plot = NTplot(        xLabel = 'Model',
                               xRange = (0, modelCount),
@@ -117,29 +120,50 @@ class AllChecks(TestCase):
 
         aAv  = angleList.cav
         width = 4.0
-        lower, upper = 200, 250
+        lower, upper = 45, 55
+        alpha = 0.3 
         
         ylim = plot.get_ylim()
         ylimMax = 5 # Just assume.
         if ylim:
             ylimMax = ylim[1]
-        
         # note plotparams.lower is a color!
-        point = (lower, 0)
-        sizes = (upper-lower,ylimMax)
-        plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=0.02))
+        bounds = NTlist(lower, upper)
+        bounds.limit(plotparams.min, plotparams.max)
+        if bounds[0] < bounds[1]: # single box
+            point = (bounds[0], 0) # lower left corner of only box.
+            sizes = (bounds[1]-bounds[0],ylimMax)
+            printDebug("point: " + `point`)
+            printDebug("sizes: " + `sizes`)
+            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+        else: # two boxes
+            # right box
+            point = (bounds[0], 0) # lower left corner of first box.
+            sizes = (plotparams.max-bounds[0],ylimMax)
+            printDebug("point: " + `point`)
+            printDebug("sizes: " + `sizes`)
+            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+            point = (plotparams.min, 0) # lower left corner of second box.
+            sizes = (bounds[1]-plotparams.min,ylimMax)
+            printDebug("point: " + `point`)
+            printDebug("sizes: " + `sizes`)
+            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+        
+        
+        
 #        plot.line( (lower, 0), (lower, ylimMax),
 #                   lineAttributes(color=plotparams.lower, width=width) )
 #        plot.line( (upper, 0), (upper, ylimMax),
 #                   lineAttributes(color=plotparams.upper, width=width) )
 #
         # Always plot the cav line
-        plot.line( (aAv, 0), (aAv, ylimMax), lineAttributes(
-                                            color=plotparams.average, width=width) )
+        plot.line( (aAv, 0), (aAv, ylimMax), 
+                   lineAttributes(color=plotparams.average, width=width) )
 #        plot.show()
         plot.hardcopy("testPlotHistoDihedral."+graphicsFormat, graphicsFormat)
 
     
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityDebug
     unittest.main()

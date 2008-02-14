@@ -66,7 +66,7 @@ def predictWithShiftx( project, model=None   ):
         NTerror('ERROR predictWithShiftx: no models for "%s"\n', project.molecule)
         return None
     #end if
-    if model != None and model >= project.molecule.modelCount: 
+    if model != None and model > project.molecule.modelCount: 
         NTerror('ERROR predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
         return None
     #end if
@@ -85,10 +85,10 @@ def predictWithShiftx( project, model=None   ):
     if skippedResidues:
         printWarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
         
-    if (model!=None):
+    if model!=None:
         models = NTlist( model )
     else:
-        models = NTlist(*range( project.molecule.modelCount ))
+        models = NTlist(*range( 1,project.molecule.modelCount+1 ))
     #end if
     
     # initialize the shiftx attributes
@@ -98,15 +98,15 @@ def predictWithShiftx( project, model=None   ):
         
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx,  )
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
-                             rootPath = root, redirectOutput = False,    )
-    NTmessage('==> Running shiftx ' )
+                             rootPath = root, redirectOutput = False)   
+    NTmessage('==> Running shiftx\n' )
            
     for model in models:
         # set filenames
         rootname =  sprintf('model%03d', model)
         model_base_name =  os.path.join( root, rootname )
         
-        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC,    )       
+        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )       
         if not pdbFile:
             NTerror("Failed to generate a pdb file for model: " + `model`)
             return None 
@@ -119,7 +119,7 @@ def predictWithShiftx( project, model=None   ):
         del( pdbFile )
     #end for
     
-    NTmessage(' averaging ...')
+    NTmessage(' averaging ...\n')
            
     #end if
     
