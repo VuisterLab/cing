@@ -375,9 +375,9 @@ def listPredefinedExperiments( project, *expNames ):
     for expName in expNames:
         expName = expName.strip().upper()
         if expName in expDict:
-            NTmessage('%s\n', ExperimentDef.describe( expDict[expName] ) )
+            NTmessage('%s', ExperimentDef.describe( expDict[expName] ) )
         else:
-            NTerror('ERROR listPredefinedExperiments: no such experiment "%s"\n',
+            NTerror('listPredefinedExperiments: no such experiment "%s"\n',
                      expName
                    )
         #end if
@@ -411,7 +411,7 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
             #end for
         #end if
     #end for
-    NTmessage('... Appended %d peaks\n', len( peakList ) )
+    NTmessage('... Appended %d peaks', len( peakList ) )
     
     return peakList
 #end def

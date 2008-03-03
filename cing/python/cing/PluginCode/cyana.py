@@ -27,6 +27,7 @@ Methods:
 
 """
 from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
@@ -39,11 +40,10 @@ from cing.core.classes import DistanceRestraint
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.molecule import translateTopology
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printDebug
 import os
 import shutil
+#from cing.Libs.NTutils import printWarning
+#import sys
 
 #==============================================================================
 # CYANA stuff
@@ -84,7 +84,7 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
     """
     fp = open( path, 'w' )
     if not fp: 
-        NTerror('ERROR exportDihedralRestraintList2cyana: unable to open "%s"\n', path )
+        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -92,7 +92,7 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
     #end for
     
     fp.close()
-    NTmessage('==> Exported %s in %s format to "%s"\n', drl, convention, path)
+    NTmessage('==> Exported %s in %s format to "%s"', drl, convention, path)
     #end if
     return drl
 #end def
@@ -110,20 +110,20 @@ def importAco( project, acoFile, convention ):
     errorCount = 0
     # check the molecule
     if (not project or not project.molecule ):
-        NTerror("ERROR importAco: initialise molecule first\n")
+        NTerror("importAco: initialize molecule first\n")
         return None
     #end if
     molecule = project.molecule
   
     if not os.path.exists( acoFile ):
-        NTerror('ERROR importAco: file "%s" not found\n', acoFile)
+        NTerror('importAco: file "%s" not found\n', acoFile)
         return None
     #end if
          
     dir,name,_ext = NTpath( acoFile )
     result       = project.dihedrals.new( name=name, status='keep')   
     
-    printDebug("Now reading: " + acoFile)
+    NTdebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
         resNum = line.int(1)
         res    = molecule.decodeNameTuple( (convention, 'A', resNum, None ) )
@@ -135,9 +135,9 @@ def importAco( project, acoFile, convention ):
 #            print '>', atoms, res, res.db[angle]
             if None in atoms:
                 if errorCount <= maxErrorCount:
-                    printError("Failed to decode all atoms from line:"+ line.dollar[0])
+                    NTerror("Failed to decode all atoms from line:"+ line.dollar[0])
                 if errorCount == (maxErrorCount+1):
-                    printError("And so on")
+                    NTerror("And so on")
                 errorCount += 1
                 continue
             else:
@@ -151,9 +151,9 @@ def importAco( project, acoFile, convention ):
     #end for 
   
     if errorCount:
-        printError("Found number of errors importing upl file: " + `errorCount`)
-    printMessage("Imported items: " + `len(result)`)
-    NTmessage('==> importAco: new %s from "%s"\n', result, acoFile )  
+        NTerror("Found number of errors importing upl file: " + `errorCount`)
+    NTmessage("Imported items: " + `len(result)`)
+    NTmessage('==> importAco: new %s from "%s"', result, acoFile )  
     return result
 #end def
 
@@ -168,13 +168,13 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
   
     # check the molecule
     if not project or not project.molecule:
-        NTerror("ERROR importUpl: initialise molecule first\n")
+        NTerror("importUpl: initialize molecule first")
         return None
     #end if
     molecule = project.molecule
   
     if not os.path.exists( uplFile ):
-        NTerror('ERROR importUpl: file "%s" not found\n', uplFile)
+        NTerror('importUpl: file "%s" not found', uplFile)
         return None
     #end if
    
@@ -183,52 +183,63 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     result       = project.distances.new( name=name, status='keep')   
     
     for line in AwkLike( uplFile, commentString="#" ):
-        if not line.isComment() and line.NF >= 7:
+        if line.isComment():
+#            NTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
+            continue
+        if line.NF < 7:
+#            NTdebug("Skipping upl file line with too few fields: [" + line.dollar[0] +']')
+            continue
+        atmIdxList = [[1,3],[4,6]]
+        atmList = []
+        i=0
+        for atmIdx in atmIdxList:
+#            NTdebug("Doing atmIdx: " + `atmIdx`)
+            atm = molecule.decodeNameTuple( (convention, 'A', line.int(atmIdx[0]), line.dollar[atmIdx[1]]))
+            if not atm:
+                if errorCount <= maxErrorCount:
+                    NTerror("Failed to decode for atom: ["+`i+1`+"] the tuple (residue number and atom name) ["+ 
+                               `line.int(atmIdx[0])` +'], ['+ line.dollar[atmIdx[1]]+'] for line: [' + line.dollar[0] +']')
+                if errorCount == maxErrorCount+1:
+                    NTerror("And so on")
+                errorCount += 1
+                i+=1
+                continue
+            atmList.append( atm )
+            i+=1
+        if len(atmList) != 2:
+            continue
+        # Unpack convenience variables.
+        atm1 = atmList[0]
+        atm2 = atmList[1]
+#        NTdebug("atom 1: " + `atm1`)
+#        NTdebug("atom 2: " + `atm2`)
+        upper = line.float(7)
+        if not upper:
+            NTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
+            continue
         
-            atm1 = molecule.decodeNameTuple( (convention, 'A', line.int(1), line.dollar[3]) )
-            atm2 = molecule.decodeNameTuple( (convention, 'A', line.int(4), line.dollar[6]) )
+        # ambiguous restraint, should be append to last one
+        if upper == 0:
+            result().appendPair( (atm1,atm2) )
+            continue
 
-            if not atm1 or not atm2:
-                if errorCount <= maxErrorCount:
-                    printError("Failed to decode name tuple using residue number and atom name from line:"+ line.dollar[0])
-                if errorCount == (maxErrorCount+1):
-                    printError("And so on")
-                errorCount += 1
-                continue
-            
-            upper = line.float(7)
-
-            if upper == 0.0 and atm1 != None and atm2 != None:
-                # ambigious restraint, should be append to last one
-                result().appendPair( (atm1,atm2) )
-            elif atm1 != None and atm2 != None:
-                r = DistanceRestraint( atomPairs= [(atm1, atm2)], lower=lower, upper=upper )
-                # also store the Candid info if present
-                if (line.NF >= 9):
-                    r.peak = line.int( 9 ) 
-                if (line.NF >= 11):
-                    r.SUP = line.float( 11 ) 
-                if (line.NF >= 13):
-                    r.QF = line.float( 13 ) 
-                result.append( r )
-            else:
-                if errorCount <= maxErrorCount:
-                    printError("invalid restraint on line:"+ line.dollar[0])
-                if errorCount == (maxErrorCount+1):
-                    printError("And so on")
-                errorCount += 1
-                continue
-            #end if
-        #end if
-    #end for 
+        
+        r = DistanceRestraint( atomPairs= [(atm1,atm2)], lower=lower, upper=upper )
+        result.append( r )
+        # also store the Candid info if present
+        if line.NF >= 9:
+            r.peak = line.int( 9 ) 
+        if line.NF >= 11:
+            r.SUP = line.float( 11 ) 
+        if line.NF >= 13:
+            r.QF = line.float( 13 ) 
     if errorCount:
-        printError("Found number of errors importing upl file: " + `errorCount`)
-    printMessage("Imported upl items: " + `len(result)`)
-    NTmessage('==> importUpl: new %s from "%s"\n', result, uplFile )
-    #end if
-  
+        NTerror("Found number of errors importing upl file: " + `errorCount`)
+        
+    NTmessage("Imported upl items: " + `len(result)`)
+    NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
+#    sys.exit(1)  
     return result
-#end def
 
 #-----------------------------------------------------------------------------
 def export2cyana( project, tmp=None ):
@@ -238,10 +249,10 @@ def export2cyana( project, tmp=None ):
         if (drl.status == 'keep'):
             #Xeasy/Cyana 1.x format
             drlFile = project.path( project.directories.xeasy, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA,   )
+            drl.export2cyana( drlFile, convention=CYANA)   
             #Cyana 2.x format
             drlFile = project.path( project.directories.xeasy2, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA2,   )
+            drl.export2cyana( drlFile, convention=CYANA2)   
         #end if
     #end for
 #end def
@@ -279,7 +290,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
             kwds[f] = kwds[f].split(',')
         #end if
     #end for
-    printDebug( '>>'+ `kwds` )
+    NTdebug( '>>'+ `kwds` )
         
 
     #print '>>',kwds
@@ -359,7 +370,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
         #end for
     #end if
     
-    printDebug( project.format())
+    NTdebug( project.format())
     return sources
 #end def
 

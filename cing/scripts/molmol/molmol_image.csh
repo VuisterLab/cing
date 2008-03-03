@@ -12,6 +12,7 @@ set id             = $3
 set molgrapDir     = $4
 set backcolor      = $5
 set executableMm   = $6
+set mac_dir        = $7
 set try            = 1
 set mul            = 1
 #setenv MOLMOLHOME $6 needs to be set to a directory and done outside of Cing, e.g. in .cshrc
@@ -21,8 +22,8 @@ set log_file       = $tmp_dir"/"$id"_"$log_file
 
 
 # check if we got the right amount of parameters
-if ( $# != 6 ) then
-   echo "ERROR: Not the right number of arguments: got $# in stead of 6"
+if ( $# != 7 ) then
+   echo "ERROR: Not the right number of arguments: got $# in stead of 7"
    goto usage
 endif
 
@@ -94,7 +95,7 @@ echo "Precision for pov file:           $precision" >> $log_file
 # Notes for the macro file:
 # -1- No empty lines allowed.
 echo "InitAll yes" > $mac_file
-echo "PathNames '' '' '' '' '/Users/jd/progs/molmol/setup/PdbAtoms' '' '/Users/jd/progs/molmol/setup/pdb.lib' '' ''" >> $mac_file
+echo "PathNames '' '' '' '' '/Users/jd/progs/molmol/setup/PdbAtoms' '/Users/jd/progs/molmol/setup/PropDef' '/Users/jd/progs/molmol/setup/pdb.lib' '' ''" >> $mac_file
 if ( $backcolor == "bmrb_yellow" ) then
     echo "BackColor 1 1 0.79688" >> $mac_file
 else
@@ -128,7 +129,7 @@ if ( $try == 1 ) then
 CalcAtom 'H'
 CalcAtom 'HN'
 DefPropRes 'aa'     ':ALA*,ARG*,ASN*,ASP*,CYS*,GLN*,GLU*,GLY*,HIS*,ILE*,LEU*,LYS*,MET*,PHE*,PRO*,SER*,THR*,TRP*,TYR*,VAL*'
-DefPropRes 'na'     ':A,C,T,G,U,DA,DC,DT,DU,DG'
+DefPropRes 'na'     ':A,C,T,G,U,DA,DC,DT,DU,DG,RADE,RCYT,RGUA,ADE,CYT,GUA,THY,URA,RURA,DURA,DADE,DCYT,DGUA,DTHY'
 DefPropRes 'kill'   ':ACE,NH2'
 DefPropRes 'hoh'    ':HOH'
 DefPropRes 'cation' ':AG,AU,AU3,AL,CA,CD,CU,CU1,FE,FE2,K,LI,MG,MN,MN3,MO,NA,NI,PB,ZN,ZN2'
@@ -143,7 +144,7 @@ SelectRes  'aa'
 CalcSecondary
 XMacStand ribbon.mac
 SelectRes  'na'
-XMacStand schem_dna.mac
+XMacStand $mac_dir/schem_dna.mac
 SelectAtom 'res.cation'
 ColorAtom 0 1 0
 SelectAtom 'res.anion'
@@ -207,7 +208,7 @@ if ( ! -e $tmp_dir/$id.pov ) then
 endif
 
 
-# Remove the tempory stuff
+# Remove the temporary stuff
 # Don't remove input and log file if no pov file was created.
 # DEBUG: uncomment next line
 #\rm -f $mac_file $log_file

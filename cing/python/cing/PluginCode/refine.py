@@ -23,8 +23,8 @@ import os
 def export2refine( project, name ):    
     basePath = project.path( project.directories.refine, name)
     
-    NTmessage('\n' + dots*5 +'\n' )
-    NTmessage(   '==> Exporting %s to for refinement\n', project )
+    NTmessage('\n' + dots*5 +'' )
+    NTmessage(   '==> Exporting %s to for refinement', project )
     #end if
 
     doSetup( refConfig, basePath )
@@ -35,17 +35,17 @@ def export2refine( project, name ):
     # Dang; even writting this out doesn't help. Ok, used a slightly different name to work this out.
     for drl in project.distances:
         fname = project.path( project.directories.refine, name, tablesConfig, drl.name +'.tbl')
-        drl.export2xplor( fname,   )
+        drl.export2xplor( fname)   
     #end for 
     
     for drl in project.dihedrals:
         fname = project.path( project.directories.refine, name, tablesConfig, drl.name +'.tbl')
-        drl.export2xplor( fname,   )
+        drl.export2xplor( fname)   
     #end for
 
     # export structures in PDB format
     path = project.path( project.directories.refine, name, convertedConfig, 'model%03d.pdb' )
-    project.molecule.export2xplor( path,   )
+    project.molecule.export2xplor( path)   
 
 #end def
 
@@ -61,7 +61,7 @@ def importFromRefine( project, name ):
     
     basePath = project.path( project.directories.refine, name)
     if not os.path.exists(basePath):
-        NTerror('ERROR importFromRefine: no path "%s" found\n', basePath)
+        NTerror('importFromRefine: no path "%s" found\n', basePath)
         return None
     #endif
 
@@ -87,7 +87,7 @@ def importFromRefine( project, name ):
     #end for
     
     if not found:
-        NTerror('ERROR importFromRefine: no files (%s) found\n', path)
+        NTerror('importFromRefine: no files (%s) found\n', path)
         return None
     #endif
 

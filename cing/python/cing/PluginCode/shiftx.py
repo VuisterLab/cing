@@ -12,7 +12,7 @@ from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
 from cing.core.constants import NOSHIFT
 from cing.core.parameters import cingPaths
-from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import NTwarning
 import cing
 import os
 
@@ -37,7 +37,7 @@ format file:
             lineCol1 = int(line.dollar[1].strip('*'))
             atm = molecule.decodeNameTuple( (IUPAC, 'A', lineCol1, line.dollar[3]) )
             if not atm:
-                NTerror('ERROR parseShiftxOutput: line %d (%s)\n', line.NR, line.dollar[0] )
+                NTerror('parseShiftxOutput: line %d (%s)\n', line.NR, line.dollar[0] )
             else:
                 atm.shiftx.append( line.float(4) )
             #end if
@@ -59,15 +59,15 @@ def predictWithShiftx( project, model=None   ):
     one at the time.
     """
     if project.molecule == None:
-        NTerror('ERROR predictWithShiftx: no molecule defined\n')
+        NTerror('predictWithShiftx: no molecule defined\n')
         return None
     #end if
     if project.molecule.modelCount == 0: 
-        NTerror('ERROR predictWithShiftx: no models for "%s"\n', project.molecule)
+        NTerror('predictWithShiftx: no models for "%s"\n', project.molecule)
         return None
     #end if
     if model != None and model > project.molecule.modelCount: 
-        NTerror('ERROR predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
+        NTerror('predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
         return None
     #end if
     
@@ -83,7 +83,7 @@ def predictWithShiftx( project, model=None   ):
         #end if
     #end for
     if skippedResidues:
-        printWarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
+        NTwarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
         
     if model!=None:
         models = NTlist( model )
@@ -96,10 +96,10 @@ def predictWithShiftx( project, model=None   ):
         atm.shiftx = NTlist()
     #end for
         
-    root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx,  )
+    root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)   
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
                              rootPath = root, redirectOutput = False)   
-    NTmessage('==> Running shiftx\n' )
+    NTmessage('==> Running shiftx' )
            
     for model in models:
         # set filenames
@@ -114,12 +114,12 @@ def predictWithShiftx( project, model=None   ):
         pdbFile.save( model_base_name + '.pdb'   )   
         shiftx('A', rootname + '.pdb', rootname + '.out' )
         
-        NTmessage('==> Parsing %s\n', model_base_name + '.out' )
+        NTmessage('==> Parsing %s', model_base_name + '.out' )
         parseShiftxOutput( model_base_name + '.out', project.molecule )
         del( pdbFile )
     #end for
     
-    NTmessage(' averaging ...\n')
+    NTmessage(' averaging ...')
            
     #end if
     

@@ -1,13 +1,17 @@
  HOWTO:
-- check if your installation is ok. First setup as described in REAME.txt in this directory.
+ 
+- Check if your installation is ok. First setup as described in REAME.txt in this directory.
+    Then type:
     cing --test
-- run procheck on a small example.
+    
+- Run procheck on a small example.
     cing -n 2hgh_small --initPDB $CINGROOT/Tests/data/2hgh_small.pdb --ipython
     project.procheck()
-- convert some cyana data to cing:
+    
+- Convert some cyana data to cing:
     python -u $CINGROOT/python/cing/Scripts/cyana2cing.py --pdbFile $CINGROOT/Tests/data/2hgh_small
     
-- print the first model's chi 1 as reported by procheck of residue 77 in chain A.
+- Print the first model's chi 1 as reported by procheck of residue 77 in chain A.
     format project.molecule.A.GLU77.procheck.CHI1[0]
     Not very useful as it's already part of cing itself; just like PHI, etc.
     format project.molecule.A.GLU77.CHI1[0] or:
@@ -22,21 +26,21 @@
     format is a method that most of cing's objects have and that give more user friendly
     output (sometimes over multiple lines)
     
-- print list of parameters:- print list of parameters:
+- Print list of parameters:- print list of parameters:
     formatall( project.plotparameters.PHI )
     formatall( project.molecule.A.residues[0].C.coordinates )
     formatall( project.plotparameters.PHI )
     formatall( project.molecule.A.residues[0].procheck )
     formatall( project.molecule.A.VAL171.C )
 
-FOR PROGRAMMERS:
-- reload a plugin:
-    cing.core.importPlugin.importPlugin("procheck") or shorthand:
-    importPlugin("procheck") if defined.
+- Reload a plugin after you recoded it:
+    from cing.core.importPlugin import importPlugin
+    importPlugin("procheck")
     
-NEW FEATURE REQUESTS:
-- Get global properties; in the check.db now there are only Atom and Residue props listed and there are only 51
-    present. Whereas the pdbout.txt file contains over 80 check results..
+- Configure local settings:
+    Create a file localConstants parallel to the setup.py file and add definitions that
+    get imported from the parallel __init__.py code. Just one setting at the moment.
+
     
     
     

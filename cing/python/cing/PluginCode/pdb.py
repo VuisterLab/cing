@@ -1,5 +1,5 @@
 """
-Adds initialise/import/export from/to PDB files
+Adds initialize/import/export from/to PDB files
 
 
 Methods:
@@ -9,13 +9,13 @@ Methods:
         return molecule or None on error
     
     Molecule.PDB2Molecule(pdbFile, moleculeName, convention)   :
-        Initialise  from pdbFile
+        Initialize  from pdbFile
         Return molecule instance
         convention eq PDB, CYANA, CYANA2 or XPLOR 
         staticmethod
     
     Project.initPDB( pdbFile, convention ):
-        initialise from pdbFile, import coordinates          
+        initialize from pdbFile, import coordinates          
         convention = PDB, CYANA, CYANA2 or XPLOR
         
     Project.importPDB( pdbFile, convention ):
@@ -36,7 +36,8 @@ from cing.core.constants import CYANA2
 from cing.core.constants import IUPAC
 from cing.core.dictionaries import NTdbGetAtom
 from cing.core.molecule import Molecule
-from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import NTwarning
+#import string
 
 #==============================================================================
 # PDB stuff
@@ -48,7 +49,7 @@ return molecule or None on error
     """
     if not molecule: return None
 
-    NTmessage('==> Parsing pdbFile "%s" ... \n', pdbFile ) 
+    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
            
     #end if
     
@@ -121,7 +122,7 @@ return molecule or None on error
     #end if
     molecule.modelCount += modelCount
     
-    NTmessage( 'read %d records; added %d structure models\n', len(pdb), modelCount )  
+    NTmessage( 'read %d records; added %d structure models', len(pdb), modelCount )  
     #end if
     
     del( pdb )
@@ -132,13 +133,13 @@ return molecule or None on error
 Molecule.importFromPDB = importFromPDB
 
 def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
-    """Initialise  from pdbFile
+    """Initialize  from pdbFile
 Return molecule instance
 convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
     showMaxNumberOfWarnings = 100
     shownWarnings = 0
-    NTmessage('==> Parsing pdbFile "%s" ... \n', pdbFile ) 
+    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
            
     pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
@@ -167,16 +168,16 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             if convention == CYANA or convention == CYANA2:
                 # the residue names are in Cyana1.x convention (i.e. for GLU-)
                 # atm names of the Cyana1.x PDB files are in messed-up Cyana format
-                # So: 1HD2 becomes HD21
-                a = record.name[1:4] + record.name[0:1]
+                # So: 1HD2 becomes HD21 where needed:
+                a = moveFirstDigitToEnd(a)
             # strip is already done in function
             atm = NTdbGetAtom( record.resName, a, convention )
             if not atm:
                 if shownWarnings <= showMaxNumberOfWarnings:
-                    printWarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
+                    NTwarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
                              convention, mol.modelCount, record))
                     if shownWarnings == showMaxNumberOfWarnings:
-                        printWarning('And so on.')
+                        NTwarning('And so on.')
                     shownWarnings += 1
                 continue
             if atm.residueDef.hasProperties('cyanaPseudoResidue'):
@@ -209,12 +210,12 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
         #end if
     #end for
     if shownWarnings:
-        printWarning('Total number of warnings: ' + `shownWarnings`)
+        NTwarning('Total number of warnings: ' + `shownWarnings`)
     
     # Patch to get modelCount right for X-ray structures with only one model
     if not foundModel: 
         mol.modelCount += 1
-    NTmessage( '==> PDB2Molecule: completed, added %d structure models\n', mol.modelCount )  
+    NTmessage( '==> PDB2Molecule: completed, added %d structure models', mol.modelCount )  
     # delete the PyMMlib pdbFile instance # JFD: why?
     del(pdb)
     return mol
@@ -240,15 +241,19 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
 #end def
 Molecule.toPDBfile = moleculeToPDBfile
 
+def moveFirstDigitToEnd(a):
+    if a[0:1].isdigit():
+        a = a[1:] + a[0:1]
+    return a
 
 def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
-    """Initialise Molecule from pdbFile. returns molecule instance"""
+    """Initialize Molecule from pdbFile. returns molecule instance"""
     if not name: 
         _path,name,_ext  = NTpath( pdbFile )
     molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
     project.appendMolecule( molecule )
     project.molecule.updateAll()
-    project.addHistory( sprintf('initPDB from "%s"\n', pdbFile ) )
+    project.addHistory( sprintf('initPDB from "%s"', pdbFile ) )
     project.updateProject()
     return molecule
 #end def
@@ -258,19 +263,17 @@ def importPDB( project, pdbFile, convention = IUPAC, nmodels=None ):
     """Import coordinates from pdbFile  
         return pdbFile or None on error
     """
-    if (not project.molecule):
-        NTerror("ERROR importPDB: no molecule defined\n")
+    if not project.molecule:
+        NTerror("importPDB: no molecule defined")
         return None
-    #end if
-    if (not importFromPDB( project.molecule, pdbFile, convention, nmodels=nmodels,   )):
+    if not importFromPDB( project.molecule, pdbFile, convention, nmodels=nmodels):
         return None
-    #end if
 
-    project.molecule.updateAll(   )
+    project.molecule.updateAll()
 
-    project.addHistory( sprintf('importPDB from "%s"\n', pdbFile ) )
+    project.addHistory( sprintf('importPDB from "%s"', pdbFile ) )
     project.updateProject()
-    NTmessage( '%s\n', project.molecule.format() )
+    NTmessage( '%s', project.molecule.format() )
     #end if
     return pdbFile
 #end def
@@ -282,8 +285,8 @@ def export2PDB( project, tmp=None ):
         mol   = project[molName]
         if (mol.modelCount > 0):
             fname = project.path( project.directories.PDB, mol.name + '.pdb' )
-            pdbFile = mol.toPDB( convention = IUPAC,   )
-            pdbFile.save( fname,   )   
+            pdbFile = mol.toPDB( convention = IUPAC)   
+            pdbFile.save( fname)      
             del(pdbFile)
         #end if
     #end for

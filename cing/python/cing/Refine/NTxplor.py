@@ -333,7 +333,7 @@ end if
         scriptFile = open( scriptFileName, 'w' )
         self.printScript( scriptFile )
         scriptFile.close()
-        NTmessage('==> Created script "%s"\n',  scriptFileName)
+        NTmessage('==> Created script "%s"',  scriptFileName)
 
         # Create job/log file
         jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh') 
@@ -351,10 +351,10 @@ end if
         jobFile.close()
 
         os.system('/bin/chmod +x %s' % jobFileName)
-        NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
+        NTmessage('==> Starting XPLOR job "%s"', jobFileName)
 
         if self.useCluster:
-            NTmessage( 'Sending job to the queu %s\n', self.queu_cluster )
+            NTmessage( 'Sending job to the queu %s', self.queu_cluster )
             os.system( '%s %s &' % (self.queu_cluster, jobFileName) )
             time.sleep(5)
         else:
@@ -400,7 +400,7 @@ class WaterRefine( Xplor ):
         self.setdefault( 'outPath', self.directories.refined )
 
         self.keysformat()
-        NTmessage('%s\n', self.format())
+        NTmessage('%s', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -690,7 +690,7 @@ class Analyze( Xplor ):
         self.setdefault( 'outPath', self.directories.analyzed )
 
         self.keysformat()
-        NTmessage('%s\n', self.format())
+        NTmessage('%s', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -817,7 +817,7 @@ class GeneratePSF( Xplor ):
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
 
         self.keysformat()
-        NTmessage('%s\n', self.format())
+        NTmessage('%s', self.format())
     #endif
 
     #------------------------------------------------------------------------

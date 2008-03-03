@@ -11,7 +11,7 @@ shifts = """
 # The statistics presented in this table were calculated from the full BMRB database. 
 # This includes paramagnetic proteins, proteins with aromatic prosthetic groups, and 
 # entries where chemical shifts are reported relative to uncommon chemical shift references. 
-# The calculated statistics are drived from a total of 1391695 chemical shifts. 
+# The calculated statistics are derived from a total of 1391695 chemical shifts. 
 #
 # In the table, the highlighted residue codes provide a link to a gif image of the amino 
 # acid with its atom nomenclature. 
@@ -370,7 +370,7 @@ for line in AwkLikeS( shifts ):
 	    if atm != None:
 		atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
 	    else:
-	        NTmessage( '>>> line %d: %s\n', line.NR, line.dollar[0] )
+	        NTmessage( '>>> line %d: %s', line.NR, line.dollar[0] )
 	    #end if
 	#end if
     #end if

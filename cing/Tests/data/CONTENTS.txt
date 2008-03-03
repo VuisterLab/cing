@@ -1,0 +1,10 @@
+Directories:
+
+cyana                   Example data using cyana formats.
+tmp                     Empty directory for temporary data created by CING test cases.
+
+Files:
+
+CONTENTS.txt            This file.
+1ai0_small.pdb          Test case of complex molecular structure (first two models).
+pc_nmr_11_rstraints.ps  Example data for postscript converter integration.

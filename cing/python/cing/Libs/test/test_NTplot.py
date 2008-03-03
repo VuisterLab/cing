@@ -1,25 +1,27 @@
 from cing import cingDirTestsTmp
+from cing import verbosityDebug
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import boxAttributes
+from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import greenLine
+from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.peirceTest import peirceTest
 from cing.core.classes import Project
 from pylab import * #@UnusedWildImport
 from unittest import TestCase
-from cing.Libs.NTplot import circlePoint
-from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTutils import printDebug
-from cing import verbosityDebug
+from cing import verbosityError
 import cing
 import os #@Reimport
 import unittest
 
 class AllChecks(TestCase):
 
-    def tttestPlotVaria(self):
+    def testPlotVaria(self):
+        close('all')
         p = NTplot( title = 'test', xRange=(0,10), yRange=(0,10), xLabel='aap' )
     
         p.box( (1,0), (0.9,2), boxAttributes( lineColor='black', line=True, fillColor='blue', fill=True) )
@@ -38,10 +40,12 @@ class AllChecks(TestCase):
 #    
         p.points(map(None,x,y,NTfill(0.0,len(x)), ey))
         p.setMinorTicks(.5)
+#        p.yRange = None # Should autoscale the plot in y.
 #        p.show()
 
 
-    def tttestPlotModelHisto(self):
+    def testPlotModelHisto(self):
+        close('all')
         modelCount = 2
         plot = NTplot(        xLabel = 'Model',
                               xRange = (0, modelCount),
@@ -65,7 +69,7 @@ class AllChecks(TestCase):
         
     def testPlotHistoDihedral(self):
         
-#        printDebug("Using mat plot (True) or biggles: "+ `useMatPlotLib`)
+#        NTdebug("Using mat plot (True) or biggles: "+ `useMatPlotLib`)
         graphicsFormat = "png"
         residueName = "ASN1"
         dihedralName= "CHI1"
@@ -93,7 +97,7 @@ class AllChecks(TestCase):
         angleList.outliers.limit( plotparams.min, plotparams.max, byItem=1 )
         
         xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize)
-#        printDebug("xTicks: " + `xTicks`)
+#        NTdebug("xTicks: " + `xTicks`)
         figWidth  = 600
         figHeight = None # Golden which turns out to be 369
 #            figHeight = figWidth * golden_mean
@@ -133,20 +137,20 @@ class AllChecks(TestCase):
         if bounds[0] < bounds[1]: # single box
             point = (bounds[0], 0) # lower left corner of only box.
             sizes = (bounds[1]-bounds[0],ylimMax)
-            printDebug("point: " + `point`)
-            printDebug("sizes: " + `sizes`)
+            NTdebug("point: " + `point`)
+            NTdebug("sizes: " + `sizes`)
             plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
         else: # two boxes
             # right box
             point = (bounds[0], 0) # lower left corner of first box.
             sizes = (plotparams.max-bounds[0],ylimMax)
-            printDebug("point: " + `point`)
-            printDebug("sizes: " + `sizes`)
+            NTdebug("point: " + `point`)
+            NTdebug("sizes: " + `sizes`)
             plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
             point = (plotparams.min, 0) # lower left corner of second box.
             sizes = (bounds[1]-plotparams.min,ylimMax)
-            printDebug("point: " + `point`)
-            printDebug("sizes: " + `sizes`)
+            NTdebug("point: " + `point`)
+            NTdebug("sizes: " + `sizes`)
             plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
         
         
@@ -166,4 +170,5 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityError
     unittest.main()

@@ -3,24 +3,34 @@
     First version: gv June 3, 2007
     Second version by jfd.
 """
-from cing.Libs.NTutils import NTdict
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import printWarning
-from cing.Libs.NTutils import CodeError
 from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import printError
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import sprintf
 from cing.core.parameters import cingPaths
 from glob import glob
 from shutil import copy
+from string import upper
 import os
 import time
 
+# Fix these strings so we can get some automated code checking by pydev extensions.
+CHECK_ID_STR     = "checkID"
+LOC_ID_STR       = "locID"
+LEVEL_STR        = "level"
+TEXT_STR         = "text"
+TYPE_STR         = "type"
+VALUE_LIST_STR   = "valueList"
+QUAL_LIST_STR    = "qualList"
+WHATIF_STR       = "whatif" # key to the entities (atoms, residues, etc under which the results will be stored
+INOCHK_STR       = 'INOCHK'
+BNDCHK_STR       = 'BNDCHK'
+ANGCHK_STR       = 'ANGCHK'
 
 class Whatif( NTdict ):
     """
@@ -41,12 +51,11 @@ class Whatif( NTdict ):
     Individual checks:
     NTdict instances with keys pointing to NTlist instances;
 
-    All file refereces relative to rootPath ('.' by default) using the .path()
+    All file references relative to rootPath ('.' by default) using the .path()
     method.
     TODO:   - Use hydrogen atoms
             - For more details see: http://spreadsheets.google.com/pub?key=p1emRxxfe3f4PkJ798dwPIg
-
-    BUGS:   - ALTATM and TOPPOS occurs twice in 1ai0 check_001.db.
+                and sf.net
     """
     #define some more user friendly names
     # List of defs at:
@@ -93,14 +102,12 @@ class Whatif( NTdict ):
                 ('WGTCHK', 'Atomic occupancy check'),
                 ('Hand',   '(Pro-)chirality or handness check')
                ]
-
+    debugCheck ='BNDCHK'
+    # Create a dictionary for fast lookup.
     nameDict = NTdict()
     for n1,n2 in nameDefs:
         nameDict[n1] = n2
-#            nameDict[n2] = n1 # Removed for efficiency.
-    #end for
     nameDict.keysformat()
-
     recordKeyWordsToIgnore = { # Using a dictionary for fast key checks below.
                               "Bad":None,
                               "Date":None,
@@ -109,7 +116,6 @@ class Whatif( NTdict ):
                               "LText":None,
                               "Poor":None,
                               "Program":None,
-                              "Text":None,
                               "Text":None,
                               "Version":None
                               }
@@ -156,13 +162,12 @@ $mv check.db check_$modelNumberString.db
     scriptQuit = """
 fullstop y
 """
-
 # Run whatif with the script
 
 
 
     def __init__( self, rootPath = '.', molecule = None, **kwds ):
-        NTdict.__init__( self, __CLASS__ = 'Whatif', **kwds )
+        NTdict.__init__( self, __CLASS__ = WHATIF_STR, **kwds )
         self.checks                = None
         self.molSpecificChecks     = None
         self.residueSpecificChecks = None
@@ -178,240 +183,259 @@ fullstop y
         return os.path.join( self.rootPath, *args )
     #end def
 
-    def _splitLine( self, line ):
-        """
-            Internal routine to split a lineof the check.db file
-            Return key, value tuple from line
-        """
-        a = line.split(':')
-        return a[0].strip(),a[1].strip()
-    #end def
+#    def _dictDictList( self, theDict, name, key ):
+#        """
+#            Internal routine that returns a NTlist instance for theDict[name][key].
+#            Also put in translated key.
+#        """
+#        d = theDict.setdefault( name, NTdict() )
+#        d[self.nameDict[key]] = d.setdefault( key, NTlist() )
 
-    def _dictDictList( self, theDict, name, key ):
-        """
-            Internal routine that returns a NTlist instance for theDict[name][key].
-            Also put in translated key.
-        """
-        d = theDict.setdefault( name, NTdict() )
-        l = d.setdefault( key, NTlist() )
-        if key in Whatif.nameDict():
-            d[Whatif.nameDict[key]] = l
-        #end if
-        return l
-    #end def
+    def _parseCheckdb( self, modelCheckDbFileName, model ):
+        """Parse check_001.db etc. Generate references to
+           all checks. Storing the check data according to residue and atom.
+           Return self on success or 
+           True on error.
 
-    def _parseCheckdb( self, modelCheckDbFileName = None, model = None   ):
-        """
-            Parse check_001.db etc. Generate references to
-            all checks. Storing the check data according to residue and atom.
-            Return self on succes or None on error.
-        """
-        modelId = model - 1
-        checkID = None # Just to keep pydev from complaining.
-        isTypeFloat = False
+        Example of parsed data structure:
+        E.g. check can have attributes like: 
+        [                                          # checks
+            {                                      # curCheck
+            "checkID":  "BNDCHK"
+            "level":    "RESIDUE"
+            "type":     "FLOAT"
+            "locId": {                             # curLocDic
+                "'A- 189-GLU'"                     # curLocId
+                    : {                            # curListDic
+                    "valeList": [ 0.009, 0.100 ]
+                    "qualList": ["POOR", "GOOD" ]
+                    },
+                "'A- 188-ILE'": {
+                    "valeList": [ 0.01, 0.200 ]
+                    "qualList": ["POOR", "GOOD" ]
+                    }}},]
+           """
+           
+        # Parser uses sense of current items as per below.
+        curModelId = model - 1
+        curCheck   = None # Can be used to skip ahead.
+        curLocId   = None
+        curLocDic  = None
+        curListDic = None 
+        isTypeFloat= False
+        
         if not self.checks: # This will be called multiple times so don't overwrite.
             self.checks = NTlist()
-        for line in AwkLike( modelCheckDbFileName ):
-#            printDebug("DEBUG: read: "+line.dollar[0])
-            if line.NF < 3:
-                continue
+        for line in AwkLike( modelCheckDbFileName, minNF = 3 ):
+#            NTdebug("DEBUG: read: "+line.dollar[0])
             if line.dollar[2] != ':':
-                printWarning("The line below was unexpectedly not parsed")
-                printWarning(line.dollar[0])
+                NTwarning("The line below was unexpectedly not parsed, expected second field to be a semicolon.")
+                NTwarning(line.dollar[0])
 
-            key, value = self._splitLine( line.dollar[0] )
-            if Whatif.recordKeyWordsToIgnore.has_key(key):
+#            Split a line of the check.db file
+            a      = line.dollar[0].split(':')
+            key    = a[0].strip()
+            value  = a[1].strip()
+            
+            if self.recordKeyWordsToIgnore.has_key(key):
                 continue
 
-#            printDebug("found key, value: [" + key + "] , [" + value + "]")
+            if key == 'CheckID':
+                curCheck = None
+                checkID = value # local var within this 'if' statement. 
+#                NTdebug("found check ID: " + checkID)
+                if not self.nameDict.has_key( checkID ):
+                    NTerror("Skipping an unknown CheckID: "+checkID)
+                    continue
+#                if self.debugCheck != checkID:
+##                    NTdebug("Skipping a check not to be debugged: "+checkID)
+#                    continue
+                isTypeFloat = False
+                
+                if self.has_key( checkID ):
+                    curCheck = self.get(checkID)
+                else:
+                    curCheck = NTdict()
+                    self.checks.append( curCheck )
+                    curCheck[CHECK_ID_STR] = checkID
+                    self[ checkID ] = curCheck
+                    NTdebug("Appended check: "+checkID)
+                # Set the curLocDic in case of the first time otherwise get.
+                curLocDic = curCheck.setdefault(LOC_ID_STR, NTdict())
+                continue
+            if not curCheck: # First pick up a check.
+                continue
+            
+#            NTdebug("found key, value: [" + key + "] , [" + value + "]")
+            if key == "Text":
+                curCheck[TEXT_STR] = value
+                continue
             if key == "Level":
-                self[checkID]["Level"] = value
+                curCheck[LEVEL_STR] = upper(value) # check Hand has level "Residue" which should be upped.
                 continue
             if key == "Type":
-                self[checkID]["Type"] = value
-                if self[checkID]["Type"] == "FLOAT":
-#                    printDebug("Setting type to float")
+                curCheck[TYPE_STR] = value
+                if value == "FLOAT":
                     isTypeFloat = True
-                continue
+                continue            
             if key == "Name":
-                self[checkID]["Name"] = value
+                curLocId = value
+                NTdebug("curLocId: "+curLocId )
+                curListDic = curLocDic.setdefault(curLocId, NTdict())
                 continue
-            if key == 'CheckID':
-                checkID = value
-#                printDebug("found check ID: " + checkID)
-                if not Whatif.nameDict.has_key( checkID ):
-                    printError("Read an unknown CheckID: "+checkID)
-                    return None # Perhaps continue here and demote error above to a warning?
-                isTypeFloat = False
-                if not self.has_key( checkID ):
-                    self[checkID] = NTdict( CheckID = checkID )
-                    self.checks.append( self[checkID] )
-                    printDebug("Appended check: "+checkID)
-                continue
-            #end if
 
 #           Only allow values so lines like:
 #            #    Value :  1.000
 #            #    Qual  : BAD
-            if key not in ( "Value", "Qual", ):
-                printError( "Unexpected key, value")
-                return None
-            if not self[checkID].has_key(key):
-                valueNTList = NTlist()
-                for dummy in range(self.molecule.modelCount): # Shorter code for these 2 lines please JFD.
-                    valueNTList.append(None)
-                self[checkID].setdefault(key,valueNTList)
-            if isTypeFloat and key == "Value":
-                self[checkID][key][modelId] = float(value)
+            if key == "Value":
+                keyWord = VALUE_LIST_STR
+            elif  key == "Qual":
+                keyWord = QUAL_LIST_STR
             else:
-                self[checkID][key][modelId] = value
-#            printDebug("For checkID   : "+checkID)
-#            printDebug("For key       : "+key)
-#            printDebug("For modelID   : "+`model`)
-#            printDebug("For value     : "+value)
-#            printDebug("For check     : "+`self[checkID]`)
-#            printDebug("For keyed list: "+`self[checkID][key]`)
-#            printDebug("For stored key: "+`self[checkID][key][modelId]`)
+                NTerror( "Expected key to be Value or Qual but found key, value pair: [%s] [%s]" % ( key, value ))
+                return None
+            
+            if not curListDic.has_key( keyWord ):
+                itemNTlist = NTlist()
+                curListDic[ keyWord ] = itemNTlist
+                for _dummy in range(self.molecule.modelCount): # Shorter code for these 2 lines please JFD.
+                    itemNTlist.append(None)
+                NTdebug("b initialized with Nones: itemNTlist: %r", itemNTlist )
+            else:
+                itemNTlist = curListDic[ keyWord ]
+            NTdebug("a itemNTlist: "+`itemNTlist` )
+
+            if isTypeFloat:
+                itemNTlist[curModelId] = float(value)
+            else:
+                itemNTlist[curModelId] = value
+#            NTdebug("c itemNTlist: "+`itemNTlist` )
+#            NTdebug("For key       : "+key)
+#            NTdebug("For modelID   : "+`model`)
+#            NTdebug("For value     : "+value)
+#            NTdebug("For check     : "+`curCheck`)
+#            NTdebug("For keyed list: "+`curCheck[key]`)
+#            NTdebug("For stored key: "+`curCheck[key][modelId]`)
         #end for each line.
 
-        # TODO: finish code hre.
-        # Example of parsed data structure at this point:
-#        self['HNDCHK']={
-#            "Name": [ "A-   9-MET- C  nv", "A-   9-MET- C  nv"],
-#            "Vale": [ 0.009, 0.100 ],
-#                        }
-
-    """ Put parsed data of all models into CING data model.
-    """
     def _processCheckdb( self   ):
-        printMessage("Now processing the check results into CING data model")
+        """ 
+        Put parsed data of all models into CING data model
+        Return None for success
+        
+        Example of processed data structure attached to say a residue:
+            "whatif": {
+                "ANGCHK": {
+                    "valeList": [ 0.009, 0.100 ],
+                    "qualList": ["POOR", "GOOD" ]},
+                "BNDCHK": {
+                    "valeList": [ 0.009, 0.100 ],
+                    }}"""
+                    
+        NTmessage("Now processing the check results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
-        self.molSpecificChecks     = NTlist()
+#        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
+        self.molecule.whatif = self # is self and that's asking for luggage 
+        # Later                   
+        
+        
+#        self.molSpecificChecks     = NTlist()
         self.residueSpecificChecks = NTlist()
         self.atomSpecificChecks    = NTlist()
 
-        self.mols     = NTdict(MyName="Mol")
+#        self.mols     = NTdict(MyName="Mol")
         self.residues = NTdict(MyName="Res")
         self.atoms    = NTdict(MyName="Atom")
-        levelIdList     = ["MOLECULE", "RESIDUE", "ATOM" ]
-        selfLevels      = [ self.mols, self.residues, self.atoms ]
-        selfLevelChecks = [ self.molSpecificChecks, self.residueSpecificChecks, self.atomSpecificChecks ]
+#        levelIdList     = ["MOLECULE", "RESIDUE", "ATOM" ]
+        levelIdList     = [ "RESIDUE", "ATOM" ]
+        selfLevels      = [ self.residues, self.atoms ]
+        selfLevelChecks = [ self.residueSpecificChecks, self.atomSpecificChecks ]
         # sorting on mols, residues, and atoms
-        printMessage("  for self.checks: " + `self.checks`)
-        printMessage("  for self.checks count: " + `len(self.checks)`)
+#        NTmessage("  for self.checks: " + `self.checks`)
+        NTdebug("  for self.checks count: " + `len(self.checks)`)
         for check in self.checks:
-            if 'Level' not in check:
-                raise CodeError("no Level attribute in check dictionary: "+check.CheckID)
-            printDebug("attaching check: "+check.CheckID+" of type: "+check.Type + " to level: "+check.Level)
-            idx = levelIdList.index( check.Level )
+            if LEVEL_STR not in check:
+                NTerror("no level attribute in check dictionary: "+check[CHECK_ID_STR])
+                NTerror("check dictionary: "+`check`)
+                return True
+#            NTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
+            idx = levelIdList.index( check[LEVEL_STR] )
             if idx < 0:
-                raise CodeError("Unknown Level ["+check.Level+"] in check:"+check.CheckID+' '+check.Text+"\n")
+                NTerror("Unknown Level ["+check[LEVEL_STR]+"] in check:"+check[CHECK_ID_STR]+' '+check[TEXT_STR])
+                return True
             selfLevelChecks[idx].append( check )
             check.keysformat()
-        #end for
 
         checkIter = iter(selfLevelChecks)
         for levelEntity in selfLevels:
             levelCheck = checkIter.next()
-            levelCheckStr = `levelCheck`
-            # Ok so there is not Java substring method as in Java. Using a slice causes a
-#            if len(levelCheckStr) > 80:
-            levelCheckStr = levelCheckStr[0:80]
-            printDebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + levelCheckStr)
+            NTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
             for check in levelCheck:
-                printDebug( 'check        : ' + `check`)
-                printDebug( 'check.CheckID: ' + check.CheckID)
-                if not ('Name' in check and 'Value' in check):
-                    printError("Failed to find Name and Value attribute for this check.")
-                    return None
-                name = check.Name
-                if not 'Qual' in check:
-                    for value in check.Value:
-                        self._dictDictList( levelEntity, name, check.CheckID ).append( value )
-                else:
-                    for value,qual in zip(check.Value, check.Qual):
-                        self._dictDictList( levelEntity, name, check.CheckID ).append( (value, qual) )
-                # JFD adds: this is a nice example to show how the values can be taken out again
-                # JFD mods so it's clear from which residue value originates
-                if len( levelEntity.values()):
-                    print 'DEBUG below value is in residue:', levelEntity.values()[0]
-                    print '>1', check.CheckID, levelEntity.values()[0].keys()
-                    print '>2', check.CheckID, levelEntity.values()[0][check.CheckID]
-            #end for
-            # TODO: finish the code below.
-#            for entity in levelEntity.values():
-#                entity.keysformat()
-#            levelEntity.keysformat()
-
-        printMessage('done with _processCheckdb')
-        return 1 # for success
+                checkId = check[CHECK_ID_STR]
+                NTdebug( 'check        : ' + `check`)
+                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
+                if not check.has_key(LOC_ID_STR):
+                    NTdebug("There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
+                    NTdebug("  check: "+ `check`)
+                    continue
+                curLocDic = check[LOC_ID_STR]
+                if not curLocDic:
+                    NTdebug("Skipping empty locationsDic")
+                    continue
+                
+                for curLocId in curLocDic.keys():
+                    curListDic = curLocDic[curLocId]                
+                    NTdebug("Working on curLocId:   " + `curLocId`)
+                    NTdebug("Working on curListDic: " + `curListDic`)
+                    
+                    nameTuple = self.translateResAtmString( curLocId )
+                    if not nameTuple:
+                        NTerror('Whatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+                        continue
+                    entity = self.molecule.decodeNameTuple( nameTuple ) # can be a chain, residue or atom level object
+                    if not entity:
+                        NTerror('Whatif._processCheckdb: mapping entity "%s" descriptor' % curLocId)
+                        continue
+                    NTdebug("adding to entity: " + `entity`)
+                    entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
+                    NTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
+                                        
+                    keyWordList = [ VALUE_LIST_STR, QUAL_LIST_STR]
+#            "locId": {                             # curLocDic
+#                "'A- 189-GLU'"                     # curLocId
+#                    : {                            # curListDic
+#                    "valeList": [ 0.009, 0.100 ]   # curList
+#                    "qualList": ["POOR", "GOOD" ]
+                    
+                    for keyWord in keyWordList:
+                        curList = curListDic.getDeepByKeys(keyWord) # just 1 level deep but never set as setdefaults would do.
+                        if not curList:
+                            continue                        
+                        entityWhatifCheckDic = entityWhatifDic.setdefault(checkId, NTdict())
+                        entityWhatifCheckDic[keyWord]=curList
+                    NTdebug("now entityWhatifDic: " + `entityWhatifDic`)
+        NTmessage('done with _processCheckdb')
     #end def
 
-    def _parseResAtmString( self, string ):
-        """
-            Internal routine to split the residue or atom identifier string
-            of the check.db file.
-            return a Molecule nametuple
-        """
-        elms = string.split('-')
-        t = ['PDB',elms[0].strip(),int(elms[1])]
-        if len(elms) == 4:
-            t.append( elms[3].strip() )
-        else:
-            t.append( None )
-        #end if
-
-        return tuple( t )
-    #end def
-
-    def map2molecule( self ):
-        """
-            Replace the residue and atoms strings with references to the
-            corresponding objects of molecule.
-            Initiate a whatif attribute for every Molecule, Chain, Residue
-            and Atom object.
-        """
-        for chain in self.molecule.allChains():
-            chain.whatif = None
-        #end for
-        for res in self.molecule.allResidues():
-            res.whatif = None
-        #end for
-        for atm in self.molecule.allAtoms():
-            atm.whatif = None
-        #end for
-
-        self.molecule.whatif = self
-
-        # Residues
-        for r,c in self.residues.items():
-            nameTuple = self._parseResAtmString( r )
-            res = self.molecule.decodeNameTuple( nameTuple )
-            #print '>',r, nameTuple, res
-            if (res == None):
-                raise CodeError('Error Whatif.map2molecule: mapping "%s" descriptor\n', r)
-            else:
-                res.whatif = c
-            #endif
-        #end for
-
-        # Atoms
-        for r,c in self.atoms.items():
-            nameTuple = self._parseResAtmString( r )
-            atm = self.molecule.decodeNameTuple( nameTuple )
-            #print '>',r, nameTuple, atm
-            if (atm == None):
-                raise CodeError('Whatif.map2molecule: mapping "%s" descriptor\n', r)
-            else:
-                atm.whatif = c
-            #endif
-        #end for
-    #end def
+    def translateResAtmString( self, string ):
+        """Internal routine to split the residue or atom identifier string
+            of the check.db file. E.g.:
+            A- 187-HIS- CB 
+            A- 177-GLU
+            return None for error            
+            """
+        try:
+            a = string.split('-')
+            t = ['PDB',a[0].strip(),int(a[1]), None]
+            if len(a) == 4: # Is there an atom name too?
+                t[3] = a[3].strip() 
+            return tuple( t )
+        except:
+            return None
 
     def report( self ):
         return ''.join( file( self.path( Whatif.reportFile ), 'r').readlines())
-    #end def
 #end Class
 
 def runWhatif( project, tmp=None ):
@@ -462,10 +486,10 @@ def runWhatif( project, tmp=None ):
     for model in models:
         fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
         # WI prefers IUPAC like PDB now. In CING the closest is BMRBd?
-        printMessage('==> Materializing model '+`model`+" to disk" )
+        NTmessage('==> Materializing model '+`model`+" to disk" )
         pdbFile = project.molecule.toPDB( model=model, convention = "BMRB" )
         if not pdbFile:
-            printError("Failed to write a temporary file with a model's coordinate")
+            NTerror("Failed to write a temporary file with a model's coordinate")
             return True
         pdbFile.save( fullname   )
 
@@ -482,10 +506,10 @@ def runWhatif( project, tmp=None ):
     totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
     timeRunEstimatedInSeconds    = totalNumberOfResidues / 13.
     timeRunEstimatedInSecondsStr = sprintf("%.0f",timeRunEstimatedInSeconds)
-    printMessage('==> Running What If checks on '+`totalNumberOfResidues`+
-                 " residues for an estimated (13 protonated residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    NTmessage('==> Running What If checks on '+`totalNumberOfResidues`+
+                 " residues for an estimated (13 residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
     if totalNumberOfResidues < 100:
-        printMessage("It takes longer per residue for small molecules and few models")
+        NTmessage("It takes much longer per residue for a small molecule/ensemble")
     scriptFileName = "whatif.script"
     scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
@@ -497,53 +521,48 @@ def runWhatif( project, tmp=None ):
     if True:
         whatifExitCode = whatifProgram("script", scriptFileName )
     else:
-        printDebug("Skipping actual whatif execution for testing")
+        NTdebug("Skipping actual whatif execution for testing")
         whatifExitCode = 0
 
-    printDebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+    NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if whatifExitCode:
-        printError("Failed whatif checks with exit code: " + `whatifExitCode`)
+        NTerror("Failed whatif checks with exit code: " + `whatifExitCode`)
         return True
 
     try:
-        removeListLocal = ["PDBFILE", "pdbout.tex"]
+        removeListLocal = ["DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "pdbout.tex"]
         removeList = []
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
 
-#        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.PDB", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
-        for extension in [ "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
+        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
             for fn in glob(os.path.join(whatifDir,extension)):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-                printDebug("Expected to find a file to be removed but it doesn't exist: " + fn )
+                NTdebug("Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
-            printDebug("Removing: " + fn)
+#            NTdebug("Removing: " + fn)
             os.unlink(fn)
     except:
-        printWarning("Failed to remove all temporary what if files that were expected")
+        NTwarning("Failed to remove all temporary what if files that were expected")
 
     for model in models:
         modelNumberString = sprintf('%03d', model)
-        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model), '.pdb' )
-        del( fullname ) #TODO: isn't it os.unlink?
+#        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
+#        os.unlink( fullname ) 
         modelCheckDbFileName = "check_"+modelNumberString+".db"
-        printMessage('==> Parsing checks for model '+modelCheckDbFileName)
+        NTmessage('==> Parsing checks for model '+modelCheckDbFileName)
         modelCheckDbFullFileName =  os.path.join( whatifDir, modelCheckDbFileName )
-        whatif._parseCheckdb( modelCheckDbFullFileName, model )
-    #end for model
+        if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
+            NTerror("Failed to parse check db")
+            return True
+            
 
-    printWarning("TODO: Processing is to be continued from here on.")
-    return None
-    if not whatif._processCheckdb():
-        printError("Failed to process check db")
+    if whatif._processCheckdb():
+        NTerror("Failed to process check db")
         return True
-
-#    whatif.map2molecule()
-
-    return None # Success
 #end def
 
-# register the functions
-methods  = [(runWhatif, None)]
+# register the function
+methods  = [(runWhatif, None)            ]

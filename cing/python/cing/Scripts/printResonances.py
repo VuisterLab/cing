@@ -29,7 +29,7 @@ NTmessage('%-8s  ',  ' ')
 for index,name in resonances:
     NTmessage('%-8s  ', name+'i'+str(index) )
 #end for
-NTmessage('\n')
+NTmessage('')
 
 # Generate peaks for all residues
 for residue in project.molecule.allResidues(): 
@@ -44,6 +44,6 @@ for residue in project.molecule.allResidues():
             NTmessage('%-8s  ', '-?-' )
         #end if
     #end for
-    NTmessage('\n')
+    NTmessage('')
 #end for
 

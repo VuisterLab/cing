@@ -1,0 +1,7 @@
+Files:
+
+schem_dna.mac       Attempted to include deviating residue names but fails to 
+                        work as of Feb 2008.
+CONTENTS.txt        This file.
+molmol_image.csh    For image generation with Molmol.
+render_convert.csh  Ray trace scenes to image files.

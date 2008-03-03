@@ -1,8 +1,8 @@
 from cing import verbosityDebug
 from cing import verbosityError
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import NTdebug
+from cing.STAR import Utils
 from unittest import TestCase
-import Utils
 import cing
 import unittest
 
@@ -17,11 +17,9 @@ class AllChecks(TestCase):
         self.assertTrue(m1t==m2)
     def testLister(self):
         self.dummy = "dumb"
-        printDebug( self )
+        NTdebug( "%r", self )
         
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityError
     unittest.main() 
-#    a = AllChecks()
-#    a.testLister()

@@ -13,7 +13,7 @@ LOOSE      = 'LOOSE'
 # Wim added
 CCPN       = 'CCPN'
 
-
+# No shift value for Xeasy.
 NOSHIFT         =  999.000
 UNDEFINED_FLOAT = -888.888
 

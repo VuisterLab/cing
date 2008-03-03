@@ -4,8 +4,12 @@ python $cingPath/PluginCode/test/test_Whatif.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
+from cing import verbosityDebug
 from cing import verbosityError
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import NTdebug
+from cing.PluginCode.Whatif import QUAL_LIST_STR
+from cing.PluginCode.Whatif import VALUE_LIST_STR
+from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
 from unittest import TestCase
@@ -19,26 +23,35 @@ class AllChecks(TestCase):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-        entryId = "1brv_1model" # Small much PDB NMR entry
+#        entryId = "1brv_1model" 
+        entryId = "1brv" 
         
-
-#        entryId = "1brv" # Small much studied PDB NMR entry 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        os.chdir(cingDirTestsTmp)
         project = Project( entryId )
-        self.failIf( project.removeFromDisk() )
+        project.removeFromDisk()
         project = Project.open( entryId, status='new' )
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        printDebug("Reading files from directory: " + cyanaDirectory)
+        NTdebug("Reading files from directory: " + cyanaDirectory)
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
 
-#        print project.save()
 #        print project.cingPaths.format()
-        self.assertFalse(runWhatif(project))                                    
+        self.assertFalse(runWhatif(project))    
+        
+        project.save()
+        for res in project.molecule.allResidues():
+            NTdebug(`res`)
+            whatifResDict = res.getDeepByKeys(WHATIF_STR)
+            if not whatifResDict:
+                continue
+            checkIDList = whatifResDict.keys()
+            for checkID in checkIDList:
+                valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
+                qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
+                NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityError
-#    cing.verbosity = verbosityDebug
     unittest.main()

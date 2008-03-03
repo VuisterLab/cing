@@ -29,6 +29,9 @@ cing --name test --ipython
 - To open an existing Project and run a script MYSCRIPT.py:
 cing --name test --script MYSCRIPT.py
 
+- To test CING without any messages (not even errors):
+cing --test --verbose 0
+
 --------------------------------------------------------------------------------
 Some simple script examples:
 --------------------------------------------------------------------------------
@@ -45,22 +48,23 @@ project.listPredefinedExperiments() # list all predefined experiments
 peaks = project.generatePeaks('hncaha','HN:HA:N')
 format(peaks)
 
+== Print list of parameters:
+    formatall( project.molecule.A.residues[0].procheck ) # Adjust for your mols
+    formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
 from cing import cingPythonDir
 from cing import header
 from cing import programVersion
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printMessage
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import printError
 import cing
 import os 
 import string
@@ -106,16 +110,16 @@ def script( scriptFile, *a, **k ):
     args = a
     kwds = k
     if os.path.exists( scriptFile ):
-        printMessage('==> Executing script '+ scriptFile )
+        NTmessage('==> Executing script '+ scriptFile )
         execfile( scriptFile, globals() )
     else:
         scriptFile2 = os.path.join( cingPythonDir, cingPaths.scripts, scriptFile)        
         if os.path.exists( scriptFile2 ):
-            printMessage('==> Executing script "%s"\n', scriptFile2 )
+            NTmessage('==> Executing script "%s"', scriptFile2 )
             #end if
             execfile( scriptFile2, globals() )
         else:
-            NTerror('ERROR script: file "%s" not found\n', scriptFile)
+            NTerror('script: file "%s" not found\n', scriptFile)
         #end if
     #end if
 #end def
@@ -133,27 +137,27 @@ def testOverall():
                           ) 
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir)
-    namepattern = "*Test.py"
-    nameList2 = findFiles(namepattern, startdir)
-    for name in nameList2:
-      nameList.append(name) 
-#    printDebug("found tests: " + `nameList`)
+#    nameList = nameList[0:5]
+#    namepattern = "*Test.py"
+#    nameList2 = findFiles(namepattern, startdir)
+#    for name in nameList2:
+#      nameList.append(name) 
     # translate: '/Users/jd/workspace/cing/python/cing/Libs/test/test_NTplot.py'
     # to: cing.Libs.test.test_NTplot
     lenCingPythonDirStr = len(cingPythonDir)
     # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
     suite = None
     for name in nameList:
+#      print "In cing.main#testOverall found cing.verbosity: %d\n" % cing.verbosity
       tailPathStr = name[lenCingPythonDirStr+1:-3]
       mod_name = string.join(tailPathStr.split('/'), '.')      
       if mod_name in excludedModuleList:
         print "Skipping module:  " + mod_name
         continue      
-#      print "Importing ", mod_name
-      exec("import %s" % (mod_name,))
-      exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name,))
-#      print "Testing"
-      unittest.TextTestRunner(verbosity=2).run(suite)
+      exec("import %s" % (mod_name)   )
+      exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
+      testVerbosity = 2
+      unittest.TextTestRunner(verbosity=testVerbosity).run(suite)
 
 
 project = None # after running main it will be filled.
@@ -197,22 +201,22 @@ def main():
                      )
     parser.add_option("--init", 
                       dest="init", default=None,
-                      help="Initialise from SEQUENCEFILE[,CONVENTION]", 
+                      help="Initialize from SEQUENCEFILE[,CONVENTION]", 
                       metavar="SEQUENCEFILE[,CONVENTION]"
                      )
     parser.add_option("--initPDB", 
                       dest="initPDB", default=None,
-                      help="Initialise from PDBFILE[,CONVENTION]", 
+                      help="Initialize from PDBFILE[,CONVENTION]", 
                       metavar="PDBFILE[,CONVENTION]"
                      )
     parser.add_option("--initBMRB", 
                       dest="initBMRB", default=None,
-                      help="Initialise from edited BMRB file", 
+                      help="Initialize from edited BMRB file", 
                       metavar="BMRBFILE"
                      )
     parser.add_option("--initCcpn", 
                       dest="initCcpn", default=None,
-                      help="Initialise from CCPNFILE", 
+                      help="Initialize from CCPNFILE", 
                       metavar="CCPNFILE"
                      )
     parser.add_option("--xeasy", 
@@ -250,9 +254,9 @@ def main():
                       dest="validate", 
                       help="Do validation"
                      )
-    parser.add_option("-v", "--verbosity",
-                      action="store_true", default=cing.verbosity,
-                      dest="verbosity", 
+    parser.add_option("-v", "--verbosity", type='int',
+                      default=cing.verbosityDefault,
+                      dest="verbosity", action='store', 
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
     parser.add_option( "--nosave",
@@ -267,14 +271,14 @@ def main():
                      )
     
     (options, _args) = parser.parse_args()
-    if options.verbosity:
-        if options.verbosity >= 0 and options.verbosity <= 9:
-            cing.verbosity = options.verbosity 
-        else:
-            printError("set verbosity is outside range [0-9] at: " + options.verbosity)
-            printError("Ignoring setting")
+    if options.verbosity >= 0 and options.verbosity <= 9:
+#        print "In main, setting verbosity to:", options.verbosity
+        cing.verbosity = options.verbosity 
+    else:
+        NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+        NTerror("Ignoring setting")
     
-    printMessage(header)
+    NTmessage(header)
 #    root,file,ext  = NTpath( __file__ )
 
     if options.test:
@@ -300,7 +304,7 @@ def main():
     
         print Project.__doc__
         for p in plugins.values():
-            NTmessage(    '-------------------------------------------------------------------------------\n' +
+            NTmessage(    '-------------------------------------------------------------------------------' +
                        'Plugin %s\n' +
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
@@ -357,7 +361,7 @@ def main():
         project = Project.open( options.name, status='create' )
     
     if not project:
-        printDebug("Doing a hard system exit")
+        NTdebug("Doing a hard system exit")
         sys.exit(2)
     
     #------------------------------------------------------------------------------------
@@ -373,7 +377,7 @@ def main():
     #------------------------------------------------------------------------------------
     # Import xeasy peakFile
     #------------------------------------------------------------------------------------
-    if (options.xeasyPeaks):
+    if options.xeasyPeaks:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 4):
             NTerror("--xeasyPEaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")

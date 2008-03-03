@@ -5,7 +5,6 @@ import unittest
 
 class AllChecks(TestCase):
     def test(self):
-        """Text"""
 #        textExpectedAfterCollapse = ';<eol-string>mmy xie<eol-string>;\n_Test'
 #        text = """;
 #mmy xie
@@ -29,7 +28,6 @@ class AllChecks(TestCase):
         self.assertEqual(t2noComment,comments_strip( t2 ))
 
     def testcomments_strip(self):
-        """comments_strip"""
         text = """
 # my comment exactly
 foo # comment
@@ -50,7 +48,6 @@ bar
         self.assertEqual( textNew, textExpected)
     
     def testcomments_strip2(self):
-        """comments_strip 2"""
         text = """
 H' # comment
 H" # also
@@ -63,7 +60,6 @@ H"
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip3a(self):
-        """comments_strip 3a"""
         text = """
 H# # comment
 """
@@ -75,7 +71,6 @@ H#
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip3(self):
-        """comments_strip 3"""
         text = """
 H# 
 """
@@ -87,7 +82,6 @@ H#
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip4(self):
-        """comments_strip 4"""
         text = """
 ;
 test1 # no comment 1
@@ -108,7 +102,6 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip5(self):
-        """comments_strip 5"""
         text = """
 'quoted value with embedded # comment' # real comment
 """
@@ -119,7 +112,6 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip6(self):
-        """comments_strip 6"""
         text = """
 "quoted value with embedded # comment" # real comment
 """
@@ -130,7 +122,6 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip7(self):
-        """comments_strip 7"""
         text = """
 "quoted 'complications ; ' with embedded # comment" # real comment
 """
@@ -141,7 +132,6 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip8(self):
-        """comments_strip 8"""
         text = """
 "quoted 'complications;' with embedded # comment" # real comment
 """
@@ -152,7 +142,6 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
     
     def testcomments_strip9(self):
-        """comments_strip 9"""
         text = """
 ;
 

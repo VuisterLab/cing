@@ -1,5 +1,7 @@
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 import sys
-import NTutils
+#from cing.Libs.NTutils import printDebug
 
 class AwkLike:
   """Awk-like functionality
@@ -43,33 +45,34 @@ class AwkLike:
       raise StopIteration
       
     self.line = self.f.readline()
-    self.dollar = [self.line[:-1]]
+    self.dollar = [self.line[:-1]] # -1 for excluding line terminator.
     
-    if (len(self.line) > 0):
+    if len(self.line):
       self.NR += 1
       for f in self.line.split():
           # Skip everything after the comment?
           if self.commentString and f.startswith(self.commentString):
+#              NTdebug("Skipping fields after comment on line: " + self.dollar[0] )
+#              NTdebug("   parsed so far: " + `self.dollar` )
               break
+#          NTdebug("Appending to parsed: ["+f+"]")
       	  self.dollar.append( f )
       self.NF = len(self.dollar)-1
-
-      # check if we need to skip this line
-      if (self.minLength >= 0 and len(self.dollar[0]) < self.minLength):
-          return self.next()
-      #end if    
-      if (self.minNF > 0 and self.NF < self.minNF):
-          return self.next()
-      #end if    
-      if (self.commentString != None and self.isComment( self.commentString )):
-          return self.next()
-      #end if
-
+      if self.minLength >= 0:
+          if len(self.dollar[0]) < self.minLength:
+#              NTdebug("Skipping line with less than required number of characters: " + self.dollar[0])
+              return self.next()
+      if self.minNF > 0:
+          if self.NF < self.minNF:
+#              NTdebug("Skipping line with less than required number of fields: " + self.dollar[0])
+              return self.next()
+      if self.commentString:
+          if self.isComment( self.commentString ):
+#              NTdebug("Skipping comment line: " + self.dollar[0])
+              return self.next()
       return self
-
-    else:
-      self.close()
-      raise StopIteration    
+    self.close()
+    raise StopIteration    
   #end def
 
       
@@ -83,61 +86,56 @@ class AwkLike:
     try: 
         return float( self.dollar[ field ] )
     except ValueError:
-        NTutils.NTerror('ERROR AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n', 
 	                 self.dollar[field],
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
 	               )
     except IndexError:
-        NTutils.NTerror('ERROR AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
 	                 field,
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
-	               )
-    #end try
-    return None
-    
+	               )    
   def int( self, field ):
     """Return field converted to int """
     try: 
         return int( self.dollar[ field ] )
     except ValueError:
-        NTutils.NTerror('ERROR AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n', 
 	                 self.dollar[field],
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
 	               )
     except IndexError:
-        NTutils.NTerror('ERROR AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
 	                 field,
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
 	               )
-    #end try
-    return None
- 
+         
   def printit( self ):
-    print '==>%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF)	
+    NTmessage( '==>%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF))	
     i=0
     for field in self.dollar:
-      print '%3d >%s<' % (i, field)
+      NTmessage( '%3d >%s<' % (i, field) )
       i += 1
     return 0
 
   def isComment( self, commentString = '#'):
     """check for commentString on start of line
-       return 0 or 1
+       return None or 1
     """
     if self.dollar[0].strip().startswith( commentString ):
       return 1
-    return 0
+    return None
  
   def isEmpty( self ):
-    return (self.NF == 0)
+    return self.NF == 0
 #
 #==============================================================================
 #
@@ -214,14 +212,14 @@ class AwkLikeS:
     try: 
         return float( self.dollar[ field ] )
     except ValueError:
-        NTutils.NTerror('ERROR AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n', 
 	                 self.dollar[field],
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
 	               )
     except IndexError:
-        NTutils.NTerror('ERROR AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
 	                 field,
 		         self.FILENAME,
 		         self.NR,
@@ -235,14 +233,14 @@ class AwkLikeS:
     try: 
         return int( self.dollar[ field ] )
     except ValueError:
-        NTutils.NTerror('ERROR AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n', 
 	                 self.dollar[field],
 		         self.FILENAME,
 		         self.NR,
 		         self.dollar[0]
 	               )
     except IndexError:
-        NTutils.NTerror('ERROR AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
+        NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n', 
 	                 field,
 		         self.FILENAME,
 		         self.NR,

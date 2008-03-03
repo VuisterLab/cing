@@ -5,7 +5,7 @@ from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
 from cing import cingPythonCingDir
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import NTdebug
 import os
 import sys
 
@@ -23,7 +23,7 @@ Restructuring using NTtree and saving to different file format.
    used nameDict attribute to store the different names
 3. File 'NTdb.py': contains classes and parser of dbTable. 
    Yields NTdb as root of database
-4. Conversion dictionaries initialised from nameDict entries of NTdb
+4. Conversion dictionaries initialized from nameDict entries of NTdb
 
 Note that updating dict and list types requires first initialisation of the 
 NTdb-tree and then updating it. Otherwise, the changes are discarded as parsing
@@ -358,10 +358,10 @@ class DihedralDef( NTtree ):
 #end class    
 
         
-def importNameDefs( tableFile, name,   ):
+def importNameDefs( tableFile, name)   :
     "Import residue and atoms name defs from tableFile"
     
-    printDebug('==> Importing database file '+ tableFile )
+    NTdebug('==> Importing database file '+ tableFile )
     
     mol = MolDef( name = 'mol' )
     obj = mol # object point to 'active' object, mol, residue, dihedral or atom
@@ -397,14 +397,14 @@ def importNameDefs( tableFile, name,   ):
 #                                    repr(r.dollar[1].strip()),
 #                                    "".join( r.dollar[2:] )
 #                                   )
-# #            NTmessage( ' >%s<\n',cmd )
+# #            NTmessage( ' >%s<',cmd )
 #
 ##  19 Feb 2007: much simpler
 #             cmd = "obj[%s] = %s " % (repr(r.dollar[1].strip()),
 #                                      " ".join( r.dollar[3:] )
 #                                     )
 #
-#            NTmessage( ' >%s<\n',cmd )
+#            NTmessage( ' >%s<',cmd )
 #             exec( cmd )
 ##  17 Sep 2007; even simpler
              obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) )
@@ -420,7 +420,7 @@ def importNameDefs( tableFile, name,   ):
 path, fname, ext = NTpath( __file__ )
 #print '>>', __file__, path
 # import the database table and generate the db-tree
-NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb',   )
+NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb')   
 
 
 # Patches for attributes

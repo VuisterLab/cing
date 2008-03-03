@@ -96,7 +96,7 @@ class nmrPipeTable( NTdict ):
     write( stream=sys.stdout ):
         Write table to stream
 
-    writeFile( tabFile,   ):
+    writeFile( tabFile)   :
         Open tabFile, write table and close tabFile
     
     """
@@ -140,7 +140,7 @@ class nmrPipeTable( NTdict ):
         return columnDef, or None on error
         """
         if name in self:
-            NTerror('ERROR nmrPipeTable.addColumn: column "%s" already exists\n', name )
+            NTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
             return None
         #end if
             
@@ -177,7 +177,7 @@ class nmrPipeTable( NTdict ):
         """
         for c in cNames:
             if not c in self:
-                NTerror('ERROR nmrPipeTable.hideColumn: column "%s" not defined\n', c)
+                NTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = True
             #end if
@@ -190,7 +190,7 @@ class nmrPipeTable( NTdict ):
         """
         for c in cNames:
             if not c in self:
-                NTerror('ERROR nmrPipeTable.showColumn: column "%s" not defined\n', c)
+                NTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = False
             #end if
@@ -279,14 +279,14 @@ class nmrPipeTable( NTdict ):
         
     #end def
 
-    def writeFile( self, tabFile,   ):
+    def writeFile( self, tabFile)   :
         """
         Write table to tabFile
         """
         file = open( tabFile, 'w' )
         self.write( file )
         file.close()
-        NTmessage('==> Written nmrPipe table file "%s"\n', tabFile )
+        NTmessage('==> Written nmrPipe table file "%s"', tabFile )
         #end if
     #end def
     

@@ -1,14 +1,15 @@
 """Unit test
 """
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
+from cing import verbosityNothing
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.STAR import Utils
 from cing.STAR.File import File
 from unittest import TestCase
-from cing import verbosityNothing
 import cing
 import os   
+import unittest
 import urllib
 import zipfile
 
@@ -16,9 +17,8 @@ import zipfile
 
 class AllChecks(TestCase):
         strf           = File()        
-        
-        def testparse(self):
-            """STAR parse"""
+         
+        def testParse(self):
             text = """data_no_comments_here
 
 save_comment
@@ -62,8 +62,7 @@ save_comment   _Saveframe_category  comment   loop_
 """
             self.assertTrue(Utils.equalIgnoringWhiteSpace(exp,st))
 
-        def testread2(self):
-            """STAR File read"""
+        def testReadFile(self):
             testEntry('1edp')
               
 """
@@ -71,7 +70,7 @@ Extra Test Routine going over some entries in the NMR Restraints Grid
 """
 def testEntry(entry):
     # Put a check in for internet availability.
-    printMessage( "Testing Entry" )
+    NTmessage( "Testing Entry" )
     strf = File() 
     # Freely available on the web so not included in package.
     stage = "2-parsed"
@@ -84,7 +83,7 @@ def testEntry(entry):
     try:
       urllib.urlretrieve(urlLocation,fnamezip)
     except:
-      printWarning("Failed to get; "+ urlLocation)
+      NTwarning("Failed to get; "+ urlLocation)
       return
 #    print "DEBUG: opening local zip file:", fnamezip
     zfobj = zipfile.ZipFile(fnamezip)
@@ -117,25 +116,25 @@ def testEntry(entry):
             cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % ( orgWattosWrittenFile, pystarlibWrittenFile, diffOrgPystarFile)
             os.system(cmd)
             if not os.path.exists(diffOrgPystarFile):
-                printWarning( "failed to diff files: " + orgWattosWrittenFile + ", " + pystarlibWrittenFile)
+                NTwarning( "failed to diff files: " + orgWattosWrittenFile + ", " + pystarlibWrittenFile)
             
     #        print "Most likely the below check will fail because it depends on Wattos being installed"
-            printDebug("DEBUG: rewrite to Java formating for comparison")
+            NTdebug("DEBUG: rewrite to Java formating for comparison")
             cmd = "java -Xmx256m Wattos.Star.STARFilter %s %s ." % ( pystarlibWrittenFile, wattosWrittenFile)
             os.system(cmd)
             if not os.path.exists(wattosWrittenFile):
-                printWarning ("failed to rewrite file: " + pystarlibWrittenFile)
+                NTwarning("failed to rewrite file: " + pystarlibWrittenFile)
             else:
     #            print "Most likely the below diff will fail because it depends on diff being installed"
                 cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % ( pystarlibWrittenFile, wattosWrittenFile, diffPystarWattosFile)
                 os.system(cmd)
                 if not os.path.exists(diffPystarWattosFile):
-                    printWarning( "failed to diff file: "+pystarlibWrittenFile + ", " +  wattosWrittenFile)
+                    NTwarning( "failed to diff file: "+pystarlibWrittenFile + ", " +  wattosWrittenFile)
     #            print "Most likely the below diff will fail because it depends on diff being installed"
                 cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % ( orgWattosWrittenFile, wattosWrittenFile, diffOrgWattosWattosFile)
                 os.system(cmd)
                 if not os.path.exists(diffOrgWattosWattosFile):
-                    printWarning( "failed to diff file: ",orgWattosWrittenFile+ ", " +  wattosWrittenFile)
+                    NTwarning( "failed to diff file: ",orgWattosWrittenFile+ ", " +  wattosWrittenFile)
         except:
     #        print "DEBUG: failed the rewrite or diff but as mentioned that's totally understandable."
             pass
@@ -154,16 +153,16 @@ def testAllEntries():
     pdbList = ('1edp')
     try:
         from Wattos.Utils import PDBEntryLists #@UnresolvedImport
-        printMessage( "Imported Wattos.Utils; but it's not essential" )
+        NTmessage( "Imported Wattos.Utils; but it's not essential" )
         try:
             pdbList = PDBEntryLists.getBmrbNmrGridEntries()[0:1] # Decide on the range yourself.
         except:
-          printWarning("Failed to get pdbList; is internet connected? Using default")
+          NTwarning("Failed to get pdbList; is internet connected? Using default")
     except:
-        printMessage( "Skipping import of Wattos.Utils; it's not needed")
+        NTmessage( "Skipping import of Wattos.Utils; it's not needed")
 
     for entry in pdbList:
-        printMessage( entry )
+        NTmessage( entry )
         testEntry(entry)
 #        entry = '1edp' # 57 kb
     #    entry = '1q56' # 10 Mb takes 27 s to parse on 2GHz PIV CPU
@@ -177,16 +176,16 @@ Extra Test Routine going over some entries in the NMR Restraints Grid
 def testSingleFile( filename ):
     strf = File() 
     strf.filename  = filename   
-    printDebug( "reading file ", strf.filename )
+    NTdebug( "reading file ", strf.filename )
     strf.read()
     strf.filename  = strf.filename + "_new.str"
-    printDebug( "writing file ", strf.filename)
+    NTdebug( "writing file ", strf.filename)
     strf.write()
     
         
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
-    printMessage("Found cing.verbosity   : " + `cing.verbosity`)
-    testAllEntries()
+    NTmessage("Found cing.verbosity   : " + `cing.verbosity`)
+#    testAllEntries()
 #    testSingleFile("S:\\jurgen\\2hgh_small_new_google.str")
-#    unittest.main()
+    unittest.main()

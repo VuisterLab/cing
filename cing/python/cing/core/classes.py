@@ -16,10 +16,6 @@ from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
@@ -40,6 +36,8 @@ from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from cing.core.sml import SMLhandler
 from shutil import rmtree
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTwarning
 import math
 import os
 import shutil
@@ -267,14 +265,14 @@ _____________________________________________________________________________
         elif status == 'old':
             root = Project.rootPath( name )
             if not os.path.exists( root ):
-                NTerror('ERROR Project.open: unable to open Project "%s"\n', name )
+                NTerror('Project.open: unable to open Project "%s"\n', name )
                 return None
             #end if
 
             # Restore Project from xml-file
             pfile = os.path.join( root, cingPaths.project )
             if not os.path.exists( pfile ):
-                NTerror('ERROR Project.open: missing Project file "%s"\n', pfile )
+                NTerror('Project.open: missing Project file "%s"\n', pfile )
                 return None
             #end if
             pr = XML2obj( pfile )
@@ -284,10 +282,10 @@ _____________________________________________________________________________
             if restore:
                 pr.restore()
         else:
-            NTerror('ERROR Project.open: invalid status option "%s"\n', status )
+            NTerror('Project.open: invalid status option "%s"\n', status )
             return None
         projects.append( pr )
-        printDebug(pr.format())
+        NTdebug(pr.format())
         return pr
     #end def
     open = staticmethod( open )
@@ -301,8 +299,8 @@ _____________________________________________________________________________
     #end def
 
     def save( self):
-        NTmessage('\n' + dots*5 +'\n' )
-        NTmessage(   '==> Saving %s\n', self )
+        NTmessage('' + dots*5 +'' )
+        NTmessage(   '==> Saving %s', self )
 
         # Save the molecules
         for molName in self.molecules:
@@ -387,8 +385,8 @@ _____________________________________________________________________________
     def export( self):
         """Call export routines from the plugins to export the project
         """
-        NTmessage('\n' + dots*5 +'\n' )
-        NTmessage(   '==> Exporting %s\n', self )
+        NTmessage('' + dots*5 +'' )
+        NTmessage(   '==> Exporting %s', self )
 
         for p in self.plugins.values():
             for f,o in p.exports:
@@ -457,7 +455,7 @@ _____________________________________________________________________________
         """
 
         if not self.molecule:
-            NTerror('ERROR Project.mergeResonances: No molecule defined\n')
+            NTerror('Project.mergeResonances: No molecule defined\n')
             return
         #end if
 
@@ -492,13 +490,13 @@ _____________________________________________________________________________
                 self.molecule.resonanceCount = 1
             else:
                 self.molecule.resonanceCount = len( atom.resonances )
-        NTmessage("==> Merged resonances\n")
+        NTmessage("==> Merged resonances")
 
     def initResonances( self ):
         """ Initialize resonances for all the atoms
         """
         if not self.molecule:
-            NTerror('ERROR Project.initResonances: No molecule defined\n')
+            NTerror('Project.initResonances: No molecule defined\n')
             return
         self.molecule.initResonances()
 
@@ -557,11 +555,11 @@ _____________________________________________________________________________
         before exiting."""
         pathString = self.rootPath(self.name)
         if not os.path.exists(pathString):
-            printWarning("No cing project is found at: " + pathString)
+            NTwarning("No cing project is found at: " + pathString)
             return None
-        printMessage("Removing existing cing project")
+        NTmessage("Removing existing cing project")
         if rmtree( pathString ):
-            printError("Failed to remove existing cing project")
+            NTerror("Failed to remove existing cing project")
             return True
  
 #end class
@@ -621,7 +619,7 @@ class ProjectList( NTlist ):
         self.append ( instance )
         s = sprintf('New "%s" instance named "%s"', self.className(), uname )
         self.project.history( s )
-        NTmessage('==> %s\n', s )
+        NTmessage('==> %s', s )
         #end if
         return instance
     #end def
@@ -883,14 +881,14 @@ class PeakList( NTlist ):
         return None
     #end def
 #
-#    def toFile(self, fileName,   ):
+#    def toFile(self, fileName)   :
 #        """
 #        Save peaks to fileName for restoring later with fromFile method
 #        """
 #
 #        fp = open( fileName, 'w' )
 #        if not fp:
-#            NTerror('ERROR PeakList.toFile: opening "%s"\n', fileName)
+#            NTerror('PeakList.toFile: opening "%s"\n', fileName)
 #            return
 #        #end if
 #        fprintf( fp, '<PeakList> %s %s\n', self.name, self.status )
@@ -900,7 +898,7 @@ class PeakList( NTlist ):
 #        fprintf( fp, '</PeakList>\n' )
 #
 #
-#        NTmessage('==> Saved %s to "%s"\n', str(self), fileName )
+#        NTmessage('==> Saved %s to "%s"', str(self), fileName )
 #        #end if
 #    #end def
 
@@ -921,17 +919,17 @@ class PeakList( NTlist ):
         return s
     #end def
 
-#    def toSMLfile(self, fileName,   ):
+#    def toSMLfile(self, fileName)   :
 #        return self.SMLhandler.list2SMLfile( self, fileName  )
 #    #end def
 #
-#    def fromSMLfile(fileName, project,   ):
+#    def fromSMLfile(fileName, project)   :
 #        """
 #        Restore PeakList from SMLfile fileName
 #        """
 #        pl = PeakList.SMLhandler.fromFile( fileName, project )
 #        if pl:
-#            NTmessage('==> Restored %s from "%s"\n', pl, fileName )
+#            NTmessage('==> Restored %s from "%s"', pl, fileName )
 #        #end if
 #        return pl
 #    #end def
@@ -1066,8 +1064,8 @@ class DistanceRestraint( NTdict ):
                 try:
                     self.distances.append( math.pow(d, -0.166666666666666667) )
                 except:
-                    NTerror( "AtomPair (%s,%s) without coordinates\n",
-                             atm1, atm2)
+                    NTerror("AtomPair (%s,%s) without coordinates"%
+                             (atm1, atm2))
                     self.error = True
                     self.colorLabel = COLOR_RED
                     return (None, None, None, None)
@@ -1231,7 +1229,7 @@ class DistanceRestraintList( NTlist ):
         """
 
         if not len( self ):
-            NTerror('ERROR DistanceRestraintList.analyze: "%s" empty list', self.name )
+            NTerror('DistanceRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -1241,7 +1239,7 @@ class DistanceRestraintList( NTlist ):
         #end if
 
         if (modelCount == 0):
-            NTerror('ERROR DistanceRestraintList.analyze: "%s" modelCount 0', self.name )
+            NTerror('DistanceRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -1296,14 +1294,14 @@ class DistanceRestraintList( NTlist ):
 
     #end def
 
-#    def toFile(self, fileName,   ):
+#    def toFile(self, fileName)   :
 #        """
 #        Save dihedralRestraints to fileName for restoring later with fromFile method
 #        """
 #
 #        fp = open( fileName, 'w' )
 #        if not fp:
-#            NTerror('ERROR DistanceRestraintList.toFile: opening "%s"\n', fileName)
+#            NTerror('DistanceRestraintList.toFile: opening "%s"\n', fileName)
 #            return
 #        #end if
 #        fprintf( fp, '<DistanceRestraintList> %s %s\n', self.name, self.status )
@@ -1313,7 +1311,7 @@ class DistanceRestraintList( NTlist ):
 #        fprintf( fp, '</DistanceRestraintList>\n' )
 #
 #
-#            NTmessage('==> Saved %s to "%s"\n', str(self), fileName )
+#            NTmessage('==> Saved %s to "%s"', str(self), fileName )
 #        #end if
 #    #end def
 #end class
@@ -1584,7 +1582,7 @@ class DihedralRestraintList( NTlist ):
         or (None, None, None, None, None) on error
         """
         if not len( self ):
-            NTerror('ERROR DihedralRestraintList.analyze: "%s" empty list', self.name )
+            NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -1594,7 +1592,7 @@ class DihedralRestraintList( NTlist ):
         #end if
 
         if (modelCount == 0):
-            NTerror('ERROR DihedralRestraintList.analyze: "%s" modelCount 0', self.name )
+            NTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -1606,7 +1604,7 @@ class DihedralRestraintList( NTlist ):
             if calculateFirst: 
                 (cav, _cv) = dr.calculateAverage()
                 if not cav:
-                    printDebug("Failed to calculate average for: "+self.format())
+                    NTdebug("Failed to calculate average for: "+self.format())
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5
@@ -1844,7 +1842,7 @@ class RDCRestraintList( NTlist ):
 
         """
         if (len( self ) == 0):
-            NTerror('ERROR RDCRestraintList.analyze: "%s" empty list', self.name )
+            NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -1854,7 +1852,7 @@ class RDCRestraintList( NTlist ):
         #end if
 
         if (modelCount == 0):
-            NTerror('ERROR RDCRestraintList.analyze: "%s" modelCount 0', self.name )
+            NTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -2328,46 +2326,3 @@ def path( *args ):
 def shift( atm ):
     return atm.shift()
 #end def
-
-#-----------------------------------------------------------------------------
-# Testing from here-on
-#-----------------------------------------------------------------------------
-#
-if __name__ == '__main__':
-    pass
-
-    myhtml = HTMLfile('myTest.html', 'A Test')
-    myhtml.header()
-    myhtml('h1', 'It is a test')
-    myhtml.main()
-    myhtml.openTag('a', href="http://www.apple.com" )
-    myhtml('img', src = 'apple1.jpg')
-    myhtml.closeTag('a')
-    myhtml('a', 'testing link', href="http://www.bioc.cam.ac.uk/")
-    myhtml.render()
-
-###############
-    myhtml = HTMLfile('myTest2.html', 'A Test 2')
-
-    myhtml.header('h1', 'It is a test 2')
-    myhtml.header('h2','another line')
-
-    myhtml.main('a', href="http://www.apple.com", closeTag=False)
-    myhtml.main('img', src = 'apple1.jpg')
-    myhtml.main('a', openTag=False)
-    myhtml.main('a', 'testing link', href="http://www.bioc.cam.ac.uk/")
-
-    myhtml('br','used call')
-
-    myhtml.render()
-    #project = openProject('im2', 'old' )
-
-
-#project.initSequence( 'forChris.13Mar2006/IM2/IM2.seq', convention = CYANA )
-#    project.initXeasy( 'forChris.13Mar2006/IM2/IM2.seq', 'forChris.13Mar2006/IM2/IM2.prot', convention = CYANA )
-
-#    project.save()
-
-#    project.exportShifts()
-
-#project2 = openProject('myproject', 'old')

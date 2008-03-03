@@ -5,10 +5,10 @@ Adds methods:
 
 Unit testing is done thru procheck.
 """
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
 from cing.core.constants import IUPAC
 from cing.core.molecule import Atom
 import string
@@ -47,20 +47,20 @@ def export2aqua( project, tmp=None ):
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
-            printMessage("No DR lists to export")
+            NTmessage("No DR lists to export")
         count = 0
         for drl in drLoL:
             count += len(drl)
         if not count:
-            printWarning("Skipping export of empty restraint list")
+            NTwarning("Skipping export of empty restraint list")
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
         exportPath = project.directories.aqua
         path = project.path( exportPath, project.name +'.' + extensionList[typeId] )
-        printMessage("Writing to: " + path )
+        NTmessage("Writing to: " + path )
         fp = open( path, 'w' )
         if not fp:
-            printError('Unable to open: ' + path )
+            NTerror('Unable to open: ' + path )
             return
         countActual = 0
         restraintListText = []
@@ -79,9 +79,9 @@ def export2aqua( project, tmp=None ):
 
                     if len(dr.atomPairs) > 1:
                         if warningCount == warningCountMax+1:
-                            printWarning("And so on")
+                            NTwarning("And so on")
                         elif warningCount <= warningCountMax:
-                            printWarning("Ambiguous restraint exported as unambiguous for Aqua  ["+`warningCount`+"]")
+                            NTwarning("Ambiguous restraint exported as unambiguous for Aqua  ["+`warningCount`+"]")
                         warningCount += 1
                     for atomPair in dr.atomPairs[1:]:
                         result += ( '\n#       %s %s AMBI not read by Aqua' % (
@@ -97,9 +97,9 @@ def export2aqua( project, tmp=None ):
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()
                     if not angleName:
                         if warningCountAngle == warningCountMax+1:
-                            printWarning("And so on")
+                            NTwarning("And so on")
                         elif warningCountAngle <= warningCountMax:
-                            printWarning("Skipping dihedral angle restraint because angle name could not be retrieved.")
+                            NTwarning("Skipping dihedral angle restraint because angle name could not be retrieved.")
                         warningCountAngle += 1
                         return None
 
@@ -119,11 +119,11 @@ def export2aqua( project, tmp=None ):
                     countActual += 1
                     restraintListText.append(result)
                 else:
-                    printWarning("Skipped restraint")
+                    NTwarning("Skipped restraint")
         if warningCount:
-            printWarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: ["+`warningCount`+"]")
+            NTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: ["+`warningCount`+"]")
         if warningCountAngle:
-            printWarning("Dihedral angle restraint not exported                for Aqua for count: ["+`warningCountAngle`+"]")
+            NTwarning("Dihedral angle restraint not exported                for Aqua for count: ["+`warningCountAngle`+"]")
         if countActual:
             # Important to let the join do this as one for optimalization.
             restraintListTextCombined = string.join( restraintListText, '\n')
@@ -132,7 +132,7 @@ def export2aqua( project, tmp=None ):
             fprintf( fp, restraintListTextCombined )
             fp.close()
         else:
-            printWarning("Failed to convert a single restraint of this type: "+restraintTypeList[typeId])
+            NTwarning("Failed to convert a single restraint of this type: "+restraintTypeList[typeId])
             return True
 #-----------------------------------------------------------------------------
 # register the functions in the project class

@@ -9,6 +9,9 @@ ___date__     = "$Date$"
 
 """
 $Log$
+Revision 1.3  2008/03/03 12:43:54  jurgenfd
+Created test code for drawing residue plots with secondary structure.
+
 Revision 1.2  2008/02/06 13:48:23  jurgenfd
 Started to switch to different plot api.
 
@@ -70,7 +73,7 @@ def transpose ( matrix ):
             print 'ERROR: [[]] would become []'
             return 1
         else:
-            return map( lambda y : (y,), matrix[0] )
+            return map( lambda y : (y)   , matrix[0] )
     else:
         return apply( map, [None,] + list(matrix) )
 

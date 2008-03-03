@@ -6,7 +6,6 @@ import unittest
 
 class AllChecks(TestCase):
     def testcheck_integrity(self):
-        """TagTable"""
 
         text = """_A a b c d e"""; free = None
         tt = TagTable(  free      = free,

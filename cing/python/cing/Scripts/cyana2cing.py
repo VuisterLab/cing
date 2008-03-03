@@ -12,9 +12,8 @@
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import OptionParser
-from cing.Libs.NTutils import printError
 from cing.core.classes import Project
-from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import NTwarning
 import os
 import sys
 
@@ -32,7 +31,7 @@ parser.add_option("-c", "--convention",
                  )
 parser.add_option("--seqFile",
                   dest="seqFile",
-                  help="Define seqFile (no .seq extention).",
+                  help="Define seqFile (no .seq extension).",
                   metavar="SEQFILE"
                  )
 parser.add_option("--protFile",
@@ -103,7 +102,7 @@ else:
 
 #if (len(args) >= 1):
 if not args:
-    printError('no arguments found')
+    NTerror('no arguments found')
     sys.exit(1)
 
 if not os.path.exists( args[0] ):
@@ -128,7 +127,7 @@ project.cyana2cing( args[0], convention=options.convention,
 )
 
 if not project:
-    printWarning("No project generated. Aborting further execution.")
+    NTwarning("No project generated. Aborting further execution.")
     sys.exit(0)
 
 if options.refine:
@@ -139,7 +138,7 @@ if options.export:
 
 project.save()
 
-#printDebug("Doing a hard system exit")
+#NTdebug("Doing a hard system exit")
 #sys.exit(0)
 
 
