@@ -5,7 +5,7 @@ python $cingPath/Scripts/test/test_cyana2cing.py
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing import verbosityError
-from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import NTwarning
 from cing.core.classes import Project
 from unittest import TestCase
 import cing
@@ -28,7 +28,7 @@ class AllChecks(TestCase):
         projectRootPath = os.path.join( cingDirTestsTmp, projectId )
         projectRoot = Project.rootPath( projectRootPath ) # xeasy_project.cing in /tmp
         if os.path.exists( projectRoot ):
-            printWarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
+            NTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )
             
         project = Project.open(projectRootPath, 'new')   
@@ -42,7 +42,7 @@ class AllChecks(TestCase):
         )
         
         if not project:
-            printWarning("No project generated. Aborting further execution.")
+            NTwarning("No project generated. Aborting further execution.")
             sys.exit(0)
         project.save()
 

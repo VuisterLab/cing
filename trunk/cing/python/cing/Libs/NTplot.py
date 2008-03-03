@@ -1,12 +1,12 @@
+from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
-from cing.Libs.NTutils import printError
-from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
-from copy import deepcopy
 from cing.Libs.NTutils import NTsort
+from copy import deepcopy
 from matplotlib.collections import LineCollection
-from cing.Libs.NTutils import printCodeError
+from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 # NOTE WELL: use only 1 NTplot instance at a time.
 haveBiggles = False
@@ -14,7 +14,7 @@ try:
     import biggles
     haveBiggles = True
 except ImportError:
-    printError("Failed to import biggles; please check installation")
+    NTdebug("Failed to import biggles; will use MatLibPlot")
     
 #-----------------------------------------------------------------------------
 # Classes
@@ -152,8 +152,8 @@ mappingPointType2MatLibPlot = {
 mappingLineType2MatLibPlot = { 'solid': None, 'dotted': ':', 'longdashed': '--'}
 
 dpi=72.27 # Latex definition
-inches_per_pt = 1.0/dpi
-golden_mean = (sqrt(5.)-1.0)/2.0     # Aesthetic ratio where possible.
+inches_per_pt = 1./dpi
+golden_mean = (sqrt(5.)-1.)/2.     # Aesthetic ratio where possible.
 
 #-----------------------------------------------------------------------------
 # Color conversions
@@ -211,11 +211,11 @@ class NTplot( NTdict ):
     """
     Base plotting class
     """
+    useMatPlotLib= True # Wherever possible transition away from Biggles.
     
     def __init__( self, **kwds ):
         NTdict.__init__( self )
         self.__CLASS__    = 'NTplot'
-        self.useMatPlotLib= True # Wherever possible transition away from Biggles.
 
         self.hardcopySize = (400,400)
         self.font         = 'Helvetica'
@@ -231,8 +231,6 @@ class NTplot( NTdict ):
 
         self.xTicks       = None   # x-axis tics-list, None is autotics
         self.yTicks       = None   # y-axis tics-list, None is autotics
-        self.xmTicks       = None  
-        self.ymTicks       = None   
 
         self.xAxis        = True
         self.yAxis        = True
@@ -254,8 +252,8 @@ class NTplot( NTdict ):
             fig_height    = fig_height_pt*inches_per_pt # height in inches
             fig_size      = [fig_width,fig_height]
             
-#            printDebug("Getting hardcopySize: "+`self.hardcopySize`)
-#            printDebug("Setting sizeInches:   "+`fig_size`)
+#            NTdebug("Getting hardcopySize: "+`self.hardcopySize`)
+#            NTdebug("Setting sizeInches:   "+`fig_size`)
 
             params = {'backend':          self.graphicsOutputFormat, 
                       'figure.dpi':       dpi, 
@@ -277,7 +275,7 @@ class NTplot( NTdict ):
             if not haveBiggles:
                 NTerror("NTplot.__init__: No biggles\n")
             else:
-                #initialise the biggles plot
+                #initialize the biggles plot
                 biggles.configure('persistent','no')
                 self.b = biggles.FramedPlot()
                 self.move( (0.0, 0.0) )
@@ -293,8 +291,8 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         xdata=(self.currentPoint[0], endPoint[0])
         ydata=(self.currentPoint[1], endPoint[1])
-#        printDebug("xdata: " + `xdata`)
-#        printDebug("ydata: " + `ydata`)
+#        NTdebug("xdata: " + `xdata`)
+#        NTdebug("ydata: " + `ydata`)
         if self.useMatPlotLib:
             ax = gca()
             line2D = Line2D(xdata, ydata)
@@ -319,7 +317,7 @@ class NTplot( NTdict ):
         self.draw( endPoint=endPoint, attributes=attributes )
     #end def
 
-    def lines( self, points, attributes=None ):
+    def lines( self, points, attributes=None ):            
         if not attributes:
             attributes=defaultAttributes
         if len(points) == 0: 
@@ -327,8 +325,6 @@ class NTplot( NTdict ):
         self.move( points[0] )
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
-        #end for
-    #end def
 
     def box( self, point, sizes, attributes=None ):
         if not attributes:
@@ -397,14 +393,14 @@ class NTplot( NTdict ):
 #        ['fill', 'fillColor', 'font', 'fontColor', 'fontSize', 'line', 'lineColor', 'lineType', 'lineWidth', 
 #         'pointColor', 'pointSize', 'pointType', 'textAlign']
         
-#        printDebug("attributes: " + attributes.format())
+#        NTdebug("attributes: " + attributes.format())
         if 'pointType' in keys:
             if attributes.pointType:                    
                 if mappingPointType2MatLibPlot.has_key(attributes.pointType):
 #                    print "doing pointType"
                     result.marker =  mappingPointType2MatLibPlot[attributes.pointType]
                 else:
-                    printCodeError("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
+                    NTcodeerror("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
                     return True
         if 'pointColor' in keys:
 #            print "doing pointColor"
@@ -429,7 +425,7 @@ class NTplot( NTdict ):
         if 'alpha' in keys:
 #            print "doing alpha"
             result.alpha           =  attributes.alpha
-#        printDebug("result attributes: " + `result`)
+#        NTdebug("result attributes: " + `result`)
         return result
 
     def mapAttributes2MatLibPatches(self, attributes=defaultAttributes):
@@ -457,8 +453,8 @@ class NTplot( NTdict ):
             result['facecolor']           =  attributes.fillColor
         if 'lineColor' in keys:
             result['edgecolor']           =  attributes.lineColor
-#        printDebug("input  mapAttributes2MatLibPatches: " + `attributes`)
-#        printDebug("result mapAttributes2MatLibPatches: " + `result`)
+#        NTdebug("input  mapAttributes2MatLibPatches: " + `attributes`)
+#        NTdebug("result mapAttributes2MatLibPatches: " + `result`)
         return result
 
 
@@ -582,6 +578,7 @@ class NTplot( NTdict ):
     #end def
 
     def autoScale( self, x=True, y=True ):
+        """Doesn't work for MatPlotLib yet."""
         if x: 
             self.xRange = None
         if y: 
@@ -604,8 +601,10 @@ class NTplot( NTdict ):
             
             if self.xRange:
                 xlim(self.xRange)
+#                NTmessage("Set the xlim in MatPlotLib")
             if self.yRange:
                 ylim(self.yRange)
+#                NTmessage("Set the ylim in MatPlotLib")
             if self.xGrid:
                 grid(True)
             else:
@@ -667,17 +666,17 @@ class NTplot( NTdict ):
     def histogram( self, theList, low, high, bins, leftMargin=0.05, rightMargin=0.05, attributes=defaultAttributes, valueIndexPairList=None ):
         if not attributes:
             attributes=defaultAttributes
-#        printDebug("Creating number of bins: " + `bins`)
-#        printDebug("theList: " + `theList`)
+#        NTdebug("Creating number of bins: " + `bins`)
+#        NTdebug("theList: " + `theList`)
         if not theList:
-#            printDebug("empty input not adding histogram")
+#            NTdebug("empty input not adding histogram")
             return # Nothing to add.
         his = NThistogram( theList, low, high, bins ) # A NTlist
         self.maxY = max(his)
         if self.useMatPlotLib:
             step = (high-low)/bins            
             ind = arange(low,high,step)  # the x locations for the groups
-#            printDebug("Creating x coor for bins: " + `ind`)
+#            NTdebug("Creating x coor for bins: " + `ind`)
             gcf() # should not be needed.
             bar(ind, his, step, 
                 color    =attributes.fillColor,
@@ -685,18 +684,18 @@ class NTplot( NTdict ):
             ax = gca()
 
             if valueIndexPairList: # Were dealing with outliers.                
-#                printDebug("Annotating the outliers with a arrow and string")
+#                NTdebug("Annotating the outliers with a arrow and string")
                 tmpValueIndexPairList = deepcopy(valueIndexPairList)
                 tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
                 
                 xlim = ax.get_xlim()
                 ylim = ax.get_ylim()
                 _ylim_min, ylim_max = ylim
-#                printDebug("xlim: " + `xlim`)
-#                printDebug("ylim: " + `ylim`)
+#                NTdebug("xlim: " + `xlim`)
+#                NTdebug("ylim: " + `ylim`)
                 outlierLocHeight = ylim_max # In data coordinate system
                 outlierLocHeightMin = ylim_max*.1 # In data coordinate system
-#                printDebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
+#                NTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
                 for item in tmpValueIndexPairList:                    
                     value = item[1]
                     modelNum = item[0] + 1
@@ -705,8 +704,8 @@ class NTplot( NTdict ):
                     outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.
                     if outlierLocHeight < outlierLocHeightMin:
                         outlierLocHeight = outlierLocHeightMin
-#                    printDebug("Setting data point to: " + `value` +", 1")
-#                    printDebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
+#                    NTdebug("Setting data point to: " + `value` +", 1")
+#                    NTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
                     ax.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
                     ax.annotate("model "+`modelNum`,                                
 #                                xy=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
@@ -794,4 +793,3 @@ class NTplot( NTdict ):
         self.setTickLineWidth()
     
 #end class
-

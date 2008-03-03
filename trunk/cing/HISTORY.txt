@@ -1,3 +1,8 @@
+Version 0.73:  3 Mar 2008: 
+    - Started to look into incorporating Queen. Need Swig update.
+    - Created test code for drawing residue plots with secondary structure
+        icons above it ala Procheck_NMR.
+        
 Version 0.72: 12 Jan 2008: 
     - Added extensive test cases. Call all by cing --test.
 	- Added integration with Aqua, Molmol, Povray, convert and ps2pdf

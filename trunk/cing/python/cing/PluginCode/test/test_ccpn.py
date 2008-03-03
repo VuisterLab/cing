@@ -1,7 +1,7 @@
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing import verbosityError
-from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.ccpn import initCcpn
 from cing.core.classes import Project
 from cing.core.constants import CYANA
@@ -23,7 +23,7 @@ class AllChecks(TestCase):
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
-        printDebug("Reading files from directory: " + cyanaDirectory)
+        NTdebug("Reading files from directory: " + cyanaDirectory)
         project.cyana2cing(cyanaDirectory=cyanaDirectory, convention=CYANA,
                     uplFiles  = [ entryId ],
                     acoFiles  = [ entryId],

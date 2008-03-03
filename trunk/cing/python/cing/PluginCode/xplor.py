@@ -88,7 +88,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     """
     fp = open( path, 'w' )
     if not fp: 
-        NTerror('ERROR exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
+        NTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -96,7 +96,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     #end for
     
     fp.close()
-    NTmessage('==> Exported %s to "%s"\n', drl, path)
+    NTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl
 #end def
@@ -131,7 +131,7 @@ def exportDihedralRestraintList2xplor( drl, path)   :
     """
     fp = open( path, 'w' )
     if not fp: 
-        NTerror('ERROR exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
+        NTerror('exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -139,7 +139,7 @@ def exportDihedralRestraintList2xplor( drl, path)   :
     #end for
     
     fp.close()
-    NTmessage('==> Exported %s to "%s"\n', drl, path)
+    NTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl
 #end def
@@ -198,7 +198,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end if
     
     if len(models) == 0:
-        NTerror('ERROR newMoleculeFromXplor: empty models list\n')
+        NTerror('newMoleculeFromXplor: empty models list\n')
         return None
     #end if
     
@@ -206,7 +206,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     modelId = models[0] - 1
     xplorFile = sprintf( path, modelId )
     if not os.path.exists(xplorFile):
-        NTerror('ERROR newMoleculeFromXplor: file "%s" not found\n', xplorFile)
+        NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
     #end if
     molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR,
@@ -227,7 +227,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()
-    NTmessage( '%s\n', molecule.format() )
+    NTmessage( '%s', molecule.format() )
             
     return molecule
 
@@ -252,7 +252,7 @@ def export2xplor( project, tmp=None ):
     for molName in project.molecules:
         mol   = project[molName]
         path = project.path( project.directories.xplor, mol.name + '%03d.pdb' )
-        mol.export2xplor( path,   )
+        mol.export2xplor( path)   
     #end for    
 #end def
 

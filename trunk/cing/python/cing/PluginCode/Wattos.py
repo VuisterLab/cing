@@ -3,12 +3,11 @@
     First version: jfd Dec 11, 2007
 """
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 import os
 import time
@@ -108,7 +107,7 @@ def runWattos( project, tmp=None ):
     fullname =  os.path.join( wattosDir, pdbFileName )
     pdbFile = project.molecule.toPDB( convention = "BMRB" )
     if not pdbFile:
-        printError("Failed to write a temporary PDB formatted coordinate file for ensemble.")
+        NTerror("Failed to write a temporary PDB formatted coordinate file for ensemble.")
         return None
     pdbFile.save( fullname   )
 
@@ -119,7 +118,7 @@ def runWattos( project, tmp=None ):
     # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
     timeRunEstimated = 0.025 *project.molecule.modelCount * len(project.molecule.allResidues())
     timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimated*60)
-    printMessage('==> Running Wattos checks for an estimated (5,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    NTmessage('==> Running Wattos checks for an estimated (5,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
     scriptFileName = "wattos.script"
     scriptFullFileName =  os.path.join( wattosDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)
@@ -135,22 +134,22 @@ def runWattos( project, tmp=None ):
     if True:
         wattosExitCode = wattosProgram()
     else:
-        printDebug("Skipping actual wattos execution for testing")
+        NTdebug("Skipping actual wattos execution for testing")
         wattosExitCode = 0
 
-    printDebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+    NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if wattosExitCode:
-        printError("Failed wattos checks with exit code: " + `wattosExitCode`)
+        NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
         return None
 
-    printMessage('==> Parsing checks')
+    NTmessage('==> Parsing checks')
 #    modelCheckDbFullFileName =  os.path.join( wattosDir, modelCheckDbFileName )
 #    wattos._parseCheckdb( modelCheckDbFullFileName, 999 )
 
-    printWarning("Processing is to be continued from here on.")
+    NTwarning("Processing is to be continued from here on.")
     return 1
     if not wattos._processCheckdb():
-        printError("Failed to process check db")
+        NTerror("Failed to process check db")
         return None
     # TODO: finish this code.
 #    wattos.map2molecule()

@@ -17,24 +17,28 @@ Residue
 
 """
 from cing import cingPythonCingDir
+from cing import verbosityDetail
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist 
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printCodeError
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
-from cing.Libs.NTutils import printWarning
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
-from cing import verbosityDetail
 import cing
 import os
 
+
+PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
+SECSTRUCT_STR      = 'secStruct'
+CONSENSUS_SEC_STRUCT_FRACTION = 0.6
+ 
 def procheckString2float(string):
     """Convert a string to float, return None in case of value of 999.90"""
     result = float(string)
@@ -137,9 +141,9 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         resNum    = (1, 5, int, False), 
         resName   = (6, 9, str, False), 
         # ignore 6 cv values and 2 deviation values.
-        gfPHIPSI  = (74, 80, procheckString2float, True), 
-        gfCHI12   = (81, 87, procheckString2float, True), 
-        gfCHI1    = (88, 94, procheckString2float, True), 
+        gfPHIPSI  = (74, 80,  procheckString2float, True), 
+        gfCHI12   = (81, 87,  procheckString2float, True), 
+        gfCHI1    = (88, 94,  procheckString2float, True), 
         gf        = (95, 101, procheckString2float, True) # note it's zero for nucleic acids.
     )
     procheckDefs = NTdict(
@@ -169,7 +173,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         self.redirectOutput = True
         if cing.verbosity >= verbosityDetail:
             self.redirectOutput=False
-#        printDebug("Will redirect procheck output: " + `self.redirectOutput`)
+#        NTdebug("Will redirect procheck output: " + `self.redirectOutput`)
         self.procheck  = ExecuteProgram(cingPaths.procheck_nmr, 
                                             rootPath = self.rootPath,  
                                             redirectOutput= self.redirectOutput
@@ -182,7 +186,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #end def
     
     # Return True on error ( None on success; Python default)
-    def run(self, ranges=None, export = True,   ):
+    def run(self, ranges=None, export = True, createPlots=True, runAqua=True)   :
         # Convert the ranges and translate into procheck format
         selectedResidues = self.molecule.ranges2list(ranges)
         NTsort(selectedResidues, 'resNum', inplace=True)
@@ -205,72 +209,77 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             singleRange = 'RESIDUES %3d %2s  %3d %2s' % (self.ranges[i].resNum, self.ranges[i].chain.name, 
                                                             self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
             fprintf(fp, singleRange+"\n")
-            printDebug( ">range: " + singleRange)
+            NTdebug( ">range: " + singleRange)
         fp.close()
 
-        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', 'procheck_nmr.prm')
+        pcNmrParameterFileOrg = 'procheck_nmr.prm'
+        if not createPlots:
+            pcNmrParameterFileOrg = 'procheck_nmr_nada.prm'
+        
+        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', pcNmrParameterFileOrg)
         pcNmrParameterFileDestination = os.path.join(self.rootPath, 'procheck_nmr.prm')
         if os.path.exists(pcNmrParameterFileDestination):
-            printDebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
+            NTdebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
             os.unlink(pcNmrParameterFileDestination)
-        printDebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+        NTdebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
         if os.link(pcNmrParameterFile, pcNmrParameterFileDestination):
-            printError("Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+            NTerror("Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
             return True
         
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
 #            project.molecule.modelCount
-            self.molecule.toPDBfile(path, convention=IUPAC,  )
+            self.molecule.toPDBfile(path, convention=IUPAC)   
             
         canAqpc = True
         # Save restraints for Aqua
         if self.project.export2aqua():
             canAqpc = False
-            printWarning("Failed to export restraints to Aqua; will run pc without restraints")
+            NTwarning("Failed to export restraints to Aqua; will run pc without restraints")
         else:
             hasRestraints = False
             for extensionRestraintFile in [ "noe", "tor" ]:
                 srcDir = os.path.join(self.project.rootPath(self.project.name), self.project.directories.aqua )
                 if not os.path.exists(srcDir):
-                    printCodeError("Aqua export dir is absent")
+                    NTcodeerror("Aqua export dir is absent")
                     return True
                 fileName = self.project.name +'.' + extensionRestraintFile
                 path = os.path.join(srcDir, fileName )                
                 if not os.path.exists(path):                    
-                    printDebug("No "+ path+" file found (in Aqua export dir)")
+                    NTdebug("No "+ path+" file found (in Aqua export dir)")
                     pass
                 else:
                     # Map from Aqua per project file to Cing per molecule file.
                     dstFileName = self.molecule.name + '.' + extensionRestraintFile
                     dstPath = os.path.join( self.rootPath, dstFileName )
                     if os.path.exists(dstPath):
-                        printDebug("Removing existing copy: " + dstPath)    
+                        NTdebug("Removing existing copy: " + dstPath)    
                         os.unlink(dstPath)
-                    printDebug("Trying to copy from: " + path+" to: "+dstPath)
+                    NTdebug("Trying to copy from: " + path+" to: "+dstPath)
                     if os.link(path, dstPath):
-                        printCodeError("Failed to copy from: " + path+" to: "+self.rootPath)
+                        NTcodeerror("Failed to copy from: " + path+" to: "+self.rootPath)
                         return True
                     hasRestraints = True
             # run aqpc 
             if not canAqpc:
-                printWarning("Skipping aqpc because failed to convert restraints to Aqua")
+                NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
             elif not hasRestraints:
-                printWarning("Skipping qapc because no Aqua restraints were copied for Aqua")
+                NTwarning("Skipping qapc because no Aqua restraints were copied for Aqua")
             else:
-                printDebug("Trying aqpc")
+                NTdebug("Trying aqpc")
                 if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
-                    printCodeError("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
+                    NTcodeerror("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
                     return True
                 else:
-                    printMessage("Finished aqpc successfully")
+                    NTmessage("Finished aqpc successfully")
                     
-        printDebug("Trying pc")
+        NTdebug("Trying pc")
         if self.procheck(self.molecule.name +'.pdb ranges'):
-            printError("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
+            NTerror("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
             return True
-        printMessage("Finished procheck_nmr successfully")
+        NTmessage("Finished procheck_nmr successfully")
         self.parseResult()
+        self.postProcess()
         return True
     #end def
     
@@ -291,76 +300,83 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             result[ field ] = func(line[c1:c2]) 
         return result
     #end def
+
+    def postProcess(self):
+        for item in [ SECSTRUCT_STR ]:
+            for res in self.project.molecule.allResidues():
+                if res.has_key( item ):
+                    itemList = res[ item ]
+                    c = itemList.setConsensus()
+                    NTdebug('consensus: %s', c)
+                    
+                
+            
     
     def parseResult(self):
         """
-        Parse procheck files and store result in procheck NTdict
-        of each residue of mol
+        Parse procheck .rin and .edt files and store result in procheck NTdict
+        of each residue of mol.
+        TODO: get a complete .sum file (bug in procheck compile) and parse it too.
         """
         modelCount = self.molecule.modelCount
-        printMessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
+        NTmessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
         for i in range(1, modelCount+1):
             modelCountStr = "%03d" % i
+            # special case in procheck_nmr
             if modelCount == 1:
-                # special case in procheck_nmr
                 modelCountStr = "***"
             path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))           
-#            print '> parsing rin >', path
     
             for line in AwkLike(path, minLength = 64, commentString = "#"):
                 result = self._parseProcheckLine(line.dollar[0], self.procheckDefs)
                 if not result:
-                    printError("Failed to parse procheck rin file the below line; giving up.")
-                    printError(line.dollar[0])
+                    NTerror("Failed to parse procheck rin file the below line; giving up.")
+                    NTerror(line.dollar[0])
                     return 
                 chain   = result['chain']
                 resNum  = result['resNum']
                 residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
                 if not residue:
-                    printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
+                    NTerror('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
                     return
+                if i==1 and residue.has_key('procheck'):
+                    del(residue['procheck'])
                 residue.setdefault('procheck', NTdict())
                 for field, value in result.iteritems():
                     if not self.procheckDefs[field][3]: # Checking store parameter.
                         continue
-                    # Insert for key: "field" if missing an zero lenght list.
+                    # Insert for key: "field" if missing an zero length list.
                     residue.procheck.setdefault(field, NTlist()) 
                     residue.procheck[field].append(value)
-#                del( result ) # redundant to remove reference to this local variable.
-            #end for
-        #end for
         
         path = os.path.join(self.rootPath, '%s.edt' % self.molecule.name)           
-        printDebug( '> parsing edt >'+ path)
+        NTdebug( '> parsing edt >'+ path)
 
         for line in AwkLike(path, minLength = 64, commentString = "#"):
             result = self._parseProcheckLine(line.dollar[0], self.procheckEnsembleDefs)
             if not result:
-                printError("Failed to parse procheck edt file the below line; giving up.")
-                printError(line.dollar[0])
+                NTerror("Failed to parse procheck edt file the below line; giving up.")
+                NTerror(line.dollar[0])
                 return 
             chain   = result['chain']
             resNum  = result['resNum']
             residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
             if not residue:
-                printError('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
+                NTerror('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
                 return
             residue.setdefault('procheck', NTdict())
             for field, value in result.iteritems():
                 if not self.procheckEnsembleDefs[field][3]: # Checking store parameter.
                     continue
-#                residue.procheck.setdefault( field, value ) 
                 residue.procheck[field] = value 
-        #end for
-    #end def    
 #end class
 
-def procheck(project, ranges=None,   ):
+def procheck(project, ranges=None, createPlots=True, runAqua=True)   :
     """
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
     if not project.molecule:
-        NTerror('ERROR procheck: no molecule defined\n')
+        NTerror('procheck: no molecule defined\n')
         return None
     #end if
     
@@ -370,10 +386,10 @@ def procheck(project, ranges=None,   ):
     
     pcheck = Procheck(project)
     if not pcheck:
-        printError("Failed to get procheck instance of project") 
+        NTerror("Failed to get procheck instance of project") 
         return None
     
-    pcheck.run(ranges=ranges,  )
+    pcheck.run(ranges=ranges,createPlots=createPlots, runAqua=runAqua)   
     project.molecule.procheck = pcheck
     
     return project.molecule.procheck

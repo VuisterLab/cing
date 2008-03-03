@@ -1,3 +1,4 @@
+from cing import NaNstring
 from cing import prefixDebug
 from cing import prefixDetail
 from cing import prefixError
@@ -12,16 +13,17 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-from cing import NaNstring
-import string
 import array
 import cing
 import inspect
 import math
 import optparse
 import os
+import string
 import sys
 import traceback
+
+CONSENSUS_STR = 'consensus'
 
 class NTlist( list ):
     """
@@ -94,6 +96,34 @@ class NTlist( list ):
         return NTlist( *list.__add__(self,other) )
     #end def
 
+    def getConsensus(self, minFraction=1.):
+        if not hasattr(self, CONSENSUS_STR):
+            self.setConsensus(minFraction=minFraction)
+        return getattr(self, CONSENSUS_STR)
+
+    def setConsensus(self, minFraction=1.):
+        """Where there are only the same values set the consensus to it
+        otherwise set it to None.
+        They don't all need to be the same, at least the given fraction 
+        should be the same. If the fraction is set to .5 or lower the result
+        is undefined.
+        
+        Return consensus or False if set to None. Consensus can be None.
+        """
+        setattr(self, CONSENSUS_STR, None)
+        count = {}
+        n = len(self)
+        for v in self:
+            count.setdefault(v,0)
+            count[v] +=1
+        for v in count:
+            if count[v] >= minFraction*n:
+                setattr(self, CONSENSUS_STR, v)
+                return v
+        return False
+        
+         
+        
     def append( self, *items ):
         for item in items:
             list.append( self, item )
@@ -314,10 +344,14 @@ class NTlist( list ):
         #end if
         string = ''
         for item in self:
-            if (fmt):
-                string = string + fmt%( item, )
+            if fmt:
+                if isinstance(item, list):
+                    for subitem in item:
+                        string += fmt % subitem
+                else:
+                    string += fmt % item
             else:
-                string = string + str( item ) +' '
+                string += `item` +' '
             #end if
         #end for
         return string
@@ -1069,10 +1103,68 @@ class NTdict(dict):
       return self
   #end def
 
+  def setDeepByKeys( self, value, *keyList ):
+      """Set arbitrary deep element to value by keyList. 
+      The essence here is silence.
+      keyList needs to have at least one key.
+      Return None on success and True on error.
+      """
+      lk = len(keyList)
+      if not lk:
+          NTerror("Can't setDeepByKeys without any key")
+          return True
+          
+      k = keyList[0]
+      if lk == 1:
+          self[k] = value
+          return
+      
+      if self.has_key(k):
+          deeper = self[k]
+      else:
+          deeper = NTdict()
+          self[k] = deeper
+          
+      reducedKeyList = keyList[1:]          
+      return deeper.setDeepByKeys(value,*reducedKeyList)
+
+
+  def getDeepByKeys( self, *keyList ):
+      """Return arbitrary deep element or None if key is absent at some point.
+      The essence here is silence."""
+      lk = len(keyList)
+#      NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
+      if not lk:
+          NTcodeerror("Asked for a get on a dictionary without a key")
+          return None
+      key = keyList[0]
+      
+      if not self.has_key( key ): 
+#          NTdebug("no key: " + `key`)
+          return None
+      value = self[key]
+      if lk == 1:
+#          NTdebug("value : " + `value`)
+          return value
+      if hasattr( value,'getDeepByKeys'):
+#          NTdebug("Going one level deeper")
+          reducedKeyList = keyList[1:]
+          return value.getDeepByKeys(*reducedKeyList)
+#      NTdebug("In NTdict.getDeepByKeys the value is not a NTdict or subclass instance but there still are keys to go for digging deeper")
+#      NTdebug(" for value : [" + `value` +']')
+#      NTdebug(" type value: [" + `type(value)` +']')
+      return None
+      
+          
+      
+      
+
   def getdefault( self, key, defaultKey ):
       'Return self[key] if key exists, self[defaultKey] otherwise'
-      if self.has_key( key ): return self[key]
-      else: return self[defaultKey]
+      if self.has_key( key ): 
+          return self[key]
+      else: 
+          return self[defaultKey]
   #end def
 
   def uniqueKey( self, key ):
@@ -1377,7 +1469,7 @@ class NTtree( NTdict ):
         selfIndex = self._parent._children.index( self )
         if (selfIndex < 0):
             #This should not happen!
-            NTerror('ERROR NTtree.sister: child "%s" not in parent "%s". This should never happen!!\n',
+            NTerror('NTtree.sister: child "%s" not in parent "%s". This should never happen!!\n',
                     str( self ), str( self._parent)
                    )
             return -1
@@ -1584,7 +1676,7 @@ class NTparameter( NTtree ):
         return branches
     #end def
 
-    def writeFile( self, fileName,   ):
+    def writeFile( self, fileName)   :
         fp = open( fileName, 'w' )
         for p in self.allLeaves():
             fprintf( fp, '%-40s = %s\n', p._Cname(-1) + '.value', repr( p ) )
@@ -2009,28 +2101,28 @@ class XMLhandler:
 
     def handleSingleElement( self, node ):
         """Returns single element below node from DOM tree"""
-        self.printNode( node )
+        self.printDebugNode( node )
         if node.nodeName != self.name:
-            NTerror('ERROR XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
+            NTerror('XML%sHandler: invalid XML handler for node <%s>', self.name, node.nodeName)
             return None
         #end if
         if len( node.childNodes ) != 1:
-            NTerror("ERROR XML%sHandler: malformed DOM tree\n", self.name)
+            NTerror("XML%sHandler: malformed DOM tree", self.name)
             return None
         #end if
         if node.childNodes[0].nodeType != Node.TEXT_NODE:
-            NTerror("ERROR XML%sHandler: malformed DOM tree, expected TEXT_NODE containing value\n", self.name)
+            NTerror("XML%sHandler: malformed DOM tree, expected TEXT_NODE containing value", self.name)
             return None
         #end if
         result = node.childNodes[0].nodeValue
-        NTerror("==>%s %s\n",repr(node), result)
+        NTdebug("==>%s %s\n",repr(node), result)
         return result
     #end def
 
     def handleMultipleElements( self, node ):
-        self.printNode( node )
+        self.printDebugNode( node )
         if node.nodeName != self.name:
-            NTerror('ERROR XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
+            NTerror('XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
         #end if
         result = []
@@ -2039,14 +2131,14 @@ class XMLhandler:
                 result.append( NThandle( subNode) )
             #end if
         #end for
-        NTerror("==>%s %s\n",repr(node), result)
+        NTdebug("==>%s %s\n",repr(node), result)
         return  result
     #end def
 
     def handleDictElements( self, node ):
-        self.printNode( node )
+        self.printDebugNode( node )
         if node.nodeName != self.name:
-            NTerror('ERROR XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
+            NTerror('XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
         #end if
 
@@ -2088,7 +2180,7 @@ class XMLhandler:
         #append all keys, checking for 'format' as outlined above
         i = 0
         while (i < len(subNodes)):
-            self.printNode( subNodes[i] )
+            self.printDebugNode( subNodes[i] )
 
             try:
                 keyName = subNodes[i].attributes.get('name').nodeValue
@@ -2102,12 +2194,12 @@ class XMLhandler:
 #            print ">>", keyName, value
             result[keyName] = value
         #end while
-        NTerror("==>%s %s\n",repr(node), result)
+        NTdebug("==>%s %s\n",repr(node), result)
         return result
     #end def
 
-    def printNode( self, node ):
-        NTerror("   %s, type %s, subnodes %d\n", str(node), node.nodeType, len(node.childNodes) )
+    def printDebugNode( self, node ):
+        NTdebug("   %s, type %s, subnodes %d\n", str(node), node.nodeType, len(node.childNodes) )
     #end def
 #end class
 
@@ -2345,12 +2437,12 @@ NTplisthandler  = XMLNTplistHandler()
 def NThandle( node ):
     """Handle a given node, return object of None in case of Error
     """
-    if ( node == None ):
-        NTerror("ERROR NThandle: None node\n")
+    if node == None:
+        NTerror("NThandle: None node")
         return None
     #end if
-    if ( node.nodeName not in XMLhandlers ):
-        NTerror('ERROR NThandle: no handler for XML <%s>\n', node.nodeName)
+    if node.nodeName not in XMLhandlers:
+        NTerror('NThandle: no handler for XML <%s>', node.nodeName)
         return None
     #end if
     return XMLhandlers[node.nodeName].handle( node )
@@ -2426,7 +2518,7 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         fprintf( stream, "</dict>" )
         fprintf( stream, lineEnd )
     else:
-        NTerror('ERROR NTtoXML: undefined object "%s": cannot generate XML\n', obj )
+        NTerror('NTtoXML: undefined object "%s": cannot generate XML\n', obj )
     #end if
 #end def
 
@@ -2434,27 +2526,23 @@ def obj2XML( obj, stream=None, path=None ):
     """Convert an object to XML
        output to stream or path
     """
-    if (obj == None):
-        NTerror("ERROR obj2XML: no object\n")
+    if obj == None:
+        NTerror("obj2XML: no object\n")
         return
-    #end if
-    if (stream == None and path == None):
-        NTerror("ERROR obj2XML: no output defined\n")
+    if stream == None and path == None:
+        NTerror("obj2XML: no output defined\n")
         return
-    #end if
 
     closeFile = 0
-    if (stream == None):
+    if not stream:
         stream = open( path, 'w')
         closeFile = 1
-    #end if
 
     fprintf( stream, '<?xml version="1.0" encoding="ISO-8859-1"?>\n' )
     NTtoXML( obj, depth=0, stream=stream, indent='    ' )
 
     if closeFile:
         stream.close()
-    #end if
 #end def
 
 def XML2obj( path=None, string=None ):
@@ -2462,16 +2550,15 @@ def XML2obj( path=None, string=None ):
        returns object or None on error
     """
     if path == None and string==None:
-        NTerror("ERROR XML2obj: no input defined\n")
+        NTerror("XML2obj: no input defined")
         return None
-    #end if
 
-    printDebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
+    NTdebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
     if path:
         doc = minidom.parse( path )
     else:
         doc = minidom.parseString( string )
-    printDebug("Done reading XML")
+    NTdebug("Done reading XML")
     root = doc.documentElement
 
     result = NThandle( root )
@@ -2532,7 +2619,7 @@ def quote( inputString ):
     single = (find( inputString, "'" ) >= 0)
     double = (find( inputString, '"' ) >= 0)
     if single and double:
-        printError("in quote: both single and double quotes in [%s]" % inputString)
+        NTerror("in quote: both single and double quotes in [%s]" % inputString)
         return None
     if double:
         return "'" + inputString + "'"
@@ -2559,7 +2646,7 @@ def asci2list( string ):
             for i in range( int(tmp[0]), int(tmp[1])+1 ):
                 result.append( i )
         else:
-            NTerror('ERROR asci2list: invalid construct "%s"\n', string )
+            NTerror('asci2list: invalid construct "%s"\n', string )
         #end if
     #end for
 
@@ -2712,7 +2799,10 @@ def NTinspect( something ):
 #
 def fprintf( stream, format, *args ):
   """C's fprintf routine"""
-  stream.write( (format) % (args) )
+  if args:
+      stream.write( (format) % (args) )
+  else:
+      stream.write( format )
 
 def mprintf( fps, fmt, *args ):
     """
@@ -2728,9 +2818,13 @@ def sprintf( format, *args ):
   return ( (format) % (args) )
 
 class PrintWrap:
-    def __init__( self, stream = None, autoFlush = True, verbose=verbosityOutput ):
+    def __init__( self, stream = None, 
+                  autoFlush = True, 
+                  verbose=verbosityOutput,
+                  noEOL=False):
         self.autoFlush = autoFlush
-        self.verbose = verbose
+        self.verbose   = verbose
+        self.noEOL     = noEOL
         if self.verbose > verbosityError:
             self.stream = sys.stdout
         else:
@@ -2749,47 +2843,34 @@ class PrintWrap:
     def __call__( self, format, *args ):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
+        if self.prefix:
+            format = self.prefix + ":" + format
+        if not self.noEOL:
+            format += '\n'
+        fprintf( self.stream, format, *args )
+        if self.prefix.find('EXCEPTION')>=0:
+            fprintf( self.stream, "Exception below:\n" )
+            traceback.print_exc() # Just prints None on my Mac. Strange.
         if self.autoFlush:
             self.stream.flush()
-        format = self.prefix + format
-        
-        fprintf( self.stream, format, *args )
-        if self.autoFlush:
             self.flush()
     def flush( self ):
         self.stream.flush()
     def setVerbosity(self,verbose):
         self.verbose=verbose
 
-def printError(msg, *msgList):
-  if cing.verbosity >= verbosityError:
-    msgTot = ''
-    for msg in msgList:
-        msgTot += " " + msg
-    print prefixError,msgTot
-def printWarning(msg):
-  if cing.verbosity >= verbosityWarning:
-    print prefixWarning,msg
-def printMessage(msg):
-  if cing.verbosity >= verbosityOutput:
-    print msg
-def printDebug(msg):
-  if cing.verbosity >= verbosityDebug:
-    print prefixDebug, msg
-def printCodeError(msg):
-  if cing.verbosity >= verbosityError:
-    print prefixError+" in code:", msg
-def printException(msg):
-  if cing.verbosity >= verbosityError:
-    print prefixError+" exception caught: ["+ msg + "]"
-    traceback.print_exc() # Just prints None on my Mac. Strange.
-
 NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly 
 NTerror   = PrintWrap(verbose=verbosityError)
+NTcodeerror=PrintWrap(verbose=verbosityError)
+NTexception=PrintWrap(verbose=verbosityError)
 NTwarning = PrintWrap(verbose=verbosityWarning)
 NTmessage = PrintWrap(verbose=verbosityOutput)
 NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug)
+
+NTmessageNoEOL = PrintWrap(verbose=verbosityOutput,noEOL=True)
+NTcodeerror.prefix += " IN CODE"
+NTcodeerror.prefix += " EXCEPTION CAUGHT"
 
 #def setVerbosity(verbosity):
 #    cing.verbosity = verbosity
@@ -2907,7 +2988,7 @@ def show( NTobject=None ):
     if NTobject != None and hasattr( NTobject, 'format' ):
         NTmessage( "%s", NTobject.format() )
     else:
-        NTmessage( "%s %s\n", type(NTobject), str(NTobject) )
+        NTmessage( "%s %s", type(NTobject), str(NTobject) )
     #end if
 #End def
 
@@ -2921,7 +3002,7 @@ def formatList( theList, fmt = '%s\n' ):
     """
     result = []
     for element in theList:
-#        printDebug("Doing element: " +`element`)
+#        NTdebug("Doing element: " +`element`)
         result.append( fmt%element.format()  )
     return string.join(result,'')
 #end def
@@ -2981,11 +3062,11 @@ class ExecuteProgram( NTdict ):
         #end if
 
         if self.redirectInputFromDummy and self.redirectInputFromFile:
-            printError("Can't redirect from dummy and from a file at the same time")
+            NTerror("Can't redirect from dummy and from a file at the same time")
             return 1
 
         if self.redirectOutputToFile and self.redirectOutput:
-#            printDebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
+#            NTdebug("Can't redirect output to standard filename and given file name at the same time; will use specific filename")
             self.redirectOutput = False
 
 
@@ -3002,9 +3083,9 @@ class ExecuteProgram( NTdict ):
         elif self.redirectOutputToFile:
             cmd = sprintf('%s >& %s', cmd, self.redirectOutputToFile)
             self.jobcount += 1
-        printDebug('==> Executing ('+cmd+') ... ')
+        NTdebug('==> Executing ('+cmd+') ... ')
         code = os.system( cmd )
-#        printDebug( "Got back from system the exit code: " + `code` )
+#        NTdebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
 #
@@ -3048,7 +3129,7 @@ def convertImageMagick(convertPath, inputPath,outputPath,options,extraOptions=No
         cmd += " " + extraOptions
     cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
-        printError("Failed to run conversion: " + cmd)
+        NTerror("Failed to run conversion: " + cmd)
         return True
 
 def convertPs2Pdf(ps2dfPath, inputPath,outputPath,options,extraOptions=None):
@@ -3058,7 +3139,7 @@ def convertPs2Pdf(ps2dfPath, inputPath,outputPath,options,extraOptions=None):
         cmd += " " + extraOptions
     cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
-        printError("Failed to run conversion: " + cmd)
+        NTerror("Failed to run conversion: " + cmd)
         return True
 
 def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
@@ -3087,7 +3168,7 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
     doPrint = True
 
     if not os.path.exists(path):
-        printError("Failed to find input")
+        NTerror("Failed to find input")
         return True
     # Next time use: NTpath for this.
 #    path = "/Users/jd/t.pdf"
@@ -3098,15 +3179,15 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
         if os.path.exists(outputDir) and os.path.isdir(outputDir):
             head = outputDir
         else:
-            printError("Given output directory: " + outputDir + " is absent or is not a dir")
+            NTerror("Given output directory: " + outputDir + " is absent or is not a dir")
             return None
 
     if extension == "pdf":
-        printDebug("Will skip generating printable version as input is also a pdf")
+        NTdebug("Will skip generating printable version as input is also a pdf")
         doPrint = False
 
     if extension == "gif":
-        printDebug("Will skip generating full size gif version as input is also a gif")
+        NTdebug("Will skip generating full size gif version as input is also a gif")
         doFull = False
 
     pinupPath = None
@@ -3117,34 +3198,49 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
     if doPinUp:
         pinupPath = os.path.join( head, root+"_pin.gif")
         if convertImageMagick(convertPath, path, pinupPath, optionsPinUp):
-            printError("Failed to generated pinup")
+            NTerror("Failed to generated pinup")
             pinupPath = None
     if doFull:
         fullPath  = os.path.join( head, root+".gif")
         if convertImageMagick(convertPath, path, fullPath, optionsFull):
-            printError("Failed to generated full gif")
+            NTerror("Failed to generated full gif")
             fullPath = None
     if doPrint:
         printPath = os.path.join( head, root+".pdf")
         if convertPs2Pdf(ps2pdfPath, path, printPath, optionsPrint):
-            printError("Failed to generated print")
+            NTerror("Failed to generated print")
             printPath = None
     result = ( pinupPath, fullPath, printPath )
     if  pinupPath or fullPath or printPath:
         return result
     return None
 
-def val2Str( value, fmt, count=None):
+def val2Str( value, fmt, count=None, nullValue=None):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is 
     None the count determines how long the return string will be.
     Regular formatting is used otherwise."""
+    if value==nullValue:
+        value = None
     if value == None:
         if not count:
             return NaNstring
         return ("%"+`count`+"s") % NaNstring
     return fmt % value
  
+def limitToRange( v, low, hi):
+    """Return a value in range [low,hi}
+    truncating the value to given bounds
+    E.g. a value of 5 with bounds [0,1] will 
+    return 1.
+    """
+    # use equal signs for speed.
+    if v >= hi:
+        return hi
+    if v <= low:
+        return low
+    return v
+
 #
 #def splitpdb( fileName = None, modelNum = None ):
 #    """
@@ -3178,14 +3274,14 @@ def val2Str( value, fmt, count=None):
 #and the script exits with status 1
 #A MODEL 0 record (as in entry 1CRQ) is ignored by the script.
 #"""
-#    printError("Don't use this code until completed")
+#    NTerror("Don't use this code until completed")
 #    return None
 #    if not fileName:
-#        printWarning(usage)
+#        NTwarning(usage)
 #        return None
 #
 #    if not os.path.exists( fileName ):
-#        printError("Input file : "+fileName+" doesn't exist")
+#        NTerror("Input file : "+fileName+" doesn't exist")
 #        return None
 #
 #    modelId = 1
@@ -3204,14 +3300,14 @@ def val2Str( value, fmt, count=None):
 #            ## Skip the whole model, treat it as if it is not an ensemble.
 #            ## if the first model listed is not number 1
 #            if line.NF < 2:
-#                printError("Add special case for when model record doesn't contain model number")
+#                NTerror("Add special case for when model record doesn't contain model number")
 #                return None
 #
 #            modelStr = line.dollar[2]
 #            modelId = `modelStr`
 ##            modelFileNamePart = sprintf( "%03i", modelId )
 #            fileNameModel = _fileNameModel( fileName=fileName, modelId=modelId )
-#            printMessage( "copying model" + modelId +  "to" + fileNameModel )
+#            NTmessage( "copying model" + modelId +  "to" + fileNameModel )
 #            if modelId > 1:
 #                file.write( "END")
 #            # Normally the first file will be closed and reopened here for multimodel files.

@@ -6,30 +6,33 @@ from cing import NaNstring
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing import cingPythonDir
-from cing import verbosityError
+from cing import verbosityDebug
+from cing import verbosityNothing
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import findFiles
-from cing.Libs.NTutils import printDebug
 from cing.Libs.NTutils import val2Str
+from cing.core.constants import NOSHIFT
 from cing.core.parameters import cingPaths
 from unittest import TestCase
 import cing
 import os
 import unittest
+#from cing import verbosityDebug
 
 class AllChecks(TestCase):
 
     def testPrints(self):
-#        printException("Now in testPrints")
-#        printError("test")
+#        NTexception("Now in testPrints")
+#        NTerror("test")
         pass
     
     def testFind(self):
-        self.assertTrue( os.path.exists( cingPythonDir) and os.path.isdir(cingPythonDir ) )
-        self.failIf( os.chdir(cingPythonDir), msg=
-            "Failed to change to test directory for data: "+cingPythonDir)
+        self.failIf( os.chdir(cingDirTestsTmp), msg=
+            "Failed to change to temp test directory for data: "+cingDirTestsTmp)
         namepattern, startdir = "CVS", cingPythonDir
         nameList = findFiles(namepattern, startdir)
         self.assertTrue( len(nameList) > 10 ) 
@@ -44,7 +47,7 @@ class AllChecks(TestCase):
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
         fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, inputPath, outputDir=outputPath ) 
-        printDebug( "Got back from convert2Web output file names: " + `fileList`)
+        NTdebug( "Got back from convert2Web output file names: " + `fileList`)
         self.assertNotEqual(fileList,True)
         if fileList != True:
             for file in fileList: 
@@ -108,35 +111,35 @@ class AllChecks(TestCase):
     def testNTaverage(self):
         l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
         (av,sd,n) = l.average()
-        printDebug((av,sd,n))
+        NTdebug((av,sd,n))
         self.assertAlmostEqual( av, 10.22, places=1) # verified in Excel stddev function.
         self.assertAlmostEqual( sd,  4.18, places=1) 
         self.assertEquals(       n, 9) 
 
         l = NTlist( 1,None,1,1 )
         (av,sd,n) = l.average()
-        printDebug((av,sd,n))
+        NTdebug((av,sd,n))
         self.assertAlmostEqual( av,   1.0, places=1) 
         self.assertAlmostEqual( sd,   0.0, places=1) 
         self.assertEquals(       n, 3) 
         
         l = NTlist( 1,2 )
         (av,sd,n) = l.average()
-        printDebug((av,sd,n))
+        NTdebug((av,sd,n))
         self.assertAlmostEqual( av,   1.5, places=1) 
         self.assertAlmostEqual( sd, 0.707, places=2) 
         self.assertEquals(       n, 2) 
         
         l = NTlist( 1 )
         (av,sd,n) = l.average()
-        printDebug((av,sd,n))
+        NTdebug((av,sd,n))
         self.assertAlmostEqual( av,   1.0, places=1) 
         self.assertEquals(      sd,  None) 
         self.assertEquals(       n,   1) 
         
         l = NTlist()
         (av,sd,n) = l.average()
-        printDebug((av,sd,n))
+        NTdebug((av,sd,n))
         self.assertEquals(      av,  None) 
         self.assertEquals(      sd,  None) 
         self.assertEquals(       n,   0) 
@@ -147,8 +150,49 @@ class AllChecks(TestCase):
         self.assertEquals( val2Str(6.3, "%5.2f",5),   " 6.30")
         self.assertEquals( val2Str(6.3, "%.2f"),      "6.30")
         self.assertEquals( val2Str(6.3, "%03d"),      "006")
+        self.assertEquals( val2Str(6.3, "%6.2f",nullValue=NOSHIFT),"  6.30")
+        self.assertEquals( val2Str(999.,"%6.2f",nullValue=NOSHIFT),NaNstring) # Oops an xeasy nan
+        self.assertNotEquals(val2Str(999.1,"%6.2f",nullValue=NOSHIFT),NaNstring)
+
+    def testNTdict(self):
+        a = NTdict(b=NTdict(anItem='there'))
+#        NTdebug( '0 '+ `a` )
+#        NTdebug( '1 '+ `a['b']`)
+#        NTdebug( '2 '+ `a.getDeepByKeys('b')`)
+#        NTdebug( '3 '+ `a.getDeepByKeys(9)`)
+        # Tests below make sure no throwables are thrown.
+        self.assertTrue(a)
+        self.assertTrue(a['b'])
+        self.assertTrue(a.getDeepByKeys('b'))
+        self.assertFalse(a.getDeepByKeys(9))
+
+        
+        a = NTdict(b=NTdict(c=NTdict(anItem='there')))
+#        NTdebug( '4 '+ `a` )
+#        NTdebug( '5 '+ `a['b']`)
+#        NTdebug( '6 '+ `a.getDeepByKeys('b')`)
+#        NTdebug( '7 '+ `a.getDeepByKeys('b','c')`)
+#        NTdebug( '8 '+ `a.getDeepByKeys('b','9')`)
+#        NTdebug( '9 '+ `a.getDeepByKeys('b','c','d')`)
+        self.assertTrue(a.getDeepByKeys('b','c','anItem'))
+        self.assertFalse(a.getDeepByKeys('b','c',9))
+        a.b.c=NTlist(1,2,3)
+        self.assertFalse(a.getDeepByKeys('b','c',1)) # better not throw an error.
+
+    def testNTmessage(self):
+        aStringToBe = 123
+        NTdebug("testing messaging system for debug: "+`aStringToBe`)
+        # Next should not be printing anything when verbosityNothing is the setting.
+        NTerror("testing messaging system for error: "+`aStringToBe`) 
+        NTdebug("testing messaging system: "+`aStringToBe`)
+        NTdebug("testing messaging system: %s", aStringToBe)
+
+    def testNTlistSetConsensus(self):
+        l = NTlist( 4., 9., 9. )
+        self.assertEqual( l.setConsensus(minFraction=0.6), 9)
+        self.assertEqual( l.consensus, 9)
         
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
-#    cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityNothing
     unittest.main()

@@ -4,7 +4,7 @@
 
  refine.py
  
- GWV 23 February/March 2005: waterrefinement
+ GWV 23 February/March 2005: water refinement
  GWV March 2007: Adapted for usage with cing
  - Model indices [0,Nmodels>
  - General directory structure using --setup
@@ -14,26 +14,26 @@
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTaverage
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import removedir
 from cing.Libs.disk import copy
+from cing.Refine import config
 from cing.Refine.NTxplor import Analyze
 from cing.Refine.NTxplor import GeneratePSF
 from cing.Refine.NTxplor import WaterRefine
 from cing.Refine.NTxplor import Xplor
+from cing.Refine.config import refConfig
 from cing.Refine.parameters import params
 from cing.core.classes import Project
-from string import find
-from cing.Refine import config
 from cing.core.constants import XPLOR
-from cing.Refine.config import refConfig
-from cing.Libs.NTutils import printDebug
+from string import find
 import os
 import sys
 
@@ -51,7 +51,7 @@ def doSetup( config, basename ):
     #end for
     parfile = os.path.join( basename, 'parameters.py' )
     copy( os.path.join( config.refinePath, 'parameters.py'), parfile )
-    NTmessage('==> Generated setup under "%s"\nEdit "%s" before continuing\n',
+    NTmessage('==> Generated setup under "%s"\nEdit "%s" before continuing',
               basename, parfile
              )
 #end def
@@ -157,7 +157,7 @@ def parseRefineOutput( params, options ):
     for i in params.models:
         
         file = params.checkPath( params.directories.jobs, 'refine_%d.log'%i )
-        NTmessage('==> Parsing %s\n', file )
+        NTmessage('==> Parsing %s', file )
         
         data = NTdict( fileName = file,
                          model = i
@@ -219,14 +219,14 @@ def parseRefineOutput( params, options ):
 
     # print results to file and screen
     resultFile = open( params.joinPath('parsedOutput.txt'), 'w' )
-    NTmessage('\n=== Results: sorted on "%s" ===\n', options.sortField)
+    NTmessage('\n=== Results: sorted on "%s" ===', options.sortField)
     fprintf(resultFile, '=== Results: sorted on "%s" ===\n', options.sortField)
     fmt = '%-10s '
     for k in keys:
         NTmessage( fmt, str(k))
         fprintf( resultFile, fmt, str(k))
     #end for
-    NTmessage('\n')
+    NTmessage('')
     fprintf(resultFile,'\n')
     for data in results:
         for k in keys:
@@ -237,23 +237,23 @@ def parseRefineOutput( params, options ):
                 NTmessage(fmt, '-')
                 fprintf( resultFile, fmt, '-')
         #end for
-        NTmessage('\n')
+        NTmessage('')
         fprintf(resultFile,'\n')
     #end for
 
     # best results
     bestModels = int(options.bestModels)
     if bestModels > 0:
-        NTmessage('\n=== Averages best %d models ===\n', bestModels)
+        NTmessage('\n=== Averages best %d models ===', bestModels)
         fprintf( resultFile, '\n=== Averages best %d models ===\n', bestModels)
         for key in keys:
             getKey = Key( key )
             values = map( getKey, results )
             av,sd,_n = NTaverage( values )
-            NTmessage('%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
+            NTmessage('%-12s: %10.3f +/- %-10.3f', key, av, sd )
             fprintf(resultFile,'%-12s: %10.3f +/- %-10.3f\n', key, av, sd )
         #end for
-        NTmessage('\n\n')
+        NTmessage('\n')
         fprintf(resultFile, '\n\n')
 
         fname = params.joinPath('best%dModels.list' % bestModels)
@@ -262,7 +262,7 @@ def parseRefineOutput( params, options ):
             fprintf(f, '%s/%s\n', params.outPath, params.baseName % results[i].model )
         #end for
         f.close()
-        NTmessage('==> Best %d models listed in %s\n', bestModels, fname )
+        NTmessage('==> Best %d models listed in %s', bestModels, fname )
     #end if  
     
     resultFile.close()
@@ -373,7 +373,7 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     if options.doc:
         parser.print_help(file=sys.stdout)
-        NTmessage("%s\n", __doc__ )
+        NTmessage("%s", __doc__ )
         sys.exit(0)
     #end if
     
@@ -382,9 +382,9 @@ if __name__ == '__main__':
     parser.check_required('-n')
         
     
-    NTmessage("-------------------------------------------------------------------------------------------------------\n")
-    NTmessage("     Refine version %s\n", version)
-    NTmessage("-------------------------------------------------------------------------------------------------------\n")
+    NTmessage("-------------------------------------------------------------------------------------------------------")
+    NTmessage("     Refine version %s", version)
+    NTmessage("-------------------------------------------------------------------------------------------------------")
     
     #------------------------------------------------------------------------------
     # Project
@@ -404,27 +404,27 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     if options.doSetup:
         doSetup( config, options.name )
-        printDebug("done with refine.doSetup now doing a system exit")
+        NTdebug("done with refine.doSetup now doing a system exit")
         sys.exit(0)
     #end if
     
     #------------------------------------------------------------------------------
     # Some output
     #------------------------------------------------------------------------------
-    NTmessage("==> Reading configuration\n")
-    NTmessage('refinePath:    %s\n', config.refinePath )
-    NTmessage('xplor:         %s\n', XPLOR )
+    NTmessage("==> Reading configuration")
+    NTmessage('refinePath:    %s', config.refinePath )
+    NTmessage('xplor:         %s', XPLOR )
     for pfile in refConfig.parameterFiles:
-        NTmessage("parameterFile: %s\n", pfile)
+        NTmessage("parameterFile: %s", pfile)
     for tfile in refConfig.topologyFiles:
-        NTmessage("topologyFile:  %s\n", tfile)
+        NTmessage("topologyFile:  %s", tfile)
     
     #------------------------------------------------------------------------------
     # read parameters file
     #------------------------------------------------------------------------------
     paramfile = os.path.join( options.name, 'parameters.py' )
     execfile( paramfile )
-    NTmessage('==> Read user parameters %s\n',  paramfile)
+    NTmessage('==> Read user parameters %s',  paramfile)
     params.basePath = options.name
     
     #------------------------------------------------------------------------------

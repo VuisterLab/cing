@@ -4,7 +4,7 @@ import sys
 # Molecule related stuff (former NTmol)
 #from constants      import *
 
-cingVersion     = '0.72 alfa'
+cingVersion     = '0.73 alfa'
 programName     = 'CING'
 programVersion  = cingVersion
 
@@ -12,7 +12,7 @@ header = """
 ======================================================================================================
 | CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
 ======================================================================================================
-""" % (cingVersion,)
+""" % (cingVersion)   
 footer = """------------------------------------------------------------------------------------------------------
 """
 authorList = [  ('Geerten Vuister',             'vuister@science.ru.nl'),
@@ -24,22 +24,27 @@ verbosityError    = 1 # show only errors
 verbosityWarning  = 2 # show errors and warnings
 verbosityOutput   = 3 # and regular output DEFAULT 
 verbosityDetail   = 4 # show more details
-verbosityDebug    = 9 # add debugging info (not recommended for casual user)  
+verbosityDebug    = 9 # add debugging info (not recommended for casual user)
+
+verbosityDefault  = verbosityOutput
 """How much text is printed to stdout/sstderr streams
 Reference to it as cing.verbosity if you want to see non-default behavior
 """
-verbosity = verbosityOutput
-prefixError     = "ERROR:"
-prefixWarning   = "WARNING:"
-prefixDetail    = "DETAIL:"
-prefixDebug     = "DEBUG:"
+verbosity = verbosityDefault
+prefixError     = "ERROR"
+prefixWarning   = "WARNING"
+prefixDetail    = "DETAIL"
+prefixDebug     = "DEBUG"
 
-#NaNstring = "\\N"
+#- configure local settings:
+#    Create a file localConstants parallel to the setup.py file and add definitions that
+#    get imported from the parallel __init__.py code. Just one setting at the moment.
 try:
     from localConstants import NaNstring #@UnresolvedImport
 except:
     NaNstring = "NaN" # default if not set in localConstants.
     
+CHARS_PER_LINE_OF_PROGRESS = 80
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
 
@@ -53,13 +58,13 @@ cingPythonDir = os.path.split(cingPythonCingDir)[0]
 # environment variable CINGROOT is defined the same this is the prefered 
 # source for the info within the CING python code.
 cingRoot = os.path.split(cingPythonDir)[0]
-#printDebug("cingRoot        : " + cingRoot)
+#NTdebug("cingRoot        : " + cingRoot)
 ######################################################################################################
-cingDirTests       = os.path.join(cingRoot,         "Tests")
-cingDirTestsData   = os.path.join(cingDirTests,     "data")
-cingDirTestsTmp    = os.path.join(cingDirTestsData, "tmp")
-cingDirCsh         = os.path.join(cingRoot,         "csh")
-cingDirTmp         = os.path.join("/tmp" , "cing")
+cingDirTests           = os.path.join(cingRoot,         "Tests")
+cingDirTestsData       = os.path.join(cingDirTests,     "data")
+cingDirTestsTmp        = os.path.join(cingDirTestsData, "tmp")
+cingDirMolmolScripts   = os.path.join(cingRoot,         "scripts", "molmol")
+cingDirTmp             = os.path.join("/tmp" , "cing")
 if not os.path.exists(cingDirTmp):
     if os.mkdir(cingDirTmp):
         print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)

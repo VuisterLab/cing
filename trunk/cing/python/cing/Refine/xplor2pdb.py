@@ -90,7 +90,7 @@ if options.convention != None:
 #=======================================================================
 
 pdbFile = open( options.outFile, 'w' )
-NTmessage("==> Opened %s\n", options.outFile )
+NTmessage("==> Opened %s", options.outFile )
 
 xplorCount = 0
 for fName in files:
@@ -158,7 +158,7 @@ fprintf( pdbFile, "END\n" )
 
 pdbFile.close()
 
-NTmessage("==> Converted %d xplor files to %s (%s format)\n", xplorCount, options.outFile, convention )
+NTmessage("==> Converted %d xplor files to %s (%s format)", xplorCount, options.outFile, convention )
 
 
 

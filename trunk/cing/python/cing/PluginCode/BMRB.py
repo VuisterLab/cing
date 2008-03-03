@@ -45,11 +45,11 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
 
     error = error or (project.importBMRB( bmrbFile)    == None)
     if error:
-        NTmessage( '==> initBMRB: completed with error(s)\n' )
+        NTmessage( '==> initBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> initBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
+        NTmessage( '==> initBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
     #end if
-    NTmessage("%s\n", mol.format() )
+    NTmessage("%s", mol.format() )
 
     if error: 
         return None
@@ -97,11 +97,11 @@ def importBMRB( project, bmrbFile =None ):
     #end for
 
     if error:
-        NTmessage( '==> importBMRB: completed with error(s)\n' )
+        NTmessage( '==> importBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> importBMRB: successfully parsed %d lines from %s\n', f.NR, f.FILENAME )
+        NTmessage( '==> importBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
     #end if
-    NTmessage("%s\n", mol.format() )
+    NTmessage("%s", mol.format() )
 
     if error: 
         return None

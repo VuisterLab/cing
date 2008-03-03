@@ -54,7 +54,7 @@ class SaveFrame (Lister):
     """
     Or print Warning and return None
     """
-    def getSaveFrameCategory(self, ):
+    def getSaveFrameCategory(self)   :
         possibleTagNamesSFCategory = [ '_Saveframe_category',  # 2.1
                                        '.Sf_category' ]        # 3
         if not self.tagtables:

@@ -1,5 +1,7 @@
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
@@ -13,10 +15,6 @@ from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import printCodeError
-from cing.Libs.NTutils import printDebug
-from cing.Libs.NTutils import printError
-from cing.Libs.NTutils import printMessage
 from cing.Libs.NTutils import quote
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
@@ -152,7 +150,7 @@ _____________________________________________________________________________
         self.xeasy        = None # reference to xeasy class, used in parsing
         self.saveXML('chainCount','residueCount','atomCount')
 
-        printDebug(self.format() )
+        NTdebug(self.format() )
         #end if
     #end def
 
@@ -165,6 +163,15 @@ _____________________________________________________________________________
         return str(self)
     #end def
 
+    def setAllChildrenByKey(self, key, value):
+        "Set chain,res, and atom children's keys to value"
+        for chain in self.allChains():
+            chain[key] = value
+        for res in self.allResidues():
+            res[key] = value
+        for atm in self.allAtoms():
+            atm[key] = value
+        
     def addChain( self, name=None, **kwds ):
         """
             Add Chain instance name
@@ -209,14 +216,17 @@ _____________________________________________________________________________
     def decodeNameTuple( self, nameTuple ):
         """
             Decode a (convention, chainName, resNum, atomName) tuple
-            generated with the nameTuple methos of Chain, Residue, or Atom Classes.
+            generated with the nameTuple methods of Chain, Residue, or Atom Classes.
             Return a Molecule, Chain, Residue or Atom instance on success or
             None on error.
 
             If no chain is given then the whole molecule is returned.
             If no residue is given then the whole chain is returned.
             ..etc..
+            Caller is responsible for relaying error messages but debug
+            statements within can be enabled from code.
         """
+#        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
         convention, chainName, resNum, atomName = nameTuple
 
         if chainName == None:
@@ -224,6 +234,7 @@ _____________________________________________________________________________
         # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
 #        if not chainName in self:
         if not self.has_key(chainName):
+#            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
             return None
 
         chain = self[chainName]
@@ -232,6 +243,7 @@ _____________________________________________________________________________
             return chain
 
         if not chain.has_key(resNum):
+#            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
             return None
         res = chain[resNum]
 
@@ -239,14 +251,14 @@ _____________________________________________________________________________
             return res
 
         resTranslated = res.translate(convention)
-        an = translateAtomName( convention, res.translate(convention), atomName, INTERNAL )
+        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 #        if (not an or (an not in res)): return None
         if not an:
-            printError("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
             return None
 
         if not res.has_key(an):
-            printError("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
             return None
 
         return res[an]
@@ -257,7 +269,7 @@ _____________________________________________________________________________
         Return Residue instances corresponding to Name, or None if not
         found. Search all chains when chains = None
         """
-        if (chains == None):
+        if not chains:
             chains = self.chains
         #end if
 
@@ -398,7 +410,7 @@ _____________________________________________________________________________
         self.saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self.saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
 
-        NTmessage('==> Saved %s to "%s"\n', self, path)
+        NTmessage('==> Saved %s to "%s"', self, path)
         #end if
     #end def
 
@@ -407,13 +419,13 @@ _____________________________________________________________________________
            return self or None on error
         """
         if (not os.path.exists( path )):
-            NTerror('ERROR Molecule.open: path "%s" not found\n', path)
+            NTerror('Molecule.open: path "%s" not found\n', path)
             return None
         #end if
 
         content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
         if not content:
-            NTerror('ERROR Molecule.open: error reading contentFile "%s"\n',
+            NTerror('Molecule.open: error reading contentFile "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
                    )
             return None
@@ -425,7 +437,7 @@ _____________________________________________________________________________
 
         mol = Molecule( name = content.name )
         if not mol:
-            NTerror('ERROR Molecule.open: initializing molecule\n')
+            NTerror('Molecule.open: initializing molecule\n')
             return None
         #end if
 
@@ -435,7 +447,7 @@ _____________________________________________________________________________
 
         mol.updateAll(   )
 
-        NTmessage('%s\n', mol.format())
+        NTmessage('%s', mol.format())
 
         return mol
     #end def
@@ -457,7 +469,7 @@ _____________________________________________________________________________
 
     def restoreSequence( self, sequenceFile ):
         if (not os.path.exists( sequenceFile ) ):
-            NTerror('ERROR Molecule.restoreSequence: sequenceFile "%s" not found\n',
+            NTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
                      sequenceFile
                    )
             return None
@@ -528,7 +540,7 @@ _____________________________________________________________________________
             atom.resonances = NTlist()
         #end for
         self.resonanceCount = 0
-        NTmessage("==> Initialized resonances\n")
+        NTmessage("==> Initialized resonances")
         #end if
     #end def
 
@@ -576,7 +588,7 @@ _____________________________________________________________________________
         """Calculate the dihedral angles for all residues
         """
         if self.modelCount > 0:
-            printMessage('==> Calculating dihedral angles ... ')
+            NTmessage('==> Calculating dihedral angles ... ')
             self.dihedralDict = {} # will be filled by calling dihedral method of residue
             for res in self.allResidues():
                 for dihedral in res.db.dihedrals:
@@ -586,7 +598,7 @@ _____________________________________________________________________________
         """Calculate mean coordinates for all atoms
         """
         if self.modelCount:
-            NTmessage('==> Calculating mean coordinates ... \n')
+            NTmessage('==> Calculating mean coordinates ... ')
             for atm in self.allAtoms():
                 atm.meanCoordinates()
 
@@ -618,7 +630,7 @@ Return an Molecule instance or None on error
         sequenceS = ''
         if path:
             if (not os.path.exists( path )):
-                NTerror('ERROR Molecule.initialize: File "%s" not found\n', path)
+                NTerror('Molecule.initialize: File "%s" not found\n', path)
                 return None
             #end if
             f = open( path, mode = 'r' )
@@ -647,7 +659,7 @@ Return an Molecule instance or None on error
                 #endif
 
                 molecule._addResidue( chainId, resName, resNum, convention )
-        NTmessage("%s\n", molecule.format())
+        NTmessage("%s", molecule.format())
         return molecule
     #end def
     
@@ -660,7 +672,7 @@ Return an Molecule instance or None on error
         """
         rn = translateResidueName( convention, resName, INTERNAL )
         if (rn == None):
-            NTerror('ERROR Molecule._addResidue: chain %s, residue "%s" not valid for convention "%s"\n',
+            NTerror('Molecule._addResidue: chain %s, residue "%s" not valid for convention "%s"\n',
                      chainId, resName, convention
                    )
             return None
@@ -724,13 +736,13 @@ Return an Molecule instance or None on error
         """
 
         if self.modelCount == 0:
-            printError("modelCount is zero in Molecule instance: " + `self`)
+            NTerror("modelCount is zero in Molecule instance: " + `self`)
             return None
         if model==0:
-            printError("model number is zero in Molecule instance: " + `self`)
+            NTerror("model number is zero in Molecule instance: " + `self`)
             return None
         if model > self.modelCount:
-            printError("model number is larger than modelCount in Molecule instance: " + `self`)
+            NTerror("model number is larger than modelCount in Molecule instance: " + `self`)
             return None
 
         if model!=None:
@@ -738,7 +750,7 @@ Return an Molecule instance or None on error
         else:
             models = NTlist(*range( 1,self.modelCount+1 ))
 
-        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... \n",
+        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
                    convention, models[0], models.last()                 )
                
         pdbFile = PDBFile()
@@ -766,7 +778,7 @@ Return an Molecule instance or None on error
                     if not record:
                         # this happens for all Q and even for like Cys HG which aren't always present in actual structure
                         # but are defined in db.
-#                        printWarning("Failed to get PDB atom record for atom: " + `atm`)
+#                        NTwarning("Failed to get PDB atom record for atom: " + `atm`)
                         continue
                     pdbFile.append( record )
                     atmCount += 1
@@ -907,7 +919,7 @@ Chain class: defines chain properties and methods
             return None
         else:
             res.chain = None
-            NTmessage('==> Removed residue %s from %s\n', residue, self )
+            NTmessage('==> Removed residue %s from %s', residue, self )
             return res
         #end if
     #end def
@@ -1069,7 +1081,7 @@ Residue class: Defines residue properties
             self.shortName = self.db.shortName + str(resNum)
             self.names     = [self.shortName, self.name]
         else:
-            NTerror('ERROR Residue._nameResidue: residue "%s" not defined in database\n', resName )
+            NTerror('Residue._nameResidue: residue "%s" not defined in database\n', resName )
             self.db        = None
             self.shortName = '_' + str(resNum)
             self.names     = [self.shortName, self.name]
@@ -1125,12 +1137,12 @@ Residue class: Defines residue properties
         # find the database entry
         if resName not in NTdb:
             self.db = NTdb[self.resName]
-            NTerror('ERROR Residue.mutate: residue "%s" not defined in database\n', resName )
+            NTerror('Residue.mutate: residue "%s" not defined in database\n', resName )
             return None
         #end if
         newRes  = Residue( resName, self.resNum )
 
-        NTmessage('==> Mutating %s to %s\n', self._Cname(-1), newRes._Cname(-1) )
+        NTmessage('==> Mutating %s to %s', self._Cname(-1), newRes._Cname(-1) )
 
         # remove old name references
         del( self._parent[self.name] )
@@ -1454,7 +1466,7 @@ Atom class: Defines object for storing atom properties
             self.db = NTdb[resName][atomName]
         else:
             self.db = None
-            NTerror('ERROR Atom.__init__: atom "%s" not defined for residue %s in database\n',
+            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database\n',
                      atomName, resName
                    )
         #end if
@@ -1909,11 +1921,11 @@ Atom class: Defines object for storing atom properties
         if model > len(self.coordinates):
             # this happens for all pseudos and atoms like Cys HG which aren't always present
             # but are defined in the db.
-#            printDebug("Trying to Atom.toPDB for model: " + `model`)
-#            printDebug("but only found coordinates length: " + `len(self.coordinates)`)
+#            NTdebug("Trying to Atom.toPDB for model: " + `model`)
+#            NTdebug("but only found coordinates length: " + `len(self.coordinates)`)
             return None
         if model < 1:
-            printCodeError("In Atom.toPDB found model to be <1: " + `model`)
+            NTcodeerror("In Atom.toPDB found model to be <1: " + `model`)
             return None
         modelId = model - 1
         coor = self.coordinates[modelId]
@@ -1923,7 +1935,8 @@ Atom class: Defines object for storing atom properties
             return None
 
         pdbResName = self.residue.translate( convention )
-        if not pdbResName: return None
+        if not pdbResName: 
+            return None
 
         if self.db.hetatm:
             record = PyMMLib.HETATM()
@@ -2180,7 +2193,7 @@ def allResidues( molecule ):
 #end def
 
 #==============================================================================
-def updateResonancesFromPeaks( peaks, axes = None,   ):
+def updateResonancesFromPeaks( peaks, axes = None)   :
     """Update the resonance entries using the peak shifts"""
     for peak in peaks:
         if (axes == None):
@@ -2190,7 +2203,7 @@ def updateResonancesFromPeaks( peaks, axes = None,   ):
             if (peak.resonances[i] != None):
                 peak.resonances[i].value = peak.positions[i]
                 if peak.resonances[i].atom != None:
-                    NTmessage("Updating resonance %s\n", peak.resonances[i].atom)
+                    NTmessage("Updating resonance %s", peak.resonances[i].atom)
                 #end if
             #end if
         #end for
@@ -2198,25 +2211,25 @@ def updateResonancesFromPeaks( peaks, axes = None,   ):
 #end def
 
 #==============================================================================
-def saveMolecule( molecule, fileName=None,   ):
+def saveMolecule( molecule, fileName=None)   :
     """save to fileName for restoring with restoreMolecule"""
     if not fileName:
         fileName = molecule.name + '.xml'
     #end if
 
     if (molecule == None):
-        NTerror("ERROR saveMolecule: molecule not defined\n")
+        NTerror("saveMolecule: molecule not defined\n")
         return
     #end if
 
     obj2XML( molecule, path=fileName )
 
-    NTmessage( '==> saveMolecule: saved to %s\n', fileName )
+    NTmessage( '==> saveMolecule: saved to %s', fileName )
     #end if
 #end def
 
 #==============================================================================
-def restoreMolecule( fileName,   ):
+def restoreMolecule( fileName)   :
     """restore from fileName, return Molecule instance """
 
     mol = XML2obj( path=fileName )

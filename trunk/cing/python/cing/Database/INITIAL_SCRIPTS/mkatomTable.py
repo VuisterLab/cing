@@ -2273,15 +2273,15 @@
 #            for i in range(0, ndihed):
 #                r.next()
 #
-#            NTmessage('\n#-----------------------------------------------------------------------\n')
-#            NTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('\n#-----------------------------------------------------------------------')
+#            NTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
 #                   'internal', 'short', BMRB, BMRBd, PDB, CYANA, XPLOR
 #                  )
-#            NTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
 #                    resname, shortName, resname, resname, resname, resname, resname
 #                  )
-#            NTmessage('\n#-----------------------------------------------------------------------\n')
-#            NTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s\n',
+#            NTmessage('\n#-----------------------------------------------------------------------')
+#            NTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s',
 #                   'internal', BMRB, BMRBd, PDB, CYANA, XPLOR
 #                  )
 #           # parse data from the atom lines
@@ -2305,8 +2305,8 @@
 #                    NTmessage( '\t%-8s          ', nameDefs['INTERNAL'] )
 #                    for n in [BMRB, BMRBd, PDB, CYANA, XPLOR]:
 #                        NTmessage( '%-8s ', nameDefs[n] )
-#                    NTmessage('\n')
-#            NTmessage( 'END_RESIDUE\n')
+#                    NTmessage('')
+#            NTmessage( 'END_RESIDUE')
 #
 ##-----------------------------------------------------------------------
 ## main

@@ -3,19 +3,18 @@
 ## its license.  Please see the LICENSE file that should have been
 ## included as part of this package.
 ## Adjusted by gv for specific purpose of NTmol
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printMessage
 from types import ListType
 from types import StringType
 from types import TupleType
 import fpformat
 
 """Brookhaven PDB v2.2 file parser.  All records in the PDB v2.2
-specification have coorasponding classes defined here.  PDB files are
-loaded into a list of these cassed, and also can be constrcted/modified
+specification have corresponding classes defined here.  PDB files are
+loaded into a list of these classes, and also can be constructed/modified
 and written back out as PDB files.
 """
 #from __future__ import generators
@@ -25,9 +24,6 @@ try:
     from mmTypes import *
 except ImportError:
     OpenFile = open    
-
-def warning( string ):
-   NTerror( "WARNING: %s\n", string )
 
 
 class PDBError(Exception):
@@ -144,8 +140,8 @@ class PDBRecord( NTdict ):
                     s = int(s)
                 except ValueError:
                     if s.strip() != "":
-                        warning("PDB parser: int(%s) failed on record" % (s))
-                        warning(str(line))
+                        NTwarning("PDB parser: int(%s) failed on record" % (s))
+                        NTwarning(str(line))
                     continue
 
             elif ftype.startswith("float"):
@@ -153,8 +149,8 @@ class PDBRecord( NTdict ):
                     s = float(s)
                 except ValueError:
                     if s.strip() != "":
-                        warning("PDB parser: float(%s) failed on record" % (s))
-                        warning(str(line))
+                        NTwarning("PDB parser: float(%s) failed on record" % (s))
+                        NTwarning(str(line))
                     continue
 
             self[field] = s
@@ -1495,7 +1491,7 @@ class PDBFile(list):
     list object, and contains a list of PDBRecord objects.
     Load, save, edit, and create PDB files with this class.
     """
-    def __init__(self, fil=None, update_cb = None,   ):
+    def __init__(self, fil=None, update_cb = None)   :
         list.__init__(self)
         if (fil != None):
             self.load_file( fil, update_cb  )
@@ -1512,7 +1508,7 @@ class PDBFile(list):
         assert isinstance(rec, PDBRecord)
         list.insert(self, i, rec)
 
-    def load_file(self, fileName, update_cb = None,  ):
+    def load_file(self, fileName, update_cb = None)   :
         """Loads a PDB file from File object fil.
         """
         fil = OpenFile(fileName, "r")
@@ -1552,7 +1548,7 @@ class PDBFile(list):
             try:
                 pdb_record_class = PDBRecordMap[rname]
             except KeyError:
-                printMessage("PDB parser: unknown record type: %s"%(rname))
+                NTmessage("PDB parser: unknown record type: %s"%(rname))
                 continue
 
             ## create/add/parse the record
@@ -1560,7 +1556,7 @@ class PDBFile(list):
             pdb_record.read(ln)
             self.append(pdb_record)
             
-        NTmessage("==> PDBFile: read %d records from %s\n", len(self), fileName )
+        NTmessage("==> PDBFile: read %d records from %s", len(self), fileName )
 
     def save_file(self, fil):
         """Saves the PDBFile object in PDB file format to File object fil.
@@ -1579,7 +1575,7 @@ class PDBFile(list):
 	for record in self:
 		fprintf( fp, '%s\n', record )
 	fp.close()
-	NTmessage("==> Written %d PDB records to %s\n", len( self ), path )
+	NTmessage("==> Written %d PDB records to %s", len( self ), path )
 	#end if
     #end def
 ## end gv adds
@@ -1735,7 +1731,7 @@ if __name__ == "__main__":
         print "usage: PDB.py <PDB file path>"
         sys.exit(1)
         
-    pdbfil = PDBFile( path,   )
+    pdbfil = PDBFile( path)   
 #    pdbfil.load_file(path)
 #    pdbfil.save_file(sys.stdout)
     for record in pdbfil:
