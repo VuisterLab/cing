@@ -58,63 +58,52 @@ return molecule or None on error
     
     foundModel = False
     modelCount = 0
-    
     for record in pdb:
-
         recordName = record._name.strip()
-        
         if  recordName == 'REMARK':
-            pass
-        
-        elif recordName == "MODEL":
+            continue
+        if recordName == "MODEL":
             foundModel = True
-        
-        elif recordName == "ENDMDL":
+            continue
+        if recordName == "ENDMDL":
             modelCount += 1
             if nmodels and modelCount >= nmodels:
                 break
-            #end if
-        
-        elif recordName == "ATOM" or recordName == "HETATM":
+            continue
+        if recordName == "ATOM" or recordName == "HETATM":
             # see if we can find a definition for this residue, atom name in the database
-       
-            if (convention == CYANA):
+            if convention == CYANA:
                 # the residue names are in Cyana1.x convention (i.e. for GLU-)
                 # atm names of the Cyana1.x PDB files are in messed-up Cyana format
                 atmName = record.name[1:4] + record.name[0:1]
-            elif (convention == CYANA2):
+            elif convention == CYANA2:
                 # the residue names are in Cyana2.x convention (i.e. for GLU)
                 # atm names of the Cyana2.x PDB files are in messed-up Cyana format
                 atmName = record.name[1:4] + record.name[0:1]
             else:
-                atmName = record.name
-            #end if
-            
+                atmName = record.name            
             # Not all PDB files have chainID's !@%^&*
+            # Actually, they do. It might be an space character though.
+            # It's important to save it as is otherwise the residue number
+            # is no longer a unique key within the chain. E.g. HOH in 1n62
+            # has a space character for the chain id and similar residue 
+            # numbering as the protein sequence in chain A. 
             if record.has_key('chainID'):
                 cname = record.chainID.strip()
             else:
-                cname = 'A'
-            #end if
+                cname = ' ' #JFD mod from 'A'
             resID = record.resSeq
             atom  = molecule.decodeNameTuple( (convention, cname, resID, atmName) )
 
-            if (atom == None):
+            if not atom:
                 NTerror('WARNING in cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)\n', 
-                         convention, modelCount, record 
-                       )         
+                         convention, modelCount, record )                         
                 #print '>>', convention, cname, resID, atmName
-
-            else:
-                # we did find a match in the molecule
-                atom.addCoordinate( record.x, record.y, record.z, record.tempFactor )
-
-                record.atom = atom
-                atom.pdbRecord = record
+                continue
+            atom.addCoordinate( record[0], record[1], record[2], record[3] )
+            record.atom = atom
+            atom.pdbRecord = record
                 
-            #end if
-        #end if
-    #end for
     
     # Patch to get modelCount right for X-ray or XPLOR structures with only one model
     if not foundModel: 
@@ -137,10 +126,10 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
 Return molecule instance
 convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
     """
-    showMaxNumberOfWarnings = 100
+    showMaxNumberOfWarnings = 100 # was 100
     shownWarnings = 0
     NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile ) 
-           
+    
     pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
     
@@ -163,6 +152,7 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             continue
          
         if recordName == "ATOM" or recordName == "HETATM":
+            # Skip records with a 
             # see if we can find a definition for this residue, atom name in the database
             a = record.name
             if convention == CYANA or convention == CYANA2:
@@ -183,12 +173,16 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             if atm.residueDef.hasProperties('cyanaPseudoResidue'):
                 # skip CYANA pseudo residues
                 continue
+            
             # we did find a match in the database
             # Not all PDB files have chainID's !@%^&*
-            cname = 'A'
+            # They do; if none returned then take the space that is always present!
+            cname = ' '
             if record.has_key('chainID'):
                 cname = record.chainID.strip()
-            #end if
+#            else:
+#                NTwarning( 'No chain id for record: %s' % record)
+                
             resID    = record.resSeq
             resName  = atm.residueDef.name
             fullName = resName+str(resID)
@@ -206,7 +200,14 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             #end if
             
             atom = mol[cname][fullName][atmName]
-            atom.addCoordinate( record.x, record.y, record.z, record.tempFactor )
+            
+            # Check if the coordinate already exists for this model
+            # This might happen when alternate locations are being
+            # specified. Simplify to one coordinate per model.
+            numCoorinates = len(atom.coordinates)
+            numModels     = mol.modelCount + 1 # current model counts already
+            if numCoorinates < numModels: 
+                atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
         #end if
     #end for
     if shownWarnings:
@@ -235,9 +236,8 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     NB model should be 1 for the first model. Not zero.
     """
     pdbFile = molecule.toPDB( model=model, convention = convention)
-    
     pdbFile.save( path)   
-    del(pdbFile)
+#    del(pdbFile)
 #end def
 Molecule.toPDBfile = moleculeToPDBfile
 

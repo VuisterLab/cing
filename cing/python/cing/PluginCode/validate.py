@@ -34,21 +34,28 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
+from cing import CHARS_PER_LINE_OF_PROGRESS
+from cing import NaNstring
+from cing import cingPythonCingDir
 from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotAttributes
+from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import pointAttributes
+from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlimit
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTvector
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
@@ -69,18 +76,17 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTwarning
-from cing import NaNstring
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTexception
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing import CHARS_PER_LINE_OF_PROGRESS
+from pylab import Float
+from pylab import UInt8
+from pylab import fromstring
+from pylab import imshow
+from pylab import resize
+import Image
 import cing
 import math
 import os
 import sys
-#from cing.Libs.NTutils import printWarning
+
 
 NotAvailableText = 'Not available'
 OpenText         = 'Open'
@@ -246,9 +252,16 @@ def calculateRmsd( project, ranges=None, models = None   ):
                 d=None
                 if atm.meanCoordinate:
                     d=0.0
-                    for i in ['x','y','z']: #JFD speed this up by unlooping if needed.
-                        tmp = atm.coordinates[modelId][i]-atm.meanCoordinate[i]
-                        d += tmp*tmp
+                    tmp0 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
+                    tmp1 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
+                    tmp2 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
+                    d += tmp0*tmp0
+                    d += tmp1*tmp1
+                    d += tmp2*tmp2
+                    
+#                    for i in ['x','y','z']: #JFD speed this up by unlooping if needed.
+#                        tmp = atm.coordinates[modelId][i]-atm.meanCoordinate[i]
+#                        d += tmp*tmp
                     #end for
                 #end if
 
@@ -283,7 +296,7 @@ def calculateRmsd( project, ranges=None, models = None   ):
             #end for
 
             # sum for the rmsd of selected residues
-            if (res in selectedResidues):
+            if res in selectedResidues:
                 project.molecule.rmsd.backbone[num]   += res.rmsd.backbone[num]
                 project.molecule.rmsd.backboneCount   += res.rmsd.backboneCount
                 project.molecule.rmsd.heavyAtoms[num] += res.rmsd.heavyAtoms[num]
@@ -542,28 +555,28 @@ def validateSaltbridge( residue1, residue2 ):
         R = ['NE','NH1','NH2']
     )
 
-    if (residue1 == None):
+    if residue1 == None:
         NTerror('validateSaltbridge: undefined residue1\n')
         return None
     #end if
-    if (residue2 == None):
+    if residue2 == None:
         NTerror('validateSaltbridge: undefined residue2\n')
         return None
     #end if
 
     modelCount = residue1.chain.molecule.modelCount
-    if (modelCount == 0):
+    if modelCount == 0:
         NTerror('validateSaltbridge: no structure models\n')
         return None
     #end if
 
-    if (residue1.db.shortName not in ['E','D','H','K','R']):
+    if residue1.db.shortName not in ['E','D','H','K','R']:
         NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R\n', residue1)
         return None
     #end if
 
 
-    if (residue2.db.shortName not in ['E','D','H','K','R']):
+    if residue2.db.shortName not in ['E','D','H','K','R']:
         NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R\n', residue2)
         return None
     #end if
@@ -603,7 +616,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         #c1 is geometric mean of centroid atms
         c1 = NTvector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
-            atm = residue1[atmName]
+            atm = residue1[atmName]            
             c1 += atm.coordinates[modelId]()
         #end for
         # not yet: c1 /= len(centroids[residue1.db.shortName])
@@ -642,20 +655,19 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
                 d = (atm1.coordinates[modelId]()-atm2.coordinates[modelId]()).length()
                 if ( d< 4.0): count += 1
                 #print '>', atm1,atm2,d,count
-            #end for
-        #end for
-        criterium2 = (count>0)
-        if   (criterium1 and criterium2):
+
+        criterium2 = count>0
+        if   criterium1 and criterium2:
             type = 0
-        elif (criterium1 and not criterium2):
+        elif criterium1 and not criterium2:
             type = 1
-        elif (not criterium1 and criterium2):
+        elif not criterium1 and criterium2:
             type = 2
-        elif (not criterium1 and not criterium2 and rl < 7.6+2.1*2 and 118-39*2< theta and theta < 118+39*2 ):
+        elif not criterium1 and not criterium2 and rl < 7.6+2.1*2 and 118-39*2< theta and theta < 118+39*2:
             type = 3
         else:
             type = 4
-        #end if
+
         counts[type] += 1
 
         data = NTdict(
@@ -1063,12 +1075,14 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
 #    NTdebug( 'residue: '+`residue`)
     angle = residue[dihedralName] # A NTlist
 #    NTdebug( 'angle: ' + `angle`)
+    ps = NTplotSet() # closes any previous plots
+    ps.hardcopySize = (600,369)
     plot = NTplot( title  = residue._Cname(1),
       xRange = (plotparams.min, plotparams.max),
       xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
       xLabel = dihedralName,
-      yLabel = 'Occurence',
-      hardcopySize= (600,369))
+      yLabel = 'Occurence')
+    ps.addPlot(plot)
 
 #    Note that the good and outliers come from:
 #    d.good, d.outliers = peirceTest( d )
@@ -1119,74 +1133,86 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
     # Always plot the cav line
     plot.line( (aAv, 0), (aAv, ylimMax), 
                lineAttributes(color=plotparams.average, width=width) )
-    return plot
+    return ps
 
 
 
 def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
-    '''Return NTplot instance with plot of dihedralName1 vrs dihedralName2 or
+    '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
+       Called with: eg ['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI']
     '''
 
-    if (project == None or
-        dihedralName1 not in residue or residue[dihedralName1] == None or
-        dihedralName2 not in residue or residue[dihedralName2] == None or
-        len(residue[dihedralName1]) == 0 or len(residue[dihedralName2]) == 0 ):
+#    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
+
+    if not project:
+        NTerror( 'in makeDihedralPlot called without project' )
         return None
-    #end if
+    
+    if dihedralName1 not in residue or residue[dihedralName1] == None:
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+        return None
+    
+    if dihedralName2 not in residue or residue[dihedralName2] == None:
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+        return None
+    
+    d1 = residue[dihedralName1]
+    d2 = residue[dihedralName2]
+
+    if not (len(d1) and len(d2)):
+#        NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
+#        NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s', dihedralName2 )
+        return None
 
     plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
     plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
 
-    d1 = residue[dihedralName1]
-    d2 = residue[dihedralName2]
-
     d1cav = d1.cav
     d2cav = d2.cav
-
+    ps =NTplotSet() # closes any previous plots
+    ps.hardcopySize = (500,500)
     plot = NTplot( title  = residue._Cname(1),
       xRange = (plotparams1.min, plotparams1.max),
       xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),
       xLabel = dihedralName1,
       yRange = (plotparams2.min, plotparams2.max),
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
-      yLabel = dihedralName2,
-      hardcopySize= (400,400))
+      yLabel = dihedralName2)
+    ps.addPlot(plot)
     plot.points( zip( d1, d2 ), attributes=plusPoint )
 
-    _width = 4.0
+    if dihedralName1=='PHI' and dihedralName2=='PSI':
+        # Plot a Ramachandran density background
+        imageFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'RamachandranLaskowski.png' )
+        im = Image.open( imageFileName )
+        s = im.tostring()
+        rgb = fromstring( s, UInt8).astype(Float)/255.0
+        rgb = resize(rgb, (im.size[1],im.size[0], 3))
+        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
+        im = imshow(rgb, alpha=0.05, extent=extent)
 
+    # Plot restraint ranges.
     dr1 = _matchDihedrals(residue, dihedralName1)
     dr2 = _matchDihedrals(residue, dihedralName2)
-
-    #dr2 = dr1 # just for test
-
-    dd = 3
-
+    
     if dr1 and dr2:
         lower1, upper1 = dr1.lower, dr1.upper
         lower2, upper2 = dr2.lower, dr2.upper
-        plot.box( (lower1,lower2), (abs(upper1-lower1),abs(upper2-lower2)),
-                  NTplotAttributes(fill=False, line=True, lineWidth=dd,
-                                          lineColor=plotparams1.lower) )
     elif dr1:
         lower1, upper1 = dr1.lower, dr1.upper
-        lower2, upper2 = plotparams2.min+dd, plotparams2.max-dd
-        plot.box( (lower1,lower2), (abs(upper1-lower1),abs(upper2-lower2)),
-                  NTplotAttributes(fill=False, line=True, lineWidth=dd,
-                                          lineColor=plotparams1.lower) )
+        lower2, upper2 = plotparams2.min, plotparams2.max
     elif dr2:
         lower2, upper2 = dr2.lower, dr2.upper
-        lower1, upper1 = plotparams1.min+dd, plotparams1.max-dd
-        plot.box( (lower1,lower2), (abs(upper1-lower1),abs(upper2-lower2)),
-                  NTplotAttributes(fill=False, line=True, lineWidth=dd,
-                                          lineColor=plotparams1.lower) )
+        lower1, upper1 = plotparams1.min, plotparams1.max
+
+    if dr1 or dr2:
+        plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
 
     # Always plot the cav point
-    plot.point( (d1cav, d2cav),
-                pointAttributes(type='circle', size=2,
+    plot.point( (d1cav, d2cav),pointAttributes(type='circle', size=2,
                                        color='green') )
-    return plot
+    return ps
 #end def
 
 def _matchDihedrals(residue, dihedralName):
@@ -1328,8 +1354,8 @@ def setupHtml(project):
                                        text = 'Home' )
 
             # Refs to move to previous, next chain or UP
-            previous = chain.sister(-1)
-            next = chain.sister(1)
+            previous = chain.sibling(-1)
+            next = chain.sibling(1)
             if previous:
                 chain.html.insertHtmlLink( chainHeader, chain, previous,
                                            text=previous._Cname(-1))
@@ -1405,8 +1431,8 @@ def setupHtml(project):
                                        text = 'Home' )
 
                 # Refs to move to previous, next residue or UP
-                previous = res.sister(-1)
-                next = res.sister(1)
+                previous = res.sibling(-1)
+                next = res.sibling(1)
                 if previous:
                     res.html.insertHtmlLink( resHeader, res, previous,
                                              text = previous._Cname(-1) )
@@ -1727,7 +1753,8 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
-    doProcheck = True # disable for testing as it takes a long time.
+    doProcheck = False # disable for testing as it takes a long time.
+#    skipFirstPart = True # disable for testing as it takes a long time.
     if not skipFirstPart:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
@@ -1762,12 +1789,16 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                     plotList = [['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI'],
                                 ['CHI1', 'CHI2', 'CHI1-CHI2',     'CHI1_CHI2']]
                     for plotItem in plotList:
-                        plot = makeDihedralPlot( project, res, plotItem[0], plotItem[1] )
-                        if plot:
-                            plot.hardcopy( fileName = os.path.join(resdir, plotItem[3] ))
+                        ps = makeDihedralPlot( project, res, plotItem[0], plotItem[1] )
+                        if ps:
+                            ps.hardcopy( fileName = os.path.join(resdir, plotItem[3] ))
                             res.html.left( 'h2', plotItem[2], id=plotItem[2])
-                            res.html.left( 'img', src = plotItem[3], alt="" )
-
+                            graphicsFormatExtension = 'png'
+                            plotFileNameDihedral2D = plotItem[3] + '.' + graphicsFormatExtension
+#                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
+                            res.html.left( 'img', src = plotFileNameDihedral2D, alt=""  )
+#                        else:
+#                            NTdebug("Failed creating a 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
 
                     for dihed in res.db.dihedrals.zap('name'):
                         if dihed in res and res[dihed]:
@@ -1788,16 +1819,16 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                                              )
                             fprintf( fp, '%s\n', summary )
     #                        print summary
-                            graphicsFormatExtension = NTplot().graphicsOutputFormat
+                            graphicsFormatExtension = 'png'
                             #generate a dihedral histogram plot
-                            plot = makeDihedralHistogramPlot( project, res, dihed )
+                            ps = makeDihedralHistogramPlot( project, res, dihed )
                             tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
     #                        NTdebug("Will write to: "+tmpPath)
                             if not os.path.isdir(resdir):
                                 NTerror("Failed to find an existing location in: " + resdir)
                                 return None
-                            if plot:
-                                plot.hardcopy( fileName = tmpPath )
+                            if ps:
+                                ps.hardcopy( fileName = tmpPath )
         #                        del( plot )
     
                                 #generate HTML code for plot and text
@@ -2028,27 +2059,27 @@ def populateHtmlModels(project):
         #molecule.modelPage.insertHtmlLink( molecule.modelPage.header,
         #                                   restraintList, project,
         #                                   text = 'Home' )
-        plot = NTplot( xLabel = 'Model',
-                              xRange = (0, project.molecule.modelCount+1),
-                              yLabel = 'Outliers',
-                              hardcopySize= (600,369),
-                              aspectRatio = 0.5
-                            )
+        ps = NTplotSet() # closes any previous plots
+        ps.hardcopySize = (600,369)        
+        plot = NTplot( xLabel = 'Model', yLabel = 'Outliers',
+                       xRange = (0, project.molecule.modelCount+1))
+        ps.addPlot(plot)
 #        project.models[i] holds the number of outliers for model i.
 #        models is a NTdict containing per model a list of outliers.
         outliers = [project.models[i] for i in range(1,molecule.modelCount+1)]
         NTdebug( '>> modelCount, outliers:' + `molecule.modelCount` +", "+ `outliers`)
         plot.barChart( project.models.items(), 0.05, 0.95,
                        attributes = boxAttributes( fillColor='green' ) )
-        plot.hardcopy( project.htmlPath('outliers') )
-        molecule.modelPage.main('img', src = 'outliers.'+plot.graphicsOutputFormat)
+        ps.hardcopy( project.htmlPath('outliers') )
+        graphicsOutputFormat = 'png'
+        molecule.modelPage.main('img', src = 'outliers.'+graphicsOutputFormat)
     #end for
 #end def
 
 def validate( project, ranges=None, htmlOnly = False ):
-    """Validatation tests returns None on success or True on failure.
-    """
-    try:
+        """Validatation tests returns None on success or True on failure.
+        """
+#    try:
         #validateSetup(project)
         if not htmlOnly:
             if setupValidation( project, ranges=ranges ):
@@ -2070,10 +2101,10 @@ def validate( project, ranges=None, htmlOnly = False ):
             NTerror("Failed to renderHtml")
             return True
 
-    except:
-        NTexception("Failed to validate at some point")
-        return True
-    NTmessage("Done with overall validation")
+#    except:
+#        NTexception("Failed to validate at some point")
+#        return True
+        NTmessage("Done with overall validation")
 #end def
 
 # register the functions

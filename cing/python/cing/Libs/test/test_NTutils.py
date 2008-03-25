@@ -16,21 +16,22 @@ from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import val2Str
 from cing.core.constants import NOSHIFT
+from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
+from random import random
 from unittest import TestCase
 import cing
 import os
 import unittest
-#from cing import verbosityDebug
 
 class AllChecks(TestCase):
 
-    def testPrints(self):
+    def tttestPrints(self):
 #        NTexception("Now in testPrints")
 #        NTerror("test")
         pass
     
-    def testFind(self):
+    def tttestFind(self):
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to temp test directory for data: "+cingDirTestsTmp)
         namepattern, startdir = "CVS", cingPythonDir
@@ -39,7 +40,7 @@ class AllChecks(TestCase):
 #        for name in nameList:
 #            print name
 
-    def testConvert2Web(self):
+    def tttestConvert2Web(self):
         fn = "pc_nmr_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
@@ -144,6 +145,13 @@ class AllChecks(TestCase):
         self.assertEquals(      sd,  None) 
         self.assertEquals(       n,   0) 
 
+        l = NTlist(0.0, 0.0, 0.0)
+        (av,sd,n) = l.average()
+        NTdebug((av,sd,n))
+        self.assertEquals(      av,  0) 
+        self.assertEquals(      sd,  0) 
+        self.assertEquals(       n,  3) 
+
     def testValueToFormattedString(self):
         self.assertEquals( val2Str(None,"%5.2f",None),NaNstring)
         self.assertEquals( val2Str(None,"%5.2f",5),   "%5s" % NaNstring)
@@ -192,7 +200,40 @@ class AllChecks(TestCase):
         self.assertEqual( l.setConsensus(minFraction=0.6), 9)
         self.assertEqual( l.consensus, 9)
         
+    def testNTlistIndex(self):
+        # speed check
+        l = NTlist()
+        for _i in range( 10*1000):
+            l.append( random() )
+        middleValue = 0.5
+        l.append( middleValue )
+        for _i in range( 10*1000):
+            l.append( random() )
+
+        for _i in range( 10*1000):
+            _x = l.index(middleValue)
+#            tree.sibling(1)
+
+    def testNTtreeIndex(self):
+        mol = Molecule('mol')
+        mol.addChain('top')
+        top = mol.allChains()[0]
+        for i in range( 1*1000):
+            top.addResidue( `random()`,i )
+        
+        resList = top.allResidues()
+        middleValue = resList[len(resList)/2]
+        
+
+        for _i in range( 1*100):
+#            _x = middleValue.sibling(0) # getting myself back should not take time.
+            _x = middleValue.sibling(1) # this tends to be very expensive
+            
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     cing.verbosity = verbosityNothing
+#    cProfile.run('unittest.main()', 'fooprof')
+#    p = pstats.Stats('fooprof')
+#    p.sort_stats('time').print_stats(10)
+#    p.sort_stats('cumulative').print_stats(40)
     unittest.main()

@@ -1,4 +1,6 @@
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTwarning
 from cing.core.constants import INTERNAL
 from cing.core.constants import LOOSE
 from cing.core.database import NTdb
@@ -79,7 +81,7 @@ def isValidAtomName( resName, atomName, convention = INTERNAL):
   rn = resName.strip()
   an = atomName.strip()
   if not isValidResidueName( rn, convention ):
-#      NTwarning("Residue name is not valid in cing.core.dictionaries#isValidAtomName for: ["+rn+"]")
+      NTwarning("Residue name is not valid in cing.core.dictionaries#isValidAtomName for: ["+rn+"]")
       return None
   res = NTdb.residueDict[convention][rn]
   if an in res.atomDict[convention]:
@@ -141,6 +143,12 @@ def NTdbGetAtom( resName, atmName, convention = INTERNAL ):
      for convention
      or None otherwise
   """
+  if not resName:
+      NTerror("in dictionaries.NTdbGetAtom resName was None")
+      return None
+  if not atmName:
+      NTerror("in dictionaries.NTdbGetAtom atmName was None")
+      return None
   rn = resName.strip()
   an = atmName.strip()
   

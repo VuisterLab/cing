@@ -8,9 +8,9 @@ import unittest
 
 class AllChecks(TestCase):
 
+    os.chdir(cingDirTestsTmp)
+    
     def test_classes(self):         
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
         myhtml = HTMLfile('myTest.html', 'A Test')
         myhtml.header("a header")
         myhtml('h1', 'It is a test')
