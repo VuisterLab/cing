@@ -288,46 +288,20 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
         kwds.setdefault(f,  [])        
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
-        #end if
-    #end for
     NTdebug( '>>'+ `kwds` )
-        
-
-    #print '>>',kwds
-    
-    # look for default seqfile
-#    d,s,e = NTpath( matchfilelist( cyanaDirectory +'/*.seq')[0] )    
-#    defaults = NTdict(
-#        seqFile   = s,
-#        protFile  = 'all-final',
-#        pdbFile   = 'final',
-#        peakFiles = ['c13','aro','n15'],
-#        uplFiles  = ['final'],
-#        acoFiles  = ['talos']
-#    )
-#    
-#    # set defaults
-#    for f,value in defaults.items():
-#        if kwds[f] == 'default' or 'default' in kwds:
-#            kwds[f] = defaults[f]
-#        #end if
-#    #end for
-    
+            
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
     if (kwds['pdbFile'] != None):
         pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
         project.initPDB( pdbFile, convention, nmodels=kwds['nmodels'] )
         sources.append( pdbFile )
-    #end if
     
     if (kwds['seqFile'] != None and kwds['protFile'] != None):
         seqFile  = os.path.join( cyanaDirectory, kwds['seqFile']  +'.seq')
         protFile = os.path.join( cyanaDirectory, kwds['protFile'] +'.prot')
         if project.importXeasy( seqFile, protFile, convention ):            
             sources.append( seqFile, protFile )
-        #end if
-    #end if
     
     for f in kwds['peakFiles']:    
         if (kwds['seqFile'] != None and kwds['protFile'] != None):
@@ -336,9 +310,6 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
             pkFile   = os.path.join( cyanaDirectory, f + '.peaks')
             if project.importXeasyPeaks( seqFile,protFile,pkFile,convention ):                       
                 sources.append( seqFile, protFile, pkFile )
-            #end if
-        #end if
-    #end for
     
 #    # patches for saveing upl,aco files
 #    project.patch = NTdict( upl= NTlist(), aco=NTlist(), convention = convention )

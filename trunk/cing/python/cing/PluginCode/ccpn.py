@@ -453,10 +453,11 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
 
         # Sometimes ccpn molecular systems with only one chain will not have
         # a letter for chain, but CING definitely doesn't like it at all.
-        if ccpnChain.code == ' ':
-            ccpnChainLetter = 'A'
-        else:
-            ccpnChainLetter = ccpnChain.code
+        # Update: CING better get used to it.
+#        if ccpnChain.code == ' ':
+#            ccpnChainLetter = 'A'
+#        else:
+        ccpnChainLetter = ccpnChain.code
         
 
         # check if Cing.Project.Molecule.Chain already exists, if so, it's used
@@ -1742,11 +1743,11 @@ def createCcpnStructures(cingProject = None, ccpnProject = None,
                     ccpnAtom = atom.ccpn
                     coordAtom = coordResidue.newAtom(name = ccpnAtom.name)
                     for modelIndex in range(molecule.modelCount):
-                      x = atom.coordinates[modelIndex].x
-                      y = atom.coordinates[modelIndex].y
-                      z = atom.coordinates[modelIndex].z
-                      occupancy = atom.coordinates[modelIndex].occupancy
-                      bFactor = atom.coordinates[modelIndex].Bfac
+                      x = atom.coordinates[modelIndex][0]
+                      y = atom.coordinates[modelIndex][1]
+                      z = atom.coordinates[modelIndex][2]
+                      occupancy = atom.coordinates[modelIndex][4]
+                      bFactor = atom.coordinates[modelIndex][3]
                       c = coordAtom.newCoord(x=x, y=y, z=z,model=models[modelIndex])
                       c.setOccupancy(occupancy)
                       c.setBFactor(bFactor)        

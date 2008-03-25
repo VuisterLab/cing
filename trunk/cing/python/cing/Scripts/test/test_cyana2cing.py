@@ -4,6 +4,7 @@ python $cingPath/Scripts/test/test_cyana2cing.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
+from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTwarning
 from cing.core.classes import Project
@@ -18,7 +19,7 @@ class AllChecks(TestCase):
         
     def testConversion(self):        
 #        SETUP FIRST
-        projectId = "1pdb" # Small much studied PDB NMR entry 
+        projectId = "1pdb"
         cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
         self.assertTrue( os.path.exists( cyanaDirectory) and os.path.isdir(cyanaDirectory ) )
         
@@ -48,5 +49,6 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
+    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityError
     unittest.main()

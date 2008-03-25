@@ -11,6 +11,7 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.core.constants import IUPAC
 from cing.core.molecule import Atom
+from cing.Libs.NTutils import NTdebug
 import string
 import time
 #-----------------------------------------------------------------------------
@@ -52,7 +53,7 @@ def export2aqua( project, tmp=None ):
         for drl in drLoL:
             count += len(drl)
         if not count:
-            NTwarning("Skipping export of empty restraint list")
+            NTdebug("Skipping export of empty restraint list")
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
         exportPath = project.directories.aqua

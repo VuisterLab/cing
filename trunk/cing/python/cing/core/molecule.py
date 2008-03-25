@@ -9,15 +9,20 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTvector
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
+from cing.Libs.NTutils import angle3Dopt
 from cing.Libs.NTutils import asci2list
+from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import quote
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
+from cing.Libs.PyMMLib import ATOM
+from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -32,6 +37,7 @@ from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
 from database     import NTdb
 from parameters   import plotParameters
+from cing.Libs.NTutils import NTvector
 import math
 import os
 
@@ -120,7 +126,7 @@ _____________________________________________________________________________
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
-        sister( relativeIndex ) :
+        sibling( relativeIndex ) :
         traverse()              :
 
     Methods inherited from NTdict:
@@ -333,7 +339,26 @@ _____________________________________________________________________________
         NTerror('Error Molecule.ranges2list: undefined ranges type [%s]\n', type(ranges) )
         return None
 
-
+    def getFixedRangeList( self, max_length_range = 50, ranges=None ):
+        """Return a list of NTlist instance with residue objects.
+        The NTlist contains only residues in the given ranges and is at most
+        max_length_range long. 
+        """
+        selectedResidues = self.allResidues()
+        if ranges:
+            selectedResidues = self.ranges2list( ranges )
+        r = NTlist()
+        result = []
+        for res in selectedResidues:
+            if len(r) == max_length_range:
+                result.append( r )
+                r = NTlist()
+            r.append(res)
+        if r:
+            result.append(r)
+        return result
+    
+    
     def models2list( self, models ):
         """
             Convert
@@ -545,20 +570,14 @@ _____________________________________________________________________________
     #end def
 
     def saveCoordinates( self, fileName ):
-        """Write a plain text file with code for saving coordinates
-        """
+        """Write a plain text file with code for saving coordinates"""
         fp = open( fileName, 'w' )
         fprintf( fp, 'self.modelCount = %d\n', self.modelCount )
         for atm in self.allAtoms():
             for c in atm.coordinates:
-                fprintf( fp, 'self%s.addCoordinate( x=%s, y=%s, z=%s, Bfac=%s )\n',
-                              atm._Cname2( 2 ),
-                              repr( c.x ),  repr( c.y ), repr( c.z ),repr( c.Bfac ),
-                       )
-            #end for
-        #end for
+                fprintf( fp, 'self%s.addCoordinate( %s, %s, %s, Bfac=%s )\n',
+                              atm._Cname2( 2 ), c[0], c[1], c[2],c[3])                
         fp.close()
-    #end def
 
     def restoreCoordinates( self, fileName, append = True ):
         """Restore coordinates from fileName
@@ -655,7 +674,7 @@ Return an Molecule instance or None on error
                 if (f.NF >= 3):
                     chainId = f.dollar[3]
                 else:
-                    chainId = 'A'
+                    chainId = ' '
                 #endif
 
                 molecule._addResidue( chainId, resName, resNum, convention )
@@ -857,7 +876,7 @@ Chain class: defines chain properties and methods
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
-        sister( relativeIndex ) :
+        sibling( relativeIndex ) :
         traverse()              :
 
     Methods inherited from NTdict:
@@ -1041,7 +1060,7 @@ Residue class: Defines residue properties
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
-        sister( relativeIndex ) :
+        sibling( relativeIndex ) :
         traverse()              :
 
     Methods inherited from NTdict:
@@ -1208,9 +1227,10 @@ Residue class: Defines residue properties
 
         set self[dihedralName] to NTlist of results
         """
-        if (dihedralName not in self.db):
+        # optimized out.
+#        if dihedralName not in self.db:
+        if not self.db.has_key(dihedralName):
             return None
-        #end if
 
         self[dihedralName] = NTlist()
         self[dihedralName].cAverage()
@@ -1223,42 +1243,30 @@ Residue class: Defines residue properties
         atoms = translateTopology( self, self.db[dihedralName].atoms )
         if (atoms == None or len(atoms) != 4 or None in atoms):
             return None
-        #end if
 
-        # Check if all atoms have coordinates
+        # Check if all atoms have the same number of coordinates
         l = len( atoms[0].coordinates)
         for a in atoms[1:]:
             if len(a.coordinates) != l:
                 return None
-            #end if
-        #end for
 
         #add dihedral to dict for lookup later
-        self.chain.molecule.dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = (self, dihedralName, self.db[dihedralName])
-        self.chain.molecule.dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = (self, dihedralName, self.db[dihedralName])
+        self.chain.molecule.dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
+            (self, dihedralName, self.db[dihedralName])
+        self.chain.molecule.dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
+            (self, dihedralName, self.db[dihedralName])
 
+        
         for i in range(0,l):
-            self[dihedralName].append( NTdihedral( atoms[0].coordinates[i],
-                                                   atoms[1].coordinates[i],
-                                                   atoms[2].coordinates[i],
-                                                   atoms[3].coordinates[i]
-                                                 )
-                                     )
-        #end for
-
-#        # Patch, should be in database
-#        if dihedralName in ['PHI','PSI']:
-#            self[dihedralName].limit( -180.0, 180.0 )
-#            cav,cv,n = self[dihedralName].cAverage(min=-180.0, max=180.0)
-#
-#        else:
-#            self[dihedralName].limit( 0.0, 360.0 )
-#            cav,cv,n = self[dihedralName].cAverage(min=0.0, max=360.0)
-#        #end if
+            self[dihedralName].append( NTdihedralOpt( 
+               atoms[0].coordinates[i],
+               atoms[1].coordinates[i],
+               atoms[2].coordinates[i],
+               atoms[3].coordinates[i]))
 
         plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
         self[dihedralName].limit( plotpars.min, plotpars.max )
-        cav,cv,_n =self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
+        cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
 
         return cav,cv
     #end def
@@ -1404,7 +1412,7 @@ Atom class: Defines object for storing atom properties
     Initiating attributes:
         resName                 : Residue name according to the nomenclature list.
         atomName                : Atom name according to the nomenclature list.
-
+        
     Derived attributes:
         atomIndex               : Unique atom index (several external programs need one).
         resonances              : NTlist of Resonance instances.
@@ -1429,7 +1437,7 @@ Atom class: Defines object for storing atom properties
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
-        sister( relativeIndex ) :
+        sibling( relativeIndex ) :
         traverse()              :
 
     Methods inherited from NTdict:
@@ -1482,8 +1490,9 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def addCoordinate( self, x, y, z, Bfac, **kwds ):
-        """Append coordinate to coordinates list"""
-        c = Coordinate( x, y, z, Bfac, atom = self )
+        """Append coordinate to coordinates list
+        Convenience method."""
+        c = Coordinate( x, y, z, Bfac=Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, atom=self )
 #        c.update( **kwds )
         self.coordinates.append( c )
     #end def
@@ -1507,7 +1516,7 @@ Atom class: Defines object for storing atom properties
         #end if
         self.distances = NTlist()
         for i in range(0, lenSelf):
-            self.distances.append( NTdistance(self.coordinates[i], other.coordinates[i]) )
+            self.distances.append( NTdistanceOpt(self.coordinates[i], other.coordinates[i]) )
         #end for
         av,sd,dummy = self.distances.average()
         minv = min(self.distances)
@@ -1517,39 +1526,59 @@ Atom class: Defines object for storing atom properties
 
     def meanCoordinates( self ):
         """"
-        Return mean Coordinate instance, or None on error.
-        Set dx, dy, dz, rmsd attributes of meanCoordinate
-        store variance of x, variance of y, variance of z and rmsd of coordinate
-        Also store result as mean
+        Store and return mean Coordinate instance, or None on error.
+        Todo: Set dx, dy, dz, rmsd attributes of meanCoordinate
+        and store variance of x, variance of y, variance of z and rmsd of coordinate
         """
-        n   = len( self.coordinates)
+        n   = len( self.coordinates )
 
         if n == 0:
             self.meanCoordinate = None
             return None
-        #end if
 
-        self.meanCoordinate = Coordinate( 0.0, 0.0, 0.0, Bfac = 0.0, atom = self )
+        c = Coordinate( 0.0, 0.0, 0.0, 
+                Coordinate.DEFAULT_BFACTOR,
+                Coordinate.DEFAULT_OCCUPANCY, 
+                self )
+        self.meanCoordinate = c
         self.meanCoordinate.__FORMAT__ = '<mean Coordinate (%(x)6.2f,%(y)6.2f,%(z)6.2f)>'
 
-        if (n==1):
-            for axis in ['x','y','z']:
-                self.meanCoordinate[axis] = self.coordinates[0][axis]
-                self.meanCoordinate['d'+axis] = 0.0
+#        if n==1:
+#            self.meanCoordinate[0] = self.coordinates[0][0]
+#            self.meanCoordinate[1] = self.coordinates[0][1]
+#            self.meanCoordinate[2] = self.coordinates[0][3]
+#            self.meanCoordinate.dx = 0.0
+#            self.meanCoordinate.dy = 0.0
+#            self.meanCoordinate.dz = 0.0
+#            for axis in ['x','y','z']:
+#                self.meanCoordinate[axis] = self.coordinates[0][axis]
+#                self.meanCoordinate['d'+axis] = 0.0
             #end for
-            self.meanCoordinate.rmsd = 0.0
-        else:
-
-            fn  = float(n)
+#            self.meanCoordinate.rmsd = 0.0
+#        else:
+#            fn  = float(n)
 #            fn1 = fn-1.0
-            self.meanCoordinate.rmsd = 0.0
-            for axis in ['x','y','z']:
-                #For speed we store the array first
-                data  = self.coordinates.zap(axis)
-                sum   = data.sum()
-#                sumsq = data.sumsq()
+#            self.meanCoordinate.rmsd = 0.0
+#        for d in range(3):
+#        xdata = NTlist()
+#        ydata = NTlist()
+#        zdata = NTlist()
+        for i in range(n):
+            cc = self.coordinates[i]
+            c[0] += cc[0]
+            c[1] += cc[1]
+            c[2] += cc[2]
+        c[0] /= n
+        c[1] /= n
+        c[2] /= n
 
-                self.meanCoordinate[axis]     = sum/fn
+#            for axis in ['x','y','z']:
+#                #For speed we store the array first
+#                data  = self.coordinates.zap(axis)
+#                sum   = data.sum()
+##                sumsq = data.sumsq()
+#
+#                self.meanCoordinate[axis]     = sum/fn
 
                 #sumsq/(fn-1.0) - (sum*sum)/(fn*(fn-1.0))
 #                self.meanCoordinate['d'+axis] = sumsq - sum*sum/fn/fn1
@@ -1583,7 +1612,7 @@ Atom class: Defines object for storing atom properties
         #end if
         self.angles = NTlist()
         for i in range(0, lenSelf):
-            self.angles.append( NTangle(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
+            self.angles.append( NTangleOpt(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
         #end for
         cav,cv,dummy = self.angles.cAverage( min=min, max=max, radians= radians )
         return (cav,cv)
@@ -1928,20 +1957,25 @@ Atom class: Defines object for storing atom properties
             NTcodeerror("In Atom.toPDB found model to be <1: " + `model`)
             return None
         modelId = model - 1
-        coor = self.coordinates[modelId]
 
         pdbAtmName = self.translate( convention )
-        if not pdbAtmName: 
+        if not pdbAtmName:
+            if self.name.startswith('Q'):
+                return None
+            NTwarning("Failed to translate from CING to convention: %s atom: %-20s" % ( convention, self )) 
             return None
 
         pdbResName = self.residue.translate( convention )
         if not pdbResName: 
+            NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue )) 
             return None
 
+        coor = self.coordinates[modelId]
+
         if self.db.hetatm:
-            record = PyMMLib.HETATM()
+            record = HETATM()
         else:
-            record = PyMMLib.ATOM()
+            record = ATOM()
         #end if
 
         record.serial     = pdbIndex
@@ -1950,11 +1984,11 @@ Atom class: Defines object for storing atom properties
 
         record.chainID    = self.residue.chain.name
         record.resSeq     = self.residue.resNum
-        record.x          = coor.x
-        record.y          = coor.y
-        record.z          = coor.z
-        record.tempFactor = coor.Bfac
-        record.occupancy  = coor.occupancy
+        record.x          = coor[0]
+        record.y          = coor[1]
+        record.z          = coor[2]
+        record.tempFactor = coor[3]
+        record.occupancy  = coor[4]
 
         return record
     #end def
@@ -2010,35 +2044,53 @@ class XMLAtomHandler( XMLhandler ):
 atomhandler = XMLAtomHandler()
 
 #==============================================================================
-class Coordinate( NTdict ):
+class Coordinate( list ):
     """
 -------------------------------------------------------------------------------
-Coordinate class
+Coordinate class optimized because dictionary indexing and attribute calls
+are too expensive. Just remember the attributes have a fixed order.
+Usually this is to be avoided but the speed improvement makes it worth our
+while.
+Added getter/setters for the non obvious ones.
 -------------------------------------------------------------------------------
-
-    Calling generates NTvector(x,y,z) Instance
     """
-    def __init__( self, x, y, z, Bfac=0.0, atom = None ):
-        NTdict.__init__(   self,
-                             CLASS    = 'Coordinate',
-                           __FORMAT__ = '(%(x)6.2f,%(y)6.2f,%(z)6.2f)'
-                         )
-        self.x = x
-        self.y = y
-        self.z = z
-        self.Bfac = Bfac
-        self.atom = atom
-        self.occupancy = 1.0
-    #end def
-
+    DEFAULT_BFACTOR   = 0.0
+    DEFAULT_OCCUPANCY = 1.0
+    def __init__( self, x, y, z, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom=None ):
+        list.__init__( self
+#                             CLASS    = 'Coordinate'
+#                           __FORMAT__ = '(%(x)6.2f,%(y)6.2f,%(z)6.2f)'
+                        )
+        self.append( x )
+        self.append( y )
+        self.append( z )
+        self.append( Bfac )
+        self.append( occupancy )
+        self.append( atom )
+    def getBFac(self):
+        return self[3]
+    def getOccupancy(self):
+        return self[4]
+    def getAtom(self):
+        return self[5]
+    def setBFac(self, v):
+        self[3] = v
+    def setOccupancy(self, v):
+        self[4] = v
+    def setAtom(self, v):
+        self[5] = v
+#        self.dx = "blabla" optional.
     def __call__( self ):
-        return NTvector(self.x, self.y, self.z)
-    #end def
-
+        return NTvector(self[0], self[1], self[2])
+#    #end def
+#    def toTuple(self):
+#        return ( self[0], self.y, self.z )
 #end class
 
 class XMLCoordinateHandler( XMLhandler ):
-    """Coordinate handler class"""
+    """Coordinate handler class
+    TODO: check with new Coordinate class.
+    """
     def __init__( self ):
         XMLhandler.__init__( self, name='Coordinate')
     #end def
@@ -2047,7 +2099,7 @@ class XMLCoordinateHandler( XMLhandler ):
         attrs = self.handleDictElements( node )
         if attrs == None: 
             return None
-        result = Coordinate( x = attrs['x'], y = attrs['y'], z=attrs['z'] )
+        result = Coordinate( attrs['x'], attrs['y'], attrs['z'] )
         # update the attrs values
         result.update( attrs )
         return result
@@ -2058,42 +2110,104 @@ class XMLCoordinateHandler( XMLhandler ):
 coordinatehandler = XMLCoordinateHandler()
 
 #==============================================================================
-def NTdistance( c1, c2 ):
+def NTdistanceOpt( c1, c2 ):
     """
     Return distance defined by Coordinate instances c1-c2
     """
-    d = c2()-c1()
-    return d.length()
-#end def
+#    d = c2()-c1()
+    d = ( c2[0]-c1[0], c2[1]-c1[1], c2[2]-c1[2] )    
+#    return d.length()
+    return length3Dopt(d)
 
 
-def NTangle( c1, c2, c3, radians = False ):
+#def NTangle( c1, c2, c3, radians = False ):
+#    """
+#    Return angle defined by Coordinate instances c1-c2-c3
+#    """
+#    a = c2()-c1()
+#    b = c2()-c3()
+#    return a.angle( b, radians=radians )
+##end def
+
+def NTangleOpt( c1, c2, c3, radians = False ):
     """
     Return angle defined by Coordinate instances c1-c2-c3
     """
-    a = c2()-c1()
-    b = c2()-c3()
-    return a.angle( b, radians=radians )
+#    a = c2()-c1()
+#    b = c2()-c3()
+    a = ( c2[0]-c1[0], c2[1]-c1[1], c2[2]-c1[2] )
+    b = ( c2[0]-c3[0], c2[1]-c3[1], c2[2]-c3[2] )
+
+#    return a.angle( b, radians=radians )
+    return angle3Dopt( a, b )
 #end def
 
-def NTdihedral( c1, c2, c3, c4, radians=False ):
-    """
+#def NTdihedral( c1, c2, c3, c4, radians=False ):
+#    """
+#    Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
+#    Adapted from biopython-1.41
+#    """
+##    c1() returns a NTvector for which subtraction is CING coded.
+##    ab = c1() - c2() 
+##    cb = c3() - c2()
+##    db = c4() - c3()
+#    ab = ( c1[0]-c2[0], c1[1]-c2[1], c1[2]-c2[2] )
+#    cb = ( c3[0]-c2[0], c3[1]-c2[1], c3[2]-c2[2] )
+#    db = ( c4[0]-c3[0], c4[1]-c3[1], c4[2]-c3[2] )
+#
+#    # Optimized out.
+#    u = ab.cross( cb )
+#    v = db.cross( cb )
+#    w =  u.cross( v )
+#
+#    angle = u.angle( v, radians=radians )
+#
+#    # Tries are expensive; next step of optimalization is to remove it.
+#    # Speed check showed major bottleneck(s) disappeared so leaving it in.
+#    # determine sign of angle
+#    try:
+#        if cb.angle( w, radians=True ) > 0.001: 
+#            angle *= -1.0 
+#    except ZeroDivisionError:
+#        # dihedral=pi or 0
+#        pass
+#
+#    return angle
+#end def
+def NTdihedralOpt( c1, c2, c3, c4 ):
+    """ To replace unoptimized routine. It's 7 times faster (20.554/2.965s)
+    for 100,000 calculations.
     Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
     Adapted from biopython-1.41
-
     """
-    ab = c1() - c2()
-    cb = c3() - c2()
-    db = c4() - c3()
+#    ab = c1() - c2() optimized
+#    cb = c3() - c2()
+#    db = c4() - c3()
+    ab = ( c1[0]-c2[0], c1[1]-c2[1], c1[2]-c2[2] )
+    cb = ( c3[0]-c2[0], c3[1]-c2[1], c3[2]-c2[2] )
+    db = ( c4[0]-c3[0], c4[1]-c3[1], c4[2]-c3[2] )
 
-    u = ab.cross( cb )
-    v = db.cross( cb )
-    w = u.cross( v )
+    # Optimized out.
+#    u = ab.cross( cb )
+#    v = db.cross( cb )
+#    w =  u.cross( v )
 
-    angle = u.angle( v, radians=radians )
+    u = cross3Dopt(ab,cb)
+    v = cross3Dopt(db,cb)
+    w = cross3Dopt( u,v)
+
+#    angle = u.angle( v, radians=radians )
+    angle = angle3Dopt( u, v )
+
+    # Tries are expensive; next step of optimalization is to remove it.
+    # Speed check showed major bottleneck(s) disappeared so leaving it in.
     # determine sign of angle
     try:
-        if cb.angle( w, radians=True ) > 0.001: angle *= -1.0
+        cbAngleDegrees = angle3Dopt( cb, w )
+#        if cb.angle( w, radians=True ) > 0.001: 
+        if cbAngleDegrees > 0.001:
+#            angle *= -1.0 optimized
+            angle = -angle
     except ZeroDivisionError:
         # dihedral=pi or 0
         pass
@@ -2164,17 +2278,14 @@ def translateTopology( residue, topDefList ):
        return NTlist instance or None on error
     """
     result = NTlist()
-
     for resdiffIndex,atomName in topDefList:
-        res = residue.sister( resdiffIndex )
-        if (res != None and atomName in res):
-            result.append( res[atomName] )
-        else:
+        # optimized
+        res = residue.sibling( resdiffIndex )
+        if res == None or not res.has_key( atomName ):
             result.append( None )
-        #end if
-    #end for
+            continue
+        result.append( res[atomName] )
     return result
-#end def
 
 #==============================================================================
 def allAtoms( molecule ):

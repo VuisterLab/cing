@@ -1,6 +1,4 @@
 #=======================================================================
-#  19 Dec   2007: remapped BMRB nucleic acid residue names to reflect PDB;
-#                   added Zn, His HE2, with BMRB map. Added nucleic prop to n.a.
 #  17 April 2007: fixed error in QE topology (was SD, should be CE)
 #  18 April 2007: changed defs QR for PHE and TYR, now similar to VAL QQG and LEU QQD
 #  24 May   2007: Reordered dihedrals for more useful output during validation:
@@ -19,6 +17,8 @@
 # 26 Sep    2007: Gave Cyana pseudo residues the cyanaPseudoResidue property
 # 10 Oct    2007: OMEGA IUPAC
 # 05 Dec    2007: Renamed NTdict to NTdict
+# 19 Dec    2007: remapped BMRB nucleic acid residue names to reflect PDB;
+#                   added Zn, His HE2, with BMRB map. Added nucleic prop to n.a.
 #=======================================================================
 #
 #
@@ -1118,7 +1118,7 @@ END_RESIDUE
 #	internal short   
 RESIDUE	ASPH      D    
 #=======================================================================
-	nameDict = {'CYANA': 'ASP', 'BMRBd': None, 'INTERNAL': 'ASPH', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': None}
+	nameDict = {'CYANA': 'ASP', 'BMRBd': 'ASP', 'INTERNAL': 'ASPH', 'CYANA2': None, 'PDB': 'ASP', 'XPLOR': None, 'BMRB': 'ASP'}
 	comment  = 'protonated (neutral) ASP (uncommon)'
 	properties = ['protein','aliphatic','charged']
 	#---------------------------------------------------------------
@@ -2102,7 +2102,7 @@ END_RESIDUE
 #	internal short   
 RESIDUE	GLUH      E       
 #=======================================================================
-	nameDict = {'CYANA': 'GLU', 'BMRBd': None, 'INTERNAL': 'GLUH', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': None}
+	nameDict = {'CYANA': 'GLU', 'BMRBd': 'GLU', 'INTERNAL': 'GLUH', 'CYANA2': None, 'PDB': 'GLU', 'XPLOR': None, 'BMRB': 'GLU'}
 	comment  = 'Protonated (neutral) GLU (uncommon)'
 	properties = ['protein','aliphatic','large','charged']
 	#---------------------------------------------------------------
@@ -11851,6 +11851,50 @@ RESIDUE ZN2P      ZN2P
         spinType = '1H'
         shift = None
     END_ATOM
+END_RESIDUE
+#=======================================================================
+
+#=======================================================================
+#   internal short   
+RESIDUE HOH      O       
+#=======================================================================
+    nameDict = {'CYANA': 'HOH', 'BMRBd': 'HOH', 'INTERNAL': 'HOH', 'CYANA2': 'HOH', 'PDB': 'HOH', 'XPLOR': 'HOH', 'BMRB': 'HOH'}
+    comment  = 'Regular Water residue'
+    properties = ['small','neutral']
+    #---------------------------------------------------------------
+    ATOM O
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'O', 'BMRBd': 'O', 'INTERNAL': 'O', 'CYANA2': 'O', 'PDB': 'O', 'XPLOR': 'O', 'BMRB': 'O'}
+        topology = [(0, 'H1'), (0, 'H2')]
+        pseudo = None
+        real = []
+        type = 'O_HYD'
+        spinType = '16O'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM H1
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'H1', 'BMRBd': 'H1', 'INTERNAL': 'H1', 'CYANA2': 'H1', 'PDB': 'H1', 'XPLOR': 'H1', 'BMRB': 'H1'}
+        topology = [(0, 'O'), (0, 'H2')]
+        pseudo = None
+        real = []
+        type = 'H_OXY'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM H2
+    #---------------------------------------------------------------
+        nameDict = {'CYANA': 'H2', 'BMRBd': 'H2', 'INTERNAL': 'H2', 'CYANA2': 'H2', 'PDB': 'H2', 'XPLOR': 'H2', 'BMRB': 'H2'}
+        topology = [(0, 'O'), (0, 'H1')]
+        pseudo = None
+        real = []
+        type = 'H_OXY'
+        spinType = '1H'
+        shift = None
+    END_ATOM
+
 END_RESIDUE
 #=======================================================================
 

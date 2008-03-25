@@ -1,28 +1,37 @@
 from cing import cingDirTestsTmp
 from cing import verbosityDebug
+from cing import verbosityError
 from cing.Libs.NTplot import NTplot
+from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import circlePoint
+from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import greenLine
-from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
+from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.peirceTest import peirceTest
-from cing.core.classes import Project
-from pylab import * #@UnusedWildImport
 from unittest import TestCase
-from cing import verbosityError
+from cing.Libs.NTplot import to3StateUpper
 import cing
 import os #@Reimport
 import unittest
+#from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):
 
+    # important to switch to temp space before starting to generate files for the project.
+    os.chdir(cingDirTestsTmp)
+    NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
+
     def testPlotVaria(self):
-        close('all')
-        p = NTplot( title = 'test', xRange=(0,10), yRange=(0,10), xLabel='aap' )
+        ps = NTplotSet() # closes any previous plots
+        p = ps.createSubplot(1,1,1)
+        p.title = 'test'
+        p.xRange=(0,10)
+        p.yRange=(0,10)
+        p.xLabel='aap'
+        ps.subplotsAdjust(left = 0.2) # Accommodate extra Y axis label.
     
         p.box( (1,0), (0.9,2), boxAttributes( lineColor='black', line=True, fillColor='blue', fill=True) )
         p.box( (2,0), (0.9,5), boxAttributes( lineColor='green', line=True, fillColor='red',  fill=True) )
@@ -40,133 +49,64 @@ class AllChecks(TestCase):
 #    
         p.points(map(None,x,y,NTfill(0.0,len(x)), ey))
         p.setMinorTicks(.5)
+        
+        attr = fontVerticalAttributes()
+        attr.fontColor  = 'blue' 
+        p.labelAxes( (-0.12, 0.5), 'Backbone', attributes=attr)
+        attr.fontColor  = 'black' 
+        p.labelAxes( (-0.2, 0.5), 'Z-scores throughout', attributes=attr)
+        
 #        p.yRange = None # Should autoscale the plot in y.
-#        p.show()
+        ps.hardcopy('testPlotVaria.png')
+#        ps.show()
 
 
     def testPlotModelHisto(self):
-        close('all')
-        modelCount = 2
+        ps = NTplotSet() # closes any previous plots
+        outliersPerModel = { 0:2, 1:3 } 
+        modelCount = len(outliersPerModel.keys())
         plot = NTplot(        xLabel = 'Model',
                               xRange = (0, modelCount),
+                              yRange = (0, 5),
                               yLabel = 'Outliers',
                               hardcopySize= (600,300),
                               aspectRatio = 0.5
                             )
-#        project.models[i] holds the number of outliers for model i.
-#        models is a NTdict.
-        outliersPerModel = { 0:0, 1:0 } # actual data for 1brv's first models.
+        ps.addPlot(plot)
         plot.barChart( outliersPerModel.items(),
                        0.05, 0.95,
-                       attributes = boxAttributes( fillColor='green' )
+                       attributes = boxAttributes(fillColor='green' )
                      )
+        
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
-        graphicsFormat = NTplot().graphicsOutputFormat
-        plot.hardcopy( 'outliers.'+graphicsFormat, graphicsFormat )
+        ps.hardcopy( 'outliers.png' )
+#        plot.show()
     
                     
         
-    def testPlotHistoDihedral(self):
+    def testTo3StateUpper(self):
+        self.assertEquals(     to3StateUpper(['S','E']), [' ','E'])
+        self.assertEquals(     to3StateUpper(['h','H']), [' ','H'])
+        self.assertNotEquals(  to3StateUpper([' ','H']), ['H','H'])
+        self.assertEquals(     to3StateUpper(['X','H']), [' ','H'])
         
-#        NTdebug("Using mat plot (True) or biggles: "+ `useMatPlotLib`)
-        graphicsFormat = "png"
-        residueName = "ASN1"
-        dihedralName= "CHI1"
-        dihedralNameLatex= "$\chi 1$"
+    def testPlotSet(self):
+#        hardcopySize = (60,30)
+        ps = NTplotSet() # closes any previous plots
+        nrows = 3
+        ntPlot1 = ps.createSubplot(nrows,1,1,useResPlot=True)
+        ntPlot2 = ps.createSubplot(nrows,1,2)
+#        ntPlot3 = ps.createSubplot(nrows,1,3)
+        ntPlot1.xTicks = []
+        point = [0,1]
+        sizes = [.2,.3]
+        ntPlot1.box(point, sizes)
+        ntPlot2.box(point, sizes)
 
-        # important to switch to temp space before starting to generate files for the project.
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
-        project     = Project('testPlotHistoDihedral')
-        plotparams  = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
-        binsize     = int(plotparams.ticksize / 12 ) # 60 over 12 results in 5 degrees. as an int
-        bins        = (plotparams.max - plotparams.min)/binsize # int
-        
-        angleList = NTlist( 50,60, 51, 53, 52, 54, 62, 90, 93 )
-        angleList.cAverage()
-        goodAndOutliers = peirceTest( angleList )
-        self.failUnless( goodAndOutliers )
-        angleList.good, angleList.outliers = goodAndOutliers
-
-
-        angleList.limit(          plotparams.min, plotparams.max ) # Actually not plotted angle anymore.?
-        angleList.cAverage(       plotparams.min, plotparams.max )
-        angleList.good.limit(     plotparams.min, plotparams.max, byItem=1 )
-        angleList.good.cAverage(  plotparams.min, plotparams.max, byItem=1 )
-        angleList.outliers.limit( plotparams.min, plotparams.max, byItem=1 )
-        
-        xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize)
-#        NTdebug("xTicks: " + `xTicks`)
-        figWidth  = 600
-        figHeight = None # Golden which turns out to be 369
-#            figHeight = figWidth * golden_mean
-        plot = NTplot(title  = residueName,
-                      xRange = (plotparams.min, plotparams.max),
-                      xTicks = xTicks,
-                      xLabel = dihedralNameLatex,
-                      yLabel = 'Occurrence',
-                      hardcopySize= (figWidth,figHeight)
-                    )
-    
-        self.failUnless( angleList.__dict__.has_key('good'))
-        plot.histogram( angleList.good.zap(1),
-                        plotparams.min, plotparams.max, bins,
-                        attributes = boxAttributes( fillColor=plotparams.color )
-                      )
-    
-        if angleList.__dict__.has_key('outliers'):
-            plot.histogram( angleList.outliers.zap(1),
-                        plotparams.min, plotparams.max, bins,
-                        attributes = boxAttributes( fillColor=plotparams.outlier),
-                        valueIndexPairList=angleList.outliers
-                      )
-
-        aAv  = angleList.cav
-        width = 4.0
-        lower, upper = 45, 55
-        alpha = 0.3 
-        
-        ylim = plot.get_ylim()
-        ylimMax = 5 # Just assume.
-        if ylim:
-            ylimMax = ylim[1]
-        # note plotparams.lower is a color!
-        bounds = NTlist(lower, upper)
-        bounds.limit(plotparams.min, plotparams.max)
-        if bounds[0] < bounds[1]: # single box
-            point = (bounds[0], 0) # lower left corner of only box.
-            sizes = (bounds[1]-bounds[0],ylimMax)
-            NTdebug("point: " + `point`)
-            NTdebug("sizes: " + `sizes`)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-        else: # two boxes
-            # right box
-            point = (bounds[0], 0) # lower left corner of first box.
-            sizes = (plotparams.max-bounds[0],ylimMax)
-            NTdebug("point: " + `point`)
-            NTdebug("sizes: " + `sizes`)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-            point = (plotparams.min, 0) # lower left corner of second box.
-            sizes = (bounds[1]-plotparams.min,ylimMax)
-            NTdebug("point: " + `point`)
-            NTdebug("sizes: " + `sizes`)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-        
-        
-        
-#        plot.line( (lower, 0), (lower, ylimMax),
-#                   lineAttributes(color=plotparams.lower, width=width) )
-#        plot.line( (upper, 0), (upper, ylimMax),
-#                   lineAttributes(color=plotparams.upper, width=width) )
-#
-        # Always plot the cav line
-        plot.line( (aAv, 0), (aAv, ylimMax), 
-                   lineAttributes(color=plotparams.average, width=width) )
-#        plot.show()
-        plot.hardcopy("testPlotHistoDihedral."+graphicsFormat, graphicsFormat)
-
-    
+        ps.hardcopySize = (100,30)
+#        ps.show()
+        ps.hardcopy('testPlotSet.png')
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

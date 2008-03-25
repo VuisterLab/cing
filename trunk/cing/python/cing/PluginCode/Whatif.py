@@ -28,9 +28,19 @@ TYPE_STR         = "type"
 VALUE_LIST_STR   = "valueList"
 QUAL_LIST_STR    = "qualList"
 WHATIF_STR       = "whatif" # key to the entities (atoms, residues, etc under which the results will be stored
+
 INOCHK_STR       = 'INOCHK'
 BNDCHK_STR       = 'BNDCHK'
 ANGCHK_STR       = 'ANGCHK'
+
+QUACHK_STR       = 'QUACHK'
+RAMCHK_STR       = 'RAMCHK'
+C12CHK_STR       = 'C12CHK'
+BBCCHK_STR       = 'BBCCHK'
+#            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
+#            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
+#            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
+#            BBCCHK
 
 class Whatif( NTdict ):
     """
@@ -259,7 +269,7 @@ fullstop y
                     self.checks.append( curCheck )
                     curCheck[CHECK_ID_STR] = checkID
                     self[ checkID ] = curCheck
-                    NTdebug("Appended check: "+checkID)
+#                    NTdebug("Appended check: "+checkID)
                 # Set the curLocDic in case of the first time otherwise get.
                 curLocDic = curCheck.setdefault(LOC_ID_STR, NTdict())
                 continue
@@ -280,7 +290,7 @@ fullstop y
                 continue            
             if key == "Name":
                 curLocId = value
-                NTdebug("curLocId: "+curLocId )
+#                NTdebug("curLocId: "+curLocId )
                 curListDic = curLocDic.setdefault(curLocId, NTdict())
                 continue
 
@@ -300,10 +310,10 @@ fullstop y
                 curListDic[ keyWord ] = itemNTlist
                 for _dummy in range(self.molecule.modelCount): # Shorter code for these 2 lines please JFD.
                     itemNTlist.append(None)
-                NTdebug("b initialized with Nones: itemNTlist: %r", itemNTlist )
+#                NTdebug("b initialized with Nones: itemNTlist: %r", itemNTlist )
             else:
                 itemNTlist = curListDic[ keyWord ]
-            NTdebug("a itemNTlist: "+`itemNTlist` )
+#            NTdebug("a itemNTlist: "+`itemNTlist` )
 
             if isTypeFloat:
                 itemNTlist[curModelId] = float(value)
@@ -368,26 +378,26 @@ fullstop y
             check.keysformat()
 
         checkIter = iter(selfLevelChecks)
-        for levelEntity in selfLevels:
+        for _levelEntity in selfLevels:
             levelCheck = checkIter.next()
-            NTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
+#            NTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
             for check in levelCheck:
                 checkId = check[CHECK_ID_STR]
-                NTdebug( 'check        : ' + `check`)
-                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
+#                NTdebug( 'check        : ' + `check`)
+#                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
                 if not check.has_key(LOC_ID_STR):
                     NTdebug("There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
                     NTdebug("  check: "+ `check`)
                     continue
                 curLocDic = check[LOC_ID_STR]
                 if not curLocDic:
-                    NTdebug("Skipping empty locationsDic")
+#                    NTdebug("Skipping empty locationsDic")
                     continue
                 
                 for curLocId in curLocDic.keys():
                     curListDic = curLocDic[curLocId]                
-                    NTdebug("Working on curLocId:   " + `curLocId`)
-                    NTdebug("Working on curListDic: " + `curListDic`)
+#                    NTdebug("Working on curLocId:   " + `curLocId`)
+#                    NTdebug("Working on curListDic: " + `curListDic`)
                     
                     nameTuple = self.translateResAtmString( curLocId )
                     if not nameTuple:
@@ -397,9 +407,9 @@ fullstop y
                     if not entity:
                         NTerror('Whatif._processCheckdb: mapping entity "%s" descriptor' % curLocId)
                         continue
-                    NTdebug("adding to entity: " + `entity`)
+#                    NTdebug("adding to entity: " + `entity`)
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
-                    NTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
+#                    NTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
                                         
                     keyWordList = [ VALUE_LIST_STR, QUAL_LIST_STR]
 #            "locId": {                             # curLocDic
@@ -414,7 +424,7 @@ fullstop y
                             continue                        
                         entityWhatifCheckDic = entityWhatifDic.setdefault(checkId, NTdict())
                         entityWhatifCheckDic[keyWord]=curList
-                    NTdebug("now entityWhatifDic: " + `entityWhatifDic`)
+#                    NTdebug("now entityWhatifDic: " + `entityWhatifDic`)
         NTmessage('done with _processCheckdb')
     #end def
 

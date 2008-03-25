@@ -52,6 +52,6 @@ class AllChecks(TestCase):
         self.assertFalse( project.validate())
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityNothing
+    cing.verbosity = verbosityDebug
     unittest.main()

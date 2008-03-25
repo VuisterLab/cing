@@ -72,7 +72,7 @@ class NTlist( list ):
     #end def
 
     def __call__( self, index=-1 ):
-        if (index < 0):
+        if index < 0:
             return self.current
         else:
             return self[ index ]
@@ -128,8 +128,6 @@ class NTlist( list ):
         for item in items:
             list.append( self, item )
             self.current = item
-        #end for
-    #end def
 
     def add( self, *items ):
         '''Add a new item to a list only if not there before, like 'add' method
@@ -170,15 +168,19 @@ class NTlist( list ):
     #end def
 
     def index( self, item ):
-        # JFD notest that this method can be twice as fast; rewritten
-#        return list.index( self, item )
-        # If only list.index wouldn't throw an Exception.
-        if item in self:
+        # JFD notes that this method is now twice as fast.
+        # This was a very rate limiting piece of code when a chain
+        # had many residues (E.g. an X-ray structure with many waters).
+        
+        
+        try:
             return list.index( self, item )
-        else:
-            return -1
-        #end if
-    #end def
+        except ValueError:
+            pass
+        return -1
+#        if item in self:
+#            return list.index( self, item )
+#        return -1
 
     def last( self ):
         l = len(self)
@@ -587,8 +589,10 @@ class NTvector( list ):
         NB: Only 3D vectors
         """
         l = len(self)
-        if l != 3: return None
-        if l != len(other): return None
+        if l != 3: 
+            return None
+        if l != len(other): 
+            return None
 
         result = NTvector()
         result.append( self[1]*other[2]-self[2]*other[1] ) # x-coordinate
@@ -596,6 +600,7 @@ class NTvector( list ):
         result.append( self[0]*other[1]-self[1]*other[0] ) # z-coordinate
         return result
     #end def
+
 
 #    def triple( self, b, c):
 #        """
@@ -943,7 +948,7 @@ class NTdict(dict):
   #------------------------------------------------------------------
   # Basic functionality
   #------------------------------------------------------------------
-  def __getattr__(self, attr):
+  def __getattr__(self, attr): # No need to override?
     return self[attr]
 
   def __setattr__(self, attr, value):
@@ -952,15 +957,14 @@ class NTdict(dict):
   def __delattr__(self, attr):
     del( self[attr] )
 
+    
   def __cmp__( self, other ):
-      if (self.__OBJECTID__ < other.__OBJECTID__):
-          return -1
-      elif (self.__OBJECTID__ > other.__OBJECTID__):
-          return 1
-      else:
+      """Optimized for speed a bit"""
+      if self.__OBJECTID__ == other.__OBJECTID__:
           return 0
-      #end if
-  #end def
+      if self.__OBJECTID__ < other.__OBJECTID__:
+          return -1
+      return 1
 
   def __hash__( self ):
       return hash( self.__OBJECTID__ )
@@ -969,8 +973,7 @@ class NTdict(dict):
   def __eq__( self, other):
     if other == None:
         return False
-    else:
-        return self.__OBJECTID__ == other.__OBJECTID__
+    return self.__OBJECTID__ == other.__OBJECTID__
 
   def __ne__( self, other):
     return not (self == other)
@@ -1285,9 +1288,6 @@ class NTdict(dict):
       for a in attrs:
           if a not in self.__SAVEXML__:
               self.__SAVEXML__.append( a )
-          #end if
-      #end for
-  #end def
 
   def removeXML( self, *attrs ):
       """remove attrributes from __SAVEXML__ list
@@ -1389,13 +1389,11 @@ class NTtree( NTdict ):
         """Return name constructor with 'depth' levels"""
         result = self.name
         parent = self._parent
-        while (depth != 0 and parent != None):
+        while depth != 0 and parent != None:
             result = parent.name + '.' + result
             depth -= 1
             parent = parent._parent
-        #end while
         return result
-    #end def
 
     def _Cname2( self, depth=0 ):
         """Return name constructor using ['name']
@@ -1407,14 +1405,10 @@ class NTtree( NTdict ):
             result = sprintf( '[%s]', quote(parent.name) ) + result
             depth -= 1
             parent = parent._parent
-        #end while
         return result
-    #end def
 
     def __str__( self ):
         return '<%s %s>' % ( self._className(), self.name )
-#        return self.name
-    #end def
 
 #    def __repr__( self ):
 #        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
@@ -1435,21 +1429,23 @@ class NTtree( NTdict ):
     #end def
 
     def removeChild( self, child ):
-        if (not child in self._children): return None
-        if child.name in self: del( self[ child.name ] )
+        if not child in self._children: 
+            return None
+        if child.name in self: 
+            del( self[ child.name ] )
         self._children.remove( child )
         child._parent = None
         return child
-    #end def
-
+ 
     def renameChild( self, child, newName ):
-        if (not child in self._children): return None
-        if child.name in self: del( self[ child.name ] )
+        if not child in self._children: 
+            return None
+        if child.name in self: 
+            del( self[ child.name ] )
         child.name = newName
         self[child.name] = child
         return child
-    #end def
-
+ 
     def replaceChild( self, child, newChild ):
         if (not child in self._children): return None
         if child.name in self: del( self[ child.name ] )
@@ -1460,73 +1456,71 @@ class NTtree( NTdict ):
         return newChild
     #end def
 
-    def _sister( self, relativeIndex ):
+    def _sibling( self, relativeIndex ):
         """Internal routine: Return index relative to self
-           or -1 if it does not exist
-        """
-        if (self._parent == None): return -1
+           or -1 if it does not exist.
+           This routine is the slowest part in a typical read of a molecule
+           at the point of trying to match atom specifications in a dihedral
+           which can span the residue.
+        """        
+        if not self._parent: 
+            return -1
 
         selfIndex = self._parent._children.index( self )
-        if (selfIndex < 0):
-            #This should not happen!
-            NTerror('NTtree.sister: child "%s" not in parent "%s". This should never happen!!\n',
+        if selfIndex < 0:
+            NTerror('NTtree.sibling: child "%s" not in parent "%s". This should never happen!!\n',
                     str( self ), str( self._parent)
                    )
             return -1
-        #end if
 
         targetIndex = selfIndex + relativeIndex
-        if ( targetIndex < 0 or targetIndex >= len(self._parent._children) ): return -1
+        if targetIndex < 0:
+            return -1
+        if targetIndex >= len(self._parent._children): 
+            return -1
 
         return targetIndex
-    #end def
 
-    def sister( self, relativeIndex ):
+    def sibling( self, relativeIndex ):
         """Return NTtree instance (relative to self)
            or None if it does not exist
         """
-
-        targetIndex = self._sister( relativeIndex )
-        if (targetIndex < 0):
+        # Next check greatly speeds up trivial lookups.        
+        if relativeIndex == 0:
+            return self
+        
+        targetIndex = self._sibling( relativeIndex )
+        if targetIndex < 0:
             return None
         else:
             return self._parent._children[targetIndex]
-        #end if
-    #end def
 
     def youngerSiblings( self ):
         """return NTlist of elements following self
            or None in case of error
         """
-        if (self._parent == None): return None
-        sister = self._sister( 1 )
-        if (sister < 0): return []
-        return self._parent._children[sister:]
-    #end def
+        if self._parent == None: 
+            return None
+        sibling = self._sibling( 1 )
+        if sibling < 0: 
+            return []
+        return self._parent._children[sibling:]
 
     def olderSiblings( self ):
         """return NTlist of elements preceding self
            or None if it does not exist
         """
-        if (self._parent == None): return None
-        sister = self.sister( -1 )
-        if (sister == None): return []
-        return self._parent._children[0:sister+1]
-    #end def
-
-#    def set( self, value ):
-#        self._value = [value]
-#    #end def
-
-#    def __call__( self, index=-1 ):
-#        return self._value( index )
-#    #end def
+        if self._parent == None: 
+            return None
+        sibling = self.sibling( -1 )
+        if sibling == None: 
+            return []
+        return self._parent._children[0:sibling+1]
 
     def __iter__( self ):
         """iteration routine: loop of children"""
         self._iter = 0
         return self
-    #end def
 
     def next( self ):
         if self._iter >= len(self._children):
@@ -1535,7 +1529,6 @@ class NTtree( NTdict ):
         s = self._children[self._iter]
         self._iter += 1
         return s
-    #end def
 
     def traverse( self, depthFirst=1, result = None, depth = -1 ):
         """Traverse the tree,
@@ -1543,42 +1536,35 @@ class NTtree( NTdict ):
            finite depth recursion for depth > 0
         """
 #        print '>>', self, depth
-        if (result == None):
+        if result == None:
             result = NTlist()
-        #end if
+
         result.append( self )
         for child in self._children:
-            if (depth != 0) :
+            if depth != 0:
                 child.traverse( depthFirst=depthFirst, result = result, depth = depth-1 )
-            #end if
-        #end for
         return result
-    #end def
 
     def subNodes( self, result = None, depth = -1 ):
         """Traverse the tree, returning all subnodes at depth
         """
 #        print '>>', self, depth
 
-        if (result == None):
+        if result == None:
             result = NTlist()
         #end if
-        if (depth == 0):
+        if depth == 0:
             result.append( self )
-        elif (depth > 0):
+        elif depth > 0:
             for child in self._children:
                 child.subNodes( result = result, depth = depth-1 )
-            #end for
-        #end if
         return result
-    #end def
 
     def header( self, dots = '---------'  ):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
-    #end def
-
+ 
 #end class
 #
 # -----------------------------------------------------------------------------
@@ -1945,7 +1931,7 @@ def NTaverage( theList, byIndex=None ):
     sumsqd = 0.0
     n = 0.0
     for item in theList:
-        if item:
+        if item != None:
             if byIndex == None:
                 val = item
             else:
@@ -1963,7 +1949,7 @@ def NTaverage( theList, byIndex=None ):
     av = sum/n
     # routine below makes it much slower but easier to read than one pass.
     for item in theList:
-        if item:
+        if item != None:
             if byIndex == None:
                 val = item
             else:
@@ -3241,6 +3227,25 @@ def limitToRange( v, low, hi):
         return low
     return v
 
+def NTmax(*args):
+    """Usefull as matplotlib overrides buildin"""
+    result = args[0]
+    for a in args:
+        if a > result:
+            result = a
+    return result
+ 
+#
+def NTmin(*args):
+    """Usefull as matplotlib overrides buildin"""
+    result = args[0]
+    for a in args:
+        if a < result:
+            result = a
+    return result
+
+    
+ 
 #
 #def splitpdb( fileName = None, modelNum = None ):
 #    """
@@ -3336,3 +3341,39 @@ def limitToRange( v, low, hi):
 ##    base = os.path.getBase(fileName)
 ##    return base + "_" + sprintf( "%03i", modelId ) + ext
 
+def cross3Dopt( a, b ):
+    return [
+    a[1]*b[2]-a[2]*b[1], # x-coordinate
+    a[2]*b[0]-a[0]*b[2], # y-coordinate
+    a[0]*b[1]-a[1]*b[0]  # z-coordinate
+    ]
+
+def dot3Dopt( a, b ):
+    return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
+
+def length3Dopt( a ):
+    return math.sqrt( a[0]*a[0]+a[1]*a[1]+a[2]*a[2] )
+
+FAC = 180.0/math.pi
+
+
+def angle3Dopt( a, b ):
+        """
+        return angle spanned by a and b
+        or None on error
+        range = [0, pi]
+        positive angle is counterclockwise (to be in-line with 'polar' methods
+        and atan2 routines).
+        """
+        # optimized out. 
+#        c = self.dot(other) /(self.length()*other.length())
+        c = dot3Dopt(a,b) 
+        c /= length3Dopt(a)
+        c /= length3Dopt(b)
+
+        # Are the below needed for rounding effects?
+        c = min( c, 1.0 )
+        c = max( c, -1.0 )
+#        if radians: 
+#            return math.acos( c )
+        return math.acos( c ) * FAC

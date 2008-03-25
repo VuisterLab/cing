@@ -3,6 +3,7 @@ from cing import cingRoot
 from cing import cingVersion
 from cing import programName
 from cing.Libs.NTutils import NTaverage
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
@@ -12,6 +13,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
@@ -25,8 +27,7 @@ from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
-from cing.core.molecule import NTdihedral 
-from cing.core.molecule import NTdistance 
+from cing.core.molecule import NTdihedralOpt
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
@@ -36,8 +37,7 @@ from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from cing.core.sml import SMLhandler
 from shutil import rmtree
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTwarning
+from cing.core.molecule import NTdistanceOpt
 import math
 import os
 import shutil
@@ -1050,7 +1050,7 @@ class DistanceRestraint( NTdict ):
                         if (len( a1.coordinates ) > i ):
                             for a2 in atms2:
                                 if (len(a2.coordinates) > i ):
-                                    tmp = NTdistance( a1.coordinates[i], a2.coordinates[i] )
+                                    tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
                                     d += math.pow( tmp, -6.0 )
                                 else:
                                     self.error = True
@@ -1411,7 +1411,8 @@ class DihedralRestraint( NTdict ):
         self.violSd     = 0.0      # Sd of violations
 
         for i in range(modelCount):
-            d = NTdihedral( self.atoms[0].coordinates[i],
+            d = NTdihedralOpt( 
+                            self.atoms[0].coordinates[i],
                             self.atoms[1].coordinates[i],
                             self.atoms[2].coordinates[i],
                             self.atoms[3].coordinates[i]

@@ -3,6 +3,7 @@
 ## its license.  Please see the LICENSE file that should have been
 ## included as part of this package.
 ## Adjusted by gv for specific purpose of NTmol
+#from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -55,7 +56,7 @@ class PDBRecord( NTdict ):
         ln = self._name
         
         for (field, start, end, ftype, just, get_func) in self._field_list:
-
+#            NTdebug( "field, start, end, ftype, just, get_func: %s %s %s %s %s %s", field, start, end, ftype, just, get_func)
             try:
                 assert len(ln) <= (start - 1)
             except AssertionError:
@@ -1508,7 +1509,10 @@ class PDBFile(list):
         assert isinstance(rec, PDBRecord)
         list.insert(self, i, rec)
 
-    def load_file(self, fileName, update_cb = None)   :
+
+    
+    
+    def load_file(self, fileName, update_cb = None ):
         """Loads a PDB file from File object fil.
         """
         fil = OpenFile(fileName, "r")
@@ -1567,18 +1571,21 @@ class PDBFile(list):
         fil.flush()
 
 ### gv added 26 Jan 2007
-    def save( self, path)   :
-	"""Save PDBFile records to path
-	"""
-	fp = file( path, 'w' )
-#	print '>>', fp
-	for record in self:
-		fprintf( fp, '%s\n', record )
-	fp.close()
-	NTmessage("==> Written %d PDB records to %s", len( self ), path )
-	#end if
-    #end def
-## end gv adds
+    def save( self, path):
+    	"""Save PDBFile records to path
+    	"""
+    	fp = file( path, 'w' )
+    #	print '>>', fp
+        i = 0
+    	for record in self:
+            fprintf( fp, '%s\n', record )
+#            NTdebug("now at record: %6d" % i )
+            i += 1
+    	fp.close()
+    	NTmessage("==> Written %d PDB records to %s", len( self ), path )
+    	#end if
+        #end def
+    ## end gv adds
 
     def record_processor(self, processor, filter_func = None):
         """Iterates the PDB records in self, and searches for handling

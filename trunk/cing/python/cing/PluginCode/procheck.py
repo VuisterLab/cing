@@ -26,7 +26,6 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist 
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.core.constants import IUPAC
@@ -152,7 +151,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 #        line      = (  0,  4, int, False ), # unique residue id over all models in NMR ensemble. No need to capture.
         resName   = (4, 7, str, False), 
         chain     = (8, 9, str, False), 
-        resNum    = (10, 13, int, False), 
+        resNum    = (9, 13, int, False), # 4 digits! 
         secStruct = (14, 15, str, True), 
         PHI       = (15, 22, procheckString2float, False), # Already calculated internally.
         PSI       = (22, 29, procheckString2float, False), 
@@ -186,31 +185,38 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #end def
     
     # Return True on error ( None on success; Python default)
-    def run(self, ranges=None, export = True, createPlots=True, runAqua=True)   :
-        # Convert the ranges and translate into procheck format
-        selectedResidues = self.molecule.ranges2list(ranges)
-        NTsort(selectedResidues, 'resNum', inplace=True)
-        # reduce this sorted list to pairs start, stop
-        self.ranges = selectedResidues[0:1]
-        for i in range(0, len(selectedResidues)-1):
-            if ((selectedResidues[i].resNum < selectedResidues[i+1].resNum - 1) or 
-                (selectedResidues[i].chain != selectedResidues[i+1].chain)
-               ):
-                self.ranges.append(selectedResidues[i])
-                self.ranges.append(selectedResidues[i+1])
-            #end if
-        #end for        
-        self.ranges.append(selectedResidues[-1])
-#        print '>ranges (just the boundaries)', self.ranges
-        #generate the ranges file
-        path = os.path.join(self.rootPath, 'ranges')
-        fp = open(path, 'w')
-        for i in range(0, len(self.ranges), 2):
-            singleRange = 'RESIDUES %3d %2s  %3d %2s' % (self.ranges[i].resNum, self.ranges[i].chain.name, 
-                                                            self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
-            fprintf(fp, singleRange+"\n")
-            NTdebug( ">range: " + singleRange)
-        fp.close()
+    def run(self, ranges=None, export = True, createPlots=True, runAqua=True):
+        # Usually no ranges are needed.
+        # It's actually important not to write any to Proceck then because
+        # there might be more than 200 stretches which upsets PC. 
+        if ranges: 
+            # Convert the ranges and translate into procheck format
+            selectedResidues = self.molecule.ranges2list(ranges)
+            NTdebug( '>selectedResidues: %s' % selectedResidues)
+            
+            # Next line doesn't work when there are the same residue numbers in different chains.
+            # TODO: rewrite to account for chain differences too. 
+    #        NTsort(selectedResidues, 'resNum', inplace=True)
+            # reduce this sorted list to pairs start, stop
+            self.ranges = selectedResidues[0:1]
+            for i in range(0, len(selectedResidues)-1):
+                if ((selectedResidues[i].resNum < selectedResidues[i+1].resNum - 1) or 
+                    (selectedResidues[i].chain != selectedResidues[i+1].chain)
+                   ):
+                    self.ranges.append(selectedResidues[i])
+                    self.ranges.append(selectedResidues[i+1])
+    
+            self.ranges.append(selectedResidues[-1])
+            NTdebug( '>ranges (just the boundaries): %s' % self.ranges)
+            path = os.path.join(self.rootPath, 'ranges')
+            fp = open(path, 'w')
+            for i in range(0, len(self.ranges), 2):
+                singleRange = 'RESIDUES %3d %2s  %3d %2s' % (
+                    self.ranges[i  ].resNum, self.ranges[i  ].chain.name, 
+                    self.ranges[i+1].resNum, self.ranges[i+1].chain.name)
+                fprintf(fp, singleRange+"\n")
+                NTdebug( ">range: " + singleRange)
+            fp.close()
 
         pcNmrParameterFileOrg = 'procheck_nmr.prm'
         if not createPlots:
@@ -264,7 +270,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             if not canAqpc:
                 NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
             elif not hasRestraints:
-                NTwarning("Skipping qapc because no Aqua restraints were copied for Aqua")
+                NTdebug("Skipping qapc because no Aqua restraints were copied for Aqua")
             else:
                 NTdebug("Trying aqpc")
                 if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
@@ -274,7 +280,10 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     NTmessage("Finished aqpc successfully")
                     
         NTdebug("Trying pc")
-        if self.procheck(self.molecule.name +'.pdb ranges'):
+        cmd = self.molecule.name +'.pdb'
+        if ranges:
+            cmd += ' ranges'
+        if self.procheck(cmd):
             NTerror("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
             return True
         NTmessage("Finished procheck_nmr successfully")
@@ -316,6 +325,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         """
         Parse procheck .rin and .edt files and store result in procheck NTdict
         of each residue of mol.
+        Return True on error.
         TODO: get a complete .sum file (bug in procheck compile) and parse it too.
         """
         modelCount = self.molecule.modelCount
@@ -328,26 +338,31 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))           
     
             for line in AwkLike(path, minLength = 64, commentString = "#"):
+#                NTdebug("working on line: %s" % line.dollar[0])
                 result = self._parseProcheckLine(line.dollar[0], self.procheckDefs)
                 if not result:
                     NTerror("Failed to parse procheck rin file the below line; giving up.")
                     NTerror(line.dollar[0])
-                    return 
+                    return True
                 chain   = result['chain']
                 resNum  = result['resNum']
                 residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
                 if not residue:
                     NTerror('in Procheck.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
-                    return
+                    return True
+                # For first model reset the procheck dictionary in the residue
                 if i==1 and residue.has_key('procheck'):
                     del(residue['procheck'])
                 residue.setdefault('procheck', NTdict())
+                
+#                NTdebug("working on residue %s" % residue)
                 for field, value in result.iteritems():
                     if not self.procheckDefs[field][3]: # Checking store parameter.
                         continue
-                    # Insert for key: "field" if missing an zero length list.
+                    # Insert for key: "field" if missing an empty  NTlist.
                     residue.procheck.setdefault(field, NTlist()) 
                     residue.procheck[field].append(value)
+#                    NTdebug("field %s has values: %s" % ( field, residue.procheck[field]))
         
         path = os.path.join(self.rootPath, '%s.edt' % self.molecule.name)           
         NTdebug( '> parsing edt >'+ path)
