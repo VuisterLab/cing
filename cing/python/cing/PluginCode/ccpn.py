@@ -173,9 +173,30 @@ def matchCing2Ccpn( cingProject = None, ccpnProject = None,
     return tupleErros
 
 """
+# The next import is possible but inside the cing package JFD prefers to
+# have unspecified Classes to be from within cing and name the outside
+# classes for eg CcpnMolecule. But that's up to you Alan.
+# Ccpn imports below
+# Try importing and catch error to print message
+# Raise error again in order to exit the import process
+# This error is then caught by the importPlugin routine
+#printDebug("Trying import of readXmlProjectFile; which is impossible")
+try:
+    from memops.general.Io import readXmlProjectFile #@UnresolvedImport
+    NTmessage("Using CCPN version 1.x\n")
+    ccpnVersion = 1
+except:
+    try:
+        from memops.general.Io import loadProject
+        NTmessage("Using CCPN version 2.x\n")
+        ccpnVersion = 2
+    except:
+        NTerror("Import Error: CCPN framework not defined\n")
+        raise ImportError
+#end try
 
+NTmessage("Done importing readXmlProjectFile; which is impossible")
 
-#NTdebug("Done importing readXmlProjectFile; which is impossible")
 namingSystem = 'DIANA' #'DIANA' #CYANA2.1
 convention = 'INTERNAL' #'CYANA2'
 
@@ -188,7 +209,7 @@ def _checkCingProject(cingProject, funcName):
     if not cingProject:
         NTerror("ERROR '%s': undefined Cing.Project\n", funcName)
         return None
-    
+
     return cingProject
 #end def
 
@@ -214,12 +235,12 @@ def _checkCcpnMolecules(ccpnProject, moleculeName, funcName):
     if moleculeName:
         listMolSystems = [ccpnProject.findFirstMolSystem(code = moleculeName)]
         if not listMolSystems:
-            NTerror("ERROR '%s': molecule '%s' not found in Ccpn\n", 
+            NTerror("ERROR '%s': molecule '%s' not found in Ccpn\n",
                      funcName, moleculeName)
             return None
     else:
         listMolSystems = ccpnProject.molSystems or []
-    
+
     return listMolSystems
 #end def
 
@@ -237,7 +258,7 @@ def _checkCcpnNmrProject(ccpnProject, funcName):
     else:
         NTerror("ERROR '%s': no NmrProject found in Ccpn\n", funcName)
         return None
-    
+
     return ccpnNmrProject
 #end def
 
@@ -255,13 +276,16 @@ def loadCcpn(cingProject = None, ccpnFile = None):
     _checkCingProject(cingProject, funcName)
     if not cingProject:
         return None
-    
 
     if not ccpnFile or not os.path.exists(ccpnFile):
         NTerror("ERROR '%s': ccpnFile '%s' not found\n", funcName, ccpnFile)
         return None
-    ccpnProject = None # TODO:
-#    ccpnProject = loadProject(ccpnFile)
+
+    if ccpnVersion == 1:
+        ccpnProject = readXmlProjectFile(file = ccpnFile)
+    else:
+        ccpnProject = loadProject(ccpnFile)
+
     if ccpnProject:
         # Make mutual linkages between Ccpn and Cing objects
         cingProject.ccpn = ccpnProject
@@ -269,10 +293,10 @@ def loadCcpn(cingProject = None, ccpnFile = None):
 
         cingProject.addHistory(sprintf('loadCcpn from "%s"\n', ccpnFile))
     else:
-        NTerror("ERROR loadCcpn: ccpn project from file '%s' not loaded\n", 
+        NTerror("ERROR loadCcpn: ccpn project from file '%s' not loaded\n",
                  ccpnFile)
         return None
-    
+
     cingProject.updateProject()
     return ccpnProject
 #end def
@@ -296,11 +320,10 @@ def initCcpn(cingProject, ccpnFile = None):
         NTerror("ERROR initCcpn: ccpnFile '%s' not found\n", ccpnFile)
         return None
 
-    ccpnProject = None # TODO:
-#    ccpnProject = loadProject(ccpnFile)
+    ccpnProject = loadProject(ccpnFile)
 
     if not ccpnProject:
-        NTerror("ERROR initCcpn: ccpn project from file '%s' not loaded\n", 
+        NTerror("ERROR initCcpn: ccpn project from file '%s' not loaded\n",
                  ccpnFile)
         return None
 
@@ -328,19 +351,19 @@ def importFromCcpn(cingProject = None, ccpnProject = None  ):
     if not cingProject:
         NTerror("ERROR '%s': undefined project\n", funcName)
         return None
-    
+
 
     ccpnProject = _checkCcpnProject(ccpnProject, cingProject, funcName)
 
     if ccpnProject:
 
-        NTmessage('==> Importing data from Ccpn project "%s"', 
-                   ccpnProject.name)        
+        NTmessage('==> Importing data from Ccpn project "%s"',
+                   ccpnProject.name)
 
-        if (not importFromCcpnMolecules(cingProject, ccpnProject, 
+        if (not importFromCcpnMolecules(cingProject, ccpnProject,
                                            coords = True)):
             return None
-        
+
 
         importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
         importFromCcpnDistanceRestraints(cingProject, ccpnProject)
@@ -351,16 +374,16 @@ def importFromCcpn(cingProject = None, ccpnProject = None  ):
 
         NTmessage('Ccpn project imported')
         NTmessage('%s', cingProject.format())
-        
+
         cingProject.updateProject()
     else:
         NTerror("ERROR '%s': no Ccpn.Project imported\n", funcName)
         return None
-    
+
     cingProject.addHistory(sprintf(funcName))
 #end def
 
-def importFromCcpnMolecules(cingProject = None, ccpnProject = None, 
+def importFromCcpnMolecules(cingProject = None, ccpnProject = None,
                           moleculeName = None  , coords = False):
     '''Description: Import MolSystems (Molecules) from Ccpn.Project instance and
                append it to Cing.Project instance, including chains, residues
@@ -406,19 +429,19 @@ def importFromCcpnMolecules(cingProject = None, ccpnProject = None,
         if coords:
             # WIM TODO: guess this only makes sense if coords available...
             NTmessage('==> Calculating dihedrals ... ')
-                   
-            cingProject.molecule.updateAll()
-            
 
-            NTmessage("Ccpn molecule '%s' imported with coordinates", 
+            cingProject.molecule.updateAll()
+
+
+            NTmessage("Ccpn molecule '%s' imported with coordinates",
                        moleculeName)
             NTmessage('%s', cingProject.molecule.format())
-            
+
         else:
             NTmessage("Ccpn molecule '%s' imported", moleculeName)
             NTmessage('%s', cingProject.molecule.format())
-            
-        
+
+
     #end for
 
     cingProject.addHistory(sprintf(funcName))
@@ -446,7 +469,7 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
 
         ccpnMolStructures = ccpnMolecule.molStructures #?
         molecule.modelCount += len(ccpnMolStructures)
-    
+
 
     # Set all the chains for this molSystem
     for ccpnChain in ccpnMolecule.sortedChains():
@@ -458,14 +481,14 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
 #            ccpnChainLetter = 'A'
 #        else:
         ccpnChainLetter = ccpnChain.code
-        
+
 
         # check if Cing.Project.Molecule.Chain already exists, if so, it's used
         if (not molecule.has_key(ccpnChainLetter)):
             chain = molecule.addChain(ccpnChainLetter)
         else:
             chain = molecule[ccpnChainLetter]
-        
+
 
         # Make mutual linkages between Ccpn and Cing instances
         chain.ccpn = ccpnChain
@@ -479,9 +502,9 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
                                                                      ccpnChain)
                 if ccpnCoordChain:
                     ccpnCoordChains.append(ccpnCoordChain)
-                
+
             #end for
-        
+
 
         for ccpnResidue in ccpnChain.sortedResidues():
 
@@ -492,7 +515,7 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
                                                                 = namingSystem)
 
             if not chemCompSysName:
-                NTmessage("WARNING: Residue '%s' not indentified", 
+                NTmessage("WARNING: Residue '%s' not indentified",
                            ccpnResidue.ccpCode)
                 continue
             # residue Name according namingSystem (here 'DIANA')
@@ -505,14 +528,14 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
             # But since we are always importing Molecule as new, chains will
             # will be always empty at first.
             if not chain.has_key(ccpnResidue.ccpCode+str(ccpnResidue.seqCode)):
-                residue = chain.addResidue(ccpnResidue.ccpCode, 
+                residue = chain.addResidue(ccpnResidue.ccpCode,
                                             ccpnResidue.seqCode)
                 # For When Cing NameSystem is included in Ccpn DB.
                 #residue=chain.addResidue(resNameInSysName,ccpnResidue.seqCode)
             else:
                 NTmessage("WARNING: overwriting existing residue!")
                 residue = chain[ccpnResidue.ccpCode+str(ccpnResidue.seqCode)]
-            
+
 
             # Make mutual linkages between Ccpn and Cing objects
             residue.ccpn = ccpnResidue
@@ -529,18 +552,18 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
                                                                  = ccpnResidue)
                     if ccpnCoordResidue:
                         ccpnCoordResidues.append(ccpnCoordResidue)
-                    
-                #end for
-            
 
-            _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter, 
+                #end for
+
+
+            _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                             ccpnCoordResidues, resNameInSysName, coords=coords)
         #end for
     #end for
     return molecule
 #end def
 
-def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter, 
+def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                      ccpnCoordResidues=[], resNameInSysName=None, coords=False):
     '''Description: Given a Ccpn.Residue it'll match Ccpn atoms to Cing.Atoms
                and may add coordinates to Cing.Atoms as well.
@@ -552,48 +575,48 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
     chemCompVar = ccpnResidue.chemCompVar
     ccpnNamingSystem = chemCompVar.chemComp.findFirstNamingSystem(name=namingSystem)
     if not ccpnNamingSystem:
-      NTmessage("--- No NamingSystem for chemComp: %s in naming system: %s", chemCompVar.chemComp, namingSystem)
-      
+        NTmessage("--- No NamingSystem for chemComp: %s in naming system: %s", chemCompVar.chemComp, namingSystem)
+
     for ccpnAtom in ccpnResidue.sortedAtoms():
         # Have to get atom name relevant for Cing
-    
+
         chemAtom = ccpnAtom.chemAtom
 #        chemAtomOrSetSysName = chemCompVar.findFirstChemAtomSysName(namingSystem
 #                                      = namingSystem, atomName = ccpnAtom.name)
         if chemAtom:
-          atomSysName = ccpnNamingSystem.findFirstAtomSysName(atomName=chemAtom.name,atomSubType=chemAtom.subType)
-          atomName = atomSysName.sysName
+            atomSysName = ccpnNamingSystem.findFirstAtomSysName(atomName=chemAtom.name,atomSubType=chemAtom.subType)
+            atomName = atomSysName.sysName
         else:
-          NTmessage("--- No NamingSystem assuming ccpn's name for: %s", atomName)
-          atomName = ccpnAtom.name
-        
+            NTmessage("--- No NamingSystem assuming ccpn's name for: %s", atomName)
+            atomName = ccpnAtom.name
+
 
 #        # TODO THESE GIVE ERRORS AND ARE CURRENTLY NOT HANDLED!
 #        if (atomName in ("H1", "H2", "H3", "O'", "O''") and
 #            ccpnResidue.molResidue.linking != "middle"):
-#            NTmessage("=> %s/%s not mapped yet", atomName, 
+#            NTmessage("=> %s/%s not mapped yet", atomName,
 #                       ccpnResidue.ccpCode)
 #            continue
-#        
+#
 #        if ccpnResidue.ccpCode == 'HIS' and atomName == 'HE2':
-#            NTmessage("=> %s/%s not mapped yet", atomName, 
+#            NTmessage("=> %s/%s not mapped yet", atomName,
 #                       ccpnResidue.ccpCode)
 #            continue
-        
+
 
         # it's returning cing atom instance according to convention
         # the problematic atoms are skipped above
         ccpnResSeq = ccpnResidue.seqCode
 
-        atom = molecule.decodeNameTuple((convention, ccpnChainLetter, 
+        atom = molecule.decodeNameTuple((convention, ccpnChainLetter,
                                           ccpnResSeq, atomName))
 
         if not atom:
-            NTerror('WARNING: atom not found in Cing DB: %s, %s, %s, %s, %s, %s, Diana Res name = %s\n', 
-                     namingSystem, convention, ccpnChainLetter, 
-                     ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName, 
+            NTerror('WARNING: atom not found in Cing DB: %s, %s, %s, %s, %s, %s, Diana Res name = %s\n',
+                     namingSystem, convention, ccpnChainLetter,
+                     ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName,
                      resNameInSysName)
-        
+
         else:
             # Make mutual linkages between Ccpn and Cing objects
             atom.ccpn = ccpnAtom
@@ -604,26 +627,26 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                 for ccpnCoordResidue in ccpnCoordResidues:
                     ccpnCoordAtom = ccpnCoordResidue.findFirstAtom(atom = ccpnAtom)
                     if not ccpnCoordAtom:
-                      NTerror('WARNING: atom not found in Ccpn: %s, %s, %s, %s, %s, %s, Diana Res name = %s\n', 
-                           namingSystem, convention, ccpnChainLetter, 
-                           ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName, 
+                        NTerror('WARNING: atom not found in Ccpn: %s, %s, %s, %s, %s, %s, Diana Res name = %s\n',
+                           namingSystem, convention, ccpnChainLetter,
+                           ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName,
                            resNameInSysName)
-                      continue                      
+                        continue
                     if ccpnCoordAtom.coords:
                         # TODO: could be multiple here - only picking first one
                         # TODO: Do the coordinates have to be in model-specific
                         #       order here?
                         ccpnCoord = ccpnCoordAtom.findFirstCoord()
-                        atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, 
+                        atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z,
                                             ccpnCoord.bFactor)
-                    
+
                 #end for
-            
-        
+
+
     #end for
 #end def
 
-def importFromCcpnCoordinates(cingProject = None, ccpnProject = None, 
+def importFromCcpnCoordinates(cingProject = None, ccpnProject = None,
                                moleculeName = None  ):
     '''Description: Import coordinates from Ccpn.Project into a Cing.Project.
                If 'moleculeName' is not defined, all MolSystem's coordinates
@@ -648,21 +671,21 @@ def importFromCcpnCoordinates(cingProject = None, ccpnProject = None,
         moleculeName = _checkName(ccpnMolecule.code)
 
         if (moleculeName not in cingProject.molecules):
-            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n", 
+            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n",
                      funcName, moleculeName)
-            NTmessage("You may want to import '%s' from Ccpn first", 
+            NTmessage("You may want to import '%s' from Ccpn first",
                        moleculeName)
             continue
         else:
             molecule = cingProject[moleculeName]
-        
+
 
         _getCcpnCoordinates(molecule)
-        cingProject.molecule.updateAll()                   
-        NTmessage("Ccpn coordinates for molecule '%s' imported", 
+        cingProject.molecule.updateAll()
+        NTmessage("Ccpn coordinates for molecule '%s' imported",
                    moleculeName)
         NTmessage('%s', cingProject.molecule.format())
-        
+
     #end for
     cingProject.addHistory(sprintf(funcName))
     cingProject.updateProject()
@@ -699,7 +722,7 @@ def _getCcpnCoordinates(molecule):
                                                                    ccpnChain)
             if ccpnCoordChain:
                 ccpnCoordChains.append(ccpnCoordChain)
-            
+
         #end for
 
         for ccpnResidue in ccpnChain.sortedResidues():
@@ -713,7 +736,7 @@ def _getCcpnCoordinates(molecule):
                                                                    ccpnResidue)
                 if ccpnCoordResidue:
                     ccpnCoordResidues.append(ccpnCoordResidue)
-                
+
             #end for
 
             for ccpnAtom in ccpnResidue.sortedAtoms():
@@ -721,9 +744,9 @@ def _getCcpnCoordinates(molecule):
                 try:
                     atom = ccpnAtom.cing
                 except:
-                    NTerror('WARNING: Ccpn atom %s/%s/%s not mapped into Cing.Project\n', 
-                              ccpnAtom.name, 
-                              ccpnResidue.ccpCode+str(ccpnResidue.seqCode), 
+                    NTerror('WARNING: Ccpn atom %s/%s/%s not mapped into Cing.Project\n',
+                              ccpnAtom.name,
+                              ccpnResidue.ccpCode+str(ccpnResidue.seqCode),
                               ccpnChainLetter)
                     NTmessage('No coordinates taken, atom skipped...')
                     continue
@@ -737,16 +760,16 @@ def _getCcpnCoordinates(molecule):
                         # TODO: Do the coordinates have to be in model-specific
                         # order here?
                         ccpnCoord = ccpnCoordAtom.coords[0]
-                        atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, 
+                        atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z,
                                             ccpnCoord.bFactor)
-                    
+
                 #end for
             #end for
         #end for
     #end for
 #end def
 
-def importFromCcpnPeaksAndShifts(cingProject = None, ccpnProject = None, 
+def importFromCcpnPeaksAndShifts(cingProject = None, ccpnProject = None,
                                   moleculeName = None  ):
     '''Description: Import peaks and shifts from Ccpn.Project into a Cing.Project
                instance.
@@ -777,14 +800,14 @@ def importFromCcpnPeaksAndShifts(cingProject = None, ccpnProject = None,
         moleculeName = _checkName(ccpnMolecule.code)
 
         if (moleculeName not in cingProject.molecules):
-            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n", 
+            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n",
                      funcName, moleculeName)
-            NTmessage("You may want to import '%s' from Ccpn first", 
+            NTmessage("You may want to import '%s' from Ccpn first",
                        moleculeName)
             continue
         else:
             molecule = cingProject[moleculeName]
-        
+
 
         if (molecule):
 
@@ -795,27 +818,27 @@ def importFromCcpnPeaksAndShifts(cingProject = None, ccpnProject = None,
 
                 for ccpnShiftList in ccpnShiftLists:
 
-                    shiftMapping = _getShiftAtomNameMapping(ccpnShiftList, 
+                    shiftMapping = _getShiftAtomNameMapping(ccpnShiftList,
                                                              ccpnMolecule)
                     _setShifts(molecule, shiftMapping, ccpnShiftList)
                 #end for
 
-                NTmessage("Ccpn shifts (resonances) for molecule '%s' imported", 
+                NTmessage("Ccpn shifts (resonances) for molecule '%s' imported",
                            moleculeName)
                 NTmessage('%s', cingProject.molecule.format())
-                
-            
-        
+
+
+
     #end for
 
     # Get ALL peaks from Ccpn NmrProject and link them to resonances
     # It's supposed to be done only once
     _setPeaks(cingProject, ccpnNmrProject)
 
-    NTmessage("Ccpn peaks for Cing.Project '%s' imported", 
+    NTmessage("Ccpn peaks for Cing.Project '%s' imported",
                cingProject.name)
     NTmessage('%s', cingProject.format())
-    
+
 
     cingProject.addHistory(sprintf(funcName))
     cingProject.updateProject()
@@ -855,7 +878,7 @@ def _getShiftAtomNameMapping(ccpnShiftList, molSystem):
             # to skip residues outside molSystem whose atoms has resonances
             if residue.chain.molSystem != molSystem:
                 continue
-            
+
 
             # Go over the atomSets and atoms, get right naming system for them
 
@@ -871,7 +894,7 @@ def _getShiftAtomNameMapping(ccpnShiftList, molSystem):
                 if curResidue != residue:
                     NTerror("ERROR two residues to same resonance!\n")
                     break
-                
+
 
                 for atom in atomSet.atoms:
                     # Now create list, with namingSystem
@@ -884,13 +907,13 @@ def _getShiftAtomNameMapping(ccpnShiftList, molSystem):
                         atomName = chemAtomSysName.sysName
                     else:
                         atomName = atom.name
-                    
+
 
                     atomNameList.append(atomName)
                 #end for
             #end for
 
-            shiftMapping[resonanceToShift[resonance]] = [ residue, 
+            shiftMapping[resonanceToShift[resonance]] = [ residue,
                                                           tuple(atomNameList) ]
 
     return (shiftMapping)
@@ -937,12 +960,12 @@ def _setShifts(molecule, shiftMapping, ccpnShiftList  ):
                 except:
                     print "_setShifts (try):: ", format(residue)
                 #end try
-            
+
         #end for
     #end for
-    NTmessage("ShiftList '%s' imported from Ccpn Nmr project '%s'", 
+    NTmessage("ShiftList '%s' imported from Ccpn Nmr project '%s'",
                ccpnShiftList.name, ccpnShiftList.parent.name)
-    
+
 #end def
 
 def _setPeaks(cingProject, ccpnNmrProject  ):
@@ -955,7 +978,7 @@ def _setPeaks(cingProject, ccpnNmrProject  ):
     for ccpnExperiment in ccpnNmrProject.experiments:
         shiftList = ccpnExperiment.shiftList
         if not shiftList:
-            NTmessage("WARNING: no shift list found for Ccpn.Experiment '%s'", 
+            NTmessage("WARNING: no shift list found for Ccpn.Experiment '%s'",
                       ccpnExperiment.name)
         # sampled data dimensions?
         for ccpnDataSource in ccpnExperiment.dataSources:
@@ -991,10 +1014,10 @@ def _setPeaks(cingProject, ccpnNmrProject  ):
                     else:
                         hValue = 0.00
                         hError = 0.00
-                    
+
 
                     if not (ccpnVolume or ccpnHeight):
-                        NTmessage("WARNING: peak '%s' missing both volume and height", 
+                        NTmessage("WARNING: peak '%s' missing both volume and height",
                                   ccpnPeak)
 
                     resonances = []
@@ -1019,16 +1042,16 @@ def _setPeaks(cingProject, ccpnNmrProject  ):
                             #    print 'oooo ',len(resonancesDim)
                         else:
                             resonances.append(None)
-                        
+
                     #end for
                     #cingResonances = resonances
                     cingResonances = list(resonances)
                     #print "3@@@", len(cingResonances), vValue
 
-                    peak = Peak(dimension = ccpnNumDim, 
-                                      positions = ccpnPositions, 
-                                      volume = vValue, volumeError = vError, 
-                                      height = hValue, heightError = hError, 
+                    peak = Peak(dimension = ccpnNumDim,
+                                      positions = ccpnPositions,
+                                      volume = vValue, volumeError = vError,
+                                      height = hValue, heightError = hError,
                                       resonances = cingResonances)
 
                     peak.ccpn = ccpnPeak
@@ -1038,8 +1061,8 @@ def _setPeaks(cingProject, ccpnNmrProject  ):
                     pl.append(peak)
                 #end for
 
-                NTmessage("PeakList '%s' imported from Ccpn Nmr project '%s'", 
-                          peakListName, ccpnNmrProject.name)                
+                NTmessage("PeakList '%s' imported from Ccpn Nmr project '%s'",
+                          peakListName, ccpnNmrProject.name)
             #end for
         #end for
     #end for
@@ -1060,7 +1083,7 @@ def _restraintsValues(constraint):
     return lower, upper, targetValue, error
 #end def
 
-def importFromCcpnDistanceRestraints(cingProject = None, ccpnProject = None, 
+def importFromCcpnDistanceRestraints(cingProject = None, ccpnProject = None,
                                        ):
     '''Description: Import distance restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
@@ -1087,7 +1110,7 @@ def importFromCcpnDistanceRestraints(cingProject = None, ccpnProject = None,
         for ccpnDistanceList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'DistanceConstraintList'):
 
-            ccpnDistanceListName = _checkName(ccpnDistanceList.name, 
+            ccpnDistanceListName = _checkName(ccpnDistanceList.name,
                                                'DistRestraint')
 
             distanceRestraintList = cingProject.distances.new \
@@ -1105,12 +1128,12 @@ def importFromCcpnDistanceRestraints(cingProject = None, ccpnProject = None,
 
                 if not atomPairs:
                     # restraints that will not be imported
-                    NTmessage("%s: Ccpn distance restraint '%s' without atom pairs", 
+                    NTmessage("%s: Ccpn distance restraint '%s' without atom pairs",
                               funcName, ccpnDistanceConstraint)
                     continue
-                
 
-                distanceRestraint = DistanceRestraint(atomPairs, lower, 
+
+                distanceRestraint = DistanceRestraint(atomPairs, lower,
                                                             upper)
 
                 distanceRestraint.ccpn = ccpnDistanceConstraint
@@ -1124,7 +1147,7 @@ def importFromCcpnDistanceRestraints(cingProject = None, ccpnProject = None,
     return listOfDistRestList
 #end def
 
-def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None, 
+def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None,
                                        ):
     '''Description: Import dihedral restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
@@ -1155,7 +1178,7 @@ def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None,
         for ccpnDihedralList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'DihedralConstraintList'):
 
-            ccpnDihedralListName = _checkName(ccpnDihedralList.name, 
+            ccpnDihedralListName = _checkName(ccpnDihedralList.name,
                                                'DihRestraint')
 
             dihedralRestraintList = cingProject.dihedrals.new \
@@ -1174,10 +1197,10 @@ def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None,
 
                 if not atoms:
                     # restraints that will not be imported
-                    NTmessage("%s: Ccpn dihedral restraint '%s' without atoms", 
+                    NTmessage("%s: Ccpn dihedral restraint '%s' without atoms",
                                funcName, ccpnDihedralConstraint)
                     continue
-                
+
 
                 residue = atoms[2].residue
 
@@ -1190,8 +1213,8 @@ def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None,
                     if upper < 0.0: upper += 360
 
                 #10/10/07 angle and residue parameters are no longer mandatory
-                dihedralRestraint = DihedralRestraint(atoms, lower, upper, 
-                                                            residue = residue, 
+                dihedralRestraint = DihedralRestraint(atoms, lower, upper,
+                                                            residue = residue,
                                                             angle = angleName)
 
                 dihedralRestraint.ccpn = ccpnDihedralConstraint
@@ -1205,7 +1228,7 @@ def importFromCcpnDihedralRestraints(cingProject = None, ccpnProject = None,
     return listOfDihRestList
 #end def
 
-def importFromCcpnRdcRestraints(cingProject = None, ccpnProject = None, 
+def importFromCcpnRdcRestraints(cingProject = None, ccpnProject = None,
                                   ):
     '''Description: Import RDC restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
@@ -1232,7 +1255,7 @@ def importFromCcpnRdcRestraints(cingProject = None, ccpnProject = None,
         for ccpnRdcList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'RdcConstraintList'):
 
-            ccpnRdcListName = _checkName(ccpnRdcList.name, 
+            ccpnRdcListName = _checkName(ccpnRdcList.name,
                                                'RdcRestraint')
 
             rdcRestraintList = cingProject.rdcs.new \
@@ -1249,10 +1272,10 @@ def importFromCcpnRdcRestraints(cingProject = None, ccpnProject = None,
 
                 if not atomPairs:
                     # restraints that will not be imported
-                    NTmessage("%s: Ccpn RDC restraint '%s' without atom pairs", 
+                    NTmessage("%s: Ccpn RDC restraint '%s' without atom pairs",
                               funcName, ccpnRdcConstraint)
                     continue
-                
+
 
                 rdcRestraint = RDCRestraint(atomPairs, lower, upper)
 
@@ -1310,7 +1333,7 @@ def _getTorsionAngleName(atoms, molSysTorsions):
                     match += "1"
                 else:
                     match += "0"
-                
+
             #end for
             #print matchType, match, torsion.name
             if match == '1111':
@@ -1344,8 +1367,8 @@ def _getTorsionAngleName(atoms, molSysTorsions):
                         chemAtoms[1] = tca[0]
                         chemAtoms[2] = tca[3]
                         chemAtoms[3] = tca[2]
-                    
-                
+
+
             #end for
             break
         #end for
@@ -1353,14 +1376,14 @@ def _getTorsionAngleName(atoms, molSysTorsions):
     if torsion:
         NTmessage('Torsinal angle not matched')
         print match
-            
+
         #end for
     #end for
     if hasattr(torsion, 'name'):
         return torsion.name
     else:
         return None
-    
+
 #end def
 
 def _getConstraintAtoms(ccpnConstraint):
@@ -1383,7 +1406,7 @@ def _getConstraintAtoms(ccpnConstraint):
         for item in ccpnConstraint.items:
             fixedResonances.append(item.resonances)
         #end for
-    
+
 
     for fixedResonanceList in fixedResonances:
         atomList = []
@@ -1398,12 +1421,12 @@ def _getConstraintAtoms(ccpnConstraint):
                         equivAtoms[atom] = True
                         if not hasattr(atom, 'cing'):
                             NTmessage("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
-                        
+
                     #end for
                 #end for
 
                 atomList.append(equivAtoms.keys())
-            
+
         #end for
 
         if len(atomList) == len(fixedResonanceList):
@@ -1432,13 +1455,13 @@ def _getConstraintAtoms(ccpnConstraint):
                             arset.add(atomPairRev)
                             if not atoms.issuperset(aset) and not atoms.issuperset(arset):
                                 atoms.add(atomPair)
-                        
+
                     #end for
                 #end for
             else:
                 NTmessage("Type of constraint '%s' not recognised", className)
-            
-        
+
+
     #end for
     return list(atoms)
 #end def
@@ -1456,7 +1479,7 @@ def _checkName(name, prefix='Ccpn'):
         if name[0] in string.digits: name = prefix + '_' + name
     else:
         name = prefix
-    
+
 
     name = name.replace('|', '_')
     name = name.replace(' ', '_')
@@ -1473,7 +1496,7 @@ def createCcpn(cingProject = None  ):
     funcName = createCcpn.func_name
 
     _checkCingProject(cingProject, funcName)
-    if not cingProject: 
+    if not cingProject:
         return None
 
 
@@ -1529,7 +1552,7 @@ def _moveCcpnProject(ccpnProject, newDirectory):
             raise Exception('"%s" exists and is not a directory'% newDirectory)
     else:
         os.mkdir(newDirectory)
-    
+
 
     projectUrl = ccpnProject.findFirstUrl(name='project')
     projectPath  = projectUrl.path
@@ -1544,9 +1567,9 @@ def _moveCcpnProject(ccpnProject, newDirectory):
                 urlsToModify.add(url)
                 if storage.isStored and not storage.isLoaded:
                     storage.load()
-                
-            
-        
+
+
+
     #end for
 
     ccpnProject.url.path = newDirectory
@@ -1558,10 +1581,10 @@ def _moveCcpnProject(ccpnProject, newDirectory):
         if os.path.exists(path):
             if not os.path.isdir(path):
                 raise Exception('"%s" exists and is not a directory'% path)
-            
+
         else:
             os.mkdir(path)
-        
+
         url.path = path
     #end for
 
@@ -1572,7 +1595,7 @@ def _moveCcpnProject(ccpnProject, newDirectory):
     ccpnProject.save()
 #end def
 
-def createCcpnMolecules(cingProject = None, ccpnProject = None, 
+def createCcpnMolecules(cingProject = None, ccpnProject = None,
                          moleculeName = None  ):
     '''Description: create from Cing.Molecule a molSystem into a existing
                Ccpn project instance.
@@ -1594,13 +1617,13 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
     if moleculeName:
         listMolecules = [cingProject[moleculeName]]
         if not listMolecules:
-            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n", 
+            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n",
                      funcName, moleculeName)
             return None
-        
+
     else:
         listMolecules = [ cingProject[mol] for mol in cingProject.molecules ]
-    
+
 
     for molecule in listMolecules:
         # add molecule from Cing to Ccpn
@@ -1615,7 +1638,7 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
         for chain in molecule.chains:
             moleculeChainName = moleculeName+'_'+chain.name
 #            ccpnMolecule = ccpnProject.newMolecule(name = moleculeChainName)
-#            ccpnMolecule = CcpMolecule(ccpnProject, 
+#            ccpnMolecule = CcpMolecule(ccpnProject,
 #                                              name = moleculeChainName)
 #            sequence = [ res for res in chain ]
             sequence = [ res.name for res in chain ]
@@ -1640,7 +1663,7 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
 #                    linking = 'end'
 #                else:
 #                    linking = 'middle'
-#                
+#
 #
 #                # You also have to specify the 'descriptor' which defines the
 #                # protonation state of the residue (the variant of the ChemComp:
@@ -1649,10 +1672,10 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
 #                chemCompVar = chemCompHead.chemComp.findFirstChemCompVar(linking
 #                                                 = linking, isDefaultVar = True)
 #
-#                ccpnResidue = MolResidue(ccpnMolecule, 
-#                                            chemCompHead = chemCompHead, 
-#                                            seqCode = residue.resNum, 
-#                                            linking = linking, 
+#                ccpnResidue = MolResidue(ccpnMolecule,
+#                                            chemCompHead = chemCompHead,
+#                                            seqCode = residue.resNum,
+#                                            linking = linking,
 #                                            descriptor = chemCompVar.descriptor)
 #
 #                # Finally we have to set the residue linking information...
@@ -1663,9 +1686,9 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
 #                        nextLink = prevMolRes.findFirstMolResLinkEnd(linkCode ='next')
 #                        if nextLink:
 #                            _molResLink = MolResLink(ccpnMolecule, molResLinkEnds = [nextLink, prevLink])
-#            ccpnChain = MolSystem.Chain(molSystem, code = chain.name, 
+#            ccpnChain = MolSystem.Chain(molSystem, code = chain.name,
 #                                         molecule = ccpnMolecule)
-            ccpnChain = molSystem.newChain(code = chain.name, 
+            ccpnChain = molSystem.newChain(code = chain.name,
                                          molecule = ccpnMolecule)
             ccpnChain.cing = chain
             chain.ccpn = ccpnChain
@@ -1679,13 +1702,13 @@ def createCcpnMolecules(cingProject = None, ccpnProject = None,
                 index += 1
             #end for
             NTmessage("Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName)
-            
+
         #end for
     #end for
     return ccpnProject
 #end def
 
-def createCcpnStructures(cingProject = None, ccpnProject = None, 
+def createCcpnStructures(cingProject = None, ccpnProject = None,
                           moleculeName = None  ):
     '''Description: create Ccpn.molStructures from Cing.Coordinates into a existing
                Ccpn project instance.
@@ -1696,8 +1719,8 @@ def createCcpnStructures(cingProject = None, ccpnProject = None,
 
     funcName = createCcpnStructures.func_name
     ccpnProject = _checkCcpnProject(ccpnProject, cingProject, funcName)
-    if not ccpnProject: 
-      return None
+    if not ccpnProject:
+        return None
 
     _moleculeList = []
 
@@ -1705,56 +1728,56 @@ def createCcpnStructures(cingProject = None, ccpnProject = None,
     if moleculeName:
         listMolecules = [cingProject[moleculeName]]
         if (not listMolecules):
-            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n", 
+            NTerror("ERROR '%s': molecule '%s' not found in Cing.Project\n",
                      funcName, moleculeName)
             return None
-        
+
     else:
         listMolecules = [ cingProject[mol] for mol in cingProject.molecules ]
-    
+
     ensembleId = 0
     for molecule in listMolecules:
         ensembleId += 1
-        if molecule.modelCount == 0: 
-          continue
+        if molecule.modelCount == 0:
+            continue
 
         molSystem = molecule.ccpn
         structureEnsemble = ccpnProject.newStructureEnsemble(molSystem=molSystem, ensembleId=ensembleId)
         for modelIndex in range(molecule.modelCount):
-          structureEnsemble.newModel()
+            structureEnsemble.newModel()
         models = structureEnsemble.sortedModels()
-        
+
         for chain in molecule.chains:
             ccpnChain = chain.ccpn
             coordChain = structureEnsemble.newChain(code = ccpnChain.code)
             for residue in chain.allResidues():
                 ccpnResidue = residue.ccpn
-                coordResidue = coordChain.newResidue(seqCode = ccpnResidue.seqCode, 
+                coordResidue = coordChain.newResidue(seqCode = ccpnResidue.seqCode,
                                                       seqId =  ccpnResidue.seqId)
                 for atom in residue.allAtoms():
-                    if not atom.coordinates: 
-                        NTwarning("Skipping atom because no coordinates were found.") 
+                    if not atom.coordinates:
+                        NTwarning("Skipping atom because no coordinates were found.")
                         NTwarning('atom: '+atom.format())
                         continue
                     if not atom.has_key('ccpn'):
-                        NTwarning("Skipping atom because no ccpn attribute was found to be set") 
+                        NTwarning("Skipping atom because no ccpn attribute was found to be set")
                         NTwarning('atom: '+atom.format())
                         continue
                     ccpnAtom = atom.ccpn
                     coordAtom = coordResidue.newAtom(name = ccpnAtom.name)
                     for modelIndex in range(molecule.modelCount):
-                      x = atom.coordinates[modelIndex][0]
-                      y = atom.coordinates[modelIndex][1]
-                      z = atom.coordinates[modelIndex][2]
-                      occupancy = atom.coordinates[modelIndex][4]
-                      bFactor = atom.coordinates[modelIndex][3]
-                      c = coordAtom.newCoord(x=x, y=y, z=z,model=models[modelIndex])
-                      c.setOccupancy(occupancy)
-                      c.setBFactor(bFactor)        
+                        x = atom.coordinates[modelIndex][0]
+                        y = atom.coordinates[modelIndex][1]
+                        z = atom.coordinates[modelIndex][2]
+                        occupancy = atom.coordinates[modelIndex][4]
+                        bFactor = atom.coordinates[modelIndex][3]
+                        c = coordAtom.newCoord(x=x, y=y, z=z,model=models[modelIndex])
+                        c.setOccupancy(occupancy)
+                        c.setBFactor(bFactor)
     return ccpnProject
 #end def
 
-def createCcpnRestraints(cingProject = None, ccpnProject = None, 
+def createCcpnRestraints(cingProject = None, ccpnProject = None,
                            ):
     '''Description: create ccp.nmr.NmrConstraint.xxxConstraintList from
                Cing.xxxRestraintList into a existing
@@ -1777,7 +1800,7 @@ def createCcpnRestraints(cingProject = None, ccpnProject = None,
                                                     distanceRestraintList.name)
         for distanceRestraint in distanceRestraintList:
             _ccpnDistanceConstraint = ccpnDistanceList.newDistanceConstraint(
-                                           lowerLimit = distanceRestraint.lower, 
+                                           lowerLimit = distanceRestraint.lower,
                                            upperLimit = distanceRestraint.upper)
             #print distanceRestraint.atomPairs[0][0].ccpn
         #end for
@@ -1811,7 +1834,7 @@ def _makeNmrConstraintStore(nmrProject):
     if not os.path.exists(url.path + '/ccp/'): os.makedirs(url.path + '/ccp/')
     if not os.path.exists(url.path + '/ccp/NmrConstraint/'):
         os.makedirs(url.path + '/ccp/NmrConstraint/')
-    
+
 
     dict = nmrProject.__dict__.get('serialDict') or {} #hack
     if dict.get('nmrConstraintStores') is None:
@@ -1821,7 +1844,7 @@ def _makeNmrConstraintStore(nmrProject):
 #    n = dict.get('nmrConstraintStores', 0) + 1
 
 #    dataPath = 'ccp/NmrConstraint/NmrConstraint_%d.xml' % (n)
-#    storage   = ContentStorage(project, package='ccp.nmr.NmrConstraint', 
+#    storage   = ContentStorage(project, package='ccp.nmr.NmrConstraint',
 #                                path=dataPath, url=url)
 #    nmrConstraintStore = nmrProject.newNmrConstraintStore(contentStorage =
 #                                                           storage)
@@ -1832,16 +1855,16 @@ def _makeNmrConstraintStore(nmrProject):
 #end def
 
 # register the functions
-methods  = [(loadCcpn, None), 
-            (initCcpn, None), 
-            (importFromCcpn, None), 
-            (importFromCcpnMolecules, None), 
-            (importFromCcpnCoordinates, None), 
-            (importFromCcpnPeaksAndShifts, None), 
-            (importFromCcpnDistanceRestraints, None), 
-            (importFromCcpnDihedralRestraints, None), 
-            (importFromCcpnRdcRestraints, None), 
-            (createCcpn, None), 
+methods  = [(loadCcpn, None),
+            (initCcpn, None),
+            (importFromCcpn, None),
+            (importFromCcpnMolecules, None),
+            (importFromCcpnCoordinates, None),
+            (importFromCcpnPeaksAndShifts, None),
+            (importFromCcpnDistanceRestraints, None),
+            (importFromCcpnDihedralRestraints, None),
+            (importFromCcpnRdcRestraints, None),
+            (createCcpn, None),
             (createCcpnMolecules, None)
            ]
 #saves    = []

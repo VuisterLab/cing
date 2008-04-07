@@ -12,7 +12,7 @@ from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.core.parameters import plotParameters 
+from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
 from matplotlib import rcParams
@@ -75,7 +75,7 @@ useMatPlotLib = True
 #    NTdebug("Failed to import MatLibPlot; check installation.")
 #    sys.exit(1)
 
-    
+
 dpi=72.27 # Latex definition
 inches_per_pt = 1./dpi
 golden_mean = (math.sqrt(5.)-1.)/2.     # Aesthetic ratio where possible.
@@ -132,7 +132,7 @@ def NTplotAttributes( **kwds ):
     a.verticalalignment   = 'bottom' # [ 'center' | 'top' | 'bottom' ]
     a.horizontalalignment = 'left' # right or center
     a.rotation            = 'horizontal' # angle in degrees 'vertical' | 'horizontal'
-    
+
     a.alpha = 1. # Takes a value in resList [0,1] for transparency/blending.
 
     # update
@@ -188,22 +188,22 @@ circlePoint        = pointAttributes( type='circle',        size=2.0, color='blu
 #        "none"                : 0,
 #        "dot"                : 1,
 #        "plus"                : 2,
-#        "asterisk"            : 3, 
+#        "asterisk"            : 3,
 #        "circle"            : 4,
 #        "cross"                : 5,
 #        "square"            : 6,
 #        "triangle"            : 7,
 #        "diamond"            : 8,
-#        "star"                : 9, 
-#        "inverted triangle"        : 10, 
+#        "star"                : 9,
+#        "inverted triangle"        : 10,
 #        "starburst"            : 11,
 #        "fancy plus"            : 12,
-#        "fancy cross"            : 13, 
-#        "fancy square"            : 14, 
+#        "fancy cross"            : 13,
+#        "fancy square"            : 14,
 #        "fancy diamond"            : 15,
 #        "filled circle"            : 16,
 #        "filled square"            : 17,
-#        "filled triangle"        : 18, 
+#        "filled triangle"        : 18,
 #        "filled diamond"        : 19,
 #        "filled inverted triangle"    : 20,
 #        "filled fancy square"        : 21,
@@ -217,10 +217,10 @@ circlePoint        = pointAttributes( type='circle',        size=2.0, color='blu
 #        "half filled fancy diamond"    : 29,
 #        "octagon"            : 30,
 #        "filled octagon"        : 31,
-mappingPointType2MatLibPlot = { 
-    'none': 'None', 
-    'plus': '+', 
-    'circle': 'o', 
+mappingPointType2MatLibPlot = {
+    'none': 'None',
+    'plus': '+',
+    'circle': 'o',
     'filled circle': 'o',
      }
 """          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ] """
@@ -279,15 +279,15 @@ def htmlRgb(mag, cmin, cmax):
         return "#%02x%02x%02x"%rgb(mag, cmin, cmax)
 
 
-class NTplot( NTdict ): 
+class NTplot( NTdict ):
     """
     Base plotting class but don't forget to instantiate a NTplotSet first.
-    """    
+    """
     def __init__( self, **kwds ):
         NTdict.__init__( self )
         self.__CLASS__    = 'NTplot'
         self.font         = 'Helvetica'
-        
+
         self.title        = None
         self.xLabel       = None
         self.yLabel       = None
@@ -304,13 +304,13 @@ class NTplot( NTdict ):
 
         self.xGrid        = True   # x-axis grid toggle
         self.yGrid        = True   # y-axis grid toggle
-        
+
         self.plotID       = "Plot A" # will be overridden by NTplotSet where needed.
                                         # Can be numeric e.g. in case of rectangular layout of set.
         if useMatPlotLib:
             rect = [.1, .1, .8, .8 ] # ll_x, ll_y, w, h
             self.axis = axes(rect) # To be overridden by NTplotSet if needed.
-            
+
         self.update( kwds )
 
     def convert_yunits(self, yValueList):
@@ -319,7 +319,7 @@ class NTplot( NTdict ):
         bottom = yViewInterval[0]
         top    = yViewInterval[1]
         height = top-bottom
-    
+
         result = []
         for v in yValueList:
             r = bottom + height * v
@@ -329,7 +329,7 @@ class NTplot( NTdict ):
 
     def move( self, point ):
         self.currentPoint = point
- 
+
     def draw( self, endPoint, attributes=defaultAttributes ):
         if not attributes:
             attributes=defaultAttributes
@@ -360,37 +360,37 @@ class NTplot( NTdict ):
         self.draw( endPoint=endPoint, attributes=attributes )
     #end def
 
-    def lines( self, points, attributes=None ):            
+    def lines( self, points, attributes=None ):
         if not attributes:
             attributes=defaultAttributes
-        if len(points) == 0: 
+        if len(points) == 0:
             return
         self.move( points[0] )
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
-            
+
     def drawVerticalLines( self, xlocList ):
         if self.yRange == None:
             self.autoScaleY(None) # sets the yRange needed below.
-            
+
         for xloc in xlocList:
             pointList = []
             pointList.append( (xloc, self.yRange[0]) )
             pointList.append( (xloc, self.yRange[1]) )
 #            pointList = self.convert_yunits(pointList)
             self.lines( pointList )
-            
+
     def box( self, point, sizes, attributes=None ):
 #        NTdebug("box with point, sizes: %s %s" %( point, sizes))
         if not attributes:
             attributes=defaultAttributes
-        
+
         if useMatPlotLib:
-            attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)            
-            rectangle = Rectangle(point, 
-                width=sizes[0], 
+            attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)
+            rectangle = Rectangle(point,
+                width=sizes[0],
                 height=sizes[1],
-                **attributesMatLibPlot )            
+                **attributesMatLibPlot )
             self.axis.add_artist(rectangle)
 #            NTdebug("box added to artist")
         else:
@@ -403,7 +403,7 @@ class NTplot( NTdict ):
             p2 = (point[0],          point[1]+sizes[1])
             p3 = (point[0]+sizes[0], point[1]+sizes[1])
             p4 = (point[0]+sizes[0], point[1])
-    
+
     #        self.closedObject( [p1,p2,p3,p4], attributes )
             if attributes.fill:
                 self.b.add(
@@ -442,15 +442,15 @@ class NTplot( NTdict ):
 #            'solid_capstyle' : None,
 #            'dash_joinstyle' : None,
 #            'solid_joinstyle': None,
-#        }        
+#        }
         keys = attributes.keys()
         # input:
-#        ['fill', 'fillColor', 'font', 'fontColor', 'fontSize', 'line', 'lineColor', 'lineType', 'lineWidth', 
+#        ['fill', 'fillColor', 'font', 'fontColor', 'fontSize', 'line', 'lineColor', 'lineType', 'lineWidth',
 #         'pointColor', 'pointSize', 'pointType', 'textAlign']
-        
+
 #        NTdebug("attributes: " + attributes.format())
         if 'pointType' in keys:
-            if attributes.pointType:                    
+            if attributes.pointType:
                 if mappingPointType2MatLibPlot.has_key(attributes.pointType):
 #                    print "doing pointType"
                     result.marker =  mappingPointType2MatLibPlot[attributes.pointType]
@@ -498,7 +498,7 @@ class NTplot( NTdict ):
 #                facecolor=attributes.fillColor,
 #                edgecolor=attributes.lineColor,
 #                fill=attributes.fill,
-        
+
         keys = attributes.keys()
         if 'alpha' in keys:
             result['alpha']                =  attributes.alpha
@@ -513,11 +513,11 @@ class NTplot( NTdict ):
         return result
 
     def mapAttributes2MatLibText(self, attributes=defaultAttributes):
-        # Creates dictionary as expected for Text attributes 
+        # Creates dictionary as expected for Text attributes
         if not attributes:
             attributes=defaultAttributes
         result = {}
-        keys = attributes.keys()            
+        keys = attributes.keys()
         if 'fontColor' in keys:
             result['color']                =  attributes.fontColor
         if 'rotation' in keys:
@@ -544,7 +544,7 @@ class NTplot( NTdict ):
         del(attributesMatLibPlot['marker'])
         del(attributesMatLibPlot['markeredgecolor'])
         del(attributesMatLibPlot['markerfacecolor'])
-            
+
     def setMatLibPlotLine2DListPropsPoint( self, line2DList, attributesMatLibPlot):
         for line2D in line2DList:
             self.setMatLibPlotLine2DPropsPoint( line2D, attributesMatLibPlot)
@@ -553,19 +553,19 @@ class NTplot( NTdict ):
         """ Add a point
             add xErrorBar if len(points)>2
             add yErrorBar if len(points)>3       """
-            
+
         if not attributes:
             attributes=defaultAttributes
         if attributes.has_key('pointType'):
             if not attributes.pointType:
                 attributes.pointType= 'none' # Changed to have no point as this is more common for all.
-        
+
         if useMatPlotLib:
             attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
 #            print attributesMatLibPlot['marker']
             x = point[0]
             y = point[1]
-            axes(self.axis) # Claim current axis.                      
+            axes(self.axis) # Claim current axis.
             line2D, = plot( [x], [y] )
             self.setMatLibPlotLine2DPropsPoint( line2D, attributesMatLibPlot)
             xerror=None
@@ -582,7 +582,7 @@ class NTplot( NTdict ):
 #            line2Dlist.addList(barcols)
 #            attributesMatLibPlotNoMarker = self.removeMarkerAttributes(attributesMatLibPlot)
 #            self.setMatLibPlotLine2DListPropsPoint( line2Dlist, attributesMatLibPlotNoMarker)
-        else:            
+        else:
             self.move(  (point[0],point[1]) )
             self.b.add(
                biggles.Point( point[0], point[1],
@@ -610,7 +610,7 @@ class NTplot( NTdict ):
     def points( self, points, attributes=defaultAttributes ):
         if not attributes:
             attributes=defaultAttributes
-        if len(points) == 0: 
+        if len(points) == 0:
             return
         for p in points:
             self.point( p, attributes )
@@ -623,9 +623,9 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             kwds = self.mapAttributes2MatLibText(attributes)
             NTdebug("In labelAxes using kwds: %s", kwds)
-            self.axis.text( point[0], point[1], text, 
+            self.axis.text( point[0], point[1], text,
                 transform=self.axis.transAxes, **kwds)
-        
+
     def label( self, point, text, attributes=defaultAttributes ):
         """Point needs to be specified in data coordinate system
         """
@@ -633,16 +633,16 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         if useMatPlotLib:
             kwds = self.mapAttributes2MatLibText(attributes)
-            
+
             xy=(point[0], point[1])
             axes(self.axis) # Claim current axis.
-            annotate(text,                                
+            annotate(text,
                         xy=xy,           # in data coordinate system; assuming only one occurrence.
-                        xytext=xy,    
+                        xytext=xy,
                         xycoords='data', # default: use the axes data coordinate system
-                        textcoords='data', 
+                        textcoords='data',
                         **kwds
-                        )            
+                        )
         else:
             self.b.add(
                 biggles.DataLabel( point[0], point[1], text,
@@ -666,14 +666,14 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( range[0], range[1] )
-        
+
     def autoScaleY( self, pointList ):
         """Using the list of points autoscale the y axis."""
         min = None
         max = None
         if pointList:
             for point in pointList:
-                v = point[1] 
+                v = point[1]
                 if min == None:
                     min = v
                     max = v
@@ -685,10 +685,10 @@ class NTplot( NTdict ):
         else:
             min = 0
             max = 0
-            
+
         if min == max: # Zero range is impossible.
             max = min + 1.
-            
+
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( min, max )
@@ -702,9 +702,9 @@ class NTplot( NTdict ):
 #            self.axis.autoscale_view()
 #            self.xRange = self.axis.get_xlim()
 #            self.yRange = self.axis.get_ylim()
-#        if x: 
+#        if x:
 #            self.xRange = None
-#        if y: 
+#        if y:
 #            self.yRange = None
 #    #end def
 
@@ -717,7 +717,7 @@ class NTplot( NTdict ):
 
     def updateSettings( self ):
 #        NTdebug("Now in updateSettings")
-        
+
         if useMatPlotLib:
             if not self.axis:
                 raise "No axis object in NTplot"
@@ -736,7 +736,7 @@ class NTplot( NTdict ):
                 # or empty
             if isinstance(self.yTicks, list):
                 yticks(self.yTicks)# A list with actual values like 0,60,120...
-            
+
             if self.xRange:
                 xlim(self.xRange)
 #                NTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
@@ -746,37 +746,37 @@ class NTplot( NTdict ):
             if self.xGrid:
                 grid(True)
             else:
-                grid(False)            
-            
+                grid(False)
+
         else:
             #update settings
             self.b.title         = self.title
             self.b.xlabel        = self.xLabel
             self.b.ylabel        = self.yLabel
-    
+
             self.b.x.draw_axis   = self.xAxis
             self.b.y.draw_axis   = self.yAxis
             self.b.x2.draw_ticks = 0
             self.b.y2.draw_ticks = 0
             self.b.x.tickdir     = 1
             self.b.y.tickdir     = 1
-    
+
             self.b.x.ticks       = self.xTicks
             self.b.y.ticks       = self.yTicks
-    
+
             self.b.aspect_ratio  = self.aspectRatio
             self.b.xrange        = self.xRange
             self.b.yrange        = self.yRange
-    
+
             self.b.x.draw_grid   = self.xGrid
             self.b.y.draw_grid   = self.yGrid
-    
+
             biggles.configure('width',    self.hardcopySize[0] )
             biggles.configure('height',   self.hardcopySize[1] )
             biggles.configure('fontface', self.font)
 
 
-    def histogram( self, theList, low, high, bins, leftMargin=0.05, rightMargin=0.05, 
+    def histogram( self, theList, low, high, bins, leftMargin=0.05, rightMargin=0.05,
                    attributes=defaultAttributes, valueIndexPairList=None ):
         if not attributes:
             attributes=defaultAttributes
@@ -788,19 +788,19 @@ class NTplot( NTdict ):
         his = NThistogram( theList, low, high, bins ) # A NTlist
         self.maxY = max(his)
         if useMatPlotLib:
-            step = (high-low)/bins            
+            step = (high-low)/bins
             ind = arange(low,high,step)  # the x locations for the groups
 #            NTdebug("Creating x coor for bins: " + `ind`)
             axes(self.axis) # Claim current axis.
-            _patches = bar(ind, his, step, 
+            _patches = bar(ind, his, step,
                 color    =attributes.fillColor,
                 edgecolor=attributes.fillColor)
 
-            if valueIndexPairList: # Were dealing with outliers.                
+            if valueIndexPairList: # Were dealing with outliers.
 #                NTdebug("Annotating the outliers with a arrow and string")
                 tmpValueIndexPairList = deepcopy(valueIndexPairList)
                 tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
-                
+
                 xlim = self.axis.get_xlim()
                 ylim = self.axis.get_ylim()
                 _ylim_min, ylim_max = ylim
@@ -809,7 +809,7 @@ class NTplot( NTdict ):
                 outlierLocHeight = ylim_max # In data coordinate system
                 outlierLocHeightMin = ylim_max*.1 # In data coordinate system
 #                NTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
-                for item in tmpValueIndexPairList:                    
+                for item in tmpValueIndexPairList:
                     value = item[1]
                     modelNum = item[0] + 1
                     if not value: # Don't annotate zero values.
@@ -820,14 +820,14 @@ class NTplot( NTdict ):
 #                    NTdebug("Setting data point to: " + `value` +", 1")
 #                    NTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
                     self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
-                    self.axis.annotate("model "+`modelNum`,                                
+                    self.axis.annotate("model "+`modelNum`,
 #                                xy=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
                                 xy=(value+0.01, 1),                       # in data coordinate system; assuming only one occurrence.
-                                xytext=(value, outlierLocHeight),    
+                                xytext=(value, outlierLocHeight),
                                 xycoords='data', # default: use the axes data coordinate system
-                                textcoords='data', 
+                                textcoords='data',
                                 arrowprops=dict(facecolor=attributes.fillColor,
-                                                edgecolor=attributes.fillColor, 
+                                                edgecolor=attributes.fillColor,
                                                 shrink=0.05,
                                                 width=1, # Width of arrow
                                                 headwidth=4
@@ -837,7 +837,7 @@ class NTplot( NTdict ):
                                 )
                 # Do at the end because the plot command resets the boundaries?
                 self.axis.set_ylim(ymax = ylim_max+1) # get some clearance at the top
-            
+
         else:
             for bin in range( bins ):
                 if his[bin] > 0:
@@ -864,7 +864,7 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             return self.axis.get_ylim()
         return None
-        
+
     def get_ticklines(self):
         'Return the ticklines lines as a list of Line2D instance; overcoming a lack of "feature" in api'
 #        print ax
@@ -881,31 +881,31 @@ class NTplot( NTdict ):
                     lines.append(tick.tick2line)
             return silent_list('Line2D ticklines', lines)
         return []
-    
+
     def setTickLineWidth(self, size=1):
         tlList = self.get_ticklines()
         if useMatPlotLib:
             for tl in tlList:
                 tl.set_markeredgewidth(size) # Unreported feature.
-    
+
     def setMinorTicks(self, space):
         if useMatPlotLib:
             minorLocator   = MultipleLocator(space)
             self.axis.xaxis.set_minor_locator(minorLocator)
             self.setTickLineWidth()
-    
+
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
         plotparamsXmin, plotparamsXmax = (self.xRange)
         plotparamsYmin, plotparamsYmax = (self.yRange)
 
         plotparams = plotParameters.getdefault("None",'dihedralDefault')
         fillColor = plotparams.lower
-         
+
         bounds1 = NTlist(lower1, upper1)
         bounds2 = NTlist(lower2, upper2)
         bounds1.limit(plotparamsXmin, plotparamsXmax)
         bounds2.limit(plotparamsYmin, plotparamsYmax)
-        
+
         alpha = 0.3
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
@@ -933,7 +933,7 @@ class NTplot( NTdict ):
                 self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
             else:  # 4 boxes; lower left ll, lr, upper left ul, ur.
                 # ur
-                point = (bounds1[0], bounds2[0]) 
+                point = (bounds1[0], bounds2[0])
                 sizes = (plotparamsXmax-bounds1[0],plotparamsYmax-bounds2[0])
                 self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
                 # lr
@@ -941,7 +941,7 @@ class NTplot( NTdict ):
                 sizes = (plotparamsXmax-bounds1[0], bounds2[1]-plotparamsYmin)
                 self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
                 # ul
-                point = (plotparamsXmin, bounds2[0]) 
+                point = (plotparamsXmin, bounds2[0])
                 sizes = (bounds1[1]-plotparamsXmin,plotparamsYmax-bounds2[0])
                 self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
                 # ll
@@ -958,10 +958,10 @@ class NTplotSet( NTdict ):
     maintained by NTplot instances themselves.
     This class attempts to insulate against specifics of the
     graphics library Matplotlib although currently no other
-    lib has been implemented against.    
-    """    
+    lib has been implemented against.
+    """
     def __init__( self, **kwds ):
-        NTdict.__init__( self )        
+        NTdict.__init__( self )
         self.close()
         self.__CLASS__    = 'NTplotSet'
         self.plotSet = {}
@@ -981,19 +981,19 @@ class NTplotSet( NTdict ):
 #            if self.hardcopySize[1]:
 #                fig_height_pt = self.hardcopySize[1]
 #            else:
-#                fig_height_pt = int(fig_width_pt*golden_mean)  
+#                fig_height_pt = int(fig_width_pt*golden_mean)
 ##            fig_size_pt   = [fig_width_pt,fig_height_pt]
 ##            print fig_size_pt
 #            fig_width     = fig_width_pt*inches_per_pt  # width in inches
 #            fig_height    = fig_height_pt*inches_per_pt # height in inches
 #            fig_size      = [fig_width,fig_height]
-#            
+#
 ##            NTdebug("Getting hardcopySize: "+`self.hardcopySize`)
 ##            NTdebug("Setting sizeInches:   "+`fig_size`)
 #
 #            params = {#'backend':          self.graphicsOutputFormat, # this is plain wrong
-#                      'figure.dpi':       dpi, 
-#                      'figure.figsize':   fig_size, 
+#                      'figure.dpi':       dpi,
+#                      'figure.figsize':   fig_size,
 #                      'savefig.dpi':      dpi,
 #                      'savefig.figsize':  fig_size,
 #                       }
@@ -1001,15 +1001,15 @@ class NTplotSet( NTdict ):
 ##            ion() # interactive on
 ##            draw() # force a draw
 ##            ioff() # interactive off.
-#            
-#            self.figure = Figure( frameon=False, 
+#
+#            self.figure = Figure( frameon=False,
 #                                  dpi=dpi,
 #                                  figsize=fig_size,
 #                                  facecolor='white',
 #                                  edgecolor='white',
 #                                   )
 #            NTdebug('In __init__: using self.figure.get_size_inches: '+`self.figure.get_size_inches()`)
-            
+
         else:
             if not haveBiggles:
                 NTerror("NTplotSet.__init__: No biggles\n")
@@ -1038,8 +1038,8 @@ class NTplotSet( NTdict ):
             self.b.show()
 
     def hardcopy( self, fileName, graphicsFormat = 'png' ):
-        """        Returns True on error.         """ 
-        
+        """        Returns True on error.         """
+
         self.updateSettings()
 #        if not self.plotSet:
 #            NTerror("no elements in NTplotSet")
@@ -1049,17 +1049,17 @@ class NTplotSet( NTdict ):
         if self.hardcopySize[1]:
             fig_height_pt = self.hardcopySize[1]
         else:
-            fig_height_pt = int(fig_width_pt*golden_mean)  
+            fig_height_pt = int(fig_width_pt*golden_mean)
 #            fig_size_pt   = [fig_width_pt,fig_height_pt]
 #            print fig_size_pt
         fig_width     = fig_width_pt*inches_per_pt  # width in inches
         fig_height    = fig_height_pt*inches_per_pt # height in inches
         fig_size      = [fig_width,fig_height]
-        
+
         if useMatPlotLib:
-            params = {#'backend':          self.graphicsOutputFormat, 
-                      'figure.dpi':       dpi, 
-                      'figure.figsize':   fig_size, 
+            params = {#'backend':          self.graphicsOutputFormat,
+                      'figure.dpi':       dpi,
+                      'figure.figsize':   fig_size,
                       'savefig.dpi':      dpi,
                       'savefig.figsize':  fig_size,
                        }
@@ -1067,43 +1067,43 @@ class NTplotSet( NTdict ):
             figure = gcf()
             figure.set_size_inches(  fig_size )
             savefig(fileName)
-        else:       
+        else:
             self.b.write_img( graphicsFormat, self.hardcopySize[0], self.hardcopySize[1], fileName )
-                
+
     def updateSettings( self ):
-        
+
 #            NTdebug("Getting hardcopySize: "+`self.hardcopySize`)
 #            NTdebug("Setting sizeInches:   "+`fig_size`)
 
-        
+
         for plotId in self.plotSet:
             p = self.plotSet[plotId]
             p.updateSettings()
-        
-    def getPlot(self, plotId): 
+
+    def getPlot(self, plotId):
         return self.plotSet[ plotId ]
 
     def addPlot(self, ntPlot, plotId="Plot from NTplotSet"):
         """Just add a plot that has been precreated"""
         self.plotSet[plotId] = ntPlot
-        return self.getPlot(plotId) 
+        return self.getPlot(plotId)
 
     def createPlot(self, plotId="Plot from NTplotSet", *args):
         ntPlot = NTplot(plotId=plotId)
         self.plotSet[plotId] = ntPlot
         if useMatPlotLib:
             ntPlot.axis = Axes( *args )
-        return self.getplot(plotId) 
+        return self.getplot(plotId)
 
-    def createSubplot(self, numRows, numCols, plotNum, 
+    def createSubplot(self, numRows, numCols, plotNum,
         useResPlot=False, molecule=None, resList=None ):
         """Layout an extra plot in a rectangular grid.
         e.g. 235 would return a
-        fifth NTplot from 
+        fifth NTplot from
         -------------
         - 1 - 2 - 3 -
         - 4 - 5 - 6 -
-        -------------    
+        -------------
         """
         self.numRows = numRows
         self.numCols = numCols
@@ -1113,22 +1113,22 @@ class NTplotSet( NTdict ):
             ntPlot = NTplot(plotID=plotNum) # use numeric value in case of rectangular grid.
         self.plotSet[plotNum] = ntPlot
         ntPlot.axis = subplot(numRows, numCols, plotNum)
-        return self.getPlot(plotNum) 
-        
+        return self.getPlot(plotNum)
+
     def subplotsAdjust(self, **args ):
         if useMatPlotLib:
             subplots_adjust( **args )
-        
+
 
 class ResPlot(NTplot):
     """Plot class for sequence of residues
 x coordinate is in 'data' coordinate system (sequence number)
 y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     coordinate a conversion needs to take place."""
-    
+
     SMALLEST_HELIX_LENGTH = 2
     MAX_WIDTH_IN_RESIDUES = 50 # Maximum number of residues in plot.
-    
+
     colorHelixIn  = 'yellow'
     colorHelixOut = 'red'
     colorStrand   = 'cyan'
@@ -1139,12 +1139,12 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     colorBaseG    = 'green'
     colorBaseC    = 'purple'
     colorLine     = 'black'
-    colorBackNoSecStruct = 'lightgrey' 
+    colorBackNoSecStruct = 'lightgrey'
     resPerPlot    = 100 # Number of residues per plot"""
-    
+
     hueRed  = 0.
     hueBlue = 0.68
-    
+
     def __init__(self,**kwargs):
         """seq        Residue list for which to produce plots
         """
@@ -1156,25 +1156,25 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         self.resIconHeight =  1.
         self.iconBoxYheight= 0.16      # in axis coordinates [0,1] the height of the residue type icon.
         # was 0.18
-            
-        
-            
+
+
+
 
     def getsecStructElementList(self):
         """Chop the molecule into segments of the same secondary structure type
         from consensus Procheck attribute.
-        
+
         ' HHHHH   SSSS   ' becomes
         [ ' ', 'HHHH', '   ', 'SSSS', '   ' ] but then in residue objects.
         """
-        
+
         result=[]
         secStructElement = []
         lastResNum = None
-        lastChainName = None        
-        prevSecStruct = None            
-            
-        for res in self.resList: # Exclude residues not in this plot's resList 
+        lastChainName = None
+        prevSecStruct = None
+
+        for res in self.resList: # Exclude residues not in this plot's resList
             # detect a break
             isBroken = False
             if lastResNum == None:
@@ -1183,16 +1183,16 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                 isBroken = True
             elif res.chain.name != lastChainName:
                 isBroken = True
-    
+
             if isBroken:
                 if secStructElement:
                     result.append(secStructElement)
                 secStructElement=[]
                 prevSecStruct = None
-                    
+
             lastResNum    = res.resNum
             lastChainName = res.chain.name
-            
+
             l = res.getDeepByKeys(PROCHECK_STR,SECSTRUCT_STR)
 #            NTdebug( 'getsecStructElementList l before reduced to 3 states: %s', l )
             secStruct = None
@@ -1206,29 +1206,29 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                     result.append(secStructElement)
                 secStructElement=[]
             secStructElement.append(res)
-            prevSecStruct=secStruct                   
+            prevSecStruct=secStruct
 
         if secStructElement:
             result.append(secStructElement)
         NTdebug('getsecStructElementList result: %s', result)
         return result
-    
+
     def setMinorTickerToRes(self):
 #        minorFormatter = NullFormatter()
         self.axis.xaxis.set_minor_locator(MultipleLocatorByOffset(1)) # accept default offset of -.5 )
 #        xaxis.set_minor_formatter( minorFormatter )
-        
+
     def drawResTypes(self, ySpaceAxis=.06):
-        """Since we want color residue types and the current api of matplotlib 
+        """Since we want color residue types and the current api of matplotlib
         is hard to extend that way we do this outside of it.
         """
 #        seqLength = len(self.resList)
 
         iconBoxXstart = 0              # data
-#        iconBoxXwidth = seqLength      # data 
-        iconBoxYstart = 1 + ySpaceAxis # axis        
+#        iconBoxXwidth = seqLength      # data
+        iconBoxYstart = 1 + ySpaceAxis # axis
 #        self.xRange       = (0,iconBoxXwidth)   # x-axis (min,max) tuple, None is autoscale
-         
+
         i = 0
         for res in self.resList:
             resChar = 'x'
@@ -1237,13 +1237,13 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             else:
                 resChar = res.name
 
-            if ( res.hasProperties('nucleic') and 
+            if ( res.hasProperties('nucleic') and
                 (resChar[0]=='r' or resChar[0]=='d') and
                 len(resChar)>1):
                 resChar = resChar[1:2] # truncate rc to c
             else:
                 resChar = resChar[0:1] # truncate A171 to A
-            
+
             resChar = string.upper(resChar)
             color = 'green'
             if not i%3:
@@ -1257,8 +1257,8 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             attributes.horizontalalignment='center'
 #            NTdebug(`attributes`)
             self.label( (x,y) , text, attributes )
-            i += 1       
-        
+            i += 1
+
     def drawResNumbers(self, showLabels=True):
         """If just the locators need to be set then disable the labels
         with the option set to False.
@@ -1268,7 +1268,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             majorFormatter = NullFormatter()
             if showLabels:
                 majorFormatter = FormatResNumbersFormatter(self.resList)
-                
+
             xaxis = self.axis.xaxis
             xaxis.set_major_formatter( majorFormatter )
             # Watch out next command also affects the minor tickers..
@@ -1279,11 +1279,11 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     #        xaxis.set_ticklabels('') # remove the major tick labels but keep the ticks.
     #        tickList = xaxis.get_minor_ticks()
         locs = []
-#        totalNumberResidues = len(self.resList)        
-        idx = -0.5 
+#        totalNumberResidues = len(self.resList)
+        idx = -0.5
         lastResNum = None
         lastChainName = None
-        for res in self.resList: 
+        for res in self.resList:
             # detect a break
             isBroken = False
             if lastResNum == None:
@@ -1293,7 +1293,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             elif res.chain.name != lastChainName:
                 isBroken = True
             lastResNum    = res.resNum
-            lastChainName = res.chain.name            
+            lastChainName = res.chain.name
             idx += 1
             if isBroken:
                 locs.append(idx)
@@ -1302,24 +1302,24 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             locs = locs[1:]
         self.drawVerticalLines( locs )
 
-        
+
     def drawResIcons(self, ySpaceAxis=.06):
         """Vary ySpaceAxis for raising it more depending on other items to be
         plotted"""
         if useMatPlotLib:
             kwargs = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorHelixIn, 'clip_on':None}
     #        seqLength = len(self.resList)
-                    
+
     #        yIconSpaceAxis= 0.005     # axis, the vertical open area from within box
-    
+
             iconBoxXstart = 0              # data
-    #        iconBoxXwidth = seqLength      # data 
+    #        iconBoxXwidth = seqLength      # data
             iconBoxYstart = 1 + ySpaceAxis # axis
-            
+
     #        self.xRange       = (0,iconBoxXwidth)   # x-axis (min,max) tuple, None is autoscale
-             
+
             # Get a background with Z-scores of accessibility.
-            i = 0 
+            i = 0
             for res in self.resList:
                 accessibilityZscoreList = res.getDeepByKeys(WHATIF_STR,INOCHK_STR,VALUE_LIST_STR)
     #            NTdebug('accessibilityZscoreList: %s', accessibilityZscoreList)
@@ -1334,12 +1334,12 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                                edgecolor=color, facecolor=color, clip_on=None,
                                )
                 if useMatPlotLib:
-                    self.axis.add_patch(p)            
-                i += 1       
-            
+                    self.axis.add_patch(p)
+                i += 1
+
             # Get a icons for secondary structure
             secStructElementList = self.getsecStructElementList()
-            i = 0 
+            i = 0
             for element in secStructElementList:
     #            NTdebug(`element`)
                 elementLength = len(element)
@@ -1349,16 +1349,16 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                 if secStructList:
                     secStructList = to3StateUpper( secStructList )
                     secStruct = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
-    
+
                 if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
                     secStruct = None
                 if secStruct == ' ':
                     secStruct = None
     #            NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
-    
+
                 xy = ( iconBoxXstart + i, iconBoxYstart)
                 width = elementLength
-                
+
                 rangeIconList = RangeIconList( axis=self.axis,secStruct=secStruct,seq=elementLength,
                     xy=xy,width=width,height=self.iconBoxYheight,**kwargs)
                 if rangeIconList.addPatches():
@@ -1366,12 +1366,12 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                     continue
                 for p in rangeIconList.patchList:
                     if useMatPlotLib:
-                        self.axis.add_patch(p)        
+                        self.axis.add_patch(p)
                 i += elementLength
-            
-        
 
-class RangeIconList():
+
+
+class RangeIconList:
     def __init__(self, axis=None, secStruct=' ', seq=1, xy=None, width=None, height=None,
                  **kwargs):
         self.patchList= []
@@ -1384,21 +1384,21 @@ class RangeIconList():
         self.kwargs   = kwargs
         if not self.axis:
             NTcodeerror('no self.axis in RangeIconList')
-            sys.exit(1)    
+            sys.exit(1)
 
     def addPatches(self):
         "Return True on error"
 #        NTmessage("Doing addPatches for seq: %d", self.seq)
-        
+
         if self.secStruct=='E':
-            p = StrandIcon(seq=self.seq, axis=self.axis, xy=self.xy, 
+            p = StrandIcon(seq=self.seq, axis=self.axis, xy=self.xy,
                            width=self.width, height=self.height,**self.kwargs)
             if not p:
                 NTerror("Failed to create StrandIcon")
                 return True
             self.patchList.append( p )
         elif self.secStruct=='H':
-            helixIconList = HelixIconList(seq=self.seq, xy=self.xy, 
+            helixIconList = HelixIconList(seq=self.seq, xy=self.xy,
                 width=self.width, height=self.height,axis=self.axis,**self.kwargs)
             if helixIconList.addPatches():
                 NTerror("Failed to create HelixIconList")
@@ -1409,7 +1409,7 @@ class RangeIconList():
                 return True
             for p in plist:
                 self.patchList.append( p )
-        elif self.secStruct==None:            
+        elif self.secStruct==None:
             p = CoilIcon(seq=self.seq, axis=self.axis, xy=self.xy, width=self.width, height=self.height,**self.kwargs)
             if not p:
                 NTerror("Failed to create CoilIcon")
@@ -1418,36 +1418,36 @@ class RangeIconList():
         else:
             NTerror("Failed to find one of 3 states, doing addPatches for seq: %d and self.secStruct: %s", (self.seq, self.secStruct))
             return True
-    
+
 class HelixIconList(RangeIconList):
     """ Draw helices in half turn increments scale back x-coordinate to fit odd
         numbered residue helices.    """
-        
+
     def toAxes( self, verts ):
-        """Translating the xy coordinates from local system x=[0,n] and y=[0,1] 
+        """Translating the xy coordinates from local system x=[0,n] and y=[0,1]
         to axes coordinate system for x and
         to data coordinate system for y.
         """
         for v in verts:
             v[0] += self.xy[0]                   # axes coordinates
             v[1] *= self.height
-            v[1] += self.xy[1]          
+            v[1] += self.xy[1]
             l    = [ v[1] ]
             v[1] = convert_yunitsResPlot(self.axis, l)[0]          # data coordinates
 
     def addPatches(self):
         """Returns True on error.
         # it looks like in procheck a gap of 2 residues makes the next
-        # helix start with opposite phase.  
+        # helix start with opposite phase.
         """
         if self.seq < 2: # keep nagging..
             NTcodeerror('Number of helical residues in resList needs to be at least two.')
             return True
-        
+
         HELIX_HWIDTH = 90.*11/13 # retro engineered from procheck. Horizontal width in units of degrees on periodic.
 #        HELIX_PERIOD = 4.- HELIX_HWIDTH # 3.15 In real life this is 3.6 for an regular alpha helix
-        # The reason for choosing a smaller period is that the helix nicely aligns with its 
-        # outer edges. 
+        # The reason for choosing a smaller period is that the helix nicely aligns with its
+        # outer edges.
         n = self.seq
         # Round the number of turns to halves. Halfturns to ints.
         # n  ht     n   ht
@@ -1461,9 +1461,9 @@ class HelixIconList(RangeIconList):
 #        NTdebug("halfTurnsTotal: %8.3f ", halfTurnsTotal )
 #        NTdebug("hw: %8.3f ", hw )
         # After contemplating for a long time, it seems that the easiest coordinate
-        # system to start in is for x [0,360> and on and for y [0,1] due to cyclic 
+        # system to start in is for x [0,360> and on and for y [0,1] due to cyclic
         # nature of the helix.
-        
+
         s = 270. # starting phase, assume for now we're going down first.
         v = s # jumps 360 after each turn done (at phase: u=0)
         t = s # will keep increasing over the different turns.
@@ -1501,11 +1501,11 @@ class HelixIconList(RangeIconList):
 #             / \-\
 #      a_b   /_/j\ \
 #       \ \i/e/f
-#        \_\ /  
+#        \_\ /
 #         c d
 
             verts = NTlist()
-            
+
             if u == 270.:
                 # draw 90 degree segment going down
                 verts.append( a,b,d,c )
@@ -1540,7 +1540,7 @@ class HelixIconList(RangeIconList):
             else:
                 NTerror("in HelixIconList need to improve float comparisons")
                 return True
-                    
+
 #            NTdebug('verts in local system [(s-hw,s-hw+360*n/4,(0,1)]')
 #            NTdebug( vertsToString(verts) )
 
@@ -1561,7 +1561,7 @@ class HelixIconList(RangeIconList):
 #            NTdebug('verts almost in icon system  [(0,n),(0,1)]')
 #            NTdebug( vertsToString(verts) )
 
-            yScaleFactor = 111./220 
+            yScaleFactor = 111./220
             scaleCentered( verts, 1, yScaleFactor)
 #            NTdebug('verts in icon system  [(0,n),(0,yScaleFactor)]')
 #            NTdebug( vertsToString(verts) )
@@ -1569,10 +1569,10 @@ class HelixIconList(RangeIconList):
             self.toAxes(verts)
 #            NTdebug('verts in axes')
 #            NTdebug( vertsToString(verts) )
-            p = RangeIconPoly( xy=verts, axis=self.axis, **self.kwargs )            
+            p = RangeIconPoly( xy=verts, axis=self.axis, **self.kwargs )
             self.patchList.append(p)
             drawnPoly += 1
-        
+
 class RangeIcon(Rectangle):
     """A drawing specific for the residue type and in the case of
     amino acids also it's DSSP determined secondary structure
@@ -1581,18 +1581,18 @@ class RangeIcon(Rectangle):
         xy is an x,y tuple lower, left
         width and height are of outer dimensions like xy.
     """
-    def __init__(self, seq=None, axis=None, *args, **kwargs ):        
+    def __init__(self, seq=None, axis=None, *args, **kwargs ):
         Rectangle.__init__(self, *args, **kwargs)
         self.seq = seq
         self.axis= axis
-        
+
     def toAxes( self, verts ):
         """See namesake
         """
         for v in verts:
             v[0] += self.xy[0]
             v[1] *= self.height
-            v[1] += self.xy[1] 
+            v[1] += self.xy[1]
             l    = [ v[1] ]
             v[1] = convert_yunitsResPlot(self.axis, l)[0]          # data coordinates
 
@@ -1601,38 +1601,38 @@ class RangeIcon(Rectangle):
         Return the vertices of the icon.
         translating the y coordinate from axes coordinate system to
         data coordinate system.
-        """        
+        """
         self.set_clip_on(None) # weird that this needs to be called this low in the code.
 
         x, y = self.xy
         left, right = self.convert_xunits((x, x + self.width))
         bottom, top = convert_yunitsResPlot(self.axis, (y, y + self.height))
-        
-        verts = ( (left,  bottom), 
+
+        verts = ( (left,  bottom),
                   (left,  top),
-                  (right, top),   
-                  (right, bottom) ) 
+                  (right, top),
+                  (right, bottom) )
 #        NTdebug('xy   : %s', self.xy)
 #        NTdebug(' self.width   : %s',  self.width)
 #        NTdebug(' self.height  : %s',  self.height)
 #        NTdebug('verts: %s', verts)
         return verts
-        
+
 class RangeIconPoly(Polygon):
-    def __init__(self, seq=None, axis=None, *args, **kwargs ):        
+    def __init__(self, seq=None, axis=None, *args, **kwargs ):
         Polygon.__init__(self, *args, **kwargs)
         self.seq = seq
         self.axis= axis
         if not self.axis:
             NTcodeerror('no self.axis in RangeIconList')
-            sys.exit(1)    
-        
+            sys.exit(1)
+
     def get_verts(self):
         """
         Return the vertices of the icon.
         translating the y coordinate to axes coordinate system.
         xy is a sequence of (x,y) 2 tuples.
-        """        
+        """
         self.set_clip_on(None) # weird that this needs to be called this low in the code.
 
         xs, ys = zip(*self.xy)[:2]
@@ -1648,41 +1648,41 @@ class CoilIcon(RangeIcon):
         """
         Return the vertices of the icon.
         translating the y coordinate to axes coordinate system.
-#               
+#
 #        b------c
-#        |      | 
+#        |      |
 #        a------d
-#               
-        # The y coordinates are in [0,1] first for the maximum resList 
+#
+        # The y coordinates are in [0,1] first for the maximum resList
         # they can span.
-        # The x coordinates are from [0,n] where n is the length of the 
+        # The x coordinates are from [0,n] where n is the length of the
         # sequence.
-        """        
+        """
         self.set_clip_on(None) # weird that this needs to be called this low in the code.
-        COIL_WIDTH = 0.08    
+        COIL_WIDTH = 0.08
         n = self.seq
         a = [0,0]
         b = [0,1]
         c = [n,1]
         d = [n,0]
 
-        verts = [ a,b,c,d ]        
+        verts = [ a,b,c,d ]
 #        NTdebug('verts in local system [0-n,0-1]: %s', verts)
         scaleCentered(verts, 1., COIL_WIDTH)
 #        NTdebug('verts in icon system  [0-n,0-r]:  %s', verts)
         self.toAxes(verts)
 #        NTdebug('verts in axes                  :  %s', verts)
         return verts
-        
-        
+
+
 class StrandIcon(RangeIcon):
     """
     Draw an arrow for part of a potential beta stranded sheet.
     """
     def __init__(self, seq=None, axis=None, xy=None, width=None, height=None,
                  **kwargs
-                 ):        
-        RangeIcon.__init__(self, seq=seq, axis=axis, xy=xy, width=width, height=height, **kwargs)    
+                 ):
+        RangeIcon.__init__(self, seq=seq, axis=axis, xy=xy, width=width, height=height, **kwargs)
 #        NTdebug('In StrandIcon.__init__: one strand seq: %d', self.seq)
 
     def get_verts(self):
@@ -1694,13 +1694,13 @@ class StrandIcon(RangeIcon):
 #        |        e
 #        a------g/
 #               f
-        # The y coordinates are in [0,1] first for the maximum resList 
+        # The y coordinates are in [0,1] first for the maximum resList
         # they can span.
-        # The x coordinates are from [0,n] where n is the length of the 
+        # The x coordinates are from [0,n] where n is the length of the
         # sequence.
-        """        
+        """
         self.set_clip_on(None) # weird that this needs to be called this low in the code.
-        ARROW_WIDTH = 0.6    
+        ARROW_WIDTH = 0.6
         n = self.seq
         x = (1-ARROW_WIDTH)/2.
         a = [0,x]
@@ -1714,7 +1714,7 @@ class StrandIcon(RangeIcon):
         verts = [ a,b,c,d,e,f, g ]
         if self.seq == 1: # Just the arrow.
             verts = [ f, d, e ]
-        
+
 #        NTdebug('verts in local system [0-n,0-1]: %s', verts)
         r = 2./3 # from procheck retro engineered
         scaleCentered(verts, 1., r)
@@ -1722,11 +1722,11 @@ class StrandIcon(RangeIcon):
         self.toAxes(verts)
 #        NTdebug('verts in axes                  :  %s', verts)
         return verts
-        
+
 
 
 def scaleCentered( verts, xscale, yscale ):
-    # Scale a list of vertices by given scale constants with 
+    # Scale a list of vertices by given scale constants with
     # keeping the center of the vertices the same.
     left   = (1.-xscale)/2.
     bottom = (1.-yscale)/2.
@@ -1735,8 +1735,8 @@ def scaleCentered( verts, xscale, yscale ):
         v[1] = bottom + v[1] * yscale
 
 def scale( verts, xscale, yscale ):
-    # Scale a list of vertices by given scale constants with 
-    # keeping to the lower left    
+    # Scale a list of vertices by given scale constants with
+    # keeping to the lower left
     for v in verts:
         v[0] *= xscale
         v[1] *= yscale
@@ -1761,37 +1761,37 @@ def mapAccessibilityZscore2Color(zScore):
     Lightgrey for a None score
     Darker blue for a more negative Z score. (-1 is straight blue)
     Darker red for a more positive Z score.  (+1 is straight red)
-             
+
     The following list contains per-residue Z-scores describing how
     well the residue's observed accessibility fits the expected one.
     A positive Z-score indicates "more exposure than usual", whereas
     a negative Z-score means "more buried than usual".
-    |Z-score| must be used to judge the quality.         
+    |Z-score| must be used to judge the quality.
         """
     if zScore == None:
         return ResPlot.colorBackNoSecStruct
     rangeHi  =  1.
     zScore = limitToRange( zScore, -rangeHi, rangeHi)
 
-    # HSV: Hue, Saturation, Value 
+    # HSV: Hue, Saturation, Value
     #They all take and return values in the resList [0.0, 1.0]
     hue = ResPlot.hueBlue
-    if zScore >= 0:            
+    if zScore >= 0:
         hue = ResPlot.hueRed
-    saturation = math.fabs( zScore/rangeHi )    
+    saturation = math.fabs( zScore/rangeHi )
     return hsv_to_rgb( hue,saturation*.5,1.   )
 
-    
+
 def triangularList( xList, c=360. ):
-    """Triangular function with periodicity. 
+    """Triangular function with periodicity.
     Returns a value between zero and one (inclusive)
-  1      /\    /\
+    1    /\    /\
         /  \  /  \
-  0    /    \/    \
+    0  /    \/    \
       |  c  |
-      c is the cycle period.
-      
-      """
+    c is the cycle period.
+
+    """
     r = []
     for x in xList:
         r.append(triangular(x, c))
@@ -1817,24 +1817,24 @@ def to3StateUpper( strNTList ):
     S,B,h,e,t, , --> space character
     E          --> E
     H G        --> H
-    
+
     Note that CING and Procheck_NMR does not draw a 'h' to a H and e to E.
 
-    Procheck description: The secondary structure plot shows a schematic 
-    representation of the Kabsch & Sander (1983) secondary structure assignments. 
-    The key just below the picture shows which structure is which. Beta strands are 
-    taken to include all residues with a Kabsch & Sander assignment of E, helices 
-    corresponds to both H and G assignments, while everything else is taken to be 
+    Procheck description: The secondary structure plot shows a schematic
+    representation of the Kabsch & Sander (1983) secondary structure assignments.
+    The key just below the picture shows which structure is which. Beta strands are
+    taken to include all residues with a Kabsch & Sander assignment of E, helices
+    corresponds to both H and G assignments, while everything else is taken to be
     random coil.
-    
-    PyMOL description: With PyMOL, heavy emphasis is placed on cartoon aesthetics, 
-    and so both hydrogen bonding patterns and backbone geometry are used in the 
-    assignment process. Depending upon the local context, helix and strand assignments 
-    are made based on geometry, hydrogen bonding, or both. This command will generate 
-    results which differ slightly from DSSP and other programs. Most deviations occur 
-    in borderline or transition regions. Generally speaking, PyMOL is more strict, 
-    thus assigning fewer helix/sheet residues, except for partially distorted helices, 
-    which PyMOL tends to tolerate. 
+
+    PyMOL description: With PyMOL, heavy emphasis is placed on cartoon aesthetics,
+    and so both hydrogen bonding patterns and backbone geometry are used in the
+    assignment process. Depending upon the local context, helix and strand assignments
+    are made based on geometry, hydrogen bonding, or both. This command will generate
+    results which differ slightly from DSSP and other programs. Most deviations occur
+    in borderline or transition regions. Generally speaking, PyMOL is more strict,
+    thus assigning fewer helix/sheet residues, except for partially distorted helices,
+    which PyMOL tends to tolerate.
 
     """
     result = NTlist()
@@ -1850,7 +1850,7 @@ def to3StateUpper( strNTList ):
 def convert_yunitsResPlot(axis, yValueList):
     """Convert from value in y-axis coordinates [0,1] to
     data coordinates [bottom,top].
-    
+
     E.g. ylim=[0,10] input    result
                         0     0
                         0.5   5
@@ -1866,7 +1866,7 @@ def convert_yunitsResPlot(axis, yValueList):
         r = bottom + height * v
         result.append( r )
 #        NTdebug('convert_yunitsResPlot: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
-        
+
     return result
 
 
@@ -1875,19 +1875,19 @@ class LocatorResidueMajorTicks(Locator):
     Tick locations are fixed.
     Every starting residue of a chain is a tick, so is every residue
     after a break in the chain. In addition, multiples of 10 are a tick.
-    If the total number of residues exceeds 100 then the XXX5 are omitted. 
-    E.g. 
+    If the total number of residues exceeds 100 then the XXX5 are omitted.
+    E.g.
     1brv 171-189 becomes 171, 175, 180, 181, 185
     2hgh 104-193 becomes 104, 110, 120,...   190,191,192,193 (including zn 191-193 in other chains.)
     """
     def __init__(self, ranges):
         self.locs = []
         totalNumberResidues = len(ranges)
-        
-        doFives = True 
+
+        doFives = True
         if totalNumberResidues/100. > 1:
             doFives = False
-        
+
         idx = -0.5 # Shift so that the first ticked label drawn is not at 1 but at 0.5
         lastResNum = None
         lastChainName = None
@@ -1900,18 +1900,18 @@ class LocatorResidueMajorTicks(Locator):
                 isBroken = True
             elif res.chain.name != lastChainName:
                 isBroken = True
-            
+
             lastResNum    = res.resNum
             lastChainName = res.chain.name
-            
+
             idx += 1
 #                if (not res.resNum%10) or (doFives and (not res.resNum%5)):
-            if (isBroken or 
+            if (isBroken or
                 not res.resNum%10 or
                 (doFives and not res.resNum%5)):
                 self.locs.append(idx)
-#                NTdebug('Adding at resNum %s, idx: %s'%(res.resNum,idx )) 
-        
+#                NTdebug('Adding at resNum %s, idx: %s'%(res.resNum,idx ))
+
     def __call__(self):
         return self.locs
 
@@ -1969,7 +1969,7 @@ class MultipleLocatorByOffset(MultipleLocator):
 class FormatResTypesFormatter(Formatter):
     def __init__(self, molecule):
         self.molecule = molecule
-        self.resPropList = ['Z'] # The zero is not supposed to be used. 
+        self.resPropList = ['Z'] # The zero is not supposed to be used.
         for res in molecule.allResidues():
             resProp = 'x'
             if res.shortName:
@@ -1977,15 +1977,15 @@ class FormatResTypesFormatter(Formatter):
             else:
                 resProp = res.name
 
-            if ( res.hasProperties('nucleic') and 
+            if ( res.hasProperties('nucleic') and
                 (resProp[0]=='r' or resProp[0]=='d') and
                 len(resProp)>1):
                 resProp = resProp[1:2] # truncate rc to c
             else:
                 resProp = resProp[0:1] # truncate A171 to A
-            
+
             self.resPropList.append(string.upper(resProp))
-        
+
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'
 #        NTdebug('called with x,pos: %s, %s' %(x,pos))
@@ -1996,14 +1996,14 @@ class FormatResTypesFormatter(Formatter):
 class FormatResNumbersFormatter(Formatter):
     def __init__(self, range):
         self.resPropList = ['Z'] # The zero is not supposed to be used.
-        prevChainId = None 
+        prevChainId = None
         for res in range:
             if res.chain.name != prevChainId:
                 prevChainId = res.chain.name
                 self.resPropList.append(res.chain.name +`res.resNum`)
             else:
                 self.resPropList.append(                `res.resNum`)
-                
+
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'
 #        NTdebug('FormatResNumbersFormatter called with x,pos: %s, %s' %(x,pos))
@@ -2012,19 +2012,19 @@ class FormatResNumbersFormatter(Formatter):
             return self.resPropList[xint]
         return 'X'
 
-            
+
 def offSet(inputList, xOffset=0., yOffset=0.):
     result = []
     for i in inputList:
         x = i[0]+xOffset
-        y = i[1]+yOffset 
+        y = i[1]+yOffset
         result.append( (x,y))
     return result
 
 def selectPointsFromRange( pointList, start=0, length=None):
     """Length is exclusive; eg from 0 to 1 exclusive should
     have length one and not two."""
-     
+
     if not length:
         NTerror('expected a non-zero length in selectPointsFromRange')
         return True
@@ -2051,4 +2051,4 @@ def removeNulls(serie):
             continue
         result.append( point )
     return result
-    
+
