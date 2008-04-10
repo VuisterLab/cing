@@ -9,7 +9,7 @@ Some examples; all assume a project named 'test':
 cing --name test --new --verbosity 9
 
 - To start a new Project from a xeasy seq file:
-cing --name test --init AD.seq,CYANA 
+cing --name test --init AD.seq,CYANA
 
 - To start a new Project from a xeasy seq file and load an xeasy prot file:
 cing --name test --init AD.seq,CYANA --xeasy AD.seq,AD.prot,CYANA
@@ -18,7 +18,7 @@ cing --name test --init AD.seq,CYANA --xeasy AD.seq,AD.prot,CYANA
 cing --name test --initCcpn ccpn_project.xml
 
 - To open an existing Project:
-cing --name test 
+cing --name test
 
 - To open an existing Project and load an xeasy prot file:
 cing --name test --xeasy AD.seq,AD.prot,CYANA
@@ -66,7 +66,7 @@ from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 import cing
-import os 
+import os
 import string
 import sys
 import unittest
@@ -85,7 +85,7 @@ def format( object ):
         print object
     #end if
 #end def
-    
+
 def formatall( object ):
     if isinstance( object, list ):
         i = 0
@@ -113,7 +113,7 @@ def script( scriptFile, *a, **k ):
         NTmessage('==> Executing script '+ scriptFile )
         execfile( scriptFile, globals() )
     else:
-        scriptFile2 = os.path.join( cingPythonDir, cingPaths.scripts, scriptFile)        
+        scriptFile2 = os.path.join( cingPythonDir, cingPaths.scripts, scriptFile)
         if os.path.exists( scriptFile2 ):
             NTmessage('==> Executing script "%s"', scriptFile2 )
             #end if
@@ -134,14 +134,14 @@ def testOverall():
 #                           "cing.PluginCode.test.test_Whatif",
 #                           "cing.Scripts.test.test_cyana2cing",
 #                           "cing.STAR.FileTest",
-                          ) 
+                          )
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
 #    for name in nameList2:
-#      nameList.append(name) 
+#      nameList.append(name)
     # translate: '/Users/jd/workspace/cing/python/cing/Libs/test/test_NTplot.py'
     # to: cing.Libs.test.test_NTplot
     lenCingPythonDirStr = len(cingPythonDir)
@@ -149,89 +149,89 @@ def testOverall():
     suite = None
     for name in nameList:
 #      print "In cing.main#testOverall found cing.verbosity: %d\n" % cing.verbosity
-      tailPathStr = name[lenCingPythonDirStr+1:-3]
-      mod_name = string.join(tailPathStr.split('/'), '.')      
-      if mod_name in excludedModuleList:
-        print "Skipping module:  " + mod_name
-        continue      
-      exec("import %s" % (mod_name)   )
-      exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
-      testVerbosity = 2
-      unittest.TextTestRunner(verbosity=testVerbosity).run(suite)
+        tailPathStr = name[lenCingPythonDirStr+1:-3]
+        mod_name = string.join(tailPathStr.split('/'), '.')
+        if mod_name in excludedModuleList:
+            print "Skipping module:  " + mod_name
+            continue
+        exec("import %s" % (mod_name)   )
+        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
+        testVerbosity = 2
+        unittest.TextTestRunner(verbosity=testVerbosity).run(suite)
 
 
 project = None # after running main it will be filled.
- 
-def main():    
+
+def main():
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
-    
+
     usage  = "usage: cing [options]       use -h (or --help) for listing"
     parser = OptionParser(usage=usage, version=programVersion)
-    parser.add_option("--test", 
-                      action="store_true", 
-                      dest="test", 
+    parser.add_option("--test",
+                      action="store_true",
+                      dest="test",
                       help="Run set of test routines to verify installations"
                      )
-    parser.add_option("--doc", 
-                      action="store_true", 
-                      dest="doc", 
+    parser.add_option("--doc",
+                      action="store_true",
+                      dest="doc",
                       help="Print more documentation to stdout"
                      )
-    parser.add_option("--docdoc", 
-                      action="store_true", 
-                      dest="docdoc", 
+    parser.add_option("--docdoc",
+                      action="store_true",
+                      dest="docdoc",
                       help="Print full documentation to stdout"
                      )
-    parser.add_option("-n", "--name", 
+    parser.add_option("-n", "--name",
                       dest="name", default=None,
-                      help="NAME of the project (required)", 
+                      help="NAME of the project (required)",
                       metavar="PROJECTNAME"
                      )
-    parser.add_option("--new", 
-                      action="store_true", 
-                      dest="new", 
+    parser.add_option("--new",
+                      action="store_true",
+                      dest="new",
                       help="Start new project"
                      )
-    parser.add_option("--old", 
-                      action="store_true", 
-                      dest="old", 
+    parser.add_option("--old",
+                      action="store_true",
+                      dest="old",
                       help="Open a old project"
                      )
-    parser.add_option("--init", 
+    parser.add_option("--init",
                       dest="init", default=None,
-                      help="Initialize from SEQUENCEFILE[,CONVENTION]", 
+                      help="Initialize from SEQUENCEFILE[,CONVENTION]",
                       metavar="SEQUENCEFILE[,CONVENTION]"
                      )
-    parser.add_option("--initPDB", 
+    parser.add_option("--initPDB",
                       dest="initPDB", default=None,
-                      help="Initialize from PDBFILE[,CONVENTION]", 
+                      help="Initialize from PDBFILE[,CONVENTION]",
                       metavar="PDBFILE[,CONVENTION]"
                      )
-    parser.add_option("--initBMRB", 
+    parser.add_option("--initBMRB",
                       dest="initBMRB", default=None,
-                      help="Initialize from edited BMRB file", 
+                      help="Initialize from edited BMRB file",
                       metavar="BMRBFILE"
                      )
-    parser.add_option("--initCcpn", 
+    parser.add_option("--initCcpn",
                       dest="initCcpn", default=None,
-                      help="Initialize from CCPNFILE", 
+                      help="Initialize from CCPNFILE",
                       metavar="CCPNFILE"
                      )
-    parser.add_option("--xeasy", 
+    parser.add_option("--xeasy",
                       dest="xeasy", default=None,
-                      help="Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION", 
+                      help="Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION",
                       metavar="SEQFILE,PROTFILE,CONVENTION"
                      )
-    parser.add_option("--xeasyPeaks", 
+    parser.add_option("--xeasyPeaks",
                       dest="xeasyPeaks", default=None,
-                      help="Import peaks from xeasy SEQFILE,PROTFILE,PEAKFILE,CONVENTION", 
+                      help="Import peaks from xeasy SEQFILE,PROTFILE,PEAKFILE,CONVENTION",
                       metavar="SEQFILE,PROTFILE,PEAKFILE,CONVENTION"
                      )
     parser.add_option("--merge",
-                      action="store_true", 
-                      dest="merge", 
+                      action="store_true",
+                      dest="merge",
                       help="Merge resonances"
                      )
     parser.add_option("--generatePeaks",
@@ -239,69 +239,69 @@ def main():
                       help="Generate EXP_NAME peaks with AXIS_ORDER from the resonance data",
                       metavar="EXP_NAME,AXIS_ORDER"
                      )
-    parser.add_option("--script", 
+    parser.add_option("--script",
                       dest="script", default=None,
-                      help="Run script from SCRIPTFILE", 
+                      help="Run script from SCRIPTFILE",
                       metavar="SCRIPTFILE"
                      )
     parser.add_option("--ipython",
-                      action="store_true", 
-                      dest="ipython", 
+                      action="store_true",
+                      dest="ipython",
                       help="Start ipython interpreter"
                      )
     parser.add_option("--validate",
-                      action="store_true", default=False, 
-                      dest="validate", 
+                      action="store_true", default=False,
+                      dest="validate",
                       help="Do validation"
                      )
     parser.add_option("-v", "--verbosity", type='int',
                       default=cing.verbosityDefault,
-                      dest="verbosity", action='store', 
+                      dest="verbosity", action='store',
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
     parser.add_option( "--nosave",
-                      action="store_true", 
-                      dest="nosave", 
+                      action="store_true",
+                      dest="nosave",
                       help="Don't save on exit (default: save)"
                      )
     parser.add_option( "--export", default=False,
-                      action="store_true", 
-                      dest="export", 
+                      action="store_true",
+                      dest="export",
                       help="Export before exit (default: noexport)"
                      )
-    
+
     (options, _args) = parser.parse_args()
     if options.verbosity >= 0 and options.verbosity <= 9:
 #        print "In main, setting verbosity to:", options.verbosity
-        cing.verbosity = options.verbosity 
+        cing.verbosity = options.verbosity
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
-    
+
     NTmessage(header)
 #    root,file,ext  = NTpath( __file__ )
 
     if options.test:
         testOverall()
         sys.exit(0)
-    
+
     #------------------------------------------------------------------------------------
     # Extended documentation
     #------------------------------------------------------------------------------------
     if options.doc:
         parser.print_help(file=sys.stdout)
-        print __doc__ 
+        print __doc__
         sys.exit(0)
     #end if
-    
+
     #------------------------------------------------------------------------------------
     # Full documentation
     #------------------------------------------------------------------------------------
     if options.docdoc:
         print '=============================================================================='
         parser.print_help(file=sys.stdout)
-        print __doc__ 
-    
+        print __doc__
+
         print Project.__doc__
         for p in plugins.values():
             NTmessage(    '-------------------------------------------------------------------------------' +
@@ -309,31 +309,31 @@ def main():
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
                      )
-        #end for        
-    
-        print Molecule.__doc__ 
+        #end for
+
+        print Molecule.__doc__
         sys.exit(0)
     #end if
-    
+
     #------------------------------------------------------------------------------------
     # START
     #------------------------------------------------------------------------------------
-    
-    #check for the required name option  
+
+    #check for the required name option
     parser.check_required('-n')
 
 #    args = []
     _kwds = {}
-    
-     
+
+
     #------------------------------------------------------------------------------------
     # open project
     #------------------------------------------------------------------------------------
-    if options.new:    
+    if options.new:
         project = Project.open( options.name, status='new' )
-    elif options.old:    
+    elif options.old:
         project = Project.open( options.name, status='old' )
-    elif options.init:    
+    elif options.init:
         init = options.init.split(',')
         if (len(init) == 2):
             project = Project.open( options.name, status='new' )
@@ -359,11 +359,11 @@ def main():
         project.initCcpn( ccpnFile = options.initCcpn )
     else:
         project = Project.open( options.name, status='create' )
-    
+
     if not project:
         NTdebug("Doing a hard system exit")
         sys.exit(2)
-    
+
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
@@ -373,7 +373,7 @@ def main():
             NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required\n")
         else:
             project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
-    
+
     #------------------------------------------------------------------------------------
     # Import xeasy peakFile
     #------------------------------------------------------------------------------------
@@ -383,10 +383,10 @@ def main():
             NTerror("--xeasyPEaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
-    
+
     if options.merge:
         project.mergeResonances()
-    
+
     if options.generatePeaks:
         gp = options.generatePeaks.split(',')
         if len(gp) != 2:
@@ -396,26 +396,26 @@ def main():
 
     if options.script:
         script( options.script )
-    
+
     if options.validate:
         project.validate()
-    
+
     if options.ipython:
         from IPython.Shell import IPShellEmbed
         ipshell = IPShellEmbed('',  banner   = '--------Dropping to IPython--------',
                                     exit_msg = '--------Leaving IPython--------')
         ipshell()
-     
+
     #------------------------------------------------------------------------------------
-    # Optionally export project 
+    # Optionally export project
     #------------------------------------------------------------------------------------
-    if project and options.export: 
+    if project and options.export:
         project.export()
-    
+
     #------------------------------------------------------------------------------------
     # CLose and optionally not save project
     #------------------------------------------------------------------------------------
-    if project and not options.nosave: 
+    if project and not options.nosave:
         project.close()
     #------------------------------------------------------------------------------------
 

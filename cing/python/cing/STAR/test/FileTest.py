@@ -8,7 +8,7 @@ from cing.STAR import Utils
 from cing.STAR.File import File
 from unittest import TestCase
 import cing
-import os   
+import os
 import unittest
 import urllib
 import zipfile
@@ -16,8 +16,8 @@ import zipfile
 
 
 class AllChecks(TestCase):
-        strf           = File()        
-         
+        strf           = File()
+
         def testParse(self):
             text = """data_no_comments_here
 
@@ -35,13 +35,13 @@ save_comment
 #######################
 
 ;
-        
+
     BOGUS_CATEGORY
 
      stop_
 save_
 """
-            self.assertFalse(self.strf.parse(text=text))                                    
+            self.assertFalse(self.strf.parse(text=text))
             st = self.strf.star_text()
 #            print "unparsed text:[" +st+ "]"
 
@@ -64,14 +64,14 @@ save_comment   _Saveframe_category  comment   loop_
 
         def testReadFile(self):
             testEntry('1edp')
-              
+
 """
 Extra Test Routine going over some entries in the NMR Restraints Grid
 """
 def testEntry(entry):
     # Put a check in for internet availability.
     NTmessage( "Testing Entry" )
-    strf = File() 
+    strf = File()
     # Freely available on the web so not included in package.
     stage = "2-parsed"
 #    stage = "3-converted-DOCR"
@@ -81,16 +81,16 @@ def testEntry(entry):
     fnamezip = entry+".zip"
 #    print "DEBUG: downloading url:", urlLocation
     try:
-      urllib.urlretrieve(urlLocation,fnamezip)
+        urllib.urlretrieve(urlLocation,fnamezip)
     except:
-      NTwarning("Failed to get; "+ urlLocation)
-      return
+        NTwarning("Failed to get; "+ urlLocation)
+        return
 #    print "DEBUG: opening local zip file:", fnamezip
     zfobj = zipfile.ZipFile(fnamezip)
     fname = None
-    for name in zfobj.namelist():    
+    for name in zfobj.namelist():
         if name.endswith('.str'):
-            fname = name            
+            fname = name
     orgWattosWrittenFile     = entry+"_org.str"
     pystarlibWrittenFile     = entry+"_pystar.str"
     wattosWrittenFile        = entry+"_wattos.str"
@@ -100,10 +100,10 @@ def testEntry(entry):
 
     outfile = open(orgWattosWrittenFile, 'w')
     outfile.write(zfobj.read(fname))
-    outfile.close()      
-    zfobj.close()          
-    strf.filename  = orgWattosWrittenFile   
-        
+    outfile.close()
+    zfobj.close()
+    strf.filename  = orgWattosWrittenFile
+
     strf.read()
     strf.filename  = pystarlibWrittenFile
     strf.write()
@@ -117,7 +117,7 @@ def testEntry(entry):
             os.system(cmd)
             if not os.path.exists(diffOrgPystarFile):
                 NTwarning( "failed to diff files: " + orgWattosWrittenFile + ", " + pystarlibWrittenFile)
-            
+
     #        print "Most likely the below check will fail because it depends on Wattos being installed"
             NTdebug("DEBUG: rewrite to Java formating for comparison")
             cmd = "java -Xmx256m Wattos.Star.STARFilter %s %s ." % ( pystarlibWrittenFile, wattosWrittenFile)
@@ -138,15 +138,15 @@ def testEntry(entry):
         except:
     #        print "DEBUG: failed the rewrite or diff but as mentioned that's totally understandable."
             pass
-    
+
     try:
         os.unlink(entry+".zip")
         os.unlink(orgWattosWrittenFile)
         os.unlink(pystarlibWrittenFile)
     except:
         pass
-    
-    
+
+
 def testAllEntries():
     """ No need to test all entries for the unit testing frame work"""
 #    pdbList = ('1edp', '1q56', '1brv', '2hgh')
@@ -157,7 +157,7 @@ def testAllEntries():
         try:
             pdbList = PDBEntryLists.getBmrbNmrGridEntries()[0:1] # Decide on the range yourself.
         except:
-          NTwarning("Failed to get pdbList; is internet connected? Using default")
+            NTwarning("Failed to get pdbList; is internet connected? Using default")
     except:
         NTmessage( "Skipping import of Wattos.Utils; it's not needed")
 
@@ -166,23 +166,23 @@ def testAllEntries():
         testEntry(entry)
 #        entry = '1edp' # 57 kb
     #    entry = '1q56' # 10 Mb takes 27 s to parse on 2GHz PIV CPU
-    #    entry = '1brv' # 1 Mb 
+    #    entry = '1brv' # 1 Mb
     #    entry = '1hue' # 6 Mb takes 26 s to parse on 2GHz PIV CPU
     #    entry = '2ihx' # ? Mb has weird quoted values
-     
+
 """
 Extra Test Routine going over some entries in the NMR Restraints Grid
 """
 def testSingleFile( filename ):
-    strf = File() 
-    strf.filename  = filename   
+    strf = File()
+    strf.filename  = filename
     NTdebug( "reading file ", strf.filename )
     strf.read()
     strf.filename  = strf.filename + "_new.str"
     NTdebug( "writing file ", strf.filename)
     strf.write()
-    
-        
+
+
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     NTmessage("Found cing.verbosity   : " + `cing.verbosity`)

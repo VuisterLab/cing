@@ -1,5 +1,5 @@
-from ccp.general.Util import createMoleculeTorsionDict #@UnresolvedImport
-from ccp.util.Molecule import makeMolecule #@UnresolvedImport
+from ccp.general.Util import createMoleculeTorsionDict
+from ccp.util.Molecule import makeMolecule
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -10,7 +10,7 @@ from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule
 from cing.main import format
-from memops.general import Io as genIo #@UnresolvedImport
+from memops.general import Io as genIo
 import os
 import string
 
@@ -195,9 +195,9 @@ except:
         raise ImportError
 #end try
 
-NTmessage("Done importing readXmlProjectFile; which is impossible")
+#NTmessage("Done importing readXmlProjectFile; which is impossible")
 
-namingSystem = 'DIANA' #'DIANA' #CYANA2.1
+namingSystem = 'CING' #'DIANA' #CYANA2.1
 convention = 'INTERNAL' #'CYANA2'
 
 def _checkCingProject(cingProject, funcName):
@@ -349,7 +349,7 @@ def importFromCcpn(cingProject = None, ccpnProject = None  ):
     funcName = importFromCcpn.func_name
 
     if not cingProject:
-        NTerror("ERROR '%s': undefined project\n", funcName)
+        NTerror(" '%s': undefined project\n", funcName)
         return None
 
 
@@ -377,7 +377,7 @@ def importFromCcpn(cingProject = None, ccpnProject = None  ):
 
         cingProject.updateProject()
     else:
-        NTerror("ERROR '%s': no Ccpn.Project imported\n", funcName)
+        NTerror(" '%s': no Ccpn.Project imported\n", funcName)
         return None
 
     cingProject.addHistory(sprintf(funcName))
@@ -515,26 +515,25 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
                                                                 = namingSystem)
 
             if not chemCompSysName:
-                NTmessage("WARNING: Residue '%s' not indentified",
+                NTmessage("WARNING: Residue '%s' not identified",
                            ccpnResidue.ccpCode)
                 continue
-            # residue Name according namingSystem (here 'DIANA')
-            # not in use at moment, just for debugging purposes
+            # residue Name according namingSystem (here 'CING')
             resNameInSysName = chemCompSysName.sysName
-            #print 'Diana Res name ===>', resNameInSysName
+            NTmessage("%s Res name ===> %s", namingSystem, resNameInSysName)
 
             # Check if if Cing.Project.Molecule.Chain.Residue alreayd exitsts,
             # if so, it'll be used.
             # But since we are always importing Molecule as new, chains will
             # will be always empty at first.
-            if not chain.has_key(ccpnResidue.ccpCode+str(ccpnResidue.seqCode)):
-                residue = chain.addResidue(ccpnResidue.ccpCode,
-                                            ccpnResidue.seqCode)
+            if not chain.has_key(ccpnResidue.ccpCode.upper()+str(ccpnResidue.seqCode)):
+                #residue = chain.addResidue(ccpnResidue.ccpCode,
+                #                            ccpnResidue.seqCode)
                 # For When Cing NameSystem is included in Ccpn DB.
-                #residue=chain.addResidue(resNameInSysName,ccpnResidue.seqCode)
+                residue=chain.addResidue(resNameInSysName,ccpnResidue.seqCode)
             else:
                 NTmessage("WARNING: overwriting existing residue!")
-                residue = chain[ccpnResidue.ccpCode+str(ccpnResidue.seqCode)]
+                residue = chain[ccpnResidue.ccpCode.upper()+str(ccpnResidue.seqCode)]
 
 
             # Make mutual linkages between Ccpn and Cing objects

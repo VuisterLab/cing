@@ -1,6 +1,6 @@
 """
 Unit test
-python $cingPath/PluginCode/test/test_Whatif.py
+python $CINGROOT/python/cing/PluginCode/test/test_Whatif.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
@@ -18,14 +18,14 @@ import os
 import unittest
 
 class AllChecks(TestCase):
-        
-    def testparse(self):        
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
+
+    def testparse(self):
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-#        entryId = "1brv_1model" 
-        entryId = "1brv" 
-        
+#        entryId = "1brv_1model"
+        entryId = "1brv"
+
         os.chdir(cingDirTestsTmp)
         project = Project( entryId )
         project.removeFromDisk()
@@ -37,8 +37,8 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
 
 #        print project.cingPaths.format()
-        self.assertFalse(runWhatif(project))    
-        
+        self.assertFalse(runWhatif(project))
+
         project.save()
         for res in project.molecule.allResidues():
             NTdebug(`res`)
