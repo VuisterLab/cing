@@ -68,7 +68,7 @@ except ImportError:
 useMatPlotLib = True
 
 #try:
-#    from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
+#    from pylab import * # preferred importing. Includes nx imports.
 #    from matplotlib.collections import LineCollection
 #    useMatPlotLib = True
 #except ImportError:
