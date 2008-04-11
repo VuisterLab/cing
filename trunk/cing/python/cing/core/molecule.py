@@ -38,6 +38,8 @@ from cing.core.dictionaries import translateResidueName
 from database     import NTdb
 from parameters   import plotParameters
 from cing.Libs.NTutils import NTvector
+from cing.core.constants import COLOR_GREEN
+import string
 import math
 import os
 
@@ -136,6 +138,7 @@ _____________________________________________________________________________
     all dict methods
 
 """
+
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
@@ -178,21 +181,19 @@ _____________________________________________________________________________
         for atm in self.allAtoms():
             atm[key] = value
         
+    def getChainIdForChainCount(self):
+        return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
+    
     def addChain( self, name=None, **kwds ):
         """
             Add Chain instance name
             or
             pick next chain identifier when chain=None
-
             Return Chain instance or None upon error
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
         if name==None:
-            chainNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                          'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-                         ]
-            name = chainNames[ self.chainCount ]
-        #end if
+            name = self.getChainIdForChainCount()
         if name in self:
             NTerror( 'ERROR Molecule.addChain: chain "%s" already present\n', name )
             return None
@@ -667,15 +668,14 @@ Return an Molecule instance or None on error
                 pass
 
             else:
-                if (f.NF > 1):
+                if f.NF > 1:
                     resNum = f.int(2)
                 #end if
 
-                if (f.NF >= 3):
+                chainId = Chain.defaultChainId # recommended to use your own instead of CING making one up.
+                if f.NF >= 3:
                     chainId = f.dollar[3]
-                else:
-                    chainId = ' '
-                #endif
+                chainId = ensureValidChainId( chainId )
 
                 molecule._addResidue( chainId, resName, resNum, convention )
         NTmessage("%s", molecule.format())
@@ -696,7 +696,10 @@ Return an Molecule instance or None on error
                    )
             return None
         else:
-            if (chainId not in self):
+            if chainId == None:
+                chainId = Chain.defaultChainId
+                
+            if chainId not in self:
                 chain = self.addChain(chainId)
             else:
                 chain = self[chainId]
@@ -811,7 +814,7 @@ Return an Molecule instance or None on error
                 #end if
             #end for
 
-            if (len(models) > 1):
+            if len(models) > 1:
                 record = PyMMLib.ENDMDL()
                 pdbFile.append( record )
             #end for
@@ -852,6 +855,44 @@ moleculehandler = XMLMoleculeHandler()
 #
 #==============================================================================
 #
+
+def ensureValidChainId( chainId ):
+    """
+    In CING all chains must have one non-space character (chain id) because:
+    
+    - More than 1 characters would not fit in PDB column 22. Note that
+    some programs read the chain id from PDB columns [73-76> but others
+    programs (e.g. SHIFTX, ???) used by CING do not.
+    In the future, the CING code could be extended to interface
+    to these programs but for now CING uses the lowest common denominator. 
+    - No space allowed because it does not materialize to a nice file name,
+    one that can be used without quotes. If the value is a space it is hard to 
+    pass this to some programs; such as SHIFTX. A space would also be
+    making it impossible to CING to use e.g.:
+    print project.molecule.A.GLU77.procheck.CHI1[0]
+    where A stands for chain id A.
+    - The letters A-Z are often used already which will cause name space
+    collisions. It is important to choose an id that will most likely not be 
+    used in the above formats.
+    
+    The chain id is ALWAYS given in PDB and XPLOR coordinate files.
+    It might be a space character but it's always implicitly present. If it's a 
+    space character, CING will translate it to the defaultChainId value.
+    
+    Bottom line: use a chain id character on input! 
+    """ 
+    if chainId==None:
+        return Chain.defaultChainId
+    if len(chainId) > 1:
+        chainId = chainId[0]
+    chainId = string.upper(chainId)
+    charOrd = ord(chainId)
+    if charOrd >= ord('A') and charOrd <= ord('Z'):
+        return chainId
+    if chainId in Chain.validChainIdListBesidesTheAlphabet:
+        return chainId
+    return Chain.defaultChainId
+
 class Chain( NTtree ):
     """
 -------------------------------------------------------------------------------
@@ -885,6 +926,13 @@ Chain class: defines chain properties and methods
 
     all dict methods
     """
+    
+    DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#^_' 
+    validChainIdListBesidesTheAlphabet = '#^_' # last 3 chars of above.    
+    'Nothing that is a special character in Python, or tcsh.'
+    defaultChainId = '_'
+    'See documentation: molecule#ensureValidChainId'
+    
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
@@ -893,11 +941,10 @@ Chain class: defines chain properties and methods
 
         self.residues = self._children
         self.residueCount = 0
-    #end def
 
     def __repr__(self):
         return str(self)
-    #end def
+
 
     def addResidue( self, resName, resNum, **kwds ):
 #       We have to make sure that whatever goes on here is also done in the XML handler
@@ -993,8 +1040,8 @@ Chain class: defines chain properties and methods
                 result.append(atm)
             #end if
         #end for
-        return result
-    #end def
+        return result          
+
 #end class
 
 
@@ -1081,6 +1128,8 @@ Residue class: Defines residue properties
 
         self._nameResidue( resName, resNum )
         self.saveXML('resName','resNum')
+        self.colorLabel = COLOR_GREEN # innocent until proven guilty.
+        
     #end def
 
     def __repr__(self):
@@ -1976,13 +2025,14 @@ Atom class: Defines object for storing atom properties
             record = HETATM()
         else:
             record = ATOM()
-        #end if
 
+        chainId = self.residue.chain.name
+        
         record.serial     = pdbIndex
         record.name       = pdbAtmName
         record.resName    = pdbResName
 
-        record.chainID    = self.residue.chain.name
+        record.chainID    = chainId
         record.resSeq     = self.residue.resNum
         record.x          = coor[0]
         record.y          = coor[1]
