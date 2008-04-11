@@ -1,12 +1,8 @@
-"""
-Unit test
-python $cingPath/PluginCode/test/test_validate.py
-"""
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
 from cing import verbosityDebug
+from cing import verbosityError
 from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import BMRB
 from cing.core.constants import CYANA
@@ -21,13 +17,11 @@ class AllChecks(TestCase):
  
     def testRun(self):
         pdbConvention = BMRB
-        restraintsConvention = CYANA
-#        entryId = "1brv"        # Small much studied PDB NMR entry 
+#        entryId = "1brv" # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model" 
 #        entryId = "1tgq_1model" # withdrawn entry
-        entryId = "1brv_1model" # withdrawn entry
-#        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
+        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
@@ -45,28 +39,10 @@ class AllChecks(TestCase):
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-        NTdebug("Reading files from directory: " + cyanaDirectory)
-        kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]              
-                  }
-        if entryId.startswith("1YWUcdGMP"):
-            del(kwds['acoFiles'])
-            
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".prot")):
-            self.assertTrue( os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")),
-                "Converter for cyana also needs a seq file before a prot file can be imported" )
-            kwds['protFile'] = entryId
-            kwds['seqFile']  = entryId
-
-        # Skip restraints if absent.
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".upl")):
-            project.cyana2cing(cyanaDirectory=cyanaDirectory, convention=restraintsConvention,
-                        copy2sources = True,
-                        **kwds )
-        project.save()
-        self.assertFalse( project.validate())
-
+        project.predictWithShiftx()
+                
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
+    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

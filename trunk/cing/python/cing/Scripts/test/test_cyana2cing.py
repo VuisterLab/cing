@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Scripts/test/test_cyana2cing.py
+python $cingPath/Scripts/test/test_cyana2cing.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
@@ -16,13 +16,13 @@ import sys
 import unittest
 
 class AllChecks(TestCase):
-
-    def testConversion(self):
+        
+    def testConversion(self):        
 #        SETUP FIRST
         projectId = "1pdb"
         cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
         self.assertTrue( os.path.exists( cyanaDirectory) and os.path.isdir(cyanaDirectory ) )
-
+        
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
 
@@ -31,17 +31,17 @@ class AllChecks(TestCase):
         if os.path.exists( projectRoot ):
             NTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )
-
-        project = Project.open(projectRootPath, 'new')
+            
+        project = Project.open(projectRootPath, 'new')   
         project.cyana2cing( #project=project,
-                            cyanaDirectory=cyanaDirectory,
+                            cyanaDirectory=cyanaDirectory, 
                             uplFiles  = [projectId],
                             acoFiles  = [projectId,"talos"],
                             pdbFile   = projectId,
                             nmodels   = 2,
                             copy2sources = True
         )
-
+        
         if not project:
             NTwarning("No project generated. Aborting further execution.")
             sys.exit(0)
