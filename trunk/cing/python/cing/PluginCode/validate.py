@@ -100,7 +100,7 @@ OpenText         = 'Open'
 dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
 dbase = shelve.open( dbaseFileName )
 #        histCombined               = dbase[ 'histCombined' ]
-histBySsAndResType         = dbase[ 'histBySsAndResType' ]
+#histBySsAndResType         = dbase[ 'histBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 dbase.close()
 

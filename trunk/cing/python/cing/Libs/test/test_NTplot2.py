@@ -180,13 +180,13 @@ class AllChecks(TestCase):
         dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
         dbase = shelve.open( dbaseFileName )
 #        histCombined               = dbase[ 'histCombined' ]
-        histBySsAndResType         = dbase[ 'histBySsAndResType' ]
+#        histBySsAndResType         = dbase[ 'histBySsAndResType' ]
     #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
         dbase.close()
-        ssType = 'E'
-        resType = 'ASN'
-        hist = histBySsAndResType[ssType][resType]        
-        self.assertFalse( plot.ramachandranZPlot(hist))
+#        ssType = 'E'
+#        resType = 'ASN'
+#        hist = histBySsAndResType[ssType][resType]        
+#        self.assertFalse( plot.ramachandranZPlot(hist))
         myPoint = plusPoint.copy()
 #        myPoint.pointColor = 'red'
         myPoint.pointSize = 6.0
