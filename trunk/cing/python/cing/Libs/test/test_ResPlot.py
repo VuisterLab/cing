@@ -31,9 +31,9 @@ from cing.core.constants import CYANA
 from random import random
 from unittest import TestCase
 import cing
-import os
+import os #@Reimport
 import unittest
-#from pylab import * # preferred importing. Includes nx imports.
+#from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):
 
@@ -42,21 +42,21 @@ class AllChecks(TestCase):
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testResPlot(self):
-
+        
         actuallyRunProcheck = False
         actuallyRunWhatif   = False
         showValues          = False
-        modelNum            = 1 # Only used when simulating data
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
+        modelNum            = 1 # Only used when simulating data 
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-        entryId = "1brv_1model"
 #        entryId = "2hgh_1model"
-
+        entryId = "1brv"
+        
         pdbConvention = BMRB
         ranges = None
         if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
+            pdbConvention = CYANA        
             # Compile a NTlist instance with residue objects.
             ranges = "2-54,111-136,145-193"
                 # 1 and 55 are 5' and 3' terminii which are a little looser.
@@ -64,8 +64,8 @@ class AllChecks(TestCase):
                 # 191-193 are bound ZN ions.
         elif entryId.startswith("1brv"):
             # Truncate from Val171-Glu189 to:
-            ranges = "176-188"
-
+            ranges = "176-188"  
+           
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to temp test directory for data: "+cingDirTestsTmp)
         project = Project( entryId )
@@ -77,14 +77,14 @@ class AllChecks(TestCase):
         NTdebug("Reading files from directory: " + cyanaDirectory)
         # Fast
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-
-        rangeList = project.molecule.getFixedRangeList(
+        
+        rangeList = project.molecule.getFixedRangeList( 
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=ranges )
-
+        
         if actuallyRunProcheck:
-            self.failIf(project.procheck(createPlots=False, runAqua=False) is None)
+            self.failIf(project.procheck(createPlots=False, runAqua=False) is None)                                    
         if actuallyRunWhatif:
-            self.assertFalse(runWhatif(project))
+            self.assertFalse(runWhatif(project))   
 
         pointsANGCHK = [] # list per res in rangeList of lists
         pointsBNDCHK = []
@@ -96,43 +96,43 @@ class AllChecks(TestCase):
         for resList in rangeList:
             for res in resList:
                 resNumb += 1
-
+                
     #            NTdebug(`res`)
-
+                
     #            if random() < 0.2: # Skip a 10%
     #                continue
-
+                
                 whatifResDict = res.setdefault(WHATIF_STR, NTdict())
                 procheckResDict = res.setdefault(PROCHECK_STR, NTdict())
     #            if not whatifResDict: # empty dict
     #                continue
-
+    
                 angList = NTlist()
                 bndList = NTlist()
-
+                
                 quaList = NTlist()
                 ramList = NTlist()
                 c12List = NTlist()
                 bbcList = NTlist()
-
+                
                 accList = NTlist()
                 sstList = NTlist()
                 sstListPossibilities='SH' # secondary structure elements.
-
+                
                 for _modelID in range(modelNum):
                     if not actuallyRunWhatif:
                         angList.append(random()*10-0) # Simulate abs max of Z-scores.
                         bndList.append(random()*5+1)  # offset by 1 but still want to start from zero?
-
-                        quaList.append(random()*5+1)
-                        ramList.append(random()*5+1)
-                        c12List.append(random()*5+1)
-                        bbcList.append(random()*5+1)
-
-                        accList.append(random()*4-2)
+                         
+                        quaList.append(random()*5+1)  
+                        ramList.append(random()*5+1)  
+                        c12List.append(random()*5+1)  
+                        bbcList.append(random()*5+1)  
+                        
+                        accList.append(random()*4-2) 
                     if not actuallyRunProcheck:
                         sstList.append( sstListPossibilities[ int(random()*2)])  # Simulate secondary structure
-
+    
                 if not actuallyRunWhatif:
                     self.assertFalse (   whatifResDict.setDeepByKeys(angList,  ANGCHK_STR,VALUE_LIST_STR) )
                     self.assertFalse (   whatifResDict.setDeepByKeys(bndList,  BNDCHK_STR,VALUE_LIST_STR) )
@@ -143,9 +143,10 @@ class AllChecks(TestCase):
                     self.assertFalse (   whatifResDict.setDeepByKeys(bbcList,  BBCCHK_STR,VALUE_LIST_STR) )
 
                     self.assertFalse (   whatifResDict.setDeepByKeys(accList,  INOCHK_STR,VALUE_LIST_STR) )
+                    
                 if not actuallyRunProcheck:
                     self.assertFalse ( procheckResDict.setDeepByKeys(sstList,  SECSTRUCT_STR) )
-
+    
                 for d in [whatifResDict, procheckResDict]:
                     checkIDList = d.keys()
                     for checkID in checkIDList:
@@ -153,83 +154,86 @@ class AllChecks(TestCase):
                             valueList = d.getDeepByKeys(checkID,VALUE_LIST_STR)
                         else:
                             valueList = d.getDeepByKeys(checkID)
-
-                        if checkID == ANGCHK_STR:
+                            
+                        if checkID == ANGCHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsANGCHK.append( (resNumb-.5, zScore) )
-                        elif checkID == BNDCHK_STR:
+                        elif checkID == BNDCHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsBNDCHK.append( (resNumb-.5, zScore) )
-                        elif checkID == QUACHK_STR:
+                        elif checkID == QUACHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsQUACHK.append( (resNumb-.5, zScore) )
-                        elif checkID == RAMCHK_STR:
+                        elif checkID == RAMCHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsRAMCHK.append( (resNumb-.5, zScore) )
-                        elif checkID == C12CHK_STR:
+                        elif checkID == C12CHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsC12CHK.append( (resNumb-.5, zScore) )
-                        elif checkID == BBCCHK_STR:
+                        elif checkID == BBCCHK_STR:                            
                             zScore = valueList.average()[0]
                             pointsBBCCHK.append( (resNumb-.5, zScore) )
 #                            NTdebug("pointsBBCCHK: %s", pointsBBCCHK)
-
+                                                
                         if showValues:
                             NTdebug("%10s valueList: %-80s" % ( checkID, valueList))
-
+        
         ps = None
-        i = 0
+        r = 0
         for resList in rangeList:
-            i += 1
+            r += 1
 #            NTdebug("resList: %s" % resList)
             ps = NTplotSet() # closes any previous plots
             ps.hardcopySize = (600,600)
-            nrows = 4
-            ntPlot1 = ps.createSubplot(nrows,1,1,useResPlot=True,molecule=project.molecule,resList=resList)
-            ntPlot2 = ps.createSubplot(nrows,1,2,useResPlot=True,molecule=project.molecule,resList=resList)
-            ntPlot3 = ps.createSubplot(nrows,1,3,useResPlot=True,molecule=project.molecule,resList=resList)
-            ntPlot4 = ps.createSubplot(nrows,1,4,useResPlot=True,molecule=project.molecule,resList=resList)
+            nrows = 2
+            ntPlotList = []
+            for i in range(nrows):
+                ntPlotList.append( ps.createSubplot(nrows,1,i+1,useResPlot=True,molecule=project.molecule,resList=resList) )
 
-            ps.subplotsAdjust(hspace  = .0) # no height spacing between plots.
+
+            ps.subplotsAdjust(hspace  = .1) # no height spacing between plots.
             ps.subplotsAdjust(top     = 0.9) # Accommodate icons and res types.
             ps.subplotsAdjust(left    = 0.15) # Accommodate extra Y axis label.
-
+    
             attr = fontVerticalAttributes()
-            attr.fontColor  = 'blue'
+            attr.fontColor  = 'blue' 
             # Left of actual yLabel.
-            ntPlot1.labelAxes( (-0.12, 0.5), 'Backbone', attributes=attr)
-            ntPlot2.labelAxes( (-0.12, 0.5), 'Quality',  attributes=attr)
-            ntPlot3.labelAxes( (-0.12, 0.5), 'Angle',    attributes=attr)
-#            ntPlot4.labelAxes( (-0.12, 0.5), 'Backbone', attributes=attr)
-
-            ntPlot1.yLabel  = 'Ramachandr. Z'
-            ntPlot2.yLabel = 'Chi 1/2. Z'
-            ntPlot3.yLabel = 'Bond max Z'
-            ntPlot4.yLabel = 'Restraint RMSD'
-
-            ntPlotBottom = ntPlot4
-
-            ntPlot1.xLabel = None
-            ntPlot2.xLabel = None
-            ntPlot3.xLabel = None
-
-#            ntPlot1.yRange= (0, 3) # to be reset later automatically..
-#            ntPlot2.yRange= (0, 3)
+            labelAxesExtraList = [ 
+              'Backbone',
+              'Quality',
+              'Angle',
+              '',
+              '' ]
+            labelAxesList = [ 
+              'Ramachandr. Z',
+              'Chi 1/2. Z',
+              'Bond max Z',
+              'Restraint RMSD',
+              '' ]
+            for i in range(nrows):
+                position = (-0.12, 0.5)
+                ntPlotList[i].labelAxes( position, labelAxesExtraList[i], attributes=attr) 
+                ntPlotList[i].yLabel = labelAxesList[i]
+                if i != nrows-1:
+                    ntPlotList[i].xLabel = None
+            
             # Draw secondary structure elements and accessibility
             # Set x range and major ticker.
             # The major ticker determines the grid layout.
-            ntPlot1.drawResIcons( ySpaceAxis=.03+.13 ) # leave space for res types but get it right on top.
-#            ntPlot3.drawResNumbers() # accept default -bottom- position.
-            # Reset the minor ticker
-#            ntPlot3.xRange = ntPlot1.xRange
-
-
+            # leave space for res types but get it right on top.
+#            .18 at nrows = 4
+            # Needs to be done before re-scaling the y axis from [0,1]
+            ySpaceAxisResIcons = .06 + (nrows-1) * .04
+            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
+            ntPlotList[0].drawResIcons( ySpaceAxis=ySpaceAxisResIcons )    
+            
+            
             plusPoint   = pointAttributes( type='plus',   size=1.5, color='black' )
             circlePoint = pointAttributes( type='circle', size=1.5, color='blue')
             plusPoint.lineColor   = 'black'
             circlePoint.lineColor = 'blue'
-            length = ntPlot1.MAX_WIDTH_IN_RESIDUES
-            start = (i-1)*length
+            length = ntPlotList[0].MAX_WIDTH_IN_RESIDUES
+            start = (r-1)*length
 
 #            pointsBBCCHK = removeNulls(pointsBBCCHK)
             # buildin max is overridden by matplotlib
@@ -240,41 +244,38 @@ class AllChecks(TestCase):
             pointsRAMCHKOffset = convertPointsToPlotRange(pointsRAMCHK, xOffset=-start, yOffset=0, start=0, length=length)
             pointsC12CHKOffset = convertPointsToPlotRange(pointsC12CHK, xOffset=-start, yOffset=0, start=0, length=length)
             pointsBBCCHKOffset = convertPointsToPlotRange(pointsBBCCHK, xOffset=-start, yOffset=0, start=0, length=length)
-
-            NTdebug("pointsRAMCHKOffset: %s" % pointsRAMCHKOffset)
+                        
+            pointsOffsetList = [pointsRAMCHKOffset,
+                                pointsQUACHKOffset,
+                                pointsANGCHKOffset ]
+            pointsOffsetList2 = [pointsBBCCHKOffset,
+                                 pointsC12CHKOffset,
+                                 pointsBNDCHKOffset ]
+#            NTdebug("pointsRAMCHKOffset: %s" % pointsRAMCHKOffset)
 #            NTdebug("start:end: %s %s" % (start,end))
-            ntPlot1.lines(pointsRAMCHKOffset, plusPoint)
-            ntPlot1.lines(pointsBBCCHKOffset, circlePoint)
-            ntPlot2.lines(pointsQUACHKOffset, plusPoint)
-            ntPlot2.lines(pointsC12CHKOffset, circlePoint)
-            ntPlot3.lines(pointsANGCHKOffset, plusPoint)
-            ntPlot3.lines(pointsBNDCHKOffset, circlePoint)
+            for i in range(nrows):
+                if i >= len( pointsOffsetList ):
+                    continue
+                ntPlotList[i].lines(pointsOffsetList[i],  plusPoint)
+                ntPlotList[i].lines(pointsOffsetList2[i], circlePoint) 
+                ntPlotList[i].autoScaleY( pointsOffsetList[i]+pointsOffsetList2[i] )
+                if i == 2: # by chance
+                    ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
 
-#            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
-#            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
-#            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
-#            BBCCHK   Poor   : <   10.00   Bad    : <    5.00
+            ySpaceAxisResTypes = .02 + (nrows-1) * .01
+            ntPlotList[0].drawResTypes(ySpaceAxis=ySpaceAxisResTypes) # Weirdly can only be called after yRange is set.
 
-            ntPlot1.autoScaleY( pointsRAMCHKOffset+pointsBBCCHKOffset )
-            ntPlot2.autoScaleY( pointsQUACHKOffset+pointsC12CHKOffset )
-            ntPlot3.autoScaleY( pointsANGCHKOffset+pointsBNDCHKOffset )
+            for i in range(nrows):
+                showLabels = False
+                if i == nrows-1:
+                    showLabels = True
+                # also sets the grid lines for major. Do last as it won't rescale with plot yet.
+                ntPlotList[i].drawResNumbers( showLabels=showLabels) 
+            
 
-            ntPlot3.setYrange((.0, ntPlot3.yRange[1]))
-
-            ntPlot1.drawResTypes( ) # accept default -top- position.
-            ntPlot2.xRange = ntPlot1.xRange
-            ntPlot3.xRange = ntPlot1.xRange
-            ntPlot4.xRange = ntPlot1.xRange
-
-            ntPlot1.drawResNumbers( showLabels=False) # also sets the grid lines for major. Do last as it won't rescale with plot yet.
-            ntPlot2.drawResNumbers( showLabels=False)
-            ntPlot3.drawResNumbers( showLabels=False)
-            ntPlotBottom.drawResNumbers()
             # Set the grid and major tickers
-            ps.hardcopy('residuePlotSet%03d.png'%i)
-#            if ps: # Can only show one
-#                ps.show()
-
+            ps.hardcopy('residuePlotSet%03d.png'%r)
+        
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

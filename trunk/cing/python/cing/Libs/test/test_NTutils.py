@@ -54,7 +54,7 @@ class AllChecks(TestCase):
             for file in fileList: 
                 self.assertNotEqual( file, None)
 
-    def testCircularAverage(self):
+    def tttestCircularAverage(self):
         lol = [  [   5,  15,   10],
                 [  345,   5,  355],
                  [   5, 345,  355],
@@ -71,7 +71,7 @@ class AllChecks(TestCase):
             if cav != None:
                 self.assertAlmostEqual(circularAverage, cav, places=5)
                 
-    def testCircularAverage2(self):
+    def tttestCircularAverage2(self):
         angleList = NTlist()
         angleList.append(1)
         result = angleList.cAverage(0, 360, 0, None)
@@ -79,7 +79,7 @@ class AllChecks(TestCase):
         circularAverage,_circularVariance,_n = result
         self.assertAlmostEqual(circularAverage, 1, places=5)
                 
-    def testCircularAverage3(self):
+    def tttestCircularAverage3(self):
         angleList = NTlist()
         result = angleList.cAverage(0, 360, 0, None)
         self.failUnless(result)
@@ -94,7 +94,7 @@ class AllChecks(TestCase):
 #                   {90, -70, -160}                
 #        };
 
-    def testGeneral(self):
+    def tttestGeneral(self):
         s = NTdict(aap='noot', mies=1)
         s.setdefault('mies',2)
         s.setdefault('kees',[])
@@ -109,7 +109,7 @@ class AllChecks(TestCase):
         s.update( b  )
 
         
-    def testNTaverage(self):
+    def tttestNTaverage(self):
         l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
@@ -152,7 +152,7 @@ class AllChecks(TestCase):
         self.assertEquals(      sd,  0) 
         self.assertEquals(       n,  3) 
 
-    def testValueToFormattedString(self):
+    def tttestValueToFormattedString(self):
         self.assertEquals( val2Str(None,"%5.2f",None),NaNstring)
         self.assertEquals( val2Str(None,"%5.2f",5),   "%5s" % NaNstring)
         self.assertEquals( val2Str(6.3, "%5.2f",5),   " 6.30")
@@ -185,9 +185,13 @@ class AllChecks(TestCase):
         self.assertTrue(a.getDeepByKeys('b','c','anItem'))
         self.assertFalse(a.getDeepByKeys('b','c',9))
         a.b.c=NTlist(1,2,3)
-        self.assertFalse(a.getDeepByKeys('b','c',1)) # better not throw an error.
+        self.assertFalse(a.getDeepByKeys('b','c',9)) # better not throw an error.
+        self.assertEquals('default value',
+            a.getDeepByKeysOrDefault('default value',9)) # returns default
+        self.assertEquals(2,
+            a.getDeepByKeys('b','c',1)) # get the second element by key 1
 
-    def testNTmessage(self):
+    def tttestNTmessage(self):
         aStringToBe = 123
         NTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
@@ -195,12 +199,12 @@ class AllChecks(TestCase):
         NTdebug("testing messaging system: "+`aStringToBe`)
         NTdebug("testing messaging system: %s", aStringToBe)
 
-    def testNTlistSetConsensus(self):
+    def tttestNTlistSetConsensus(self):
         l = NTlist( 4., 9., 9. )
         self.assertEqual( l.setConsensus(minFraction=0.6), 9)
         self.assertEqual( l.consensus, 9)
         
-    def testNTlistIndex(self):
+    def tttestNTlistIndex(self):
         # speed check
         l = NTlist()
         for _i in range( 10*1000):
@@ -214,7 +218,7 @@ class AllChecks(TestCase):
             _x = l.index(middleValue)
 #            tree.sibling(1)
 
-    def testNTtreeIndex(self):
+    def tttestNTtreeIndex(self):
         mol = Molecule('mol')
         mol.addChain('top')
         top = mol.allChains()[0]
@@ -230,8 +234,8 @@ class AllChecks(TestCase):
             _x = middleValue.sibling(1) # this tends to be very expensive
             
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityNothing
+    cing.verbosity = verbosityDebug
 #    cProfile.run('unittest.main()', 'fooprof')
 #    p = pstats.Stats('fooprof')
 #    p.sort_stats('time').print_stats(10)
