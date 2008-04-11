@@ -8,7 +8,7 @@ for res in NTdb:
         if (atm.name == 'HN'):
             atm.nameDict[CYANA2] = 'H'
         else:
-           atm.nameDict[CYANA2] = atm.nameDict[CYANA]
+            atm.nameDict[CYANA2] = atm.nameDict[CYANA]
 
 stream = open('dbTable-new.py', 'w')
 NTdb.exportDef(stream=stream)
