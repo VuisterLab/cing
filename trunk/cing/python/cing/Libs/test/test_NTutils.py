@@ -1,7 +1,3 @@
-"""
-Unit test execute as:
-python $cingPath/Scripts/test/test_cyana2cing.py
-"""
 from cing import NaNstring
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
@@ -30,13 +26,13 @@ class AllChecks(TestCase):
 #        NTexception("Now in testPrints")
 #        NTerror("test")
         pass
-    
+
     def tttestFind(self):
         self.failIf( os.chdir(cingDirTestsTmp), msg=
             "Failed to change to temp test directory for data: "+cingDirTestsTmp)
         namepattern, startdir = "CVS", cingPythonDir
         nameList = findFiles(namepattern, startdir)
-        self.assertTrue( len(nameList) > 10 ) 
+        self.assertTrue( len(nameList) > 10 )
 #        for name in nameList:
 #            print name
 
@@ -47,11 +43,11 @@ class AllChecks(TestCase):
         outputPath = cingDirTestsTmp
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
-        fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, inputPath, outputDir=outputPath ) 
+        fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, inputPath, outputDir=outputPath )
         NTdebug( "Got back from convert2Web output file names: " + `fileList`)
         self.assertNotEqual(fileList,True)
         if fileList != True:
-            for file in fileList: 
+            for file in fileList:
                 self.assertNotEqual( file, None)
 
     def tttestCircularAverage(self):
@@ -61,7 +57,7 @@ class AllChecks(TestCase):
                   [180,-180, None],
                    [90, -70,   10]]
         for cycle in lol:
-            v1, v2, cav = cycle            
+            v1, v2, cav = cycle
             angleList = NTlist()
             angleList.append(v1)
             angleList.append(v2)
@@ -70,7 +66,7 @@ class AllChecks(TestCase):
             circularAverage,_circularVariance,_n = result
             if cav != None:
                 self.assertAlmostEqual(circularAverage, cav, places=5)
-                
+
     def tttestCircularAverage2(self):
         angleList = NTlist()
         angleList.append(1)
@@ -78,20 +74,20 @@ class AllChecks(TestCase):
         self.failUnless(result)
         circularAverage,_circularVariance,_n = result
         self.assertAlmostEqual(circularAverage, 1, places=5)
-                
+
     def tttestCircularAverage3(self):
         angleList = NTlist()
         result = angleList.cAverage(0, 360, 0, None)
         self.failUnless(result)
         _circularAverage,_circularVariance,_n = result
-                
-            
+
+
 #        double[][] testValues = new double[][] {
 #                {    5,  15,   10},
 #                {  345,   5,   20},
 #                 {   5, 345,  -20},
 #                  {180, 180,    0},
-#                   {90, -70, -160}                
+#                   {90, -70, -160}
 #        };
 
     def tttestGeneral(self):
@@ -100,57 +96,57 @@ class AllChecks(TestCase):
         s.setdefault('kees',[])
         s.kees = [0, 1, 3]
         s.name ='ss'
-  
+
         b = s.copy()
- 
-        p = s.popitem() 
+
+        p = s.popitem()
         while p:
             p = s.popitem()
         s.update( b  )
 
-        
+
     def tttestNTaverage(self):
         l = NTlist( 4, 9, 11, 12, 17, 5, 8, 12, 14 )
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
         self.assertAlmostEqual( av, 10.22, places=1) # verified in Excel stddev function.
-        self.assertAlmostEqual( sd,  4.18, places=1) 
-        self.assertEquals(       n, 9) 
+        self.assertAlmostEqual( sd,  4.18, places=1)
+        self.assertEquals(       n, 9)
 
         l = NTlist( 1,None,1,1 )
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
-        self.assertAlmostEqual( av,   1.0, places=1) 
-        self.assertAlmostEqual( sd,   0.0, places=1) 
-        self.assertEquals(       n, 3) 
-        
+        self.assertAlmostEqual( av,   1.0, places=1)
+        self.assertAlmostEqual( sd,   0.0, places=1)
+        self.assertEquals(       n, 3)
+
         l = NTlist( 1,2 )
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
-        self.assertAlmostEqual( av,   1.5, places=1) 
-        self.assertAlmostEqual( sd, 0.707, places=2) 
-        self.assertEquals(       n, 2) 
-        
+        self.assertAlmostEqual( av,   1.5, places=1)
+        self.assertAlmostEqual( sd, 0.707, places=2)
+        self.assertEquals(       n, 2)
+
         l = NTlist( 1 )
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
-        self.assertAlmostEqual( av,   1.0, places=1) 
-        self.assertEquals(      sd,  None) 
-        self.assertEquals(       n,   1) 
-        
+        self.assertAlmostEqual( av,   1.0, places=1)
+        self.assertEquals(      sd,  None)
+        self.assertEquals(       n,   1)
+
         l = NTlist()
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
-        self.assertEquals(      av,  None) 
-        self.assertEquals(      sd,  None) 
-        self.assertEquals(       n,   0) 
+        self.assertEquals(      av,  None)
+        self.assertEquals(      sd,  None)
+        self.assertEquals(       n,   0)
 
         l = NTlist(0.0, 0.0, 0.0)
         (av,sd,n) = l.average()
         NTdebug((av,sd,n))
-        self.assertEquals(      av,  0) 
-        self.assertEquals(      sd,  0) 
-        self.assertEquals(       n,  3) 
+        self.assertEquals(      av,  0)
+        self.assertEquals(      sd,  0)
+        self.assertEquals(       n,  3)
 
     def tttestValueToFormattedString(self):
         self.assertEquals( val2Str(None,"%5.2f",None),NaNstring)
@@ -174,7 +170,7 @@ class AllChecks(TestCase):
         self.assertTrue(a.getDeepByKeys('b'))
         self.assertFalse(a.getDeepByKeys(9))
 
-        
+
         a = NTdict(b=NTdict(c=NTdict(anItem='there')))
 #        NTdebug( '4 '+ `a` )
 #        NTdebug( '5 '+ `a['b']`)
@@ -195,7 +191,7 @@ class AllChecks(TestCase):
         aStringToBe = 123
         NTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
-        NTerror("testing messaging system for error: "+`aStringToBe`) 
+        NTerror("testing messaging system for error: "+`aStringToBe`)
         NTdebug("testing messaging system: "+`aStringToBe`)
         NTdebug("testing messaging system: %s", aStringToBe)
 
@@ -203,7 +199,7 @@ class AllChecks(TestCase):
         l = NTlist( 4., 9., 9. )
         self.assertEqual( l.setConsensus(minFraction=0.6), 9)
         self.assertEqual( l.consensus, 9)
-        
+
     def tttestNTlistIndex(self):
         # speed check
         l = NTlist()
@@ -224,15 +220,15 @@ class AllChecks(TestCase):
         top = mol.allChains()[0]
         for i in range( 1*1000):
             top.addResidue( `random()`,i )
-        
+
         resList = top.allResidues()
         middleValue = resList[len(resList)/2]
-        
+
 
         for _i in range( 1*100):
 #            _x = middleValue.sibling(0) # getting myself back should not take time.
             _x = middleValue.sibling(1) # this tends to be very expensive
-            
+
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
