@@ -5,6 +5,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import limitToRange
 from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
@@ -18,21 +19,24 @@ from copy import deepcopy
 from matplotlib import rcParams
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
-from matplotlib.collections import LineCollection
 from matplotlib.lines import Line2D
 from matplotlib.mlab import frange
-from matplotlib.numerix import arange
+from matplotlib.numerix.mlab import amax
+from matplotlib.numerix.mlab import amin
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
 from matplotlib.pylab import annotate
 from matplotlib.pylab import axes
 from matplotlib.pylab import bar
-from matplotlib.pylab import cla
+from matplotlib.pylab import cla  
+from matplotlib.pylab import clabel
 from matplotlib.pylab import clf
 from matplotlib.pylab import close
+from matplotlib.pylab import contour
 from matplotlib.pylab import errorbar
 from matplotlib.pylab import gcf
 from matplotlib.pylab import grid
+from matplotlib.pylab import imshow 
 from matplotlib.pylab import plot
 from matplotlib.pylab import savefig
 from matplotlib.pylab import show # prone to change.
@@ -49,6 +53,12 @@ from matplotlib.ticker import Formatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
+from numpy.core.ma import arange
+from pylab import nx
+from cing.PluginCode.procheck import to3StateUpper
+from cing.PluginCode.procheck import getProcheckSecStructConsensus
+from matplotlib.ticker import FuncFormatter
+import Image
 import math
 import string
 import sys
@@ -119,9 +129,9 @@ def NTplotAttributes( **kwds ):
     a.line       = False
 
     # points
-    a.pointType  = None # Changed to have no point as this is more common for all.
-    a.pointSize  = 2.0
-    a.pointColor = 'blue'
+    a.pointType  = None   # in matplotlib: marker
+    a.pointSize  = 2.0    # in matplotlib: markeredgewidth
+    a.pointColor = 'blue' # in matplotlib: markeredgecolor
 
     # fonts
     a.font       = 'Helvetica'
@@ -162,8 +172,8 @@ def fontVerticalAttributes( horizontalalignment='left', verticalalignment  = 'ce
     result.rotation=rotation
     return result
 
-def pointAttributes( type='circle', size=2.0, color='black', alpha=1. ):
-    return NTplotAttributes( pointType=type, pointSize=size, pointColor=color, alpha=alpha )
+def pointAttributes( type='circle', size=4.0, pointEdgeWidth=2.0, color='black', alpha=1. ):
+    return NTplotAttributes( pointType=type, pointSize=size, pointEdgeWidth=pointEdgeWidth, pointColor=color, alpha=alpha )
 #end def
 
 # Some default attributes
@@ -340,7 +350,7 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             line2D = Line2D(xdata, ydata)
             attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
-            self.setMatLibPlotLine2DPropsPoint(line2D, attributesMatLibPlot)
+            line2D.set( **attributesMatLibPlot )
             self.axis.add_artist(line2D)
         else:
             self.b.add(
@@ -426,9 +436,11 @@ class NTplot( NTdict ):
     def mapAttributes2MatLibPlotLine2D(self, attributes=defaultAttributes):
         if not attributes:
             attributes=defaultAttributes
-        result = NTdict()
-        result.color  = None
-        result.marker = 'None'
+        result = {}
+        result['color']  = None
+        result['marker'] = 'None'
+        
+        
 #            'linewidth'      : None, # all Nones default to rc
 #            'linestyle'      : None,
 #            'color'          : None,
@@ -453,34 +465,46 @@ class NTplot( NTdict ):
             if attributes.pointType:
                 if mappingPointType2MatLibPlot.has_key(attributes.pointType):
 #                    print "doing pointType"
-                    result.marker =  mappingPointType2MatLibPlot[attributes.pointType]
+                    result['marker'] =  mappingPointType2MatLibPlot[attributes.pointType]
                 else:
                     NTcodeerror("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
                     return True
         if 'pointColor' in keys:
 #            print "doing pointColor"
-            result.markeredgecolor =  attributes.pointColor
-            result.markerfacecolor =  attributes.pointColor
-            result.color           =  attributes.pointColor
+            result['markeredgecolor'] =  attributes.pointColor
+            result['markerfacecolor'] =  attributes.pointColor
+            result['color']           =  attributes.pointColor
+        if 'pointSize' in keys:
+#            print "doing pointSize"
+            result['markersize'] =  attributes.pointSize
+        if 'pointEdgeWidth' in keys:
+#            print "doing pointEdgeWidth"
+            result['markeredgewidth'] =  attributes.pointEdgeWidth
+            
         if 'lineColor' in keys:
 #            print "doing lineColor"
-            result.color           =  attributes.lineColor
+            result['color']           =  attributes.lineColor
         if 'color' in keys:
 #            print "doing color"
-            result.color           =  attributes.color
+            result['color']           =  attributes.color
         if 'fill' in keys:
 #            print "doing fill"
-            markerColor = result.color
+            markerColor = result['color']
             if 'pointColor' in keys:
                 markerColor = attributes.pointColor
             elif 'lineColor' in keys:
                 markerColor = attributes.lineColor
-            result.markeredgecolor =  markerColor
-            result.markerfacecolor =  markerColor
+            result['markeredgecolor'] =  markerColor
+            result['markerfacecolor'] =  markerColor
+            
+#    a.pointType  = None   # in matplotlib: marker
+#    a.pointSize  = 2.0    # in matplotlib: markersize
+#    a.pointColor = 'blue' # in matplotlib: markeredgecolor
+            
         if 'alpha' in keys:
 #            print "doing alpha"
-            result.alpha           =  attributes.alpha
-#        NTdebug("result attributes: " + `result`)
+            result['alpha']           =  attributes.alpha
+#        NTdebug("result[attributes: " + `result[)
         return result
 
     def mapAttributes2MatLibPatches(self, attributes=defaultAttributes):
@@ -488,7 +512,7 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         result = {}
         # Patch attributes.
-#                 edgecolor=None,
+#                 edgecolor=None, 
 #                 facecolor=None,
 #                 linewidth=None,
 #                 antialiased = None,
@@ -529,17 +553,6 @@ class NTplot( NTdict ):
         return result
 
 
-    def setMatLibPlotLine2DPropsPoint( self,line2D, attributesMatLibPlot):
-        line2D.set_color(attributesMatLibPlot['color'])
-        if isinstance(line2D,LineCollection): # Limited set of possibilities.
-            return
-        if attributesMatLibPlot.has_key('marker'):
-            if attributesMatLibPlot.marker == 'None':
-                return
-            line2D.set_marker(attributesMatLibPlot['marker'])
-            line2D.set_markeredgecolor(attributesMatLibPlot['markeredgecolor'])
-            line2D.set_markerfacecolor(attributesMatLibPlot['markerfacecolor'])
-
     def removeMarkerAttributes( self, attributesMatLibPlot):
         del(attributesMatLibPlot['marker'])
         del(attributesMatLibPlot['markeredgecolor'])
@@ -547,7 +560,7 @@ class NTplot( NTdict ):
 
     def setMatLibPlotLine2DListPropsPoint( self, line2DList, attributesMatLibPlot):
         for line2D in line2DList:
-            self.setMatLibPlotLine2DPropsPoint( line2D, attributesMatLibPlot)
+            line2D.set( **attributesMatLibPlot )
 
     def point( self, point, attributes=defaultAttributes ):
         """ Add a point
@@ -559,7 +572,6 @@ class NTplot( NTdict ):
         if attributes.has_key('pointType'):
             if not attributes.pointType:
                 attributes.pointType= 'none' # Changed to have no point as this is more common for all.
-
         if useMatPlotLib:
             attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
 #            print attributesMatLibPlot['marker']
@@ -567,7 +579,9 @@ class NTplot( NTdict ):
             y = point[1]
             axes(self.axis) # Claim current axis.
             line2D, = plot( [x], [y] )
-            self.setMatLibPlotLine2DPropsPoint( line2D, attributesMatLibPlot)
+#            NTdebug('before getp(line2D):')
+#            getp(line2D)
+            line2D.set( **attributesMatLibPlot)
             xerror=None
             yerror=None
             if len(point) >2:
@@ -622,8 +636,8 @@ class NTplot( NTdict ):
         """
         if useMatPlotLib:
             kwds = self.mapAttributes2MatLibText(attributes)
-            NTdebug("In labelAxes using kwds: %s", kwds)
-            self.axis.text( point[0], point[1], text,
+#            NTdebug("In labelAxes using kwds: %s", kwds)
+            self.axis.text( point[0], point[1], text, 
                 transform=self.axis.transAxes, **kwds)
 
     def label( self, point, text, attributes=defaultAttributes ):
@@ -666,8 +680,15 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( range[0], range[1] )
-
-    def autoScaleY( self, pointList ):
+        
+    def autoScaleYByValueList( self, valueList, startAtZero=False, useIntegerTickLabels=False ):
+        pointList = []
+        for i in range(len(valueList)):
+            item = (None,valueList[i])
+            pointList.append(item)
+        return self.autoScaleY( pointList, startAtZero )
+ 
+    def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
         """Using the list of points autoscale the y axis."""
         min = None
         max = None
@@ -688,12 +709,19 @@ class NTplot( NTdict ):
 
         if min == max: # Zero range is impossible.
             max = min + 1.
-
+        
+        if startAtZero and min >= 0:
+            min = 0
+            
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( min, max )
             self.axis.autoscale_view( scalex=False, scaley=True)
             self.yRange = self.axis.get_ylim()
+            formatter = FuncFormatter(integerNumberOnly)
+            yaxis = self.axis.yaxis
+            yaxis.set_major_formatter( formatter )
+            
 
 #    def autoScale( self, x=True, y=True ):
 #        """Doesn't work for MatPlotLib yet.
@@ -893,8 +921,143 @@ class NTplot( NTdict ):
             minorLocator   = MultipleLocator(space)
             self.axis.xaxis.set_minor_locator(minorLocator)
             self.setTickLineWidth()
+    
+    
+    def imshow(self, imageFileName):
+        alpha = 0.05 # much lower than any background.
+        im = Image.open( imageFileName )
+#        s = im.tostring()
+#        rgb = fromstring( s, UInt8).astype(Float)/255.0
+#        rgb = resize(im, (im.size[1],im.size[0], 3))
 
+        extent = self.xRange + self.yRange
+        _image = imshow(im, 
+                        alpha=alpha, 
+                        extent=extent,
+                        origin='lower')
+    
+    def ramachandranZPlot(self, hist):
+        """Overlay contours for Z score from histogram.
+        Return 2 when the plot is of low-density.
+        Return True on error.
+        May need to be optimized when called many times.
+        """
+        binSize   = 10
+        binCount  = 360/binSize
+        
+    #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
+        sumHist = sum(sum( hist ))
+        maxHist = amax(amax( hist ))
+    #    x = nx.arange(plotparams1.min, plotparams1.max+0.01, binSize)
+    #    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
+        Z = hist
+        # Calculate the count database average for this histogram and
+        # the sigma (s.d.) of it. this is done as defined by equations
+        # in: Hooft et al. Objectively judging the quality of a protein 
+        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997) 
+        # vol. 13 (4) pp. 425-430
+        c_squaredSum = 0
+        for r in range(binCount):
+            row = Z[r]
+            for c in range(binCount):
+                cell = row[c]
+                c_squaredSum += cell*cell
+        c_dbav = c_squaredSum / sumHist
+        
+        if c_dbav < 2.0:
+            NTwarning('Skipping low-density plot %s' )
+            return True
+        s_temp = 0
+        for r in range(binCount):
+            row = Z[r]
+            for c in range(binCount):
+                cell = row[c]
+                d = cell-c_dbav
+                s_temp += (d*d)*cell
+        s_dbav = math.sqrt( s_temp / (sumHist - 1)) # pretty useless the minus one.
+        
+        Zscore = hist - c_dbav
+        Zscore = Zscore / s_dbav
+    #    vmax = maxHist # Focus on low density regions? 
+    #    norm = colors.Normalize(vmin=0, vmax=vmax)
+        minZscore = amin(amin( Zscore ))
+        maxZscore = amax(amax( Zscore ))
+        NTdebug('Zscore c_dbav,s_dbav,minZ, maxZ: %8.3f %8.3f %8.3f %8.3f' % (c_dbav,s_dbav,minZscore, maxZscore))
+        NTdebug('Hist sumHist, max: %5.0f %5.0f' % (sumHist, maxHist))
+        levels = nx.arange(-5.0, 5.0, 0.5)    
+    #    zeroLevel = [0.0]    
+#        ps = NTplotSet() # closes any previous plots
+#        ps.hardcopySize = [1200,1200]
+    #    NTdebug( 'plotparams1: %r' % plotparams1)
+    #    NTdebug( 'xRange: %r' % `xRange`)
+    #    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
+    #    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
+#        _plot = ps.createSubplot(1,1,1)
+    #    plot = NTplot( #title  = titleStr,
+    #      xRange = xRange,
+    #      xTicks = xTicks,
+    #      xLabel = dihedralName1,
+    #      yRange = yRange,
+    #      yTicks = yTicks,
+    #      yLabel = dihedralName2)
+    #    ps.addPlot(plot)
+#        kwds = {
+#          'left': 0.0,   # the left side of the subplots of the figure
+#          'right': 1.0,    # the right side of the subplots of the figure
+#          'bottom': 0.0,   # the bottom of the subplots of the figure
+#          'top': 1.0,      # the top of the subplots of the figure
+#                }
+#        ps.subplotsAdjust(**kwds)
+    #    X, Y = meshgrid(x, y)
+        extent = self.xRange + self.yRange
+    #    NTdebug("Covering extent: " +`extent`)
+#        _im = imshow( Zscore, 
+#                interpolation='bilinear', 
+#                interpolation = 'nearest',
+#                origin='lower',
+#                extent=extent )
+    #    im.set_norm(norm)
+    
+    #    cset1 = contourf(X, Y, Z, levels,
+    #                            cmap=cm.get_cmap('jet', len(levels)-1),
+    #                            )
+    
+    #    cset1 = contourf(X, Y, Z, levels, 
+    #        cmap=cm.get_cmap('jet', len(levels)-1), 
+    #        origin='lower')
+        cset2 = contour(Zscore, levels,
+            colors = 'black',
+            hold='on',
+            extent=extent,
+            origin='lower')
+        clabel(cset2, inline=0, fmt = '%.1f',
+               fontsize=8)
+        
+    #    fmt = '%1.3f'
+    #    csetZero = contour(Zscore, zeroLevel,
+    #        colors = 'green',
+    #        hold='on',
+    #        extent=extent,
+    #        linewidths=3,
+    #        origin='lower')
+    #    for c in cset2.collections:
+    #        c.set_linestyle('solid')
+    #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
+    #            origin='lower', 
+    #            extent=extent)
+    #    colorbar(im)
+    #    colorbar(cset2)
+        # It is easier here to make a separate call to contour than
+        # to set up an array of colors and linewidths.
+        # We are making a thick green line as a zero contour.
+        # Specify the zero level as a tuple with only 0 in it.
+    #    colorbar(cset1)
+    #    ps.show()
+    
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
+
+        alpha = 0.3
+
         plotparamsXmin, plotparamsXmax = (self.xRange)
         plotparamsYmin, plotparamsYmax = (self.yRange)
 
@@ -905,8 +1068,7 @@ class NTplot( NTdict ):
         bounds2 = NTlist(lower2, upper2)
         bounds1.limit(plotparamsXmin, plotparamsXmax)
         bounds2.limit(plotparamsYmin, plotparamsYmax)
-
-        alpha = 0.3
+        
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
                 point = (bounds1[0], bounds2[0]) # lower left corner of only box.
@@ -1154,7 +1316,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         self.xRange = ( 0, 50 )
         self.xLabel = 'Sequence'
         self.resIconHeight =  1.
-        self.iconBoxYheight= 0.16      # in axis coordinates [0,1] the height of the residue type icon.
+        self.iconBoxYheight= 0.16 # in axis coordinates [0,1] the height of the residue type icon.
         # was 0.18
 
 
@@ -1313,7 +1475,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     #        yIconSpaceAxis= 0.005     # axis, the vertical open area from within box
 
             iconBoxXstart = 0              # data
-    #        iconBoxXwidth = seqLength      # data
+    #        iconBoxXwidth = seqLength     # data 
             iconBoxYstart = 1 + ySpaceAxis # axis
 
     #        self.xRange       = (0,iconBoxXwidth)   # x-axis (min,max) tuple, None is autoscale
@@ -1344,12 +1506,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     #            NTdebug(`element`)
                 elementLength = len(element)
                 res = element[0]
-                secStructList = res.getDeepByKeys(PROCHECK_STR,SECSTRUCT_STR)
-                secStruct = None
-                if secStructList:
-                    secStructList = to3StateUpper( secStructList )
-                    secStruct = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
-
+                secStruct = getProcheckSecStructConsensus( res )    
                 if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
                     secStruct = None
                 if secStruct == ' ':
@@ -1811,41 +1968,6 @@ def vertsToString( verts ):
     result = result[:-1] #Remove eol
     return result
 
-def to3StateUpper( strNTList ):
-    """Exactly the same as Procheck postscript plots was attempted.
-
-    S,B,h,e,t, , --> space character
-    E          --> E
-    H G        --> H
-
-    Note that CING and Procheck_NMR does not draw a 'h' to a H and e to E.
-
-    Procheck description: The secondary structure plot shows a schematic
-    representation of the Kabsch & Sander (1983) secondary structure assignments.
-    The key just below the picture shows which structure is which. Beta strands are
-    taken to include all residues with a Kabsch & Sander assignment of E, helices
-    corresponds to both H and G assignments, while everything else is taken to be
-    random coil.
-
-    PyMOL description: With PyMOL, heavy emphasis is placed on cartoon aesthetics,
-    and so both hydrogen bonding patterns and backbone geometry are used in the
-    assignment process. Depending upon the local context, helix and strand assignments
-    are made based on geometry, hydrogen bonding, or both. This command will generate
-    results which differ slightly from DSSP and other programs. Most deviations occur
-    in borderline or transition regions. Generally speaking, PyMOL is more strict,
-    thus assigning fewer helix/sheet residues, except for partially distorted helices,
-    which PyMOL tends to tolerate.
-
-    """
-    result = NTlist()
-    for c in strNTList:
-        if c in 'HGE':
-            if c == 'G':
-                c = 'H'
-            result.append( string.upper(c))
-        else:
-            result.append( ' ' )
-    return result
 
 def convert_yunitsResPlot(axis, yValueList):
     """Convert from value in y-axis coordinates [0,1] to
@@ -2051,4 +2173,11 @@ def removeNulls(serie):
             continue
         result.append( point )
     return result
+    
+def integerNumberOnly(x,_dummy):
+    'Returns empty string wherever not integer x'
+    remainder = math.fabs(x) % 1.0
+    if remainder > 0.001:
+        return ''
+    return '%.0f' % x
 
