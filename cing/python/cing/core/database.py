@@ -368,24 +368,24 @@ def importNameDefs( tableFile, name)   :
                # attributes get appended to obj.
     for r in AwkLike( tableFile ):
 #            print '>',r.dollar[0]
-         if (r.isComment() or r.isEmpty()):
+         if r.isComment() or r.isEmpty():
              pass                
-         elif (r.dollar[1] == 'RESIDUE'): 
+         elif r.dollar[1] == 'RESIDUE': 
              res = mol.appendResidue( name=r.dollar[2], shortName =r.dollar[3] )
              obj = res
-         elif (r.dollar[1] == 'END_RESIDUE'):
+         elif r.dollar[1] == 'END_RESIDUE':
              obj = mol
-         elif (r.dollar[1] == 'DIHEDRAL'):
+         elif r.dollar[1] == 'DIHEDRAL':
              dh = res.appendDihedral( name=r.dollar[2] )
              obj = dh
-         elif (r.dollar[1] == 'END_DIHEDRAL'):
+         elif r.dollar[1] == 'END_DIHEDRAL':
              obj = res
-         elif (r.dollar[1] == 'ATOM'):
+         elif r.dollar[1] == 'ATOM':
              atm = res.appendAtom( name=r.dollar[2] )
              obj = atm
-         elif (r.dollar[1] == 'END_ATOM'):
+         elif r.dollar[1] == 'END_ATOM':
              obj = res
-         elif (r.NF > 2):
+         elif r.NF > 2:
 #            NTmessage( '=> %s',repr(obj))
 #             # Get a mol representing constructor 
 #              cname = obj._Cname( -1 ).split(".")
@@ -425,7 +425,6 @@ NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable')
 
 # Patches for attributes
 if patches:
-    
     def isAromatic( atmDef ):
         """Return true if it is an atom belonging to an aromatic ring
            Patched for now, have to store it in database

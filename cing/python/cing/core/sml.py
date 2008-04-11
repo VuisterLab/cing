@@ -10,7 +10,7 @@ SMLendhandlers   = {}
 SMLversion       = 0.1
 
 class SMLhandler:
-    """ "
+    """
     Base class for decoding of the Simple-markup language storage.
 
 Example file:
@@ -41,8 +41,6 @@ Example file:
 </Peak>
 </PeakList>
 </SML>
-
-    
     """
     global SMLstarthandlers, SMLendhandlers
         

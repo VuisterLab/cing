@@ -86,8 +86,7 @@ def isValidAtomName( resName, atomName, convention = INTERNAL):
   res = NTdb.residueDict[convention][rn]
   if an in res.atomDict[convention]:
       return 1 
-#  return 0
-#end def
+#  NTwarning("Atom name is not valid in cing.core.dictionaries#isValidAtomName for: ["+an+"]")
     
 #print isValidAtomName( 'Y', 'HN', 'BMRB')
 #print isValidResidueName('Y',LOOSE)
