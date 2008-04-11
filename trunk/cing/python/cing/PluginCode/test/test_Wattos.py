@@ -1,6 +1,6 @@
 """
 Unit test
-python $cingPath/PluginCode/test/test_Whatif.py
+python $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
@@ -16,10 +16,10 @@ import unittest
 
 
 class AllChecks(TestCase):
-        
-    def testparse(self):        
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-        entryId = "1brv" # Small much studied PDB NMR entry; 48 models 
+
+    def testparse(self):
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+        entryId = "1brv" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
 
         self.failIf( os.chdir(cingDirTestsTmp), msg=
@@ -35,7 +35,7 @@ class AllChecks(TestCase):
 
 #        print project.save()
 #        NTdebug( project.cingPaths.format() )
-        self.assertTrue(runWattos(project))                                    
+        self.assertTrue(runWattos(project))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError
