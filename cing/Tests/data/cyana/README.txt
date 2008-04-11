@@ -13,6 +13,19 @@
                     
 1brv: 
     - small system of only 19 AA
+
+1pdb:
+    - generic pdb structure as example for something I forgot.
+    
+1tgq:
+    - SG group structure now withdrawn?
+
+1y4o:
+    - SG group structure now withdrawn?
+
+1YWUcdGMP:
+    - user prelim data
+    
     
 2hgh:
     - larger system of a protein/RNA complex

@@ -1,6 +1,6 @@
 """
 Unit test
-python $CINGROOT/python/cing/PluginCode/test/test_Whatif.py
+python $cingPath/PluginCode/test/test_Whatif.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTestsTmp
@@ -13,19 +13,21 @@ from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
 from unittest import TestCase
+from cing.core.constants import PDB
 import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
-
-    def testparse(self):
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
+        
+    def testparse(self):        
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-#        entryId = "1brv_1model"
-        entryId = "1brv"
-
+#        entryId = "1brv_1model" 
+        entryId = "1tgq_1model" 
+        convention = PDB
+        
         os.chdir(cingDirTestsTmp)
         project = Project( entryId )
         project.removeFromDisk()
@@ -34,11 +36,11 @@ class AllChecks(TestCase):
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         NTdebug("Reading files from directory: " + cyanaDirectory)
-        project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
+        project.initPDB( pdbFile=pdbFilePath, convention = convention )
 
 #        print project.cingPaths.format()
-        self.assertFalse(runWhatif(project))
-
+        self.assertFalse(runWhatif(project))    
+        
         project.save()
         for res in project.molecule.allResidues():
             NTdebug(`res`)
@@ -52,6 +54,6 @@ class AllChecks(TestCase):
                 NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityError
+    cing.verbosity = verbosityDebug
     unittest.main()

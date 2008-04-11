@@ -20,7 +20,7 @@ shifts = """
 #
 #                   Leu  Lys  Met  Phe  Pro  Ser  Thr  Trp  Tyr  Val
 #
-#
+# 
 #Last updated: 09-20-2004 
 #
 #Amino   Atom    Atom     Number     Minimum     Maximum    Average    Standard    
@@ -358,36 +358,36 @@ LYS = ['LYS', 'LYS+'],
 for line in AwkLikeS( shifts ):
     if (not line.isComment() and line.NF == 8):
         if (line.dollar[1] in resEquiv):
-	    resNames = resEquiv[line.dollar[1]]
-	else:
-	    resNames = line.dollar[1:2]
-	#end if
-	
-	for resName in resNames:
-	    res = NTdb[resName]
-	    
-	    atm = NTdbGetAtom( resName, line.dollar[2], BMRBd )
-	    if atm != None:
-		atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
-	    else:
-	        NTmessage( '>>> line %d: %s', line.NR, line.dollar[0] )
+            resNames = resEquiv[line.dollar[1]]
+    else:
+        resNames = line.dollar[1:2]
+    #end if
+    
+    for resName in resNames:
+        res = NTdb[resName]
+        
+        atm = NTdbGetAtom( resName, line.dollar[2], BMRBd )
+        if atm != None:
+            atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
+        else:
+            NTmessage( '>>> line %d: %s', line.NR, line.dollar[0] )
 
 #also get the pseudo shifts
 for res in NTdb:
     for atm in res:
         ave = 0.0
-	sd = 0.0
-	n = 0
-        for aN in atm.real:
-	    a = res[aN]
-	    if a.shift != None:
-	        ave += a.shift.average
-		sd += a.shift.sd
-		n += 1
-	    #end if
-	#end for
-	if n > 0:
-	    atm.shift = NTdict( average = ave/float(n), sd = sd/float(n) )
+    sd = 0.0
+    n = 0
+    for aN in atm.real:
+        a = res[aN]
+        if a.shift != None:
+            ave += a.shift.average
+        sd += a.shift.sd
+        n += 1
+        #end if
+    #end for
+    if n > 0:
+        atm.shift = NTdict( average = ave/float(n), sd = sd/float(n) )
 
 stream = open('bla.text', 'w')
 NTdb.exportDef(stream=stream)

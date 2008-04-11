@@ -19,6 +19,7 @@ from cing.Libs.PyMMLib import REMARK
 from cing.Libs.PyMMLib import TER
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import NTdbGetAtom
+from cing.core.molecule import Chain
 import sys
 
 version = "%prog 1.1 alpha"
@@ -115,8 +116,7 @@ for fName in files:
     atomCount = 0
     lastRecord = None
     for record in pdbfile:
-        if record._name.strip() in ["ATOM","HETATM"]:
-        
+        if record._name.strip() in ["ATOM","HETATM"]:        
             # see if we can find a definition for this residue, atom name in the database
             atm = NTdbGetAtom( record.resName, record.name, XPLOR )
             
@@ -129,18 +129,13 @@ for fName in files:
                     record.resName = atm.residueDef.translate( convention )        
                     record.name    = atm.translate( convention )
                     if not 'chainID' in record:
-                        record.chainID = 'A'
-                    #end if
+                        record.chainID = Chain.defaultChainId
                     fprintf( pdbFile, "%s\n", record )
                     lastRecord = record
                 else:       
                     NTerror('WARNING: cannot translate record to %s (%s)\n', convention, record )
-                #end if
             else:
                 NTerror('WARNING: %s incompatible record (%s)\n', convention, record )
-            #end if
-        pass
-    pass
     
     if options.terRecord != None:
         # generate a TER record
@@ -153,11 +148,8 @@ for fName in files:
         fprintf( pdbFile, "%s\n", ter )
     #end if
     fprintf( pdbFile, 'ENDMDL\n' )
-pass
 fprintf( pdbFile, "END\n" )
-
 pdbFile.close()
-
 NTmessage("==> Converted %d xplor files to %s (%s format)", xplorCount, options.outFile, convention )
 
 

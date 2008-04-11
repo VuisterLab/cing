@@ -3,7 +3,8 @@ Version 0.74: 25 Mar 2008:
     - Added water to topology.
     - Added user settings in a standard localConstants.py 
     - Improved processing of X-ray structures as done by getPhiPsi.py script
-
+    - Added trivial parallelization of running over multiple molecules.
+     
 Version 0.73:  3 Mar 2008: 
     - Started to look into incorporating Queen. Need Swig update.
     - Created test code for drawing residue plots with secondary structure
