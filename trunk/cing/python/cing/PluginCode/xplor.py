@@ -158,7 +158,8 @@ def exportMolecule2xplor( molecule, path)   :
     """
     for model in range(molecule.modelCount):
         pdbFile = molecule.toPDB( model=model, convention = XPLOR)   
-        if not pdbFile: return None
+        if not pdbFile: 
+            return None
         pdbFile.save( sprintf( path, model )   )  
         del(pdbFile) 
     #end for

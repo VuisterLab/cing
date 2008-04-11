@@ -28,10 +28,11 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.core.constants import IUPAC
+from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 import cing
 import os
+import string
 
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
@@ -235,7 +236,9 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
 #            project.molecule.modelCount
-            self.molecule.toPDBfile(path, convention=IUPAC)   
+            self.molecule.toPDBfile(path, convention=AQUA)
+            # Can't use IUPAC here because aqua doesn't understand difference between
+            # G and DG.(oxy/deoxy).
             
         canAqpc = True
         # Save restraints for Aqua
@@ -409,6 +412,53 @@ def procheck(project, ranges=None, createPlots=True, runAqua=True)   :
     
     return project.molecule.procheck
 #end def
+
+def getProcheckSecStructConsensus( res ):
+    """ Returns None for error, or one of [' ', 'H', E' ]
+    """
+    secStructList = res.getDeepByKeys(PROCHECK_STR,SECSTRUCT_STR)
+    result = None
+    if secStructList:
+        secStructList = to3StateUpper( secStructList )
+        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+#    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
+    return result
+
+def to3StateUpper( strNTList ):
+    """Exactly the same as Procheck postscript plots was attempted.
+
+    S,B,h,e,t, ,None--> space character
+    E               --> E
+    H G             --> H
+
+    Note that CING and Procheck_NMR does not draw a 'h' to a H and e to E.
+
+    Procheck description: The secondary structure plot shows a schematic 
+    representation of the Kabsch & Sander (1983) secondary structure assignments. 
+    The key just below the picture shows which structure is which. Beta strands are 
+    taken to include all residues with a Kabsch & Sander assignment of E, helices 
+    corresponds to both H and G assignments, while everything else is taken to be 
+    random coil.
+    
+    PyMOL description: With PyMOL, heavy emphasis is placed on cartoon aesthetics, 
+    and so both hydrogen bonding patterns and backbone geometry are used in the 
+    assignment process. Depending upon the local context, helix and strand assignments 
+    are made based on geometry, hydrogen bonding, or both. This command will generate 
+    results which differ slightly from DSSP and other programs. Most deviations occur 
+    in borderline or transition regions. Generally speaking, PyMOL is more strict, 
+    thus assigning fewer helix/sheet residues, except for partially distorted helices, 
+    which PyMOL tends to tolerate. 
+
+    """
+    result = NTlist()
+    for c in strNTList:
+        if c in 'HGE':
+            if c == 'G':
+                c = 'H'
+            result.append( string.upper(c))
+        else:
+            result.append( ' ' )
+    return result
 
 # register the functions
 methods  = [(procheck, None)

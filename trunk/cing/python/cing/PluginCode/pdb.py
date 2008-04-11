@@ -37,6 +37,8 @@ from cing.core.constants import IUPAC
 from cing.core.dictionaries import NTdbGetAtom
 from cing.core.molecule import Molecule
 from cing.Libs.NTutils import NTwarning
+from cing.core.molecule import Chain
+from cing.core.molecule import ensureValidChainId
 #import string
 
 #==============================================================================
@@ -88,12 +90,13 @@ return molecule or None on error
             # is no longer a unique key within the chain. E.g. HOH in 1n62
             # has a space character for the chain id and similar residue 
             # numbering as the protein sequence in chain A. 
+            chainId = Chain.defaultChainId
             if record.has_key('chainID'):
-                cname = record.chainID.strip()
-            else:
-                cname = ' ' #JFD mod from 'A'
+                chainId = record.chainID.strip()
+                chainId = ensureValidChainId(chainId)
+                
             resID = record.resSeq
-            atom  = molecule.decodeNameTuple( (convention, cname, resID, atmName) )
+            atom  = molecule.decodeNameTuple( (convention, chainId, resID, atmName) )
 
             if not atom:
                 NTerror('WARNING in cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)\n', 
@@ -164,8 +167,8 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             atm = NTdbGetAtom( record.resName, a, convention )
             if not atm:
                 if shownWarnings <= showMaxNumberOfWarnings:
-                    NTwarning('in cing.PluginCode.pdb#PDB2Molecule: %s, model %d incompatible record (%s)' % (
-                             convention, mol.modelCount, record))
+                    NTwarning('in #PDB2Molecule: %s, model %d incompatible record (%s)' % (
+                             convention, mol.modelCount+1, record))
                     if shownWarnings == showMaxNumberOfWarnings:
                         NTwarning('And so on.')
                     shownWarnings += 1
@@ -177,11 +180,10 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             # we did find a match in the database
             # Not all PDB files have chainID's !@%^&*
             # They do; if none returned then take the space that is always present!
-            cname = ' '
+            chainId = Chain.defaultChainId
             if record.has_key('chainID'):
-                cname = record.chainID.strip()
-#            else:
-#                NTwarning( 'No chain id for record: %s' % record)
+                chainId = record.chainID.strip()
+                chainId = ensureValidChainId(chainId)
                 
             resID    = record.resSeq
             resName  = atm.residueDef.name
@@ -190,16 +192,16 @@ convention eq PDB, CYANA, CYANA2 or XPLOR, BMRB
             
             # check if this chain,fullName,atmName already exists in the molecule
             # if not, add chain or residue                 
-            if not cname in mol:
-                mol.addChain( cname )
+            if not chainId in mol:
+                mol.addChain( chainId )
             #end if
             
-            if not fullName in mol[cname]:
-                res = mol[cname].addResidue( resName, resID )
+            if not fullName in mol[chainId]:
+                res = mol[chainId].addResidue( resName, resID )
                 res.addAllAtoms()
             #end if
             
-            atom = mol[cname][fullName][atmName]
+            atom = mol[chainId][fullName][atmName]
             
             # Check if the coordinate already exists for this model
             # This might happen when alternate locations are being
@@ -237,7 +239,7 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     """
     pdbFile = molecule.toPDB( model=model, convention = convention)
     pdbFile.save( path)   
-#    del(pdbFile)
+    del(pdbFile)
 #end def
 Molecule.toPDBfile = moleculeToPDBfile
 
@@ -287,7 +289,7 @@ def export2PDB( project, tmp=None ):
             fname = project.path( project.directories.PDB, mol.name + '.pdb' )
             pdbFile = mol.toPDB( convention = IUPAC)   
             pdbFile.save( fname)      
-            del(pdbFile)
+            del( pdbFile )
         #end if
     #end for
 #end def

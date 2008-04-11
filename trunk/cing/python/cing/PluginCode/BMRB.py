@@ -8,6 +8,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.core.constants import BMRBd
 from cing.core.molecule import Molecule
+from cing.core.molecule import Chain
 
 class NMRrestraintsGrid:
     def __init__(self):
@@ -32,8 +33,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
 #        shift   = f.float(6)
 #        serror  = f.float(7)
 #        ambig   = f.int(8)
-
-        res = mol._addResidue( 'A', resName, resNum, BMRBd )
+        res = mol._addResidue( Chain.defaultChainId, resName, resNum, BMRBd )
 
         if (not res):
             NTerror( 'Error initBMRB: invalid residue %s %s line %d (%s)\n',
@@ -83,12 +83,11 @@ def importBMRB( project, bmrbFile =None ):
         serror  = f.float(7)
         _ambig   = f.int(8)
 
-        atm = mol.decodeNameTuple( (BMRBd, 'A', resNum, atomName) )
+        atm = mol.decodeNameTuple( (BMRBd, Chain.defaultChainId, resNum, atomName) )
 
-        if (not atm):
+        if not atm:
             NTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)\n',
-                    resName, atomName, f.NR, f.dollar[0]
-                    )
+                    resName, atomName, f.NR, f.dollar[0] )
             error = True
         else:
             atm.resonances().value = shift

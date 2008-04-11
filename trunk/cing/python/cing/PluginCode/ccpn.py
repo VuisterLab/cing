@@ -1,5 +1,5 @@
-from ccp.general.Util import createMoleculeTorsionDict
-from ccp.util.Molecule import makeMolecule
+from ccp.general.Util import createMoleculeTorsionDict #@UnresolvedImport
+from ccp.util.Molecule import makeMolecule #@UnresolvedImport
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -10,7 +10,7 @@ from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule
 from cing.main import format
-from memops.general import Io as genIo
+from memops.general import Io as genIo #@UnresolvedImport
 import os
 import string
 
@@ -187,7 +187,7 @@ try:
     ccpnVersion = 1
 except:
     try:
-        from memops.general.Io import loadProject
+        from memops.general.Io import loadProject #@UnresolvedImport
         NTmessage("Using CCPN version 2.x\n")
         ccpnVersion = 2
     except:
