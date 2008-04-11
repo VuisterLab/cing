@@ -5,13 +5,13 @@ Adds methods:
 
 Unit testing is done thru procheck.
 """
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.core.constants import IUPAC
+from cing.core.constants import AQUA
 from cing.core.molecule import Atom
-from cing.Libs.NTutils import NTdebug
 import string
 import time
 #-----------------------------------------------------------------------------
@@ -27,9 +27,9 @@ def exportAtom2aqua( atom ):
     chain = residue.chain
     return 'CHAIN %-3s %-4s %4d %-5s' % (
                       chain.name,
-                      residue.resName,
+                      residue.translate(AQUA),
                       residue.resNum,
-                      atom.translate(IUPAC))
+                      atom.translate(AQUA))
 #end def
 # add as a method to Atom Class
 Atom.export2aqua = exportAtom2aqua

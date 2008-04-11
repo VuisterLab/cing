@@ -32,6 +32,7 @@ from cing.core.dictionaries import isValidAtomName
 from cing.core.dictionaries import isValidResidueName
 from cing.core.dictionaries import translateAtomName
 from cing.core.molecule import allResidues
+from cing.Libs.NTutils import NTdebug
 import os
 
 #==============================================================================
@@ -122,7 +123,8 @@ class Xeasy( NTdict ):
         """map entries of the prot-dict onto an atom of molecule
         """
         chain = molecule.chains[0]
-        maxToReport = 20 # no need to fill screen.
+        NTdebug( 'now in XEASY#map2molecule for chain: [%s]' % ( chain.name ) )
+        maxToReport = 200 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
             if not p.resNum in chain:
@@ -142,7 +144,7 @@ class Xeasy( NTdict ):
                          p.atomName, res))                    
             errCount += 1
         if errCount > maxToReport:
-            NTerror('Xeasy.map2molecule: and so')
+            NTerror('Xeasy.map2molecule: and so on...')
         if errCount:
             NTerror('Total number of errors: %d', errCount)
             

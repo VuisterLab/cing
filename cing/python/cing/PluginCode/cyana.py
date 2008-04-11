@@ -114,6 +114,8 @@ def importAco( project, acoFile, convention ):
         return None
     #end if
     molecule = project.molecule
+    # Sometimes set from other than CYANA coordinate file.
+    chainId = molecule.chains[0].name
   
     if not os.path.exists( acoFile ):
         NTerror('importAco: file "%s" not found\n', acoFile)
@@ -126,7 +128,7 @@ def importAco( project, acoFile, convention ):
     NTdebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
         resNum = line.int(1)
-        res    = molecule.decodeNameTuple( (convention, 'A', resNum, None ) )
+        res    = molecule.decodeNameTuple( (convention, chainId, resNum, None ) )
         angle  = line.dollar[3]
         lower  = line.float(4)
         upper  = line.float(5)
@@ -172,7 +174,9 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         return None
     #end if
     molecule = project.molecule
-  
+    # Sometimes set from other than CYANA coordinate file.
+    chainId = molecule.chains[0].name
+    
     if not os.path.exists( uplFile ):
         NTerror('importUpl: file "%s" not found', uplFile)
         return None
@@ -194,7 +198,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         i=0
         for atmIdx in atmIdxList:
 #            NTdebug("Doing atmIdx: " + `atmIdx`)
-            atm = molecule.decodeNameTuple( (convention, 'A', line.int(atmIdx[0]), line.dollar[atmIdx[1]]))
+            atm = molecule.decodeNameTuple( (convention, chainId, line.int(atmIdx[0]), line.dollar[atmIdx[1]]))
             if not atm:
                 if errorCount <= maxErrorCount:
                     NTerror("Failed to decode for atom: ["+`i+1`+"] the tuple (residue number and atom name) ["+ 

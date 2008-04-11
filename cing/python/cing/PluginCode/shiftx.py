@@ -16,7 +16,7 @@ from cing.Libs.NTutils import NTwarning
 import cing
 import os
 
-def parseShiftxOutput( fileName, molecule ):
+def parseShiftxOutput( fileName, molecule, chainId ):
     """
     Parse shiftx generated output (gv_version!).
     Store result in shiftx attribute (which is a NTlist type) of each atom
@@ -29,21 +29,22 @@ format file:
   501   H  CA      55.4902
   501   H  CB      29.9950
   501   H  C      169.8446
-  501   H  H        8.4401
+  501   H  H        8.4401 
+  or in 1y4o:
+  1     G  N      109.7404
+  1     G  CA      45.2787
+ 
 
     """
+
     for line in AwkLike( fileName, commentString = '#', minNF = 4 ):
         if (line.float(4) != -666.000):
             lineCol1 = int(line.dollar[1].strip('*'))
-            atm = molecule.decodeNameTuple( (IUPAC, 'A', lineCol1, line.dollar[3]) )
+            atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, line.dollar[3]) )
             if not atm:
-                NTerror('parseShiftxOutput: line %d (%s)\n', line.NR, line.dollar[0] )
+                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)\n', chainId, line.NR, line.dollar[0] )
             else:
                 atm.shiftx.append( line.float(4) )
-            #end if
-        #end if                                   
-    #end for
-#end def
 
 def predictWithShiftx( project, model=None   ):
     """
@@ -79,9 +80,6 @@ def predictWithShiftx( project, model=None   ):
             for atm in res.allAtoms():
                 atm.pdbSkipRecord = True
                 skippedAtoms.append( atm )
-            #end for
-        #end if
-    #end for
     if skippedResidues:
         NTwarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
         
@@ -89,7 +87,6 @@ def predictWithShiftx( project, model=None   ):
         models = NTlist( model )
     else:
         models = NTlist(*range( 1,project.molecule.modelCount+1 ))
-    #end if
     
     # initialize the shiftx attributes
     for atm in project.molecule.allAtoms():
@@ -99,7 +96,7 @@ def predictWithShiftx( project, model=None   ):
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)   
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
                              rootPath = root, redirectOutput = False)   
-    NTmessage('==> Running shiftx' )
+#    NTmessage('==> Running shiftx' )
            
     for model in models:
         # set filenames
@@ -111,22 +108,24 @@ def predictWithShiftx( project, model=None   ):
             NTerror("Failed to generate a pdb file for model: " + `model`)
             return None 
         
-        pdbFile.save( model_base_name + '.pdb'   )   
-        shiftx('A', rootname + '.pdb', rootname + '.out' )
-        
-        NTmessage('==> Parsing %s', model_base_name + '.out' )
-        parseShiftxOutput( model_base_name + '.out', project.molecule )
+        pdbFile.save( model_base_name + '.pdb'   )
+        for chain in project.molecule.allChains():
+#            NTmessage('Doing chain code [%s]' % (chain.name))                    
+            # quotes needed because by default the chain id is a space now.
+            chainId =  "'" + chain.name + "'"
+            outputFile = rootname + '_' + chain.name + '.out' 
+            shiftx(chainId, rootname + '.pdb', outputFile )
+            outputFile = os.path.join(root,outputFile)
+#            outputFile = os.path.abspath(outputFile)
+            NTmessage('==> Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+            parseShiftxOutput( outputFile, project.molecule, chain.name )
         del( pdbFile )
-    #end for
     
     NTmessage(' averaging ...')
-           
-    #end if
-    
+               
     # Restore the 'default' state
     for atm in skippedAtoms:
         atm.pdbSkipRecord = False
-    #end for
     
     # Average the methyl proton shifts and b-methylene, before calculating average per atom 
     for atm in project.molecule.allAtoms():

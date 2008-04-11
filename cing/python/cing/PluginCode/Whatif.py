@@ -112,7 +112,7 @@ class Whatif( NTdict ):
                 ('WGTCHK', 'Atomic occupancy check'),
                 ('Hand',   '(Pro-)chirality or handness check')
                ]
-    debugCheck ='BNDCHK'
+    debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
     nameDict = NTdict()
     for n1,n2 in nameDefs:
@@ -568,11 +568,16 @@ def runWhatif( project, tmp=None ):
             NTerror("Failed to parse check db")
             return True
             
-
     if whatif._processCheckdb():
         NTerror("Failed to process check db")
         return True
 #end def
 
+def criticizeByWhatif( project ):
+    NTmessage('What If passes opportunity to critique. A first.')
+
 # register the function
-methods  = [(runWhatif, None)            ]
+methods  = [
+            (runWhatif, None),
+            (criticizeByWhatif, None),
+                        ]
