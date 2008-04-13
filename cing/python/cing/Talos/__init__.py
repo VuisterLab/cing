@@ -1,26 +1,26 @@
 # File to allow this directory to be treated as a python package.
 # import sys
-# 
+#
 # header = """
 # ====================================
-#  Talos: python talos package 
-#  (c) GWV 2006             
+#  Talos: python talos package
+#  (c) GWV 2006
 # ====================================
-# 
+#
 # """
 from cing.Talos.nmrPipeTable import nmrPipeTable
 import  os
 
 talosPath = os.path.split( __file__)[0]
 
-talosDb          = nmrPipeTable( talosPath + '/talos.tab' ) 
+talosDb          = nmrPipeTable( talosPath + '/talos.tab' )
 talosDb.atoms    = ['N', 'CA', 'HA', 'C', 'CB']
 talosDb.residues = ['R1', 'R2', 'R3']
-    
+
 talosDb.shiftNames = []
 for a in talosDb.atoms:
     for r in talosDb.residues:
-         talosDb.shiftNames.append( a + '_' + r )
+        talosDb.shiftNames.append( a + '_' + r )
     #end for
 #end for
 

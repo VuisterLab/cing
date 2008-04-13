@@ -24,7 +24,7 @@ and written back out as PDB files.
 try:
     from mmTypes import *
 except ImportError:
-    OpenFile = open    
+    OpenFile = open
 
 
 class PDBError(Exception):
@@ -54,7 +54,7 @@ class PDBRecord( NTdict ):
         dictionary values.
         """
         ln = self._name
-        
+
         for (field, start, end, ftype, just, get_func) in self._field_list:
 #            NTdebug( "field, start, end, ftype, just, get_func: %s %s %s %s %s %s", field, start, end, ftype, just, get_func)
             try:
@@ -62,13 +62,13 @@ class PDBRecord( NTdict ):
             except AssertionError:
                 print "[ASSERT] "+ln
                 raise
-            
+
             ## add spaces to the end if necessary
             ln = ln.ljust(start - 1)
 
             ## used later
             field_char_len = end - start + 1
-            
+
             ## access the namespace of this class to write the field
             ## if a class has a special function defined for retrieveing
             ## this record, it should use it
@@ -128,7 +128,7 @@ class PDBRecord( NTdict ):
                 continue
 
             elif ftype.startswith("string"):
-                
+
                 if just.endswith("lstrip"):
                     s = s.lstrip()
                 elif just.endswith("rstrip"):
@@ -188,7 +188,7 @@ class PDBRecord( NTdict ):
             key = x[:i].strip()
             val = x[i+1:].strip()
             listx.append((key, val))
-        return listx  
+        return listx
 
     def reccat_dictlist(self, rec_list, field, master_key):
         listx = []
@@ -216,7 +216,7 @@ class PDBRecord( NTdict ):
         """
         if type(rec_list) != ListType:
             rec_list = [rec_list]
-        
+
         listx = []
         for rec in rec_list:
 
@@ -253,7 +253,7 @@ class PDBRecord( NTdict ):
                 ## added to a list under the dest key in dictx
                 if type(trans) == TupleType:
                     (dest, srcs) = trans
-                    
+
                     for sx in srcs:
                         if dictx.has_key(dest):
                             try:
@@ -274,7 +274,7 @@ class PDBRecord( NTdict ):
                     except KeyError:
                         pass
 
-        return listx    
+        return listx
 
 
 ###############################################################################
@@ -288,7 +288,7 @@ class HEADER(PDBRecord):
     and REMARK records.
     """
     __slots__ = []
-    
+
     _name = "HEADER"
     _field_list = [
         ("classification", 11, 50, "string", "rjust", None),
@@ -303,7 +303,7 @@ class OBSLTE(PDBRecord):
     entries replacing one existing entry.
     """
     __slots__ = []
-    
+
     _name = "OBSLTE"
     _multi_record = "continuation"
     _field_list = [
@@ -328,14 +328,14 @@ class OBSLTE(PDBRecord):
             ["repDate",
              ("rIdCodes", ["rIdCode1", "rIdCode2", "rIdCode3", "rIdCode4",
                            "rIdCode5", "rIdCode6", "rIdCode7", "rIdCode8"])])
-    
+
 class TITLE(PDBRecord):
     """The TITLE record contains a title for the experiment or analysis that is
     represented in the entry. It should identify an entry in the PDB in the
     same way that a title identifies a paper.
     """
     __slots__ = []
-    
+
     _name = "TITLE "
     _multi_record = "continuation"
     _field_list = [
@@ -350,7 +350,7 @@ class CAVEAT(PDBRecord):
     entry containing this record.
     """
     __slots__ = []
-    
+
     _name = "CAVEAT"
     _multi_record = "continuation"
     _field_list = [
@@ -397,9 +397,9 @@ class COMPND(PDBRecord):
     names.  For each macromolecular component, the molecule name, synonyms,
     number assigned by the Enzyme Commission (EC), and other relevant details
     are specified.
-    """ 
+    """
     __slots__ = []
-    
+
     _name = "COMPND"
     _multi_record = "continuation"
     _field_list = [
@@ -417,7 +417,7 @@ class SOURCE(PDBRecord):
     identify the biological entity studied.
     """
     __slots__ = []
-    
+
     _name = "SOURCE"
     _multi_record = "continuation"
     _field_list = [
@@ -436,7 +436,7 @@ class KEYWDS(PDBRecord):
     concise and computer-searchable fashion.
     """
     __slots__ = []
-    
+
     _name = "KEYWDS"
     _multi_record = "continuation"
     _field_list = [
@@ -450,7 +450,7 @@ class EXPDTA(PDBRecord):
     """The EXPDTA record presents information about the experiment.  The EXPDTA
     record identifies the experimental technique used. This may refer to the
     type of radiation and sample, or include the spectroscopic or modeling
-    technique. Permitted values include: 
+    technique. Permitted values include:
     ELECTRON DIFFRACTION
     FIBER DIFFRACTION
     FLUORESCENCE TRANSFER
@@ -458,9 +458,9 @@ class EXPDTA(PDBRecord):
     NMR
     THEORETICAL MODEL
     X-RAY DIFFRACTION
-    """ 
+    """
     __slots__ = []
-    
+
     _name = "EXPDTA"
     _multi_record = "continuation"
     _field_list = [
@@ -501,7 +501,7 @@ class AUTHOR(PDBRecord):
     contents of the entry.
     """
     __slots__ = []
-    
+
     _name = "AUTHOR"
     _multi_record = "continuation"
     _field_list = [
@@ -516,7 +516,7 @@ class REVDAT(PDBRecord):
     since its release.
     """
     __slots__ = []
-    
+
     _name = "REVDAT"
     _multi_record = "continuation"
     _field_list = [
@@ -545,7 +545,7 @@ class SPRSDE(PDBRecord):
     principal investigator of a structure has the authority to withdraw it.
     """
     __slots__ = []
-    
+
     _name = "SPRSDE"
     _multi_record = "continuation"
     _field_list = [
@@ -575,7 +575,7 @@ class JRNL(PDBRecord):
     there is no JRNL reference. Other references are given in REMARK 1.
     """
     __slots__ = []
-    
+
     _name = "JRNL  "
     _field_list = [
         ("text", 13, 70, "string", "ljust", None)]
@@ -587,18 +587,18 @@ class REMARK(PDBRecord):
     structure is being used for some REMARK records. This is expected to
     facilitate searching and will assist in the conversion to a relational
     database.
-    
+
     gv: 3 Feb 2006: Omitted the remarkNum field, and moved all to text field
     """
     __slots__ = []
-    
+
     _name = "REMARK"
 #     _field_list = [
 #         ("remarkNum", 8, 10, "integer", "rjust", None),
 #         ("text", 12, 70, "string", "ljust", None)]
     _field_list = [
         ("text", 8, 70, "string", "ljust", None)]
-        
+
 ## SECTION 3: Primary Structure Section
 class DBREF(PDBRecord):
     """ The DBREF record provides cross-reference links between PDB sequences
@@ -609,7 +609,7 @@ class DBREF(PDBRecord):
     the corresponding entry exists in NDB.
     """
     __slots__ = []
-    
+
     _name = "DBREF "
     _field_list = [
         ("idCode", 8, 11, "string", "rjust", None),
@@ -636,7 +636,7 @@ class SEQADV(PDBRecord):
     correct sequence.
     """
     __slots__ = []
-    
+
     _name = "SEQADV"
     _field_list = [
         ("idCode", 8, 11, "string", "rjust", None),
@@ -649,13 +649,13 @@ class SEQADV(PDBRecord):
         ("dbRes", 40, 42, "string", "rjust", None),
         ("dbSeq", 44, 48, "integer", "rjust", None),
         ("convlict", 50, 70, "string", "ljust", None)]
-    
+
 class SEQRES(PDBRecord):
     """The SEQRES records contain the amino acid or nucleic acid sequence of
     residues in each chain of the macromolecule that was studied.
     """
     __slots__ = []
-    
+
     _name = "SEQRES"
     _multi_record = "serNum"
     _field_list = [
@@ -708,7 +708,7 @@ class MODRES(PDBRecord):
     standard residues.
     """
     __slots__ = []
-    
+
     _name = "MODRES"
     _field_list = [
         ("idCode", 8, 11, "string", "rjust", None),
@@ -723,18 +723,18 @@ class MODRES(PDBRecord):
 class HET(PDBRecord):
     """The HET records are used to describe non-standard residues, such as
     prosthetic groups, inhibitors, solvent molecules, and ions for
-    which coordinates are supplied. Groups are considered HET if they are: 
-    - not one of the standard amino acids, and 
-    - not one of the nucleic acids (C, G, A, T, U, and I), and 
+    which coordinates are supplied. Groups are considered HET if they are:
+    - not one of the standard amino acids, and
+    - not one of the nucleic acids (C, G, A, T, U, and I), and
     - not one of the modified versions of nucleic acids (+C, +G, +A,
-      +T, +U, and +I), and 
+      +T, +U, and +I), and
     - not an unknown amino acid or nucleic acid where UNK is used to
-      indicate the unknown residue name. 
+      indicate the unknown residue name.
     Het records also describe heterogens for which the chemical identity
     is unknown, in which case the group is assigned the hetID UNK.
     """
     __slots__ = []
-    
+
     _name = "HET   "
     _field_list = [
         ("hetID", 8, 10, "string", "rjust", None),
@@ -743,27 +743,27 @@ class HET(PDBRecord):
         ("iCode", 18, 18, "string", "rjust", None),
         ("numHetAtoms", 21, 25, "integer", "rjust", None),
         ("text", 31, 70, "string", "ljust", None)]
-    
+
 class HETNAM(PDBRecord):
     """This record gives the chemical name of the compound with the
     given hetID.
     """
     __slots__ = []
-    
+
     _name = "HETNAM"
     _multi_record = "continuation"
     _field_list = [
         ("continuation", 9, 10, "integer", "ljust", None),
         ("hetID", 12, 14, "string", "rjust", None),
         ("text", 16, 70, "string", "ljust", None)]
-    
+
 class HETSYN(PDBRecord):
     """This record provides synonyms, if any, for the compound in the
     corresponding (i.e., same hetID) HETNAM record. This is to allow
     greater flexibility in searching for HET groups.
     """
     __slots__ = []
-    
+
     _name = "HETSYN"
     _multi_record = "continuation"
     _field_list = [
@@ -777,7 +777,7 @@ class FORMUL(PDBRecord):
     in Appendix 5.)
     """
     __slots__ = []
-    
+
     _name = "FORMUL"
     _multi_record = "continuation"
     _field_list = [
@@ -794,7 +794,7 @@ class HELIX(PDBRecord):
     helix begins and ends are noted, as well as the total length.
     """
     __slots__ = []
-    
+
     _name = "HELIX "
     _field_list = [
         ("serNum", 8, 10, "integer", "rjust", None),
@@ -817,7 +817,7 @@ class SHEET(PDBRecord):
     sheet begins and ends are noted.
     """
     __slots__ = []
-    
+
     _name = "SHEET "
     _field_list = [
         ("strand", 8, 10, "integer", "rjust", None),
@@ -848,7 +848,7 @@ class TURN(PDBRecord):
     normally connect other secondary structure segments.
     """
     __slots__ = []
-    
+
     _name = "TURN  "
     _field_list = [
         ("seq", 8, 10, "integer", "rjust", None),
@@ -870,7 +870,7 @@ class SSBOND(PDBRecord):
     bond.
     """
     __slots__ = []
-    
+
     _name = "SSBOND"
     _field_list = [
         ("serNum", 8, 10, "integer", "rjust", None),
@@ -892,7 +892,7 @@ class LINK(PDBRecord):
     records and is provided here for convenience in searching.
     """
     __slots__ = []
-    
+
     _name = "LINK  "
     _field_list = [
         ("name1", 13, 16, "string", "rjust", None),
@@ -914,7 +914,7 @@ class HYDBND(PDBRecord):
     """The HYDBND records specify hydrogen bonds in the entry.
     """
     __slots__ = []
-    
+
     _name = "HYDBND"
     _field_list = [
         ("name1", 13, 16, "string", "rjust", None),
@@ -941,7 +941,7 @@ class SLTBRG(PDBRecord):
     """The SLTBRG records specify salt bridges in the entry.
     """
     __slots__ = []
-    
+
     _name = "SLTBRG"
     _field_list = [
         ("name1", 13, 16, "string", "rjust", None),
@@ -965,7 +965,7 @@ class CISPEP(PDBRecord):
     to list cis peptides.
     """
     __slots__ = []
-    
+
     _name = "CISPEP"
     _field_list = [
         ("serial", 8, 10, "integer", "rjust", None),
@@ -979,14 +979,14 @@ class CISPEP(PDBRecord):
         ("iCode2", 36, 36, "string", "rjust", None),
         ("modNum", 44, 46, "integer", "rjust", None),
         ("measure", 54, 59, "float.2", "rjust", None)]
-    
+
 ## SECTION 7: Miscellanious Features Section
 class SITE(PDBRecord):
     """The SITE records supply the identification of groups comprising
     important sites in the macromolecule.
     """
     __slots__ = []
-    
+
     _name = "SITE  "
     _field_list = [
         ("seqNum", 8, 10, "integer", "rjust", None),
@@ -1016,7 +1016,7 @@ class CRYSTn(PDBRecord):
     means, CRYSTn simply defines a unit cube.
     """
     __slots__ = []
-    
+
     _field_list = [
         ("a", 7, 15, "float.3", "rjust", None),
         ("b", 16, 24, "float.3", "rjust", None),
@@ -1029,17 +1029,17 @@ class CRYSTn(PDBRecord):
 
 class CRYST1(CRYSTn):
     __slots__ = []
-    
+
     _name = "CRYST1"
-    
+
 class CRYST2(CRYSTn):
     __slots__ = []
-    
+
     _name = "CRYST2"
 
 class CRYST3(CRYSTn):
     __slots__ = []
-    
+
     _name = "CRYST3"
 
 class ORIGXn(PDBRecord):
@@ -1048,7 +1048,7 @@ class ORIGXn(PDBRecord):
     coordinates.
     """
     __slots__ = []
-    
+
     _field_list = [
         ("o[n][1]", 11, 20, "float.6", "rjust", None),
         ("o[n][2]", 21, 30, "float.6", "rjust", None),
@@ -1057,19 +1057,19 @@ class ORIGXn(PDBRecord):
 
 class ORIGX1(ORIGXn):
     __slots__ = []
-    
+
     _name = "ORIGX1"
 
 class ORIGX2(ORIGXn):
     __slots__ = []
-    
+
     _name = "ORIGX2"
 
 class ORIGX3(ORIGXn):
     __slots__ = []
-    
+
     _name = "ORIGX3"
-    
+
 class SCALEn(PDBRecord):
     """The SCALEn (n = 1, 2, or 3) records present the transformation from
     the orthogonal coordinates as contained in the entry to fractional
@@ -1077,26 +1077,26 @@ class SCALEn(PDBRecord):
     be explained in the remarks.
     """
     __slots__ = []
-    
+
     _field_list = [
         ("s[n][1]", 11, 20, "float.6", "rjust", None),
         ("s[n][2]", 21, 30, "float.6", "rjust", None),
         ("s[n][3]", 31, 40, "float.6", "rjust", None),
         ("u[n]", 46, 55, "float.5", "rjust", None)]
-    
+
 class SCALE1(SCALEn):
     __slots__ = []
-    
+
     _name = "SCALE1"
-        
+
 class SCALE2(SCALEn):
     __slots__ = []
-    
+
     _name = "SCALE2"
 
 class SCALE3(SCALEn):
     __slots__ = []
-    
+
     _name = "SCALE3"
 
 class MTRIXn(PDBRecord):
@@ -1104,7 +1104,7 @@ class MTRIXn(PDBRecord):
     non-crystallographic symmetry.
     """
     __slots__ = []
-    
+
     _field_list = [
         ("serial", 8, 10, "integer", "rjust", None),
         ("s[n][1]", 11, 20, "float.6", "rjust", None),
@@ -1112,20 +1112,20 @@ class MTRIXn(PDBRecord):
         ("s[n][3]", 31, 40, "float.6", "rjust", None),
         ("v[n]", 46, 55, "float.5", "rjust", None),
         ("iGiven", 60, 60, "integer", "rjust", None)]
-    
+
 class MTRIX1(MTRIXn):
     __slots__ = []
-    
+
     _name = "MTRIX1"
 
 class MTRIX2(MTRIXn):
     __slots__ = []
-    
+
     _name = "MTRIX2"
 
 class MTRIX3(MTRIXn):
     __slots__ = []
-    
+
     _name = "MTRIX3"
 
 class TVECT(PDBRecord):
@@ -1133,7 +1133,7 @@ class TVECT(PDBRecord):
     covalently connected structures.
     """
     __slots__ = []
-    
+
     _name = "TVECT "
     _field_list = [
         ("serial", 8, 10, "integer", "rjust", None),
@@ -1159,7 +1159,7 @@ def ATOM_get_name(rec):
         if    l == 0:            name = "".ljust(4)
         elif  name[0].isdigit(): name = name.ljust(4)[:4]
         elif  l <  4:            name = " " + name.ljust(3)[:3]
-        
+
     return name
 
 class MODEL(PDBRecord):
@@ -1168,7 +1168,7 @@ class MODEL(PDBRecord):
     the case with structures determined by NMR.
     """
     __slots__ = []
-    
+
     _name = "MODEL "
     _field_list = [
         ("serial", 11, 14, "integer", "rjust", None)]
@@ -1208,7 +1208,7 @@ class ANISOU(PDBRecord):
     ATOM/HETATM record.
     """
     __slots__ = []
-    
+
     _name = "ANISOU"
     _field_list = [
         ("serial", 7, 11, "integer", "rjust", None),
@@ -1234,7 +1234,7 @@ class HETATM(ATOM):
     molecules and atoms presented in HET groups.
     """
     __slots__ = []
-    
+
     _name = "HETATM"
 
 class SIGATM(PDBRecord):
@@ -1263,12 +1263,12 @@ class SIGATM(PDBRecord):
 
 class SIGUIJ(PDBRecord):
     """The SIGUIJ records present the standard deviations of anisotropic
-    temperature factors scaled by a factor of 10**4 (Angstroms**2). 
+    temperature factors scaled by a factor of 10**4 (Angstroms**2).
     Columns 7 - 27 and 73 - 80 are identical to the corresponding
     ATOM/HETATM record.
     """
     __slots__ = []
-    
+
     _name = "SIGUIJ"
     _field_list = [
         ("serial", 7, 11, "integer", "rjust", None),
@@ -1293,7 +1293,7 @@ class TER(PDBRecord):
     for a chain.
     """
     __slots__ = []
-    
+
     _name = "TER   "
     _field_list = [
         ("serial", 7, 11, "integer", "rjust", None),
@@ -1301,16 +1301,16 @@ class TER(PDBRecord):
         ("chainID", 22, 22, "string", "rjust", None),
         ("resSeq", 23, 26, "integer", "rjust", None),
         ("iCode", 27, 27, "string", "rjust", None)]
-    
+
 class ENDMDL(PDBRecord):
     """The ENDMDL records are paired with MODEL records to group individual
     structures found in a coordinate entry.
     """
     __slots__ = []
-    
+
     _name = "ENDMDL"
     _field_list = []
-    
+
 ## SECTION 10: Connectivity Section
 class CONECT(PDBRecord):
     """The CONECT records specify connectivity between atoms for which
@@ -1322,7 +1322,7 @@ class CONECT(PDBRecord):
     residues). These records are generated by the PDB.
     """
     __slots__ = []
-    
+
     _name = "CONECT"
     _field_list = [
         ("serial", 7, 11, "integer", "rjust", None),
@@ -1344,7 +1344,7 @@ class MASTER(PDBRecord):
     types.
     """
     __slots__ = []
-    
+
     _name = "MASTER"
     _field_list = [
         ("numRemark", 11, 15, "integer", "rjust", None),
@@ -1364,7 +1364,7 @@ class END(PDBRecord):
     """The END record marks the end of the PDB file.
     """
     __slots__ = []
-    
+
     _name = "END   "
     _field_list = []
 
@@ -1496,7 +1496,7 @@ class PDBFile(list):
         list.__init__(self)
         if (fil != None):
             self.load_file( fil, update_cb  )
-			 
+
     def __setattr__(self, i, rec):
         assert isinstance(rec, PDBRecord)
         list.__setattr__(self, i, rec)
@@ -1510,13 +1510,13 @@ class PDBFile(list):
         list.insert(self, i, rec)
 
 
-    
-    
+
+
     def load_file(self, fileName, update_cb = None ):
         """Loads a PDB file from File object fil.
         """
         fil = OpenFile(fileName, "r")
-    
+
         ## get file size for update callbacks
         line_number    = 0
         percent_done   = 0
@@ -1548,7 +1548,7 @@ class PDBFile(list):
             ## find the record data element for the given line
             ln = ln.rstrip()
             rname = ln[:6].ljust(6)
-            
+
             try:
                 pdb_record_class = PDBRecordMap[rname]
             except KeyError:
@@ -1559,7 +1559,7 @@ class PDBFile(list):
             pdb_record = pdb_record_class()
             pdb_record.read(ln)
             self.append(pdb_record)
-            
+
         NTmessage("==> PDBFile: read %d records from %s", len(self), fileName )
 
     def save_file(self, fil):
@@ -1572,19 +1572,19 @@ class PDBFile(list):
 
 ### gv added 26 Jan 2007
     def save( self, path):
-    	"""Save PDBFile records to path
-    	"""
-    	fp = file( path, 'w' )
-    #	print '>>', fp
+        """Save PDBFile records to path
+        """
+        fp = file( path, 'w' )
+        #print '>>', fp
         i = 0
-    	for record in self:
+        for record in self:
             fprintf( fp, '%s\n', record )
 #            NTdebug("now at record: %6d" % i )
             i += 1
-    	fp.close()
-    	NTmessage("==> Written %d PDB records to %s", len( self ), path )
-    	#end if
-        #end def
+        fp.close()
+        NTmessage("==> Written %d PDB records to %s", len( self ), path )
+        #end if
+    #end def
     ## end gv adds
 
     def record_processor(self, processor, filter_func = None):
@@ -1647,7 +1647,7 @@ class RecordProcessor(object):
         ## check record names
         if rec._name != prev_rec._name:
             return False
-        
+
         ## NOTE: perhaps record type specific handlers could be put
         ##       here to catch common mistakes which are found in PDB
         ##       files
@@ -1679,7 +1679,7 @@ class RecordProcessor(object):
         or multiple records.
         """
         return hasattr(rec, "_multi_record")
-    
+
     def process(self):
         """Iterates the PDB records in self, and searches for handling
         methods in the processor object for reading the objects.  There
@@ -1697,7 +1697,7 @@ class RecordProcessor(object):
             if prev_rec == None:
                 if self.is_multi_record(rec) == True:
                     record_list.append(rec)
-                    prev_rec = rec                    
+                    prev_rec = rec
                 else:
                     self.call_processor(rec)
 
@@ -1737,14 +1737,14 @@ if __name__ == "__main__":
     except IndexError:
         print "usage: PDB.py <PDB file path>"
         sys.exit(1)
-        
-    pdbfil = PDBFile( path)   
+
+    pdbfil = PDBFile( path)
 #    pdbfil.load_file(path)
 #    pdbfil.save_file(sys.stdout)
     for record in pdbfil:
         if record._name.strip() == "ATOM":
 #	    pass
             print '>%s<'% record.name
-	pass
+            pass
 ### </testing>
 

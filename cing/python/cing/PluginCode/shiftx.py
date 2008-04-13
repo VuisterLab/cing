@@ -21,7 +21,7 @@ def parseShiftxOutput( fileName, molecule, chainId ):
     Parse shiftx generated output (gv_version!).
     Store result in shiftx attribute (which is a NTlist type) of each atom
 
-format file:     
+format file:
 
 # Entries marked with a * may have inaccurate shift predictions.
 # Entries marked with a value < -600 should be ignored
@@ -29,11 +29,11 @@ format file:
   501   H  CA      55.4902
   501   H  CB      29.9950
   501   H  C      169.8446
-  501   H  H        8.4401 
+  501   H  H        8.4401
   or in 1y4o:
   1     G  N      109.7404
   1     G  CA      45.2787
- 
+
 
     """
 
@@ -52,10 +52,10 @@ def predictWithShiftx( project, model=None   ):
     Works only for protein residues.
     Adds a NTlist object with predicted values for each model as shiftx attribute
     to each atom for which there are predictions, or empty list otherwise.
-    
+
     Throws warnings for non-protein residues.
     Returns project or None on error.
-    
+
     Shiftx works on pdb files, uses only one model (first), so we have to write the files separately and analyze them
     one at the time.
     """
@@ -63,15 +63,15 @@ def predictWithShiftx( project, model=None   ):
         NTerror('predictWithShiftx: no molecule defined\n')
         return None
     #end if
-    if project.molecule.modelCount == 0: 
+    if project.molecule.modelCount == 0:
         NTerror('predictWithShiftx: no models for "%s"\n', project.molecule)
         return None
     #end if
-    if model != None and model > project.molecule.modelCount: 
+    if model != None and model > project.molecule.modelCount:
         NTerror('predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
         return None
     #end if
-    
+
     skippedAtoms = [] # Keep a list of skipped atoms for later
     skippedResidues = []
     for res in project.molecule.allResidues():
@@ -82,67 +82,67 @@ def predictWithShiftx( project, model=None   ):
                 skippedAtoms.append( atm )
     if skippedResidues:
         NTwarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
-        
+
     if model!=None:
         models = NTlist( model )
     else:
         models = NTlist(*range( 1,project.molecule.modelCount+1 ))
-    
+
     # initialize the shiftx attributes
     for atm in project.molecule.allAtoms():
         atm.shiftx = NTlist()
     #end for
-        
-    root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)   
-    shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'), 
-                             rootPath = root, redirectOutput = False)   
+
+    root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)
+    shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'),
+                             rootPath = root, redirectOutput = False)
 #    NTmessage('==> Running shiftx' )
-           
+
     for model in models:
         # set filenames
         rootname =  sprintf('model%03d', model)
         model_base_name =  os.path.join( root, rootname )
-        
-        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )       
+
+        pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
         if not pdbFile:
             NTerror("Failed to generate a pdb file for model: " + `model`)
-            return None 
-        
+            return None
+
         pdbFile.save( model_base_name + '.pdb'   )
         for chain in project.molecule.allChains():
-#            NTmessage('Doing chain code [%s]' % (chain.name))                    
+#            NTmessage('Doing chain code [%s]' % (chain.name))
             # quotes needed because by default the chain id is a space now.
             chainId =  "'" + chain.name + "'"
-            outputFile = rootname + '_' + chain.name + '.out' 
+            outputFile = rootname + '_' + chain.name + '.out'
             shiftx(chainId, rootname + '.pdb', outputFile )
             outputFile = os.path.join(root,outputFile)
 #            outputFile = os.path.abspath(outputFile)
             NTmessage('==> Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
             parseShiftxOutput( outputFile, project.molecule, chain.name )
         del( pdbFile )
-    
+
     NTmessage(' averaging ...')
-               
+
     # Restore the 'default' state
     for atm in skippedAtoms:
         atm.pdbSkipRecord = False
-    
-    # Average the methyl proton shifts and b-methylene, before calculating average per atom 
+
+    # Average the methyl proton shifts and b-methylene, before calculating average per atom
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():
-            
+
             protons = atm.attachedProtons(includePseudo=False)
             if len(protons) >= 2:
                 skip = False
                 for p in protons:
-                    if len(p.shiftx) == 0: # No prediction for this proton
-                                           # Do not average
+                    if len(p.shiftx) == 0:  # No prediction for this proton
+                                            # Do not average
                         skip = True
                         #print p, p.shiftx
                         break
                     #end if
                 #end for
-                
+
                 if not skip:
                     shifts  = NTfill(0.0,len(models))
                     for i in range(len(models)):
@@ -153,18 +153,18 @@ def predictWithShiftx( project, model=None   ):
                     #end for
                     protons[0].pseudoAtom().shiftx = shifts
                 #end if
-            #end if         
+            #end if
         #end if
     #end for
-    
-    # Average's for each atom    
+
+    # Average's for each atom
     for atm in project.molecule.allAtoms():
         # Set averages
         atm.shiftx.average()
         if atm.shiftx.av == None:
             atm.shiftx.av = -NOSHIFT
             atm.shiftx.sd = 0.0
-    
+
     return project
 #end def
 
