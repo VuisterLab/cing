@@ -40,20 +40,20 @@ class TagTable (Lister):
                   ):
         self.free       = free
         self.title      = title
-        
+
         # Modified tagnames, tagvalues initialization so list references
         # are not carried through (Wim 14/07/2002)
-        
+
         self.tagnames = tagnames
         if self.tagnames == None:
-          self.tagnames  = [ '_Dummy_tag' ]
-          
+            self.tagnames  = [ '_Dummy_tag' ]
+
         self.tagvalues = tagvalues
         if self.tagvalues == None:
-          self.tagvalues  = [ [None] ]
-          
+            self.tagvalues  = [ [None] ]
+
         self.verbosity  = verbosity
-    
+
     "Returns the STAR text representation"
     def star_text ( self,
                     flavor                  = 'NMR-STAR'
@@ -67,15 +67,15 @@ class TagTable (Lister):
         else:
             print 'ERROR: Unknown flavor of STAR given', flavor
             return 1
-                
+
         free_ident_size         = loop_ident_size
         tagnames_ident_size     = loop_ident_size + 3
         show_stop_tag           = 1
-        
+
         str         = ''
         count       = -1
         count_hash  = 100000 # Show progress hashes while composing text for each count_hash number of values approximately
-        
+
         ## Free tags here
         if self.free:
             i = 0
@@ -90,7 +90,7 @@ class TagTable (Lister):
                     str = str + '\n'
                 i = i + 1
             return str
-        
+
         ## Loop tags here
         str = str + loop_ident_size * ' ' + 'loop_\n'
 
@@ -98,7 +98,7 @@ class TagTable (Lister):
             ## Just format it such that it will take the least space
             str = str + tagnames_ident_size * ' ' + '%s\n' % tagname
         str = str + '\n'
-            
+
         col_count = len( self.tagnames )
         row_count = len( self.tagvalues[0] )
         col_range = range( col_count )
@@ -114,7 +114,7 @@ class TagTable (Lister):
         ## spaces before parsing it was 1 Mb)
         ## Any quicker method in other modules?
         tagvalues_tr = transpose( self.tagvalues )
-        
+
         for row_id in row_range:
 
             str_tmp = string.join( tagvalues_tr[row_id], ',' )
@@ -141,7 +141,7 @@ class TagTable (Lister):
                     count = tag_id
                     if self.verbosity >= 9:
                         print '##### %s looped tag values collected ######' % count_hash
-                                
+
         if show_stop_tag:
             str_row.append( '\n' + loop_ident_size * ' ' + 'stop_\n' )
 
@@ -149,9 +149,9 @@ class TagTable (Lister):
 
         # Save some space
         del tagvalues_tr
-        
+
         return str
-    
+
     """
     A title identifing a tagtable by its tagnames
     simply the space separated concatenation of the tag names
@@ -161,13 +161,13 @@ class TagTable (Lister):
             print 'Setting title of tagtable'
         self.title = string.join( self.tagnames )
 
-                
+
     """
     Size and type checks to be extended
     0 Only fast checks
     9 Type checks of each element
     """
-    def check_integrity( self, check_type=0 ):                
+    def check_integrity( self, check_type=0 ):
 
         names_length    = len(self.tagnames)
         values_length   = len(self.tagvalues)
@@ -178,7 +178,7 @@ class TagTable (Lister):
             print "ERROR: names:", self.tagnames
             return 1
 
-        column_length_first = len( self.tagvalues[ 0 ] )            
+        column_length_first = len( self.tagvalues[ 0 ] )
         for tag_id in range( values_length ):
             if len( self.tagvalues[ tag_id ] ) != column_length_first:
                 print "ERROR: length column[%s](%s) is not the same as" % (
@@ -204,7 +204,7 @@ class TagTable (Lister):
             print 'Checked integrity of TagTable (%2s names %4s values each): OK [%s]' % (
                 names_length, column_length_first, self.title )
         return 0
-        
+
 
     """
     - Parses text into a tagtable.
@@ -232,8 +232,8 @@ class TagTable (Lister):
             if self.check_integrity():
                 print "ERROR: integrity of parsed table is not ok"
                 return None
-            
-        ## Parse looped tagtable        
+
+        ## Parse looped tagtable
         # Tag names
         match_tags_loop = pattern_tags_loop.search(text, pos)
         if not match_tags_loop:
@@ -255,13 +255,13 @@ class TagTable (Lister):
         ## position already know to have a stop sign. Problem is that this
         ## is different for NMR-STAR (\sstop_) and mmCIF (\sloop_ or \s_\S)
         ## The (\ssave_) is included for when there are more flavors...
-    
+
         text_length = len(text)
         if pos == text_length:
             print "ERROR: No tag values found for looped tagtable"
             return None
 
-##        pos_sf_begin_or_end_nws = pattern_unquoted_find(text, pattern_sf_begin_or_end, pos)        
+##        pos_sf_begin_or_end_nws = pattern_unquoted_find(text, pattern_sf_begin_or_end, pos)
         pos_tagtable_loop = pattern_unquoted_find(text, pattern_tagtable_loop_2, pos)
         pos_tagtable_stop = pattern_unquoted_find(text, pattern_tagtable_stop_2, pos)
         pos_tagname       = pattern_unquoted_find(text, pattern_tagname_2, pos)
@@ -281,7 +281,7 @@ class TagTable (Lister):
             print'pos_tagtable_stop:', pos_tagtable_stop
             print'pos_tagname      :', pos_tagname
             print 'Will parse tagtable text to end at position: [%s]' % pos_end
-            
+
         ## Just checking
         if not ( pos_tagtable_loop!=-1 or pos_tagtable_stop!=-1 or pos_tagname!=-1 ):
             if self.verbosity > 1:
@@ -292,7 +292,7 @@ class TagTable (Lister):
 ##                print '(free or looped).'
 ##                print 'Actually the begin/end of saveframe is not checked since'
 ##                print 'NMR-STAR and mmCIF both end a tagtable without it.'
-        
+
         # Tag values
         if self._tagtable_loop_values_parse(
                 text, pos, pos_end): ## will set title too
@@ -301,7 +301,7 @@ class TagTable (Lister):
         ## Set the position to the end of this tagtable at the beginning
         ## of a stop_ or a new tagtable
         pos = pos_end
-        
+
         ## Skip the stop sign and empty space if it was stop_
         if pos_tagtable_stop != -1:
             ## Try a match from the previously found position including
@@ -311,7 +311,7 @@ class TagTable (Lister):
                 print "ERROR: no stop_ on second try"
                 return None
             pos = match_tagtable_stop.end()
-        
+
         if self.check_integrity():
             print "ERROR: integrity of parsed table is not ok"
             return None
@@ -323,7 +323,7 @@ class TagTable (Lister):
     returns new position alias status (None for failure)
     """
     def _tagtable_free_parse( self, text, pos ):
-        
+
         text_length = len(text)
 
         while pos < text_length - 1:
@@ -346,7 +346,7 @@ class TagTable (Lister):
                 print "ERROR: looking for a free tag name(1)"
                 return None
             ## Structures of free and looped tagtable are the same
-            self.tagvalues.append( [ value ] ) 
+            self.tagvalues.append( [ value ] )
             if self.verbosity >= 9:
                 print '**Parsed tag name : [%s] and value [%s]: ' % (
                     match_tag_name.group(1), value)
@@ -359,13 +359,13 @@ class TagTable (Lister):
     returns status (None for success, 1 for failure)
     """
     def _tagtable_loop_values_parse( self, text, pos, pos_end):
-        
+
         if self.free:
             print "ERROR: This is a 'free' tagtable, only looped tagtable can be parsed"
             return 1
         names_length                = len(self.tagnames)
         ## Empty the table
-        self.tagvalues   = []        
+        self.tagvalues   = []
         for dummy in range( names_length ):
             self.tagvalues.append( [] )
 
@@ -374,7 +374,7 @@ class TagTable (Lister):
         if match_white_space:
             if match_white_space.start() == 0: # Match has to start at the beginning
                 pos = match_white_space.end()
-            
+
         tag_id          = 0
         count           = 0          # Last number of characters at which a print occured.
         count_hash      = 100000
@@ -387,8 +387,8 @@ class TagTable (Lister):
                     print 'DEBUG: ##### %s chars processed ######' % count_hash
                     count = pos
             ## 1 char search; ', ", or ; at beginning of line
-            match_quoted = pattern_quoted.search( text, pos, pos_end )            
-            if match_quoted:                
+            match_quoted = pattern_quoted.search( text, pos, pos_end )
+            if match_quoted:
                 if match_quoted.start() == pos: # quoted at the beginning
                     ## Quoted at pos
                     value, pos = tag_value_quoted_parse( text, pos )
@@ -396,13 +396,13 @@ class TagTable (Lister):
                         print 'ERROR: got error in parse (1)'
                         return 1
                     if pos > pos_end:
-                        print 'ERROR: found a quoted value that was not wholly within boundaries (1)'                        
+                        print 'ERROR: found a quoted value that was not wholly within boundaries (1)'
                         return 1
                     self.tagvalues[ tag_id ].append( value )
                     tag_id += 1
-                    if tag_id == names_length:  
+                    if tag_id == names_length:
                         tag_id = 0
-                else:      # quoted but not at the beginning              
+                else:      # quoted but not at the beginning
                     # Wim 25/09/03: Changed following to allow correct parsing of H5'' type names
                     # and "asdfasdf'" type stuff
                     # New positions depend on whether correct quote or not
@@ -412,19 +412,19 @@ class TagTable (Lister):
                     bc = text[idxstart-1]
                     if (c == "'" or c == '"') and bc != " ":
                         # JFD the next line takes an expensive slice of the pie?
-#                        tempendpos = idxstart + string.find(text[idxstart:],' ')                      
+#                        tempendpos = idxstart + string.find(text[idxstart:],' ')
                         tempendpos = string.find(text,' ',idxstart)
-                    else:                    
+                    else:
                         tempendpos = idxstart
 
                     ## Parse all unquoted tag values beginning from position
                     ## UP TO specified end position
-                    ## NOT QUOTED                    
+                    ## NOT QUOTED
                     for t in text[pos:tempendpos].split():
                         self.tagvalues[tag_id].append( t )
                         tag_id += 1
-                        if tag_id == names_length: 
-                            tag_id = 0                                        
+                        if tag_id == names_length:
+                            tag_id = 0
                     if tempendpos == match_quoted.start():
                         ## QUOTED:
                         pos = tempendpos
@@ -437,7 +437,7 @@ class TagTable (Lister):
                             return 1
                         self.tagvalues[ tag_id ].append( value )
                         tag_id += 1
-                        if tag_id == names_length:  
+                        if tag_id == names_length:
                             tag_id = 0
                     else:
                         pos = tempendpos
@@ -445,11 +445,11 @@ class TagTable (Lister):
                 for t in text[pos:pos_end].split():
                     self.tagvalues[tag_id].append( t )
                     tag_id += 1
-                    if tag_id == names_length: 
+                    if tag_id == names_length:
                         tag_id = 0
-                pos = text_length # Needed to break while loop               
-            
-        col_length = len( self.tagvalues[-1] )    
+                pos = text_length # Needed to break while loop
+
+        col_length = len( self.tagvalues[-1] )
         if tag_id != 0:
             print "ERROR: not correct number of tag values read"
             print "Read [%s] tag(s) that is:" \
@@ -457,15 +457,15 @@ class TagTable (Lister):
             print "[%s] row(s) complete and [%s] tag value(s) in last row that is incomplete." \
                   % ( col_length, tag_id )
             print "Tag names of this table are:"
-            print self.tagnames            
-            for xxx in range(0,len(self.tagvalues[0])):             
+            print self.tagnames
+            for xxx in range(0,len(self.tagvalues[0])):
                 for yyy in range(0,len(self.tagvalues)):
-                    print self.tagvalues[yyy][xxx],              
-                print '\n-----------------------------------------------'              
+                    print self.tagvalues[yyy][xxx],
+                print '\n-----------------------------------------------'
             pos = 0
             while pos < tag_id:
-                 print self.tagvalues[pos][-1]
-                 pos = pos + 1            
+                print self.tagvalues[pos][-1]
+                pos = pos + 1
             return 1
 
         if col_length == 0:

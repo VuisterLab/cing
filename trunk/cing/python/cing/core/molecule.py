@@ -29,7 +29,7 @@ from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
-from cing.core.constants import LOOSE 
+from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
 from cing.core.constants import UNDEFINED_FLOAT
 from cing.core.constants import XPLOR
@@ -68,7 +68,7 @@ Mapping between the CING data model and NMR-STAR:
 CING     | NMR-STAR             CCPN
 --------------------------------
 Molecule | Molecular system     MolSystem (from ccp.api.molecule.MolSystem)
-Chain    | Assembly entity      Chain   
+Chain    | Assembly entity      Chain
 Residue  | Chemical component   Residue
 
 There are things that will be difficult to map from one to the other.
@@ -180,10 +180,10 @@ _____________________________________________________________________________
             res[key] = value
         for atm in self.allAtoms():
             atm[key] = value
-        
+
     def getChainIdForChainCount(self):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
-    
+
     def addChain( self, name=None, **kwds ):
         """
             Add Chain instance name
@@ -343,7 +343,7 @@ _____________________________________________________________________________
     def getFixedRangeList( self, max_length_range = 50, ranges=None ):
         """Return a list of NTlist instance with residue objects.
         The NTlist contains only residues in the given ranges and is at most
-        max_length_range long. 
+        max_length_range long.
         """
         selectedResidues = self.allResidues()
         if ranges:
@@ -358,8 +358,8 @@ _____________________________________________________________________________
         if r:
             result.append(r)
         return result
-    
-    
+
+
     def models2list( self, models ):
         """
             Convert
@@ -371,7 +371,7 @@ _____________________________________________________________________________
 
             Returns empty list if modelCount == 0,
             Returns the list or None upon error.
-            
+
             Note that model number start at 1 and not zero as before.
         """
         if models == None:
@@ -389,7 +389,7 @@ _____________________________________________________________________________
                     NTerror('Error Molecule.models2list: invalid model number %d (zero)\n', model )
                     return None
                 if model > self.modelCount:
-                    NTerror('Error Molecule.models2list: invalid model number %d (larger than modelCount: %d)\n', 
+                    NTerror('Error Molecule.models2list: invalid model number %d (larger than modelCount: %d)\n',
                             (model, self.modelCount ))
                     return None
                 result.append(model)
@@ -407,7 +407,7 @@ _____________________________________________________________________________
                     NTerror('Error Molecule.models2list: Invalid model number %d (zero)\n', model )
                     return None
                 if model > self.modelCount:
-                    NTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n', 
+                    NTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n',
                                 (model, self.modelCount ))
                     return None
                 result.append(model)
@@ -428,7 +428,7 @@ _____________________________________________________________________________
         os.mkdir( path )
 
         content = NTdict( name = self.name, convention = INTERNAL )
-        content.update( NTmolParameters ) 
+        content.update( NTmolParameters )
         content.saveAllXML()
         obj2XML( content, path=os.path.join( path, NTmolParameters.contentFile ) )
 
@@ -458,7 +458,7 @@ _____________________________________________________________________________
         #end if
 
         NTmessage('==> Restoring Molecule from "%s" ... ', path )
-               
+
         #end if
 
         mol = Molecule( name = content.name )
@@ -504,7 +504,7 @@ _____________________________________________________________________________
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(sequenceFile, 'r')
         for line in file:
-             exec(line)
+            exec(line)
         #end for
         file.close()
     #end def
@@ -542,7 +542,7 @@ _____________________________________________________________________________
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(fileName, 'r')
         for line in file:
-             exec(line)
+            exec(line)
         #end for
         file.close()
 
@@ -577,7 +577,7 @@ _____________________________________________________________________________
         for atm in self.allAtoms():
             for c in atm.coordinates:
                 fprintf( fp, 'self%s.addCoordinate( %s, %s, %s, Bfac=%s )\n',
-                              atm._Cname2( 2 ), c[0], c[1], c[2],c[3])                
+                              atm._Cname2( 2 ), c[0], c[1], c[2],c[3])
         fp.close()
 
     def restoreCoordinates( self, fileName, append = True ):
@@ -598,7 +598,7 @@ _____________________________________________________________________________
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(fileName, 'r')
         for line in file:
-             exec(line)
+            exec(line)
         #end for
         file.close()
         return self
@@ -681,7 +681,7 @@ Return an Molecule instance or None on error
         NTmessage("%s", molecule.format())
         return molecule
     #end def
-    
+
     initialize = staticmethod( initialize )
 
     def _addResidue( self, chainId, resName, resNum, convention ):
@@ -698,7 +698,7 @@ Return an Molecule instance or None on error
         else:
             if chainId == None:
                 chainId = Chain.defaultChainId
-                
+
             if chainId not in self:
                 chain = self.addChain(chainId)
             else:
@@ -774,9 +774,9 @@ Return an Molecule instance or None on error
 
         NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
                    convention, models[0], models.last()                 )
-               
+
         pdbFile = PDBFile()
- 
+
         record = PyMMLib.REMARK()
         record.text = sprintf('PDB file of molecule %s', self.name )
         pdbFile.append( record )
@@ -859,28 +859,28 @@ moleculehandler = XMLMoleculeHandler()
 def ensureValidChainId( chainId ):
     """
     In CING all chains must have one non-space character (chain id) because:
-    
+
     - More than 1 characters would not fit in PDB column 22. Note that
     some programs read the chain id from PDB columns [73-76> but others
     programs (e.g. SHIFTX, ???) used by CING do not.
     In the future, the CING code could be extended to interface
-    to these programs but for now CING uses the lowest common denominator. 
+    to these programs but for now CING uses the lowest common denominator.
     - No space allowed because it does not materialize to a nice file name,
-    one that can be used without quotes. If the value is a space it is hard to 
+    one that can be used without quotes. If the value is a space it is hard to
     pass this to some programs; such as SHIFTX. A space would also be
     making it impossible to CING to use e.g.:
     print project.molecule.A.GLU77.procheck.CHI1[0]
     where A stands for chain id A.
     - The letters A-Z are often used already which will cause name space
-    collisions. It is important to choose an id that will most likely not be 
+    collisions. It is important to choose an id that will most likely not be
     used in the above formats.
-    
+
     The chain id is ALWAYS given in PDB and XPLOR coordinate files.
-    It might be a space character but it's always implicitly present. If it's a 
+    It might be a space character but it's always implicitly present. If it's a
     space character, CING will translate it to the defaultChainId value.
-    
-    Bottom line: use a chain id character on input! 
-    """ 
+
+    Bottom line: use a chain id character on input!
+    """
     if chainId==None:
         return Chain.defaultChainId
     if len(chainId) > 1:
@@ -926,13 +926,13 @@ Chain class: defines chain properties and methods
 
     all dict methods
     """
-    
-    DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#^_' 
-    validChainIdListBesidesTheAlphabet = '#^_' # last 3 chars of above.    
+
+    DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#^_'
+    validChainIdListBesidesTheAlphabet = '#^_' # last 3 chars of above.
     'Nothing that is a special character in Python, or tcsh.'
     defaultChainId = '_'
     'See documentation: molecule#ensureValidChainId'
-    
+
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
@@ -1040,7 +1040,7 @@ Chain class: defines chain properties and methods
                 result.append(atm)
             #end if
         #end for
-        return result          
+        return result
 
 #end class
 
@@ -1129,7 +1129,7 @@ Residue class: Defines residue properties
         self._nameResidue( resName, resNum )
         self.saveXML('resName','resNum')
         self.colorLabel = COLOR_GREEN # innocent until proven guilty.
-        
+
     #end def
 
     def __repr__(self):
@@ -1305,9 +1305,9 @@ Residue class: Defines residue properties
         self.chain.molecule.dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
             (self, dihedralName, self.db[dihedralName])
 
-        
+
         for i in range(0,l):
-            self[dihedralName].append( NTdihedralOpt( 
+            self[dihedralName].append( NTdihedralOpt(
                atoms[0].coordinates[i],
                atoms[1].coordinates[i],
                atoms[2].coordinates[i],
@@ -1385,8 +1385,8 @@ Residue class: Defines residue properties
         Returns True if Residue has the argument properties, False otherwise.
         Special case: if no properties are set return True
         """
-        if not len(properties): 
-          return True
+        if not len(properties):
+            return True
         props = NTlist( self.db.name, self.db.shortName, *self.db.properties)
         for p in properties:
             if not p in props:
@@ -1461,7 +1461,7 @@ Atom class: Defines object for storing atom properties
     Initiating attributes:
         resName                 : Residue name according to the nomenclature list.
         atomName                : Atom name according to the nomenclature list.
-        
+
     Derived attributes:
         atomIndex               : Unique atom index (several external programs need one).
         resonances              : NTlist of Resonance instances.
@@ -1585,9 +1585,9 @@ Atom class: Defines object for storing atom properties
             self.meanCoordinate = None
             return None
 
-        c = Coordinate( 0.0, 0.0, 0.0, 
+        c = Coordinate( 0.0, 0.0, 0.0,
                 Coordinate.DEFAULT_BFACTOR,
-                Coordinate.DEFAULT_OCCUPANCY, 
+                Coordinate.DEFAULT_OCCUPANCY,
                 self )
         self.meanCoordinate = c
         self.meanCoordinate.__FORMAT__ = '<mean Coordinate (%(x)6.2f,%(y)6.2f,%(z)6.2f)>'
@@ -1851,7 +1851,7 @@ Atom class: Defines object for storing atom properties
 
         for p in properties:
             if not p in props:
-               return False
+                return False
             #end if
         #end for
         return True
@@ -2011,12 +2011,12 @@ Atom class: Defines object for storing atom properties
         if not pdbAtmName:
             if self.name.startswith('Q'):
                 return None
-            NTwarning("Failed to translate from CING to convention: %s atom: %-20s" % ( convention, self )) 
+            NTwarning("Failed to translate from CING to convention: %s atom: %-20s" % ( convention, self ))
             return None
 
         pdbResName = self.residue.translate( convention )
-        if not pdbResName: 
-            NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue )) 
+        if not pdbResName:
+            NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue ))
             return None
 
         coor = self.coordinates[modelId]
@@ -2027,7 +2027,7 @@ Atom class: Defines object for storing atom properties
             record = ATOM()
 
         chainId = self.residue.chain.name
-        
+
         record.serial     = pdbIndex
         record.name       = pdbAtmName
         record.resName    = pdbResName
@@ -2147,7 +2147,7 @@ class XMLCoordinateHandler( XMLhandler ):
 
     def handle( self, node ):
         attrs = self.handleDictElements( node )
-        if attrs == None: 
+        if attrs == None:
             return None
         result = Coordinate( attrs['x'], attrs['y'], attrs['z'] )
         # update the attrs values
@@ -2165,7 +2165,7 @@ def NTdistanceOpt( c1, c2 ):
     Return distance defined by Coordinate instances c1-c2
     """
 #    d = c2()-c1()
-    d = ( c2[0]-c1[0], c2[1]-c1[1], c2[2]-c1[2] )    
+    d = ( c2[0]-c1[0], c2[1]-c1[1], c2[2]-c1[2] )
 #    return d.length()
     return length3Dopt(d)
 
@@ -2198,7 +2198,7 @@ def NTangleOpt( c1, c2, c3, radians = False ):
 #    Adapted from biopython-1.41
 #    """
 ##    c1() returns a NTvector for which subtraction is CING coded.
-##    ab = c1() - c2() 
+##    ab = c1() - c2()
 ##    cb = c3() - c2()
 ##    db = c4() - c3()
 #    ab = ( c1[0]-c2[0], c1[1]-c2[1], c1[2]-c2[2] )
@@ -2216,8 +2216,8 @@ def NTangleOpt( c1, c2, c3, radians = False ):
 #    # Speed check showed major bottleneck(s) disappeared so leaving it in.
 #    # determine sign of angle
 #    try:
-#        if cb.angle( w, radians=True ) > 0.001: 
-#            angle *= -1.0 
+#        if cb.angle( w, radians=True ) > 0.001:
+#            angle *= -1.0
 #    except ZeroDivisionError:
 #        # dihedral=pi or 0
 #        pass
@@ -2254,7 +2254,7 @@ def NTdihedralOpt( c1, c2, c3, c4 ):
     # determine sign of angle
     try:
         cbAngleDegrees = angle3Dopt( cb, w )
-#        if cb.angle( w, radians=True ) > 0.001: 
+#        if cb.angle( w, radians=True ) > 0.001:
         if cbAngleDegrees > 0.001:
 #            angle *= -1.0 optimized
             angle = -angle
@@ -2339,18 +2339,18 @@ def translateTopology( residue, topDefList ):
 
 #==============================================================================
 def allAtoms( molecule ):
-  """generator looping over all atoms of molecule
-     25 Feb 2006: depreciated: use molecule.allAtoms() method in stead.
-  """
-  return molecule.allAtoms()
+    """generator looping over all atoms of molecule
+       25 Feb 2006: depreciated: use molecule.allAtoms() method in stead.
+    """
+    return molecule.allAtoms()
 #end def
 
 #==============================================================================
 def allResidues( molecule ):
-  """generator looping over all residues of molecule
-     25 Feb 2006: depreciated: use molecule.allResidues() method in stead.
-  """
-  return molecule.allResidues()
+    """generator looping over all residues of molecule
+       25 Feb 2006: depreciated: use molecule.allResidues() method in stead.
+    """
+    return molecule.allResidues()
 #end def
 
 #==============================================================================

@@ -199,7 +199,7 @@ _____________________________________________________________________________
                 self.colorLabel = setMaxColor( self, drl.colorLabel )
         if self.colorLabel:
             return True
-        
+
     #-------------------------------------------------------------------------
     # Path stuff
     #-------------------------------------------------------------------------
@@ -439,7 +439,7 @@ _____________________________________________________________________________
                                         path = sequenceFile,
                                         convention=convention
                                        )
-        if not molecule: 
+        if not molecule:
             return None
         self.appendMolecule( molecule )
 
@@ -486,10 +486,10 @@ _____________________________________________________________________________
             #end if
 
             if (rm):
-               atom.resonances.append(rm)
+                atom.resonances.append(rm)
             else:
-               rm = atom.resonances[0]
-               atom.resonances.append(rm)
+                rm = atom.resonances[0]
+                atom.resonances.append(rm)
             #end if
 
             # Optionally reduce the list
@@ -556,7 +556,7 @@ _____________________________________________________________________________
                              self.footer( dots )
         return NTdict.format( self )
     #end def
-    
+
     def removeFromDisk(self):
         """Removes True on error. If no cing project is found on disk None (Success) will
         still be returned. Note that you should set the nosave option on the project
@@ -569,7 +569,7 @@ _____________________________________________________________________________
         if rmtree( pathString ):
             NTerror("Failed to remove existing cing project")
             return True
- 
+
 #end class
 
 #-----------------------------------------------------------------------------
@@ -658,7 +658,7 @@ class ProjectList( NTlist ):
         """
         for name in names:
             fname = self.project.path( self.savePath, name + self.extention )
-            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project)   
+            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project)
         #end for
     #end def
 
@@ -839,7 +839,7 @@ class SMLPeakHandler( SMLhandler ):
                  ]:
             fprintf( fp, '    %-15s = %s\n', a, repr(peak[a]) )
         #end for
-        rl = [] 
+        rl = []
         for r in peak.resonances.zap('atom'):
             if (r != None):
                 rl.append(r.nameTuple())
@@ -969,8 +969,8 @@ def getAtomsFromAtomPairs(atomPairs):
         for atom in atomPair:
             for real_atm in atom.realAtoms():
                 result.append( real_atm )
-    return result                    
-    
+    return result
+
 #-----------------------------------------------------------------------------
 class DistanceRestraint( NTdict ):
     """DistanceRestraint class:
@@ -978,10 +978,10 @@ class DistanceRestraint( NTdict ):
        lower and upper bounds
     """
     DR_MAXALL_DEFAULT_POOR_VALUE = 0.5
-#    dr_maxall_poor = cingCriticismDict.getDeepByKeys( 
+#    dr_maxall_poor = cingCriticismDict.getDeepByKeys(
 #        ANY_ENTITY_LEVEL, 'dr_maxall', POOR_PROP,1,default=DR_MAXALL_DEFAULT_POOR_VALUE)
     dr_maxall_poor = DR_MAXALL_DEFAULT_POOR_VALUE
-    
+
     def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
 
         NTdict.__init__(self,__CLASS__  = 'DistanceRestraint',
@@ -1004,8 +1004,7 @@ class DistanceRestraint( NTdict ):
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
-        self.error      = False    # Indicates if an error was encountered when
-                                   # analyzing restraint
+        self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
         for pair in atomPairs:
             self.appendPair( pair )
@@ -1025,9 +1024,9 @@ class DistanceRestraint( NTdict ):
             for atom in getAtomsFromAtomPairs(self.atomPairs):
                 atom.appendCritique( self, cascade = True )
         return critiqued
-            
-        
-        
+
+
+
     def appendPair( self, pair ):
         # check if atom already present, keep order
         # otherwise: keep atom with lower residue index first
@@ -1072,8 +1071,7 @@ class DistanceRestraint( NTdict ):
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = None     # Sd of violations
-        self.error      = False    # Indicates if an error was encountered when
-                                   # analyzing restraint
+        self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
         if modelCount:
             for i in range(0, modelCount):
@@ -1127,7 +1125,7 @@ class DistanceRestraint( NTdict ):
             # analyze violations
             for d in self.violations:
                 dabs = math.fabs(d)
- #               print '>>', d,dabs
+#                print '>>', d,dabs
                 if ( dabs > 0.1): self.violCount1 += 1
                 if ( dabs > 0.3): self.violCount3 += 1
                 if ( dabs > 0.5): self.violCount5 += 1
@@ -1263,7 +1261,7 @@ class DistanceRestraintList( NTlist ):
                 self.colorLabel = setMaxColor( self, dr.colorLabel )
         if self.colorLabel:
             return True
-       
+
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
         NTlist.append( self, distanceRestraint )
@@ -1334,7 +1332,7 @@ class DistanceRestraintList( NTlist ):
     #end def
 
     def format( self ):
-         return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n'+\
+        return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n'+\
                         'rmsd: %7s %6s        Violations > 0.1,0.3,0.5: %d, %d, %d\n',
                       dots, self.name,self.status,len(self), dots,
                       val2Str(self.rmsdAv,         "%7.3f", 7),
@@ -1398,7 +1396,7 @@ class DihedralRestraint( NTdict ):
     """
     def __init__( self, atoms, lower, upper, **kwds ):
 
-        if upper<lower: 
+        if upper<lower:
             upper+=360.0
         NTdict.__init__(self, __CLASS__  = 'DihedralRestraint',
                               atoms      = NTlist( *atoms ),
@@ -1460,7 +1458,7 @@ class DihedralRestraint( NTdict ):
         self.violSd     = 0.0      # Sd of violations
 
         for i in range(modelCount):
-            d = NTdihedralOpt( 
+            d = NTdihedralOpt(
                             self.atoms[0].coordinates[i],
                             self.atoms[1].coordinates[i],
                             self.atoms[2].coordinates[i],
@@ -1618,7 +1616,7 @@ class DihedralRestraintList( NTlist ):
         self.violCount3 = 0       # Total violations over 3 degrees
         self.violCount5 = 0       # Total violations over 5 degrees
     #end def
- 
+
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
         NTlist.append( self, dihedralRestraint )
@@ -1651,7 +1649,7 @@ class DihedralRestraintList( NTlist ):
         self.violCount3 =  0
         self.violCount5 =  0
         for dr in self:
-            if calculateFirst: 
+            if calculateFirst:
                 (cav, _cv) = dr.calculateAverage()
                 if not cav:
                     NTdebug("Failed to calculate average for: "+self.format())

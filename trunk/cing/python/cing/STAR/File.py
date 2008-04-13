@@ -19,7 +19,7 @@ import os
 import re
 #import profile
 
-__author__    = "$Author$" 
+__author__    = "$Author$"
 ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
@@ -31,25 +31,25 @@ Only methods for reading and writing are currently implemented.
 datanodes is a list of possibly mixed saveframes and tagtables
 """
 class File (Lister):
-    def __init__(self, 
-                    title                   = 'general_star_file_title', 
-                    filename                = '', 
-                    datanodes               = None, 
+    def __init__(self,
+                    title                   = 'general_star_file_title',
+                    filename                = '',
+                    datanodes               = None,
                     flavor                  = None, # Call set_flavor when changing
 #                    preferred_quote         = '"', # Put somewhere else?
                     verbosity   = 2
                   ):
         self.title      = title
         self.filename   = filename
-        
+
         if datanodes:
-          self.datanodes  = datanodes
+            self.datanodes  = datanodes
         else:
-          self.datanodes = []
-          
+            self.datanodes = []
+
         self.flavor     = flavor
         self.verbosity  = verbosity
-        
+
     "Simple checks on integrity"
     def check_integrity(self, recursive = 1):
         if recursive:
@@ -89,10 +89,10 @@ class File (Lister):
         if self.parse(text=text, nmrView_type = nmrView_type):
             print "ERROR: couldn't parse file"
             return 1
-         
+
         return 0
 
-    
+
     """
     - Parses text into save frames and tagtables.
     - Input text should start at position given with non-white space character
@@ -100,7 +100,7 @@ class File (Lister):
     """
     def parse (self, text='', nmrView_type = 0):
 
-        if self.verbosity > 2:        
+        if self.verbosity > 2:
             print 'DEBUG: Parsing STAR file:', self.filename
 
         """
@@ -115,13 +115,13 @@ class File (Lister):
 
         ## Collapse the semicolon block for ease of parsing
         text = semicolon_block_collapse(text)
-        
-        
+
+
         ## For nmrView 'nmrStar' also compress {  } into {}
-        ## Wim 05/03/2003        
+        ## Wim 05/03/2003
         if nmrView_type:
-            text = nmrView_compress(text) 
-        
+            text = nmrView_compress(text)
+
         ## TITLE
         match_data_tag = re.search(r'\s*data_(\S+)\s+', text, 0)
         if not match_data_tag:
@@ -145,7 +145,7 @@ class File (Lister):
             if self.verbosity >= 9:
                 print 'Parse text from position:%s : [%s]' % (
                     pos, text[pos:pos+10])
-            
+
             match_save_begin_nws = pattern_save_begin_nws.search(text, pos, pos+len('save_1'))
             if match_save_begin_nws:
                 if match_save_begin_nws.start() == pos:
@@ -171,7 +171,7 @@ class File (Lister):
                 print 'ERROR: No new item found in data_nodes_parse.'
                 print 'Items looked for are a begin or end of a saveframe, or'
                 print 'a begin of a tagtable(free or looped).'
-                print 
+                print
                 print "At text (before pos=" , pos , "):"
                 start = pos-70
                 if start < 0:
@@ -180,7 +180,7 @@ class File (Lister):
                 print "At text (starting pos=" , pos , "):"
                 print "[" + text[pos:pos+70]+ "]"
                 return None
-            
+
             ## SAVE FRAME BEGIN
             if next_sf_begin:
                 if sf_open:
@@ -243,25 +243,25 @@ class File (Lister):
                 dn = self.datanodes[-1].tagtables # Insert in last saveframes' tagtables
             else:
                 dn = self.datanodes
-                
+
             dn.append(
-                    TagTable(free      = free, 
-                                tagnames  = [], 
-                                tagvalues = [], 
+                    TagTable(free      = free,
+                                tagnames  = [],
+                                tagvalues = [],
                                 verbosity = self.verbosity))
             tt = dn[-1] # Just to be explicit for the beloved reader
             pos = tt.parse(text=text, pos=pos)
-            
+
             if pos ==  None:
                 print "ERROR: In parsing tagtable"
                 return None
-            if self.verbosity >=9:                
+            if self.verbosity >=9:
                 print 'Parsed tagtable up to pos: [%s]' % pos
-            
+
         if self.verbosity > 2:
             print 'DEBUG Parsed: [%s] datanodes (top level count only)' % \
                   len(self.datanodes)
-            
+
         if self.check_integrity(recursive = 0):
             print "ERROR: integrity not ok"
             return 1
@@ -300,7 +300,7 @@ class File (Lister):
                 return 1
 #            print "Appended: ", str
             matchList.append( m )
-        
+
         input  = open(inputFN,  'r')
         output = open(outputFN, 'w')
         L =[]
@@ -318,7 +318,7 @@ class File (Lister):
             line = input.readline()
 
 #        print "DEBUG: writing number of lines: ", len(L)
-        output.writelines(L)                    
+        output.writelines(L)
         output.close()
         if not os.path.exists(outputFN):
             print "WARNING: failed to materialize file: " + outputFN
@@ -340,31 +340,31 @@ class File (Lister):
         return result
 
 
-        
+
     """
     Tries to reformat a file on disk with the filename given in the
     attribute of this object.
-    Running Steve Madings (BMRB) formatNMRSTAR program if available    
+    Running Steve Madings (BMRB) formatNMRSTAR program if available
     NOTE: this does NOT do anything with the datanodes of this object!
     """
-    def formatNMRSTAR(self, 
-#                    comment_file_str_dir    = '/bmrb/lib', 
+    def formatNMRSTAR(self,
+#                    comment_file_str_dir    = '/bmrb/lib',
                     ):
 
         if self.verbosity >= 9:
             print "Attempting to reformat STAR file using external program if available"
-        
+
         if os.name != 'posix':
             print "WARNING: No external program available on non-posix systems for reformatting STAR files"
             return 1
 
         ##  Try command and check for non-zero exit status
-        ##  Note that these commands are only valid on Unix 
+        ##  Note that these commands are only valid on Unix
         ##  Standard error is thrown on the bit bucket.
         cmd = "%s < %s 2>/dev/null" % ('formatNMRSTAR', self.filename)
         pipe = os.popen(cmd)
         output = pipe.read()
-        
+
         ##  The program exit status is available by the following construct
         ##  The status will be the exit number (in one of the bytes)
         ##  unless the program executed successfully in which case it will
@@ -379,7 +379,7 @@ class File (Lister):
                 open(self.filename, 'w').write(output)
             except IOError:
                 print 'ERROR: Could not open the file for writing', self.filename
-                return 1            
+                return 1
             if self.verbosity >= 9:
                 print "Reformatted STAR file:", self.filename
             return 0

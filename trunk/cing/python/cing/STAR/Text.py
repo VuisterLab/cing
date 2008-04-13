@@ -53,15 +53,15 @@ pattern_semicolon_block = re.compile(r"""
 pattern_eol_string     = re.compile( eol_string, re.MULTILINE )
 
 ## Next pattern tells when search for on ONE tagvalue if it needs quotes
-pattern_quotes_needed  = re.compile( r'[\s\'\"]|^_|^\#' ) 
+pattern_quotes_needed  = re.compile( r'[\s\'\"]|^_|^\#' )
 
 ## Next pattern tells when search for on MANY tagvalues if it needs quotes
 ## The values should be joined by a comma. A value: 'bla,_bla' will be
 ## mentioned as needing quotes unnecessarily but that's dealt with in the code by further checking
-pattern_quotes_needed_2= re.compile( r'[\s\'\"]|^_|,_|,\#' ) 
+pattern_quotes_needed_2= re.compile( r'[\s\'\"]|^_|,_|,\#' )
 
 pattern_eoline_etcet   = re.compile( r'[\n\r\v\f]' )
-# If the quote character is at the end of the word then it is falsely considered to need a 
+# If the quote character is at the end of the word then it is falsely considered to need a
 # different quote style; this happens frequently for e.g. H1' and all nucleic acid sugar atoms.
 pattern_single_qoute   = re.compile( r"'" )
 pattern_double_qoute   = re.compile( r'"' )
@@ -108,7 +108,7 @@ pattern_e_semicolon    = re.compile( eol_string + r"""\;\s*""", re.MULTILINE ) #
 # Set beginning of line BEFORE whitespace - Wim 06/03/2003
 #pattern_comment_begin  = re.compile (r"""^\s*\#.*\n           # A string starting a line with a sharp
 #                                   """, re.MULTILINE | re.VERBOSE)
-                   
+
 pattern_nmrView_compress_empty = re.compile(r""" \{(\s+)\}
                                              """, re.MULTILINE | re.VERBOSE)
 pattern_nmrView_compress_questionmark = re.compile(r""" \{(\s+\?)\}
@@ -118,18 +118,18 @@ pattern_nmrView_compress_questionmark = re.compile(r""" \{(\s+\?)\}
 #                                         (\s \#  .* $  )   # Any string ending a line and starting with a sharp
 #                                   """, re.MULTILINE | re.VERBOSE)
 
-# Wim's:                   
+# Wim's:
 #pattern_comment_middle = re.compile (
 #     r""" (                                             # start group 1 that will be captured for replay.
 #             ^[^;^\n]                                   # not a what?
 #             (?:                                        # start a non-capturing group
 #                 (                                      # start group 2 (capturing?)
-#                  [\'][^\']*\#[^\']*[\'] |              # get '<text>#<text>' 
+#                  [\'][^\']*\#[^\']*[\'] |              # get '<text>#<text>'
 #                  [\"][^\"]*\#[^\"]*[\"]                # get "<text>#<text>"
-#                 ) |                
-#                 [^\#.]                                 
-#             )*? 
-#           )  
+#                 ) |
+#                 [^\#.]
+#             )*?
+#           )
 #          # Any string beginning a line other than with a semicolon and with no quotes in it
 #          (\s+\#.*)?    $                                                         # the comment to be deleted.
 #          # Any string ending a line and starting with a sharp
@@ -163,13 +163,13 @@ character in it before pos (not fully tested; perhaps possible).
 - No requirements set on what follows the pattern.
 """
 
-def pattern_unquoted_find(text, pattern, pos=0):    
+def pattern_unquoted_find(text, pattern, pos=0):
     while 1:
         match = pattern.search( text, pos)
         if not match:
             ## No match at all
             return -1
-        
+
         pos = match.start()
 
         ## Is it the beginning of the string
@@ -181,19 +181,19 @@ def pattern_unquoted_find(text, pattern, pos=0):
             if verbosity >= 9:
                 print 'Found pattern: [%s] at the beginning of a line' % pattern.pattern
             return pos
-            
+
         ## I hope the rfind is optimized to stroll backwards from pos
         pos_end_of_previous_line = text.rfind('\n', 0, pos)
         if pos_end_of_previous_line == -1:
             pos_end_of_previous_line = -1 ## Dangerous rewind?
-        
+
         line = text[pos_end_of_previous_line+1:pos]
         # Some dummy value but continue with the test below.
         if line == '':
             line = ' '
-            
+
         # Not the one
-        if line[0] == ';': 
+        if line[0] == ';':
             if verbosity > 1:
                 print 'WARNING: (1) found pattern: [%s] preceded by: [%s]' % (
                     pattern.pattern, line )
@@ -220,12 +220,12 @@ def pattern_unquoted_find(text, pattern, pos=0):
                     pattern.pattern, line )
 
             # Not the one
-            pos = pos + 1 
+            pos = pos + 1
             continue
 
         return pos
 
-    
+
 """
 Parse one quoted tag value beginning from position: pos
 Return the value and the position of the 'cursor' behind the
@@ -277,8 +277,8 @@ def tag_value_quoted_parse( text, pos ):
         ## print '-----------'
         value = semicolon_block_expand( value )
         ## print 'Found Q (semicolon) tag value: expanded   [%s]' % value
-        
-        return value, match_e_semicolon.end() 
+
+        return value, match_e_semicolon.end()
 
     print   "ERROR: Position in text:", pos
     print """ERROR: should contain a ', ", or a ; but was not found:"""
@@ -294,11 +294,11 @@ that should only be used for free tags.
 def tag_value_parse( text, pos):
 
     match_quoted = pattern_quoted.search( text, pos )
-    if match_quoted:      
+    if match_quoted:
         if match_quoted.start() == pos:
-            
+
             return tag_value_quoted_parse( text, pos ) # Better speed with this code
-                
+
     match_word = pattern_word.search( text, pos )
     if not match_word:
         print "ERROR: No match for a 'word' at offset:", pos
@@ -332,45 +332,45 @@ SPEED:  0.6 cpu seconds for a 5 Mb file with 31 blocks and
         1.3 "                10 "            64 ".
 """
 def semicolon_block_collapse( text ):
-    
+
     count = 0
     startpos = 0
-    
+
     # TODO: this is not good - since text[startpos:] is used it's always the start of a line, so if string starts with ;...
     pattern_semicolon_only = re.compile("^\;", re.MULTILINE)
     # Added special _end pattern with $ for better pattern matching - Wim 31/10/2005
     pattern_semicolon_only_end = re.compile("(^\;\s*$)", re.MULTILINE)
-    
+
     semicolon_start = pattern_semicolon_only.search(text[startpos:])
-    
+
     while(semicolon_start):
 
-      count += 1
-      
-      startpos = startpos + semicolon_start.start()
-      semicolon_end = pattern_semicolon_only_end.search(text[startpos+1:])
-      try:
-        endpos = startpos + 1 + semicolon_end.end() - len(semicolon_end.group(1)) + 1
-      except:
-        print "ERROR in semicolon_block_collapse for text starting at: ["+ text[startpos:startpos+100]+ "]"            
-        raise
-    
-      text_replace = re.sub("\n", eol_string,text[startpos:endpos])
+        count += 1
 
-      # This is bulky and not very elegant but works
-      text= text[0:startpos] + text_replace + text[endpos:]
-    
-      startpos = startpos + len(text_replace)
-    
-      semicolon_start = pattern_semicolon_only.search(text[startpos:])
-   
+        startpos = startpos + semicolon_start.start()
+        semicolon_end = pattern_semicolon_only_end.search(text[startpos+1:])
+        try:
+            endpos = startpos + 1 + semicolon_end.end() - len(semicolon_end.group(1)) + 1
+        except:
+            print "ERROR in semicolon_block_collapse for text starting at: ["+ text[startpos:startpos+100]+ "]"
+            raise
+
+        text_replace = re.sub("\n", eol_string,text[startpos:endpos])
+
+        # This is bulky and not very elegant but works
+        text= text[0:startpos] + text_replace + text[endpos:]
+
+        startpos = startpos + len(text_replace)
+
+        semicolon_start = pattern_semicolon_only.search(text[startpos:])
+
     # Original code: can't handle re matches that are too long
     #text, count = pattern_semicolon_block.subn( semicolon_block_replace, text )
     if verbosity >= 9:
         print 'Done [%s] subs with semicolon blocks' % count
     return text
 
-def semicolon_block_expand( text ):        
+def semicolon_block_expand( text ):
     return pattern_eol_string.sub('\n', text )
 
 """
@@ -387,7 +387,7 @@ argument to this function. [TODO]
 def quotes_add( text ):
 
     preferred_quote='"' # This info should be in a more central spot
-    
+
     if pattern_eoline_etcet.search( text ):
         return semicolons_add( text )
 
@@ -444,7 +444,7 @@ def semicolons_add( text, possible_bad_char=None ):
 ##        return "\n;" + text + ";\n"
 #JFD updates 5/23/2006; apparently the text does not always end with an eol.
     if not text.endswith('\n'):
-       text = text + '\n'
+        text = text + '\n'
     return "\n;\n" + text + ";\n"
 
 """
@@ -495,7 +495,7 @@ def _comments_strip_line( line ):
     c=0
     state = FREE # like to start out free which is possible after donning semicolon blocks.
     l = len(line)
-    while c < l: # parse range [0,n> where n is length and exclusive.        
+    while c < l: # parse range [0,n> where n is length and exclusive.
         ch=line[c]
 #        print "DEBUG: Processing char '"+ch+"' at "+`c`+" in state:", state
         if ( ch == sharp and state == FREE and    # A sharp in FREE state
@@ -506,21 +506,21 @@ def _comments_strip_line( line ):
             return line[0:c] # this is fast.
         if c==l-1: # c is the last character; leave it alone if it's not a sharpie
             return line
-        
+
         if ch == doubleq:
             if (state == FREE and                # new " behind space or at beginning of line
                 (c==0 or line[c-1].isspace())):
                 state = DOUBLE
             elif state == DOUBLE:
-                if line[c+1].isspace(): # garanteed to exist now.                
-                    state = FREE                
+                if line[c+1].isspace(): # garanteed to exist now.
+                    state = FREE
         elif ch == singleq:
             if (state == FREE and
                     (c==0 or line[c-1].isspace())):
                 state = SINGLE
             elif state == SINGLE:
-                if line[c+1].isspace():                    
-                    state = FREE           
+                if line[c+1].isspace():
+                    state = FREE
         c += 1
     return line
 
@@ -541,13 +541,13 @@ def _comments_strip_line( line ):
 #    if verbosity >= 9:
 #        print 'Done [%s] subs with comment not at beginning of line' % count
 #    return text
-    
+
 def nmrView_compress( text ):
 
-    text, count = pattern_nmrView_compress_empty.subn( '{}', text )    
+    text, count = pattern_nmrView_compress_empty.subn( '{}', text )
     print 'Compressed [%s] nmrView empty { } tags' % count
 
-    text, count = pattern_nmrView_compress_questionmark.subn( '{?}', text )    
+    text, count = pattern_nmrView_compress_questionmark.subn( '{?}', text )
     print 'Compressed [%s] nmrView question mark { ?} tags' % count
-    
+
     return text

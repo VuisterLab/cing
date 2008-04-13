@@ -110,23 +110,23 @@ def setupValidation( project, ranges=None ):
     returns None on success or True on failure.
     """
     validateDihedrals(  project  )
-    validateModels(     project  ) 
+    validateModels(     project  )
 
     project.predictWithShiftx()
-    project.validateAssignments(toFile=True)   
-    project.checkForSaltbridges(toFile=True)   
-    project.validateRestraints( toFile=True)   
-    project.calculateRmsd(      ranges=ranges)   
-    project.procheck(           ranges=ranges)   
-#    project.runWhatif(          ranges=ranges)   
-#    project.criticizeByAll()   
+    project.validateAssignments(toFile=True)
+    project.checkForSaltbridges(toFile=True)
+    project.validateRestraints( toFile=True)
+    project.calculateRmsd(      ranges=ranges)
+    project.procheck(           ranges=ranges)
+#    project.runWhatif(          ranges=ranges)
+#    project.criticizeByAll()
     project.summary()
 #end def
 
 def criticizeByAll( project ):
     project.criticize()
-    criticizeByWhatif( project )    
-    
+    criticizeByWhatif( project )
+
 def summary( project ):
     fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
     fp = open( fname, 'w' )
@@ -243,7 +243,7 @@ def calculateRmsd( project, ranges=None, models = None   ):
     for model in selectedModels:
         modelId = model-1
         NTmessage(".")
-               
+
         #end if
         project.molecule.rmsd.backbone[num]   = 0.0
         project.molecule.rmsd.backboneCount   = 0
@@ -266,7 +266,7 @@ def calculateRmsd( project, ranges=None, models = None   ):
                     d += tmp0*tmp0
                     d += tmp1*tmp1
                     d += tmp2*tmp2
-                    
+
 #                    for i in ['x','y','z']: #JFD speed this up by unlooping if needed.
 #                        tmp = atm.coordinates[modelId][i]-atm.meanCoordinate[i]
 #                        d += tmp*tmp
@@ -324,7 +324,7 @@ def calculateRmsd( project, ranges=None, models = None   ):
         num += 1
     #end for
     NTmessage("")
-    
+
     if shownWarningCount1 > 10:
         NTerror('Error calculateRmsd: expected coordinates1 for '+`shownWarningCount1`+' atoms\n')
 #            if shownWarningCount2 > 10:
@@ -347,11 +347,11 @@ def calculateRmsd( project, ranges=None, models = None   ):
 def validateRestraints( project, toFile = True)   :
     """
     Calculate rmsd's and violation on restraints
-    """ 
+    """
 
 #    fps = []
 #    fps.append( sys.stdout )
-    
+
     msg = ""
     msg += sprintf('%s\n', project.format() )
 
@@ -462,7 +462,7 @@ def validateRestraints( project, toFile = True)   :
         fp = open( fname, 'w' )
         NTmessage( '==> validateRestraints, output to %s', fname)
         fprintf(fp, msg)
-    #end if    
+    #end if
 #end def
 
 def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
@@ -507,7 +507,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
             s = validateSaltbridge(res1,res2)
             if s:
                 if (s.types[4][1] <= cutoff):    # less then cutoff 'not observed'
-                    if toFile: 
+                    if toFile:
                         fprintf(fp, '%s\n', s.format() )
                     NTdebug(    '%s\n', s.format() )
                     res1.saltbridges.append( s )
@@ -595,7 +595,7 @@ def validateSaltbridge( residue1, residue2 ):
             if len(atm.coordinates) == 0:
                 NTerror('validateSaltbridge: no coordinates for atom %s\n', atm)
                 return None
-           #end if
+            #end if
         #end for
     #end for
 
@@ -624,20 +624,20 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         #c1 is geometric mean of centroid atms
         c1 = NTvector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
-            atm = residue1[atmName]            
+            atm = residue1[atmName]
             c1 += atm.coordinates[modelId]()
         #end for
         # not yet: c1 /= len(centroids[residue1.db.shortName])
         for j in range(3):
             c1[j] /= len(centroids[residue1.db.shortName])
 
-        try: 
+        try:
             c1a = residue1['CA'].coordinates[modelId]()
-        except: 
+        except:
             break
 
         #c2 is geometric mean of centroid atms
-        c2 = NTvector(0,0,0) 
+        c2 = NTvector(0,0,0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
             c2 += atm.coordinates[modelId]()
@@ -800,7 +800,7 @@ def validateAssignments( project, toFile = True   ):
 
     return a NTlist with atms with errors.
     Generate output in moleculename/Cing/validateAssignments.txt if toFile is True.
-    
+
     return None on code error.
     """
     NTmessage("Starting validateAssignments")
@@ -811,8 +811,8 @@ def validateAssignments( project, toFile = True   ):
         return result
 
     for atm in project.molecule.allAtoms():
-       atm.validateAssignment = NTlist()
-       if atm.isAssigned():
+        atm.validateAssignment = NTlist()
+        if atm.isAssigned():
             # Check database
             #print '===>', atm
             if not atm.db.shift:
@@ -845,7 +845,7 @@ def validateAssignments( project, toFile = True   ):
             # Check if not both realAtom and pseudoAtom are assigned
             if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
                 string = sprintf('%s: atm also has %s assigned', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
- #               NTmessage('%-20s %s', atm, string)
+#                NTmessage('%-20s %s', atm, string)
                 result.append( atm )
                 atm.validateAssignment.append(string)
             #end if
@@ -858,7 +858,7 @@ def validateAssignments( project, toFile = True   ):
 #                        NTmessage('%-20s %s', atm, string)
                         result.append( atm )
                         atm.validateAssignment.append(string)
-                 #end if
+                    #end if
                 #end for
             #end if
 
@@ -884,10 +884,10 @@ def validateAssignments( project, toFile = True   ):
                     atm.validateAssignment.append(string)
                 #end if
             #end if atm.isProton()
-       #end if atm.isAssigned():
-       if len(atm.validateAssignment):
+        #end if atm.isAssigned():
+        if len(atm.validateAssignment):
             atm.colorLabel = COLOR_ORANGE
-       #end if
+        #end if
     #end for
 #    for atm in result:
 #        # check for shiftx averages
@@ -913,12 +913,12 @@ def validateAssignments( project, toFile = True   ):
 #               'shiftx:   %7s %7s \n' +\
 #               'database: %7s %7s \n',
 #                dots, atm, dots,
-#                mavStr, msdStr, 
-#                savStr, ssdStr, 
+#                mavStr, msdStr,
+#                savStr, ssdStr,
 #                savStr, davStr)
 #        NTwarning(atm.validateAssignment.format('%s') )
 #    #end for
-    
+
     if toFile:
         #path = project.mkdir( project.directories.analysis, project.molecule.name )
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'validateAssignments.txt')
@@ -936,22 +936,22 @@ def validateAssignments( project, toFile = True   ):
             dsd     = None
             value   = None
             error   = None
-            
+
             if atm.has_key('shiftx') and len(atm.shiftx) > 0:
                 sav = atm.shiftx.av
                 ssd = atm.shiftx.sd
             if atm.isAssigned() and sav:
                 delta = atm.resonances().value - sav
                 rdelta = 1.0
-                if ssd > 0.0: 
+                if ssd > 0.0:
                     rdelta = sav/ssd
             if atm.db.shift:
                 dav = atm.db.shift.average
-                dsd = atm.db.shift.sd            
+                dsd = atm.db.shift.sd
             if atm.resonances():
                 value = atm.resonances().value
                 error = atm.resonances().error
-                
+
             savStr     = val2Str(sav,   '%6.2f', 6 )
             ssdStr     = val2Str(ssd,   '%6.2f', 6 )
             deltaStr   = val2Str(delta, '%6.2f', 6 )
@@ -962,12 +962,12 @@ def validateAssignments( project, toFile = True   ):
             if valueStr==NaNstring:
                 error=None
             errorStr   = val2Str(error, '%6.2f', 6 )
-            
+
             fprintf(fp,'%-18s (%6s %6s)   (shiftx: %6s %6s)   (delta: %6s %6s)   (db: %6s %6s)   %s\n',
                     atm,
                     valueStr,
                     errorStr,
-                    savStr, ssdStr, 
+                    savStr, ssdStr,
                     deltaStr, rdeltaStr,
                     davStr, dsdStr,
                     atm.validateAssignment.format()
@@ -989,18 +989,18 @@ def validateDihedrals( self)   :
         return True
     if not self.molecule.modelCount:
         return True
-        
+
     for res in self.molecule.allResidues():
         for dihed in res.db.dihedrals.zap('name'):
             if not dihed in res:
                 continue
             if not res.has_key(dihed):
                 continue
-            
+
             d = res[dihed]
             if not d: # skip dihedrals without values e.g. n terminal phi.
                 continue
-#            print res, dihed, d 
+#            print res, dihed, d
 
             plotpars = self.plotParameters.getdefault(dihed,'dihedralDefault')
 
@@ -1033,7 +1033,7 @@ def validateModels( self)   :
     if not self.molecule:
         NTerror("Skipping validateModels because no molecule")
         return True
-    if not self.molecule.modelCount: 
+    if not self.molecule.modelCount:
         NTerror("Skipping validateModels because no model")
         return True
 
@@ -1136,10 +1136,10 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
             point = (plotparams.min, 0) # lower left corner of second box.
             sizes = (bounds[1]-plotparams.min,ylimMax)
             plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-            
+
 
     # Always plot the cav line
-    plot.line( (aAv, 0), (aAv, ylimMax), 
+    plot.line( (aAv, 0), (aAv, ylimMax),
                lineAttributes(color=plotparams.average, width=width) )
     return ps
 
@@ -1156,15 +1156,15 @@ def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
     if not project:
         NTerror( 'in makeDihedralPlot called without project' )
         return None
-    
+
     if dihedralName1 not in residue or residue[dihedralName1] == None:
 #        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
-    
+
     if dihedralName2 not in residue or residue[dihedralName2] == None:
 #        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
-    
+
     d1 = residue[dihedralName1]
     d2 = residue[dihedralName2]
 
@@ -1200,19 +1200,19 @@ def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
 ##        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
 ##        im = imshow(rgb, alpha=0.05, extent=extent)
 #        ssType = residue.getDeepByKeys(PROCHECK_STR, SECSTRUCT_STR)
-#        
-#        
+#
+#
 #        ssType = 'E'
 #        resType = 'ASN'
-#        
-#        hist = histBySsAndResType[ssType][resType]        
+#
+#        hist = histBySsAndResType[ssType][resType]
 #        plot.ramachandranZPlot(hist)
-        
+
 
     # Plot restraint ranges.
     dr1 = _matchDihedrals(residue, dihedralName1)
     dr2 = _matchDihedrals(residue, dihedralName2)
-    
+
     if dr1 and dr2:
         lower1, upper1 = dr1.lower, dr1.upper
         lower2, upper2 = dr2.lower, dr2.upper
@@ -1302,14 +1302,14 @@ def setupHtml(project):
         next = None
 
         if index > 0:
-            try: 
+            try:
                 previous = project[project.molecules[index-1]]
-            except: 
+            except:
                 pass
 
-        try: 
+        try:
             next = project[project.molecules[index+1]]
-        except: 
+        except:
             pass
 
         molecule.html.insertHtmlLink( molecule.html.header, molecule, project,
@@ -1346,7 +1346,7 @@ def setupHtml(project):
             #end if
 
             #if hasattr(chain, 'html'): del(chain['html'])
-            if chain.has_key('html'): 
+            if chain.has_key('html'):
                 del(chain.html)
 
             chain.htmlLocation = ( os.path.join(chaindir,'index.html'), top )
@@ -1361,7 +1361,7 @@ def setupHtml(project):
                                             chain, text='Chain %s' % chain.name)
 
             residues = chain.allResidues()
-            if not residues: 
+            if not residues:
                 break
 
             #Chain page
@@ -1414,7 +1414,7 @@ def setupHtml(project):
                 #end if
 
                 #if hasattr(res, 'html'): del(res['html'])
-                if res.has_key('html'): 
+                if res.has_key('html'):
                     del(res.html)
 
                 res.htmlLocation = ( os.path.join(resdir,'index.html'), top )
@@ -1763,7 +1763,7 @@ def renderHtml(project):
         if htmlObj.render():
             NTerror( "Failed to render an html object." )
             return True
-            
+
 
 def populateHtmlMolecules( project, skipFirstPart=False ):
     '''Description: generate the Html content for Molecules and Residues pages.
@@ -1832,7 +1832,7 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                                 outlierList = d.outliers.zap(0)
 #                            -180.1 is longest: 6.1f
                             summary = '%-2s %3d %-6s: average: %6.1f   cv: %6.3f  ||  outliers: %3s (models %s)' % (
-                                chainId, resNum, dihed, 
+                                chainId, resNum, dihed,
                                 d.cav, d.cv, lenOutliers, outlierList
                                              )
                             fprintf( fp, '%s\n', summary )
@@ -1848,7 +1848,7 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                             if ps:
                                 ps.hardcopy( fileName = tmpPath )
         #                        del( plot )
-    
+
                                 #generate HTML code for plot and text
                                 res.html.left( 'h2', dihed, id=dihed),
                                 res.html.left( 'img', src = dihed + '.' + graphicsFormatExtension, alt=""  )
@@ -1893,14 +1893,14 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
             ncols = 6
             main = molecule.html.main
             main('table',  closeTag=False)
-            plotCount = -1        
+            plotCount = -1
             printedDots = 0 # = plotCount+1
             for p,d in pcPlotList:
                 if not printedDots % 10:
                     digit = printedDots / 10
                     NTmessage(`digit`)
                 else:
-                    NTmessage('.')            
+                    NTmessage('.')
                 printedDots += 1
                 plotCount += 1
                 procheckLink = os.path.join('..',
@@ -1910,7 +1910,7 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
     #            NTdebug('procheck real path: ' + procheckLinkReal)
                 if not os.path.exists( procheckLinkReal ):
                     continue # Skip their inclusion.
-    
+
                 fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, procheckLinkReal )
                 fileList = False
     #            NTdebug( "Got back from convert2Web output file names: " + `fileList`)
@@ -1934,14 +1934,14 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                 main('a',   "",         href = fullLink, closeTag=False )
                 main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
                 main('a',   "",         openTag=False )
-                main('br')            
+                main('br')
                 main('a',   d,          href = procheckLink )
-                main('br')            
+                main('br')
                 main('a',   "pdf",      href = printLink )
                 main('td',  openTag=False)
             #end for
             NTmessage('')
-            
+
             if plotCount: # close any started rows.
                 main('tr',  openTag=False)
             main('table',  openTag=False) # close table
@@ -2078,7 +2078,7 @@ def populateHtmlModels(project):
         #                                   restraintList, project,
         #                                   text = 'Home' )
         ps = NTplotSet() # closes any previous plots
-        ps.hardcopySize = (600,369)        
+        ps.hardcopySize = (600,369)
         plot = NTplot( xLabel = 'Model', yLabel = 'Outliers',
                        xRange = (0, project.molecule.modelCount+1))
         ps.addPlot(plot)
@@ -2089,10 +2089,10 @@ def populateHtmlModels(project):
         plot.barChart( project.models.items(), 0.05, 0.95,
                        attributes = boxAttributes( fillColor='green' ) )
 
-        plot.autoScaleYByValueList(outliers, 
+        plot.autoScaleYByValueList(outliers,
                     startAtZero=True,
                     useIntegerTickLabels=True )
-        
+
         ps.hardcopy( project.htmlPath('outliers') )
         graphicsOutputFormat = 'png'
         molecule.modelPage.main('img', src = 'outliers.'+graphicsOutputFormat)
@@ -2115,7 +2115,7 @@ def validate( project, ranges=None, htmlOnly = False ):
 
         # populate Molecule (Procheck) and Residues
         if populateHtmlMolecules(project):
-            NTerror("Failed to populateHtmlMolecules") 
+            NTerror("Failed to populateHtmlMolecules")
 #            return True TODO: enable after it works again.
         if populateHtmlModels(project):
             NTerror("Failed to populateHtmlModels")
