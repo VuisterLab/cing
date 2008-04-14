@@ -7,7 +7,7 @@ from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 import string
 
-START_ENTRY_ID                 = 0 # default 0
+START_ENTRY_ID                 = 2 # default 0
 MAX_ENTRIES_TODO               = 999999 # default a ridiculously large number like 999999
 
 def doScriptOnEntryList(pythonScriptFileName, 

@@ -19,6 +19,7 @@ from matplotlib.pylab import imshow
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 from pylab import nx
+from cing.Libs.NTutils import getDeepByKeys
 import cing
 import csv
 import os
@@ -30,10 +31,10 @@ Takes a file with dihedral angles values and converts them to a python pickle fi
 with histograms for (combined) residue and sec. struct. types.
 
 Please note well that the values are per residue and that the value range is much
-smaller than per molecule values. The per-molecule values are scaled by a sigma.
+smaller than per molecule values. The per-molecule values are scaled by a sigma. 
 See formula 8 in Rob Hooft's paper:
 
-Hooft et al. Objectively judging the quality of a protein structure from a
+Hooft et al. Objectively judging the quality of a protein structure from a 
 Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
 """
 
@@ -63,7 +64,7 @@ def inRange(a):
     if a < plotparams1.min or a > plotparams1.max:
         return False
     return True
-
+      
 def main():
     reader = csv.reader(open(cvs_file_name, "rb"), quoting=csv.QUOTE_NONE)
     valuesBySsAndResType       = {}
@@ -71,6 +72,8 @@ def main():
     histBySsAndCombinedResType = {}
 #    histByCombinedSsAndResType = {}
     valuesByEntrySsAndResType       = {}
+    hrange = (xRange, yRange)
+        
     for row in reader:
 #        7a3h,A,VAL ,   5,H, -62.8, -52.8
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
@@ -90,20 +93,19 @@ def main():
         appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType,resType,'psi' )
 
     (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
-
-
-    hrange = (xRange, yRange)
+#    (Cav, Csd) = ( 1.0, 1.0 )
+    
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
             hist2d, _xedges, _yedges = histogram2d(
-                valuesBySsAndResType[ssType][resType]['psi'],
-                valuesBySsAndResType[ssType][resType]['phi'],
-                bins = binCount,
+                valuesBySsAndResType[ssType][resType]['psi'], 
+                valuesBySsAndResType[ssType][resType]['phi'], 
+                bins = binCount, 
                 range= hrange)
             hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys( histBySsAndResType, hist2d, ssType, resType )
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
-
+    
     for ssType in valuesBySsAndResType.keys():
         phi = []
         psi = []
@@ -115,7 +117,7 @@ def main():
         hist2d, _xedges, _yedges = histogram2d(
             psi, # Note that the x is the psi for some stupid reason,
             phi, # otherwise the imagery but also the [row][column] notation is screwed.
-            bins = binCount,
+            bins = binCount, 
             range= hrange)
         hist2d = zscaleHist( hist2d, Cav, Csd )
         setDeepByKeys( histBySsAndCombinedResType, hist2d, ssType )
@@ -132,13 +134,13 @@ def main():
     hist2d, _xedges, _yedges = histogram2d(
         psi, # Note that the x is the psi for some stupid reason,
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
-        bins = binCount,
+        bins = binCount, 
         range= hrange)
     hist2d = zscaleHist( hist2d, Cav, Csd )
     sumHistCombined = sum(sum( hist2d ))
     NTdebug('histCombined elements: %.0f' % sumHistCombined)
 
-
+    
     dbase = shelve.open( dbase_file_name )
     dbase[ 'histCombined' ]               = hist2d
     dbase[ 'histBySsAndCombinedResType' ] = histBySsAndCombinedResType
@@ -152,40 +154,44 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
     """Returns the value from the bin pointed to by v0,v1.
     """
     tx = ogrid[ v0:v0:1j, v1:v1:1j ]
-    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s' % (tx, bins[1], hist))
     interpolatedValueArray = interpn_linear( hist, tx, bins )
     interpolatedValue = interpolatedValueArray[ 0, 0 ]
-    NTdebug( 'interpolatedValue: %s' % interpolatedValue)
+    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
     return interpolatedValue
-
+    
 def getRescaling(valuesByEntrySsAndResType):
-    '''Use a jack knife technique to get the average and sd over all entry) scores'''
+    '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
+    http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
+    '''            
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
         histBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
         z = NTlist()
         for ssType in valuesByEntrySsAndResType[ entryId ].keys():
-            for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
-                angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
-                angleList0 = angleDict[ 'phi' ]
-                angleList1 = angleDict[ 'psi' ]
-                for i in range(len(angleList0)):
-                    zi = getValueFromHistogramUsingInterpolation(
-                        histBySsAndResTypeExcludingEntry[ssType][resType],
+             for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
+                 angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
+                 angleList0 = angleDict[ 'phi' ]
+                 angleList1 = angleDict[ 'psi' ]
+                 for i in range(len(angleList0)):
+                     his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
+                     if not his: # when testing not all residues are present in smaller sets.
+                         continue 
+                     zi = getValueFromHistogramUsingInterpolation( 
+                        histBySsAndResTypeExcludingEntry[ssType][resType], 
                         angleList0[i], angleList1[i])
-                    z.append( zi )
+                     z.append( zi )
         (av, _sd, _n) = z.average()
         NTdebug("For entry %s found av,sd,n: %s" %(entryId,(av, _sd, _n)))
         C.append( av )
     (Cav, Csd, Cn) = C.average()
-    NTdebug("Overall found av,sd,n: %s" %(Cav, Csd, Cn))
+    NTdebug("Overall found av,sd,n: " + `C.average()`)
     return (Cav, Csd, Cn)
 
 
 def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
     hrange = (xRange, yRange)
     histBySsAndResTypeExcludingEntry = {}
-    valuesBySsAndResTypeExcludingEntry = {}
+    result = {}
 
     for entryId in valuesByEntrySsAndResType.keys():
         if entryId == entryIdToExclude:
@@ -195,38 +201,38 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
             for resType in valuesBySsAndResType[ssType].keys():
                 angleList0 = valuesBySsAndResType[ssType][resType]['phi']
                 angleList1 = valuesBySsAndResType[ssType][resType]['psi']
-                appendDeepByKeys(valuesBySsAndResTypeExcludingEntry,angleList0,ssType,resType,'phi')
-                appendDeepByKeys(valuesBySsAndResTypeExcludingEntry,angleList1,ssType,resType,'psi')
-
-
-    for ssType in valuesBySsAndResTypeExcludingEntry.keys():
-        for resType in valuesBySsAndResTypeExcludingEntry[ssType].keys():
-            angleList0 = valuesBySsAndResTypeExcludingEntry[ssType][resType]['phi']
-            angleList1 = valuesBySsAndResTypeExcludingEntry[ssType][resType]['psi']
+                appendDeepByKeys(result,angleList0,ssType,resType,'phi')
+                appendDeepByKeys(result,angleList1,ssType,resType,'psi')
+        
+        
+    for ssType in result.keys():
+        for resType in result[ssType].keys():
+            angleList0 = result[ssType][resType]['phi']
+            angleList1 = result[ssType][resType]['psi']
             NTdebug( 'entry: %s ssType %s resType %s angleList0 %s' % (
                 entryId, ssType, resType, angleList0 ))
             hist2d, _xedges, _yedges = histogram2d(
                 angleList1, # think rows (y)
                 angleList0, # think columns (x)
-                bins = binCount,
+                bins = binCount, 
                 range= hrange)
             setDeepByKeys( histBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
 
     return histBySsAndResTypeExcludingEntry
 
 
-
-def getValueFromHistogram( hist, angle0, angle1):
-    pass
+    
+#def getValueFromHistogram( hist, angle0, angle1):
+#    pass
 
 def ramachandranPlot(hist, titleStr):
 #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
     sumHist = sum(sum( hist ))
     maxHist = amax(amax( hist ))
-#    vmax = maxHist # Focus on low density regions?
+#    vmax = maxHist # Focus on low density regions? 
 #    norm = colors.Normalize(vmin=0, vmax=vmax)
     NTdebug('hist sumHist, max: %12s %5.0f %5.0f' % (titleStr,sumHist, maxHist))
-    levels = nx.arange(maxHist*0.05, maxHist*0.5+1, maxHist*0.1)
+    levels = nx.arange(maxHist*0.05, maxHist*0.5+1, maxHist*0.1)    
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = [600,600]
 #    NTdebug( 'plotparams1: %r' % plotparams1)
@@ -248,8 +254,8 @@ def ramachandranPlot(hist, titleStr):
     Z = hist
     extent = xRange + yRange
 #    NTdebug("Covering extent: " +`extent`)
-    im = imshow( Z,
-#            interpolation='bilinear',
+    im = imshow( Z, 
+#            interpolation='bilinear', 
             interpolation = 'nearest',
             origin='lower',
             extent=extent )
@@ -259,8 +265,8 @@ def ramachandranPlot(hist, titleStr):
 #                            cmap=cm.get_cmap('jet', len(levels)-1),
 #                            )
 
-#    cset1 = contourf(X, Y, Z, levels,
-#        cmap=cm.get_cmap('jet', len(levels)-1),
+#    cset1 = contourf(X, Y, Z, levels, 
+#        cmap=cm.get_cmap('jet', len(levels)-1), 
 #        origin='lower')
     cset2 = contour(Z, levels,
         colors = 'black',
@@ -270,7 +276,7 @@ def ramachandranPlot(hist, titleStr):
     for c in cset2.collections:
         c.set_linestyle('solid')
 #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-#            origin='lower',
+#            origin='lower', 
 #            extent=extent)
     colorbar(im)
 #    colorbar(cset2)
@@ -289,7 +295,7 @@ def ramachandranZPlotTest(hist, titleStr):
 #    NTdebug( 'xRange: %r' % `xRange`)
     xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
     yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-    plot = NTplot(
+    plot = NTplot( 
       title  = titleStr,
       xRange = xRange,
       xTicks = xTicks,
@@ -304,7 +310,7 @@ def ramachandranZPlotTest(hist, titleStr):
 #      'bottom': 0.0,   # the bottom of the subplots of the figure
 #      'top': 1.0,      # the top of the subplots of the figure
 #            }
-#    ps.subplotsAdjust(**kwds)
+#    ps.subplotsAdjust(**kwds)    
 #    X, Y = meshgrid(x, y)
 #    extent = xRange + yRange
     plot.ramachandranZPlot( hist )
@@ -323,7 +329,7 @@ def testPlot():
 #            titleStr = ssType + '_' + resType
 #            hist = histBySsAndResType[ssType][resType]
 #            ramachandranZPlot(hist, titleStr)
-#
+#            
 #    for ssType in  'E','H',' ':
 #        titleStr = ssType + '_ALL'
 #        hist = histBySsAndCombinedResType[ssType]
@@ -331,7 +337,7 @@ def testPlot():
 
 #    ramachandranPlot(histCombined, 'ALL_ALL')
     ramachandranZPlotTest(histCombined, 'ALL_ALL')
-
+            
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug

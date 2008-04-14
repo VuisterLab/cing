@@ -159,7 +159,7 @@ class AllChecks(TestCase):
         self.assertNotEquals(val2Str(999.1,"%6.2f",nullValue=NOSHIFT),NaNstring)
 
     def testNTdict(self):
-        a = NTdict(b=NTdict(anItem='there'))
+        a = NTdict( b=NTdict( anItem='there'))
 #        NTdebug( '0 '+ `a` )
 #        NTdebug( '1 '+ `a['b']`)
 #        NTdebug( '2 '+ `a.getDeepByKeys('b')`)
