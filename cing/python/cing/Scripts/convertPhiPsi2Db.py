@@ -1,3 +1,4 @@
+from cing import cingDirTestsTmp
 from cing import cingPythonCingDir
 from cing import verbosityDebug
 from cing import verbosityOutput
@@ -7,6 +8,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.PluginCode.procheck import to3StateUpper
@@ -19,7 +21,6 @@ from matplotlib.pylab import imshow
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 from pylab import nx
-from cing.Libs.NTutils import getDeepByKeys
 import cing
 import csv
 import os
@@ -58,7 +59,7 @@ xGrid,yGrid = ogrid[ plotparams1.min:plotparams1.max:binCountJ, plotparams1.min:
 bins = (xGrid,yGrid)
 
 pluginDataDir = os.path.join( cingPythonCingDir,'PluginCode','data')
-os.chdir(pluginDataDir)
+os.chdir(cingDirTestsTmp)
 
 def inRange(a):
     if a < plotparams1.min or a > plotparams1.max:
@@ -66,7 +67,8 @@ def inRange(a):
     return True
       
 def main():
-    reader = csv.reader(open(cvs_file_name, "rb"), quoting=csv.QUOTE_NONE)
+    cvs_file_abs_name = os.path.join( pluginDataDir, cvs_file_name )
+    reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
     valuesBySsAndResType       = {}
     histBySsAndResType         = {}
     histBySsAndCombinedResType = {}
@@ -141,7 +143,8 @@ def main():
     NTdebug('histCombined elements: %.0f' % sumHistCombined)
 
     
-    dbase = shelve.open( dbase_file_name )
+    dbase_file_abs_name = os.path.join( pluginDataDir, dbase_file_name )
+    dbase = shelve.open( dbase_file_abs_name )
     dbase[ 'histCombined' ]               = hist2d
     dbase[ 'histBySsAndCombinedResType' ] = histBySsAndCombinedResType
     dbase[ 'histBySsAndResType' ]         = histBySsAndResType
@@ -168,18 +171,18 @@ def getRescaling(valuesByEntrySsAndResType):
         histBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
         z = NTlist()
         for ssType in valuesByEntrySsAndResType[ entryId ].keys():
-             for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
-                 angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
-                 angleList0 = angleDict[ 'phi' ]
-                 angleList1 = angleDict[ 'psi' ]
-                 for i in range(len(angleList0)):
-                     his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
-                     if not his: # when testing not all residues are present in smaller sets.
-                         continue 
-                     zi = getValueFromHistogramUsingInterpolation( 
+            for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
+                angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
+                angleList0 = angleDict[ 'phi' ]
+                angleList1 = angleDict[ 'psi' ]
+                for i in range(len(angleList0)):
+                    his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
+                    if not his: # when testing not all residues are present in smaller sets.
+                        continue 
+                    zi = getValueFromHistogramUsingInterpolation( 
                         histBySsAndResTypeExcludingEntry[ssType][resType], 
                         angleList0[i], angleList1[i])
-                     z.append( zi )
+                    z.append( zi )
         (av, _sd, _n) = z.average()
         NTdebug("For entry %s found av,sd,n: %s" %(entryId,(av, _sd, _n)))
         C.append( av )
@@ -337,7 +340,7 @@ def testPlot():
 
 #    ramachandranPlot(histCombined, 'ALL_ALL')
     ramachandranZPlotTest(histCombined, 'ALL_ALL')
-            
+             
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug

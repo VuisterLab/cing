@@ -104,10 +104,10 @@ class NTlist( list ):
     def setConsensus(self, minFraction=1.):
         """Where there are only the same values set the consensus to it
         otherwise set it to None.
-        They don't all need to be the same, at least the given fraction 
+        They don't all need to be the same, at least the given fraction
         should be the same. If the fraction is set to .5 or lower the result
         is undefined.
-        
+
         Return consensus or False if set to None. Consensus can be None.
         """
         setattr(self, CONSENSUS_STR, None)
@@ -121,9 +121,9 @@ class NTlist( list ):
                 setattr(self, CONSENSUS_STR, v)
                 return v
         return False
-        
-         
-        
+
+
+
     def append( self, *items ):
         for item in items:
             list.append( self, item )
@@ -171,8 +171,8 @@ class NTlist( list ):
         # JFD notes that this method is now twice as fast.
         # This was a very rate limiting piece of code when a chain
         # had many residues (E.g. an X-ray structure with many waters).
-        
-        
+
+
         try:
             return list.index( self, item )
         except ValueError:
@@ -242,13 +242,44 @@ class NTlist( list ):
             self.current = item
         #end if
     #end def
-    
+
     def getDeepByKeysOrDefault( self, default, *keyList ):
-        return getDeepByKeysOrDefault( self, default, *keyList )
+        result = self.getDeepByKeys( *keyList )
+        if result == None:
+            return default
+        return result
 
     def getDeepByKeys( self, *keyList ):
-        return getDeepByKeys( self, *keyList )
-    
+        """Return arbitrary deep element or None if key is absent at some point.
+        The essence here is silence."""
+        lk = len(keyList)
+#        NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
+        if not lk:
+            NTdebug("Asked for a get on a dictionary without a key")
+            return None
+        key = keyList[0]
+
+        if not isinstance(key, int ):
+            NTdebug("no int key in NTlist.getDeepByKeys: " + `key`)
+            return None
+
+        if key >= len(self):
+            NTdebug("int key in NTlist.getDeepByKeys to large for this NTlist: " + `key`)
+            return None
+
+        value = self[key]
+        if lk == 1:
+#            NTdebug("value : " + `value`)
+            return value
+        if hasattr( value,'getDeepByKeys'):
+#            NTdebug("Going one level deeper")
+            reducedKeyList = keyList[1:]
+            return value.getDeepByKeys(*reducedKeyList)
+#            NTdebug("In NTdict.getDeepByKeys the value is not a NTdict or subclass instance but there still are keys to go for digging deeper")
+#            NTdebug(" for value : [" + `value` +']')
+#            NTdebug(" type value: [" + `type(value)` +']')
+        return None
+
     #--------------------------------------------------------------
     # numeric lists, None elements ignored
     #--------------------------------------------------------------
@@ -408,7 +439,7 @@ def NTfill( value, n ):
 def NThistogram( theList, low, high, bins ):
     """Return a histogram of theList
     """
-    if bins < 1: 
+    if bins < 1:
         return None
 
     his = NTfill( 0, bins) # Returns NTlist
@@ -433,11 +464,11 @@ def NThistogram( theList, low, high, bins ):
         if item >= currentBinlow and item < currentBinhigh:
             his[bin] += 1
             continue
-        while bin < bins and item > currentBinhigh: 
+        while bin < bins and item > currentBinhigh:
             bin += 1
             currentBinlow  = low+bin*binSize
             currentBinhigh = currentBinlow + binSize
-        if bin < bins: 
+        if bin < bins:
             his[bin] += 1
     return his
 #end def
@@ -596,9 +627,9 @@ class NTvector( list ):
         NB: Only 3D vectors
         """
         l = len(self)
-        if l != 3: 
+        if l != 3:
             return None
-        if l != len(other): 
+        if l != len(other):
             return None
 
         result = NTvector()
@@ -621,7 +652,7 @@ class NTvector( list ):
 #        return    self[0] * (b[1]*c[2]-b[2]*c[1] )
 #                - self[1] * (b[0]*c[2]-b[2]*c[0] )
 #                + self[2] * (b[0]*c[1]-b[1]*c[0] )
-               
+
 
     def angle( self, other, radians = False ):
         """
@@ -886,341 +917,419 @@ NTdictObjectId = 0
 # Variables to limit recursion and prevent cycles in __repr__() call
 NTdictDepth    = 0
 NTdictMaxDepth = 1
-NTdictCycles   = [] 
+NTdictCycles   = []
 
 class NTdict(dict):
-  """
-      class NTdict: Base class for all mapping NT objects.
-
-      create a 'structure' from keywords to group things. Keys can be referenced as
-      in dictionary methods, or as an attribute; e.g.
-
-          aap = NTdict( noot=3, mies=4, kees='not awake' )
-          print aap['noot']
-          > 3
-          print aap.noot
-          > 3
-
-      Hashing and compare implemented.
-
-      Methods:
-          __call__( **kwds )                            Calling will update kwds and return self
-
-          format( format=None ):                        Format the object according to format or __FORMAT__ (when
-                                                        format == None) attribute.
-          getAttr( hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
-                                                        Also print 'hidden' attributes when hidden!=0.
-
-          getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise
-
-          saveXML( *attrs ):                            Add attrs to the list to save in XML format.
-          toXML( stream=sys.stdout )                    Write XML code of object to stream; recursively decend; i.e.
-                                                        cycles will wreck this routine.
-
-      Inherited methods:
-          most methods defined as in dict()
-
-          methods __iter__(),iterkeys(), values(), itervalues(), items() and iteritems()
-          len(), popitem(), clear(), update() all decend from method keys().
-          Hence when subclassing, overriding the keys() method effectively implements the other methods
-
-          popitem() returns None upon empty dictionary
-
-      Reserved attributes:
-          attribute '__CLASS__'                         is reserved to store a class identifier; usefull for subtyping
-          attribute '__OBJECTID__'                      is reserved to store an unique object id
-          attribute '__FORMAT__'                        is reserved to store format for method format()
-          attribute '__HIDDEN__'                        is reserved to store the hidden attributes
-          attribute '__SAVEXML__'                       is reserved to store the name of attributes saved as XML
-
-      GV 12 Sep 2007:
-        removed implementation with global storage in NTstructObjects since it was never used and
-        will result in objects persisting even if they could be deleted (i.e. a memory leak).
-  """
-  def __init__( self, *args, **kwds ):
-     global NTdictObjectId
-
-     #print '>>>', args, kwds
-     dict.__init__( self, *args, **kwds )
-     self.setdefault('__CLASS__',  'NTdict' )
-     self.setdefault('__FORMAT__',  None )      # set to None, which means by default not shown in repr() and toXML() methods
-     self.setdefault('__SAVEXML__', None )      # set to None, which means by default not shown in repr() and toXML() methods
-     self.setdefault('__SAVEALLXML__', False )  # when True, save all attributes in toXML() methods
-#     self.__getstate__ =  self  # Trick for fooling shelve.
-
-     self.__OBJECTID__ = NTdictObjectId
-     NTdictObjectId += 1
-     self.__HIDDEN__  = ['__HIDDEN__','__OBJECTID__','__CLASS__','__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
-  #end def
-
-  #------------------------------------------------------------------
-  # Basic functionality
-  #------------------------------------------------------------------
-  def __getattr__(self, attr):
-    """Need to override because otherwise attributes such as __SAVEXML__
-    aren't available"""
-#    if attr == '__getstate__':
-#        return 
-    return self[attr]
-    
-
-  def __setattr__(self, attr, value):
-    self[attr] = value
-
-  def __delattr__(self, attr):
-    del( self[attr] )
-
-    
-  def __cmp__( self, other ):
-      """Optimized for speed a bit"""
-      if self.__OBJECTID__ == other.__OBJECTID__:
-          return 0
-      if self.__OBJECTID__ < other.__OBJECTID__:
-          return -1
-      return 1
-
-  def __hash__( self ):
-      return hash( self.__OBJECTID__ )
-  #end def
-
-  def __eq__( self, other):
-    if other == None:
-        return False
-    if not isinstance(other,NTdict): # eg when comparing with tuple.
-        return False        
-    return self.__OBJECTID__ == other.__OBJECTID__
-
-  def __ne__( self, other):
-    return not (self == other)
-
-  #------------------------------------------------------------------
-  # Print/repr/output routines
-  #------------------------------------------------------------------
-  def __str__( self ):
-#    return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
-#    return self.format()
-    return '<%s-object (%d)>' % ( self._className(), self.__OBJECTID__ )
-
-  def _className( self ):
-    return str(self.__class__)[7:-2].split('.')[-1:][0]
-  #end def
-
-  def __repr__( self ):
-#     return dict.__repr__( self )
-#     return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
-     global NTdictDepth, NTdictMaxDepth, NTdictCycles
-
-     #prevent cycles
-     if (NTdictDepth == 0):
-         NTdictCycles = []
-     #end if
-
-     if (self.__OBJECTID__ in NTdictCycles):
-         return  '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
-     #end if
-     NTdictCycles.append( self.__OBJECTID__ )
-
-     NTdictDepth += 1
-     if (NTdictDepth > NTdictMaxDepth):
-         NTdictDepth -= 1
-         return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
-     #end if
-
-     string = self.__CLASS__ + '( '
-     remove2chars = 0
-     for k in self.keys():
-         string = string + str(k) + ' = ' + repr( self[k] ) + ', '
-         remove2chars = 1
-     #end for
-     #check if we also need to store some internals
-     for k in ['__FORMAT__','__SAVEXML__']:
-         if self[k] != None:
-             string = string + k + ' = ' + repr( self[k] ) + ', '
-             remove2chars = 1
-     #end for
-     #check if we need to remove the final (not needed) 2 chars
-     if remove2chars: string = string[0:len(string)-2]
-     # append closing paren
-     string = string + ' )'
-
-     NTdictDepth -= 1
-     return string
-  #end def
-
-  def format( self, format=None ):
-    """Return a formatted string of the items
-       Uses format or stored attribute __FORMAT__ or default
     """
-    if (format == None):
-        format = self.__FORMAT__
-    # use the default format if None
+        class NTdict: Base class for all mapping NT objects.
+
+        create a 'structure' from keywords to group things. Keys can be referenced as
+        in dictionary methods, or as an attribute; e.g.
+
+            aap = NTdict( noot=3, mies=4, kees='not awake' )
+            print aap['noot']
+            > 3
+            print aap.noot
+            > 3
+
+        Hashing and compare implemented.
+
+        Methods:
+            __call__( **kwds )                            Calling will update kwds and return self
+
+            format( format=None ):                        Format the object according to format or __FORMAT__ (when
+                                                          format == None) attribute.
+            getAttr( hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
+                                                          Also print 'hidden' attributes when hidden!=0.
+
+            getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise
+
+            saveXML( *attrs ):                            Add attrs to the list to save in XML format.
+            toXML( stream=sys.stdout )                    Write XML code of object to stream; recursively decend; i.e.
+                                                          cycles will wreck this routine.
+
+        Inherited methods:
+            most methods defined as in dict()
+
+            methods __iter__(),iterkeys(), values(), itervalues(), items() and iteritems()
+            len(), popitem(), clear(), update() all decend from method keys().
+            Hence when subclassing, overriding the keys() method effectively implements the other methods
+
+            popitem() returns None upon empty dictionary
+
+        Reserved attributes:
+            attribute '__CLASS__'                         is reserved to store a class identifier; usefull for subtyping
+            attribute '__OBJECTID__'                      is reserved to store an unique object id
+            attribute '__FORMAT__'                        is reserved to store format for method format()
+            attribute '__HIDDEN__'                        is reserved to store the hidden attributes
+            attribute '__SAVEXML__'                       is reserved to store the name of attributes saved as XML
+
+        GV 12 Sep 2007:
+          removed implementation with global storage in NTstructObjects since it was never used and
+          will result in objects persisting even if they could be deleted (i.e. a memory leak).
+    """
+    def __init__( self, *args, **kwds ):
+        global NTdictObjectId
+
+        #print '>>>', args, kwds
+        dict.__init__( self, *args, **kwds )
+        self.setdefault('__CLASS__',  'NTdict' )
+        self.setdefault('__FORMAT__',  None )      # set to None, which means by default not shown in repr() and toXML() methods
+        self.setdefault('__SAVEXML__', None )      # set to None, which means by default not shown in repr() and toXML() methods
+        self.setdefault('__SAVEALLXML__', False )  # when True, save all attributes in toXML() methods
+#        self.__getstate__ =  self  # Trick for fooling shelve.
+
+        self.__OBJECTID__ = NTdictObjectId
+        NTdictObjectId += 1
+        self.__HIDDEN__  = ['__HIDDEN__','__OBJECTID__','__CLASS__','__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
+    #end def
+
+    #------------------------------------------------------------------
+    # Basic functionality
+    #------------------------------------------------------------------
+    def __getattr__(self, attr):
+        """Need to override because otherwise attributes such as __SAVEXML__
+        aren't available"""
+#        if attr == '__getstate__':
+#        return
+        return self[attr]
+
+
+    def __setattr__(self, attr, value):
+        self[attr] = value
+
+    def __delattr__(self, attr):
+        del( self[attr] )
+
+
+    def __cmp__( self, other ):
+        """Optimized for speed a bit"""
+        if self.__OBJECTID__ == other.__OBJECTID__:
+            return 0
+        if self.__OBJECTID__ < other.__OBJECTID__:
+            return -1
+        return 1
+
+    def __hash__( self ):
+        return hash( self.__OBJECTID__ )
+    #end def
+
+    def __eq__( self, other):
+        if other == None:
+            return False
+        if not isinstance(other,NTdict): # eg when comparing with tuple.
+            return False
+        return self.__OBJECTID__ == other.__OBJECTID__
+
+    def __ne__( self, other):
+        return not (self == other)
+
+    #------------------------------------------------------------------
+    # Print/repr/output routines
+    #------------------------------------------------------------------
+    def __str__( self ):
+#        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+#        return self.format()
+        return '<%s-object (%d)>' % ( self._className(), self.__OBJECTID__ )
+
+    def _className( self ):
+        return str(self.__class__)[7:-2].split('.')[-1:][0]
+    #end def
+
+    def __repr__( self ):
+#        return dict.__repr__( self )
+#        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+        global NTdictDepth, NTdictMaxDepth, NTdictCycles
+
+        #prevent cycles
+        if (NTdictDepth == 0):
+            NTdictCycles = []
+        #end if
+
+        if (self.__OBJECTID__ in NTdictCycles):
+            return  '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+        #end if
+        NTdictCycles.append( self.__OBJECTID__ )
+
+        NTdictDepth += 1
+        if (NTdictDepth > NTdictMaxDepth):
+            NTdictDepth -= 1
+            return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+        #end if
+
+        string = self.__CLASS__ + '( '
+        remove2chars = 0
+        for k in self.keys():
+            string = string + str(k) + ' = ' + repr( self[k] ) + ', '
+            remove2chars = 1
+        #end for
+        #check if we also need to store some internals
+        for k in ['__FORMAT__','__SAVEXML__']:
+            if self[k] != None:
+                string = string + k + ' = ' + repr( self[k] ) + ', '
+                remove2chars = 1
+        #end for
+        #check if we need to remove the final (not needed) 2 chars
+        if remove2chars: string = string[0:len(string)-2]
+        # append closing paren
+        string = string + ' )'
+
+        NTdictDepth -= 1
+        return string
+    #end def
+
+    def format( self, format=None ):
+        """Return a formatted string of the items
+           Uses format or stored attribute __FORMAT__ or default
+        """
+        if (format == None):
+            format = self.__FORMAT__
+        # use the default format if None
 #    if (format == None):
 #        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
 #    #end if
-    return format % self
-  #end def
+        return format % self
+    #end def
 
-  def keysformat( self, dots='-'*20 ):
-    """set __FORMAT__ to list all keys
-    """
-    fmt = self.header(dots) + '\n'
-    for key in self.keys():
-        s = '%-' + str(len(dots)) + 's '
-        fmt = fmt +  s%(str(key)+':') + '%(' + str(key) + ')s\n'
-    #end for
-    fmt = fmt + self.footer(dots)
-    self.__FORMAT__ = fmt
-  #end def
+    def keysformat( self, dots='-'*20 ):
+        """set __FORMAT__ to list all keys
+        """
+        fmt = self.header(dots) + '\n'
+        for key in self.keys():
+            s = '%-' + str(len(dots)) + 's '
+            fmt = fmt +  s%(str(key)+':') + '%(' + str(key) + ')s\n'
+        #end for
+        fmt = fmt + self.footer(dots)
+        self.__FORMAT__ = fmt
+    #end def
 
 
-  def getAttr( self, stream=sys.stdout, hidden=0 ):
-    """Get attributes of structure
-    """
-    msg = sprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
-    # append hidden keys if asked for
-    keys = self.keys()
-    if hidden: 
-        keys = keys + self.__HIDDEN__
+    def getAttr( self, stream=sys.stdout, hidden=0 ):
+        """Get attributes of structure
+        """
+        msg = sprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
+        # append hidden keys if asked for
+        keys = self.keys()
+        if hidden:
+            keys = keys + self.__HIDDEN__
 #    print '>>',keys
-    for key in keys:
-        msg += sprintf( '%-12s : %s\n', key, str(self[key]))
-    return msg
+        for key in keys:
+            msg += sprintf( '%-12s : %s\n', key, str(self[key]))
+        return msg
 
-  def header( self, dots = '-'*20  ):
-    """Generate a header using __CLASS__ and dots.
-    """
-    return sprintf('%s %s %s', dots, self.__CLASS__, dots )
-  #end def
+    def header( self, dots = '-'*20  ):
+        """Generate a header using __CLASS__ and dots.
+        """
+        return sprintf('%s %s %s', dots, self.__CLASS__, dots )
+    #end def
 
-  def footer( self, dots = '-'*20  ):
-    """Generate a footer using dots of the same length as header.
-    """
-    header = self.header( dots )
-    lheader = len(header)
-    s = dots
-    while len(s) < lheader:
-        s = s + dots
-    #end while
-    return s[0:lheader]
-  #end def
+    def footer( self, dots = '-'*20  ):
+        """Generate a footer using dots of the same length as header.
+        """
+        header = self.header( dots )
+        lheader = len(header)
+        s = dots
+        while len(s) < lheader:
+            s = s + dots
+        #end while
+        return s[0:lheader]
+    #end def
 
-  #------------------------------------------------------------------
-  # Misc routines
-  #------------------------------------------------------------------
+    #------------------------------------------------------------------
+    # Misc routines
+    #------------------------------------------------------------------
 
-  def copy( self ):
-    """Generate a copy with 'shallow' references"""
-    newInstance = self.__class__( **dict( self.items() ) )
-    for k in ['__SAVEXML__', '__FORMAT__']:
-        newInstance[k] = self[k]
-    #end for
-    return newInstance
+    def copy( self ):
+        """Generate a copy with 'shallow' references"""
+        newInstance = self.__class__( **dict( self.items() ) )
+        for k in ['__SAVEXML__', '__FORMAT__']:
+            newInstance[k] = self[k]
+        #end for
+        return newInstance
 
-  def __call__( self, **kwds ):
-      self.update( kwds )
-      return self
-  #end def
+    def __call__( self, **kwds ):
+        self.update( kwds )
+        return self
+    #end def
 
-  def setDeepByKeys( self, value, *keyList ):
-      return setDeepByKeys( self, value, *keyList )
+    def setDeepByKeys( self, value, *keyList ):
+        """Set arbitrary deep element to value by keyList.
+        The essence here is silence.
+        keyList needs to have at least one key.
+        Return None on success and True on error.
+        """
+        lk = len(keyList)
+        if not lk:
+            NTerror("Can't setDeepByKeys without any key")
+            return True
 
-  def appendDeepByKeys( self, value, *keyList ):
-      return appendDeepByKeys( self, value, *keyList )
+        k = keyList[0]
+        if lk == 1:
+            self[k] = value
+            return
 
-  def getDeepByKeysOrDefault( self, default, *keyList ):
-      return getDeepByKeysOrDefault( self, default, *keyList )
+        if self.has_key(k):
+            deeper = self[k]
+        else:
+            deeper = NTdict()
+            self[k] = deeper
 
-  def getDeepByKeys( self, *keyList ):
-      return getDeepByKeys( self, *keyList )
+        reducedKeyList = keyList[1:]
+        return deeper.setDeepByKeys(value,*reducedKeyList)
 
-  def getdefault( self, key, defaultKey ):
-      'Return self[key] if key exists, self[defaultKey] otherwise'
-      if self.has_key( key ): 
-          return self[key]
-      else: 
-          return self[defaultKey]
-  #end def
+    def appendDeepByKeys( self, value, *keyList ):
+        """Append value to arbitrary deep list.
+        The essence here is silence.
+        keyList needs to have at least one key.
+        Return None on success and True on error.
+        """
+        lk = len(keyList)
+        NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
+        if not lk:
+            NTerror("Can't appendDeepByKeys without any key")
+            return True
 
-  def uniqueKey( self, key ):
-      """return a unique key derived from key"""
-      i = 1
-      newkey = key
-      while (newkey in self):
-        newkey = sprintf('%s_%d', key, i)
-        i += 1
-      #end while
-      return newkey
-  #end def
+        k = keyList[0]
+        if lk == 1:
+            if not self.has_key(k):
+                self[k] = []
+            self[k].append(value) # No extra checks done here for speed purposes.
+            return
 
-  #------------------------------------------------------------------
-  # methods __iter__(), iterkeys(),
-  #         values(),   itervalues(),
-  #         items(),    iteritems()
-  #         len(),      popitem(),     clear(),   update()
-  # now all decend from method keys().
-  #------------------------------------------------------------------
-  def keys( self ):
-    keys = dict.keys( self )
-    # i.e. we only need to remove the 'local' stuff here
-    # remove keys that should be hidden
-    for key in self.__HIDDEN__:
-      keys.remove(key)
-    # sort keys as well
-    keys.sort()
-    return keys
+        if self.has_key(k):
+            deeper = self[k]
+        else:
+            deeper = NTdict()
+            self[k] = deeper
 
-  def __iter__( self ):
-    """__iter__ returns keys
-    """
-    for key in self.keys():
-      yield key
-  #end def
+        reducedKeyList = keyList[1:]
+        return deeper.appendDeepByKeys(value,*reducedKeyList)
 
-  def iterkeys( self ):
-    for key in self.keys():
-        yield key
 
-  def values( self ):
-    return map( self.get, self.keys() )
+    def getDeepByKeysOrDefault( self, default, *keyList ):
+        result = self.getDeepByKeys( *keyList )
+        if result == None:
+            return default
+        return result
 
-  def itervalues( self ):
-    for value in self.values():
-        yield value
+    def getDeepByKeys( self, *keyList ):
+        """Return arbitrary deep element or default=None if key is absent at some point.
+        The essence here is silence."""
+        lk = len(keyList)
+#      NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
+        if not lk:
+            NTdebug("Asked for a get on a dictionary without a key")
+            return None
+        key = keyList[0]
 
-  def items( self ):
-    return zip( self.keys(), self.values() )
+        if not self.has_key( key ):
+#          NTdebug("no key: " + `key`)
+            return None
+        value = self[key]
+        if lk == 1:
+#          NTdebug("value : " + `value`)
+            return value
+        if hasattr( value,'getDeepByKeys'):
+#          NTdebug("Going one level deeper")
+            reducedKeyList = keyList[1:]
+            return value.getDeepByKeys(*reducedKeyList)
+#      NTdebug("In NTdict.getDeepByKeys the value is not a NTdict or subclass instance but there still are keys to go for digging deeper")
+#      NTdebug(" for value : [" + `value` +']')
+#      NTdebug(" type value: [" + `type(value)` +']')
+        return None
 
-  def iteritems( self ):
-    for item in self.items():
-        yield item
 
-  def __len__( self ):
-    return len( self.keys() )
 
-  def popitem(self):
-    keys = self.keys()
-    try:
-      key = keys[0]
-    except IndexError:
-      return None
 
-    val = self[key]
-    del self[key]
-    return (key, val)
 
-  def clear( self ):
-    p = self.popitem()
-    while p:
+    def getdefault( self, key, defaultKey ):
+        'Return self[key] if key exists, self[defaultKey] otherwise'
+        if self.has_key( key ):
+            return self[key]
+        else:
+            return self[defaultKey]
+    #end def
+
+    def uniqueKey( self, key ):
+        """return a unique key derived from key"""
+        i = 1
+        newkey = key
+        while (newkey in self):
+            newkey = sprintf('%s_%d', key, i)
+            i += 1
+        #end while
+        return newkey
+    #end def
+
+    #------------------------------------------------------------------
+    # methods __iter__(), iterkeys(),
+    #         values(),   itervalues(),
+    #         items(),    iteritems()
+    #         len(),      popitem(),     clear(),   update()
+    # now all decend from method keys().
+    #------------------------------------------------------------------
+    def keys( self ):
+        keys = dict.keys( self )
+        # i.e. we only need to remove the 'local' stuff here
+        # remove keys that should be hidden
+        for key in self.__HIDDEN__:
+            keys.remove(key)
+        # sort keys as well
+        keys.sort()
+        return keys
+
+    def __iter__( self ):
+        """__iter__ returns keys
+        """
+        for key in self.keys():
+            yield key
+    #end def
+
+    def iterkeys( self ):
+        for key in self.keys():
+            yield key
+
+    def values( self ):
+        return map( self.get, self.keys() )
+
+    def itervalues( self ):
+        for value in self.values():
+            yield value
+
+    def items( self ):
+        return zip( self.keys(), self.values() )
+
+    def iteritems( self ):
+        for item in self.items():
+            yield item
+
+    def __len__( self ):
+        return len( self.keys() )
+
+    def popitem(self):
+        keys = self.keys()
+        try:
+            key = keys[0]
+        except IndexError:
+            return None
+
+        val = self[key]
+        del self[key]
+        return (key, val)
+
+    def clear( self ):
         p = self.popitem()
+        while p:
+            p = self.popitem()
 
-  def update( self, fromDict ):
-    for key,value in fromDict.iteritems():
-      self[key] = value
+    def update( self, fromDict ):
+        for key,value in fromDict.iteritems():
+            self[key] = value
 
-  #------------------------------------------------------------------
-  # XML routines
-  #------------------------------------------------------------------
-  def toXML( self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n' ):
+    #------------------------------------------------------------------
+    # XML routines
+    #------------------------------------------------------------------
+    def toXML( self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n' ):
         NTindent( depth, stream, indent )
         fprintf( stream, "<%s>", self.__CLASS__ )
         fprintf( stream, lineEnd )
@@ -1249,34 +1358,34 @@ class NTdict(dict):
         NTindent( depth, stream, indent )
         fprintf( stream, "</%s>", self.__CLASS__ )
         fprintf( stream, lineEnd )
-  #end def
+    #end def
 
-  def saveXML( self, *attrs ):
-      """add attrributes to save list
-      """
-      if (self.__SAVEXML__ == None):
-          self.__SAVEXML__ =  []
-      for a in attrs:
-          if a not in self.__SAVEXML__:
-              self.__SAVEXML__.append( a )
-
-  def removeXML( self, *attrs ):
-      """remove attrributes from __SAVEXML__ list
-      """
-      if self.__SAVEXML__:
+    def saveXML( self, *attrs ):
+        """add attrributes to save list
+        """
+        if (self.__SAVEXML__ == None):
+            self.__SAVEXML__ =  []
         for a in attrs:
-          if a in self.__SAVEXML__:
-            self.__SAVEXML__.remove( a )
-          #end if
-        #end for
-      #end if
-  #end def
+            if a not in self.__SAVEXML__:
+                self.__SAVEXML__.append( a )
 
-  def saveAllXML( self ):
-      """Define __SAVEALLXML__
-      """
-      self.__SAVEALLXML__ = True
-  #end def
+    def removeXML( self, *attrs ):
+        """remove attrributes from __SAVEXML__ list
+        """
+        if self.__SAVEXML__:
+            for a in attrs:
+                if a in self.__SAVEXML__:
+                    self.__SAVEXML__.remove( a )
+                #end if
+            #end for
+        #end if
+    #end def
+
+    def saveAllXML( self ):
+        """Define __SAVEALLXML__
+        """
+        self.__SAVEALLXML__ = True
+    #end def
 
 #end class
 
@@ -1400,23 +1509,23 @@ class NTtree( NTdict ):
     #end def
 
     def removeChild( self, child ):
-        if not child in self._children: 
+        if not child in self._children:
             return None
-        if child.name in self: 
+        if child.name in self:
             del( self[ child.name ] )
         self._children.remove( child )
         child._parent = None
         return child
- 
+
     def renameChild( self, child, newName ):
-        if not child in self._children: 
+        if not child in self._children:
             return None
-        if child.name in self: 
+        if child.name in self:
             del( self[ child.name ] )
         child.name = newName
         self[child.name] = child
         return child
- 
+
     def replaceChild( self, child, newChild ):
         if (not child in self._children): return None
         if child.name in self: del( self[ child.name ] )
@@ -1433,8 +1542,8 @@ class NTtree( NTdict ):
            This routine is the slowest part in a typical read of a molecule
            at the point of trying to match atom specifications in a dihedral
            which can span the residue.
-        """        
-        if not self._parent: 
+        """
+        if not self._parent:
             return -1
 
         selfIndex = self._parent._children.index( self )
@@ -1447,7 +1556,7 @@ class NTtree( NTdict ):
         targetIndex = selfIndex + relativeIndex
         if targetIndex < 0:
             return -1
-        if targetIndex >= len(self._parent._children): 
+        if targetIndex >= len(self._parent._children):
             return -1
 
         return targetIndex
@@ -1456,10 +1565,10 @@ class NTtree( NTdict ):
         """Return NTtree instance (relative to self)
            or None if it does not exist
         """
-        # Next check greatly speeds up trivial lookups.        
+        # Next check greatly speeds up trivial lookups.
         if relativeIndex == 0:
             return self
-        
+
         targetIndex = self._sibling( relativeIndex )
         if targetIndex < 0:
             return None
@@ -1470,10 +1579,10 @@ class NTtree( NTdict ):
         """return NTlist of elements following self
            or None in case of error
         """
-        if self._parent == None: 
+        if self._parent == None:
             return None
         sibling = self._sibling( 1 )
-        if sibling < 0: 
+        if sibling < 0:
             return []
         return self._parent._children[sibling:]
 
@@ -1481,10 +1590,10 @@ class NTtree( NTdict ):
         """return NTlist of elements preceding self
            or None if it does not exist
         """
-        if self._parent == None: 
+        if self._parent == None:
             return None
         sibling = self.sibling( -1 )
-        if sibling == None: 
+        if sibling == None:
             return []
         return self._parent._children[0:sibling+1]
 
@@ -1535,7 +1644,7 @@ class NTtree( NTdict ):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
- 
+
 #end class
 #
 # -----------------------------------------------------------------------------
@@ -1609,7 +1718,7 @@ class NTparameter( NTtree ):
                 p.set( p.default )
             #end for
         else:
-                self.set( self.default )
+            self.set( self.default )
         #end if
     #end def
 
@@ -1693,11 +1802,11 @@ class NTvalue( NTdict ):
 
     def __add__( self, other ):
         if hasattr(other,'value'):
-                v = self.value+other.value
-                e = math.sqrt(self.error**2+other.error**2)
+            v = self.value+other.value
+            e = math.sqrt(self.error**2+other.error**2)
         else:
-                v = self.value+other
-                e = self.error
+            v = self.value+other
+            e = self.error
         return NTvalue( v, e, self.fmt )
     #end def
 
@@ -1708,20 +1817,20 @@ class NTvalue( NTdict ):
 
     def __iadd__( self, other ):
         if hasattr(other,'value'):
-                self.value += other.value
-                self.error = math.sqrt(self.error**2+other.error**2)
+            self.value += other.value
+            self.error = math.sqrt(self.error**2+other.error**2)
         else:
-                self.value += other
+            self.value += other
         return self
     #end def
 
     def __sub__( self, other ):
         if hasattr(other,'value'):
-                v = self.value-other.value
-                e = math.sqrt(self.error**2+other.error**2)
+            v = self.value-other.value
+            e = math.sqrt(self.error**2+other.error**2)
         else:
-                v = self.value-other
-                e = self.error
+            v = self.value-other
+            e = self.error
         return NTvalue( v, e, self.fmt )
     #end def
 
@@ -1732,20 +1841,20 @@ class NTvalue( NTdict ):
 
     def __isub__( self, other ):
         if hasattr(other,'value'):
-                self.value -= other.value
-                self.error = math.sqrt(self.error**2+other.error**2)
+            self.value -= other.value
+            self.error = math.sqrt(self.error**2+other.error**2)
         else:
-                self.value -= other
+            self.value -= other
         return self
     #end def
 
     def __mul__( self, other ):
         if hasattr(other,'value'):
-                v = self.value*other.value
-                e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
+            v = self.value*other.value
+            e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
-                v = self.value*other
-                e = self.error*other
+            v = self.value*other
+            e = self.error*other
         return NTvalue( v, e, self.fmt )
     #end def
 
@@ -1757,22 +1866,22 @@ class NTvalue( NTdict ):
 
     def __imul__( self, other ):
         if hasattr(other,'value'):
-                v = self.value
-                self.value *= other.value
-                self.error = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
+            v = self.value
+            self.value *= other.value
+            self.error = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
-                self.value *= other
-                self.error *= other
+            self.value *= other
+            self.error *= other
         return self
     #end def
 
     def __div__( self, other ):
         if hasattr(other,'value'):
-                v = self.value/other.value
-                e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
+            v = self.value/other.value
+            e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
-                v = self.value/other
-                e = self.error/other
+            v = self.value/other
+            e = self.error/other
         return NTvalue( v, e, self.fmt )
     #end def
 
@@ -1784,12 +1893,12 @@ class NTvalue( NTdict ):
 
     def __idiv__( self, other ):
         if hasattr(other,'value'):
-                self.value /= other.value
-                # JFD: Next line should be checked
-                self.error = self.value*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
+            self.value /= other.value
+            # JFD: Next line should be checked
+            self.error = self.value*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
-                self.value /= other
-                self.error /= other
+            self.value /= other
+            self.error /= other
         return self
     #end def
 
@@ -1876,14 +1985,14 @@ def NTlimit( theList, min, max, byItem=None ):
     for i in range(0, l):
         if (theList[i] != None):
             if byItem == None:
-                while theList[i] < min: 
+                while theList[i] < min:
                     theList[i] += listRange
-                while theList[i] > max: 
+                while theList[i] > max:
                     theList[i] -= listRange
             else:
-                while theList[i][byItem] < min: 
+                while theList[i][byItem] < min:
                     theList[i][byItem] += listRange
-                while theList[i][byItem] > max: 
+                while theList[i][byItem] > max:
                     theList[i][byItem] -= listRange
         #end if
     #end for
@@ -1926,7 +2035,7 @@ def NTaverage( theList, byIndex=None ):
             else:
                 val = item[byIndex]
             sumsqd += (val-av)*(val-av) # sum of squared deviations.
-    
+
     # some python implementations (Linux) crash in case of all same numbers,
     # => zero sd, but roundoffs likely generate a very small negative number
     # here
@@ -1976,7 +2085,7 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
 
     #calculate cmean, avoid zero divisions
     if (math.fabs( csum ) < 1e-10 ):
-         csum = 1e-10
+        csum = 1e-10
     #end if
     cav = math.atan( ssum/csum )
     if (csum < 0):
@@ -2118,12 +2227,12 @@ class XMLhandler:
 ##
 # Or Apple plist dict's
 ##<dict>
-##	<key>Key</key>
-##	<string>3F344E56-C8C2-4A1C-B6C7-CD84EAA1E70A</string>
-##	<key>Title</key>
-##	<string>New on palm</string>
-##	<key>Type</key>
-##	<string>com.apple.ical.sources.naivereadwrite</string>
+##      <key>Key</key>
+##      <string>3F344E56-C8C2-4A1C-B6C7-CD84EAA1E70A</string>
+##      <key>Title</key>
+##      <string>New on palm</string>
+##      <key>Type</key>
+##      <string>com.apple.ical.sources.naivereadwrite</string>
 ##</dict>
 
         # first collect all element nodes, skipping the 'empty' text nodes
@@ -2548,12 +2657,12 @@ class Sorter:
         else:
             aux = []
             for i in range(len(data)):
-                 try:
-                     aux.append((data[i][itemindex], i))
-                 except KeyError:
-                     aux.append( (None, i) )
-                 except IndexError:
-                     aux.append( (None, i) )
+                try:
+                    aux.append((data[i][itemindex], i))
+                except KeyError:
+                    aux.append( (None, i) )
+                except IndexError:
+                    aux.append( (None, i) )
 #           aux = [(data[i][itemindex], i) for i in range(len(data))]
             return self._helper(data, aux, inplace)
         #end if
@@ -2679,20 +2788,20 @@ def length( object ):
     """return length object
     """
     try:
-      l = len(object)
-      return l
+        l = len(object)
+        return l
     except TypeError:
-      return 1
+        return 1
 
 def object2list( object ):
     """return object as list
     """
     if object==None:
-      return []
+        return []
     if isinstance( object, list):
-      return object
+        return object
     else:
-      return [object]
+        return [object]
 
 #def NTsetNone( var ):
 #  """Set var to None
@@ -2702,64 +2811,64 @@ def object2list( object ):
 # -----------------------------------------------------------------------------
 #
 class CommandWrap:
-  """Wrapper for command callbacks
-     From Python Cookbook, section 9.1 (p. 302)
-  """
+    """Wrapper for command callbacks
+       From Python Cookbook, section 9.1 (p. 302)
+    """
 
-  def __init__(self, callback, *args, **kwargs):
-    self.callback = callback
-    self.args = args
-    self.kwargs = kwargs
+    def __init__(self, callback, *args, **kwargs):
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
 
-  def __call__(self):
-    return self.callback( *self.args, **self.kwargs)
+    def __call__(self):
+        return self.callback( *self.args, **self.kwargs)
 #
 # -----------------------------------------------------------------------------
 #
 class EventWrap:
-  """Wrapper for event callbacks
-       Adapted from Python Cookbook, section 9.1 (p. 302)
-  """
+    """Wrapper for event callbacks
+         Adapted from Python Cookbook, section 9.1 (p. 302)
+    """
 
-  def __init__(self, callback, *args, **kwargs):
-    self.callback = callback
-    self.args = args
-    self.kwargs = kwargs
+    def __init__(self, callback, *args, **kwargs):
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
 
-  def __call__(self, event):
-    return self.callback( event, *self.args, **self.kwargs)
+    def __call__(self, event):
+        return self.callback( event, *self.args, **self.kwargs)
 
 #
 # -----------------------------------------------------------------------------
 #
 class EventSkip:
-  """Wrapper for callbacks, skipping the event argument
-       Adapted from Python Cookbook, section 9.1 (p. 302)
-  """
+    """Wrapper for callbacks, skipping the event argument
+         Adapted from Python Cookbook, section 9.1 (p. 302)
+    """
 
-  def __init__(self, callback, *args, **kwargs):
-    self.callback = callback
-    self.args = args
-    self.kwargs = kwargs
+    def __init__(self, callback, *args, **kwargs):
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
 
-  def __call__(self, event):
-    return self.callback( *self.args, **self.kwargs)
+    def __call__(self, event):
+        return self.callback( *self.args, **self.kwargs)
 #
 # -----------------------------------------------------------------------------
 #
 def NTinspect( something ):
-  m = inspect.getmembers(something)
-  for item in m:
-    print str(item)
+    m = inspect.getmembers(something)
+    for item in m:
+        print str(item)
 #
 # -----------------------------------------------------------------------------
 #
 def fprintf( stream, format, *args ):
-  """C's fprintf routine"""
-  if args:
-      stream.write( (format) % (args) )
-  else:
-      stream.write( format )
+    """C's fprintf routine"""
+    if args:
+        stream.write( (format) % (args) )
+    else:
+        stream.write( format )
 
 def mprintf( fps, fmt, *args ):
     """
@@ -2771,12 +2880,12 @@ def mprintf( fps, fmt, *args ):
             fprintf( fp, fmt, *args )
 
 def sprintf( format, *args ):
-  """return a string according to C's sprintf routine"""
-  return ( (format) % (args) )
+    """return a string according to C's sprintf routine"""
+    return ( (format) % (args) )
 
 class PrintWrap:
-    def __init__( self, stream = None, 
-                  autoFlush = True, 
+    def __init__( self, stream = None,
+                  autoFlush = True,
                   verbose=verbosityOutput,
                   noEOL=False):
         self.autoFlush = autoFlush
@@ -2816,7 +2925,7 @@ class PrintWrap:
     def setVerbosity(self,verbose):
         self.verbose=verbose
 
-NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly 
+NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
 NTerror   = PrintWrap(verbose=verbosityError)
 NTcodeerror=PrintWrap(verbose=verbosityError)
 NTexception=PrintWrap(verbose=verbosityError)
@@ -2838,7 +2947,7 @@ NTcodeerror.prefix += " EXCEPTION CAUGHT"
 #    NTmessage.setVerbosity(verbosity):
 #    NTdetail.setVerbosity(verbosity):
 #    NTdebug.setVerbosity(verbosity):
-    
+
 class SetupError( Exception ):
     "Setup check error"
 
@@ -2905,25 +3014,25 @@ NTopen = NTfile
 # -----------------------------------------------------------------------------
 #
 def removedir(path):
-      while (1):
+    while (1):
+        try:
+            filelist=os.listdir(path)
+        except:
+            NTerror("ERROR: Subdirectory %s could not be entered\n", path)
+        # DELETE ALL THE FILES
+        for file in filelist:
+            file=os.path.join(path,file)
             try:
-                filelist=os.listdir(path)
+                os.remove(file)
             except:
-                NTerror("ERROR: Subdirectory %s could not be entered\n", path)
-            # DELETE ALL THE FILES
-            for file in filelist:
-              file=os.path.join(path,file)
-              try:
-                  os.remove(file)
-              except:
-                    if os.path.isdir(file):
-                        removedir(file)
-            try:
-                os.rmdir(path)
-            except:
-                NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.\n")
-                continue
-            break
+                if os.path.isdir(file):
+                    removedir(file)
+        try:
+            os.rmdir(path)
+        except:
+            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.\n")
+            continue
+        break
 
 #
 # -----------------------------------------------------------------------------
@@ -3057,11 +3166,11 @@ from: http://docs.python.org/lib/optparse-extending-examples.html
 class OptionParser (optparse.OptionParser):
 
     def check_required (self, opt):
-      option = self.get_option(opt)
+        option = self.get_option(opt)
 
-      # Assumes the option's 'default' is set to None!
-      if getattr(self.values, option.dest) is None:
-          self.error("%s option not supplied" % option)
+        # Assumes the option's 'default' is set to None!
+        if getattr(self.values, option.dest) is None:
+            self.error("%s option not supplied" % option)
 
 """
 Taken from O'Reilly book
@@ -3174,7 +3283,7 @@ def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
 
 def val2Str( value, fmt, count=None, nullValue=None):
     """Utility for translating numeric values to strings allowing the value
-    to be a None and returning the NaNstring in such case. When the value is 
+    to be a None and returning the NaNstring in such case. When the value is
     None the count determines how long the return string will be.
     Regular formatting is used otherwise."""
     if value==nullValue:
@@ -3184,11 +3293,11 @@ def val2Str( value, fmt, count=None, nullValue=None):
             return NaNstring
         return ("%"+`count`+"s") % NaNstring
     return fmt % value
- 
+
 def limitToRange( v, low, hi):
     """Return a value in range [low,hi}
     truncating the value to given bounds
-    E.g. a value of 5 with bounds [0,1] will 
+    E.g. a value of 5 with bounds [0,1] will
     return 1.
     """
     # use equal signs for speed.
@@ -3205,7 +3314,7 @@ def NTmax(*args):
         if a > result:
             result = a
     return result
- 
+
 #
 def NTmin(*args):
     """Usefull as matplotlib overrides buildin"""
@@ -3215,8 +3324,8 @@ def NTmin(*args):
             result = a
     return result
 
-    
- 
+
+
 #
 #def splitpdb( fileName = None, modelNum = None ):
 #    """
@@ -3329,165 +3438,166 @@ FAC = 180.0/math.pi
 
 
 def angle3Dopt( a, b ):
-        """
-        return angle spanned by a and b
-        or None on error
-        range = [0, pi]
-        positive angle is counterclockwise (to be in-line with 'polar' methods
-        and atan2 routines).
-        """
-        # optimized out. 
+    """
+    return angle spanned by a and b
+    or None on error
+    range = [0, pi]
+    positive angle is counterclockwise (to be in-line with 'polar' methods
+    and atan2 routines).
+    """
+    # optimized out.
 #        c = self.dot(other) /(self.length()*other.length())
-        c = dot3Dopt(a,b) 
-        c /= length3Dopt(a)
-        c /= length3Dopt(b)
+    c = dot3Dopt(a,b)
+    c /= length3Dopt(a)
+    c /= length3Dopt(b)
 
-        # Are the below needed for rounding effects?
-        c = min( c, 1.0 )
-        c = max( c, -1.0 )
-#        if radians: 
+    # Are the below needed for rounding effects?
+    c = min( c, 1.0 )
+    c = max( c, -1.0 )
+#        if radians:
 #            return math.acos( c )
-        return math.acos( c ) * FAC
+    return math.acos( c ) * FAC
 
-def appendDeepByKeys( c, value, *keyList ):
-      """
-      Append value to arbitrary deep list.
-      If value is a (subclass of) list then append individual values from the list
-      to the c (complex object) which needs to be a (subclass of) list itself. 
-      The essence here is silence.
-      keyList needs to have at least one key.
-      Return None on success and True on error.
-      """
-      lk = len(keyList)
-    #  NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
-      if not lk:
-          NTerror("Can't appendDeepByKeys without any key")
-          return True
-          
-      key = keyList[0]
-      
-      if lk == 1:
-          if isinstance(c, list):
-              if len(c) >= key: 
-                  # Impossible situation: trying to append to a list at some index that isn't present yet.
-                  return True
-          elif isinstance(c, dict):
-              if not c.has_key(key):
-                  c[key] = []
-          else:
-              # The input complex object needs to be a (subclass of) dict or list
-              return True
-          l = c[key]
-          if not isinstance(l, list):
-              return True
-          if isinstance(value, list):
-              for v in value:
-                  l.append(v)
-          else:
-              l.append(value) # No extra checks done here for speed purposes.
-          return
-      
-      if c.has_key(key):
-          deeper = c[key]
-      else:
-          if lk == 2: # next time we want to append to a list finally, at the lowest level.
-              # this is of course a cross assumption
-              # why can't some other level be a list? 
-              # well if you need that, don't expect this function to create
-              # it for you without the info.
-              deeper = []
-          else:
-              deeper = {}
-          c[key] = deeper
-          
-      reducedKeyList = keyList[1:]          
-      return appendDeepByKeys(deeper, value,*reducedKeyList)
 
-def setDeepByKeys( d, value, *keyList ):
-      """Set arbitrary deep element to value by keyList. 
-      The essence here is silence.
-      keyList needs to have at least one key.
-      Return None on success and True on error.
-      """
-      lk = len(keyList)
-      if not lk:
-          NTerror("Can't setDeepByKeys without any key")
-          return True
-          
-      k = keyList[0]
-      if lk == 1:
-          d[k] = value
-          return
-      
-      if d.has_key(k):
-          deeper = d[k]
-      else:
-          deeper = {}
-          d[k] = deeper
-          
-      reducedKeyList = keyList[1:]          
-      return setDeepByKeys(deeper,value,*reducedKeyList)
+def appendDeepByKeys(c, value, *keyList):
+    """
+    Append value to arbitrary deep list.
+    If value is a (subclass of) list then append individual values from the list
+    to the c (complex object) which needs to be a (subclass of) list itself.
+    The essence here is silence.
+    keyList needs to have at least one key.
+    Return None on success and True on error.
+    """
+    lk = len(keyList)
+#  NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
+    if not lk:
+        NTerror("Can't appendDeepByKeys without any key")
+        return True
 
-def addDeepByKeys( d, value, *keyList ):
-      """Increase found value (or zero in case absent) by given value.
-      Return None on success and True on error.
-      """
-      v = d.getDeepByKeys(*keyList)
-      if not v:
-          v = 0
-      v += value
-      return d.setDeepByKeys(v, *keyList)
+    key = keyList[0]
 
-def getDeepByKeysOrDefault( dict, default, *keyList ):
-  result = dict.getDeepByKeys( *keyList )
-  if result == None:
-      return default
-  return result
+    if lk == 1:
+        if isinstance(c, list):
+            if len(c) >= key:
+                # Impossible situation: trying to append to a list at some index that isn't present yet.
+                return True
+    elif isinstance(c, dict):
+        if not c.has_key(key):
+            c[key] = []
+    else:
+        # The input complex object needs to be a (subclass of) dict or list
+        return True
+    l = c[key]
+    if not isinstance(l, list):
+        return True
+    if isinstance(value, list):
+        for v in value:
+            l.append(v)
+    else:
+        l.append(value) # No extra checks done here for speed purposes.
+        return
 
-def getDeepByKeys( c, *keyList ):
-  """Return arbitrary deep element or None if key is absent at some point.
-  The essence here is silence.
-  If the key is an integer and the dict is not a dict but a list of sorts
-  then the nice thing is that the element can be returned too!
-  
-  c for complex object.
-  """
-  lk = len(keyList)
+    if c.has_key(key):
+        deeper = c[key]
+    else:
+        if lk == 2: # next time we want to append to a list finally, at the lowest level.
+    # this is of course a cross assumption
+    # why can't some other level be a list?
+    # well if you need that, don't expect this function to create
+    # it for you without the info.
+            deeper = []
+        else:
+            deeper = {}
+        c[key] = deeper
+
+    reducedKeyList = keyList[1:]
+    return appendDeepByKeys(deeper, value, *reducedKeyList)
+
+def setDeepByKeys(d, value, *keyList):
+    """Set arbitrary deep element to value by keyList.
+    The essence here is silence.
+    keyList needs to have at least one key.
+    Return None on success and True on error.
+    """
+    lk = len(keyList)
+    if not lk:
+        NTerror("Can't setDeepByKeys without any key")
+        return True
+
+    k = keyList[0]
+    if lk == 1:
+        d[k] = value
+        return
+
+    if d.has_key(k):
+        deeper = d[k]
+    else:
+        deeper = {}
+        d[k] = deeper
+
+    reducedKeyList = keyList[1:]
+    return setDeepByKeys(deeper, value, *reducedKeyList)
+
+def addDeepByKeys(d, value, *keyList):
+    """Increase found value (or zero in case absent) by given value.
+    Return None on success and True on error.
+    """
+    v = d.getDeepByKeys(*keyList)
+    if not v:
+        v = 0
+    v += value
+    return d.setDeepByKeys(v, *keyList)
+
+def getDeepByKeysOrDefault(dict, default, *keyList):
+    result = dict.getDeepByKeys(*keyList)
+    if result == None:
+        return default
+    return result
+
+def getDeepByKeys(c, *keyList):
+    """Return arbitrary deep element or None if key is absent at some point.
+    The essence here is silence.
+    If the key is an integer and the dict is not a dict but a list of sorts
+    then the nice thing is that the element can be returned too!
+
+    c for complex object.
+    """
+    lk = len(keyList)
 #      NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
-  if not lk:
-      NTdebug("Asked for a get on a dictionary without a key")
-      return None
-  key = keyList[0]
+    if not lk:
+        NTdebug("Asked for a get on a dictionary without a key")
+        return None
+    key = keyList[0]
 
-  if isinstance( c, dict ):
-      if not c.has_key( key ): 
+    if isinstance(c, dict):
+        if not c.has_key(key):
 #          NTdebug("no key: " + `key`)
-          return None
-      value = c[key]
-      if lk == 1:
+            return None
+        value = c[key]
+        if lk == 1:
 #          NTdebug("value : " + `value`)
-          return value
+            return value
 #      NTdebug("Going one level deeper")
-      reducedKeyList = keyList[1:]
-      return getDeepByKeys(value, *reducedKeyList)
-      
-  if not isinstance( c, list ):
+        reducedKeyList = keyList[1:]
+        return getDeepByKeys(value, *reducedKeyList)
+
+    if not isinstance(c, list):
 #      NTdebug("complex object not an instance of list")
-      return None
-  
-  if not isinstance(key, int ): 
+        return None
+
+    if not isinstance(key, int):
 #      NTdebug("no int key in getDeepByKeys: " + `key`)
-      return None
-  
-  if key >= len(c): 
+        return None
+
+    if key >= len(c):
 #      NTdebug("int key in getDeepByKeys to large for this NTlist: " + `key`)
-      return None
-  
-  value = c[key]
-  if lk == 1:
+        return None
+
+    value = c[key]
+    if lk == 1:
 #      NTdebug("value : " + `value`)
-      return value
-  
+        return value
+
 #  NTdebug("Going one level deeper")
-  reducedKeyList = keyList[1:]
-  return getDeepByKeys(value, *reducedKeyList)
+    reducedKeyList = keyList[1:]
+    return getDeepByKeys(value, *reducedKeyList)
