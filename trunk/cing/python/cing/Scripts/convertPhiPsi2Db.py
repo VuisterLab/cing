@@ -23,6 +23,7 @@ from numpy.lib.twodim_base import histogram2d
 from pylab import nx
 import cing
 import csv
+import math
 import os
 import shelve
 
@@ -132,15 +133,19 @@ def main():
                 continue
             phi += valuesBySsAndResType[ssType][resType]['phi']
             psi += valuesBySsAndResType[ssType][resType]['psi']
-#    NTdebug('total number of residues B: %d' % len(psi))
+    
+    NTdebug('Total number of residues: %d' % len(psi))
     hist2d, _xedges, _yedges = histogram2d(
         psi, # Note that the x is the psi for some stupid reason,
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
         bins = binCount, 
         range= hrange)
+    sumHistCombined = sum( hist2d )
+    sumsumHistCombined = sum( sumHistCombined )
+    NTdebug('hist2d   : \n%s' % hist2d)
+    NTdebug('sumHistCombined   : %s' % `sumHistCombined`)
+    NTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
     hist2d = zscaleHist( hist2d, Cav, Csd )
-    sumHistCombined = sum(sum( hist2d ))
-    NTdebug('histCombined elements: %.0f' % sumHistCombined)
 
     
     dbase_file_abs_name = os.path.join( pluginDataDir, dbase_file_name )
@@ -159,8 +164,44 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
     tx = ogrid[ v0:v0:1j, v1:v1:1j ]
     interpolatedValueArray = interpn_linear( hist, tx, bins )
     interpolatedValue = interpolatedValueArray[ 0, 0 ]
-    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
+#    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
     return interpolatedValue
+    
+def getEnsembleAverageAndSigmaFromHistogram( his ):
+    """According to Rob's paper. Note that weird cases exist which to me
+    are counter intuitive
+[[ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]]
+Gives an c_av of 1. And the c_sd can't be calculated.
+Rob might have caught this by requiring c_av be at least 2.0.
+    """
+    NTdebug("getEnsembleAverageAndSigmaFromHistogram on his:\n%s" % his)
+    (nr,nc) = his.shape
+    sum = 0.
+    sumsq = 0.
+    for r in range(nr):
+        for c in range(nc):
+            v = his[r,c] # convenience variable
+            sum += v
+            sumsq += v*v
+    c_av = sumsq / sum # this is not a regular average as far as I can tell.
+    if sum <= 1.: # possible for small sets.
+        return (c_av, None)
+    sumsdsq = 0.
+    for r in range(nr):
+        for c in range(nc):
+            v = his[r,c] # convenience variable
+            v2 = v - c_av # convenience variable
+            sumsdsq += v * v2*v2
+    NTdebug("sumsdsq: %8.3f" % sumsdsq)
+    c_sd = sumsdsq / (sum-1)
+    c_sd = math.sqrt( c_sd )
+    return (c_av, c_sd)
+    
     
 def getRescaling(valuesByEntrySsAndResType):
     '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
@@ -169,20 +210,32 @@ def getRescaling(valuesByEntrySsAndResType):
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
         histBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
+#        NTdebug("histBySsAndResTypeExcludingEntry: %s" % histBySsAndResTypeExcludingEntry )
         z = NTlist()
         for ssType in valuesByEntrySsAndResType[ entryId ].keys():
             for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
                 angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
                 angleList0 = angleDict[ 'phi' ]
                 angleList1 = angleDict[ 'psi' ]
-                for i in range(len(angleList0)):
-                    his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
-                    if not his: # when testing not all residues are present in smaller sets.
-                        continue 
-                    zi = getValueFromHistogramUsingInterpolation( 
+                his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
+                if his == None:
+                    NTdebug('when testing not all residues are present in smaller sets.')
+                    continue 
+                (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
+                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
+                if c_sd == None:
+                    NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                    continue
+                if c_sd == 0.:
+                    NTerror('Got zero c_sd, ignoring histogram. This should only occur in smaller sets.')
+                    continue
+                for k in range(len(angleList0)):
+                    ck = getValueFromHistogramUsingInterpolation( 
                         histBySsAndResTypeExcludingEntry[ssType][resType], 
-                        angleList0[i], angleList1[i])
-                    z.append( zi )
+                        angleList0[k], angleList1[k])
+                    zk = ( ck - c_av ) / c_sd
+                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
+                    z.append( zk )
         (av, _sd, _n) = z.average()
         NTdebug("For entry %s found av,sd,n: %s" %(entryId,(av, _sd, _n)))
         C.append( av )
@@ -212,8 +265,8 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
         for resType in result[ssType].keys():
             angleList0 = result[ssType][resType]['phi']
             angleList1 = result[ssType][resType]['psi']
-            NTdebug( 'entry: %s ssType %s resType %s angleList0 %s' % (
-                entryId, ssType, resType, angleList0 ))
+#            NTdebug( 'entry: %s ssType %s resType %s angleList0 %s' % (
+#                entryId, ssType, resType, angleList0 ))
             hist2d, _xedges, _yedges = histogram2d(
                 angleList1, # think rows (y)
                 angleList0, # think columns (x)
