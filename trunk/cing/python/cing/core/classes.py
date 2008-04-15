@@ -46,13 +46,15 @@ import sys
 import time
 
 
+
 projects = NTlist()
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
 #-----------------------------------------------------------------------------
-class Project( NTdict ):
 
+class Project( NTdict ):
+    
     """
 -------------------------------------------------------------------------------
 Project: Top level Cing project class
@@ -72,41 +74,41 @@ Project: Top level Cing project class
      v                    NTdb <-> ResidueDef <-> AtomDef
   ccpnProject
 
-    Project.ccpn     = ccpnProject    (Molecule.ccpn      =  ccpnMolecule and so on)
-    ccpnProject.cing = Project        (ccpnMolecule.cing  =  Molecule and so on)
+  Project.ccpn     = ccpnProject    (Molecule.ccpn      =  ccpnMolecule and so on)
+  ccpnProject.cing = Project        (ccpnMolecule.cing  =  Molecule and so on)
 
-    ccpnProject :: (memops.Implementation.Project)
-    ccpnMolecule = ccpnProject.molSystems[0]   :: (ccp.molecule.MolSystem.MolSystem)
-    ccpnChain   in ccpnMolecule.sortedChains() :: (ccp.molecule.MolSystem.Chain)
-    ccpnResidue in ccpnChain.sortedResidues()  :: (ccp.molecule.MolSystem.Residue)
-    ccpnAtom    in ccpnResidue.sortedAtoms()   :: (ccp.molecule.MolSystem.Atom)
+  ccpnProject :: (memops.Implementation.Project)
+  ccpnMolecule = ccpnProject.molSystems[0]   :: (ccp.molecule.MolSystem.MolSystem)
+  ccpnChain   in ccpnMolecule.sortedChains() :: (ccp.molecule.MolSystem.Chain)
+  ccpnResidue in ccpnChain.sortedResidues()  :: (ccp.molecule.MolSystem.Residue)
+  ccpnAtom    in ccpnResidue.sortedAtoms()   :: (ccp.molecule.MolSystem.Atom)
 
-    Project -> molecules[Molecule-1, Molecule-2, ...] # Molecules name list
-            -> molecule <-> ... (See Molecule)        # 'Current' molecule
+  Project  -> molecules[Molecule-1, Molecule-2, ...] # Molecules name list
+           -> molecule <-> ... (See Molecule)        # 'Current' molecule
+  
+           -> peakLists[<Peaklist [<Peak>, ...]>]
+          <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]
+          <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]
 
-            -> peakLists[<Peaklist [<Peak>, ...]>]
-            <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]
-            <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]
-
-            -> parameters
-            -> directories
-            -> cingPaths
-            -> plotParameters
-            -> plugins
-_____________________________________________________________________________
-
+           -> parameters
+           -> directories
+           -> cingPaths
+           -> plotParameters
+           -> plugins
+  _____________________________________________________________________________
+                  
     Methods:
 
     to open a project:
-        project = Project.open( name, status = 'old' )      Open an existing project
-        project = Project.open( name, status = 'new' )      Open a new project
-        project = Project.open( name, status = 'create' )   Open an existing project
-                                                            if it exists or new project
-                                                            otherwise
+        project = Project.open( name, status = 'old' )    Open an existing project
+        project = Project.open( name, status = 'new' )    Open a new project
+        project = Project.open( name, status = 'create' ) Open an existing project 
+                                                          if it exists or new project
+                                                          otherwise
 
     to initialize a Molecule:
-        project.initializeMolecule( name, sequenceFile, convention )
-
+        project.initializeMolecule( name, sequenceFile, convention )   
+                                                
                                     convention = CYANA, CYANA2, INTERNAL, LOOSE
 
     to save a project:
@@ -117,14 +119,14 @@ _____________________________________________________________________________
 
     to export and save:
         project.close()
-
+        
     to initialize the resonance lists:
         project.initResonances()
 
     to merge the resonance lists:
         project.mergeResonances( order=None, status='reduce' )
-                                status='reduce' results in reducing the resonances
-                                list to one merged entry
+                                status='reduce' results in reducing the resonances 
+                                list to one merged entry 
 
     to define and add a new PeakList to project:
         peakList = project.newPeakList( name, status='keep' ):
@@ -134,63 +136,68 @@ _____________________________________________________________________________
 
     """
     def __init__( self, name ):
+         
+        root, name = Project.rootPath( name )
+
         NTdict.__init__(   self,
                            __CLASS__                = 'Project',
-
+                           
                            version                  =  cingVersion,
-
+                           
+                           root                     =  root,
                            name                     =  name.strip(),
                            created                  =  time.asctime(),
-
+                           
                            molecules                =  NTlist(),    # list of names
                            molecule                 =  None,        # Current Molecule instance
-
+                           
                            peakListNames            =  NTlist(),    # list to store peaklist names for save and restore
                            distanceListNames        =  NTlist(),    # list to store distancelist names names for save and restore
                            dihedralListNames        =  NTlist(),    # list to store dihedrallist names for save and restore
                            rdcListNames             =  NTlist(),    # list to store rdclist names for save and restore
-
+                           
                            history                  =  History(),
+                           
+                           contentIsRestored        =  False,
+                           storedInCcpnFormat       =  False,       # 
 
-                           storedInCcpnFormat       =  False,       #
-
-
+                         
                          # store a reference to te global things we might need
-                           parameters               = parameters,
-                           directories              = directories,
-                           moleculeDirectories      = moleculeDirectories,
-                           cingPaths                = cingPaths,
-                           plotParameters           = plotParameters,
-                           plugins                  = plugins
+                           gui                      =  None,        # Reference to CingGui instance
+                           parameters               =  parameters,
+                           directories              =  directories,
+                           moleculeDirectories      =  moleculeDirectories,
+                           cingPaths                =  cingPaths,
+                           plotParameters           =  plotParameters, 
+                           plugins                  =  plugins                           
                          )
-
-#       self.peakLists  =  NTlist()
+                         
+ #       self.peakLists  =  NTlist()
         # These lists are dynamic and will be filled  on restoring a project
         self.peaks      =  ProjectList( self, PeakList,              directories.peaklists,  '.peaks' )
         self.distances  =  ProjectList( self, DistanceRestraintList, directories.restraints, '.distances' )
         self.dihedrals  =  ProjectList( self, DihedralRestraintList, directories.restraints, '.dihedrals' )
         self.rdcs       =  ProjectList( self, RDCRestraintList,      directories.restraints, '.rdcs' )
-
-        self.saveXML( 'version',
-                      'name',  'created',
+                          
+        self.saveXML( 'version', 
+                      'name',  'created', 
                       'molecules',
                       'peakListNames','distanceListNames','dihedralListNames','rdcListNames',
-                      'storedInCcpnFormat',
-                      'history'
+                      'storedInCcpnFormat', 
+                      'history' 
                     )
-
-        root = Project.rootPath( name )
-        if not os.path.exists( root ):
-            os.mkdir( root )
-            # Save the project data
-            obj2XML( self, path = self.path( cingPaths.project ) )
-        #end if
-
-        # Check the subdirectories
-        for dir in directories.values():
-            self.mkdir( dir )
-        #end for
-
+#        
+#        if not os.path.exists( self.root ): 
+#            os.mkdir( self.root )
+#            # Save the project data
+#            obj2XML( self, path = self.path( cingPaths.project ) )
+#        #end if
+#        
+#        # Check the subdirectories
+#        for dir in directories.values():
+#            self.mkdir( dir )
+#        #end for
+        
     #end def
 
     def criticize(self):
@@ -206,30 +213,49 @@ _____________________________________________________________________________
 
     def path( self, *args ):
         """Return joined args as path relative to root of project
-        """
-        return os.path.join( Project.rootPath( self.name ), *args )
+        """        
+        return os.path.join( self.root, *args )
     #end def
-
+    
     def rootPath( name ):
-        """Static method returning Root of project from name
+        """Static method returning Root,name of project from name
+        
+        name can be:
+            simple name string
+            directory.cing
+            directory.cing/
+            directory.cing/project.xml
+            
+        GWV 6 Dec 2007: to allow for relative paths
         """
-        return name + '.cing'
+        root,name,ext = NTpath(name)
+        if name == '' or name == 'project': # indicate we had a full path
+            root,name,ext = NTpath( root )
+        #end if
+        if (len(ext)>0 and ext != '.cing'):
+            NTerror('FATAL ERROR: unable to parse "%s"\n', name )
+            exit(1)
+        #end if
+        
+        rootp = os.path.join(root, name + '.cing')
+        #print '>>',rootp,name
+
+        return rootp, name
     #end def
     rootPath = staticmethod( rootPath )
-
+    
     def mkdir( self, *args ):
-        """
-            Make a directory relative to to root of project from joined args.
-            Check for presence.
-            Return the result
+        """Make a directory relative to to root of project from joined args.
+           Check for presence.
+           Return the result
         """
         dir = self.path( *args )
         if (not os.path.exists( dir )):
-            os.makedirs(  dir )
+            os.makedirs(  dir ) 
         #end if
         return dir
     #end def
-
+    
     def moleculePath(self, subdir=None, *args ):
         """ Path relative to molecule.
         Return path or None in case of error.
@@ -239,7 +265,7 @@ _____________________________________________________________________________
             return self.path( self.molecule.name )
         else:
             return self.path( self.molecule.name, moleculeDirectories[subdir], *args )
-
+    
     def htmlPath(self, *args ):
         """ Path relative to molecule's html directory.
         Return path or None in case of error.
@@ -255,49 +281,66 @@ _____________________________________________________________________________
            Project data is restored when restore == True.
         """
         global projects
-
-        if status == 'new':
-            root = Project.rootPath( name )
-            if os.path.exists( root ):
+        
+        #print '>>', name, status
+        
+        if (status == 'new'):
+            root,dummy = Project.rootPath( name )
+            if os.path.exists( root ): 
                 removedir( root )
-
+            #end if
+            os.mkdir( root )        
             pr = Project( name )
             pr.addHistory( 'New project'  )
-        elif status == 'create':
-            root = Project.rootPath( name )
-            if os.path.exists( root ):
+            # Save the project data
+            obj2XML( pr, path = pr.path( cingPaths.project ) )
+            
+        elif (status == 'create'):
+            root,dummy = Project.rootPath( name )
+            if os.path.exists( root ): 
                 return Project.open( name, 'old')
             else:
                 return Project.open( name, 'new')
             #end if
-        elif status == 'old':
-            root = Project.rootPath( name )
+            
+        elif (status == 'old'):
+            root,newName = Project.rootPath( name )
             if not os.path.exists( root ):
-                NTerror('Project.open: unable to open Project "%s"\n', name )
+                NTerror('ERROR Project.open: unable to open Project "%s"\n', name )
                 return None
             #end if
 
             # Restore Project from xml-file
             pfile = os.path.join( root, cingPaths.project )
             if not os.path.exists( pfile ):
-                NTerror('Project.open: missing Project file "%s"\n', pfile )
+                NTerror('ERROR Project.open: missing Project file "%s"\n', pfile )
                 return None
-            #end if
+            #end if            
             pr = XML2obj( pfile )
-            pr.name = name    # This allows renaming at the shell level
-
-            # Restore the molecules
+            # This allows renaming/relative adressing at the shell level
+            pr.root = root
+            pr.name = newName    
+        
+            # Optional restore the content
             if restore:
                 pr.restore()
+            #end if
         else:
-            NTerror('Project.open: invalid status option "%s"\n', status )
+            NTerror('ERROR Project.open: invalid status option "%s"\n', status )
             return None
+        #end if
+
+        # Check the subdirectories
+        for dir in directories.values():
+            pr.mkdir( dir )
+        #end for
+
         projects.append( pr )
         NTdebug(pr.format())
         return pr
     #end def
     open = staticmethod( open )
-
+    
     def close( self ):
         global projects
         #self.export()
@@ -309,11 +352,11 @@ _____________________________________________________________________________
     def save( self):
         NTmessage('' + dots*5 +'' )
         NTmessage(   '==> Saving %s', self )
-
+       
         # Save the molecules
         for molName in self.molecules:
             self[molName].save( path = self.path( directories.molecules, molName ))
-
+        
         # Save the lists
         for pl, nameList in [(self.peaks,     'peakListNames'),
                              (self.distances, 'distanceListNames'),
@@ -324,11 +367,11 @@ _____________________________________________________________________________
             # Patch for XML bug
             self.saveXML( nameList )
         #end for
-
+        
 #        self.peakListNames = self.peaks.save()
 #        #Patch for XML bug
 #        self.saveXML('peakListNames')
-#
+#        
 #        # Save the distanceRestaintsLists
 #        self.distanceListNames = self.distances.save()
 #        #Patch for XML bug
@@ -345,18 +388,18 @@ _____________________________________________________________________________
 #        self.saveXML('rdcListNames')
 
         # Call Plugin registered functions
-        for p in self.plugins.values():
+        for p in self.plugins.values(): 
             for f,o in p.saves:
                 f( self, o )
             #end for
-        #end for
-
+        #end for    
+                
         # Save the project data
         obj2XML( self, path = self.path( cingPaths.project ) )
-
+         
         self.addHistory( 'Saved project' )
     #end def
-
+    
     def restore(self ):
         """
         Restore the project: molecules and lists
@@ -370,7 +413,7 @@ _____________________________________________________________________________
                 self.mkdir( self.molecule.name, dir )
             #end for
         #end for
-
+        
         # restore the lists
         for pl, nameList in [(self.peaks,     'peakListNames'),
                              (self.distances, 'distanceListNames'),
@@ -381,13 +424,13 @@ _____________________________________________________________________________
         #end for
 
         # Plugin registered functions
-        for p in self.plugins.values():
+        for p in self.plugins.values(): 
             for f,o in p.restores:
                 f( self, o )
             #end for
-        #end for
-
-        self.updateProject()
+        #end for 
+        
+        self.updateProject()  
     #end def
 
     def export( self):
@@ -396,7 +439,7 @@ _____________________________________________________________________________
         NTmessage('' + dots*5 +'' )
         NTmessage(   '==> Exporting %s', self )
 
-        for p in self.plugins.values():
+        for p in self.plugins.values(): 
             for f,o in p.exports:
                 f( self, o )
             #end for
@@ -414,12 +457,12 @@ _____________________________________________________________________________
     #-------------------------------------------------------------------------
     def appendMolecule( self, molecule ):
         if not molecule: return None
-
+        
         # generate the required directories for export and HTML data
         for dir in moleculeDirectories.values():
             self.mkdir( molecule.name, dir )
         #end for
-
+        
         # Store names and references
         self.molecule = molecule
         self.molecules.append( molecule.name )
@@ -428,15 +471,15 @@ _____________________________________________________________________________
         # Save it to make sure we can restore it later
         self.molecule.save( path = self.path( directories.molecules, molecule.name )   )
         return self.molecule
-
+    
     #end def
-
+    
     def newMolecule( self, name, sequenceFile, convention = LOOSE ):
         """Return Molecule instance or None on error
         """
         uname = self.uniqueKey(name)
-        molecule = Molecule.initialize( uname,
-                                        path = sequenceFile,
+        molecule = Molecule.initialize( uname, 
+                                        path = sequenceFile, 
                                         convention=convention
                                        )
         if not molecule:
@@ -448,7 +491,7 @@ _____________________________________________________________________________
     #end def
     initializeMolecule = newMolecule # keep old name
 
-
+    
     #-------------------------------------------------------------------------
     # Resonances stuff
     #-------------------------------------------------------------------------
@@ -457,16 +500,16 @@ _____________________________________________________________________________
 
         """ Merge resonances for all the atoms
             check all the resonances in the list, optionally using selection
-            and take the first one which has a assigned value,
+            and take the first one which has a assigned value, 
             append or reduce the resonances list to this entry depending on status.
-
+            
         """
 
-        if not self.molecule:
+        if not self.molecule: 
             NTerror('Project.mergeResonances: No molecule defined\n')
             return
         #end if
-
+        
         for atom in self.molecule.allAtoms():
             if ( len(atom.resonances) == 0 ):
                 NTerror('mergeResonances: zero length resonance list for atom "%s"\n',
@@ -484,30 +527,31 @@ _____________________________________________________________________________
                     #end for
                 #end if
             #end if
-
+            
             if (rm):
-                atom.resonances.append(rm)
+               atom.resonances.append(rm)
             else:
-                rm = atom.resonances[0]
-                atom.resonances.append(rm)
+               rm = atom.resonances[0]
+               atom.resonances.append(rm)
             #end if
-
-            # Optionally reduce the list
+            
+            # Optionally reduce the list 
             if (status == 'reduce'):
                 atom.resonances = NTlist( atom.resonances() )
-                self.molecule.resonanceCount = 1
-            else:
+                self.molecule.resonanceCount = 1                
+            else:                    
                 self.molecule.resonanceCount = len( atom.resonances )
         NTmessage("==> Merged resonances")
 
     def initResonances( self ):
-        """ Initialize resonances for all the atoms
+
+        """ Initialize resonances for all the atoms            
         """
-        if not self.molecule:
+        if not self.molecule: 
             NTerror('Project.initResonances: No molecule defined\n')
             return
         self.molecule.initResonances()
-
+    
     #-------------------------------------------------------------------------
     # actions other
     #-------------------------------------------------------------------------
@@ -515,13 +559,13 @@ _____________________________________________________________________________
     def addHistory( self, line, timeStamp = True ):
         self.history( line, timeStamp )
     #end def
-
+        
     def newPeakList( self, name, status='keep'):
         """Dummy for compatibility
         """
         return self.peaks.new( name = name, status=status)
     #end def
-
+    
     def appendPeakList( self, peaklist):
         """Append peaklist; dummy for compatibility
         """
@@ -529,26 +573,27 @@ _____________________________________________________________________________
         return peaklist
     #end def
 
-
-
+    
+        
     def header( self, dots = '---------'  ):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
     #end def
-
+    
     def __str__( self ):
         return sprintf('<Project %s>', self.name )
     #end def
-
+    
     def __repr__(self):
         return str(self)
-
+    
     def format( self ):
         dots =              '-----------'
         self.__FORMAT__   =  self.header( dots ) + '\n' + \
                             'created:    %(created)s\n' +\
                             'molecules:  %(molecules)s\n' +\
+                            '            %(molecule)s\n' +\
                             'peaks:      %(peaks)s\n' +\
                             'distances:  %(distances)s\n' +\
                             'dihedrals:  %(dihedrals)s\n' +\
@@ -556,7 +601,7 @@ _____________________________________________________________________________
                              self.footer( dots )
         return NTdict.format( self )
     #end def
-
+    
     def removeFromDisk(self):
         """Removes True on error. If no cing project is found on disk None (Success) will
         still be returned. Note that you should set the nosave option on the project
@@ -577,9 +622,9 @@ _____________________________________________________________________________
 class XMLProjectHandler( XMLhandler ):
     """Project handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Project')
+        XMLhandler.__init__( self, name='Project') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -587,7 +632,7 @@ class XMLProjectHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-
+            
         return result
     #end def
 #end class
@@ -608,7 +653,7 @@ class ProjectList( NTlist ):
         self.savePath = savePath
         self.extention = extention
     #end def
-
+    
     def append( self, *args ):
         """Append *args to self, storing a.name in project
         """
@@ -618,7 +663,7 @@ class ProjectList( NTlist ):
             NTlist.append( self, a )
         #end for
     #end def
-
+    
     def new( self, name,*args, **kwds ):
         """Create a new classDef instance, append to self
         """
@@ -631,14 +676,14 @@ class ProjectList( NTlist ):
         #end if
         return instance
     #end def
-
+    
     def save(self):
         """
         Save the lists of self to savePath/name.extention
         savePath relative to project
-
+        
         Use SML methods
-
+        
         Return a list of names
         """
         saved = NTlist()
@@ -650,7 +695,7 @@ class ProjectList( NTlist ):
         #end for
         return saved
     #end def
-
+    
     def restore(self, names ):
         """
         Use the SMLhandler instance of classDef to restore the list.
@@ -661,14 +706,14 @@ class ProjectList( NTlist ):
             dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project)
         #end for
     #end def
-
+    
     def className(self):
         """Return a string describing the class of lists of this project list
         """
         # eg. to extract from <class 'cing.classes.PeakList'>
         return str(self.classDef)[8:-2].split(".")[-1:][0]
     #end def
-
+    
 #end class Project
 #
 #-----------------------------------------------------------------------------
@@ -715,8 +760,8 @@ class Peak( NTdict ):
        by GV 20070723: added hasHeight, hasVolume attributes to the class
        GV 28092007: Moved from molecule.py to project.py
     """
-    def __init__( self,
-                  dimension=1,
+    def __init__( self, 
+                  dimension=1, 
                   positions=None,
                   height=0.00, heightError = 0.00, hasHeight = False,
                   volume=0.00, volumeError = 0.00, hasVolume = False,
@@ -739,7 +784,7 @@ class Peak( NTdict ):
                            self.footer(dots)
 
         self.dimension=dimension
-
+ 
         # Copy the poistions and resonances argumnet to assure they become
         # NTlist objects
         if resonances:
@@ -747,13 +792,13 @@ class Peak( NTdict ):
         else:
             self.resonances = NTfill( None, dimension )
         #end if
-
+        
         if positions:
             self.positions = NTlist( *positions )
         else:
             self.positions = NTfill( NOSHIFT, dimension )
         #end if
-
+        
         self.height = height
         self.heightError = heightError
         self.hasHeight = hasHeight
@@ -761,15 +806,15 @@ class Peak( NTdict ):
         self.volumeError = volumeError
         self.hasVolume  = hasVolume
     #end def
-
+    
     def isAssigned( self, axis ):
         if (axis >= self.dimension): return False
         if (axis >= len(self.resonances) ): return False
         if (self.resonances[axis] == None): return False
-        if (self.resonances[axis].atom == None): return False
+        if (self.resonances[axis].atom == None): return False       
         return True
     #end def
-
+    
     def getAssignment( self, axis):
         """Return atom instances in case of an assignment or None
         """
@@ -778,11 +823,11 @@ class Peak( NTdict ):
         #end if
         return None
     #end def
-
+    
     def __str__( self ):
         return sprintf( 'Peak %4d (%dD)   %s   %10.3e %10.3e %10.3e %10.3e   %s',
-                         self.peakIndex, self.dimension,
-                         self.positions.format('%8.3f '),
+                         self.peakIndex, self.dimension, 
+                         self.positions.format('%8.3f '), 
                          self.height, self.heightError, self.volume, self.volumeError,
                          self.resonances.zap('atom')
                        )
@@ -793,21 +838,21 @@ class Peak( NTdict ):
         """
         return sprintf('%s %s: %d %s', dots, self.__CLASS__, self.peakIndex, dots)
     #end def
-#end class
+#end class    
 
 class SMLPeakHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'Peak' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         pk = Peak( *line[2:] )
-        return self.dictHandler(pk, fp, project)
+        return self.dictHandler(pk, fp, project) 
     #end def
 
 ### REMARK: This restoring of resonances is dangerous, because it is not guranteed that the order and hence last
-#           resonance of atoms is always the same. Needs reviewing !!!
+#           resonance of atoms is always the same. Needs reviewing !!!    
     def endHandler(self, pk, project):
         if project == None:
             NTerror('Error SMLPeakHandler.endHandler: Undefined project\n')
@@ -815,11 +860,11 @@ class SMLPeakHandler( SMLhandler ):
         #end if
         pk.resonances = NTfill(None,pk.dimension)
         # Check if we have to make the linkage
-        if pk.atoms and project.molecule:
-            #print '>>',pk.atoms
+        if pk.atoms and project.molecule: 
+            #print '>>',pk.atoms                       
             for i in range(pk.dimension):
                 if pk.atoms[i] != None:
-                    atm = project.molecule.decodeNameTuple(pk.atoms[i])
+                    atm = project.molecule.decodeNameTuple(pk.atoms[i]) 
                     pk.resonances[i] = atm.resonances()
                 else:
                     pk.resonances[i] = None
@@ -828,7 +873,7 @@ class SMLPeakHandler( SMLhandler ):
         #end if
         return pk
     #end def
-
+    
     def toSML(self, peak, fp):
         """
         """
@@ -848,7 +893,7 @@ class SMLPeakHandler( SMLhandler ):
             #endif
         fprintf( fp, '    %-15s = %s\n', 'atoms', repr( rl ) )
         fprintf( fp, '%s\n', self.endTag )
-    #end def
+    #end def    
 
 #end class
 Peak.SMLhandler = SMLPeakHandler()
@@ -865,13 +910,13 @@ class PeakList( NTlist ):
 
     def peakFromAtoms( self, atoms, onlyAssigned=True ):
         """Append a new Peak based on atoms list
-           Return Peak instance, or None
+           Return Peak instance, or None 
         """
         if (None not in atoms):     # None value in atoms indicates atom not present
             if (onlyAssigned and (False in map( Atom.isAssigned, atoms ))):
                 pass                # Check atom assignments, if only assigned and not all assignments
                                     # present we skip it
-            else:                   # all other cases we add a peak
+            else:                   # all other cases we add a peak             
                 s = []
                 r = []
                 for a in atoms:
@@ -888,12 +933,12 @@ class PeakList( NTlist ):
         #end if
         return None
     #end def
-#
+#    
 #    def toFile(self, fileName)   :
 #        """
 #        Save peaks to fileName for restoring later with fromFile method
 #        """
-#
+#        
 #        fp = open( fileName, 'w' )
 #        if not fp:
 #            NTerror('PeakList.toFile: opening "%s"\n', fileName)
@@ -904,17 +949,17 @@ class PeakList( NTlist ):
 #            peak.toStream( fp )
 #        #end for
 #        fprintf( fp, '</PeakList>\n' )
-#
-#
+#        
+#        
 #        NTmessage('==> Saved %s to "%s"', str(self), fileName )
 #        #end if
 #    #end def
-
+                
 
     def __str__( self ):
         return sprintf( '<PeakList "%s" (%s,%d)>',self.name,self.status,len(self) )
     #end def
-
+    
     def __repr__(self):
         return str(self)
     #end def
@@ -926,11 +971,11 @@ class PeakList( NTlist ):
         #end for
         return s
     #end def
-
+    
 #    def toSMLfile(self, fileName)   :
 #        return self.SMLhandler.list2SMLfile( self, fileName  )
 #    #end def
-#
+#    
 #    def fromSMLfile(fileName, project)   :
 #        """
 #        Restore PeakList from SMLfile fileName
@@ -946,18 +991,18 @@ class PeakList( NTlist ):
 
 
 class SMLPeakListHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'PeakList' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         pl = PeakList( *line[2:] )
         if not self.listHandler(pl, fp, project): return None
         if project: project.peaks.append( pl )
         return pl
     #end def
-
+    
     def toSML(self, pl, fp):
         return self.list2SML( pl, fp )
 #end class
@@ -974,7 +1019,7 @@ def getAtomsFromAtomPairs(atomPairs):
 #-----------------------------------------------------------------------------
 class DistanceRestraint( NTdict ):
     """DistanceRestraint class:
-       atomPairs: list of (atom_1,atom_2) tuples,
+       atomPairs: list of (atom_1,atom_2) tuples, 
        lower and upper bounds
     """
     DR_MAXALL_DEFAULT_POOR_VALUE = 0.5
@@ -991,7 +1036,7 @@ class DistanceRestraint( NTdict ):
                                **kwds
                         )
         self.id         = -1       # Undefined index number
-
+        
         self.distances  = None     # list with distances for each model; None: not yet defined
         self.av         = 0.0      # Average distance
         self.sd         = 0.0      # sd on distance
@@ -1005,12 +1050,12 @@ class DistanceRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
-
+       
         for pair in atomPairs:
             self.appendPair( pair )
         #end for
     #end def
-
+    
     def criticize(self):
         critiqued = False
         ## Order of next two checks matters
@@ -1029,19 +1074,19 @@ class DistanceRestraint( NTdict ):
 
     def appendPair( self, pair ):
         # check if atom already present, keep order
-        # otherwise: keep atom with lower residue index first
+        # otherwise: keep atom with lower residue index first        
         a0 = self.atomPairs.zap(0)
         a1 = self.atomPairs.zap(1)
         if (pair[0] in a0 or pair[1] in a1):
             self.atomPairs.append( pair )
         elif (pair[0] in a1 or pair[1] in a0):
-            self.atomPairs.append( (pair[1],pair[0]) )
+            self.atomPairs.append( (pair[1],pair[0]) )        
         elif (pair[0].residue.resNum > pair[1].residue.resNum):
             self.atomPairs.append( (pair[1],pair[0]) )
         else:
             self.atomPairs.append( pair )
     #end def
-
+    
     def calculateAverage(self):
         """
         Calculate R-6 average distance and violation
@@ -1053,7 +1098,7 @@ class DistanceRestraint( NTdict ):
         if (len(self.atomPairs) > 0):
             modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
-
+        
         if modelCount == 0:
             NTerror('Error DistanceRestraint.calculateAverage: No structure models (%s)\n', self)
             return (None, None, None, None)
@@ -1072,8 +1117,8 @@ class DistanceRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = None     # Sd of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
-
-        if modelCount:
+        
+        if modelCount>0:
             for i in range(0, modelCount):
                 d = 0.0
                 for atm1,atm2 in self.atomPairs:
@@ -1106,11 +1151,11 @@ class DistanceRestraint( NTdict ):
                     return (None, None, None, None)
                 #end try
             #end for
-
+            
             self.av, self.sd, self.n = NTaverage( self.distances )
             self.min = min( self.distances )
-            self.max = max( self.distances )
-
+            self.max = max( self.distances )           
+             
             # calculate violations
             for d in self.distances:
                 if (d < self.lower):
@@ -1121,40 +1166,40 @@ class DistanceRestraint( NTdict ):
                     self.violations.append( 0.0 )
                 #end if
             #end for
-
+            
             # analyze violations
             for d in self.violations:
                 dabs = math.fabs(d)
-#                print '>>', d,dabs
+ #               print '>>', d,dabs
                 if ( dabs > 0.1): self.violCount1 += 1
                 if ( dabs > 0.3): self.violCount3 += 1
                 if ( dabs > 0.5): self.violCount5 += 1
             #end for
             if self.violations:
-                self.violAv, self.violSd, dummy = NTaverage( map(math.fabs,self.violations) )
-                self.violMax = max( map(math.fabs,self.violations) )
+            	self.violAv, self.violSd, dummy = NTaverage( map(math.fabs,self.violations) )
+            	self.violMax = max( map(math.fabs,self.violations) )       
         #end if
-
+        
         return (self.av,self.sd,self.min,self.max )
-
+    
     #end def
-
+    
     def listViolatingModels(self, cutoff = 0.3 ):
         """
-        Examine for violations larger then cutoff, return list of violating models or None on error
+        Examine for violations larger then cutoff, return list of violating models or None on error 
         Requires violations attribute (obtained with calculateAverage method.
         """
-        if not self.has_key('violations'):
+        if not self.has_key('violations'): 
             return None
-
+        
         violatingModels = NTlist()
         #TODO: check if the below self.violations was meant when JFD changed from just 'violations'
         for i in range(0, len(self.violations) ):
             if (math.fabs( self.violations[i]) > cutoff):
                 violatingModels.append( i )
             #end if
-        #end for
-
+        #end for 
+         
         return violatingModels
     #end def
 
@@ -1168,17 +1213,17 @@ class DistanceRestraint( NTdict ):
         #end for
         return s.strip()
     #end def
-
+    
     def __str__(self):
         return sprintf('<DistanceRestraint %d>', self.id )
     #end def
-
+        
     def format( self ):
         return  \
             sprintf('%-25s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f)'+\
                     '(Violations: av %6s max %6.1f counts %2d,%2d,%2d) %s',
-                str(self),
-                self.lower, self.upper,
+                        str(self),
+                        self.lower, self.upper, 
                 val2Str(self.av,         "%6.1f", 6),
                 val2Str(self.sd,         "%7.3f", 7),
                 self.min, self.max,
@@ -1189,16 +1234,16 @@ class DistanceRestraint( NTdict ):
 #end class
 
 class SMLDistanceRestraintHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'DistanceRestraint' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         dr = DistanceRestraint( *line[2:] )
-        return self.dictHandler(dr, fp, project)
+        return self.dictHandler(dr, fp, project) 
     #end def
-
+    
     def endHandler(self, dr, project):
         # Parse the atomPairs tuples, map to molecule
         if project == None or project.molecule == None: return dr
@@ -1209,7 +1254,7 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         #end for
         return dr
     #end def
-
+    
     def toSML(self, dr, stream ):
         """
         """
@@ -1217,14 +1262,14 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         for a in ['lower','upper' ]:
             fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
-
+        
         rl = []
         for r in dr.atomPairs:
             rl.append((r[0].nameTuple(),r[1].nameTuple()))
         #end for
         fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
         fprintf( stream, "%s\n", self.endTag )
-    #end def
+    #end def 
 #end class
 DistanceRestraint.SMLhandler = SMLDistanceRestraintHandler()
 
@@ -1246,13 +1291,13 @@ class DistanceRestraintList( NTlist ):
         self.status = status      # Status of the list; 'keep' indicates storage required
         self.Hbond  = False       # Hbond: fix to keep information about Hbond restraints from CCPN
         self.currentId  = 0       # Id for each element of list
-
+        
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
-        self.violCount1 = 0       # Total violations over 0.1 A
-        self.violCount3 = 0       # Total violations over 0.3 A
-        self.violCount5 = 0       # Total violations over 0.5 A
+        self.violCount1 = 0       # Total violations over 0.1 A 
+        self.violCount3 = 0       # Total violations over 0.3 A 
+        self.violCount5 = 0       # Total violations over 0.5 A 
     #end def
 
     def criticize(self):
@@ -1261,13 +1306,13 @@ class DistanceRestraintList( NTlist ):
                 self.colorLabel = setMaxColor( self, dr.colorLabel )
         if self.colorLabel:
             return True
-
+    
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
         NTlist.append( self, distanceRestraint )
         self.currentId += 1
     #end def
-
+            
     def analyze( self ):
         """
         Calculate averages for every restraint.
@@ -1275,11 +1320,11 @@ class DistanceRestraintList( NTlist ):
         or (None, None, None, None, None) on error
         """
 
-        if not len( self ):
-            NTerror('DistanceRestraintList.analyze: "%s" empty list', self.name )
+        if (len( self ) == 0): 
+            NTerror('ERROR DistanceRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
-
+        
         modelCount = 0
         if (len(self[0].atomPairs) > 0):
             modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
@@ -1289,13 +1334,13 @@ class DistanceRestraintList( NTlist ):
             NTerror('DistanceRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
-
-        self.rmsd  = NTfill( 0.0, modelCount )
-        self.violCount1 =  0
-        self.violCount3 =  0
+                       
+        self.rmsd  = NTfill( 0.0, modelCount ) 
+        self.violCount1 =  0  
+        self.violCount3 =  0  
         self.violCount5 =  0
         count = 0
-        self.errors = NTlist() # Store reference to restraints with calc problems
+        self.errors = NTlist() # Store reference to restraints with calc problems 
         for dr in self:
             dr.calculateAverage()
             if dr.error:
@@ -1305,28 +1350,28 @@ class DistanceRestraintList( NTlist ):
                 self.violCount3 += dr.violCount3
                 self.violCount5 += dr.violCount5
                 for i in range(0, modelCount):
-                    self.rmsd[i] += dr.violations[i]*dr.violations[i]
+                    self.rmsd[i] += dr.violations[i]*dr.violations[i]                
                 #end for
                 count += 1
             #end if
         #end for
-
+ 
         for i in range(0, modelCount):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
         #end for
-
+        
         self.rmsdAv, self.rmsdSd, dummy_n = NTaverage( self.rmsd )
-        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
+        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)                    
     #end def
-
+   
     def sort(self, byItem ):
         """
-        Sort the list byItem
+        Sort the list byItem 
         """
         NTsort( self, byItem, inplace=True)
         return self
-    #end def
-
+    #end def  
+     
     def __str__( self ):
         return sprintf( '<DistanceRestraintList "%s" (%s,%d)>',self.name,self.status,len(self) )
     #end def
@@ -1340,12 +1385,12 @@ class DistanceRestraintList( NTlist ):
                       self.violCount1, self.violCount3, self.violCount5)
 
     #end def
-
+    
 #    def toFile(self, fileName)   :
 #        """
 #        Save dihedralRestraints to fileName for restoring later with fromFile method
 #        """
-#
+#        
 #        fp = open( fileName, 'w' )
 #        if not fp:
 #            NTerror('DistanceRestraintList.toFile: opening "%s"\n', fileName)
@@ -1356,26 +1401,26 @@ class DistanceRestraintList( NTlist ):
 #            restraint.toStream( fp )
 #        #end for
 #        fprintf( fp, '</DistanceRestraintList>\n' )
-#
-#
+#        
+#        
 #            NTmessage('==> Saved %s to "%s"', str(self), fileName )
 #        #end if
 #    #end def
 #end class
 
 class SMLDistanceRestraintListHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'DistanceRestraintList' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         drl = DistanceRestraintList( *line[2:] )
         if not self.listHandler(drl, fp, project): return None
         project.distances.append( drl )
         return drl
     #end def
-
+    
     def toSML(self, drl, fp):
         self.list2SML( drl, fp )
     #end def
@@ -1387,12 +1432,12 @@ DistanceRestraintList.SMLhandler = SMLDistanceRestraintListHandler()
 class DihedralRestraint( NTdict ):
     """
         DihedralRestraint class:
-
-        GV 2 Oct 2007: removed residue and angle attributes.
-        If the 4 atoms consitute a known dihedral angle, this can
-        be retrieved with the retrieveDefinition method
-
-        GV&AWSS: 10 Oct 2007, upper-limit adjustment
+    
+       GV 2 Oct 2007: removed residue and angle attributes.
+       If the 4 atoms consitute a known dihedral angle, this can
+       be retrieved with the retrieveDefinition method
+       
+       GV&AWSS: 10 Oct 2007, upper-limit adjustment
     """
     def __init__( self, atoms, lower, upper, **kwds ):
 
@@ -1418,31 +1463,32 @@ class DihedralRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
     #end def
-
+    
     def calculateAverage(self):
         """Calculate the values and violations for each model
         return cav and cv tuple or (None, None) tuple on error
         """
-
+        
         modelCount = 0
-        if len(self.atoms):
-            modelCount = self.atoms[0].residue.chain.molecule.modelCount        #end if
-
-        if not modelCount:
+        if (len(self.atoms) > 0):
+            modelCount = self.atoms[0].residue.chain.molecule.modelCount
+        #end if
+        
+        if (modelCount == 0):
             NTerror('Error DihedralRestraint: no structure models\n' )
             return (None,None)
         #end if
-
+        
         if len(self.atoms) != 4 or (None in self.atoms):
             NTerror('Error DihedralRestraint: invalid dihedral definition %s\n', self.atoms )
             return (None,None)
         #end if
-
+        
         if None in self.atoms.zap('meanCoordinate'):
             NTerror('Error DihedralRestraint: atom without coordinates %s\n', self.atoms )
             return (None,None)
         #end if
-
+        
         #set the default values
         self.dihedrals  = NTlist() # list with dihedral values for each model
         self.cav        = 0.0      # Average dihedral value
@@ -1466,17 +1512,17 @@ class DihedralRestraint( NTdict ):
                           )
             self.dihedrals.append( d )
         #end for
-
+        
         #find the range to store these dihedral values
         #limit = 0.0
         #if limit > self.lower: limit = -180.0
         #self.dihedrals.limit(limit, limit+360.0)
-
+        
         plotpars =plotParameters.getdefault( self.retrieveDefinition()[1],
                                              'dihedralDefault' )
-
+        
         self.dihedrals.limit(plotpars.min, plotpars.max)
-
+        
         # Analyze violations, account for periodicity by using NTlist.limit feature
         for d in self.dihedrals:
             l = NTlist(self.lower, self.upper, d)
@@ -1484,7 +1530,7 @@ class DihedralRestraint( NTdict ):
             h = NTlist(self.lower, self.upper, d) # list circular with upper as highest value
             h.limit(self.upper-360, self.upper)
             if l[0]<=l[2] and l[2]<=l[1]: # between lower and upper
-                self.violations.append( 0.0 )
+                self.violations.append( 0.0 )                
             else: # there is a violation
                 if math.fabs(l[2]-l[1]) < math.fabs( h[2]-h[0] ): # find smallest to either upper or lower bound
                     v = l[2]-l[1]
@@ -1499,28 +1545,29 @@ class DihedralRestraint( NTdict ):
             #end if
         #end for
         self.violAv,self.violSd,dummy_n = self.violations.average()
-        self.cav,   self.cv,    dummy_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
+        
+        self.cav,self.cv,dummy_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
         return( self.cav, self.cv )
     #end def
-
+    
     def listViolatingModels(self, cutoff = 3.0 ):
         """
-        Examine for violations larger then cutoff, return list of violating models or None on error
+        Examine for violations larger then cutoff, return list of violating models or None on error 
         Requires violations attribute (obtained with calculateAverage method).
         """
-        if not self.has_key('violations'):
+        if not self.has_key('violations'): 
             return None
-
+        
         violatingModels = NTlist()
         for i in range(0, len(self.violations) ):
             if (math.fabs( self.violations[i]) > cutoff):
                 violatingModels.append( i )
             #end if
-        #end for
-
+        #end for 
+         
         return violatingModels
     #end def
-
+    
     def retrieveDefinition(self):
         """
         Retrieve a (<Residue>, angleName, <AngleDef>) tuple from
@@ -1532,44 +1579,44 @@ class DihedralRestraint( NTdict ):
             return (None,None,None)
         #end if
         mol = self.atoms[0].residue.chain.molecule
-
+        
         if mol.dihedralDict.has_key(tuple(self.atoms)):
             return mol.dihedralDict[tuple(self.atoms)]
         else:
             return (None,None,None)
         #end if
-    #end def
-
+    #end def    
+    
     def __str__(self):
         return sprintf('<DihedralRestraint %d>', self.id )
     #end def
-
+            
     def format( self ):
         return  \
             sprintf('%-25s (Target: %6.1f %6.1f)  (Models: cav %6s cv %4s)  '+\
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
-                self, self.lower, self.upper,
+                        self, self.lower, self.upper, 
                 val2Str(self.cav,         "%6.1f", 6),
                 val2Str(self.cv,          "%4.1f", 4),
                 val2Str(self.violAv,      "%4.1f", 4),
                 self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                self.atoms.format('%-11s ')
-               )
-
+                        self.atoms.format('%-11s ')
+                       )
+        
     #end def
 #end class
 
 class SMLDihedralRestraintHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'DihedralRestraint' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         dr = DihedralRestraint( atoms=[], upper = 0.0 , lower =0.0 )
-        return self.dictHandler(dr, fp, project)
+        return self.dictHandler(dr, fp, project) 
     #end def
-
+    
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project.molecule )
@@ -1579,7 +1626,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
 #            dr.append( project.molecule.decodeNameTuple(atm) )
 #        #end for
     #end def
-
+    
     def toSML(self, dr, stream ):
         """
         """
@@ -1588,7 +1635,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
             fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
         fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
-
+        
 #        rl = []
 #        for r in self.atoms:
 #            rl.append(r.nameTuple())
@@ -1596,7 +1643,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
 #        fprintf( stream, '    %-15s = %s\n', 'atoms', repr( rl ) )
 
         fprintf( stream, "%s\n", self.endTag )
-    #end def
+    #end def 
 #end class
 DihedralRestraint.SMLhandler = SMLDihedralRestraintHandler()
 
@@ -1609,20 +1656,21 @@ class DihedralRestraintList( NTlist ):
         self.name       = name
         self.status     = status
         self.currentId  = 0       # Id for each element of list
+        
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
-        self.violCount1 = 0       # Total violations over 1 degree
-        self.violCount3 = 0       # Total violations over 3 degrees
-        self.violCount5 = 0       # Total violations over 5 degrees
+        self.violCount1 = 0       # Total violations over 1 degree 
+        self.violCount3 = 0       # Total violations over 3 degrees 
+        self.violCount5 = 0       # Total violations over 5 degrees 
     #end def
-
+    
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
         NTlist.append( self, dihedralRestraint )
         self.currentId += 1
     #end def
-
+                
     def analyze( self, calculateFirst = True ):
         """
         Calculate averages for every restraint.
@@ -1633,7 +1681,7 @@ class DihedralRestraintList( NTlist ):
             NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
-
+        
         modelCount = 0
         if (len(self[0].atoms) > 0):
             modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
@@ -1643,11 +1691,11 @@ class DihedralRestraintList( NTlist ):
             NTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
-
-        self.rmsd  = NTfill( 0.0, modelCount )
-        self.violCount1 =  0
-        self.violCount3 =  0
-        self.violCount5 =  0
+                       
+        self.rmsd  = NTfill( 0.0, modelCount ) 
+        self.violCount1 =  0  
+        self.violCount3 =  0  
+        self.violCount5 =  0  
         for dr in self:
             if calculateFirst:
                 (cav, _cv) = dr.calculateAverage()
@@ -1660,23 +1708,23 @@ class DihedralRestraintList( NTlist ):
                 self.rmsd[i] += dr.violations[i]*dr.violations[i]
             #end for
         #end for
-
+ 
         for i in range(0, modelCount):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/len(self))
         #end for
-
+        
         self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
-        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
+        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)                    
     #end def
-
+   
     def sort(self, byItem ):
         """
-        Sort the list byItem
+        Sort the list byItem 
         """
         NTsort( self, byItem, inplace=True)
         return self
-    #end def
-
+    #end def  
+ 
     def __str__( self ):
         return sprintf( '<DihedralRestraintList "%s" (%s,%d)>', self.name, self.status, len(self) )
     #end def
@@ -1692,18 +1740,18 @@ class DihedralRestraintList( NTlist ):
 #end class
 
 class SMLDihedralRestraintListHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'DihedralRestraintList' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         drl = DihedralRestraintList( *line[2:] )
         if not self.listHandler(drl, fp, project): return None
         project.dihedrals.append( drl )
         return drl
     #end def
-
+    
     def toSML(self, drl, fp):
         self.list2SML( drl, fp )
     #end def
@@ -1734,66 +1782,66 @@ class RDCRestraint( NTdict ):
 
     def appendPair( self, pair ):
         # check if atom already present, keep order
-        # otherwise: keep atom with lower residue index first
+        # otherwise: keep atom with lower residue index first        
         a0 = self.atomPairs.zap(0)
         a1 = self.atomPairs.zap(1)
         if (pair[0] in a0 or pair[1] in a1):
             self.atomPairs.append( pair )
         elif (pair[0] in a1 or pair[1] in a0):
-            self.atomPairs.append( (pair[1],pair[0]) )
+            self.atomPairs.append( (pair[1],pair[0]) )        
         elif (pair[0].residue.resNum > pair[1].residue.resNum):
             self.atomPairs.append( (pair[1],pair[0]) )
         else:
             self.atomPairs.append( pair )
     #end def
-
+    
     def calculateAverage(self):
         """Calculate the values and violations for each model
         """
-
+        
         modelCount = 0
         if (len(self.atoms) > 0):
             modelCount = self.atoms[0].residue.chain.molecule.modelCount
         #end if
-
+        
         if (modelCount == 0):
             NTerror('Error RDCRestraint: no structure models\n' )
             return (None,None)
         #end if
-
+        
         if len(self.atoms) != 2 or None in self.atoms:
             NTerror('Error RDCRestraint: invalid rdc definition %s\n', self.atoms )
             return (None,None)
         #end if
-
+        
         if None in self.atoms.zap('meanCoordinate'):
             NTerror('Error RDCRestraint: atom without coordinates %s\n', self.atoms )
             return (None,None)
         #end if
-
+        
         #set the default values
 
         return( None, None )
     #end def
-
+    
     def listViolatingModels(self, cutoff = 3.0 ):
         """
-        Examine for violations larger then cutoff, return list of violating models or None on error
+        Examine for violations larger then cutoff, return list of violating models or None on error 
         Requires violations attribute (obtained with calculateAverage method).
         """
-        if not self.has_key('violations'):
+        if not self.has_key('violations'): 
             return None
-
+        
         violatingModels = NTlist()
         for i in range(0, len(self.violations) ):
             if (math.fabs( self.violations[i]) > cutoff):
                 violatingModels.append( i )
             #end if
-        #end for
-
+        #end for 
+         
         return violatingModels
     #end def
-
+    
     def _names(self):
         """
         Internal routine: generate string from atomPairs
@@ -1804,7 +1852,7 @@ class RDCRestraint( NTdict ):
         #end for
         return s.strip()
     #end def
-
+            
     def __str__(self):
         return sprintf('<RDCRestraint %d>', self.id )
     #end def
@@ -1816,24 +1864,24 @@ class RDCRestraint( NTdict ):
 #        #end for
 #        s = s.strip() + ')'
         return  sprintf('%-25s (Target: %6.1f %6.1f) %s',
-                        str(self), self.lower, self.upper,
+                        str(self), self.lower, self.upper, 
                         self._names()
                        )
-
+        
     #end def
 #end class
 
 class SMLRDCRestraintHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'RDCRestraint' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         dr = RDCRestraint( atoms=[], upper = 0.0 , lower =0.0 )
-        return self.dictHandler(dr, fp, project)
+        return self.dictHandler(dr, fp, project) 
     #end def
-
+    
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project.molecule )
@@ -1843,7 +1891,7 @@ class SMLRDCRestraintHandler( SMLhandler ):
 #            dr.appendPair( project.molecule.decodeNameTuple(atm) )
 #        #end for
     #end def
-
+    
     def toSML(self, dr, stream ):
         """
         """
@@ -1852,14 +1900,14 @@ class SMLRDCRestraintHandler( SMLhandler ):
             fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
         fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
-
+        
 #        rl = []
 #        for r in self.atoms:
 #            rl.append(r.nameTuple())
 #        #end for
 #        fprintf( stream, '    %-15s = %s\n', 'atoms', repr( rl ) )
         fprintf( stream, "%s\n", self.endTag )
-    #end def
+    #end def 
 #end class
 RDCRestraint.SMLhandler = SMLRDCRestraintHandler()
 
@@ -1872,28 +1920,28 @@ class RDCRestraintList( NTlist ):
         self.name       = name
         self.status     = status
         self.currentId  = 0       # Id for each element of list
-
+        
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
     #end def
-
+    
     def append( self, RDCRestraint ):
         RDCRestraint.id = self.currentId
         NTlist.append( self, RDCRestraint )
         self.currentId += 1
     #end def
-
+                
     def analyze( self, calculateFirst = True ):
         """
         Calculate averages for every restraint.
-
+        
         """
-        if (len( self ) == 0):
+        if (len( self ) == 0): 
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
-
+        
         modelCount = 0
         if (len(self[0].atoms) > 0):
             modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
@@ -1903,11 +1951,11 @@ class RDCRestraintList( NTlist ):
             NTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
-
-        self.rmsd  = NTfill( 0.0, modelCount )
-        self.violCount1 =  0
-        self.violCount3 =  0
-        self.violCount5 =  0
+                       
+        self.rmsd  = NTfill( 0.0, modelCount ) 
+        self.violCount1 =  0  
+        self.violCount3 =  0  
+        self.violCount5 =  0  
         for dr in self:
             if calculateFirst: dr.calculateAverage()
             self.violCount1 += dr.violCount1
@@ -1917,23 +1965,23 @@ class RDCRestraintList( NTlist ):
                 self.rmsd[i] += dr.violations[i]*dr.violations[i]
             #end for
         #end for
-
+ 
         for i in range(0, modelCount):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/len(self))
         #end for
-
+        
         self.rmsdAv, self.rmsdSd, dummy_n = NTaverage( self.rmsd )
-        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
+        return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)                    
     #end def
-
+   
     def sort(self, byItem ):
         """
-        Sort the list byItem
+        Sort the list byItem 
         """
         NTsort( self, byItem, inplace=True)
         return self
-    #end def
-
+    #end def  
+ 
     def __str__( self ):
         return sprintf( '<RDCRestraintList "%s" (%s,%d)>', self.name, self.status, len(self) )
     #end def
@@ -1948,18 +1996,18 @@ class RDCRestraintList( NTlist ):
 #end class
 
 class SMLRDCRestraintListHandler( SMLhandler ):
-
+    
     def __init__(self):
         SMLhandler.__init__( self, name = 'RDCRestraintList' )
     #end def
-
+    
     def handle(self, line, fp, project=None):
         drl = RDCRestraintList( *line[2:] )
         if not self.listHandler(drl, fp, project): return None
         project.rdcs.append( drl )
         return drl
     #end def
-
+    
     def toSML(self, drl, fp):
         self.list2SML( drl, fp )
     #end def
@@ -1968,9 +2016,9 @@ RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
 #-----------------------------------------------------------------------------
 
 class History( NTlist ):
-    """Cing history storage class
+    """Cing history storage class    
     """
-
+    
     def __call__( self, line, timeStamp = True ):
         if timeStamp:
             self.append( (time.asctime(), line) )
@@ -1978,12 +2026,12 @@ class History( NTlist ):
             self.append( (None, line) )
         #end if
     #end def
-
+    
     def __str__( self ):
         s = sprintf('%s History %s\n', dots, dots )
         for timeStamp,line in self:
             if timeStamp:
-                s = s + sprintf('%s: %s\n', timeStamp, line )
+                s = s + sprintf('%s: %s\n', timeStamp, line ) 
             else:
                 s = s + line + '\n'
             #end if
@@ -2006,22 +2054,22 @@ class History( NTlist ):
         fprintf( stream, lineEnd )
     #end def
 #end class
-
+    
 #-----------------------------------------------------------------------------
 
 class XMLHistoryHandler( XMLhandler ):
     """History handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='History')
+        XMLhandler.__init__( self, name='History') 
     #end def
-
+    
     def handle( self, node ):
         items = self.handleMultipleElements( node )
         if items == None: return None
         result = History()
         for item in items:
             result.append( item )
-        return result
+        return result   
     #end def
 #end class
 
@@ -2033,21 +2081,21 @@ historyhandler = XMLHistoryHandler()
 
 htmlObjects = NTlist() # A list of all htmlobject for rendering purposes
 
-class HTMLfile:
+class HTMLfile:    
     '''Description: Class to create a Html file; to be used with cing.css layout.
        Inputs: file name, title
        Output: a Html file.
     '''
-
+    
     # A list of all htmlobject for rendering purposes
     #htmlObjects = NTlist() # Local track-keeping list
-
+    
     def __init__( self, fileName, title = None ):
         '''Description: __init__ for HTMLfile class.
            Inputs: file name, title
            Output: an instanciated HTMLfile obj.
         '''
-
+        
         self.fileName = fileName
         self.stream = open( fileName, 'w' )
         self.stream.close()
@@ -2055,10 +2103,10 @@ class HTMLfile:
         # definition of content-less  tags
         self.noContent = [ 'base','basefont','br','col','frame','hr','img',
                            'input','link','meta','ccsrule' ]
-
+        
         self.title = title
         self.indent = 0
-
+ 
         # copy css and other files (only files! no dirs)
         dirname,dummy_base,dummy_extention = NTpath( fileName )
         htmlPath = os.path.join(cingRoot,cingPaths.html)
@@ -2066,17 +2114,17 @@ class HTMLfile:
             htmlFile = os.path.join(cingRoot,cingPaths.html,f)
             if os.path.isfile(htmlFile): shutil.copy( htmlFile, dirname )
         #end for
-
+        
         self._header    = NTlist()
         self._call      = NTlist()
         self._main      = NTlist()
         self._left      = NTlist()
         self._right     = NTlist()
         self._footer    = NTlist()
-
+        
         htmlObjects.append( self )
     #end def
-
+    
     # Having a del method might upset the gc.
 #    def __del__(self):
 #        print '>>deleting>', self.title, self.fileName
@@ -2094,9 +2142,9 @@ class HTMLfile:
         while htmlObjects.pop(): pass # I think this should work to clear the list
         #print '222222', htmlObjects
     #end def
-
+    
     killHtmlObjects = staticmethod( killHtmlObjects)
-
+       
     def _appendTag( self, htmlList, tag, *args, **kwds ):
         '''Description: core routine for generating Tags.
            Inputs: HTMLfile obj, list, tag, openTag, closeTag, *args, **kwds.
@@ -2106,39 +2154,39 @@ class HTMLfile:
         htmlList.append( self._generateTag( tag, *args, **kwds ) )
         self.indent -= 1
     #end def
-
+        
     def _generateTag( self, tag, *args, **kwds ):
         '''Description: core routine for generating Tags.
            Inputs: HTMLfile obj, tag, openTag, closeTag,
                    newLine, *args, **kwds.
            Output: list.
         '''
-
+        
         #self.indent += 1
-
+        
         if kwds.has_key('openTag'):
             openTag = kwds['openTag']
             del kwds['openTag']
         else:
             openTag = True
-
+        
         if kwds.has_key('closeTag'):
             closeTag = kwds['closeTag']
             del kwds['closeTag']
         else:
             closeTag = True
-
+            
         if kwds.has_key('newLine'):
             newLine = kwds['newLine']
             del kwds['newLine']
         else:
             newLine = True
         v = { True: None, False: -1 }
-
+            
         #print '****', htmlList,'*',tag,'*', openTag,'*', closeTag, '*', args
-
+        
         if openTag and closeTag:
-            s = ( self.openTag( tag, *args, **kwds )[:-1] +
+            s = ( self.openTag( tag, *args, **kwds )[:-1] + 
                   self.closeTag(tag)[self.indent:v[newLine]] )
         elif openTag:
             s = ( self.openTag( tag, *args, **kwds ) )
@@ -2146,20 +2194,20 @@ class HTMLfile:
             s = ( self.closeTag( tag, *args, **kwds ) )
         #end if
         #self.indent -=1
-
+        
         return s
     #end def
-
+        
     def header( self, tag, *args, **kwds ):
         self.indent +=1
         self._appendTag( self._header, tag, *args, **kwds )
         self.indent -=1
     #end def
-
+       
     def __call__( self, tag, *args, **kwds ):
         "Write openTag, content, closeTag (if appropriate)"
         self.indent +=1
-        self._appendTag( self._call, tag, *args, **kwds )
+        self._appendTag( self._call, tag, *args, **kwds )    
         self.indent -=1
     #end def
 
@@ -2174,7 +2222,7 @@ class HTMLfile:
         self._appendTag( self._left, tag, *args, **kwds )
         self.indent -=1
     #end def
-
+    
     def right( self, tag, *args, **kwds ):
         self.indent +=1
         self._appendTag( self._right, tag, *args, **kwds )
@@ -2190,27 +2238,33 @@ class HTMLfile:
            Inputs: a HTMLfile obj.
            Output: written lines and close file.
         '''
+
         self.stream = open( self.fileName, 'w' )
+        
         self.indent = 0
+        
         self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
         self.stream.write(self.openTag('html'))
         self.stream.write(self.openTag('head'))
-        if self.title:
+        if self.title: 
             self.stream.write( self._generateTag( 'title', self.title ))
-        self.stream.write(self._generateTag( 'link',
+        
+        self.stream.write(self._generateTag( 'link', 
             rel="stylesheet", type="text/css", media="screen", href=cingPaths.css))
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
         self.stream.write(self.openTag('div', id="container"))
         self.indent += 1
+
         self.stream.write( self.openTag('div', id = 'header') )
         self.stream.writelines(self._header)
         self.stream.write(self.closeTag('div', '<!-- end header -->'))
-
+        
         self.stream.write( self.openTag('div', id = 'main') )
         self.stream.writelines(self._call + self._main)
 
         for divId, htmlList in [ ('left', self._left), ('right', self._right) ]:
+        
             if htmlList:
                 self.indent += 1
 
@@ -2221,8 +2275,11 @@ class HTMLfile:
                 self.indent -= 1
         self.stream.write(self.closeTag('div', '<!-- end main -->'))
         self.stream.write(self._generateTag( 'br', style="clear: both;" ))
+                                                      
         self.indent = 0
+
         self.stream.write(self.closeTag('div', '<!-- end container -->'))
+
         self.stream.write(self.openTag('div', id = 'footer'))
         #self.defaultFooter()
         self.stream.writelines(self._footer)
@@ -2238,8 +2295,10 @@ class HTMLfile:
                 msg += ', '
         self.stream.write(self._generateTag( 'p', msg))
         self.stream.write(self.closeTag('div', '<!-- end footer -->'))
+
         self.stream.write(self.closeTag('body'))
         self.stream.write(self.closeTag('html'))
+
         self.stream.close()
 
     def tag( self, tag, *args, **kwds ):
@@ -2248,15 +2307,15 @@ class HTMLfile:
         #print '*****', tag, [args], (kwds)
         openTag = sprintf('<%s',tag)
         for key,value in kwds.iteritems():
-            openTag = openTag + sprintf(' %s="%s"', key, value)
+            openTag = openTag + sprintf(' %s="%s"', key, value) 
         #end for
-
+        
         if (tag in self.noContent):
-            openTag = openTag +  '/>'
+            openTag = openTag +  '/>' 
         else:
-            openTag = openTag +  '>'
+            openTag = openTag +  '>' 
         #end if
-
+        
         content = ''.join(args)
         if (tag in self.noContent):
             closeTag = ''
@@ -2265,13 +2324,13 @@ class HTMLfile:
         #end if
         return (openTag,content,closeTag)
     #end def
-
+        
     def openTag( self, tag, *args, **kwds ):
         "Write openTag, content; NO closeTag"
         openTag, content, dummyCloseTag = self.tag( tag, *args, **kwds )
         return sprintf( '%s%s%s\n', '' + '\t' * self.indent, openTag, content )
     #end def
-
+        
     def closeTag( self, tag, *args, **kwds ):
         "Write closeTag *args"
         dummyOpenTag, content, closeTag = self.tag( tag, *args, **kwds )
@@ -2283,7 +2342,7 @@ class HTMLfile:
            Inputs: Cing objects souce, destination
            Output: string path or None or error
         '''
-
+    
         testFail = False
         for item in [source, destination]:
             if not hasattr(item,'htmlLocation'):
@@ -2291,45 +2350,45 @@ class HTMLfile:
                 NTerror('No htmlLocation attribute associated to obj %s\n', item)
             #end if
         #end for
-
+        
         if testFail: return None
-
+        
         sourcePath, dummySourceId = source.htmlLocation
         destPath, destId = destination.htmlLocation
-
+        
         if id: destId = '#' + id
-
+            
         listSourcePath = sourcePath.split('/')
         listDestPath = destPath.split('/')
-
+    
         lenSP = len(listSourcePath)
-
+        
         for index in range(lenSP):
             if listSourcePath[index] != listDestPath[index]:
                 #location = index * ['..'] + listDestPath
                 break
-
-        i = lenSP - 1 - index
+    
+        i = lenSP - 1 - index 
         location = (index + i) * ['..'] + listDestPath
-
+    
         loc = ''
         for item in location:
             loc = os.path.join(loc,item)
-
+        
         return loc + destId
     #end def
-
+    
     def insertHtmlLink( self, section, source, destination, text=None, id=None ):
         '''Description: create the html command for linking Cing objects.
            Inputs: section (main, header, left etc.), source obj., destination
                    obj., html text, id.
            Output: <a class="red" href="link">text</a> inside section
         '''
-
+        
         if not section:
             NTerror("No HTML section defined here\n")
             return None
-
+        
         if not source:
             NTerror("No Cing object source defined here\n")
             return None
@@ -2337,13 +2396,13 @@ class HTMLfile:
         if not destination:
             NTerror("No Cing object destination defined here\n")
             return None
-
+        
         link = self.findHtmlLocation( source, destination, id )
-
+        
         #if not destination.has_key('colorLabel'):
         if not hasattr(destination, 'colorLabel'):
             destination.colorLabel = COLOR_GREEN
-
+        
         # solution for avoiding python 'class' command with html syntax
         kw = {'class':destination.colorLabel, 'href':link}
         section('a', text, **kw)
@@ -2356,14 +2415,14 @@ class HTMLfile:
                    destination obj., html text, id.
            Output: <h1><a class="red" href="link">text</a></h1> inside section
         '''
-
+        
         section(tag, closeTag=False)
         self.insertHtmlLink(section, source, destination, text=text, id=id)
         section(tag, openTag=False)
-    #end def
+    #end def    
 
 #end class
-
+        
 #-----------------------------------------------------------------------------
 def path( *args ):
     """
