@@ -1,7 +1,7 @@
 import os
 import sys
 
-cingVersion     = '0.74 alfa'
+cingVersion     = '0.75 alfa'
 programName     = 'CING'
 CING_STR        = programName # key to the entities (atoms, residues, etc under which the results will be stored
 

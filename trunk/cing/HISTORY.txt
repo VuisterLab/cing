@@ -1,3 +1,6 @@
+Version 0.75: 17 Apr 2008: 
+    - Optimized the coordinate storage class for speed through cython now.
+
 Version 0.74: 25 Mar 2008: 
     - Optimized the coordinate storage class for speed.
     - Added water to topology.
