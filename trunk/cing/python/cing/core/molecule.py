@@ -9,8 +9,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTvector
-from cing.Libs.vector  import Vector
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import angle3Dopt
@@ -25,6 +24,8 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
+from cing.Libs.cython.vector  import Vector #@UnresolvedImport
+from cing.core.constants import COLOR_GREEN
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
@@ -38,12 +39,9 @@ from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
 from database     import NTdb
 from parameters   import plotParameters
-from cing.Libs.NTutils import NTvector
-from cing.core.constants import COLOR_GREEN
-from cing.Libs.NTutils import NTwarning
-import string
 import math
 import os
+import string
 
 #==============================================================================
 # Global variables
@@ -370,7 +368,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def models2list( self, models ):
         """
             Convert
-              either a models string, e.g. '1,3,5,6-20, 
+              either a models string, e.g. '0,3,5,6-19 
               or a list with model numbers,
               or None,
               
@@ -379,10 +377,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
            Returns empty list if modelCount == 0, 
            Returns the list or None upon error.
 
-            Note that model number start at 1 and not zero as before.
+            Note that model number start at zero .
         """
         if models == None:
-            return NTlist( *range(1,self.modelCount+1))
+            return NTlist( *range(self.modelCount))
             
         if self.modelCount == 0:
             return NTlist()
@@ -392,15 +390,16 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             models.sort()
             result = NTlist()
             for model in models:
-                if model == 0:
-                    NTerror('Error Molecule.models2list: invalid model number %d (zero)\n', model )
+                if model < 0:
+                    NTerror('Error Molecule.models2list: invalid model number %d (below zero)\n', model )
                     return None
-                if model > self.modelCount:
+                if model >= self.modelCount:
                     NTerror('Error Molecule.models2list: invalid model number %d (larger than modelCount: %d)\n',
                             (model, self.modelCount ))
                     return None
-                    result.append(model)
+                result.append(model)
             #end for
+            result.sort()
             return result
             
         if isinstance( models, list ):
@@ -410,18 +409,18 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 if not isinstance( model, int):
                     NTerror('Error Molecule.models2list: invalid model "%s" in models list\n', model )
                     return None
-                if model == 0:
-                    NTerror('Error Molecule.models2list: Invalid model number %d (zero)\n', model )
+                if model < 0:
+                    NTerror('Error Molecule.models2list: Invalid model number %d (below zero)\n', model )
                     return None
-                if model > self.modelCount:
+                if model >= self.modelCount:
                     NTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n',
                                 (model, self.modelCount ))
                     return None
                 result.append(model)
             #end for
             return result
-            NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
-            return None
+        NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
+        return None
     #end def  
     
           
@@ -613,8 +612,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues         
         """
-        if self.modelCount > 0:
-                NTmessage('==> Calculating dihedral angles ... ')
+        if self.modelCount <= 0:
+            NTmessage('==> No models so skipping calculating dihedral angles ... ')
+            return
+        NTmessage('==> Calculating dihedral angles ... ')
         self.dihedralDict = {} # will be filled by calling dihedral method of residue
         for res in self.allResidues():
             for dihedral in res.db.dihedrals:
@@ -759,23 +760,24 @@ Return an Molecule instance or None on error
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
         Only export model if specified.
-        Note that model starts not at zero but at one.
+        Note that the first model is model numbered zero.
+        Return None on error or pdbfile object on success.
         """
         
         if self.modelCount == 0:
             NTerror("modelCount is zero in Molecule instance: " + `self`)
             return None
-        if model==0:
-            NTerror("model number is zero in Molecule instance: " + `self`)
-            return None
-        if model > self.modelCount:
-            NTerror("model number is larger than modelCount in Molecule instance: " + `self`)
-            return None
         
-        if model!=None:
-            models = NTlist( model )
+        if model==None:
+            models = NTlist(*range( self.modelCount ))
         else:
-            models = NTlist(*range( 1,self.modelCount+1 ))
+            if model<0:
+                NTerror("model number is below zero in Molecule instance: " + `self` + " and model number: " + model)
+                return None
+            if model >= self.modelCount:
+                NTerror("model number is larger than modelCount in Molecule instance: " + `self`)
+                return None
+            models = NTlist( model )
         
         NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ", 
                    convention, models[0], models.last()                 )
@@ -786,10 +788,10 @@ Return an Molecule instance or None on error
         record.text = sprintf('PDB file of molecule %s', self.name )
         pdbFile.append( record )
             
-        for model in models:
+        for m in models:
             if len(models) > 1:
                 record = PyMMLib.MODEL()
-                record.serial = model # JFD is curious as to why this was wrong?
+                record.serial = m + 1 # only now change to a model number that starts at one.
                 pdbFile.append( record )
             #end if
             
@@ -800,8 +802,7 @@ Return an Molecule instance or None on error
                     atm.setdefault('pdbSkipRecord',False)
                     if atm.pdbSkipRecord:
                         continue
-#                    if not atm.pdbSkipRecord and model < len(atm.coordinates):
-                        record = atm.toPDB( pdbIndex=atmCount, model=model, convention=convention )
+                    record = atm.toPDB( pdbIndex=atmCount, model=m, convention=convention )
                     if not record:
                         # this happens for all Q and even for like Cys HG which aren't always present in actual structure
                         # but are defined in db.
@@ -1325,7 +1326,7 @@ Residue class: Defines residue properties
         cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
         
         return cav,cv
-    #end def
+    #end def 
     
     def translate( self, convention ):
         """return translated name according to convention"""
@@ -2005,18 +2006,17 @@ Atom class: Defines object for storing atom properties
            16 Oct 2007: GV Fixed bug: model=0 would also invoke
                         The "current" setting; i.e would map to last
                         coordinate added.
-            Changed model to start from 1 instead of from zero.
         """
-        if model > len(self.coordinates):
+        if model >= len(self.coordinates):
             # this happens for all pseudos and atoms like Cys HG which aren't always present
             # but are defined in the db.
 #            NTdebug("Trying to Atom.toPDB for model: " + `model`)
 #            NTdebug("but only found coordinates length: " + `len(self.coordinates)`)
             return None
-        if model < 1:
-            NTcodeerror("In Atom.toPDB found model to be <1: " + `model`)
+        if model < 0:
+            NTcodeerror("In Atom.toPDB found model to be <0: " + `model`)
             return None
-        modelId = model - 1
+#        modelId = model - 1
         
         pdbAtmName = self.translate( convention )
         if not pdbAtmName:
@@ -2030,7 +2030,7 @@ Atom class: Defines object for storing atom properties
             NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue ))
             return None
 
-        coor = self.coordinates[modelId]
+        coor = self.coordinates[model]
         
         if self.db.hetatm:
             record = HETATM()
@@ -2104,21 +2104,50 @@ class XMLAtomHandler( XMLhandler ):
 #register this handler
 atomhandler = XMLAtomHandler()
 
-#==============================================================================
-class Coordinate( Vector ):
+class CoordinateOld( list ):
     """
--------------------------------------------------------------------------------
-JFD:
+--
 Coordinate class optimized because dictionary indexing and attribute calls
 are too expensive. Just remember the attributes have a fixed order.
 Usually this is to be avoided but the speed improvement makes it worth our
 while.
 Added getter/setters for the non obvious ones.
+--
+    """
+    DEFAULT_BFACTOR   = 0.0
+    DEFAULT_OCCUPANCY = 1.0
+    def __init__( self, x, y, z, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom=None ):
+        list.__init__( self  )
+        self.append( x )
+        self.append( y )
+        self.append( z )
+        self.append( Bfac )
+        self.append( occupancy )
+        self.append( atom )
+    def getBFac(self):
+        return self[3]
+    def getOccupancy(self):
+        return self[4]
+    def getAtom(self):
+        return self[5]
+    def setBFac(self, v):
+        self[3] = v
+    def setOccupancy(self, v):
+        self[4] = v
+    def setAtom(self, v):
+        self[5] = v
+#        self.dx = "blabla" optional.
+    def __call__( self ):
+        return self
+
+#==============================================================================
+class Coordinate( Vector ):
+    """
 -------------------------------------------------------------------------------
 GWV:
 Derived from Vector class
-
-    
+TODO: compile super class with Pyrex
+    correct superclass name in above definition to "cing.Libs.vector.vector".
     """
 
     DEFAULT_BFACTOR   = 0.0
@@ -2185,9 +2214,10 @@ Derived from Vector class
     def __repr__(self):
         return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f )', self.x, self.y, self.z, self.Bfac )
     #end def    
-#    def __call__( self ):
+    def __call__( self ):
 #        return Vector(self.x, self.y, self.z)
-#    #end def
+        return self
+    #end def
     
 #end class
 
@@ -2281,7 +2311,8 @@ def NTdihedral( c1, c2, c3, c4, radians=False ):
 #end def
 def NTdihedralOpt( c1, c2, c3, c4 ):
     """ To replace unoptimized routine. It's 7 times faster (20.554/2.965s)
-    for 100,000 calculations.
+    for 100,000 calculations. Since last the performance dropped with
+    the coordinate based on CoordinateOld(list) to 3.0 s per 10,000.
     Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
     Adapted from biopython-1.41
     """
@@ -2390,7 +2421,7 @@ def translateTopology( residue, topDefList ):
         if res == None or not res.has_key( atomName ):
             result.append( None )
             continue
-            result.append( res[atomName] )
+        result.append( res[atomName] )
     return result
 #end def
                     

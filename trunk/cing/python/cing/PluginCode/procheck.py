@@ -200,7 +200,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     #        NTsort(selectedResidues, 'resNum', inplace=True)
             # reduce this sorted list to pairs start, stop
             self.ranges = selectedResidues[0:1]
-            for i in range(0, len(selectedResidues)-1):
+            for i in range(len(selectedResidues)-1):
                 if ((selectedResidues[i].resNum < selectedResidues[i+1].resNum - 1) or 
                     (selectedResidues[i].chain != selectedResidues[i+1].chain)
                    ):
@@ -235,7 +235,6 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
-#            project.molecule.modelCount
             self.molecule.toPDBfile(path, convention=AQUA)
             # Can't use IUPAC here because aqua doesn't understand difference between
             # G and DG.(oxy/deoxy).
@@ -248,7 +247,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         else:
             hasRestraints = False
             for extensionRestraintFile in [ "noe", "tor" ]:
-                srcDir = os.path.join(self.project.rootPath(self.project.name), self.project.directories.aqua )
+                srcDir = os.path.join(self.project.rootPath(self.project.name)[0], self.project.directories.aqua )
                 if not os.path.exists(srcDir):
                     NTcodeerror("Aqua export dir is absent")
                     return True
@@ -331,6 +330,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         Return True on error.
         TODO: get a complete .sum file (bug in procheck compile) and parse it too.
         """
+        # modelCount starts at ONE but CING numbers models internally starting at ZERO.
         modelCount = self.molecule.modelCount
         NTmessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
         for i in range(1, modelCount+1):

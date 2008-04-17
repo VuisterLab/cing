@@ -221,12 +221,13 @@ Project: Top level Cing project class
         """Static method returning Root,name of project from name
         
         name can be:
-            simple name string
+            simple_name_string
             directory.cing
             directory.cing/
             directory.cing/project.xml
             
-        GWV 6 Dec 2007: to allow for relative paths
+        GWV  6 Dec 2007: to allow for relative paths. 
+        JFD 17 Apr 2008: fixed bugs caused by returning 2 values.
         """
         root,name,ext = NTpath(name)
         if name == '' or name == 'project': # indicate we had a full path
@@ -234,14 +235,14 @@ Project: Top level Cing project class
         #end if
         if (len(ext)>0 and ext != '.cing'):
             NTerror('FATAL ERROR: unable to parse "%s"\n', name )
-            exit(1)
-        #end if
+#            exit(1) # no more hard exits for we might call this from GUI or so wrappers
+            return None
         
         rootp = os.path.join(root, name + '.cing')
         #print '>>',rootp,name
 
         return rootp, name
-    #end def
+
     rootPath = staticmethod( rootPath )
     
     def mkdir( self, *args ):
@@ -260,11 +261,12 @@ Project: Top level Cing project class
         """ Path relative to molecule.
         Return path or None in case of error.
         """
-        if not self.molecule: return None
+        if not self.molecule: 
+            return None
         if subdir == None:
             return self.path( self.molecule.name )
-        else:
-            return self.path( self.molecule.name, moleculeDirectories[subdir], *args )
+
+        return self.path( self.molecule.name, moleculeDirectories[subdir], *args )
     
     def htmlPath(self, *args ):
         """ Path relative to molecule's html directory.
@@ -606,7 +608,7 @@ Project: Top level Cing project class
         """Removes True on error. If no cing project is found on disk None (Success) will
         still be returned. Note that you should set the nosave option on the project
         before exiting."""
-        pathString = self.rootPath(self.name)
+        pathString, _name = self.rootPath(self.name)
         if not os.path.exists(pathString):
             NTwarning("No cing project is found at: " + pathString)
             return None
@@ -1095,7 +1097,7 @@ class DistanceRestraint( NTdict ):
         """
 
         modelCount = 0
-        if (len(self.atomPairs) > 0):
+        if len(self.atomPairs) :
             modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
         
@@ -1119,7 +1121,7 @@ class DistanceRestraint( NTdict ):
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
         
         if modelCount>0:
-            for i in range(0, modelCount):
+            for i in range( modelCount):
                 d = 0.0
                 for atm1,atm2 in self.atomPairs:
                     #expand pseudoatoms
@@ -1194,7 +1196,7 @@ class DistanceRestraint( NTdict ):
         
         violatingModels = NTlist()
         #TODO: check if the below self.violations was meant when JFD changed from just 'violations'
-        for i in range(0, len(self.violations) ):
+        for i in range( len(self.violations) ):
             if (math.fabs( self.violations[i]) > cutoff):
                 violatingModels.append( i )
             #end if
@@ -1326,11 +1328,11 @@ class DistanceRestraintList( NTlist ):
         #end if
         
         modelCount = 0
-        if (len(self[0].atomPairs) > 0):
+        if len(self[0].atomPairs):
             modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
-        if (modelCount == 0):
+        if modelCount == 0:
             NTerror('DistanceRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
@@ -1470,7 +1472,7 @@ class DihedralRestraint( NTdict ):
         """
         
         modelCount = 0
-        if (len(self.atoms) > 0):
+        if len(self.atoms):
             modelCount = self.atoms[0].residue.chain.molecule.modelCount
         #end if
         
@@ -2419,7 +2421,6 @@ class HTMLfile:
         section(tag, closeTag=False)
         self.insertHtmlLink(section, source, destination, text=text, id=id)
         section(tag, openTag=False)
-    #end def    
 
 #end class
         

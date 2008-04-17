@@ -24,7 +24,7 @@ class AllChecks(TestCase):
     os.chdir(cingDirTestsTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
-    def tttestPlotVaria(self):
+    def testPlotVaria(self):
         ps = NTplotSet() # closes any previous plots
         p = ps.createSubplot(1,1,1)
         p.title = 'test'
@@ -58,7 +58,7 @@ class AllChecks(TestCase):
 
 #        p.yRange = None # Should autoscale the plot in y.
         ps.hardcopy('testPlotVaria.png')
-        ps.show()
+#        ps.show()
 
 
     def testPlotModelHisto(self):
@@ -82,7 +82,7 @@ class AllChecks(TestCase):
         plot.barChart( outliersPerModel.items(),
                        0.05, 0.95,
                        attributes = boxAttributes(fillColor='green' ) )
-        ps.hardcopy( 'outliers.png' )
+        ps.hardcopy( 'testPlotModelHisto.png' )
 #        plot.show()
 
 
@@ -93,7 +93,7 @@ class AllChecks(TestCase):
         self.assertNotEquals(  to3StateUpper([' ','H']), ['H','H'])
         self.assertEquals(     to3StateUpper(['X','H']), [' ','H'])
 
-    def tttestPlotSet(self):
+    def testPlotSet(self):
 #        hardcopySize = (60,30)
         ps = NTplotSet() # closes any previous plots
         nrows = 3
@@ -106,7 +106,7 @@ class AllChecks(TestCase):
         ntPlot1.box(point, sizes)
         ntPlot2.box(point, sizes)
 
-        ps.hardcopySize = (100,30)
+        ps.hardcopySize = (400,300)
 #        ps.show()
         ps.hardcopy('testPlotSet.png')
 

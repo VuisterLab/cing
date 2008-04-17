@@ -59,6 +59,7 @@ from cing import programVersion
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.core.classes import Project
@@ -164,7 +165,7 @@ project = None # after running main it will be filled.
 
 def main():
 
-    root,file,ext  = NTpath( __file__ )
+    root,file,_ext  = NTpath( __file__ )
     usage          = "usage: cing [options]       use -h or --help for listing"
 
     #------------------------------------------------------------------------------------
@@ -423,7 +424,7 @@ def main():
         if len(gp) != 2:
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required\n")
         else:
-            peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] )
+            peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] ) #@UnusedVariable
         #end if
     #end if
     

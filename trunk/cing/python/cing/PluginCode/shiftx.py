@@ -67,7 +67,7 @@ def predictWithShiftx( project, model=None   ):
         NTerror('predictWithShiftx: no models for "%s"\n', project.molecule)
         return None
     #end if
-    if model != None and model > project.molecule.modelCount:
+    if model != None and model >= project.molecule.modelCount:
         NTerror('predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
         return None
     #end if
@@ -86,7 +86,7 @@ def predictWithShiftx( project, model=None   ):
     if model!=None:
         models = NTlist( model )
     else:
-        models = NTlist(*range( 1,project.molecule.modelCount+1 ))
+        models = NTlist(*range( project.molecule.modelCount ))
 
     # initialize the shiftx attributes
     for atm in project.molecule.allAtoms():
