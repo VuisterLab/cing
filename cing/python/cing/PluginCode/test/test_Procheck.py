@@ -9,6 +9,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
 import cing
@@ -26,8 +27,14 @@ class AllChecks(TestCase):
         ranges = None
         pdbConvention = BMRB
         restraintsConvention = CYANA
-        if entryId == '1YWUcdGMP':
+        if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
+        if entryId.startswith("2hgh"):
+            pdbConvention = CYANA
+        if entryId.startswith("1tgq"):
+            pdbConvention = PDB
+        if entryId.startswith("1brv"):
+            pdbConvention = CYANA
             
         if entryId == "2hgh":
             # Note that CING doesn't support chain ids in range selection for procheck. TODO

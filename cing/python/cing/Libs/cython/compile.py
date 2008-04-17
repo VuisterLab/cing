@@ -1,9 +1,9 @@
 # usage: python compile.py build_ext --inplace
-
+# TODO automate this from CING setup script.
 from distutils.core import setup
-#from distutils.extension import Extension
-from Pyrex.Distutils.extension import Extension #@UnresolvedImport
-from Pyrex.Distutils import build_ext #@UnresolvedImport
+from Cython.Distutils.extension import Extension
+from Cython.Distutils.build_ext import build_ext
+
 
 setup(
   name = 'Superpose',

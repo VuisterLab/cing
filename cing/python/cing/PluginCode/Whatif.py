@@ -227,7 +227,7 @@ fullstop y
            """
            
         # Parser uses sense of current items as per below.
-        curModelId = model - 1
+        curModelId = model
         curCheck   = None # Can be used to skip ahead.
         curLocId   = None
         curLocDic  = None
@@ -484,7 +484,7 @@ def runWhatif( project, tmp=None ):
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
             NTwarning('non-standard residue %s found and will be written out for What If\n' % `res`)
 
-    models = NTlist(*range( 1,project.molecule.modelCount+1 ))
+    models = NTlist(*range( project.molecule.modelCount ))
 
     whatifDir = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
     whatifPath       = os.path.dirname(cingPaths.whatif)

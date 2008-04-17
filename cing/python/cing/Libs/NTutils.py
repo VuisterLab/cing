@@ -187,7 +187,7 @@ class NTlist( list ):
         if (l == 0):
             return None
         #end if
-        return self[l-1]  # equivalent to self[-1:][0]
+        return self[l-1]  # equivalent to self[-1:][0] or simply self[-1]
     #end def
 
     def push( self, item ):
@@ -478,7 +478,7 @@ def NThistogram( theList, low, high, bins ):
 #
 
 class NTvector( list ):
-    """Lightweigt class to implement a few vector operations
+    """Lightweight class to implement a few vector operations
        Numeric or Numpy has compiled code; this is a python
        only class based on list
        See also:
@@ -3043,9 +3043,10 @@ def NTpath( path ):
     """
     d = os.path.split( path )
     dirname = d[0]
-    if len(dirname) == 0: dirname = '.'
+    if len(dirname) == 0: 
+        dirname = '.'
     f = os.path.splitext( d[1] )
-    return (dirname,f[0],f[1])
+    return dirname, f[0], f[1]
 
 #
 # -----------------------------------------------------------------------------

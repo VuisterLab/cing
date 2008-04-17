@@ -70,7 +70,7 @@ class Molgrap(NTdict):
                 NTwarning('molgrap: non-protein residues will be skipped:\n' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             # 
-            molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=1)
+            molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=0)
             # Restore the 'default' state
             for atm in skippedAtoms:
                 atm.pdbSkipRecord = False
@@ -227,6 +227,7 @@ def export2gif(molecule, path ):
 #    NTdebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap()
     m.run(molecule, path)
+    
 Molecule.export2gif = export2gif
 
 # register the functions

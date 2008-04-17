@@ -241,7 +241,6 @@ def calculateRmsd( project, ranges=None, models = None   ):
     shownWarningCount1 = 0
 #            shownWarningCount2 = 0
     for model in selectedModels:
-        modelId = model-1
         NTmessage(".")
 
         #end if
@@ -260,9 +259,9 @@ def calculateRmsd( project, ranges=None, models = None   ):
                 d=None
                 if atm.meanCoordinate:
                     d=0.0
-                    tmp0 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
-                    tmp1 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
-                    tmp2 = atm.coordinates[modelId][0]-atm.meanCoordinate[0]
+                    tmp0 = atm.coordinates[model][0]-atm.meanCoordinate[0]
+                    tmp1 = atm.coordinates[model][0]-atm.meanCoordinate[0]
+                    tmp2 = atm.coordinates[model][0]-atm.meanCoordinate[0]
                     d += tmp0*tmp0
                     d += tmp1*tmp1
                     d += tmp2*tmp2
@@ -620,19 +619,18 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
 
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
     for model in range( modelCount ):
-        modelId = model - 1
         #c1 is geometric mean of centroid atms
         c1 = NTvector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
             atm = residue1[atmName]
-            c1 += atm.coordinates[modelId]()
+            c1 += atm.coordinates[model]()
         #end for
         # not yet: c1 /= len(centroids[residue1.db.shortName])
         for j in range(3):
             c1[j] /= len(centroids[residue1.db.shortName])
 
         try:
-            c1a = residue1['CA'].coordinates[modelId]()
+            c1a = residue1['CA'].coordinates[model]()
         except:
             break
 
@@ -640,13 +638,13 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         c2 = NTvector(0,0,0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
-            c2 += atm.coordinates[modelId]()
+            c2 += atm.coordinates[model]()
         #end for
         # not yet: c2 /= len(centroids[residue2.db.shortName])
         for j in range(3):
             c2[j] /= len(centroids[residue2.db.shortName])
 
-        c2a = residue2['CA'].coordinates[modelId]()
+        c2a = residue2['CA'].coordinates[model]()
 
         #print '>>', c1, c2
         r = c2-c1
@@ -660,7 +658,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             atm1 = residue1[atmName1]
             for atmName2 in donorAcceptor[residue2.db.shortName]:
                 atm2 = residue2[atmName2]
-                d = (atm1.coordinates[modelId]()-atm2.coordinates[modelId]()).length()
+                d = (atm1.coordinates[model]()-atm2.coordinates[model]()).length()
                 if ( d< 4.0): count += 1
                 #print '>', atm1,atm2,d,count
 
@@ -726,7 +724,7 @@ def checkHbond( donorH, acceptor,
         heavyAtom-donorH-acceptor angle between minAngle and maxAngle
         and adonorH-acceptor distance < maxDistance.
 
-    H-bond is accpeted when H-bond is present in at least fraction of
+    H-bond is accepted when H-bond is present in at least fraction of
     the models in the ensemble.
     """
 
@@ -770,7 +768,7 @@ def checkHbond( donorH, acceptor,
     distances             = NTlist()    # make copies to calculate averages of accepted
     angles                = NTlist()    # make copies to calculate averages of accepted
     for d,a in result.data:
-        if (d <= maxDistance and a >= minAngle and a <= maxAngle ):
+        if d <= maxDistance and a >= minAngle and a <= maxAngle:
             result.acceptedModels.append( (result.modelCount, d, a ) )
             result.acceptedCount += 1
             distances.append( d )
@@ -1042,7 +1040,7 @@ def validateModels( self)   :
 #    self.validateDihedrals(    )
     # self.models keeps track of the number of outliers per model.
     self.models = NTdict()
-    for m in range(1,self.molecule.modelCount+1):
+    for m in range(self.molecule.modelCount):
         self.models[m] = 0
 
     for res in self.molecule.allResidues():
@@ -1058,12 +1056,12 @@ def validateModels( self)   :
                 except:
                     continue
                 for m in d.outliers.zap( 0 ):    #get all modelId of outliers
-                    self.models[m+1] += 1
+                    self.models[m] += 1
             #end if
         #end for
     #end for
     for m, count in self.models.items():
-        NTmessage('Model %s: %2d backbone dihedral outliers', `m+1`, count )
+        NTmessage('Model %2d: %2d backbone dihedral outliers', m, count )
 #end def
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
@@ -1277,20 +1275,17 @@ def setupHtml(project):
         htmlPath = project.htmlPath()
         if os.path.exists( htmlPath ):
             removedir( htmlPath )
-        #end if
         os.makedirs( htmlPath )
 
         for subdir in htmlDirectories.values():
-            project.mkdir( project.molecule.name, moleculeDirectories.html,
-                           subdir )
-        #end for
+            project.mkdir( project.molecule.name, moleculeDirectories.html, subdir )
 
         if hasattr(molecule, 'html'):
             del(molecule['html'])
 
         molecule.htmlLocation = (project.htmlPath('index.html'), top)
         molecule.html = HTMLfile( molecule.htmlLocation[0],
-                                       title = 'Molecule ' + molecule.name )
+                                  title = 'Molecule ' + molecule.name )
 
     for molecule in project.molecules:
         index = project.molecules.index(molecule)
@@ -1335,7 +1330,6 @@ def setupHtml(project):
             project.mainPageObjects['Molecules'].append(molecule)
         else:
             project.mainPageObjects['Molecules'] = [molecule]
-        #end if
 
         for chain in molecule.allChains():
 
@@ -1343,8 +1337,7 @@ def setupHtml(project):
             chaindir = project.htmlPath(chain.name)
             if not os.path.exists( chaindir ):
                 os.mkdir( chaindir )
-            #end if
-
+ 
             #if hasattr(chain, 'html'): del(chain['html'])
             if chain.has_key('html'):
                 del(chain.html)
@@ -1352,7 +1345,6 @@ def setupHtml(project):
             chain.htmlLocation = ( os.path.join(chaindir,'index.html'), top )
             chain.html = HTMLfile(chain.htmlLocation[0],
                                        title='%s %s'%(molecule.name,chain.name))
-        #end for
 
         for chain in molecule.allChains():
 
@@ -1398,15 +1390,11 @@ def setupHtml(project):
                 obj.html.main('tr', closeTag=False)
                 obj.html.main( 'td',sprintf('%d-%d',r1,r2), style="width: %s" %
                                width )
-            #end for
-            for dummy in range( 0, r0.resNum%ncols ):
+            for dummy in range( r0.resNum%ncols ):
                 for obj in htmlList:
                     obj.html.main('td', style="width: %s" % width)
-                #end for
-            #end for
-
+ 
             for res in residues:
-
                 # Create the directory for this residue
                 resdir = project.htmlPath(chain.name, res.name)
                 if not os.path.exists( resdir ):
@@ -1429,16 +1417,14 @@ def setupHtml(project):
                         obj.html.main('tr', closeTag=False)
                         obj.html.main( 'td',sprintf('%d-%d',r1,r2),
                                        style="width: %s" % width )
-                    #end for
-                #end if
+ 
                 # add residue to table
                 for obj in htmlList:
                     objMain = obj.html.main
                     objMain('td', style="width: %s" % width, closeTag=False)
                     obj.html.insertHtmlLink(objMain, obj, res, text=res.name)
                     objMain('td', openTag=False)
-                #end for
-
+ 
                 # Create a page for each residue
 
                 # generate html file for this residue
@@ -1454,19 +1440,16 @@ def setupHtml(project):
                 if previous:
                     res.html.insertHtmlLink( resHeader, res, previous,
                                              text = previous._Cname(-1) )
-                #end if
                 res.html.insertHtmlLink( resHeader, res, chain,
                                              text = 'UP' )
                 if next:
                     res.html.insertHtmlLink( resHeader, res, next,
                                              text = next._Cname(-1) )
-                #end if
-            #end for
+
             for obj in htmlList:
                 obj.html.main('tr', openTag=False)
                 obj.html.main('table', openTag=False)
-            #end for
-        #end for
+
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',
                                             href='models.html', newLine=False) )
@@ -1742,8 +1725,6 @@ def setupHtml(project):
             project.html.insertHtmlLinkInTag( 'li', main, project, item,
                                               text=item.name )
             main('ul', openTag=False)
-        #end for
-    #end for
     main('td', openTag=False)
     main('td', closeTag=False)
     main('img', src = 'mol.gif')
@@ -1905,7 +1886,7 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
                 plotCount += 1
                 procheckLink = os.path.join('..',
                             project.moleculeDirectories.procheck, molecule.name + p + ".ps")
-                procheckLinkReal = os.path.join( project.rootPath( project.name), molecule.name,
+                procheckLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                             project.moleculeDirectories.procheck, molecule.name + p + ".ps")
     #            NTdebug('procheck real path: ' + procheckLinkReal)
                 if not os.path.exists( procheckLinkReal ):
@@ -2084,8 +2065,8 @@ def populateHtmlModels(project):
         ps.addPlot(plot)
 #        project.models[i] holds the number of outliers for model i.
 #        models is a NTdict containing per model a list of outliers.
-        outliers = [project.models[i] for i in range(1,molecule.modelCount+1)]
-        NTdebug( '>> modelCount, outliers:' + `molecule.modelCount` +", "+ `outliers`)
+        outliers = [project.models[i] for i in range(molecule.modelCount)]
+        NTdebug( '>> Number of outliers per model: ' + `outliers`)
         plot.barChart( project.models.items(), 0.05, 0.95,
                        attributes = boxAttributes( fillColor='green' ) )
 

@@ -109,7 +109,7 @@ if not os.path.exists( args[0] ):
     NTerror('ERROR: directory "%s" not found\n', args[0] )
     sys.exit(1)
 
-projectRoot = Project.rootPath( args[0] )
+projectRoot = Project.rootPath( args[0] )[0]
 if os.path.exists( projectRoot ) and not options.overwrite:
     NTerror('ERROR: output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
     sys.exit(1)

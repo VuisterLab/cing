@@ -235,9 +235,12 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     For speedup reasons, this routine should be explicitly coded.
     This routine should eventually replace toPDB.
     
-    NB model should be 1 for the first model. Not zero.
+    NB model should be ZERO for the first model. Not one.
+    Returns True on error.
     """
     pdbFile = molecule.toPDB( model=model, convention = convention)
+    if not pdbFile:
+        return True
     pdbFile.save( path)   
     del(pdbFile)
 #end def
@@ -285,7 +288,7 @@ def export2PDB( project, tmp=None ):
     """
     for molName in project.molecules:
         mol   = project[molName]
-        if (mol.modelCount > 0):
+        if mol.modelCount > 0:
             fname = project.path( project.directories.PDB, mol.name + '.pdb' )
             pdbFile = mol.toPDB( convention = IUPAC)   
             pdbFile.save( fname)      

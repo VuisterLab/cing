@@ -9,19 +9,19 @@ from memops.gui.ButtonList      import ButtonList
 from memops.gui.Entry           import Entry
 from memops.gui.FileSelect      import FileType
 from memops.gui.FileSelectPopup import FileSelectPopup
-from memops.gui.Frame           import Frame
+from memops.gui.Frame           import Frame #@UnusedImport
 from memops.gui.Label           import Label
 from memops.gui.Menu            import Menu
 #from memops.gui.LabelFrame      import LabelFrame
-from memops.gui.MessageReporter import showWarning, showOkCancel
-from memops.gui.PulldownMenu    import PulldownMenu
+from memops.gui.MessageReporter import showWarning, showOkCancel #@UnusedImport
+from memops.gui.PulldownMenu    import PulldownMenu #@UnusedImport
 from memops.gui.ScrolledText    import ScrolledText
 from memops.gui.ScrolledText    import Text
 
 from memops.editor.BasePopup    import BasePopup
-from memops.editor.Util         import createDismissHelpButtonList
+from memops.editor.Util         import createDismissHelpButtonList #@UnusedImport
 
-from cing.Libs.NTutils          import NTpath, NTerror, NTmessage, sprintf, NTdict
+from cing.Libs.NTutils          import NTpath, NTerror, NTmessage, sprintf
 
 
 largeFont = 'Helvetica 14 bold'
@@ -805,3 +805,10 @@ if __name__ == '__main__':
   
   
   
+# Fails to run yet on JFD machine giving error:
+#Model read finished. Duration 7.61048102379 
+#Model validity check skipped
+#Traceback (most recent call last):
+#  File "/Users/jd/workspace/cing/python/cing/core/gui.py", line 800, in <module>
+#    popup = CingGui(root)
+#TypeError: __init__() takes at least 3 arguments (2 given)

@@ -41,7 +41,7 @@ from sys import stdout
 
 from math import sqrt, fabs
 
-# Make the Vector defs visibe within current context
+# Make the Vector defs visible within current context
 from vector cimport VECTOR_SIZE, Vector
 # Make the Matrix defs visible
 from matrix cimport MATRIX_SIZE

@@ -179,7 +179,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
        
        return Molecule or None on error
        
-       NB model_000.pdb becomes model number 1. Ie model=1
+       NB model_000.pdb becomes model number 0. Ie model=0
     """
     print '>', path, name, models
 #    NTmessage(name,models[0])
@@ -204,8 +204,8 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end if
     
     # first one:
-    modelId = models[0] - 1
-    xplorFile = sprintf( path, modelId )
+#    modelId = models[0]
+    xplorFile = sprintf( path, models[0] )
     if not os.path.exists(xplorFile):
         NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
@@ -217,8 +217,8 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 
     # now the other models:
     for model in models[1:]:
-        modelId = model - 1
-        xplorFile = sprintf( path, modelId )
+#        modelId = model - 1
+        xplorFile = sprintf( path, model )
         if not molecule.importFromPDB( xplorFile, XPLOR, nmodels=1):
             return None
         #end if

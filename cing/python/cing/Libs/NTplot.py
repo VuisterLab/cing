@@ -839,7 +839,7 @@ class NTplot( NTdict ):
 #                NTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
                 for item in tmpValueIndexPairList:
                     value = item[1]
-                    modelNum = item[0] + 1
+                    modelNum = item[0]
                     if not value: # Don't annotate zero values.
                         continue
                     outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.

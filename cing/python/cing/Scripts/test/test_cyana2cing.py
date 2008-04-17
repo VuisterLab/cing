@@ -27,7 +27,7 @@ class AllChecks(TestCase):
             "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
 
         projectRootPath = os.path.join( cingDirTestsTmp, projectId )
-        projectRoot = Project.rootPath( projectRootPath ) # xeasy_project.cing in /tmp
+        projectRoot = Project.rootPath( projectRootPath )[0] # xeasy_project.cing in /tmp
         if os.path.exists( projectRoot ):
             NTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )

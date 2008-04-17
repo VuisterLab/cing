@@ -49,7 +49,7 @@ moleculeDirectories.keysformat() #define a format string for 'pretty' output
 htmlDirectories = NTdict(     
     # Directories generated  
     procheck= 'Models',
-    whatif  = 'Restraints',
+    whatif  = 'Restraints', #JFD would like to know how this makes sense? TODO:
     peaks   = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output

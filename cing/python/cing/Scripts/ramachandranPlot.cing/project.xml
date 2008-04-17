@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Project>
+    <Attr name="version">
+        <string>0.74 alfa</string>
+    </Attr>
+    <Attr name="name">
+        <string>ramachandranPlot</string>
+    </Attr>
+    <Attr name="created">
+        <string>Mon Apr 14 13:52:26 2008</string>
+    </Attr>
+    <Attr name="molecules">
+        <NTlist>
+        </NTlist>
+    </Attr>
+    <Attr name="peakListNames">
+        <NTlist>
+        </NTlist>
+    </Attr>
+    <Attr name="distanceListNames">
+        <NTlist>
+        </NTlist>
+    </Attr>
+    <Attr name="dihedralListNames">
+        <NTlist>
+        </NTlist>
+    </Attr>
+    <Attr name="rdcListNames">
+        <NTlist>
+        </NTlist>
+    </Attr>
+    <Attr name="storedInCcpnFormat">
+        <bool>False</bool>
+    </Attr>
+    <Attr name="history">
+        <History>
+        </History>
+    </Attr>
+</Project>
