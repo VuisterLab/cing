@@ -60,7 +60,6 @@ from cing.PluginCode.procheck import getProcheckSecStructConsensus
 from matplotlib.ticker import FuncFormatter
 import Image
 import math
-import string
 import sys
 #from matplotlib.backends.backend_tkagg import show # prone to change.
 
@@ -1406,7 +1405,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             else:
                 resChar = resChar[0:1] # truncate A171 to A
 
-            resChar = string.upper(resChar)
+            resChar = resChar.upper()
             color = 'green'
             if not i%3:
                 color='red'
@@ -2106,7 +2105,7 @@ class FormatResTypesFormatter(Formatter):
             else:
                 resProp = resProp[0:1] # truncate A171 to A
 
-            self.resPropList.append(string.upper(resProp))
+            self.resPropList.append(resProp.upper())
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'

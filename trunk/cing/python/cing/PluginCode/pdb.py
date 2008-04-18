@@ -39,7 +39,6 @@ from cing.core.molecule import Molecule
 from cing.Libs.NTutils import NTwarning
 from cing.core.molecule import Chain
 from cing.core.molecule import ensureValidChainId
-#import string
 
 #==============================================================================
 # PDB stuff

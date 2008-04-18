@@ -1,6 +1,7 @@
 # YASARA BioTools
 # Visit www.yasara.org for more...
 # Copyright by Elmar Krieger
+from string import digits
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +18,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-import os
-import string
-import shutil
 import fnmatch
+import os
+import shutil
 import zipfile
 
 #  ======================================================================
@@ -94,7 +94,7 @@ def filesize(filename):
 # ==================
 def incfilename(filename):
     i=len(filename)-1
-    while (i>0 and filename[i] not in string.digits): i=i-1
+    while (i>0 and filename[i] not in digits): i=i-1
     while (i>=0):
         num=ord(filename[i])
         if (num<48 or num>57): break
@@ -139,8 +139,8 @@ def havesamecontent(filename1,filename2):
 # BUILD TEMPORARY FILE NAME
 # =========================
 def tmpfilename(filename):
-    dotpos=string.rfind(filename,".")
-    slashpos=string.rfind(filename,os.sep)
+    dotpos=filename.rfind(".")
+    slashpos=filename.rfind(os.sep)
     if (dotpos==-1 or dotpos<slashpos): dotpos=len(filename)
     filename=filename[:dotpos]+"_tmp%d"%os.getpid()+filename[dotpos:]
     return(filename)
@@ -221,7 +221,7 @@ def recursivedirlist(path):
                     pathlist=pathlist+subdirlist
     pathlist.sort()
     return(pathlist)
-
+ 
 # DELETE A FILE
 # =============
 def remove(filename):
@@ -285,14 +285,14 @@ def rmdir(path):
 # REMOVE FILE EXTENSION
 # =====================
 def rmext(filename):
-    dotpos=string.rfind(filename,".")
+    dotpos=filename.rfind(".")
     if (dotpos!=-1): filename=filename[:dotpos]
     return(filename)
 
 # GET FILE EXTENSION
 # ==================
 def ext(filename):
-    dotpos=string.rfind(filename,".")
+    dotpos=filename.rfind(".")
     if (dotpos!=-1): return(filename[dotpos+1:])
     return("")
 

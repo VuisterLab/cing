@@ -5,7 +5,6 @@ and a file with a list of their names.
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
-import string
 
 START_ENTRY_ID                 = 2 # default 0
 MAX_ENTRIES_TODO               = 999999 # default a ridiculously large number like 999999
@@ -28,7 +27,7 @@ def doScriptOnEntryList(pythonScriptFileName,
     entryListFile = file(entryListFileName, 'r')
     entryCodeList = []
     for line in entryListFile.readlines():
-        entryCode = string.lower( line[0:4] )
+        entryCode = line[0:4].lower()
         if entryCode in entryCodeListFilter:
             continue
         entryCodeList.append( entryCode )
@@ -40,7 +39,7 @@ def doScriptOnEntryList(pythonScriptFileName,
     
     job_list = []
     for entry_code in entryCodeList:
-        extraArgListStr = string.join( extraArgList, ' ')
+        extraArgListStr = extraArgList.join(' ')
         cmd = 'cd %s; python -u %s %s %s > %s.log 2>&1 ' % ( startDir,
             pythonScriptFileName, 
             entry_code, 

@@ -1,0 +1,31 @@
+In CING, the python coding standards set forth here were attempted:
+http://www.python.org/dev/peps/pep-0008/
+<P>
+With the following exceptions
+<ol>
+<li>
+<b>Annotations</b> for Pydev Extensions such as: are included. 
+Settings for Pydev Extensions: turn off checking for inconsistent spacing because
+it drives JFD crazy.
+<li>
+<b>Documentation Strings 
+</b>
+No leading space.<li>
+<b>Package and Module Names</b>
+Caps are allowed. Few underscores used.
+<li>
+<b>Function Names</b>
+Again, Caps are used instead of underscores.
+</ol>
+
+And the additions:
+
+<ol>
+<li>
+No brackets for simple if block.
+<li>
+Extra #end if comments for -long- sections but not for single line ifs or fors.
+</ol>
+
+Special care:
+No "import string" because always using string methods directly for speed.

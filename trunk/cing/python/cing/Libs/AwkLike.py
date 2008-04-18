@@ -157,13 +157,13 @@ class AwkLikeS:
                 print line.dollar[0], line.dollar[1]
     """
 
-    def __init__(self, string, minLength = -1, commentString = None, minNF = -1):
+    def __init__(self, str, minLength = -1, commentString = None, minNF = -1):
 
-        if (not string) or (len(string)<=0):
+        if (not str) or (len(str)<=0):
             self.lines = None
             return None
 
-        self.lines = string.splitlines()
+        self.lines = str.splitlines()
         self.MAX_NR = len( self.lines)
 
         self.minLength = minLength

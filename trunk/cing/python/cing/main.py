@@ -66,9 +66,9 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from string import join
 import cing
 import os
-import string
 import sys
 import unittest
 
@@ -151,7 +151,7 @@ def testOverall():
     for name in nameList:
 #      print "In cing.main#testOverall found cing.verbosity: %d\n" % cing.verbosity
         tailPathStr = name[lenCingPythonDirStr+1:-3]
-        mod_name = string.join(tailPathStr.split('/'), '.')
+        mod_name = join(tailPathStr.split('/'), '.')
         if mod_name in excludedModuleList:
             print "Skipping module:  " + mod_name
             continue

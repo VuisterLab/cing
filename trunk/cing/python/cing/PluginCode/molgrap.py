@@ -17,7 +17,6 @@ from cing.core.constants import CYANA
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 import os
-import string
 
 class Molgrap(NTdict):
     def __init__(self, backcolor='cing_turqoise'):
@@ -218,7 +217,7 @@ class Molgrap(NTdict):
         output_text = open( file_name_in, 'r' ).read()
         for i in range( len(org) ):
             #print "DEBUG: Doing replace of: org[i]"
-            output_text = string.replace(output_text, org[i], new[i])    
+            output_text = output_text.replace( org[i], new[i])    
         open( file_name_out, 'w' ).write( output_text )
 
 def export2gif(molecule, path ):
