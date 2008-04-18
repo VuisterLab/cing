@@ -68,10 +68,16 @@ cingRoot = os.path.split(cingPythonDir)[0]
 cingDirTests           = os.path.join(cingRoot,         "Tests")
 cingDirMolmolScripts   = os.path.join(cingRoot,         "scripts", "molmol")
 cingDirTestsData       = os.path.join(cingDirTests,     "data")
-cingDirTestsTmp        = os.path.join(cingDirTestsData, "tmp")
 cingDirScripts         = os.path.join(cingPythonCingDir,"Scripts")
 cingDirTmp             = os.path.join("/tmp" , "cing")
+
+try:
+    from localConstants import cingDirTmp #@UnresolvedImport
+except:
+    pass # cingDirTmp was set above already.
+
 if not os.path.exists(cingDirTmp):
+    print("Creating a temporary dir for cing: [%s]" % cingDirTmp)
     if os.mkdir(cingDirTmp):
         print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)
         sys.exit(1)

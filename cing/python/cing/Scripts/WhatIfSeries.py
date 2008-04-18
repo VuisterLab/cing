@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import SetupError
 from cing.PluginCode.Whatif import runWhatif
@@ -8,7 +8,7 @@ import os
 """
 Usage: define the set of files below and the atom nomenclature of the input
 then run as: "python WhatIfSeries.py"
-Paths have to be relative to cingDirTestsTmp
+Paths have to be relative to cingDirTmp
 """
 
 fileSet = [ 
@@ -24,8 +24,8 @@ pdbFileAtomNomenclatureConvention = "CYANA2"
 
 # NO CHANGES BELOW THIS LINE
 ###############################################################################
-if os.chdir(cingDirTestsTmp):
-    raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+if os.chdir(cingDirTmp):
+    raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
 
 for pdbFilePath in fileSet:
     pdbFileName = os.path.split(os.path.abspath(pdbFilePath))[0]

@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.ccpn import initCcpn
@@ -18,8 +18,8 @@ class AllChecks(TestCase):
 
     def ttttestExport2Ccpn(self):
         entryId = "1brv" # Small much studied PDB NMR entry
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
@@ -42,13 +42,13 @@ class AllChecks(TestCase):
         del(project)
 
         entryId = "1brv" # Small much studied PDB NMR entry
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
 
     def tttestInitCcpn(self):
         entryId = "1brv" # Small much studied PDB NMR entry
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( "test_for_ccpn_cing_project" )
         ccpnFile = os.path.join(entryId+".cing", "Data", "CCPN", entryId+".xml")
         project = initCcpn(cingProject=project, ccpnFile=ccpnFile)

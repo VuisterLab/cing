@@ -1,23 +1,22 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
-from cing import verbosityError
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import removedir
 from cing.core.classes import HTMLfile
 from cing.core.classes import Project
-from unittest import TestCase
-from cing.Libs.NTutils import removedir
-from cing.Libs.NTutils import NTdebug
+from cing.core.molecule import Molecule
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.core.molecule import Molecule
+from unittest import TestCase
 import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTestsTmp)
+    os.chdir(cingDirTmp)
     
-    def tttest_HTMLfile_simple(self):         
+    def test_HTMLfile_simple(self):         
         myhtml = HTMLfile('myTest.html', 'A Test')
         myhtml.header("a header")
         myhtml('h1', 'It is a test')
@@ -49,29 +48,27 @@ class AllChecks(TestCase):
         self.assertEquals( './1brv.cing', p.rootPath('1brv')[0] )         
         self.assertEquals( '1brv',        p.rootPath('1brv')[1] )         
 
-    def test_HTMLfile_links(self):
+    def test_HTMLfile(self):
         
         """
-        Create two html files that have relative links to each other.
+        Create two html files (project and moleucle) that have relative links to each other.
         Exercising the machinery in HTMLfile class.
         """
-        entryId = "test_HTMLfile_links" # Small much studied PDB NMR entry 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        entryId = "test_HTMLfile" 
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
         molecule = Molecule( name='moleculeName' )
         project.appendMolecule(molecule)
 
+        top = '_top'
         # initialize project html page
-        top = '#_top'
-        
-        # per item always set 2 toplevel attributes:
+        # per item always set 2 top level attributes:
         project.htmlLocation = (project.path('index.html'), top)
         project.html = HTMLfile( project.htmlLocation[0], title = 'Project' )
+        NTdebug("project.htmlLocation[0]: %s" % project.htmlLocation[0])
         #create new folders for Molecule/HTML
-        htmlPath = project.htmlPath() # JFD doesn't understand why this is specific to the molecule too.
+        htmlPath = project.htmlPath()
         if os.path.exists( htmlPath ):
             removedir( htmlPath )
         os.makedirs( htmlPath )
@@ -81,10 +78,8 @@ class AllChecks(TestCase):
         for subdir in htmlDirectories.values():
             project.mkdir( project.molecule.name, moleculeDirectories.html, subdir )
 
-        if hasattr(molecule, 'html'):
-            del(molecule['html'])
-
-        molecule.htmlLocation = (project.htmlPath('index.html'), top)
+        # NB project.htmlPath is different from project.path
+        molecule.htmlLocation = (project.htmlPath('indexMolecule.html'), top)
         NTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
         molecule.html = HTMLfile( molecule.htmlLocation[0],
                                   title = 'Molecule ' + molecule.name )
@@ -94,13 +89,16 @@ class AllChecks(TestCase):
         # In the validate.py code, the source argument is the 'main' section in 
         # project.html. JFD doesn't understand why.
         project.html.insertHtmlLinkInTag(     'li',    section=project.html.main, 
-            source=project.html.main,  destination=molecule, text='mol ref')
+            source=project,  destination=molecule, text='mol ref', id=top)
+        # rerun for testing.
+        link = project.html.findHtmlLocation( project, molecule,id=top )
+        self.assertEquals( 'moleculeName/HTML/indexMolecule.html#_top',
+                           link)
         project.html.main('ul', openTag=False)
 
         for htmlObj in [ project.html, molecule.html ]:
             self.assertFalse( htmlObj.render() )
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

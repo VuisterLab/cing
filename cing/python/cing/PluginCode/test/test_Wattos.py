@@ -3,7 +3,7 @@ Unit test
 python $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
@@ -22,8 +22,8 @@ class AllChecks(TestCase):
         entryId = "1brv" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )

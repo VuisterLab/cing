@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import verbosityDebug
 from cing import verbosityError
@@ -30,7 +30,7 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTestsTmp)
+    os.chdir(cingDirTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
         
@@ -155,8 +155,8 @@ class AllChecks(TestCase):
 #        lower2, upper2 =  10,  60        
         
         # important to switch to temp space before starting to generate files for the project.
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project     = Project('testPlotHistoDihedral2D')
         plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
         plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')

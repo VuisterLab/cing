@@ -252,7 +252,7 @@ Project: Top level Cing project class
         """
         dir = self.path( *args )
         if not os.path.exists( dir ):
-            NTdebug( "project.mkdir: %s" % dir )
+#            NTdebug( "project.mkdir: %s" % dir )
             os.makedirs(  dir ) 
         return dir
     #end def
@@ -1356,7 +1356,7 @@ class DistanceRestraintList( NTlist ):
                 #end for
                 count += 1
             #end if
-        #end for
+        #end for 
  
         for i in range(0, modelCount):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
@@ -2100,8 +2100,8 @@ class HTMLfile:
            The file is immidiately tested by a quick open for writing and closing.
         '''
         
-        self.fileName = fileName
-        self.stream = open( fileName, 'w' )
+        self.fileName = os.path.normpath( fileName )
+        self.stream = open( self.fileName, 'w' )
         self.stream.close()
 
         # definition of content-less  tags
@@ -2114,7 +2114,7 @@ class HTMLfile:
         # copy css and other files (only files! no dirs)
 #        The content of this dir is being copied to each HTMLfile instance's location.
 #        TODO: remove this redundancy.
-        dirname,_base,_extention = NTpath( fileName )
+        dirname,_base,_extention = NTpath( self.fileName )
         htmlPath = os.path.join(cingRoot,cingPaths.html) #e.g. 1brv.cing/HTML
         for f in os.listdir( htmlPath ):
             htmlFile = os.path.join(htmlPath,f)
@@ -2247,7 +2247,7 @@ class HTMLfile:
         '''
 
         self.stream = open( self.fileName, 'w' )
-        NTdebug('writing to file: %s' % self.fileName)
+#        NTdebug('writing to file: %s' % self.fileName)
         self.indent = 0
         
         self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
@@ -2348,36 +2348,68 @@ class HTMLfile:
         '''Description: given 2 Cing objects returns the relative path between them.
            Inputs: Cing objects souce, destination
            Output: string path or None or error
+           
+           E.g. input: source.htmlLocation[0]     : test_HTMLfile.cing/index.html
+                       destination.htmlLocation[0]: test_HTMLfile.cing/moleculeName/HTML/indexMolecule.html
+                output                            : moleculeName/HTML/indexMolecule.html
         '''
-    
+        # Debugger perspecitive put at source (me)
+        # Destination is the target.
         for item in [source, destination]:
             if not hasattr(item,'htmlLocation'):
                 NTerror('No htmlLocation attribute associated to obj %s\n', item)
                 return None
         
-        sourcePath       =      source.htmlLocation[0]
-        destPath, destId = destination.htmlLocation
-        
+        # Strip leading dot for rest of algorithm.
+        # Normalize path, eliminating double slashes, etc.
+        sourcePath = os.path.normpath(     source.htmlLocation[0])
+        destPath   = os.path.normpath(destination.htmlLocation[0])
+        # Get default id.
+        destId     = destination.htmlLocation[1]
+        # Or override.
         if id: 
             destId = '#' + id
             
         listSourcePath = sourcePath.split('/')
         listDestPath   = destPath.split('/')
-    
-        lenSP = len(listSourcePath)
-        
-        for index in range(lenSP):
-            if listSourcePath[index] != listDestPath[index]:
-                #location = index * ['..'] + listDestPath
-                break
-    
-        i = lenSP - 1 - index 
-        locationList = (index + i) * ['..'] + listDestPath
-    
+            
+        # JFD next code is disabled because the comparison might shortcircuit
+        # when identical names are matched 'by accident'.
+#        for index in range(lenSP):
+#            if listSourcePath[index] != listDestPath[index]:
+#                #location = index * ['..'] + listDestPath
+#                break
+#        i = lenSP - 1 - index 
+#        locationList = (index + i) * ['..'] + listDestPath    
 #        loc = ''
 #        for item in location:
 #            loc = os.path.join(loc,item)
+#        loc = os.path.join( *locationList )
+
+        # How far away (in dir changes) am I from the first (left/cing) dir?
+        # The list will look like:  list: ['test_HTMLfile.cing', 'index.html']
+        # One jump is one directory.
+        # E.g. 1brv/1brv/index.html has 2 jumps.
+        
+        toLeftNumberOfJumpsSource = len(listSourcePath) - 1
+        toLeftNumberOfJumpsDest   = len(listDestPath)   - 1
+        
+        # Any same leading directories may be ommited.
+        # using the fact that they are rooted in the same starting dir (curdir)
+        toLeftNumberOfJumpsSourceNew = toLeftNumberOfJumpsSource 
+        i = 0
+        while i < toLeftNumberOfJumpsDest and i < toLeftNumberOfJumpsSource:
+            if listSourcePath[i] == listDestPath[i]:
+                toLeftNumberOfJumpsSourceNew -= 1
+            else:
+                break
+            i += 1
+        jumpsToRemove = toLeftNumberOfJumpsSource - toLeftNumberOfJumpsSourceNew
+        listDestPathNew = listDestPath[jumpsToRemove:]
+        locationList = toLeftNumberOfJumpsSourceNew * ['..']
+        locationList += listDestPathNew
         loc = os.path.join( *locationList )
+        loc = os.path.normpath(loc) # I don't think it's needed anymore but can't hurt either.
         return loc + destId
     
     def insertHtmlLink( self, section, source, destination, text=None, id=None ):
@@ -2402,7 +2434,7 @@ class HTMLfile:
             return None
         
         link = self.findHtmlLocation( source, destination, id )
-        NTdebug('using link: %s' % link)
+#        NTdebug('From source: [%s] to destination [%s] id [%s] using relative link: %s' % (source, destination, id,link))
         #if not destination.has_key('colorLabel'):
         if not hasattr(destination, 'colorLabel'):
             destination.colorLabel = COLOR_GREEN

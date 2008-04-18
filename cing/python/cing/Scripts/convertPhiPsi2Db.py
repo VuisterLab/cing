@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import verbosityDebug
 from cing import verbosityOutput
@@ -60,7 +60,7 @@ xGrid,yGrid = ogrid[ plotparams1.min:plotparams1.max:binCountJ, plotparams1.min:
 bins = (xGrid,yGrid)
 
 pluginDataDir = os.path.join( cingPythonCingDir,'PluginCode','data')
-os.chdir(cingDirTestsTmp)
+os.chdir(cingDirTmp)
 
 def inRange(a):
     if a < plotparams1.min or a > plotparams1.max:

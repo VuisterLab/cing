@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityError
 from cing.core.molecule import Coordinate
 from cing.core.molecule import NTangleOpt
@@ -41,8 +41,8 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     fn = 'fooprof'
-    os.chdir(cingDirTestsTmp)
-#    os.path.join( cingDirTestsTmp, fn)
+    os.chdir(cingDirTmp)
+#    os.path.join( cingDirTmp, fn)
     cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
 #    cProfile.run('unittest.main()', fn)
