@@ -12,6 +12,13 @@
 
 #------------------------------------------------------------------------------
 """
+from Refine import config
+from Refine.NTxplor import Analyze
+from Refine.NTxplor import GeneratePSF
+from Refine.NTxplor import WaterRefine
+from Refine.NTxplor import Xplor
+from Refine.config import refConfig
+from Refine.parameters import params
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTdebug
@@ -24,15 +31,8 @@ from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import removedir
 from cing.Libs.disk import copy
-from cing.Refine import config
-from cing.Refine.NTxplor import Analyze
-from cing.Refine.NTxplor import GeneratePSF
-from cing.Refine.NTxplor import WaterRefine
-from cing.Refine.NTxplor import Xplor
-from cing.Refine.config import refConfig
-from cing.Refine.parameters import params
 from cing.core.classes import Project
-from cing.core.constants import XPLOR
+from cing.core.constants import XPLOR 
 from string import find
 import os
 import sys
