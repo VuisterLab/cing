@@ -32,8 +32,6 @@ from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 import cing
 import os
-import string
-
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
 SECSTRUCT_STR      = 'secStruct'
@@ -455,7 +453,7 @@ def to3StateUpper( strNTList ):
         if c in 'HGE':
             if c == 'G':
                 c = 'H'
-            result.append( string.upper(c))
+            result.append( c.upper())
         else:
             result.append( ' ' )
     return result

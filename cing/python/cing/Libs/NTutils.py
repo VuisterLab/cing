@@ -19,7 +19,6 @@ import inspect
 import math
 import optparse
 import os
-import string
 import sys
 import traceback
 
@@ -197,7 +196,8 @@ class NTlist( list ):
     def pop( self, index=0 ):
         """Return index'ed item from list or None on empty list
         """
-        if len( self ) == 0: return None
+        if len( self ) == 0: 
+            return None
         item = list.pop( self, index )
         if item == self.current:
             self.current = self.last()
@@ -3071,7 +3071,7 @@ def formatList( theList, fmt = '%s\n' ):
     for element in theList:
 #        NTdebug("Doing element: " +`element`)
         result.append( fmt%element.format()  )
-    return string.join(result,'')
+    return ''.join(result)
 #end def
 
 ######################################################################################################

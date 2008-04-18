@@ -41,7 +41,6 @@ from database     import NTdb
 from parameters   import plotParameters
 import math
 import os
-import string
 
 #==============================================================================
 # Global variables
@@ -890,7 +889,7 @@ def ensureValidChainId( chainId ):
         return Chain.defaultChainId
     if len(chainId) > 1:
         chainId = chainId[0]
-    chainId = string.upper(chainId)
+    chainId = chainId.upper()
     charOrd = ord(chainId)
     if charOrd >= ord('A') and charOrd <= ord('Z'):
         return chainId

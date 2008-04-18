@@ -705,7 +705,7 @@ class ProjectList( NTlist ):
         """
         for name in names:
             fname = self.project.path( self.savePath, name + self.extention )
-            dummy_l = self.classDef.SMLhandler.fromFile( fname, self.project)
+            _l = self.classDef.SMLhandler.fromFile( fname, self.project)
         #end for
     #end def
     
@@ -1362,7 +1362,7 @@ class DistanceRestraintList( NTlist ):
             self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
         #end for
         
-        self.rmsdAv, self.rmsdSd, dummy_n = NTaverage( self.rmsd )
+        self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)                    
     #end def
    
@@ -1546,9 +1546,9 @@ class DihedralRestraint( NTdict ):
                 if fv > self.violMax: self.violMax = fv
             #end if
         #end for
-        self.violAv,self.violSd,dummy_n = self.violations.average()
+        self.violAv,self.violSd,_n = self.violations.average()
         
-        self.cav,self.cv,dummy_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
+        self.cav,self.cv,_n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
         return( self.cav, self.cv )
     #end def
     
@@ -2096,6 +2096,8 @@ class HTMLfile:
         '''Description: __init__ for HTMLfile class.
            Inputs: file name, title
            Output: an instanciated HTMLfile obj.
+           
+           The file is immidiately tested by a quick open for writing and closing.
         '''
         
         self.fileName = fileName
@@ -2110,12 +2112,14 @@ class HTMLfile:
         self.indent = 0
  
         # copy css and other files (only files! no dirs)
-        dirname,dummy_base,dummy_extention = NTpath( fileName )
-        htmlPath = os.path.join(cingRoot,cingPaths.html)
+#        The content of this dir is being copied to each HTMLfile instance's location.
+#        TODO: remove this redundancy.
+        dirname,_base,_extention = NTpath( fileName )
+        htmlPath = os.path.join(cingRoot,cingPaths.html) #e.g. 1brv.cing/HTML
         for f in os.listdir( htmlPath ):
-            htmlFile = os.path.join(cingRoot,cingPaths.html,f)
-            if os.path.isfile(htmlFile): shutil.copy( htmlFile, dirname )
-        #end for
+            htmlFile = os.path.join(htmlPath,f)
+            if os.path.isfile(htmlFile):
+                shutil.copy( htmlFile, dirname )
         
         self._header    = NTlist()
         self._call      = NTlist()
@@ -2139,11 +2143,8 @@ class HTMLfile:
     def killHtmlObjects():  # note there is no 'self', it's going to be a static method!
         """ Remove all objects from the htmlObjects list
             """
-        #print "HHHHHHHHHHHHHHHHHHHHHHHHHH"
-        #print '11111', htmlObjects
-        while htmlObjects.pop(): pass # I think this should work to clear the list
-        #print '222222', htmlObjects
-    #end def
+        while htmlObjects.pop(): 
+            pass # I think this should work to clear the list
     
     killHtmlObjects = staticmethod( killHtmlObjects)
        

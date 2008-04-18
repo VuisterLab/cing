@@ -11,8 +11,8 @@ from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule
 from cing.main import format
 from memops.general import Io as genIo
+from string import digits
 import os
-import string
 
 """
 Adds initialize from CCPN project files
@@ -1475,7 +1475,8 @@ def _checkName(name, prefix='Ccpn'):
     '''
 
     if name:
-        if name[0] in string.digits: name = prefix + '_' + name
+        if name[0] in digits: 
+            name = prefix + '_' + name
     else:
         name = prefix
 

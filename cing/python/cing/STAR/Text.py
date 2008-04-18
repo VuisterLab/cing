@@ -7,7 +7,7 @@ __author__    = "$Author$"
 ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
-import string, re
+import re
 
 """
 Some handy patterns and functions for dealing with text in the STAR syntax.
@@ -434,7 +434,7 @@ the second semicolon can not be the first char on a line.
 """
 def semicolons_add( text, possible_bad_char=None ):
     if possible_bad_char:
-        lines       = string.split(text,'\n')
+        lines       = text.split('\n')
         text   = ''
         for line in lines:
             text = text + prepending_string + line + '\n'
@@ -451,7 +451,7 @@ def semicolons_add( text, possible_bad_char=None ):
 Strip the STAR comments new style
 """
 def comments_strip( text ):
-    lines = string.split(text, "\n" )
+    lines = text.split( "\n" )
     i=0
     count = 0
     ls = len(lines)
@@ -485,7 +485,7 @@ def comments_strip( text ):
 
     if verbosity >= 9:
         print 'Done [%s] comment subs' % count
-    text = string.join(lines,"\n")
+    text = lines.join("\n")
     return text
 
 """
