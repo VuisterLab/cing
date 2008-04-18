@@ -1709,7 +1709,7 @@ Atom class: Defines object for storing atom properties
 #        """Return true if it is an atom belonging to an aromatic ring
 #           Patched for now, have to store it in database
 #        """
-#        if not self.residue.db.hasPropeties('aromatic'): return False
+#        if not self.residue.db.hasProperties('aromatic'): return False
 #        
 #        if (self.isCarbon() and self.db.shift.average > 100.0):
 #            return True
@@ -1768,35 +1768,35 @@ Atom class: Defines object for storing atom properties
     def isAromatic( self ):
         """Return true if it is an atom belonging to an aromatic ring
         """
-        return self.db.hasPropeties('aromatic')
+        return self.db.hasProperties('aromatic')
     #end def
     
     def isBackbone( self ):
         """
         Return True if it is a backbone atom.
         """
-        return self.db.hasPropeties('backbone')
+        return self.db.hasProperties('backbone')
     #end def
     
     def isSidechain( self ):
         """
         Return True if it is a sidechain atom,
         """
-        return self.db.hasPropeties('sidechain')
+        return self.db.hasProperties('sidechain')
     #end def
     
     def isMethyl( self ):
         """
         Return True atm is a methyl (either carbon or proton)
         """
-        return self.db.hasPropeties('methyl')
+        return self.db.hasProperties('methyl')
     #end def
     
     def isMethylProton( self ):
         """
         Return True if atm is a methyl proton
         """
-        return self.db.hasPropeties('methylproton')
+        return self.db.hasProperties('methylproton')
     #end def
         
     def isProton( self ):

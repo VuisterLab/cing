@@ -1,8 +1,15 @@
+from cing import cingDirTestsData
 from cing import cingDirTestsTmp
+from cing import verbosityDebug
 from cing import verbosityError
 from cing.core.classes import HTMLfile
-from unittest import TestCase
 from cing.core.classes import Project
+from cing.core.constants import CYANA
+from unittest import TestCase
+from cing.Libs.NTutils import removedir
+from cing.Libs.NTutils import NTdebug
+from cing.core.parameters import htmlDirectories
+from cing.core.parameters import moleculeDirectories
 import cing
 import os
 import unittest
@@ -11,7 +18,7 @@ class AllChecks(TestCase):
 
     os.chdir(cingDirTestsTmp)
     
-    def test_classes(self):         
+    def test_HTMLfile_simple(self):         
         myhtml = HTMLfile('myTest.html', 'A Test')
         myhtml.header("a header")
         myhtml('h1', 'It is a test')
@@ -43,6 +50,61 @@ class AllChecks(TestCase):
         self.assertEquals( './1brv.cing', p.rootPath('1brv')[0] )         
         self.assertEquals( '1brv',        p.rootPath('1brv')[1] )         
 
+    def tttest_HTMLfile_links(self):
+        
+        """
+        Create two html files that have relative links to each other.
+        Exercising the machinery in HTMLfile class.
+        """
+        entryId = "1brv_1model" # Small much studied PDB NMR entry 
+        pdbConvention = CYANA
+        self.failIf( os.chdir(cingDirTestsTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        project = Project( entryId )
+        self.failIf( project.removeFromDisk() )
+        project = Project.open( entryId, status='new' )
+        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+        pdbFileName = entryId+".pdb"
+        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        
+
+        # initialize project html page
+        top = '#_top'
+        project.htmlLocation = (project.path('index.html'), top)
+        project.html = HTMLfile( project.htmlLocation[0], title = 'Project' )
+        #create new folders for Molecule/HTML
+        htmlPath = project.htmlPath() # JFD doesn't understand why this is specific to the molecule too.
+        if os.path.exists( htmlPath ):
+            removedir( htmlPath )
+        os.makedirs( htmlPath )
+        NTdebug("htmlPath: %s" % htmlPath)
+
+        # initialize molecule html page
+        molecule = project.molecules[0]
+        for subdir in htmlDirectories.values():
+            project.mkdir( project.molecule.name, moleculeDirectories.html, subdir )
+
+        if hasattr(molecule, 'html'):
+            del(molecule['html'])
+
+        molecule.htmlLocation = (project.htmlPath('index.html'), top)
+        NTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
+        molecule.html = HTMLfile( molecule.htmlLocation[0],
+                                  title = 'Molecule ' + molecule.name )
+        
+        # nb: destination is a destination obj (eg molecule object) that is to 
+        # have a html attribute that points to an HTMLfile instance.
+        # In the validate.py code, the source argument is the 'main' section in 
+        # project.html. JFD doesn't understand why.
+        project.html.insertHtmlLinkInTag(     'li',    section=project.html.main, 
+            source=project.html.main,  destination=molecule, text='mol ref')
+        project.html.main('ul', openTag=False)
+
+        for htmlObj in [ project.html, molecule.html ]:
+            self.assertFalse( htmlObj.render() )
+
 if __name__ == "__main__":
     cing.verbosity = verbosityError
+    cing.verbosity = verbosityDebug
     unittest.main()
