@@ -251,9 +251,9 @@ Project: Top level Cing project class
            Return the result
         """
         dir = self.path( *args )
-        if (not os.path.exists( dir )):
+        if not os.path.exists( dir ):
+            NTdebug( "project.mkdir: %s" % dir )
             os.makedirs(  dir ) 
-        #end if
         return dir
     #end def
     
@@ -2239,10 +2239,14 @@ class HTMLfile:
         '''Description: write container to file Html.
            Inputs: a HTMLfile obj.
            Output: written lines and close file.
+           
+           JFD notes it is simpler to code this as constructing the whole content
+           first and then writing. It would be just as fast for the size
+           of html files we render.
         '''
 
         self.stream = open( self.fileName, 'w' )
-        
+        NTdebug('writing to file: %s' % self.fileName)
         self.indent = 0
         
         self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
@@ -2345,23 +2349,19 @@ class HTMLfile:
            Output: string path or None or error
         '''
     
-        testFail = False
         for item in [source, destination]:
             if not hasattr(item,'htmlLocation'):
-                testFail = True
                 NTerror('No htmlLocation attribute associated to obj %s\n', item)
-            #end if
-        #end for
+                return None
         
-        if testFail: return None
-        
-        sourcePath, dummySourceId = source.htmlLocation
+        sourcePath       =      source.htmlLocation[0]
         destPath, destId = destination.htmlLocation
         
-        if id: destId = '#' + id
+        if id: 
+            destId = '#' + id
             
         listSourcePath = sourcePath.split('/')
-        listDestPath = destPath.split('/')
+        listDestPath   = destPath.split('/')
     
         lenSP = len(listSourcePath)
         
@@ -2371,20 +2371,21 @@ class HTMLfile:
                 break
     
         i = lenSP - 1 - index 
-        location = (index + i) * ['..'] + listDestPath
+        locationList = (index + i) * ['..'] + listDestPath
     
-        loc = ''
-        for item in location:
-            loc = os.path.join(loc,item)
-        
+#        loc = ''
+#        for item in location:
+#            loc = os.path.join(loc,item)
+        loc = os.path.join( *locationList )
         return loc + destId
-    #end def
     
     def insertHtmlLink( self, section, source, destination, text=None, id=None ):
         '''Description: create the html command for linking Cing objects.
            Inputs: section (main, header, left etc.), source obj., destination
                    obj., html text, id.
            Output: <a class="red" href="link">text</a> inside section
+           
+           Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
         '''
         
         if not section:
@@ -2400,7 +2401,7 @@ class HTMLfile:
             return None
         
         link = self.findHtmlLocation( source, destination, id )
-        
+        NTdebug('using link: %s' % link)
         #if not destination.has_key('colorLabel'):
         if not hasattr(destination, 'colorLabel'):
             destination.colorLabel = COLOR_GREEN
@@ -2416,6 +2417,10 @@ class HTMLfile:
            Inputs: tag, section (main, header, left etc.), source obj.,
                    destination obj., html text, id.
            Output: <h1><a class="red" href="link">text</a></h1> inside section
+
+        Example call:
+                    project.html.insertHtmlLinkInTag( 'li', main, project, item, text=item.name )
+
         '''
         
         section(tag, closeTag=False)

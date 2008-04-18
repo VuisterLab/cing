@@ -369,7 +369,7 @@ def validateRestraints( project, toFile = True)   :
         msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         drl.sort('violCount3').reverse()
-        # don't list restraints that have a violation less than cut off.  TODO:
+        # omit restraints that have a violation less than cut off.  NEW FEATURE REQUEST
         msg += sprintf( '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
         theList = drl[0:min(len(drl),30)]
 #        NTdebug("Found list: " + `theList`)
@@ -1276,7 +1276,7 @@ def setupHtml(project):
         if os.path.exists( htmlPath ):
             removedir( htmlPath )
         os.makedirs( htmlPath )
-
+        NTdebug("htmlPath: %s" % htmlPath)
         for subdir in htmlDirectories.values():
             project.mkdir( project.molecule.name, moleculeDirectories.html, subdir )
 
@@ -1284,45 +1284,30 @@ def setupHtml(project):
             del(molecule['html'])
 
         molecule.htmlLocation = (project.htmlPath('index.html'), top)
+        NTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
         molecule.html = HTMLfile( molecule.htmlLocation[0],
                                   title = 'Molecule ' + molecule.name )
 
     for molecule in project.molecules:
         index = project.molecules.index(molecule)
         molecule = project[molecule]
-
         molecule.html.header('h1', 'Molecule: ' + molecule.name)
 
         previous = None
         next = None
-
+        lastMoleculeIndex = len(project.molecules) - 1
         if index > 0:
-            try:
-                previous = project[project.molecules[index-1]]
-            except:
-                pass
+            previous = project[ project.molecules[index-1] ]    
+    
+        if index < lastMoleculeIndex:
+            next = project[ project.molecules[index+1] ]
 
-        try:
-            next = project[project.molecules[index+1]]
-        except:
-            pass
-
-        molecule.html.insertHtmlLink( molecule.html.header, molecule, project,
-                                      text = 'Home' )
-
+        molecule.html.insertHtmlLink(     molecule.html.header, molecule, project, text='Home' )
         if previous:
-            molecule.html.insertHtmlLink( molecule.html.header, molecule,
-                                          previous, text='Previous' )
-        #end if
-
-        molecule.html.insertHtmlLink( molecule.html.header, molecule,
-                                      project, text='UP' )
-
+            molecule.html.insertHtmlLink( molecule.html.header, molecule, previous,text='Previous' )
+        molecule.html.insertHtmlLink(     molecule.html.header, molecule, project, text='UP' )
         if next:
-            molecule.html.insertHtmlLink( molecule.html.header, molecule,
-                                          next, text='Next' )
-
-        #end if
+            molecule.html.insertHtmlLink( molecule.html.header, molecule, next,    text='Next' )
 
         molecule.html.main('h1','Residue-based analysis')
 
@@ -1332,7 +1317,6 @@ def setupHtml(project):
             project.mainPageObjects['Molecules'] = [molecule]
 
         for chain in molecule.allChains():
-
             #Create the directory for this chain
             chaindir = project.htmlPath(chain.name)
             if not os.path.exists( chaindir ):
@@ -1341,7 +1325,6 @@ def setupHtml(project):
             #if hasattr(chain, 'html'): del(chain['html'])
             if chain.has_key('html'):
                 del(chain.html)
-
             chain.htmlLocation = ( os.path.join(chaindir,'index.html'), top )
             chain.html = HTMLfile(chain.htmlLocation[0],
                                        title='%s %s'%(molecule.name,chain.name))
@@ -1407,6 +1390,7 @@ def setupHtml(project):
 
                 res.htmlLocation = ( os.path.join(resdir,'index.html'), top )
                 res.html = HTMLfile( res.htmlLocation[0], title=res.name )
+            #end for over res in residues
 
             for res in residues:
                 if res.resNum%ncols == 0:
@@ -1430,25 +1414,22 @@ def setupHtml(project):
                 # generate html file for this residue
                 resHeader = res.html.header
                 resHeader('h1', res._Cname(-1) )
-
-                res.html.insertHtmlLink( resHeader, res, project,
-                                       text = 'Home' )
+                res.html.insertHtmlLink( resHeader, res, project, text = 'Home' )
 
                 # Refs to move to previous, next residue or UP
                 previous = res.sibling(-1)
                 next = res.sibling(1)
                 if previous:
-                    res.html.insertHtmlLink( resHeader, res, previous,
-                                             text = previous._Cname(-1) )
-                res.html.insertHtmlLink( resHeader, res, chain,
-                                             text = 'UP' )
+                    res.html.insertHtmlLink( resHeader, res, previous,text = previous._Cname(-1) )
+                res.html.insertHtmlLink(     resHeader, res, chain,   text = 'UP' )
                 if next:
-                    res.html.insertHtmlLink( resHeader, res, next,
-                                             text = next._Cname(-1) )
+                    res.html.insertHtmlLink( resHeader, res, next,    text = next._Cname(-1) )
+            #end for over res in residues
 
             for obj in htmlList:
                 obj.html.main('tr', openTag=False)
                 obj.html.main('table', openTag=False)
+            #end for over obj in htmlList 
 
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',
@@ -1457,10 +1438,9 @@ def setupHtml(project):
         molecule.html.main('h1', 'Structure-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Salt bridges',
                                             href='../../../'+project.moleculePath('analysis')+'/saltbridges.txt', newLine=False) )
-        # return None for success is standard.
     #end for
 
-    # TODO: setup Models page
+    # NEW FEATURE: setup Models page
 
     # Do Peaks HTML pages
     for peakList in project.peaks:
@@ -1688,49 +1668,49 @@ def setupHtml(project):
     #end for
 
     # Do Project HTML page
-    main = project.html.main
+    htmlMain = project.html.main
 
-    main('table', closeTag=False)
-    main('tr', closeTag=False)
-    main('td', closeTag=False)
+    htmlMain('table', closeTag=False)
+    htmlMain('tr', closeTag=False)
+    htmlMain('td', closeTag=False)
 
-    main('h1', 'Summary')
-    main('ul', closeTag=False)
-    main('li', closeTag=False)
+    htmlMain('h1', 'Summary')
+    htmlMain('ul', closeTag=False)
+    htmlMain('li', closeTag=False)
 #    NTdebug("os.path.abspath(os.curdir): " + os.path.abspath(os.curdir))
     refItem = os.path.join( project.moleculePath('analysis'),'summary.txt')
 #    NTdebug("refItem: " + refItem)
     if os.path.exists(refItem):
-        main('a',  OpenText, href = os.path.join( "..", refItem))
+        htmlMain('a',  OpenText, href = os.path.join( "..", refItem))
     else:
-        main('a',  NotAvailableText)
-    main('li', openTag=False)
-    main('ul', openTag=False)
+        htmlMain('a',  NotAvailableText)
+    htmlMain('li', openTag=False)
+    htmlMain('ul', openTag=False)
 
-    main('h1', 'Assignments')
-    main('ul', closeTag=False)
-    main('li', closeTag=False)
+    htmlMain('h1', 'Assignments')
+    htmlMain('ul', closeTag=False)
+    htmlMain('li', closeTag=False)
     refItem = os.path.join( project.moleculePath('analysis'),'validateAssignments.txt')
     if os.path.exists(refItem):
-        main('a',  OpenText, href = os.path.join( "..", refItem))
+        htmlMain('a',  OpenText, href = os.path.join( "..", refItem))
     else:
-        main('a',  NotAvailableText)
-    main('li', openTag=False)
-    main('ul', openTag=False)
+        htmlMain('a',  NotAvailableText)
+    htmlMain('li', openTag=False)
+    htmlMain('ul', openTag=False)
 
     for key in project.mainPageObjects.keys():
-        main('h1', key)
+        htmlMain('h1', key)
         for item in project.mainPageObjects[key]:
-            main('ul', closeTag=False)
-            project.html.insertHtmlLinkInTag( 'li', main, project, item,
-                                              text=item.name )
-            main('ul', openTag=False)
-    main('td', openTag=False)
-    main('td', closeTag=False)
-    main('img', src = 'mol.gif')
-    main('td', openTag=False)
-    main('tr', openTag=False)
-    main('table', openTag=False)
+            NTdebug('item: %s' % item)
+            htmlMain('ul', closeTag=False)
+            project.html.insertHtmlLinkInTag( 'li', htmlMain, project, item, text=item.name )
+            htmlMain('ul', openTag=False)
+    htmlMain('td', openTag=False)
+    htmlMain('td', closeTag=False)
+    htmlMain('img', src = 'mol.gif')
+    htmlMain('td', openTag=False)
+    htmlMain('tr', openTag=False)
+    htmlMain('table', openTag=False)
 #end def
 
 def renderHtml(project):
@@ -1746,13 +1726,13 @@ def renderHtml(project):
             return True
 
 
-def populateHtmlMolecules( project, skipFirstPart=False ):
+def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProcheck = False ):
     '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project.
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
-    doProcheck = False # disable for testing as it takes a long time.
+#    doProcheck = False # disable for testing as it takes a long time.
 #    skipFirstPart = True # disable for testing as it takes a long time.
     if not skipFirstPart:
         molGifFileName = "mol.gif"
@@ -1820,7 +1800,10 @@ def populateHtmlMolecules( project, skipFirstPart=False ):
     #                        print summary
                             graphicsFormatExtension = 'png'
                             #generate a dihedral histogram plot
-                            ps = makeDihedralHistogramPlot( project, res, dihed )
+                            if htmlOnly:
+                                ps = None
+                            else:
+                                ps = makeDihedralHistogramPlot( project, res, dihed )
                             tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
     #                        NTdebug("Will write to: "+tmpPath)
                             if not os.path.isdir(resdir):
@@ -2095,12 +2078,13 @@ def validate( project, ranges=None, htmlOnly = False ):
             return True
 
         # populate Molecule (Procheck) and Residues
-        if populateHtmlMolecules(project):
+        if populateHtmlMolecules(project,skipFirstPart=htmlOnly,htmlOnly=htmlOnly,):
             NTerror("Failed to populateHtmlMolecules")
-#            return True TODO: enable after it works again.
-        if populateHtmlModels(project):
-            NTerror("Failed to populateHtmlModels")
-            return True
+
+        if not htmlOnly:
+            if populateHtmlModels(project):
+                NTerror("Failed to populateHtmlModels")
+                return True
         if renderHtml(project):
             NTerror("Failed to renderHtml")
             return True

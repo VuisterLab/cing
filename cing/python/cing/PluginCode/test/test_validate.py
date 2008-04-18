@@ -20,6 +20,7 @@ import unittest
 class AllChecks(TestCase):
  
     def testRun(self):
+        htmlOnly=True # default is False but enable it for faster runs without some actual data.
         pdbConvention = BMRB
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
@@ -64,7 +65,7 @@ class AllChecks(TestCase):
                         copy2sources = True,
                         **kwds )
         project.save()
-        self.assertFalse( project.validate())
+        self.assertFalse( project.validate(htmlOnly=htmlOnly))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
