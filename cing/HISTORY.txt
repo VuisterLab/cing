@@ -1,5 +1,6 @@
 Version 0.75: 17 Apr 2008: 
     - Optimized the coordinate storage class for speed through cython now.
+    - Temp dir now set in $CINGROOT/python/localConstants.py or __init__.py by default.
 
 Version 0.74: 25 Mar 2008: 
     - Optimized the coordinate storage class for speed.
