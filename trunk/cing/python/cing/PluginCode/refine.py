@@ -7,15 +7,15 @@ Adds export2refine method
         exports DistanceRestraintLists in xplor format
         exports DihedralRestraintLists in xplor format
 """
+from Refine.config import convertedConfig
+from Refine.config import refConfig
+from Refine.config import refinedConfig
+from Refine.config import tablesConfig
+from Refine.refine import doSetup
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import sprintf
-from cing.Refine.config import convertedConfig
-from cing.Refine.config import refConfig
-from cing.Refine.config import refinedConfig
-from cing.Refine.config import tablesConfig
-from cing.Refine.refine import doSetup
 from cing.core.molecule import dots
 import os
 
