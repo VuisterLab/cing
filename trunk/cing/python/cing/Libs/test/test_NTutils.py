@@ -1,6 +1,6 @@
 from cing import NaNstring
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import cingPythonDir
 from cing import verbosityDebug
 from cing import verbosityNothing
@@ -28,8 +28,8 @@ class AllChecks(TestCase):
         pass
 
     def tttestFind(self):
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to temp test directory for data: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to temp test directory for data: "+cingDirTmp)
         namepattern, startdir = "CVS", cingPythonDir
         nameList = findFiles(namepattern, startdir)
         self.assertTrue( len(nameList) > 10 )
@@ -40,7 +40,7 @@ class AllChecks(TestCase):
         fn = "pc_nmr_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
-        outputPath = cingDirTestsTmp
+        outputPath = cingDirTmp
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
         fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, inputPath, outputDir=outputPath )

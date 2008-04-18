@@ -1,5 +1,5 @@
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing import verbosityNothing
@@ -29,8 +29,8 @@ class AllChecks(TestCase):
             pdbConvention = CYANA
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )

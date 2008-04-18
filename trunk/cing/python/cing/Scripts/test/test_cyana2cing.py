@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/Scripts/test/test_cyana2cing.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTwarning
@@ -23,10 +23,10 @@ class AllChecks(TestCase):
         cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
         self.assertTrue( os.path.exists( cyanaDirectory) and os.path.isdir(cyanaDirectory ) )
 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
 
-        projectRootPath = os.path.join( cingDirTestsTmp, projectId )
+        projectRootPath = os.path.join( cingDirTmp, projectId )
         projectRoot = Project.rootPath( projectRootPath )[0] # xeasy_project.cing in /tmp
         if os.path.exists( projectRoot ):
             NTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )

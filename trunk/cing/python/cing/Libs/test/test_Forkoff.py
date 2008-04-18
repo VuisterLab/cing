@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityError
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -26,7 +26,7 @@ def my_sleep( arg ):
 
 class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTestsTmp)
+    os.chdir(cingDirTmp)
 
     def tttestRun(self):
         ## Initializing f will also initialize an instance of class Process

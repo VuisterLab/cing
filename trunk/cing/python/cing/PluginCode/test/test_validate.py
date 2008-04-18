@@ -3,7 +3,7 @@ Unit test
 python $CINGROOT/python/cing/PluginCode/test/test_validate.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
@@ -20,14 +20,14 @@ import unittest
 class AllChecks(TestCase):
  
     def testRun(self):
-        htmlOnly=True # default is False but enable it for faster runs without some actual data.
+        htmlOnly=False # default is False but enable it for faster runs without some actual data.
         pdbConvention = BMRB
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
-#        entryId = "2hgh_1model" # RNA-protein complex.
+        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model" 
 #        entryId = "1tgq_1model" # withdrawn entry
-        entryId = "1brv_1model" # withdrawn entry
+#        entryId = "1brv_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         
         if entryId.startswith("1YWUcdGMP"):
@@ -36,8 +36,8 @@ class AllChecks(TestCase):
             pdbConvention = CYANA
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )

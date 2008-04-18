@@ -1,5 +1,5 @@
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTplot import NTplotSet
@@ -38,14 +38,14 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTestsTmp)
+    os.chdir(cingDirTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testResPlot(self):
         
         actuallyRunProcheck = False
         actuallyRunWhatif   = False
-        showValues          = False
+        showValues          = True
         modelNum            = 1 # Only used when simulating data 
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
@@ -66,8 +66,8 @@ class AllChecks(TestCase):
             # Truncate from Val171-Glu189 to:
             ranges = "176-188"  
            
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to temp test directory for data: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to temp test directory for data: "+cingDirTmp)
         project = Project( entryId )
         project.removeFromDisk()
         project = Project.open( entryId, status='new' )

@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_pdb.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
@@ -21,15 +21,15 @@ class AllChecks(TestCase):
         entryId = "1brv_1model"
 #        entryId = "2vb1_simple" # Protein solved by X-ray.
 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
 
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         # does it matter to import it just now?
         project = Project( entryId )
         self.failIf( project.removeFromDisk())

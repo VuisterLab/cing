@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_Molgrap.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.core.classes import Project
 from cing.core.constants import CYANA
@@ -35,8 +35,8 @@ class AllChecks(TestCase):
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
 
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         # does it matter to import it just now?
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
@@ -44,7 +44,7 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 #        project.save( )
         gifFileName = entryId+".gif"
-        pathGif = os.path.join( cingDirTestsTmp, gifFileName)
+        pathGif = os.path.join( cingDirTmp, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif))
 
 if __name__ == "__main__":

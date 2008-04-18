@@ -17,8 +17,8 @@ def doScriptOnEntryList(pythonScriptFileName,
           delay_between_submitting_jobs  = 1,
           extraArgList = None
           ):
-#    if os.chdir(cingDirTestsTmp):
-#        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+#    if os.chdir(cingDirTmp):
+#        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
 
     # Empty list means no filtering done.
     entryCodeListFilter = []

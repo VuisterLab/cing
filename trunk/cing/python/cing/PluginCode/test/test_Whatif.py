@@ -3,7 +3,7 @@ Unit test
 python $CINGROOT/python/cing/PluginCode/test/test_Whatif.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
@@ -28,7 +28,7 @@ class AllChecks(TestCase):
         entryId = "1tgq_1model" 
         convention = PDB
         
-        os.chdir(cingDirTestsTmp)
+        os.chdir(cingDirTmp)
         project = Project( entryId )
         project.removeFromDisk()
         project = Project.open( entryId, status='new' )

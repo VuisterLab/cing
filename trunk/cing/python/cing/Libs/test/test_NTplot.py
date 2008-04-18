@@ -1,4 +1,4 @@
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTplot import NTplot
@@ -21,7 +21,7 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTestsTmp)
+    os.chdir(cingDirTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testPlotVaria(self):

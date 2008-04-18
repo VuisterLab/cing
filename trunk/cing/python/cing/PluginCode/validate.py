@@ -1701,7 +1701,7 @@ def setupHtml(project):
     for key in project.mainPageObjects.keys():
         htmlMain('h1', key)
         for item in project.mainPageObjects[key]:
-            NTdebug('item: %s' % item)
+#            NTdebug('item: %s' % item)
             htmlMain('ul', closeTag=False)
             project.html.insertHtmlLinkInTag( 'li', htmlMain, project, item, text=item.name )
             htmlMain('ul', openTag=False)

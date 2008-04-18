@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_Procheck.py
 """
 from cing import cingDirTestsData
-from cing import cingDirTestsTmp
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
@@ -55,8 +55,8 @@ class AllChecks(TestCase):
     #        RESIDUES 115  A  136  A
     #        RESIDUES 145  A  190  A        
             
-        self.failIf( os.chdir(cingDirTestsTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTestsTmp)
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
