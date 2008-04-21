@@ -8,10 +8,11 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
+from cing.core.molecule import Chain
 from gzip import GzipFile
-import sys
 import cing
 import os
+import sys
 
 def doEntry( entryCode, chainCode ):
     char23 = entryCode[1:3]
@@ -19,6 +20,10 @@ def doEntry( entryCode, chainCode ):
     pdbFileNameZipped = pdbFileName+'.gz'
     if not os.path.exists(pdbFileNameZipped):
         NTdebug("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
+        return True
+    
+    if Chain.isNullValue(chainCode):
+        NTerror("didn't expect null value for chain")
         return True
     
     localPdbFileName = entryCode+chainCode+".pdb"

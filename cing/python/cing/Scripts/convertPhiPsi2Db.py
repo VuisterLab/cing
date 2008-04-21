@@ -46,7 +46,7 @@ dbase_file_name = file_name_base + '.dat'
 
 binSize   = 60
 binCount  = 360/binSize
-binCountJ = (binCount + 0)* 1j # used for numpy's gridding.
+binCountJ = (binCount + 0)* 1j # used for numpy's 'gridding'.
 dihedralName1= "PHI"
 dihedralName2= "PSI"
 project     = Project('ramachandranPlot')
@@ -140,12 +140,13 @@ def main():
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
         bins = binCount, 
         range= hrange)
-    sumHistCombined = sum( hist2d )
-    sumsumHistCombined = sum( sumHistCombined )
-    NTdebug('hist2d   : \n%s' % hist2d)
-    NTdebug('sumHistCombined   : %s' % `sumHistCombined`)
-    NTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
+#    sumHistCombined = sum( hist2d )
+#    sumsumHistCombined = sum( sumHistCombined )
+    NTdebug('hist2d         : \n%s' % hist2d)
+#    NTdebug('sumHistCombined   : %s' % `sumHistCombined`)
+#    NTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
     hist2d = zscaleHist( hist2d, Cav, Csd )
+    NTdebug('hist2d scaled  : \n%s' % hist2d)
 
     
     dbase_file_abs_name = os.path.join( pluginDataDir, dbase_file_name )
@@ -156,7 +157,9 @@ def main():
     dbase.close()
 
 def zscaleHist( hist2d, Cav, Csd ):
-    return (hist2d - Cav) / Csd
+    hist2d -= Cav
+    hist2d /= Csd
+    return hist2d
 
 def getValueFromHistogramUsingInterpolation( hist, v0, v1):
     """Returns the value from the bin pointed to by v0,v1.
@@ -227,7 +230,7 @@ def getRescaling(valuesByEntrySsAndResType):
                     NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                     continue
                 if c_sd == 0.:
-                    NTerror('Got zero c_sd, ignoring histogram. This should only occur in smaller sets.')
+                    NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets.')
                     continue
                 for k in range(len(angleList0)):
                     ck = getValueFromHistogramUsingInterpolation( 
