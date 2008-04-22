@@ -80,7 +80,7 @@ pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #NTdebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 #NTwarning("TODO: reintroduce the ccpn plugin code here once fixed")
-pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
+#pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
 #NTwarning("TODO: reintroduce the validate plugin code here once fixed")
 #pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
 for p in pluginFileList:
