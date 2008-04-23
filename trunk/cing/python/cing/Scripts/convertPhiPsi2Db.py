@@ -1,5 +1,6 @@
+from cing import cingDirData
+from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import cingPythonCingDir
 from cing import verbosityDebug
 from cing import verbosityOutput
 from cing.Libs.NTplot import NTplot
@@ -7,12 +8,20 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
+from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.numpyInterpolation import interpn_linear
-from cing.PluginCode.procheck import to3StateUpper
+from cing.PluginCode.Whatif import DB_RAMCHK
+from cing.PluginCode.Whatif import histBySsAndResType
+from cing.PluginCode.dssp import DSSP_STR
+from cing.PluginCode.dssp import to3StateUpper
+from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.classes import Project
+from cing.core.constants import PDB
 from matplotlib.numerix.mlab import amax
 from matplotlib.pylab import axis
 from matplotlib.pylab import colorbar
@@ -23,7 +32,6 @@ from numpy.lib.twodim_base import histogram2d
 from pylab import nx
 import cing
 import csv
-import math
 import os
 import shelve
 
@@ -41,10 +49,14 @@ Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
 """
 
 file_name_base  = 'phipsi_wi_db'
+# .gz extension is appended in the code.
 cvs_file_name   = file_name_base + '.csv'
 dbase_file_name = file_name_base + '.dat'
+dir_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf' )
+cvs_file_abs_name   = os.path.join( dir_name, cvs_file_name )
+dbase_file_abs_name = os.path.join( dir_name, dbase_file_name )
 
-binSize   = 60
+binSize   = 10
 binCount  = 360/binSize
 binCountJ = (binCount + 0)* 1j # used for numpy's 'gridding'.
 dihedralName1= "PHI"
@@ -59,16 +71,13 @@ yRange = (plotparams2.min, plotparams2.max)
 xGrid,yGrid = ogrid[ plotparams1.min:plotparams1.max:binCountJ, plotparams1.min:plotparams1.max:binCountJ ]
 bins = (xGrid,yGrid)
 
-pluginDataDir = os.path.join( cingPythonCingDir,'PluginCode','data')
+#pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
 
-def inRange(a):
-    if a < plotparams1.min or a > plotparams1.max:
-        return False
-    return True
       
 def main():
-    cvs_file_abs_name = os.path.join( pluginDataDir, cvs_file_name )
+    cvs_file_abs_name_gz = cvs_file_abs_name + '.gz'
+    gunzip( cvs_file_abs_name_gz )
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
     valuesBySsAndResType       = {}
     histBySsAndResType         = {}
@@ -94,9 +103,12 @@ def main():
 #        NTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
         appendDeepByKeys(valuesByEntrySsAndResType, phi, entryId, ssType,resType,'phi' )
         appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType,resType,'psi' )
-
-    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
-#    (Cav, Csd) = ( 1.0, 1.0 )
+    del(reader) # closes the file handles 
+    os.unlink(cvs_file_abs_name)
+#    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
+#    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
+    (Cav, Csd ) = ( 1.0, 1.0 )
+    NTdebug("Overall found av,sd,n: " + `(Cav, Csd)`)
     
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
@@ -105,7 +117,7 @@ def main():
                 valuesBySsAndResType[ssType][resType]['phi'], 
                 bins = binCount, 
                 range= hrange)
-            hist2d = zscaleHist( hist2d, Cav, Csd )
+#            hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys( histBySsAndResType, hist2d, ssType, resType )
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
     
@@ -122,7 +134,7 @@ def main():
             phi, # otherwise the imagery but also the [row][column] notation is screwed.
             bins = binCount, 
             range= hrange)
-        hist2d = zscaleHist( hist2d, Cav, Csd )
+#        hist2d = zscaleHist( hist2d, Cav, Csd )
         setDeepByKeys( histBySsAndCombinedResType, hist2d, ssType )
 
     phi = []
@@ -145,11 +157,10 @@ def main():
     NTdebug('hist2d         : \n%s' % hist2d)
 #    NTdebug('sumHistCombined   : %s' % `sumHistCombined`)
 #    NTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
-    hist2d = zscaleHist( hist2d, Cav, Csd )
-    NTdebug('hist2d scaled  : \n%s' % hist2d)
+#    hist2d = zscaleHist( hist2d, Cav, Csd )
+#    NTdebug('hist2d scaled  : \n%s' % hist2d)
 
     
-    dbase_file_abs_name = os.path.join( pluginDataDir, dbase_file_name )
     dbase = shelve.open( dbase_file_abs_name )
     dbase[ 'histCombined' ]               = hist2d
     dbase[ 'histBySsAndCombinedResType' ] = histBySsAndCombinedResType
@@ -170,40 +181,6 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
 #    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
     return interpolatedValue
     
-def getEnsembleAverageAndSigmaFromHistogram( his ):
-    """According to Rob's paper. Note that weird cases exist which to me
-    are counter intuitive
-[[ 0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  1.  0.]
- [ 0.  0.  0.  0.  0.  0.]
- [ 0.  0.  1.  0.  0.  0.]]
-Gives an c_av of 1. And the c_sd can't be calculated.
-Rob might have caught this by requiring c_av be at least 2.0.
-    """
-    NTdebug("getEnsembleAverageAndSigmaFromHistogram on his:\n%s" % his)
-    (nr,nc) = his.shape
-    sum = 0.
-    sumsq = 0.
-    for r in range(nr):
-        for c in range(nc):
-            v = his[r,c] # convenience variable
-            sum += v
-            sumsq += v*v
-    c_av = sumsq / sum # this is not a regular average as far as I can tell.
-    if sum <= 1.: # possible for small sets.
-        return (c_av, None)
-    sumsdsq = 0.
-    for r in range(nr):
-        for c in range(nc):
-            v = his[r,c] # convenience variable
-            v2 = v - c_av # convenience variable
-            sumsdsq += v * v2*v2
-    NTdebug("sumsdsq: %8.3f" % sumsdsq)
-    c_sd = sumsdsq / (sum-1)
-    c_sd = math.sqrt( c_sd )
-    return (c_av, c_sd)
     
     
 def getRescaling(valuesByEntrySsAndResType):
@@ -225,7 +202,7 @@ def getRescaling(valuesByEntrySsAndResType):
                     NTdebug('when testing not all residues are present in smaller sets.')
                     continue 
                 (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
-                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
+#                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
                 if c_sd == None:
                     NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                     continue
@@ -237,13 +214,12 @@ def getRescaling(valuesByEntrySsAndResType):
                         histBySsAndResTypeExcludingEntry[ssType][resType], 
                         angleList0[k], angleList1[k])
                     zk = ( ck - c_av ) / c_sd
-                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
+#                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
                     z.append( zk )
-        (av, _sd, _n) = z.average()
-        NTdebug("For entry %s found av,sd,n: %s" %(entryId,(av, _sd, _n)))
+        (av, sd, n) = z.average()
+        NTdebug("%4s,%8.3f,%8.3f,%d" %( entryId, av, sd, n))
         C.append( av )
     (Cav, Csd, Cn) = C.average()
-    NTdebug("Overall found av,sd,n: " + `C.average()`)
     return (Cav, Csd, Cn)
 
 
@@ -347,7 +323,7 @@ def ramachandranPlot(hist, titleStr):
 #    ps.show()
     ps.hardcopy('Ramachandran_%s.png' % titleStr)
 
-def ramachandranZPlotTest(hist, titleStr):
+def ramachandranPlotTest(hist, titleStr):
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = [400,400]
 #    NTdebug( 'plotparams1: %r' % plotparams1)
@@ -372,33 +348,88 @@ def ramachandranZPlotTest(hist, titleStr):
 #    ps.subplotsAdjust(**kwds)    
 #    X, Y = meshgrid(x, y)
 #    extent = xRange + yRange
-    plot.ramachandranZPlot( hist )
+    plot.ramachandranPlot( hist )
     axis('off')
     ps.hardcopy('RamachandranZ_%s.png' % titleStr)
 
-def testPlot():
-    dbase = shelve.open( dbase_file_name )
-    histCombined               = dbase[ 'histCombined' ]
-#    histBySsAndResType         = dbase[ 'histBySsAndResType' ]
-#    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-    dbase.close()
+def testEntry():        
+    #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
+#        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
+    entryId = "1brv_1model" 
+#        entryId = "1tgq_1model" 
+    convention = PDB
+    
+    os.chdir(cingDirTmp)
+        
+    project = Project( entryId )
+    project.removeFromDisk()
+    project = Project.open( entryId, status='new' )
+    cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+    pdbFileName = entryId+".pdb"
+    pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+    NTdebug("Reading files from directory: " + cyanaDirectory)
+    project.initPDB( pdbFile=pdbFilePath, convention = convention )
+    if not project.dssp():
+        NTerror("Failed to dssp project")
+        return True
+#        print project.cingPaths.format()
+#    self.assertFalse(runWhatif(project))    
+    
+    project.save()
+    # seq:      VPCSTCEGNLACLSLCHIE
+    _wiSstype = '  HHHHTT HHHHHH    '
+    _pcSstype  = ' hHHHHhThHHHHHHh   '
+    i=0
+    for res in project.molecule.allResidues():
+#        NTdebug(`res`)
+#        whatifResDict = res.getDeepByKeys(WHATIF_STR)
+#        if not whatifResDict:
+#            continue
+#        checkIDList = whatifResDict.keys()
+#        for checkID in checkIDList:
+#            if checkID != RAMCHK_STR:
+#                continue
+#            valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
+#            qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
+#            NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
+        if not (res.has_key('PHI') and res.has_key('PSI')):
+            continue
+        if not (res.PHI and res.PSI):
+            continue
+        
+        phi = res.PHI[0]
+        psi = res.PSI[0]
+#        ssType = wiSstype[i]
+#        ssTypeList = to3StateUpper( [pcSstype[i]] )
+        ssTypeDsspList = getDeepByKeys(res,DSSP_STR,SECSTRUCT_STR)
+        ssTypeList = to3StateUpper( ssTypeDsspList )
+        ssType = ssTypeList.getConsensus() 
+        resType = res.resName
+        hist = histBySsAndResType[ssType][resType]
+        sumHist = sum(sum( hist ))
+        maxHist = amax(amax( hist ))
+        c_dbav, s_dbav = getEnsembleAverageAndSigmaFromHistogram( hist )
+        Zscore = hist - c_dbav
+        Zscore = Zscore / s_dbav
+        # Note the reversal of phi,psi!
+        ck = getValueFromHistogramUsingInterpolation(hist, psi, phi)
+        zk = ck - c_dbav 
+        zk /= s_dbav
+        ZscoreDB = zk - DB_RAMCHK[0] # av
+        ZscoreDB /= DB_RAMCHK[1] # sd
+        
+        NTmessage("ssType [%s] resType %s sumHist %4.0f maxHist %4.0f c_dbav %6.1f s_dbav %6.1f ck %6.1f zk %8.3f ZscoreDB %8.3f" % (
+            ssType, resType, sumHist, maxHist, c_dbav, s_dbav, ck, zk, ZscoreDB))
+        i += 1
 
-#    for ssType in  'E','H',' ':
-#        for resType in histBySsAndResType[ssType].keys():
-#            titleStr = ssType + '_' + resType
-#            hist = histBySsAndResType[ssType][resType]
-#            ramachandranZPlot(hist, titleStr)
-#            
-#    for ssType in  'E','H',' ':
-#        titleStr = ssType + '_ALL'
-#        hist = histBySsAndCombinedResType[ssType]
-#        ramachandranZPlot(hist, titleStr)
-
-#    ramachandranPlot(histCombined, 'ALL_ALL')
-    ramachandranZPlotTest(histCombined, 'ALL_ALL')
+def inRange(a): 
+    if a < plotparams1.min or a > plotparams1.max:
+        return False
+    return True
              
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
-    main()
-#    testPlot()
+#    main()
+    testEntry()

@@ -13,6 +13,7 @@ from fnmatch import fnmatch
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+from gzip import GzipFile
 import array
 import cing
 import inspect
@@ -264,7 +265,7 @@ class NTlist( list ):
             return None
 
         if key >= len(self):
-            NTdebug("int key in NTlist.getDeepByKeys to large for this NTlist: " + `key`)
+            NTdebug("int key in NTlist.getDeepByKeys too large for this NTlist: " + `key`)
             return None
 
         value = self[key]
@@ -3097,7 +3098,8 @@ class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
     """
-    def __init__(self, pathToProgram, rootPath = None,
+    def __init__(self, pathToProgram, 
+                 rootPath = None,
                  redirectOutput= True,
                  redirectOutputToFile = False,
                  redirectInputFromDummy = False,
@@ -3466,9 +3468,26 @@ def appendDeepByKeys(c, value, *keyList):
     If value is a (subclass of) list then append individual values from the list
     to the c (complex object) which needs to be a (subclass of) list itself.
     The essence here is silence.
-    keyList needs to have at least one key.
+    
+    NB:
+    - keyList needs to have at least one key.
+    
+    - All but the last level of the complex object should be (subclasses of) 
+    dictionaries. The last level must be a (subclasses of) list. If the
+    itermediate objects (dictionaries and list) do not exist, they will be 
+    silently created.
+    
+    - The last key is not the id to the list to append to.
+    
+    - The complex argument needs to exist.
+    
     Return None on success and True on error.
     """
+    
+    if c == None:
+        NTerror("Can't appendDeepByKeys without complex object on input.")
+        return True
+        
     lk = len(keyList)
 #  NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
     if not lk:
@@ -3477,42 +3496,43 @@ def appendDeepByKeys(c, value, *keyList):
 
     key = keyList[0]
 
-    if lk == 1:
-        if isinstance(c, list):
-            if len(c) >= key:
-                # Impossible situation: trying to append to a list at some index that isn't present yet.
+    # At the level where only one key exists; do the actual append to the list.
+    if lk == 1: 
+        # First make sure the list to append to exists.
+        if isinstance(c, list): 
+            # Make sure the list already has an element with the key as index.
+            if key >= len(c):
+                NTdebug("Impossible situation: trying to go into a list at an index that isn't present.")
+                NTdebug("key: %d and list length: %d" % ( key, len(c)))
                 return True
-    elif isinstance(c, dict):
-        if not c.has_key(key):
-            c[key] = []
-    else:
-        # The input complex object needs to be a (subclass of) dict or list
-        return True
-    l = c[key]
-    if not isinstance(l, list):
-        return True
-    if isinstance(value, list):
-        for v in value:
-            l.append(v)
-    else:
+        elif isinstance(c, dict):
+            if not c.has_key(key):
+                c[key] = [] # For last level a new -list- is made when absent.
+        else:
+            NTdebug("The input complex object needs to be a (subclass of) dict or list")
+            return True
+    
+        l = c[key]
+        if not isinstance(l, list):
+            NTdebug("At the bottom level the input complex object needs to be a (subclass of) list")
+            return True
+        if isinstance(value, list):
+            for v in value:
+                l.append(v)
+            return
         l.append(value) # No extra checks done here for speed purposes.
         return
-
+    # endif on lk==1, above section was misalligned before. 
+    
     if c.has_key(key):
         deeper = c[key]
-    else:
-        if lk == 2: # next time we want to append to a list finally, at the lowest level.
-    # this is of course a cross assumption
-    # why can't some other level be a list?
-    # well if you need that, don't expect this function to create
-    # it for you without the info.
-            deeper = []
-        else:
-            deeper = {}
+    else:        
+        deeper = {}
         c[key] = deeper
 
     reducedKeyList = keyList[1:]
     return appendDeepByKeys(deeper, value, *reducedKeyList)
+
 
 def setDeepByKeys(d, value, *keyList):
     """Set arbitrary deep element to value by keyList.
@@ -3602,3 +3622,58 @@ def getDeepByKeys(c, *keyList):
 #  NTdebug("Going one level deeper")
     reducedKeyList = keyList[1:]
     return getDeepByKeys(value, *reducedKeyList)
+
+
+def gunzip(fileNameZipped):
+    """Returns true on error. Uses python api instead of OS defaults"""
+    inF = GzipFile(fileNameZipped, 'rb');
+    s=inF.read()
+    inF.close()
+    if not fileNameZipped.endswith('.gz'):
+        return True
+    fileName = fileNameZipped[:-3]
+    outF = file(fileName, 'wb');
+    outF.write(s)
+    outF.close()
+    
+def getEnsembleAverageAndSigmaFromHistogram( his ):
+    """According to Rob's paper. Note that weird cases exist which to me
+    are counter intuitive
+[[ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]]
+Gives an c_av of 1. And the c_sd can't be calculated.
+Rob might have caught this by requiring c_av be at least 2.0.
+
+        # Calculate the count database average for this histogram and
+        # the sigma (s.d.) of it. this is done as defined by equations
+        # in: Hooft et al. Objectively judging the quality of a protein 
+        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997) 
+        # vol. 13 (4) pp. 425-430
+
+    """
+#    NTdebug("getEnsembleAverageAndSigmaFromHistogram on his:\n%s" % his)
+    (nr,nc) = his.shape
+    sum = 0.
+    sumsq = 0.
+    for r in range(nr):
+        for c in range(nc):
+            v = his[r,c] # convenience variable
+            sum += v
+            sumsq += v*v
+    c_av = sumsq / sum # this is not a regular average as far as I can tell.
+    if sum <= 1.: # possible for small sets.
+        return (c_av, None)
+    sumsdsq = 0.
+    for r in range(nr):
+        for c in range(nc):
+            v = his[r,c] # convenience variable
+            v2 = v - c_av # convenience variable
+            sumsdsq += v * v2*v2
+#    NTdebug("sumsdsq: %8.3f" % sumsdsq)
+    c_sd = sumsdsq / (sum-1)
+    c_sd = math.sqrt( c_sd )
+    return (c_av, c_sd)

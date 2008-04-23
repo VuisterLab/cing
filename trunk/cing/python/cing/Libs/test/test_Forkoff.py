@@ -29,6 +29,7 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmp)
 
     def tttestRun(self):
+        ## Test is disable because it takes 10 seconds to run.
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(

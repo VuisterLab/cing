@@ -88,7 +88,7 @@ class AllChecks(TestCase):
 
 
     def testTo3StateUpper(self):
-        self.assertEquals(     to3StateUpper(['S','E']), [' ','E'])
+        self.assertEquals(     to3StateUpper(['S','E']), [' ','S'])
         self.assertEquals(     to3StateUpper(['h','H']), [' ','H'])
         self.assertNotEquals(  to3StateUpper([' ','H']), ['H','H'])
         self.assertEquals(     to3StateUpper(['X','H']), [' ','H'])

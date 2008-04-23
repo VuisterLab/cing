@@ -43,7 +43,7 @@ class AllChecks(TestCase):
         myhtml.render()
         #project = openProject('im2', 'old' )
 
-    def tttest_rootPath(self):
+    def test_rootPath(self):
         p = Project('1brv')
         self.assertEquals( './1brv.cing', p.rootPath('1brv')[0] )         
         self.assertEquals( '1brv',        p.rootPath('1brv')[1] )         

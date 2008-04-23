@@ -37,6 +37,7 @@ directories.keysformat() #define a format string for 'pretty' output
 moleculeDirectories = NTdict(     
     # Directories generated 
     procheck   = 'Procheck',
+    dssp       = 'Dssp',
     whatif     = 'Whatif',
     wattos     = 'Wattos',
     analysis   = 'Cing',
@@ -68,6 +69,7 @@ cingPaths = NTdict(
     procheck_nmr = os.getenv('procheckPath'),
     aqpc         = os.getenv('aqpcPath'),
     whatif       = os.getenv('whatifPath'),
+    dssp         = os.getenv('dsspPath'),
     convert      = os.getenv('convertPath'),
     ps2pdf       = os.getenv('ps2pdfPath'),
     molmol       = os.getenv('molmolPath'),

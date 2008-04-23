@@ -5,34 +5,36 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import limitToRange
+from cing.Libs.matplotlibExt import blue_inv
+from cing.Libs.matplotlibExt import green_inv
+from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.PluginCode.procheck import getProcheckSecStructConsensus
+from cing.PluginCode.procheck import to3StateUpper
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
+from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
-from matplotlib.lines import Line2D
+from matplotlib.lines import Line2D 
 from matplotlib.mlab import frange
 from matplotlib.numerix.mlab import amax
-from matplotlib.numerix.mlab import amin
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
 from matplotlib.pylab import annotate
 from matplotlib.pylab import axes
 from matplotlib.pylab import bar
 from matplotlib.pylab import cla  
-from matplotlib.pylab import clabel
 from matplotlib.pylab import clf
 from matplotlib.pylab import close
-from matplotlib.pylab import contour
 from matplotlib.pylab import errorbar
 from matplotlib.pylab import gcf
 from matplotlib.pylab import grid
@@ -50,14 +52,11 @@ from matplotlib.pylab import ylabel
 from matplotlib.pylab import ylim
 from matplotlib.pylab import yticks
 from matplotlib.ticker import Formatter
+from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy.core.ma import arange
-from pylab import nx
-from cing.PluginCode.procheck import to3StateUpper
-from cing.PluginCode.procheck import getProcheckSecStructConsensus
-from matplotlib.ticker import FuncFormatter
 import Image
 import math
 import sys
@@ -226,11 +225,42 @@ circlePoint        = pointAttributes( type='circle',        size=2.0, color='blu
 #        "half filled fancy diamond"    : 29,
 #        "octagon"            : 30,
 #        "filled octagon"        : 31,
+
+# pylab
+#            -     : solid line
+#            --    : dashed line
+#            -.    : dash-dot line
+#            :     : dotted line
+#            .     : points
+#            ,     : pixels
+#            o     : circle symbols
+#            ^     : triangle up symbols
+#            v     : triangle down symbols
+#            <     : triangle left symbols
+#            >     : triangle right symbols
+#            s     : square symbols
+#            +     : plus symbols
+#            x     : cross symbols
+#            D     : diamond symbols
+#            d     : thin diamond symbols
+#            1     : tripod down symbols
+#            2     : tripod up symbols
+#            3     : tripod left symbols
+#            4     : tripod right symbols
+#            h     : hexagon symbols
+#            H     : rotated hexagon symbols
+#            p     : pentagon symbols
+#            |     : vertical line symbols
+#            _     : horizontal line symbols
+#            steps : use gnuplot style 'steps' # kwarg only
+
 mappingPointType2MatLibPlot = {
-    'none': 'None',
-    'plus': '+',
-    'circle': 'o',
-    'filled circle': 'o',
+    'none':             'None',
+    'plus':             '+',
+    'circle':           'o',
+    'square':           's',
+    'filled circle':    'o',
+    'triangle':         '^',
      }
 """          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ] """
 mappingLineType2MatLibPlot = { 'solid': None, 'dotted': ':', 'longdashed': '--'}
@@ -487,14 +517,17 @@ class NTplot( NTdict ):
 #            print "doing color"
             result['color']           =  attributes.color
         if 'fill' in keys:
-#            print "doing fill"
-            markerColor = result['color']
-            if 'pointColor' in keys:
-                markerColor = attributes.pointColor
-            elif 'lineColor' in keys:
-                markerColor = attributes.lineColor
-            result['markeredgecolor'] =  markerColor
-            result['markerfacecolor'] =  markerColor
+            if attributes.fill: # it might still be set to False.
+    #            print "doing fill"
+                markerColor = result['color']
+                if 'pointColor' in keys:
+                    markerColor = attributes.pointColor
+                elif 'lineColor' in keys:
+                    markerColor = attributes.lineColor
+                result['markeredgecolor'] =  markerColor
+                result['markerfacecolor'] =  markerColor
+            else:
+                result['markerfacecolor'] =  None # it might have been set above.
             
 #    a.pointType  = None   # in matplotlib: marker
 #    a.pointSize  = 2.0    # in matplotlib: markersize
@@ -935,123 +968,48 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
     
-    def ramachandranZPlot(self, hist):
-        """Overlay contours for Z score from histogram.
-        Return 2 when the plot is of low-density.
+    def ramachandranPlot(self, histList):
+        """Image histogram as in Ramachandran plot for coil, helix, sheet.
+
         Return True on error.
-        May need to be optimized when called many times.
+        
+        Input histogram should be the bare counts.
+        This routine will calculate the c_dbav, s_dbav
         """
-        binSize   = 10
-        binCount  = 360/binSize
-        
-    #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
-        sumHist = sum(sum( hist ))
-        maxHist = amax(amax( hist ))
-    #    x = nx.arange(plotparams1.min, plotparams1.max+0.01, binSize)
-    #    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
-        Z = hist
-        # Calculate the count database average for this histogram and
-        # the sigma (s.d.) of it. this is done as defined by equations
-        # in: Hooft et al. Objectively judging the quality of a protein 
-        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997) 
-        # vol. 13 (4) pp. 425-430
-        c_squaredSum = 0
-        for r in range(binCount):
-            row = Z[r]
-            for c in range(binCount):
-                cell = row[c]
-                c_squaredSum += cell*cell
-        c_dbav = c_squaredSum / sumHist
-        
-        if c_dbav < 2.0:
-            NTwarning('Skipping low-density plot %s' )
-            return True
-        s_temp = 0
-        for r in range(binCount):
-            row = Z[r]
-            for c in range(binCount):
-                cell = row[c]
-                d = cell-c_dbav
-                s_temp += (d*d)*cell
-        s_dbav = math.sqrt( s_temp / (sumHist - 1)) # pretty useless the minus one.
-        
-        Zscore = hist - c_dbav
-        Zscore = Zscore / s_dbav
-    #    vmax = maxHist # Focus on low density regions? 
-    #    norm = colors.Normalize(vmin=0, vmax=vmax)
-        minZscore = amin(amin( Zscore ))
-        maxZscore = amax(amax( Zscore ))
-        NTdebug('Zscore c_dbav,s_dbav,minZ, maxZ: %8.3f %8.3f %8.3f %8.3f' % (c_dbav,s_dbav,minZscore, maxZscore))
-        NTdebug('Hist sumHist, max: %5.0f %5.0f' % (sumHist, maxHist))
-        levels = nx.arange(-5.0, 5.0, 0.5)    
-    #    zeroLevel = [0.0]    
-#        ps = NTplotSet() # closes any previous plots
-#        ps.hardcopySize = [1200,1200]
-    #    NTdebug( 'plotparams1: %r' % plotparams1)
-    #    NTdebug( 'xRange: %r' % `xRange`)
-    #    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
-    #    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-#        _plot = ps.createSubplot(1,1,1)
-    #    plot = NTplot( #title  = titleStr,
-    #      xRange = xRange,
-    #      xTicks = xTicks,
-    #      xLabel = dihedralName1,
-    #      yRange = yRange,
-    #      yTicks = yTicks,
-    #      yLabel = dihedralName2)
-    #    ps.addPlot(plot)
-#        kwds = {
-#          'left': 0.0,   # the left side of the subplots of the figure
-#          'right': 1.0,    # the right side of the subplots of the figure
-#          'bottom': 0.0,   # the bottom of the subplots of the figure
-#          'top': 1.0,      # the top of the subplots of the figure
-#                }
-#        ps.subplotsAdjust(**kwds)
-    #    X, Y = meshgrid(x, y)
+
+        minPercentage =  2.0
+        maxPercentage = 20.0
+        alpha = 0.8
+
+
         extent = self.xRange + self.yRange
-    #    NTdebug("Covering extent: " +`extent`)
-#        _im = imshow( Zscore, 
-#                interpolation='bilinear', 
-#                interpolation = 'nearest',
-#                origin='lower',
-#                extent=extent )
-    #    im.set_norm(norm)
-    
-    #    cset1 = contourf(X, Y, Z, levels,
-    #                            cmap=cm.get_cmap('jet', len(levels)-1),
-    #                            )
-    
-    #    cset1 = contourf(X, Y, Z, levels, 
-    #        cmap=cm.get_cmap('jet', len(levels)-1), 
-    #        origin='lower')
-        cset2 = contour(Zscore, levels,
-            colors = 'black',
-            hold='on',
-            extent=extent,
-            origin='lower')
-        clabel(cset2, inline=0, fmt = '%.1f',
-               fontsize=8)
-        
-    #    fmt = '%1.3f'
-    #    csetZero = contour(Zscore, zeroLevel,
-    #        colors = 'green',
-    #        hold='on',
-    #        extent=extent,
-    #        linewidths=3,
-    #        origin='lower')
-    #    for c in cset2.collections:
-    #        c.set_linestyle('solid')
-    #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-    #            origin='lower', 
-    #            extent=extent)
-    #    colorbar(im)
-    #    colorbar(cset2)
-        # It is easier here to make a separate call to contour than
-        # to set up an array of colors and linewidths.
-        # We are making a thick green line as a zero contour.
-        # Specify the zero level as a tuple with only 0 in it.
-    #    colorbar(cset1)
-    #    ps.show()
+        # make sure helix and sheet are plotted over coil
+        cmapList= [   green_inv, blue_inv, yellow_inv ]
+        colorList= [ 'green',   'blue',   'yellow']
+        i = 0
+        for hist in histList:
+#            if i == 9: # skip some when testing.
+#                i += 1
+#                continue
+            maxHist = amax(amax( hist ))
+            hist *= 100./maxHist            
+            palette = cmapList[i]
+            palette.set_over( colorList[i], 1.0) # alpha is 1.0
+            palette.set_under(alpha = 0.0)
+#            histm = masked_where(hist < minPercentage, hist, copy=1)
+            norm = colors.Normalize(vmin = minPercentage, 
+                                    vmax = maxPercentage, clip = False)
+            imshow( hist, 
+                    interpolation='bicubic', 
+#                    interpolation = 'nearest', # bare data.
+                    origin='lower',
+                    extent=extent,
+                    alpha=alpha,
+                    cmap=palette,
+                    norm = norm )
+#            NTdebug('plotted %d %s' % (i, cmapList[i].name))
+            i += 1
+        # end for
     
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
 
@@ -2180,3 +2138,113 @@ def integerNumberOnly(x,_dummy):
         return ''
     return '%.0f' % x
 
+
+# Junk follows
+#        binSize   = 10
+#        binCount  = 360/binSize
+#        colorList = ['blue', 'red', 'green']
+#        colorList = ['blue'] * 3
+
+
+            
+#            c_dbav, s_dbav = getEnsembleAverageAndSigmaFromHistogram( hist )
+#            Zscore = hist - c_dbav
+#            Zscore = Zscore / s_dbav
+                
+        #    vmax = maxHist # Focus on low density regions? 
+#            norm = colors.Normalize(vmin=0, vmax=100)
+#            minZscore = amin(amin( Zscore ))
+#            maxZscore = amax(amax( Zscore ))
+#    
+#            ZscoreDB = Zscore - DB_RAMCHK[0] # av
+#            ZscoreDB /= DB_RAMCHK[1] # sd
+#    
+#            minZscoreDB = amin(amin( ZscoreDB ))
+#            maxZscoreDB = amax(amax( ZscoreDB ))
+#        
+#            NTdebug('Hist max,sum                     : %8.0f %8.0f' % (maxHist,sumHist))
+#            NTdebug('Hist av,sd                       : %8.3f %8.3f' % (c_dbav,s_dbav))
+#            NTdebug('Zscore min, max                  : %8.3f %8.3f' % (minZscore, maxZscore))
+#            NTdebug('ZscoreDB c_dbav,s_dbav,minZ, maxZ: %8.3f %8.3f %8.3f %8.3f' % (DB_RAMCHK[0],DB_RAMCHK[1],minZscoreDB, maxZscoreDB))
+#    
+#            if c_dbav < 2.0:
+#                NTwarning('Skipping low-density plot (with c_dbav<2) %s' )
+#                return True
+            
+#            levels = (-10., -5., -2., 0., 5., 10., 25., 50., 100., 200)    
+#            levels = range(10,60,10) # as in fig.1 of robs paper.
+            # by percentage.
+              
+        #    zeroLevel = [0.0]    
+    #        ps = NTplotSet() # closes any previous plots
+    #        ps.hardcopySize = [1200,1200]
+        #    NTdebug( 'plotparams1: %r' % plotparams1)
+        #    NTdebug( 'xRange: %r' % `xRange`)
+        #    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
+        #    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
+    #        _plot = ps.createSubplot(1,1,1)
+        #    plot = NTplot( #title  = titleStr,
+        #      xRange = xRange,
+        #      xTicks = xTicks,
+        #      xLabel = dihedralName1,
+        #      yRange = yRange,
+        #      yTicks = yTicks,
+        #      yLabel = dihedralName2)
+        #    ps.addPlot(plot)
+    #        kwds = {
+    #          'left': 0.0,   # the left side of the subplots of the figure
+    #          'right': 1.0,    # the right side of the subplots of the figure
+    #          'bottom': 0.0,   # the bottom of the subplots of the figure
+    #          'top': 1.0,      # the top of the subplots of the figure
+    #                }
+    #        ps.subplotsAdjust(**kwds)
+        #    X, Y = meshgrid(x, y)
+
+
+
+        #    NTdebug("Covering extent: " +`extent`)
+        #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
+#            sumHist = sum(sum( hist ))
+        #    x = nx.arange(plotparams1.min, plotparams1.max+0.01, binSize)
+        #    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
+
+#            im.set_norm(norm)
+        
+        #    cset1 = contourf(X, Y, Z, levels,
+        #                            cmap=cm.get_cmap('jet', len(levels)-1),
+        #                            )
+        
+        #    cset1 = contourf(X, Y, Z, levels, 
+        #        cmap=cm.get_cmap('jet', len(levels)-1), 
+        #        origin='lower')
+            
+######            cset2 = contour(hist, levels,
+######    #        cset2 = contour(ZscoreDB,
+######                colors = colorList[i],
+######                hold='on',
+######                extent=extent,
+######                origin='lower')
+######            clabel(cset2, inline=0, fmt = '%.0f',
+######                colors = colorList[i],
+######                   fontsize=12)
+            
+        #    fmt = '%1.3f'
+        #    csetZero = contour(Zscore, zeroLevel,
+        #        colors = 'green',
+        #        hold='on',
+        #        extent=extent,
+        #        linewidths=3,
+        #        origin='lower')
+        #    for c in cset2.collections:
+        #        c.set_linestyle('solid')
+        #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
+        #            origin='lower', 
+        #            extent=extent)
+#            colorbar(im)
+        #    colorbar(cset2)
+            # It is easier here to make a separate call to contour than
+            # to set up an array of colors and linewidths.
+            # We are making a thick green line as a zero contour.
+            # Specify the zero level as a tuple with only 0 in it.
+        #    colorbar(cset1)
+        #    ps.show()

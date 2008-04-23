@@ -40,6 +40,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  procheckPath%(equals)s%(procheckPath)s
 %(export)s  aqpcPath%(equals)s%(aqpcPath)s
 %(export)s  whatifPath%(equals)s%(whatifPath)s
+%(export)s  dsspPath%(equals)s%(dsspPath)s
 %(export)s  convertPath%(equals)s%(convertPath)s
 %(export)s  ps2pdfPath%(equals)s%(ps2pdfPath)s
 %(export)s  molmolPath%(equals)s%(molmolPath)s
@@ -202,8 +203,16 @@ if __name__ == '__main__':
         parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
         NTmessage("Found 'what if'")
-        parametersDict['whatifPath'] = strip(whatifPath)
-
+        whatifPath = strip(whatifPath)
+        parametersDict['whatifPath'] = whatifPath
+        head, _tail = os.path.split( whatifPath ) 
+        dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
+        if not os.path.exists(dsspPath):
+            NTwarning("Couldn't find 'dssp'")
+            parametersDict['dsspPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        else:
+            NTmessage("Found 'dssp'")
+            parametersDict['dsspPath'] = dsspPath
 
     time = 0
     try:

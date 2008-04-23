@@ -9,7 +9,9 @@ from cing.Libs.NTutils import NTerror
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
 from cing.core.molecule import Chain
-from gzip import GzipFile
+from cing.Libs.NTutils import gunzip
+from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.PluginCode.dssp import DSSP_STR
 import cing
 import os
 import sys
@@ -19,20 +21,16 @@ def doEntry( entryCode, chainCode ):
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
     pdbFileNameZipped = pdbFileName+'.gz'
     if not os.path.exists(pdbFileNameZipped):
-        NTdebug("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
+        NTerror("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
         return True
     
     if Chain.isNullValue(chainCode):
         NTerror("didn't expect null value for chain")
         return True
     
+    gunzip(pdbFileNameZipped)
     localPdbFileName = entryCode+chainCode+".pdb"
-    inF = GzipFile(pdbFileNameZipped, 'rb');
-    s=inF.read()
-    inF.close()
-    outF = file(localPdbFileName, 'wb');
-    outF.write(s)
-    outF.close()
+    os.rename(pdbFileName, localPdbFileName)
     
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
@@ -40,7 +38,8 @@ def doEntry( entryCode, chainCode ):
     project = Project.open( entryCode+chainCode, status='new' )
     project.initPDB( pdbFile=localPdbFileName, convention = 'BMRB' )
     os.unlink(localPdbFileName)    
-    project.procheck(createPlots=False, runAqua=False)                   
+#    project.procheck(createPlots=False, runAqua=False)                   
+    project.dssp()                   
     
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
     
@@ -60,7 +59,7 @@ def doEntry( entryCode, chainCode ):
             if not res.PSI:
                 NTdebug('Skipping terminii II on psi etc in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                 continue
-            secStruct = res.getDeepByKeys( 'procheck', 'secStruct' ) 
+            secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR) 
             if secStruct == None:
                 NTdebug('Skipping because no procheck secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                 continue
@@ -75,7 +74,7 @@ def doEntry( entryCode, chainCode ):
     resultsFile = file(resultsFileName, 'w') 
     resultsFile.flush()
     resultsFile.write(strSum)
-    NTdebug( strSum )
+    NTdebug( '\n'+strSum )
     resultsFile.flush()
     
     

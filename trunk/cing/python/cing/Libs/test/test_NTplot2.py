@@ -1,5 +1,4 @@
 from cing import cingDirTmp
-from cing import cingPythonCingDir
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTplot import HelixIconList
@@ -7,7 +6,6 @@ from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import selectPointsFromRange
 from cing.Libs.NTplot import triangularList
 from cing.Libs.NTplot import useMatPlotLib
@@ -21,7 +19,9 @@ from matplotlib.pylab import plot
 from matplotlib.pylab import text
 from unittest import TestCase
 from numpy.core.ma import arange
-import shelve
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTplot import plusPoint
+from cing.PluginCode.Whatif import histBySsAndResType
 import cing
 import os #@Reimport
 import unittest
@@ -131,69 +131,95 @@ class AllChecks(TestCase):
         ps.hardcopy("testPlotHistoDihedral."+graphicsFormat, graphicsFormat)
 #        plot.show()
 
-    def testPlotDihedral2D(self):
-        ps = NTplotSet() # closes any previous plots
-        ps.hardcopySize = (500,500)
-        
-        graphicsFormat = "png"
-        residueName = "ASN1"
+    def testPlotDihedral2D(self):  
+        showRestraints = True
+        showDataPoints = True  
         dihedralName1= "PHI"
         dihedralName2= "PSI"
-        x = NTlist(-45, -80,  125) # outside the range.
-        y = NTlist(-65, -63, -125)
-        # 4 boxes:
-        lower1, upper1 = 120,   0
-        lower2, upper2 = 130,  20
-        # left/right boxes:
-#        lower1, upper1 =  90, 270
-#        lower2, upper2 =   0,  70        
-        # upper/lower boxes:
-#        lower1, upper1 =   0,  70
-#        lower2, upper2 =  80, 270        
-        # borring one box
-#        lower1, upper1 =   0,  70
-#        lower2, upper2 =  10,  60        
-        
-        # important to switch to temp space before starting to generate files for the project.
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
-        project     = Project('testPlotHistoDihedral2D')
-        plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
-        plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
-
-        x.limit(plotparams1.min, plotparams1.max)
-        y.limit(plotparams2.min, plotparams2.max)
-        
-        plot = NTplot( title  = residueName,
-          xRange = (plotparams1.min, plotparams1.max),
-          xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),
-          xLabel = dihedralName1,
-          yRange = (plotparams2.min, plotparams2.max),
-          yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
-          yLabel = dihedralName2)
-        ps.addPlot(plot)
-        
-        
-        # Plot a Ramachandran density background        
-        self.assertFalse( plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2))
+        graphicsFormat = "png"
                 
-        dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-        dbase = shelve.open( dbaseFileName )
-#        histCombined               = dbase[ 'histCombined' ]
-#        histBySsAndResType         = dbase[ 'histBySsAndResType' ]
-    #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-        dbase.close()
+#        outputDir = os.path.join(cingDirTmp,'png')
+        outputDir = cingDirTmp
+        self.failIf( os.chdir(outputDir), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
+                
 #        ssType = 'E'
-#        resType = 'ASN'
-#        hist = histBySsAndResType[ssType][resType]        
-#        self.assertFalse( plot.ramachandranZPlot(hist))
-        myPoint = plusPoint.copy()
-#        myPoint.pointColor = 'red'
-        myPoint.pointSize = 6.0
-        myPoint.pointEdgeWidth = 1.0
-#        myPoint.pointEdgeWidth = 4.0
-        plot.points( zip( x,y ), attributes=myPoint )
-        ps.hardcopy("testPlotDihedral2D."+graphicsFormat, graphicsFormat)
+#        resType = 'GLY'
+#        for ssType in histBySsAndResType.keys():
+#            ssTypeForFileName = ssType.replace(' ', '_')
+        ssTypeFixed = 'H'
+        for resType in histBySsAndResType[ssTypeFixed].keys():
+            if resType != 'ALA': # for testing enable filtering.
+                continue
+            
+#                title = ssType + ' ' + resType
+            title = resType
+            NTmessage("plotting: %s" % title)
+#            hist = histBySsAndResType[ssType][resType]
+    
+            ps = NTplotSet() # closes any previous plots
+            ps.hardcopySize = (500, 500)
+            
+#                residueName = resType + ""
+            x = NTlist(-45, -80,  125) # outside the range.
+            y = NTlist(-65, -63, -125)
+            # 4 boxes:
+            lower1, upper1 = 120,   0
+            lower2, upper2 = 130,  20
+            # left/right boxes:
+    #        lower1, upper1 =  90, 270
+    #        lower2, upper2 =   0,  70        
+            # upper/lower boxes:
+    #        lower1, upper1 =   0,  70
+    #        lower2, upper2 =  80, 270        
+            # borring one box
+    #        lower1, upper1 =   0,  70
+    #        lower2, upper2 =  10,  60        
+            
+            # important to switch to temp space before starting to generate files for the project.
+            project     = Project('testPlotHistoDihedral2D')
+            plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
+            plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
+    
+            x.limit(plotparams1.min, plotparams1.max)
+            y.limit(plotparams2.min, plotparams2.max)
+            
+            plot = NTplot( title  = title,
+              xRange = (plotparams1.min, plotparams1.max),
+              xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),
+              xLabel = dihedralName1,
+              yRange = (plotparams2.min, plotparams2.max),
+              yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
+              yLabel = dihedralName2)
+            ps.addPlot(plot)
+            
+            if showRestraints:
+                self.assertFalse( plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2))
+            
+            # Plot a Ramachandran density background        
+            histList = []
+            ssTypeList = histBySsAndResType.keys()
+            ssTypeList.sort() # in place sort to: space, H, S
+            for ssType in ssTypeList: 
+#                NTdebug('appending [%s]' % ssType )                   
+                hist = histBySsAndResType[ssType][resType]
+                histList.append(hist)       
+            self.assertFalse( plot.ramachandranPlot(histList))
+            if showDataPoints:
+                myPoint = plusPoint.copy()
+                myPoint.pointColor = 'green'
+                myPoint.pointSize = 6.0
+                myPoint.pointEdgeWidth = 1.0
+                myPoint.fill = False
+                if resType == 'GLY':
+                    myPoint.pointType = 'triangle'            
+                if resType == 'PRO':
+                    myPoint.pointType = 'square'
+                plot.points( zip( x,y ), attributes=myPoint )
+#            fn = os.path.join('bySsAndResType', ( ssTypeForFileName+"_"+resType+"."+graphicsFormat))
+#            fn = os.path.join('byResType', ( resType+"."+graphicsFormat))
+            fn = resType+"."+graphicsFormat
+            ps.hardcopy(fn, graphicsFormat)
 #        plot.show() 
     
 
@@ -204,7 +230,7 @@ class AllChecks(TestCase):
         self.assertTrue( len(selectPointsFromRange( pointList, start=1, length=1))==1)            
         self.assertTrue( len(selectPointsFromRange( pointList, start=2, length=1))==0)
         
-    def tttestClipOn(self):
+    def testClipOn(self):
         # Bug reported to sf.net project for matplot
         figure().add_subplot(111)        
         text(0.5,0.95, 'matplottext', 

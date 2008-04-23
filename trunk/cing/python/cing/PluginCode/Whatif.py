@@ -3,6 +3,7 @@
     First version: gv June 3, 2007
     Second version by jfd.
 """
+from cing import cingDirData
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
@@ -17,6 +18,7 @@ from glob import glob
 from shutil import copy
 from string import upper
 import os
+import shelve
 import time
 
 # Fix these strings so we can get some automated code checking by pydev extensions.
@@ -41,6 +43,15 @@ BBCCHK_STR       = 'BBCCHK'
 #            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
 #            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
 #            BBCCHK
+# jackknifed av,sd,n over set of entries.
+DB_RAMCHK = (-1.36040035673, 0.033537074106736189, 555)
+
+_dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
+_dbase = shelve.open( _dbase_file_abs_name )
+histCombined               = _dbase[ 'histCombined' ]
+histBySsAndResType         = _dbase[ 'histBySsAndResType' ]
+histBySsAndCombinedResType = _dbase[ 'histBySsAndCombinedResType' ]
+_dbase.close()
 
 class Whatif( NTdict ):
     """

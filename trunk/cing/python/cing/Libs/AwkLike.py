@@ -1,3 +1,4 @@
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 import sys
@@ -20,7 +21,8 @@ class AwkLike:
              print line.dollar[0], line.dollar[1]
     """
 
-    def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1 ):
+    def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
+                 skipHeaderLines = 0 ):
         if filename:
             self.f = open(filename,'r')
             self.FILENAME = filename
@@ -31,7 +33,8 @@ class AwkLike:
         self.minLength = minLength
         self.commentString = commentString
         self.minNF = minNF
-
+        self.skipHeaderLines = skipHeaderLines
+        
         self.NR = 0
         self.NF = 0
         self.dollar = []
@@ -53,24 +56,28 @@ class AwkLike:
             for f in self.line.split():
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
-#                    NTdebug("Skipping fields after comment on line: " + self.dollar[0] )
-#                    NTdebug("   parsed so far: " + `self.dollar` )
+                    NTdebug("Skipping fields after comment on line: " + self.dollar[0] )
+                    NTdebug("   parsed so far: " + `self.dollar` )
                     break
-#                    NTdebug("Appending to parsed: ["+f+"]")
+#                NTdebug("Appending to parsed: ["+f+"]")
                 self.dollar.append( f )
             self.NF = len(self.dollar)-1
             if self.minLength >= 0:
                 if len(self.dollar[0]) < self.minLength:
-#                    NTdebug("Skipping line with less than required number of characters: " + self.dollar[0])
+                    NTdebug("Skipping line with less than required number of characters: " + self.dollar[0])
                     return self.next()
             if self.minNF > 0:
                 if self.NF < self.minNF:
-#                    NTdebug("Skipping line with less than required number of fields: " + self.dollar[0])
+                    NTdebug("Skipping line with less than required number of fields: " + self.dollar[0])
                     return self.next()
             if self.commentString:
                 if self.isComment( self.commentString ):
-#                    NTdebug("Skipping comment line: " + self.dollar[0])
+                    NTdebug("Skipping comment line: " + self.dollar[0])
                     return self.next()
+            if self.skipHeaderLines >= self.NR:
+                NTdebug('skipping header line [%d] which is less than or equal to [%d]' % (
+                    self.NR, self.skipHeaderLines))                              
+                return self.next()
             return self
         self.close()
         raise StopIteration

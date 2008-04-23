@@ -69,6 +69,7 @@ cingDirTests           = os.path.join(cingRoot,         "Tests")
 cingDirMolmolScripts   = os.path.join(cingRoot,         "scripts", "molmol")
 cingDirTestsData       = os.path.join(cingDirTests,     "data")
 cingDirScripts         = os.path.join(cingPythonCingDir,"Scripts")
+cingDirData            = os.path.join(cingRoot,         "data")
 cingDirTmp             = os.path.join("/tmp" , "cing")
 
 try:
