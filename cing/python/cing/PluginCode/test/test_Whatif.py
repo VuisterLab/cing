@@ -10,23 +10,42 @@ from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.Whatif import QUAL_LIST_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
+from cing.PluginCode.Whatif import histBySsAndResType
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
+from cing.core.constants import BMRB
+from matplotlib.numerix.mlab import amax
+from numpy.core.arrayprint import array2string
+from numpy.core.arrayprint import set_printoptions
 from unittest import TestCase
-from cing.core.constants import PDB
 import cing
 import os
+import sys
 import unittest
 
 class AllChecks(TestCase):
-        
+
+    def testHistogram(self):
+        resType = 'GLY'     
+        for ssType in histBySsAndResType.keys(): 
+            hist = histBySsAndResType[ssType][resType]
+            sumHist =  sum(sum(hist))
+            maxHist =  amax(amax(hist))
+            NTdebug( 'histBySsAndResType[%s][%s]' % (ssType, resType))
+            NTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
+            sys.output_line_width = 9999 # queried below.
+            set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
+            strHist = array2string(hist, max_line_width = 9999, precision = 0, 
+                         suppress_small = None, separator='') 
+            NTdebug( '\n%s' % strHist )
+
     def testparse(self):        
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
         entryId = "1brv_1model" 
 #        entryId = "1tgq_1model" 
-        convention = PDB
+        pdbConvention = BMRB
         
         os.chdir(cingDirTmp)
         project = Project( entryId )
@@ -36,7 +55,7 @@ class AllChecks(TestCase):
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         NTdebug("Reading files from directory: " + cyanaDirectory)
-        project.initPDB( pdbFile=pdbFilePath, convention = convention )
+        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 
 #        print project.cingPaths.format()
         self.assertFalse(runWhatif(project))    

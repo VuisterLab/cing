@@ -937,6 +937,9 @@ Chain class: defines chain properties and methods
     defaultChainId = '_'
     'See documentation: molecule#ensureValidChainId'
 
+    NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valied chain code but needs to be able to be passed on commandline
+    # like in: Scripts/getPhiPsiWrapper.py
+    
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
@@ -951,6 +954,10 @@ Chain class: defines chain properties and methods
         return str(self)
     #end def
   
+    def isNullValue(id):
+        return id == Chain.NULL_VALUE
+    isNullValue = staticmethod( isNullValue )
+    
     def addResidue( self, resName, resNum, **kwds ):
 #       We have to make sure that whatever goes on here is also done in the XML handler
         name = resName + str(resNum)
@@ -1154,7 +1161,7 @@ Residue class: Defines residue properties
             self.shortName = self.db.shortName + str(resNum)
             self.names     = [self.shortName, self.name]
         else:
-            NTerror('Residue._nameResidue: residue "%s" not defined in database\n', resName )
+            NTwarning('Residue._nameResidue: residue "%s" not defined in database', resName )
             self.db        = None
             self.shortName = '_' + str(resNum)
             self.names     = [self.shortName, self.name]

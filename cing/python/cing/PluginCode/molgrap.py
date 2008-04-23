@@ -66,7 +66,7 @@ class Molgrap(NTdict):
                         atm.pdbSkipRecord = True
                         skippedAtoms.append( atm )
             if skippedResidues:
-                NTwarning('molgrap: non-protein residues will be skipped:\n' + `skippedResidues`)
+                NTwarning('molgrap: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             # 
             molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=0)

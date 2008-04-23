@@ -328,7 +328,6 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         Return True on error.
         TODO: get a complete .sum file (bug in procheck compile) and parse it too.
         """
-        # modelCount starts at ONE but CING numbers models internally starting at ZERO.
         modelCount = self.molecule.modelCount
         NTmessage("Parse procheck files and store result in each residue for " + `modelCount` + " models")
         for i in range(1, modelCount+1):
@@ -426,10 +425,10 @@ def to3StateUpper( strNTList ):
     """Exactly the same as Procheck postscript plots was attempted.
 
     S,B,h,e,t, ,None--> space character
-    E               --> E
+    E               --> S
     H G             --> H
 
-    Note that CING and Procheck_NMR does not draw a 'h' to a H and e to E.
+    Note that CING and Procheck_NMR does not draw an 'h' to a H and e to S.
 
     Procheck description: The secondary structure plot shows a schematic 
     representation of the Kabsch & Sander (1983) secondary structure assignments. 
@@ -450,12 +449,13 @@ def to3StateUpper( strNTList ):
     """
     result = NTlist()
     for c in strNTList:
-        if c in 'HGE':
-            if c == 'G':
-                c = 'H'
-            result.append( c.upper())
+        if c == 'E':
+            n = 'S'
+        elif c == 'H' or c == 'G':
+            n = 'H'
         else:
-            result.append( ' ' )
+            n = ' '
+        result.append( n )
     return result
 
 # register the functions

@@ -6,7 +6,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from cing.core.molecule import Chain
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 
 """
 NB
@@ -54,10 +54,6 @@ def doScriptOnEntryList(pythonScriptFileName,
     entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId]
     chainCodeList = chainCodeList[START_ENTRY_ID:lastEntryId]
 
-    NTdebug( "START_ENTRY_ID    : %d" % START_ENTRY_ID)
-    NTdebug( "MAX_ENTRIES_TODO  : %d" % MAX_ENTRIES_TODO)
-    NTdebug( "lastEntryId       : %d" % lastEntryId)
-
     NTmessage('Read      %04d entries    ' % entryCountTotal)  
     NTmessage('Selected  %04d entries    ' % entryCountSelected)  
     NTmessage('Sliced    %04d entries: %s' % (len(entryCodeList), entryCodeList ))  
@@ -69,12 +65,14 @@ def doScriptOnEntryList(pythonScriptFileName,
         if extraArgList:
             extraArgListStr = extraArgList.join(' ')
         chain_code = chainCodeList[i]
-        cmd = 'cd %s; python -u %s %s %s %s > %s.log 2>&1 ' % ( startDir,
+        cmd = 'cd %s; python -u %s %s %s %s > %s%s.log 2>&1 ' % ( startDir,
             pythonScriptFileName, 
             entry_code, 
             chain_code, 
             extraArgListStr,
-            entry_code )
+            entry_code,
+            chain_code
+             )
         job = ( do_cmd, (cmd,) )
         job_list.append( job )
         i += 1
@@ -82,5 +80,20 @@ def doScriptOnEntryList(pythonScriptFileName,
     f = ForkOff( processes_max       = processes_max,
             max_time_to_wait    = max_time_to_wait) 
     done_entry_list = f.forkoff_start( job_list, delay_between_submitting_jobs )
-    NTmessage("Finished following list: %s" % done_entry_list)
+    done_entry_list.sort()
+    not_done_entry_list = range(len(job_list))
+    for id in done_entry_list:
+        idx = not_done_entry_list.index(id)
+        if idx >= 0:
+            del(not_done_entry_list[idx])
+    NTmessage("Finished list  : %s" % done_entry_list)
+    NTmessage("Unfinished list: %s" % not_done_entry_list)
+    for id in not_done_entry_list:
+        job = job_list[id]
+        _do_cmd, cmdTuple = job
+        cmd = cmdTuple[0]
+        NTerror("Failed forked: %s" % cmd)
+        
+        
+        
     

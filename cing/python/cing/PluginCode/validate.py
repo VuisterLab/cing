@@ -42,7 +42,6 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTplot import pointAttributes
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -76,6 +75,8 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.PluginCode.Whatif import histBySsAndResType
+from cing.PluginCode.Whatif import histCombined
 import cing
 import math
 import os
@@ -1143,42 +1144,60 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
 
 
 
-def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
+def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
+                      plotTitle = None ):
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
-       Called with: eg ['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI']
+       Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
+       
+       Note that residue can also be a list of residues. A single plot will
+       be created for all together were the appropriate background histograms
+       will be picked.
+       
+       Return None on error or ps on success.
     '''
-
-#    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
 
     if not project:
         NTerror( 'in makeDihedralPlot called without project' )
         return None
+    if not residueList:
+        NTerror( 'makeDihedralPlot called without residues in list' )
+        return None
+
+    # Set residue to first residue. For looping over multiple residues the var
+    # res will be used.
+    residue = residueList[0]
+    # Note if all types are the same for selection of background.
+#    allSameResType = True
+#    for res in residueList:
+#        if res.resName != residue.resName:
+#            allSameResType = False
+#            break
+    isSingleResiduePlot = len(residueList) == 1
+    
+    if not plotTitle:
+        if isSingleResiduePlot:
+            plotTitle = residue._Cname(1)
+        else:
+            plotTitle = '%d residues'
+            
 
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
 
-    d1 = residue[dihedralName1]
-    d2 = residue[dihedralName2]
-
-    if not (len(d1) and len(d2)):
-#        NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
-#        NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s', dihedralName2 )
-        return None
+#    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
 
     plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
     plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
 
-    d1cav = d1.cav
-    d2cav = d2.cav
     ps =NTplotSet() # closes any previous plots
     ps.hardcopySize = (500,500)
-    plot = NTplot( title  = residue._Cname(1),
+    plot = NTplot( title  = plotTitle,
       xRange = (plotparams1.min, plotparams1.max),
       xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),
       xLabel = dihedralName1,
@@ -1186,49 +1205,84 @@ def makeDihedralPlot( project, residue, dihedralName1, dihedralName2 ):
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
     ps.addPlot(plot)
-    plot.points( zip( d1, d2 ), attributes=plusPoint )
-
-#    if dihedralName1=='PHI' and dihedralName2=='PSI':
-#        # Plot a Ramachandran density background
+    
+    if dihedralName1=='PHI' and dihedralName2=='PSI':
+#         Plot a Ramachandran density background
 ##        imageFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'RamachandranLaskowski.png' )
-##        im = Image.open( imageFileName )
-##        s = im.tostring()
-##        rgb = fromstring( s, UInt8).astype(Float)/255.0
-##        rgb = resize(rgb, (im.size[1],im.size[0], 3))
-##        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
-##        im = imshow(rgb, alpha=0.05, extent=extent)
-#        ssType = residue.getDeepByKeys(PROCHECK_STR, SECSTRUCT_STR)
-#
-#
-#        ssType = 'E'
-#        resType = 'ASN'
-#
-#        hist = histBySsAndResType[ssType][resType]
-#        plot.ramachandranZPlot(hist)
+#        im = Image.open( imageFileName )
+#        s = im.tostring()
+#        rgb = fromstring( s, UInt8).astype(Float)/255.0
+#        rgb = resize(rgb, (im.size[1],im.size[0], 3))
+#        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
+#        im = imshow(rgb, alpha=0.05, extent=extent)
+        histList = []
+        ssTypeList = histBySsAndResType.keys()
+        ssTypeList.sort()
+        for ssType in ssTypeList:
+            if isSingleResiduePlot: 
+                hist = histBySsAndResType[ssType][residue.resName]
+            else:
+                hist = histCombined[ssType] # excludes GLY/PRO densities
+            histList.append(hist)       
+        plot.ramachandranPlot(histList)
 
 
-    # Plot restraint ranges.
-    dr1 = _matchDihedrals(residue, dihedralName1)
-    dr2 = _matchDihedrals(residue, dihedralName2)
 
-    if dr1 and dr2:
-        lower1, upper1 = dr1.lower, dr1.upper
-        lower2, upper2 = dr2.lower, dr2.upper
-    elif dr1:
-        lower1, upper1 = dr1.lower, dr1.upper
-        lower2, upper2 = plotparams2.min, plotparams2.max
-    elif dr2:
-        lower2, upper2 = dr2.lower, dr2.upper
-        lower1, upper1 = plotparams1.min, plotparams1.max
+    # Plot restraint ranges for single residue plots.
+    for res in residueList:
+        if isSingleResiduePlot:
+            # res is equal to residue
+            dr1 = _matchDihedrals(res, dihedralName1)
+            dr2 = _matchDihedrals(res, dihedralName2)
+        
+            if dr1 and dr2:
+                lower1, upper1 = dr1.lower, dr1.upper
+                lower2, upper2 = dr2.lower, dr2.upper
+            elif dr1:
+                lower1, upper1 = dr1.lower, dr1.upper
+                lower2, upper2 = plotparams2.min, plotparams2.max
+            elif dr2:
+                lower2, upper2 = dr2.lower, dr2.upper
+                lower1, upper1 = plotparams1.min, plotparams1.max
+        
+            if dr1 or dr2:
+                plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
+    
+        d1 = res[dihedralName1]
+        d2 = res[dihedralName2]
+    
+        if not (len(d1) and len(d2)):
+#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
+#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
+            return None
+        d1cav = d1.cav
+        d2cav = d2.cav
+    
+        # Plot data points on top for painters algorithm without alpha blending.
+        myPoint = plusPoint.copy()
+        myPoint.pointColor = 'green'
+        myPoint.pointSize = 6.0
+        myPoint.pointEdgeWidth = 1.0
+        if res.resName == 'GLY':
+            myPoint.pointType = 'triangle'            
+        if res.resName == 'PRO':
+            myPoint.pointType = 'square'
+            
+        plot.points( zip( d1, d2 ), attributes=myPoint )
+        
+        # Plot the cav point for single residue plots.
+        if isSingleResiduePlot:
+            myPoint = myPoint.copy()
+            myPoint.pointSize = 8.0
+            myPoint.pointType = 'circle'
+            myPoint.pointColor = 'blue'
+            myPoint.fill = False
+            plot.point( (d1cav, d2cav),myPoint )
 
-    if dr1 or dr2:
-        plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
-
-    # Always plot the cav point
-    plot.point( (d1cav, d2cav),pointAttributes(type='circle', size=2,
-                                       color='green') )
     return ps
 #end def
+
+
 
 def _matchDihedrals(residue, dihedralName):
     for dr in residue.dihedralRestraints:
@@ -1765,10 +1819,10 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
                     msg = sprintf('----- %5s -----', res)
                     fprintf(fp, msg+'\n')
 #                    NTdebug(msg)
-                    plotList = [['PHI',  'PSI',  'Ramanchandran', 'PHI_PSI'],
+                    plotList = [['PHI',  'PSI',  'Ramachandran', 'PHI_PSI'],
                                 ['CHI1', 'CHI2', 'CHI1-CHI2',     'CHI1_CHI2']]
                     for plotItem in plotList:
-                        ps = makeDihedralPlot( project, res, plotItem[0], plotItem[1] )
+                        ps = makeDihedralPlot( project, [res], plotItem[0], plotItem[1] )
                         if ps:
                             ps.hardcopy( fileName = os.path.join(resdir, plotItem[3] ))
                             res.html.left( 'h2', plotItem[2], id=plotItem[2])
@@ -1776,8 +1830,9 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
                             plotFileNameDihedral2D = plotItem[3] + '.' + graphicsFormatExtension
 #                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
                             res.html.left( 'img', src = plotFileNameDihedral2D, alt=""  )
-#                        else:
-#                            NTdebug("Failed creating a 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
+                        else:
+                            pass
+#                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
 
                     for dihed in res.db.dihedrals.zap('name'):
                         if dihed in res and res[dihed]:
@@ -1835,12 +1890,12 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
             molecule.html.main('h1','Procheck_NMR')
             anyProcheckPlotsGenerated = False
             pcPlotList = [
-                 ('_01_ramachand','Ramanchandran (all)'),
-                 ('_02_allramach','Ramanchandran (type)'),
+                 ('_01_ramachand','Ramachandran (all)'),
+                 ('_02_allramach','Ramachandran (type)'),
                  ('_03_chi1_chi2','chi1-chi2'),
                  ('_04_ch1distrb','chi1'),
                  ('_05_ch2distrb','chi2'),
-                 ('_06_ensramach','Ramanchandran (sequence)'),
+                 ('_06_ensramach','Ramachandran (sequence)'),
                  ('_07_ensch1ch2','Ensemble chi1-chi2'),
                  ('_08_residprop','Residue properties'),
                  ('_09_equivresl','Equivalent resolution'),
