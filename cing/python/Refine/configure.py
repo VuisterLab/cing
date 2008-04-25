@@ -8,8 +8,8 @@
 #
 # This configuration file contains all necessary information 
 # for the refine.py script.
+from cing.Libs.NTutils import NTdict
 
-from cing.Libs.NTutils import NTstruct
 import os
 
 refinePath = os.path.join(os.getenv('CINGROOT','.'), 'python','Refine')
@@ -19,7 +19,7 @@ xplorPath  = os.getenv('xplorPath','.')
 # editing below here should generally not be necessary
 # **********************************************************
 # Relabelled from config to refineConfig for apparent clashes with other config.
-config = NTstruct(  
+config = NTdict(  
 
     XPLOR            =  xplorPath,
 
@@ -38,7 +38,7 @@ config = NTstruct(
                          'top_axis_aria.pro',
                          'ion.top',
                        ],
-    directories      = NTstruct(
+    directories      = NTdict(
         converted    = 'Converted',
         analyzed     = 'Analyzed',
         refined      = 'Refined', 

@@ -916,7 +916,6 @@ class NTset( NTlist ):
 # -----------------------------------------------------------------------------
 #
 NTdictObjectId = 0
-#NTstructObjects  = {}
 # Variables to limit recursion and prevent cycles in __repr__() call
 NTdictDepth    = 0
 NTdictMaxDepth = 1
@@ -1393,7 +1392,7 @@ class NTdict(dict):
 #end class
 
 # Discouraged name for NTdict; please replace in your scripts asap.
-NTstruct = NTdict
+#NTstruct = NTdict
 
 class NoneObjectClass( NTdict ):
     """

@@ -34,7 +34,7 @@ class AllChecks(TestCase):
         )
 #        project.save()
 #        self.assertFalse( project.validate())
-#        project.save( )
+#        project.save()
         self.failIf(project.export2Ccpn() is None)
         self.failIf(project.save())
 

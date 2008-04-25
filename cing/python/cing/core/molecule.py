@@ -1284,10 +1284,9 @@ Residue class: Defines residue properties
         """Add all atoms according to the definition database
         """
         # Use database to add atoms
-        for atm in self.db:
-            self.addAtom( atm.name )
-        #end for
-    #end def
+        if self.db:
+            for atm in self.db:
+                self.addAtom( atm.name )
     
     def dihedral( self, dihedralName ):
         """Return cmean,cv tuple for dihedralName,
