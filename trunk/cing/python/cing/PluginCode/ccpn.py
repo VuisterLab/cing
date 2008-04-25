@@ -1,5 +1,18 @@
+# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+import sys
+_bitBucket = open('/dev/null','aw')
+_returnMyTerminal = sys.stdout
+sys.stdout = _bitBucket
+from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x
+from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x
+from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x
 from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2
 from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2
+from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x
+from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x
+sys.stdout = _returnMyTerminal
+del(_bitBucket)
+
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -10,14 +23,9 @@ from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
 from cing.core.molecule import Molecule
 from cing.main import format
-from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x
-from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x
-from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x
-from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x
-from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x
-#from string import digits
 import os
 import string
+#from string import digits
 
 """
 Adds initialize from CCPN project files
