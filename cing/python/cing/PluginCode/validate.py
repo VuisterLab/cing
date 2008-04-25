@@ -77,6 +77,9 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import getDeepByKeys
+from cing.core.constants import PDB
 import cing
 import math
 import os
@@ -1219,13 +1222,19 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         histList = []
         ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
         ssTypeList.sort()
+        # The assumption is that the derived residues can be represented by the regular.
+        resNamePdb = getDeepByKeysOrDefault(residue, 'nameDict', residue.resName, PDB)
+
         for ssType in ssTypeList:
+#                hist = histCombined[ssType] # excludes GLY/PRO densities
+            hist = getDeepByKeys(histCombined,ssType)
             if isSingleResiduePlot: 
-                hist = histBySsAndResType[ssType][residue.resName]
-            else:
-                hist = histCombined[ssType] # excludes GLY/PRO densities
-            histList.append(hist)       
-        plot.dihedralComboPlot(histList)
+#                hist = histBySsAndResType[ssType][residue.resName]
+                hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)
+            if hist:
+                histList.append(hist)
+        if histList:
+            plot.dihedralComboPlot(histList)
 
 
 
