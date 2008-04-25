@@ -27,7 +27,7 @@ class AllChecks(TestCase):
     def testFind(self):
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to temp test directory for data: "+cingDirTmp)
-        namepattern, startdir = "CVS", cingPythonDir
+        namepattern, startdir = "test*.py", cingPythonDir # CVS is only for developers
         nameList = findFiles(namepattern, startdir)
         self.assertTrue( len(nameList) > 10 )
 #        for name in nameList:
