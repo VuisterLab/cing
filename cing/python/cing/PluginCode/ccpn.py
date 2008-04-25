@@ -1,14 +1,15 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+from cing.Libs.NTutils import NTdebug
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
 sys.stdout = _bitBucket
-from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x
-from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x
-from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x
+from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
+from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
+from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2
 from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2
-from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x
+from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
@@ -198,7 +199,7 @@ try:
     from memops.general.Io import readXmlProjectFile # only on ccpn 1.x @UnresolvedImport
     from memops.api.Implementation import ContentStorage # only on ccpn 1.x @UnresolvedImport
     from ccp.general.Io import getChemCompHead # only on ccpn 1.x @UnresolvedImport
-    NTmessage("Using CCPN version 1.x")
+    NTdebug("Using CCPN version 1.x")
     ccpnVersion = 1
     namingSystem = 'DIANA' #CYANA2.1
     dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
@@ -206,7 +207,7 @@ except:
     try:
         from memops.general.Io import loadProject # only on ccpn 2.x
         from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet
-        NTmessage("Using CCPN version 2.x")
+        NTdebug("Using CCPN version 2.x")
         ccpnVersion = 2
         namingSystem = 'CING' # exists only in ccpn 2.x
     except:
