@@ -968,7 +968,7 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
     
-    def ramachandranPlot(self, histList):
+    def dihedralComboPlot(self, histList, minPercentage =  2.0, maxPercentage = 20.0):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
         Return True on error.
@@ -977,11 +977,7 @@ class NTplot( NTdict ):
         This routine will calculate the c_dbav, s_dbav
         """
 
-        minPercentage =  2.0
-        maxPercentage = 20.0
         alpha = 0.8
-
-
         extent = self.xRange + self.yRange
         # make sure helix and sheet are plotted over coil
         cmapList= [   green_inv, blue_inv, yellow_inv ]

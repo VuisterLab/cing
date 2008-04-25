@@ -27,7 +27,7 @@ class AllChecks(TestCase):
 
     def testHistogram(self):
         resType = 'GLY'     
-        for ssType in histBySsAndResType.keys(): 
+        for ssType in histBySsAndResType.keys(): #@UndefinedVariable
             hist = histBySsAndResType[ssType][resType]
             sumHist =  sum(sum(hist))
             maxHist =  amax(amax(hist))

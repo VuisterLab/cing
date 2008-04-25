@@ -171,7 +171,8 @@ class Dssp:
 
 def dssp(project)   :
     """
-    Adds <Procheck> instance to molecule. Run dssp and parse result
+    Adds <Procheck> instance to molecule. Run dssp and parse result.
+    Return None on error.
     """
     if not project.molecule:
         NTerror('dssp: no molecule defined\n')

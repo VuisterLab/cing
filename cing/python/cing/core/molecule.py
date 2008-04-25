@@ -10,6 +10,7 @@ from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import angle3Dopt
@@ -24,7 +25,7 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
-from cing.Libs.cython.vector  import Vector #@UnresolvedImport
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -32,8 +33,8 @@ from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
-from cing.core.constants import NOSHIFT
 from cing.core.constants import NAN_FLOAT
+from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
@@ -74,7 +75,7 @@ There are things that will be difficult to map from one to the other.
 A Zinc ion will usually be part of the same chain in CING whereas it will be
 in a different assembly entity in NMR-STAR. This has consequences for numbering.
 -------------------------------------------------------------------------------
-
+    
                                      Coordinate
                                        ^
                                        |
@@ -84,60 +85,60 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                             v          v
               NTdb <-> ResidueDef <-> AtomDef
   _____________________________________________________________________________
-
+                  
     Molecule.chains     List of Chain instances; equivalent to Molecule._children
-
+    
     Chain.molecule      Parent Molecule instance
     Chain.residues      List of Residue instances; equivalent to Chain._children
-
+  
     Residue.chain       Parent Chain instance
     Residue.atoms       List of Atom instances; equivalent to Residue._children
     Residue.db          Points to database ResidueDef instance
-
+  
     Atom.residue        Parent Residue instance
     Atom.resonances     List of Resonances instances
     Atom.coordinates    List of Coordinate instances
     Atom.db             Points to database AtomDef instance
+  
+    Resonance.atom      Points to Atom instance 
+  
+    Coordinate.atom     Points to Atom instance 
 
-    Resonance.atom      Points to Atom instance
-
-    Coordinate.atom     Points to Atom instance
-
-    Peak.resonances     List of Resonance instances
+    Peak.resonances     List of Resonance instances 
                         corresponding with dimensions of peak
   _____________________________________________________________________________
 
     Initiating attributes:
         name                    : Molecule name
-
+      
     Derived attributes:
         chains                  : NTlist of Chain instances (identical to _children)
         residueCount            : Number of Residue instances
         chainCount              : Number of Chain instances
-
+        
     Attributes inherited from NTtree:
         _parent                 : None
         _children               : NTlist of children NTtree instances.
-
+ 
     Methods:
         allChains()             : Returns a list of all chains objects of molecule.
         allResidues()           : Returns a list of all residue objects of molecule.
         allAtoms()              : Returns a list of all atom objects of molecule.
-
+        
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
-
+        
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         getAttr()       : Print a list of all attributes and their values.
-
+        
     all dict methods
-
+          
  """
-
+  
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
@@ -148,29 +149,34 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                           'resonances: %(resonanceCount)d per atom\n' + \
                           'models:     %(modelCount)d\n' +\
                            self.footer( dots )
-
+                          
         self.chains       = self._children
         self.chainCount   = 0
         self.residueCount = 0
         self.atomCount    = 0
-
+        
         self.resonanceCount = 0
 
         self.modelCount   = 0
-
+        
         self.xeasy        = None # reference to xeasy class, used in parsing
 
         self.saveXML('chainCount','residueCount','atomCount')
 
+        # save the content definitions
+        self.content = NTdict( name = self.name, convention = INTERNAL )
+        self.content.update( NTmolParameters )
+        self.content.saveAllXML()        
+
         NTdebug(self.format() )
         #end if
     #end def
-
+    
     def __str__(self):
         return sprintf('<Molecule "%s" (C:%d,R:%d,A:%d,M:%d)>',
             self.name,self.chainCount,self.residueCount,self.atomCount,self.modelCount)
     #end def
-
+    
     def __repr__(self):
         return str(self)
     #end def
@@ -186,13 +192,13 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
     def getChainIdForChainCount(self):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
-
+        
     def addChain( self, name=None, **kwds ):
         """
             Add Chain instance name
-           or
+           or 
            pick next chain identifier when chain=None
-
+           
            Return Chain instance or None upon error
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
@@ -212,18 +218,18 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def allChains( self ):
         """Returns a list of all chains of molecule"""
         return self.subNodes( depth = 1 )
-    #end def
+    #end def    
 
     def allResidues( self ):
         """Returns a list of all residues of molecule"""
         return self.subNodes( depth = 2 )
     #end def
-
+    
     def allAtoms( self ):
         """Returns a list of all atoms of molecule"""
         return self.subNodes( depth = 3 )
-    #end def
-
+    #end def  
+    
     def decodeNameTuple( self, nameTuple ):
         """
             Decode a (convention, chainName, resNum, atomName) tuple
@@ -247,9 +253,9 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         if not self.has_key(chainName):
 #            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
             return None
-
+        
         chain = self[chainName]
-
+        
         if resNum == None:
             return chain
 
@@ -260,7 +266,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
         if atomName == None:
             return res
-
+        
         resTranslated = res.translate(convention)
         an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 #        if (not an or (an not in res)): return None
@@ -290,24 +296,24 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             #end if
         #end for
         return None
-    #end def
-
-
+    #end def 
+    
+    
     def ranges2list( self, ranges ):
         """
             Convert
-              either a residue ranges string, e.g. '10-20,34,50-60',
+              either a residue ranges string, e.g. '10-20,34,50-60', 
               or a list with residue number or residue instances,
               or None,
-
+              
            to a NTlist instance with residue objects.
-
+           
            Return the list or None upon error.
             When the input for ranges is None then the output will be all residues.
         """
         if ranges == None:
             return self.allResidues()
-
+            
         if type(ranges) == str:
             # self.allResidues() is a list of NTtree with residue instances
             # .zap('resNum') returns the items collapsed by residue number
@@ -324,7 +330,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 else:
                     NTerror('Error Molecule.ranges2list: invalid residue number [%d]\n', resNum )
             return result
-
+            
         if isinstance( ranges, list ):
             resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
             result = NTlist()
@@ -339,10 +345,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 else:
                     NTerror('Error Molecule.ranges2list: invalid item [%s] in ranges list\n', item )
             return result
-
+                
         NTerror('Error Molecule.ranges2list: undefined ranges type [%s]\n', type(ranges) )
         return None
-
+        
     def getFixedRangeList( self, max_length_range = 50, ranges=None ):
         """Return a list of NTlist instance with residue objects.
         The NTlist contains only residues in the given ranges and is at most
@@ -362,28 +368,28 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             result.append(r)
         return result
 
-
-
+    
+    
     def models2list( self, models ):
         """
             Convert
-              either a models string, e.g. '0,3,5,6-19
+              either a models string, e.g. '0,3,5,6-19 
               or a list with model numbers,
               or None,
-
+              
            to a NTlist instance with model numbers.
-
-           Returns empty list if modelCount == 0,
+           
+           Returns empty list if modelCount == 0, 
            Returns the list or None upon error.
 
             Note that model number start at zero .
         """
         if models == None:
             return NTlist( *range(self.modelCount))
-
+            
         if self.modelCount == 0:
             return NTlist()
-
+            
         if type(models) == str:
             models = asci2list(models)
             models.sort()
@@ -400,7 +406,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             #end for
             result.sort()
             return result
-
+            
         if isinstance( models, list ):
             models.sort()
             result = NTlist()
@@ -420,41 +426,41 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             return result
         NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
         return None
-    #end def
-
-
+    #end def  
+    
+          
     def save( self, path = None)   :
         """Create a directory path (or use name.NTmol)
-           Save sequence, resonances and coordinates so it can be restored by
+           Save sequence, resonances and coordinates so it can be restored by 
            restore.
         """
         if not path: path = self.name + '.NTmol'
         if os.path.exists( path ): removedir( path )
         os.mkdir( path )
-
+        
         content = NTdict( name = self.name, convention = INTERNAL )
         content.update( NTmolParameters )
-        content.saveAllXML()
+        content.saveAllXML()        
         obj2XML( content, path=os.path.join( path, NTmolParameters.contentFile ) )
-
+        
         self.saveSequence(    os.path.join( path, NTmolParameters.sequenceFile   ) )
         self.saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self.saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
-
+        
         NTmessage('==> Saved %s to "%s"', self, path)
         #end if
     #end def
-
+    
     def open( path)   :
-        """Static method to restore molecule from directory path
+        """Static method to restore molecule from directory path 
            return self or None on error
         """
-        if (not os.path.exists( path )):
+        if (not os.path.exists( path )): 
             NTerror('Molecule.open: path "%s" not found\n', path)
             return None
         #end if
-
-        content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
+        
+        content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) ) 
         if not content:
             NTerror('Molecule.open: error reading contentFile "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
@@ -463,56 +469,57 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         #end if
 
         NTmessage('==> Restoring Molecule from "%s" ... ', path )
-
-
+     
+        
         mol = Molecule( name = content.name )
         if not mol:
             NTerror('Molecule.open: initializing molecule\n')
             return None
         #end if
-
+        
         mol.restoreSequence(    os.path.join( path, content.sequenceFile   ) )
         mol.restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False )
         mol.restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
+        mol.content = content
 
         mol.updateAll(   )
-
+       
         NTmessage('%s', mol.format())
 
         return mol
     #end def
     open = staticmethod(open)
-
+    
     def saveSequence( self, fileName ):
         """Write a plain text-file with code to generate sequence
         """
         fp = open( fileName, 'w' )
         for res in self.allResidues():
-            fprintf( fp, 'self._addResidue( %s, %s, %d, "CYANA" )\n',
-                          quote(res.chain.name),
-                          quote(res.db.translate(CYANA)),
-                          res.resNum
+            fprintf( fp, 'self._addResidue( %s, %s, %d, "CYANA" )\n', 
+                          quote(res.chain.name), 
+                          quote(res.db.translate(CYANA)), 
+                          res.resNum 
                    )
         #end for
         fp.close()
     #end def
-
+    
     def restoreSequence( self, sequenceFile ):
         if (not os.path.exists( sequenceFile ) ):
             NTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
                      sequenceFile
                    )
-            return None
+            return None        
         #end if
-        #execfile( sequenceFile )
+        #execfile( sequenceFile )            
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(sequenceFile, 'r')
         for line in file:
-            exec(line)
+             exec(line)
         #end for
         file.close()
     #end def
-
+    
     def saveResonances( self, fileName ):
         """Write a plain text file with code for saving resonances
         """
@@ -520,15 +527,15 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         fprintf( fp, 'self.resonanceCount = %d\n', self.resonanceCount )
         for atm in self.allAtoms():
             for r in atm.resonances:
-                fprintf( fp, 'self%s.addResonance( value=%s, error=%s )\n',
+                fprintf( fp, 'self%s.addResonance( value=%s, error=%s )\n', 
                               atm._Cname2( 2 ),
-                              repr(r.value), repr(r.error)
+                              repr(r.value), repr(r.error) 
                        )
             #end for
         #end for
         fp.close()
     #end def
-
+    
     def restoreResonances( self, fileName, append = True ):
         """Restore resonances from fileName
            Optionally append to existing settings
@@ -541,18 +548,18 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         if not append:
             self.initResonances(   )
         #end if
-
+        
         #execfile( fileName )
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(fileName, 'r')
         for line in file:
-            exec(line)
+             exec(line)
         #end for
         file.close()
 
         return self.resonanceCount
     #end def
-
+    
     def newResonances( self ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
@@ -560,20 +567,20 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         for atom in self.allAtoms():
             atom.addResonance( value=NOSHIFT, error = 0.000 )
         #end for
-        self.resonanceCount += 1
+        self.resonanceCount += 1                
     #end def
-
+    
     def initResonances( self)   :
-        """ Initialize resonances for all the atoms
+        """ Initialize resonances for all the atoms            
         """
         for atom in self.allAtoms():
             atom.resonances = NTlist()
         #end for
-        self.resonanceCount = 0
+        self.resonanceCount = 0                
         NTmessage("==> Initialized resonances")
         #end if
     #end def
-
+    
     def saveCoordinates( self, fileName ):
         """Write a plain text file with code for saving coordinates"""
         fp = open( fileName, 'w' )
@@ -583,7 +590,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 fprintf( fp, 'self%s.addCoordinate( %r, %r, %r, Bfac=%r )\n',
                               atm._Cname2( 2 ), c[0], c[1], c[2], c.Bfac)
         fp.close()
-
+    
     def restoreCoordinates( self, fileName, append = True ):
         """Restore coordinates from fileName
            Optionally append to existing settings
@@ -598,18 +605,18 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 atm.coordinates = NTlist()
             #end for
         #end if
-        #execfile(fileName);
+        #execfile(fileName); 
         # 25 Sep 2007: Explicit coding, less memory, better:
         file = open(fileName, 'r')
         for line in file:
-            exec(line)
+             exec(line)
         #end for
         file.close()
-        return self
+        return self           
     #end def
-
+    
     def updateDihedrals( self)   :
-        """Calculate the dihedral angles for all residues
+        """Calculate the dihedral angles for all residues         
         """
         if self.modelCount <= 0:
             NTmessage('==> No models so skipping calculating dihedral angles ... ')
@@ -619,18 +626,18 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         for res in self.allResidues():
             for dihedral in res.db.dihedrals:
                 res.dihedral( dihedral.name )
-
+ 
     def updateMean( self)   :
-        """Calculate mean coordinates for all atoms
+        """Calculate mean coordinates for all atoms         
         """
         if self.modelCount:
             NTmessage('==> Calculating mean coordinates ... ')
         for atm in self.allAtoms():
-            atm.meanCoordinates()
-
+            atm.calculateMeanCoordinate()
+   
     def updateAll( self)   :
         """Calculate the dihedral angles for all residues
-           Calculate mean coordinates for all atoms
+           Calculate mean coordinates for all atoms         
         """
         if self.modelCount > 0:
             self.updateDihedrals(   )
@@ -642,17 +649,17 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def initialize( name, path = None, convention=LOOSE   ):
 
         """
-Static method to initialize a Molecule from a file
+Static method to initialize a Molecule from a file 
 Return an Molecule instance or None on error
-
+         
        fromFile:  File ==  <resName1 [resNum1] [chainId1]
                             resName2 [resNum2] [chainId2]
                             ...
                            >
-        """
+        """  
         #print '>', path, convention
         molecule = Molecule( name=name )
-
+        
         sequenceS = ''
         if path:
             if (not os.path.exists( path )):
@@ -662,33 +669,33 @@ Return an Molecule instance or None on error
             f = open( path, mode = 'r' )
             sequenceS = f.read()
             f.close()
-        #end if
+        #end if 
 
         resNum = 1
         for f in AwkLikeS( sequenceS, minNF = 1, commentString = '#' ):
             resName = f.dollar[1]
-
+            
             if ( (convention == CYANA or convention == CYANA2) and
                  resName in CYANA_NON_RESIDUES         # skip the bloody CYANA non-residue stuff
                ):
-                pass
-
+               pass
+               
             else:
                 if f.NF > 1:
-                    resNum = f.int(2)
+                    resNum = f.int(2) 
                 #end if
-
+            
                 chainId = Chain.defaultChainId # recommended to use your own instead of CING making one up.
                 if f.NF >= 3:
                     chainId = f.dollar[3]
                 chainId = ensureValidChainId( chainId )
-
+            
                 molecule._addResidue( chainId, resName, resNum, convention )
         NTmessage("%s", molecule.format())
         return molecule
-    #end def
+    #end def    
     initialize = staticmethod( initialize )
-
+    
     def _addResidue( self, chainId, resName, resNum, convention ):
         """
         Internal routine to add a residue to molecule
@@ -710,26 +717,26 @@ Return an Molecule instance or None on error
                 chain = self[chainId]
             #end if
             if not chain: return None
-
+            
             # Add the residue
             if resNum in chain:
                 return chain[resNum]
             #end if
             residue = chain.addResidue( rn, resNum )
             if not residue: return None
-
+            
             # Use database to add atoms
             residue.addAllAtoms()
         #end if
         return residue
     #end def
-
+    
     def residuesWithProperties(self, *properties ):
         """
         Return a NTlist instance with Residues that have properties
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
@@ -738,13 +745,13 @@ Return an Molecule instance or None on error
         #end for
         return result
     #end def
-
+    
     def atomsWithProperties(self, *properties ):
         """
         Return a NTlist instance with Atoms that have properties
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
@@ -753,7 +760,7 @@ Return an Molecule instance or None on error
         #end for
         return result
     #end def
-
+    
     def toPDB( self, model = None, convention = IUPAC   ):
         """
         Return a PyMMlib PDBfile instance or None on error
@@ -762,11 +769,11 @@ Return an Molecule instance or None on error
         Note that the first model is model numbered zero.
         Return None on error or pdbfile object on success.
         """
-
+        
         if self.modelCount == 0:
             NTerror("modelCount is zero in Molecule instance: " + `self`)
             return None
-
+        
         if model==None:
             models = NTlist(*range( self.modelCount ))
         else:
@@ -777,23 +784,23 @@ Return an Molecule instance or None on error
                 NTerror("model number is larger than modelCount in Molecule instance: " + `self`)
                 return None
             models = NTlist( model )
-
-        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
+        
+        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ", 
                    convention, models[0], models.last()                 )
-
+        
         pdbFile = PDBFile()
-
+     
         record = PyMMLib.REMARK()
         record.text = sprintf('PDB file of molecule %s', self.name )
         pdbFile.append( record )
-
+            
         for m in models:
             if len(models) > 1:
                 record = PyMMLib.MODEL()
                 record.serial = m + 1 # only now change to a model number that starts at one.
                 pdbFile.append( record )
             #end if
-
+            
             atmCount = 1
             for chain in self.allChains():
                 lastAtm = None
@@ -828,14 +835,14 @@ Return an Molecule instance or None on error
         pdbFile.append( record )
         return pdbFile
     #end def
-#end class
+#end class      
 
 class XMLMoleculeHandler( XMLhandler ):
     """Molecule handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Molecule')
+        XMLhandler.__init__( self, name='Molecule') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -843,7 +850,7 @@ class XMLMoleculeHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-
+            
         # restore the tree structure
         for child in result._children:
 #           print '>child>', repr(child)
@@ -856,9 +863,9 @@ class XMLMoleculeHandler( XMLhandler ):
 #register this handler
 moleculehandler = XMLMoleculeHandler()
 
-#
+#      
 #==============================================================================
-#
+#           
 
 def ensureValidChainId( chainId ):
     """
@@ -904,30 +911,30 @@ Chain class: defines chain properties and methods
 -------------------------------------------------------------------------------
     Initiating attributes:
         name                    : Chain identifier such as 'A'.
-
+      
     Derived attributes:
         residues                : NTlist of Residue instances (identical to _children)
         residueCount            : Number of Residue instances
-
+        
     Attributes inherited from NTtree:
         _parent                 : None
         _children               : NTlist of children NTtree instances.
-
+ 
     Methods:
         allChains()             : Returns a list containing self.
         allResidues()           : Returns a list of all residue objects of chain.
         allAtoms()              : Returns a list of all atom objects of chain.
-
+        
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
-
+        
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         getAttr()       : Print a list of all attributes and their values.
-
+        
     all dict methods
     """
 
@@ -939,25 +946,25 @@ Chain class: defines chain properties and methods
 
     NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valied chain code but needs to be able to be passed on commandline
     # like in: Scripts/getPhiPsiWrapper.py
-
+    
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
                            self.footer( dots )
-
+                          
         self.residues = self._children
         self.residueCount = 0
     #end def
-
+            
     def __repr__(self):
         return str(self)
     #end def
-
+  
     def isNullValue(id):
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
-
+    
     def addResidue( self, resName, resNum, **kwds ):
 #       We have to make sure that whatever goes on here is also done in the XML handler
         name = resName + str(resNum)
@@ -974,10 +981,10 @@ Chain class: defines chain properties and methods
         self.residueCount += 1
         return res
     #end def
-
+    
     def removeResidue( self, residue)   :
         if (not residue in self._children):
-            NTerror( 'ERROR Chain.removeResidue: residue "%s" not present in chain %s\n',
+            NTerror( 'ERROR Chain.removeResidue: residue "%s" not present in chain %s\n', 
                      residue, self
                    )
             return None
@@ -990,7 +997,7 @@ Chain class: defines chain properties and methods
         self._parent.residueCount -= 1
         self.residueCount -= 1
         self._parent.atomCount -= len( residue.atoms )
-
+        
         res = self.removeChild( residue )
         if (res == None):
             NTerror('Error Chain.removeResidue: error removing %s from %s\n', residue, self)
@@ -1005,18 +1012,18 @@ Chain class: defines chain properties and methods
     def allChains( self ):
         """return self"""
         return self.subNodes( depth = 0 )
-    #end def
+    #end def    
 
     def allResidues( self ):
         """Returns a list of all residues of chain"""
         return self.subNodes( depth = 1 )
     #end def
-
+    
     def allAtoms( self ):
         """Returns a list of all atoms of chain"""
         return self.subNodes( depth = 2 )
-    #end def
-
+    #end def  
+    
     def nameTuple( self, convention = INTERNAL ):
         """
         Return a (convention, chainName, None, None) tuple
@@ -1024,13 +1031,13 @@ Chain class: defines chain properties and methods
         """
         return (convention, self.name, None, None)
     #end def
-
+    
     def residuesWithProperties(self, *properties ):
         """
         Return a NTlist instance with Residues that have properties
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
@@ -1039,13 +1046,13 @@ Chain class: defines chain properties and methods
         #end for
         return result
     #end def
-
+    
     def atomsWithProperties(self, *properties ):
         """
         Return a NTlist instance with Atoms that have properties
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
@@ -1060,9 +1067,9 @@ Chain class: defines chain properties and methods
 class XMLChainHandler( XMLhandler ):
     """Chain handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Chain')
+        XMLhandler.__init__( self, name='Chain') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -1070,7 +1077,7 @@ class XMLChainHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-
+            
         # restore the tree structure and references
         for res in result._children:
 #           print '>child>', repr(child)
@@ -1085,27 +1092,27 @@ class XMLChainHandler( XMLhandler ):
 #register this handler
 chainhandler = XMLChainHandler()
 
-#
+#      
 #==============================================================================
 #
 class Residue( NTtree ):
     """
 -------------------------------------------------------------------------------
-Residue class: Defines residue properties
+Residue class: Defines residue properties  
 -------------------------------------------------------------------------------
     Initiating attributes:
         resName                 : Residue name according to the nomenclature list.
         resNum                  : Unique residue number within this chain.
-
+      
     Derived attributes:
         atoms                   : NTlist of Atom instances.
         db                      : Reference to database residueDef instance
         chain                   : Reference to Chain instance
-
+        
     Attributes inherited from NTtree:
         _parent                 : Reference to parent NTtree instance (None for root)
         _children               : NTlist of children NTtree instances.
-
+ 
     Methods:
         translate( convention ) : translate resName according to convention.
         addAtom()
@@ -1115,27 +1122,27 @@ Residue class: Defines residue properties
         allAtoms()              : Returns a list of all atom objects of residue.
 
         ...
-
+        
     Methods inherited from NTtree:
         _Cname( depth )         : Returns name expanded to depth
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
-
+        
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         getAttr()       : Print a list of all attributes and their values.
-
+        
     all dict methods
-
+          
     """
     def __init__( self, resName, resNum, **kwds ):
         #print '>',resName, resNum
-        NTtree.__init__(self, name=resName + str(resNum),
-                              __CLASS__='Residue', **kwds
+        NTtree.__init__(self, name=resName + str(resNum), 
+                              __CLASS__='Residue', **kwds 
                        )
         self.atoms     = self._children
-        self.atomCount = 0
+        self.atomCount = 0        
         self.chain     = self._parent
 
         self._nameResidue( resName, resNum )
@@ -1143,11 +1150,11 @@ Residue class: Defines residue properties
         self.colorLabel = COLOR_GREEN # innocent until proven guilty.
 
     #end def
-
+    
     def __repr__(self):
         return str(self)
     #end def
-
+    
     def _nameResidue( self, resName, resNum ):
         """Internal routine to set al the naming right and database refs right
         """
@@ -1165,13 +1172,13 @@ Residue class: Defines residue properties
             self.db        = None
             self.shortName = '_' + str(resNum)
             self.names     = [self.shortName, self.name]
-        #end if
+        #end if         
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'shortName:  %(shortName)s\n' +\
                           'chain:      %(chain)s\n' +\
                           'atoms (%(atomCount)2d): %(atoms)s\n' +\
                            self.footer( dots )
-
+                          
     #end def
 
     def renumber( self, newResNum ):
@@ -1184,7 +1191,7 @@ Residue class: Defines residue properties
             NTerror( 'ERROR Residue.renumber: residue "%s" already present\n', newName )
             return None
         #end if
-
+        
         # remove old name references
         del( self._parent[self.name] )
         del( self._parent[self.resNum] )
@@ -1197,7 +1204,7 @@ Residue class: Defines residue properties
         self._parent.renameChild( self, self.name )
         self._parent[self.resNum]    = self
         self._parent[self.shortName] = self
-
+        
 #         self._parent.renameChild( self, newName )
 #         self.resNum = newResNum
 #         # define the new names
@@ -1205,8 +1212,8 @@ Residue class: Defines residue properties
 #         self.names = [self.shortName, self.name]
 #         self._parent[self.resNum] = self
 #         self._parent[self.shortName] = self
-        return self
-    #end def
+        return self        
+    #end def    
 
 
     def mutate( self, resName   ):
@@ -1219,11 +1226,11 @@ Residue class: Defines residue properties
             self.db = NTdb[self.resName]
             NTerror('Residue.mutate: residue "%s" not defined in database\n', resName )
             return None
-        #end if
+        #end if 
         newRes  = Residue( resName, self.resNum )
 
         NTmessage('==> Mutating %s to %s', self._Cname(-1), newRes._Cname(-1) )
-
+        
         # remove old name references
         del( self._parent[self.name] )
         del( self._parent[self.resNum] )
@@ -1234,13 +1241,13 @@ Residue class: Defines residue properties
         self.chain   = None
         newRes.chain = newRes._parent
         newRes.chain.molecule.atomCount -= self.atomCount
-
+        
         # Set new name references
         newRes._parent[newRes.name]      = newRes
         newRes._parent[newRes.resNum]    = newRes
         newRes._parent[newRes.shortName] = newRes
 #        print '.>',newRes.shortName, newRes._parent
-
+        
         # Move like atoms from self, create new atoms if needed
         for atmDef in newRes.db.atoms:
             if (atmDef.name in self):
@@ -1259,8 +1266,8 @@ Residue class: Defines residue properties
         #end for
 
         return self,newRes
-    #end def
-
+    #end def    
+    
     def addAtom( self, name, **kwds ):
         """add atomName, return Atom instance
         """
@@ -1272,7 +1279,7 @@ Residue class: Defines residue properties
         self.atomCount += 1
         return ac
     #end def
-
+    
     def addAllAtoms( self ):
         """Add all atoms according to the definition database
         """
@@ -1281,30 +1288,30 @@ Residue class: Defines residue properties
             self.addAtom( atm.name )
         #end for
     #end def
-
+    
     def dihedral( self, dihedralName ):
         """Return cmean,cv tuple for dihedralName,
         or None on error
-
+        
         set self[dihedralName] to NTlist of results
         """
         # optimized out.
 #        if dihedralName not in self.db:
         if not self.db.has_key(dihedralName):
             return None
-
+        
         self[dihedralName] = NTlist()
         self[dihedralName].cAverage()
         self[dihedralName].cav = NAN_FLOAT
         self[dihedralName].cv  = NAN_FLOAT
         self[dihedralName].db  = self.db[dihedralName] # linkage to the database
         self[dihedralName].residue  = self             # linkage to self
-
+        
         # Get/Check the topology
         atoms = translateTopology( self, self.db[dihedralName].atoms )
         if (atoms == None or len(atoms) != 4 or None in atoms):
             return None
-
+        
         # Check if all atoms have the same number of coordinates
         l = len( atoms[0].coordinates)
         for a in atoms[1:]:
@@ -1312,28 +1319,28 @@ Residue class: Defines residue properties
                 return None
             #end if
         #end for
-
+        
         #add dihedral to dict for lookup later
         self.chain.molecule.dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
             (self, dihedralName, self.db[dihedralName])
         self.chain.molecule.dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
             (self, dihedralName, self.db[dihedralName])
 
-
+        
         for i in range(0,l):
             self[dihedralName].append( NTdihedralOpt(
                atoms[0].coordinates[i],
                atoms[1].coordinates[i],
                atoms[2].coordinates[i],
                atoms[3].coordinates[i]))
-
+        
         plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
         self[dihedralName].limit( plotpars.min, plotpars.max )
         cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
-
+        
         return cav,cv
-    #end def
-
+    #end def 
+    
     def translate( self, convention ):
         """return translated name according to convention"""
         return self.db.translate(convention)
@@ -1343,12 +1350,12 @@ Residue class: Defines residue properties
         """return self"""
         return self.subNodes( depth = 0 )
     #end def
-
+    
     def allAtoms( self ):
         """Returns a list of all atom instances of residue"""
         return self.subNodes( depth = 1 )
-    #end def
-
+    #end def  
+        
     def nameTuple( self, convention = INTERNAL ):
         """
         Return a (convention, chainName, resNum, None) tuple
@@ -1365,7 +1372,7 @@ Residue class: Defines residue properties
         if atomName == None:
             return None
         #end if
-
+        
         if (convention != INTERNAL):
             atomName = translateAtomName( convention, self.resName, atomName, INTERNAL )
         #end if
@@ -1374,16 +1381,16 @@ Residue class: Defines residue properties
         #end if
         return None
     #end def
-
+    
     def getAtoms( self, atomNames, convention = INTERNAL ):
         """
         Return a list of Atom instances corresponding to atomName
            translate from convention if needed
-        """
+        """ 
         if atomNames == None:
             return NTlist()
         #end if
-
+                
         result = NTlist()
         for name in atomNames:
             a = self.getAtom( name, convention=convention )
@@ -1393,7 +1400,7 @@ Residue class: Defines residue properties
         #end for
         return result
     #end def
-
+                        
     def hasProperties(self, *properties):
         """
         Returns True if Residue has the argument properties, False otherwise.
@@ -1404,19 +1411,19 @@ Residue class: Defines residue properties
         props = NTlist( self.db.name, self.db.shortName, *self.db.properties)
         for p in properties:
             if not p in props:
-                return False
+               return False
             #end if
         #end for
         return True
     #end def
-
+     
     def residuesWithProperties(self, *properties ):
         """
         Return a NTlist instance with self if it has properties.
         NB (ode copied from Molecule and Chain; could be shorter.
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
@@ -1425,13 +1432,13 @@ Residue class: Defines residue properties
         #end for
         return result
     #end def
-
+    
     def atomsWithProperties(self, *properties ):
         """
         Return a NTlist instance with Atoms that have properties
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
@@ -1440,15 +1447,15 @@ Residue class: Defines residue properties
         #end for
         return result
     #end def
-
+    
 #end class
 
 class XMLResidueHandler( XMLhandler ):
     """Residue handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Residue')
+        XMLhandler.__init__( self, name='Residue') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -1456,7 +1463,7 @@ class XMLResidueHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-
+            
         # restore the tree structure
         for atm in result._children:
             result[atm.name] = atm
@@ -1467,28 +1474,28 @@ class XMLResidueHandler( XMLhandler ):
 
 #register this handler
 residuehandler = XMLResidueHandler()
-
+  
 
 #==============================================================================
 class Atom( NTtree ):
     """
 -------------------------------------------------------------------------------
-Atom class: Defines object for storing atom properties
+Atom class: Defines object for storing atom properties 
 -------------------------------------------------------------------------------
     Initiating attributes:
         resName                 : Residue name according to the nomenclature list.
         atomName                : Atom name according to the nomenclature list.
-
+      
     Derived attributes:
         atomIndex               : Unique atom index (several external programs need one).
         resonances              : NTlist of Resonance instances.
         db                      : Reference to database AtomDef instance
         residue                 : Reference to Residue instance
-
+        
     Attributes inherited from NTtree:
         _parent                 : Reference to parent NTtree instance (None for root)
         _children               : NTlist of children NTtree instances.
-
+ 
     Methods:
         translate( convention ) : translate atomName according to convention.
         topology()              : Return list of Atom instances defining topology
@@ -1497,7 +1504,7 @@ Atom class: Defines object for storing atom properties
                                      if   isPseudoAtom():  set contains self and the real atom instances
                                      elif hasPseudoAtom(): set contains self and pseudoAtom instances
                                      else:                 set contains self
-
+        
         allAtoms()              : Returns a list containing self.
 
     Methods inherited from NTtree:
@@ -1505,31 +1512,31 @@ Atom class: Defines object for storing atom properties
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
-
+        
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
         getAttr()       : Print a list of all attributes and their values.
-
+        
     all dict methods
-
+          
     """
     def __init__( self, resName, atomName, **kwds ):
-
+    
         NTtree.__init__(self, name=atomName, __CLASS__='Atom',**kwds )
-
+        
         self.__FORMAT__ = self.header( dots ) + '\n' +\
                           'residue:     %(residue)s\n' +\
                           'resonances:  %(resonances)s\n' +\
                           'coordinates: %(coordinates)s\n' +\
-                          self.footer( dots )
+                          self.footer( dots ) 
 
         self.resonances  = NTlist()
         self.coordinates = NTlist()
 #        self.resName     = resName # have to store because initialisation is done
 #                                   # without knowledge of parent
-
+        
         self.saveXML('resName', 'resonances','coordinates')
-
+        
         # several external programs need an index
         global AtomIndex
         self.atomIndex = AtomIndex
@@ -1541,20 +1548,20 @@ Atom class: Defines object for storing atom properties
         else:
             self.db = None
             NTerror('Atom.__init__: atom "%s" not defined for residue %s in database\n',
-                     atomName, resName
+                     atomName, resName 
                    )
         #end if
-    #end def
-
+    #end def 
+    
     def __str__( self ):
 #        return self._Cname( 1 )
         return '<%s %s>' % ( self._className(), self._Cname(1) )
     #end def
-
+    
     def __repr__(self):
         return str(self)
     #end def
-
+ 
     def addCoordinate( self, x, y, z, Bfac, **kwds ):
         """Append coordinate to coordinates list
         Convenience method."""
@@ -1562,12 +1569,12 @@ Atom class: Defines object for storing atom properties
 #        c.update( **kwds )
         self.coordinates.append( c )
     #end def
-
+ 
     def addResonance( self, value, error=0.0 ):
         r = Resonance( atom=self, value=value, error = 0.000 )
         self.resonances.append( r )
     #end def
-
+ 
     def distance( self, other ):
         """Return (av,sd,min,max) tuple corresponding to distance
            between self and other or None on error
@@ -1589,79 +1596,73 @@ Atom class: Defines object for storing atom properties
         maxv = max(self.distances)
         return (av,sd,minv,maxv)
     #end def
-
-    def meanCoordinates( self ):
+    
+    def calculateMeanCoordinate( self ):
         """"
-        Store and return mean Coordinate instance, or None on error.
-        Todo: Set dx, dy, dz, rmsd attributes of meanCoordinate
-        and store variance of x, variance of y, variance of z and rmsd of coordinate
+        Calculate mean of coordinates of self
+        Return mean Coordinate instance, or NoneObject on error.
+         
         """
         n   = len( self.coordinates)
+        fn  = float(n)
 
         if n == 0:
-            self.meanCoordinate = None
-            return None
+            self.meanCoordinate = NoneObject
+            return self.meanCoordinate
+        #end if
 
-        c = Coordinate( x=0.0, y=0.0, z=0.0,
-                        Bfac=Coordinate.DEFAULT_BFACTOR,
-                        occupancy=Coordinate.DEFAULT_OCCUPANCY,
-                        atom = self
-                      )
-        self.meanCoordinate = c
-        self.meanCoordinate.__FORMAT__ = '<mean Coordinate (%6.2f,%6.2f,%6.2f)>'
-
-#        if n==1:
-#            self.meanCoordinate[0] = self.coordinates[0][0]
-#            self.meanCoordinate[1] = self.coordinates[0][1]
-#            self.meanCoordinate[2] = self.coordinates[0][3]
-#            self.meanCoordinate.dx = 0.0
-#            self.meanCoordinate.dy = 0.0
-#            self.meanCoordinate.dz = 0.0
-#            for axis in ['x','y','z']:
-#                self.meanCoordinate[axis] = self.coordinates[0][axis]
-#                self.meanCoordinate['d'+axis] = 0.0
-            #end for
-#            self.meanCoordinate.rmsd = 0.0
-#        else:
-#            fn  = float(n)
-#            fn1 = fn-1.0
-#            self.meanCoordinate.rmsd = 0.0
-#        for d in range(3):
-#        xdata = NTlist()
-#        ydata = NTlist()
-#        zdata = NTlist()
-        for i in range(n):
-            cc = self.coordinates[i]
-            c[0] += cc[0]
-            c[1] += cc[1]
-            c[2] += cc[2]
-        c[0] /= n
-        c[1] /= n
-        c[2] /= n
-
-#            for axis in ['x','y','z']:
-#                #For speed we store the array first
-#                data  = self.coordinates.zap(axis)
-#                sum   = data.sum()
-##                sumsq = data.sumsq()
-#
-#                self.meanCoordinate[axis]     = sum/fn
-
-                #sumsq/(fn-1.0) - (sum*sum)/(fn*(fn-1.0))
-#                self.meanCoordinate['d'+axis] = sumsq - sum*sum/fn/fn1
-#                self.meanCoordinate.rmsd += sumsq - sum*sum/fn
-            #end for
-
-#            self.rmsd = 0.0
-#            for c in self.coordinates:
-#                self.rmsd += NTdistance(c, self.meanCoordinate )
-#            #end for
-#            self.rmsd /= fn
-#        #end if
-
+        if 'meanCoordinate' not in self or not self.meanCoordinate:
+            self.meanCoordinate = Coordinate( 0.0, 0.0, 0.0, Bfac = 0.0, atom = self )
+        #end if
+        
+        self.meanCoordinate.rmsd = 0.0
+        self.meanCoordinate.e.set(0.0, 0.0, 0.0)
+        for c in self.coordinates:
+            self.meanCoordinate.e += c.e
+        #end for
+        
+        for axis in ['x','y','z']:
+                self.meanCoordinate[axis] /= fn
+        #end for
+        
+        for c in self.coordinates:
+            self.meanCoordinate.rmsd += (c.e-self.meanCoordinate.e).sqsum()
+        #end for
+        self.meanCoordinate.rmsd = math.sqrt(self.meanCoordinate.rmsd/fn)
+        
+#         if (n==1): 
+#             self.coordinates
+#             for axis in ['x','y','z']:
+#                 self.meanCoordinate[axis] = self.coordinates[0][axis]
+#             #end for
+#         else:
+#             
+# #            fn1 = fn-1.0
+#             self.meanCoordinate.rmsd = 0.0
+#             
+# #            for axis in ['x','y','z']:
+#                 #For speed we store the array first
+# #                data  = self.coordinates.zap(axis)
+# #                sum   = data.sum()        
+# #                sumsq = data.sumsq()
+#         
+#                 self.meanCoordinate[axis]     = sum/fn
+#                 
+#                 #sumsq/(fn-1.0) - (sum*sum)/(fn*(fn-1.0))
+# #                self.meanCoordinate['d'+axis] = sumsq - sum*sum/fn/fn1
+# #                self.meanCoordinate.rmsd += sumsq - sum*sum/fn
+#             #end for
+#             
+# #            self.rmsd = 0.0
+# #            for c in self.coordinates:
+# #                self.rmsd += NTdistance(c, self.meanCoordinate )
+# #            #end for
+# #            self.rmsd /= fn
+# #        #end if    
+                
         return self.meanCoordinate
     #end def
-
+   
     def angle( self, other1, other2, min = 0.0, max = 360.0, radians = False ):
         """Return (cav,cv) tuple corresponding to angle
            other1-self-other2 or None on error.
@@ -1684,25 +1685,25 @@ Atom class: Defines object for storing atom properties
         cav,cv,dummy = self.angles.cAverage( min=min, max=max, radians= radians )
         return (cav,cv)
     #end def
-
+    
     def translate( self, convention ):
         """return translates name according to convention"""
         return self.db.translate(convention)
     #end def
-
+     
     def topology( self ):
         """return list of Atom instances defining the topology"""
         return translateTopology( self._parent, self.db.topology )
     #end def
-
+    
     def isAssigned( self ):
         """return true if atom current resonance has a valid assignment"""
         if (self.resonances() != None):
             return (self.resonances().value != NOSHIFT)
-        #end if
+        #end if 
         return False
     #end def
-
+    
     def shift( self ):
         if self.isAssigned():
             return self.resonances().value
@@ -1710,13 +1711,13 @@ Atom class: Defines object for storing atom properties
             return NOSHIFT
         #end if
     #end def
-
+    
 #    def isAromatic( self ):
 #        """Return true if it is an atom belonging to an aromatic ring
 #           Patched for now, have to store it in database
 #        """
 #        if not self.residue.db.hasProperties('aromatic'): return False
-#
+#        
 #        if (self.isCarbon() and self.db.shift.average > 100.0):
 #            return True
 #        if (self.isNitrogen() and self.db.shift.average > 130.0):
@@ -1729,7 +1730,7 @@ Atom class: Defines object for storing atom properties
 #        #end if
 #        return False
 #    #end def
-#
+#    
 #    def isBackbone( self ):
 #        """
 #        Return True if it is a backbone atom.
@@ -1740,7 +1741,7 @@ Atom class: Defines object for storing atom properties
 #        else:
 #            return False
 #    #end def
-#
+#    
 #    def isSidechain( self ):
 #        """
 #        Return True if it is a sidechain atom,
@@ -1748,23 +1749,23 @@ Atom class: Defines object for storing atom properties
 #        """
 #        return not self.isBackbone()
 #    #end def
-#
+#    
 #    def isMethyl( self ):
 #        """
 #        Return True atm is a methyl (either carbon or proton)
 #        """
 #        if self.isCarbon() and len(self.attachedProtons(includePseudo = False)) == 3:
 #            return True
-#        elif self.isProton():
+#        elif self.isProton(): 
 #            # should be attched to a heavy atomo
 #            topo = self.topology()
-#            if len(topo) == 0 or topo[0] == None: return False
+#            if len(topo) == 0 or topo[0] == None: return False            
 #            return topo[0].isMethyl()
 #        else:
 #            return False
 #        #end if
 #    #end def
-#
+#    
 #    def isMethylProton( self ):
 #        """
 #        Return True if atm is a methyl proton
@@ -1776,35 +1777,35 @@ Atom class: Defines object for storing atom properties
         """
         return self.db.hasProperties('aromatic')
     #end def
-
+    
     def isBackbone( self ):
         """
         Return True if it is a backbone atom.
         """
         return self.db.hasProperties('backbone')
     #end def
-
+    
     def isSidechain( self ):
         """
         Return True if it is a sidechain atom,
         """
         return self.db.hasProperties('sidechain')
     #end def
-
+    
     def isMethyl( self ):
         """
         Return True atm is a methyl (either carbon or proton)
         """
         return self.db.hasProperties('methyl')
     #end def
-
+    
     def isMethylProton( self ):
         """
         Return True if atm is a methyl proton
         """
         return self.db.hasProperties('methylproton')
     #end def
-
+        
     def isProton( self ):
         """Return Tue if atm is 1H
         """
@@ -1816,7 +1817,7 @@ Atom class: Defines object for storing atom properties
         """
         return (self.db.spinType == '13C')
     #end def
-
+    
     def isNitrogen( self ):
         """Return Tue if atm is 15N
         """
@@ -1828,7 +1829,7 @@ Atom class: Defines object for storing atom properties
         """
         return (self.db.spinType == '32S')
     #end def
-
+                       
     def hasProperties(self, *properties):
         """
         Returns True if Atom has properties, expand with db properties for atom
@@ -1837,14 +1838,14 @@ Atom class: Defines object for storing atom properties
         if len(properties) == 0: return False
 
         props = NTlist(*self.db.properties)
-
-        if self.isAssigned():
+        
+        if self.isAssigned(): 
             props.append('isAssigned','assigned')
         else:
             props.append('isNotAssigned','notassigned')
         #end if
 # in database now
-#        if self.isBackbone():
+#        if self.isBackbone(): 
 #            props.append('isBackbone','backbone')
 #        else:
 #            props.append('isSidechain','sidechain')
@@ -1866,22 +1867,22 @@ Atom class: Defines object for storing atom properties
 #        #end if
 
 #        print '>>', props
-
+        
         for p in properties:
             if not p in props:
-                return False
+               return False
             #end if
         #end for
         return True
     #end def
-
+    
     def atomsWithProperties(self, *properties ):
         """
         Return a NTlist instance with self if it has propeties.
         NB. Code could be shorter but is copied from Molecule,Chain,Residue
-        """
+        """  
         result = NTlist()
-
+        
         if len(properties) == 0: return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
@@ -1890,12 +1891,12 @@ Atom class: Defines object for storing atom properties
         #end for
         return result
     #end def
-
+    
     def allAtoms( self ):
         """return self"""
         return self.subNodes( depth = 0 )
     #end def
-
+        
     def nameTuple( self, convention = INTERNAL ):
         """Return a (convention, chainName, resNum, atomName) tuple
            for usage with Molecule.decodeNameTuple
@@ -1910,10 +1911,10 @@ Atom class: Defines object for storing atom properties
         """Return 1 if atom is pseudoAtom"""
         return ( len(self.db.real) > 0 )
     #end def
-
+        
     def hasPseudoAtom( self ):
         """Return 1 if atom has a correponding pseudoAtom"""
-        return ( self.db.pseudo != None )
+        return ( self.db.pseudo != None ) 
     #end def
 
     def pseudoAtom( self ):
@@ -1924,7 +1925,7 @@ Atom class: Defines object for storing atom properties
             return None
         #end if
     #end def
-
+    
     def realAtoms( self ):
         """IF pseudoAtom: Return an NTlist with real Atom instances of a pseudoAtom
            else NTlist with self.
@@ -1936,9 +1937,9 @@ Atom class: Defines object for storing atom properties
             return NTlist( self )
         #end if
     #end def
-
+    
     def set( self ):
-        """
+        """ 
         set()                   : Return a NTset instance containing Atom instances:
                                      if   isPseudoAtom():  set contains self and the real atom instances
                                      elif hasPseudoAtom(): set contains self and pseudoAtom instances
@@ -1946,21 +1947,21 @@ Atom class: Defines object for storing atom properties
         """
         # generate the set
         result = NTset( self )
-        if  self.isPseudoAtom():
+        if  self.isPseudoAtom():  
             # set contains self and the real atoms
             for a in self.realAtoms():
                 result.append( a )
             #end for
-        elif self.hasPseudoAtom():
+        elif self.hasPseudoAtom(): 
             #set contains self and pseudoAtom instances
             result.append( self.pseudoAtom() )
-        else:
+        else:                 
             # set contains self
             pass
         #end if
         return result
     #end def
-
+    
     def attachedProtons( self, includePseudo = 0 ):
         """
         Return all attached proton instances or empty list
@@ -1971,7 +1972,7 @@ Atom class: Defines object for storing atom properties
         if (self.db.spinType == '1H'):
             return result
         #endif
-
+        
         for a in self.topology():
             if (a != None and a.db.spinType == '1H'):
                 result.append( a )
@@ -1984,7 +1985,7 @@ Atom class: Defines object for storing atom properties
         #end if
         return result
     #end def
-
+    
     def observableProtons( self, includePseudo = 0 ):
         """
         Return all NMR observable proton instances or empty list
@@ -2002,13 +2003,13 @@ Atom class: Defines object for storing atom properties
         #end if
         return result
     #end def
-
+    
     def toPDB( self, pdbIndex, model, convention = IUPAC ):
-        """Convert to PyMMLib ATOM record;
+        """Convert to PyMMLib ATOM record; 
            use x,y,z values of model
            use convention nomenclature
            return record on success or None on error/non-valid atoms
-
+           
            16 Oct 2007: GV Fixed bug: model=0 would also invoke
                         The "current" setting; i.e would map to last
                         coordinate added.
@@ -2023,32 +2024,32 @@ Atom class: Defines object for storing atom properties
             NTcodeerror("In Atom.toPDB found model to be <0: " + `model`)
             return None
 #        modelId = model - 1
-
+        
         pdbAtmName = self.translate( convention )
         if not pdbAtmName:
             if self.name.startswith('Q'):
                 return None
             NTwarning("Failed to translate from CING to convention: %s atom: %-20s" % ( convention, self ))
             return None
-
+        
         pdbResName = self.residue.translate( convention )
         if not pdbResName:
             NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue ))
             return None
 
         coor = self.coordinates[model]
-
+        
         if self.db.hetatm:
             record = HETATM()
         else:
             record = ATOM()
 
         chainId = self.residue.chain.name
-
+        
         record.serial     = pdbIndex
         record.name       = pdbAtmName
         record.resName    = pdbResName
-
+            
         record.chainID    = chainId
         record.resSeq     = self.residue.resNum
         record.x          = coor[0]
@@ -2059,23 +2060,23 @@ Atom class: Defines object for storing atom properties
 
         return record
     #end def
-
+    
     def toPDBTER( self, pdbIndex, convention = IUPAC ):
-        """Convert to PyMMLib TER record;
+        """Convert to PyMMLib TER record; 
            return record on success or None on error
         """
         pdbAtmName = self.translate( convention )
         if not pdbAtmName: return None
-
+        
         pdbResName = self.residue.translate( convention )
         if not pdbResName: return None
-
+        
         record = PyMMLib.TER()
-
+        
         record.serial   = pdbIndex
         record.name     = pdbAtmName
         record.resName  = pdbResName
-
+            
         record.chainID  = self.residue.chain.name
         record.resSeq   = self.residue.resNum
 
@@ -2088,9 +2089,9 @@ Atom class: Defines object for storing atom properties
 class XMLAtomHandler( XMLhandler ):
     """Atom handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Atom')
+        XMLhandler.__init__( self, name='Atom') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
@@ -2098,7 +2099,7 @@ class XMLAtomHandler( XMLhandler ):
 
         # update the attrs values
         result.update( attrs )
-
+            
         # restore the resonance references
         for r in result.resonances:
             r.atom = result
@@ -2147,60 +2148,89 @@ Added getter/setters for the non obvious ones.
         return self
 
 #==============================================================================
-class Coordinate( Vector ):
+class Coordinate:
     """
 -------------------------------------------------------------------------------
-GWV:
-Derived from Vector class
-TODO: compile super class with Pyrex
-    correct superclass name in above definition to "cing.Libs.vector.vector".
-    """
+Coordinate class
+-------------------------------------------------------------------------------
+coordinates stored in attribute e (NTcVector instance)
 
+Several mappings implemented
+e.g.
+    c=Coordinate(5.0, 6.0, 7.0)
+
+    c[0] == c.x == c.e[0]
+-------------------------------------------------------------------------------
+    """
+    
     DEFAULT_BFACTOR   = 0.0
     DEFAULT_OCCUPANCY = 1.0
-
-    def __init__( self, x, y, z,
-                        Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None
-                ):
-        Vector.__init__( self, x, y, z )
-#        NTstruct.__init__(   self,
-#                           __CLASS__  = 'Coordinate',
+    
+    def __init__( self, x, y, z, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
+#        NTdict.__init__(   self,
+#                           __CLASS__  = 'Coordinate', 
 #                           __FORMAT__ = '(%(x)6.2f,%(y)6.2f,%(z)6.2f)'
-#                         )
+#                       )
 #        self.x = x
 #        self.y = y
 #        self.z = z
+        self.e = NTcVector( x, y, z )
         self.Bfac = Bfac
-        self.atom = atom
         self.occupancy = occupancy
-        self.__FORMAT__ = '<Coordinate (%6.2f,%6.2f,%6.2f)>'
+        self.atom = atom
+    #end def
+    
+    #implement  x,y,z attributes mapped to e vector
+    def __getattr__(self, item):
+        if  item == 'x':
+            return self.e[0]
+        elif  item == 'y':
+            return self.e[1]
+        elif  item == 'z':
+            return self.e[2]
+        else: 
+            raise AttributeError
     #end def
 
-    # Mimic the dict functionality for all but integers and x,y,z
+    def __setattr__(self, item, value):
+        if  item == 'x':
+            self.e[0] = value
+        elif  item == 'y':
+            self.e[1] = value
+        elif  item == 'z':
+            self.e[2] = value
+        else: 
+            self.__dict__[item] = value
+    #end def
+
+    # Implement a dict-like functionality 
+    # map integers and x,y,z
     def __getitem__(self, item):
         if isinstance( item, int ):
-            return Vector.__getitem__(self, item)
+            return NTcVector.__getitem__(self.e, item)
         elif  item == 'x':
-            return self.x
+            return self.e[0]
         elif  item == 'y':
-            return self.y
+            return self.e[1]
         elif  item == 'z':
-            return self.z
-        else:
+            return self.e[2]
+        else: 
             return self.__dict__[item]
+    #end def
 
     def __setitem__(self, item, value):
         if isinstance( item, int ):
-            Vector.__setitem__( self, item, value )
+            NTcVector.__setitem__( self.e, item, value )
         elif  item == 'x':
-            self.x = value
+            self.e[0] = value
         elif  item == 'y':
-            self.y = value
+            self.e[1] = value
         elif  item == 'z':
-            self.z = value
-        else:
+            self.e[2] = value
+        else: 
             self.__dict__[item] = value
-
+    #end def
+    
     def __delitem__(self, item):
         if isinstance( item, int ):
             pass
@@ -2210,48 +2240,76 @@ TODO: compile super class with Pyrex
             pass
         elif  item == 'z':
             pass
-        else:
+        else: 
             del(self.__dict__[item])
+    #end def
+
+    def distance( self, other ):
+        return self.e.distance( other.e )
+    #end def
+
+    def dot( self, other ):
+        return self.e.dot( other.e )
+    #end def
 
     def format(self):
-        return sprintf( self.__FORMAT__, self.x, self.y, self.z )
+         return sprintf( '<Coordinate: %s>', self )   
     #end def
-
+    
+    def __str__(self):
+        return sprintf('(%6.2f,%6.2f,%6.2f)', self.e[0], self.e[1], self.e[2])
+    #end def    
+    
     def __repr__(self):
-        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f )', self.x, self.y, self.z, self.Bfac )
-    #end def
-    def __call__( self ):
-#        return Vector(self.x, self.y, self.z)
-        return self
-    #end def
+        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f )', self.e[0], self.e[1], self.e[2], self.Bfac )
 
-#end class
-
-#class XMLCoordinateHandler( XMLhandler ):
-#    """Coordinate handler class"""
-#    def __init__( self ):
-#        XMLhandler.__init__( self, name='Coordinate')
-#    #end def
-#
-#    def handle( self, node ):
-#        attrs = self.handleDictElements( node )
-#        if attrs == None: return None
-#        result = Coordinate( x = attrs['x'], y = attrs['y'], z=attrs['z'] )
-#        # update the attrs values
-#        result.update( attrs )
-#        return result
-#    #end def
-##end class
-#
-##register this handler
-#coordinatehandler = XMLCoordinateHandler()
 
 #==============================================================================
 def NTdistance( c1, c2 ):
     """
     Return distance defined by Coordinate instances c1-c2
     """
-    return (c2-c1).length()
+    return (c2.e-c1.e).length()
+#end def
+
+
+def NTangle( c1, c2, c3, radians = False ):
+    """
+    Return angle defined by Coordinate instances c1-c2-c3
+    """
+#    a = c2()-c1()
+#    b = c2()-c3()
+    a = c2.e-c1.e
+    b = c2.e-c3.e
+    return a.angle( b, radians=radians )    
+#end def
+
+def NTdihedral( c1, c2, c3, c4, radians=False ):
+    """
+    Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
+    Adapted from biopython-1.41
+    
+    """
+#    ab = c1() - c2()
+#    cb = c3() - c2()
+#    db = c4() - c3()
+    ab = c1.e - c2.e
+    cb = c3.e - c2.e
+    db = c4.e - c3.e
+    
+    u = ab.cross( cb )
+    v = db.cross( cb )
+    w = u.cross( v )
+    
+    angle = u.angle( v, radians=radians )
+    # determine sign of angle
+    try:
+        if cb.angle( w, radians=True ) > 0.001: angle *= -1.0
+    except ZeroDivisionError:
+        # dihedral=pi or 0
+        pass    
+    
+    return angle
 #end def
 
 def NTdistanceOpt( c1, c2 ):
@@ -2263,17 +2321,6 @@ def NTdistanceOpt( c1, c2 ):
 #    return d.length()
     return length3Dopt(d)
 
-
-def NTangle( c1, c2, c3, radians = False ):
-    """
-    Return angle defined by Coordinate instances c1-c2-c3
-    """
-#    a = c2()-c1()
-#    b = c2()-c3()
-    a = c2-c1
-    b = c2-c3
-    return a.angle( b, radians=radians )
-#end def
 
 def NTangleOpt( c1, c2, c3, radians = False ):
     """
@@ -2288,32 +2335,6 @@ def NTangleOpt( c1, c2, c3, radians = False ):
     return angle3Dopt( a, b )
 #end def
 
-def NTdihedral( c1, c2, c3, c4, radians=False ):
-    """
-    Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
-    Adapted from biopython-1.41
-
-    """
-#    ab = c1() - c2()
-#    cb = c3() - c2()
-#    db = c4() - c3()
-    ab = c1 - c2
-    cb = c3 - c2
-    db = c4 - c3
-
-    u = ab.cross( cb )
-    v = db.cross( cb )
-    w = u.cross( v )
-
-    angle = u.angle( v, radians=radians )
-    # determine sign of angle
-    try:
-        if cb.angle( w, radians=True ) > 0.001: angle *= -1.0
-    except ZeroDivisionError:
-        # dihedral=pi or 0
-        pass
-
-    return angle
 #end def
 def NTdihedralOpt( c1, c2, c3, c4 ):
     """ To replace unoptimized routine. It's 7 times faster (20.554/2.965s)
@@ -2361,26 +2382,26 @@ def NTdihedralOpt( c1, c2, c3, c4 ):
 class Resonance( NTvalue  ):
     """Resonance class; implemented as an NTvalue object
     """
-
+    
     def __init__( self, atom=None, value=NOSHIFT, error=0.000 ):
-        NTvalue.__init__( self, __CLASS__  = 'Resonance',
-                                value      = value,
-                                error      = error,
-                                fmt        = '<%7.3f  (%7.3f)>',
+        NTvalue.__init__( self, __CLASS__  = 'Resonance', 
+                                value      = value, 
+                                error      = error, 
+                                fmt        = '<%7.3f  (%7.3f)>', 
                                 atom       = atom
                          )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'atom:  %(atom)-12s\n' +\
                           'value: %(value)7.3f\n' +\
                           'error: %(error)7.3f\n' +\
-                           self.footer( dots )
+                           self.footer( dots ) 
 
     #end def
-
+    
     def __str__( self ):
         return sprintf('<Resonance: %.3f %.3f %s>', self.value, self.error, self.atom )
     #end def
-
+    
     def match( self, other ):
         """Return probability of matching between self and other
         """
@@ -2388,7 +2409,7 @@ class Resonance( NTvalue  ):
         if sigma1 == 0.0: sigma1 = 1.0
         sigma2 = other.error
         if sigma2 == 0.0: sigma2 = 1.0
-
+         
         return math.exp( -(self.value-other.value )**2 / (sigma1*sigma2*2) )
     #end def
 #end class
@@ -2396,15 +2417,15 @@ class Resonance( NTvalue  ):
 class XMLResonanceHandler( XMLhandler ):
     """Resonance handler class"""
     def __init__( self ):
-        XMLhandler.__init__( self, name='Resonance')
+        XMLhandler.__init__( self, name='Resonance') 
     #end def
-
+    
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
         result = Resonance( value = attrs['value'], error = attrs['error'] )
         # update the attrs values
-        result.update( attrs )
+        result.update( attrs )      
         return result
     #end def
 #end class
@@ -2415,12 +2436,12 @@ resonancehandler = XMLResonanceHandler()
 
 #==============================================================================
 def translateTopology( residue, topDefList ):
-    """internal routine to translate a list of topology (resdiffIndex,atomName)
-       tuples to Atom instances
-       return NTlist instance or None on error
-    """
+    """internal routine to translate a list of topology (resdiffIndex,atomName) 
+       tuples to Atom instances 
+       return NTlist instance or None on error 
+    """ 
     result = NTlist()
-
+    
     for resdiffIndex,atomName in topDefList:
         # optimized
         res = residue.sibling( resdiffIndex )
@@ -2430,21 +2451,21 @@ def translateTopology( residue, topDefList ):
         result.append( res[atomName] )
     return result
 #end def
-
+                    
 #==============================================================================
 def allAtoms( molecule ):
-    """generator looping over all atoms of molecule
-       25 Feb 2006: depreciated: use molecule.allAtoms() method in stead.
-    """
-    return molecule.allAtoms()
-#end def
+  """generator looping over all atoms of molecule
+     25 Feb 2006: depreciated: use molecule.allAtoms() method in stead.
+  """
+  return molecule.allAtoms()  
+#end def    
 
 #==============================================================================
 def allResidues( molecule ):
-    """generator looping over all residues of molecule
-       25 Feb 2006: depreciated: use molecule.allResidues() method in stead.
-    """
-    return molecule.allResidues()
+  """generator looping over all residues of molecule
+     25 Feb 2006: depreciated: use molecule.allResidues() method in stead.
+  """
+  return molecule.allResidues()
 #end def
 
 #==============================================================================
@@ -2464,19 +2485,19 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
         #end for
     #end for
 #end def
-
+     
 #==============================================================================
 def saveMolecule( molecule, fileName=None)   :
     """save to fileName for restoring with restoreMolecule"""
     if not fileName:
         fileName = molecule.name + '.xml'
     #end if
-
+    
     if (molecule == None):
         NTerror("saveMolecule: molecule not defined\n")
         return
     #end if
-
+  
     obj2XML( molecule, path=fileName )
 
     NTmessage( '==> saveMolecule: saved to %s', fileName )
@@ -2486,30 +2507,30 @@ def saveMolecule( molecule, fileName=None)   :
 #==============================================================================
 def restoreMolecule( fileName)   :
     """restore from fileName, return Molecule instance """
-
+    
     mol = XML2obj( path=fileName )
     if (mol == None): return None
-
+  
     mol.source = fileName
-
+  
     NTmessage( '==> restoreMolecule: restored %s', mol.format())
     #end if
-
+  
     return mol
 #end def
 
 def rmsd( atomList ):
     """
-    return (rmsd,n) tuple for all atoms in atomList
+    return (rmsd,n) tuple for all atoms in atomList 
     """
-
+    
     result = 0.0
     n = 0
     for atm in atomList:
-        if atm.mean:
+        if atm.mean: 
             result += atm.mean.variance
             n += 1
         #end if
     #end for
-    return (math.sqrt( result/n ), n)
+    return (math.sqrt( result/n ), n)       
 #end def

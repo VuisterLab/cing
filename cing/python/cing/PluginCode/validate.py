@@ -53,7 +53,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTvector
 from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
@@ -61,22 +60,23 @@ from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.Whatif import criticizeByWhatif
+from cing.PluginCode.Whatif import histBySsAndResType
+from cing.PluginCode.Whatif import histCombined
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
+from cing.core.constants import NAN_FLOAT
 from cing.core.constants import NOSHIFT
-from cing.core.constants import UNDEFINED_FLOAT
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.PluginCode.Whatif import histBySsAndResType
-from cing.PluginCode.Whatif import histCombined
 import cing
 import math
 import os
@@ -621,31 +621,31 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
     for model in range( modelCount ):
         #c1 is geometric mean of centroid atms
-        c1 = NTvector(0,0,0)
+        c1 = NTcVector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
             atm = residue1[atmName]
-            c1 += atm.coordinates[model]()
+            c1 += atm.coordinates[model].e
         #end for
         # not yet: c1 /= len(centroids[residue1.db.shortName])
         for j in range(3):
             c1[j] /= len(centroids[residue1.db.shortName])
 
         try:
-            c1a = residue1['CA'].coordinates[model]()
+            c1a = residue1['CA'].coordinates[model].e
         except:
             break
 
         #c2 is geometric mean of centroid atms
-        c2 = NTvector(0,0,0)
+        c2 = NTcVector(0,0,0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
-            c2 += atm.coordinates[model]()
+            c2 += atm.coordinates[model].e
         #end for
         # not yet: c2 /= len(centroids[residue2.db.shortName])
         for j in range(3):
             c2[j] /= len(centroids[residue2.db.shortName])
 
-        c2a = residue2['CA'].coordinates[model]()
+        c2a = residue2['CA'].coordinates[model].e
 
         #print '>>', c1, c2
         r = c2-c1
@@ -659,8 +659,9 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             atm1 = residue1[atmName1]
             for atmName2 in donorAcceptor[residue2.db.shortName]:
                 atm2 = residue2[atmName2]
-                d = (atm1.coordinates[model]()-atm2.coordinates[model]()).length()
-                if ( d< 4.0): count += 1
+                d = (atm1.coordinates[model].e-atm2.coordinates[model].e).length()
+                if d < 4.0: 
+                    count += 1
                 #print '>', atm1,atm2,d,count
 
         criterium2 = count>0
@@ -751,9 +752,9 @@ def checkHbond( donorH, acceptor,
     result.maxAngle      = maxAngle
     result.maxDistance   = maxDistance
     result.fraction      = fraction
-    result.distance      = UNDEFINED_FLOAT
+    result.distance      = NAN_FLOAT
     result.distanceSD    = 0.0
-    result.angle         = UNDEFINED_FLOAT
+    result.angle         = NAN_FLOAT
     result.angleCV       = 0.0
     result.accepted      = False
 
@@ -1149,11 +1150,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
-
+       
        Note that residue can also be a list of residues. A single plot will
        be created for all together were the appropriate background histograms
        will be picked.
-
+       
        Return None on error or ps on success.
     '''
 
@@ -1174,20 +1175,20 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     isSingleResiduePlot = len(residueList) == 1
-
+    
     if not plotTitle:
         if isSingleResiduePlot:
             plotTitle = residue._Cname(1)
         else:
             plotTitle = '%d residues'
-
+            
 
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
 
 #    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
@@ -1205,7 +1206,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
     ps.addPlot(plot)
-
+    
     if dihedralName1=='PHI' and dihedralName2=='PSI':
 #         Plot a Ramachandran density background
 ##        imageFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'RamachandranLaskowski.png' )
@@ -1219,12 +1220,12 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
         ssTypeList.sort()
         for ssType in ssTypeList:
-            if isSingleResiduePlot:
+            if isSingleResiduePlot: 
                 hist = histBySsAndResType[ssType][residue.resName]
             else:
                 hist = histCombined[ssType] # excludes GLY/PRO densities
-            histList.append(hist)
-        plot.ramachandranPlot(histList)
+            histList.append(hist)       
+        plot.dihedralComboPlot(histList)
 
 
 
@@ -1234,7 +1235,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             # res is equal to residue
             dr1 = _matchDihedrals(res, dihedralName1)
             dr2 = _matchDihedrals(res, dihedralName2)
-
+        
             if dr1 and dr2:
                 lower1, upper1 = dr1.lower, dr1.upper
                 lower2, upper2 = dr2.lower, dr2.upper
@@ -1244,32 +1245,32 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             elif dr2:
                 lower2, upper2 = dr2.lower, dr2.upper
                 lower1, upper1 = plotparams1.min, plotparams1.max
-
+        
             if dr1 or dr2:
                 plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
-
+    
         d1 = res[dihedralName1]
         d2 = res[dihedralName2]
-
+    
         if not (len(d1) and len(d2)):
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
         d1cav = d1.cav
         d2cav = d2.cav
-
+    
         # Plot data points on top for painters algorithm without alpha blending.
         myPoint = plusPoint.copy()
         myPoint.pointColor = 'green'
         myPoint.pointSize = 6.0
         myPoint.pointEdgeWidth = 1.0
         if res.resName == 'GLY':
-            myPoint.pointType = 'triangle'
+            myPoint.pointType = 'triangle'            
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
-
+            
         plot.points( zip( d1, d2 ), attributes=myPoint )
-
+        
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot:
             myPoint = myPoint.copy()
@@ -1351,8 +1352,8 @@ def setupHtml(project):
         next = None
         lastMoleculeIndex = len(project.molecules) - 1
         if index > 0:
-            previous = project[ project.molecules[index-1] ]
-
+            previous = project[ project.molecules[index-1] ]    
+    
         if index < lastMoleculeIndex:
             next = project[ project.molecules[index+1] ]
 
@@ -1375,7 +1376,7 @@ def setupHtml(project):
             chaindir = project.htmlPath(chain.name)
             if not os.path.exists( chaindir ):
                 os.mkdir( chaindir )
-
+ 
             #if hasattr(chain, 'html'): del(chain['html'])
             if chain.has_key('html'):
                 del(chain.html)
@@ -1430,7 +1431,7 @@ def setupHtml(project):
             for dummy in range( r0.resNum%ncols ):
                 for obj in htmlList:
                     obj.html.main('td', style="width: %s" % width)
-
+ 
             for res in residues:
                 # Create the directory for this residue
                 resdir = project.htmlPath(chain.name, res.name)
@@ -1455,14 +1456,14 @@ def setupHtml(project):
                         obj.html.main('tr', closeTag=False)
                         obj.html.main( 'td',sprintf('%d-%d',r1,r2),
                                        style="width: %s" % width )
-
+ 
                 # add residue to table
                 for obj in htmlList:
                     objMain = obj.html.main
                     objMain('td', style="width: %s" % width, closeTag=False)
                     obj.html.insertHtmlLink(objMain, obj, res, text=res.name)
                     objMain('td', openTag=False)
-
+ 
                 # Create a page for each residue
 
                 # generate html file for this residue
@@ -1483,7 +1484,7 @@ def setupHtml(project):
             for obj in htmlList:
                 obj.html.main('tr', openTag=False)
                 obj.html.main('table', openTag=False)
-            #end for over obj in htmlList
+            #end for over obj in htmlList 
 
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',

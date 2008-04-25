@@ -1,20 +1,33 @@
 """
-Read certain PDB files for their backbone dihedrals. 
+Read PDB files for their dihedrals. 
 """
 from cing import verbosityDebug
 from cing import verbosityOutput
 from cing import verbosityWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import floatFormat
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import gunzip
+from cing.PluginCode.dssp import DSSP_STR
+from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.Scripts.getPhiPsiWrapper import doRamachandran # once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
+from cing.core.constants import NAN_FLOAT
 from cing.core.molecule import Chain
-from cing.Libs.NTutils import gunzip
-from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.PluginCode.dssp import DSSP_STR
 import cing
 import os
 import sys
+ 
+
+# Can be called for phi, psi or any other combo like chi1, chi2
+DIHEDRAL_NAME_1 = 'CHI1'
+DIHEDRAL_NAME_2 = 'CHI2'
+
+if doRamachandran:
+    DIHEDRAL_NAME_1 = 'PHI'
+    DIHEDRAL_NAME_2 = 'PSI'
 
 def doEntry( entryCode, chainCode ):
     char23 = entryCode[1:3]
@@ -39,7 +52,9 @@ def doEntry( entryCode, chainCode ):
     project.initPDB( pdbFile=localPdbFileName, convention = 'BMRB' )
     os.unlink(localPdbFileName)    
 #    project.procheck(createPlots=False, runAqua=False)                   
-    project.dssp()                   
+    if not project.dssp():
+        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
+        return True          
     
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
     
@@ -50,33 +65,44 @@ def doEntry( entryCode, chainCode ):
             continue
 
         for res in chain.allResidues():
-            if not (res.has_key('PHI') and res.has_key('PSI')):
-                NTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
-                continue
-            if not res.PHI:
-                NTdebug('Skipping terminii II on phi etc in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
-                continue
-            if not res.PSI:
-                NTdebug('Skipping terminii II on psi etc in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
-                continue
+#            NTdebug( "Considering: %s,%s,%-4s,%4d" % (entryCode, chain.name, res.resName, res.resNum))
+            if doRamachandran:
+                if not (res.has_key(DIHEDRAL_NAME_1) and res.has_key(DIHEDRAL_NAME_2)):
+                    NTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    continue
+            else:
+                if not (res.has_key(DIHEDRAL_NAME_1) or res.has_key(DIHEDRAL_NAME_2)): 
+                    NTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    continue
             secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR) 
             if secStruct == None:
-                NTdebug('Skipping because no procheck secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                NTdebug('Skipping because no dssp secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                 continue
             secStruct = secStruct[0]
-            str = "%s,%s,%-4s,%4d,%1s,%6.1f,%6.1f\n" % (entryCode, chain.name, res.resName, res.resNum, secStruct, res.PHI[0], res.PSI[0] )
+            # Make sure we always have something to hold onto.
+            d1_value_list = getDeepByKeysOrDefault( res, [ NAN_FLOAT ], DIHEDRAL_NAME_1)
+            d2_value_list = getDeepByKeysOrDefault( res, [ NAN_FLOAT ], DIHEDRAL_NAME_2)
+            if len( d1_value_list ) == 0:
+                d1_value_list = [ NAN_FLOAT ]
+            if len( d2_value_list ) == 0:
+                d2_value_list = [ NAN_FLOAT ]
+                
+            d1_value_str = floatFormat( d1_value_list[0], "%6.1f" ) # counterpart is floatParse
+            d2_value_str = floatFormat( d2_value_list[0], "%6.1f" )
+            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s\n" % (entryCode, chain.name, res.resName, res.resNum, secStruct, 
+                d1_value_str, d2_value_str )
 #            NTmessageNoEOL(str)
             strSum += str # expensive
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode)
         
-    resultsFileName = 'phipsi_wi_db_%s.csv' % ( entryCode+chainCode )
+    file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
+    resultsFileName = file_name_base + '_wi_db_%s.csv' % ( entryCode+chainCode )
     resultsFile = file(resultsFileName, 'w') 
     resultsFile.flush()
     resultsFile.write(strSum)
     NTdebug( '\n'+strSum )
     resultsFile.flush()
-    
     
   
 if __name__ == "__main__":

@@ -1,3 +1,7 @@
+#http://www.python.org/dev/peps/pep-0754/
+from matplotlib.numerix import nan # is in python 2.6 ?
+from matplotlib.numerix._na_imports import isnan
+
 AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
 BMRB       = 'BMRB'
 SPARKY     = BMRB
@@ -16,8 +20,8 @@ CCPN       = 'CCPN'
 
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
-UNDEFINED_FLOAT = -888.888
-NAN_FLOAT       = -888.888
+NAN_FLOAT = nan
+ISNAN = isnan # should be math.isnan when we switch to python 2.6
 
 X_AXIS = 0
 Y_AXIS = 1

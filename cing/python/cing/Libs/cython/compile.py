@@ -8,8 +8,8 @@ from Cython.Distutils.build_ext import build_ext
 setup(
   name = 'Superpose',
   ext_modules=[ 
-    Extension("vector",       ["vector.pyx"]),
-    Extension("matrix",       ["matrix.pyx"])
+#    Extension("vector",       ["vector.pyx"]),
+    Extension("superpose",       ["superpose.pyx"])
     ],
   cmdclass = {'build_ext': build_ext}
 )

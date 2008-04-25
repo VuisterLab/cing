@@ -1,5 +1,4 @@
 from cing import cingPythonCingDir
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexception
@@ -7,6 +6,7 @@ from cing.Libs.NTutils import NTpath
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from cing.Libs.NTutils import NTdetail
 import glob
 import os
 
@@ -39,7 +39,7 @@ def importPlugin( pluginName ):
                          [pluginName]) #JFD changed from default to zero which means to only try absolute imports.
 
 #    NTdebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
-    NTdebug('==> Imported plugin ' + pluginName )
+    NTdetail('==> Imported plugin: ' + pluginName )
     if not hasattr(pluginCodeModulePackage, pluginName):
         NTerror("Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
         return None
