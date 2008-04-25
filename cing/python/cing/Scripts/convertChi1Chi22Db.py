@@ -45,7 +45,7 @@ with histograms for (combined) residue and sec. struct. types.
 Janin et al. Conformation of amino acid side-chains in proteins. J Mol Biol (1978)
 
 Using "Table 2. Rotamer library used for crystallographic model building with O" from
-Kleywegt et al. Databases in protein crystallography. Acta Crystallogr D Biol 
+Kleywegt et al. Databases in protein crystallography. Acta Crystallogr D Biol
 Crystallogr (1998) vol. 54 (Pt 6 Pt 1) pp. 1119-31
 """
 
@@ -75,7 +75,7 @@ bins = (xGrid,yGrid)
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
 
-      
+
 def main():
     cvs_file_abs_name_gz = cvs_file_abs_name + '.gz'
     gunzip( cvs_file_abs_name_gz )
@@ -86,7 +86,7 @@ def main():
 #    histByCombinedSsAndResType = {}
     valuesByEntrySsAndResType       = {}
     hrange = (xRange, yRange)
-        
+
     for row in reader:
 #        7a3h,A,VAL ,   5,H, -62.8, -52.8
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
@@ -108,24 +108,24 @@ def main():
                 return
             appendDeepByKeys(valuesBySsAndResType,      chi2,          ssType,resType,'chi2' )
             appendDeepByKeys(valuesByEntrySsAndResType, chi2, entryId, ssType,resType,'chi2' )
-    del(reader) # closes the file handles 
+    del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
 #    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
 #    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
     (Cav, Csd ) = ( 1.0, 1.0 )
     NTdebug("Overall found av,sd,n: " + `(Cav, Csd)`)
-    
+
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
             hist2d, _xedges, _yedges = histogram2d(
-                valuesBySsAndResType[ssType][resType]['chi2'], 
-                valuesBySsAndResType[ssType][resType]['chi1'], 
-                bins = binCount, 
+                valuesBySsAndResType[ssType][resType]['chi2'],
+                valuesBySsAndResType[ssType][resType]['chi1'],
+                bins = binCount,
                 range= hrange)
 #            hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys( histBySsAndResType, hist2d, ssType, resType )
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
-    
+
     for ssType in valuesBySsAndResType.keys():
         chi1 = []
         chi2 = []
@@ -137,7 +137,7 @@ def main():
         hist2d, _xedges, _yedges = histogram2d(
             chi2, # Note that the x is the chi2 for some stupid reason,
             chi1, # otherwise the imagery but also the [row][column] notation is screwed.
-            bins = binCount, 
+            bins = binCount,
             range= hrange)
 #        hist2d = zscaleHist( hist2d, Cav, Csd )
         setDeepByKeys( histBySsAndCombinedResType, hist2d, ssType )
@@ -150,12 +150,12 @@ def main():
                 continue
             chi1 += valuesBySsAndResType[ssType][resType]['chi1']
             chi2 += valuesBySsAndResType[ssType][resType]['chi2']
-    
+
     NTdebug('Total number of residues: %d' % len(chi2))
     hist2d, _xedges, _yedges = histogram2d(
         chi2, # Note that the x is the chi2 for some stupid reason,
         chi1, # otherwise the imagery but also the [row][column] notation is screwed.
-        bins = binCount, 
+        bins = binCount,
         range= hrange)
 #    sumHistCombined = sum( hist2d )
 #    sumsumHistCombined = sum( sumHistCombined )
@@ -165,7 +165,7 @@ def main():
 #    hist2d = zscaleHist( hist2d, Cav, Csd )
 #    NTdebug('hist2d scaled  : \n%s' % hist2d)
 
-    
+
     dbase = shelve.open( dbase_file_abs_name )
     dbase[ 'histCombined' ]               = hist2d
     dbase[ 'histBySsAndCombinedResType' ] = histBySsAndCombinedResType
@@ -185,13 +185,13 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
     interpolatedValue = interpolatedValueArray[ 0, 0 ]
 #    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
     return interpolatedValue
-    
-    
-    
+
+
+
 def getRescaling(valuesByEntrySsAndResType):
     '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
     http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
-    '''            
+    '''
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
         histBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
@@ -205,7 +205,7 @@ def getRescaling(valuesByEntrySsAndResType):
                 his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
                 if his == None:
                     NTdebug('when testing not all residues are present in smaller sets.')
-                    continue 
+                    continue
                 (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
 #                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
                 if c_sd == None:
@@ -215,8 +215,8 @@ def getRescaling(valuesByEntrySsAndResType):
                     NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets.')
                     continue
                 for k in range(len(angleList0)):
-                    ck = getValueFromHistogramUsingInterpolation( 
-                        histBySsAndResTypeExcludingEntry[ssType][resType], 
+                    ck = getValueFromHistogramUsingInterpolation(
+                        histBySsAndResTypeExcludingEntry[ssType][resType],
                         angleList0[k], angleList1[k])
                     zk = ( ck - c_av ) / c_sd
 #                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
@@ -243,8 +243,8 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
                 angleList1 = valuesBySsAndResType[ssType][resType]['chi2']
                 appendDeepByKeys(result,angleList0,ssType,resType,'chi1')
                 appendDeepByKeys(result,angleList1,ssType,resType,'chi2')
-        
-        
+
+
     for ssType in result.keys():
         for resType in result[ssType].keys():
             angleList0 = result[ssType][resType]['chi1']
@@ -254,14 +254,14 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
             hist2d, _xedges, _yedges = histogram2d(
                 angleList1, # think rows (y)
                 angleList0, # think columns (x)
-                bins = binCount, 
+                bins = binCount,
                 range= hrange)
             setDeepByKeys( histBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
 
     return histBySsAndResTypeExcludingEntry
 
 
-    
+
 #def getValueFromHistogram( hist, angle0, angle1):
 #    pass
 
@@ -269,10 +269,10 @@ def janinPlot(hist, titleStr):
 #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
     sumHist = sum(sum( hist ))
     maxHist = amax(amax( hist ))
-#    vmax = maxHist # Focus on low density regions? 
+#    vmax = maxHist # Focus on low density regions?
 #    norm = colors.Normalize(vmin=0, vmax=vmax)
     NTdebug('hist sumHist, max: %12s %5.0f %5.0f' % (titleStr,sumHist, maxHist))
-    levels = nx.arange(maxHist*0.05, maxHist*0.5+1, maxHist*0.1)    
+    levels = nx.arange(maxHist*0.05, maxHist*0.5+1, maxHist*0.1)
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = [600,600]
 #    NTdebug( 'plotparams1: %r' % plotparams1)
@@ -294,8 +294,8 @@ def janinPlot(hist, titleStr):
     Z = hist
     extent = xRange + yRange
 #    NTdebug("Covering extent: " +`extent`)
-    im = imshow( Z, 
-#            interpolation='bilinear', 
+    im = imshow( Z,
+#            interpolation='bilinear',
             interpolation = 'nearest',
             origin='lower',
             extent=extent )
@@ -305,8 +305,8 @@ def janinPlot(hist, titleStr):
 #                            cmap=cm.get_cmap('jet', len(levels)-1),
 #                            )
 
-#    cset1 = contourf(X, Y, Z, levels, 
-#        cmap=cm.get_cmap('jet', len(levels)-1), 
+#    cset1 = contourf(X, Y, Z, levels,
+#        cmap=cm.get_cmap('jet', len(levels)-1),
 #        origin='lower')
     cset2 = contour(Z, levels,
         colors = 'black',
@@ -316,7 +316,7 @@ def janinPlot(hist, titleStr):
     for c in cset2.collections:
         c.set_linestyle('solid')
 #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-#            origin='lower', 
+#            origin='lower',
 #            extent=extent)
     colorbar(im)
 #    colorbar(cset2)
@@ -335,7 +335,7 @@ def janinPlotTest(hist, titleStr):
 #    NTdebug( 'xRange: %r' % `xRange`)
     xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
     yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-    plot = NTplot( 
+    plot = NTplot(
       title  = titleStr,
       xRange = xRange,
       xTicks = xTicks,
@@ -350,23 +350,23 @@ def janinPlotTest(hist, titleStr):
 #      'bottom': 0.0,   # the bottom of the subplots of the figure
 #      'top': 1.0,      # the top of the subplots of the figure
 #            }
-#    ps.subplotsAdjust(**kwds)    
+#    ps.subplotsAdjust(**kwds)
 #    X, Y = meshgrid(x, y)
 #    extent = xRange + yRange
     plot.dihedralComboPlot( hist )
     axis('off')
     ps.hardcopy('JaninZ_%s.png' % titleStr)
 
-def testEntry():        
-    #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
+def testEntry():
+    #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-    entryId = "1brv_1model" 
-#        entryId = "1tgq_1model" 
+    entryId = "1brv_1model"
+#        entryId = "1tgq_1model"
     convention = PDB
-    
+
     os.chdir(cingDirTmp)
-        
+
     project = Project( entryId )
     project.removeFromDisk()
     project = Project.open( entryId, status='new' )
@@ -379,8 +379,8 @@ def testEntry():
         NTerror("Failed to dssp project")
         return True
 #        print project.cingPaths.format()
-#    self.assertFalse(runWhatif(project))    
-    
+#    self.assertFalse(runWhatif(project))
+
     project.save()
     # seq:      VPCSTCEGNLACLSLCHIE
     _wiSstype = '  HHHHTT HHHHHH    '
@@ -402,14 +402,14 @@ def testEntry():
             continue
         if not (res.CHI1 and res.CHI2):
             continue
-        
+
         chi1 = res.CHI1[0]
         chi2 = res.CHI2[0]
 #        ssType = wiSstype[i]
 #        ssTypeList = to3StateUpper( [pcSstype[i]] )
         ssTypeDsspList = getDeepByKeys(res,DSSP_STR,SECSTRUCT_STR)
         ssTypeList = to3StateUpper( ssTypeDsspList )
-        ssType = ssTypeList.getConsensus() 
+        ssType = ssTypeList.getConsensus()
         resType = res.resName
         hist = histBySsAndResType[ssType][resType]
         sumHist = sum(sum( hist ))
@@ -419,20 +419,20 @@ def testEntry():
         Zscore = Zscore / s_dbav
         # Note the reversal of chi1,chi2!
         ck = getValueFromHistogramUsingInterpolation(hist, chi2, chi1)
-        zk = ck - c_dbav 
+        zk = ck - c_dbav
         zk /= s_dbav
         ZscoreDB = zk - DB_RAMCHK[0] # av
         ZscoreDB /= DB_RAMCHK[1] # sd
-        
+
         NTmessage("ssType [%s] resType %s sumHist %4.0f maxHist %4.0f c_dbav %6.1f s_dbav %6.1f ck %6.1f zk %8.3f ZscoreDB %8.3f" % (
             ssType, resType, sumHist, maxHist, c_dbav, s_dbav, ck, zk, ZscoreDB))
         i += 1
 
-def inRange(a): 
+def inRange(a):
     if a < plotparams1.min or a > plotparams1.max:
         return False
     return True
-             
+
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
