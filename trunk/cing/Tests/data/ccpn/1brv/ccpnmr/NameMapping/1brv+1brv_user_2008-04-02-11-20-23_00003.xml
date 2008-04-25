@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit release="2.0.a0" originator="CCPN Python XmlIO" packageGuid="www.ccpn.ac.uk_Fogh_2006-08-17-14:16:23_00004" time="Wed Apr  2 11:20:35 2008">
+
+<NMAP.NameMappingStore _ID="_1" createdBy="user" guid="1brv_user_2008-04-02-11-20-23_00003" isModifiable="true" name="1brv">
+  <NMAP.NameMappingStore.nameMappings>
+    <NMAP.NameMapping _ID="_2" formatName="nmrStar" isOriginalImport="true" namingSystem="MSI" serial="1">
+      <NMAP.NameMapping.chainMappings>
+        <NMAP.ChainMapping _ID="_3" chainCode="A" firstSeqId="14" formatChainCode="1" formatFirstSeqCode="171" formatLastSeqCode="189" formatSeqInsertCode=" " serial="1">
+        </NMAP.ChainMapping>
+      </NMAP.NameMapping.chainMappings>
+    </NMAP.NameMapping>
+    <NMAP.NameMapping _ID="_4" formatName="pdb" isOriginalImport="true" namingSystem="PDB_REMED" serial="2">
+      <NMAP.NameMapping.chainMappings>
+        <NMAP.ChainMapping _ID="_5" chainCode="A" firstSeqId="1" formatChainCode="A" formatFirstSeqCode="158" formatLastSeqCode="189" formatSeqInsertCode=" " serial="1">
+          <IMPL.DataObject.applicationData>
+            <IMPL.AppDataString application="ccpNmr" keyword="originalFormatChainCode" value="A"/>
+          </IMPL.DataObject.applicationData>
+        </NMAP.ChainMapping>
+      </NMAP.NameMapping.chainMappings>
+      <NMAP.NameMapping.moleculeMappings>
+        <NMAP.MoleculeMapping _ID="_6" formatName="PROTEIN G" name="PROTEIN G" serial="1">
+        </NMAP.MoleculeMapping>
+      </NMAP.NameMapping.moleculeMappings>
+    </NMAP.NameMapping>
+  </NMAP.NameMappingStore.nameMappings>
+</NMAP.NameMappingStore>
+
+</_StorageUnit>
+<!--End of Memops Data-->

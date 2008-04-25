@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit release="2.0.a0" originator="CCPN Python XmlIO" packageGuid="www.ccpn.ac.uk_Fogh_2006-08-16-14:22:53_00017" time="Wed Apr  2 11:20:35 2008">
+
+<AFFI.AffiliationStore _ID="_1" createdBy="user" guid="1brv_user_2008-04-02-11-20-33_00001" isModifiable="true" name="1brv">
+  <AFFI.AffiliationStore.persons>
+    <AFFI.Person _ID="_2" familyName="Doreleijers" givenName="J" serial="1">
+    </AFFI.Person>
+    <AFFI.Person _ID="_3" familyName="Langedijk" givenName="J" serial="2">
+    </AFFI.Person>
+    <AFFI.Person _ID="_4" familyName="Hard" givenName="K" serial="3">
+    </AFFI.Person>
+    <AFFI.Person _ID="_5" familyName="Boelens" givenName="R" serial="4">
+    </AFFI.Person>
+    <AFFI.Person _ID="_6" familyName="Rullmann" givenName="J" serial="5">
+    </AFFI.Person>
+    <AFFI.Person _ID="_7" familyName="Schaaper" givenName="W" serial="6">
+    </AFFI.Person>
+    <AFFI.Person _ID="_8" familyName="Van oirschot" givenName="J" serial="7">
+    </AFFI.Person>
+    <AFFI.Person _ID="_9" familyName="Kaptein" givenName="R" serial="8">
+    </AFFI.Person>
+    <AFFI.Person _ID="_10" familyName="Meloen" givenName="R" serial="9">
+    </AFFI.Person>
+  </AFFI.AffiliationStore.persons>
+</AFFI.AffiliationStore>
+
+</_StorageUnit>
+<!--End of Memops Data-->
