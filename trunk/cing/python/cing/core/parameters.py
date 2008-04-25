@@ -65,7 +65,6 @@ cingPaths = NTdict(
     html         = 'HTML',
     css          = 'cing.css',
     xplor        = os.getenv('xplorPath'),
-    profit       = os.getenv('profitPath'),
     procheck_nmr = os.getenv('procheckPath'),
     aqpc         = os.getenv('aqpcPath'),
     whatif       = os.getenv('whatifPath'),
@@ -129,15 +128,7 @@ parameters = NTparameter( name = 'parameters', branch = True,
                                     prettyS    = 'path to whatif',
                                     help       = 'Path to whatif',
                                     __FORMAT__ = '%(value)s'
-        ),
-        profit =       NTparameter( name       = 'profit',
-                                    partype    = 'string',
-                                    default    = 'profit',
-                                    prettyS    = 'path to profit',
-                                    help       = 'Path to profit',
-                                    __FORMAT__ = '%(value)s'
-        ),
-    
+        ),    
     )
 )
 parameters.programs.procheck_nmr.value   = 'procheck_nmr'

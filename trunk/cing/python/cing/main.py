@@ -134,7 +134,8 @@ def testOverall():
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = ( "cing.PluginCode.test.test_ccpn",
+    excludedModuleList = ( 
+                          "cing.PluginCode.test.test_ccpn",
 #                           "cing.PluginCode.test.test_Procheck",
 #                           "cing.PluginCode.test.test_Whatif",
 #                           "cing.Scripts.test.test_cyana2cing",

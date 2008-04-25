@@ -20,8 +20,8 @@ Adjust if needed.
 GV: 16 Sep: added cingBinPath and profitPath
 JFD: 27 Nov 2007 removed again.
 
-Uses 'which xplor/profit/$prodir/procheck_nmr.scr/DO_WHATIF.COM' to determine initial
-xplor/profit/procheck/what if executables; make sure they are in your
+Uses 'which xplor/$prodir/procheck_nmr.scr/DO_WHATIF.COM' to determine initial
+xplor/procheck/what if executables; make sure they are in your
 path when you run setup. If they are not; you may continue without their
 respective functionalities.
 """
@@ -36,7 +36,6 @@ CING_SHELL_TEMPLATE = \
 # adjust these, if needed
 #############################################
 %(export)s  xplorPath%(equals)s%(xplorPath)s
-%(export)s  profitPath%(equals)s%(profitPath)s
 %(export)s  procheckPath%(equals)s%(procheckPath)s
 %(export)s  aqpcPath%(equals)s%(aqpcPath)s
 %(export)s  whatifPath%(equals)s%(whatifPath)s
@@ -158,14 +157,6 @@ if __name__ == '__main__':
     else:
         NTmessage("Found 'xplor'")
         parametersDict['xplorPath']  = strip(xplorPath)
-
-    profitPath,err  = NTgetoutput('which profit')
-    if not profitPath:
-        NTwarning("Couldn't find 'profit'")
-        parametersDict['profitPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
-    else:
-        NTmessage("Found 'profit'")
-        parametersDict['profitPath'] = strip(profitPath)
 
 #    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("prodir"):
