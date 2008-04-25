@@ -53,6 +53,7 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import header
 from cing import programVersion
@@ -110,17 +111,20 @@ def script( scriptFile, *a, **k ):
     global kwds
     args = a
     kwds = k
-    if os.path.exists( scriptFile ):
-        NTmessage('==> Executing script '+ scriptFile )
-        execfile( scriptFile, globals() )
-    else:
-        scriptFile2 = os.path.join( cingPythonDir, cingPaths.scripts, scriptFile)
-        if os.path.exists( scriptFile2 ):
-            NTmessage('==> Executing script "%s"', scriptFile2 )
-            #end if
-            execfile( scriptFile2, globals() )
-        else:
-            NTerror('script: file "%s" not found\n', scriptFile)
+    
+    if not os.path.exists( scriptFile ):
+        NTdebug('Missed in current working directory the script file: %s' % scriptFile)
+        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts)
+        scriptFileAbs = os.path.join( scriptsDir, scriptFile)
+        if not os.path.exists( scriptFileAbs ):
+            NTerror('Missed in current working directory and Scripts directory\n'+
+                    '[%s] the script file [%s]' % ( scriptsDir, scriptFile ))
+            return True
+        scriptFile = scriptFileAbs
+        
+    NTmessage('==> Executing script '+ scriptFile )
+    execfile( scriptFile, globals() )
+        
         #end if
     #end if
 #end def
@@ -130,8 +134,7 @@ def testOverall():
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = (
-#                           "cing.PluginCode.test.test_ccpn",
+    excludedModuleList = ( "cing.PluginCode.test.test_ccpn",
 #                           "cing.PluginCode.test.test_Procheck",
 #                           "cing.PluginCode.test.test_Whatif",
 #                           "cing.Scripts.test.test_cyana2cing",
@@ -172,7 +175,7 @@ def main():
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
-
+    
     parser = OptionParser(usage=usage, version=programVersion)
     parser.add_option("--test",
                       action="store_true",
@@ -194,14 +197,14 @@ def main():
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
                      )
-    parser.add_option("--gui",
-                      action="store_true",
-                      dest="gui",
+    parser.add_option("--gui", 
+                      action="store_true", 
+                      dest="gui", 
                       help="Start graphical user inteface"
                      )
-    parser.add_option("--new",
-                      action="store_true",
-                      dest="new",
+    parser.add_option("--new", 
+                      action="store_true", 
+                      dest="new", 
                       help="Start new project"
                      )
     parser.add_option("--old",
@@ -209,39 +212,39 @@ def main():
                       dest="old",
                       help="Open a old project"
                      )
-    parser.add_option("--init",
+    parser.add_option("--init", 
                       dest="init", default=None,
                       help="Initialize from SEQUENCEFILE[,CONVENTION]",
                       metavar="SEQUENCEFILE[,CONVENTION]"
                      )
-    parser.add_option("--initPDB",
+    parser.add_option("--initPDB", 
                       dest="initPDB", default=None,
                       help="Initialize from PDBFILE[,CONVENTION]",
                       metavar="PDBFILE[,CONVENTION]"
                      )
-    parser.add_option("--initBMRB",
+    parser.add_option("--initBMRB", 
                       dest="initBMRB", default=None,
                       help="Initialize from edited BMRB file",
                       metavar="BMRBFILE"
                      )
-    parser.add_option("--initCcpn",
+    parser.add_option("--initCcpn", 
                       dest="initCcpn", default=None,
                       help="Initialize from CCPNFILE",
                       metavar="CCPNFILE"
                      )
-    parser.add_option("--xeasy",
+    parser.add_option("--xeasy", 
                       dest="xeasy", default=None,
-                      help="Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION",
+                      help="Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION", 
                       metavar="SEQFILE,PROTFILE,CONVENTION"
                      )
-    parser.add_option("--xeasyPeaks",
+    parser.add_option("--xeasyPeaks", 
                       dest="xeasyPeaks", default=None,
-                      help="Import peaks from xeasy SEQFILE,PROTFILE,PEAKFILE,CONVENTION",
+                      help="Import peaks from xeasy SEQFILE,PROTFILE,PEAKFILE,CONVENTION", 
                       metavar="SEQFILE,PROTFILE,PEAKFILE,CONVENTION"
                      )
     parser.add_option("--merge",
-                      action="store_true",
-                      dest="merge",
+                      action="store_true", 
+                      dest="merge", 
                       help="Merge resonances"
                      )
     parser.add_option("--generatePeaks",
@@ -249,19 +252,19 @@ def main():
                       help="Generate EXP_NAME peaks with AXIS_ORDER from the resonance data",
                       metavar="EXP_NAME,AXIS_ORDER"
                      )
-    parser.add_option("--script",
+    parser.add_option("--script", 
                       dest="script", default=None,
-                      help="Run script from SCRIPTFILE",
+                      help="Run script from SCRIPTFILE", 
                       metavar="SCRIPTFILE"
                      )
     parser.add_option("--ipython",
-                      action="store_true",
-                      dest="ipython",
+                      action="store_true", 
+                      dest="ipython", 
                       help="Start ipython interpreter"
                      )
     parser.add_option("--validate",
-                      action="store_true", default=False,
-                      dest="validate",
+                      action="store_true", default=False, 
+                      dest="validate", 
                       help="Do validation"
                      )
     parser.add_option("-v", "--verbosity", type='int',
@@ -270,13 +273,13 @@ def main():
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
     parser.add_option( "--nosave",
-                      action="store_true",
-                      dest="nosave",
+                      action="store_true", 
+                      dest="nosave", 
                       help="Don't save on exit (default: save)"
                      )
     parser.add_option( "--export", default=False,
-                      action="store_true",
-                      dest="export",
+                      action="store_true", 
+                      dest="export", 
                       help="Export before exit (default: noexport)"
                      )
 
@@ -287,31 +290,31 @@ def main():
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
-
+    
     NTmessage(header)
 #    root,file,ext  = NTpath( __file__ )
-
+    
     if options.test:
         testOverall()
         sys.exit(0)
-
+    
     #------------------------------------------------------------------------------------
     # Extended documentation
     #------------------------------------------------------------------------------------
     if options.doc:
         parser.print_help(file=sys.stdout)
-        print __doc__
+        print __doc__ 
         sys.exit(0)
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # Full documentation
     #------------------------------------------------------------------------------------
     if options.docdoc:
         print '=============================================================================='
         parser.print_help(file=sys.stdout)
-        print __doc__
-
+        print __doc__ 
+    
         print Project.__doc__
         for p in plugins.values():
             NTmessage(    '-------------------------------------------------------------------------------' +
@@ -319,38 +322,38 @@ def main():
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
                      )
-        #end for
-
-        print Molecule.__doc__
+        #end for        
+    
+        print Molecule.__doc__ 
         sys.exit(0)
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # START
     #------------------------------------------------------------------------------------
-
+    
     # GUI
     if options.gui:
-        import Tkinter
-        from cing.core.gui import CingGui
+        import Tkinter 
+        from cing.core.gui import CingGui  
 
         root = Tkinter.Tk()
 
         popup = CingGui(root, options=options)
         popup.open()
-
+  
         root.withdraw()
         root.mainloop()
         exit()
     #end if
-
-    #check for the required name option
+    
+    #check for the required name option  
     parser.check_required('-n')
 
 #    args = []
     _kwds = {}
-
-
+    
+     
     #------------------------------------------------------------------------------------
     # open project
     #------------------------------------------------------------------------------------
@@ -384,12 +387,12 @@ def main():
         project.initCcpn( ccpnFile = options.initCcpn )
     else:
         project = Project.open( options.name, status='create' )
-
+    
     if not project:
         NTdebug("Doing a hard system exit")
         sys.exit(2)
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
@@ -399,7 +402,7 @@ def main():
             NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required\n")
         else:
             project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
-
+    
     #------------------------------------------------------------------------------------
     # Import xeasy peakFile
     #------------------------------------------------------------------------------------
@@ -409,14 +412,14 @@ def main():
             NTerror("--xeasyPEaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
-
+    
     #------------------------------------------------------------------------------------
     # Merge resonances
     #------------------------------------------------------------------------------------
     if (options.merge):
         project.mergeResonances()
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # Generate peaks
     #------------------------------------------------------------------------------------
@@ -428,20 +431,20 @@ def main():
             peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] ) #@UnusedVariable
         #end if
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # Script
     #------------------------------------------------------------------------------------
     if options.script:
         script( options.script )
-
+    
     #------------------------------------------------------------------------------------
     # Validate
     #------------------------------------------------------------------------------------
     if options.validate:
         project.validate()
     #end if
-
+    
     #------------------------------------------------------------------------------------
     # ipython
     #------------------------------------------------------------------------------------
@@ -451,13 +454,13 @@ def main():
                                     exit_msg = '--------Leaving IPython--------')
         ipshell()
     #end if
-
+     
     #------------------------------------------------------------------------------------
-    # Optionally export project
+    # Optionally export project 
     #------------------------------------------------------------------------------------
-    if project and  options.export:
+    if project and  options.export: 
         project.export()
-
+    
     #------------------------------------------------------------------------------------
     # CLose and optionally not save project
     #------------------------------------------------------------------------------------
