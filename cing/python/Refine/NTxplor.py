@@ -1,14 +1,15 @@
 #
 #
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import NTerror
-import time
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import removedir
 import os
 import random
 import sys
+import time
+
 todo = """
 
 -copying tlog, log
@@ -32,13 +33,211 @@ readable
 Cluster issues
 """
 
+#------------------------------------------------------------------------------
+
+class refineParameters( NTdict ):
+
+    def __init__(self, **kwds):
+        NTdict.__init__( self, __CLASS__ = "refineParameters",
+                
+      baseName          = 'model%03d.pdb',      # Basename used for pdb files
+      models            = '',
+      overwrite         = False,                # Overwrite existing files
+      verbose           = False,                # verbose on/off
+      useCluster        = False,                # use cluster; not yet implemented     
+
+      # PSF generation
+      psfFile           = 'name.psf',            
+      patchHISD         = [],                   # HISD patches are needed for CYANA->XPLOR compatibility.
+      patchHISE         = [],                   # HISE patches are needed for CYANA->XPLOR compatibility.
+      patchCISP         = [],                   # Cis prolines
+      
+      # initial analysis
+      minimizeProtons   = False,
+            
+      # NOE restraints
+      noeMaxRestraints  = 30000,
+      noeCeiling        = 100,    
+      noeRestraints     = [],                   # Noe restraint lists, should be in the Tables directory
+
+      # dihedral restraints
+      dihedralMaxRestraints = 10000,
+      dihedralScale      = 200,
+      dihedralRestraints = [],                  # dihedral restraint lists, should be in the Tables directory
+                          
+      # water refinement protocol      
+      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX" 
+      # The water refinement uses the OPLSX parameters 
+      nonBonded         = 'OPLSX',
+      temp              = 500,                  # temperature (K); 500 initially
+      mdheat            = NTdict( # 100,0.003 initially with Chris
+                                    nstep  = 100,       # number of MD steps
+                                    timest = 0.003,     # timestep of MD (ps)
+                                ),
+      mdhot             = NTdict( # 2000, 0.004 initially with Chris
+                                    nstep  = 2000,      # number of MD steps
+                                    timest = 0.004,     # timestep of MD (ps)
+                                  ),
+      mdcool            = NTdict( # 200, 0.004 initially with Chris
+                                    nstep  = 200,       # number of MD steps
+                                    timest = 0.004,     # timestep of MD (ps)
+                                 ),
+      
+      # Analysis
+      bestModels        = '',
+      superpose         = '',
+      
+      # Run time
+      inPath            = '',       # Run time, no need to edit
+      outPath           = '',       # Run time, no need to edit
+      basePath          = '',       # Run time, no need to edit
+      
+      __FORMAT__ = """
+parameters = refineParameters(
+      baseName          = "%(baseName)s",
+      
+      # ascilist to select the model(s) to refine; e.g 0-19
+      # can also be modified as command-line argument
+      models            = '%(models)s',
+
+      # Overwrite existing files
+      overwrite         = %(overwrite)s, 
+      # verbose on/off
+      verbose           = %(verbose)s, 
+      # use cluster; not yet implemented
+      useCluster        = %(useCluster)s,            
+
+      # PSF generation
+      psfFile           = "%(psfFile)s",            
+      # HISD patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
+      patchHISD         = %(patchHISD)s,        
+      # HISE patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
+      patchHISE         = %(patchHISE)s,
+      # Cis-roline patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
+      patchCISP         = %(patchCISP)s,
+      
+      # initial analysis
+      minimizeProtons   = %(minimizeProtons)s,
+            
+      # NOE restraints
+      noeMaxRestraints  = %(noeMaxRestraints)s,
+      noeCeiling        = %(noeCeiling)s,
+      # Noe restraint lists, should be in the Tables directory
+      noeRestraints     = %(noeRestraints)r, 
+      
+      # dihedral restraints
+      dihedralMaxRestraints = %(dihedralMaxRestraints)s,
+      dihedralScale      = %(dihedralScale)s,
+      # dihedral restraint lists, should be in the Tables directory
+      dihedralRestraints = %(dihedralRestraints)r,                  
+
+      # water refinement protocol      
+      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX" 
+      # The water refinement uses the OPLSX parameters 
+      nonBonded         = "%(nonBonded)s",
+      # temperature (K); 500 initially
+      temp              = %(temp)s,            
+      # nstep: number of MD steps; timest: # timestep of MD (ps)
+      mdheat            = %(mdheat)r,            # 100,  0.003 initially with Chris
+      mdhot             = %(mdhot)r,             # 2000, 0.004 initially with Chris
+      mdcool            = %(mdcool)r,            # 200, 0.004 initially with Chris
+      
+      # analysis
+      # bestModels; ascilist, e.g. '3,4,1,7,20,5'; typically generated by --best option
+      bestModels        = "%(bestModels)s",
+      # Superpose residues; ascilist e.g. 200-270,276-300,320-350
+      superpose         = "%(superpose)s",
+      
+      # Run time, no need to edit
+      # basePath        = %(basePath)s
+      # inPath          = %(inPath)s
+      # outPath         = %(outPath)s
+)
+"""
+)
+        if kwds:
+            self.update( kwds )
+    #end def
+    
+    def toFile( self, path ):
+        f = open( path, 'w' )
+        fprintf( f, '%s', self )
+        f.close()
+    #end def
+    
+    def __str__( self ):
+        return self.format()
+    #end def
+#end class
+
+class refineNoeParameters( NTdict ):    
+    def __init__( self, name, **kwds ):
+        NTdict.__init__( self, __CLASS__ = "refineNoeParameters",
+
+                         name      = name,
+                         averaging = 'sum',
+                         scale     = 50,
+                         accept    = 0.5,
+                         fileName  = name+'.tbl',  # should be in the Tables directory
+
+                         __FORMAT__ = """
+                            refineNoeParameters(
+                                    name      = "%(name)s",
+                                    averaging = "%(averaging)s",
+                                    scale     = %(scale)s,
+                                    accept    = %(accept)s,
+                                    fileName  = "%(fileName)s" \t# should be in the Tables directory
+                                  )
+                            """        
+)
+    
+        if kwds:
+            self.update( kwds )
+    #end def
+    
+    def __str__( self ):
+        return self.format()
+    #end def
+    def __repr__( self ):
+        return self.format()
+    #end def
+#end class
+
+class refineDihedralParameters( NTdict ):    
+    def __init__( self, name, **kwds ):
+        NTdict.__init__( self, __CLASS__ = "refineDihedralParameters",
+
+                         name      = name,
+                         accept    = 5.0,
+                         fileName  = name+'.tbl',  # should be in the Tables directory
+
+                         __FORMAT__ = """
+                            refineDihedralParameters(
+                                    name      = "%(name)s",
+                                    accept    = %(accept)s,
+                                    fileName  = "%(fileName)s" \t# should be in the Tables directory
+                                  )
+                            """        
+)
+    
+        if kwds:
+            self.update( kwds )
+    #end def
+    
+    def __str__( self ):
+        return self.format()
+    #end def
+    def __repr__( self ):
+        return self.format()
+    #end def
+#end class
 
 
-class Xplor( NTdict ):
+class Xplor( refineParameters ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-        NTdict.__init__( self )
+        refineParameters.__init__( self )
         self.update( config )
         for arg in args:
             self.update( arg )
@@ -46,7 +245,7 @@ class Xplor( NTdict ):
         
         # check for directories relative to basePath
         self.setdefault( 'basePath', '.')
-        for _dirname, dirpath in self.directories.items():
+        for dummy_dirname, dirpath in self.directories.items():
             self.makePath( self.joinPath( dirpath ) )
         #end for
         
@@ -58,7 +257,8 @@ class Xplor( NTdict ):
         self.setdefault( 'seed',          12397 )
         
         self.setdefault( 'overwrite', False )
-
+        self.setdefault( 'verbose', True )
+        
     #------------------------------------------------------------------------
     def cleanPath( self, path ):
         if not os.path.exists(path):
@@ -70,7 +270,7 @@ class Xplor( NTdict ):
     #------------------------------------------------------------------------
     def makePath( self, path ):
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
 
     #------------------------------------------------------------------------
     def joinPath( self, *args):
@@ -94,7 +294,7 @@ class Xplor( NTdict ):
         
     #------------------------------------------------------------------------
     def newPath( self, *args):
-        """Check existence of joined path, relative to basePath, 
+        """Check existance of joined path, relative to basePath, 
            remove if exists and overwrite
            Return joined path or do a system exit.
         """
@@ -103,7 +303,7 @@ class Xplor( NTdict ):
             if self.overwrite:
                 os.remove( path )
             else:
-                NTerror('Error: path "%s" already exists\n', path )        
+                NTerror('Error: path "%s" already exists; use --overwrite\n', path )        
                 sys.exit(1)
             #end if
         #end if
@@ -124,13 +324,13 @@ evaluate ( $par_nonbonded = "''' + self.nonBonded + '''" )
         for filename in self.parameterFiles:
             code = code + """
 parameter
-  @""" + filename + """
+  @""" + self.joinPath( self.directories.toppar, filename ) + """
 end
 """ 
         for filename in self.topologyFiles:
             code = code + """
 topology
-  @""" + filename + """
+  @""" + self.joinPath( self.directories.toppar, filename ) + """
 end"""     
         return code
         
@@ -333,7 +533,8 @@ end if
         scriptFile = open( scriptFileName, 'w' )
         self.printScript( scriptFile )
         scriptFile.close()
-        NTmessage('==> Created script "%s"',  scriptFileName)
+        if self.verbose:
+            NTmessage('==> Created script "%s"\n',  scriptFileName)
 
         # Create job/log file
         jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh') 
@@ -351,10 +552,11 @@ end if
         jobFile.close()
 
         os.system('/bin/chmod +x %s' % jobFileName)
-        NTmessage('==> Starting XPLOR job "%s"', jobFileName)
+        if self.verbose:
+            NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
 
         if self.useCluster:
-            NTmessage( 'Sending job to the queu %s', self.queu_cluster )
+            NTmessage( 'Sending job to the queu %s\n', self.queu_cluster )
             os.system( '%s %s &' % (self.queu_cluster, jobFileName) )
             time.sleep(5)
         else:
@@ -379,28 +581,12 @@ class WaterRefine( Xplor ):
     def __init__( self, config, *args, **kwds ):
     
         Xplor.__init__( self, config, *args, **kwds )
-        # set default values if not supplied through args or kwds 
-        self.setdefault( 'temp',    500 )
-        self.setdefault( 'mdheat',  NTdict( 
-                                             nstep  = 100,      # number of MD steps
-                                             timest = 0.003,    # timestep of MD (ps)
-                                            )
-                       )
-        self.setdefault( 'mdhot',   NTdict( 
-                                             nstep  = 2000,     # number of MD steps
-                                             timest = 0.004,    # timestep of MD (ps)
-                                            )
-                       )
-        self.setdefault( 'mdcool',  NTdict( 
-                                             nstep  = 200,      # number of MD steps
-                                             timest = 0.004,    # timestep of MD (ps)
-                                            )
-                       )
-        self.setdefault( 'inPath',  self.directories.analyzed )
-        self.setdefault( 'outPath', self.directories.refined )
+        self.inPath  = self.directories.analyzed
+        self.outPath = self.directories.refined 
 
-        self.keysformat()
-        NTmessage('%s', self.format())
+        if self.verbose:
+            #self.keysformat()
+            NTmessage('%s\n', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -685,12 +871,12 @@ class Analyze( Xplor ):
     def __init__( self, config, *args, **kwds ):
     
         Xplor.__init__( self, config, *args, **kwds )
-        self.setdefault( 'minimizeProtons', True )        
-        self.setdefault( 'inPath',  self.directories.converted )
-        self.setdefault( 'outPath', self.directories.analyzed )
+        self.inPath  = self.directories.converted
+        self.outPath = self.directories.analyzed 
 
-        self.keysformat()
-        NTmessage('%s', self.format())
+        if self.verbose:
+            #self.keysformat()
+            NTmessage('%s\n', self.format())
         #end if
 
     #------------------------------------------------------------------------
@@ -809,15 +995,14 @@ class GeneratePSF( Xplor ):
     def __init__( self, config, *args, **kwds ):
     
         Xplor.__init__( self, config, *args, **kwds )
-        self.setdefault( 'patchHISD', [] )
-        self.setdefault( 'patchHISE', [] )
-        self.setdefault( 'patchCISP', [] )
         # make relative Path
         self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
 
-        self.keysformat()
-        NTmessage('%s', self.format())
+        if self.verbose:
+            #self.keysformat()
+            NTmessage('%s\n', self.format())
+        #end if        
     #endif
 
     #------------------------------------------------------------------------
