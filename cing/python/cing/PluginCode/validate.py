@@ -1149,11 +1149,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
-       
+
        Note that residue can also be a list of residues. A single plot will
        be created for all together were the appropriate background histograms
        will be picked.
-       
+
        Return None on error or ps on success.
     '''
 
@@ -1174,13 +1174,13 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     isSingleResiduePlot = len(residueList) == 1
-    
+
     if not plotTitle:
         if isSingleResiduePlot:
             plotTitle = residue._Cname(1)
         else:
             plotTitle = '%d residues'
-            
+
 
     if dihedralName1 not in residue or residue[dihedralName1] == None:
         NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
@@ -1205,7 +1205,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
     ps.addPlot(plot)
-    
+
     if dihedralName1=='PHI' and dihedralName2=='PSI':
 #         Plot a Ramachandran density background
 ##        imageFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'RamachandranLaskowski.png' )
@@ -1216,14 +1216,14 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
 #        im = imshow(rgb, alpha=0.05, extent=extent)
         histList = []
-        ssTypeList = histBySsAndResType.keys()
+        ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
         ssTypeList.sort()
         for ssType in ssTypeList:
-            if isSingleResiduePlot: 
+            if isSingleResiduePlot:
                 hist = histBySsAndResType[ssType][residue.resName]
             else:
                 hist = histCombined[ssType] # excludes GLY/PRO densities
-            histList.append(hist)       
+            histList.append(hist)
         plot.ramachandranPlot(histList)
 
 
@@ -1234,7 +1234,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             # res is equal to residue
             dr1 = _matchDihedrals(res, dihedralName1)
             dr2 = _matchDihedrals(res, dihedralName2)
-        
+
             if dr1 and dr2:
                 lower1, upper1 = dr1.lower, dr1.upper
                 lower2, upper2 = dr2.lower, dr2.upper
@@ -1244,32 +1244,32 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             elif dr2:
                 lower2, upper2 = dr2.lower, dr2.upper
                 lower1, upper1 = plotparams1.min, plotparams1.max
-        
+
             if dr1 or dr2:
                 plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
-    
+
         d1 = res[dihedralName1]
         d2 = res[dihedralName2]
-    
+
         if not (len(d1) and len(d2)):
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
         d1cav = d1.cav
         d2cav = d2.cav
-    
+
         # Plot data points on top for painters algorithm without alpha blending.
         myPoint = plusPoint.copy()
         myPoint.pointColor = 'green'
         myPoint.pointSize = 6.0
         myPoint.pointEdgeWidth = 1.0
         if res.resName == 'GLY':
-            myPoint.pointType = 'triangle'            
+            myPoint.pointType = 'triangle'
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
-            
+
         plot.points( zip( d1, d2 ), attributes=myPoint )
-        
+
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot:
             myPoint = myPoint.copy()
@@ -1351,8 +1351,8 @@ def setupHtml(project):
         next = None
         lastMoleculeIndex = len(project.molecules) - 1
         if index > 0:
-            previous = project[ project.molecules[index-1] ]    
-    
+            previous = project[ project.molecules[index-1] ]
+
         if index < lastMoleculeIndex:
             next = project[ project.molecules[index+1] ]
 
@@ -1375,7 +1375,7 @@ def setupHtml(project):
             chaindir = project.htmlPath(chain.name)
             if not os.path.exists( chaindir ):
                 os.mkdir( chaindir )
- 
+
             #if hasattr(chain, 'html'): del(chain['html'])
             if chain.has_key('html'):
                 del(chain.html)
@@ -1430,7 +1430,7 @@ def setupHtml(project):
             for dummy in range( r0.resNum%ncols ):
                 for obj in htmlList:
                     obj.html.main('td', style="width: %s" % width)
- 
+
             for res in residues:
                 # Create the directory for this residue
                 resdir = project.htmlPath(chain.name, res.name)
@@ -1455,14 +1455,14 @@ def setupHtml(project):
                         obj.html.main('tr', closeTag=False)
                         obj.html.main( 'td',sprintf('%d-%d',r1,r2),
                                        style="width: %s" % width )
- 
+
                 # add residue to table
                 for obj in htmlList:
                     objMain = obj.html.main
                     objMain('td', style="width: %s" % width, closeTag=False)
                     obj.html.insertHtmlLink(objMain, obj, res, text=res.name)
                     objMain('td', openTag=False)
- 
+
                 # Create a page for each residue
 
                 # generate html file for this residue
@@ -1483,7 +1483,7 @@ def setupHtml(project):
             for obj in htmlList:
                 obj.html.main('tr', openTag=False)
                 obj.html.main('table', openTag=False)
-            #end for over obj in htmlList 
+            #end for over obj in htmlList
 
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',

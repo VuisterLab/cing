@@ -17,6 +17,7 @@ CCPN       = 'CCPN'
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 UNDEFINED_FLOAT = -888.888
+NAN_FLOAT       = -888.888
 
 X_AXIS = 0
 Y_AXIS = 1
