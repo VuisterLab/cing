@@ -33,7 +33,7 @@ from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
-from cing.core.constants import UNDEFINED_FLOAT
+from cing.core.constants import NAN_FLOAT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
@@ -1295,8 +1295,8 @@ Residue class: Defines residue properties
         
         self[dihedralName] = NTlist()
         self[dihedralName].cAverage()
-        self[dihedralName].cav = UNDEFINED_FLOAT
-        self[dihedralName].cv  = UNDEFINED_FLOAT
+        self[dihedralName].cav = NAN_FLOAT
+        self[dihedralName].cv  = NAN_FLOAT
         self[dihedralName].db  = self.db[dihedralName] # linkage to the database
         self[dihedralName].residue  = self             # linkage to self
         
