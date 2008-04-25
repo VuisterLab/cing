@@ -4,9 +4,8 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityError
+from cing import verbosityDetail
 from cing.Libs.NTutils import NTdebug
-from cing.PluginCode.ccpn import initCcpn
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from unittest import TestCase
@@ -45,15 +44,17 @@ class AllChecks(TestCase):
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
 
-    def tttestInitCcpn(self):
+    def testInitCcpn(self):
         entryId = "1brv" # Small much studied PDB NMR entry
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
-        project = Project( "test_for_ccpn_cing_project" )
-        ccpnFile = os.path.join(entryId+".cing", "Data", "CCPN", entryId+".xml")
-        project = initCcpn(cingProject=project, ccpnFile=ccpnFile)
-        self.failIf(project)
+        project = Project( entryId )
+        self.failIf( project.removeFromDisk())
+        project = Project.open( entryId, status='new' )
+        ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId)
+        project.initCcpn(ccpnFile=ccpnFile)
+        self.failIf(project.save())
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
+    cing.verbosity = verbosityDetail
     unittest.main()

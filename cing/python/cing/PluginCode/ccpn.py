@@ -396,10 +396,10 @@ def importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
         # end if
 
 
-        importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
-        importFromCcpnDistanceRestraints(cingProject, ccpnProject)
-        importFromCcpnDihedralRestraints(cingProject, ccpnProject)
-        importFromCcpnRdcRestraints(cingProject, ccpnProject)
+        #importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
+        #importFromCcpnDistanceRestraints(cingProject, ccpnProject)
+        #importFromCcpnDihedralRestraints(cingProject, ccpnProject)
+        #importFromCcpnRdcRestraints(cingProject, ccpnProject)
 
         cingProject.addHistory(sprintf(funcName))
 

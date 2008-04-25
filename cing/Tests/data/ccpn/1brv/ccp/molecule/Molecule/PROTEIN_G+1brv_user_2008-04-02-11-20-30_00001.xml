@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<_StorageUnit release="2.0.a0" originator="CCPN Python XmlIO" packageGuid="www.ccpn.ac.uk_Fogh_2006-08-16-14:22:54_00038" time="Wed Apr  2 11:20:37 2008">
+
+<MOLE.Molecule _ID="_1" createdBy="user" guid="1brv_user_2008-04-02-11-20-30_00001" isFinalised="false" isModifiable="true" name="PROTEIN G">
+  <MOLE.Molecule.commonNames>
+    <IMPL.Line>BRSV-G REGION</IMPL.Line>
+  </MOLE.Molecule.commonNames>
+  <MOLE.Molecule.molResLinks>
+    <MOLE.MolResLink _ID="_2">
+      <MOLE.MolResLink.molResLinkEnds> _3 _4</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_5">
+      <MOLE.MolResLink.molResLinkEnds> _6 _7</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_8">
+      <MOLE.MolResLink.molResLinkEnds> _9 _10</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_11">
+      <MOLE.MolResLink.molResLinkEnds> _12 _13</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_14">
+      <MOLE.MolResLink.molResLinkEnds> _15 _16</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_17">
+      <MOLE.MolResLink.molResLinkEnds> _18 _19</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_20">
+      <MOLE.MolResLink.molResLinkEnds> _21 _22</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_23">
+      <MOLE.MolResLink.molResLinkEnds> _24 _25</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_26">
+      <MOLE.MolResLink.molResLinkEnds> _27 _28</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_29">
+      <MOLE.MolResLink.molResLinkEnds> _30 _31</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_32">
+      <MOLE.MolResLink.molResLinkEnds> _33 _34</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_35">
+      <MOLE.MolResLink.molResLinkEnds> _36 _37</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_38">
+      <MOLE.MolResLink.molResLinkEnds> _39 _40</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_41">
+      <MOLE.MolResLink.molResLinkEnds> _42 _43</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_44">
+      <MOLE.MolResLink.molResLinkEnds> _45 _46</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_47">
+      <MOLE.MolResLink.molResLinkEnds> _48 _49</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_50">
+      <MOLE.MolResLink.molResLinkEnds> _51 _52</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_53">
+      <MOLE.MolResLink.molResLinkEnds> _54 _55</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_56">
+      <MOLE.MolResLink.molResLinkEnds> _57 _58</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_59">
+      <MOLE.MolResLink.molResLinkEnds> _60 _61</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_62">
+      <MOLE.MolResLink.molResLinkEnds> _63 _64</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_65">
+      <MOLE.MolResLink.molResLinkEnds> _66 _67</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_68">
+      <MOLE.MolResLink.molResLinkEnds> _69 _70</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_71">
+      <MOLE.MolResLink.molResLinkEnds> _72 _73</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_74">
+      <MOLE.MolResLink.molResLinkEnds> _75 _76</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_77">
+      <MOLE.MolResLink.molResLinkEnds> _78 _79</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_80">
+      <MOLE.MolResLink.molResLinkEnds> _81 _82</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_83">
+      <MOLE.MolResLink.molResLinkEnds> _84 _85</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_86">
+      <MOLE.MolResLink.molResLinkEnds> _87 _88</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_89">
+      <MOLE.MolResLink.molResLinkEnds> _90 _91</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_92">
+      <MOLE.MolResLink.molResLinkEnds> _93 _94</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_95">
+      <MOLE.MolResLink.molResLinkEnds> _96 _97</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+    <MOLE.MolResLink _ID="_98">
+      <MOLE.MolResLink.molResLinkEnds> _99 _100</MOLE.MolResLink.molResLinkEnds>
+    </MOLE.MolResLink>
+  </MOLE.Molecule.molResLinks>
+  <MOLE.Molecule.molResidues>
+    <MOLE.MolResidue _ID="_101" descriptor="prot:H3" linking="start" seqCode="1" seqInsertCode=" " serial="1">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-10_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_28" linkCode="next" molResLink="_26">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_102" descriptor="prot:HD1,HE2" linking="middle" seqCode="2" seqInsertCode=" " serial="2">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-16_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_13" linkCode="next" molResLink="_11">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_27" linkCode="prev" molResLink="_26">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_103" descriptor="neutral" linking="middle" seqCode="3" seqInsertCode=" " serial="3">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-15_00017</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_16" linkCode="next" molResLink="_14">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_12" linkCode="prev" molResLink="_11">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_104" descriptor="deprot:HD2" linking="middle" seqCode="4" seqInsertCode=" " serial="4">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-10_00001</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_97" linkCode="next" molResLink="_95">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_15" linkCode="prev" molResLink="_14">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_105" descriptor="prot:HD1,HE2" linking="middle" seqCode="5" seqInsertCode=" " serial="5">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-16_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_34" linkCode="next" molResLink="_32">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_96" linkCode="prev" molResLink="_95">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_106" descriptor="neutral" linking="middle" seqCode="6" seqInsertCode=" " serial="6">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-10_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_19" linkCode="next" molResLink="_17">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_33" linkCode="prev" molResLink="_32">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_107" descriptor="neutral" linking="middle" seqCode="7" seqInsertCode=" " serial="7">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-10_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_4" linkCode="next" molResLink="_2">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_18" linkCode="prev" molResLink="_17">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_108" descriptor="neutral" linking="middle" seqCode="8" seqInsertCode=" " serial="8">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-22_00003</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_55" linkCode="next" molResLink="_53">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_3" linkCode="prev" molResLink="_2">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_109" descriptor="neutral" linking="middle" seqCode="9" seqInsertCode=" " serial="9">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-15_00017</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_43" linkCode="next" molResLink="_41">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_54" linkCode="prev" molResLink="_53">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_110" descriptor="prot:HG1" linking="middle" seqCode="10" seqInsertCode=" " serial="10">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-24_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_64" linkCode="next" molResLink="_62">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_42" linkCode="prev" molResLink="_41">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_111" descriptor="neutral" linking="middle" seqCode="11" seqInsertCode=" " serial="11">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-17_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_70" linkCode="next" molResLink="_68">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_63" linkCode="prev" molResLink="_62">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_112" descriptor="neutral" linking="middle" seqCode="12" seqInsertCode=" " serial="12">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-22_00008</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_85" linkCode="next" molResLink="_83">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_69" linkCode="prev" molResLink="_68">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_113" descriptor="prot:HH" linking="middle" seqCode="13" seqInsertCode=" " serial="13">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-26_00001</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_22" linkCode="next" molResLink="_20">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_84" linkCode="prev" molResLink="_83">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_114" descriptor="neutral" linking="middle" seqCode="14" seqInsertCode=" " serial="14">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-27_00001</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_94" linkCode="next" molResLink="_92">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_21" linkCode="prev" molResLink="_20">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_115" descriptor="neutral" linking="middle" seqCode="15" seqInsertCode=" " serial="15">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-22_00008</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_40" linkCode="next" molResLink="_38">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_93" linkCode="prev" molResLink="_92">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_116" descriptor="link:SG" linking="middle" seqCode="16" seqInsertCode=" " serial="16">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-13_00005</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_60" linkCode="SG" molResLink="_59">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_67" linkCode="next" molResLink="_65">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_39" linkCode="prev" molResLink="_38">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_117" descriptor="prot:HG" linking="middle" seqCode="17" seqInsertCode=" " serial="17">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-23_00016</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_82" linkCode="next" molResLink="_80">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_66" linkCode="prev" molResLink="_65">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_118" descriptor="prot:HG1" linking="middle" seqCode="18" seqInsertCode=" " serial="18">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-24_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_73" linkCode="next" molResLink="_71">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_81" linkCode="prev" molResLink="_80">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_119" descriptor="link:SG" linking="middle" seqCode="19" seqInsertCode=" " serial="19">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-13_00005</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_45" linkCode="SG" molResLink="_44">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_88" linkCode="next" molResLink="_86">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_72" linkCode="prev" molResLink="_71">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_120" descriptor="prot:HE2" linking="middle" seqCode="20" seqInsertCode=" " serial="20">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-15_00018</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_100" linkCode="next" molResLink="_98">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_87" linkCode="prev" molResLink="_86">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_121" descriptor="neutral" linking="middle" seqCode="21" seqInsertCode=" " serial="21">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-15_00019</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_79" linkCode="next" molResLink="_77">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_99" linkCode="prev" molResLink="_98">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_122" descriptor="neutral" linking="middle" seqCode="22" seqInsertCode=" " serial="22">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-10_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_76" linkCode="next" molResLink="_74">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_78" linkCode="prev" molResLink="_77">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_123" descriptor="neutral" linking="middle" seqCode="23" seqInsertCode=" " serial="23">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-17_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_91" linkCode="next" molResLink="_89">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_75" linkCode="prev" molResLink="_74">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_124" descriptor="neutral" linking="middle" seqCode="24" seqInsertCode=" " serial="24">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-09_00022</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_25" linkCode="next" molResLink="_23">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_90" linkCode="prev" molResLink="_89">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_125" descriptor="link:SG" linking="middle" seqCode="25" seqInsertCode=" " serial="25">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-13_00005</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_46" linkCode="SG" molResLink="_44">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_37" linkCode="next" molResLink="_35">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_24" linkCode="prev" molResLink="_23">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_126" descriptor="neutral" linking="middle" seqCode="26" seqInsertCode=" " serial="26">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-17_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_31" linkCode="next" molResLink="_29">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_36" linkCode="prev" molResLink="_35">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_127" descriptor="prot:HG" linking="middle" seqCode="27" seqInsertCode=" " serial="27">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-23_00016</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_7" linkCode="next" molResLink="_5">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_30" linkCode="prev" molResLink="_29">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_128" descriptor="neutral" linking="middle" seqCode="28" seqInsertCode=" " serial="28">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-17_00014</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_49" linkCode="next" molResLink="_47">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_6" linkCode="prev" molResLink="_5">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_129" descriptor="link:SG" linking="middle" seqCode="29" seqInsertCode=" " serial="29">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-13_00005</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_61" linkCode="SG" molResLink="_59">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_58" linkCode="next" molResLink="_56">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_48" linkCode="prev" molResLink="_47">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_130" descriptor="prot:HE2;deprot:HD1" linking="middle" seqCode="30" seqInsertCode=" " serial="30">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-16_00013</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_52" linkCode="next" molResLink="_50">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_57" linkCode="prev" molResLink="_56">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_131" descriptor="neutral" linking="middle" seqCode="31" seqInsertCode=" " serial="31">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-17_00003</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_10" linkCode="next" molResLink="_8">
+        </MOLE.MolResLinkEnd>
+        <MOLE.MolResLinkEnd _ID="_51" linkCode="prev" molResLink="_50">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+    <MOLE.MolResidue _ID="_132" descriptor="prot:HE2;deprot:H''" linking="end" seqCode="32" seqInsertCode=" " serial="32">
+      <MOLE.MolResidue.chemComp>
+        <CHEM.exo-StdChemComp>
+          <IMPL.Line>msd_ccpnRef_2007-12-11-10-20-15_00018</IMPL.Line>
+        </CHEM.exo-StdChemComp>
+      </MOLE.MolResidue.chemComp>
+      <MOLE.MolResidue.molResLinkEnds>
+        <MOLE.MolResLinkEnd _ID="_9" linkCode="prev" molResLink="_8">
+        </MOLE.MolResLinkEnd>
+      </MOLE.MolResidue.molResLinkEnds>
+    </MOLE.MolResidue>
+  </MOLE.Molecule.molResidues>
+</MOLE.Molecule>
+
+</_StorageUnit>
+<!--End of Memops Data-->
