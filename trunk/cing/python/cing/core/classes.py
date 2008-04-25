@@ -278,6 +278,16 @@ Project: Top level Cing project class
     # actions open/restore/save/close/export/updateProject
     #-------------------------------------------------------------------------
 
+
+    def exists( name ):
+        rootp, _n = Project.rootPath( name )
+        if os.path.exists( rootp ):
+            return True
+        return False
+    #end def
+    exists = staticmethod( exists )
+    
+
     def open( name, status = 'create', restore=True ):
         """Static method open returns a new/existing Project instance depending on status
            Project data is restored when restore == True.

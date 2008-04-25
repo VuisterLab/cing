@@ -198,13 +198,13 @@ class AllChecks(TestCase):
             
             # Plot a Ramachandran density background        
             histList = []
-            ssTypeList = histBySsAndResType.keys()
+            ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
             ssTypeList.sort() # in place sort to: space, H, S
             for ssType in ssTypeList: 
 #                NTdebug('appending [%s]' % ssType )                   
                 hist = histBySsAndResType[ssType][resType]
                 histList.append(hist)       
-            self.assertFalse( plot.ramachandranPlot(histList))
+            self.assertFalse( plot.dihedralComboPlot(histList))
             if showDataPoints:
                 myPoint = plusPoint.copy()
                 myPoint.pointColor = 'green'

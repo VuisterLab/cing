@@ -9,11 +9,13 @@ from cing import verbosityError
 from cing import verbosityNothing
 from cing import verbosityOutput
 from cing import verbosityWarning
+from cing.core.constants import ISNAN
+from cing.core.constants import NAN_FLOAT
 from fnmatch import fnmatch
+from gzip import GzipFile
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-from gzip import GzipFile
 import array
 import cing
 import inspect
@@ -2884,6 +2886,10 @@ def sprintf( format, *args ):
     """return a string according to C's sprintf routine"""
     return ( (format) % (args) )
 
+def printf( format, *args ):
+    """print string according to C's sprintf routine"""
+    NTmessage(  (format) % (args)  )
+
 class PrintWrap:
     def __init__( self, stream = None,
                   autoFlush = True,
@@ -3569,8 +3575,8 @@ def addDeepByKeys(d, value, *keyList):
     v += value
     return d.setDeepByKeys(v, *keyList)
 
-def getDeepByKeysOrDefault(dict, default, *keyList):
-    result = dict.getDeepByKeys(*keyList)
+def getDeepByKeysOrDefault(c, default, *keyList):
+    result = getDeepByKeys(c, *keyList)
     if result == None:
         return default
     return result
@@ -3677,3 +3683,16 @@ Rob might have caught this by requiring c_av be at least 2.0.
     c_sd = sumsdsq / (sum-1)
     c_sd = math.sqrt( c_sd )
     return (c_av, c_sd)
+
+def floatFormat( v, format ):
+    ''' Just check for nans.'''
+    if ISNAN(v):
+        return NaNstring
+    return format % v
+
+def floatParse( v_str ):
+    '''Just check for nans.'''
+    if v_str == NaNstring:
+        return NAN_FLOAT 
+    return float(v_str)
+    

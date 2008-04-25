@@ -35,22 +35,14 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-
-        for chain in project.molecule.allChains():
-            if chain.name != 'A':
-                NTdebug('Skipping chain in: entry %s for chain code: %s' % (entryId,chain.name) )
-                continue
-
-            for res in chain.allResidues():
-                NTdebug('Doing entry %s for chain code %s residue %s' % (entryId,chain.name,res))
-
-                self.failUnless( res.has_key('PHI') and res.has_key('PSI'))
-#                if res.resNum != 172:
-#                    self.failUnless( res.PHI )
-#                if res.resNum != 2:
-#                    self.failUnless( res.PSI )
-
-        project.save()
+        ens = project.molecule.superpose()
+        NTdebug( 'ens %s' % ens)
+        NTdebug( 'ens.averageModel %s' % ens.averageModel)
+        self.assertAlmostEquals( 0.8086942743967287, ens.averageModel.rmsd, 3 )
+        ens = project.molecule.superpose(backboneOnly=False, includeProtons = True,
+                                         iterations=3) # no improvement to do 3 over the default 2 but left in for speed checking.
+        NTdebug( 'ens.averageModel %s' % ens.averageModel)
+        self.assertAlmostEquals( 1.0951898620323912, ens.averageModel.rmsd, 3 )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
