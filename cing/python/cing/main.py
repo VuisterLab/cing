@@ -193,7 +193,12 @@ def main():
                       dest="docdoc",
                       help="Print full documentation to stdout"
                      )
-    parser.add_option("-n", "--name",
+    parser.add_option("-n", 
+                      dest="name", default=None,
+                      help="NAME of the project (required)",
+                      metavar="PROJECTNAME"
+                     )
+    parser.add_option("--name",
                       dest="name", default=None,
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
@@ -291,8 +296,11 @@ def main():
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
-
+    # From this point on code may be executed that will go through the appropriate verbosity filtering
     NTmessage(header)
+    # The weird location of this import is because we want it to be verbose. 
+    from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
+    
 #    root,file,ext  = NTpath( __file__ )
 
     if options.test:

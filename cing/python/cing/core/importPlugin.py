@@ -1,4 +1,5 @@
 from cing import cingPythonCingDir
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexception
@@ -6,7 +7,6 @@ from cing.Libs.NTutils import NTpath
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import NTdetail
 import glob
 import os
 
