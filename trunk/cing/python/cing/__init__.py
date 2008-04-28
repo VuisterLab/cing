@@ -94,6 +94,6 @@ from cing.core.parameters import *
 from cing.core.database import NTdb
 from cing.core.dictionaries import *
 from cing.core.molecule import *
-from cing.core.importPlugin import importPlugin # This imports all plugins
+#from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.Libs.peirceTest import peirceTest
 #from cing.Libs.TypeChecking import *
