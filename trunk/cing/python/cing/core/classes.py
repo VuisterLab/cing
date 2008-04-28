@@ -2,6 +2,7 @@ from cing import authorList
 from cing import cingRoot
 from cing import cingVersion
 from cing import programName
+from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -1535,25 +1536,15 @@ class DihedralRestraint( NTdict ):
 
         self.dihedrals.limit(plotpars.min, plotpars.max)
 
-        # Analyze violations, account for periodicity by using NTlist.limit feature
+        # Analyze violations, account for periodicity
         for d in self.dihedrals:
-            l = NTlist(self.lower, self.upper, d)
-            l.limit(self.lower, self.lower+360.0) # list circular with lower as lowest value
-            h = NTlist(self.lower, self.upper, d) # list circular with upper as highest value
-            h.limit(self.upper-360, self.upper)
-            if l[0]<=l[2] and l[2]<=l[1]: # between lower and upper
-                self.violations.append( 0.0 )
-            else: # there is a violation
-                if math.fabs(l[2]-l[1]) < math.fabs( h[2]-h[0] ): # find smallest to either upper or lower bound
-                    v = l[2]-l[1]
-                else:
-                    v = h[2]-h[0]
-                fv = math.fabs(v)
-                self.violations.append( v )
-                if fv > 1.0: self.violCount1 += 1
-                if fv > 3.0: self.violCount3 += 1
-                if fv > 5.0: self.violCount5 += 1
-                if fv > self.violMax: self.violMax = fv
+            v = violationAngle(value=d, lowerBound=self.lower, upperBound=self.upper)
+            fv = math.fabs(v)
+            self.violations.append( v )
+            if fv > 1.0: self.violCount1 += 1
+            if fv > 3.0: self.violCount3 += 1
+            if fv > 5.0: self.violCount5 += 1
+            if fv > self.violMax: self.violMax = fv
             #end if
         #end for
         self.violAv,self.violSd,_n = self.violations.average()
