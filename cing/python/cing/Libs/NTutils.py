@@ -3694,4 +3694,5 @@ def floatParse( v_str ):
     if v_str == NaNstring:
         return NAN_FLOAT 
     return float(v_str)
-    
+
+

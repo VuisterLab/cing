@@ -1021,7 +1021,7 @@ def validateDihedrals( self)   :
             d.good.limit(     plotpars.min, plotpars.max, byItem=1 )
             d.good.cAverage(  plotpars.min, plotpars.max, byItem=1 )
             d.outliers.limit( plotpars.min, plotpars.max, byItem=1 )
-            if False:
+            if True:
                 NTmessage( '--- Residue %s, %s ---', res, dihed )
                 NTmessage( 'good:     %2d %6.1f %4.3f',
                            d.good.n, d.good.cav, d.good.cv )
@@ -1790,7 +1790,7 @@ def renderHtml(project):
             return True
 
 
-def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProcheck = False ):
+def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProcheck = True ):
     '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project.
        Output: return None for success is standard.
