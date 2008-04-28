@@ -2183,7 +2183,7 @@ class XMLhandler:
             return None
         #end if
         result = node.childNodes[0].nodeValue
-        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s\n",repr(node), result)
         return result
     #end def
 
@@ -2199,7 +2199,7 @@ class XMLhandler:
                 result.append( NThandle( subNode) )
             #end if
         #end for
-        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s\n",repr(node), result)
         return  result
     #end def
 
@@ -2262,12 +2262,13 @@ class XMLhandler:
 #            print ">>", keyName, value
             result[keyName] = value
         #end while
-        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s\n",repr(node), result)
         return result
     #end def
 
     def printDebugNode( self, node ):
-        NTdebug("   %s, type %s, subnodes %d\n", str(node), node.nodeType, len(node.childNodes) )
+        pass
+#        NTdebug("   %s, type %s, subnodes %d\n", str(node), node.nodeType, len(node.childNodes) )
     #end def
 #end class
 
