@@ -233,17 +233,15 @@ def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False,
         for a in res.allAtoms():
             if len(a.coordinates) != molecule.modelCount:
                 noCoordinates.append( a )
+                continue
+            if ( (not fitResidue) or
+                 (not includeProtons and a.isProton()) ):
+                notFitted.append( a )
+                continue
+            if backboneOnly and a.isSidechain():
+                notFitted.append( a )
             else:
-                if ( (not fitResidue) or
-                     (not includeProtons and a.isProton()) ):
-                    notFitted.append( a )
-                else:
-                    if backboneOnly and a.isSidechain():
-                        notFitted.append( a )
-                    else:
-                        fitted.append( a )
-                    #end if
-                #end if
+                fitted.append( a )
             #end if
         #end for
     #end for

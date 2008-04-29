@@ -421,7 +421,10 @@ path, fname, ext = NTpath( __file__ )
 # import the database table and generate the db-tree
 NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb')
 
-
+# Use dictionaries for quick lookup.
+# Note it does not include the carbonyl anymore. Just like molmol doesn't.
+backBoneProteinAtomDict = { 'C':1,'N'  :1,'H'  :1,'HN' :1,'H1' :1,'H2':1,'H3':1,'CA':1,'HA':1,'HA1':1,'HA2':1,'HA3':1 }
+backBoneNucleicAtomDict = { 'P':1,"O3'":1,"C3'":1,"C4'":1,"C5'":1,"O5'":1 } # skipping 'backbone protons'
 # Patches for attributes
 if patches:
     def isAromatic( atmDef ):
@@ -447,22 +450,20 @@ if patches:
         Return True if it is a backbone atom.
         Patch for now, based upon explicit enumeration
         """
-        if atmDef.residueDef.hasProperties('protein') and atmDef.name in ['C','O','N','H','HN','H1','H2','H3','CA','HA','HA1','HA2']:
-            return True
-        else:
-            return False
-    #end def
+        if atmDef.residueDef.hasProperties('protein') and \
+           backBoneProteinAtomDict.has_key( atmDef.name ):
+                return True
+        if atmDef.residueDef.hasProperties('nucleic') and \
+           backBoneNucleicAtomDict.has_key( atmDef.name ):
+                return True
+        return False
 
     def isSidechain( atmDef ):
         """
         Return True if it is a sidechain atom,
         i.e. not isBackbone
         """
-        if atmDef.residueDef.hasProperties('protein') and atmDef.name not in ['C','O','N','H','HN','H1','H2','H3','CA','HA','HA1','HA2']:
-            return True
-        else:
-            return False
-    #end def
+        return not isBackbone( atmDef )
 
     def isMethyl( atmDef ):
         """
