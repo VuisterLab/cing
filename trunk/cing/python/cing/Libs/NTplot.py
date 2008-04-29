@@ -983,7 +983,7 @@ class NTplot( NTdict ):
         cmapList= [   green_inv, blue_inv, yellow_inv ]
         colorList= [ 'green',   'blue',   'yellow']
         i = 0
-        for hist in histList:
+        for hist in histList:            
 #            if i == 9: # skip some when testing.
 #                i += 1
 #                continue

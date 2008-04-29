@@ -44,13 +44,18 @@ BBCCHK_STR       = 'BBCCHK'
 #            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
 #            BBCCHK
 # jackknifed av,sd,n over set of entries.
-DB_RAMCHK = (-1.36040035673, 0.033537074106736189, 555)
+#DB_RAMCHK = (-1.36040035673, 0.033537074106736189, 555)
 
 _dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
 _dbase = shelve.open( _dbase_file_abs_name )
-histCombined               = _dbase[ 'histCombined' ]
-histBySsAndResType         = _dbase[ 'histBySsAndResType' ]
-histBySsAndCombinedResType = _dbase[ 'histBySsAndCombinedResType' ]
+histRamaCombined                = _dbase[ 'histRamaCombined' ]
+histRamaBySsAndResType          = _dbase[ 'histRamaBySsAndResType' ]
+histRamaBySsAndCombinedResType  = _dbase[ 'histRamaBySsAndCombinedResType' ]
+_dbase.close()
+_dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
+_dbase = shelve.open( _dbase_file_abs_name )
+histJaninBySsAndResType         = _dbase[ 'histJaninBySsAndResType' ]
+histJaninBySsAndCombinedResType = _dbase[ 'histJaninBySsAndCombinedResType' ]
 _dbase.close()
 
 class Whatif( NTdict ):

@@ -1,35 +1,20 @@
 from cing import cingDirData
-from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityOutput
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.numpyInterpolation import interpn_linear
-from cing.PluginCode.Whatif import DB_RAMCHK
-from cing.PluginCode.Whatif import histBySsAndResType
-from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.dssp import to3StateUpper
-from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.classes import Project
-from cing.core.constants import PDB
-from matplotlib.numerix.mlab import amax
-from matplotlib.pylab import axis
-from matplotlib.pylab import colorbar
-from matplotlib.pylab import contour
-from matplotlib.pylab import imshow
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
-from pylab import nx
 import cing
 import csv
 import os
@@ -80,8 +65,8 @@ def main():
     gunzip( cvs_file_abs_name_gz )
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
     valuesBySsAndResType       = {}
-    histBySsAndResType         = {}
-    histBySsAndCombinedResType = {}
+    histRamaBySsAndResType         = {}
+    histRamaBySsAndCombinedResType = {}
 #    histByCombinedSsAndResType = {}
     valuesByEntrySsAndResType       = {}
     hrange = (xRange, yRange)
@@ -97,7 +82,7 @@ def main():
         psi = float(psi)
         if not (inRange(phi) and inRange(psi)):
             NTerror("phi and/or psi not in range for row: %s" % `row`)
-            return
+            return 
         appendDeepByKeys(valuesBySsAndResType, phi, ssType,resType,'phi' )
         appendDeepByKeys(valuesBySsAndResType, psi, ssType,resType,'psi' )
 #        NTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
@@ -118,7 +103,7 @@ def main():
                 bins = binCount, 
                 range= hrange)
 #            hist2d = zscaleHist( hist2d, Cav, Csd )
-            setDeepByKeys( histBySsAndResType, hist2d, ssType, resType )
+            setDeepByKeys( histRamaBySsAndResType, hist2d, ssType, resType )
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
     
     for ssType in valuesBySsAndResType.keys():
@@ -135,7 +120,7 @@ def main():
             bins = binCount, 
             range= hrange)
 #        hist2d = zscaleHist( hist2d, Cav, Csd )
-        setDeepByKeys( histBySsAndCombinedResType, hist2d, ssType )
+        setDeepByKeys( histRamaBySsAndCombinedResType, hist2d, ssType )
 
     phi = []
     psi = []
@@ -162,9 +147,9 @@ def main():
 
     
     dbase = shelve.open( dbase_file_abs_name )
-    dbase[ 'histCombined' ]               = hist2d
-    dbase[ 'histBySsAndCombinedResType' ] = histBySsAndCombinedResType
-    dbase[ 'histBySsAndResType' ]         = histBySsAndResType
+    dbase[ 'histRamaCombined' ]               = hist2d
+    dbase[ 'histRamaBySsAndCombinedResType' ] = histRamaBySsAndCombinedResType
+    dbase[ 'histRamaBySsAndResType' ]         = histRamaBySsAndResType
     dbase.close()
 
 def zscaleHist( hist2d, Cav, Csd ):
@@ -189,15 +174,15 @@ def getRescaling(valuesByEntrySsAndResType):
     '''            
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
-        histBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
-#        NTdebug("histBySsAndResTypeExcludingEntry: %s" % histBySsAndResTypeExcludingEntry )
+        histRamaBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
+#        NTdebug("histRamaBySsAndResTypeExcludingEntry: %s" % histRamaBySsAndResTypeExcludingEntry )
         z = NTlist()
         for ssType in valuesByEntrySsAndResType[ entryId ].keys():
             for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
                 angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
                 angleList0 = angleDict[ 'phi' ]
                 angleList1 = angleDict[ 'psi' ]
-                his = getDeepByKeys(histBySsAndResTypeExcludingEntry,ssType,resType)
+                his = getDeepByKeys(histRamaBySsAndResTypeExcludingEntry,ssType,resType)
                 if his == None:
                     NTdebug('when testing not all residues are present in smaller sets.')
                     continue 
@@ -211,7 +196,7 @@ def getRescaling(valuesByEntrySsAndResType):
                     continue
                 for k in range(len(angleList0)):
                     ck = getValueFromHistogramUsingInterpolation( 
-                        histBySsAndResTypeExcludingEntry[ssType][resType], 
+                        histRamaBySsAndResTypeExcludingEntry[ssType][resType], 
                         angleList0[k], angleList1[k])
                     zk = ( ck - c_av ) / c_sd
 #                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
@@ -225,7 +210,7 @@ def getRescaling(valuesByEntrySsAndResType):
 
 def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
     hrange = (xRange, yRange)
-    histBySsAndResTypeExcludingEntry = {}
+    histRamaBySsAndResTypeExcludingEntry = {}
     result = {}
 
     for entryId in valuesByEntrySsAndResType.keys():
@@ -251,178 +236,12 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
                 angleList0, # think columns (x)
                 bins = binCount, 
                 range= hrange)
-            setDeepByKeys( histBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
+            setDeepByKeys( histRamaBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
 
-    return histBySsAndResTypeExcludingEntry
+    return histRamaBySsAndResTypeExcludingEntry
 
 
     
-#def getValueFromHistogram( hist, angle0, angle1):
-#    pass
-
-def ramachandranPlot(hist, titleStr):
-#    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
-    sumHist = sum(sum( hist ))
-    maxHist = amax(amax( hist ))
-#    vmax = maxHist # Focus on low density regions? 
-#    norm = colors.Normalize(vmin=0, vmax=vmax)
-    NTdebug('hist sumHist, max: %12s %5.0f %5.0f' % (titleStr,sumHist, maxHist))
-    levels = nx.arange(maxHist*0.05, maxHist*0.5+1, maxHist*0.1)    
-    ps = NTplotSet() # closes any previous plots
-    ps.hardcopySize = [600,600]
-#    NTdebug( 'plotparams1: %r' % plotparams1)
-#    NTdebug( 'xRange: %r' % `xRange`)
-    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
-    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-    plot = NTplot( title  = titleStr,
-      xRange = xRange,
-      xTicks = xTicks,
-      xLabel = dihedralName1,
-      yRange = yRange,
-      yTicks = yTicks,
-      yLabel = dihedralName2)
-    ps.addPlot(plot)
-
-#    x = nx.arange(plotparams1.min, plotparams1.max+0.01, binSize)
-#    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
-#    X, Y = meshgrid(x, y)
-    Z = hist
-    extent = xRange + yRange
-#    NTdebug("Covering extent: " +`extent`)
-    im = imshow( Z, 
-#            interpolation='bilinear', 
-            interpolation = 'nearest',
-            origin='lower',
-            extent=extent )
-#    im.set_norm(norm)
-
-#    cset1 = contourf(X, Y, Z, levels,
-#                            cmap=cm.get_cmap('jet', len(levels)-1),
-#                            )
-
-#    cset1 = contourf(X, Y, Z, levels, 
-#        cmap=cm.get_cmap('jet', len(levels)-1), 
-#        origin='lower')
-    cset2 = contour(Z, levels,
-        colors = 'black',
-        hold='on',
-        extent=extent,
-        origin='lower')
-    for c in cset2.collections:
-        c.set_linestyle('solid')
-#    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-#            origin='lower', 
-#            extent=extent)
-    colorbar(im)
-#    colorbar(cset2)
-    # It is easier here to make a separate call to contour than
-    # to set up an array of colors and linewidths.
-    # We are making a thick green line as a zero contour.
-    # Specify the zero level as a tuple with only 0 in it.
-#    colorbar(cset1)
-#    ps.show()
-    ps.hardcopy('Ramachandran_%s.png' % titleStr)
-
-def ramachandranPlotTest(hist, titleStr):
-    ps = NTplotSet() # closes any previous plots
-    ps.hardcopySize = [400,400]
-#    NTdebug( 'plotparams1: %r' % plotparams1)
-#    NTdebug( 'xRange: %r' % `xRange`)
-    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
-    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-    plot = NTplot( 
-      title  = titleStr,
-      xRange = xRange,
-      xTicks = xTicks,
-      xLabel = dihedralName1,
-      yRange = yRange,
-      yTicks = yTicks,
-      yLabel = dihedralName2)
-    ps.addPlot(plot)
-#    kwds = {
-#      'left': 0.0,   # the left side of the subplots of the figure
-#      'right': 1.0,    # the right side of the subplots of the figure
-#      'bottom': 0.0,   # the bottom of the subplots of the figure
-#      'top': 1.0,      # the top of the subplots of the figure
-#            }
-#    ps.subplotsAdjust(**kwds)    
-#    X, Y = meshgrid(x, y)
-#    extent = xRange + yRange
-    plot.ramachandranPlot( hist )
-    axis('off')
-    ps.hardcopy('RamachandranZ_%s.png' % titleStr)
-
-def testEntry():        
-    #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
-#        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-    entryId = "1brv_1model" 
-#        entryId = "1tgq_1model" 
-    convention = PDB
-    
-    os.chdir(cingDirTmp)
-        
-    project = Project( entryId )
-    project.removeFromDisk()
-    project = Project.open( entryId, status='new' )
-    cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-    pdbFileName = entryId+".pdb"
-    pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-    NTdebug("Reading files from directory: " + cyanaDirectory)
-    project.initPDB( pdbFile=pdbFilePath, convention = convention )
-    if not project.dssp():
-        NTerror("Failed to dssp project")
-        return True
-#        print project.cingPaths.format()
-#    self.assertFalse(runWhatif(project))    
-    
-    project.save()
-    # seq:      VPCSTCEGNLACLSLCHIE
-    _wiSstype = '  HHHHTT HHHHHH    '
-    _pcSstype  = ' hHHHHhThHHHHHHh   '
-    i=0
-    for res in project.molecule.allResidues():
-#        NTdebug(`res`)
-#        whatifResDict = res.getDeepByKeys(WHATIF_STR)
-#        if not whatifResDict:
-#            continue
-#        checkIDList = whatifResDict.keys()
-#        for checkID in checkIDList:
-#            if checkID != RAMCHK_STR:
-#                continue
-#            valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
-#            qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
-#            NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
-        if not (res.has_key('PHI') and res.has_key('PSI')):
-            continue
-        if not (res.PHI and res.PSI):
-            continue
-        
-        phi = res.PHI[0]
-        psi = res.PSI[0]
-#        ssType = wiSstype[i]
-#        ssTypeList = to3StateUpper( [pcSstype[i]] )
-        ssTypeDsspList = getDeepByKeys(res,DSSP_STR,SECSTRUCT_STR)
-        ssTypeList = to3StateUpper( ssTypeDsspList )
-        ssType = ssTypeList.getConsensus() 
-        resType = res.resName
-        hist = histBySsAndResType[ssType][resType]
-        sumHist = sum(sum( hist ))
-        maxHist = amax(amax( hist ))
-        c_dbav, s_dbav = getEnsembleAverageAndSigmaFromHistogram( hist )
-        Zscore = hist - c_dbav
-        Zscore = Zscore / s_dbav
-        # Note the reversal of phi,psi!
-        ck = getValueFromHistogramUsingInterpolation(hist, psi, phi)
-        zk = ck - c_dbav 
-        zk /= s_dbav
-        ZscoreDB = zk - DB_RAMCHK[0] # av
-        ZscoreDB /= DB_RAMCHK[1] # sd
-        
-        NTmessage("ssType [%s] resType %s sumHist %4.0f maxHist %4.0f c_dbav %6.1f s_dbav %6.1f ck %6.1f zk %8.3f ZscoreDB %8.3f" % (
-            ssType, resType, sumHist, maxHist, c_dbav, s_dbav, ck, zk, ZscoreDB))
-        i += 1
-
 def inRange(a): 
     if a < plotparams1.min or a > plotparams1.max:
         return False
@@ -431,5 +250,4 @@ def inRange(a):
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
-#    main()
-    testEntry()
+    main()

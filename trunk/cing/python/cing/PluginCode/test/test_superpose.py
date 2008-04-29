@@ -38,11 +38,11 @@ class AllChecks(TestCase):
         ens = project.molecule.superpose()
         NTdebug( 'ens %s' % ens)
         NTdebug( 'ens.averageModel %s' % ens.averageModel)
-        self.assertAlmostEquals( 0.8086942743967287, ens.averageModel.rmsd, 3 )
+        self.assertAlmostEquals( 0.79258554728692587, ens.averageModel.rmsd, 3 )
         ens = project.molecule.superpose(backboneOnly=False, includeProtons = True,
                                          iterations=3) # no improvement to do 3 over the default 2 but left in for speed checking.
         NTdebug( 'ens.averageModel %s' % ens.averageModel)
-        self.assertAlmostEquals( 1.0951898620323912, ens.averageModel.rmsd, 3 )
+        self.assertAlmostEquals( 1.2723930097942036, ens.averageModel.rmsd, 3 )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

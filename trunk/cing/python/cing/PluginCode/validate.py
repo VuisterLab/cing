@@ -56,6 +56,8 @@ from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
@@ -63,8 +65,10 @@ from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.Whatif import criticizeByWhatif
-from cing.PluginCode.Whatif import histBySsAndResType
-from cing.PluginCode.Whatif import histCombined
+from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
+from cing.PluginCode.Whatif import histJaninBySsAndResType
+from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
+from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_GREEN
@@ -72,14 +76,12 @@ from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import NAN_FLOAT
 from cing.core.constants import NOSHIFT
+from cing.core.constants import PDB
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import getDeepByKeys
-from cing.core.constants import PDB
 import cing
 import math
 import os
@@ -104,7 +106,7 @@ OpenText         = 'Open'
 dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
 dbase = shelve.open( dbaseFileName )
 #        histCombined               = dbase[ 'histCombined' ]
-#histBySsAndResType         = dbase[ 'histBySsAndResType' ]
+#histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 dbase.close()
 
@@ -1208,33 +1210,35 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yRange = (plotparams2.min, plotparams2.max),
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
-    ps.addPlot(plot)
+    ps.addPlot(plot)    
     
     if dihedralName1=='PHI' and dihedralName2=='PSI':
-#         Plot a Ramachandran density background
-##        imageFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'RamachandranLaskowski.png' )
-#        im = Image.open( imageFileName )
-#        s = im.tostring()
-#        rgb = fromstring( s, UInt8).astype(Float)/255.0
-#        rgb = resize(rgb, (im.size[1],im.size[0], 3))
-#        extent = (plotparams1.min, plotparams1.max,plotparams2.min, plotparams2.max)
-#        im = imshow(rgb, alpha=0.05, extent=extent)
-        histList = []
-        ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
-        ssTypeList.sort()
-        # The assumption is that the derived residues can be represented by the regular.
-        resNamePdb = getDeepByKeysOrDefault(residue, 'nameDict', residue.resName, PDB)
-
-        for ssType in ssTypeList:
-#                hist = histCombined[ssType] # excludes GLY/PRO densities
-            hist = getDeepByKeys(histCombined,ssType)
-            if isSingleResiduePlot: 
-#                hist = histBySsAndResType[ssType][residue.resName]
-                hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)
-            if hist:
-                histList.append(hist)
-        if histList:
-            plot.dihedralComboPlot(histList)
+        histBySsAndCombinedResType = histRamaBySsAndCombinedResType
+        histBySsAndResType         = histRamaBySsAndResType
+    elif dihedralName1=='CHI1' and dihedralName2=='CHI2':
+        histBySsAndCombinedResType = histJaninBySsAndCombinedResType
+        histBySsAndResType         = histJaninBySsAndResType
+    else:
+        NTcodeerror("makeDihedralPlot called for non Rama/Janin")
+        return None
+    
+    histList = []
+    ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
+    ssTypeList.sort()
+    # The assumption is that the derived residues can be represented by the regular.
+    resNamePdb = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
+    
+    for ssType in ssTypeList:
+#        NTdebug('Looking up ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
+        hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
+        if isSingleResiduePlot:             
+            hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)
+        if hist != None:
+#            NTdebug('Appending for ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
+            histList.append(hist)
+    if histList:
+#        NTdebug('Will do dihedralComboPlot')
+        plot.dihedralComboPlot(histList)
 
 
 
@@ -1796,9 +1800,11 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
-#    doProcheck = False # disable for testing as it takes a long time.
+    doProcheck = True # disable for testing as it takes a long time.
 #    skipFirstPart = True # disable for testing as it takes a long time.
-    if not skipFirstPart:
+    skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
+    
+    if not skipExport2Gif:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
         NTdebug("Trying to create : " + pathMolGif)
@@ -1829,17 +1835,20 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
                     msg = sprintf('----- %5s -----', res)
                     fprintf(fp, msg+'\n')
 #                    NTdebug(msg)
-                    plotList = [['PHI',  'PSI',  'Ramachandran', 'PHI_PSI'],
-                                ['CHI1', 'CHI2', 'CHI1-CHI2',     'CHI1_CHI2']]
+                    plotList = [['PHI',  'PSI',  'Ramachandran'],
+                                ['CHI1', 'CHI2', 'Janin']]
                     for plotItem in plotList:
-                        ps = makeDihedralPlot( project, [res], plotItem[0], plotItem[1] )
+                        plotDihedralName1 = plotItem[0]
+                        plotDihedralName2 = plotItem[1]
+                        plotDihedralComboName = plotItem[2]
+                        ps = makeDihedralPlot( project, [res], plotDihedralName1, plotDihedralName2)
                         if ps:
-                            ps.hardcopy( fileName = os.path.join(resdir, plotItem[3] ))
-                            res.html.left( 'h2', plotItem[2], id=plotItem[2])
+                            ps.hardcopy( fileName = os.path.join(resdir, plotDihedralComboName))
+                            res.html.left( 'h2', plotDihedralComboName, id=plotDihedralComboName)
                             graphicsFormatExtension = 'png'
-                            plotFileNameDihedral2D = plotItem[3] + '.' + graphicsFormatExtension
+                            plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
 #                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
-                            res.html.left( 'img', src = plotFileNameDihedral2D, alt=""  )
+                            res.html.left( 'img', src = plotFileNameDihedral2D )
                         else:
                             pass
 #                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
@@ -1927,9 +1936,9 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
             for p,d in pcPlotList:
                 if not printedDots % 10:
                     digit = printedDots / 10
-                    NTmessage(`digit`)
+                    NTmessageNoEOL(`digit`)
                 else:
-                    NTmessage('.')
+                    NTmessageNoEOL('.')
                 printedDots += 1
                 plotCount += 1
                 procheckLink = os.path.join('..',
@@ -1969,7 +1978,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False, doProch
                 main('a',   "pdf",      href = printLink )
                 main('td',  openTag=False)
             #end for
-            NTmessage('')
+            NTmessage('' ) # for the eol char.
 
             if plotCount: # close any started rows.
                 main('tr',  openTag=False)

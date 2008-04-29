@@ -38,12 +38,11 @@ prefixDebug     = "DEBUG"
 #- configure local settings:
 #    Create a file localConstants parallel to the setup.py file and add definitions that
 #    get imported from the parallel __init__.py code. Just one setting at the moment.
+NaNstring = "NaN" # default if not set in localConstants. @UnusedVariable
 try:
     from localConstants import NaNstring #@UnresolvedImport
 except:
-    NaNstring = "NaN" # default if not set in localConstants.
-
-
+    pass
 #try:
 #    from localConstants import criteriaDict #@UnresolvedImport
 #except:
@@ -94,6 +93,6 @@ from cing.core.parameters import *
 from cing.core.database import NTdb
 from cing.core.dictionaries import *
 from cing.core.molecule import *
-#from cing.core.importPlugin import importPlugin # This imports all plugins
+from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.Libs.peirceTest import peirceTest
 #from cing.Libs.TypeChecking import *
