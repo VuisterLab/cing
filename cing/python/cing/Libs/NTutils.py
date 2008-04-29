@@ -3692,6 +3692,8 @@ def floatFormat( v, format ):
 
 def floatParse( v_str ):
     '''Just check for nans.'''
+#    NTdebug('''NaNstring [%s]''' % NaNstring)
+#    NTdebug('''v_str [%s]''' % v_str)
     if v_str == NaNstring:
         return NAN_FLOAT 
     return float(v_str)

@@ -6,6 +6,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityNothing
+from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import BMRB
@@ -48,7 +49,7 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
         NTdebug("Reading files from directory: " + cyanaDirectory)
         kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]              
+                'acoFiles': [ entryId ]         
                   }
         if entryId.startswith("1YWUcdGMP"):
             del(kwds['acoFiles'])
@@ -70,4 +71,5 @@ class AllChecks(TestCase):
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityOutput
     unittest.main()

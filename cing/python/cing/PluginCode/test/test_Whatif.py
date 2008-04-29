@@ -10,7 +10,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.Whatif import QUAL_LIST_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.Whatif import histBySsAndResType
+from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
 from cing.core.constants import BMRB
@@ -27,11 +27,11 @@ class AllChecks(TestCase):
 
     def testHistogram(self):
         resType = 'GLY'     
-        for ssType in histBySsAndResType.keys(): #@UndefinedVariable
-            hist = histBySsAndResType[ssType][resType]
+        for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
+            hist = histRamaBySsAndResType[ssType][resType]
             sumHist =  sum(sum(hist))
             maxHist =  amax(amax(hist))
-            NTdebug( 'histBySsAndResType[%s][%s]' % (ssType, resType))
+            NTdebug( 'histRamaBySsAndResType[%s][%s]' % (ssType, resType))
             NTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
             sys.output_line_width = 9999 # queried below.
             set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
