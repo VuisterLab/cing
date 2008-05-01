@@ -42,7 +42,6 @@ from cing.core.sml import SMLhandler
 from shutil import rmtree
 import math
 import os
-import shutil
 import sys
 import time
 
@@ -287,7 +286,7 @@ Project: Top level Cing project class
         return False
     #end def
     exists = staticmethod( exists )
-    
+
 
     def open( name, status = 'create', restore=True ):
         """Static method open returns a new/existing Project instance depending on status
@@ -2112,16 +2111,6 @@ class HTMLfile:
         self.title = title
         self.indent = 0
 
-        # copy css and other files (only files! no dirs)
-#        The content of this dir is being copied to each HTMLfile instance's location.
-#        TODO: remove this redundancy.
-        dirname,_base,_extention = NTpath( self.fileName )
-        htmlPath = os.path.join(cingRoot,cingPaths.html) #e.g. 1brv.cing/HTML
-        for f in os.listdir( htmlPath ):
-            htmlFile = os.path.join(htmlPath,f)
-            if os.path.isfile(htmlFile):
-                shutil.copy( htmlFile, dirname )
-
         self._header    = NTlist()
         self._call      = NTlist()
         self._main      = NTlist()
@@ -2257,8 +2246,10 @@ class HTMLfile:
         if self.title:
             self.stream.write( self._generateTag( 'title', self.title ))
 
+        relativePath = self.relativePath()
+        cssLink = os.path.join(relativePath, cingPaths.css)
         self.stream.write(self._generateTag( 'link',
-            rel="stylesheet", type="text/css", media="screen", href=cingPaths.css))
+            rel="stylesheet", type="text/css", media="screen", href=cssLink))
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
         self.stream.write(self.openTag('div', id="container"))
@@ -2344,6 +2335,22 @@ class HTMLfile:
         dummyOpenTag, content, closeTag = self.tag( tag, *args, **kwds )
         return sprintf( '%s%s%s\n', '' + '\t' * self.indent, closeTag, content )
     #end def
+
+    def relativePath(self):
+        ''' Description: return relative path between htmlObj and project
+            directory.
+            Inputs: htmlObj
+            Output: relative path to project root
+            Example: htmlObj molecule: Ccpn_1brv
+                     project.molecule.html.fileName (1brvV1.cing/Ccpn_1brv/HTML/index.html)
+                     returns: '../../'
+        '''
+        fileName = self.fileName
+        sep = os.path.sep
+        pardir = os.path.pardir
+        pardirSep = pardir + sep
+        countSep = fileName.count(sep)
+        return (countSep - 1)* pardirSep
 
     def findHtmlLocation(self, source, destination, id=None ):
         '''Description: given 2 Cing objects returns the relative path between them.
