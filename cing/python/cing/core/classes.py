@@ -2347,10 +2347,10 @@ class HTMLfile:
         '''
         fileName = self.fileName
         sep = os.path.sep
-        pardir = os.path.pardir
-        pardirSep = pardir + sep
+        #pardir = os.path.pardir
+        pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
         countSep = fileName.count(sep)
-        return (countSep - 1)* pardirSep
+        return (countSep - 1) * pardirSep
 
     def findHtmlLocation(self, source, destination, id=None ):
         '''Description: given 2 Cing objects returns the relative path between them.
