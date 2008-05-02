@@ -199,7 +199,7 @@ class NTlist( list ):
     def pop( self, index=0 ):
         """Return index'ed item from list or None on empty list
         """
-        if len( self ) == 0:
+        if len( self ) == 0: 
             return None
         item = list.pop( self, index )
         if item == self.current:
@@ -3050,7 +3050,7 @@ def NTpath( path ):
     """
     d = os.path.split( path )
     dirname = d[0]
-    if len(dirname) == 0:
+    if len(dirname) == 0: 
         dirname = '.'
     f = os.path.splitext( d[1] )
     return dirname, f[0], f[1]
@@ -3104,7 +3104,7 @@ class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
     """
-    def __init__(self, pathToProgram,
+    def __init__(self, pathToProgram, 
                  rootPath = None,
                  redirectOutput= True,
                  redirectOutputToFile = False,
@@ -3197,98 +3197,6 @@ def findvisitor((matches, pattern), thisdir, nameshere):
             matches.append(fullpath)
 
 
-def convertImageMagick(convertPath, inputPath,outputPath,options,extraOptions=None):
-    convert = ExecuteProgram(convertPath, redirectOutput=False) # No output expected
-    cmd = options
-    if extraOptions:
-        cmd += " " + extraOptions
-    cmd += " " + inputPath + " " + outputPath
-    if convert( cmd ):
-        NTerror("Failed to run conversion: " + cmd)
-        return True
-
-def convertPs2Pdf(ps2dfPath, inputPath,outputPath,options,extraOptions=None):
-    convert = ExecuteProgram(ps2dfPath, redirectOutput=False) # No output expected
-    cmd = options
-    if extraOptions:
-        cmd += " " + extraOptions
-    cmd += " " + inputPath + " " + outputPath
-    if convert( cmd ):
-        NTerror("Failed to run conversion: " + cmd)
-        return True
-
-def convert2Web(convertPath, ps2pdfPath, path, outputDir=None):
-    """Using the system convert from ImageMagick several pieces of imagery will be created:
-        a- pinup (smallish gif usable as an preview; 100 width by 1xx for A4 aspect ratio)
-        b- full size 1(gif of 1000 width )
-        c- printable version (pdf)
-
-       The output file names are automatically generated. If the outputDir is set it will be
-       used.
-       Returns None for error and list of output files otherwise. A None in the list means\
-       the plot was not generated.
-       Gif files are multipaged with 2 second intervals.
-       Input can be anything ImageMagick reads, e.g. Postscript produced by Procheck_NMR.
-       The input path can be with or without directory and can be
-       an absolute or relative path.
-       The
-
-    """
-    optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width
-    optionsFull  = "-delay 200 -geometry 1024"
-    optionsPrint = ""
-
-    doPinUp = True
-    doFull  = True
-    doPrint = True
-
-    if not os.path.exists(path):
-        NTerror("Failed to find input")
-        return True
-    # Next time use: NTpath for this.
-#    path = "/Users/jd/t.pdf"
-    head, tail = os.path.split(path)             # split is on last /
-    root, extension = os.path.splitext(tail)     # splitext is on last .
-
-    if outputDir:
-        if os.path.exists(outputDir) and os.path.isdir(outputDir):
-            head = outputDir
-        else:
-            NTerror("Given output directory: " + outputDir + " is absent or is not a dir")
-            return None
-
-    if extension == "pdf":
-        NTdebug("Will skip generating printable version as input is also a pdf")
-        doPrint = False
-
-    if extension == "gif":
-        NTdebug("Will skip generating full size gif version as input is also a gif")
-        doFull = False
-
-    pinupPath = None
-    fullPath  = None
-    printPath = None
-    # Algorithm below can be speeded up by not rereading the input but scripting the
-    #     generation of 3 outputs.
-    if doPinUp:
-        pinupPath = os.path.join( head, root+"_pin.gif")
-        if convertImageMagick(convertPath, path, pinupPath, optionsPinUp):
-            NTerror("Failed to generated pinup")
-            pinupPath = None
-    if doFull:
-        fullPath  = os.path.join( head, root+".gif")
-        if convertImageMagick(convertPath, path, fullPath, optionsFull):
-            NTerror("Failed to generated full gif")
-            fullPath = None
-    if doPrint:
-        printPath = os.path.join( head, root+".pdf")
-        if convertPs2Pdf(ps2pdfPath, path, printPath, optionsPrint):
-            NTerror("Failed to generated print")
-            printPath = None
-    result = ( pinupPath, fullPath, printPath )
-    if  pinupPath or fullPath or printPath:
-        return result
-    return None
 
 def val2Str( value, fmt, count=None, nullValue=None):
     """Utility for translating numeric values to strings allowing the value
@@ -3474,26 +3382,26 @@ def appendDeepByKeys(c, value, *keyList):
     If value is a (subclass of) list then append individual values from the list
     to the c (complex object) which needs to be a (subclass of) list itself.
     The essence here is silence.
-
+    
     NB:
     - keyList needs to have at least one key.
-
-    - All but the last level of the complex object should be (subclasses of)
+    
+    - All but the last level of the complex object should be (subclasses of) 
     dictionaries. The last level must be a (subclasses of) list. If the
-    itermediate objects (dictionaries and list) do not exist, they will be
+    itermediate objects (dictionaries and list) do not exist, they will be 
     silently created.
-
+    
     - The last key is not the id to the list to append to.
-
+    
     - The complex argument needs to exist.
-
+    
     Return None on success and True on error.
     """
-
+    
     if c == None:
         NTerror("Can't appendDeepByKeys without complex object on input.")
         return True
-
+        
     lk = len(keyList)
 #  NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
     if not lk:
@@ -3503,9 +3411,9 @@ def appendDeepByKeys(c, value, *keyList):
     key = keyList[0]
 
     # At the level where only one key exists; do the actual append to the list.
-    if lk == 1:
+    if lk == 1: 
         # First make sure the list to append to exists.
-        if isinstance(c, list):
+        if isinstance(c, list): 
             # Make sure the list already has an element with the key as index.
             if key >= len(c):
                 NTdebug("Impossible situation: trying to go into a list at an index that isn't present.")
@@ -3517,7 +3425,7 @@ def appendDeepByKeys(c, value, *keyList):
         else:
             NTdebug("The input complex object needs to be a (subclass of) dict or list")
             return True
-
+    
         l = c[key]
         if not isinstance(l, list):
             NTdebug("At the bottom level the input complex object needs to be a (subclass of) list")
@@ -3528,11 +3436,11 @@ def appendDeepByKeys(c, value, *keyList):
             return
         l.append(value) # No extra checks done here for speed purposes.
         return
-    # endif on lk==1, above section was misalligned before.
-
+    # endif on lk==1, above section was misalligned before. 
+    
     if c.has_key(key):
         deeper = c[key]
-    else:
+    else:        
         deeper = {}
         c[key] = deeper
 
@@ -3641,7 +3549,7 @@ def gunzip(fileNameZipped):
     outF = file(fileName, 'wb');
     outF.write(s)
     outF.close()
-
+    
 def getEnsembleAverageAndSigmaFromHistogram( his ):
     """According to Rob's paper. Note that weird cases exist which to me
     are counter intuitive
@@ -3656,8 +3564,8 @@ Rob might have caught this by requiring c_av be at least 2.0.
 
         # Calculate the count database average for this histogram and
         # the sigma (s.d.) of it. this is done as defined by equations
-        # in: Hooft et al. Objectively judging the quality of a protein
-        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997)
+        # in: Hooft et al. Objectively judging the quality of a protein 
+        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997) 
         # vol. 13 (4) pp. 425-430
 
     """
@@ -3695,7 +3603,7 @@ def floatParse( v_str ):
 #    NTdebug('''NaNstring [%s]''' % NaNstring)
 #    NTdebug('''v_str [%s]''' % v_str)
     if v_str == NaNstring:
-        return NAN_FLOAT
+        return NAN_FLOAT 
     return float(v_str)
 
 
