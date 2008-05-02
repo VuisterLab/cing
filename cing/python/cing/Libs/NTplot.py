@@ -1234,7 +1234,6 @@ class NTplotSet( NTdict ):
         if useMatPlotLib:
             subplots_adjust( **args )
 
-
 class ResPlot(NTplot):
     """Plot class for sequence of residues
 x coordinate is in 'data' coordinate system (sequence number)
@@ -1500,7 +1499,7 @@ class RangeIconList:
         "Return True on error"
 #        NTmessage("Doing addPatches for seq: %d", self.seq)
 
-        if self.secStruct=='E':
+        if self.secStruct=='S':
             p = StrandIcon(seq=self.seq, axis=self.axis, xy=self.xy,
                            width=self.width, height=self.height,**self.kwargs)
             if not p:

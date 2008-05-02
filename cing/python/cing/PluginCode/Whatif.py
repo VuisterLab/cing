@@ -462,7 +462,11 @@ fullstop y
 
     def report( self ):
         return ''.join( file( self.path( Whatif.reportFile ), 'r').readlines())
+    
 #end Class
+
+def createHtmlWhatif(project):
+    pass
 
 def runWhatif( project, tmp=None ):
     """
@@ -595,5 +599,6 @@ def criticizeByWhatif( project ):
 # register the function
 methods  = [
             (runWhatif, None),
-            (criticizeByWhatif, None),
+            (createHtmlWhatif, None),
+            (criticizeByWhatif, None)
                         ]

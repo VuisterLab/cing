@@ -22,6 +22,7 @@ class AllChecks(TestCase):
  
     def testRun(self):
         htmlOnly=False # default is False but enable it for faster runs without some actual data.
+        doWhatifValidationOnly = True # disables other items for checking.
         pdbConvention = BMRB
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
@@ -66,7 +67,8 @@ class AllChecks(TestCase):
                         copy2sources = True,
                         **kwds )
         project.save()
-        self.assertFalse( project.validate(htmlOnly=htmlOnly))
+        self.assertFalse( project.validate(htmlOnly=htmlOnly,
+                doWhatif=doWhatifValidationOnly))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

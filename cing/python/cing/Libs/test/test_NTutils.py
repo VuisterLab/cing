@@ -1,5 +1,4 @@
 from cing import NaNstring
-from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import cingPythonDir
 from cing import verbosityDebug
@@ -7,11 +6,9 @@ from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import convert2Web
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import val2Str
 from cing.core.constants import NOSHIFT
-from cing.core.parameters import cingPaths
 from unittest import TestCase
 import cing
 import os
@@ -33,19 +30,6 @@ class AllChecks(TestCase):
 #        for name in nameList:
 #            print name
 
-    def testConvert2Web(self):
-        fn = "pc_nmr_11_rstraints.ps"
-        self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
-        inputPath = os.path.join(cingDirTestsData,fn)
-        outputPath = cingDirTmp
-        self.failIf( os.chdir(outputPath), msg=
-            "Failed to change to temporary test directory for data: "+outputPath)
-        fileList = convert2Web( cingPaths.convert, cingPaths.ps2pdf, inputPath, outputDir=outputPath )
-        NTdebug( "Got back from convert2Web output file names: " + `fileList`)
-        self.assertNotEqual(fileList,True)
-        if fileList != True:
-            for file in fileList:
-                self.assertNotEqual( file, None)
 
     def testCircularAverage(self):
         lol = [  [   5,  15,   10],

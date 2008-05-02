@@ -1,3 +1,7 @@
+Version 0.76: XX May 2008: 
+    - Added superposing algorithm mostly in cython. 
+    - Added chi1/2 plots labeled Janin plots
+
 Version 0.75: 17 Apr 2008: 
     - Optimized the coordinate storage class for speed through cython now.
     - Temp dir now set in $CINGROOT/python/localConstants.py or __init__.py by default.

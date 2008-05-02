@@ -70,6 +70,7 @@ cingPaths = NTdict(
     whatif       = os.getenv('whatifPath'),
     dssp         = os.getenv('dsspPath'),
     convert      = os.getenv('convertPath'),
+    ghostscript  = os.getenv('ghostscriptPath'),
     ps2pdf       = os.getenv('ps2pdfPath'),
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),

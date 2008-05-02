@@ -38,11 +38,10 @@ prefixDebug     = "DEBUG"
 #- configure local settings:
 #    Create a file localConstants parallel to the setup.py file and add definitions that
 #    get imported from the parallel __init__.py code. Just one setting at the moment.
-NaNstring = "NaN" # default if not set in localConstants. @UnusedVariable
-try:
-    from localConstants import NaNstring #@UnresolvedImport
-except:
-    pass
+NaNstring = "." # default if not set in localConstants. @UnusedVariable
+# When specified differently it should also be reflected in some dictionaries
+# so better not.
+
 #try:
 #    from localConstants import criteriaDict #@UnresolvedImport
 #except:
