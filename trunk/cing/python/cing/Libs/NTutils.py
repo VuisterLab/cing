@@ -199,7 +199,7 @@ class NTlist( list ):
     def pop( self, index=0 ):
         """Return index'ed item from list or None on empty list
         """
-        if len( self ) == 0: 
+        if len( self ) == 0:
             return None
         item = list.pop( self, index )
         if item == self.current:
@@ -3050,7 +3050,7 @@ def NTpath( path ):
     """
     d = os.path.split( path )
     dirname = d[0]
-    if len(dirname) == 0: 
+    if len(dirname) == 0:
         dirname = '.'
     f = os.path.splitext( d[1] )
     return dirname, f[0], f[1]
@@ -3104,7 +3104,7 @@ class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
     """
-    def __init__(self, pathToProgram, 
+    def __init__(self, pathToProgram,
                  rootPath = None,
                  redirectOutput= True,
                  redirectOutputToFile = False,
@@ -3474,26 +3474,26 @@ def appendDeepByKeys(c, value, *keyList):
     If value is a (subclass of) list then append individual values from the list
     to the c (complex object) which needs to be a (subclass of) list itself.
     The essence here is silence.
-    
+
     NB:
     - keyList needs to have at least one key.
-    
-    - All but the last level of the complex object should be (subclasses of) 
+
+    - All but the last level of the complex object should be (subclasses of)
     dictionaries. The last level must be a (subclasses of) list. If the
-    itermediate objects (dictionaries and list) do not exist, they will be 
+    itermediate objects (dictionaries and list) do not exist, they will be
     silently created.
-    
+
     - The last key is not the id to the list to append to.
-    
+
     - The complex argument needs to exist.
-    
+
     Return None on success and True on error.
     """
-    
+
     if c == None:
         NTerror("Can't appendDeepByKeys without complex object on input.")
         return True
-        
+
     lk = len(keyList)
 #  NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
     if not lk:
@@ -3503,9 +3503,9 @@ def appendDeepByKeys(c, value, *keyList):
     key = keyList[0]
 
     # At the level where only one key exists; do the actual append to the list.
-    if lk == 1: 
+    if lk == 1:
         # First make sure the list to append to exists.
-        if isinstance(c, list): 
+        if isinstance(c, list):
             # Make sure the list already has an element with the key as index.
             if key >= len(c):
                 NTdebug("Impossible situation: trying to go into a list at an index that isn't present.")
@@ -3517,7 +3517,7 @@ def appendDeepByKeys(c, value, *keyList):
         else:
             NTdebug("The input complex object needs to be a (subclass of) dict or list")
             return True
-    
+
         l = c[key]
         if not isinstance(l, list):
             NTdebug("At the bottom level the input complex object needs to be a (subclass of) list")
@@ -3528,11 +3528,11 @@ def appendDeepByKeys(c, value, *keyList):
             return
         l.append(value) # No extra checks done here for speed purposes.
         return
-    # endif on lk==1, above section was misalligned before. 
-    
+    # endif on lk==1, above section was misalligned before.
+
     if c.has_key(key):
         deeper = c[key]
-    else:        
+    else:
         deeper = {}
         c[key] = deeper
 
@@ -3641,7 +3641,7 @@ def gunzip(fileNameZipped):
     outF = file(fileName, 'wb');
     outF.write(s)
     outF.close()
-    
+
 def getEnsembleAverageAndSigmaFromHistogram( his ):
     """According to Rob's paper. Note that weird cases exist which to me
     are counter intuitive
@@ -3656,8 +3656,8 @@ Rob might have caught this by requiring c_av be at least 2.0.
 
         # Calculate the count database average for this histogram and
         # the sigma (s.d.) of it. this is done as defined by equations
-        # in: Hooft et al. Objectively judging the quality of a protein 
-        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997) 
+        # in: Hooft et al. Objectively judging the quality of a protein
+        # structure from a Ramachandran plot. Comput.Appl.Biosci. (1997)
         # vol. 13 (4) pp. 425-430
 
     """
@@ -3695,7 +3695,7 @@ def floatParse( v_str ):
 #    NTdebug('''NaNstring [%s]''' % NaNstring)
 #    NTdebug('''v_str [%s]''' % v_str)
     if v_str == NaNstring:
-        return NAN_FLOAT 
+        return NAN_FLOAT
     return float(v_str)
 
 

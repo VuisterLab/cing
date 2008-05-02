@@ -1,5 +1,4 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
-from cing.Libs.NTutils import NTdebug
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -17,6 +16,7 @@ del(_bitBucket)
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import sprintf
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
@@ -61,7 +61,7 @@ Methods:
        Output: Cing.Project or None or error.
     '''
 
-    importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
+    importFromCcpn( cingProject = None, ccpnProject = None ):
     '''Descrn: Import data from Ccpn into a Cing instance.
                Either Cing instance or Ccpn instance, or both.
                Check if either instance has attribute .cing or .ccpn,
@@ -71,7 +71,7 @@ Methods:
     '''
 
     importFromCcpnMolecules( cingProject = None, ccpnProject = None,
-                          moleculeName = None, verbose = True, coords = False ):
+                          moleculeName = None, coords = False ):
     '''Descrn: Import MolSystems (Molecules) from Ccpn.Project instance and
                append it to Cing.Project instance, including chains, residues
                and atoms.
@@ -88,7 +88,7 @@ Methods:
     '''
 
     importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
-                             moleculeName = None, verbose = True ):
+                             moleculeName = None ):
     '''Descrn: Import coordinates from Ccpn.Project into a Cing.Project.
                If 'moleculeName' is not defined, all MolSystem's coordinates
                will be imported, otherwise only specified one.
@@ -101,7 +101,7 @@ Methods:
     '''
 
     importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
-                                  moleculeName = None, verbose = True ):
+                                  moleculeName = None ):
     '''Descrn: Import peaks and shifts from Ccpn.Project into a Cing.Project
                instance.
                If 'moleculeName' is not defined, all MolSystem will be
@@ -115,8 +115,7 @@ Methods:
        Output: Cing.Project or None or error.
     '''
 
-    importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None,
-                                      verbose = True ):
+    importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: Import distance restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
@@ -126,8 +125,7 @@ Methods:
        Output: Cing.DistanceRestraintList or None or error
     '''
 
-    importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None,
-                                      verbose = True ):
+    importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: Import dihedral restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
@@ -137,14 +135,14 @@ Methods:
        Output: Cing.DihedralRestraintList or None or error
     '''
 
-    createCcpn( cingProject = None, verbose = True ):
+    createCcpn( cingProject = None ):
     '''Descrn: create a new Ccpn project and associates it to a Cing.Project
        Inputs: Cing.Project instance.
        Output: Ccpn Implementation.Project.
     '''
 
     createCcpnMolecules( cingProject = None, ccpnProject = None,
-                         moleculeName = None, verbose = True ):
+                         moleculeName = None ):
     '''Descrn: create from Cing.Molecule a molSystem into a existing
                Ccpn project instance.
        Inputs: Ccpn Implementation.Project, Cing.Project instance,
@@ -152,7 +150,7 @@ Methods:
        Output: Ccpn Implementation.Project or None or error.
     '''
 
-    export2Ccpn( cingProject = None, verbose = True ):
+    export2Ccpn( cingProject = None ):
     '''Descrn: Export Ccpn.Project associated to a Cing.Project by creating
                a new Ccpn.Project from Cing data and saving it
                into Cing CCPN directory.
@@ -161,7 +159,7 @@ Methods:
     '''
 
     createCcpnStructures( cingProject = None, ccpnProject = None,
-                          moleculeName = None, verbose = True ):
+                          moleculeName = None ):
     '''Descrn: create Ccpn.molStructures from Cing.Coordinates into a existing
                Ccpn project instance.
        Inputs: Ccpn Implementation.Project, Cing.Project instance,
@@ -199,7 +197,8 @@ try:
     from memops.general.Io import readXmlProjectFile # only on ccpn 1.x @UnresolvedImport
     from memops.api.Implementation import ContentStorage # only on ccpn 1.x @UnresolvedImport
     from ccp.general.Io import getChemCompHead # only on ccpn 1.x @UnresolvedImport
-    NTdebug("Using CCPN version 1.x")
+
+    NTdetail("Using CCPN version 1.x")
     ccpnVersion = 1
     namingSystem = 'DIANA' #CYANA2.1
     dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
@@ -207,7 +206,8 @@ except:
     try:
         from memops.general.Io import loadProject # only on ccpn 2.x
         from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet
-        NTdebug("Using CCPN version 2.x")
+
+        NTdetail("Using CCPN version 2.x")
         ccpnVersion = 2
         namingSystem = 'CING' # exists only in ccpn 2.x
     except:
@@ -373,7 +373,7 @@ def initCcpn( cingProject, ccpnFile = None ):
     cingProject.updateProject()
 # end def initCcpn
 
-def importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
+def importFromCcpn( cingProject = None, ccpnProject = None ):
     '''Descrn: Import data from Ccpn into a Cing instance.
                Either Cing instance or Ccpn instance, or both.
                Check if either instance has attribute .cing or .ccpn,
@@ -393,11 +393,8 @@ def importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
 
     if ( ccpnProject ):
 
-        if ( verbose ):
-            NTmessage( '==> Importing data from Ccpn project "%s"',
-                       ccpnProject.name )
-            NTmessage.flush()
-        # end if
+        NTmessage( '==> Importing data from Ccpn project "%s"', ccpnProject.name )
+        NTmessage.flush()
 
         if (not importFromCcpnMolecules(cingProject, ccpnProject,
                                            coords = True)): #True is the correct, just for test now
@@ -405,17 +402,16 @@ def importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
         # end if
 
 
-        #importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
-        #importFromCcpnDistanceRestraints(cingProject, ccpnProject)
-        #importFromCcpnDihedralRestraints(cingProject, ccpnProject)
-        #importFromCcpnRdcRestraints(cingProject, ccpnProject)
+        importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
+        importFromCcpnDistanceRestraints(cingProject, ccpnProject)
+#        importFromCcpnDihedralRestraints(cingProject, ccpnProject)
+        importFromCcpnRdcRestraints(cingProject, ccpnProject)
 
         cingProject.addHistory(sprintf(funcName))
 
-        if ( verbose ):
-            NTmessage( 'Ccpn project imported' )
-            NTmessage( '%s', cingProject.format() )
-        # end if
+        NTmessage( 'Ccpn project imported' )
+        NTmessage( '%s', cingProject.format() )
+
         cingProject.updateProject()
     else:
         NTerror(" '%s': no Ccpn.Project imported", funcName)
@@ -425,7 +421,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None, verbose = True ):
 # end def importFromCcpn
 
 def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
-                          moleculeName = None, verbose = True, coords = False ):
+                          moleculeName = None, coords = False ):
     '''Descrn: Import MolSystems (Molecules) from Ccpn.Project instance and
                append it to Cing.Project instance, including chains, residues
                and atoms.
@@ -472,28 +468,20 @@ def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
 
         if coords:
             # WIM TODO: guess this only makes sense if coords available...
-            if verbose: #cingProject.parameters.verbose():
-                NTmessage('==> Calculating dihedrals ... ' )
-                NTmessage.flush()
-            # end if
+            NTmessage('==> Calculating dihedrals ... ' )
+            NTmessage.flush()
 
             cingProject.molecule.updateAll()
 
-            if verbose: #cingProject.parameters.verbose():
-                    NTmessage('done' )
-                    NTmessage.flush()
+            NTmessage('done' )
+            NTmessage.flush()
             # end if
 
-            if ( verbose ):
-                NTmessage( "Ccpn molecule '%s' imported with coordinates",
-                           moleculeName )
-                NTmessage( '%s', cingProject.molecule.format() )
-            # end if
+            NTmessage( "Ccpn molecule '%s' imported with coordinates", moleculeName )
+            NTmessage( '%s', cingProject.molecule.format() )
         else:
-            if ( verbose ):
-                NTmessage( "Ccpn molecule '%s' imported", moleculeName )
-                NTmessage( '%s', cingProject.molecule.format() )
-            # end if
+            NTmessage( "Ccpn molecule '%s' imported", moleculeName )
+            NTmessage( '%s', cingProject.molecule.format() )
         # end if
     # end for
 
@@ -750,7 +738,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
 # end def _ccpnAtom2CingAndCoords
 
 def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
-                               moleculeName = None, verbose = True ):
+                               moleculeName = None ):
     '''Descrn: Import coordinates from Ccpn.Project into a Cing.Project.
                If 'moleculeName' is not defined, all MolSystem's coordinates
                will be imported, otherwise only specified one.
@@ -788,23 +776,16 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
         _getCcpnCoordinates( molecule )
 
         # WIM TODO: guess this only makes sense if coords available...
-        if verbose: #cingProject.parameters.verbose():
-            NTmessage('==> Calculating dihedrals ... ' )
-            NTmessage.flush()
-        # end if
+        NTmessage('==> Calculating dihedrals ... ' )
+        NTmessage.flush()
 
         cingProject.molecule.updateAll()
 
-        if verbose: #cingProject.parameters.verbose():
-                NTmessage('done' )
-                NTmessage.flush()
-        # end if
+        NTmessage('done' )
+        NTmessage.flush()
 
-        if ( verbose ):
-            NTmessage( "Ccpn coordinates for molecule '%s' imported",
-                       moleculeName )
-            NTmessage( '%s', cingProject.molecule.format() )
-        # end if
+        NTmessage( "Ccpn coordinates for molecule '%s' imported", moleculeName )
+        NTmessage( '%s', cingProject.molecule.format() )
     # end for
     cingProject.addHistory( sprintf(funcName) )
     cingProject.updateProject()
@@ -897,7 +878,7 @@ def _getCcpnCoordinates( molecule ):
 # end def _getCcpnCoordinates
 
 def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
-                                  moleculeName = None, verbose = True ):
+                                  moleculeName = None ):
     '''Descrn: Import peaks and shifts from Ccpn.Project into a Cing.Project
                instance.
                If 'moleculeName' is not defined, all MolSystem will be
@@ -954,11 +935,8 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
                     _setShifts( molecule, shiftMapping, ccpnShiftList )
                 # end for
 
-                if ( verbose ):
-                    NTmessage( "Ccpn shifts (resonances) for molecule '%s' imported",
-                               moleculeName )
-                    NTmessage( '%s', cingProject.molecule.format() )
-                # end if
+                NTmessage( "Ccpn shifts (resonances) for molecule '%s' imported", moleculeName )
+                NTmessage( '%s', cingProject.molecule.format() )
             # end if
         # end if
     # end for
@@ -967,11 +945,8 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
     # It's supposed to be done only once
     _setPeaks( cingProject, ccpnNmrProject )
 
-    if ( verbose ):
-        NTmessage( "Ccpn peaks for Cing.Project '%s' imported",
-                   cingProject.name )
-        NTmessage( '%s', cingProject.format() )
-    # end if
+    NTmessage( "Ccpn peaks for Cing.Project '%s' imported", cingProject.name )
+    NTmessage( '%s', cingProject.format() )
 
     cingProject.addHistory( sprintf(funcName) )
     cingProject.updateProject()
@@ -1053,7 +1028,7 @@ def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
     return (shiftMapping)
 # end def _getShiftAtomNameMapping
 
-def _setShifts( molecule, shiftMapping, ccpnShiftList, verbose = True ):
+def _setShifts( molecule, shiftMapping, ccpnShiftList ):
     '''Descrn: Core function that sets resonances to atoms.
        Inputs: Cing.Molecule instance (obj), ccp.molecule.MolSystem.MolSystem.
        Output: Cing.Project or None or error.
@@ -1097,13 +1072,11 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList, verbose = True ):
             # end if
         # end for
     # end for
-    if ( verbose ):
-        NTmessage( "ShiftList '%s' imported from Ccpn Nmr project '%s'",
+    NTmessage( "ShiftList '%s' imported from Ccpn Nmr project '%s'",
                    ccpnShiftList.name, ccpnShiftList.parent.name )
-    # end if
 # end def _setShifts
 
-def _setPeaks( cingProject, ccpnNmrProject, verbose = True ):
+def _setPeaks( cingProject, ccpnNmrProject ):
     '''Descrn: Core function that sets peaks imported from Ccpn for a
                Cing.Project and links to resonances.
        Inputs: Cing.Project instance, ccp.nmr.Nmr.NmrProject.
@@ -1199,10 +1172,8 @@ def _setPeaks( cingProject, ccpnNmrProject, verbose = True ):
                     pl.append(peak)
                 # end for
 
-                if ( verbose ):
-                    NTmessage("PeakList '%s' imported from Ccpn Nmr project '%s'",
+                NTmessage("PeakList '%s' imported from Ccpn Nmr project '%s'",
                               peakListName, ccpnNmrProject.name)
-                # end if
             # end for
         # end for
     # end for
@@ -1224,8 +1195,7 @@ def _restraintsValues(constraint):
     return lower, upper, targetValue, error
 # end def _restraintsValues
 
-def importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None,
-                                      verbose = True ):
+def importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: Import distance restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
@@ -1291,8 +1261,7 @@ def importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None,
     return listOfDistRestList
 # end def importFromCcpnDistanceRestraints
 
-def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None,
-                                      verbose = True ):
+def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: Import dihedral restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
@@ -1383,8 +1352,7 @@ def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None,
     return listOfDihRestList
 # end def importFromCcpnDihedralRestraints
 
-def importFromCcpnRdcRestraints( cingProject = None, ccpnProject = None,
-                                 verbose = True ):
+def importFromCcpnRdcRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: Import RDC restraints from Ccpn.Project into Cing.Project.
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
@@ -1653,7 +1621,7 @@ def _checkName(name, prefix='Ccpn'):
     return name
 # end def _checkName
 
-def createCcpn( cingProject = None, verbose = True ):
+def createCcpn( cingProject = None ):
     '''Descrn: Create a new Ccpn project and associates it to a Cing.Project.
        Inputs: Cing.Project instance.
        Output: Ccpn Implementation.Project.
@@ -1688,7 +1656,7 @@ def createCcpn( cingProject = None, verbose = True ):
     return ccpnProject
 # end def createCcpn
 
-def export2Ccpn( cingProject = None, verbose = True ):
+def export2Ccpn( cingProject = None ):
     '''Descrn: Export Ccpn.Project associated to a Cing.Project by creating
                a new Ccpn.Project from Cing data and saving it
                into Cing CCPN directory.
@@ -1773,7 +1741,7 @@ def _moveCcpnProject(ccpnProject, newDirectory):
 # end def _moveCcpnProject
 
 def createCcpnMolecules( cingProject = None, ccpnProject = None,
-                         moleculeName = None, verbose = True ):
+                         moleculeName = None ):
     '''Descrn: create from Cing.Molecule a molSystem into a existing
                Ccpn project instance.
        Inputs: Ccpn Implementation.Project, Cing.Project instance,
@@ -1909,16 +1877,14 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
                 _ccpnAtom2CingAndCoords( molecule, ccpnResidue, chain.name )
                 index += 1
             # end for
-            if ( verbose ):
-                NTmessage( "Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName )
-            # end if
+            NTmessage( "Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName )
         # end for
     # end for
     return ccpnProject
 # end def createCcpnMolecules
 
 def createCcpnStructures( cingProject = None, ccpnProject = None,
-                          moleculeName = None, verbose = True ):
+                          moleculeName = None ):
     '''Descrn: create Ccpn.molStructures from Cing.Coordinates into a existing
                Ccpn project instance.
        Inputs: Ccpn Implementation.Project, Cing.Project instance,
@@ -2048,8 +2014,7 @@ def createCcpnStructures( cingProject = None, ccpnProject = None,
     return ccpnProject
 # end def createCcpnStructures
 
-def createCcpnRestraints( cingProject = None, ccpnProject = None,
-                          verbose = True ):
+def createCcpnRestraints( cingProject = None, ccpnProject = None ):
     '''Descrn: create ccp.nmr.NmrConstraint.xxxConstraintList from
                Cing.xxxRestraintList into a existing
                Ccpn project instance.
