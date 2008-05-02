@@ -41,6 +41,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  whatifPath%(equals)s%(whatifPath)s
 %(export)s  dsspPath%(equals)s%(dsspPath)s
 %(export)s  convertPath%(equals)s%(convertPath)s
+%(export)s  ghostscriptPath%(equals)s%(ghostscriptPath)s
 %(export)s  ps2pdfPath%(equals)s%(ps2pdfPath)s
 %(export)s  molmolPath%(equals)s%(molmolPath)s
 %(export)s  povrayPath%(equals)s%(povrayPath)s
@@ -227,6 +228,14 @@ if __name__ == '__main__':
     else:
         NTmessage("Found 'convert'")
         parametersDict['convertPath'] = strip(convertPath)
+
+    ghostscriptPath,err  = NTgetoutput('which gs')
+    if not ghostscriptPath:
+        NTwarning("Couldn't find 'ghostscript' (from ImageMagick)")
+        parametersDict['ghostscriptPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    else:
+        NTmessage("Found 'ghostscript'")
+        parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
 
     ps2pdfPath,err  = NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
