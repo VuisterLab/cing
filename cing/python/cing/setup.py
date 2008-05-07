@@ -193,6 +193,10 @@ if __name__ == '__main__':
     parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     parametersDict['dsspPath']    = "PLEASE_ADD_EXECUTABLE_HERE"
     if not whatifPath:
+        defaultWhatifPath = '/home/vriend/whatif/DO_WHATIF.COM'
+        if os.path.exists(defaultWhatifPath):
+            whatifPath = defaultWhatifPath
+    if not whatifPath:
         NTwarning("Couldn't find 'what if'")
     else:
         NTmessage("Found 'what if'")
