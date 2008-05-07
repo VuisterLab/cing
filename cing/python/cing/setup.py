@@ -190,9 +190,10 @@ if __name__ == '__main__':
         parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
 
     whatifPath,err  = NTgetoutput('which DO_WHATIF.COM')
+    parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+    parametersDict['dsspPath']    = "PLEASE_ADD_EXECUTABLE_HERE"
     if not whatifPath:
         NTwarning("Couldn't find 'what if'")
-        parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
         NTmessage("Found 'what if'")
         whatifPath = strip(whatifPath)
@@ -201,7 +202,6 @@ if __name__ == '__main__':
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
             NTwarning("Couldn't find 'dssp'")
-            parametersDict['dsspPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
         else:
             NTmessage("Found 'dssp'")
             parametersDict['dsspPath'] = dsspPath
@@ -216,8 +216,8 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        NTwarning("Wattos is not configured.'")
-        NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
+        NTwarning("Couldn't find 'Wattos'")
+#        NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
         NTmessage("Found 'wattos'")
 
@@ -239,7 +239,7 @@ if __name__ == '__main__':
 
     ps2pdfPath,err  = NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
-        NTwarning("Couldn't find 'ps2pdfPath' (from Ghostscript)")
+        NTwarning("Couldn't find 'ps2pdf' (from Ghostscript)")
         parametersDict['ps2pdfPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
         NTmessage("Found 'ps2pdf'")
