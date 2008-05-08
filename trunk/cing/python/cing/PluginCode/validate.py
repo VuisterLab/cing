@@ -529,7 +529,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
     sys.stdout.flush()
     #end if
 
-    return result 
+    return result
 #end def
 
 def validateSaltbridge( residue1, residue2 ):
@@ -660,7 +660,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             for atmName2 in donorAcceptor[residue2.db.shortName]:
                 atm2 = residue2[atmName2]
                 d = (atm1.coordinates[model].e-atm2.coordinates[model].e).length()
-                if d < 4.0: 
+                if d < 4.0:
                     count += 1
                 #print '>', atm1,atm2,d,count
 
@@ -1150,11 +1150,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
-       
+
        Note that residue can also be a list of residues. A single plot will
        be created for all together were the appropriate background histograms
        will be picked.
-       
+
        Return None on error or ps on success.
     '''
 
@@ -1175,13 +1175,13 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     isSingleResiduePlot = len(residueList) == 1
-    
+
     if not plotTitle:
         if isSingleResiduePlot:
             plotTitle = residue._Cname(1)
         else:
             plotTitle = '%d residues'
-            
+
 
     if dihedralName1 not in residue or residue[dihedralName1] == None:
 #        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
@@ -1205,8 +1205,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yRange = (plotparams2.min, plotparams2.max),
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
-    ps.addPlot(plot)    
-    
+    ps.addPlot(plot)
+
     if dihedralName1=='PHI' and dihedralName2=='PSI':
         histBySsAndCombinedResType = histRamaBySsAndCombinedResType
         histBySsAndResType         = histRamaBySsAndResType
@@ -1216,17 +1216,17 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     else:
         NTcodeerror("makeDihedralPlot called for non Rama/Janin")
         return None
-    
+
     histList = []
     ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
     ssTypeList.sort()
     # The assumption is that the derived residues can be represented by the regular.
     resNamePdb = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
-    
+
     for ssType in ssTypeList:
 #        NTdebug('Looking up ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
         hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
-        if isSingleResiduePlot:             
+        if isSingleResiduePlot:
             hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)
         if hist != None:
 #            NTdebug('Appending for ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
@@ -1243,7 +1243,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             # res is equal to residue
             dr1 = _matchDihedrals(res, dihedralName1)
             dr2 = _matchDihedrals(res, dihedralName2)
-        
+
             if dr1 and dr2:
                 lower1, upper1 = dr1.lower, dr1.upper
                 lower2, upper2 = dr2.lower, dr2.upper
@@ -1253,32 +1253,32 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             elif dr2:
                 lower2, upper2 = dr2.lower, dr2.upper
                 lower1, upper1 = plotparams1.min, plotparams1.max
-        
+
             if dr1 or dr2:
                 plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
-    
+
         d1 = res[dihedralName1]
         d2 = res[dihedralName2]
-    
+
         if not (len(d1) and len(d2)):
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
         d1cav = d1.cav
         d2cav = d2.cav
-    
+
         # Plot data points on top for painters algorithm without alpha blending.
         myPoint = plusPoint.copy()
         myPoint.pointColor = 'green'
         myPoint.pointSize = 6.0
         myPoint.pointEdgeWidth = 1.0
         if res.resName == 'GLY':
-            myPoint.pointType = 'triangle'            
+            myPoint.pointType = 'triangle'
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
-            
+
         plot.points( zip( d1, d2 ), attributes=myPoint )
-        
+
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot:
             myPoint = myPoint.copy()
@@ -1367,8 +1367,8 @@ def setupHtml(project):
         next = None
         lastMoleculeIndex = len(project.molecules) - 1
         if index > 0:
-            previous = project[ project.molecules[index-1] ]    
-    
+            previous = project[ project.molecules[index-1] ]
+
         if index < lastMoleculeIndex:
             next = project[ project.molecules[index+1] ]
 
@@ -1391,7 +1391,7 @@ def setupHtml(project):
             chaindir = project.htmlPath(chain.name)
             if not os.path.exists( chaindir ):
                 os.mkdir( chaindir )
- 
+
             #if hasattr(chain, 'html'): del(chain['html'])
             if chain.has_key('html'):
                 del(chain.html)
@@ -1446,7 +1446,7 @@ def setupHtml(project):
             for dummy in range( r0.resNum%ncols ):
                 for obj in htmlList:
                     obj.html.main('td', style="width: %s" % width)
- 
+
             for res in residues:
                 # Create the directory for this residue
                 resdir = project.htmlPath(chain.name, res.name)
@@ -1471,14 +1471,14 @@ def setupHtml(project):
                         obj.html.main('tr', closeTag=False)
                         obj.html.main( 'td',sprintf('%d-%d',r1,r2),
                                        style="width: %s" % width )
- 
+
                 # add residue to table
                 for obj in htmlList:
                     objMain = obj.html.main
                     objMain('td', style="width: %s" % width, closeTag=False)
                     obj.html.insertHtmlLink(objMain, obj, res, text=res.name)
                     objMain('td', openTag=False)
- 
+
                 # Create a page for each residue
 
                 # generate html file for this residue
@@ -1499,7 +1499,7 @@ def setupHtml(project):
             for obj in htmlList:
                 obj.html.main('tr', openTag=False)
                 obj.html.main('table', openTag=False)
-            #end for over obj in htmlList 
+            #end for over obj in htmlList
 
         molecule.html.main('h1', 'Model-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Models page',
@@ -1803,11 +1803,13 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
-    doProcheck = False # disable for testing as it takes a long time.
-    doWhatif = False
+#    doProcheck = False # disable for testing as it takes a long time.
+#    doWhatif = False
+    skipProcheck = htmlOnly
+    skipWhatif = htmlOnly
 #    skipFirstPart = True # disable for testing as it takes a long time.
-    skipExport2Gif = True # Default is to follow value of skipFirstPart.
-    
+    skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
+
     if not skipExport2Gif:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
@@ -1908,7 +1910,8 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             NTmessage("") # Done printing progress.
         # end of skip test.
 
-        if doProcheck:
+#        if doProcheck:
+        if not skipProcheck:
             NTmessage("Formating Procheck plots")
             molecule.html.main('h1','Procheck_NMR')
             anyProcheckPlotsGenerated = False
@@ -1991,12 +1994,13 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                 main('h2', "No procheck plots found at all")
         #end for doProcheck check.
 
-        if doWhatif:
+#        if doWhatif:
+        if not skipWhatif:
             NTmessage("Creating Whatif plots")
             if project.createHtmlWhatif():
                 NTerror('Failed to createHtmlWhatif')
                 return True
-            
+
             molecule.html.main('h1','What If')
 #            anyWhatifPlotsGenerated = False
             pcPlotList = [
@@ -2060,7 +2064,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             if not anyProcheckPlotsGenerated:
                 main('h2', "No procheck plots found at all")
         #end for doProcheck check.
-    
+
     #end for molecule
     # return None for success is standard.
 #end def
@@ -2213,36 +2217,32 @@ def populateHtmlModels(project):
 #end def
 
 def validate( project, ranges=None, htmlOnly = False, doWhatif = True ):
-        """Validatation tests returns None on success or True on failure.
-        """
-#    try:
-        #validateSetup(project)
-        if not htmlOnly:
-            if setupValidation( project, ranges=ranges ):
-                NTerror("Failed to setupValidation")
-                return True
+    """Validatation tests returns None on success or True on failure.
+    """
 
-        if setupHtml(project):
-            NTerror("Failed to setupHtml")
+    if not htmlOnly:
+        if setupValidation( project, ranges=ranges ):
+            NTerror("Failed to setupValidation")
             return True
 
-        # populate Molecule (Procheck) and Residues
-        if populateHtmlMolecules(project,skipFirstPart=htmlOnly,htmlOnly=htmlOnly, \
-                doWhatif=doWhatif):
-            NTerror("Failed to populateHtmlMolecules")
+    if setupHtml(project):
+        NTerror("Failed to setupHtml")
+        return True
 
-        if not htmlOnly:
-            if populateHtmlModels(project):
-                NTerror("Failed to populateHtmlModels")
-                return True
-        if renderHtml(project):
-            NTerror("Failed to renderHtml")
+    # populate Molecule (Procheck) and Residues
+    if populateHtmlMolecules(project,skipFirstPart=htmlOnly,htmlOnly=htmlOnly, \
+            doWhatif=doWhatif):
+        NTerror("Failed to populateHtmlMolecules")
+
+    if not htmlOnly:
+        if populateHtmlModels(project):
+            NTerror("Failed to populateHtmlModels")
             return True
+    if renderHtml(project):
+        NTerror("Failed to renderHtml")
+        return True
 
-#    except:
-#        NTexception("Failed to validate at some point")
-#        return True
-        NTmessage("Done with overall validation")
+    NTmessage("Done with overall validation")
 #end def
 
 # register the functions

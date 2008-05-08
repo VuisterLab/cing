@@ -7,7 +7,7 @@ from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTutils import NTcodeerror
 
 
-class MoleculePlotSet():
+class MoleculePlotSet:
     def __init__(self, project, ranges, keyLoL, nrows):
         self.project = project
         self.ranges  = ranges
@@ -17,11 +17,11 @@ class MoleculePlotSet():
         if len( self.keyLoL ) != nrows:
             NTcodeerror('keyLoL does not contain nrows: %d but has length: %d' % (
                             nrows, len( self.keyLoL )))
-        
+
     def createMoleculePlotSet(self):
-        _rangeList = self.project.molecule.getFixedRangeList( 
+        _rangeList = self.project.molecule.getFixedRangeList(
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=self.ranges )
-        
+
 class ResPlotSet(NTplotSet):
     def __init__(self):
         pass

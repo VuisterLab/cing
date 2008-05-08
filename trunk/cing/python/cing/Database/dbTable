@@ -20,8 +20,9 @@
 # 19 Dec    2007: remapped BMRB nucleic acid residue names to reflect PDB;
 #                   added Zn, His HE2, with BMRB map. Added nucleic prop to n.a.
 # 11 Apr    2008: Added Aqua mappings and improved others.
-# 29 Apr    2008: fixed entry HIS: removed HE2, now is prot HD1; deprot HE2
-# 30 Apr    2008: fixed entry HISH: nameDict = { ..., 'CYANA': 'HIS+', ...}
+# 29 Apr    2008: Fixed entry HIS: removed HE2, now is prot HD1; deprot HE2
+# 30 Apr    2008: Fixed entry HISH: nameDict = { ..., 'CYANA': 'HIS+', ...}
+# 08 May    2008: Renamed RURA to URA
 #=======================================================================
 #   internal short
 RESIDUE ALA      A
@@ -11648,7 +11649,7 @@ END_RESIDUE
 
 #=======================================================================
 #   internal short
-RESIDUE RURA     u
+RESIDUE URA     u
 #=======================================================================
     nameDict = {'INTERNAL': 'URA', 'AQUA': 'U', 'BMRBd': 'URA', 'CYANA': 'URA', 'CYANA2': 'URA', 'PDB': 'U', 'XPLOR': 'URA', 'BMRB': 'U'}
     comment = None

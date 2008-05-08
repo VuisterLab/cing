@@ -200,7 +200,7 @@ try:
 
     NTdetail("Using CCPN version 1.x")
     ccpnVersion = 1
-    namingSystem = 'DIANA' #CYANA2.1
+    namingSystem = 'DIANA' #DIANA almost equals CYANA
     dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
 except:
     try:
@@ -404,7 +404,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
 
         importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
         importFromCcpnDistanceRestraints(cingProject, ccpnProject)
-#        importFromCcpnDihedralRestraints(cingProject, ccpnProject)
+        importFromCcpnDihedralRestraints(cingProject, ccpnProject)
         importFromCcpnRdcRestraints(cingProject, ccpnProject)
 
         cingProject.addHistory(sprintf(funcName))
@@ -1641,7 +1641,8 @@ def createCcpn( cingProject = None ):
         ccpnProject = Implementation.Project(name = projectName) #@UndefinedVariable
         nmrProject = Nmr.NmrProject(ccpnProject, name = ccpnProject.name) #@UnusedVariable
     else: # ccpn 2.x
-        ccpnProject = genIo.newProject(name = projectName, path=None)
+        ccpnDir = os.path.abspath(cingProject.path(cingProject.directories.ccpn))
+        ccpnProject = genIo.newProject(projectName, path=ccpnDir)
 #        ccpnProject = MemopsRoot(name = projectName)
         ccpnProject.newNmrProject(name = ccpnProject.name)
     # end if
@@ -1649,10 +1650,13 @@ def createCcpn( cingProject = None ):
     cingProject.ccpn = ccpnProject
     ccpnProject.cing = cingProject
 
-    createCcpnMolecules( cingProject )
-    createCcpnStructures( cingProject )
-    createCcpnRestraints( cingProject )
+    #createCcpnMolecules( cingProject )
+    #createCcpnStructures( cingProject )
+    #createCcpnRestraints( cingProject )
 
+    if ccpnVersion == 2:
+        ccpnProject.saveAll()
+    # end if
     return ccpnProject
 # end def createCcpn
 
@@ -1662,6 +1666,7 @@ def export2Ccpn( cingProject = None ):
                into Cing CCPN directory.
        Inputs: Cing.Project instance.
        Output: Ccpn Implementation.Project or None or error.
+       Observ: It'll be deprecated with CCPN API 2.x
     '''
 
     funcName = export2Ccpn.func_name
@@ -1673,9 +1678,11 @@ def export2Ccpn( cingProject = None ):
 
     ccpnProject = createCcpn( cingProject )
 
-    ccpnDir = os.path.abspath(cingProject.path(cingProject.directories.ccpn))
+    if ccpnVersion == 1:
+        ccpnDir = os.path.abspath(cingProject.path(cingProject.directories.ccpn))
 
-    _moveCcpnProject(ccpnProject, ccpnDir)
+        _moveCcpnProject(ccpnProject, ccpnDir)
+    # end if
 
     return ccpnProject
 # end def export2Ccpn
@@ -1685,6 +1692,7 @@ def _moveCcpnProject(ccpnProject, newDirectory):
                Move Ccpn project to a new directory.
        Inputs: Ccpn Implementation.Project, new Ccpn Project path (string).
        Output: Ccpn Implementation.Project or None or error.
+       Observ: Used only by CCPN API 1.x
     '''
 
     if not os.path.isabs(newDirectory):
