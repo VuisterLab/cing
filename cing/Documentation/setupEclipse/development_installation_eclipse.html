@@ -8,15 +8,20 @@
 Install the requirements:<br><br>
 <ol>
 <li><b>Install Fink</b>
-<br>Make sure you have the unstable trees in your fink.conf too. I had to add:
+<br>Make sure you have the unstable trees in your /sw/etc/fink.conf too. I had to add:
         <PRE>/unstable/main and /unstable/fink </PRE>
  and do: <PRE>fink selfupdate</PRE>
  <li><b>Install Matlibplot  plotting utilities</b>
 <pre>fink install matplotlib-py25</pre>
  Note that this also installs the python 2.5  numeric dependencies.
- <li><b>Install cython</b>
-<pre>fink install cython-py25</pre>
- <li><b>Install gawk</b>
+ You might have to make a single change in something like line 508 of:<br>/sw/lib/python2.5/site-packages/matplotlib/backends/backend_pdf.py from:<br>
+ <PRE>unicode = cp1252.decoding_map[charcode] or 0</PRE>
+ to:
+ <PRE>unicode = 0</pre>
+This was reported and fixed for Matlibplot version: 0.91?
+See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
+<li><b>Install cython</pre>
+<pre>fink install cython-py25</pre>This package has been absent at times but was installed to: Cython-0.9.6.13.1-py2.5.egg-info. Strange.<li><b>Install gawk</b>
 <pre>fink install gawk</pre>
  <li><b>Install ImageMagick (for convert program)</b>
 <pre>fink install imagemagick</pre>
