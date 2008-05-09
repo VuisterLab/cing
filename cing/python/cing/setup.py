@@ -128,6 +128,10 @@ def _writeCingShellFile(isTcsh):
     print ' Please check/modify %s' % (cname)   
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
     print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
+    
+    print '==> Note'
+    print ' There is another dependency; cython. Please install it and run:'
+    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
 #end def
 #------------------------------------------------------------------------------------
 
