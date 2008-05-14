@@ -68,7 +68,9 @@ class AllChecks(TestCase):
                         **kwds )
         project.save()
         self.assertFalse( project.validate(htmlOnly=htmlOnly,
-                doWhatif=doWhatifValidationOnly))
+                doWhatif=doWhatifValidationOnly,
+                doProcheck=(not doWhatifValidationOnly),
+                ))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

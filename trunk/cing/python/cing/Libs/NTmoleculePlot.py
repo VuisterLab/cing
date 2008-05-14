@@ -2,28 +2,218 @@
 # Only code specific for molecule.py related things.
 # It would be good to move the ResPlot class here too.
 
+from cing.Libs.Imagery import joinPdfPages
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import ResPlot
-from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTplot import fontVerticalAttributes
+from cing.Libs.NTplot import pointAttributes
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import getDeepByKeys
+import os
 
+KEY_LIST_STR = 'keyList'
+YLABEL_STR = 'yLabel'
+USE_ZERO_FOR_MIN_VALUE_STR = 'useZeroForMinValue'
 
 class MoleculePlotSet:
-    def __init__(self, project, ranges, keyLoL, nrows):
+    """A set of ResPlotSet (pages)."""
+    def __init__(self, project, ranges, keyLoLoL ):
         self.project = project
         self.ranges  = ranges
-        self.nrows   = nrows
-        self.keyLoLoL = keyLoL
-#        E.g. keyList of one plotable parameter off of a residue: [ 'whatif', 'RAMCHK' ]
-        if len( self.keyLoL ) != nrows:
-            NTcodeerror('keyLoL does not contain nrows: %d but has length: %d' % (
-                            nrows, len( self.keyLoL )))
+        self.keyLoLoL= keyLoLoL
+        self.colorMain= 'black'
+        self.colorAlt = 'blue'
+        self.pointSize = 3.0 # was 1.5
 
-    def createMoleculePlotSet(self):
-        _rangeList = self.project.molecule.getFixedRangeList(
-            max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=self.ranges )
+    def renderMoleculePlotSet(self, fileName, createPngCopyToo=False ):
+        # next variable must have same dimensions as self.keyLoLoL
+        pointsLoLoL = [] # list per res in rangeList of lists
+        for row in self.keyLoLoL:
+            pointsLoL = []
+            pointsLoLoL.append(pointsLoL)
+            for mainOrAlt in row:
+                pointsL = []
+                pointsLoL.append(pointsL)
+                for item in mainOrAlt:
+                    points = []
+                    pointsL.append(points)
+        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
+        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
+        rangeList = self.project.molecule.getFixedRangeList(
+            max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES,
+            ranges=self.ranges )
+        resNumb = 0
+        
+        # start a new plot for each resList
+        for resList in rangeList:
+            for res in resList:
+                resNumb += 1
+                NTdebug(`res`)
+                r = 0 # r for row
+                for row in self.keyLoLoL:
+                    pointsLoL = pointsLoLoL[r]
+                    i = 0
+                    for mainOrAlt in row:
+                        pointsL = pointsLoL[i]
+                        j = 0
+                        for item in mainOrAlt:
+                            points = pointsL[j]
+                            keys = item[KEY_LIST_STR]
+                            point = getDeepByKeys(res,*keys)
+                            if isinstance(point, NTlist):
+                                point = point.average()[0]
+                            points.append((resNumb-.5, point))
+                            j += 1
+                        i += 1
+                    r += 1
+                # end for row
+            # end for res
+        # end for resList
+        NTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
+
+        fileNameList =[]
+        ps = None
+        r = 0 # r now for resList
+        nrows = len(self.keyLoLoL)
+        for resList in rangeList:
+            r += 1
+            NTdebug("resList: %s" % resList)
+            ps = ResPlotSet() # closes any previous plots
+            ntPlotList = []
+            # create all subplots
+            for i in range(nrows):
+                ntPlotList.append( ps.createSubplot(nrows,1,i+1,
+                                            useResPlot=True,
+                                            molecule=self.project.molecule,
+                                            resList=resList) )
+            # Set y and x labels for all rows.
+            attr = fontVerticalAttributes()
+            attr.fontColor  = self.colorAlt
+            position = (-0.12, 0.5)
+            for i in range(nrows):
+                if i != nrows-1:
+                    ntPlotList[i].xLabel = None
+                row = self.keyLoLoL[i]
+                for m in range(len(row)): # m in range [0,1] # 1 maybe absent
+                    mainOrAlt = row[m]
+                    key   = mainOrAlt[0] # take first main first
+                    label = key[YLABEL_STR]
+                    NTdebug( '%d Label: %s' % (m,label))
+                    if not m:      # main y-axis?
+                        ntPlotList[i].yLabel = label
+                    else: # alternative y-axis?
+                        ntPlotList[i].labelAxes( position, label, attributes=attr)
+
+            # Draw secondary structure elements and accessibility
+            # Set x range and major ticker.
+            # The major ticker determines the grid layout.
+            # leave space for res types but get it right on top.
+            # .18 at nrows = 4
+            # Needs to be done before re-scaling the y axis from [0,1]
+            ySpaceAxisResIcons = .06 + (nrows-1) * .04
+            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
+            ntPlotList[0].drawResIcons( ySpaceAxis=ySpaceAxisResIcons )
+
+            plusPoint   = pointAttributes( type='plus',   size=self.pointSize, color=self.colorMain )
+            circlePoint = pointAttributes( type='circle', size=self.pointSize, color=self.colorAlt)
+            plusPoint.lineColor   = self.colorMain
+            circlePoint.lineColor = self.colorAlt
+            length = ntPlotList[0].MAX_WIDTH_IN_RESIDUES
+            start = (r-1)*length
+
+            for i in range(nrows):
+                pointsLoL = pointsLoLoL[i]
+                pointsForAutoscaling = [] # might be done differently in future when alternative axis doesn't have same scale as main axis.
+                for j in range(len(pointsLoL)): # j is 0 for main or 1 for alt
+                    pointsL = pointsLoL[j]
+                    for k in range(len(pointsL)): # k usually just 0
+                        points = pointsL[k]
+                        pointsOffset = convertPointsToPlotRange(points, xOffset=-start, yOffset=0, start=0, length=length)
+                        pointAttr = plusPoint
+                        if j:      # alternative y-axis
+                            pointAttr = circlePoint
+                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
+                        ntPlotList[i].lines(pointsOffset,  pointAttr)
+                        pointsForAutoscaling += pointsOffset
+                        
+                NTdebug( 'autoScaleY row %d' % (i))
+                ntPlotList[i].autoScaleY( pointsForAutoscaling )
+                if getDeepByKeys( self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR ):
+                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
+                    ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
+
+            ySpaceAxisResTypes = .02 + (nrows-1) * .01
+            ntPlotList[0].drawResTypes(ySpaceAxis=ySpaceAxisResTypes) # Weirdly can only be called after yRange is set.
+
+            for i in range(nrows):
+                showLabels = False
+                if i == nrows-1:
+                    showLabels = True
+                # Set the grid and major tickers
+                # also sets the grid lines for major. Do last as it won't rescale with plot yet.
+                ntPlotList[i].drawResNumbers( showLabels=showLabels)
+
+            # Actually plot
+            fileNameList.append('%s%03d.pdf' % (fileName,r)) # TODO: get rid of final .pdf
+            if ps.hardcopy(fileNameList[r-1]):
+                NTerror('Failed to ps.hardcopy to: %s' % fileNameList[r-1])
+                return True
+
+            if createPngCopyToo:
+                fileNamePng = '%s%03d.png' % (fileName,r) # TODO: get rid of final .pdf
+                if ps.hardcopy(fileNamePng):
+                    NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
+                    return True
+
+        # end for resList in rangeList:
+        if joinPdfPages( fileNameList, fileName ):
+            NTerror('Failed to joinPdfPages from %s to: %s' % ( fileNameList, fileName))
+            return True
+        for fileName in fileNameList:
+            os.unlink( fileName )
 
 class ResPlotSet(NTplotSet):
+    """A single page with one or more rows of plots."""
     def __init__(self):
-        pass
-    def createResPlotSet(self):
-        pass
+        NTplotSet.__init__( self )
+        self.hardcopySize = (600,600)
+        self.subplotsAdjust(hspace  = .1) # no height spacing between plots.
+        self.subplotsAdjust(top     = 0.9) # Accommodate icons and res types.
+        self.subplotsAdjust(left    = 0.15) # Accommodate extra Y axis label.
+
+def offSet(inputList, xOffset=0., yOffset=0.):
+    result = []
+    for i in inputList:
+        if i[0] == None: 
+            x = None
+        else:
+            x = i[0]+xOffset
+        if i[1] == None:
+            y = None
+        else:
+            y = i[1]+yOffset
+        result.append( (x,y))
+    return result
+
+def selectPointsFromRange( pointList, start=0, length=None):
+    """Length is exclusive; eg from 0 to 1 exclusive should
+    have length one and not two."""
+
+    if not length:
+        NTerror('expected a non-zero length in selectPointsFromRange')
+        return True
+    end = start + length
+    result = []
+    for point in pointList:
+        x = point[0]
+        if x >= start and x < end:
+            result.append( (x,point[1]) )
+    return result
+
+def convertPointsToPlotRange( inputList, xOffset=0, yOffset=0, start=0, length=None):
+    """Convenience method combining offSet and selectPointsFromRange"""
+    result = offSet(inputList, xOffset=xOffset, yOffset=yOffset)
+    result = selectPointsFromRange( result, start=start, length=length)
+    return result
