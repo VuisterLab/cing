@@ -225,7 +225,8 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end for
     
     project.molecule.updateAll()
-        
+    project.dssp() # TODO: move these calls toproject.molecule.updateAll()
+    
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()
     NTmessage( '%s', molecule.format() )

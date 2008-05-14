@@ -16,7 +16,7 @@ from cing.PluginCode.Whatif import BNDCHK_STR
 from cing.PluginCode.Whatif import C12CHK_STR
 from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import QUACHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
+from cing.PluginCode.Whatif import RAMCHK_STR 
 from cing.PluginCode.Whatif import ROTCHK_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR

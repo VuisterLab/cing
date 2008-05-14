@@ -5,6 +5,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import limitToRange
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
@@ -20,7 +21,7 @@ from cing.PluginCode.procheck import to3StateUpper
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
-from matplotlib import colors
+from matplotlib import colors 
 from matplotlib import rcParams
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
@@ -57,7 +58,6 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy.core.ma import arange
-from cing.Libs.NTutils import NTwarning
 import Image
 import math
 import sys
@@ -760,7 +760,7 @@ class NTplot( NTdict ):
         if startAtZero and min >= 0.:
             min = 0.
             
-        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( min, max )
@@ -1168,7 +1168,7 @@ class NTplotSet( NTdict ):
         fig_height    = fig_height_pt*inches_per_pt # height in inches
         fig_size      = [fig_width,fig_height]
 
-        if useMatPlotLib:
+        if useMatPlotLib: 
             params = {#'backend':          self.graphicsOutputFormat,
                       'figure.dpi':       dpi,
                       'figure.figsize':   fig_size,
@@ -1273,7 +1273,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
     def getsecStructElementList(self):
         """Chop the molecule into segments of the same secondary structure type
-        from consensus Procheck attribute.
+        from consensus DSSP attribute.
 
         ' HHHHH   SSSS   ' becomes
         [ ' ', 'HHHH', '   ', 'SSSS', '   ' ] but then in residue objects.
@@ -1321,7 +1321,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
         if secStructElement:
             result.append(secStructElement)
-        NTdebug('getsecStructElementList result: %s', result)
+#        NTdebug('getsecStructElementList result: %s', result)
         return result
 
     def setMinorTickerToRes(self):
@@ -1452,7 +1452,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             secStructElementList = self.getsecStructElementList()
             i = 0
             for element in secStructElementList:
-    #            NTdebug(`element`)
+#                NTdebug(`element`)
                 elementLength = len(element)
                 res = element[0]
 #                secStruct = getProcheckSecStructConsensus( res )    
@@ -1461,7 +1461,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                     secStruct = None
                 if secStruct == ' ':
                     secStruct = None
-                NTdebug('secStruct res: %s %s and length: %d', res, secStruct, elementLength)
+#                NTdebug('res: %s, secStruct %s, and length: %d', res, secStruct, elementLength)
 
                 xy = ( iconBoxXstart + i, iconBoxYstart)
                 width = elementLength

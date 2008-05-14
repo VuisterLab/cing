@@ -1,7 +1,6 @@
 """
 Runs and retrieves DSSP
 """
-from cing import verbosityDetail
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
@@ -13,9 +12,9 @@ from cing.Libs.NTutils import NTwarning
 from cing.core.parameters import cingPaths
 from cing.setup import time
 from cing.PluginCode.procheck import SECSTRUCT_STR
-import cing
+from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 import os
-
+ 
 # don't change:
 DSSP_STR = "dssp" # key to the entities (atoms, residues, etc under which the results will be stored
 
@@ -46,8 +45,8 @@ class Dssp:
         self.molecule     = project.molecule
         self.rootPath     = project.mkdir(project.molecule.name, project.moleculeDirectories.dssp)
         self.redirectOutput = True
-        if cing.verbosity >= verbosityDetail:
-            self.redirectOutput=False
+#        if cing.verbosity >= verbosityDetail:
+#            self.redirectOutput=False
         self.dssp  = ExecuteProgram(pathToProgram = cingPaths.dssp, 
                                     rootPath = self.rootPath,  
                                     redirectOutput= self.redirectOutput)
@@ -107,12 +106,13 @@ class Dssp:
         return result
 
     def postProcess(self):
-        for item in [ SECSTRUCT_STR ]:
-            for res in self.project.molecule.allResidues():
-                if res.has_key( item ):
-                    itemList = res[ item ]
-                    c = itemList.setConsensus()
-                    NTdebug('consensus: %s', c)
+        item = SECSTRUCT_STR
+#        for item in [ SECSTRUCT_STR ]:
+        for res in self.project.molecule.allResidues():
+            if res.has_key( item ):
+                itemList = res[ item ]
+                c = itemList.setConsensus()
+                NTdebug('consensus: %s', c)
                     
                 
             
@@ -138,9 +138,9 @@ class Dssp:
                     continue
                 if not isDataStarted:
                     continue
-                NTdebug("working on line: %s" % line.dollar[0])
+#                NTdebug("working on line: %s" % line.dollar[0])
                 if not len( line.dollar[0][6:10].strip() ):
-                    NTdebug('Skipping line without residue number')
+#                    NTdebug('Skipping line without residue number')
                     continue 
                 result = self._parseLine(line.dollar[0], self.dsspDefs)
                 if not result:
@@ -158,14 +158,14 @@ class Dssp:
                     del(residue['dssp'])
                 residue.setdefault('dssp', NTdict())
                 
-                NTdebug("working on residue %s" % residue)
+#                NTdebug("working on residue %s" % residue)
                 for field, value in result.iteritems():
                     if not self.dsspDefs[field][3]: # Checking store parameter.
                         continue
                     # Insert for key: "field" if missing an empty  NTlist.
                     residue.dssp.setdefault(field, NTlist()) 
                     residue.dssp[field].append(value)
-                    NTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
+#                    NTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
         
 #end class
 
@@ -195,11 +195,11 @@ def dssp(project)   :
 #end def
 
 def to3StateUpper( strNTList ):
-    """From Rob Hooft and Gert Vriend.
+    """Personal communications JFD with Rob Hooft and Gert Vriend.
 
     3, H -> H
     B, E -> S
-    space, S, G, T -> coil
+    space, S, G, T -> coil (represented by ' ')
 
     See namesake method in procheck class.
     """
@@ -211,6 +211,17 @@ def to3StateUpper( strNTList ):
         elif c == 'B' or c == 'E':
             n = 'S'
         result.append( n )
+    return result
+
+def getDsspSecStructConsensus( res ):
+    """ Returns None for error, or one of ['H', 'S', ' ' ]
+    """
+    secStructList = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
+    result = None
+    if secStructList:
+        secStructList = to3StateUpper( secStructList )
+        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+#    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
     return result
 
 # register the functions
