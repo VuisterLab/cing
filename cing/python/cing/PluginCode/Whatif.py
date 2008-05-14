@@ -39,6 +39,8 @@ QUACHK_STR       = 'QUACHK'
 RAMCHK_STR       = 'RAMCHK'
 C12CHK_STR       = 'C12CHK'
 BBCCHK_STR       = 'BBCCHK'
+ROTCHK_STR       = 'ROTCHK'
+
 #            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
 #            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
 #            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
@@ -88,17 +90,18 @@ class Whatif( NTdict ):
     # http://www.yasara.org/pdbfinder_file.py.txt
     # http://swift.cmbi.ru.nl/whatif/html/chap23.html
     # All are in text record of file to be parsed so they're kind of redundant.
+    # Third element is optional short name suitable for labeling a y-axis.
     nameDefs =[
                 ('ACCLST', 'Relative accessibility'),
                 ('ALTATM', 'Amino acids inside ligands check/Attached group check'),
                 ('ANGCHK', 'Angles'),
                 ('BA2CHK', 'Hydrogen bond acceptors'),
-                ('BBCCHK', 'Backbone normality'),
+                ('BBCCHK', 'Backbone normality', 'Backbone normality'),
                 ('BH2CHK', 'Hydrogen bond donors'),
                 ('BMPCHK', 'Bumps'),
                 ('BNDCHK', 'Bond lengths'),
                 ('BVALST', 'B-Factors'),
-                ('C12CHK', 'Chi-1 chi-2'),
+                ('C12CHK', 'Chi-1 chi-2', 'Chi 1/2. Z',),
                 ('CHICHK', 'Torsions'),
                 ('CCOCHK', 'Inter-chain connection check'),
                 ('CHICHK', 'Torsion angle check'),
@@ -119,20 +122,27 @@ class Whatif( NTdict ):
                 ('PLNCHK', 'Protein side chain planarities'),
                 ('PRECHK', 'Missing backbone atoms.'),
                 ('PUCCHK', 'Ring puckering in Prolines'),
-                ('QUACHK', 'Directional Atomic Contact Analysis'),
-                ('RAMCHK', 'Ramachandran'),
-                ('ROTCHK', 'Rotamers'),
+                ('QUACHK', 'Directional Atomic Contact Analysis', 'Packing Quality'),
+                ('RAMCHK', 'Ramachandran', 'Ramachandr. Z'),
+                ('ROTCHK', 'Rotamers', 'Rotamer normality'),
                 ('SCOLST', 'List of symmetry contacts'),
                 ('TO2CHK', 'Missing C-terminal groups'),
                 ('TOPPOS', 'Ligand without know topology'),
                 ('WGTCHK', 'Atomic occupancy check'),
                 ('Hand',   '(Pro-)chirality or handness check')
                ]
+              
+#              'Bond max Z',
+               
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
     nameDict = NTdict()
-    for n1,n2 in nameDefs:
-        nameDict[n1] = n2
+    shortNameDict = NTdict()
+    for row in nameDefs:
+        n1 = row[0]
+        nameDict[n1] = row[1]
+        if len(row) >= 3:
+            shortNameDict[n1] = row[2]
     nameDict.keysformat()
     recordKeyWordsToIgnore = { # Using a dictionary for fast key checks below.
                               "Bad":None,

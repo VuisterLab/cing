@@ -105,7 +105,7 @@ dbase = shelve.open( dbaseFileName )
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 dbase.close()
 
-def setupValidation( project, ranges=None ):
+def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     """
     Run the initial validation calculations or programs.
     returns None on success or True on failure.
@@ -118,8 +118,10 @@ def setupValidation( project, ranges=None ):
     project.checkForSaltbridges(toFile=True)
     project.validateRestraints( toFile=True)
     project.calculateRmsd(      ranges=ranges)
-    project.procheck(           ranges=ranges)
-#    project.runWhatif(          ranges=ranges)
+    if doProcheck:
+        project.procheck(           ranges=ranges)
+    if doWhatif:
+        project.runWhatif(          ranges=ranges)
 #    project.criticizeByAll()
     project.summary()
 #end def
@@ -1797,16 +1799,13 @@ def renderHtml(project):
 
 
 def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
-            doProcheck = True, doWhatif = True ):
+            doProcheck = True, doWhatif = False ):
     '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project.
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
-#    doProcheck = False # disable for testing as it takes a long time.
-#    doWhatif = False
-    skipProcheck = htmlOnly
-    skipWhatif = htmlOnly
+
 #    skipFirstPart = True # disable for testing as it takes a long time.
     skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
 
@@ -1910,8 +1909,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             NTmessage("") # Done printing progress.
         # end of skip test.
 
-#        if doProcheck:
-        if not skipProcheck:
+        if doProcheck:
             NTmessage("Formating Procheck plots")
             molecule.html.main('h1','Procheck_NMR')
             anyProcheckPlotsGenerated = False
@@ -1992,10 +1990,9 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             main('table',  openTag=False) # close table
             if not anyProcheckPlotsGenerated:
                 main('h2', "No procheck plots found at all")
-        #end for doProcheck check.
 
-#        if doWhatif:
-        if not skipWhatif:
+
+        if doWhatif:
             NTmessage("Creating Whatif plots")
             if project.createHtmlWhatif():
                 NTerror('Failed to createHtmlWhatif')
@@ -2004,7 +2001,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             molecule.html.main('h1','What If')
 #            anyWhatifPlotsGenerated = False
             pcPlotList = [
-                 ('_01_ramachand','Ramachandran (all)')
+                 ('_01_nabuurs_collection','QUA/RAM/CHI/BBC')
                 ]
             ncols = 6
             main = molecule.html.main
@@ -2216,12 +2213,13 @@ def populateHtmlModels(project):
     #end for
 #end def
 
-def validate( project, ranges=None, htmlOnly = False, doWhatif = True ):
+def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhatif = True ):
     """Validatation tests returns None on success or True on failure.
     """
 
     if not htmlOnly:
-        if setupValidation( project, ranges=ranges ):
+        if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif
+                            ):
             NTerror("Failed to setupValidation")
             return True
 
@@ -2231,7 +2229,9 @@ def validate( project, ranges=None, htmlOnly = False, doWhatif = True ):
 
     # populate Molecule (Procheck) and Residues
     if populateHtmlMolecules(project,skipFirstPart=htmlOnly,htmlOnly=htmlOnly, \
-            doWhatif=doWhatif):
+            doProcheck=doProcheck,
+            doWhatif=doWhatif,
+            ):
         NTerror("Failed to populateHtmlMolecules")
 
     if not htmlOnly:

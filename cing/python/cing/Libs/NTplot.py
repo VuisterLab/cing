@@ -12,10 +12,10 @@ from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
+from cing.PluginCode.dssp import DSSP_STR
+from cing.PluginCode.dssp import getDsspSecStructConsensus
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
-from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.PluginCode.procheck import getProcheckSecStructConsensus
 from cing.PluginCode.procheck import to3StateUpper
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
@@ -57,6 +57,7 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy.core.ma import arange
+from cing.Libs.NTutils import NTwarning
 import Image
 import math
 import sys
@@ -721,59 +722,55 @@ class NTplot( NTdict ):
         return self.autoScaleY( pointList, startAtZero )
  
     def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
-        """Using the list of points autoscale the y axis."""
+        """Using the list of points autoscale the y axis.
+        If no list is given then the routine simply returns now.
+        If the list only contains nulls the min and max will be assumed 0 and 1.
+        If the min equals the max then the max is simply taken as min increased by one.
+        If the min is None then the min is assumed to be zero and max will become one.
+        This guarantees a y range.
+        """
         min = None
         max = None
-        if pointList:
-            for point in pointList:
-                v = point[1]
-                if min == None:
-                    min = v
-                    max = v
-                    continue
-                if  v < min:
-                    min = v
-                if  v > max:
-                    max = v
-        else:
-            min = 0
-            max = 0
+        if not pointList:
+            return
+        
+        for point in pointList:
+            v = point[1]
+            if v == None:
+                continue
+            if min == None:
+                min = v
+                max = v
+                continue
+            if  v < min:
+                min = v
+            if  v > max:
+                max = v
 
+        if min == None or max == None:
+            NTwarning('Only None values in autoScaleY pointList found')
+            min = 0.0
+            max = 1.0
+        
         if min == max: # Zero range is impossible.
+            if min == None:
+                min = 0.
             max = min + 1.
         
-        if startAtZero and min >= 0:
-            min = 0
+        if startAtZero and min >= 0.:
+            min = 0.
             
+        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( min, max )
             self.axis.autoscale_view( scalex=False, scaley=True)
             self.yRange = self.axis.get_ylim()
-            formatter = FuncFormatter(integerNumberOnly)
-            yaxis = self.axis.yaxis
-            yaxis.set_major_formatter( formatter )
-            
-
-#    def autoScale( self, x=True, y=True ):
-#        """Doesn't work for MatPlotLib yet.
-#        At least not tested."""
-#        if useMatPlotLib and x and y:
-#            self.axis.autoscale_view()
-#            self.xRange = self.axis.get_xlim()
-#            self.yRange = self.axis.get_ylim()
-#        if x:
-#            self.xRange = None
-#        if y:
-#            self.yRange = None
-#    #end def
-
-#    def show( self ):
-#        self.updateSettings()
-#        if useMatPlotLib:
-#            show()
-#        else:
-#            self.b.show()
+            if useIntegerTickLabels:
+                formatter = FuncFormatter(integerNumberOnly)
+                yaxis = self.axis.yaxis
+                yaxis.set_major_formatter( formatter )
+                
 
     def updateSettings( self ):
 #        NTdebug("Now in updateSettings")
@@ -1307,7 +1304,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             lastResNum    = res.resNum
             lastChainName = res.chain.name
 
-            l = res.getDeepByKeys(PROCHECK_STR,SECSTRUCT_STR)
+            l = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
 #            NTdebug( 'getsecStructElementList l before reduced to 3 states: %s', l )
             secStruct = None
             if l:
@@ -1360,8 +1357,8 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
             resChar = resChar.upper()
             color = 'green'
-            if not i%3:
-                color='red'
+#            if not i%3: # TODO: use something usefull.
+#                color='red'
 #            NTdebug("color: %8s %-80s" % (accessibilityZscore, color))
             x = iconBoxXstart + i + 0.5
             y = self.convert_yunits([ iconBoxYstart ])[0]          # data coordinates
@@ -1458,12 +1455,13 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     #            NTdebug(`element`)
                 elementLength = len(element)
                 res = element[0]
-                secStruct = getProcheckSecStructConsensus( res )    
+#                secStruct = getProcheckSecStructConsensus( res )    
+                secStruct = getDsspSecStructConsensus( res )    
                 if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
                     secStruct = None
                 if secStruct == ' ':
                     secStruct = None
-    #            NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
+                NTdebug('secStruct res: %s %s and length: %d', res, secStruct, elementLength)
 
                 xy = ( iconBoxXstart + i, iconBoxYstart)
                 width = elementLength
@@ -2087,34 +2085,6 @@ class FormatResNumbersFormatter(Formatter):
         return 'X'
 
 
-def offSet(inputList, xOffset=0., yOffset=0.):
-    result = []
-    for i in inputList:
-        x = i[0]+xOffset
-        y = i[1]+yOffset
-        result.append( (x,y))
-    return result
-
-def selectPointsFromRange( pointList, start=0, length=None):
-    """Length is exclusive; eg from 0 to 1 exclusive should
-    have length one and not two."""
-
-    if not length:
-        NTerror('expected a non-zero length in selectPointsFromRange')
-        return True
-    end = start + length
-    result = []
-    for point in pointList:
-        x = point[0]
-        if x >= start and x < end:
-            result.append( (x,point[1]) )
-    return result
-
-def convertPointsToPlotRange( inputList, xOffset=0, yOffset=0, start=0, length=None):
-    """Convenience method combining offSet and selectPointsFromRange"""
-    result = offSet(inputList, xOffset=xOffset, yOffset=yOffset)
-    result = selectPointsFromRange( result, start=start, length=length)
-    return result
 
 def removeNulls(serie):
     """Check y values for None and kick them out if they are."""

@@ -6,10 +6,10 @@ sys.stdout = _bitBucket
 from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
-from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2
-from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2
+from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2 @UnresolvedImport
+from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2 @UnresolvedImport
 from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
-from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x
+from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x @UnresolvedImport
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
 
@@ -204,8 +204,8 @@ try:
     dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
 except:
     try:
-        from memops.general.Io import loadProject # only on ccpn 2.x
-        from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet
+        from memops.general.Io import loadProject # only on ccpn 2.x @UnresolvedImport
+        from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet @UnresolvedImport
 
         NTdetail("Using CCPN version 2.x")
         ccpnVersion = 2
