@@ -52,9 +52,9 @@ def doEntry( entryCode, chainCode ):
     project.initPDB( pdbFile=localPdbFileName, convention = 'BMRB' )
     os.unlink(localPdbFileName)    
 #    project.procheck(createPlots=False, runAqua=False)                   
-    if not project.dssp():
-        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
-        return True          
+#    if not project.dssp(): 
+#        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
+#        return True          
     
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
     

@@ -257,6 +257,7 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None ):
     molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
     project.appendMolecule( molecule )
     project.molecule.updateAll()
+    project.dssp()   # TODO: move these calls toproject.molecule.updateAll()
     project.addHistory( sprintf('initPDB from "%s"', pdbFile ) )
     project.updateProject()
     return molecule
@@ -274,7 +275,7 @@ def importPDB( project, pdbFile, convention = IUPAC, nmodels=None ):
         return None
 
     project.molecule.updateAll()
-
+    project.dssp()     # TODO: move these calls toproject.molecule.updateAll()
     project.addHistory( sprintf('importPDB from "%s"', pdbFile ) )
     project.updateProject()
     NTmessage( '%s', project.molecule.format() )

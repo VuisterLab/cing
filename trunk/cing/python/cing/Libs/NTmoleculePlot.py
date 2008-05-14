@@ -100,7 +100,7 @@ class MoleculePlotSet:
                     mainOrAlt = row[m]
                     key   = mainOrAlt[0] # take first main first
                     label = key[YLABEL_STR]
-                    NTdebug( '%d Label: %s' % (m,label))
+                    NTdebug( 'row %d Label: %s' % (m,label))
                     if not m:      # main y-axis?
                         ntPlotList[i].yLabel = label
                     else: # alternative y-axis?
@@ -134,14 +134,14 @@ class MoleculePlotSet:
                         pointAttr = plusPoint
                         if j:      # alternative y-axis
                             pointAttr = circlePoint
-                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
+#                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
                         ntPlotList[i].lines(pointsOffset,  pointAttr)
                         pointsForAutoscaling += pointsOffset
                         
-                NTdebug( 'autoScaleY row %d' % (i))
+#                NTdebug( 'autoScaleY row %d' % (i))
                 ntPlotList[i].autoScaleY( pointsForAutoscaling )
                 if getDeepByKeys( self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR ):
-                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
+#                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
                     ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
 
             ySpaceAxisResTypes = .02 + (nrows-1) * .01

@@ -640,8 +640,9 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
            Calculate mean coordinates for all atoms
         """
         if self.modelCount > 0:
-            self.updateDihedrals(   )
-            self.updateMean(   )
+            self.updateDihedrals()
+            self.updateMean()
+#            self.dssp() # TODO move dssp to this location.
         #end if
     #end def
 
