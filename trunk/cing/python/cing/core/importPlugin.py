@@ -7,7 +7,7 @@ from cing.Libs.NTutils import NTpath
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import NTwarning
+#from cing.Libs.NTutils import NTwarning
 import glob
 import os
 
@@ -80,8 +80,8 @@ pluginDir = os.path.join(cingPythonCingDir, cingPaths.plugins)
 pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #NTdebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
-NTwarning("TODO: reintroduce the ccpn plugin code here once fixed")
-pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
+#NTwarning("TODO: reintroduce the ccpn plugin code here once fixed")
+#pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
 #NTwarning("TODO: reintroduce the validate plugin code here once fixed")
 #pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
 for p in pluginFileList:
