@@ -121,7 +121,7 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     if doProcheck:
         project.procheck(           ranges=ranges)
     if doWhatif:
-        project.runWhatif(          ranges=ranges)
+        project.runWhatif()
 #    project.criticizeByAll()
     project.summary()
 #end def
@@ -1808,7 +1808,9 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
 
 #    skipFirstPart = True # disable for testing as it takes a long time.
     skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
-
+    
+    doWhatif = False # TODO: remove when debugged.
+    
     if not skipExport2Gif:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
