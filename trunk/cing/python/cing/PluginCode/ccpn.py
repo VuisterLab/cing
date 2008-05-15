@@ -6,13 +6,14 @@ sys.stdout = _bitBucket
 from ccp.api.molecule import MolSystem # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from ccp.api.molecule import Molecule as CcpnMolecule # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
 from ccp.api.nmr import Nmr # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
-from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2 @UnresolvedImport
-from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2 @UnresolvedImport
+from ccp.general.Util import createMoleculeTorsionDict # common to ccpn 1 and 2
+from ccp.util.Molecule import makeMolecule # common to ccpn 1 and 2, used only in 2
 from memops.api import Implementation # common to ccpn 1 and 2, used only by ccpn 1.x @UnresolvedImport
-from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x @UnresolvedImport
+from memops.general import Io as genIo # common to ccpn 1 and 2, used only by ccpn 2.x
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
 
+from cing import NTdbGetResidue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -204,8 +205,8 @@ try:
     dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
 except:
     try:
-        from memops.general.Io import loadProject # only on ccpn 2.x @UnresolvedImport
-        from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet @UnresolvedImport
+        from memops.general.Io import loadProject # only on ccpn 2.x
+        from ccp.general.Util import findAtomSysNameByChemAtom #, findAtomSysNameByChemAtomSet
 
         NTdetail("Using CCPN version 2.x")
         ccpnVersion = 2
@@ -219,6 +220,7 @@ except:
 #NTmessage("Done importing readXmlProjectFile; which is impossible")
 
 convention = 'INTERNAL' #'CYANA2'
+dictCif2Cing = {'ZN':'ZN2P', 'CA':'CA2P'}
 
 def _checkCingProject( cingProject, funcName ):
     '''Descrn: Check if a Cing.Project exists for a given function.
@@ -564,27 +566,33 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
 
             #chemCompVar tells which residue variant is being used
             chemCompVar = ccpnResidue.chemCompVar
+            newNamingSystem = 'CIF'
 
             if ccpnVersion == 1:
-                chemCompSysName = chemCompVar.findFirstChemCompSysName( namingSystem
-                                                                = namingSystem )
+                chemCompSysName = chemCompVar.findFirstChemCompSysName( namingSystem = namingSystem )
+                if not chemCompSysName: # try CIF naming system
+                    NTmessage("Trying to import '%s' via CIF naming system", ccpnResidue.ccpCode)
+                    chemCompSysName = chemCompVar.findFirstChemCompSysName( namingSystem = newNamingSystem )
             else: # ccpn 2.x
                 chemComp = chemCompVar.chemComp
                 namingSysObj = chemComp.findFirstNamingSystem(name = namingSystem)
 
                 if namingSysObj:
-                    chemCompSysName = chemCompVar.findFirstSpecificSysName( namingSystem = namingSysObj) \
-                    or chemCompVar.findFirstChemCompSysName(namingSystem = namingSysObj)
+                    chemCompSysName = chemCompVar.findFirstSpecificSysName(namingSystem = namingSysObj) \
+                                   or chemCompVar.findFirstChemCompSysName(namingSystem = namingSysObj)
+                    if not chemCompSysName: # try CIF naming system
+                        NTmessage("Trying to import '%s' via CIF naming system", ccpnResidue.ccpCode)
+                        namingSysObj = chemComp.findFirstNamingSystem(name = newNamingSystem)
+                        chemCompSysName = chemCompVar.findFirstSpecificSysName(namingSystem = namingSysObj) \
+                                       or chemCompVar.findFirstChemCompSysName(namingSystem = namingSysObj)
                 else:
                     NTwarning("No namingSysObj for '%s'", chemCompVar)
                 # end if
             # end if
-
             if not chemCompSysName:
                 NTwarning( "Residue '%s' not identified", ccpnResidue.ccpCode )
                 continue
             # end if
-
             # residue Name according namingSystem
             resNameInSysName = chemCompSysName.sysName
             NTmessage("Res %s name '%s' (CCPN) ==> '%s' ('%s')",
@@ -596,6 +604,15 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
                     resNameInSysName = dictDiana2Cing[resNameInSysName]
                     NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, namingSystem, resNameInSysName)
                 # end if
+            # end if
+            if resNameInSysName in dictCif2Cing.keys():
+                oldName = resNameInSysName
+                resNameInSysName = dictCif2Cing[resNameInSysName]
+                NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, newNamingSystem, resNameInSysName)
+            # end if
+            if not NTdbGetResidue(resNameInSysName):
+                NTwarning( "Residue '%s' not identified in CING DB", ccpnResidue.ccpCode )
+                continue
             # end if
 
             # Check if Cing.Project.Molecule.Chain.Residue already exists,
@@ -680,16 +697,21 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
             #    atomSysName = findAtomSysNameByChemAtomSet(namingSystem,chemAtomSet)
             chemAtom = ccpnAtom.chemAtom
 
-            if chemAtom:
-                atomSysName = findAtomSysNameByChemAtom(namingSysObj, chemAtom)
+            #if chemAtom:
+            atomSysName = findAtomSysNameByChemAtom(namingSysObj, chemAtom)
                 #atomSysName = ccpnNamingSystem.findFirstAtomSysName(atomName=chemAtom.name, atomSubType=chemAtom.subType)
+            if atomSysName:
                 atomName = atomSysName.sysName
             else:
                 atomName = ccpnAtom.name
                 NTmessage("--- No NamingSystem. Assuming ccpn's name for: %s", atomName)
             # end if
+            if atomName in dictCif2Cing.keys() and ccpnResidue.molType == 'other':
+                oldName = atomName
+                atomName = dictCif2Cing[atomName]
+                NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, atomNamingSys, atomName)
+            # end if
         # end if
-
         # it's returning cing atom instance according to convention
         ccpnResSeq = ccpnResidue.seqCode
 
@@ -782,7 +804,7 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
 
         cingProject.molecule.updateAll()
         cingProject.dssp()
-        
+
         NTmessage('done' )
         NTmessage.flush()
 
