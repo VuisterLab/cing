@@ -526,7 +526,7 @@ def runWhatif( project, tmp=None ):
     for model in models:
         fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
         # WI prefers IUPAC like PDB now. In CING the closest is BMRBd?
-        NTmessage('==> Materializing model '+`model`+" to disk" )
+        NTdebug('==> Materializing model '+`model`+" to disk" )
         pdbFile = project.molecule.toPDB( model=model, convention = "BMRB" )
         if not pdbFile:
             NTerror("Failed to write a temporary file with a model's coordinate")

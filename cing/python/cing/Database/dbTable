@@ -3290,7 +3290,7 @@ RESIDUE HISE     H
     #---------------------------------------------------------------
     ATOM CE1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CE1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CE1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'CE1'}
         topology = [(0, 'ND1'), (0, 'NE2'), (0, 'HE1')]
         pseudo = None
         real = []
