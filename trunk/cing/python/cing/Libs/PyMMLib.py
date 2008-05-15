@@ -4,6 +4,7 @@
 ## included as part of this package.
 ## Adjusted by gv for specific purpose of NTmol
 #from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -1582,7 +1583,7 @@ class PDBFile(list):
 #            NTdebug("now at record: %6d" % i )
             i += 1
         fp.close()
-        NTmessage("==> Written %d PDB records to %s", len( self ), path )
+        NTdebug("==> Written %d PDB records to %s", len( self ), path )
         #end if
     #end def
     ## end gv adds

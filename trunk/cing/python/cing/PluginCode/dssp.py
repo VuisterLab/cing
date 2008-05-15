@@ -9,10 +9,10 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist 
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
+from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.parameters import cingPaths
 from cing.setup import time
-from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 import os
  
 # don't change:
@@ -63,7 +63,7 @@ class Dssp:
             for model in models:
                 fullname =  os.path.join( self.rootPath, 'model_%03d.pdb' % model )
                 # DSSP prefers what?
-                NTmessage('==> Materializing model '+`model`+" to disk" )
+                NTdebug('==> Materializing model '+`model`+" to disk" )
                 pdbFile = self.project.molecule.toPDB( model=model, convention = "BMRB" )
                 if not pdbFile:
                     NTerror("Failed to write a temporary file with a model's coordinate")
@@ -82,7 +82,7 @@ class Dssp:
                 return True
         taken = time.time() - now
         NTdebug("Took number of seconds: %8.1f" % taken)        
-        NTmessage("Finished dssp successfully")
+        NTdebug("Finished dssp successfully")
         self.parseResult()
 #        self.postProcess()
         return True
@@ -124,13 +124,13 @@ class Dssp:
         Return True on error.
         """
         modelCount = self.molecule.modelCount
-        NTmessage("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
+        NTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
 
         for model in range(modelCount):
             fullnameOut =  'model_%03d.dssp' % model 
             path = os.path.join(self.rootPath, fullnameOut)           
 
-            NTmessage("Parsing " + path)
+#            NTmessage("Parsing " + path)
             isDataStarted = False
             for line in AwkLike(path):
                 if line.dollar[0].find( "RESIDUE AA STRUCTURE BP1 BP2" ) >= 0:
@@ -174,6 +174,7 @@ def dssp(project)   :
     Adds <Procheck> instance to molecule. Run dssp and parse result.
     Return None on error.
     """
+    NTmessage('==> Calculating secondary structure by DSSP')
     if not project.molecule:
         NTerror('dssp: no molecule defined\n')
         return None

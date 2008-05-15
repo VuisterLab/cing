@@ -786,7 +786,7 @@ Return an Molecule instance or None on error
                 return None
             models = NTlist( model )
 
-        NTmessage("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
+        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
                    convention, models[0], models.last()                 )
 
         pdbFile = PDBFile()
