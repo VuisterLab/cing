@@ -23,6 +23,7 @@
 # 29 Apr    2008: Fixed entry HIS: removed HE2, now is prot HD1; deprot HE2
 # 30 Apr    2008: Fixed entry HISH: nameDict = { ..., 'CYANA': 'HIS+', ...}
 # 08 May    2008: Renamed RURA to URA
+# 15 May    2008: Defined CE1 for BRMB in HISE
 #=======================================================================
 #   internal short
 RESIDUE ALA      A
