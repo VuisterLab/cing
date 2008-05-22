@@ -2,10 +2,10 @@
  
 - Check if your installation is ok. First setup as described in REAME.txt in this directory.
     Then type:
-    cing --test
+    cing --test -v 0
     
 - Run procheck on a small example.
-    cing -n 2hgh_small --initPDB $CINGROOT/Tests/data/2hgh_small.pdb --ipython
+    cing -n 1brv --nosave --ipython --initPDB $CINGROOT/Tests/data/cyana/1brv/1brv.pdb
     project.procheck()
     
 - Convert some cyana data to cing:
@@ -29,7 +29,6 @@
 - Print list of parameters:- print list of parameters:
     formatall( project.plotparameters.PHI )
     formatall( project.molecule.A.residues[0].C.coordinates )
-    formatall( project.plotparameters.PHI )
     formatall( project.molecule.A.residues[0].procheck )
     formatall( project.molecule.A.VAL171.C )
 

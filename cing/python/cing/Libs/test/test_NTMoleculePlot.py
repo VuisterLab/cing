@@ -189,6 +189,11 @@ class AllChecks(TestCase):
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
         plotAttributesRowMain = NTdict()
+        plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BBCCHK_STR ]
+        keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+        plotAttributesRowMain = NTdict()
         plotAttributesRowAlte = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
@@ -197,10 +202,6 @@ class AllChecks(TestCase):
 #        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
         keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
         
-#        plotAttributesRowMain = NTdict()
-#        plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
-#        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BBCCHK_STR ]
-#        keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
 
         moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )

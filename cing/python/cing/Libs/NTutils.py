@@ -302,7 +302,9 @@ class NTlist( list ):
            return cav on min-max interval (that has to be spaced
            360 or 2pi depending on radians )
            Store cav,cv,cn as attributes of self
-           Assumes numeric list, None elements ignored
+           Assumes numeric list, None elements ignored.
+           If only None elements are found the cav, cv, cn will be set tO:
+               ( None, None, 0)
            See also NTcAverage routine
         """
         self.cav, self.cv, self.cn = NTcAverage( self, min, max, radians, byItem )
@@ -994,7 +996,9 @@ class NTdict(dict):
         aren't available"""
 #        if attr == '__getstate__':
 #        return
+#        if hasattr(self, attr):
         return self[attr]
+#        return None
 
 
     def __setattr__(self, attr, value):

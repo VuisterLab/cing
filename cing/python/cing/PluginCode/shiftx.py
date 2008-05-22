@@ -100,7 +100,7 @@ def predictWithShiftx( project, model=None   ):
 
     for model in models:
         # set filenames
-        rootname =  sprintf('model%03d', model)
+        rootname =  sprintf('model_%03d', model)
         model_base_name =  os.path.join( root, rootname )
 
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
