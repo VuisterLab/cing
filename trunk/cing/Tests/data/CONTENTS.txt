@@ -6,5 +6,5 @@ tmp                     Empty directory for temporary data created by CING test 
 Files:
 
 CONTENTS.txt            This file.
-1ai0_small.pdb          Test case of complex molecular structure (first two models).
+2vb1_simple.pdb         Protein solved by X-ray.
 pc_nmr_11_rstraints.ps  Example data for postscript converter integration.
