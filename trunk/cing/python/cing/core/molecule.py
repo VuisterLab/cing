@@ -33,7 +33,6 @@ from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
-from cing.core.constants import NAN_FLOAT
 from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
@@ -1291,7 +1290,7 @@ Residue class: Defines residue properties
 
     def dihedral( self, dihedralName ):
         """Return cmean,cv tuple for dihedralName,
-        or None on error
+        or None on error 
 
         set self[dihedralName] to NTlist of results
         """
@@ -1302,14 +1301,14 @@ Residue class: Defines residue properties
 
         self[dihedralName] = NTlist()
         self[dihedralName].cAverage()
-        self[dihedralName].cav = NAN_FLOAT
-        self[dihedralName].cv  = NAN_FLOAT
+#        self[dihedralName].cav = NAN_FLOAT Now redundant because cAverage will already have set them
+#        self[dihedralName].cv  = NAN_FLOAT To be set at the end of this routine by calling cAverage() again.
         self[dihedralName].db  = self.db[dihedralName] # linkage to the database
         self[dihedralName].residue  = self             # linkage to self
 
         # Get/Check the topology
         atoms = translateTopology( self, self.db[dihedralName].atoms )
-        if (atoms == None or len(atoms) != 4 or None in atoms):
+        if atoms == None or len(atoms) != 4 or None in atoms:
             return None
 
         # Check if all atoms have the same number of coordinates
@@ -1337,7 +1336,7 @@ Residue class: Defines residue properties
         plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
         self[dihedralName].limit( plotpars.min, plotpars.max )
         cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
-
+        
         return cav,cv
     #end def
 

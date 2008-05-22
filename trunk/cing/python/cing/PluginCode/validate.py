@@ -244,9 +244,9 @@ def calculateRmsd( project, ranges=None, models = None   ):
     shownWarningCount1 = 0
 #            shownWarningCount2 = 0
     for model in selectedModels:
-        NTmessage(".")
-
-        #end if
+        NTmessageNoEOL(".")
+        if model % 80 == 0:
+            NTmessageNoEOL("\n")
         project.molecule.rmsd.backbone[num]   = 0.0
         project.molecule.rmsd.backboneCount   = 0
         project.molecule.rmsd.heavyAtoms[num] = 0.0
@@ -450,8 +450,11 @@ def validateRestraints( project, toFile = True)   :
         try:
             msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f\n',
                  res, phi, psi,
-                 len(res.distanceRestraints), res.distanceRestraints.violCount1, res.distanceRestraints.violCount3,
-                 res.distanceRestraints.violCount5, res.distanceRestraints.rmsd
+                 len(res.distanceRestraints), 
+                 res.distanceRestraints.violCount1, 
+                 res.distanceRestraints.violCount3,
+                 res.distanceRestraints.violCount5, 
+                 res.distanceRestraints.rmsd
                    )
         except:
             NTerror("No coordinates for residue %s\n", res)
@@ -1020,7 +1023,7 @@ def validateDihedrals( self)   :
             d.good.limit(     plotpars.min, plotpars.max, byItem=1 )
             d.good.cAverage(  plotpars.min, plotpars.max, byItem=1 )
             d.outliers.limit( plotpars.min, plotpars.max, byItem=1 )
-            if True:
+            if False:
                 NTmessage( '--- Residue %s, %s ---', res, dihed )
                 NTmessage( 'good:     %2d %6.1f %4.3f',
                            d.good.n, d.good.cav, d.good.cv )
@@ -1906,9 +1909,8 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                     # Dihedral Restraints
                     _generateHtmlResidueRestraints(project, res, type = 'Dihedral')
                 #end for residue
+                NTmessage("") # Done printing progress.
             #end for chain
-
-            NTmessage("") # Done printing progress.
         # end of skip test.
 
         if doProcheck:
