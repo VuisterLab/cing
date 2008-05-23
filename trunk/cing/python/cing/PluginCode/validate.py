@@ -1780,6 +1780,15 @@ def setupHtml(project):
             htmlMain('ul', closeTag=False)
             project.html.insertHtmlLinkInTag( 'li', htmlMain, project, item, text=item.name )
             htmlMain('ul', openTag=False)
+            
+    htmlMain('h1', 'Credits')
+    htmlMain('ul', closeTag=False)
+    htmlMain('li', closeTag=False)
+    refItem = 'credits.html'
+    htmlMain('a',  OpenText, href = refItem )
+    htmlMain('li', openTag=False)
+    htmlMain('ul', openTag=False)
+            
     htmlMain('td', openTag=False)
     htmlMain('td', closeTag=False)
     htmlMain('img', src = 'mol.gif')

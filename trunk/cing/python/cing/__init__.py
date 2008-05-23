@@ -15,8 +15,9 @@ header = """
 footer = """------------------------------------------------------------------------------------------------------
 """
 authorList = [  ('Geerten Vuister',             'vuister@science.ru.nl'),
+                ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl')
                 ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
-                ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl')]
+                ]
 
 verbosityNothing  = 0 # Even errors will be suppressed
 verbosityError    = 1 # show only errors
