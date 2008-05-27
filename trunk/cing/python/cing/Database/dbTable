@@ -23,7 +23,8 @@
 # 29 Apr    2008: Fixed entry HIS: removed HE2, now is prot HD1; deprot HE2
 # 30 Apr    2008: Fixed entry HISH: nameDict = { ..., 'CYANA': 'HIS+', ...}
 # 08 May    2008: Renamed RURA to URA
-# 15 May    2008: Defined CE1 for BRMB in HISE
+# 15 May    2008: Defined CE1 for BRMB, AQUA in HISE
+# 20 May    2008: BRMB, AQUA atom names for HISH
 #=======================================================================
 #   internal short
 RESIDUE ALA      A
@@ -3291,7 +3292,7 @@ RESIDUE HISE     H
     #---------------------------------------------------------------
     ATOM CE1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CE1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'CE1'}
+        nameDict = {'INTERNAL': 'CE1', 'AQUA': 'CE1', 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'CE1'}
         topology = [(0, 'ND1'), (0, 'NE2'), (0, 'HE1')]
         pseudo = None
         real = []
@@ -3396,7 +3397,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM N
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'N', 'AQUA': None, 'BMRBd': None, 'CYANA': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'N', 'AQUA': 'N', 'BMRBd': None, 'CYANA': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': None, 'BMRB': 'N'}
         topology = [(-1, 'C'), (0, 'HN'), (0, 'CA')]
         pseudo = None
         real = []
@@ -3409,7 +3410,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HN
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HN', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HN', 'AQUA': 'H', 'BMRBd': None, 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': 'H'}
         topology = [(0, 'N')]
         pseudo = None
         real = []
@@ -3422,7 +3423,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM CA
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CA', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CA', 'AQUA': 'CA', 'BMRBd': None, 'CYANA': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': None, 'BMRB': 'CA'}
         topology = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
         pseudo = None
         real = []
@@ -3435,7 +3436,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HA
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HA', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HA', 'AQUA': 'HA', 'BMRBd': None, 'CYANA': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': None, 'BMRB': 'HA'}
         topology = [(0, 'CA')]
         pseudo = None
         real = []
@@ -3448,7 +3449,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM CB
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CB', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CB', 'AQUA': 'CB', 'BMRBd': None, 'CYANA': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': None, 'BMRB': 'CB'}
         topology = [(0, 'CA'), (0, 'HB2'), (0, 'HB3'), (0, 'CG')]
         pseudo = None
         real = []
@@ -3461,7 +3462,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HB2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HB2', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HB2', 'AQUA': 'HB2', 'BMRBd': None, 'CYANA': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HB2'}
         topology = [(0, 'CB')]
         pseudo = 'QB'
         real = []
@@ -3474,7 +3475,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HB3
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HB3', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HB3', 'AQUA': 'HB3', 'BMRBd': None, 'CYANA': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': None, 'BMRB': 'HB3'}
         topology = [(0, 'CB')]
         pseudo = 'QB'
         real = []
@@ -3487,7 +3488,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM QB
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'QB', 'AQUA': None, 'BMRBd': None, 'CYANA': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'QB', 'AQUA': 'QB', 'BMRBd': None, 'CYANA': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': None, 'BMRB': 'QB'}
         topology = [(0, 'CB')]
         pseudo = None
         real = ['HB2', 'HB3']
@@ -3500,7 +3501,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM CG
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CG', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CG', 'AQUA': 'CG', 'BMRBd': None, 'CYANA': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': None, 'BMRB': 'CG'}
         topology = [(0, 'CB'), (0, 'ND1'), (0, 'CD2')]
         pseudo = None
         real = []
@@ -3513,7 +3514,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM ND1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'ND1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'ND1', 'AQUA': 'ND1', 'BMRBd': None, 'CYANA': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': None, 'BMRB': 'ND1'}
         topology = [(0, 'CG'), (0, 'HD1'), (0, 'CE1')]
         pseudo = None
         real = []
@@ -3526,7 +3527,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM CD2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CD2', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CD2', 'AQUA': 'CD2', 'BMRBd': None, 'CYANA': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': None, 'BMRB': 'CD2'}
         topology = [(0, 'CG'), (0, 'NE2'), (0, 'HD2')]
         pseudo = None
         real = []
@@ -3539,7 +3540,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HD1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HD1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HD1', 'CYANA2': 'HD1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HD1', 'AQUA': 'HD1', 'BMRBd': None, 'CYANA': 'HD1', 'CYANA2': 'HD1', 'PDB': None, 'XPLOR': None, 'BMRB': 'HD1'}
         topology = [(0, 'ND1')]
         pseudo = None
         real = []
@@ -3552,7 +3553,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM CE1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'CE1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'CE1', 'AQUA': 'CE1', 'BMRBd': None, 'CYANA': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'CE1'}
         topology = [(0, 'ND1'), (0, 'NE2'), (0, 'HE1')]
         pseudo = None
         real = []
@@ -3565,7 +3566,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM NE2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'NE2', 'AQUA': None, 'BMRBd': None, 'CYANA': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'NE2', 'AQUA': 'NE2', 'BMRBd': None, 'CYANA': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': None, 'BMRB': 'NE2'}
         topology = [(0, 'CD2'), (0, 'CE1'), (0, 'HE2')]
         pseudo = None
         real = []
@@ -3578,7 +3579,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HD2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HD2', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HD2', 'AQUA': 'HD2', 'BMRBd': None, 'CYANA': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HD2'}
         topology = [(0, 'CD2')]
         pseudo = None
         real = []
@@ -3591,7 +3592,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HE1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HE1', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HE1', 'AQUA': 'HE1', 'BMRBd': None, 'CYANA': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': None, 'BMRB': 'HE1'}
         topology = [(0, 'CE1')]
         pseudo = None
         real = []
@@ -3604,7 +3605,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM HE2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HE2', 'AQUA': None, 'BMRBd': None, 'CYANA': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'HE2', 'AQUA': 'HE2', 'BMRBd': None, 'CYANA': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None, 'BMRB': 'HE2'}
         topology = [(0, 'NE2')]
         pseudo = None
         real = []
@@ -3617,7 +3618,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM C
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'C', 'AQUA': None, 'BMRBd': None, 'CYANA': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'C', 'AQUA': 'C', 'BMRBd': None, 'CYANA': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': None, 'BMRB': 'C'}
         topology = [(0, 'CA'), (0, 'O'), (1, 'N')]
         pseudo = None
         real = []
@@ -3630,7 +3631,7 @@ RESIDUE HISH     H
     #---------------------------------------------------------------
     ATOM O
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'O', 'AQUA': None, 'BMRBd': None, 'CYANA': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': None, 'BMRB': None}
+        nameDict = {'INTERNAL': 'O', 'AQUA': 'O', 'BMRBd': None, 'CYANA': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': None, 'BMRB': 'O'}
         topology = [(0, 'C')]
         pseudo = None
         real = []
