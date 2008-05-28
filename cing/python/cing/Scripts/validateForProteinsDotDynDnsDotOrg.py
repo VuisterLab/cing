@@ -27,6 +27,6 @@ extraArgList = ( inputDir,
                  restraintsConvention )
 
 doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,
-                    max_time_to_wait = 1200, # 1y4o took more than 600. This is one of the optional arguments.
+                    max_time_to_wait = 12000, # 1y4o took more than 600. This is one of the optional arguments.
                     extraArgList=extraArgList)
 

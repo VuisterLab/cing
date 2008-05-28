@@ -1674,6 +1674,23 @@ def setupHtml(project):
                 #     'Distance Restraint %i' % count, id = tag, newLine=False) )
                 restrMain('h2', 'Distance Restraint %i' % count, id = tag)
                 restrMain('ul', closeTag=False)
+                restrMain('li', 'Pair of Atoms:', closeTag=False)
+
+                if len(restraint.atomPairs) < 1: 
+                    restrMain('b', 'None')
+
+                for atomPair in restraint.atomPairs:
+                    res1 = atomPair[0]._parent
+                    res2 = atomPair[1]._parent
+#                    atomName1 = "(%s.%s.%s," % ( chn1.name, res1.name, atomPair[0].name )
+                    atomName1 = "(" + atomPair[0].toString() +','
+                    atomName2 =       atomPair[1].toString() +')'
+
+                    restraintList.html.insertHtmlLink( restrMain, restraintList,
+                                                       res1, text = atomName1 )
+                    restraintList.html.insertHtmlLink( restrMain, restraintList,
+                                                       res2, text = atomName2 )
+                #end for
                 restrMain('li', 'Lower/Upper: %.2f / %.2f' % (restraint.lower,
                                                               restraint.upper))
                 restrMain('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
@@ -1684,20 +1701,6 @@ def setupHtml(project):
                         (       val2Str(restraint.violAv,  "%.2f"),
                                 val2Str(restraint.violSd,  "%.2f"),
                                 val2Str(restraint.violMax, "%.2f") ))
-                restrMain('li', 'Pair of Atoms:', closeTag=False)
-
-                if len(restraint.atomPairs) < 1: restrMain('b', 'None')
-
-                for atomPair in restraint.atomPairs:
-                    res1 = atomPair[0]._parent
-                    res2 = atomPair[1]._parent
-                    atomName1 = "(%s.%s," % ( res1.name, atomPair[0].name )
-                    atomName2 = "%s.%s)" % ( res2.name, atomPair[1].name )
-                    restraintList.html.insertHtmlLink( restrMain, restraintList,
-                                                       res1, text = atomName1 )
-                    restraintList.html.insertHtmlLink( restrMain, restraintList,
-                                                       res2, text = atomName2 )
-                #end for
                 restrMain('li', openTag=False)
                 restrMain('ul', openTag=False)
             #end for

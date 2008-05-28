@@ -7,7 +7,6 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
-from cing.core.molecule import Chain
 
 """
 NB

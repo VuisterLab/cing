@@ -21,7 +21,8 @@ class AllChecks(TestCase):
  
     def testRun(self):
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
+        doWhatif = False # disables whatif actual run
+        doProcheck = False
         pdbConvention = BMRB
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
@@ -73,6 +74,7 @@ class AllChecks(TestCase):
         self.assertFalse( 
                          project.validate( 
                             htmlOnly=htmlOnly,
+                            doProcheck = doProcheck, 
                             doWhatif=doWhatif,
 #                            doProcheck=(not doWhatifValidationOnly),
                             ))
