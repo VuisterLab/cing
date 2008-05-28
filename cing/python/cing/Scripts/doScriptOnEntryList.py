@@ -2,11 +2,12 @@
 Run script on set of entries given their input/output locations
 and a file with a list of their names. 
 """
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from cing.core.molecule import Chain
-from cing.Libs.NTutils import NTerror
 
 """
 NB
@@ -38,15 +39,18 @@ def doScriptOnEntryList(pythonScriptFileName,
     chainCodeList = []
     entryCountTotal = 0
     for line in entryListFile.readlines():
+        line = line.strip()
         entryCountTotal += 1
         entryCode = line[0:4].lower()
         if entryCode in entryCodeListFilter:
             continue
         entryCodeList.append( entryCode )
-        # get it only when present.
-        chainCode = Chain.NULL_VALUE
-        if len(line) > 4:
+        # get it only when present or ignore it. Watch for number of arguments changes.
+        # the python script will only see entry_code and extraArgListStr
+        chainCode = ''
+        if len(line) > 4:            
             chainCode = line[4].upper()
+        NTdebug('Using chainCode: [%s]' % chainCode )
         chainCodeList.append(chainCode)
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
@@ -63,9 +67,10 @@ def doScriptOnEntryList(pythonScriptFileName,
     for entry_code in entryCodeList:  
         extraArgListStr = ''
         if extraArgList:
-            extraArgListStr = extraArgList.join(' ')
+            extraArgListStr = ' '.join( extraArgList )
         chain_code = chainCodeList[i]
-        cmd = 'cd %s; python -u %s %s %s %s > %s%s.log 2>&1 ' % ( startDir,
+        cmd = 'cd %s; python -u %s %s %s %s > %s%s.log 2>&1 ' % ( 
+            startDir,
             pythonScriptFileName, 
             entry_code, 
             chain_code, 
