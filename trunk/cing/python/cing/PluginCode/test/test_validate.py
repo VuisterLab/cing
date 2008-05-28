@@ -6,7 +6,6 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityNothing
-from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import BMRB
@@ -21,8 +20,8 @@ import unittest
 class AllChecks(TestCase):
  
     def testRun(self):
-        htmlOnly=True # default is False but enable it for faster runs without some actual data.
-        doWhatifValidationOnly = False # disables other items for checking.
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
         pdbConvention = BMRB
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
@@ -71,13 +70,15 @@ class AllChecks(TestCase):
                         copy2sources = True,
                         **kwds )
         project.save()
-        self.assertFalse( project.validate(htmlOnly=htmlOnly,
-                doWhatif=doWhatifValidationOnly,
-                doProcheck=(not doWhatifValidationOnly),
-                ))
+        self.assertFalse( 
+                         project.validate( 
+                            htmlOnly=htmlOnly,
+                            doWhatif=doWhatif,
+#                            doProcheck=(not doWhatifValidationOnly),
+                            ))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
-    cing.verbosity = verbosityOutput
+#    cing.verbosity = verbosityOutput
     unittest.main()

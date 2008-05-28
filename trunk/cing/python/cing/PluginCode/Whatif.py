@@ -3,25 +3,10 @@
     First version: gv June 3, 2007
     Second version by jfd.
 """
-from cing import cingDirData
-from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import sprintf
-from cing.core.parameters import cingPaths
-from glob import glob
-from shutil import copy
-from string import upper
-import os
-import shelve
-import time
 
 # Fix these strings so we can get some automated code checking by pydev extensions.
+# Also, we want to put these defs on top before the imports to prevent cycle in
+# look up.
 CHECK_ID_STR     = "checkID"
 LOC_ID_STR       = "locID"
 LEVEL_STR        = "level"
@@ -40,6 +25,38 @@ RAMCHK_STR       = 'RAMCHK'
 C12CHK_STR       = 'C12CHK'
 BBCCHK_STR       = 'BBCCHK'
 ROTCHK_STR       = 'ROTCHK'
+
+NQACHK_STR       = 'NQACHK'
+PLNCHK_STR       = 'PLNCHK'
+PL2CHK_STR       = 'PL2CHK'
+PL3CHK_STR       = 'PL3CHK'
+
+CHICHK_STR       = 'CHICHK'
+FLPCHK_STR       = 'FLPCHK'
+ACCLST_STR       = 'ACCLST'
+BMPCHK_STR       = 'BMPCHK'
+
+from cing import cingDirData
+from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTmoleculePlot import KEY_LIST_STR
+from cing.Libs.NTmoleculePlot import MoleculePlotSet
+from cing.Libs.NTmoleculePlot import YLABEL_STR
+from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import sprintf
+from cing.core.parameters import cingPaths
+from glob import glob
+from shutil import copy
+from string import upper
+import os
+import shelve
+import time
+
 
 #            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
 #            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
@@ -92,45 +109,45 @@ class Whatif( NTdict ):
     # All are in text record of file to be parsed so they're kind of redundant.
     # Third element is optional short name suitable for labeling a y-axis.
     nameDefs =[
-                ('ACCLST', 'Relative accessibility'),
-                ('ALTATM', 'Amino acids inside ligands check/Attached group check'),
-                ('ANGCHK', 'Angles'),
-                ('BA2CHK', 'Hydrogen bond acceptors'),
-                ('BBCCHK', 'Backbone normality', 'Backbone normality'),
-                ('BH2CHK', 'Hydrogen bond donors'),
-                ('BMPCHK', 'Bumps'),
-                ('BNDCHK', 'Bond lengths'),
-                ('BVALST', 'B-Factors'),
-                ('C12CHK', 'Chi-1 chi-2', 'Chi 1/2. Z',),
-                ('CHICHK', 'Torsions'),
-                ('CCOCHK', 'Inter-chain connection check'),
-                ('CHICHK', 'Torsion angle check'),
-                ('DUNCHK', 'Duplicate atom names in ligands'),
-                ('EXTO2',  'Test for extra OXTs'),
-                ('FLPCHK', 'Peptide flip'),
-                ('HNDCHK', 'Chirality'),
-                ('HNQCHK', 'Flip HIS GLN ASN hydrogen-bonds'),
-                ('INOCHK', 'Accessibility'),
-                ('MISCHK', 'Missing atoms'),
-                ('MO2CHK', 'Missing C-terminal oxygen atoms'),
-                ('NAMCHK', 'Atom names'),
-                ('NQACHK', 'Qualities'),
-                ('PC2CHK', 'Proline puckers'),
-                ('PDBLST', 'List of residues'),
-                ('PL2CHK', 'Connections to aromatic rings'),
-                ('PL3CHK', 'Side chain planarity with hydrogens attached'),
-                ('PLNCHK', 'Protein side chain planarities'),
-                ('PRECHK', 'Missing backbone atoms.'),
-                ('PUCCHK', 'Ring puckering in Prolines'),
-                ('QUACHK', 'Directional Atomic Contact Analysis', 'Packing Quality'),
-                ('RAMCHK', 'Ramachandran', 'Ramachandr. Z'),
-                ('ROTCHK', 'Rotamers', 'Rotamer normality'),
-                ('SCOLST', 'List of symmetry contacts'),
-                ('TO2CHK', 'Missing C-terminal groups'),
-                ('TOPPOS', 'Ligand without know topology'),
-                ('WGTCHK', 'Atomic occupancy check'),
-                ('Hand',   '(Pro-)chirality or handness check')
-               ]
+                ('ACCLST', 'Relative accessibility',                                    'Rel. accessibility'),
+                ('ALTATM', 'Amino acids inside ligands check/Attached group check',     'Amino acids inside ligands check/Attached group check'),
+                ('ANGCHK', 'Angles',                                                    'Bond angle'),
+                ('BA2CHK', 'Hydrogen bond acceptors', 'Hydrogen bond acceptors'),
+                ('BBCCHK', 'Backbone normality',                                        'Backbone normality' ),
+                ('BH2CHK', 'Hydrogen bond donors', 'Hydrogen bond donors'),
+                ('BMPCHK', 'Bumps',                                                     'Summed bumps'),
+                ('BNDCHK', 'Bond lengths',                                              'Bond lengths'),
+                ('BVALST', 'B-Factors', 'B-Factors'),
+                ('C12CHK', 'Chi-1 chi-2',                                               'Chi 1/2. Z'),
+                ('CHICHK', 'Torsions',                                                  'Aver. torsions Z.'),
+                ('CCOCHK', 'Inter-chain connection check', 'Inter-chain connection check'),
+                ('CHICHK', 'Torsion angle check', 'Torsion angle check'),
+                ('DUNCHK', 'Duplicate atom names in ligands', 'Duplicate atom names in ligands'),
+                ('EXTO2',  'Test for extra OXTs', 'Test for extra OXTs'),
+                ('FLPCHK', 'Peptide flip',                                              'Peptide flip'),
+                ('HNDCHK', 'Chirality', 'Chirality'),
+                ('HNQCHK', 'Flip HIS GLN ASN hydrogen-bonds', 'Flip HIS GLN ASN hydrogen-bonds'),
+                ('INOCHK', 'Accessibility',                                             'Accessibility Z.'),
+                ('MISCHK', 'Missing atoms', 'Missing atoms'),
+                ('MO2CHK', 'Missing C-terminal oxygen atoms', 'Missing C-terminal oxygen atoms'),
+                ('NAMCHK', 'Atom names', 'Atom names'),
+                ('NQACHK', 'Qualities',                                                 'New quality'),
+                ('PC2CHK', 'Proline puckers', 'Proline puckers'),
+                ('PDBLST', 'List of residues', 'List of residues'),
+                ('PL2CHK', 'Connections to aromatic rings',                             'Plan. to aromatic'),
+                ('PL3CHK', 'Side chain planarity with hydrogens attached',              'NA planarity'),
+                ('PLNCHK', 'Protein side chain planarities',                            'Protein SC planarity'),
+                ('PRECHK', 'Missing backbone atoms.', 'Missing backbone atoms.'),
+                ('PUCCHK', 'Ring puckering in Prolines', 'Ring puckering in Prolines'),
+                ('QUACHK', 'Directional Atomic Contact Analysis',                       'Packing quality'),
+                ('RAMCHK', 'Ramachandran',                                              'Ramachandr.' ),
+                ('ROTCHK', 'Rotamers',                                                  'Rotamer normality'),
+                ('SCOLST', 'List of symmetry contacts', 'List of symmetry contacts'),
+                ('TO2CHK', 'Missing C-terminal groups', 'Missing C-terminal groups'),
+                ('TOPPOS', 'Ligand without know topology', 'Ligand without know topology'),
+                ('WGTCHK', 'Atomic occupancy check', 'Atomic occupancy check'),
+                ('Hand',   '(Pro-)chirality or handness check',                         '(Pro-)chirality'),
+                 ]
               
 #              'Bond max Z',
                
@@ -475,8 +492,128 @@ fullstop y
     
 #end Class
 
-def createHtmlWhatif(project):
-    pass
+wiPlotList = []
+
+def createHtmlWhatif(project, ranges=None):
+    """ Read out wiPlotList to see what get's created. """ 
+    wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
+    # The following object will be responsible for creating a (png/pdf) file with 
+    # possibly multiple pages
+    # Level 1: row
+    # Level 2: against main or alternative y-axis
+    # Level 3: plot parameters dictionary (extendable).
+    keyLoLoL = []
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  QUACHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+    
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  RAMCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BBCCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  C12CHK_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  ROTCHK_STR ]
+#        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
+    keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
+    
+    printLink = os.path.join(
+                project.rootPath( project.name )[0], 
+                project.molecule.name,
+                project.moleculeDirectories.whatif, 
+                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+    
+    wiPlotList.append( ('_02_bond_angle','BND/ANG/NQA/PLNCHK') )
+    keyLoLoL = []
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BNDCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BNDCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+    
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          ANGCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  ANGCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          NQACHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  NQACHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          PLNCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          PL2CHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  PLNCHK_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  PL2CHK_STR ]
+#        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
+    keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          PL3CHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  PL3CHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+    
+    printLink = os.path.join(
+                project.rootPath( project.name )[0], 
+                project.molecule.name,
+                project.moleculeDirectories.whatif, 
+                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+
+    
+    wiPlotList.append( ('_03_steric_acc_flip','BMP/ACC/FLP/CHI') )
+    keyLoLoL = []
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BMPCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BMPCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          ACCLST_STR,         VALUE_LIST_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          INOCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  ACCLST_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  INOCHK_STR ]
+#        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
+    keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          FLPCHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  FLPCHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          CHICHK_STR,         VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  CHICHK_STR ]
+    keyLoLoL.append( [ [plotAttributesRowMain] ] )
+    
+    
+    printLink = os.path.join(
+                project.rootPath( project.name )[0], 
+                project.molecule.name,
+                project.moleculeDirectories.whatif, 
+                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+
+    
 
 def runWhatif( project, tmp=None ):
     """

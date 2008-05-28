@@ -31,6 +31,7 @@ from cing import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
 from cing import cingPythonCingDir
 from cing import cingRoot
+from cing.Libs.Imagery import convert2Web
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
@@ -47,6 +48,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
@@ -62,6 +64,7 @@ from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
 from cing.PluginCode.Whatif import histJaninBySsAndResType
 from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.Whatif import histRamaBySsAndResType
+from cing.PluginCode.Whatif import wiPlotList
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_GREEN
@@ -75,7 +78,6 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.Libs.Imagery import convert2Web
 import cing
 import math
 import os
@@ -118,10 +120,16 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     project.checkForSaltbridges(toFile=True)
     project.validateRestraints( toFile=True)
     project.calculateRmsd(      ranges=ranges)
-    if doProcheck:
-        project.procheck(           ranges=ranges)
-    if doWhatif:
+
+    if not doWhatif:
+        NTwarning('Skipping because not doWhatif')
+    else:
         project.runWhatif()
+
+    if not doProcheck:
+        NTwarning('Skipping because not doProcheck')
+    else:
+        project.procheck( ranges=ranges)
 #    project.criticizeByAll()
     project.summary()
 #end def
@@ -1512,7 +1520,8 @@ def setupHtml(project):
 
         molecule.html.main('h1', 'Structure-based analysis')
         molecule.html.main( 'p', molecule.html._generateTag('a', 'Salt bridges',
-                                            href='../../../'+project.moleculePath('analysis')+'/saltbridges.txt', newLine=False) )
+            href='../../../'+project.moleculePath('analysis')+'/saltbridges.txt', newLine=False) )
+
     #end for
 
     # NEW FEATURE: setup Models page
@@ -1811,9 +1820,9 @@ def renderHtml(project):
 
 
 def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
-            doProcheck = True, doWhatif = False ):
+            doProcheck = True, doWhatif = True, ranges=None ):
     '''Description: generate the Html content for Molecules and Residues pages.
-       Inputs: a Cing.Project.
+       Inputs: a Cing.Project. 
        Output: return None for success is standard.
        If skipFirstPart is set then the imagery above the procheck plots will be skipped.
     '''
@@ -1821,9 +1830,11 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
 #    skipFirstPart = True # disable for testing as it takes a long time.
     skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
     
-    doWhatif = False # TODO: remove when debugged.
+    doWhatif = True # TODO: remove when debugged.
     
-    if not skipExport2Gif:
+    if skipExport2Gif:
+        NTwarning('Skipping export of molecular imagery to gif')
+    else:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
         NTdebug("Trying to create : " + pathMolGif)
@@ -1831,7 +1842,9 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             NTerror("Failed to generated a Molmol picture; continuelng.")
 
     for molecule in [project[mol] for mol in project.molecules]:
-        if not skipFirstPart:
+        if skipFirstPart:
+            NTwarning('Skipping first part of HTML creation.')
+        else:
             for chain in molecule.allChains():
                 chainId = chain.name
                 NTmessage("Generating dihedral angle plots for chain: " + chainId)
@@ -1921,10 +1934,67 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                 NTmessage("") # Done printing progress.
             #end for chain
         # end of skip test.
+        main = molecule.html.main
+
+        if doWhatif:
+            NTmessage("Creating Whatif plots")
+            anyWIPlotsGenerated = False
+            if project.createHtmlWhatif(ranges=ranges):
+                NTerror('Failed to createHtmlWhatif')
+                return True
+
+            main('h1','What If')
+#            anyWhatifPlotsGenerated = False
+            ncols = 6
+            main('table',  closeTag=False)
+            plotCount = -1
+            printedDots = 0 # = plotCount+1
+            for p,d in wiPlotList:
+                if not printedDots % 10:
+                    digit = printedDots / 10
+                    NTmessageNoEOL(`digit`)
+                else:
+                    NTmessageNoEOL('.')
+                printedDots += 1
+                plotCount += 1
+                wiLink = os.path.join('..',
+                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
+                wiLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
+                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
+                NTdebug('wiLinkReal: ' + wiLinkReal)
+                if not os.path.exists( wiLinkReal ):
+                    NTerror('Failed to find expected wiLinkReal: ' + wiLinkReal)
+                    continue # Skip their inclusion.
+
+                pinupLink = os.path.join('..',
+                            project.moleculeDirectories.whatif, molecule.name + p + "_pin.gif" )
+                fullLink = os.path.join('..',
+                            project.moleculeDirectories.whatif, molecule.name + p + ".png" )
+                anyWIPlotsGenerated = True
+                if plotCount % ncols == 0:
+                    if plotCount:
+                        main('tr',  openTag=False)
+                    main('tr',  closeTag=False)
+                main('td',  closeTag=False)
+                main('a',   "",         href = fullLink, closeTag=False )
+                main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+                main('a',   "",         openTag=False )
+                main('br')
+                main('a',   d,          href = wiLink )
+                main('td',  openTag=False)
+            #end for plot
+            NTmessage('' ) # for the eol char.
+
+            if plotCount: # close any started rows.
+                main('tr',  openTag=False)
+            main('table',  openTag=False) # close table
+            if not anyWIPlotsGenerated:
+                main('h2', "No what if plots found at all")
+        #end for doWhatif check.
 
         if doProcheck:
             NTmessage("Formating Procheck plots")
-            molecule.html.main('h1','Procheck_NMR')
+            main('h1','Procheck_NMR')
             anyProcheckPlotsGenerated = False
             pcPlotList = [
                  ('_01_ramachand','Ramachandran (all)'),
@@ -1947,7 +2017,6 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                  ('_18_modelcomp','By-model violations')
                 ]
             ncols = 6
-            main = molecule.html.main
             main('table',  closeTag=False)
             plotCount = -1
             printedDots = 0 # = plotCount+1
@@ -2005,75 +2074,6 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                 main('h2', "No procheck plots found at all")
 
 
-        if doWhatif:
-            NTmessage("Creating Whatif plots")
-            if project.createHtmlWhatif():
-                NTerror('Failed to createHtmlWhatif')
-                return True
-
-            molecule.html.main('h1','What If')
-#            anyWhatifPlotsGenerated = False
-            pcPlotList = [
-                 ('_01_nabuurs_collection','QUA/RAM/CHI/BBC')
-                ]
-            ncols = 6
-            main = molecule.html.main
-            main('table',  closeTag=False)
-            plotCount = -1
-            printedDots = 0 # = plotCount+1
-            for p,d in pcPlotList:
-                if not printedDots % 10:
-                    digit = printedDots / 10
-                    NTmessageNoEOL(`digit`)
-                else:
-                    NTmessageNoEOL('.')
-                printedDots += 1
-                plotCount += 1
-                procheckLink = os.path.join('..',
-                            project.moleculeDirectories.procheck, molecule.name + p + ".ps")
-                procheckLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
-                            project.moleculeDirectories.procheck, molecule.name + p + ".ps")
-    #            NTdebug('procheck real path: ' + procheckLinkReal)
-                if not os.path.exists( procheckLinkReal ):
-                    continue # Skip their inclusion.
-
-                fileList = convert2Web( procheckLinkReal )
-                fileList = False
-    #            NTdebug( "Got back from convert2Web output file names: " + `fileList`)
-                if fileList == True:
-                    NTerror( "Failed to convert2Web input file: " + procheckLinkReal)
-                    continue
-    #            _pinupPath, _fullPath, _printPath = fileList
-                pinupLink = os.path.join('..',
-                            project.moleculeDirectories.procheck, molecule.name + p + "_pin.gif" )
-                fullLink = os.path.join('..',
-                            project.moleculeDirectories.procheck, molecule.name + p + ".gif" )
-                printLink = os.path.join('..',
-                            project.moleculeDirectories.procheck, molecule.name + p + ".pdf" )
-                anyProcheckPlotsGenerated = True
-                # plotCount is numbered starting at zero.
-                if plotCount % ncols == 0:
-                    if plotCount: # Only close rows that were started
-                        main('tr',  openTag=False)
-                    main('tr',  closeTag=False)
-                main('td',  closeTag=False)
-                main('a',   "",         href = fullLink, closeTag=False )
-                main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
-                main('a',   "",         openTag=False )
-                main('br')
-                main('a',   d,          href = procheckLink )
-                main('br')
-                main('a',   "pdf",      href = printLink )
-                main('td',  openTag=False)
-            #end for
-            NTmessage('' ) # for the eol char.
-
-            if plotCount: # close any started rows.
-                main('tr',  openTag=False)
-            main('table',  openTag=False) # close table
-            if not anyProcheckPlotsGenerated:
-                main('h2', "No procheck plots found at all")
-        #end for doProcheck check.
 
     #end for molecule
     # return None for success is standard.
@@ -2189,7 +2189,7 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
     #end for
     #resRight('p', openTag=False)
 #end def
-
+ 
 def populateHtmlModels(project):
     "Output: return None for success is standard."
 #    NTdebug("Starting: populateHtmlModels")
@@ -2230,9 +2230,10 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
     """Validatation tests returns None on success or True on failure.
     """
 
-    if not htmlOnly:
-        if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif
-                            ):
+    if htmlOnly:
+        NTwarning('Skipping setupValidation')
+    else:
+        if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif ):
             NTerror("Failed to setupValidation")
             return True
 
@@ -2241,13 +2242,17 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
         return True
 
     # populate Molecule (Procheck) and Residues
-    if populateHtmlMolecules(project,skipFirstPart=htmlOnly,htmlOnly=htmlOnly, \
+    if populateHtmlMolecules(project,
+            htmlOnly=htmlOnly,
             doProcheck=doProcheck,
             doWhatif=doWhatif,
+            ranges=ranges
             ):
         NTerror("Failed to populateHtmlMolecules")
 
-    if not htmlOnly:
+    if htmlOnly:
+        NTwarning('Skipping populateHtmlModels')
+    else:
         if populateHtmlModels(project):
             NTerror("Failed to populateHtmlModels")
             return True

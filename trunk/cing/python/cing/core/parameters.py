@@ -75,6 +75,9 @@ cingPaths = NTdict(
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
 )
+if cingPaths.convert:
+    cingPaths[ 'montage' ] = cingPaths.convert + '/../montage'
+    
 cingPaths.keysformat() #define a format string for 'pretty' output
 
 outlierColor = 'red'

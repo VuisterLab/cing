@@ -13,6 +13,7 @@
                     
 1brv: 
     - small system of only 19 AA
+    - 48 models (too many;-)
 
 1i1s:
     - withdrawn entry discussed at: http://proteins.dyndns.org/Education/Validation
