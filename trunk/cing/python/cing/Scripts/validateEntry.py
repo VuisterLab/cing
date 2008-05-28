@@ -7,6 +7,10 @@ from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.core.classes import Project
+from cing.core.constants import BMRB
+from cing.core.constants import CYANA
+from cing.core.constants import PDB
+from cing.core.constants import XPLOR
 import cing
 import os
 import sys
@@ -14,13 +18,14 @@ import sys
 def main(entryId, *extraArgList):
     expectedNumberOfArguments = 4
     if len( extraArgList ) != expectedNumberOfArguments:
+        NTerror("Got arguments: %s" % extraArgList )
         NTerror("Failed to get expected number of arguments: %d got %d"%( 
             expectedNumberOfArguments, len( extraArgList )))
         return True
     
-    inputDir              = extraArgList[0]
+    inputDir              = os.path.join( extraArgList[0], entryId )
     outputDir             = extraArgList[1]
-    pdbConvention         = extraArgList[2]
+    pdbConvention         = extraArgList[2] #@UnusedVariable
     restraintsConvention  = extraArgList[3]
 
     os.chdir(outputDir)
@@ -32,7 +37,17 @@ def main(entryId, *extraArgList):
         
     project = Project.open( entryId, status='new' )
     pdbFileName = entryId+".pdb"
+#    pdbFilePath = os.path.join( inputDir, pdbFileName)
     pdbFilePath = os.path.join( inputDir, pdbFileName)
+    
+    if True:
+        pdbConvention = BMRB
+        if entryId.startswith("1YWUcdGMP"):
+            pdbConvention = XPLOR
+        if entryId.startswith("2hgh"):
+            pdbConvention = CYANA
+        if entryId.startswith("1tgq"):
+            pdbConvention = PDB
     
     project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
     NTdebug("Reading files from directory: " + inputDir)
