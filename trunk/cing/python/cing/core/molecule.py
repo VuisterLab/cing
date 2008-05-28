@@ -1561,6 +1561,22 @@ Atom class: Defines object for storing atom properties
         return str(self)
     #end def
 
+    def toString(self, showChainId=True, showResidueType=True):
+        res = self._parent
+
+        if showChainId:
+            chn = res._parent
+            result = chn.name + '.'
+        else:
+            result = ''
+        # Compressed for speed.
+        if showResidueType:
+            result += res.name + '.' + self.name
+        else:
+            result += res.number + '.'  + self.name
+            
+        return result
+            
     def addCoordinate( self, x, y, z, Bfac, **kwds ):
         """Append coordinate to coordinates list
         Convenience method."""

@@ -59,7 +59,7 @@ def main(entryId, *extraArgList):
         del(kwds['acoFiles'])
         
     if os.path.exists( os.path.join(         inputDir, entryId+".prot")):
-        if not os.path.exists( os.path.join( inputDir, entryId+".seq" )):
+        if os.path.exists( os.path.join( inputDir, entryId+".seq" )):
             kwds['protFile'] = entryId
             kwds['seqFile']  = entryId
         else:
