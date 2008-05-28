@@ -4,6 +4,7 @@ from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.Imagery import joinPdfPagesByGhostScript
+from cing.Libs.Imagery import montage
 from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
 from unittest import TestCase
@@ -17,7 +18,7 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
-    def testConvert2Web(self):
+    def tttestConvert2Web(self):
         fn = "pc_nmr_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
@@ -33,6 +34,12 @@ class AllChecks(TestCase):
 
         fn1 = "pc_nmr_11_rstraints.pdf"
         self.assertFalse( joinPdfPagesByGhostScript( [fn1,fn1], "pc_nmr_11_rstraints_echo.pdf"))
+
+    def testConvert2Html(self):
+        inputPath = os.path.join( cingDirTestsData, 'imagery')  
+        inputPathList = map(os.path.join, [inputPath]*2, ['residuePlotSetAll001.png', 'residuePlotSetAll002.png'] )
+        outputPath = os.path.join( cingDirTmp, 'residuePlotSetAll.png' )
+        self.assertFalse( montage(inputPathList, outputPath) )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

@@ -42,8 +42,8 @@ class AllChecks(TestCase):
 
     def testMoleculePlot(self):
         
-        actuallyRunWhatif   = False
-        showValues          = False
+        actuallyRunWhatif   = True
+        showValues          = True
         
         modelNum            = 2 # Only used when simulating data 
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
@@ -85,13 +85,6 @@ class AllChecks(TestCase):
         else:
             rangeList = project.molecule.getFixedRangeList( 
                 max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=ranges )
-            pointsANGCHK = [] # list per res in rangeList of lists
-            pointsBNDCHK = []
-            pointsQUACHK = []
-            pointsRAMCHK = []
-            pointsC12CHK = []
-            pointsROTCHK = []
-            pointsBBCCHK = []
             resNumb = 0
             for resList in rangeList:
                 for res in resList:
@@ -143,31 +136,7 @@ class AllChecks(TestCase):
                             if d==whatifResDict:
                                 valueList = d.getDeepByKeys(checkID,VALUE_LIST_STR)
                             else:
-                                valueList = d.getDeepByKeys(checkID)
-                                
-                            if checkID == ANGCHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsANGCHK.append( (resNumb-.5, zScore) )
-                            elif checkID == BNDCHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsBNDCHK.append( (resNumb-.5, zScore) )
-                            elif checkID == QUACHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsQUACHK.append( (resNumb-.5, zScore) )
-                            elif checkID == RAMCHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsRAMCHK.append( (resNumb-.5, zScore) )
-                            elif checkID == C12CHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsC12CHK.append( (resNumb-.5, zScore) )
-                            elif checkID == ROTCHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsROTCHK.append( (resNumb-.5, zScore) )
-                            elif checkID == BBCCHK_STR:                            
-                                zScore = valueList.average()[0]
-                                pointsBBCCHK.append( (resNumb-.5, zScore) )
-    #                            NTdebug("pointsBBCCHK: %s", pointsBBCCHK)
-                            
+                                valueList = d.getDeepByKeys(checkID)                                                        
                             if showValues:
                                 NTdebug("%10s valueList: %-80s" % ( checkID, valueList))
         #end if actuallyRunWhatif:
@@ -205,7 +174,8 @@ class AllChecks(TestCase):
 
 
         moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
-        moleculePlotSet.renderMoleculePlotSet( 'residuePlotSetAll.pdf', createPngCopyToo=True  )
+        moleculePlotSet.renderMoleculePlotSet( 'residuePlotSetAll.pdf', 
+            createPngCopyToo=True  )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

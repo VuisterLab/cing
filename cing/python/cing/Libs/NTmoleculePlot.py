@@ -2,7 +2,9 @@
 # Only code specific for molecule.py related things.
 # It would be good to move the ResPlot class here too.
 
+from cing.Libs.Imagery import convert2Web
 from cing.Libs.Imagery import joinPdfPages
+from cing.Libs.Imagery import montage
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTplot import fontVerticalAttributes
@@ -27,7 +29,20 @@ class MoleculePlotSet:
         self.colorAlt = 'blue'
         self.pointSize = 3.0 # was 1.5
 
-    def renderMoleculePlotSet(self, fileName, createPngCopyToo=False ):
+    def renderMoleculePlotSet(self, fileName,  createPngCopyToo=True ):
+        """
+        Create a PDF with possibly multiple pages of this MoleculePlotSet.
+        
+        If createPngCopyToo is set then also created are: 
+        - _pin.gif file per set, 
+        - png file per set, and
+        - png files per page.
+        
+        
+        The fileName is for the output of course. 
+        
+        The directory of that filename is also take for any other plots created. 
+        """
         # next variable must have same dimensions as self.keyLoLoL
         pointsLoLoL = [] # list per res in rangeList of lists
         for row in self.keyLoLoL:
@@ -73,7 +88,8 @@ class MoleculePlotSet:
         # end for resList
         NTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
 
-        fileNameList =[]
+        fileNameList = []
+        pathPngList = []
         ps = None
         r = 0 # r now for resList
         nrows = len(self.keyLoLoL)
@@ -156,21 +172,35 @@ class MoleculePlotSet:
                 ntPlotList[i].drawResNumbers( showLabels=showLabels)
 
             # Actually plot
-            fileNameList.append('%s%03d.pdf' % (fileName,r)) # TODO: get rid of final .pdf
+            fileNameList.append('%s%03d.pdf' % (fileName[:-4],r))
             if ps.hardcopy(fileNameList[r-1]):
                 NTerror('Failed to ps.hardcopy to: %s' % fileNameList[r-1])
                 return True
 
             if createPngCopyToo:
-                fileNamePng = '%s%03d.png' % (fileName,r) # TODO: get rid of final .pdf
+                fileNamePng = '%s%03d.png' % (fileName[:-4],r) 
                 if ps.hardcopy(fileNamePng):
                     NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
                     return True
+                pathPngList.append( fileNamePng )
 
         # end for resList in rangeList:
         if joinPdfPages( fileNameList, fileName ):
             NTerror('Failed to joinPdfPages from %s to: %s' % ( fileNameList, fileName))
             return True
+        
+        if createPngCopyToo:
+            head, _tail = os.path.split(fileName)             # split is on last /
+            # Just do the _pin.gif
+            if not convert2Web(pathPngList, outputDir=head, doPrint=False, doFull=False ):
+                NTerror('Failed to convert2Web from %s to: %s' % ( pathPngList, head))
+                return True
+            
+            if montage(pathPngList, fileName[:-4]+".png" ):
+                NTerror('Failed to convert2Web from %s to: %s' % ( pathPngList, fileName[:-4]+".png" ))
+                return True
+            
+        # Remove the single pdf files.
         for fileName in fileNameList:
             os.unlink( fileName )
 
