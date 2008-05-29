@@ -26,7 +26,10 @@ extraArgList = ( inputDir,
                  pdbConvention,
                  restraintsConvention )
 
-doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,
+doScriptOnEntryList(pythonScriptFileName, 
+                    entryListFileName, 
+                    startDir,
+                    processes_max = 2,
                     max_time_to_wait = 12000, # 1y4o took more than 600. This is one of the optional arguments.
                     extraArgList=extraArgList)
 
