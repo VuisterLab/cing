@@ -20,9 +20,9 @@ Install the requirements:<br><br>
  <PRE>unicode = 0</pre>
 This was reported and fixed for Matlibplot version: 0.91?
 See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
-Another thing to worry about is the settings in .matplotlib/matplotlibrc. 
-Make sure the back end set here allows rendering without going to a X server. 
-So perhaps you need to change from:
+Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example). 
+Make sure the back end set here allows rendering without going to an X server. 
+So perhaps you need to create the file and then change from:
 <pre>backend     : GTKAgg </pre>
 to: 
 <pre>backend     : Agg </pre>

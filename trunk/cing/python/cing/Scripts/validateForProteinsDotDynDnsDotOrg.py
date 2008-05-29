@@ -1,5 +1,4 @@
 from cing import cingDirScripts
-from cing import cingDirTmp
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
@@ -12,7 +11,7 @@ cing.verbosity = cing.verbosityDebug
 #startDir              = '/Users/jd/tmp/cing/dyndns/'
 startDir              = '/Users/jd/Sites/cing/out'
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName     = os.path.join(cingDirTmp, 'entryCodeList.csv')
+entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'

@@ -2,7 +2,6 @@
 Run script on set of entries given their input/output locations
 and a file with a list of their names. 
 """
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import ForkOff
@@ -13,8 +12,8 @@ NB
 - Doing procheck on MacOSX.5.3/MacBook Pro best performance is  
 for when using 3 processes. 
 """
-START_ENTRY_ID                 = 0 # default 0
-MAX_ENTRIES_TODO               = 999999 # default a ridiculously large number like 999999
+START_ENTRY_ID                 = 1 # default 0
+MAX_ENTRIES_TODO               = 1 # default a ridiculously large number like 999999
 
 def doScriptOnEntryList(pythonScriptFileName, 
           entryListFileName, 
@@ -49,7 +48,7 @@ def doScriptOnEntryList(pythonScriptFileName,
         chainCode = ''
         if len(line) > 4:            
             chainCode = line[4].upper()
-        NTdebug('Using chainCode: [%s]' % chainCode )
+#        NTdebug('Using chainCode: [%s]' % chainCode )
         chainCodeList.append(chainCode)
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
