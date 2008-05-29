@@ -20,6 +20,15 @@ Install the requirements:<br><br>
  <PRE>unicode = 0</pre>
 This was reported and fixed for Matlibplot version: 0.91?
 See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
+Another thing to worry about is the settings in .matplotlib/matplotlibrc. 
+Make sure the back end set here allows rendering without going to a X server. 
+So perhaps you need to change from:
+<pre>backend     : GTKAgg </pre>
+to: 
+<pre>backend     : Agg </pre>
+See this <a href="http://matplotlib.sourceforge.net/backends.html">discussion</a>.
+Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool. 
+ 
 <li><b>Install cython</b>
 <pre>fink install cython-py25</pre>This package has been absent at times but was installed to: Cython-0.9.6.13.1-py2.5.egg-info. Strange.<li><b>Install gawk</b>
 <pre>fink install gawk</pre>
