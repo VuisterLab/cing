@@ -23,6 +23,7 @@ from colorsys import hsv_to_rgb
 from copy import deepcopy
 from matplotlib import colors 
 from matplotlib import rcParams
+from matplotlib import use
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
 from matplotlib.lines import Line2D 
@@ -61,9 +62,6 @@ from numpy.core.ma import arange
 import Image
 import math
 import sys
-#from matplotlib.backends.backend_tkagg import show # prone to change.
-
-
 
 
 # NOTE WELL: use only 1 NTplot instance at a time.
@@ -74,7 +72,10 @@ try:
 except ImportError:
     NTdebug("Failed to import biggles; will try to use MatLibPlot")
 
+# TODO: remove hard dependency.
 useMatPlotLib = True
+# Use a backend that allows headless (without GUI) printing in addition to GUI.
+use('Agg')
 
 #try:
 #    from pylab import * # preferred importing. Includes nx imports.
