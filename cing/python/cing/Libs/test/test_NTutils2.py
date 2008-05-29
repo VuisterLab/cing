@@ -8,12 +8,13 @@ from cing.core.molecule import Molecule
 from random import random
 from unittest import TestCase
 from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import NTvalue
 import cing
 import unittest
 
 class AllChecks(TestCase):
 
-    def testNTdict(self):
+    def tttestNTdict(self):
         a = NTdict( b=NTdict( anItem='there'))
 #        NTdebug( '0 '+ `a` )
 #        NTdebug( '1 '+ `a['b']`)
@@ -43,7 +44,7 @@ class AllChecks(TestCase):
         self.assertEquals(2,
             a.getDeepByKeys('b','c',1)) # get the second element by key 1
 
-    def testNTdict2(self):
+    def tttestNTdict2(self):
         a = {}
         appendDeepByKeys(a, 1.23, 'b', 'c')
         strComplexObject = '%s' % a
@@ -56,7 +57,7 @@ class AllChecks(TestCase):
         self.assertEquals(strComplexObject, "{'b': [10, [11, 13], 12]}")
         
 
-    def testNTmessage(self):
+    def tttestNTmessage(self):
         aStringToBe = 123
         NTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
@@ -64,12 +65,12 @@ class AllChecks(TestCase):
         NTdebug("testing messaging system: "+`aStringToBe`)
         NTdebug("testing messaging system: %s", aStringToBe)
 
-    def testNTlistSetConsensus(self):
+    def tttestNTlistSetConsensus(self):
         l = NTlist( 4., 9., 9. )
         self.assertEqual( l.setConsensus(minFraction=0.6), 9)
         self.assertEqual( l.consensus, 9)
 
-    def testNTlistIndex(self):
+    def tttestNTlistIndex(self):
         # speed check
         l = NTlist()
         for _i in range( 1*1000):
@@ -83,7 +84,7 @@ class AllChecks(TestCase):
             _x = l.index(middleValue)
 #            tree.sibling(1)
 
-    def testNTtreeIndex(self):
+    def tttestNTtreeIndex(self):
         mol = Molecule('mol')
         mol.addChain('top')
         top = mol.allChains()[0]
@@ -97,6 +98,20 @@ class AllChecks(TestCase):
 #            _x = middleValue.sibling(0) # getting myself back should not take time.
             _x = middleValue.sibling(1) # this tends to be very expensive
 
+    def testNTvalue(self):
+        s = "%s"  % NTvalue(value=None,  error=None, fmt='%.3f (+- %.3f)')
+        self.assertEquals( s, '. (+- .)')
+        s = "%s"  % NTvalue(value=1.0,   error=None, fmt='%.3f (+- %.3f)')
+        self.assertEquals( s, '1.0 (+- .)')
+        s = "%s"  % NTvalue(value=1.000, error=None, fmt='%.3f (+- %.3f)')
+        self.assertEquals( s, '1.0 (+- .)')
+        s = "%s"  % NTvalue(value=2.000, error=0.2,  fmt='%.3f (+- %.3f)')
+        self.assertEquals( s, '2.000 (+- 0.200)')
+        s = "%s"  % NTvalue(value=3000, error=300,   fmt='%.3f (+- %.3f)')
+        self.assertEquals( s, '3000.000 (+- 300.000)')
+        s = "%s"  % NTvalue(value=3e7, error=3e6,    fmt='%.3e (+- %.3e)')
+        self.assertEquals( s, '3.000e+07 (+- 3.000e+06)')
+        
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug

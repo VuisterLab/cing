@@ -59,6 +59,10 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.peirceTest import peirceTest
+from cing.PluginCode.Whatif import C12CHK_STR
+from cing.PluginCode.Whatif import RAMCHK_STR
+from cing.PluginCode.Whatif import VALUE_LIST_STR
+from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import criticizeByWhatif
 from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
 from cing.PluginCode.Whatif import histJaninBySsAndResType
@@ -253,7 +257,7 @@ def calculateRmsd( project, ranges=None, models = None   ):
 #            shownWarningCount2 = 0
     for model in selectedModels:
         NTmessageNoEOL(".")
-        if model % 80 == 0:
+        if model % 80 == 0 and model != 0:
             NTmessageNoEOL("\n")
         project.molecule.rmsd.backbone[num]   = 0.0
         project.molecule.rmsd.backboneCount   = 0
@@ -1870,8 +1874,13 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                     msg = sprintf('----- %5s -----', res)
                     fprintf(fp, msg+'\n')
 #                    NTdebug(msg)
-                    plotList = [['PHI',  'PSI',  'Ramachandran'],
-                                ['CHI1', 'CHI2', 'Janin']]
+                    # 0: angle 1 name
+                    # 1: angle 2 name
+                    # 2: Angle combination name
+                    # 3: Tuple of arbitrary number of keys to value to show
+                    # 4: Name of value to show (eg QUACHK)
+                    plotList = [['PHI',  'PSI',  'Ramachandran', (WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR), RAMCHK_STR ],
+                                ['CHI1', 'CHI2', 'Janin',        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR), C12CHK_STR]]
                     for plotItem in plotList:
                         plotDihedralName1 = plotItem[0]
                         plotDihedralName2 = plotItem[1]
@@ -1884,9 +1893,22 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                             plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
 #                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
                             res.html.left( 'img', src = plotFileNameDihedral2D )
+                            # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
+                            keys = plotItem[3]
+                            strToShow = '.'.join( keys )
+                            av = getDeepByKeys(res,*keys)
+                            if av != None:
+                                sd = None
+                                if isinstance(av, NTlist):
+                                    ( av, sd, _n ) = av.average()
+        #                            strToShow += '.'+'average'
+                                pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)')
+                                strToShow += ': %s' % pointNTvalueStr
+                                res.html.left( 'BR', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
                         else:
                             pass
 #                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
+                        
 
                     for dihed in res.db.dihedrals.zap('name'):
                         if dihed in res and res[dihed]:
