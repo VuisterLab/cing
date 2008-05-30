@@ -134,7 +134,7 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
         NTwarning('Skipping because not doProcheck')
     else:
         project.procheck( ranges=ranges)
-#    project.criticizeByAll()
+    project.criticizeByAll()
     project.summary()
 #end def
 
@@ -434,7 +434,10 @@ def validateRestraints( project, toFile = True)   :
                 sumsq = d.violations.sumsq( sumsq )
                 n += len(d.violations)
             #end for
-            res.distanceRestraints.rmsd = math.sqrt(sumsq/n)
+            if n == 0:
+                NTwarning('No DRs so no rmsd')
+            else:
+                res.distanceRestraints.rmsd = math.sqrt(sumsq/n)
             res.distanceRestraints.violCount1 = res.distanceRestraints.zap('violCount1').sum()
             res.distanceRestraints.violCount3 = res.distanceRestraints.zap('violCount3').sum()
             res.distanceRestraints.violCount5 = res.distanceRestraints.zap('violCount5').sum()
@@ -1617,7 +1620,7 @@ def setupHtml(project):
 
     for restraintList in allRestraintList:
 
-        RLLink = project.htmlPath( htmlDirectories.whatif,
+        RLLink = project.htmlPath( htmlDirectories.restraints,
                                    restraintList.name+'.html' )
         restraintList.htmlLocation = ( RLLink, top )
         restraintList.html = HTMLfile( restraintList.htmlLocation[0],
@@ -1665,18 +1668,26 @@ def setupHtml(project):
             project.mainPageObjects['Restraints'] = [restraintList]
         #end if
 
-        restraintList.html.main('h3', restraintList.formatHtml())
+        restrMain = restraintList.html.main
+        restrMain('h3', restraintList.formatHtml())
 
         if str(type(restraintList)).count('DistanceRestraintList'):
             #count = 0
             for restraint in restraintList:
                 count = restraint.id #count += 1
+                NTdebug('restraint count %d colorLabel: %s' % ( count, restraint.colorLabel))
                 tag = 'o'+str(restraint.__OBJECTID__)
                 restraint.htmlLocation = ( RLLink, '#' + tag )
-                restrMain = restraintList.html.main
+                
                 #restrMain('h2', restraintList.html._generateTag( 'a',
                 #     'Distance Restraint %i' % count, id = tag, newLine=False) )
-                restrMain('h2', 'Distance Restraint %i' % count, id = tag)
+                
+                restrMain('h2', 'Restraint ', closeTag=False)
+                # Strangely JFD doesn't know how to get the coloring into the next text
+                # without creating a html link. So just put in a self reference.
+                restraintList.html.insertHtmlLink(restrMain,restraintList,restraint,'%i'%count)
+                restrMain('h2', openTag=False)
+#                restrMain('h2', 'Distance Restraint %i' % count, id = tag)
                 restrMain('ul', closeTag=False)
                 restrMain('li', 'Pair of Atoms:', closeTag=False)
 
@@ -1717,8 +1728,28 @@ def setupHtml(project):
 
                 #restrMain('h2', restraintList.html._generateTag( 'a',
                 #      'Dihedral Restraint %i' % count, id = tag, newLine=False))
-                restrMain('h2', 'Dihedral Restraint %i' % count, id = tag)
+                restrMain('h2', 'Restraint ', closeTag=False)
+                restraintList.html.insertHtmlLink(restrMain,restraintList,restraint,'%i'%count)
+                restrMain('h2', openTag=False)
+
                 restrMain('ul', closeTag=False)
+                restrMain( 'li', 'Torsional Angle Atoms:', closeTag=False )
+                if len(restraint.atoms) < 1: 
+                    restrMain('b','None')
+                ind = 0
+                for atom in restraint.atoms:
+                    res = atom._parent
+                    atomName = atom.toString() +','
+#                    atomName = "%s.%s," % ( res.name, atom.name )
+                    if ind == 0: 
+                        atomName = '(' + atomName
+                    if ind == 3: 
+                        atomName = atomName[:-1] + ')'
+                    restraintList.html.insertHtmlLink( restrMain, restraintList,
+                                                       res, text = atomName )
+                    ind += 1
+                #end for
+                restrMain('li', openTag=False)
                 restrMain('li', 'Lower/Upper: %.2f / %.2f' % (restraint.lower,
                                                               restraint.upper))
                 restrMain('li', 'Average (CV):  %.2f (%.2f)'
@@ -1736,22 +1767,6 @@ def setupHtml(project):
                 restrMain('li', 'Angle Name:', closeTag=False)
                 restraintList.html.insertHtmlLink( restrMain, restraintList,
                                        restraint.residue, text=restraint.angle )
-                restrMain('li', openTag=False)
-
-                restrMain( 'li', 'Torsional Angle Atoms:', closeTag=False )
-
-                if len(restraint.atoms) < 1: restrMain('b','None')
-
-                ind = 0
-                for atom in restraint.atoms:
-                    res = atom._parent
-                    atomName = "%s.%s," % ( res.name, atom.name )
-                    if ind == 0: atomName = '(' + atomName
-                    if ind == 3: atomName = atomName[:-1] + ')'
-                    restraintList.html.insertHtmlLink( restrMain, restraintList,
-                                                       res, text = atomName )
-                    ind += 1
-                #end for
                 restrMain('li', openTag=False)
                 restrMain('ul', openTag=False)
             #end for
@@ -1831,16 +1846,11 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
     '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project. 
        Output: return None for success is standard.
-       If skipFirstPart is set then the imagery above the procheck plots will be skipped.
+       If htmlOnly is set then the html will be created without imagery.
     '''
-
-#    skipFirstPart = True # disable for testing as it takes a long time.
-    skipExport2Gif = skipFirstPart # Default is to follow value of skipFirstPart.
-    
-    doWhatif = True # TODO: remove when debugged.
-    
-    if skipExport2Gif:
-        NTwarning('Skipping export of molecular imagery to gif')
+        
+    if htmlOnly:
+        NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
     else:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
@@ -1849,31 +1859,32 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
             NTerror("Failed to generated a Molmol picture; continuelng.")
 
     for molecule in [project[mol] for mol in project.molecules]:
-        if skipFirstPart:
-            NTwarning('Skipping first part of HTML creation.')
-        else:
-            for chain in molecule.allChains():
-                chainId = chain.name
-                NTmessage("Generating dihedral angle plots for chain: " + chainId)
-                printedDots = 0
-                for res in chain.allResidues():
-    #                write without extra space
-                    if not printedDots % 10:
-                        digit = printedDots / 10
-                        NTmessageNoEOL(`digit`)
-                    else:
-                        NTmessageNoEOL('.')
-                    printedDots += 1
-                    resNum = res.resNum
-                    if not printedDots % CHARS_PER_LINE_OF_PROGRESS:
-                        NTmessage("")
-                        printedDots = 0
-                    resdir = os.path.dirname(res.htmlLocation[0])
+        for chain in molecule.allChains():
+            chainId = chain.name
+            NTmessage("Generating dihedral angle plots for chain: " + chainId)
+            printedDots = 0
+            for res in chain.allResidues():
+#                write without extra space
+                if not printedDots % 10:
+                    digit = printedDots / 10
+                    NTmessageNoEOL(`digit`)
+                else:
+                    NTmessageNoEOL('.')
+                printedDots += 1
+                resNum = res.resNum
+                if not printedDots % CHARS_PER_LINE_OF_PROGRESS:
+                    NTmessage("")
+                    printedDots = 0
+                resdir = os.path.dirname(res.htmlLocation[0])
 
-                    fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
-                    msg = sprintf('----- %5s -----', res)
-                    fprintf(fp, msg+'\n')
-#                    NTdebug(msg)
+                fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
+                msg = sprintf('----- %5s -----', res)
+                fprintf(fp, msg+'\n')
+                if htmlOnly:
+                    pass
+#                    NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
+                else:
+    #                    NTdebug(msg)
                     # 0: angle 1 name
                     # 1: angle 2 name
                     # 2: Angle combination name
@@ -1891,7 +1902,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                             res.html.left( 'h2', plotDihedralComboName, id=plotDihedralComboName)
                             graphicsFormatExtension = 'png'
                             plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
-#                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
+    #                            NTdebug('plotFileNameDihedral2D: ' + plotFileNameDihedral2D)
                             res.html.left( 'img', src = plotFileNameDihedral2D )
                             # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
                             keys = plotItem[3]
@@ -1907,14 +1918,14 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                                 res.html.left( 'BR', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
                         else:
                             pass
-#                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
+    #                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
                         
-
+    
                     for dihed in res.db.dihedrals.zap('name'):
                         if dihed in res and res[dihed]:
-#                            NTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
+    #                            NTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
                             d = res[dihed] # List of values with outliers etc attached.
-
+    
                             # summarize the results
                             lenOutliers = '.' # JFD adds: Indicating None
                             outlierList = '.'
@@ -1922,7 +1933,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
     #                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
                                 lenOutliers = `len(d.outliers)`
                                 outlierList = d.outliers.zap(0)
-#                            -180.1 is longest: 6.1f
+    #                            -180.1 is longest: 6.1f
                             summary = '%-2s %3d %-6s: average: %6.1f   cv: %6.3f  ||  outliers: %3s (models %s)' % (
                                 chainId, resNum, dihed,
                                 d.cav, d.cv, lenOutliers, outlierList
@@ -1943,22 +1954,22 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                             if ps:
                                 ps.hardcopy( fileName = tmpPath )
         #                        del( plot )
-
+    
                                 #generate HTML code for plot and text
                                 res.html.left( 'h2', dihed, id=dihed),
                                 res.html.left( 'img', src = dihed + '.' + graphicsFormatExtension, alt=""  )
                                 res.html.left( 'p', summary )
                         #end if
                     #end for
-                    # Right side
-                    # Distance Restraints
-                    _generateHtmlResidueRestraints(project, res, type = 'Distance')
-                    # Dihedral Restraints
-                    _generateHtmlResidueRestraints(project, res, type = 'Dihedral')
-                #end for residue
-                NTmessage("") # Done printing progress.
-            #end for chain
-        # end of skip test.
+                # end of skip test.
+                # Right side
+                # Distance Restraints
+                _generateHtmlResidueRestraints(project, res, type = 'Distance')
+                # Dihedral Restraints
+                _generateHtmlResidueRestraints(project, res, type = 'Dihedral')
+            #end for residue
+            NTmessage("") # Done printing progress.
+        #end for chain
         main = molecule.html.main
 
         if doWhatif:
@@ -2150,10 +2161,14 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
         # sort by color: 1st red, 2nd orange, then green and by violCount3 reverse order
         listRed, listOrange, listGreen = [], [], []
         for dr in resRL:
-            if not hasattr(dr,'colorLabel'): dr.colorLabel = COLOR_GREEN
-            if dr.colorLabel == COLOR_GREEN: listGreen.append(dr)
-            if dr.colorLabel == COLOR_RED: listRed.append(dr)
-            if dr.colorLabel == COLOR_ORANGE: listOrange.append(dr)
+#            if not hasattr(dr,'colorLabel'): 
+#                dr.colorLabel = COLOR_GREEN
+            if dr.colorLabel == COLOR_GREEN: 
+                listGreen.append(dr)
+            if dr.colorLabel == COLOR_RED: 
+                listRed.append(dr)
+            if dr.colorLabel == COLOR_ORANGE: 
+                listOrange.append(dr)
             #if dr.colorLabel == COLOR_GREEN: listGreen.append(dr)
         resRL = listRed + listOrange + listGreen
         # display restraint by number, in line, sorted by violCount3 reverse
@@ -2171,8 +2186,10 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                 for atomPair in dr.atomPairs:
                     res1 = atomPair[0]._parent
                     res2 = atomPair[1]._parent
-                    atomName1 = "(%s.%s," % ( res1.name, atomPair[0].name )
-                    atomName2 = "%s.%s)" % ( res2.name, atomPair[1].name )
+                    atomName1 = "(" + atomPair[0].toString() +','
+                    atomName2 =       atomPair[1].toString() +')'
+#                    atomName1 = "(%s.%s," % ( res1.name, atomPair[0].name )
+#                    atomName2 = "%s.%s)" % ( res2.name, atomPair[1].name )
                     residue.html.insertHtmlLink( resRight, residue, res1,
                                                  text = atomName1 )
                     residue.html.insertHtmlLink( resRight, residue, res2,
@@ -2255,12 +2272,9 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
     """Validatation tests returns None on success or True on failure.
     """
 
-    if htmlOnly:
-        NTwarning('Skipping setupValidation')
-    else:
-        if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif ):
-            NTerror("Failed to setupValidation")
-            return True
+    if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif ):
+        NTerror("Failed to setupValidation")
+        return True
 
     if setupHtml(project):
         NTerror("Failed to setupHtml")

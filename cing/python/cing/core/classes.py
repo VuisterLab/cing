@@ -201,11 +201,8 @@ Project: Top level Cing project class
     #end def
 
     def criticize(self):
-        for drl in self.distances:
-            if drl.criticize():
-                self.colorLabel = setMaxColor( self, drl.colorLabel )
-        if self.colorLabel:
-            return True
+        for drl in self.distances + self.dihedrals:
+            drl.criticize()
 
     #-------------------------------------------------------------------------
     # Path stuff
@@ -1034,10 +1031,12 @@ class DistanceRestraint( NTdict ):
        atomPairs: list of (atom_1,atom_2) tuples,
        lower and upper bounds
     """
-    DR_MAXALL_DEFAULT_POOR_VALUE = 0.5
-#    dr_maxall_poor = cingCriticismDict.getDeepByKeys(
-#        ANY_ENTITY_LEVEL, 'dr_maxall', POOR_PROP,1,default=DR_MAXALL_DEFAULT_POOR_VALUE)
-    dr_maxall_poor = DR_MAXALL_DEFAULT_POOR_VALUE
+    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but set low for testing 1brv to 
+    DR_MAXALL_DEFAULT_BAD_VALUE  = 0.5 # Normally 0.5 but set low for testing 1brv to
+    DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.5 # Ang.
+    """Fraction of models."""
+    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5 
+    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.5 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to 
 
     def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
 
@@ -1062,6 +1061,7 @@ class DistanceRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
+        self.colorLabel = COLOR_GREEN
 
         for pair in atomPairs:
             self.appendPair( pair )
@@ -1069,18 +1069,29 @@ class DistanceRestraint( NTdict ):
     #end def
 
     def criticize(self):
-        critiqued = False
-        ## Order of next two checks matters
-        if self.max >= DistanceRestraint.dr_maxall_poor:
-            self.colorLabel = COLOR_ORANGE
-            critiqued = True
-        if self.max >= DistanceRestraint.dr_maxall_bad:
-            self.colorLabel = COLOR_RED
-            critiqued = True
-        if critiqued:
-            for atom in getAtomsFromAtomPairs(self.atomPairs):
-                atom.appendCritique( self, cascade = True )
-        return critiqued
+        """Only the self violations,violMax and violSd needs to be set before calling this routine"""
+        NTdebug( '%s' % self )
+        if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
+            NTdebug('Setting DR to max orange [crit.1] violMax: %8.3f' % self.violMax)
+            setMaxColor( self, COLOR_ORANGE)
+        if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR to red [crit.2] violMax: %8.3f' % self.violMax)
+            setMaxColor( self, COLOR_RED)
+            return
+        fractionAbove = getFractionAbove( self.violations, DistanceRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
+        if fractionAbove >= DistanceRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
+            setMaxColor( self, COLOR_RED)            
+            return
+#        (self.violAv, self.violSd, _n) = self.violations.average()
+        if self.violSd >= DistanceRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR to red [crit.4] violSd: %8.3f' % self.violSd)
+            setMaxColor( self, COLOR_RED)            
+            return
+            
+#        if critiqued:
+#            for atom in getAtomsFromAtomPairs(self.atomPairs):
+#                atom.appendCritique( self, cascade = True )
 
 
 
@@ -1104,6 +1115,8 @@ class DistanceRestraint( NTdict ):
         Calculate R-6 average distance and violation
         for each model.
         return (av,sd,min,max) tuple, or (None, None, None, None) on error
+        Important to set the violations to 0.0 if no violations were found.
+        In that case the s.d. may remain None to indicate undefined.  
         """
 
         modelCount = 0
@@ -1121,7 +1134,7 @@ class DistanceRestraint( NTdict ):
         self.sd         = 0.0      # sd on distance
         self.min        = 0.0      # Minimum distance
         self.max        = 0.0      # Max distance
-        self.violations = NTlist() # list with violations for each model
+        self.violations = NTlist() # list with violations for each model INCLUDING non violating models!
         self.violCount1 = 0        # Number of violations over 0.1A
         self.violCount3 = 0        # Number of violations over 0.3A
         self.violCount5 = 0        # Number of violations over 0.5A
@@ -1130,7 +1143,7 @@ class DistanceRestraint( NTdict ):
         self.violSd     = None     # Sd of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
-        if modelCount>0:
+        if modelCount:
             for i in range( modelCount):
                 d = 0.0
                 for atm1,atm2 in self.atomPairs:
@@ -1183,12 +1196,16 @@ class DistanceRestraint( NTdict ):
             for d in self.violations:
                 dabs = math.fabs(d)
 #               print '>>', d,dabs
-                if ( dabs > 0.1): self.violCount1 += 1
-                if ( dabs > 0.3): self.violCount3 += 1
-                if ( dabs > 0.5): self.violCount5 += 1
+                if ( dabs > 0.1): 
+                    self.violCount1 += 1
+                if ( dabs > 0.3): 
+                    self.violCount3 += 1
+                if ( dabs > 0.5): 
+                    self.violCount5 += 1
             #end for
             if self.violations:
-                self.violAv, self.violSd, dummy = NTaverage( map(math.fabs,self.violations) )
+                # JFD doesn't understand why the values need to be mapped to floats.
+                self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
                 self.violMax = max( map(math.fabs,self.violations) )
         #end if
 
@@ -1286,9 +1303,16 @@ class SMLDistanceRestraintHandler( SMLhandler ):
 DistanceRestraint.SMLhandler = SMLDistanceRestraintHandler()
 
 def setMaxColor(o, colorLabel):
+    """priority: red, orange, green"""
+#    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
+#    if not hasattr(o,'colorLabel'):
+#        o.colorLabel = COLOR_GREEN
+        
     if colorLabel == COLOR_RED:
         o.colorLabel = colorLabel
-    elif not o.has_key( 'colorLabel' ):
+        return
+    
+    if o.colorLabel == COLOR_GREEN: # independent of colorLabel being green or orange.
         o.colorLabel = colorLabel
 #-----------------------------------------------------------------------------
 class DistanceRestraintList( NTlist ):
@@ -1310,14 +1334,13 @@ class DistanceRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 0.1 A
         self.violCount3 = 0       # Total violations over 0.3 A
         self.violCount5 = 0       # Total violations over 0.5 A
+        self.colorLabel = COLOR_GREEN
     #end def
 
     def criticize(self):
         for dr in self:
-            if dr.criticize():
-                self.colorLabel = setMaxColor( self, dr.colorLabel )
-        if self.colorLabel:
-            return True
+            dr.criticize()
+            setMaxColor( self, dr.colorLabel )
 
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
@@ -1451,6 +1474,13 @@ class DihedralRestraint( NTdict ):
 
        GV&AWSS: 10 Oct 2007, upper-limit adjustment
     """
+    
+    DR_MAXALL_DEFAULT_POOR_VALUE = 3. # Normally 0.3 but set low for testing 1brv to 
+    DR_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 0.5 but set low for testing 1brv to
+    DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.3 # degrees.
+    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5 
+    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to 
+    
     def __init__( self, atoms, lower, upper, **kwds ):
 
         if upper<lower:
@@ -1474,7 +1504,34 @@ class DihedralRestraint( NTdict ):
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
+        self.colorLabel = COLOR_GREEN
     #end def
+
+    def criticize(self):
+        """Only the self violations,violMax and violSd needs to be set before calling this routine"""
+        NTdebug( '%s (dih)' % self )
+        if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
+            NTdebug('Setting DR (dih) to max orange [crit.1] violMax: %8.3f' % self.violMax)
+            setMaxColor( self, COLOR_ORANGE)
+        if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR (dih) to red [crit.2] violMax: %8.3f' % self.violMax)
+            setMaxColor( self, COLOR_RED)
+            return
+        fractionAbove = getFractionAbove( self.violations, DihedralRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
+        if fractionAbove >= DihedralRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR (dih) to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
+            setMaxColor( self, COLOR_RED)            
+            return
+#        (self.violAv, self.violSd, _n) = self.violations.average()
+        if self.violSd >= DihedralRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
+            NTdebug('Setting DR (dih) to red [crit.4] violSd: %8.3f' % self.violSd)
+            setMaxColor( self, COLOR_RED)            
+            return
+            
+#        if critiqued:
+#            for atom in getAtomsFromAtomPairs(self.atomPairs):
+#                atom.appendCritique( self, cascade = True )
+
 
     def calculateAverage(self):
         """Calculate the values and violations for each model
@@ -1665,7 +1722,13 @@ class DihedralRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 1 degree
         self.violCount3 = 0       # Total violations over 3 degrees
         self.violCount5 = 0       # Total violations over 5 degrees
+        self.colorLabel = COLOR_GREEN
     #end def
+
+    def criticize(self):
+        for dr in self:
+            dr.criticize()
+            setMaxColor( self, dr.colorLabel )
 
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
@@ -2427,6 +2490,11 @@ class HTMLfile:
            Output: <a class="red" href="link">text</a> inside section
 
            Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
+           
+           And the funny thing is that if the destination has an attribute:
+               'colorLabel' then it will be used to define an html class with
+               which through the cing.css can be used for defining coloring
+               schemes. 
         '''
 
         if not section:
@@ -2481,3 +2549,19 @@ def path( *args ):
 def shift( atm ):
     return atm.shift()
 #end def
+
+
+def getFractionAbove( valueList, threshold ):
+    """Return the fraction that is above the threshold. Return .0 if
+    list contains no values.
+    """
+    if not valueList:
+        return .0
+    n = 0.0 # enforce float arithmics for below division.
+    for v in valueList:
+        if not v: # catch None and pure zero
+            continue
+        if v > threshold:
+            n += 1.
+    return n / len(valueList)  
+    

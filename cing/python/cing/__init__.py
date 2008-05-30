@@ -87,7 +87,7 @@ if not os.path.exists(cingDirTmp):
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import *
 from cing.core.classes import *
 from cing.core.parameters import *
 from cing.core.database import NTdb

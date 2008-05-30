@@ -49,9 +49,9 @@ moleculeDirectories.keysformat() #define a format string for 'pretty' output
 #These directories get generated below the HLML root of a molecule 
 htmlDirectories = NTdict(     
     # Directories generated  
-    procheck= 'Models',
-    whatif  = 'Restraints', #JFD would like to know how this makes sense? TODO:
-    peaks   = 'Peaks'
+    procheck    = 'Models',
+    restraints  = 'Restraints',
+    peaks       = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output
 
