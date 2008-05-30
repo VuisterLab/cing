@@ -8,11 +8,11 @@ from cing import verbosityDebug
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
+from cing.core.constants import IUPAC
 import cing
 import os
 import unittest
@@ -21,20 +21,21 @@ class AllChecks(TestCase):
  
     def testRun(self):
         # TODO: the htmlOnly set to True currently fails. To fix! 
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        doWhatif = False # disables whatif actual run
         doProcheck = False
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         restraintsConvention = CYANA
-        entryId = "1brv"        # Small much studied PDB NMR entry 
+#        entryId = "1brv"        # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model" 
+#        entryId = "1y4o_1model" 
 #        entryId = "1i1s" # withdrawn entry
 #        entryId = "1ka3" # has been replaced by the authors in 2004 (new pdb entry 1tkv).
 #        entryId = "1tkv" # replaced 1ka3
 #        entryId = "1tgq" # withdrawn entry
 #        entryId = "1tgq_1model" # withdrawn entry
-#        entryId = "1brv_1model" # withdrawn entry
+        entryId = "1brv_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         
         if entryId.startswith("1YWUcdGMP"):
@@ -43,6 +44,12 @@ class AllChecks(TestCase):
             pdbConvention = CYANA
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
+            
+            
+            
+        if entryId.startswith("1tgq"):
+            restraintsConvention = IUPAC
+            
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
@@ -59,6 +66,9 @@ class AllChecks(TestCase):
                   }
         if entryId.startswith("1YWUcdGMP"):
             del(kwds['acoFiles'])
+
+        if os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")):
+            kwds['seqFile']  = entryId
             
         if os.path.exists( os.path.join( cyanaDirectory, entryId+".prot")):
             self.assertTrue( os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")),

@@ -150,7 +150,11 @@ class Whatif( NTdict ):
                  ]
               
 #              'Bond max Z',
-               
+    DEFAULT_RESIDUE_POOR_SCORES = {}
+    DEFAULT_RESIDUE_POOR_SCORES[ RAMCHK_STR ] =  -0.75 # Guessing on basis of 1ai0, 1brv for demonstration.
+    DEFAULT_RESIDUE_BAD_SCORES = {}
+    DEFAULT_RESIDUE_BAD_SCORES[ RAMCHK_STR ] =  -1.3
+    
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
     nameDict = NTdict()
@@ -741,7 +745,9 @@ def runWhatif( project, tmp=None ):
 #end def
 
 def criticizeByWhatif( project ):
-    NTmessage('What If passes opportunity to critique. A first.')
+#    NTmessage('What If passes opportunity to critique. A first.') # though luck
+    pass
+
 
 # register the function
 methods  = [
