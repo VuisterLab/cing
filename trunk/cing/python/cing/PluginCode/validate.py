@@ -143,25 +143,36 @@ def criticizeByAll( project ):
     criticizeByWhatif( project )
 
 def summary( project ):
+    if not project.molecule:
+        NTerror('Strange, there was no molecule in this project')
+        return
+
     fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
     fp = open( fname, 'w' )
     NTmessage( '==> summary, output to %s', fname)
 
     msg = sprintf( '%s\n', project.format() )
 
-    if project.molecule:
-        msg += sprintf( '%s\n', project.molecule.format() )
-        if project.molecule.has_key('rmsd' ):
-            msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
-        #end if
-        for drl in project.distances + project.dihedrals + project.rdcs:
-            msg += sprintf( '\n%s\n', drl.format() )
-        #end for
-        # No procheck summary added yet.
-#        if project.molecule.has_key('procheck'):
-#            if project.molecule.procheck.has_key('summary'):
-#                mprintf( fps, '%s\n', project.molecule.procheck.summary )
-    #end if
+    
+    msg += sprintf( '%s\n', project.molecule.format() )
+    if project.molecule.has_key('rmsd' ):
+        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
+    for drl in project.distances + project.dihedrals + project.rdcs:
+        msg += sprintf( '\n%s\n', drl.format() )
+        
+        
+    wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
+    if wiSummary:
+        msg += '\n' + wiSummary
+    else:
+        NTwarning('Failed to find whatif summary ')
+        
+    pcSummary = getDeepByKeys(project.molecule, 'pcSummary') # Hacked bexause should be another procheck level inbetween.
+    if pcSummary:
+        msg += '\n' + pcSummary +'\nThe above summary of ProcheckNMR might be incomplete' 
+    else:
+        NTwarning('Failed to find procheck summary')
+        
     fprintf( fp, msg )
     fp.close()
 #end def
@@ -1841,7 +1852,7 @@ def renderHtml(project):
             return True
 
 
-def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
+def populateHtmlMolecules( project, htmlOnly=False,
             doProcheck = True, doWhatif = True, ranges=None ):
     '''Description: generate the Html content for Molecules and Residues pages.
        Inputs: a Cing.Project. 
@@ -1972,7 +1983,7 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
         #end for chain
         main = molecule.html.main
 
-        if doWhatif:
+        if doWhatif and not htmlOnly:
             NTmessage("Creating Whatif plots")
             anyWIPlotsGenerated = False
             if project.createHtmlWhatif(ranges=ranges):
@@ -2072,7 +2083,10 @@ def populateHtmlMolecules( project, skipFirstPart=False, htmlOnly=False,
                 if not os.path.exists( procheckLinkReal ):
                     continue # Skip their inclusion.
 
-                fileList = convert2Web( procheckLinkReal )
+                if not htmlOnly:
+#                    fileList = False 
+#                else:
+                    fileList = convert2Web( procheckLinkReal )
                 fileList = False
     #            NTdebug( "Got back from convert2Web output file names: " + `fileList`)
                 if fileList == True:
