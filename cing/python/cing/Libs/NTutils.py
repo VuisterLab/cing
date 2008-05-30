@@ -3611,4 +3611,31 @@ def floatParse( v_str ):
         return NAN_FLOAT 
     return float(v_str)
 
+def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):
+    """Slice the text to include only that inbetween. Input strings maybe None"""
+    if startString:
+        startIdx = s.find(startString)
+    else:
+        startIdx = 0
+    if startIdx < 0:
+        NTwarning('Failed to find starting string in given string')
+        return
+    if endString:
+        endIdx = s.find(endString,startIdx)
+    else:
+        endIdx = len(s)
+        
+    if endIdx < 0:
+        NTwarning('Failed to find ending string in given string')
+        return
+    if not startIncl:
+        startIdx += len(startString)
+    if endIncl:
+        if endString:
+            endIdx += len(endString)
+        else:
+            endIdx = len(s)
+    
+    return s[startIdx:endIdx]
+    
 

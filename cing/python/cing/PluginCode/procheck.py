@@ -28,6 +28,7 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import setDeepByKeys
 from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 import cing
@@ -287,7 +288,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             NTerror("Failed to run pc; please consult the log file (.log etc). in the molecules procheck directory.")
             return True
         NTmessage("Finished procheck_nmr successfully")
-        self.parseResult()
+        if self.parseResult():
+            return False
         self.postProcess()
         return True
     #end def
@@ -384,6 +386,17 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 if not self.procheckEnsembleDefs[field][3]: # Checking store parameter.
                     continue
                 residue.procheck[field] = value 
+        path = os.path.join(self.rootPath, '%s.sum' % self.molecule.name)           
+        NTdebug( '> parsing sum >'+ path)
+        summary = open(path, 'r').read()
+        NTdebug( 'got: \n'+ summary)
+        if summary:
+            if setDeepByKeys(self.molecule, summary, 'pcSummary'):# Hacked bexause should be another procheck level inbetween.
+                NTerror( 'Failed to set PC summary' )
+                return True
+        else:
+            NTerror('Failed to parse PC summary file')
+            return True
 #end class
 
 def procheck(project, ranges=None, createPlots=True, runAqua=True)   :

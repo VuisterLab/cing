@@ -48,8 +48,10 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import setDeepByKeys
 from cing.core.classes import setMaxColor
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
@@ -755,6 +757,32 @@ def runWhatif( project, tmp=None ):
     if whatif._processCheckdb():
         NTerror("Failed to process check db")
         return True
+    
+    
+    path = os.path.join(whatifDir, 'pdbout.txt' )           
+    NTdebug( '> parsing '+ path)
+    fullText = open(path, 'r').read()
+    if fullText:
+        start       = 'This report was created by WHAT IF'
+        end         ='INTRODUCTION'
+        intro = getTextBetween( fullText, start, end, endIncl=False )
+        intro = '----------- ' + intro.strip() + ' -----------'
+        NTdebug( 'got intro: \n'+ intro)
+
+        start       = 'Summary report for users of a structure'
+        end         ='=============='
+        summary = getTextBetween( fullText, start, end, endIncl=False )
+        summary = summary.strip() + '\n---------------------------------------------'
+        NTdebug( 'got summary: \n'+ summary)
+        
+        summary = '\n\n'.join([intro,summary]) 
+        if setDeepByKeys(project.molecule, summary, 'wiSummary'):# Hacked bexause should be another wi level inbetween.
+            NTerror( 'Failed to set WI summary' )
+            return True
+    else:
+        NTerror('Failed to parse WI summary file')
+        return True
+    
 #end def
 
 def criticizeByWhatif( project ):
