@@ -815,11 +815,11 @@ MISSING_HEAVY_ATOM_ASSIGNMENT   = 'MISSING_HEAVY_ATOM_ASSIGNMENT'
 def validateAssignments( project, toFile = True   ):
     """
     Validate the assignments; check for potential problems and inconsistencies
-    Add's NTlist instance with string's with warning description to each atom as
+    Add's NTlist instance with strings of warning description to each atom as
     validateAssignment attribute
 
-    return a NTlist with atms with errors.
-    Generate output in moleculename/Cing/validateAssignments.txt if toFile is True.
+    return a NTlist of atoms with errors.
+    Generate output in moleculeName/Cing/validateAssignments.txt if toFile is True.
 
     return None on code error.
     """
@@ -827,8 +827,8 @@ def validateAssignments( project, toFile = True   ):
     funcName = validateAssignments.func_name
     result = NTlist()
     if project.molecule.resonanceCount == 0:
-        NTmessage("No resonance assignments read so no validation on it done.")
-        return result
+        NTdebug("No resonance assignments read so no real validation on it can be done. Let's try anyway.")
+#        return result
 
     for atm in project.molecule.allAtoms():
         atm.validateAssignment = NTlist()
@@ -853,7 +853,7 @@ def validateAssignments( project, toFile = True   ):
 
             # Check the shift against the database
             delta = math.fabs(shift - av) / sd
-            if (delta > 3.0):
+            if delta > 3.0:
                 string = sprintf('%s: %.2f ppm is %.1f*sd away from average (%.2f,%.2f)',
                                  'SHIFT', shift, delta, av, sd
                                 )

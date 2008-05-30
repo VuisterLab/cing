@@ -12,8 +12,8 @@ NB
 - Doing procheck on MacOSX.5.3/MacBook Pro best performance is  
 for when using 3 processes. 
 """
-START_ENTRY_ID                 = 1 # default 0
-MAX_ENTRIES_TODO               = 1 # default a ridiculously large number like 999999
+START_ENTRY_ID                 = 2 # default 0
+MAX_ENTRIES_TODO               = 99 # default a ridiculously large number like 999999
 
 def doScriptOnEntryList(pythonScriptFileName, 
           entryListFileName, 

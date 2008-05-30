@@ -42,6 +42,8 @@ format file:
             lineCol1 = int(line.dollar[1].strip('*'))
             atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, line.dollar[3]) )
             if not atm:
+                atm = molecule.decodeNameTuple( (IUPAC, None, lineCol1, line.dollar[3]), fromCYANA2CING=True )
+            if not atm:
                 NTerror('parseShiftxOutput: chainId [%s] line %d (%s)\n', chainId, line.NR, line.dollar[0] )
             else:
                 atm.shiftx.append( line.float(4) )
