@@ -101,7 +101,7 @@ class Dssp:
         if len(line) < 65:
             return None
         for field, fieldDef in defs.iteritems():
-            c1, c2, func, dummyStore = fieldDef
+            c1, c2, func, _dummy = fieldDef
             result[ field ] = func(line[c1:c2]) 
         return result
 

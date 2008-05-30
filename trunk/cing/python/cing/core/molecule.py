@@ -159,6 +159,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.modelCount   = 0
 
         self.xeasy        = None # reference to xeasy class, used in parsing
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
 
         self.saveXML('chainCount','residueCount','atomCount')
 
@@ -952,6 +953,7 @@ Chain class: defines chain properties and methods
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
                            self.footer( dots )
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
 
         self.residues = self._children
         self.residueCount = 0
@@ -1533,6 +1535,7 @@ Atom class: Defines object for storing atom properties
         self.coordinates = NTlist()
 #        self.resName     = resName # have to store because initialisation is done
 #                                   # without knowledge of parent
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
 
         self.saveXML('resName', 'resonances','coordinates')
 

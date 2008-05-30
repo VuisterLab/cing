@@ -3,7 +3,6 @@
     First version: gv June 3, 2007
     Second version by jfd.
 """
-
 # Fix these strings so we can get some automated code checking by pydev extensions.
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
@@ -48,7 +47,12 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import val2Str
+from cing.core.classes import setMaxColor
+from cing.core.constants import COLOR_ORANGE
+from cing.core.constants import COLOR_RED
 from cing.core.parameters import cingPaths
 from glob import glob
 from shutil import copy
@@ -56,6 +60,8 @@ from string import upper
 import os
 import shelve
 import time
+
+
 
 
 #            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
@@ -151,9 +157,16 @@ class Whatif( NTdict ):
               
 #              'Bond max Z',
     DEFAULT_RESIDUE_POOR_SCORES = {}
-    DEFAULT_RESIDUE_POOR_SCORES[ RAMCHK_STR ] =  -0.75 # Guessing on basis of 1ai0, 1brv for demonstration.
     DEFAULT_RESIDUE_BAD_SCORES = {}
-    DEFAULT_RESIDUE_BAD_SCORES[ RAMCHK_STR ] =  -1.3
+
+    DEFAULT_RESIDUE_BAD_SCORES[  RAMCHK_STR ] =  -1.3
+    DEFAULT_RESIDUE_POOR_SCORES[ RAMCHK_STR ] =  -1.0 # Guessing on basis of 1ai0, 1brv
+    
+    DEFAULT_RESIDUE_BAD_SCORES[  BBCCHK_STR ] =    3.0
+    DEFAULT_RESIDUE_POOR_SCORES[ BBCCHK_STR ] =   10.0 # Guessing on basis of 1ai0, 1brv
+
+    DEFAULT_RESIDUE_BAD_SCORES[  C12CHK_STR ] =  -1.2 
+    DEFAULT_RESIDUE_POOR_SCORES[ C12CHK_STR ] =  -0.9 # Guessing on basis of 1ai0, 1brv
     
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
@@ -746,9 +759,33 @@ def runWhatif( project, tmp=None ):
 
 def criticizeByWhatif( project ):
 #    NTmessage('What If passes opportunity to critique. A first.') # though luck
-    pass
+    ranges = None
+    selectedResidues = project.molecule.allResidues()
+    if ranges:
+        selectedResidues = project.molecule.ranges2list( ranges )
 
-
+    keyList = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ] # second item replaced below.
+    for key in Whatif.DEFAULT_RESIDUE_BAD_SCORES:
+        NTdebug('Whatif critiquing on key [%5s]' % key)
+        thresholdValueBad  = Whatif.DEFAULT_RESIDUE_BAD_SCORES[ key]
+        thresholdValuePoor = Whatif.DEFAULT_RESIDUE_POOR_SCORES[key]
+        keyList[1] = key
+        for res in selectedResidues:
+            actualValue = getDeepByKeys(res,*keyList)
+            if actualValue == None:
+                continue
+            if isinstance(actualValue, NTlist):
+                actualValue = actualValue.average()[0]
+            actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
+            if actualValue < thresholdValueBad: # assuming Z score
+                NTdebug('residue [%s] critiqued to red for bad is: [%8.3f] and actual found: [%s]' % (
+                    res, thresholdValueBad, actualValueStr ))
+                setMaxColor( res, COLOR_RED)
+            elif actualValue < thresholdValuePoor:
+                NTdebug('residue [%s] critiqued to orange for poor is: [%8.3f] and actual found: [%s]' % (
+                    res, thresholdValuePoor, actualValueStr ))
+                setMaxColor( res, COLOR_ORANGE)
+            
 # register the function
 methods  = [
             (runWhatif, None),

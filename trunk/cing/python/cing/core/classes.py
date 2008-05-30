@@ -178,6 +178,7 @@ Project: Top level Cing project class
         self.distances  =  ProjectList( self, DistanceRestraintList, directories.restraints, '.distances' )
         self.dihedrals  =  ProjectList( self, DihedralRestraintList, directories.restraints, '.dihedrals' )
         self.rdcs       =  ProjectList( self, RDCRestraintList,      directories.restraints, '.rdcs' )
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
 
         self.saveXML( 'version',
                       'name',  'created',
@@ -1070,7 +1071,7 @@ class DistanceRestraint( NTdict ):
 
     def criticize(self):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
-        NTdebug( '%s' % self )
+#        NTdebug( '%s' % self )
         if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
             NTdebug('Setting DR to max orange [crit.1] violMax: %8.3f' % self.violMax)
             setMaxColor( self, COLOR_ORANGE)
@@ -1509,7 +1510,7 @@ class DihedralRestraint( NTdict ):
 
     def criticize(self):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
-        NTdebug( '%s (dih)' % self )
+#        NTdebug( '%s (dih)' % self )
         if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
             NTdebug('Setting DR (dih) to max orange [crit.1] violMax: %8.3f' % self.violMax)
             setMaxColor( self, COLOR_ORANGE)
@@ -1722,7 +1723,7 @@ class DihedralRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 1 degree
         self.violCount3 = 0       # Total violations over 3 degrees
         self.violCount5 = 0       # Total violations over 5 degrees
-        self.colorLabel = COLOR_GREEN
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
     #end def
 
     def criticize(self):
@@ -1838,6 +1839,7 @@ class RDCRestraint( NTdict ):
                        )
         self.id         = -1       # Undefined index number
         self.rdcs        = None     # list with backcalculated rdc values for each model, None indicates no analysis done
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
 
         for pair in atomPairs:
             self.appendPair( pair )
@@ -1989,6 +1991,7 @@ class RDCRestraintList( NTlist ):
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
+        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
     #end def
 
     def append( self, RDCRestraint ):

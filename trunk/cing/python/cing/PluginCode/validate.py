@@ -1333,7 +1333,7 @@ def setupHtml(project):
 
     # values for residue table
     ncols = 10
-    width = '75px'
+    width = '75px' # reserve some space per residue in chain table
     top = '#_top'
 
     # initialize project html page
@@ -1675,7 +1675,7 @@ def setupHtml(project):
             #count = 0
             for restraint in restraintList:
                 count = restraint.id #count += 1
-                NTdebug('restraint count %d colorLabel: %s' % ( count, restraint.colorLabel))
+#                NTdebug('restraint count %d colorLabel: %s' % ( count, restraint.colorLabel))
                 tag = 'o'+str(restraint.__OBJECTID__)
                 restraint.htmlLocation = ( RLLink, '#' + tag )
                 
