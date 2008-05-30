@@ -71,6 +71,7 @@ class NTlist( list ):
         self.av = None
         self.sd = None
         self.n = 0
+        
     #end def
 
     def __call__( self, index=-1 ):
