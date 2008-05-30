@@ -230,54 +230,93 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return self.subNodes( depth = 3 )
     #end def
 
-    def decodeNameTuple( self, nameTuple ):
+    def decodeNameTuple( self, nameTuple, fromCYANA2CING=False ):
         """
             Decode a (convention, chainName, resNum, atomName) tuple
             generated with the nameTuple methods of Chain, Residue, or Atom Classes.
             Return a Molecule, Chain, Residue or Atom instance on success or
             None on error.
 
-            If no chain is given then the whole molecule is returned.
+            If chain is given then the whole molecule is returned.
             If no residue is given then the whole chain is returned.
             ..etc..
             Caller is responsible for relaying error messages but debug
             statements within can be enabled from code.
+            
+            fromCYANA2CING can be set in which case all chains will be searched
+            for the requested residue or atom. This is needed when reading
+            CYANA restraints without chain ids but numbering that is non-overlapping
+            between CING's residue numbering. E.g. in entry 1y4o there are chains:
+            A and B in PDB but just [1-104] and [201-304] in the upls. 
         """
 #        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
         convention, chainName, resNum, atomName = nameTuple
 
-        if chainName == None:
-            return self
-        # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
-#        if not chainName in self:
-        if not self.has_key(chainName):
-#            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
+        if not fromCYANA2CING:
+            if chainName == None:
+                return self
+            # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
+    #        if not chainName in self:
+            
+            if not self.has_key(chainName):
+    #            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
+                return None
+    
+            chain = self[chainName]
+    
+            if resNum == None:
+                return chain
+    
+            if not chain.has_key(resNum):
+    #            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+                return None
+            res = chain[resNum]
+    
+            if atomName == None:
+                return res
+    
+            resTranslated = res.translate(convention)
+            an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
+    #        if (not an or (an not in res)): return None
+            if not an:
+    #            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+                return None
+    
+            if not res.has_key(an):
+    #            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+                return None
+            return res[an]
+        else: # fromCYANA2CING
+            if chainName != None:
+                NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
+                return None
+
+            for chain in self.allChains():    
+                if resNum == None:
+                    return chain
+        
+                if not chain.has_key(resNum):
+#                    NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+                    continue # perhaps in other chain?
+                res = chain[resNum]
+        
+                if atomName == None:
+                    return res
+        
+                resTranslated = res.translate(convention)
+                an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
+
+                if not an:
+                    NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+                    return None
+        
+                if not res.has_key(an):
+                    NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+                    return None
+                return res[an]
+            NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
             return None
-
-        chain = self[chainName]
-
-        if resNum == None:
-            return chain
-
-        if not chain.has_key(resNum):
-#            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
-            return None
-        res = chain[resNum]
-
-        if atomName == None:
-            return res
-
-        resTranslated = res.translate(convention)
-        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
-#        if (not an or (an not in res)): return None
-        if not an:
-#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
-            return None
-
-        if not res.has_key(an):
-#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
-            return None
-        return res[an]
+        # end else 
     #end def
 
     def getResidue( self, resName, chains = None):
