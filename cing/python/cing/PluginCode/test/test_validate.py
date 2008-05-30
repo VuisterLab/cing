@@ -22,7 +22,7 @@ class AllChecks(TestCase):
     def testRun(self):
         # TODO: the htmlOnly set to True currently fails. To fix! 
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
+        doWhatif = False # disables whatif actual run
         doProcheck = False
         pdbConvention = IUPAC
         restraintsConvention = CYANA
@@ -30,12 +30,13 @@ class AllChecks(TestCase):
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model" 
 #        entryId = "1y4o_1model" 
+        entryId = "1y4o" 
 #        entryId = "1i1s" # withdrawn entry
 #        entryId = "1ka3" # has been replaced by the authors in 2004 (new pdb entry 1tkv).
 #        entryId = "1tkv" # replaced 1ka3
 #        entryId = "1tgq" # withdrawn entry
 #        entryId = "1tgq_1model" # withdrawn entry
-        entryId = "1brv_1model" # withdrawn entry
+#        entryId = "1brv_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         
         if entryId.startswith("1YWUcdGMP"):
