@@ -99,9 +99,9 @@ def export2aqua( project, tmp=None ):
                         if warningCountAngle == warningCountMax+1:
                             NTwarning("And so on")
                         elif warningCountAngle <= warningCountMax:
-                            NTwarning("Skipping dihedral angle restraint because angle name could not be retrieved.")
+                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.", dr.id, dr.residue)
                         warningCountAngle += 1
-                        return None
+                        #return None
 
                     atom = dr.atoms[1] # this is true except for Omega? TODO correct!
                     if angleName == "OMEGA":

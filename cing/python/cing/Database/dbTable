@@ -25,6 +25,7 @@
 # 08 May    2008: Renamed RURA to URA
 # 15 May    2008: Defined CE1 for BRMB, AQUA in HISE
 # 20 May    2008: BRMB, AQUA atom names for HISH
+# 01 Jun    2008: BRMB, AQUQ residue names for LYSx, ARGx
 #=======================================================================
 #   internal short
 RESIDUE ALA      A
@@ -200,7 +201,7 @@ END_RESIDUE
 #   internal short
 RESIDUE ARGx     R
 #=======================================================================
-    nameDict = {'INTERNAL': 'ARGx', 'AQUA': None, 'BMRBd': None, 'CYANA': 'ARG', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': None}
+    nameDict = {'INTERNAL': 'ARGx', 'AQUA': 'ARG', 'BMRBd': None, 'CYANA': 'ARG', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': 'ARG'}
     comment = 'non-protonated (neutral) ARG (uncommon)'
     properties = ['protein', 'aliphatic', 'large', 'charged']
     #---------------------------------------------------------------
@@ -4587,7 +4588,7 @@ END_RESIDUE
 #   internal short
 RESIDUE LYSx     K
 #=======================================================================
-    nameDict = {'INTERNAL': 'LYSx', 'AQUA': None, 'BMRBd': None, 'CYANA': 'LYS', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': None}
+    nameDict = {'INTERNAL': 'LYSx', 'AQUA': 'LYS', 'BMRBd': None, 'CYANA': 'LYS', 'CYANA2': None, 'PDB': None, 'XPLOR': None, 'BMRB': 'LYS'}
     comment = 'Non-protonated (neutral) Lys (uncommon)'
     properties = ['protein', 'aliphatic', 'large', 'charged']
     #---------------------------------------------------------------

@@ -153,26 +153,26 @@ def summary( project ):
 
     msg = sprintf( '%s\n', project.format() )
 
-    
+
     msg += sprintf( '%s\n', project.molecule.format() )
     if project.molecule.has_key('rmsd' ):
         msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
     for drl in project.distances + project.dihedrals + project.rdcs:
         msg += sprintf( '\n%s\n', drl.format() )
-        
-        
+
+
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
         msg += '\n' + wiSummary
     else:
         NTwarning('Failed to find whatif summary ')
-        
+
     pcSummary = getDeepByKeys(project.molecule, 'pcSummary') # Hacked bexause should be another procheck level inbetween.
     if pcSummary:
-        msg += '\n' + pcSummary +'\nThe above summary of ProcheckNMR might be incomplete' 
+        msg += '\n' + pcSummary +'\nThe above summary of ProcheckNMR might be incomplete'
     else:
         NTwarning('Failed to find procheck summary')
-        
+
     fprintf( fp, msg )
     fp.close()
 #end def
@@ -368,7 +368,6 @@ def calculateRmsd( project, ranges=None, models = None   ):
     return project.molecule.rmsd
 #end def
 
-
 def validateRestraints( project, toFile = True)   :
     """
     Calculate rmsd's and violation on restraints
@@ -476,10 +475,10 @@ def validateRestraints( project, toFile = True)   :
         try:
             msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f\n',
                  res, phi, psi,
-                 len(res.distanceRestraints), 
-                 res.distanceRestraints.violCount1, 
+                 len(res.distanceRestraints),
+                 res.distanceRestraints.violCount1,
                  res.distanceRestraints.violCount3,
-                 res.distanceRestraints.violCount5, 
+                 res.distanceRestraints.violCount5,
                  res.distanceRestraints.rmsd
                    )
         except:
@@ -531,6 +530,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
         res.saltbridges = NTlist()
     #end for
 
+    s = None
     result = NTlist()
     for res1 in residues1:
         for res2 in residues2:
@@ -1011,7 +1011,20 @@ def validateAssignments( project, toFile = True   ):
     return result
 #end def
 
-def validateDihedrals( self)   :
+def restoreDihRestraintInfo(project):
+    """To restore restraint.residue and restraint.angle"""
+    for dihRestraintList in project.dihedrals:
+        for dihRestraint in dihRestraintList:
+            residue, angle, _val3 = dihRestraint.retrieveDefinition()
+            if angle:
+                dihRestraint.residue = residue
+                dihRestraint.angle = '%s_%i' % (angle, residue.resNum)
+            else:
+                dihRestraint.residue = dihRestraint.atoms[2].residue #'Invalid'
+                dihRestraint.angle = 'Discarted'
+# end def
+
+def validateDihedrals(self):
     """Validate the dihedrals of dihedralList for outliers and cv using pierceTest.
     Return True on error.
     """
@@ -1020,6 +1033,8 @@ def validateDihedrals( self)   :
         return True
     if not self.molecule.modelCount:
         return True
+
+    restoreDihRestraintInfo(self)
 
     for res in self.molecule.allResidues():
         for dihed in res.db.dihedrals.zap('name'):
@@ -1689,11 +1704,11 @@ def setupHtml(project):
 #                NTdebug('restraint count %d colorLabel: %s' % ( count, restraint.colorLabel))
                 tag = 'o'+str(restraint.__OBJECTID__)
                 restraint.htmlLocation = ( RLLink, '#' + tag )
-                
+
                 #restrMain('h2', restraintList.html._generateTag( 'a',
                 #     'Distance Restraint %i' % count, id = tag, newLine=False) )
-                
-                restrMain('h2', 'Restraint ', closeTag=False)
+
+                restrMain('h2', 'Restraint ', id = tag, closeTag=False)
                 # Strangely JFD doesn't know how to get the coloring into the next text
                 # without creating a html link. So just put in a self reference.
                 restraintList.html.insertHtmlLink(restrMain,restraintList,restraint,'%i'%count)
@@ -1702,7 +1717,7 @@ def setupHtml(project):
                 restrMain('ul', closeTag=False)
                 restrMain('li', 'Pair of Atoms:', closeTag=False)
 
-                if len(restraint.atomPairs) < 1: 
+                if len(restraint.atomPairs) < 1:
                     restrMain('b', 'None')
 
                 for atomPair in restraint.atomPairs:
@@ -1727,7 +1742,7 @@ def setupHtml(project):
                         (       val2Str(restraint.violAv,  "%.2f"),
                                 val2Str(restraint.violSd,  "%.2f"),
                                 val2Str(restraint.violMax, "%.2f") ))
-                restrMain('li', openTag=False)
+                #restrMain('li', openTag=False)
                 restrMain('ul', openTag=False)
             #end for
         elif str(type(restraintList)).count('DihedralRestraintList'):
@@ -1739,22 +1754,22 @@ def setupHtml(project):
 
                 #restrMain('h2', restraintList.html._generateTag( 'a',
                 #      'Dihedral Restraint %i' % count, id = tag, newLine=False))
-                restrMain('h2', 'Restraint ', closeTag=False)
+                restrMain('h2', 'Restraint ',  id = tag, closeTag=False)
                 restraintList.html.insertHtmlLink(restrMain,restraintList,restraint,'%i'%count)
                 restrMain('h2', openTag=False)
 
                 restrMain('ul', closeTag=False)
                 restrMain( 'li', 'Torsional Angle Atoms:', closeTag=False )
-                if len(restraint.atoms) < 1: 
+                if len(restraint.atoms) < 1:
                     restrMain('b','None')
                 ind = 0
                 for atom in restraint.atoms:
                     res = atom._parent
                     atomName = atom.toString() +','
 #                    atomName = "%s.%s," % ( res.name, atom.name )
-                    if ind == 0: 
+                    if ind == 0:
                         atomName = '(' + atomName
-                    if ind == 3: 
+                    if ind == 3:
                         atomName = atomName[:-1] + ')'
                     restraintList.html.insertHtmlLink( restrMain, restraintList,
                                                        res, text = atomName )
@@ -1771,9 +1786,9 @@ def setupHtml(project):
                     val2Str(restraint.violSd,  "%.2f"),
                     val2Str(restraint.violMax, "%.2f") ))
 
-                val1, val2, _val3 = restraint.retrieveDefinition()
-                restraint.residue = val1
-                restraint.angle = '%s_%i' % (val2, val1.resNum)
+#                 val1, val2, _val3 = restraint.retrieveDefinition()
+#                 restraint.residue = val1
+#                 restraint.angle = '%s_%i' % (val2, val1.resNum)
 
                 restrMain('li', 'Angle Name:', closeTag=False)
                 restraintList.html.insertHtmlLink( restrMain, restraintList,
@@ -1822,7 +1837,7 @@ def setupHtml(project):
             htmlMain('ul', closeTag=False)
             project.html.insertHtmlLinkInTag( 'li', htmlMain, project, item, text=item.name )
             htmlMain('ul', openTag=False)
-            
+
     htmlMain('h1', 'Credits')
     htmlMain('ul', closeTag=False)
     htmlMain('li', closeTag=False)
@@ -1830,7 +1845,7 @@ def setupHtml(project):
     htmlMain('a',  OpenText, href = refItem )
     htmlMain('li', openTag=False)
     htmlMain('ul', openTag=False)
-            
+
     htmlMain('td', openTag=False)
     htmlMain('td', closeTag=False)
     htmlMain('img', src = 'mol.gif')
@@ -1855,11 +1870,11 @@ def renderHtml(project):
 def populateHtmlMolecules( project, htmlOnly=False,
             doProcheck = True, doWhatif = True, ranges=None ):
     '''Description: generate the Html content for Molecules and Residues pages.
-       Inputs: a Cing.Project. 
+       Inputs: a Cing.Project.
        Output: return None for success is standard.
        If htmlOnly is set then the html will be created without imagery.
     '''
-        
+
     if htmlOnly:
         NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
     else:
@@ -1874,7 +1889,9 @@ def populateHtmlMolecules( project, htmlOnly=False,
             chainId = chain.name
             NTmessage("Generating dihedral angle plots for chain: " + chainId)
             printedDots = 0
-            for res in chain.allResidues():
+            #NB: it's falling with malloc for AWSS if >~ 140 residues
+            resRange = chain.allResidues()#[:60]
+            for res in resRange:
 #                write without extra space
                 if not printedDots % 10:
                     digit = printedDots / 10
@@ -1926,17 +1943,17 @@ def populateHtmlMolecules( project, htmlOnly=False,
         #                            strToShow += '.'+'average'
                                 pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)')
                                 strToShow += ': %s' % pointNTvalueStr
-                                res.html.left( 'BR', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
+                                res.html.left( 'a', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
                         else:
                             pass
     #                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
-                        
-    
+
+
                     for dihed in res.db.dihedrals.zap('name'):
                         if dihed in res and res[dihed]:
     #                            NTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
                             d = res[dihed] # List of values with outliers etc attached.
-    
+
                             # summarize the results
                             lenOutliers = '.' # JFD adds: Indicating None
                             outlierList = '.'
@@ -1965,7 +1982,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
                             if ps:
                                 ps.hardcopy( fileName = tmpPath )
         #                        del( plot )
-    
+
                                 #generate HTML code for plot and text
                                 res.html.left( 'h2', dihed, id=dihed),
                                 res.html.left( 'img', src = dihed + '.' + graphicsFormatExtension, alt=""  )
@@ -2084,7 +2101,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
                     continue # Skip their inclusion.
 
                 if not htmlOnly:
-#                    fileList = False 
+#                    fileList = False
 #                else:
                     fileList = convert2Web( procheckLinkReal )
                 fileList = False
@@ -2175,13 +2192,13 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
         # sort by color: 1st red, 2nd orange, then green and by violCount3 reverse order
         listRed, listOrange, listGreen = [], [], []
         for dr in resRL:
-#            if not hasattr(dr,'colorLabel'): 
+#            if not hasattr(dr,'colorLabel'):
 #                dr.colorLabel = COLOR_GREEN
-            if dr.colorLabel == COLOR_GREEN: 
+            if dr.colorLabel == COLOR_GREEN:
                 listGreen.append(dr)
-            if dr.colorLabel == COLOR_RED: 
+            if dr.colorLabel == COLOR_RED:
                 listRed.append(dr)
-            if dr.colorLabel == COLOR_ORANGE: 
+            if dr.colorLabel == COLOR_ORANGE:
                 listOrange.append(dr)
             #if dr.colorLabel == COLOR_GREEN: listGreen.append(dr)
         resRL = listRed + listOrange + listGreen
@@ -2231,12 +2248,13 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
             #resRight('ul', openTag=False)
             resRight('br')
             if resRL.index(dr) + 1 == toShow:
-                resRight('a','More: ')
-                for dr in resRL[toShow:]:
-                    residue.html.insertHtmlLink( resRight, residue, dr,
+                if len(resRL) > toShow :
+                    resRight('a','More: ')
+                    for dr in resRL[toShow:]:
+                        residue.html.insertHtmlLink( resRight, residue, dr,
                                                  text=str(dr.id) )
-                #end for
-                resRight('br')
+                        #end for
+                    resRight('br')
                 break
             #end if
         #end for
@@ -2245,7 +2263,7 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
     #end for
     #resRight('p', openTag=False)
 #end def
- 
+
 def populateHtmlModels(project):
     "Output: return None for success is standard."
 #    NTdebug("Starting: populateHtmlModels")
