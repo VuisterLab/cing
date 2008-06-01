@@ -28,10 +28,10 @@ class AllChecks(TestCase):
         restraintsConvention = CYANA
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
-#        entryId = "1brv_1model" 
+        entryId = "1brv_1model" 
 #        entryId = "1y4o_1model" 
 #        entryId = "1y4o" 
-        entryId = "1i1s_1model" # withdrawn entry
+#        entryId = "1i1s_1model" # withdrawn entry
 #        entryId = "1ka3" # has been replaced by the authors in 2004 (new pdb entry 1tkv).
 #        entryId = "1tkv" # replaced 1ka3
 #        entryId = "1tgq" # withdrawn entry
