@@ -202,7 +202,9 @@ try:
     NTdetail("Using CCPN version 1.x")
     ccpnVersion = 1
     namingSystem = 'DIANA' #DIANA almost equals CYANA
-    dictDiana2Cing = {'HIS+':'HISH', 'ASP-':'ASP', 'HIST':'HISE'}
+    dictDiana2Cing = {'HIS+':'HISH', 'HIST':'HISE', 'LYS+':'LYS','LYS':'LYSx',
+                      'GLU-':'GLU', 'GLU':'GLUH', 'ARG+':'ARG', 'ARG':'ARGx',
+                      'ASP':'ASPH', 'ASP-':'ASP'}
 except:
     try:
         from memops.general.Io import loadProject # only on ccpn 2.x
@@ -398,8 +400,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
         NTmessage( '==> Importing data from Ccpn project "%s"', ccpnProject.name )
         NTmessage.flush()
 
-        if (not importFromCcpnMolecules(cingProject, ccpnProject,
-                                           coords = True)): #True is the correct, just for test now
+        if not importFromCcpnMolecules(cingProject, ccpnProject, coords = True): #True is the correct, just for test now
             return None
         # end if
 
@@ -407,7 +408,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
         importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
         importFromCcpnDistanceRestraints(cingProject, ccpnProject)
         importFromCcpnDihedralRestraints(cingProject, ccpnProject)
-        importFromCcpnRdcRestraints(cingProject, ccpnProject)
+        #importFromCcpnRdcRestraints(cingProject, ccpnProject) #Cing can't store RDCs at the moment.
 
         cingProject.addHistory(sprintf(funcName))
 
@@ -611,7 +612,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
                 NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, newNamingSystem, resNameInSysName)
             # end if
             if not NTdbGetResidue(resNameInSysName):
-                NTwarning( "Residue '%s' not identified in CING DB", ccpnResidue.ccpCode )
+                NTwarning( "Residue '%s' not identified in CING DB", resNameInSysName )
                 continue
             # end if
 
@@ -1501,7 +1502,11 @@ def _getTorsionAngleName(atoms, molSysTorsions):
     # end for
 
     #print match
-    return torsion.name
+    if 'CHI' in torsion.name:
+        torsionName = torsion.name[:4]
+    else:
+        torsionName = torsion.name
+    return torsionName
 
     if matchPatterns or not torsion:
 
@@ -1535,7 +1540,13 @@ def _getTorsionAngleName(atoms, molSysTorsions):
         print match
     # end if
     if hasattr(torsion, 'name'):
-        return torsion.name
+        if 'CHI' in torsion.name:
+            torsionName = torsion.name[:4]
+        else:
+            torsionName = torsion.name
+        # end if
+        return torsionName
+    # end if
     else:
         return None
     # end if
