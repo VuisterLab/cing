@@ -135,6 +135,10 @@ Project: Top level Cing project class
         distanceRestraintList = project.distances.new( name, status='keep' ):
 
     """
+    
+    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 15. # Normally 0.3 but set low for testing 1brv to 
+    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 20. # Normally 0.5 but set low for testing 1brv to
+    
     def __init__( self, name ):
 
         root, name = Project.rootPath( name )
@@ -202,6 +206,27 @@ Project: Top level Cing project class
     #end def
 
     def criticize(self):
+        # funny things not in what if.
+        for res in self.molecule.allResidues():
+            dihed = 'OMEGA'
+            if dihed in res and res[dihed]:
+                d = res[dihed] # NTlist object
+                if d == None:
+                    continue
+                modelId = 0
+                for value in d:
+                    v = violationAngle(value=value, lowerBound=180., upperBound=180)
+                    if v > 90.: # Never mind a cis
+                        v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
+                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
+                            res, modelId, v) )
+                    if v >= Project.OMEGA_MAXALL_DEFAULT_BAD_VALUE:
+                        setMaxColor(res, COLOR_RED)
+                    elif v >= Project.OMEGA_MAXALL_DEFAULT_POOR_VALUE:
+                        setMaxColor(res, COLOR_ORANGE)
+                    modelId += 1
+                                    
+        # distance and dihedral restraints 
         for drl in self.distances + self.dihedrals:
             drl.criticize()
 

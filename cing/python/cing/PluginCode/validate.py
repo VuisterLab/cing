@@ -82,6 +82,8 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.core.constants import COLOR_RED
+from cing.core.constants import COLOR_ORANGE
 import cing
 import math
 import os
@@ -160,7 +162,39 @@ def summary( project ):
     for drl in project.distances + project.dihedrals + project.rdcs:
         msg += sprintf( '\n%s\n', drl.format() )
 
-
+    level = 'residue'
+    c = NTlist( 0, 0,0 )
+    for residue in project.molecule.allResidues():
+        if residue.colorLabel == COLOR_RED:
+            c[2] += 1
+        elif residue.colorLabel == COLOR_ORANGE:
+            c[1] += 1
+        else:
+            c[2] += 1  
+#    cAll = c.sum()*1.0
+    total = reduce(lambda x, y: x+y+0.0, c) # total expressed as a float because of 0.0
+    if total <= 0:
+        msgTmp = 'Funny, no residues encountered'
+        NTwarning(msgTmp)
+        msg += msgTmp
+    else:         
+        p = map( lambda x: 100*x/total, c)
+        msg += '----------- CING %s analysis -----------' % level
+        msg += """
+Color  Count (Percentage)
+*------*-----*-----------
+Green:   %3d (%3.0f)
+Orange:  %3d (%3.0f)
+Red:     %3d (%3.0f)
+       -----------
+Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
+# To result in:        
+#Green:   28 ( 28%)
+#Orange:  37 ( 37%)
+#Red:     35 ( 35%)
+#       -----------
+#Total   100 (100%)        
+    
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
         msg += '\n' + wiSummary
