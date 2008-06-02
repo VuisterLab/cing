@@ -222,8 +222,10 @@ Project: Top level Cing project class
                             res, modelId, v) )
                     if v >= Project.OMEGA_MAXALL_DEFAULT_BAD_VALUE:
                         setMaxColor(res, COLOR_RED)
+                        NTdebug('Set to red')
                     elif v >= Project.OMEGA_MAXALL_DEFAULT_POOR_VALUE:
                         setMaxColor(res, COLOR_ORANGE)
+                        NTdebug('Set to orange (perhaps)')
                     modelId += 1
                                     
         # distance and dihedral restraints 
