@@ -96,6 +96,100 @@ def NTwarning(msg):
 def NTmessage(msg):
     print msg
 
+def check_python():
+
+    print 'Python version   ',
+
+    version = float(sys.version[:3])
+
+    if version < 2.4:
+        print 'Python version 2.4 or higher required.'
+        print 'Current version is', sys.version[:5]
+    else:
+        print 'ok.'
+
+def check_pylab():
+
+    print 'Matplotlib module  ',
+    result = 0
+    try:
+        import matplotlib.pylab #@UnusedImport
+        print 'ok.'
+        result = 1
+    except:
+        print 'could not import Matplotlib module.'
+
+    return result
+
+def check_ccpn():
+
+    print '\nCCPN distribution:',
+
+    missing = []
+
+    try:
+        import ccpnmr #@UnusedImport
+        print 'ok.'
+    except:
+        missing.append('ccpnmr')
+        print
+
+    try:
+        import ccpnmr.format #@UnusedImport @Reimport
+        print 'FormatConverter: ok.'
+    except:
+        missing.append('ccpnmr.format')
+
+    try:
+        import ccpnmr.analysis #@UnusedImport @Reimport
+        print 'Anaysis: ok.'
+    except:
+        missing.append('ccpnmr.analysis')
+
+    if missing:
+        print 'Could not import the following modules:',
+        print ', '.join(missing)
+        print 'This only matters if you do intend to use the CCPN. Analysis is optional'
+
+def check_numarray():
+
+    print 'Numarray module   ',
+    result = 0
+    try:
+        import numarray #@UnusedImport
+        print 'ok.'
+        result = 1
+    except:
+        print 'could not import Numarray module.'
+
+    return result
+
+def check_numpy():
+
+    print 'Numpy module   ',
+    result = 0
+    try:
+        import numpy #@UnusedImport
+        print 'ok.'
+        result = 1
+    except:
+        print 'could not import Numpy module.'
+
+    return result
+
+def check_cython():
+
+    print 'Cython module   ',
+    result = 0
+    try:
+        import Cython.Distutils #@UnusedImport
+        print 'ok.'
+        result = 1
+    except:
+        print 'could not import Cython module.'
+
+    return result
+
 def _writeCingShellFile(isTcsh):
     '''Generate the Cing Shell file for csh or bash'''
     if isTcsh:
@@ -125,10 +219,10 @@ def _writeCingShellFile(isTcsh):
     #AWSS: not really
     #chmod(cname, 0755)
     print '==> Done'
-    print ' Please check/modify %s' % (cname)   
+    print ' Please check/modify %s' % (cname)
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
     print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
-    
+
     print '==> Note'
     print ' There is another dependency; cython. Please install it and run:'
     print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
@@ -138,6 +232,13 @@ def _writeCingShellFile(isTcsh):
 
 if __name__ == '__main__':
 #    cing.verbosity = verbosityOutput # Default is no output of anything.
+
+    check_python()
+    check_ccpn()
+    check_pylab()
+    check_numpy()
+    check_numarray()
+    check_cython()
 
     if not cingRoot:
         print "Failed to derive the CINGROOT from this setup.py script; are there other setup.py or code confusing me here?"
@@ -206,7 +307,7 @@ if __name__ == '__main__':
         NTmessage("Found 'what if'")
         whatifPath = strip(whatifPath)
         parametersDict['whatifPath'] = whatifPath
-        head, _tail = os.path.split( whatifPath ) 
+        head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
             NTwarning("Couldn't find 'dssp'")
