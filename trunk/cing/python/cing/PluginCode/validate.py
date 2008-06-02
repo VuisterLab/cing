@@ -82,8 +82,6 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing.core.constants import COLOR_RED
-from cing.core.constants import COLOR_ORANGE
 import cing
 import math
 import os
@@ -163,14 +161,14 @@ def summary( project ):
         msg += sprintf( '\n%s\n', drl.format() )
 
     level = 'residue'
-    c = NTlist( 0, 0,0 )
+    c = NTlist( 0, 0, 0 ) # ounts for green, orange and red.
     for residue in project.molecule.allResidues():
         if residue.colorLabel == COLOR_RED:
             c[2] += 1
         elif residue.colorLabel == COLOR_ORANGE:
             c[1] += 1
         else:
-            c[2] += 1  
+            c[0] += 1  
 #    cAll = c.sum()*1.0
     total = reduce(lambda x, y: x+y+0.0, c) # total expressed as a float because of 0.0
     if total <= 0:
