@@ -1,8 +1,8 @@
 """
-Adds methods: 
+Adds methods:
     Molecule.export2gif()
 """
-from cing import cingDirMolmolScripts 
+from cing import cingDirMolmolScripts
 from cing import cingDirTmp
 from cing import cingRoot
 from cing.Libs.NTutils import ExecuteProgram
@@ -23,21 +23,25 @@ class Molgrap(NTdict):
         self.csh_script_dir = cingDirMolmolScripts
         self.backcolor = backcolor # see csh script definitions.
 #        self.backcolor = 'bmrb_yellow' # see csh script definitions.
-#        self.backcolor = 'cing_turqoise' # see csh script definitions. 
-#        self.backcolor = 'white' # see csh script definitions. 
-       
+#        self.backcolor = 'cing_turqoise' # see csh script definitions.
+#        self.backcolor = 'white' # see csh script definitions.
+
     """Creates a large gif to path for the given molecule.
     Return True on error and False on success.
     """
     def run(self, molecule, path, export = True):
+
+        if not os.environ.has_key('MOLMOLHOME'):
+            NTdebug('MOLMOLHOME not defined by user, using a temporary one')
+            os.putenv('MOLMOLHOME', cingDirTmp)
 
         apath = os.path.abspath(path)
         if apath != path:
 #            NTdebug("Using the absolute path ["+apath+"] from relative path: [" +path+"]")
             path = apath
         root,file,_ext  = NTpath(path)
-        entry_code = file 
-        
+        entry_code = file
+
         if root and not os.path.exists(root):
             NTerror("Given path root is absent; not creating.")
             return True
@@ -45,9 +49,9 @@ class Molgrap(NTdict):
         pdb_first_file_name = os.path.join(cingDirTmp, file + "_001.pdb")
         pov_file_name       = os.path.join(cingDirTmp, file + ".pov")
         pov_cor_file_name   = os.path.join(cingDirTmp, file + "_cor.pov")
-    
+
 #        NTdebug( "pdb_first_file_name: "+ pdb_first_file_name)
-    
+
         if not os.path.exists(pdb_first_file_name):
             export = True
 
@@ -68,24 +72,24 @@ class Molgrap(NTdict):
             if skippedResidues:
                 NTwarning('molgrap: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
-            # 
+            #
             molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=0)
             # Restore the 'default' state
             for atm in skippedAtoms:
                 atm.pdbSkipRecord = False
-        
+
         if not os.path.exists(pdb_first_file_name):
             NTerror("Failed to materialize first model PDB file")
             return True
-        
+
 #        NTdebug("Doing molmol on: "+ entry_code)
-            
+
         status = self._make_molmol_pov_file(
             pdb_first_file_name,
             entry_code,
             self.backcolor
         )
-        
+
         if status:
             NTerror( "while doing molmol for: "+ entry_code)
             return True
@@ -102,13 +106,13 @@ class Molgrap(NTdict):
         if status:
             NTerror("Doing molmol_povray_substitute._substitute_nans for: "+ entry_code)
             return True
-        
+
         if not os.path.isfile( pov_cor_file_name ):
             NTerror("no corrected pov ray file generated for: " + entry_code)
             return True
 
 #        print "DEBUG: Doing render/convert", entry_code
-            
+
         status = self._render_convert_pov_file(
             pov_file_name   =pov_cor_file_name,
             id              =entry_code,
@@ -116,8 +120,8 @@ class Molgrap(NTdict):
             )
         if status:
             print "ERROR: Doing render/convert for entry:", entry_code
-            return True          
-    
+            return True
+
 #        ## Remove temporary files if successful and possible
 #        try:
 #            os.unlink( pdb_first_file_name )
@@ -129,9 +133,9 @@ class Molgrap(NTdict):
 
     """
     Makes molmol images using a csh script. Note that these commands are only valid
-    on Unix. 
+    on Unix.
     """
-    def _make_molmol_pov_file(self, pdb_file_name, id, backcolor  ):    
+    def _make_molmol_pov_file(self, pdb_file_name, id, backcolor  ):
         script_file_name = os.path.join ( cingDirTmp, id + "_molmol.csh" )
         log_file_name    = os.path.join ( cingDirTmp, id + "_molmol_python.log" )
         script_file = open(script_file_name, 'w')
@@ -148,7 +152,7 @@ class Molgrap(NTdict):
         script_file.write('exit $status\n')
         script_file.close()
         os.chmod(script_file_name,0755)
-        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)    
+        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)
         if program(""):
             NTerror( "Failed shell command: " + script_file_name)
             return True
@@ -162,7 +166,7 @@ class Molgrap(NTdict):
     Render pov ray file and convert output using a csh script.
     """
     def _render_convert_pov_file(self, pov_file_name, id, results_dir ):
-    
+
         script_file_name = os.path.join ( cingDirTmp, id + "_render_convert_pov.csh" )
         log_file_name    = os.path.join ( cingDirTmp, id + "_render_convert_pov_python.log" )
         script_file = open(script_file_name, 'w')
@@ -179,13 +183,14 @@ class Molgrap(NTdict):
         script_file.write('exit $status\n')
         script_file.close()
         os.chmod(script_file_name,0755)
-    
-    
-        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)    
+
+
+        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)
         if program(""):
             NTerror( "Failed shell command: " + script_file_name)
-            return True    
-#        try: 
+            NTerror("Have you installed povray-includes or similar?\n      For some Linuxes 'colors.inc' doesn't come with povray")
+            return True
+#        try:
 #            os.unlink(script_file_name)
 #            os.unlink(log_file_name)
 #        except:
@@ -208,16 +213,16 @@ class Molgrap(NTdict):
             r'<0.0, 0.0,',
             ]
         self._substitute( file_name_in, file_name_out, org, new )
-    
+
     """
     Substitute from a dictionary the content of a file writting to another
     """
     def _substitute(self, file_name_in, file_name_out, org, new ):
-        
+
         output_text = open( file_name_in, 'r' ).read()
         for i in range( len(org) ):
             #print "DEBUG: Doing replace of: org[i]"
-            output_text = output_text.replace( org[i], new[i])    
+            output_text = output_text.replace( org[i], new[i])
         open( file_name_out, 'w' ).write( output_text )
 
 def export2gif(molecule, path ):
@@ -226,7 +231,7 @@ def export2gif(molecule, path ):
 #    NTdebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap()
     m.run(molecule, path)
-    
+
 Molecule.export2gif = export2gif
 
 # register the functions
