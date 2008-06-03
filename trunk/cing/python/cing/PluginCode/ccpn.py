@@ -408,7 +408,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
         importFromCcpnPeaksAndShifts(cingProject, ccpnProject)
         importFromCcpnDistanceRestraints(cingProject, ccpnProject)
         importFromCcpnDihedralRestraints(cingProject, ccpnProject)
-        #importFromCcpnRdcRestraints(cingProject, ccpnProject) #Cing can't store RDCs at the moment.
+        importFromCcpnRdcRestraints(cingProject, ccpnProject) #Cing can't store RDCs at the moment.
 
         cingProject.addHistory(sprintf(funcName))
 

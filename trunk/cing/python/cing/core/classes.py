@@ -135,10 +135,10 @@ Project: Top level Cing project class
         distanceRestraintList = project.distances.new( name, status='keep' ):
 
     """
-    
-    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 15. # Normally 0.3 but set low for testing 1brv to 
+
+    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 15. # Normally 0.3 but set low for testing 1brv to
     OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 20. # Normally 0.5 but set low for testing 1brv to
-    
+
     def __init__( self, name ):
 
         root, name = Project.rootPath( name )
@@ -227,8 +227,8 @@ Project: Top level Cing project class
                         setMaxColor(res, COLOR_ORANGE)
                         NTdebug('Set to orange (perhaps)')
                     modelId += 1
-                                    
-        # distance and dihedral restraints 
+
+        # distance and dihedral restraints
         for drl in self.distances + self.dihedrals:
             drl.criticize()
 
@@ -1059,12 +1059,12 @@ class DistanceRestraint( NTdict ):
        atomPairs: list of (atom_1,atom_2) tuples,
        lower and upper bounds
     """
-    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but set low for testing 1brv to 
+    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but set low for testing 1brv to
     DR_MAXALL_DEFAULT_BAD_VALUE  = 0.5 # Normally 0.5 but set low for testing 1brv to
     DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.5 # Ang.
     """Fraction of models."""
-    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5 
-    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.5 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to 
+    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5
+    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.5 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
 
     def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
 
@@ -1109,14 +1109,14 @@ class DistanceRestraint( NTdict ):
         fractionAbove = getFractionAbove( self.violations, DistanceRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
         if fractionAbove >= DistanceRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
             NTdebug('Setting DR to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
-            setMaxColor( self, COLOR_RED)            
+            setMaxColor( self, COLOR_RED)
             return
 #        (self.violAv, self.violSd, _n) = self.violations.average()
         if self.violSd >= DistanceRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
             NTdebug('Setting DR to red [crit.4] violSd: %8.3f' % self.violSd)
-            setMaxColor( self, COLOR_RED)            
+            setMaxColor( self, COLOR_RED)
             return
-            
+
 #        if critiqued:
 #            for atom in getAtomsFromAtomPairs(self.atomPairs):
 #                atom.appendCritique( self, cascade = True )
@@ -1144,7 +1144,7 @@ class DistanceRestraint( NTdict ):
         for each model.
         return (av,sd,min,max) tuple, or (None, None, None, None) on error
         Important to set the violations to 0.0 if no violations were found.
-        In that case the s.d. may remain None to indicate undefined.  
+        In that case the s.d. may remain None to indicate undefined.
         """
 
         modelCount = 0
@@ -1224,11 +1224,11 @@ class DistanceRestraint( NTdict ):
             for d in self.violations:
                 dabs = math.fabs(d)
 #               print '>>', d,dabs
-                if ( dabs > 0.1): 
+                if ( dabs > 0.1):
                     self.violCount1 += 1
-                if ( dabs > 0.3): 
+                if ( dabs > 0.3):
                     self.violCount3 += 1
-                if ( dabs > 0.5): 
+                if ( dabs > 0.5):
                     self.violCount5 += 1
             #end for
             if self.violations:
@@ -1314,6 +1314,7 @@ class SMLDistanceRestraintHandler( SMLhandler ):
 
     def toSML(self, dr, stream ):
         """
+            For DistanceRestraint
         """
         fprintf( stream, "%s\n", self.startTag )
         for a in ['lower','upper' ]:
@@ -1335,11 +1336,11 @@ def setMaxColor(o, colorLabel):
 #    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
 #    if not hasattr(o,'colorLabel'):
 #        o.colorLabel = COLOR_GREEN
-        
+
     if colorLabel == COLOR_RED:
         o.colorLabel = colorLabel
         return
-    
+
     if o.colorLabel == COLOR_GREEN: # independent of colorLabel being green or orange.
         o.colorLabel = colorLabel
 #-----------------------------------------------------------------------------
@@ -1502,13 +1503,13 @@ class DihedralRestraint( NTdict ):
 
        GV&AWSS: 10 Oct 2007, upper-limit adjustment
     """
-    
-    DR_MAXALL_DEFAULT_POOR_VALUE = 3. # Normally 0.3 but set low for testing 1brv to 
+
+    DR_MAXALL_DEFAULT_POOR_VALUE = 3. # Normally 0.3 but set low for testing 1brv to
     DR_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 0.5 but set low for testing 1brv to
     DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.3 # degrees.
-    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5 
-    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to 
-    
+    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5
+    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
+
     def __init__( self, atoms, lower, upper, **kwds ):
 
         if upper<lower:
@@ -1548,14 +1549,14 @@ class DihedralRestraint( NTdict ):
         fractionAbove = getFractionAbove( self.violations, DihedralRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
         if fractionAbove >= DihedralRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
             NTdebug('Setting DR (dih) to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
-            setMaxColor( self, COLOR_RED)            
+            setMaxColor( self, COLOR_RED)
             return
 #        (self.violAv, self.violSd, _n) = self.violations.average()
         if self.violSd >= DihedralRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
             NTdebug('Setting DR (dih) to red [crit.4] violSd: %8.3f' % self.violSd)
-            setMaxColor( self, COLOR_RED)            
+            setMaxColor( self, COLOR_RED)
             return
-            
+
 #        if critiqued:
 #            for atom in getAtomsFromAtomPairs(self.atomPairs):
 #                atom.appendCritique( self, cascade = True )
@@ -1988,18 +1989,18 @@ class SMLRDCRestraintHandler( SMLhandler ):
 
     def toSML(self, dr, stream ):
         """
+            For RDCRestraint (based on DistanceRestraint)
         """
         fprintf( stream, "%s\n", self.startTag )
         for a in ['lower','upper' ]:
             fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
-        fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
 
-#        rl = []
-#        for r in self.atoms:
-#            rl.append(r.nameTuple())
-#        #end for
-#        fprintf( stream, '    %-15s = %s\n', 'atoms', repr( rl ) )
+        rl = []
+        for r in dr.atomPairs:
+            rl.append((r[0].nameTuple(),r[1].nameTuple()))
+        #end for
+        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
         fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
@@ -2520,11 +2521,11 @@ class HTMLfile:
            Output: <a class="red" href="link">text</a> inside section
 
            Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
-           
+
            And the funny thing is that if the destination has an attribute:
                'colorLabel' then it will be used to define an html class with
                which through the cing.css can be used for defining coloring
-               schemes. 
+               schemes.
         '''
 
         if not section:
@@ -2593,5 +2594,4 @@ def getFractionAbove( valueList, threshold ):
             continue
         if v > threshold:
             n += 1.
-    return n / len(valueList)  
-    
+    return n / len(valueList)
