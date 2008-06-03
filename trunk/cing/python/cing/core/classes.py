@@ -1979,7 +1979,15 @@ class SMLRDCRestraintHandler( SMLhandler ):
 
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
-        dr.atoms = decode( dr.atoms, project.molecule )
+        if project == None or project.molecule == None: return dr
+        aps = dr.atomPairs
+        dr.atomPairs = NTlist()
+        for ap in aps:
+            dr.appendPair( (project.molecule.decodeNameTuple(ap[0]), project.molecule.decodeNameTuple(ap[1])) )
+        #end for
+        return dr
+
+#        dr.atoms = decode( dr.atoms, project.molecule )
 #        atms = dr.atoms
 #        dr.atoms = NTlist()
 #        for atm in atms:
