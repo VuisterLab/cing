@@ -125,6 +125,12 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     project.validateRestraints( toFile=True)
     project.calculateRmsd(      ranges=ranges)
 
+    if cingPaths.whatif == 'PLEASE_ADD_EXECUTABLE_HERE':
+        doWhatif = False
+
+    if cingPaths.procheck_nmr == 'PLEASE_ADD_EXECUTABLE_HERE':
+        doProcheck = False
+
     if not doWhatif:
         NTwarning('Skipping because not doWhatif')
     else:
@@ -168,14 +174,14 @@ def summary( project ):
         elif residue.colorLabel == COLOR_ORANGE:
             c[1] += 1
         else:
-            c[0] += 1  
+            c[0] += 1
 #    cAll = c.sum()*1.0
     total = reduce(lambda x, y: x+y+0.0, c) # total expressed as a float because of 0.0
     if total <= 0:
         msgTmp = 'Funny, no residues encountered'
         NTwarning(msgTmp)
         msg += msgTmp
-    else:         
+    else:
         p = map( lambda x: 100*x/total, c)
         msg += '----------- CING %s analysis -----------' % level
         msg += """
@@ -186,13 +192,13 @@ Orange:  %3d (%3.0f)
 Red:     %3d (%3.0f)
        -----------
 Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
-# To result in:        
+# To result in:
 #Green:   28 ( 28%)
 #Orange:  37 ( 37%)
 #Red:     35 ( 35%)
 #       -----------
-#Total   100 (100%)        
-    
+#Total   100 (100%)
+
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
         msg += '\n' + wiSummary

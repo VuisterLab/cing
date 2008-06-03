@@ -190,6 +190,20 @@ def check_cython():
 
     return result
 
+def check_profiler():
+
+    print 'Profiler module   ',
+    result = 0
+    try:
+        import profile #@UnusedImport
+        print 'ok.'
+        result = 1
+    except:
+        print 'could not import Profiler module.'
+
+    return result
+
+
 def _writeCingShellFile(isTcsh):
     '''Generate the Cing Shell file for csh or bash'''
     if isTcsh:
