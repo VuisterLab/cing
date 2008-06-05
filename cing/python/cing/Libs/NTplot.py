@@ -21,12 +21,16 @@ from cing.PluginCode.procheck import to3StateUpper
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
-from matplotlib import colors 
+from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib import use
+# Use a backend that allows headless (without GUI) printing in addition to GUI.
+# It has to be called before matplotlib.pylab. Defined here and one not need to
+# defined in matoplotlibrc, and if defined there, it'll be overridden
+use('Agg')
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
-from matplotlib.lines import Line2D 
+from matplotlib.lines import Line2D
 from matplotlib.mlab import frange
 from matplotlib.numerix.mlab import amax
 from matplotlib.patches import Polygon
@@ -34,13 +38,13 @@ from matplotlib.patches import Rectangle
 from matplotlib.pylab import annotate
 from matplotlib.pylab import axes
 from matplotlib.pylab import bar
-from matplotlib.pylab import cla  
+from matplotlib.pylab import cla
 from matplotlib.pylab import clf
 from matplotlib.pylab import close
 from matplotlib.pylab import errorbar
 from matplotlib.pylab import gcf
 from matplotlib.pylab import grid
-from matplotlib.pylab import imshow 
+from matplotlib.pylab import imshow
 from matplotlib.pylab import plot
 from matplotlib.pylab import savefig
 from matplotlib.pylab import show # prone to change.
@@ -75,7 +79,7 @@ except ImportError:
 # TODO: remove hard dependency.
 useMatPlotLib = True
 # Use a backend that allows headless (without GUI) printing in addition to GUI.
-use('Agg')
+#use('Agg') # it needs to be called above first, not here
 
 #try:
 #    from pylab import * # preferred importing. Includes nx imports.
@@ -470,8 +474,8 @@ class NTplot( NTdict ):
         result = {}
         result['color']  = None
         result['marker'] = 'None'
-        
-        
+
+
 #            'linewidth'      : None, # all Nones default to rc
 #            'linestyle'      : None,
 #            'color'          : None,
@@ -511,7 +515,7 @@ class NTplot( NTdict ):
         if 'pointEdgeWidth' in keys:
 #            print "doing pointEdgeWidth"
             result['markeredgewidth'] =  attributes.pointEdgeWidth
-            
+
         if 'lineColor' in keys:
 #            print "doing lineColor"
             result['color']           =  attributes.lineColor
@@ -530,11 +534,11 @@ class NTplot( NTdict ):
                 result['markerfacecolor'] =  markerColor
             else:
                 result['markerfacecolor'] =  None # it might have been set above.
-            
+
 #    a.pointType  = None   # in matplotlib: marker
 #    a.pointSize  = 2.0    # in matplotlib: markersize
 #    a.pointColor = 'blue' # in matplotlib: markeredgecolor
-            
+
         if 'alpha' in keys:
 #            print "doing alpha"
             result['alpha']           =  attributes.alpha
@@ -546,7 +550,7 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         result = {}
         # Patch attributes.
-#                 edgecolor=None, 
+#                 edgecolor=None,
 #                 facecolor=None,
 #                 linewidth=None,
 #                 antialiased = None,
@@ -671,7 +675,7 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             kwds = self.mapAttributes2MatLibText(attributes)
 #            NTdebug("In labelAxes using kwds: %s", kwds)
-            self.axis.text( point[0], point[1], text, 
+            self.axis.text( point[0], point[1], text,
                 transform=self.axis.transAxes, **kwds)
 
     def label( self, point, text, attributes=defaultAttributes ):
@@ -714,14 +718,14 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
             ylocator.set_bounds( range[0], range[1] )
-        
+
     def autoScaleYByValueList( self, valueList, startAtZero=False, useIntegerTickLabels=False ):
         pointList = []
         for i in range(len(valueList)):
             item = (None,valueList[i])
             pointList.append(item)
         return self.autoScaleY( pointList, startAtZero )
- 
+
     def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
         """Using the list of points autoscale the y axis.
         If no list is given then the routine simply returns now.
@@ -734,7 +738,7 @@ class NTplot( NTdict ):
         max = None
         if not pointList:
             return
-        
+
         for point in pointList:
             v = point[1]
             if v == None:
@@ -752,15 +756,15 @@ class NTplot( NTdict ):
             NTwarning('Only None values in autoScaleY pointList found')
             min = 0.0
             max = 1.0
-        
+
         if min == max: # Zero range is impossible.
             if min == None:
                 min = 0.
             max = min + 1.
-        
+
         if startAtZero and min >= 0.:
             min = 0.
-            
+
 #        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         if useMatPlotLib:
             ylocator = self.axis.yaxis.get_major_locator()
@@ -771,7 +775,7 @@ class NTplot( NTdict ):
                 formatter = FuncFormatter(integerNumberOnly)
                 yaxis = self.axis.yaxis
                 yaxis.set_major_formatter( formatter )
-                
+
 
     def updateSettings( self ):
 #        NTdebug("Now in updateSettings")
@@ -951,8 +955,8 @@ class NTplot( NTdict ):
             minorLocator   = MultipleLocator(space)
             self.axis.xaxis.set_minor_locator(minorLocator)
             self.setTickLineWidth()
-    
-    
+
+
     def imshow(self, imageFileName):
         alpha = 0.05 # much lower than any background.
         im = Image.open( imageFileName )
@@ -961,16 +965,16 @@ class NTplot( NTdict ):
 #        rgb = resize(im, (im.size[1],im.size[0], 3))
 
         extent = self.xRange + self.yRange
-        _image = imshow(im, 
-                        alpha=alpha, 
+        _image = imshow(im,
+                        alpha=alpha,
                         extent=extent,
                         origin='lower')
-    
+
     def dihedralComboPlot(self, histList, minPercentage =  2.0, maxPercentage = 20.0):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
         Return True on error.
-        
+
         Input histogram should be the bare counts.
         This routine will calculate the c_dbav, s_dbav
         """
@@ -981,20 +985,20 @@ class NTplot( NTdict ):
         cmapList= [   green_inv, blue_inv, yellow_inv ]
         colorList= [ 'green',   'blue',   'yellow']
         i = 0
-        for hist in histList:            
+        for hist in histList:
 #            if i == 9: # skip some when testing.
 #                i += 1
 #                continue
             maxHist = amax(amax( hist ))
-            hist *= 100./maxHist            
+            hist *= 100./maxHist
             palette = cmapList[i]
             palette.set_over( colorList[i], 1.0) # alpha is 1.0
             palette.set_under(alpha = 0.0)
 #            histm = masked_where(hist < minPercentage, hist, copy=1)
-            norm = colors.Normalize(vmin = minPercentage, 
+            norm = colors.Normalize(vmin = minPercentage,
                                     vmax = maxPercentage, clip = False)
-            imshow( hist, 
-                    interpolation='bicubic', 
+            imshow( hist,
+                    interpolation='bicubic',
 #                    interpolation = 'nearest', # bare data.
                     origin='lower',
                     extent=extent,
@@ -1004,7 +1008,7 @@ class NTplot( NTdict ):
 #            NTdebug('plotted %d %s' % (i, cmapList[i].name))
             i += 1
         # end for
-    
+
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
 
         alpha = 0.3
@@ -1019,7 +1023,7 @@ class NTplot( NTdict ):
         bounds2 = NTlist(lower2, upper2)
         bounds1.limit(plotparamsXmin, plotparamsXmax)
         bounds2.limit(plotparamsYmin, plotparamsYmax)
-        
+
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
                 point = (bounds1[0], bounds2[0]) # lower left corner of only box.
@@ -1169,7 +1173,7 @@ class NTplotSet( NTdict ):
         fig_height    = fig_height_pt*inches_per_pt # height in inches
         fig_size      = [fig_width,fig_height]
 
-        if useMatPlotLib: 
+        if useMatPlotLib:
             params = {#'backend':          self.graphicsOutputFormat,
                       'figure.dpi':       dpi,
                       'figure.figsize':   fig_size,
@@ -1425,7 +1429,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     #        yIconSpaceAxis= 0.005     # axis, the vertical open area from within box
 
             iconBoxXstart = 0              # data
-    #        iconBoxXwidth = seqLength     # data 
+    #        iconBoxXwidth = seqLength     # data
             iconBoxYstart = 1 + ySpaceAxis # axis
 
     #        self.xRange       = (0,iconBoxXwidth)   # x-axis (min,max) tuple, None is autoscale
@@ -1456,8 +1460,8 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 #                NTdebug(`element`)
                 elementLength = len(element)
                 res = element[0]
-#                secStruct = getProcheckSecStructConsensus( res )    
-                secStruct = getDsspSecStructConsensus( res )    
+#                secStruct = getProcheckSecStructConsensus( res )
+                secStruct = getDsspSecStructConsensus( res )
                 if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
                     secStruct = None
                 if secStruct == ' ':
@@ -2096,7 +2100,7 @@ def removeNulls(serie):
             continue
         result.append( point )
     return result
-    
+
 def integerNumberOnly(x,_dummy):
     'Returns empty string wherever not integer x'
     remainder = math.fabs(x) % 1.0
@@ -2112,36 +2116,36 @@ def integerNumberOnly(x,_dummy):
 #        colorList = ['blue'] * 3
 
 
-            
+
 #            c_dbav, s_dbav = getEnsembleAverageAndSigmaFromHistogram( hist )
 #            Zscore = hist - c_dbav
 #            Zscore = Zscore / s_dbav
-                
-        #    vmax = maxHist # Focus on low density regions? 
+
+        #    vmax = maxHist # Focus on low density regions?
 #            norm = colors.Normalize(vmin=0, vmax=100)
 #            minZscore = amin(amin( Zscore ))
 #            maxZscore = amax(amax( Zscore ))
-#    
+#
 #            ZscoreDB = Zscore - DB_RAMCHK[0] # av
 #            ZscoreDB /= DB_RAMCHK[1] # sd
-#    
+#
 #            minZscoreDB = amin(amin( ZscoreDB ))
 #            maxZscoreDB = amax(amax( ZscoreDB ))
-#        
+#
 #            NTdebug('Hist max,sum                     : %8.0f %8.0f' % (maxHist,sumHist))
 #            NTdebug('Hist av,sd                       : %8.3f %8.3f' % (c_dbav,s_dbav))
 #            NTdebug('Zscore min, max                  : %8.3f %8.3f' % (minZscore, maxZscore))
 #            NTdebug('ZscoreDB c_dbav,s_dbav,minZ, maxZ: %8.3f %8.3f %8.3f %8.3f' % (DB_RAMCHK[0],DB_RAMCHK[1],minZscoreDB, maxZscoreDB))
-#    
+#
 #            if c_dbav < 2.0:
 #                NTwarning('Skipping low-density plot (with c_dbav<2) %s' )
 #                return True
-            
-#            levels = (-10., -5., -2., 0., 5., 10., 25., 50., 100., 200)    
+
+#            levels = (-10., -5., -2., 0., 5., 10., 25., 50., 100., 200)
 #            levels = range(10,60,10) # as in fig.1 of robs paper.
             # by percentage.
-              
-        #    zeroLevel = [0.0]    
+
+        #    zeroLevel = [0.0]
     #        ps = NTplotSet() # closes any previous plots
     #        ps.hardcopySize = [1200,1200]
         #    NTdebug( 'plotparams1: %r' % plotparams1)
@@ -2175,15 +2179,15 @@ def integerNumberOnly(x,_dummy):
         #    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
 
 #            im.set_norm(norm)
-        
+
         #    cset1 = contourf(X, Y, Z, levels,
         #                            cmap=cm.get_cmap('jet', len(levels)-1),
         #                            )
-        
-        #    cset1 = contourf(X, Y, Z, levels, 
-        #        cmap=cm.get_cmap('jet', len(levels)-1), 
+
+        #    cset1 = contourf(X, Y, Z, levels,
+        #        cmap=cm.get_cmap('jet', len(levels)-1),
         #        origin='lower')
-            
+
 ######            cset2 = contour(hist, levels,
 ######    #        cset2 = contour(ZscoreDB,
 ######                colors = colorList[i],
@@ -2193,7 +2197,7 @@ def integerNumberOnly(x,_dummy):
 ######            clabel(cset2, inline=0, fmt = '%.0f',
 ######                colors = colorList[i],
 ######                   fontsize=12)
-            
+
         #    fmt = '%1.3f'
         #    csetZero = contour(Zscore, zeroLevel,
         #        colors = 'green',
@@ -2204,7 +2208,7 @@ def integerNumberOnly(x,_dummy):
         #    for c in cset2.collections:
         #        c.set_linestyle('solid')
         #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-        #            origin='lower', 
+        #            origin='lower',
         #            extent=extent)
 #            colorbar(im)
         #    colorbar(cset2)
