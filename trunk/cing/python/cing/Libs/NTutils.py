@@ -2927,8 +2927,9 @@ class PrintWrap:
             format += '\n'
         fprintf( self.stream, format, *args )
         if self.prefix.find('EXCEPTION')>=0:
-            fprintf( self.stream, "Exception below:\n" )
-            traceback.print_exc() # Just prints None on my Mac. Strange.
+            pass
+#            fprintf( self.stream, "Exception below:\n" )
+#            traceback.print_exc() # Just prints None on my Mac. Strange.
         if self.autoFlush:
             self.stream.flush()
             self.flush()

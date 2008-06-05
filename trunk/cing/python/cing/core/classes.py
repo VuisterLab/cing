@@ -218,8 +218,8 @@ Project: Top level Cing project class
                     v = violationAngle(value=value, lowerBound=180., upperBound=180)
                     if v > 90.: # Never mind a cis
                         v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
-                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
-                            res, modelId, v) )
+#                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
+#                            res, modelId, v) )
                     if v >= Project.OMEGA_MAXALL_DEFAULT_BAD_VALUE:
                         setMaxColor(res, COLOR_RED)
                         NTdebug('Set to red')

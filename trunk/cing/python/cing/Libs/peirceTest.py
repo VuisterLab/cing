@@ -1,4 +1,6 @@
 from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 import math
 
@@ -23,7 +25,7 @@ import math
         could happen that a small sublist gets analyzed and an
         item would not be identified as a outlier whereas it would if it
         was considered in the scope of the full list.
-        Since the shape of the items are so monotomous a simple extrapolation
+        Since the shape of the items are so monotonous a simple extrapolation
         was implemented.
 
         Let the "Number of doubtful observations" be called y and the number of
@@ -134,9 +136,9 @@ class Peirce:
             return self.peirce[row][-1]
 
         # At this point the row,y combination falls to the right of the table
-        # row>=20 and we need delta to get a R value close to 1.
+        # row>=20 and we need delta to get an R value close to 1.
         if y >= x/2:
-            NTcodeerror("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
+            NTdebug("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
             return None
 
         lastValue = self.peirce[row][-1]
@@ -251,8 +253,10 @@ class Peirce:
             done = True # Quit if no outliers were identified.
             R = self._getR(x, y)
             if not R:
-                NTcodeerror("Failed to get a Peirce constant R; giving up")
-                return None
+#                NTdebug("Failed to get a Peirce constant R; not adding outliers anymore.")
+#                NTdebug('This happened on values:\n%s' % valueList)
+#                return None
+                break
             maxDeviation = R * sd
 #            NTdebug("R : " + `R`)
 #            NTdebug("md: " + `maxDeviation`)
