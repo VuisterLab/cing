@@ -15,6 +15,11 @@
     - small system of only 19 AA
     - 48 models (too many;-)
 
+1hkt:
+    - # Geerten's first structure in PDB
+    - restraints from 1hks
+    - DNA-BINDING DOMAIN OF DROSOPHILA HEAT SHOCK TRANSCRIPTION FACTOR (DBD HS TF)
+    - monomeric 106 residues.
 1i1s:
     - withdrawn entry discussed at: http://proteins.dyndns.org/Education/Validation
     
@@ -38,3 +43,6 @@
     
 2hgh:
     - larger system of a protein/RNA complex
+    
+2hm9:
+    - entry from Nadia K.W.
