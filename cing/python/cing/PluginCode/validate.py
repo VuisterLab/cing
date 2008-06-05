@@ -1179,14 +1179,16 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
 #    Note that the good and outliers come from:
 #    d.good, d.outliers = peirceTest( d )
     if not angle.__dict__.has_key('good'):
-        NTcodeerror("No angle.good plots added")
+        NTcodeerror("No angle.good plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
+                    residue, dihedralName))
         return None
 #    NTdebug( 'angle.good: ' + `angle.good`)
     plot.histogram( angle.good.zap(1),
                     plotparams.min, plotparams.max, bins,
                     attributes = boxAttributes( fillColor=plotparams.color ))
     if not angle.__dict__.has_key('outliers'):
-        NTcodeerror("No angle.outliers plots added")
+        NTcodeerror("No angle.outliers plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
+                    residue, dihedralName))
         return None
 #    NTdebug( 'angle.outliers: ' + `angle.outliers`)
     plot.histogram( angle.outliers.zap(1),

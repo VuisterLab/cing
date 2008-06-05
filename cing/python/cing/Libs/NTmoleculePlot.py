@@ -54,8 +54,8 @@ class MoleculePlotSet:
                 for item in mainOrAlt:
                     points = []
                     pointsL.append(points)
-        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
-        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
+#        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
+#        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
         rangeList = self.project.molecule.getFixedRangeList(
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES,
             ranges=self.ranges )
@@ -65,7 +65,7 @@ class MoleculePlotSet:
         for resList in rangeList:
             for res in resList:
                 resNumb += 1
-                NTdebug(`res`)
+#                NTdebug(`res`)
                 r = 0 # r for row
                 for row in self.keyLoLoL:
                     pointsLoL = pointsLoLoL[r]
