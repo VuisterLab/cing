@@ -2,6 +2,7 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import atoi
 from string import strip
+from subprocess import call
 import os
 import sys
 import time
@@ -185,6 +186,16 @@ def check_cython():
         import Cython.Distutils #@UnusedImport
         print 'ok.'
         result = 1
+        #doing cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace
+        print 'Great you have Cython! Compiling CING Cython libs ...'
+        cmd = 'cd %s/python/cing/Libs/cython; python compile.py build_ext --inplace; cd -' % cingRoot
+        os.chdir(os.path.join(cingRoot,'python/cing/Libs/cython'))
+        out = call(['python', 'compile.py','build_ext', '--inplace'])
+        if out:
+            print '==> Failed to compile CING Cython libs.'
+            print '    If your using Mac, see "https://bugs.launchpad.net/cython/+bug/179097"'
+            print '    or try: %s' % cmd
+
     except:
         print 'could not import Cython module.'
 
@@ -200,7 +211,7 @@ def check_profiler():
         result = 1
     except:
         print 'could not import Profiler module.'
-
+        print "it's not essencial but used with 'cing --test'."
     return result
 
 
@@ -237,9 +248,9 @@ def _writeCingShellFile(isTcsh):
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
     print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
 
-    print '==> Note'
-    print ' There is another dependency; cython. Please install it and run:'
-    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
+#    print '==> Note'
+#    print ' There is another dependency; cython. Please install it and run:'
+#    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
 #end def
 #------------------------------------------------------------------------------------
 

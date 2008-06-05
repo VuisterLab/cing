@@ -37,8 +37,8 @@ if doUnzipFirst:
         line = line.strip()
         entryCode = line[0:4].lower()
         entryCodeList.append( entryCode )
-    NTmessage('Found %d entries    ' % len(entryCodeList))  
-        
+    NTmessage('Found %d entries    ' % len(entryCodeList))
+
     for entryCode in entryCodeList:
         fileNameZipped = os.path.join( PDBZ2, entryCode[1:3], 'pdb'+entryCode+'.ent.gz' )
         outputFileName = os.path.join( inputDir, entryCode+'.pdb' )
@@ -50,7 +50,7 @@ if doUnzipFirst:
             NTerror('failed to get pdb file')
             continue
         if gunzip(fileNameZipped, outputFileName=outputFileName):
-             NTerror('Failed gunzip for entry: ' + entryCode)
+            NTerror('Failed gunzip for entry: ' + entryCode)
         # Unusual path hierarchy by symlink only.
         if not os.path.exists(dstDir):
             os.mkdir(dstDir)
@@ -59,10 +59,10 @@ if doUnzipFirst:
         if os.symlink(outputFileName, dst):
             NTerror('failed to symlink pdb file')
             continue
-            
 
-doScriptOnEntryList(pythonScriptFileName, 
-                    entryListFileName, 
+
+doScriptOnEntryList(pythonScriptFileName,
+                    entryListFileName,
                     startDir,
                     processes_max = 2,
                     max_time_to_wait = 12000, # 1y4o took more than 600. This is one of the optional arguments.
