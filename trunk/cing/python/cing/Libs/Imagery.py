@@ -73,10 +73,10 @@ def joinPdfPagesByGhostScript( inputFileList, outputPath):
 #joinPdfPages = joinPdfPagesByConvert
 joinPdfPages = joinPdfPagesByGhostScript
     
-def convert2Web(path, outputDir=None, doFull=True, doPrint=True):
+def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False):
     """Using the system convert from ImageMagick several pieces of imagery will be created:
         a- pinup (smallish gif usable as an preview; 100 width by 1xx for A4 aspect ratio)
-        b- full size 1(gif of 1000 width )
+        b- full size 1(gif of 1000 width or montaged png of 1000 width for each page) 
         c- printable version (pdf)
 
        The output file names are automatically generated. If the outputDir is set it will be
@@ -150,10 +150,16 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True):
             NTerror("Failed to generated pinup")
             pinupPath = None
     if doFull:
-        fullPath  = os.path.join( head, root+".gif")
-        if convertImageMagick(pathStr, fullPath, optionsFull):
-            NTerror("Failed to generated full gif")
-            fullPath = None
+        if doMontage:
+            fullPath  = os.path.join( head, root+".png")
+            if montage(pathFirst, fullPath, extraOptions = "-density 144" ):
+                NTerror('Failed to montage from %s to: %s' % ( pathFirst, fullPath ))
+                return True
+        else:
+            fullPath  = os.path.join( head, root+".gif")
+            if convertImageMagick(pathStr, fullPath, optionsFull):
+                NTerror("Failed to generated full gif")
+                fullPath = None
     if doPrint:
         printPath = os.path.join( head, root+".pdf")
         if convertPs2Pdf( pathStr, printPath, optionsPrint):
@@ -168,22 +174,27 @@ def removeTrailingNumbers(fileName):
     p = re.compile( '\d+$' ) # I didn't get this to work with string.replace()
     return p.sub('', fileName)  
 
-def montage(pathList, outputFileName ):
+def montage(pathList, outputFileName, extraOptions = None ):
     """Using the system montage from ImageMagick an html file will piece together the given
         imagery in full size:
         a- full size 1(gif of original size)
        
        Returns None for success.
        Input can be anything ImageMagick reads, e.g. Postscript produced by Procheck_NMR.
+       The input pathList may also be a single file such as a multiple page .ps.
     """
 #    backgroundColor = '#ede8e2' # default in cing.css
 #    optionsPinUp = "-label %f -frame 15 -background %s -geometry +10+10 -geometry 102" % ( backgroundColor )
 #    optionsFull  = "-frame 15 -geometry +10+10 -background '#ede8e2'"
     optionsFull  = "-geometry +10+10  "
 #    optionsFull +=  backgroundColor
-
-    pathStr = ' '.join(pathList)
+    if extraOptions:
+        optionsFull += ' ' + extraOptions
     
+    if isinstance(pathList, list):
+        pathStr = ' '.join(pathList)
+    else:
+        pathStr = pathList
+        
     if montageImageMagick(pathStr, outputFileName, optionsFull):
         NTerror("Failed to generated full html")
-

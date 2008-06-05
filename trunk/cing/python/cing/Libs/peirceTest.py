@@ -1,6 +1,4 @@
-from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 import math
 

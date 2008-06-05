@@ -18,14 +18,14 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmp)
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
-    def tttestConvert2Web(self):
+    def testConvert2Web(self):
         fn = "pc_nmr_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
         outputPath = cingDirTmp
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
-        fileList = convert2Web( inputPath, outputDir=outputPath )
+        fileList = convert2Web( inputPath, outputDir=outputPath, doMontage=True )
         NTdebug( "Got back from convert2Web output file names: " + `fileList`)
         self.assertNotEqual(fileList,True)
         if fileList != True:

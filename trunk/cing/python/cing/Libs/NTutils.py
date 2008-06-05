@@ -23,7 +23,6 @@ import math
 import optparse
 import os
 import sys
-import traceback
 
 CONSENSUS_STR = 'consensus'
 
