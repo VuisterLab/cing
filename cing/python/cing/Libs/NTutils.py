@@ -3545,17 +3545,22 @@ def getDeepByKeys(c, *keyList):
     return getDeepByKeys(value, *reducedKeyList)
 
 
-def gunzip(fileNameZipped):
+def gunzip(fileNameZipped, outputFileName=None):
     """Returns true on error. Uses python api instead of OS defaults"""
+    if not fileNameZipped.endswith('.gz'):
+        NTerror("Expected zipped file to have .gz extension; giving up.")
+        return True
+
     inF = GzipFile(fileNameZipped, 'rb');
     s=inF.read()
     inF.close()
-    if not fileNameZipped.endswith('.gz'):
-        return True
     fileName = fileNameZipped[:-3]
+    if outputFileName:
+        fileName = outputFileName
     outF = file(fileName, 'wb');
     outF.write(s)
     outF.close()
+        
 
 def getEnsembleAverageAndSigmaFromHistogram( his ):
     """According to Rob's paper. Note that weird cases exist which to me
