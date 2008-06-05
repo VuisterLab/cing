@@ -2143,17 +2143,18 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 if not htmlOnly:
 #                    fileList = False
 #                else:
-                    fileList = convert2Web( procheckLinkReal )
+                    fileList = convert2Web( procheckLinkReal, doMontage=True )
                 fileList = False
     #            NTdebug( "Got back from convert2Web output file names: " + `fileList`)
                 if fileList == True:
                     NTerror( "Failed to convert2Web input file: " + procheckLinkReal)
                     continue
+                
     #            _pinupPath, _fullPath, _printPath = fileList
                 pinupLink = os.path.join('..',
                             project.moleculeDirectories.procheck, molecule.name + p + "_pin.gif" )
                 fullLink = os.path.join('..',
-                            project.moleculeDirectories.procheck, molecule.name + p + ".gif" )
+                            project.moleculeDirectories.procheck, molecule.name + p + ".png" )
                 printLink = os.path.join('..',
                             project.moleculeDirectories.procheck, molecule.name + p + ".pdf" )
                 anyProcheckPlotsGenerated = True

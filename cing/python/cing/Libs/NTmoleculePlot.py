@@ -197,7 +197,7 @@ class MoleculePlotSet:
                 return True
             
             if montage(pathPngList, fileName[:-4]+".png" ):
-                NTerror('Failed to convert2Web from %s to: %s' % ( pathPngList, fileName[:-4]+".png" ))
+                NTerror('Failed to montage from %s to: %s' % ( pathPngList, fileName[:-4]+".png" ))
                 return True
             
         # Remove the single pdf files.

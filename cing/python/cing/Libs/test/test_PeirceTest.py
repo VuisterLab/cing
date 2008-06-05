@@ -7,7 +7,7 @@ import unittest
 
 class AllChecks(TestCase):
         
-    def tttestPeirceTest1(self):        
+    def testPeirceTest1(self):        
         values = [101.2, 90.0, 99.0, 102.0, 103.0, 100.2, 89.0, 98.1, 101.5, 102.0]
         vOld,_oOld = peirceTest.peirceTestOld( values )
 #        print 'v=',vOld
@@ -21,7 +21,7 @@ class AllChecks(TestCase):
     
         self.assertTrue( vOld == v )
 
-    def tttestPeirceTest2(self):
+    def testPeirceTest2(self):
         # A stable array just longer than the reference data used in the test.
         values = []        
         for i in range(0,1000):
@@ -43,7 +43,7 @@ class AllChecks(TestCase):
         self.assertFalse( vOld == v )
         self.assertFalse( oOld == o )
                 
-    def tttestPeirceTest3(self):
+    def testPeirceTest3(self):
         #Note the difference between array sizes 17 and 18. 
         #No outliers identified at 18 but 7 outliers made the cutoff at size 17
         values = []    
@@ -62,7 +62,7 @@ class AllChecks(TestCase):
             self.assertTrue(len(o)<=m)
             n -= 1
                     
-    def ttttestPeirceTest4(self):
+    def testPeirceTest4(self):
         values = []    
         n = 2   # Default value 200. Tested up to 10,000 once before.
         for i in range(n):
