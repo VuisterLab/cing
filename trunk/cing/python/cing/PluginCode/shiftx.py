@@ -114,7 +114,9 @@ def predictWithShiftx( project, model=None   ):
         for chain in project.molecule.allChains():
 #            NTmessage('Doing chain code [%s]' % (chain.name))
             # quotes needed because by default the chain id is a space now.
-            chainId =  "'" + chain.name + "'"
+#            chainId =  "'" + chain.name + "'"
+            # According to the readme in shiftx with the source this is the way to call it.
+            chainId =  "1" + chain.name
             outputFile = rootname + '_' + chain.name + '.out'
             shiftx(chainId, rootname + '.pdb', outputFile )
             outputFile = os.path.join(root,outputFile)

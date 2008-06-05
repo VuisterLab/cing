@@ -21,11 +21,12 @@ class AllChecks(TestCase):
  
     def testRun(self):
         # TODO: the htmlOnly set to True currently fails. To fix! 
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         pdbConvention = IUPAC
         restraintsConvention = CYANA
+#        entryId = "1ai0" 
 #        entryId = "1brv"        # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
         entryId = "1brv_1model" 
