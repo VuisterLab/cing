@@ -15,6 +15,7 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
@@ -22,7 +23,6 @@ from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
@@ -136,8 +136,8 @@ Project: Top level Cing project class
 
     """
 
-    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 15. # Normally 0.3 but set low for testing 1brv to
-    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 20. # Normally 0.5 but set low for testing 1brv to
+    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 1. # Normally 15 but may be set low for testing 1brv to
+    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 20 
 
     def __init__( self, name ):
 
@@ -182,7 +182,7 @@ Project: Top level Cing project class
         self.distances  =  ProjectList( self, DistanceRestraintList, directories.restraints, '.distances' )
         self.dihedrals  =  ProjectList( self, DihedralRestraintList, directories.restraints, '.dihedrals' )
         self.rdcs       =  ProjectList( self, RDCRestraintList,      directories.restraints, '.rdcs' )
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore   = ROGscore()
 
         self.saveXML( 'version',
                       'name',  'created',
@@ -221,10 +221,11 @@ Project: Top level Cing project class
 #                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
 #                            res, modelId, v) )
                     if v >= Project.OMEGA_MAXALL_DEFAULT_BAD_VALUE:
-                        setMaxColor(res, COLOR_RED)
+                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
+#                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
                         NTdebug('Set to red')
                     elif v >= Project.OMEGA_MAXALL_DEFAULT_POOR_VALUE:
-                        setMaxColor(res, COLOR_ORANGE)
+                        res.rogScore.setMaxColor( COLOR_ORANGE, ROGscore.ROG_COMMENT_BAD_OMEGA )
                         NTdebug('Set to orange (perhaps)')
                     modelId += 1
 
@@ -1059,8 +1060,8 @@ class DistanceRestraint( NTdict ):
        atomPairs: list of (atom_1,atom_2) tuples,
        lower and upper bounds
     """
-    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but set low for testing 1brv to
-    DR_MAXALL_DEFAULT_BAD_VALUE  = 0.5 # Normally 0.5 but set low for testing 1brv to
+    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but can be set low for testing 1brv to
+    DR_MAXALL_DEFAULT_BAD_VALUE  = 0.3 # Normally 0.5 but can be set low for testing 1brv to
     DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.5 # Ang.
     """Fraction of models."""
     DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5
@@ -1089,7 +1090,7 @@ class DistanceRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
-        self.colorLabel = COLOR_GREEN
+        self.rogScore   = ROGscore()
 
         for pair in atomPairs:
             self.appendPair( pair )
@@ -1100,21 +1101,25 @@ class DistanceRestraint( NTdict ):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s' % self )
         if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
-            NTdebug('Setting DR to max orange [crit.1] violMax: %8.3f' % self.violMax)
-            setMaxColor( self, COLOR_ORANGE)
+            comment = '[crit.1] violMax: %8.3f' % self.violMax
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
+#            self.rogScore.setMaxColor( COLOR_ORANGE, comment+" intentional duplicate for testing" )
         if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR to red [crit.2] violMax: %8.3f' % self.violMax)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.2] violMax: %8.3f' % self.violMax
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
         fractionAbove = getFractionAbove( self.violations, DistanceRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
         if fractionAbove >= DistanceRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
-#        (self.violAv, self.violSd, _n) = self.violations.average()
         if self.violSd >= DistanceRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR to red [crit.4] violSd: %8.3f' % self.violSd)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.4] violSd: %8.3f' % self.violSd
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
 
 #        if critiqued:
@@ -1197,10 +1202,10 @@ class DistanceRestraint( NTdict ):
                 try:
                     self.distances.append( math.pow(d, -0.166666666666666667) )
                 except:
-                    NTerror("AtomPair (%s,%s) without coordinates"%
-                             (atm1, atm2))
                     self.error = True
-                    self.colorLabel = COLOR_RED
+                    msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
+                    NTdebug(msg)
+                    self.rogScore.setMaxColor( COLOR_RED, msg )
                     return (None, None, None, None)
                 #end try
             #end for
@@ -1331,18 +1336,6 @@ class SMLDistanceRestraintHandler( SMLhandler ):
 #end class
 DistanceRestraint.SMLhandler = SMLDistanceRestraintHandler()
 
-def setMaxColor(o, colorLabel):
-    """priority: red, orange, green"""
-#    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
-#    if not hasattr(o,'colorLabel'):
-#        o.colorLabel = COLOR_GREEN
-
-    if colorLabel == COLOR_RED:
-        o.colorLabel = colorLabel
-        return
-
-    if o.colorLabel == COLOR_GREEN: # independent of colorLabel being green or orange.
-        o.colorLabel = colorLabel
 #-----------------------------------------------------------------------------
 class DistanceRestraintList( NTlist ):
     """
@@ -1363,13 +1356,13 @@ class DistanceRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 0.1 A
         self.violCount3 = 0       # Total violations over 0.3 A
         self.violCount5 = 0       # Total violations over 0.5 A
-        self.colorLabel = COLOR_GREEN
+        self.rogScore   = ROGscore()
     #end def
 
     def criticize(self):
         for dr in self:
             dr.criticize()
-            setMaxColor( self, dr.colorLabel )
+            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
 
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
@@ -1533,28 +1526,32 @@ class DihedralRestraint( NTdict ):
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
-        self.colorLabel = COLOR_GREEN
+        self.rogScore   = ROGscore()
     #end def
 
     def criticize(self):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
         if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
-            NTdebug('Setting DR (dih) to max orange [crit.1] violMax: %8.3f' % self.violMax)
-            setMaxColor( self, COLOR_ORANGE)
+            comment = '[crit.1] violMax: %8.3f' % self.violMax
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR (dih) to red [crit.2] violMax: %8.3f' % self.violMax)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.2] violMax: %8.3f' % self.violMax
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
         fractionAbove = getFractionAbove( self.violations, DihedralRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
         if fractionAbove >= DihedralRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR (dih) to red [crit.3]: fractionAbove: %8.3f' % fractionAbove)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
 #        (self.violAv, self.violSd, _n) = self.violations.average()
         if self.violSd >= DihedralRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
-            NTdebug('Setting DR (dih) to red [crit.4] violSd: %8.3f' % self.violSd)
-            setMaxColor( self, COLOR_RED)
+            comment = '[crit.4] violSd: %8.3f' % self.violSd
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
             return
 
 #        if critiqued:
@@ -1751,13 +1748,13 @@ class DihedralRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 1 degree
         self.violCount3 = 0       # Total violations over 3 degrees
         self.violCount5 = 0       # Total violations over 5 degrees
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore   = ROGscore()
     #end def
 
     def criticize(self):
         for dr in self:
             dr.criticize()
-            setMaxColor( self, dr.colorLabel )
+            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
 
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
@@ -1867,7 +1864,7 @@ class RDCRestraint( NTdict ):
                        )
         self.id         = -1       # Undefined index number
         self.rdcs        = None     # list with backcalculated rdc values for each model, None indicates no analysis done
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore   = ROGscore()
 
         for pair in atomPairs:
             self.appendPair( pair )
@@ -2027,7 +2024,7 @@ class RDCRestraintList( NTlist ):
         self.rmsd       = None    # rmsd per model, None indicate no analysis done
         self.rmsdAv     = 0.0
         self.rmsdSd     = 0.0
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore   = ROGscore()
     #end def
 
     def append( self, RDCRestraint ):
@@ -2190,7 +2187,6 @@ class HTMLfile:
        Inputs: file name, title
        Output: a Html file.
     '''
-
     # A list of all htmlobject for rendering purposes
     #htmlObjects = NTlist() # Local track-keeping list
 
@@ -2208,7 +2204,7 @@ class HTMLfile:
 
         # definition of content-less  tags
         self.noContent = [ 'base','basefont','br','col','frame','hr','img',
-                           'input','link','meta','ccsrule' ]
+                           'input','link','meta','ccsrule', 'script' ]
 
         self.title = title
         self.indent = 0
@@ -2341,8 +2337,8 @@ class HTMLfile:
         self.stream = open( self.fileName, 'w' )
 #        NTdebug('writing to file: %s' % self.fileName)
         self.indent = 0
-
-        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
+        # JFD proposes to drop the below tags because they hinder javascript beyond my knowledge.
+#        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
         self.stream.write(self.openTag('html'))
         self.stream.write(self.openTag('head'))
         if self.title:
@@ -2350,8 +2346,12 @@ class HTMLfile:
 
         relativePath = self.relativePath()
         cssLink = os.path.join(relativePath, cingPaths.css)
+        jsMultiLineLink = os.path.join(relativePath, cingPaths.jsMultiLine)
         self.stream.write(self._generateTag( 'link',
             rel="stylesheet", type="text/css", media="screen", href=cssLink))
+        self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
+            type="text/javascript", src=jsMultiLineLink))
+        
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
         self.stream.write(self.openTag('div', id="container"))
@@ -2531,7 +2531,7 @@ class HTMLfile:
            Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
 
            And the funny thing is that if the destination has an attribute:
-               'colorLabel' then it will be used to define an html class with
+               'rogScore.colorLabel' then it will be used to define an html class with
                which through the cing.css can be used for defining coloring
                schemes.
         '''
@@ -2550,12 +2550,16 @@ class HTMLfile:
 
         link = self.findHtmlLocation( source, destination, id )
 #        NTdebug('From source: [%s] to destination [%s] id [%s] using relative link: %s' % (source, destination, id,link))
-        #if not destination.has_key('colorLabel'):
-        if not hasattr(destination, 'colorLabel'):
-            destination.colorLabel = COLOR_GREEN
 
-        # solution for avoiding python 'class' command with html syntax
-        kw = {'class':destination.colorLabel, 'href':link}
+        
+        kw = {'href':link}
+        #if not destination.has_key('colorLabel'):
+        if hasattr(destination, 'rogScore'):
+#            destination.colorLabel = COLOR_GREEN
+            if destination.rogScore.isCritiqued():
+                # solution for avoiding python 'class' command with html syntax
+                kw['class'] = destination.rogScore.colorLabel
+                destination.rogScore.addHTMLkeywords( kw )
         section('a', text, **kw)
     #end def
 
@@ -2603,3 +2607,45 @@ def getFractionAbove( valueList, threshold ):
         if v > threshold:
             n += 1.
     return n / len(valueList)
+
+#-----------------------------------------------------------------------------
+class AtomList( NTlist ):
+    """
+    Class based on NTlist that holds atoms.
+    Also manages the "id's".
+    Sort by item of Atom Class.
+    
+    NB this list is only instantiated for the validate plugin. It has very little
+    functionality. Most functionality should be in Residue, Chains, etc.
+    """
+    def __init__( self, project, status='keep' ):
+        NTlist.__init__( self )
+        self.name       = 'Atom List'
+        self.status     = status      # Status of the list; 'keep' indicates storage required
+        self.currentId  = 0       # Id for each element of list
+        self.rogScore = ROGscore()
+        self.appendFromMolecule( project.molecule )
+        self.criticize()
+    #end def
+
+    def criticize(self):
+        for atom in self:
+#            atom.criticize()
+            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s'%atom.toString() )
+
+    def append( self, o ):
+        o.id = self.currentId
+        NTlist.append( self, o )
+        self.currentId += 1
+
+    def appendFromMolecule( self, molecule ):
+        for atom in molecule.allAtoms():
+            self.append( atom )
+
+    def __str__( self ):
+        return sprintf( '<AtomList "%s" (%s,%d)>',self.name,self.status,len(self) )
+    #end def
+
+    def format( self ):
+        return sprintf( '%s AtomList "%s" (%s,%d) %s\n',
+                      dots, self.name,self.status,len(self), dots)

@@ -52,7 +52,6 @@ from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.NTutils import setDeepByKeys
-from cing.core.classes import setMaxColor
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.parameters import cingPaths
@@ -794,7 +793,6 @@ def criticizeByWhatif( project ):
 
     keyList = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ] # second item replaced below.
     for key in Whatif.DEFAULT_RESIDUE_BAD_SCORES:
-        NTdebug('Whatif critiquing on key [%5s]' % key)
         thresholdValueBad  = Whatif.DEFAULT_RESIDUE_BAD_SCORES[ key]
         thresholdValuePoor = Whatif.DEFAULT_RESIDUE_POOR_SCORES[key]
         keyList[1] = key
@@ -806,13 +804,15 @@ def criticizeByWhatif( project ):
                 actualValue = actualValue.average()[0]
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
-                NTdebug('residue [%s] critiqued to red for bad is: [%8.3f] and actual found: [%s]' % (
-                    res, thresholdValueBad, actualValueStr ))
-                setMaxColor( res, COLOR_RED)
+                comment = 'whatif key [%s] to red for bad is: [%8.3f] and actual found: [%s]' % (
+                    key, thresholdValueBad, actualValueStr )
+                NTdebug(comment)
+                res.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
-                NTdebug('residue [%s] critiqued to orange for poor is: [%8.3f] and actual found: [%s]' % (
-                    res, thresholdValuePoor, actualValueStr ))
-                setMaxColor( res, COLOR_ORANGE)
+                comment = 'whatif key [%s] to orange for poor is: [%8.3f] and actual found: [%s]' % (
+                    key, thresholdValuePoor, actualValueStr )
+                NTdebug(comment)                
+                res.rogScore.setMaxColor( COLOR_ORANGE, comment)
             
 # register the function
 methods  = [
