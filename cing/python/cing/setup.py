@@ -98,121 +98,132 @@ def NTmessage(msg):
     print msg
 
 def check_python():
-
-    print 'Python version   ',
-
     version = float(sys.version[:3])
-
     if version < 2.4:
-        print 'Python version 2.4 or higher required.'
-        print 'Current version is', sys.version[:5]
+        NTwarning('Failed to find Python version 2.4 or higher.')
+#        print 'Current version is', sys.version[:5]
     else:
-        print 'ok.'
+        NTmessage("Found 'Python'")
 
 def check_pylab():
-
-    print 'Matplotlib module  ',
+#    print 'Matplotlib module  ',
     result = 0
     try:
         import matplotlib.pylab #@UnusedImport
-        print 'ok.'
+#        print 'ok.'
         result = 1
     except:
-        print 'could not import Matplotlib module.'
-
+        NTwarning('Failed to find Matplotlib.')
+    if not result:
+        NTmessage("Found 'Matplotlib'")
     return result
 
 def check_ccpn():
-
-    print '\nCCPN distribution:',
+#    print '\nCCPN distribution:',
 
     missing = []
-
+    gotRequiredCcpnModules = False
     try:
         import ccpnmr #@UnusedImport
-        print 'ok.'
+        gotRequiredCcpnModules = True
+#        print 'ok.'
     except:
         missing.append('ccpnmr')
-        print
+#        print
 
-    try:
-        import ccpnmr.format #@UnusedImport @Reimport
-        print 'FormatConverter: ok.'
-    except:
-        missing.append('ccpnmr.format')
+    # JFD disabled these since they aren't used in CING (?yet).
+#    try:
+#        import ccpnmr.format #@UnusedImport @Reimport
+#        NTmessage("Found 'FormatConverter'")
+#    except:
+#        missing.append('ccpnmr.format')
+#
+#    try:
+#        import ccpnmr.analysis #@UnusedImport @Reimport @UnresolvedImport
+#        print 'Anaysis: ok.'
+#    except:
+#        missing.append('ccpnmr.analysis')
 
-    try:
-        import ccpnmr.analysis #@UnusedImport @Reimport
-        print 'Anaysis: ok.'
-    except:
-        missing.append('ccpnmr.analysis')
+    if gotRequiredCcpnModules:
+        NTmessage("Found 'CCPN'")
+    else:
+        NTwarning('Failed to find CCPN.')        
 
     if missing:
-        print 'Could not import the following modules:',
-        print ', '.join(missing)
-        print 'This only matters if you do intend to use the CCPN. Analysis is optional'
+        NTwarning( '    Missing (optional) packages: ' + ', '.join(missing))
+        
+# disabled for this needs to be no extra- dependency. A version of numarray should
+# be in matplotlib. In fact the code doesn't refer to numarray anywhere. Or JFD
+# can't find it. Did Alan meant to check for things like: from matplotlib.numerix import nan # is in python 2.6 ?
+#def check_numarray():
+#
+#    print 'Numarray module   ',
+#    result = 0
+#    try:
+#        import numarray #@UnusedImport
+#        print 'ok.'
+#        result = 1
+#    except:
+#        print 'could not import Numarray module.'
+#
+#    return result
 
-def check_numarray():
-
-    print 'Numarray module   ',
-    result = 0
-    try:
-        import numarray #@UnusedImport
-        print 'ok.'
-        result = 1
-    except:
-        print 'could not import Numarray module.'
-
-    return result
-
-def check_numpy():
-
-    print 'Numpy module   ',
-    result = 0
-    try:
-        import numpy #@UnusedImport
-        print 'ok.'
-        result = 1
-    except:
-        print 'could not import Numpy module.'
-
-    return result
+# See above.
+#def check_numpy():
+#
+#    print 'Numpy module   ',
+#    result = 0
+#    try:
+#        import numpy #@UnusedImport
+#        print 'ok.'
+#        result = 1
+#    except:
+#        print 'could not import Numpy module.'
+#
+#    return result
 
 def check_cython():
 
-    print 'Cython module   ',
+#    print 'Cython module   ',
     result = 0
     try:
         import Cython.Distutils #@UnusedImport
-        print 'ok.'
+#        print 'ok.'
         result = 1
-        #doing cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace
-        print 'Great you have Cython! Compiling CING Cython libs ...'
-        cmd = 'cd %s/python/cing/Libs/cython; python compile.py build_ext --inplace; cd -' % cingRoot
-        os.chdir(os.path.join(cingRoot,'python/cing/Libs/cython'))
-        out = call(['python', 'compile.py','build_ext', '--inplace'])
-        if out:
-            print '==> Failed to compile CING Cython libs.'
-            print '    If your using Mac, see "https://bugs.launchpad.net/cython/+bug/179097"'
-            print '    or try: %s' % cmd
+#        print "Great you have Cython! Please try to compile CING's Cython libs running:"
+#        print 'cd %s/python/cing/Libs/cython; python compile.py build_ext --inplace; cd -' % cingRoot
 
+        # JFD disabled this until we get it to work on our Macs.
+#        os.chdir(os.path.join(cingRoot,'python/cing/Libs/cython'))
+#        out = call(['python', 'compile.py','build_ext', '--inplace'])
+#        if out:
+#            print '==> Failed to compile CING Cython libs.'
+#            print '    Good chance it will run by hand, try running:\n%s' % cmd
+#            print '    If your using Mac, see "https://bugs.launchpad.net/cython/+bug/179097"'
     except:
-        print 'could not import Cython module.'
+#        print 'failed to import Cython module.'
+        pass
+       
+    if not result:
+         NTwarning('Failed to find Cython')
+    else:
+         NTmessage("Found 'Cython'")
 
     return result
 
-def check_profiler():
-
-    print 'Profiler module   ',
-    result = 0
-    try:
-        import profile #@UnusedImport
-        print 'ok.'
-        result = 1
-    except:
-        print 'could not import Profiler module.'
-        print "it's not essencial but used with 'cing --test'."
-    return result
+# JFD This one is even disabled in the test since some time now.
+#def check_profiler():
+#
+#    print 'Profiler module   ',
+#    result = 0
+#    try:
+#        import profile #@UnusedImport
+#        print 'ok.'
+#        result = 1
+#    except:
+#        print 'could not import Profiler module.'
+#        print "it's not essencial but used with 'cing --test'."
+#    return result
 
 
 def _writeCingShellFile(isTcsh):
@@ -248,9 +259,9 @@ def _writeCingShellFile(isTcsh):
     print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
     print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
 
-#    print '==> Note'
-#    print ' There is another dependency; cython. Please install it and run:'
-#    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
+    print '==> Note'
+    print ' Please (once) compile the cython code in CING by running:'
+    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace;cd -'
 #end def
 #------------------------------------------------------------------------------------
 
@@ -261,8 +272,8 @@ if __name__ == '__main__':
     check_python()
     check_ccpn()
     check_pylab()
-    check_numpy()
-    check_numarray()
+#    check_numpy()
+#    check_numarray()
     check_cython()
 
     if not cingRoot:
