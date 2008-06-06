@@ -16,6 +16,9 @@ from gzip import GzipFile
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+from cing.core.constants import COLOR_GREEN
+from cing.core.constants import COLOR_RED
+from cing.core.constants import COLOR_ORANGE
 import array
 import cing
 import inspect
@@ -216,17 +219,16 @@ class NTlist( list ):
     #end def
 
     def removeDuplicates( self ):
-        if len(self) <= 1: return
+        """Can be optimized when needed by doing a sorted lookup table"""
+        if len(self) <= 1: 
+            return
         i = 1
-        while (i < len(self)):
+        while i < len(self):
 #            print '>i=',i,  'list=',self[0:i],  'item=',self[i], 'len=',len(self)
-            if (self[i] in self[0:i]):
+            if self[i] in self[0:i]:
                 self.pop( i )
             else:
                 i += 1
-            #end if
-        #end while
-    #end def
 
     def reorder( self, indices ):
         """Return a new NTlist, ordered according to indices or None on error
@@ -3645,4 +3647,92 @@ def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):
 
     return s[startIdx:endIdx]
 
+
+
+class ROGscore( NTdict ):
+    """
+    Red orange green with comments.
+    """
+    ROG_COMMENT_NO_COOR = 'No coordinates'
+    ROG_COMMENT_BAD_OMEGA = 'Bad omega'
+    ROG_COMMENT_POOR_ASSIGNMENT = 'Poor assignment'
+    
+    MAX_TO_REPORT_IN_POPUP = 5
+    
+    def __init__( self ):
+        NTdict.__init__( self )
+        self.colorLabel = COLOR_GREEN
+        self.colorCommentList = NTlist()
+
+    def isCritiqued(self):
+        if self.colorLabel != COLOR_GREEN:
+            return True
+        
+    def isRed(self):
+        return self.colorLabel == COLOR_RED
+    def isOrange(self):
+        return self.colorLabel == COLOR_ORANGE
+    
+    
+    # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
+    # TODO: get aligned to left using a better .css.
+    def addHTMLkeywords(self, kw ):
+        if not self.isCritiqued():
+            return
+        if self.colorCommentList:
+            ln = len( self.colorCommentList )
+            subList = self.colorCommentList
+            if ln > self.MAX_TO_REPORT_IN_POPUP:
+                subList = self.colorCommentList[:self.MAX_TO_REPORT_IN_POPUP]
+            kw[ 'cavtitle' ] = '\n'.join( subList )
+            if ln > self.MAX_TO_REPORT_IN_POPUP:
+                kw[ 'cavtitle' ] += '\nand so on for %d comments in total' % ln
+            kw[ 'onmousemove' ] = 'SetCavTimer(event);'
+            kw[ 'onmouseout' ]  = "CancelCavTimer(event);" 
+        
+    def createHtmlForComments(self, dst ):
+        if not self.isCritiqued():
+            return        
+#        dst('ul', 'Critiques:', closeTag=False )
+        kw = {'href':''}
+        kw['class'] = self.colorLabel        
+        for comment in self.colorCommentList:
+            dst('li' , closeTag=False)
+            dst('a' , comment, **kw)
+            dst('li' , openTag=False)
+#        dst('ul', openTag=False)
+            
+        
+    def setMaxColor(self, colorLabel, comment=None):
+        """priority: red, orange, green. The socalled ROG score.
+        The comment is optional and will only be appended when the color lable is
+        at least as severe as the current one. The less severe levels of comments
+        will also be wiped out.
+        Only orange and green levels can add comments.
+        comment may also be a list of comments.
+        """
+    #    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
+    #    if not hasattr(o,'colorLabel'):
+    #        o.colorLabel = COLOR_GREEN
+    
+        if colorLabel == COLOR_GREEN:
+            return
+        
+        if colorLabel == COLOR_RED:
+            if self.colorLabel != COLOR_RED:
+                self.colorCommentList = NTlist()
+                self.colorLabel = COLOR_RED    
+        elif colorLabel == COLOR_ORANGE: # independent of colorLabel being green or orange.
+            if self.colorLabel == COLOR_RED:
+                return
+#                self.colorCommentList = NTlist() # redundant because self was green without comments. 
+            self.colorLabel = colorLabel
+
+        if comment:
+            if isinstance(comment, list ):
+                self.colorCommentList += comment # grow list with potentially multiple comments.
+                self.colorCommentList.removeDuplicates()
+            else:
+                if comment not in self.colorCommentList: 
+                    self.colorCommentList.append( comment ) 
 

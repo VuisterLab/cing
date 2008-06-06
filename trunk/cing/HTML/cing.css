@@ -3,8 +3,9 @@
 body {
 	background: #ede8e2;
 	margin: 0px 0px 0px 0px;
-	text-align: center;
-	color: #000000;
+    text-align: left;
+    /*text-align: center; changed to make popup html code align left*/
+    color: #000000;
 	font: 11px Verdana, Arial, Helvetica, sans-serif;
 }
 

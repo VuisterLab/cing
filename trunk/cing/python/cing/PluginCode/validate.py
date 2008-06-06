@@ -69,11 +69,10 @@ from cing.PluginCode.Whatif import histJaninBySsAndResType
 from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import wiPlotList
+from cing.core.classes import AtomList
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
-from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
 from cing.core.constants import NAN_FLOAT
 from cing.core.constants import NOSHIFT
 from cing.core.constants import PDB
@@ -88,7 +87,6 @@ import os
 import shelve
 import shutil
 import sys
-
 
 NotAvailableText = 'Not available'
 OpenText         = 'Open'
@@ -116,9 +114,11 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     Run the initial validation calculations or programs.
     returns None on success or True on failure.
     """
+
+    
     validateDihedrals(  project  )
     validateModels(     project  )
-
+    
     project.predictWithShiftx()
     project.validateAssignments(toFile=True)
     project.checkForSaltbridges(toFile=True)
@@ -167,14 +167,19 @@ def summary( project ):
         msg += sprintf( '\n%s\n', drl.format() )
 
     level = 'residue'
-    c = NTlist( 0, 0, 0 ) # ounts for green, orange and red.
+    cStringList = [ 'green', 'orange', 'red' ]
+    c = NTlist( 0, 0, 0 ) # Counts for green, orange and red.
+    cL = NTlist( NTlist(), NTlist(), NTlist() )
     for residue in project.molecule.allResidues():
-        if residue.colorLabel == COLOR_RED:
+        if residue.rogScore.isRed():
             c[2] += 1
-        elif residue.colorLabel == COLOR_ORANGE:
+            cL[2].append( residue )
+        elif residue.rogScore.isOrange():
             c[1] += 1
+            cL[1].append( residue )
         else:
             c[0] += 1
+            cL[0].append( residue )
 #    cAll = c.sum()*1.0
     total = reduce(lambda x, y: x+y+0.0, c) # total expressed as a float because of 0.0
     if total <= 0:
@@ -198,6 +203,18 @@ Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
 #Red:     35 ( 35%)
 #       -----------
 #Total   100 (100%)
+        # by request of Nadia write out the actual residues
+        
+        idx = 0
+        for residueList in cL:
+            color = cStringList[idx]
+            idx += 1
+            # Map residues to a string representation 'en masse'
+            residueListStr = map( Residue.toString, residueList)
+            tmpStr = 'Residues colored %6s: [' % color
+            tmpStr += ' '.join( residueListStr )
+            tmpStr += ']\n'
+            msg += tmpStr
 
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
@@ -954,8 +971,8 @@ def validateAssignments( project, toFile = True   ):
                 #end if
             #end if atm.isProton()
         #end if atm.isAssigned():
-        if len(atm.validateAssignment):
-            atm.colorLabel = COLOR_ORANGE
+        if atm.validateAssignment:
+            atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
         #end if
     #end for
 #    for atm in result:
@@ -1782,6 +1799,7 @@ def setupHtml(project):
                         (       val2Str(restraint.violAv,  "%.2f"),
                                 val2Str(restraint.violSd,  "%.2f"),
                                 val2Str(restraint.violMax, "%.2f") ))
+                restraint.rogScore.createHtmlForComments(restrMain)
                 #restrMain('li', openTag=False)
                 restrMain('ul', openTag=False)
             #end for
@@ -1839,6 +1857,106 @@ def setupHtml(project):
         #end if
     #end for
 
+    # For the atom list.
+    atomList = AtomList(project) # instantiated only for this purpose locally.
+    RLLink = project.htmlPath( htmlDirectories.atoms, 'atoms.html' )
+    atomList.htmlLocation = ( RLLink, top )
+    atomList.html = HTMLfile( atomList.htmlLocation[0], title = 'Atom List ' + atomList.name )
+    RLLink = atomList.htmlLocation[0]
+    atomHeader = atomList.html.header
+    atomHeader('h1', 'Atom List: '+ atomList.name)
+    atomList.html.insertHtmlLink( atomHeader, atomList, project,
+                                       text = 'Home' )
+    atomList.html.insertHtmlLink( atomHeader, atomList,
+                                       project, text = 'UP' )
+    project.mainPageObjects['Atoms'] = [ atomList ]
+
+    atomMain = atomList.html.main
+    
+    atomMain('h3', closeTag=False)
+    refItem = os.path.join( project.moleculePath('analysis'),'validateAssignments.txt')
+    abstractResource = NTdict()
+    abstractResource.htmlLocation = ( refItem, top )
+    if os.path.exists(refItem):
+        atomList.html.insertHtmlLink( atomMain, atomList, abstractResource, text = 'Assignments' )
+#        atomMain('a',  'Assignments', href = os.path.join( "../..", refItem))
+    else:
+        atomMain('a',  NotAvailableText)
+    atomMain('h3', openTag=False)
+    
+    atomMain('h3', atomList.formatHtml())
+    for atom in atomList:
+        count = atom.id
+        tag = 'o'+str(atom.__OBJECTID__)
+        atom.htmlLocation = ( RLLink, '#' + tag )
+
+        #restrMain('h2', atomList.html._generateTag( 'a',
+        #     'Distance Restraint %i' % count, id = tag, newLine=False) )
+
+        atomMain('h2', 'Atom ', id = tag, closeTag=False)
+        atomList.html.insertHtmlLink(atomMain,atomList,atom,'%i'%count)
+        atomMain('h2', openTag=False)
+        atomMain('ul', closeTag=False)
+        atomMain('li', 'Atom:', closeTag=False)
+        res = atom._parent
+        atomName = "(" + atom.toString() +')'
+        atomList.html.insertHtmlLink( atomMain, atomList, res, text = atomName )
+        atomMain('li', openTag=False)
+        
+        sav     = None
+        ssd     = None
+        delta   = None
+        rdelta  = None
+        dav     = None
+        dsd     = None
+        value   = None
+        error   = None
+
+        if atom.has_key('shiftx') and len(atom.shiftx) > 0:
+            sav = atom.shiftx.av
+            ssd = atom.shiftx.sd
+        if atom.isAssigned() and sav:
+            delta = atom.resonances().value - sav
+            rdelta = 1.0
+            if ssd > 0.0:
+                rdelta = sav/ssd
+        if atom.db.shift:
+            dav = atom.db.shift.average
+            dsd = atom.db.shift.sd
+        if atom.resonances():
+            value = atom.resonances().value
+            error = atom.resonances().error
+
+        savStr     = val2Str(sav,   '%6.2f', 6 )
+        ssdStr     = val2Str(ssd,   '%6.2f', 6 )
+        deltaStr   = val2Str(delta, '%6.2f', 6 )
+        rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
+        davStr     = val2Str(dav,   '%6.2f', 6 )
+        dsdStr     = val2Str(dsd,   '%6.2f', 6 )
+        valueStr   = val2Str(value, '%6.2f', 6, nullValue=NOSHIFT ) # was sometimes set to a NOSHIFT
+        if valueStr==NaNstring:
+            error=None
+        errorStr   = val2Str(error, '%6.2f', 6 )
+
+#        fprintf(fp,'%-18s (%6s %6s)   (shiftx: %6s %6s)   (delta: %6s %6s)   (db: %6s %6s)   %s\n',
+#                atm,
+#                valueStr,
+#                errorStr,
+#                savStr, ssdStr,
+#                deltaStr, rdeltaStr,
+#                davStr, dsdStr,
+#                atm.validateAssignment.format()
+#               )
+        
+        atomMain('li', 'Chemical shift: (%6s %6s)' % (valueStr, errorStr))
+        atomMain('li', 'SHIFTX shift: (%6s %6s)' % (savStr, ssdStr))
+        atomMain('li', 'delta shift: (%6s %6s)' % (deltaStr, rdeltaStr))
+        atomMain('li', 'db shift: (%6s %6s)' % (davStr, dsdStr))
+
+        atom.rogScore.createHtmlForComments(atomMain)
+        atomMain('ul', openTag=False)
+    #end for
+    
     # Do Project HTML page
     htmlMain = project.html.main
 
@@ -1852,17 +1970,6 @@ def setupHtml(project):
 #    NTdebug("os.path.abspath(os.curdir): " + os.path.abspath(os.curdir))
     refItem = os.path.join( project.moleculePath('analysis'),'summary.txt')
 #    NTdebug("refItem: " + refItem)
-    if os.path.exists(refItem):
-        htmlMain('a',  OpenText, href = os.path.join( "..", refItem))
-    else:
-        htmlMain('a',  NotAvailableText)
-    htmlMain('li', openTag=False)
-    htmlMain('ul', openTag=False)
-
-    htmlMain('h1', 'Assignments')
-    htmlMain('ul', closeTag=False)
-    htmlMain('li', closeTag=False)
-    refItem = os.path.join( project.moleculePath('analysis'),'validateAssignments.txt')
     if os.path.exists(refItem):
         htmlMain('a',  OpenText, href = os.path.join( "..", refItem))
     else:
@@ -1927,7 +2034,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
     for molecule in [project[mol] for mol in project.molecules]:
         for chain in molecule.allChains():
             chainId = chain.name
-            NTmessage("Generating dihedral angle plots for chain: " + chainId)
+            NTmessage("Generating residue html pages for chain: " + chainId)
             printedDots = 0
             #NB: it's falling with malloc for AWSS if >~ 140 residues
             resRange = chain.allResidues()#[:60]
@@ -1948,6 +2055,11 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
                 msg = sprintf('----- %5s -----', res)
                 fprintf(fp, msg+'\n')
+                
+                if res.rogScore.isCritiqued():
+                    res.html.left( 'h2', 'Critiques', id='Critiques')
+                    res.rogScore.createHtmlForComments(res.html.left)
+                
                 if htmlOnly:
                     pass
 #                    NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
@@ -1983,7 +2095,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
         #                            strToShow += '.'+'average'
                                 pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)')
                                 strToShow += ': %s' % pointNTvalueStr
-                                res.html.left( 'a', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
+                                res.html.left( 'p', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
                         else:
                             pass
     #                            NTdebug("No 2D dihedral angle plot for plotItem: %s %s %s", res, plotItem[0], plotItem[1])
@@ -2233,15 +2345,12 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
         # sort by color: 1st red, 2nd orange, then green and by violCount3 reverse order
         listRed, listOrange, listGreen = [], [], []
         for dr in resRL:
-#            if not hasattr(dr,'colorLabel'):
-#                dr.colorLabel = COLOR_GREEN
-            if dr.colorLabel == COLOR_GREEN:
-                listGreen.append(dr)
-            if dr.colorLabel == COLOR_RED:
+            if dr.rogScore.isRed():
                 listRed.append(dr)
-            if dr.colorLabel == COLOR_ORANGE:
+            elif dr.rogScore.isOrange():
                 listOrange.append(dr)
-            #if dr.colorLabel == COLOR_GREEN: listGreen.append(dr)
+            else:
+                listGreen.append(dr)
         resRL = listRed + listOrange + listGreen
         # display restraint by number, in line, sorted by violCount3 reverse
         #for dr in resRL:
@@ -2286,6 +2395,9 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                                 val2Str(dr.violAv,  "%.2f"),
                                 val2Str(dr.violSd,  "%.2f"),
                                 val2Str(dr.violMax, "%.2f") ))
+            resRight('br')
+            dr.rogScore.createHtmlForComments(resRight)
+                
             #resRight('ul', openTag=False)
             resRight('br')
             if resRL.index(dr) + 1 == toShow:

@@ -11,6 +11,7 @@ from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NoneObject
+from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import angle3Dopt
@@ -26,7 +27,7 @@ from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
-from cing.core.constants import COLOR_GREEN
+from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
@@ -159,7 +160,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.modelCount   = 0
 
         self.xeasy        = None # reference to xeasy class, used in parsing
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore = ROGscore()
 
         self.saveXML('chainCount','residueCount','atomCount')
 
@@ -992,8 +993,7 @@ Chain class: defines chain properties and methods
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
                            self.footer( dots )
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
-
+        self.rogScore = ROGscore()
         self.residues = self._children
         self.residueCount = 0
     #end def
@@ -1188,7 +1188,7 @@ Residue class: Defines residue properties
 
         self._nameResidue( resName, resNum )
         self.saveXML('resName','resNum')
-        self.colorLabel = COLOR_GREEN # innocent until proven guilty.
+        self.rogScore = ROGscore()
 
     #end def
 
@@ -1196,8 +1196,21 @@ Residue class: Defines residue properties
         return str(self)
     #end def
 
+    def toString(self, showChainId=True, showResidueType=True):
+        """A unique compact string identifier.e.g B.LYS282"""
+        if showChainId:
+            chn = self._parent
+            result = chn.name + '.'
+        else:
+            result = ''
+        if showResidueType:
+            result += self.name 
+        else:
+            result += self.number
+        return result
+        
     def _nameResidue( self, resName, resNum ):
-        """Internal routine to set al the naming right and database refs right
+        """Internal routine to set all the naming right and database refs right
         """
         self.resName  = resName
         self.resNum   = resNum
@@ -1560,6 +1573,7 @@ Atom class: Defines object for storing atom properties
     all dict methods
 
     """
+    
     def __init__( self, resName, atomName, **kwds ):
 
         NTtree.__init__(self, name=atomName, __CLASS__='Atom',**kwds )
@@ -1572,9 +1586,7 @@ Atom class: Defines object for storing atom properties
 
         self.resonances  = NTlist()
         self.coordinates = NTlist()
-#        self.resName     = resName # have to store because initialisation is done
-#                                   # without knowledge of parent
-        self.colorLabel = COLOR_GREEN # Really, anything can be critiqued so put it at low level here.
+        self.rogScore = ROGscore()
 
         self.saveXML('resName', 'resonances','coordinates')
 
@@ -1602,6 +1614,12 @@ Atom class: Defines object for storing atom properties
     def __repr__(self):
         return str(self)
     #end def
+
+    def criticize(self):
+#        NTdebug( '%s' % self )
+        if not len(self.coordinates):
+            NTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment=ROGscore.ROG_COMMENT_NO_COOR)
 
     def toString(self, showChainId=True, showResidueType=True):
         res = self._parent

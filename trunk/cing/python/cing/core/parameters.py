@@ -49,8 +49,9 @@ moleculeDirectories.keysformat() #define a format string for 'pretty' output
 #These directories get generated below the HLML root of a molecule
 htmlDirectories = NTdict(
     # Directories generated
-    procheck= 'Models',
+    procheck= 'Models', # CHECK:weird mapping! 
     restraints  = 'Restraints',
+    atoms   = 'Atoms',
     peaks   = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output
@@ -64,6 +65,7 @@ cingPaths = NTdict(
     bin          = 'bin',
     html         = 'HTML',
     css          = 'cing.css',
+    jsMultiLine  = 'multilineTitles.js',
     xplor        = os.getenv('xplorPath'),
     procheck_nmr = os.getenv('procheckPath'),
     aqpc         = os.getenv('aqpcPath'),
