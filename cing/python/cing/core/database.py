@@ -241,6 +241,7 @@ class AtomDef( NTtree ):
                            __CLASS__ = 'AtomDef' ,
                            name     = name,     # Internal name
                            nameDict = {},
+                           aliases  = [],       # list of aliases
 
                            topology = [],       # List of bound atoms: (i, name) tuple
                                                 # i:  -1=previous residue; 0=current residue; 1=next residue

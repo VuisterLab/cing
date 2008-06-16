@@ -63,7 +63,15 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy.core.ma import arange
-import Image
+
+try:
+    import Image
+    haveImage = True
+except ImportError:
+    NTdebug("Failed to import Image; certain plot options will fail")
+    haveImage = False
+#end try
+
 import math
 import sys
 

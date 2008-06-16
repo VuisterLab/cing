@@ -134,15 +134,15 @@ def testOverall():
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = (
-#                           "cing.PluginCode.test.test_ccpn",
-#                           "cing.PluginCode.test.test_Procheck",
-#                           "cing.PluginCode.test.test_Whatif",
-#                           "cing.Scripts.test.test_cyana2cing",
-#                           "cing.STAR.FileTest",
-                          )
+    excludedModuleList = [  cingPythonDir + "/Cython*"
+#                           cingPythonDir + "/cing.PluginCode.test.test_ccpn",
+#                           cingPythonDir + "/cing.PluginCode.test.test_Procheck",
+#                           cingPythonDir + "/cing.PluginCode.test.test_Whatif",
+#                           cingPythonDir + "/cing.Scripts.test.test_cyana2cing",
+#                           cingPythonDir + "/cing.STAR.FileTest",
+                          ]
     namepattern, startdir = "test_*.py", cingPythonDir
-    nameList = findFiles(namepattern, startdir)
+    nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
@@ -157,9 +157,9 @@ def testOverall():
 #      print "In cing.main#testOverall found cing.verbosity: %d\n" % cing.verbosity
         tailPathStr = name[lenCingPythonDirStr+1:-3]
         mod_name = join(tailPathStr.split('/'), '.')
-        if mod_name in excludedModuleList:
-            print "Skipping module:  " + mod_name
-            continue
+#        if mod_name in excludedModuleList:
+#            print "Skipping module:  " + mod_name
+#            continue
         exec("import %s" % (mod_name)   )
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
         testVerbosity = 2
@@ -193,7 +193,7 @@ def main():
                       dest="docdoc",
                       help="Print full documentation to stdout"
                      )
-    parser.add_option("-n", 
+    parser.add_option("-n",
                       dest="name", default=None,
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
@@ -298,9 +298,9 @@ def main():
         NTerror("Ignoring setting")
     # From this point on code may be executed that will go through the appropriate verbosity filtering
     NTmessage(header)
-    # The weird location of this import is because we want it to be verbose. 
+    # The weird location of this import is because we want it to be verbose.
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
-    
+
 #    root,file,ext  = NTpath( __file__ )
 
     if options.test:
@@ -473,8 +473,8 @@ def main():
     #------------------------------------------------------------------------------------
     # CLose and optionally not save project
     #------------------------------------------------------------------------------------
-    if project and not options.nosave:
-        project.close()
+    if project:
+        project.close(save=not options.nosave)
     #------------------------------------------------------------------------------------
 
 if __name__ == '__main__':

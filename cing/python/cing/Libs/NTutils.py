@@ -220,7 +220,7 @@ class NTlist( list ):
 
     def removeDuplicates( self ):
         """Can be optimized when needed by doing a sorted lookup table"""
-        if len(self) <= 1: 
+        if len(self) <= 1:
             return
         i = 1
         while i < len(self):
@@ -2537,15 +2537,15 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         obj.toXML( depth, stream, indent, lineEnd )
     elif ( type( obj ) == int ):
         NTindent( depth, stream, indent )
-        fprintf( stream, "<int>%s</int>", str( obj ) )
+        fprintf( stream, "<int>%s</int>", repr( obj ) )
         fprintf( stream, lineEnd )
     elif ( type( obj ) == bool ):
         NTindent( depth, stream, indent )
-        fprintf( stream, "<bool>%s</bool>", str( obj ) )
+        fprintf( stream, "<bool>%s</bool>", repr( obj ) )
         fprintf( stream, lineEnd )
     elif ( type( obj ) == float ):
         NTindent( depth, stream, indent )
-        fprintf( stream, "<float>%s</float>", str( obj ) )
+        fprintf( stream, "<float>%s</float>", repr( obj ) )
         fprintf( stream, lineEnd )
     elif ( type( obj ) == str ):
         NTindent( depth, stream, indent )
@@ -2600,13 +2600,14 @@ def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
 def obj2XML( obj, stream=None, path=None ):
     """Convert an object to XML
        output to stream or path
+       gwv 13 Jun08: return object or None on error
     """
     if obj == None:
         NTerror("obj2XML: no object\n")
-        return
+        return None
     if stream == None and path == None:
         NTerror("obj2XML: no output defined\n")
-        return
+        return None
 
     closeFile = 0
     if not stream:
@@ -2618,6 +2619,8 @@ def obj2XML( obj, stream=None, path=None ):
 
     if closeFile:
         stream.close()
+
+    return obj
 #end def
 
 def XML2obj( path=None, string=None ):
@@ -2893,8 +2896,8 @@ def sprintf( format, *args ):
     return ( (format) % (args) )
 
 def printf( format, *args ):
-    """print string according to C's sprintf routine"""
-    NTmessage(  (format) % (args)  )
+    """print string according to C's printf routine"""
+    fprintf(  sys.stdout, format, *args  )
 
 class PrintWrap:
     def __init__( self, stream = None,
@@ -3193,7 +3196,7 @@ class OptionParser (optparse.OptionParser):
 """
 Taken from O'Reilly book
 """
-def findFiles(pattern, startdir=os.curdir):
+def findFiles_old(pattern, startdir=os.curdir):
     matches = []
     os.path.walk(startdir, findvisitor, (matches, pattern))
     matches.sort()
@@ -3205,7 +3208,36 @@ def findvisitor((matches, pattern), thisdir, nameshere):
             fullpath = os.path.join(thisdir, name)
             matches.append(fullpath)
 
+def findFiles( pattern, startdir, exclude=[]):
+    """
+    Find files matching pattern, based upon os.walk
+    """
+    result = []
+    #print exclude
+    for dirpath, dirs, files in os.walk(startdir):
 
+        excludePath = False
+        for e in exclude:
+            #print '>>',dirpath,e
+            if fnmatch(str(dirpath), e):
+                excludePath = True
+                break
+            #end if
+        #end for
+        #print '>>',dirpath, excludePath
+
+        if not excludePath:
+            for file in files:
+                if fnmatch(file,pattern):
+                    result.append(os.path.join(dirpath,file))
+                #end if
+            #end for
+        #end if
+    #end for
+    result.sort()
+    #print '>>',result
+    return result
+#end def
 
 def val2Str( value, fmt, count=None, nullValue=None):
     """Utility for translating numeric values to strings allowing the value
@@ -3562,7 +3594,7 @@ def gunzip(fileNameZipped, outputFileName=None):
     outF = file(fileName, 'wb');
     outF.write(s)
     outF.close()
-        
+
 
 def getEnsembleAverageAndSigmaFromHistogram( his ):
     """According to Rob's paper. Note that weird cases exist which to me
@@ -3656,9 +3688,9 @@ class ROGscore( NTdict ):
     ROG_COMMENT_NO_COOR = 'No coordinates'
     ROG_COMMENT_BAD_OMEGA = 'Bad omega'
     ROG_COMMENT_POOR_ASSIGNMENT = 'Poor assignment'
-    
+
     MAX_TO_REPORT_IN_POPUP = 5
-    
+
     def __init__( self ):
         NTdict.__init__( self )
         self.colorLabel = COLOR_GREEN
@@ -3667,13 +3699,13 @@ class ROGscore( NTdict ):
     def isCritiqued(self):
         if self.colorLabel != COLOR_GREEN:
             return True
-        
+
     def isRed(self):
         return self.colorLabel == COLOR_RED
     def isOrange(self):
         return self.colorLabel == COLOR_ORANGE
-    
-    
+
+
     # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
     # TODO: get aligned to left using a better .css.
     def addHTMLkeywords(self, kw ):
@@ -3688,21 +3720,21 @@ class ROGscore( NTdict ):
             if ln > self.MAX_TO_REPORT_IN_POPUP:
                 kw[ 'cavtitle' ] += '\nand so on for %d comments in total' % ln
             kw[ 'onmousemove' ] = 'SetCavTimer(event);'
-            kw[ 'onmouseout' ]  = "CancelCavTimer(event);" 
-        
+            kw[ 'onmouseout' ]  = "CancelCavTimer(event);"
+
     def createHtmlForComments(self, dst ):
         if not self.isCritiqued():
-            return        
+            return
 #        dst('ul', 'Critiques:', closeTag=False )
         kw = {'href':''}
-        kw['class'] = self.colorLabel        
+        kw['class'] = self.colorLabel
         for comment in self.colorCommentList:
             dst('li' , closeTag=False)
             dst('a' , comment, **kw)
             dst('li' , openTag=False)
 #        dst('ul', openTag=False)
-            
-        
+
+
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The socalled ROG score.
         The comment is optional and will only be appended when the color lable is
@@ -3714,18 +3746,18 @@ class ROGscore( NTdict ):
     #    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
     #    if not hasattr(o,'colorLabel'):
     #        o.colorLabel = COLOR_GREEN
-    
+
         if colorLabel == COLOR_GREEN:
             return
-        
+
         if colorLabel == COLOR_RED:
             if self.colorLabel != COLOR_RED:
                 self.colorCommentList = NTlist()
-                self.colorLabel = COLOR_RED    
+                self.colorLabel = COLOR_RED
         elif colorLabel == COLOR_ORANGE: # independent of colorLabel being green or orange.
             if self.colorLabel == COLOR_RED:
                 return
-#                self.colorCommentList = NTlist() # redundant because self was green without comments. 
+#                self.colorCommentList = NTlist() # redundant because self was green without comments.
             self.colorLabel = colorLabel
 
         if comment:
@@ -3733,6 +3765,6 @@ class ROGscore( NTdict ):
                 self.colorCommentList += comment # grow list with potentially multiple comments.
                 self.colorCommentList.removeDuplicates()
             else:
-                if comment not in self.colorCommentList: 
-                    self.colorCommentList.append( comment ) 
+                if comment not in self.colorCommentList:
+                    self.colorCommentList.append( comment )
 

@@ -6,7 +6,7 @@ from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist 
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
@@ -14,7 +14,7 @@ from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.parameters import cingPaths
 from cing.setup import time
 import os
- 
+
 # don't change:
 DSSP_STR = "dssp" # key to the entities (atoms, residues, etc under which the results will be stored
 
@@ -30,16 +30,16 @@ class Dssp:
     7  177 A E  T 3< S-     0   0  154     -4,-1.5     3,-0.1     1,-0.2    -3,-0.1   0.794  70.9 -19.7  51.6  50.3   -6.1    5.3    1.9
     8  178 A G  T 3  S+     0   0   61      1,-0.2     2,-0.9    -5,-0.2    -1,-0.2   0.364  98.5 124.3 102.3  -2.4   -5.9    8.0   -0.8
 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-0    -    1         2         3         4         5         6         7    -    8         9         1     
-    """        
+0    -    1         2         3         4         5         6         7    -    8         9         1
+    """
     dsspDefs = NTdict(
                           # Keep rucksack from filling up over the years.
     #   field       (startChar, endChar, conversionFunction, store)
-        resNum    = (6, 10, int, False), 
+        resNum    = (6, 10, int, False),
         chain     = (11, 12, str, False)
     )
     dsspDefs[ SECSTRUCT_STR ] = (16, 17,  str, True) # only one to store for now.
-    
+
     def __init__(self, project):
         self.project      = project
         self.molecule     = project.molecule
@@ -47,8 +47,8 @@ class Dssp:
         self.redirectOutput = True
 #        if cing.verbosity >= verbosityDetail:
 #            self.redirectOutput=False
-        self.dssp  = ExecuteProgram(pathToProgram = cingPaths.dssp, 
-                                    rootPath = self.rootPath,  
+        self.dssp  = ExecuteProgram(pathToProgram = cingPaths.dssp,
+                                    rootPath = self.rootPath,
                                     redirectOutput= self.redirectOutput)
     # Return True on error ( None on success; Python default)
     def run(self, export = True):
@@ -56,7 +56,7 @@ class Dssp:
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
                     NTwarning('non-protein residue %s found and will be written out for Dssp' % `res`)
-        
+
             models = NTlist(*range( self.project.molecule.modelCount ))
             # Can't use IUPAC here because aqua doesn't understand difference between
             # G and DG.(oxy/deoxy).
@@ -67,28 +67,28 @@ class Dssp:
                 pdbFile = self.project.molecule.toPDB( model=model, convention = "BMRB" )
                 if not pdbFile:
                     NTerror("Failed to write a temporary file with a model's coordinate")
-                    return True 
+                    return True
                 pdbFile.save( fullname   )
-                                
+
         NTdebug("Running dssp")
-        
+
         now = time.time()
         for model in models:
-            fullname =     'model_%03d.pdb'  % model 
-            fullnameOut =  'model_%03d.dssp' % model 
+            fullname =     'model_%03d.pdb'  % model
+            fullnameOut =  'model_%03d.dssp' % model
             cmd = fullname + ' ' + fullnameOut
             if self.dssp(cmd):
                 NTerror("Failed to run DSSP; please consult the log file (.log etc). in the molecules dssp directory.")
                 return True
         taken = time.time() - now
-        NTdebug("Took number of seconds: %8.1f" % taken)        
+        NTdebug("Took number of seconds: %8.1f" % taken)
         NTdebug("Finished dssp successfully")
         self.parseResult()
 #        self.postProcess()
         return True
     #end def
-    
-    
+
+
     def _parseLine(self, line, defs):
         """
         Internal routine to parse a single line
@@ -102,7 +102,7 @@ class Dssp:
             return None
         for field, fieldDef in defs.iteritems():
             c1, c2, func, _dummy = fieldDef
-            result[ field ] = func(line[c1:c2]) 
+            result[ field ] = func(line[c1:c2])
         return result
 
     def postProcess(self):
@@ -113,10 +113,10 @@ class Dssp:
                 itemList = res[ item ]
                 c = itemList.setConsensus()
                 NTdebug('consensus: %s', c)
-                    
-                
-            
-    
+
+
+
+
     def parseResult(self):
         """
         Parse .dssp files and store result in dssp NTdict
@@ -127,8 +127,8 @@ class Dssp:
         NTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
 
         for model in range(modelCount):
-            fullnameOut =  'model_%03d.dssp' % model 
-            path = os.path.join(self.rootPath, fullnameOut)           
+            fullnameOut =  'model_%03d.dssp' % model
+            path = os.path.join(self.rootPath, fullnameOut)
 
 #            NTmessage("Parsing " + path)
             isDataStarted = False
@@ -141,7 +141,7 @@ class Dssp:
 #                NTdebug("working on line: %s" % line.dollar[0])
                 if not len( line.dollar[0][6:10].strip() ):
 #                    NTdebug('Skipping line without residue number')
-                    continue 
+                    continue
                 result = self._parseLine(line.dollar[0], self.dsspDefs)
                 if not result:
                     NTerror("Failed to parse dssp file the below line; giving up.")
@@ -157,16 +157,16 @@ class Dssp:
                 if model==0 and residue.has_key('dssp'):
                     del(residue['dssp'])
                 residue.setdefault('dssp', NTdict())
-                
+
 #                NTdebug("working on residue %s" % residue)
                 for field, value in result.iteritems():
                     if not self.dsspDefs[field][3]: # Checking store parameter.
                         continue
                     # Insert for key: "field" if missing an empty  NTlist.
-                    residue.dssp.setdefault(field, NTlist()) 
+                    residue.dssp.setdefault(field, NTlist())
                     residue.dssp[field].append(value)
 #                    NTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
-        
+
 #end class
 
 def dssp(project)   :
@@ -174,24 +174,29 @@ def dssp(project)   :
     Adds <Procheck> instance to molecule. Run dssp and parse result.
     Return None on error.
     """
-    NTmessage('==> Calculating secondary structure by DSSP')
+    # check if dssp is present
+    if cingPaths.dssp == 'PLEASE_ADD_EXECUTABLE_HERE':
+        NTdebug('dssp: skipping since executable is not defined')
+        return None
+
     if not project.molecule:
         NTerror('dssp: no molecule defined\n')
         return None
     #end if
-    
+
     if project.molecule.has_key('dssp'):
         del(project.molecule.dssp)
     #end if
-    
+
     dcheck = Dssp(project)
     if not dcheck:
-        NTerror("Failed to get dssp instance of project") 
+        NTerror("Failed to get dssp instance of project")
         return None
-        
-    dcheck.run()   
+
+    NTmessage('==> Calculating secondary structure by DSSP')
+    dcheck.run()
     project.molecule.dssp = dcheck
-    
+
     return dcheck
 #end def
 

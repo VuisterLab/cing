@@ -45,6 +45,8 @@ import os
 import sys
 import time
 
+import cing
+
 
 
 projects = NTlist()
@@ -137,7 +139,7 @@ Project: Top level Cing project class
     """
 
     OMEGA_MAXALL_DEFAULT_POOR_VALUE = 1. # Normally 15 but may be set low for testing 1brv to
-    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 20 
+    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 20
 
     def __init__( self, name ):
 
@@ -300,10 +302,10 @@ Project: Top level Cing project class
         """
         return self.moleculePath( 'html', *args )
     #end def
-    #-------------------------------------------------------------------------
-    # actions open/restore/save/close/export/updateProject
-    #-------------------------------------------------------------------------
 
+    #-------------------------------------------------------------------------
+    # actions exists/open/restore/save/close/export/updateProject
+    #-------------------------------------------------------------------------
 
     def exists( name ):
         rootp, _n = Project.rootPath( name )
@@ -344,18 +346,22 @@ Project: Top level Cing project class
         elif (status == 'old'):
             root,newName = Project.rootPath( name )
             if not os.path.exists( root ):
-                NTerror('ERROR Project.open: unable to open Project "%s"\n', name )
+                NTerror('Project.open: unable to open Project "%s"\n', name )
                 return None
             #end if
 
-            # Restore Project from xml-file
+            # Restore Project info from xml-file
             pfile = os.path.join( root, cingPaths.project )
             if not os.path.exists( pfile ):
-                NTerror('ERROR Project.open: missing Project file "%s"\n', pfile )
+                NTerror('Project.open: missing Project file "%s"\n', pfile )
                 return None
             #end if
             pr = XML2obj( pfile )
-            # This allows renaming/relative adressing at the shell level
+            if pr == None:
+                NTerror('Project.open: error parsing Project file "%s"\n', pfile )
+                return None
+            #end if
+            # This allows renaming/relative addressing at the shell level
             pr.root = root
             pr.name = newName
 
@@ -369,25 +375,43 @@ Project: Top level Cing project class
         #end if
 
         # Check the subdirectories
+        tmpdir = pr.path( directories.tmp )
+        # have to use cing.verbosity to work?
+        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
+            removedir(tmpdir)
         for dir in directories.values():
             pr.mkdir( dir )
         #end for
 
         projects.append( pr )
-        NTdebug(pr.format())
+        NTmessage('%s', pr.format())
         return pr
     #end def
     open = staticmethod( open )
 
-    def close( self ):
+    def close( self, save=True ):
+        """
+        Save project data and close project.
+        TODO: Call destructor on self and its elements
+        """
         global projects
         #self.export()
-        self.save()
+        if save: self.save()
+        # remove the tmpdir
+        tmpdir = self.path( directories.tmp )
+        # have to use cing.verbosity to work?
+        #print '>>', cing.verbosity, cing.verbosityDebug
+        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
+            removedir(tmpdir)
+
         projects.remove(self)
         return None
     #end def
 
     def save( self):
+        """
+        Save project data
+        """
         NTmessage('' + dots*5 +'' )
         NTmessage(   '==> Saving %s', self )
 
@@ -406,25 +430,6 @@ Project: Top level Cing project class
             self.saveXML( nameList )
         #end for
 
-#        self.peakListNames = self.peaks.save()
-#        #Patch for XML bug
-#        self.saveXML('peakListNames')
-#
-#        # Save the distanceRestaintsLists
-#        self.distanceListNames = self.distances.save()
-#        #Patch for XML bug
-#        self.saveXML('distanceListNames')
-#
-#        # Save the dihedralRestaintsLists
-#        self.dihedralListNames = self.dihedrals.save()
-#        #Patch for XML bug
-#        self.saveXML('dihedralListNames')
-#
-#        # Save the rdcRestaintsLists
-#        self.rdcListNames = self.rdcs.save()
-#        #Patch for XML bug
-#        self.saveXML('rdcListNames')
-
         # Call Plugin registered functions
         for p in self.plugins.values():
             for f,o in p.saves:
@@ -433,7 +438,10 @@ Project: Top level Cing project class
         #end for
 
         # Save the project data
-        obj2XML( self, path = self.path( cingPaths.project ) )
+        xmlfile = self.path( cingPaths.project )
+        if obj2XML( self, path = xmlfile) != self:
+            NTerror('Project.save: writing Project file "%s" failed', xmlfile)
+        #end if
 
         self.addHistory( 'Saved project' )
     #end def
@@ -453,11 +461,12 @@ Project: Top level Cing project class
         #end for
 
         # restore the lists
-        for pl, nameList in [(self.peaks,     'peakListNames'),
-                             (self.distances, 'distanceListNames'),
-                             (self.dihedrals, 'dihedralListNames'),
-                             (self.rdcs,      'rdcListNames' )
-                            ]:
+        for pl, nameList, name in [(self.peaks,     'peakListNames',    'peaks'),
+                                   (self.distances, 'distanceListNames','distances'),
+                                   (self.dihedrals, 'dihedralListNames','dihedrals'),
+                                   (self.rdcs,      'rdcListNames',     'rdcs')
+                                  ]:
+            NTmessage('==> Restoring %s ...', name)
             pl.restore( self[nameList]  )
         #end for
 
@@ -2351,7 +2360,7 @@ class HTMLfile:
             rel="stylesheet", type="text/css", media="screen", href=cssLink))
         self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
             type="text/javascript", src=jsMultiLineLink))
-        
+
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
         self.stream.write(self.openTag('div', id="container"))
@@ -2551,7 +2560,7 @@ class HTMLfile:
         link = self.findHtmlLocation( source, destination, id )
 #        NTdebug('From source: [%s] to destination [%s] id [%s] using relative link: %s' % (source, destination, id,link))
 
-        
+
         kw = {'href':link}
         #if not destination.has_key('colorLabel'):
         if hasattr(destination, 'rogScore'):
@@ -2614,7 +2623,7 @@ class AtomList( NTlist ):
     Class based on NTlist that holds atoms.
     Also manages the "id's".
     Sort by item of Atom Class.
-    
+
     NB this list is only instantiated for the validate plugin. It has very little
     functionality. Most functionality should be in Residue, Chains, etc.
     """

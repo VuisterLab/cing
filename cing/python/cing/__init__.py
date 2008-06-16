@@ -1,3 +1,9 @@
+"""
+CING: Common Interface for NMR structure Generation
+
+(c) AW,JFD,GWV 2004-2008
+
+"""
 import os
 import sys
 
@@ -14,7 +20,7 @@ header = """
 """ % (cingVersion)
 footer = """------------------------------------------------------------------------------------------------------
 """
-authorList = [  ('Geerten Vuister',             'vuister@science.ru.nl'),
+authorList = [  ('Geerten Vuister',             'g.vuister@science.ru.nl'),
                 ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
                 ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
                 ]
@@ -87,12 +93,15 @@ if not os.path.exists(cingDirTmp):
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import *
-from cing.core.classes import *
-from cing.core.parameters import *
+from cing.Libs.NTutils import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist
+from cing.core.classes import Project
+from cing.core.classes import Peak, PeakList, DistanceRestraint, DistanceRestraintList
+from cing.core.classes import DistanceRestraint, DistanceRestraintList
+from cing.core.classes import DihedralRestraint, DihedralRestraintList
+#from cing.core.parameters import *
 from cing.core.database import NTdb
-from cing.core.dictionaries import *
-from cing.core.molecule import *
+#from cing.core.dictionaries import *
+from cing.core.molecule import Molecule, Chain, Residue, Atom, Coordinate, Resonance
 from cing.core.importPlugin import importPlugin # This imports all plugins
-from cing.Libs.peirceTest import peirceTest
+#from cing.Libs.peirceTest import peirceTest
 #from cing.Libs.TypeChecking import *

@@ -1,5 +1,6 @@
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -38,6 +39,7 @@ from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
+from cing.core.sml import SMLhandler
 from database     import NTdb
 from parameters   import plotParameters
 import math
@@ -48,12 +50,15 @@ import os
 #==============================================================================
 AtomIndex = 1
 
+# version <= 0.91: old sequence.dat defs
+# version 0.92: xml-sequence storage, xml-stereo storage
 NTmolParameters = NTdict(
-    version        = 0.9,
+    version        = 0.92,
     contentFile    = 'content.xml',
-    sequenceFile   = 'sequence.dat',
+    sequenceFile   = 'sequence.xml',
     resonanceFile  = 'resonances.dat',
     coordinateFile = 'coordinates.dat',
+    stereoFile     = 'stereo.xml'
 )
 
 dots = '-----------'
@@ -142,13 +147,13 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
-        self.__FORMAT__ =  self.header( dots ) + '\n' +\
-                          'chains:     %(chainCount)d %(chains)s\n' +\
-                          'residues:   %(residueCount)d\n' +\
-                          'atoms:      %(atomCount)d\n' +\
-                          'resonances: %(resonanceCount)d per atom\n' + \
-                          'models:     %(modelCount)d\n' +\
-                           self.footer( dots )
+#        self.__FORMAT__ =  self.header( dots ) + '\n' +\
+#                          'chains:     %(chainCount)d %(chains)s\n' +\
+#                          'residues:   %(residueCount)d\n' +\
+#                          'atoms:      %(atomCount)d\n' +\
+#                          'models:     %(modelCount)d\n' +\
+#                          'resonances: %(resonanceCount)d per atom\n' + \
+#                           self.footer( dots )
 
         self.chains       = self._children
         self.chainCount   = 0
@@ -158,9 +163,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.resonanceCount = 0
 
         self.modelCount   = 0
+        self._coordinates = NTlist()   # internal array with coordinate references
 
         self.xeasy        = None # reference to xeasy class, used in parsing
-        self.rogScore = ROGscore()
+        self.rogScore     = ROGscore()
 
         self.saveXML('chainCount','residueCount','atomCount')
 
@@ -168,10 +174,40 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.content = NTdict( name = self.name, convention = INTERNAL )
         self.content.update( NTmolParameters )
         self.content.saveAllXML()
+        self.content.keysformat()
 
-        NTdebug(self.format() )
+        NTdebug('Molecule.__init__: %s', self )
         #end if
     #end def
+
+    def format(self):
+        self.nAssigned = 0
+        self.nStereoAssigned = 0
+        for atm in self.allAtoms():
+            if atm.isAssigned(): self.nAssigned += 1
+            if atm.isStereoAssigned(): self.nStereoAssigned += 1
+        #end for
+
+        result = sprintf(
+                          '%s\n' +\
+                          'chains:      %d %s\n' +\
+                          'residues:    %d\n' +\
+                          'atoms:       %d\n' +\
+                          'models:      %d\n' +\
+                          'resonances:  %d per atom\n' +\
+                          'assignments: %d (%d stereo)\n' +\
+                          '%s',
+                           self.header( dots ),
+                           self.chainCount, self.chains,
+                           self.residueCount,
+                           self.atomCount,
+                           self.modelCount,
+                           self.resonanceCount,
+                           self.nAssigned, self.nStereoAssigned,
+                           self.footer(dots)
+                         )
+        return result
+   #end def
 
     def __str__(self):
         return sprintf('<Molecule "%s" (C:%d,R:%d,A:%d,M:%d)>',
@@ -243,12 +279,12 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             ..etc..
             Caller is responsible for relaying error messages but debug
             statements within can be enabled from code.
-            
+
             fromCYANA2CING can be set in which case all chains will be searched
             for the requested residue or atom. This is needed when reading
             CYANA restraints without chain ids but numbering that is non-overlapping
             between CING's residue numbering. E.g. in entry 1y4o there are chains:
-            A and B in PDB but just [1-104] and [201-304] in the upls. 
+            A and B in PDB but just [1-104] and [201-304] in the upls.
         """
 #        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
         convention, chainName, resNum, atomName = nameTuple
@@ -258,31 +294,31 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 return self
             # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
     #        if not chainName in self:
-            
+
             if not self.has_key(chainName):
     #            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
                 return None
-    
+
             chain = self[chainName]
-    
+
             if resNum == None:
                 return chain
-    
+
             if not chain.has_key(resNum):
     #            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
                 return None
             res = chain[resNum]
-    
+
             if atomName == None:
                 return res
-    
+
             resTranslated = res.translate(convention)
             an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
     #        if (not an or (an not in res)): return None
             if not an:
     #            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
                 return None
-    
+
             if not res.has_key(an):
     #            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
                 return None
@@ -292,32 +328,32 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
                 return None
 
-            for chain in self.allChains():    
+            for chain in self.allChains():
                 if resNum == None:
                     return chain
-        
+
                 if not chain.has_key(resNum):
 #                    NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
                     continue # perhaps in other chain?
                 res = chain[resNum]
-        
+
                 if atomName == None:
                     return res
-        
+
                 resTranslated = res.translate(convention)
                 an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 
                 if not an:
                     NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
                     return None
-        
+
                 if not res.has_key(an):
                     NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
                     return None
                 return res[an]
             NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
             return None
-        # end else 
+        # end else
     #end def
 
     def getResidue( self, resName, chains = None):
@@ -471,8 +507,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
     def save( self, path = None)   :
         """Create a directory path (or use name.NTmol)
-           Save sequence, resonances and coordinates so it can be restored by
-           restore.
+           Save sequence, resonances, stereo assignments and coordinates.
+           gwv 13 Jun 08: Return self or None on error
         """
         if not path: path = self.name + '.NTmol'
         if os.path.exists( path ): removedir( path )
@@ -481,14 +517,20 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         content = NTdict( name = self.name, convention = INTERNAL )
         content.update( NTmolParameters )
         content.saveAllXML()
-        obj2XML( content, path=os.path.join( path, NTmolParameters.contentFile ) )
-
-        self.saveSequence(    os.path.join( path, NTmolParameters.sequenceFile   ) )
-        self.saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
+        content.keysformat()
+        xmlfile = os.path.join( path, NTmolParameters.contentFile )
+        if (obj2XML( content, path=xmlfile ) != content):
+            NTerror('Molecule.save: writing xml file "%s" failed', xmlfile)
+            return None
+        #end if
+        self.content = content
+        self._saveSequence(   os.path.join( path, NTmolParameters.sequenceFile   ) )
+        self._saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
+        self._saveStereoAssignments( os.path.join( path, NTmolParameters.stereoFile ) )
         self.saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
 
         NTmessage('==> Saved %s to "%s"', self, path)
-        #end if
+        return self
     #end def
 
     def open( path)   :
@@ -502,14 +544,15 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
         content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
         if not content:
-            NTerror('Molecule.open: error reading contentFile "%s"\n',
+            NTerror('Molecule.open: error reading xml file "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
                    )
             return None
         #end if
+        content.keysformat()
+        NTdebug('content from xml-file: %s', content.format())
 
         NTmessage('==> Restoring Molecule from "%s" ... ', path )
-
 
         mol = Molecule( name = content.name )
         if not mol:
@@ -517,10 +560,14 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             return None
         #end if
 
-        mol.restoreSequence(    os.path.join( path, content.sequenceFile   ) )
-        mol.restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False )
-        mol.restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
         mol.content = content
+        if not mol._restoreSequence(    os.path.join( path, content.sequenceFile   ) ):
+            return None
+        if mol._restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False ) < 0:
+            return None
+        if mol._restoreStereoAssignments( os.path.join( path, content.stereoFile ) ) < 0:
+            return None
+        mol.restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
 
         mol.updateAll(   )
 
@@ -530,37 +577,58 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     #end def
     open = staticmethod(open)
 
-    def saveSequence( self, fileName ):
-        """Write a plain text-file with code to generate sequence
+    def _saveSequence( self, fileName ):
+        """Write a xml sequence file.
+        return self or None on error
         """
-        fp = open( fileName, 'w' )
+        sequence = NTlist()
         for res in self.allResidues():
-            fprintf( fp, 'self._addResidue( %s, %s, %d, "CYANA" )\n',
-                          quote(res.chain.name),
-                          quote(res.db.translate(CYANA)),
-                          res.resNum
-                   )
+            # append a tuple
+            sequence.append( ( res.chain.name,
+                               res.db.translate(CYANA),
+                               res.resNum,
+                               CYANA
+                             )
+                           )
         #end for
-        fp.close()
+        if obj2XML( sequence, path=fileName ) != sequence:
+            NTerror('Molecule._saveSequence: writing xml sequence file "%s"', fileName)
+            return None
+        #end if
+        return self
     #end def
 
-    def restoreSequence( self, sequenceFile ):
+    def _restoreSequence( self, sequenceFile ):
+        """Restore sequence from sequenceFile.
+        Return self or None on error.
+        """
         if (not os.path.exists( sequenceFile ) ):
             NTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
                      sequenceFile
                    )
             return None
         #end if
-        #execfile( sequenceFile )
-        # 25 Sep 2007: Explicit coding, less memory, better:
-        file = open(sequenceFile, 'r')
-        for line in file:
-            exec(line)
-        #end for
-        file.close()
+        # compatibility
+        if self.content.version < 0.92:
+            file = open(sequenceFile, 'r')
+            for line in file:
+                exec(line)
+            #end for
+            file.close()
+        else:
+            sequence = XML2obj( sequenceFile )
+            if sequence == None:
+                NTerror('Molecule._restoreSequence: error parsing xml-file "%s"', sequenceFile)
+                return None
+            for chainId, resName, resNum, convention in sequence:
+                self._addResidue( chainId, resName, resNum, convention )
+            #end for
+        #end if
+        #NTdebug('Molecule._restoreSequence: %s', sequenceFile)
+        return self
     #end def
 
-    def saveResonances( self, fileName ):
+    def _saveResonances( self, fileName ):
         """Write a plain text file with code for saving resonances
         """
         fp = open( fileName, 'w' )
@@ -574,16 +642,17 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             #end for
         #end for
         fp.close()
+        #NTdebug('Molecule.saveResonances: %s', fileName)
     #end def
 
-    def restoreResonances( self, fileName, append = True ):
+    def _restoreResonances( self, fileName, append = True ):
         """Restore resonances from fileName
            Optionally append to existing settings
-           Return resonanceCount or None on error
+           Return resonanceCount or -1 on error
         """
         if not os.path.exists( fileName ):
-            NTerror('Error Molecule.restoreResonances: file "%s" not found\n', fileName )
-            return None
+            NTerror('Error Molecule._restoreResonances: file "%s" not found\n', fileName )
+            return -1
         #end if
         if not append:
             self.initResonances(   )
@@ -597,6 +666,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         #end for
         file.close()
 
+        #NTdebug('Molecule.restoreResonances: %s (%d)', fileName, self.resonanceCount)
         return self.resonanceCount
     #end def
 
@@ -617,8 +687,57 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             atom.resonances = NTlist()
         #end for
         self.resonanceCount = 0
-        NTmessage("==> Initialized resonances")
+        #NTmessage("==> Initialized resonances")
         #end if
+    #end def
+
+    def _saveStereoAssignments( self, stereoFileName ):
+        """
+        Save the stereo assignments to xml stereoFileName.
+        Return self of None on error
+        """
+        stereo = NTlist()
+        for atm in self.allAtoms():
+            if atm.isStereoAssigned():
+                stereo.append( atm.nameTuple(convention=CYANA) )
+            #endif
+        #end for
+        if obj2XML(stereo, path=stereoFileName) != stereo:
+            NTerror('Molecule._saveStereoAssignments: write xml-file "%s" failed', stereoFileName)
+            return None
+        #end if
+
+        #NTdebug('Molecule.saveStereoAssignments: saved %d stereo assignments to "%s', len(stereo), stereoFileName)
+        return self
+    #end def
+
+    def _restoreStereoAssignments( self, stereoFileName ):
+        """
+        Restore the stereo assignments from xml stereoFileName,
+        return count or -1 on error
+        """
+        if not os.path.exists( stereoFileName ):
+            return -1
+
+        stereo = XML2obj(stereoFileName)
+        if stereo == None:
+            NTerror('Molecule._restoreStereoAssignment: parsing xml-file "s"', stereoFileName)
+            return -1
+        #end if
+
+        count = 0
+        for nameTuple in stereo:
+            atm = self.decodeNameTuple( nameTuple )
+            if atm == None:
+                NTerror('Molecule._restoreStereoAssignment: invalid atom nameTuple (%s)', nameTuple)
+            else:
+                atm.stereoAssigned = True
+                count += 1
+            #end if
+        #end for
+
+        #NTdebug('Molecule.restoreStereoAssignments: restored %d stereo assignments from "%s\n',count, stereoFileName)
+        return count
     #end def
 
     def saveCoordinates( self, fileName ):
@@ -630,6 +749,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 fprintf( fp, 'self%s.addCoordinate( %r, %r, %r, Bfac=%r )\n',
                               atm._Cname2( 2 ), c[0], c[1], c[2], c.Bfac)
         fp.close()
+        #NTdebug('Molecule.saveCoordinates: %s', fileName)
 
     def restoreCoordinates( self, fileName, append = True ):
         """Restore coordinates from fileName
@@ -652,6 +772,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             exec(line)
         #end for
         file.close()
+        #NTdebug('Molecule.restoreCoordinates: %s (%d)', fileName, self.modelCount)
         return self
     #end def
 
@@ -659,9 +780,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         """Calculate the dihedral angles for all residues
         """
         if self.modelCount <= 0:
-            NTmessage('==> No models so skipping calculating dihedral angles ... ')
+            NTdebug('No models so skipping calculating dihedral angles')
             return
-        NTmessage('==> Calculating dihedral angles ... ')
+
+        NTdebug('Calculating dihedral angles')
         self.dihedralDict = {} # will be filled by calling dihedral method of residue
         for res in self.allResidues():
             for dihedral in res.db.dihedrals:
@@ -670,8 +792,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def updateMean( self)   :
         """Calculate mean coordinates for all atoms
         """
-        if self.modelCount:
-            NTmessage('==> Calculating mean coordinates ... ')
+        NTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
         for atm in self.allAtoms():
             atm.calculateMeanCoordinate()
 
@@ -1204,11 +1325,11 @@ Residue class: Defines residue properties
         else:
             result = ''
         if showResidueType:
-            result += self.name 
+            result += self.name
         else:
             result += self.number
         return result
-        
+
     def _nameResidue( self, resName, resNum ):
         """Internal routine to set all the naming right and database refs right
         """
@@ -1272,8 +1393,12 @@ Residue class: Defines residue properties
 
     def mutate( self, resName   ):
         """
-        Mutate residue to resName
-           Return self or None on error
+        Mutate residue to resName:
+            Generate newResidue <Residue> instance.
+            Move the 'like' atoms from self to newResidue.
+            Replace self by newResidue in chain.
+
+        Return (self,newResidue) tuple or None on error
         """
         # find the database entry
         if resName not in NTdb:
@@ -1306,11 +1431,17 @@ Residue class: Defines residue properties
         for atmDef in newRes.db.atoms:
             if (atmDef.name in self):
                 atm = self.removeChild( self[atmDef.name] )
+                for alias in atm.db.aliases:
+                    if alias in self: del(self[alias])
+                #end for
                 self.atomCount -= 1
                 atm.residue = newRes
                 newRes._addChild( atm )
                 newRes.atomCount += 1
                 newRes.chain.molecule.atomCount += 1
+                for alias in atm.db.aliases:
+                    newRes[alias] = atm
+                #end for
             else:
                 atm = newRes.addAtom( atmDef.name )
                 for dummy in range(newRes.chain.molecule.resonanceCount):
@@ -1323,7 +1454,8 @@ Residue class: Defines residue properties
     #end def
 
     def addAtom( self, name, **kwds ):
-        """add atomName, return Atom instance
+        """add atomName to self as well as potential alias references
+           return Atom instance
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
         ac = Atom( resName=self.resName, atomName=name, **kwds )
@@ -1331,6 +1463,8 @@ Residue class: Defines residue properties
         ac.residue = self
         self._parent._parent.atomCount += 1
         self.atomCount += 1
+        for alias in ac.db.aliases:
+            self[alias] = ac
         return ac
     #end def
 
@@ -1344,7 +1478,7 @@ Residue class: Defines residue properties
 
     def dihedral( self, dihedralName ):
         """Return cmean,cv tuple for dihedralName,
-        or None on error 
+        or None on error
 
         set self[dihedralName] to NTlist of results
         """
@@ -1390,7 +1524,7 @@ Residue class: Defines residue properties
         plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
         self[dihedralName].limit( plotpars.min, plotpars.max )
         cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
-        
+
         return cav,cv
     #end def
 
@@ -1573,7 +1707,7 @@ Atom class: Defines object for storing atom properties
     all dict methods
 
     """
-    
+
     def __init__( self, resName, atomName, **kwds ):
 
         NTtree.__init__(self, name=atomName, __CLASS__='Atom',**kwds )
@@ -1583,6 +1717,8 @@ Atom class: Defines object for storing atom properties
                           'resonances:  %(resonances)s\n' +\
                           'coordinates: %(coordinates)s\n' +\
                           self.footer( dots )
+
+        self.setdefault( 'stereoAssigned', False )
 
         self.resonances  = NTlist()
         self.coordinates = NTlist()
@@ -1634,19 +1770,21 @@ Atom class: Defines object for storing atom properties
             result += res.name + '.' + self.name
         else:
             result += res.number + '.'  + self.name
-            
+
         return result
-            
+
     def addCoordinate( self, x, y, z, Bfac, **kwds ):
         """Append coordinate to coordinates list
         Convenience method."""
         c = Coordinate( x, y, z, Bfac=Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, atom=self )
 #        c.update( **kwds )
+        c.model = len(self.coordinates)
         self.coordinates.append( c )
+        self._parent._parent._parent._coordinates.append(c)
     #end def
 
     def addResonance( self, value, error=0.0 ):
-        r = Resonance( atom=self, value=value, error = 0.000 )
+        r = Resonance( atom=self, value=value, error = error )
         self.resonances.append( r )
     #end def
 
@@ -1787,6 +1925,67 @@ Atom class: Defines object for storing atom properties
         #end if
     #end def
 
+    def isStereoAssigned( self ):
+        """
+        Return True if stereoAssigned flag present and True
+        """
+        return self.stereoAssigned
+    #end def
+
+    def isProChiral( self ):
+        """
+        Return True if atm is pro-chiral and thus can have stereo assignment
+        Should be in in database
+        """
+        LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1',
+                       CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1'
+                     )
+        self.db.proChiralPartnerAtom = None
+        if self.residue.db.name in ['LEU', 'VAL'] and self.db.name in LVdict:
+            # patch database
+            self.db.proChiralPartnerAtom = LVdict[ self.db.name ]
+            return True
+        #end if
+        if self.isProton():
+            p = self.pseudoAtom()
+            if p != None:
+                r = p.realAtoms()
+                if len(r) == 2:
+                    if atm == r[0]:
+                        self.db.proChiralPartnerAtom = r[1].db.name
+                    else:
+                        self.db.proChiralPartnerAtom = r[0].db.name
+                    return True
+                #end if
+            #end if
+        #end if
+        return False
+    #end def
+
+    def proChiralPartner( self ):
+        """
+        Return proChiral partner Atom instance of self or None if this does not exist
+        should be in database
+        """
+
+        if self.isProChiral():
+            return self.residue[self.db.proChiralPartnerAtom]
+        #end if
+        return None
+    #end def
+
+    def heavyAtom( self ):
+        """
+        For protons return heavyAtom of self,
+        None otherwise
+        """
+        if not self.isProton(): return None
+        return self.topology()[0]
+    #end def
+
+
+
+
 #    def isAromatic( self ):
 #        """Return true if it is an atom belonging to an aromatic ring
 #           Patched for now, have to store it in database
@@ -1919,6 +2118,13 @@ Atom class: Defines object for storing atom properties
         else:
             props.append('isNotAssigned','notassigned')
         #end if
+
+        if self.isStereoAssigned():
+            props.append('isStereoAssigned','stereoassigned')
+        else:
+            props.append('isNotStereoAssigned','notstereoassigned')
+        #end if
+
 # in database now
 #        if self.isBackbone():
 #            props.append('isBackbone','backbone')
@@ -2241,18 +2447,12 @@ e.g.
     DEFAULT_BFACTOR   = 0.0
     DEFAULT_OCCUPANCY = 1.0
 
-    def __init__( self, x, y, z, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
-#        NTdict.__init__(   self,
-#                           __CLASS__  = 'Coordinate',
-#                           __FORMAT__ = '(%(x)6.2f,%(y)6.2f,%(z)6.2f)'
-#                       )
-#        self.x = x
-#        self.y = y
-#        self.z = z
-        self.e = NTcVector( x, y, z )
-        self.Bfac = Bfac
+    def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
+        self.e         = NTcVector( x, y, z )
+        self.Bfac      = Bfac
         self.occupancy = occupancy
-        self.atom = atom
+        self.atom      = atom
+        self.model     = -1    # index of the model
     #end def
 
     #implement  x,y,z attributes mapped to e vector
@@ -2337,6 +2537,72 @@ e.g.
 
     def __repr__(self):
         return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f )', self.e[0], self.e[1], self.e[2], self.Bfac )
+#end class
+
+class SMLCoordinateHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'Coordinate' )
+    #end def
+
+    def handle(self, line, fp, project=None):
+        # Explicit coding saved ca 30%
+        c = Coordinate(x=float(line[2]), y=float(line[3]), z=float(line[4]), Bfac=float(line[5]),occupancy=float(line[6]))
+        c.model = int(line[7])
+        line = self.readline( fp )
+        c.atomNameTuple = eval(line[0])
+#        return self.dictHandler(c, fp, project)
+        line = self.readline( fp )
+        if line[0] == self.endTag:
+            self.endHandler(c, project)
+            return c
+        #end if
+        # We should not be here
+        NTerror('SMLCoordinateHandler.handle: missing Coordinate endTag')
+        return None
+    #end def
+
+    def endHandler(self, c, project):
+        # Map the atomNameTuple
+        if project == None: return None
+        # Misuse project as molecule here
+        molecule = project
+        atm = molecule.decodeNameTuple(c.atomNameTuple)
+        if atm == None:
+            NTerror('SMLCoordinateHandler.endHandler: invalid atomNameTuple (%s)', c.atomNameTuple)
+            return None
+        #end if
+        c.atom = atm
+        atm.coordinates.append(c)
+        return c
+    #end def
+
+    def toSML(self, c, stream ):
+        """
+            For coordinate
+        """
+#        fprintf( stream, "%s\n", self.startTag)
+#        for a in ['x','y','z','Bfac','occupancy','model']:
+#            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
+#        #end for
+
+        # print x,y,z,Bfac,occupancy, model ontag line to speed up parsing and initialization
+        fprintf( stream, "%s %.3f %.3f %.3f %.3f %.3f %d\n",
+                         self.startTag,
+                         c.e[0], c.e[1], c.e[2],
+                         c.Bfac, c.occupancy,
+                         c.model
+               )
+        fprintf( stream, '%s\n', repr( c.atom.nameTuple(CYANA) ) )
+#        Can add attributes here; update handle
+#        for a in ['model']:
+#            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
+        #end for
+
+        fprintf( stream, "%s\n", self.endTag )
+    #end def
+#end class
+Coordinate.SMLhandler = SMLCoordinateHandler()
 
 
 #==============================================================================
