@@ -10,10 +10,11 @@
     Optionally export on-the-fly to a xplor refine setup.
 
 """
-from cing.Libs.NTutils import NTerror
+
+import cing
+from cing import NTwarning
+from cing import Project
 from cing.Libs.NTutils import OptionParser
-from cing.core.classes import Project
-from cing.Libs.NTutils import NTwarning
 import os
 import sys
 
@@ -25,8 +26,9 @@ parser.add_option("-o","--overwrite",
                   help="Overwrite existing cing output directory (default: no-overwrite)."
                  )
 parser.add_option("-c", "--convention",
-                  dest="convention", default="CYANA2",
-                  help="Set convention (CYANA,CYANA2).",
+                  dest="convention",
+                  default="CYANA2",
+                  help="Set convention: CYANA,CYANA2 (default=CYANA2).",
                   metavar="CONVENTION"
                  )
 parser.add_option("--seqFile",
@@ -38,6 +40,11 @@ parser.add_option("--protFile",
                   dest="protFile",
                   help="Define protFile (no .prot extention).",
                   metavar="PROTFILE"
+                 )
+parser.add_option("--stereoFile",
+                  dest="stereoFile",
+                  help="Define stereoFile (no .cya extention).",
+                  metavar="STEREOFILE"
                  )
 parser.add_option("--pdbFile",
                   dest="pdbFile",
@@ -64,25 +71,39 @@ parser.add_option("--acoFiles",
                   help="Define acoFiles (no .aco extention; separate by comma's:e.g. talos,hnha).",
                   metavar="ACOFILES"
                  )
-parser.add_option("--refine",
-                  dest="refine",
-                  help="Setup and export to Refine/NAME directory of project.",
-                  metavar="NAME"
-                 )
 parser.add_option("--export",
                   action="store_true",
                   dest="export", default=False,
                   help="Export to different formats (default: no-export)."
                  )
+parser.add_option("-v", "--verbosity", type='int',
+                  default=cing.verbosityDefault,
+                  dest="verbosity", action='store',
+                  help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
+                 )
 
 (options, args) = parser.parse_args()
 
+if options.verbosity >= 0 and options.verbosity <= 9:
+#        print "In main, setting verbosity to:", options.verbosity
+    cing.verbosity = options.verbosity
+else:
+    NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+    NTerror("Ignoring setting")
+#end if
+
+
 if not options.seqFile:
     options.seqFile = None
+
 if not options.protFile:
     options.protFile = None
+
 if not options.pdbFile:
     options.pdbFile = None
+
+if not options.stereoFile:
+    options.stereoFile = None
 
 if not options.peakFiles:
     options.peakFiles = []
@@ -106,32 +127,34 @@ if not args:
     sys.exit(1)
 
 if not os.path.exists( args[0] ):
-    NTerror('ERROR: directory "%s" not found\n', args[0] )
+    NTerror('directory "%s" not found\n', args[0] )
     sys.exit(1)
 
 projectRoot = Project.rootPath( args[0] )[0]
 if os.path.exists( projectRoot ) and not options.overwrite:
-    NTerror('ERROR: output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
+    NTerror('output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
     sys.exit(1)
 
-project = Project.open(args[0], 'new')   
-project.cyana2cing( args[0], convention=options.convention,
-                    seqFile   = options.seqFile,
-                    protFile  = options.protFile,
-                    peakFiles = options.peakFiles,
-                    uplFiles  = options.uplFiles,
-                    acoFiles  = options.acoFiles,
-                    pdbFile   = options.pdbFile,
-                    nmodels   = int(options.nmodels),
-                    copy2sources = True
-)
-
+project = Project.open(args[0], 'new')
 if not project:
     NTwarning("No project generated. Aborting further execution.")
     sys.exit(0)
+#end if
 
-if options.refine:
-    project.export2refine( options.refine )
+project.cyana2cing( args[0],
+                    convention   = options.convention,
+                    seqFile      = options.seqFile,
+                    protFile     = options.protFile,
+                    stereoFile   = options.stereoFile,
+                    peakFiles    = options.peakFiles,
+                    uplFiles     = options.uplFiles,
+                    acoFiles     = options.acoFiles,
+                    pdbFile      = options.pdbFile,
+                    nmodels      = int(options.nmodels),
+                    copy2sources = True,
+                    update       = False
+                  )
+
 
 if options.export:
     project.export()

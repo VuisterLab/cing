@@ -18,8 +18,9 @@ Generates either cing.csh or cing .sh to source in your .cshrc or .bashrc
 
 Adjust if needed.
 
-GV: 16 Sep: added cingBinPath and profitPath
-JFD: 27 Nov 2007 removed again.
+GV:  16 Sep 2007: added cingBinPath and profitPath
+JFD: 27 Nov 2007: removed again.
+GV:  13 Jun 2008: Added CYTHON path and refine, cyana2cing and cython aliases
 
 Uses 'which xplor/$prodir/procheck_nmr.scr/DO_WHATIF.COM' to determine initial
 xplor/procheck/what if executables; make sure they are in your
@@ -50,16 +51,20 @@ CING_SHELL_TEMPLATE = \
 # No changes needed below this line.
 #############################################
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
+%(export)s  CYTHON%(equals)s%(cingRoot)s/python/Cython
 
 if %(conditional)s then
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${PYTHONPATH}
+    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYTHONPATH}
 else
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python
+    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}
 %(close_if)s
 
 # Use -u to ensure messaging streams for stdout/stderr
 #     don't mingle.
 alias cing%(equals)s'python -u $CINGROOT/python/cing/main.py'
+alias cyana2cing%(equals)s'python -u $CINGROOT/python/cyana2cing/cyana2cing.py'
+alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
+alias cython%(equals)s'${CYTHON}/bin/cython'
 
 '''
 #------------------------------------------------------------------------------------
@@ -103,7 +108,7 @@ def check_python():
         NTwarning('Failed to find Python version 2.4 or higher.')
 #        print 'Current version is', sys.version[:5]
     else:
-        NTmessage("Found 'Python'")
+        NTmessage("........ Found 'Python'")
 
 def check_pylab():
 #    print 'Matplotlib module  ',
@@ -115,7 +120,7 @@ def check_pylab():
     except:
         NTwarning('Failed to find Matplotlib.')
     if not result:
-        NTmessage("Found 'Matplotlib'")
+        NTmessage("........ Found 'Matplotlib'")
     return result
 
 def check_ccpn():
@@ -145,13 +150,13 @@ def check_ccpn():
 #        missing.append('ccpnmr.analysis')
 
     if gotRequiredCcpnModules:
-        NTmessage("Found 'CCPN'")
+        NTmessage("........ Found 'CCPN'")
     else:
-        NTwarning('Failed to find CCPN.')        
+        NTwarning('Failed to find CCPN.')
 
     if missing:
-        NTwarning( '    Missing (optional) packages: ' + ', '.join(missing))
-        
+        NTwarning( 'Missing (optional) packages: ' + ', '.join(missing))
+
 # disabled for this needs to be no extra- dependency. A version of numarray should
 # be in matplotlib. In fact the code doesn't refer to numarray anywhere. Or JFD
 # can't find it. Did Alan meant to check for things like: from matplotlib.numerix import nan # is in python 2.6 ?
@@ -203,11 +208,11 @@ def check_cython():
     except:
 #        print 'failed to import Cython module.'
         pass
-       
+
     if not result:
          NTwarning('Failed to find Cython')
     else:
-         NTmessage("Found 'Cython'")
+         NTmessage("........ Found 'Cython'")
 
     return result
 
@@ -254,14 +259,17 @@ def _writeCingShellFile(isTcsh):
     # for bash it's necessary that the file be executable for this user.
     #AWSS: not really
     #chmod(cname, 0755)
-    print '==> Done'
-    print ' Please check/modify %s' % (cname)
-    print ' Then activate it by including it in your shell settings file (.cshrc or .bashrc)'
-    print ' Quick test for activation: %s %s' % ( sourceCommand, cname)
 
-    print '==> Note'
-    print ' Please (once) compile the cython code in CING by running:'
-    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace;cd -'
+    print ''
+    print '==> Please check/modify %s <===' % (cname)
+    print '    Then activate it by sourcing it in your shell settings file (.cshrc or .bashrc):'
+    print ''
+    print '    %s %s' % ( sourceCommand, cname)
+    print ''
+#    print ''
+#    print '==> Note'
+#    print ' There is another dependency; cython. Please install it and run:'
+#    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
 #end def
 #------------------------------------------------------------------------------------
 
@@ -281,7 +289,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if not os.path.exists(cingRoot):
-        print "The derived CINGROOT doesn't exist: ["  + cingRoot + "]"
+        print "The derived CINGROOT does not exist: ["  + cingRoot + "]"
         sys.exit(1)
 
     if not cingPythonDir:
@@ -294,25 +302,25 @@ if __name__ == '__main__':
 
     xplorPath,err  = NTgetoutput('which xplor')
     if not xplorPath:
-        NTwarning("Couldn't find 'xplor'")
+        NTwarning("Could not find 'xplor'")
         parametersDict['xplorPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'xplor'")
+        NTmessage("........ Found 'xplor'")
         parametersDict['xplorPath']  = strip(xplorPath)
 
 #    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("prodir"):
         procheckPath = os.path.join( os.environ["prodir"], "procheck_nmr.scr")
         if not os.path.exists(procheckPath):
-            NTwarning("Found the system variable prodir but the script below wasn't found")
+            NTwarning("Found the system variable prodir but the script below was not found")
             NTwarning( procheckPath )
-            NTwarning("Couldn't find 'procheck_nmr'")
+            NTwarning("Could not find 'procheck_nmr'")
             parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
         else:
-            NTmessage("Found 'procheck_nmr'")
+            NTmessage("........ Found 'procheck_nmr'")
             parametersDict['procheckPath'] = procheckPath
     else:
-        NTwarning("Couldn't find 'procheck_nmr'")
+        NTwarning("Could not find 'procheck_nmr'")
         parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
 
 #    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
@@ -321,13 +329,13 @@ if __name__ == '__main__':
         if not os.path.exists(aqpcPath):
             NTwarning("Found the system variable aquaroot but the script below wasn't found")
             NTwarning( aqpcPath )
-            NTwarning("Couldn't find 'aqua'")
+            NTwarning("Could not find 'aqua'")
             parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
         else:
-            NTmessage("Found 'aqua'")
+            NTmessage("........ Found 'aqua'")
             parametersDict['aqpcPath'] = aqpcPath
     else:
-        NTwarning("Couldn't find 'aqua'")
+        NTwarning("Could not find 'aqua'")
         parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
 
     whatifPath,err  = NTgetoutput('which DO_WHATIF.COM')
@@ -338,17 +346,17 @@ if __name__ == '__main__':
         if os.path.exists(defaultWhatifPath):
             whatifPath = defaultWhatifPath
     if not whatifPath:
-        NTwarning("Couldn't find 'what if'")
+        NTwarning("Could not find 'what if'")
     else:
-        NTmessage("Found 'what if'")
+        NTmessage("........ Found 'what if'")
         whatifPath = strip(whatifPath)
         parametersDict['whatifPath'] = whatifPath
         head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
-            NTwarning("Couldn't find 'dssp'")
+            NTwarning("Could not find 'dssp'")
         else:
-            NTmessage("Found 'dssp'")
+            NTmessage("... Found 'dssp'")
             parametersDict['dsspPath'] = dsspPath
 
     time = 0
@@ -361,49 +369,49 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        NTwarning("Couldn't find 'Wattos'")
+        NTwarning("Could not find 'Wattos'")
 #        NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
-        NTmessage("Found 'wattos'")
+        NTmessage("........ Found 'wattos'")
 
     convertPath,err  = NTgetoutput('which convert')
     if not convertPath:
-        NTwarning("Couldn't find 'convert' (from ImageMagick)")
+        NTwarning("Could not find 'convert' (from ImageMagick)")
         parametersDict['convertPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'convert'")
+        NTmessage("........ Found 'convert'")
         parametersDict['convertPath'] = strip(convertPath)
 
     ghostscriptPath,err  = NTgetoutput('which gs')
     if not ghostscriptPath:
-        NTwarning("Couldn't find 'ghostscript' (from ImageMagick)")
+        NTwarning("Could not find 'ghostscript' (from ImageMagick)")
         parametersDict['ghostscriptPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'ghostscript'")
+        NTmessage("........ Found 'ghostscript'")
         parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
 
     ps2pdfPath,err  = NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
-        NTwarning("Couldn't find 'ps2pdf' (from Ghostscript)")
+        NTwarning("Could not find 'ps2pdf' (from Ghostscript)")
         parametersDict['ps2pdfPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'ps2pdf'")
+        NTmessage("........ Found 'ps2pdf'")
         parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
 
     molmolPath,err  = NTgetoutput('which molmol')
     if not molmolPath:
-        NTwarning("Couldn't find 'molmol'")
+        NTwarning("Could not find 'molmol'")
         parametersDict['molmolPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'molmol'")
+        NTmessage("........ Found 'molmol'")
         parametersDict['molmolPath'] = strip(molmolPath)
 
     povrayPath,err  = NTgetoutput('which povray')
     if not povrayPath:
-        NTwarning("Couldn't find 'povray'")
+        NTwarning("Could not find 'povray'")
         parametersDict['povrayPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("Found 'povray'")
+        NTmessage("........ Found 'povray'")
         parametersDict['povrayPath'] = strip(povrayPath)
 
 
@@ -411,6 +419,7 @@ if __name__ == '__main__':
 #    Better not use the above as this gives on JFD's mac: /bin/bash and actually
 #    use tcsh. Better ask a question once.
     answer = None
+    print ''
     while answer not in ["y","n"]:
         answer = raw_input("Do you use tcsh/csh [y] or bash/sh/ksh/zsh/ash etc. [n]; please enter y or n:")
     isTcsh = answer == "y"

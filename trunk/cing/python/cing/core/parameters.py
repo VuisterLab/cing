@@ -26,7 +26,8 @@ directories = NTdict(
     xplor      = 'Export/Xplor',
     aqua       = 'Export/Aqua',
     queen      = 'Queen',
-    refine     = 'Refine'
+    refine     = 'Refine',
+    tmp        = 'Temp'
 )
 directories.keysformat() #define a format string for 'pretty' output
 
@@ -49,7 +50,7 @@ moleculeDirectories.keysformat() #define a format string for 'pretty' output
 #These directories get generated below the HLML root of a molecule
 htmlDirectories = NTdict(
     # Directories generated
-    procheck= 'Models', # CHECK:weird mapping! 
+    procheck= 'Models', # CHECK:weird mapping!
     restraints  = 'Restraints',
     atoms   = 'Atoms',
     peaks   = 'Peaks'

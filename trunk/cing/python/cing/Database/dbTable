@@ -68,6 +68,7 @@ RESIDUE ALA      A
     ATOM HN
     #---------------------------------------------------------------
         nameDict = {'INTERNAL': 'HN', 'AQUA': 'H', 'BMRBd': 'H', 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': 'H', 'XPLOR': 'HN', 'BMRB': 'H'}
+        aliases = ['H']
         topology = [(0, 'N')]
         pseudo = None
         real = []

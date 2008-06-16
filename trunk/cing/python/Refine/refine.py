@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
  refine.py
- 
+
  GWV 23 February/March 2005: waterrefinement
  GWV March 2007: Adapted for usage with cing
  - Model indices [0,Nmodels>
@@ -12,7 +12,7 @@
  GWV April 2008: version 0.70
  - Modified --setup: full export to refine directories; automated generation
    of parameters file
- - Import into cing (version >= 0.70); 
+ - Import into cing (version >= 0.70);
 
 #------------------------------------------------------------------------------
 """
@@ -54,10 +54,10 @@ def importFromRefine( config, params, project ):
     """
     Import data from params.basePath/Refined directory as new molecule
     Use params.bestModels
-    
+
     Return Molecule or None on error
     """
-    
+
     xplor = Xplor( config, params )
 
     models=asci2list( xplor.bestModels )
@@ -65,17 +65,17 @@ def importFromRefine( config, params, project ):
         NTerror('moleculeFromRefine: no bestModels defined\n')
         return None
     #end if
-    
+
     path = xplor.joinPath( xplor.directories.refined, xplor.baseName )
     for m in models:
-        p = sprintf(path, m)        
+        p = sprintf(path, m)
         if not os.path.exists( p ):
             NTerror('moleculeFromRefine: model "%s" not found\n', p)
             return None
         #end if
     #end for
 
-    # import structures from Xplor PDB files    
+    # import structures from Xplor PDB files
     molecule = project.newMoleculeFromXplor( path, xplor.name, models )
     if 'superpose' in xplor and len(xplor.superpose) > 0:
         molecule.superpose( ranges = xplor.superpose )
@@ -85,9 +85,9 @@ def importFromRefine( config, params, project ):
     molecule.restoreResonances(  rFile, append=False )
     print molecule.format()
     print project.format()
-    
+
     molecule.save( project.path(project.directories.molecules, molecule.name ) )
-    
+
     # remove original molecule
     project.molecules.pop(0)
     print project.format()
@@ -100,14 +100,14 @@ def importFromRefine( config, params, project ):
 def doSetup( config, project, basePath ):
     """Generate the directory setup and parameter.py file from project and basePath
        Export the data from project
-    """   
-    
-    if os.path.exists( basePath ): 
+    """
+
+    if os.path.exists( basePath ):
         removedir( basePath )
     #end if
-    
-    xplor = Xplor( config, basePath = basePath ) # generates the directories and initialize parameter setup 
-    
+
+    xplor = Xplor( config, basePath = basePath ) # generates the directories and initialize parameter setup
+
     # copy xplor parameter and topology files
     for f in config.parameterFiles + config.topologyFiles:
         copy( os.path.join(xplor.refinePath,'toppar',f), xplor.joinPath( xplor.directories.toppar, f ) )
@@ -120,17 +120,17 @@ def doSetup( config, project, basePath ):
         NTerror('doSetup: No molecule defined for project %s\n', project )
         sys.exit(1)
     #end if
-    
+
     # export the data
-    NTmessage('\n' + dots*10 +'\n' )
-    NTmessage(   '==> Exporting %s to for refinement\n', project )
-    
+    NTmessage('\n' + dots*10 )
+    NTmessage(   '==> Exporting %s to %s for refinement\n', project, basePath )
+
     for drl in project.distances:
         xplor.noeRestraints.append( refineNoeParameters( drl.name ) )
         fname = xplor.joinPath( xplor.directories.tables, drl.name +'.tbl' )
         drl.export2xplor( fname )
-    #end for 
-    
+    #end for
+
     for drl in project.dihedrals:
         xplor.dihedralRestraints.append( refineDihedralParameters( drl.name ) )
         fname = xplor.joinPath( xplor.directories.tables, drl.name +'.tbl' )
@@ -140,12 +140,13 @@ def doSetup( config, project, basePath ):
     # export structures in Xplor-PDB format
     xplor.baseName = project.molecule.name + '_%03d.pdb'
     path = xplor.joinPath( xplor.directories.converted, xplor.baseName )
+    NTmessage('==> Exporting %s to XPLOR PDB-files (%s)', project.molecule, path)
     project.molecule.export2xplor( path)
     xplor.models     = sprintf('%d-%d', 0, project.molecule.modelCount-1)
     xplor.bestModels = sprintf('%d-%d', 0, project.molecule.modelCount-1)
     #TODO
     #xplor.superpose  = sprintf('%d-%d', 0, project.molecule.modelCount-1)
-    
+
     # PSF file
     xplor.psfFile = project.molecule.name +'.psf'
     # Set the patches for the psf file
@@ -155,11 +156,11 @@ def doSetup( config, project, basePath ):
         xplor.patchHISE.append( res.resNum )
     for res in project.molecule.residuesWithProperties('cPRO'):
         xplor.patchCISP.append( res.resNum )
-    
+
     # save the parameterfile
     parfile = xplor.joinPath( 'parameters.py' )
     xplor.toFile( parfile )
-    
+
     NTmessage('\n==> Generated setup under "%s"\nEdit "%s" before continuing\n',
               basePath, parfile
              )
@@ -192,15 +193,15 @@ def generatePSF( config, params, doPrint = 0 ):
 #------------------------------------------------------------------------------
 def analyze( config, params, doPrint = 0 ):
 
-    # first create the jobs, run later    
+    # first create the jobs, run later
     analyzeJobs = []
     for i in asci2list( params.models ):
         job = Analyze(
                         config,
                         params,
-                   
+
                         fileNum    = i,
-                        
+
                         molecules  = [
                                       NTdict(
                                                 psfFile        = params.psfFile,
@@ -208,17 +209,17 @@ def analyze( config, params, doPrint = 0 ):
                                                 selectionCode  = '(not resn TIP3 and not resn ANI)'
                                               ),
                                      ],
-                        
+
 #                         inPath     = config.directories.converted,
 #                         outPath    = config.directories.analyzed,
 
-                        jobName    = 'analyze_%d'%i,      
+                        jobName    = 'analyze_%d'%i,
                      )
-                     
+
         analyzeJobs.append( job )
     #end for
- 
-        
+
+
     for job in analyzeJobs:
         job.createScript()
         if doPrint:
@@ -228,18 +229,18 @@ def analyze( config, params, doPrint = 0 ):
     #end for
 #end def
 
-        
+
 #------------------------------------------------------------------------------
 def refine( config, params, doPrint = 0 ):
 
-    # first create the jobs, run later    
+    # first create the jobs, run later
     refineJobs = []
     for i in asci2list( params.models ):
         refineJobs.append(
             WaterRefine(
                    config,
                    params,
-                   
+
                    fileNum    = i,
 
                    molecules  = [
@@ -251,8 +252,8 @@ def refine( config, params, doPrint = 0 ):
                                 ],
 #                   inPath     = config.directories.analyzed,
 #                   outPath    = config.directories.refined,
-                   
-                   jobName    = 'refine_%d'%i,       
+
+                   jobName    = 'refine_%d'%i,
             )
         )
 
@@ -266,25 +267,25 @@ def refine( config, params, doPrint = 0 ):
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# Parsing code    
+# Parsing code
 #------------------------------------------------------------------------------
- 
+
 def parseRefineOutput( config, params, options ):
     """
     Parse the output in the Jobs directory
     params is a NTxplor instance
-    
+
     """
-    
+
     xplor = Xplor( config, params, outPath = config.directories.refined )
-    
-    results = NTlist()    
-    # parse all output files   
+
+    results = NTlist()
+    # parse all output files
     for i in asci2list( params.models ):
-        
+
         file = xplor.checkPath( xplor.directories.jobs, 'refine_%d.log'%i )
         NTmessage('==> Parsing %s\n', file )
-        
+
         data = NTdict( fileName = file,
                          model = i
                        )
@@ -302,13 +303,13 @@ def parseRefineOutput( config, params, options ):
                 awkf.next()
                 data['Enoe'] = float( line.dollar[0][68:75] )
                 foundEnergy = 1
-            
+
             elif (not foundNOE1) and find(line.dollar[0], 'NOEPRI: RMS diff. =') >= 0:
                 data['NOErmsd'] = float( line.dollar[5][:-1] )
                 data['NOEbound1'] = float( line.dollar[7][:-2] )
                 data['NOEviol1'] = int( line.dollar[8] )
                 foundNOE1 = 1
-                
+
             elif (not foundNOE2) and find(line.dollar[0], 'NOEPRI: RMS diff. =') >= 0:
                 data['NOEbound2'] = float( line.dollar[7][:-2] )
                 data['NOEviol2'] = int( line.dollar[8] )
@@ -324,18 +325,18 @@ def parseRefineOutput( config, params, options ):
                 data['DIHEDrmsd'] = float( line.dollar[3] )
                 foundDIHED = 1
             #endif
-            
+
         #end for
-        
-        results.append( data )        
+
+        results.append( data )
     #end for
-    
+
     keys = ['model', 'Etotal','Enoe','NOErmsd','NOEnumber', 'NOEbound1',
-            'NOEviol1', 'NOEbound2', 'NOEviol2', 
+            'NOEviol1', 'NOEbound2', 'NOEviol2',
             'DIHEDrmsd','DIHEDnumber', 'DIHEDbound', 'DIHEDviol'
            ]
 
-    # sort the results    
+    # sort the results
     if options.sortField in keys:
         myComp = CompareDict( options.sortField )
         results.sort( myComp )
@@ -368,7 +369,7 @@ def parseRefineOutput( config, params, options ):
     #end for
 
     # best results
-    bestModels = int(options.bestModels)    
+    bestModels = int(options.bestModels)
     if bestModels > 0:
         printf('\n=== Averages best %d models ===\n', bestModels)
         fprintf( resultFile, '\n=== Averages best %d models ===\n', bestModels)
@@ -382,7 +383,7 @@ def parseRefineOutput( config, params, options ):
         printf('\n\n')
         fprintf(resultFile, '\n\n')
 
-        fname = xplor.joinPath( 'best%dModels.txt' % bestModels )        
+        fname = xplor.joinPath( 'best%dModels.txt' % bestModels )
         f = open( fname, 'w')
         params.bestModels = ''
         for i in range(0, bestModels):
@@ -394,14 +395,14 @@ def parseRefineOutput( config, params, options ):
         NTmessage('==> Best %d models listed in %s\n', bestModels, fname )
     else:
         params.bestModels = params.models
-    #end if  
-    
-    resultFile.close()    
+    #end if
+
+    resultFile.close()
     params.toFile( xplor.joinPath( 'parameters.py' ) )
-    
+
     print '>>>'
     print xplor.format( params.__FORMAT__ )
-    
+
     return results
 #end def
 #------------------------------------------------------------------------------
@@ -412,7 +413,7 @@ class CompareDict:
     def __init__( self, key ):
         self.key = key
     #end def
-    
+
     def __call__( self, a, b ):
         return cmp( a[self.key], b[self.key] )
     #end def
@@ -424,7 +425,7 @@ class Key:
     def __init__( self, key ):
         self.key = key
     #end def
-    
+
     def __call__( self, a ):
         return a[self.key]
     #end def
@@ -440,75 +441,75 @@ if __name__ == '__main__':
     usage   = "usage: refine.py [options]"
 
     parser = OptionParser(usage=usage, version=version)
-    parser.add_option("--doc", 
-                      action="store_true", 
+    parser.add_option("--doc",
+                      action="store_true",
                       dest ="doc", default=False,
                       help="print extended documentation to stdout"
                      )
-    parser.add_option("-n", "--name", 
+    parser.add_option("-n", "--name",
                       dest="name", default=None,
-                      help="NAME of the refinement run (required)", 
+                      help="NAME of the refinement run (required)",
                       metavar="NAME"
                      )
-    parser.add_option("--project", 
+    parser.add_option("--project",
                       dest="project", default=None,
-                      help="Cing project name (required); data will be in PROJECT/Refine/NAME", 
+                      help="Cing project name (required); data will be in PROJECT/Refine/NAME",
                       metavar="PROJECT"
                      )
     parser.add_option("-s", "--setup",
-                      action="store_true", 
+                      action="store_true",
                       dest="doSetup", default=False,
                       help="Generate directory structure, parameter file, export project data",
                      )
     parser.add_option("-f", "--psf",
-                      action="store_true", 
+                      action="store_true",
                       dest="doPSF", default=False,
                       help="Generate PSF file (default: no PSF)"
                      )
     parser.add_option("-a", "--analyze",
-                      action="store_true", 
+                      action="store_true",
                       dest="doAnalyze", default=False,
                       help="Initial analysis (default: no analysis)"
                      )
     parser.add_option("-r", "--refine",
-                      action="store_true", 
+                      action="store_true",
                       dest="doRefine", default=False,
                       help="Refine the structures (default: no refine)"
                      )
     parser.add_option("-p", "--print",
-                      action="store_true", 
+                      action="store_true",
                       dest="doPrint", default=False,
                       help="Print script before running (default: no print)"
                      )
-    parser.add_option("--models", 
+    parser.add_option("--models",
                       dest="models", default=None,
-                      help="Model indices (e.g. 0,2-5,7,10-13)", 
+                      help="Model indices (e.g. 0,2-5,7,10-13)",
                       metavar="MODELS"
                      )
     parser.add_option("--parse",
-                      action="store_true", 
+                      action="store_true",
                       dest="doParse", default=False,
                       help="Parse the output of the refine run (default: no parse)"
                      )
-    parser.add_option("--sort", 
+    parser.add_option("--sort",
                       dest="sortField", default=None,
-                      help="sort field for parse option", 
+                      help="sort field for parse option",
                       metavar="SORTFIELD"
-                     ) 
-    parser.add_option("--best", 
+                     )
+    parser.add_option("--best",
                       dest="bestModels", default=0,
-                      help="Number of best models for parse option", 
+                      help="Number of best models for parse option",
                       metavar="BESTMODELS"
-                     )                 
+                     )
     parser.add_option("--import",
-                      action="store_true", 
+                      action="store_true",
                       dest="doImport", default=False,
                       help="Import the refined structures of the refine run (default: no import)"
                      )
-                     
+
     (options, args) = parser.parse_args()
-    
-    
+
+
     #------------------------------------------------------------------------------
     # Documentation
     #------------------------------------------------------------------------------
@@ -517,26 +518,26 @@ if __name__ == '__main__':
         NTmessage("%s\n", __doc__ )
         sys.exit(0)
     #end if
-    
+
     #------------------------------------------------------------------------------
-    #check for the required project, name option  
+    #check for the required project, name option
     parser.check_required('--name')
     parser.check_required('--project')
-    
+
     NTmessage(dots*10+"\n")
     NTmessage("     Refine version %s\n", version)
     NTmessage(dots*10+"\n")
-    
+
     #------------------------------------------------------------------------------
     # Project
     #------------------------------------------------------------------------------
     project = Project.open(options.project, status = 'old', restore=False )
     if project==None:
-        NTerror("Failed to get a project") 
+        NTerror("Failed to get a project")
         sys.exit(1)
     #end if
     basePath = project.path( project.directories.refine, options.name )
-  
+
     #------------------------------------------------------------------------------
     # Setup
     #------------------------------------------------------------------------------
@@ -544,7 +545,7 @@ if __name__ == '__main__':
         doSetup( config, project, basePath )
         sys.exit(0)
     #end if
-    
+
     #------------------------------------------------------------------------------
     # Some output
     #------------------------------------------------------------------------------
@@ -553,7 +554,7 @@ if __name__ == '__main__':
     NTmessage('xplor:          %s\n', config.XPLOR )
     NTmessage("parameterFiles: %s\n", config.parameterFiles )
     NTmessage("topologyFiles:  %s\n", config.topologyFiles )
-    
+
     #------------------------------------------------------------------------------
     # read parameters file
     #------------------------------------------------------------------------------
@@ -561,36 +562,36 @@ if __name__ == '__main__':
     paramfile = project.path( project.directories.refine, options.name, 'parameters.py' )
     execfile( paramfile )
     NTmessage('==> Read user parameters %s\n',  paramfile)
-    parameters.basePath = basePath 
+    parameters.basePath = basePath
     parameters.name     = options.name
-    
+
     #------------------------------------------------------------------------------
     # Model selection
     #------------------------------------------------------------------------------
     if options.models:
         parameters.models = options.models
     #end if
-    
+
     #------------------------------------------------------------------------------
     # Action selection
     #------------------------------------------------------------------------------
     if options.doPSF:
         generatePSF( config, parameters, options.doPrint )
-        
+
     elif options.doAnalyze:
         analyze( config, parameters, options.doPrint )
-    
+
     elif options.doRefine:
         refine( config, parameters, options.doPrint )
-    
+
     elif options.doParse:
         results = parseRefineOutput(  config, parameters, options )
-    
+
     elif options.doImport:
         mol = importFromRefine( config, parameters, project )
     else:
         NTerror('Error: refine.py, invalid option\n')
     #end if
-    
-    
-    
+
+
+

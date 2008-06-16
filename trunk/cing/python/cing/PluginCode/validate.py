@@ -115,10 +115,10 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     returns None on success or True on failure.
     """
 
-    
+
     validateDihedrals(  project  )
     validateModels(     project  )
-    
+
     project.predictWithShiftx()
     project.validateAssignments(toFile=True)
     project.checkForSaltbridges(toFile=True)
@@ -204,7 +204,7 @@ Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
 #       -----------
 #Total   100 (100%)
         # by request of Nadia write out the actual residues
-        
+
         idx = 0
         for residueList in cL:
             color = cStringList[idx]
@@ -877,6 +877,7 @@ cing.Atom.checkHbond = checkHbond
 MULTIPLE_ASSIGNMENT             = 'MULTIPLE_ASSIGNMENT'
 MISSING_PROTON_ASSIGNMENT       = 'MISSING_PROTON_ASSIGNMENT'
 MISSING_HEAVY_ATOM_ASSIGNMENT   = 'MISSING_HEAVY_ATOM_ASSIGNMENT'
+INVALID_STEREO_ASSIGNMENT       = 'INVALID_STEREO_ASSIGNMENT'
 
 def validateAssignments( project, toFile = True   ):
     """
@@ -970,7 +971,15 @@ def validateAssignments( project, toFile = True   ):
                     atm.validateAssignment.append(string)
                 #end if
             #end if atm.isProton()
+        else:
+            # Atm is not assigned but stereo assignment is set
+            if atm.isStereoAssigned():
+                string = sprintf('%s: expected %s to be assigned', INVALID_STEREO_ASSIGNMENT, atm )
+                result.append( atm )
+                atm.validateAssignment.append(string)
+            #end if
         #end if atm.isAssigned():
+
         if atm.validateAssignment:
             atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
         #end if
@@ -1872,7 +1881,7 @@ def setupHtml(project):
     project.mainPageObjects['Atoms'] = [ atomList ]
 
     atomMain = atomList.html.main
-    
+
     atomMain('h3', closeTag=False)
     refItem = os.path.join( project.moleculePath('analysis'),'validateAssignments.txt')
     abstractResource = NTdict()
@@ -1883,7 +1892,7 @@ def setupHtml(project):
     else:
         atomMain('a',  NotAvailableText)
     atomMain('h3', openTag=False)
-    
+
     atomMain('h3', atomList.formatHtml())
     for atom in atomList:
         count = atom.id
@@ -1902,7 +1911,7 @@ def setupHtml(project):
         atomName = "(" + atom.toString() +')'
         atomList.html.insertHtmlLink( atomMain, atomList, res, text = atomName )
         atomMain('li', openTag=False)
-        
+
         sav     = None
         ssd     = None
         delta   = None
@@ -1947,7 +1956,7 @@ def setupHtml(project):
 #                davStr, dsdStr,
 #                atm.validateAssignment.format()
 #               )
-        
+
         atomMain('li', 'Chemical shift: (%6s %6s)' % (valueStr, errorStr))
         atomMain('li', 'SHIFTX shift: (%6s %6s)' % (savStr, ssdStr))
         atomMain('li', 'delta shift: (%6s %6s)' % (deltaStr, rdeltaStr))
@@ -1956,7 +1965,7 @@ def setupHtml(project):
         atom.rogScore.createHtmlForComments(atomMain)
         atomMain('ul', openTag=False)
     #end for
-    
+
     # Do Project HTML page
     htmlMain = project.html.main
 
@@ -2055,11 +2064,11 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
                 msg = sprintf('----- %5s -----', res)
                 fprintf(fp, msg+'\n')
-                
+
                 if res.rogScore.isCritiqued():
                     res.html.left( 'h2', 'Critiques', id='Critiques')
                     res.rogScore.createHtmlForComments(res.html.left)
-                
+
                 if htmlOnly:
                     pass
 #                    NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
@@ -2261,7 +2270,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 if fileList == True:
                     NTerror( "Failed to convert2Web input file: " + procheckLinkReal)
                     continue
-                
+
     #            _pinupPath, _fullPath, _printPath = fileList
                 pinupLink = os.path.join('..',
                             project.moleculeDirectories.procheck, molecule.name + p + "_pin.gif" )
@@ -2397,7 +2406,7 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                                 val2Str(dr.violMax, "%.2f") ))
             resRight('br')
             dr.rogScore.createHtmlForComments(resRight)
-                
+
             #resRight('ul', openTag=False)
             resRight('br')
             if resRL.index(dr) + 1 == toShow:

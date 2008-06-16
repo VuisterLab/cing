@@ -7,15 +7,15 @@ Methods:
         import uplFile
         convention = CYANA or CYANA2
         return a DistanceRestraintList or None on error
-        
+
   Project.importAco( acoFile, convention ):
-        Read Cyana acoFile       
+        Read Cyana acoFile
         convention = CYANA or CYANA2
         return a DihedralRestraintList or None on error
-        
+
   Project.export2cyana():
         Export restraints in CYANA and CYANA2 formats
-  
+
   DihedralRestraint.export2cyana( convention ):
         Return string with distanceRestraint (dr) in cyana format or None on error
         convention = CYANA or CYANA2
@@ -60,11 +60,11 @@ def exportDihedralRestraint2cyana( dr, convention ):
         NTerror('Error exportDihedralRestraint2cyana: undefined restraint\n' )
         return None
     #end if
-    
-    res, angleName, _db = dr.retrieveDefinition()    
+
+    res, angleName, _db = dr.retrieveDefinition()
     if res:
         return sprintf( '%4d %-4s %-6s %6.1f %6.1f',
-                        res.resNum, res.db.translate( convention ), 
+                        res.resNum, res.db.translate( convention ),
                         angleName, dr.lower, dr.upper
                       )
     else:
@@ -83,14 +83,14 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
        return drl or None on error
     """
     fp = open( path, 'w' )
-    if not fp: 
+    if not fp:
         NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
         fprintf( fp, '%s\n', dr.export2cyana( convention ) )
     #end for
-    
+
     fp.close()
     NTmessage('==> Exported %s in %s format to "%s"', drl, convention, path)
     #end if
@@ -116,19 +116,19 @@ def importAco( project, acoFile, convention ):
     molecule = project.molecule
     # Sometimes set from other than CYANA coordinate file.
 #    chainId = molecule.chains[0].name
-  
+
     if not os.path.exists( acoFile ):
         NTerror('importAco: file "%s" not found\n', acoFile)
         return None
     #end if
-         
+
     dir,name,_ext = NTpath( acoFile )
-    result       = project.dihedrals.new( name=name, status='keep')   
-    
+    result       = project.dihedrals.new( name=name, status='keep')
+
     NTdebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
         resNum = line.int(1)
-        res    = molecule.decodeNameTuple( (convention, None, resNum, None ), 
+        res    = molecule.decodeNameTuple( (convention, None, resNum, None ),
                                            fromCYANA2CING=True )
         angle  = line.dollar[3]
         lower  = line.float(4)
@@ -144,19 +144,19 @@ def importAco( project, acoFile, convention ):
                 errorCount += 1
                 continue
             else:
-                r = DihedralRestraint( atoms = atoms, lower=lower, upper=upper, 
+                r = DihedralRestraint( atoms = atoms, lower=lower, upper=upper,
                                             angle = angle, residue = res
                                           )
                 #print r.format()
                 result.append( r )
             #end if
         #end if
-    #end for 
-  
+    #end for
+
     if errorCount:
         NTerror("Found number of errors importing upl file: " + `errorCount`)
     NTmessage("Imported items: " + `len(result)`)
-    NTmessage('==> importAco: new %s from "%s"', result, acoFile )  
+    NTmessage('==> importAco: new %s from "%s"', result, acoFile )
     return result
 #end def
 
@@ -168,7 +168,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     """
     maxErrorCount = 50
     errorCount = 0
-  
+
     # check the molecule
     if not project or not project.molecule:
         NTerror("importUpl: initialize molecule first")
@@ -177,16 +177,16 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     molecule = project.molecule
     # Sometimes set from other than CYANA coordinate file.
 #    chainId = molecule.chains[0].name # assumed unkown rite?
-    
+
     if not os.path.exists( uplFile ):
         NTerror('importUpl: file "%s" not found', uplFile)
         return None
     #end if
-   
+
     dir,name,_ext = NTpath( uplFile )
 #    result       = project.newDistanceRestraintList( name )
-    result       = project.distances.new( name=name, status='keep')   
-    
+    result       = project.distances.new( name=name, status='keep')
+
     for line in AwkLike( uplFile, commentString="#" ):
         if line.isComment():
 #            NTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
@@ -203,7 +203,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
                                             fromCYANA2CING=True)
             if not atm:
                 if errorCount <= maxErrorCount:
-                    NTerror("Failed to decode for atom: ["+`i+1`+"] the tuple (residue number and atom name) ["+ 
+                    NTerror("Failed to decode for atom: ["+`i+1`+"] the tuple (residue number and atom name) ["+
                                `line.int(atmIdx[0])` +'], ['+ line.dollar[atmIdx[1]]+'] for line: [' + line.dollar[0] +']')
                 if errorCount == maxErrorCount+1:
                     NTerror("And so on")
@@ -223,29 +223,77 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         if not upper:
             NTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
             continue
-        
+
         # ambiguous restraint, should be append to last one
         if upper == 0:
             result().appendPair( (atm1,atm2) )
             continue
 
-        
+
         r = DistanceRestraint( atomPairs= [(atm1,atm2)], lower=lower, upper=upper )
         result.append( r )
         # also store the Candid info if present
         if line.NF >= 9:
-            r.peak = line.int( 9 ) 
+            r.peak = line.int( 9 )
         if line.NF >= 11:
-            r.SUP = line.float( 11 ) 
+            r.SUP = line.float( 11 )
         if line.NF >= 13:
-            r.QF = line.float( 13 ) 
+            r.QF = line.float( 13 )
     if errorCount:
         NTerror("Found number of errors importing upl file: " + `errorCount`)
-        
+
     NTmessage("Imported upl items: " + `len(result)`)
     NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
-#    sys.exit(1)  
+#    sys.exit(1)
     return result
+#end def
+
+def importCyanaStereoFile( project, stereoFileName, convention ):
+    """Import stereo assignments from CYANA
+       return project or None on error.
+
+CYANA stereo file:
+
+var info echo
+echo:=off
+info:=none
+atom stereo "HB2  HB3   509"   # GLU-
+atom stereo "QG1  QG2   511"   # VAL
+atom stereo "HB2  HB3   513"   # HIS
+atom stereo "QG1  QG2   514"   # VAL
+atom stereo "HG2  HG3   516"   # GLU-
+atom stereo "HA1  HA2   519"   # GLY
+
+    """
+    if project.molecule == None:
+        return None
+
+    molecule = project.molecule
+    count = 0
+    for line in AwkLike( stereoFileName, minNF=5 ):
+        if line.dollar[1] == 'atom' and line.dollar[2] == 'stereo':
+            resnum = int (line.dollar[5].strip('"') )
+            for i in [3,4]:
+                atm = molecule.decodeNameTuple( (convention, 'A', resnum, line.dollar[i].strip('"')) )
+                if atm == None:
+                    NTerror(' importCyanaStereoFile: atom %s; line %d (%s)\n', line.dollar[i], line.NR, line.dollar[0] )
+                else:
+                    atm.stereoAssigned = True
+                    count += 1
+                    #print atm.nameTuple()
+                    if atm.residue.db.name in ['VAL', 'LEU'] and atm.isMethylProton():        # Val, Ile methyls: Carbon implicit in CYANA defs
+                        heavy = atm.heavyAtom()
+                        heavy.stereoAssigned = True
+                        count += 1
+                        #print heavy.nameTuple()
+                    #end if
+                #end if
+            #end for
+        #end if
+    #end for
+    NTmessage('==> Derived %d stereo assignments from "%s"', count, stereoFileName )
+    return project
+#end def
 
 #-----------------------------------------------------------------------------
 def export2cyana( project, tmp=None ):
@@ -255,90 +303,99 @@ def export2cyana( project, tmp=None ):
         if (drl.status == 'keep'):
             #Xeasy/Cyana 1.x format
             drlFile = project.path( project.directories.xeasy, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA)   
+            drl.export2cyana( drlFile, convention=CYANA)
             #Cyana 2.x format
             drlFile = project.path( project.directories.xeasy2, drl.name+'.aco' )
-            drl.export2cyana( drlFile, convention=CYANA2)   
+            drl.export2cyana( drlFile, convention=CYANA2)
         #end if
     #end for
 #end def
 
 #-----------------------------------------------------------------------------
-def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, **kwds):
+def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, update=True, **kwds):
     """
      kwds options:
-                seqFile   = None, 
-                protFile  = None,  
+                seqFile   = None,
+                protFile  = None,
+                stereoFile = None,
                 peakFiles = [],
                 uplFiles  = [],
                 acoFiles  = [],
-                pdbFile   = None, nmodels=None,
+                pdbFile   = None,
+                nmodels=None,
 
-    
+
     Read the data from the cyanaDirectory and store in project.
     Optionally set to defaults by supplying 'default' as argument
-    
+
     Return list of sources or None on error.
     """
-    
+
     sources   = NTlist()
     sourceDir = project.mkdir( project.directories.sources, 'Cyana' )
-    
+
     kwds.setdefault('seqFile',  None)
     kwds.setdefault('protFile', None)
+    kwds.setdefault('stereoFile', None)
     kwds.setdefault('pdbFile',  None)
     kwds.setdefault('nmodels',  None)
 
     # peakFiles, uplFiles, acoFiles arguments can be a list of comma-separated string
     for f in ['peakFiles','uplFiles','acoFiles']:
-        kwds.setdefault(f,  [])        
+        kwds.setdefault(f,  [])
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
     NTdebug( '>>'+ `kwds` )
-            
+
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
     if (kwds['pdbFile'] != None):
         pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
-        project.initPDB( pdbFile, convention, nmodels=kwds['nmodels'] )
+        mol = project.initPDB( pdbFile, convention, nmodels=kwds['nmodels'], update=update )
+        if not mol:
+            NTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
+            return None
+        #end if
+        NTdebug('Parsed PDB file "%s", molecule %s', pdbFile, mol)
         sources.append( pdbFile )
-    
+
     if (kwds['seqFile'] != None and kwds['protFile'] != None):
         seqFile  = os.path.join( cyanaDirectory, kwds['seqFile']  +'.seq')
         protFile = os.path.join( cyanaDirectory, kwds['protFile'] +'.prot')
-        if project.importXeasy( seqFile, protFile, convention ):            
+        if project.importXeasy( seqFile, protFile, convention ) != None:
             sources.append( seqFile, protFile )
-    
-    for f in kwds['peakFiles']:    
+
+    if (kwds['stereoFile'] != None):
+        stereoFile = os.path.join( cyanaDirectory, kwds['stereoFile']  +'.cya')
+        if project.importCyanaStereoFile( stereoFile, convention ):
+            sources.append( stereoFile )
+
+
+    for f in kwds['peakFiles']:
         if (kwds['seqFile'] != None and kwds['protFile'] != None):
             seqFile  = os.path.join( cyanaDirectory, kwds['seqFile']  + '.seq')
             protFile = os.path.join( cyanaDirectory, kwds['protFile'] + '.prot')
             pkFile   = os.path.join( cyanaDirectory, f + '.peaks')
-            if project.importXeasyPeaks( seqFile,protFile,pkFile,convention ):                       
+            if project.importXeasyPeaks( seqFile,protFile,pkFile,convention ):
                 sources.append( seqFile, protFile, pkFile )
-    
-#    # patches for saveing upl,aco files
-#    project.patch = NTdict( upl= NTlist(), aco=NTlist(), convention = convention )
-#    project.saveXML('patch','__SAVEXML__')
-#    project.patch.saveXML('aco','upl','convention','__SAVEXML__')
-    
-    #end if
+
     for f in kwds['uplFiles']:
-        uplFile = os.path.join( cyanaDirectory, f + '.upl')    
+        uplFile = os.path.join( cyanaDirectory, f + '.upl')
         if project.importUpl( uplFile, convention ):
-            sources.append( uplFile ) 
-#            project.patch.upl.append( uplFile ) 
-        #end if                    
-    #end for
-    
-    for f in kwds['acoFiles']:  
-        acoFile = os.path.join( cyanaDirectory, f + '.aco') 
-        if (project.importAco( acoFile, convention )):
-            sources.append( acoFile )                    
-#            project.patch.aco.append( acoFile ) 
-        #end if                    
+            sources.append( uplFile )
+#            project.patch.upl.append( uplFile )
+        #end if
     #end for
 
+    for f in kwds['acoFiles']:
+        acoFile = os.path.join( cyanaDirectory, f + '.aco')
+        if (project.importAco( acoFile, convention )):
+            sources.append( acoFile )
+#            project.patch.aco.append( acoFile )
+        #end if
+    #end for
+
+    NTdebug( str(sources) )
     sources.removeDuplicates()
     if copy2sources:
         for f in sources:
@@ -346,7 +403,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
             shutil.copy( f, sourceDir )
         #end for
     #end if
-    
+
     NTdebug( project.format())
     return sources
 #end def
@@ -368,7 +425,8 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
 # register the functions
 methods  = [(importUpl, None),
             (importAco, None),
-            (cyana2cing, None)
+            (cyana2cing, None),
+            (importCyanaStereoFile, None)
            ]
 #saves    = []
 #restores = []
