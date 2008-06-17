@@ -7,9 +7,9 @@ from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import floatParse
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.fpconst import isNaN
 from cing.PluginCode.dssp import to3StateUpper
 from cing.core.classes import Project
-from cing.core.constants import ISNAN
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 import cing
@@ -78,7 +78,7 @@ def main():
         chi2 = chi2.strip()
         chi1 = floatParse(chi1)
         chi2 = floatParse(chi2)
-        if ISNAN(chi1) or ISNAN(chi2):
+        if isNaN(chi1) or isNaN(chi2):
             continue
         if not inRange(chi1):
             NTerror("chi1 not in range for row: %s" % `row`)

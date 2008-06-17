@@ -9,16 +9,16 @@ from cing import verbosityError
 from cing import verbosityNothing
 from cing import verbosityOutput
 from cing import verbosityWarning
-from cing.core.constants import ISNAN
-from cing.core.constants import NAN_FLOAT
+from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import isNaN
+from cing.core.constants import COLOR_GREEN
+from cing.core.constants import COLOR_ORANGE
+from cing.core.constants import COLOR_RED
 from fnmatch import fnmatch
 from gzip import GzipFile
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-from cing.core.constants import COLOR_GREEN
-from cing.core.constants import COLOR_RED
-from cing.core.constants import COLOR_ORANGE
 import array
 import cing
 import inspect
@@ -3640,7 +3640,7 @@ Rob might have caught this by requiring c_av be at least 2.0.
 
 def floatFormat( v, format ):
     ''' Just check for nans.'''
-    if ISNAN(v):
+    if isNaN(v):
         return NaNstring
     return format % v
 
@@ -3649,7 +3649,7 @@ def floatParse( v_str ):
 #    NTdebug('''NaNstring [%s]''' % NaNstring)
 #    NTdebug('''v_str [%s]''' % v_str)
     if v_str == NaNstring:
-        return NAN_FLOAT
+        return NaN
     return float(v_str)
 
 def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):

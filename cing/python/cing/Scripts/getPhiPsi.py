@@ -9,16 +9,17 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import floatFormat
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import gunzip
+from cing.Libs.fpconst import NaN
 from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import doRamachandran # once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
-from cing.core.constants import NAN_FLOAT
 from cing.core.molecule import Chain
 import cing
 import os
 import sys
+#from cing.core.constants import NAN_FLOAT
  
 
 # Can be called for phi, psi or any other combo like chi1, chi2
@@ -80,12 +81,12 @@ def doEntry( entryCode, chainCode ):
                 continue
             secStruct = secStruct[0]
             # Make sure we always have something to hold onto.
-            d1_value_list = getDeepByKeysOrDefault( res, [ NAN_FLOAT ], DIHEDRAL_NAME_1)
-            d2_value_list = getDeepByKeysOrDefault( res, [ NAN_FLOAT ], DIHEDRAL_NAME_2)
+            d1_value_list = getDeepByKeysOrDefault( res, [ NaN ], DIHEDRAL_NAME_1)
+            d2_value_list = getDeepByKeysOrDefault( res, [ NaN ], DIHEDRAL_NAME_2)
             if len( d1_value_list ) == 0:
-                d1_value_list = [ NAN_FLOAT ]
+                d1_value_list = [ NaN ]
             if len( d2_value_list ) == 0:
-                d2_value_list = [ NAN_FLOAT ]
+                d2_value_list = [ NaN ]
                 
             d1_value_str = floatFormat( d1_value_list[0], "%6.1f" ) # counterpart is floatParse
             d2_value_str = floatFormat( d2_value_list[0], "%6.1f" )

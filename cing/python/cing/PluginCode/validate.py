@@ -58,6 +58,7 @@ from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
+from cing.Libs.fpconst import NaN
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.Whatif import C12CHK_STR
 from cing.PluginCode.Whatif import RAMCHK_STR
@@ -73,7 +74,6 @@ from cing.core.classes import AtomList
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import NAN_FLOAT
 from cing.core.constants import NOSHIFT
 from cing.core.constants import PDB
 from cing.core.molecule import Residue
@@ -838,9 +838,9 @@ def checkHbond( donorH, acceptor,
     result.maxAngle      = maxAngle
     result.maxDistance   = maxDistance
     result.fraction      = fraction
-    result.distance      = NAN_FLOAT
+    result.distance      = NaN
     result.distanceSD    = 0.0
-    result.angle         = NAN_FLOAT
+    result.angle         = NaN
     result.angleCV       = 0.0
     result.accepted      = False
 
