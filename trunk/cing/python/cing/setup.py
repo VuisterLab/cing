@@ -356,7 +356,7 @@ if __name__ == '__main__':
         if not os.path.exists(dsspPath):
             NTwarning("Could not find 'dssp'")
         else:
-            NTmessage("... Found 'dssp'")
+            NTmessage("........ Found 'dssp'")
             parametersDict['dsspPath'] = dsspPath
 
     time = 0
