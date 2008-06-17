@@ -1,4 +1,6 @@
+from ConfigParser import ConfigParser
 from cing import authorList
+from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
 from cing import programName
@@ -138,8 +140,8 @@ Project: Top level Cing project class
 
     """
 
-    OMEGA_MAXALL_DEFAULT_POOR_VALUE = 1. # Normally 15 but may be set low for testing 1brv to
-    OMEGA_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 20
+#    project.valSets.OMEGA_MAXALL_POOR = 15. # Normally 15 but may be set low for testing 1brv to
+#    OMEGA_MAXALL_BAD  = 20. # Normally 20 
 
     def __init__( self, name ):
 
@@ -185,7 +187,8 @@ Project: Top level Cing project class
         self.dihedrals  =  ProjectList( self, DihedralRestraintList, directories.restraints, '.dihedrals' )
         self.rdcs       =  ProjectList( self, RDCRestraintList,      directories.restraints, '.rdcs' )
         self.rogScore   = ROGscore()
-
+        self.valSets = NTdict()
+        self.readValidationSettings(fn=None)
         self.saveXML( 'version',
                       'name',  'created',
                       'molecules',
@@ -207,6 +210,18 @@ Project: Top level Cing project class
 
     #end def
 
+    def readValidationSettings(self, fn=None):
+        if fn:
+            validationConfigurationFile = fn
+        else:
+            validationConfigurationFile = os.path.join(cingPythonCingDir, 'valSets.cfg')
+        config = ConfigParser()
+        config.readfp(open(validationConfigurationFile))
+        for item in config.items('DEFAULT'):
+            key = item[0].upper()  # upper only.
+            value = float(item[1])
+            self.valSets[key] = value # name value pairs.
+
     def criticize(self):
         # funny things not in what if.
         for res in self.molecule.allResidues():
@@ -222,18 +237,18 @@ Project: Top level Cing project class
                         v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
 #                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
 #                            res, modelId, v) )
-                    if v >= Project.OMEGA_MAXALL_DEFAULT_BAD_VALUE:
+                    if v >= self.valSets.OMEGA_MAXALL_BAD:
                         res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
 #                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
                         NTdebug('Set to red')
-                    elif v >= Project.OMEGA_MAXALL_DEFAULT_POOR_VALUE:
+                    elif v >= self.valSets.OMEGA_MAXALL_POOR:
                         res.rogScore.setMaxColor( COLOR_ORANGE, ROGscore.ROG_COMMENT_BAD_OMEGA )
                         NTdebug('Set to orange (perhaps)')
                     modelId += 1
 
         # distance and dihedral restraints
         for drl in self.distances + self.dihedrals:
-            drl.criticize()
+            drl.criticize(self)
 
     #-------------------------------------------------------------------------
     # Path stuff
@@ -1069,12 +1084,6 @@ class DistanceRestraint( NTdict ):
        atomPairs: list of (atom_1,atom_2) tuples,
        lower and upper bounds
     """
-    DR_MAXALL_DEFAULT_POOR_VALUE = 0.1 # Normally 0.3 but can be set low for testing 1brv to
-    DR_MAXALL_DEFAULT_BAD_VALUE  = 0.3 # Normally 0.5 but can be set low for testing 1brv to
-    DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.5 # Ang.
-    """Fraction of models."""
-    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5
-    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.5 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
 
     def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
 
@@ -1106,36 +1115,31 @@ class DistanceRestraint( NTdict ):
         #end for
     #end def
 
-    def criticize(self):
+    def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s' % self )
-        if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
+        if self.violMax >= project.valSets.DR_MAXALL_POOR:
             comment = '[crit.1] violMax: %8.3f' % self.violMax
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
-#            self.rogScore.setMaxColor( COLOR_ORANGE, comment+" intentional duplicate for testing" )
-        if self.violMax >= DistanceRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
+        if self.violMax >= project.valSets.DR_MAXALL_BAD:
             comment = '[crit.2] violMax: %8.3f' % self.violMax
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-        fractionAbove = getFractionAbove( self.violations, DistanceRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
-        if fractionAbove >= DistanceRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
+        fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_POOR )
+        if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
+            comment = '[crit.3b]: fractionAbove: %8.3f' % fractionAbove
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
+        fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_BAD )
+        if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
             comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-        if self.violSd >= DistanceRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
+        if self.violSd >= project.valSets.DR_RMSALL_BAD:
             comment = '[crit.4] violSd: %8.3f' % self.violSd
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-
-#        if critiqued:
-#            for atom in getAtomsFromAtomPairs(self.atomPairs):
-#                atom.appendCritique( self, cascade = True )
-
-
 
     def appendPair( self, pair ):
         # check if atom already present, keep order
@@ -1368,9 +1372,9 @@ class DistanceRestraintList( NTlist ):
         self.rogScore   = ROGscore()
     #end def
 
-    def criticize(self):
+    def criticize(self, project):
         for dr in self:
-            dr.criticize()
+            dr.criticize(project)
             self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
 
     def append( self, distanceRestraint ):
@@ -1506,11 +1510,11 @@ class DihedralRestraint( NTdict ):
        GV&AWSS: 10 Oct 2007, upper-limit adjustment
     """
 
-    DR_MAXALL_DEFAULT_POOR_VALUE = 3. # Normally 0.3 but set low for testing 1brv to
-    DR_MAXALL_DEFAULT_BAD_VALUE  = 5. # Normally 0.5 but set low for testing 1brv to
-    DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE  = 0.3 # degrees.
-    DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE  = 0.5
-    DR_RMSALL_DEFAULT_BAD_VALUE  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
+#    project.valSets.DR_MAXALL_POOR = 3. # Normally 0.3 but set low for testing 1brv to
+#    DR_MAXALL_BAD  = 5. # Normally 0.5 but set low for testing 1brv to
+#    DR_THRESHOLD_OVER_BAD  = 0.3 # degrees.
+#    DR_THRESHOLD_FRAC_BAD  = 0.5
+#    DR_RMSALL_BAD  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
 
     def __init__( self, atoms, lower, upper, **kwds ):
 
@@ -1538,34 +1542,32 @@ class DihedralRestraint( NTdict ):
         self.rogScore   = ROGscore()
     #end def
 
-    def criticize(self):
+    def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
+                
 #        NTdebug( '%s (dih)' % self )
-        if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_POOR_VALUE:
+        if self.violMax >= project.valSets.AC_MAXALL_POOR:
             comment = '[crit.1] violMax: %8.3f' % self.violMax
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
-        if self.violMax >= DihedralRestraint.DR_MAXALL_DEFAULT_BAD_VALUE:
+        if self.violMax >= project.valSets.AC_MAXALL_BAD:
             comment = '[crit.2] violMax: %8.3f' % self.violMax
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-        fractionAbove = getFractionAbove( self.violations, DihedralRestraint.DR_THRESHOLD_OVER_DEFAULT_BAD_VALUE )
-        if fractionAbove >= DihedralRestraint.DR_THRESHOLD_FRAC_DEFAULT_BAD_VALUE:
+        fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_POOR )
+        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
+            comment = '[crit.3a]: fractionAbove: %8.3f' % fractionAbove
+            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
+        fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_BAD )
+        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
             comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-#        (self.violAv, self.violSd, _n) = self.violations.average()
-        if self.violSd >= DihedralRestraint.DR_RMSALL_DEFAULT_BAD_VALUE:
+        if self.violSd >= project.valSets.AC_RMSALL_BAD:
             comment = '[crit.4] violSd: %8.3f' % self.violSd
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            return
-
-#        if critiqued:
-#            for atom in getAtomsFromAtomPairs(self.atomPairs):
-#                atom.appendCritique( self, cascade = True )
 
 
     def calculateAverage(self):
@@ -1760,9 +1762,9 @@ class DihedralRestraintList( NTlist ):
         self.rogScore   = ROGscore()
     #end def
 
-    def criticize(self):
+    def criticize(self, project):
         for dr in self:
-            dr.criticize()
+            dr.criticize(project)
             self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
 
     def append( self, dihedralRestraint ):
