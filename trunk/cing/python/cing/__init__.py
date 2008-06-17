@@ -4,6 +4,7 @@ CING: Common Interface for NMR structure Generation
 (c) AW,JFD,GWV 2004-2008
 
 """
+
 import os
 import sys
 
@@ -95,7 +96,7 @@ if not os.path.exists(cingDirTmp):
 #from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist
 from cing.core.classes import Project
-from cing.core.classes import Peak, PeakList, DistanceRestraint, DistanceRestraintList
+from cing.core.classes import Peak, PeakList
 from cing.core.classes import DistanceRestraint, DistanceRestraintList
 from cing.core.classes import DihedralRestraint, DihedralRestraintList
 #from cing.core.parameters import *
@@ -105,3 +106,5 @@ from cing.core.molecule import Molecule, Chain, Residue, Atom, Coordinate, Reson
 from cing.core.importPlugin import importPlugin # This imports all plugins
 #from cing.Libs.peirceTest import peirceTest
 #from cing.Libs.TypeChecking import *
+
+
