@@ -21,9 +21,9 @@ class AllChecks(TestCase):
  
     def testRun(self):
         # TODO: the htmlOnly set to True currently fails. To fix! 
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
         pdbConvention = IUPAC
         restraintsConvention = CYANA
 #        entryId = "1ai0" 
