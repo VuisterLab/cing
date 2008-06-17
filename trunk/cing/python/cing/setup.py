@@ -2,7 +2,6 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import atoi
 from string import strip
-from subprocess import call
 import os
 import sys
 import time
