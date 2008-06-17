@@ -49,6 +49,6 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityError
+    cing.verbosity = verbosityDebug
     unittest.main()
