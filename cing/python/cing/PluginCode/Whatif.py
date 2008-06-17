@@ -49,9 +49,9 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getTextBetween
+from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.Libs.NTutils import setDeepByKeys
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.parameters import cingPaths
@@ -61,6 +61,7 @@ from string import upper
 import os
 import shelve
 import time
+
 
 
 
@@ -792,10 +793,17 @@ def criticizeByWhatif( project ):
         selectedResidues = project.molecule.ranges2list( ranges )
 
     keyList = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ] # second item replaced below.
-    for key in Whatif.DEFAULT_RESIDUE_BAD_SCORES:
-        thresholdValueBad  = Whatif.DEFAULT_RESIDUE_BAD_SCORES[ key]
-        thresholdValuePoor = Whatif.DEFAULT_RESIDUE_POOR_SCORES[key]
-        keyList[1] = key
+    
+    for key in project.valSets:
+
+        if not key.startswith('WI'):
+            continue
+        if not key.endswith('BAD' ):
+            continue
+        keyPoor = key.replace('BAD', "POOR")
+        thresholdValuePoor = project.valSets[ keyPoor ]
+        thresholdValueBad  = project.valSets[ key ]
+
         for res in selectedResidues:
             actualValue = getDeepByKeys(res,*keyList)
             if actualValue == None:
