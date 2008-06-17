@@ -10,13 +10,14 @@
     Optionally export on-the-fly to a xplor refine setup.
 
 """
-
-import cing
 from cing import NTwarning
 from cing import Project
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import OptionParser
+import cing
 import os
 import sys
+
 
 parser = OptionParser(usage="cyana2cing.py [options] cyanaDirectory Use -h or --help for full options.")
 
