@@ -1,12 +1,14 @@
 Directories:
 
-Documentation   Help and related files.
-HTML            Style sheets for HTML output from CING.
-Tests           (temporary) data for testing.
-bin             Shiftx binaries for mac os x.
-java            Java libraries (e.g. for using Wattos).
-python          Code.
-scripts         Scripts; i.e. for image generation.
+python                  Python code for CING and Refine.
+bin                     Binaries for distribution.
+data                    Larger data that should not reside under PYTHONOPATH directory.
+Documentation           Installation, setup etc. info
+HTML                    Html, stylesheet, images etc. for CING web pages. Everything
+                        will be copied verbatim to those pages.
+java                    Java code, including Wattos.
+scripts                 Loose pieces of CING code in several programming languages.
+Tests                   Extensive test case data. Data that is run before each commit.
 
 Files:
 
@@ -15,3 +17,5 @@ HISTORY.txt     Changes between versions.
 README.txt      Read this first.
 cing.csh        setup file to source in your shell settings (.cshrc or .bashrc).
 cing.sh         See cing.csh.
+cing.properties Properties for web/cgi server installation by ant script build.xml
+build.xml       web/cgi server installation script by this ant script
