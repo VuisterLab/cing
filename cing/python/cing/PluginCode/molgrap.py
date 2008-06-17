@@ -16,15 +16,20 @@ from cing.Libs.TypeChecking import check_type
 from cing.core.constants import CYANA
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
+from cing.core.parameters import directories
 import os
 
 class Molgrap(NTdict):
-    def __init__(self, backcolor='cing_turqoise'):
+    def __init__(self, backcolor='cing_turqoise', project=None):
         self.csh_script_dir = cingDirMolmolScripts
         self.backcolor = backcolor # see csh script definitions.
 #        self.backcolor = 'bmrb_yellow' # see csh script definitions.
 #        self.backcolor = 'cing_turqoise' # see csh script definitions.
 #        self.backcolor = 'white' # see csh script definitions.
+        self.projectDirTmp = cingDirTmp
+        if project:
+            self.projectDirTmp = os.path.abspath( project.path( directories.tmp ) )
+        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp) 
 
     """Creates a large gif to path for the given molecule.
     Return True on error and False on success.
@@ -33,7 +38,7 @@ class Molgrap(NTdict):
 
         if not os.environ.has_key('MOLMOLHOME'):
             NTdebug('MOLMOLHOME not defined by user, using a temporary one')
-            os.putenv('MOLMOLHOME', cingDirTmp)
+            os.putenv('MOLMOLHOME', self.projectDirTmp)
 
         apath = os.path.abspath(path)
         if apath != path:
@@ -42,13 +47,14 @@ class Molgrap(NTdict):
         root,file,_ext  = NTpath(path)
         entry_code = file
 
+        
         if root and not os.path.exists(root):
             NTerror("Given path root is absent; not creating.")
             return True
 
-        pdb_first_file_name = os.path.join(cingDirTmp, file + "_001.pdb")
-        pov_file_name       = os.path.join(cingDirTmp, file + ".pov")
-        pov_cor_file_name   = os.path.join(cingDirTmp, file + "_cor.pov")
+        pdb_first_file_name = os.path.join(self.projectDirTmp, file + "_001.pdb")
+        pov_file_name       = os.path.join(self.projectDirTmp, file + ".pov")
+        pov_cor_file_name   = os.path.join(self.projectDirTmp, file + "_cor.pov")
 
 #        NTdebug( "pdb_first_file_name: "+ pdb_first_file_name)
 
@@ -136,13 +142,13 @@ class Molgrap(NTdict):
     on Unix.
     """
     def _make_molmol_pov_file(self, pdb_file_name, id, backcolor  ):
-        script_file_name = os.path.join ( cingDirTmp, id + "_molmol.csh" )
-        log_file_name    = os.path.join ( cingDirTmp, id + "_molmol_python.log" )
+        script_file_name = os.path.join ( self.projectDirTmp, id + "_molmol.csh" )
+        log_file_name    = os.path.join ( self.projectDirTmp, id + "_molmol_python.log" )
         script_file = open(script_file_name, 'w')
         script_file.write('#!/bin/csh\n')
         script_file.write('set id              = %s\n' % id)
         script_file.write('set csh_script_dir  = %s\n' % self.csh_script_dir)
-        script_file.write('set tmp_dir         = %s\n' % cingDirTmp)
+        script_file.write('set tmp_dir         = %s\n' % self.projectDirTmp)
         script_file.write('set pdb_file        = %s\n' % pdb_file_name)
         script_file.write('set backcolor       = %s\n' % backcolor)
         script_file.write('set executableMm    = %s\n' % cingPaths.molmol )
@@ -152,7 +158,7 @@ class Molgrap(NTdict):
         script_file.write('exit $status\n')
         script_file.close()
         os.chmod(script_file_name,0755)
-        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)
+        program = ExecuteProgram(script_file_name, rootPath = self.projectDirTmp,redirectOutputToFile = log_file_name)
         if program(""):
             NTerror( "Failed shell command: " + script_file_name)
             return True
@@ -167,14 +173,14 @@ class Molgrap(NTdict):
     """
     def _render_convert_pov_file(self, pov_file_name, id, results_dir ):
 
-        script_file_name = os.path.join ( cingDirTmp, id + "_render_convert_pov.csh" )
-        log_file_name    = os.path.join ( cingDirTmp, id + "_render_convert_pov_python.log" )
+        script_file_name = os.path.join ( self.projectDirTmp, id + "_render_convert_pov.csh" )
+        log_file_name    = os.path.join ( self.projectDirTmp, id + "_render_convert_pov_python.log" )
         script_file = open(script_file_name, 'w')
         script_file.write('#!/bin/csh\n')
         script_file.write('set id              = %s\n' % id)
         script_file.write('set csh_script_dir  = %s\n' % self.csh_script_dir)
         script_file.write('set results_dir     = %s\n' % results_dir )
-        script_file.write('set tmp_dir         = %s\n' % cingDirTmp)
+        script_file.write('set tmp_dir         = %s\n' % self.projectDirTmp)
         script_file.write('set pov_file_name   = %s\n' % pov_file_name)
         script_file.write('set executablePov   = %s\n' % cingPaths.povray )
         script_file.write('set executableConv  = %s\n' % cingPaths.convert )
@@ -185,7 +191,7 @@ class Molgrap(NTdict):
         os.chmod(script_file_name,0755)
 
 
-        program = ExecuteProgram(script_file_name, rootPath = cingDirTmp,redirectOutputToFile = log_file_name)
+        program = ExecuteProgram(script_file_name, rootPath = self.projectDirTmp,redirectOutputToFile = log_file_name)
         if program(""):
             NTerror( "Failed shell command: " + script_file_name)
             NTerror("Have you installed povray-includes or similar?\n      For some Linuxes 'colors.inc' doesn't come with povray")
@@ -225,11 +231,13 @@ class Molgrap(NTdict):
             output_text = output_text.replace( org[i], new[i])
         open( file_name_out, 'w' ).write( output_text )
 
-def export2gif(molecule, path ):
+def export2gif(molecule, path, project=None ):
     check_type(molecule,'Molecule')
     check_string(path)
+    if project:
+        check_type(project, 'Project')
 #    NTdebug("Now in cing.Plugincode.molgrap#export2gif")
-    m = Molgrap()
+    m = Molgrap(project=project)
     m.run(molecule, path)
 
 Molecule.export2gif = export2gif
