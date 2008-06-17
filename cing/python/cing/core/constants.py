@@ -27,7 +27,7 @@ except ImportError:
 try:
     from matplotlib.numerix._na_imports import isnan as ISNAN
 except ImportError:
-    from cing.Libs.fpconst import isNaN as ISNAN
+    from cing.Libs.fpconst import isNaN as ISNAN #@UnusedImport
     # should be math.isnan when we switch to python 2.6
 #end try
 

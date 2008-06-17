@@ -1,5 +1,6 @@
-import cing
+from cing.core.molecule import NTdistance
 from math import acos, pi
+import cing
 
 # TODO: incorporate into CING
 
@@ -44,15 +45,15 @@ def disulfideScore( cys1, cys2 ):
     mc = len(cys1.CA.coordinates)
     score = cing.NTlist(0.0, 0.0, 0.0, 0.0)
     for m in range( mc ):
-        da = cing.NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
+        da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
         if da >= 3.72 and da <= 6.77: 
             score[0] += 1.0
             
-        db = cing.NTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
+        db = NTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
         if db >= 3.18 and db <= 4.78: 
             score[1] += 1.0
         
-        dg = cing.NTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
+        dg = NTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
         chi3 = chi3SS( db )
         if (dg >= 1.63 and dg <= 2.72) or (chi3 >= 27.0 and chi3 <= 153.0): 
             score[2] += 1.0

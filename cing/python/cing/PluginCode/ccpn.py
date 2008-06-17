@@ -1,4 +1,5 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+from cing.core.dictionaries import NTdbGetResidue
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -13,7 +14,6 @@ from memops.general import Io as genIo # common to ccpn 1 and 2, used only by cc
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
 
-from cing import NTdbGetResidue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning

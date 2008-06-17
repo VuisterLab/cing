@@ -3214,7 +3214,7 @@ def findFiles( pattern, startdir, exclude=[]):
     """
     result = []
     #print exclude
-    for dirpath, dirs, files in os.walk(startdir):
+    for dirpath, _dirs, files in os.walk(startdir):
 
         excludePath = False
         for e in exclude:

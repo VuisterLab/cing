@@ -1,6 +1,5 @@
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -21,7 +20,6 @@ from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import quote
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.PyMMLib import ATOM
@@ -1951,7 +1949,7 @@ Atom class: Defines object for storing atom properties
             if p != None:
                 r = p.realAtoms()
                 if len(r) == 2:
-                    if atm == r[0]:
+                    if self == r[0]:
                         self.db.proChiralPartnerAtom = r[1].db.name
                     else:
                         self.db.proChiralPartnerAtom = r[0].db.name
