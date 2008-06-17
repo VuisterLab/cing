@@ -2035,7 +2035,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
         NTdebug("Trying to create : " + pathMolGif)
-        if project.molecule.export2gif(pathMolGif):
+        if project.molecule.export2gif(pathMolGif, project=project):
             NTerror("Failed to generated a Molmol picture; continuelng.")
 
     for molecule in [project[mol] for mol in project.molecules]:
