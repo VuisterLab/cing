@@ -5,9 +5,12 @@ cing.css
 header_bg.jpg
 multilineTitles.js
 
+Directories:
+example             Example data.
+
+
 Files:
 
 favicon.ico         For CING server a mini icon for address bar etc.
-1brv.*              Example data.
 CING_server.html    CGI form containing html file.
 index.html          Redirection to CGI form.

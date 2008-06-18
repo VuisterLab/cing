@@ -2922,6 +2922,7 @@ class PrintWrap:
             self.prefix = prefixDetail
         elif self.verbose == verbosityDebug:
             self.prefix = prefixDebug
+            
     def __call__( self, format, *args ):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
@@ -3031,6 +3032,7 @@ NTopen = NTfile
 # -----------------------------------------------------------------------------
 #
 def removedir(path):
+    """Recursive remove"""
     while (1):
         try:
             filelist=os.listdir(path)

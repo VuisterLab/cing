@@ -32,6 +32,9 @@ SetEnv  HOME /Users/jd/Sites/cing-home
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
 
+monitor with:
+tail -f /private/var/log/apache2/*_log &
+
 - allow indexing on home dirs and beyond for  e.g.:
     http://tang.bmrb.wisc.edu/~jurgen/tmp/Aqua/900971/
     by including settings:<Directory /home/*/external_html> in /etc/httpd/conf/httpd.conf
