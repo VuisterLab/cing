@@ -134,8 +134,8 @@ def testOverall():
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = [  cingPythonDir + "/Cython*"
-#                           cingPythonDir + "/cing.PluginCode.test.test_ccpn",
+    excludedModuleList = [ cingPythonDir + "/Cython*",
+                           cingPythonDir + "/cyana2cing*",
 #                           cingPythonDir + "/cing.PluginCode.test.test_Procheck",
 #                           cingPythonDir + "/cing.PluginCode.test.test_Whatif",
 #                           cingPythonDir + "/cing.Scripts.test.test_cyana2cing",
@@ -143,6 +143,7 @@ def testOverall():
                           ]
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
+    NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
