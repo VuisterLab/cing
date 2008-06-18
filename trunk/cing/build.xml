@@ -30,13 +30,20 @@
             description="Publish the server.">
     </target>
     
-	
+    <target name="server-local-install" depends="init"
+            description="Run this target locally on the server.">
+    	<mkdir dir="${server.cgi.dir.log}" />
+    	<!-- set permissions for executable but not readible so it's secret -->
+        <chmod perm="a+wx" dir="${server.cgi.dir.tmp}" />
+        <chmod perm="o-r" dir="${server.cgi.dir.tmp}" />
+    </target>
+   
     <target name="server-cgi-install" depends="init">
         <echo message="Installing cgi scripts to server engine: ${server.cgi.user}@${server.cgi.machine}:${server.cgi.dir}"/>
 
         <copy todir="${tmp.local.dir}" file="${server.cgi.dir.local}/${server.cgi.python.prog}" overwrite="true"
             verbose="false"/>
-    	
+    	<!-- TODO use nested match/replace for conciseness -->
         <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
                                match="PYTHON_EXECUTABLE" 
                                replace='${server.cgi.python} ${server.cgi.python.flags}'
@@ -45,6 +52,15 @@
                                match="CING_ROOT_PYTHON" 
                                replace='${server.cgi.cing.python.dir}'
                                byline="true"/>
+        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
+                               match="CING_SERVER_TMP" 
+                               replace='${server.cgi.dir.tmp}'
+                               byline="true"/>
+        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
+                               match="SERVER_CGI_URL_TMP" 
+                               replace='${server.cgi.url.tmp}'
+                               byline="true"/>
+    	
     	
     	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}"
             keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
@@ -57,28 +73,33 @@
     </target>
 
     <target name="server-web-install" depends="init">
-        <echo message="Installing HTML to server engine: ${server.web.machine}:${server.web.dir}"/>
-
+        <echo message="Installing HTML to server engine: ${server.web.machine.looped}:${server.web.dir}"/>
         <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}"
                 keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
             port="${server.cgi.port}"
-            verbose="false"
+            verbose="true"
             >
-            <fileset dir="${server.local.dir}" includes="**" excludes=".svn"/>                     
+        	<!-- for some reason JFD can't get the example copied over with ** without blocking
+        	further ant targets. Perhaps permissions or special files prevent it?
+        	Perhaps the nestedness of the .svn dir ? The work around is to ant on this once, kill it and
+        	enable the below exclude afterwards.-->
+            <fileset dir="${server.local.dir}" excludes="example/**"/>                     
         </scp>
-    	
-            	
-        <copy todir="${tmp.local.dir}" file="${server.local.dir}/${server.web.prog}" overwrite="true" />
+        <echo message="DEBUG: Copy to ${tmp.local.dir}"/>        
+        <copy todir="${tmp.local.dir}" file="${server.local.dir}/${server.web.prog}" overwrite="true" verbose="true" />
         <!-- special case for localizing the server setting in the html code.
+        includes="*.html" excludes=".svn"
         ACTION="http://stella.cmbi.umcn.nl/cgi-bin/simpleCgiServer.py" --> 
+        <echo message="DEBUG: Replacing some localizations in temp dir ${tmp.local.dir}"/>        
         <replaceregexp file="${tmp.local.dir}/${server.web.prog}"
                                match="(ACTION.*)" 
                                replace='ACTION="http://${server.cgi.machine}/cgi-bin/${server.cgi.python.prog}"'
-                               byline="true"/>
+                               byline="true"
+        />
         <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}"
             keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
             port="${server.cgi.port}"
-            verbose="false"
+            verbose="true"
             >
             <fileset dir="${tmp.local.dir}"  includes="${server.web.prog}"/>                     
         </scp>

@@ -1,11 +1,10 @@
 <html>
 <head>
-<title>CING Server</title>
-<link media="screen" href="cing.css" type="text/css" rel="stylesheet"/>
-<script src="multilineTitles.js" type="text/javascript"/>
+	<title>CING Server</title>
+	<link media="screen" href="cing.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
-<FORM METHOD="POST"
+<FORM METHOD="POST" name="myform"
 ACTION="http://TO_BE_LOCALIZED_LIKE.NMR.cmbi.umcn.nl/cgi-bin/simpleCgiServer.py" 
 ENCTYPE="multipart/form-data">
 
@@ -15,39 +14,41 @@ ENCTYPE="multipart/form-data">
     </div>
 
     <div id="main">
-
+The gray-ed out parameters can not yet be provided or changed.
 <table>
     <TR class=GRAY>
         <td>Project
-        (.tgz if n>1)<td><INPUT TYPE="file" NAME="PROJECT_FILE" VALUE="" SIZE=50> <A HREF="1brv.tgz">eg</A>
+        (.tgz if n>1)<td><INPUT TYPE="file" NAME="PROJECT_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.tgz">eg</A>
         <BR><INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-cyana" CHECKED>
         CCPN <INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-xplor">
         NMR-STAR <INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-pdb"> CING
     </tr>
-    <TR>
+    <TR >
         <td>Coordinate (required)
-        <td><INPUT TYPE="file" NAME="PDB_FILE" VALUE="" SIZE=50> <A HREF="1brv.pdb">eg</A>
-        <BR><INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>
-        CYANA <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-xplor">
-        XPLOR <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-pdb"> PDB
+        <td><INPUT TYPE="file" NAME="COOR_FILE" VALUE="/Users/jd/workspace/cing/server/example/1brv.pdb" SIZE=50> <A HREF="example/1brv.pdb">eg</A>
+        <BR>
+        <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="IUPAC" checked="checked"> IUPAC
+        <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="CYANA">CYANA
+        <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="XPLOR">XPLOR
+        
     </tr>
-    <TR>
+    <TR class=GRAY>
     
         <td>Sequence
-        <TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="1brv.seq">eg</A>
+        <TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.seq">eg</A>
         <BR>
         <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>CYANA
-    <TR>
-        <td>Distance<TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="1brv.upl">eg</A>
+    <TR class=GRAY>
+        <td>Distance<TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.upl">eg</A>
         <BR>
         <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>CYANA
-	<TR>
-		<td>Dihedral<TD><INPUT TYPE="file" NAME="ACO_FILE" VALUE="" SIZE=50> <A HREF="1brv.aco">eg</A>
+	<TR class=GRAY>
+		<td>Dihedral<TD><INPUT TYPE="file" NAME="ACO_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.aco">eg</A>
         <BR>
         <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>CYANA
 		</TD>
 	</tr>
-    <tr>
+    <tr class=GRAY>
         <td>Peak</td>
         <td><INPUT TYPE="file" NAME="PEAK_FILE" VALUE="" SIZE=50>
         <BR>
@@ -62,7 +63,7 @@ to create a CCPN project file.
 
 
 <H1>Options <small><A class="GRAY">Load Options and Criteria</A></small></H1>
-<table>
+<table class=GRAY>
 
 <TR><TD>
 Residues:
@@ -89,7 +90,7 @@ Verbosity (in ascending order)
 <OPTION VALUE="3" SELECTED>Output
 <OPTION VALUE="4">Detail
 <OPTION VALUE="9">Debug
-</SELECT>
+</SELECT><input name="DO_IMAGES" type="checkbox" checked="checked">Create imagery
 <TR class="GRAY"><TD>
 Access key
 <TD><INPUT 
@@ -97,12 +98,13 @@ TYPE="input"
 NAME="ACCESS_KEY" 
 VALUE="4A2EM9kt"
 SIZE=8 >
-[a-Z0-9]{8}
+[a-Z0-9]{6}
+<INPUT TYPE="button" Value="Regenerate" onClick="regenerate(this.form)">
 </TD></TR>
 </table>
 
 <h1>Criteria for <A class="orange">Poor</A>/<A class="red">Bad</A></h1>
-<TABLE BORDER CELLSPACING=0 CELLPADDING=10 >
+<TABLE BORDER CELLSPACING=0 CELLPADDING=10 class=GRAY >
 <TR>
 <TD>
 
@@ -110,7 +112,7 @@ SIZE=8 >
 
 
 
-<h2><input name="WI_DO" type="checkbox" checked="checked">CING</h2>
+<h2><input name="TODO_PARAM" type="checkbox" checked="checked">CING</h2>
 
 <input name="DO_OMEGA" type="checkbox" checked="checked">Omega 
 <input TEXT="" name="OMEGA_MAXALL_DEFAULT_POOR_VALUE" value="15" size="2" class="orange"> and
@@ -122,13 +124,10 @@ SIZE=8 >
 <BR>
 <input name="DO_FLAG_MISSING_ASS" type="checkbox" checked="checked">Flag missing coordinates
 
-<h2> <input name="DO_RAMCHK" type="checkbox" checked="checked">What If </h2>
-<table>
+<h2> <input name="DO_WHATIF" type="checkbox">What If </h2>
+<table class=GRAY>
 <tr>
-<td cavtitle="Provides per-residue Z-scores describing
-   LText  : how well each residue fits into the allowed areas of the
-   LText  : Ramachandran plot.
-" onmousemove="SetCavTimer(event);" onmouseout="CancelCavTimer(event);">
+<td>
 
 <input name="DO_RAMCHK" type="checkbox" checked="checked">Ramachandran plot
 <a href="http://swift.cmbi.ru.nl/teach/B2/bioinf_7.html">*</a></td><td>
@@ -158,8 +157,8 @@ residue sigmas [-2,2]
 </table>
 
 
-<br><h2><input name="DO_RAMCHK" type="checkbox" checked="checked">ProcheckNMR/<input name="DO_RAMCHK" type="checkbox" checked="checked">Aqua</h2>
-		<table>
+<br><h2><input name="DO_PROCHECK" type="checkbox" >ProcheckNMR/<input name="DO_RAMCHK" type="checkbox" checked="checked">Aqua</h2>
+		<table class=GRAY>
 
 
 			<tr>
@@ -202,9 +201,9 @@ Observable atoms:</DT>
 <DL>
 <DT>
 
-<H1><input name="WI_DO" type="checkbox" checked="checked">Distances</H1>
+<H1><input name="WI_DO" type="checkbox" >Distances</H1>
 
-<table>
+<table class=GRAY>
 <TR>
 <TD>
 <input name="WI_DO" type="checkbox" checked="checked">Maximum of any (maxall)
@@ -239,9 +238,9 @@ Observable atoms:</DT>
 
 </table>
 
-<h1><input name="WI_DO" type="checkbox" checked="checked">Dihedrals</h1>
+<h1><input name="DO_VAL_DIH" type="checkbox" checked="checked">Dihedrals</h1>
 
-<table>
+<table class=GRAY>
 <tr>
 <td>
 <input name="WI_DO" type="checkbox" checked="checked">Maximum of any (maxall)
@@ -292,5 +291,19 @@ VALUE="Start validation"></FORM>
 <div id="footer">
 <p>CING 0.75 alfa <a href="mailto:vuister@science.ru.nl">Geerten Vuister</a>, <a href="mailto:jurgend@cmbi.ru.nl">Jurgen F. Doreleijers</a> and <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
 </div><!-- end footer -->
+
+<script type="text/javascript">
+function regenerate(form) {
+    var requiredLength = 6
+	var allowedCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	var new_access=""
+	for (i = 1; i <= requiredLength; i++)
+	{
+	    var idxChar=Math.floor(Math.random()*(allowedCharacters.length))
+	    new_access = new_access + allowedCharacters[idxChar]
+	}
+    form.ACCESS_KEY.value = new_access
+}
+</script>
 </body>
 </html>
