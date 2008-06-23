@@ -29,6 +29,7 @@ Methods:
 from cing.Libs import PyMMLib
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
@@ -194,7 +195,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
 
             # check if this chain,fullName,atmName already exists in the molecule
             # if not, add chain or residue
-            if not chainId in mol:                
+            if not chainId in mol:
                 mol.addChain( chainId )
             #end if
 
@@ -302,10 +303,10 @@ def importPDB( project, pdbFile, convention = IUPAC, nmodels=None ):
 def export2PDB( project, tmp=None ):
     """Export coordinates to pdb file
     """
-    for molName in project.molecules:
-        mol   = project[molName]
+    for mol in project.molecules:
         if mol.modelCount > 0:
             fname = project.path( project.directories.PDB, mol.name + '.pdb' )
+            NTdetail('==> Exporting to PDB file "%s"', fname)
             pdbFile = mol.toPDB( convention = IUPAC)
             pdbFile.save( fname)
             del( pdbFile )

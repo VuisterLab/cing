@@ -121,12 +121,12 @@ def script( scriptFile, *a, **k ):
                     '[%s] the script file [%s]' % ( scriptsDir, scriptFile ))
             return True
         scriptFile = scriptFileAbs
+        #end if
+    #end if
 
     NTmessage('==> Executing script '+ scriptFile )
     execfile( scriptFile, globals() )
 
-        #end if
-    #end if
 #end def
 
 
@@ -403,6 +403,8 @@ def main():
         sys.exit(2)
     #end if
 
+    NTmessage( project.format() )
+
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
@@ -419,7 +421,7 @@ def main():
     if options.xeasyPeaks:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 4):
-            NTerror("--xeasyPEaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
+            NTerror("--xeasyPeaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
 

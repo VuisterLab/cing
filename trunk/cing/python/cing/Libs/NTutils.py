@@ -368,11 +368,14 @@ class NTlist( list ):
         return string
     #end def
 
-#    def __repr__( self ):
+# gv 19 Jun 08: reintroduced functionality, but shorter
+    def __repr__( self ):
+        string = list.__repr__(self)
+        return 'NTlist(' + string[1:-1] + ')'
+
 #        if len(self) == 0:
 #            return 'NTlist()'
 #        #end if
-#
 #        string = 'NTlist('
 #        for item in self:
 #            string = string + repr( item ) +', '
@@ -427,6 +430,14 @@ class NTlist( list ):
         NTindent( depth, stream, indent )
         fprintf( stream, "</NTlist>")
         fprintf( stream, lineEnd )
+    #end def
+
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(NTlist,'SMLhandler'):
+            NTlist.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('NTlist.toSML: no SMLhandler defined')
+        #end if
     #end def
 #end class
 
@@ -1395,10 +1406,18 @@ class NTdict(dict):
         self.__SAVEALLXML__ = True
     #end def
 
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(NTdict,'SMLhandler'):
+            NTdict.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('NTdict.toSML: no SMLhandler defined')
+        #end if
+    #end def
+
 #end class
 
 # Discouraged name for NTdict; please replace in your scripts asap.
-#NTstruct = NTdict
+NTstruct = NTdict
 
 class NoneObjectClass( NTdict ):
     """
@@ -1774,9 +1793,7 @@ class NTparameter( NTtree ):
     #end def
 #end class
 
-#
-# -----------------------------------------------------------------------------
-#
+
 class NTvalue( NTdict ):
     """
     Class to store a value and its error
@@ -1962,6 +1979,24 @@ class NTvalue( NTdict ):
             return self.value != other
         #end if
     #end def
+
+    def toTuple(self):
+        """
+        Return a (value,error) tuple
+        """
+        return (self.value, self.error)
+    #end def
+
+    def fromTuple(theTuple):
+        """
+        Static method to generate a NTvalue instance from two-element
+        (value,error) tuple
+        or None on error
+        """
+        if len(theTuple)!=2: return None
+        return NTvalue(value=theTuple[0], error=theTuple[1])
+    #end def
+    fromTuple = staticmethod(fromTuple)
 #end class
 
 #
@@ -2029,9 +2064,9 @@ def NTaverage( theList, byIndex=None ):
     #end fpr
 
     if n == 0:
-        return ( None, None, 0 )
+        return ( NaN, NaN, 0 )
     if n == 1:
-        return ( sum, None, 1 ) # sd not defined for serie of length one.
+        return ( sum, NaN, 1 ) # sd not defined for serie of length one.
 #    fn = float(n)
 #    print '>>', n, sum, sumsq, sumsq/(fn-1.0), (sum*sum)/(fn*(fn-1.0))
     av = sum/n
@@ -2417,11 +2452,26 @@ class XMLdictHandler( XMLhandler ):
     #end def
 #end class
 
-
-class XMLNTstructHandler( XMLhandler ):
+class XMLNTdictHandler( XMLhandler ):
     """NTdict handler class"""
     def __init__( self ):
         XMLhandler.__init__( self, name='NTdict')
+    #end def
+
+    def handle( self, node ):
+        attrs = self.handleDictElements( node )
+        if attrs == None: return None
+        result = NTdict()
+        result.update( attrs )
+        return result
+    #end def
+#end class
+
+# dummy: leave for compatibility
+class XMLNTstructHandler( XMLhandler ):
+    """NTstruct handler class"""
+    def __init__( self ):
+        XMLhandler.__init__( self, name='NTstruct')
     #end def
 
     def handle( self, node ):
@@ -2492,7 +2542,7 @@ class XMLNTplistHandler( XMLhandler ):
     #end def
 #end class
 
-#define the handlers
+#define one instance of the handlers
 nonehandler     = XMLNoneHandler()
 inthandler      = XMLintHandler()
 boolhandler     = XMLboolHandler()
@@ -2500,13 +2550,15 @@ floathandler    = XMLfloatHandler()
 stringhandler   = XMLstringHandler()
 unicodehandler  = XMLunicodeHandler()
 listhandler     = XMLlistHandler()
-NTlisthandler   = XMLNTlistHandler()
 tuplehandler    = XMLtupleHandler()
 dicthandler     = XMLdictHandler()
-NTstructhandler = XMLNTstructHandler()
-NTtreehandler   = XMLNTtreeHandler()
-NTvaluehandler  = XMLNTvalueHandler()
-NTplisthandler  = XMLNTplistHandler()
+# link handler of own classes to class def
+NTlist.XMLhandler  = XMLNTlistHandler()
+NTdict.XMLhandler  = XMLNTdictHandler()
+NTstructhandler    = XMLNTstructHandler() # Handler cannot be linked to NTstruct/NTdict!!
+NTtree.XMLhandler  = XMLNTtreeHandler()
+NTvalue.XMLhandler = XMLNTvalueHandler()
+NTplist.XMLhandler = XMLNTplistHandler()
 
 
 def NThandle( node ):
@@ -2922,7 +2974,6 @@ class PrintWrap:
             self.prefix = prefixDetail
         elif self.verbose == verbosityDebug:
             self.prefix = prefixDebug
-            
     def __call__( self, format, *args ):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
@@ -3783,4 +3834,3 @@ def stripExtensions( pathList ):
     for path in pathList:
         result.append( stripExtension(path))        
     return result
-        

@@ -1,5 +1,5 @@
 """
-Adds export2xplor methods to: 
+Adds export2xplor methods to:
 DistanceRestraint , DistanceRestraintList, DihedralRestraint, DihedralRestraintList,
 Atom, Molecule and Project classes.
 
@@ -14,21 +14,21 @@ Atom, Molecule and Project classes.
     Atom.export2xplor()
 
     Molecule.export2xplor( path  )
- 
+
     Project.export2xplor():
         exports Molecules in xplor nomenclature
         exports DistanceRestraintLists in xplor format
-        
+
     Molecule.newMoleculeFromXplor( project, path, name, models=None ):
-        Generate new molecule 'name' from set of pdbFiles in XPLOR convention   
+        Generate new molecule 'name' from set of pdbFiles in XPLOR convention
         path should be in the form filename%03d.pdb, to allow for multiple files
         for each model.
         models is a list of model numbers.
         return Molecule or None on error
 
- 
+
 !!NEED to Check periodicity in dihedrals
-                
+
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
@@ -48,11 +48,11 @@ import os
 #==============================================================================
 # XPLOR stuff
 #==============================================================================
-    
+
 #-----------------------------------------------------------------------------
 def exportAtom2xplor( atom ):
     """returns string in xplor format"""
-    return sprintf( '(resid %-3d and name %s)', 
+    return sprintf( '(resid %-3d and name %s)',
                       atom.residue.resNum,
                       atom.translate(XPLOR)
                    )
@@ -87,14 +87,14 @@ def exportDistanceRestraintList2xplor( drl, path)   :
        return drl or None on error
     """
     fp = open( path, 'w' )
-    if not fp: 
+    if not fp:
         NTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
         fprintf( fp, '%s\n', dr.export2xplor() )
     #end for
-    
+
     fp.close()
     NTmessage('==> Exported %s to "%s"', drl, path)
     #end if
@@ -112,12 +112,12 @@ def exportDihedralRestraint2xplor( dihedralRestraint ):
     for a in dihedralRestraint.atoms:
         s = s + sprintf( '     %-30s\n', a.export2xplor() )
     #end for
-    
+
     delta = math.fabs( dihedralRestraint.upper-dihedralRestraint.lower )
     ave   = dihedralRestraint.lower + delta*0.5
 
     s = s + sprintf('     %8.2f %8.2f %8.2f 2\n',
-                     1.0, ave, delta*0.5  # syntax xplor: 
+                     1.0, ave, delta*0.5  # syntax xplor:
                    )
     return s
 #end def
@@ -130,14 +130,14 @@ def exportDihedralRestraintList2xplor( drl, path)   :
        return drl or None on error
     """
     fp = open( path, 'w' )
-    if not fp: 
+    if not fp:
         NTerror('exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
         fprintf( fp, '%s\n', dr.export2xplor() )
     #end for
-    
+
     fp.close()
     NTmessage('==> Exported %s to "%s"', drl, path)
     #end if
@@ -149,19 +149,19 @@ DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
 
 #-----------------------------------------------------------------------------
 def exportMolecule2xplor( molecule, path)   :
-    """Export coordinates of molecule to pdbFile in XPLOR convention; 
+    """Export coordinates of molecule to pdbFile in XPLOR convention;
        generate modelCount files,
        path should be in the form name%03d.pdb, to allow for multiple files
        for each model
-       
+
        return Molecule or None on error
     """
     for model in range(molecule.modelCount):
-        pdbFile = molecule.toPDB( model=model, convention = XPLOR)   
-        if not pdbFile: 
+        pdbFile = molecule.toPDB( model=model, convention = XPLOR)
+        if not pdbFile:
             return None
-        pdbFile.save( sprintf( path, model )   )  
-        del(pdbFile) 
+        pdbFile.save( sprintf( path, model )   )
+        del(pdbFile)
     #end for
     return molecule
 #end def
@@ -171,19 +171,19 @@ Molecule.export2xplor = exportMolecule2xplor
 
 def newMoleculeFromXplor( project, path, name, models=None ):
     """Generate new molecule 'name' from set of pdbFiles in XPLOR convention
-    
+
        path should be in the form filename%03d.pdb, to allow for multiple files
        for each model.
-       
+
        models is a optional list of model numbers, otherwise it scans for files.
-       
+
        return Molecule or None on error
-       
+
        NB model_000.pdb becomes model number 0. Ie model=0
     """
     print '>', path, name, models
 #    NTmessage(name,models[0])
-    
+
     if models == None:
         models = NTlist()
         model = 0
@@ -197,12 +197,12 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         #end while
         #print '>>', models
     #end if
-    
+
     if len(models) == 0:
         NTerror('newMoleculeFromXplor: empty models list\n')
         return None
     #end if
-    
+
     # first one:
 #    modelId = models[0]
     xplorFile = sprintf( path, models[0] )
@@ -211,7 +211,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         return None
     #end if
     molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR,
-                                            
+
                                          )
     project.appendMolecule( molecule )
 
@@ -223,14 +223,14 @@ def newMoleculeFromXplor( project, path, name, models=None ):
             return None
         #end if
     #end for
-    
+
     project.molecule.updateAll()
     project.dssp() # TODO: move these calls toproject.molecule.updateAll()
-    
+
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()
     NTmessage( '%s', molecule.format() )
-            
+
     return molecule
 
 #end def
@@ -241,21 +241,21 @@ def export2xplor( project, tmp=None ):
     """
     for drl in project.distances:
         drl.export2xplor( project.path( project.directories.xplor, drl.name +'.tbl' ),
-                           
-                        )
-    #end for
-    
-    for drl in project.dihedrals:
-        drl.export2xplor( project.path( project.directories.xplor, drl.name +'.tbl' ),
-                           
+
                         )
     #end for
 
-    for molName in project.molecules:
+    for drl in project.dihedrals:
+        drl.export2xplor( project.path( project.directories.xplor, drl.name +'.tbl' ),
+
+                        )
+    #end for
+
+    for molName in project.moleculeNames:
         mol   = project[molName]
         path = project.path( project.directories.xplor, mol.name + '%03d.pdb' )
-        mol.export2xplor( path)   
-    #end for    
+        mol.export2xplor( path)
+    #end for
 #end def
 
 #-----------------------------------------------------------------------------

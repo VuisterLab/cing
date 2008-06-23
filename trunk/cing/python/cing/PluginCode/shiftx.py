@@ -10,7 +10,7 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import IUPAC
-from cing.core.constants import NOSHIFT
+from cing.Libs.fpconst import NaN
 from cing.core.parameters import cingPaths
 from cing.Libs.NTutils import NTwarning
 import cing
@@ -166,8 +166,8 @@ def predictWithShiftx( project, model=None   ):
         # Set averages
         atm.shiftx.average()
         if atm.shiftx.av == None:
-            atm.shiftx.av = -NOSHIFT
-            atm.shiftx.sd = 0.0
+            atm.shiftx.av = NaN
+            atm.shiftx.sd = NaN
 
     return project
 #end def
