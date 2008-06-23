@@ -4,7 +4,6 @@ from cing.Libs.NTutils import sprintf
 
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessage
 
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict
@@ -17,7 +16,6 @@ from cing.core.molecule import Chain
 from cing.core.molecule import Residue
 from cing.core.molecule import Atom
 from cing.core.molecule import Resonance
-from cing.core.molecule import Coordinate
 
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
@@ -30,12 +28,11 @@ from cing.core.classes import DihedralRestraintList
 
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
-from cing.core.classes import Peak
 
 from cing.core.constants import CYANA
 
 #The following imports we need for restoring the project
-from cing.Libs.fpconst import NaN as nan #@UnresolvedImport
+from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
 
 import os
 import sys

@@ -655,6 +655,7 @@ def runWhatif( project, tmp=None ):
             res.whatif = None
         for atm in project.molecule.allAtoms():
             atm.whatif = None
+        NTerror("No path [%s] in runWhatCheck" % path)
         return True
 
     whatif = Whatif( rootPath = path, molecule = project.molecule )

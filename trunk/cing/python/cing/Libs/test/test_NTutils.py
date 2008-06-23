@@ -8,8 +8,9 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import val2Str
-from cing.core.constants import NOSHIFT
+from cing.Libs.fpconst import NaN
 from unittest import TestCase
+from cing.Libs.fpconst import isNaN
 import cing
 import os
 import unittest
@@ -110,16 +111,16 @@ class AllChecks(TestCase):
 
         l = NTlist( 1 )
         (av,sd,n) = l.average()
-        NTdebug( "av %s, sd %s, n %s" % (av,sd,n) )
+        NTdebug( "(one element) av %s, sd %f, n %s" % (av,sd,n) )
         self.assertAlmostEqual( av,   1.0, places=1)
-        self.assertEquals(      sd,  None)
+        self.assertTrue( isNaN(sd) )
         self.assertEquals(       n,   1)
 
         l = NTlist()
         (av,sd,n) = l.average()
         NTdebug( "av %s, sd %s, n %s" % (av,sd,n) )
-        self.assertEquals(      av,  None)
-        self.assertEquals(      sd,  None)
+        self.assertTrue( isNaN(av))
+        self.assertTrue( isNaN(sd) )
         self.assertEquals(       n,   0)
 
         l = NTlist(0.0, 0.0, 0.0)

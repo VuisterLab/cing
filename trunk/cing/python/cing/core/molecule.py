@@ -14,16 +14,13 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import angle3Dopt
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import NTpath
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
@@ -568,7 +565,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self._saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self._saveStereoAssignments( os.path.join( path, NTmolParameters.stereoFile ) )
         self._saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
-        NTdetail('==> Saved %s to "%s"', self, smlFile)
+#        NTdetail('==> Saved %s to "%s"', self, smlFile) # smlFile was undefined.
+        NTdetail('==> Saved %s to "%s"', self )
         return self
     #end def
 
@@ -674,7 +672,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                 NTerror('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
                         atm, l, self.resonanceCount
                         )
-                for i in range(l,self.resonanceCount):
+                for _i in range(l,self.resonanceCount):
                     atm.addResonance()
                 #end for
             #end if
@@ -2061,7 +2059,8 @@ Atom class: Defines object for storing atom properties
             r.atom = self
         tmp = self.resonances
         self.resonances = other.resonances
-        other.resonances = self
+#        other.resonances = self
+        other.resonances = tmp
     #end def
 
 
