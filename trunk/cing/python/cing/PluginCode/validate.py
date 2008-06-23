@@ -595,7 +595,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
                 if (s.types[4][1] <= cutoff):    # less then cutoff 'not observed'
                     if toFile:
                         fprintf(fp, '%s\n', s.format() )
-                    NTdebug(    '%s\n', s.format() )
+#                    NTdebug(    '%s\n', s.format() )
                     res1.saltbridges.append( s )
                     res2.saltbridges.append( s )
                     result.append( s )
@@ -1908,7 +1908,9 @@ def setupHtml(project):
         atomMain('li', 'Atom: (', closeTag=False)
         res = atom._parent
         atomList.html.insertHtmlLink( atomMain, atomList, res, text = res.toString() )
-        atomMain('li', atom.name + ')', openTag=False)
+        atomMain('i', '.'+atom.name + ')') # weirdly it didn't work to put this text in the next statement...
+        # The text was put after the </li>
+        atomMain('li', '', openTag=False)
         
         sav     = None
         ssd     = None
