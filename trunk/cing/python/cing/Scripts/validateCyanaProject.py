@@ -2,16 +2,17 @@
 python -u $CINGROOT/python/cing/Scripts/validateCyanaProject.py cyanaProjectDir
 """
 from cing import verbosityDebug
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexit
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import stripExtension
 from cing.Libs.NTutils import stripExtensions
 from cing.core.classes import Project
 from cing.core.constants import CYANA2
 from glob import glob
-from cing.Libs.NTutils import stripExtension
 import cing
 import os
 import sys
@@ -20,9 +21,9 @@ class ValidateCyanaProject():
     def __init__(self, cyanaProjectDir):
         """Retrieves all needed info from path"""
 
-        self.htmlOnly               = False # default is False but enable it for faster runs without some actual data.
-        self.doWhatif               = True # disables whatif actual run
-        self.doProcheck             = True
+        self.htmlOnly               = True # default is False but enable it for faster runs without some actual data.
+        self.doWhatif               = False # disables whatif actual run
+        self.doProcheck             = False
         self.pdbConvention          = CYANA2
         self.restraintsConvention   = CYANA2
 
@@ -64,7 +65,8 @@ class ValidateCyanaProject():
             else:
                 NTwarning( "Converter for cyana also needs a seq file before a prot file can be imported" )
         if peakList:
-            kwds[ 'peakFiles' ] = stripExtension( peakList )
+            NTdebug('found peakList: [%s]' % peakList)
+            kwds[ 'peakFiles' ] = stripExtensions( peakList )
         if not project.cyana2cing(cyanaDirectory=".", convention=self.restraintsConvention,
                         copy2sources = True, **kwds ):
             NTexit('Failed to project.cyana2cing')
