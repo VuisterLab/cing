@@ -8,11 +8,13 @@ from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTindent
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
@@ -25,10 +27,13 @@ from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
+from cing.core.constants import CYANA
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
@@ -40,7 +45,7 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
-from cing.core.sml import SMLhandler
+#from cing.core.sml import SMLhandler
 from shutil import rmtree
 import math
 import os
@@ -48,7 +53,6 @@ import sys
 import time
 
 import cing
-
 
 
 projects = NTlist()
@@ -156,17 +160,19 @@ Project: Top level Cing project class
                            name                     =  name.strip(),
                            created                  =  time.asctime(),
 
-                           molecules                =  NTlist(),    # list of names
                            molecule                 =  None,        # Current Molecule instance
 
+                           moleculeNames            =  NTlist(),    # list to store molecule names for save and restore
                            peakListNames            =  NTlist(),    # list to store peaklist names for save and restore
                            distanceListNames        =  NTlist(),    # list to store distancelist names names for save and restore
                            dihedralListNames        =  NTlist(),    # list to store dihedrallist names for save and restore
                            rdcListNames             =  NTlist(),    # list to store rdclist names for save and restore
 
+                           reports                  =  NTlist(),    # list with validation reports names
+
                            history                  =  History(),
 
-                           contentIsRestored        =  False,
+                           contentIsRestored        =  False,       # True if Project.restore() has been called
                            storedInCcpnFormat       =  False,       #
 
 
@@ -180,35 +186,56 @@ Project: Top level Cing project class
                            plugins                  =  plugins
                          )
 
-#       self.peakLists  =  NTlist()
-        # These lists are dynamic and will be filled  on restoring a project
-        self.peaks      =  ProjectList( self, PeakList,              directories.peaklists,  '.peaks' )
-        self.distances  =  ProjectList( self, DistanceRestraintList, directories.restraints, '.distances' )
-        self.dihedrals  =  ProjectList( self, DihedralRestraintList, directories.restraints, '.dihedrals' )
-        self.rdcs       =  ProjectList( self, RDCRestraintList,      directories.restraints, '.rdcs' )
+        # These Project lists are dynamic and will be filled  on restoring a project
+        # They also maintain some internal settings
+        # new( name ), append( instance), save(), restore() and path( name ) comprise core functionality
+        self.molecules  =  _ProjectList( project     = self,
+                                         classDef    = Molecule,
+                                         nameListKey = 'moleculeNames',
+                                         basePath    = directories.molecules + '/%s.molecule'
+                                       )
+        self.peaks      =  _ProjectList( project     = self,
+                                         classDef    = PeakList,
+                                         nameListKey = 'peakListNames',
+                                         basePath    = directories.peaklists + '/%s.peaks'
+                                       )
+        self.distances  =  _ProjectList( project     = self,
+                                         classDef    = DistanceRestraintList,
+                                         nameListKey = 'distanceListNames',
+                                         basePath    = directories.restraints + '/%s.distances'
+                                       )
+        self.dihedrals  =  _ProjectList( project     = self,
+                                         classDef    = DihedralRestraintList,
+                                         nameListKey = 'dihedralListNames',
+                                         basePath    = directories.restraints + '/%s.dihedrals'
+                                       )
+        self.rdcs       =  _ProjectList( project     = self,
+                                         classDef    = RDCRestraintList,
+                                         nameListKey = 'rdcListNames',
+                                         basePath    = directories.restraints + '/%s.rdcs'
+                                       )
+
+        # store reference to self
+        self[name] = self
+        self.objectPath = self.path( cingPaths.project )
+#        self.makeObjectPaths() # generates the objectPaths dict from the nameLists
+
+
         self.rogScore   = ROGscore()
         self.valSets = NTdict()
         self.readValidationSettings(fn=None)
+        
+
         self.saveXML( 'version',
                       'name',  'created',
-                      'molecules',
+                      'moleculeNames',
                       'peakListNames','distanceListNames','dihedralListNames','rdcListNames',
                       'storedInCcpnFormat',
+                      'reports',
                       'history'
                     )
-#
-#        if not os.path.exists( self.root ):
-#            os.mkdir( self.root )
-#            # Save the project data
-#            obj2XML( self, path = self.path( cingPaths.project ) )
-#        #end if
-#
-#        # Check the subdirectories
-#        for dir in directories.values():
-#            self.mkdir( dir )
-#        #end for
-
     #end def
+
 
     def readValidationSettings(self, fn=None):
         if fn:
@@ -318,11 +345,48 @@ Project: Top level Cing project class
         return self.moleculePath( 'html', *args )
     #end def
 
+#    def makeObjectPaths(self):
+#        """
+#        Generate paths for all the currently defined names in the project
+#        """
+#        self.objectPaths = NTdict()
+#        for name in self.moleculeNames:
+##            self.objectPaths[name] = self.path(directories.molecules, name+'.molecule')
+#            self.objectPaths[name] = self.molecules.path(name)
+#        for name in self.peakListNames:
+#            self.objectPaths[name] = self.peaks.path(name)
+#        for name in self.distanceListNames:
+#            self.objectPaths[name] = self.distances.path(name)
+#        for name in self.dihedralListNames:
+#            self.objectPaths[name] = self.dihedrals.path(name)
+#        for name in self.rdcListNames:
+#            self.objectPaths[name] = self.rdcs.path(name)
+#
+#        self.objectPaths.keysformat()
+#        NTdebug('objectPaths: %s', self.objectPaths.format())
+#    #end def
+
+    def decodeNameTuple(self, nameTuple):
+        """
+        Decode the 7-element nameTuple:
+        (objectName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+
+        Return Object or None on error.
+
+@TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
+        """
+        if nameTuple == None or not self.has_key(nameTuple[0]):
+            return None
+        return self[nameTuple[0]].decodeNameTuple(nameTuple)
+
     #-------------------------------------------------------------------------
     # actions exists/open/restore/save/close/export/updateProject
     #-------------------------------------------------------------------------
 
     def exists( name ):
+        """Static method exists check for presence of Project directory derived from name
+            returns True or False
+        """
         rootp, _n = Project.rootPath( name )
         if os.path.exists( rootp ):
             return True
@@ -332,8 +396,14 @@ Project: Top level Cing project class
 
 
     def open( name, status = 'create', restore=True ):
-        """Static method open returns a new/existing Project instance depending on status
-           Project data is restored when restore == True.
+        """Static method open returns a new/existing Project instance depending on status.
+
+           status == 'new': open a new project 'name'
+           status == 'old: open existing project 'name'
+                      project data is restored when restore == True.
+           status == 'create': if project name if exists open as old, open as new otherwise.
+
+           Returns Project instance or None on error.
         """
         global projects
 
@@ -348,7 +418,7 @@ Project: Top level Cing project class
             pr = Project( name )
             pr.addHistory( 'New project'  )
             # Save the project data
-            obj2XML( pr, path = pr.path( cingPaths.project ) )
+            obj2XML( pr, path = pr.objectPath )
 
         elif (status == 'create'):
             root,dummy = Project.rootPath( name )
@@ -379,11 +449,53 @@ Project: Top level Cing project class
             # This allows renaming/relative addressing at the shell level
             pr.root = root
             pr.name = newName
+            pr.objectPath = pfile
 
-            # Optional restore the content
-            if restore:
+            pr.contentIsRestored = False
+
+            try:
+                # <= 0.75 version have string
+                pr.version = float(pr.version.split()[0])
+            except:
+                pass
+
+            if pr.version <= 0.75:
+                NTmessage('Project.Open: converting from version %s', pr.version)
+
+                # 0.75 version had moleculeNames stored in molecules attribute
+                # >=0.76 version molecules is a ProjectList instance
+                pr.moleculeNames = pr.molecules
+                # store the xmlFile and reopen to have correct settings
+                if obj2XML(pr, path=pfile) != pr:
+                    NTerror('Molecule.Open: conversion from version %s failed on write', pr.version)
+                    return None
+                pr = XML2obj( pfile )
+                if pr == None:
+                    NTerror('Molecule.Open: conversion from version %s failed on read', pr.version)
+                    return None
+
+                for molName in pr.moleculeNames:
+                    path = pr.path( directories.molecules, molName ) # old reference
+                    mol = Molecule._open075( path )
+                    if not mol:
+                        NTerror('Molecule.Open: conversion from version %s failed on molecule %s', pr.version, molName)
+                        return None
+                    removedir(path)
+                    # Save molecule to new format
+                    mol.save( pr.molecules.path(molName) )
+                #end for
+
+                # restore
+                pr.restore()
+                # Save to consolidate
+                pr.save()
+            #end if
+
+            # Optionally restore the content
+            if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
+
         else:
             NTerror('ERROR Project.open: invalid status option "%s"\n', status )
             return None
@@ -399,7 +511,6 @@ Project: Top level Cing project class
         #end for
 
         projects.append( pr )
-        NTmessage('%s', pr.format())
         return pr
     #end def
     open = staticmethod( open )
@@ -431,18 +542,14 @@ Project: Top level Cing project class
         NTmessage(   '==> Saving %s', self )
 
         # Save the molecules
-        for molName in self.molecules:
-            self[molName].save( path = self.path( directories.molecules, molName ))
+        for mol in self.molecules:
+            mol.save( mol.objectPath)
 
-        # Save the lists
-        for pl, nameList in [(self.peaks,     'peakListNames'),
-                             (self.distances, 'distanceListNames'),
-                             (self.dihedrals, 'dihedralListNames'),
-                             (self.rdcs,      'rdcListNames' )
-                            ]:
-            self[nameList] = pl.save()
+        # Save the molecules and lists
+        for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:
+            self[pl.nameListKey] = pl.save() # Save returns a list of name; store these in project
             # Patch for XML bug
-            self.saveXML( nameList )
+            self.saveXML( pl.nameListKey )
         #end for
 
         # Call Plugin registered functions
@@ -452,10 +559,11 @@ Project: Top level Cing project class
             #end for
         #end for
 
-        # Save the project data
-        xmlfile = self.path( cingPaths.project )
-        if obj2XML( self, path = xmlfile) != self:
-            NTerror('Project.save: writing Project file "%s" failed', xmlfile)
+        # Update version number since it is now saved with this cingVersion
+        self.version = cingVersion
+        # Save the project data to xml file
+        if obj2XML( self, path = self.objectPath) != self:
+            NTerror('Project.save: writing Project file "%s" failed', self.objectPath)
         #end if
 
         self.addHistory( 'Saved project' )
@@ -465,24 +573,21 @@ Project: Top level Cing project class
         """
         Restore the project: molecules and lists
         """
+        NTmessage('==> Restoring %s ... ', self )
+
         # Molecules
-        for molName in self.molecules:
-            self.molecule = Molecule.open( self.path( directories.molecules, molName ) )
-            self[molName] = self.molecule
-            # generate/check the required directories for export and HTML data
-            for dir in moleculeDirectories.values():
-                self.mkdir( self.molecule.name, dir )
-            #end for
+        for molName in self.moleculeNames:
+            path = self.molecules.path( molName )
+            mol = Molecule.open( path )
+            if mol:
+                mol.status = 'keep'
+                self.appendMolecule(mol)
+            #end if
         #end for
 
         # restore the lists
-        for pl, nameList, name in [(self.peaks,     'peakListNames',    'peaks'),
-                                   (self.distances, 'distanceListNames','distances'),
-                                   (self.dihedrals, 'dihedralListNames','dihedrals'),
-                                   (self.rdcs,      'rdcListNames',     'rdcs')
-                                  ]:
-            NTmessage('==> Restoring %s ...', name)
-            pl.restore( self[nameList]  )
+        for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:
+             pl.restore()
         #end for
 
         # Plugin registered functions
@@ -491,6 +596,8 @@ Project: Top level Cing project class
                 f( self, o )
             #end for
         #end for
+
+        self.contentIsRestored = True
 
         self.updateProject()
     #end def
@@ -525,15 +632,12 @@ Project: Top level Cing project class
             self.mkdir( molecule.name, dir )
         #end for
 
-        # Store names and references
+        # Store names and references and append
         self.molecule = molecule
-        self.molecules.append( molecule.name )
-        self[molecule.name] = self.molecule
-
-        # Save it to make sure we can restore it later
-        self.molecule.save( path = self.path( directories.molecules, molecule.name )   )
+        self.molecules.append( molecule )
+# GV 21 Jun 08: do not know why we would need a save here
+#        self.molecule.save( path = self.molecule.objectPath )
         return self.molecule
-
     #end def
 
     def newMolecule( self, name, sequenceFile, convention = LOOSE ):
@@ -542,14 +646,15 @@ Project: Top level Cing project class
         uname = self.uniqueKey(name)
         molecule = Molecule.initialize( uname,
                                         path = sequenceFile,
-                                        convention=convention
-                                       )
+                                        convention=convention,
+                                        status='keep'
+                                      )
         if not molecule:
             return None
         self.appendMolecule( molecule )
 
         self.addHistory( sprintf('Initialized molecule "%s" from "%s"', uname, sequenceFile ) )
-        return self.molecule
+        return molecule
     #end def
     initializeMolecule = newMolecule # keep old name
 
@@ -582,7 +687,7 @@ Project: Top level Cing project class
                 rm = None
                 if (selection == None or atom.name in selection):
                     for res in atom.resonances:
-                        if (res.value != NOSHIFT):
+                        if not isNaN(res.value):
                             rm=res
                             break
                         #end if
@@ -635,8 +740,6 @@ Project: Top level Cing project class
         return peaklist
     #end def
 
-
-
     def header( self, dots = '---------'  ):
         """Subclass header to generate using __CLASS__, name and dots.
         """
@@ -655,11 +758,11 @@ Project: Top level Cing project class
         self.__FORMAT__   =  self.header( dots ) + '\n' + \
                             'created:    %(created)s\n' +\
                             'molecules:  %(molecules)s\n' +\
-                            '            %(molecule)s\n' +\
                             'peaks:      %(peaks)s\n' +\
                             'distances:  %(distances)s\n' +\
                             'dihedrals:  %(dihedrals)s\n' +\
                             'rdcs:       %(rdcs)s\n' +\
+                            'reports:    %(reports)s\n' +\
                              self.footer( dots )
         return NTdict.format( self )
     #end def
@@ -704,26 +807,38 @@ projecthandler = XMLProjectHandler()
 
 #
 #-----------------------------------------------------------------------------
-class ProjectList( NTlist ):
-    """Generic Project list class
+class _ProjectList( NTlist ):
+    """Generic Project list class; only to be used internally
        Creates classDef instance when calling the new() method
     """
-    def __init__( self, project, classDef, savePath, extention ):
+    def __init__( self, project, classDef, nameListKey, basePath ):
+        """
+        nameList is key of project identifying list of names.
+        This is done because of the update done in the Project.restore()
+        method.
+        """
         NTlist.__init__( self )
         self.project  = project
         self.classDef = classDef
-        self.savePath = savePath
-        self.extention = extention
+        self.nameListKey = nameListKey
+        self.basePath = basePath # project(self.basePath % name) yields valid path
+#        self.savePath = savePath
+#        self.extention = extention
     #end def
 
-    def append( self, *args ):
-        """Append *args to self, storing a.name in project
+    def path(self, name):
+        #print '>>', self.basePath % name
+        return self.project.path(self.basePath % name)
+
+    def append( self, instance ):
+        """Append instance to self, storing instance.name in project
         """
-        for a in args:
-            a.name = self.project.uniqueKey( a.name )
-            self.project[a.name] = a
-            NTlist.append( self, a )
-        #end for
+        #print '>>',instance, self.project
+        instance.name = self.project.uniqueKey( instance.name )
+        NTlist.append( self, instance )
+        # add reference in project
+        self.project[instance.name] = instance
+        instance.objectPath = self.path(instance.name)
     #end def
 
     def new( self, name,*args, **kwds ):
@@ -734,7 +849,7 @@ class ProjectList( NTlist ):
         self.append ( instance )
         s = sprintf('New "%s" instance named "%s"', self.className(), uname )
         self.project.history( s )
-        NTmessage('==> %s', s )
+        NTdebug( s )
         #end if
         return instance
     #end def
@@ -751,23 +866,43 @@ class ProjectList( NTlist ):
         saved = NTlist()
         for l in self:
             if l.status == 'keep':
-                fname = self.project.path( self.savePath, l.name + self.extention )
-                self.classDef.SMLhandler.toFile( l, fname )
-                saved.append(l.name)
+                NTdetail('==> Saving %s to %s', l, l.objectPath)
+                if self.classDef.SMLhandler.toFile( l, l.objectPath ) == l:
+                    saved.append(l.name)
+            #end if
         #end for
+        self.project[self.nameListKey] = saved
+        # patch XML bug
+        self.project.saveXML( self.nameListKey )
         return saved
     #end def
 
-    def restore(self, names ):
+    def restore(self, names=None ):
         """
         Use the SMLhandler instance of classDef to restore the list.
-        Names is a list instance containing the names to of the lists to restore.
+        if names=None;
+            derive the list from the project[nameListKey]
+        else:
+            names is a list instance containing the names to of the lists to restore.
         """
+        if not names:
+            names = self.project[self.nameListKey]
         for name in names:
-            fname = self.project.path( self.savePath, name + self.extention )
-            _l = self.classDef.SMLhandler.fromFile( fname, self.project)
+            path = self.path(name)
+            l = self.classDef.SMLhandler.fromFile( path, self.project) # Lists get append to project by SML routines
+            if l != None:
+                NTdetail('==> Restored %s from %s', l, path)
+                l.objectPath = path
+            #end if
         #end for
     #end def
+
+    def names(self):
+        "Return a list of name of self"
+        names = NTlist()
+        for l in self:
+            names.append(l.name)
+        return names
 
     def className(self):
         """Return a string describing the class of lists of this project list
@@ -775,58 +910,29 @@ class ProjectList( NTlist ):
         # eg. to extract from <class 'cing.classes.PeakList'>
         return str(self.classDef)[8:-2].split(".")[-1:][0]
     #end def
-
-#end class Project
-#
-#-----------------------------------------------------------------------------
-# Two handy (?) routines
-#-----------------------------------------------------------------------------
-
-def encode( objects ):
-    """Return a list of nametuples encoding the molecule objects (chains, residues, atoms)
-    """
-    result = NTlist()
-    for obj in objects:
-        if (obj == None):
-            result.append(None)
-        else:
-            result.append( obj.nameTuple() )
-        #end if
-    #end for
-    return result
-#end def
-
-def decode( nameTuples, molecule ):
-    """
-    Return a list molecular objects, decoding the nametuples for molecule
-    """
-    result = NTlist()
-    for nt in nameTuples:
-        if molecule == None or nt == None:
-            result.append(None)
-        else:
-            result.append( molecule.decodeNameTuple( nt ) )
-        #end if
-    #end for
-    return result
-#end def
+#end class ProjectList
 
 #
-#-----------------------------------------------------------------------------
-
-PeakIndex = 1
+#
+PeakIndex = 0
 class Peak( NTdict ):
     """Peak class:
        Peaks point to resonances
        Resonances point to atoms
-       by GV 20070723: added hasHeight, hasVolume attributes to the class
-       GV 28092007: Moved from molecule.py to project.py
+       by GV 2007 07 23: added hasHeight, hasVolume attributes to the class
+          GV 2007 28 09: Moved from molecule.py to project.py
+          GV 19 Jun 08: PeakIndex starts at 0
+          GV 19 Jun 08: change height, volume to NTvalue clasess
+          GV 19 Jun 08: changed hasHeight and hasVolume to methods
     """
+
+    HEIGHT_VOLUME_FORMAT  = '%9.2e +- %8.1e'
+
     def __init__( self,
-                  dimension=1,
+                  dimension,
                   positions=None,
-                  height=0.00, heightError = 0.00, hasHeight = False,
-                  volume=0.00, volumeError = 0.00, hasVolume = False,
+                  height=NaN, heightError = NaN,
+                  volume=NaN, volumeError = NaN,
                   resonances=None,
                   **kwds
                 ):
@@ -840,8 +946,8 @@ class Peak( NTdict ):
         self.__FORMAT__ =  self.header(dots) + '\n' +\
                            'dimension:  %(dimension)dD\n' +\
                            'positions:  %(positions)s\n' +\
-                           'height:     %(height)10.3e %(heightError)10.3e\n'   +\
-                           'volume:     %(volume)10.3e %(volumeError)10.3e\n' +\
+                           'height:     %(height)s\n'   +\
+                           'volume:     %(volume)s\n' +\
                            'resonances: %(resonances)s\n' +\
                            self.footer(dots)
 
@@ -858,15 +964,11 @@ class Peak( NTdict ):
         if positions:
             self.positions = NTlist( *positions )
         else:
-            self.positions = NTfill( NOSHIFT, dimension )
+            self.positions = NTfill( NaN, dimension )
         #end if
 
-        self.height = height
-        self.heightError = heightError
-        self.hasHeight = hasHeight
-        self.volume = volume
-        self.volumeError = volumeError
-        self.hasVolume  = hasVolume
+        self.height = NTvalue(height, heightError, Peak.HEIGHT_VOLUME_FORMAT)
+        self.volume = NTvalue(volume, volumeError, Peak.HEIGHT_VOLUME_FORMAT)
     #end def
 
     def isAssigned( self, axis ):
@@ -886,12 +988,19 @@ class Peak( NTdict ):
         return None
     #end def
 
+    def hasHeight(self):
+        return not isNaN(self.height.value)
+
+    def hasVolume(self):
+        return not isNaN(self.volume.value)
+
     def __str__( self ):
-        return sprintf( 'Peak %4d (%dD)   %s   %10.3e %10.3e %10.3e %10.3e   %s',
+        #print '>>', self.resonances.zap('atom')
+        return sprintf( 'Peak %4d (%dD)  [%s]   height: %s   volume: %s    Assiged to: %s',
                          self.peakIndex, self.dimension,
-                         self.positions.format('%8.3f '),
-                         self.height, self.heightError, self.volume, self.volumeError,
-                         self.resonances.zap('atom')
+                         self.positions.format('%8.2f'),
+                         self.height, self.volume,
+                         self.resonances.zap('atom').format('%-20s')
                        )
     #end def
 
@@ -902,63 +1011,6 @@ class Peak( NTdict ):
     #end def
 #end class
 
-class SMLPeakHandler( SMLhandler ):
-
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'Peak' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        pk = Peak( *line[2:] )
-        return self.dictHandler(pk, fp, project)
-    #end def
-
-### REMARK: This restoring of resonances is dangerous, because it is not guranteed that the order and hence last
-#           resonance of atoms is always the same. Needs reviewing !!!
-    def endHandler(self, pk, project):
-        if project == None:
-            NTerror('Error SMLPeakHandler.endHandler: Undefined project\n')
-            return None
-        #end if
-        pk.resonances = NTfill(None,pk.dimension)
-        # Check if we have to make the linkage
-        if pk.atoms and project.molecule:
-            #print '>>',pk.atoms
-            for i in range(pk.dimension):
-                if pk.atoms[i] != None:
-                    atm = project.molecule.decodeNameTuple(pk.atoms[i])
-                    pk.resonances[i] = atm.resonances()
-                else:
-                    pk.resonances[i] = None
-                #end if
-            #end for
-        #end if
-        return pk
-    #end def
-
-    def toSML(self, peak, fp):
-        """
-        """
-        fprintf( fp, '%s\n', self.startTag )
-        for a in ['dimension','positions',
-                  'height','heightError','hasHeight',
-                  'volume','volumeError','hasVolume'
-                 ]:
-            fprintf( fp, '    %-15s = %s\n', a, repr(peak[a]) )
-        #end for
-        rl = []
-        for r in peak.resonances.zap('atom'):
-            if (r != None):
-                rl.append(r.nameTuple())
-            else:
-                rl.append(None)
-            #endif
-        fprintf( fp, '    %-15s = %s\n', 'atoms', repr( rl ) )
-        fprintf( fp, '%s\n', self.endTag )
-    #end def
-
-#end class
-Peak.SMLhandler = SMLPeakHandler()
 
 #-----------------------------------------------------------------------------
 class PeakList( NTlist ):
@@ -995,28 +1047,6 @@ class PeakList( NTlist ):
         #end if
         return None
     #end def
-#
-#    def toFile(self, fileName)   :
-#        """
-#        Save peaks to fileName for restoring later with fromFile method
-#        """
-#
-#        fp = open( fileName, 'w' )
-#        if not fp:
-#            NTerror('PeakList.toFile: opening "%s"\n', fileName)
-#            return
-#        #end if
-#        fprintf( fp, '<PeakList> %s %s\n', self.name, self.status )
-#        for peak in self:
-#            peak.toStream( fp )
-#        #end for
-#        fprintf( fp, '</PeakList>\n' )
-#
-#
-#        NTmessage('==> Saved %s to "%s"', str(self), fileName )
-#        #end if
-#    #end def
-
 
     def __str__( self ):
         return sprintf( '<PeakList "%s" (%s,%d)>',self.name,self.status,len(self) )
@@ -1034,41 +1064,22 @@ class PeakList( NTlist ):
         return s
     #end def
 
-#    def toSMLfile(self, fileName)   :
-#        return self.SMLhandler.list2SMLfile( self, fileName  )
-#    #end def
-#
-#    def fromSMLfile(fileName, project)   :
-#        """
-#        Restore PeakList from SMLfile fileName
-#        """
-#        pl = PeakList.SMLhandler.fromFile( fileName, project )
-#        if pl:
-#            NTmessage('==> Restored %s from "%s"', pl, fileName )
-#        #end if
-#        return pl
-#    #end def
-#    fromSMLfile = staticmethod( fromSMLfile )
+    def save(self,path=None):
+        """
+        Create a SML file
+        Return self or None on error
+        """
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('PeakList.save: failed creating "%s"', path)
+            return None
+        #end if
+
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
+    #end def
 #end class
 
-
-class SMLPeakListHandler( SMLhandler ):
-
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'PeakList' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        pl = PeakList( *line[2:] )
-        if not self.listHandler(pl, fp, project): return None
-        if project: project.peaks.append( pl )
-        return pl
-    #end def
-
-    def toSML(self, pl, fp):
-        return self.list2SML( pl, fp )
-#end class
-PeakList.SMLhandler = SMLPeakListHandler()
 
 def getAtomsFromAtomPairs(atomPairs):
     result = []
@@ -1308,46 +1319,6 @@ class DistanceRestraint( NTdict ):
     #end def
 #end class
 
-class SMLDistanceRestraintHandler( SMLhandler ):
-
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'DistanceRestraint' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        dr = DistanceRestraint( *line[2:] )
-        return self.dictHandler(dr, fp, project)
-    #end def
-
-    def endHandler(self, dr, project):
-        # Parse the atomPairs tuples, map to molecule
-        if project == None or project.molecule == None: return dr
-        aps = dr.atomPairs
-        dr.atomPairs = NTlist()
-        for ap in aps:
-            dr.appendPair( (project.molecule.decodeNameTuple(ap[0]), project.molecule.decodeNameTuple(ap[1])) )
-        #end for
-        return dr
-    #end def
-
-    def toSML(self, dr, stream ):
-        """
-            For DistanceRestraint
-        """
-        fprintf( stream, "%s\n", self.startTag )
-        for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
-        #end for
-
-        rl = []
-        for r in dr.atomPairs:
-            rl.append((r[0].nameTuple(),r[1].nameTuple()))
-        #end for
-        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
-        fprintf( stream, "%s\n", self.endTag )
-    #end def
-#end class
-DistanceRestraint.SMLhandler = SMLDistanceRestraintHandler()
 
 #-----------------------------------------------------------------------------
 class DistanceRestraintList( NTlist ):
@@ -1456,46 +1427,21 @@ class DistanceRestraintList( NTlist ):
 
     #end def
 
-#    def toFile(self, fileName)   :
-#        """
-#        Save dihedralRestraints to fileName for restoring later with fromFile method
-#        """
-#
-#        fp = open( fileName, 'w' )
-#        if not fp:
-#            NTerror('DistanceRestraintList.toFile: opening "%s"\n', fileName)
-#            return
-#        #end if
-#        fprintf( fp, '<DistanceRestraintList> %s %s\n', self.name, self.status )
-#        for restraint in self:
-#            restraint.toStream( fp )
-#        #end for
-#        fprintf( fp, '</DistanceRestraintList>\n' )
-#
-#
-#            NTmessage('==> Saved %s to "%s"', str(self), fileName )
-#        #end if
-#    #end def
-#end class
+    def save(self,path=None):
+        """
+        Create a SML file
+        Return self or None on error
+        """
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('DistanceRestraintList.save: failed creating "%s"', path)
+            return None
+        #end if
 
-class SMLDistanceRestraintListHandler( SMLhandler ):
-
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'DistanceRestraintList' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        drl = DistanceRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
-        project.distances.append( drl )
-        return drl
-    #end def
-
-    def toSML(self, drl, fp):
-        self.list2SML( drl, fp )
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
     #end def
 #end class
-DistanceRestraintList.SMLhandler = SMLDistanceRestraintListHandler()
 
 
 #-----------------------------------------------------------------------------
@@ -1544,7 +1490,6 @@ class DihedralRestraint( NTdict ):
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
-                
 #        NTdebug( '%s (dih)' % self )
         if self.violMax >= project.valSets.AC_MAXALL_POOR:
             comment = '[crit.1] violMax: %8.3f' % self.violMax
@@ -1568,6 +1513,7 @@ class DihedralRestraint( NTdict ):
             comment = '[crit.4] violSd: %8.3f' % self.violSd
             NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
+
 
 
     def calculateAverage(self):
@@ -1702,49 +1648,7 @@ class DihedralRestraint( NTdict ):
     #end def
 #end class
 
-class SMLDihedralRestraintHandler( SMLhandler ):
 
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'DihedralRestraint' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        dr = DihedralRestraint( atoms=[], upper = 0.0 , lower =0.0 )
-        return self.dictHandler(dr, fp, project)
-    #end def
-
-    def endHandler(self, dr, project):
-        # Parse the atoms nameTuples, map to molecule
-        dr.atoms = decode( dr.atoms, project.molecule )
-#        atms = dr.atoms
-#        dr.atoms = NTlist()
-#        for atm in atms:
-#            dr.append( project.molecule.decodeNameTuple(atm) )
-#        #end for
-    #end def
-
-    def toSML(self, dr, stream ):
-        """
-        """
-        fprintf( stream, "%s\n", self.startTag )
-        for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
-        #end for
-        fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
-
-#        rl = []
-#        for r in self.atoms:
-#            rl.append(r.nameTuple())
-#        #end for
-#        fprintf( stream, '    %-15s = %s\n', 'atoms', repr( rl ) )
-
-        fprintf( stream, "%s\n", self.endTag )
-    #end def
-#end class
-DihedralRestraint.SMLhandler = SMLDihedralRestraintHandler()
-
-
-#-----------------------------------------------------------------------------
 class DihedralRestraintList( NTlist ):
 
     def __init__( self, name, status='keep' ):
@@ -1839,29 +1743,24 @@ class DihedralRestraintList( NTlist ):
                       val2Str(self.rmsdSd,         "%6.3f", 6),
                       self.violCount1, self.violCount3, self.violCount5)
     #end def
-#end class
 
-class SMLDihedralRestraintListHandler( SMLhandler ):
+    def save(self,path=None):
+        """
+        Create a SML file
+        Return self or None on error
+        """
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('DihedralRestraintList.save: failed creating "%s"', path)
+            return None
+        #end if
 
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'DihedralRestraintList' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        drl = DihedralRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
-        project.dihedrals.append( drl )
-        return drl
-    #end def
-
-    def toSML(self, drl, fp):
-        self.list2SML( drl, fp )
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
     #end def
 #end class
-DihedralRestraintList.SMLhandler = SMLDihedralRestraintListHandler()
 
 
-#-----------------------------------------------------------------------------
 class RDCRestraint( NTdict ):
     """RDCRestraint class:
     """
@@ -1974,56 +1873,7 @@ class RDCRestraint( NTdict ):
     #end def
 #end class
 
-class SMLRDCRestraintHandler( SMLhandler ):
 
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'RDCRestraint' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        dr = RDCRestraint( atoms=[], upper = 0.0 , lower =0.0 )
-        return self.dictHandler(dr, fp, project)
-    #end def
-
-    def endHandler(self, dr, project):
-        # Parse the atoms nameTuples, map to molecule
-        if project == None or project.molecule == None: return dr
-        aps = dr.atomPairs
-        dr.atomPairs = NTlist()
-        for ap in aps:
-            dr.appendPair( (project.molecule.decodeNameTuple(ap[0]), project.molecule.decodeNameTuple(ap[1])) )
-        #end for
-        return dr
-
-#        dr.atoms = decode( dr.atoms, project.molecule )
-#        atms = dr.atoms
-#        dr.atoms = NTlist()
-#        for atm in atms:
-#            dr.appendPair( project.molecule.decodeNameTuple(atm) )
-#        #end for
-    #end def
-
-    def toSML(self, dr, stream ):
-        """
-            For RDCRestraint (based on DistanceRestraint)
-        """
-        fprintf( stream, "%s\n", self.startTag )
-        for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
-        #end for
-
-        rl = []
-        for r in dr.atomPairs:
-            rl.append((r[0].nameTuple(),r[1].nameTuple()))
-        #end for
-        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
-        fprintf( stream, "%s\n", self.endTag )
-    #end def
-#end class
-RDCRestraint.SMLhandler = SMLRDCRestraintHandler()
-
-
-#-----------------------------------------------------------------------------
 class RDCRestraintList( NTlist ):
 
     def __init__( self, name, status='keep' ):
@@ -2105,27 +1955,23 @@ class RDCRestraintList( NTlist ):
                       self.rmsdAv, self.rmsdSd )
         return s
     #end def
-#end class
 
-class SMLRDCRestraintListHandler( SMLhandler ):
+    def save(self,path=None):
+        """
+        Create a SML file
+        Return self or None on error
+        """
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('RDCRestraintList.save: failed creating "%s"', path)
+            return None
+        #end if
 
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'RDCRestraintList' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        drl = RDCRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
-        project.rdcs.append( drl )
-        return drl
-    #end def
-
-    def toSML(self, drl, fp):
-        self.list2SML( drl, fp )
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
     #end def
 #end class
-RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
-#-----------------------------------------------------------------------------
+
 
 class History( NTlist ):
     """Cing history storage class
@@ -2167,7 +2013,6 @@ class History( NTlist ):
     #end def
 #end class
 
-#-----------------------------------------------------------------------------
 
 class XMLHistoryHandler( XMLhandler ):
     """History handler class"""
@@ -2188,8 +2033,6 @@ class XMLHistoryHandler( XMLhandler ):
 #register this handler
 historyhandler = XMLHistoryHandler()
 
-
-#-----------------------------------------------------------------------------
 
 htmlObjects = NTlist() # A list of all htmlobject for rendering purposes
 
@@ -2592,7 +2435,6 @@ class HTMLfile:
 
 #end class
 
-#-----------------------------------------------------------------------------
 def path( *args ):
     """
     Return a path from arguments relative to cing root

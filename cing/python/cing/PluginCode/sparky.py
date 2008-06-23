@@ -113,9 +113,9 @@ def export2Sparky( project, tmp=None ):
     Export resonances and peaks to sparky format
     """
 
-    for molName in project.molecules:
-        fileName = project.path( directories.sparky, project[molName].name+'.sparky' )
-        exportShifts2Sparky( project[molName],
+    for mol in project.molecules:
+        fileName = project.path( directories.sparky, mol.name+'.sparky' )
+        exportShifts2Sparky( mol,
                              fileName=fileName,
                              onlyAssigned=True,
 

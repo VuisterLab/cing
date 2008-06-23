@@ -1,5 +1,4 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
-from cing.core.dictionaries import NTdbGetResidue
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -14,6 +13,7 @@ from memops.general import Io as genIo # common to ccpn 1 and 2, used only by cc
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
 
+from cing import NTdbGetResidue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -787,7 +787,7 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
 
         moleculeName = _checkName(ccpnMolecule.code)
 
-        if ( moleculeName not in cingProject.molecules ):
+        if ( moleculeName not in cingProject.moleculeNames ):
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
             NTmessage( "You may want to import '%s' from Ccpn first",
@@ -936,7 +936,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
         moleculeName = _checkName(ccpnMolecule.code)
 
-        if ( moleculeName not in cingProject.molecules ):
+        if ( moleculeName not in cingProject.moleculeNames ):
             NTerror( " '%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
             NTmessage( "You may want to import '%s' from Ccpn first",
@@ -1812,7 +1812,7 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
             return None
         # end if
     else:
-        listMolecules = [ cingProject[mol] for mol in cingProject.molecules ]
+        listMolecules = [ cingProject[mol] for mol in cingProject.moleculeNames ]
     # end if
 
     for molecule in listMolecules:
@@ -1956,7 +1956,7 @@ def createCcpnStructures( cingProject = None, ccpnProject = None,
         # end if
 
     else:
-        listMolecules = [ cingProject[mol] for mol in cingProject.molecules ]
+        listMolecules = [ cingProject[mol] for mol in cingProject.moleculeNames ]
     # end if
 
     ensembleId = 0 # ccpn 2.x

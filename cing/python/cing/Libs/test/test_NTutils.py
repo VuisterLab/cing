@@ -135,9 +135,10 @@ class AllChecks(TestCase):
         self.assertEquals( val2Str(6.3, "%5.2f",5),   " 6.30")
         self.assertEquals( val2Str(6.3, "%.2f"),      "6.30")
         self.assertEquals( val2Str(6.3, "%03d"),      "006")
-        self.assertEquals( val2Str(6.3, "%6.2f",nullValue=NOSHIFT),"  6.30")
-        self.assertEquals( val2Str(999.,"%6.2f",nullValue=NOSHIFT),NaNstring) # Oops an xeasy nan
-        self.assertNotEquals(val2Str(999.1,"%6.2f",nullValue=NOSHIFT),NaNstring)
+# GV 19Jun08 removed
+#        self.assertEquals( val2Str(6.3, "%6.2f",nullValue=NOSHIFT),"  6.30")
+#        self.assertEquals( val2Str(999.,"%6.2f",nullValue=NOSHIFT),NaNstring) # Oops an xeasy nan
+#        self.assertNotEquals(val2Str(999.1,"%6.2f",nullValue=NOSHIFT),NaNstring)
 
 
 if __name__ == "__main__":

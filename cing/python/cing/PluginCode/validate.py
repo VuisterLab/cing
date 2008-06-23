@@ -115,10 +115,10 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     returns None on success or True on failure.
     """
 
-    
+
     validateDihedrals(  project  )
     validateModels(     project  )
-    
+
     project.predictWithShiftx()
     project.validateAssignments(toFile=True)
     project.checkForSaltbridges(toFile=True)
@@ -204,7 +204,7 @@ Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
 #       -----------
 #Total   100 (100%)
         # by request of Nadia write out the actual residues
-        
+
         idx = 0
         for residueList in cL:
             color = cStringList[idx]
@@ -430,6 +430,8 @@ def validateRestraints( project, toFile = True)   :
 
 #    fps = []
 #    fps.append( sys.stdout )
+
+    if not project.molecule: return
 
     msg = ""
     msg += sprintf('%s\n', project.format() )
@@ -979,6 +981,7 @@ def validateAssignments( project, toFile = True   ):
                 atm.validateAssignment.append(string)
             #end if
         #end if atm.isAssigned():
+
         if atm.validateAssignment:
             atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
         #end if
@@ -1444,7 +1447,7 @@ def setupHtml(project):
     project.mainPageObjects = NTdict()
 
     # Do Molecules HTML pages
-    for molecule in project.molecules:
+    for molecule in project.moleculeNames:
         molecule = project[molecule]
 
         if not project.molecule.modelCount:
@@ -1469,19 +1472,19 @@ def setupHtml(project):
         molecule.html = HTMLfile( molecule.htmlLocation[0],
                                   title = 'Molecule ' + molecule.name )
 
-    for molecule in project.molecules:
-        index = project.molecules.index(molecule)
+    for molecule in project.moleculeNames:
+        index = project.moleculeNames.index(molecule)
         molecule = project[molecule]
         molecule.html.header('h1', 'Molecule: ' + molecule.name)
 
         previous = None
         next = None
-        lastMoleculeIndex = len(project.molecules) - 1
+        lastMoleculeIndex = len(project.moleculeNames) - 1
         if index > 0:
-            previous = project[ project.molecules[index-1] ]
+            previous = project[ project.moleculeNames[index-1] ]
 
         if index < lastMoleculeIndex:
-            next = project[ project.molecules[index+1] ]
+            next = project[ project.moleculeNames[index+1] ]
 
         molecule.html.insertHtmlLink(     molecule.html.header, molecule, project, text='Home' )
         if previous:
@@ -1685,10 +1688,10 @@ def setupHtml(project):
 
             peakMain('ul', closeTag=False)
             peakMain('li', 'Positions: %s' % peak.positions.__str__())
-            peakMain('li', 'Height: %.3e (%.3e)' % ( peak.height,
-                                                     peak.heightError))
-            peakMain('li', 'Volume: %.3e (%.3e)' % ( peak.volume,
-                                                     peak.volumeError))
+            peakMain('li', 'Height: %.3e (%.3e)' % ( peak.height.value,
+                                                     peak.height.error))
+            peakMain('li', 'Volume: %.3e (%.3e)' % ( peak.volume.value,
+                                                     peak.volume.error))
             peakMain('li', 'Atoms:', closeTag=False)
             for resonance in peak.resonances:
                 if resonance:
@@ -1880,7 +1883,7 @@ def setupHtml(project):
     project.mainPageObjects['Atoms'] = [ atomList ]
 
     atomMain = atomList.html.main
-    
+
     atomMain('h3', closeTag=False)
     refItem = os.path.join( project.moleculePath('analysis'),'validateAssignments.txt')
     abstractResource = NTdict()
@@ -1891,7 +1894,7 @@ def setupHtml(project):
     else:
         atomMain('a',  NotAvailableText)
     atomMain('h3', openTag=False)
-    
+
     atomMain('h3', atomList.formatHtml())
     for atom in atomList:
         count = atom.id
@@ -1911,7 +1914,7 @@ def setupHtml(project):
         atomMain('i', '.'+atom.name + ')') # weirdly it didn't work to put this text in the next statement...
         # The text was put after the </li>
         atomMain('li', '', openTag=False)
-        
+
         sav     = None
         ssd     = None
         delta   = None
@@ -1956,7 +1959,7 @@ def setupHtml(project):
 #                davStr, dsdStr,
 #                atm.validateAssignment.format()
 #               )
-        
+
         atomMain('li', 'Chemical shift: (%6s %6s)' % (valueStr, errorStr))
         atomMain('li', 'SHIFTX shift: (%6s %6s)' % (savStr, ssdStr))
         atomMain('li', 'delta shift: (%6s %6s)' % (deltaStr, rdeltaStr))
@@ -1965,7 +1968,7 @@ def setupHtml(project):
         atom.rogScore.createHtmlForComments(atomMain)
         atomMain('ul', openTag=False)
     #end for
-    
+
     # Do Project HTML page
     htmlMain = project.html.main
 
@@ -2040,7 +2043,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
         if project.molecule.export2gif(pathMolGif, project=project):
             NTerror("Failed to generated a Molmol picture; continuelng.")
 
-    for molecule in [project[mol] for mol in project.molecules]:
+    for molecule in [project[mol] for mol in project.moleculeNames]:
         for chain in molecule.allChains():
             chainId = chain.name
             NTmessage("Generating residue html pages for chain: " + chainId)
@@ -2064,11 +2067,11 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 fp = open( os.path.join( resdir, 'summary.txt' ), 'w' )
                 msg = sprintf('----- %5s -----', res)
                 fprintf(fp, msg+'\n')
-                
+
                 if res.rogScore.isCritiqued():
                     res.html.left( 'h2', 'Critiques', id='Critiques')
                     res.rogScore.createHtmlForComments(res.html.left)
-                
+
                 if htmlOnly:
                     pass
 #                    NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
@@ -2270,7 +2273,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
                 if fileList == True:
                     NTerror( "Failed to convert2Web input file: " + procheckLinkReal)
                     continue
-                
+
     #            _pinupPath, _fullPath, _printPath = fileList
                 pinupLink = os.path.join('..',
                             project.moleculeDirectories.procheck, molecule.name + p + "_pin.gif" )
@@ -2406,7 +2409,7 @@ def _generateHtmlResidueRestraints( project, residue, type = None ):
                                 val2Str(dr.violMax, "%.2f") ))
             resRight('br')
             dr.rogScore.createHtmlForComments(resRight)
-                
+
             #resRight('ul', openTag=False)
             resRight('br')
             if resRL.index(dr) + 1 == toShow:
@@ -2430,7 +2433,7 @@ def populateHtmlModels(project):
     "Output: return None for success is standard."
 #    NTdebug("Starting: populateHtmlModels")
     # Models page
-    for molecule in [project[mol] for mol in project.molecules]:
+    for molecule in [project[mol] for mol in project.moleculeNames]:
 #        NTdebug("Starting: populateHtmlModels for molecule: " + molecule.name)
         # should go to setupHtml
         molecule.modelPage = HTMLfile( project.htmlPath( 'models.html' ),title = 'Outliers' )
@@ -2503,7 +2506,6 @@ methods  = [(validateDihedrals, None),
             (validate, None),
             (criticizeByAll, None),
             (checkForSaltbridges, None),
-            (validateRestraints, None),
             (setupValidation, None),
             (populateHtmlMolecules, None), # for debugging.
             (populateHtmlModels, None), # for debugging.
@@ -2514,5 +2516,6 @@ methods  = [(validateDihedrals, None),
             (makeDihedralPlot, None)
            ]
 #saves    = []
-#restores = []
+restores = [(validateRestraints, None),
+           ]
 #exports  = []

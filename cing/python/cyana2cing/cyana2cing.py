@@ -10,14 +10,23 @@
     Optionally export on-the-fly to a xplor refine setup.
 
 """
-from cing import NTwarning
-from cing import Project
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import OptionParser
+
 import cing
+from cing import cingVersion
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTerror
+from cing.core.classes import Project
+
+from cing.Libs.NTutils import OptionParser
 import os
 import sys
 
+header = """
+======================================================================================================
+    cyana2cing       version %s
+======================================================================================================
+""" % (cingVersion)
 
 parser = OptionParser(usage="cyana2cing.py [options] cyanaDirectory Use -h or --help for full options.")
 
@@ -131,10 +140,14 @@ if not os.path.exists( args[0] ):
     NTerror('directory "%s" not found\n', args[0] )
     sys.exit(1)
 
-projectRoot = Project.rootPath( args[0] )[0]
-if os.path.exists( projectRoot ) and not options.overwrite:
-    NTerror('output directory "%s" already exists; Use -o or --overwrite to overwrite\n', projectRoot )
+if Project.exists( args[0] ) and not options.overwrite:
+    NTerror('Cing project "%s" already exists; Use -o or --overwrite to overwrite\n', args[0] )
     sys.exit(1)
+
+#=====================================================================================
+# Done checking arguments, lets have some action
+#=====================================================================================
+NTmessage( header )
 
 project = Project.open(args[0], 'new')
 if not project:
@@ -156,11 +169,12 @@ project.cyana2cing( args[0],
                     update       = False
                   )
 
+print project.format()
 
 if options.export:
     project.export()
 
-project.save()
+project.close()
 
 #NTdebug("Doing a hard system exit")
 #sys.exit(0)

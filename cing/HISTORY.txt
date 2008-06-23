@@ -1,43 +1,84 @@
-Version 0.76: XX May 2008: 
-    - Added superposing algorithm mostly in cython. 
+cingVersionHistory = """
+0.75: Start of logging
+- SML 0.2: recursion
+
+0.76: 23 Jun 2008
+    - project.molecules is now a _ProjectList instance (used to be a NTlist instance with names)
+      molecule names are stored now in moleculeNames attribute
+      preferentially used the names() method of molecules, peaks, distances and rdcs to get the names of the list
+      to loop over all molecule instances:
+        for mol in project.molecules:
+    - All project objects (like a Molecule or PeakList) have an attribute 'objectPath' which contains the full CING path and is used as default
+      for saving;
+      i.e. myMolecule.save() should work
+    - project.version is a float (used for version comparison)
+    - new project.reports: NTlist instance: to hold the validation report names (not yet implemented, but who knows!?)
+    - Defined a 7-element name tuple:
+
+        (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+
+      Allows referencing of an object at the Project level:
+
+      hence
+
+      Project.decodeNameTuple( nameTuple )
+
+      Implemented for Molecule, Chain, Residue, Chain, Atom, Resonance, Coordinate
+      TODO: Peak, PeakList, etc...
+
+      The 4-element nameTuple still works
+
+    - Hash in molecule.nameTuple
+    - New Molecule storage in one file using SML routines; conversion routines implemented.
+    - PeakList storage updated using SML >0.2. Employs the 7-element nameTuple format.
+    - Peak class updated: now has NTvalue for height and error; likewise for volume; hasHeight() and hasVolume() methods
+    - Resonances have NaN as undefined, rather then NOSHIFT.
+    - Molecule.resonanceSources: a simple list to store the source from which the resonances were derived; e.g. all-final.prot
+    - All SML routines in file sml.py; prevent circular imports; one import in cing.__init__ (this file) needed to activate.
+    - NTaverage returns NaN for n=0, n=1.
+    - NTvalue uses NaN as initiating (value, error)
+    - Improved output using NTdetail.
+
+Version 0.751: 1 May 2008:
+    - Added superposing algorithm mostly in cython.
     - Added chi1/2 plots labeled Janin plots
 
-Version 0.75: 17 Apr 2008: 
+Version 0.75: 17 Apr 2008:
     - Optimized the coordinate storage class for speed through cython now.
     - Temp dir now set in $CINGROOT/python/localConstants.py or __init__.py by default.
 
-Version 0.74: 25 Mar 2008: 
+Version 0.74: 25 Mar 2008:
     - Optimized the coordinate storage class for speed.
     - Added water to topology.
-    - Added user settings in a standard localConstants.py 
+    - Added user settings in a standard localConstants.py
     - Improved processing of X-ray structures as done by getPhiPsi.py script
     - Added trivial parallelization of running over multiple molecules.
-     
-Version 0.73:  3 Mar 2008: 
+
+Version 0.73:  3 Mar 2008:
     - Started to look into incorporating Queen. Need Swig update.
     - Created test code for drawing residue plots with secondary structure
         icons above it ala Procheck_NMR.
-        
-Version 0.72: 12 Jan 2008: 
+
+Version 0.72: 12 Jan 2008:
     - Added extensive test cases. Call all by cing --test.
 	- Added integration with Aqua, Molmol, Povray, convert and ps2pdf
 	- Started migration to matlibplot away from biggles. Needs more testing.
-	
-Version 0.71: 05 Dec 2007: 
+
+Version 0.71: 05 Dec 2007:
     - reformatted the version/copyright formatting
     - redid the determination of the CINGROOT and checks in setup.py
     - added --test option to main.py but needs beautification;-)
     - renamed NTstruct to NTdict (including in the dbTable)
     - exercised the feature request system in sf.net.
     - Changed DOS eol in cing/__init__.py to Unix.
-     
-Version 0.70: 03 Dec 2007: 
+
+Version 0.70: 03 Dec 2007:
     - Reorganized for easy integration with Eclipse/PyDev
     - Removed wild imports to accommodate the imports as PyDev suggests.
     - Organized import statements by PyDev.
     - Replaced many variable names to dummy if their values aren't used anymore after assignment.
         This is then no longer flagged by PyDev as a potential bug.
-    - Moved version.py to __init__.py 
+    - Moved version.py to __init__.py
     - Renamed main script from cing.py to main.py to prevent possible name space clashes.
     - Removed cing.par for now.
     - Removed development.py
@@ -53,7 +94,7 @@ Version 0.70: 03 Dec 2007:
     - Failed to get cing.PluginCode.validate.py working completely.
     - Failed to get cing.PluginCode.ccpn.py working as it references the old ccpn
         api (branch 4?).
-         
+
 Version 0.520: 16 Oct 2007: Merged version GV and Alan
     classes.py:
          - <a class="red"...</a> solution
@@ -73,9 +114,9 @@ Version 0.520: 16 Oct 2007: Merged version GV and Alan
 
 Version 0.513: 16 October 2007:
 - included IPython library
-- Fixed a serious bug in export routine to toPDB from atom properties that caused the first model to be skipped in lieu off 
+- Fixed a serious bug in export routine to toPDB from atom properties that caused the first model to be skipped in lieu off
   the last model.
-  
+
 Version 0.512: 15 October 2007:
 - Completed the procheck ranges option and import of results routines.
 
@@ -113,13 +154,13 @@ Version 0.51: 10 October 2007
     - delta adjusted to delta*0.5
 - cing.py:
     - little change in function formatall()
-- TODO: 
+- TODO:
     - implement importFromCcpnRdcRestraints() in ccpn.py
     - remove initCCPN (old implementation) from cing.py
-    - define a testing code way.  
+    - define a testing code way.
 
 Version 0.50: 20 September 2007
-- New structure for directories 
+- New structure for directories
 
 Version 0.48: 23 August 2007
 - Version for overhaul validation
@@ -130,12 +171,12 @@ Version 0.48: 23 August 2007
     - newPeakList, appendPeakList are obsolete
     - verbose in ProjectList.new()
     - new method to class ProjectList: self.toFile(), for internal storage
-    - new parameters (in __init__) and methods for class DistanceRestraints: 
+    - new parameters (in __init__) and methods for class DistanceRestraints:
       calculateAverage, listViolatingModels, _names
     - new parameters (in __init__) and methods for class DistanceRestraintList:
       append, analyze, sort
     - new htmlObjects (NTlist)
-    - new method 'path" (returns where Cing is installed): better change this 
+    - new method 'path" (returns where Cing is installed): better change this
       name!!!
 - validade.py:
     - new setupValidation (validateDistanceRestraints)
@@ -171,7 +212,7 @@ Version 0.46: 23 May 2007
 Version 0.45
 - Fixed refinement stuff, related to PSF generation
 - Smaller bugs
- 
+
 Version 0.44
 - implemented isProton, isCarbon, isNitrogen methods of Atom class.
 - peakList or peak attribute xeasyColor
@@ -181,13 +222,13 @@ Version 0.44
 - Changed database PHE/TYR QR real definition, removed pseudo for QD/QE
   now is more like the VAL QQG or LEU QQD defs.
 - Cosmetic stuff on the output
-  
+
 version 0.43
 - Wim Franken's integration with CCPN stuff.
-  
+
 Version 0.42
 - Implemented importUpl, importAco methods of Project class
 - Integrated refine stuff
-- New setup for PYTHONPATH and the like: setup.py script generates 
+- New setup for PYTHONPATH and the like: setup.py script generates
   cing.csh script.
 """

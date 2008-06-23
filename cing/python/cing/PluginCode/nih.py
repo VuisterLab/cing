@@ -1,12 +1,12 @@
 """
-Adds export/import to NIH files 
+Adds export/import to NIH files
 
 
 Methods:
-        
+
   export2NIH():
         Export resonances talos format
-        
+
 """
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTdict
@@ -25,7 +25,7 @@ NIHheaderDefinitionString = """
 /***/
 
 /***/
-/* The NMRPipe parameter array FDATA currently consists of 512 4-byte 
+/* The NMRPipe parameter array FDATA currently consists of 512 4-byte
 /* floating-point values which describe the spectral data.  While all numerical
 /* values in this array are floating point, many represent parameters
 /* (such as size in points) which are integers.  Some parts of the
@@ -46,7 +46,7 @@ NIHheaderDefinitionString = """
 /*   3. Data Stream (1D-4D): the data are in the form of a pipeline
 /*      stream, with a single header at the beginning followed by
 /*      all of the spectral intensities in sequential order.
-/* 
+/*
 /* The header values can be manipulated directly, but this is not
 /* recommended.  Instead, the functions getParm() and setParm() can
 /* be used to extract or set header values according to parameter
@@ -54,7 +54,7 @@ NIHheaderDefinitionString = """
 /* code distribution for examples of these functions.
 /*
 /* The NMRPipe format was created to be compatible with an older format
-/* which pre-dates phase-sensitive NMR and multidimensional NMR. 
+/* which pre-dates phase-sensitive NMR and multidimensional NMR.
 /* So, for historical reasons, there are some potentially confusing
 /* aspects regarding definition of dimension sizes, data types,
 /* and interleaving of real and imaginary data.
@@ -64,7 +64,7 @@ NIHheaderDefinitionString = """
 /* follow:
 /*
 /*  1. Complex data in the X-Axis is stored as separated 1D vectors
-/*     of real and imaginary points (see below). 
+/*     of real and imaginary points (see below).
 /*
 /*  2. Complex data in the Y-Axis, Z-Axis, and A-Axis is stored as
 /*     interleaved real and imaginary points.
@@ -114,7 +114,7 @@ NIHheaderDefinitionString = """
 /* planes above, which are alternating real and imaginary in the third
 /* dimension.
 /*
-/* 4D Hypercomplex format: consists of a series of 3D hypercomplex 
+/* 4D Hypercomplex format: consists of a series of 3D hypercomplex
 /* spectra above, which are alternating real and imaginary in the
 /* fourth dimension.
 /***/
@@ -127,7 +127,7 @@ NIHheaderDefinitionString = """
 
 ##define FDIEEECONS   0xeeeeeeee  /* Indicates IEEE floating point format.    */
 ##define FDVAXCONS    0x11111111  /* Indicates DEC VAX floating point format. */
-##define FDORDERCONS       2.345  /* Constant used to determine byte-order.   */ 
+##define FDORDERCONS       2.345  /* Constant used to determine byte-order.   */
 ##define FDFMTCONS    FDIEEECONS  /* Floating point format on this computer.  */
 ##define ZERO_EQUIV       -666.0  /* Might be used as equivalent for zero.    */
 
@@ -278,11 +278,11 @@ NIHheaderDefinitionString = """
 
 #define FDF1LABEL     18
 #define FDF1APOD     428
-#define FDF1SW       229 
-#define FDF1OBS      218 
-#define FDF1ORIG     249 
-#define FDF1UNITS    234 
-#define FDF1FTFLAG   222 
+#define FDF1SW       229
+#define FDF1OBS      218
+#define FDF1ORIG     249
+#define FDF1UNITS    234
+#define FDF1FTFLAG   222
 #define FDF1AQSIGN   475 /* Non-standard. */
 #define FDF1LB       243
 #define FDF1QUADFLAG  55 /* Non-standard. */
@@ -293,7 +293,7 @@ NIHheaderDefinitionString = """
 #define FDF1P1       246
 #define FDF1APODCODE 414
 #define FDF1APODQ1   420
-#define FDF1APODQ2   421 
+#define FDF1APODQ2   421
 #define FDF1APODQ3   422
 #define FDF1C1       423
 #define FDF1ZF       437
@@ -396,9 +396,9 @@ NIHheaderDefinitionString = """
 ##define ABS_ZDIM      -3
 ##define ABS_ADIM      -4
 
-##define CUR_HDIM       9 
+##define CUR_HDIM       9
 ##define CUR_VDIM      10
- 
+
 ##define NDSIZE        (1+NDPARM)  /* Number of points in dimension.          */
 ##define NDAPOD        (2+NDPARM)  /* Current valid time-domain size.         */
 ##define NDSW          (3+NDPARM)  /* Sweep Width Hz.                         */
@@ -469,7 +469,7 @@ NIHheaderDefinitionString = """
 
 #define FOLD_INVERT        -1 /* Folding requires sign inversion.             */
 #define FOLD_BAD            0 /* Folding can't be performed (extracted data). */
-#define FOLD_ORDINARY       1 /* Ordinary folding, no sign inversion.         */ 
+#define FOLD_ORDINARY       1 /* Ordinary folding, no sign inversion.         */
 """
 #-----------------------------------------------------------------------------
 # Parse and create NIH header definitions
@@ -491,12 +491,12 @@ class NMRPipeFile( NTfile ):
     Class to Read (Write?) NMRPipe file
     Reads header on opening
     """
-    
+
     def __init__( self, path, dimcount=2):
         NTfile.__init__( self, path )
         self.header = parseNMRPipeHeader( self.readHeader() )
     #end def
-    
+
     def readHeader( self ):
         self.rewind()
         return self.binaryRead( typecode='f', size=NIHheaderDefs.FDATASIZE )
@@ -511,36 +511,36 @@ def parseNMRPipeHeader( data ):
     # convert the data also to char format
     charData = array.array('b')
     charData.fromstring( array.array('f',data).tostring())
-    
+
     # Parse and interpret the header data
     header = NTdict()
-    
+
     #dimensions and dimension order; bloody pipe format
     for name in ['DIMCOUNT','SIZE','SPECNUM','TRANSPOSED']:
         n = NIHheaderDefs['FD'+name]
         header[name.lower()] = int( data[n] )
     #end for
-    
+
     n1 = NIHheaderDefs.FDDIMORDER
     n2 = n1+header.dimcount
     header.dimorder = map(int, data[n1:n2])
-    
+
     # dimension parameters
     for d in range(1,5):
-    
+
         dim = NTdict()
         header['axis_'+str(d)] = dim
         dim.axisIndex = d
 
         root = 'FDF'+str(d)
-    
+
         # Char's
         #define FDF4LABEL     22
         #define SIZE_F4LABEL    8
         n1 = NIHheaderDefs[root+'LABEL']*4  # 4 Bytes per float
         n2 = n1 + NIHheaderDefs['SIZE_F'+str(d)+'LABEL'] # given in Bytes
         dim.label = charData[n1:n2].tostring()
-        
+
         # Int's
         #define FDF4APOD      53 /* Non-standard. */
         #define FDF4FTFLAG    31
@@ -561,11 +561,11 @@ def parseNMRPipeHeader( data ):
             n = NIHheaderDefs[root+name]
             dim[name.lower()] = int( data[n] )
         #end for
-        
+
         # float's
         #define FDF4OBS       28
         #define FDF4SW        29
-        #define FDF4ORIG      30        
+        #define FDF4ORIG      30
         #define FDF4P0        62 /* Non-standard. */
         #define FDF4P1        63 /* Non-standard. */
         #define FDF4CAR       69 /* Non-standard. */
@@ -578,16 +578,16 @@ def parseNMRPipeHeader( data ):
                      'APODQ1','APODQ2','APODQ3','C1'
                     ]:
             n = NIHheaderDefs[root+name]
-            dim[name.lower()] = data[n] 
+            dim[name.lower()] = data[n]
         #end for
-        
+
     #end for
-    
-    # Do the mapping of axis_1 _2 _3 _4 on X, Y, Z, A using dimorder    
+
+    # Do the mapping of axis_1 _2 _3 _4 on X, Y, Z, A using dimorder
     for xyza,axis in zip( ['X','Y','Z','A'], header.dimorder ):
         header[xyza] = header['axis_'+str(axis)]
     #end for
-    
+
     # Now get sizes right; just write out all posibilities
     # BLOODY !@#$ Pipe (see definitions above)
     if (header.X.quadflag == 0):
@@ -597,9 +597,9 @@ def parseNMRPipeHeader( data ):
     else:
         header.X.size      = header.size
         header.X.totalsize = header.size
-        header.X.dataType  = 'Real'  
+        header.X.dataType  = 'Real'
     #end if
-    
+
     if (header.Y.quadflag == 0):
         if (header.X.quadflag == 0):
             header.Y.size      = header.specnum/2
@@ -613,7 +613,7 @@ def parseNMRPipeHeader( data ):
     else:
         header.Y.size      = header.specnum
         header.Y.totalsize = header.specnum
-        header.Y.dataType  = 'Real'  
+        header.Y.dataType  = 'Real'
     #end if
 
     for i in ['3','4']:
@@ -627,8 +627,8 @@ def parseNMRPipeHeader( data ):
             dim.dataType = 'Real'
         #endif
     #end for
-    
-    
+
+
     # Processing
     #define FDPIPEFLAG    57 /* Dimension code of data stream.    Non-standard.  */
     #define FDPIPECOUNT   75 /* Number of functions in pipeline.  Non-standard.  */
@@ -647,7 +647,7 @@ def parseNMRPipeHeader( data ):
         header[name.lower()] = int( data[n] )
     #end for
     # others
-    
+
     for name in ['NOISE','TEMPERATURE','TAU',
                  'USER1','USER2','USER3','USER4','USER5',
                  'MAX','MIN','DISPMAX', 'DISPMIN'
@@ -655,15 +655,15 @@ def parseNMRPipeHeader( data ):
         n = NIHheaderDefs['FD'+name]
         header[name.lower()] = data[n]
     #end for
-    
+
     for name,i in [('SRCNAME',16),('USERNAME',16),('OPERNAME',32),
                    ('TITLE',60),('COMMENT',160)
                   ]:
         n = NIHheaderDefs['FD'+name]*4
         header[name.lower()] = charData[n:n+i].tostring()
     #end for
-    
-    
+
+
     # set the output formats
     for xyza in ['X','Y','Z','A'][0:header.dimcount]:
         header[xyza].keysformat()
@@ -686,60 +686,57 @@ def exportShifts2Talos( molecule, fileName=None)   :
     if not fileName:
         fileName = molecule.name + '.tab'
     #end if
-    
+
     f = open( fileName, 'w' )
 
-#   generate a oneletter sequence string  
+#   generate a oneletter sequence string
     seqString = ''
     for res in allResidues( molecule ):
-        seqString = seqString + res.db.shortName 
+        seqString = seqString + res.db.shortName
     #end for
-    
-#   header  
+
+#   header
     fprintf( f, 'REMARK shifts from %s\n\n', molecule.name )
-    fprintf( f, 'DATA SEQUENCE %s\n\n', seqString ) 
+    fprintf( f, 'DATA SEQUENCE %s\n\n', seqString )
     fprintf( f, 'VARS   RESID   RESNAME ATOMNAME SHIFT\n' )
     fprintf( f, '%s\n\n', 'FORMAT       %4d     %1s     %4s      %8.3f' )
 
     talosUsed = ['N', 'H', 'CA', 'HA', 'HA1', 'HA2', 'HA3', 'CB', 'C']
-  
+
     count = 0
     for ac in allAtoms( molecule ):
-        atomName    = ac.translate('BMRB')    
+        atomName    = ac.translate('BMRB')
         if (ac.isAssigned() and (atomName in talosUsed)):
             fprintf( f, '%4d    %1s     %4s      %8.3f\n',
-                        ac._parent.resNum, 
-                        ac._parent.db.shortName, 
+                        ac._parent.resNum,
+                        ac._parent.db.shortName,
                         atomName,
                         ac.shift()
                    )
             count += 1
         #end if
     #end for
-      
+
     f.close()
-  
+
     NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"', count, fileName )
     #end if
-#end def    
+#end def
 
 #-----------------------------------------------------------------------------
 def export2NIH( project, tmp=None ):
     """
     Export resonances to NIH (talos) format
     """
-    
-    for molName in project.molecules:
-        fileName = project.path( project.directories.nih, project[molName].name+'.talos' )        
-        exportShifts2Talos(  project[molName], 
-                             fileName=fileName, 
-                              
-                           )
+
+    for mol in project.molecules:
+        fileName = project.path( project.directories.nih, mol.name+'.talos' )
+        exportShifts2Talos(  mol, fileName=fileName )
     #end for
 
 #     for pl in project.peakLists:
 #         peakFile = project.path( directories.sparky, pl.name+'.peaks' )
-#         exportPeaks2Sparky( pl, peakFile)   
+#         exportPeaks2Sparky( pl, peakFile)
     #end for
 #end def
 #-----------------------------------------------------------------------------
@@ -757,5 +754,5 @@ exports  = [(export2NIH, None)]
 #
 if __name__ == '__main__':
     pass
-    
+
 

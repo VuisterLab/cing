@@ -4,11 +4,11 @@ CING: Common Interface for NMR structure Generation
 (c) AW,JFD,GWV 2004-2008
 
 """
-
 import os
 import sys
 
-cingVersion     = '0.75 alfa'
+cingVersion     = 0.76
+
 programName     = 'CING'
 CING_STR        = programName # key to the entities (atoms, residues, etc under which the results will be stored
 
@@ -94,17 +94,20 @@ if not os.path.exists(cingDirTmp):
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist
-from cing.core.classes import Project
-from cing.core.classes import Peak, PeakList
-from cing.core.classes import DistanceRestraint, DistanceRestraintList
-from cing.core.classes import DihedralRestraint, DihedralRestraintList
+from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist, NTvalue
+from cing.Libs.fpconst      import NaN
+
+from cing.core.constants    import *
+from cing.core.classes      import Project
+from cing.core.classes      import Peak,              PeakList
+from cing.core.classes      import DistanceRestraint, DistanceRestraintList
+from cing.core.classes      import DihedralRestraint, DihedralRestraintList
 #from cing.core.parameters import *
-from cing.core.database import NTdb
+from cing.core.database     import NTdb
 #from cing.core.dictionaries import *
-from cing.core.molecule import Molecule, Chain, Residue, Atom, Coordinate, Resonance
+from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance
 from cing.core.importPlugin import importPlugin # This imports all plugins
+from cing.core.sml          import obj2SML    # This also initializes the SMLhandler methods
+from cing.core.sml          import SML2obj    # This also initializes the SMLhandler methods
 #from cing.Libs.peirceTest import peirceTest
 #from cing.Libs.TypeChecking import *
-
-

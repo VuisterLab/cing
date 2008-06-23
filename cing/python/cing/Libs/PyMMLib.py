@@ -1561,7 +1561,7 @@ class PDBFile(list):
             pdb_record.read(ln)
             self.append(pdb_record)
 
-        NTmessage("==> PDBFile: read %d records from %s", len(self), fileName )
+        NTdebug("PDBFile: read %d records from %s", len(self), fileName )
 
     def save_file(self, fil):
         """Saves the PDBFile object in PDB file format to File object fil.
@@ -1583,7 +1583,7 @@ class PDBFile(list):
 #            NTdebug("now at record: %6d" % i )
             i += 1
         fp.close()
-        NTdebug("==> Written %d PDB records to %s", len( self ), path )
+        NTdebug("Written %d PDB records to %s", len( self ), path )
         #end if
     #end def
     ## end gv adds

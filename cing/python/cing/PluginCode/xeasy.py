@@ -28,6 +28,8 @@ from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import X_AXIS
+from cing.core.constants import NOSHIFT
+from cing.Libs.fpconst import isNaN
 from cing.core.dictionaries import isValidAtomName
 from cing.core.dictionaries import isValidResidueName
 from cing.core.dictionaries import translateAtomName
@@ -113,9 +115,9 @@ class Xeasy( NTdict ):
         #end for
 
         self.protFile = protFile
-        NTmessage('==> Xeasy: parsed %d residues, %d atoms from %s, %s',
+        NTdebug('Xeasy.__init__: parsed %d residues, %d atoms from %s, %s',
                       self.resCount, self.protCount, self.seqFile,self.protFile
-                     )
+               )
         #end if
     #end def
 
@@ -159,13 +161,13 @@ class Xeasy( NTdict ):
 
         # now update the values
         for p in self.prot.itervalues():
-            if p.atom:
+            if p.atom and p.shift != NOSHIFT:
                 p.atom.resonances().value = p.shift
                 p.atom.resonances().error = p.error
             #end if
         #end for
 
-        NTmessage('==> Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
+        NTdebug('Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
         #end if
 
     #end def
@@ -265,7 +267,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-        NTmessage('==> Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
+        NTdebug('Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
         #end if
 
         return peaks
@@ -305,8 +307,15 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
         cyanaName = atom.translate(convention)
         if (cyanaName != None and atom.resonances() != None ):
             atom.xeasyIndex = idx
+            if isNaN(atom.resonances().value):
+                shift = NOSHIFT
+                error = 0.0
+            else:
+                shift = atom.resonances().value
+                error = atom.resonances().error
+            #end if
             fprintf( fout, '%4d %7.3f %5.3f %-4s %4d\n',
-                     atom.xeasyIndex, atom.resonances().value, atom.resonances().error,
+                     atom.xeasyIndex, shift, error,
                      cyanaName, atom._parent.resNum
                    )
             idx += 1
@@ -352,10 +361,10 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
     # write the peaks
     count = 0
     for peak in peakList:
-        if hasattr( peak, 'xeasyIndex'):
-            idx = peak.xeasyIndex
+        if peak.has_key('xeasyIndex'):
+            idx = peak['xeasyIndex']
         else:
-            idx = peak.peakIndex
+            idx = peak.peakIndex + 1 # Xeasy peakIndices start from 1
         #end if
         fprintf( fout, '%4d ', idx )
 
@@ -372,7 +381,7 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
         #end if
         fprintf( fout, '%1d U         ', color )
 
-        fprintf( fout, '%10.3e %9.2e ', peak.height, peak.heightError )
+        fprintf( fout, '%10.3e %9.2e ', peak.height.value, peak.height.error )
         fprintf( fout, '-   0 ' )
         for i in range (X_AXIS, dimension):
             if peak.isAssigned( i ):
@@ -398,20 +407,25 @@ def importXeasy( project, seqFile, protFile, convention ):
         return the 'slot' (i.e position in the list) of these resonances or None on error
         """
         if seqFile == None:
-            NTerror('importXeasy: undefined seqFile\n' )
+            NTerror('importXeasy: undefined seqFile' )
             return None
         #end if
         if protFile == None:
-            NTerror('importXeasy: undefined protFile\n' )
+            NTerror('importXeasy: undefined protFile' )
             return None
         #end if
 
         if not os.path.exists( seqFile ):
-            NTerror('importXeasy: seqFile "%s" not found\n', seqFile )
+            NTerror('importXeasy: seqFile "%s" not found', seqFile )
             return None
         #end if
         if not os.path.exists( protFile ):
-            NTerror('importXeasy: protFile "%s" not found\n', protFile )
+            NTerror('importXeasy: protFile "%s" not found', protFile )
+            return None
+        #end if
+
+        if not project.molecule:
+            NTerror('importXeasy: No molecule defined' )
             return None
         #end if
 
@@ -419,9 +433,9 @@ def importXeasy( project, seqFile, protFile, convention ):
         project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Append the shifts to molecule
         project.xeasy.appendShifts( project.molecule   )
+        project.molecule.resonanceSources.append(protFile)
 
         project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
-
 
         if project.xeasy.error:
             NTmessage( '==> importXeasy: error(s) appending resonances from "%s"', protFile )
@@ -461,6 +475,11 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
             return None
         #end if
 
+        if not project.molecule:
+            NTerror('importXeasyPeaks: No molecule defined' )
+            return None
+        #end if
+
 #       Parse the seq file and prot file
         project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Extract the peaks
@@ -481,7 +500,7 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
 def export2Xeasy( project, tmp=None ):
         """Export to shift and peaks to Xeasy in CYANA and CYANA2 formats
         """
-        for molName in project.molecules:
+        for molName in project.moleculeNames:
             #Xeasy/Cyana 1.x format
             fileName = project.path( project.directories.xeasy, project[molName].name )
             exportShifts2Xeasy(  project[molName],

@@ -155,7 +155,7 @@ def importAco( project, acoFile, convention ):
 
     if errorCount:
         NTerror("Found number of errors importing upl file: " + `errorCount`)
-    NTmessage("Imported items: " + `len(result)`)
+#    NTmessage("Imported items: " + `len(result)`)
     NTmessage('==> importAco: new %s from "%s"', result, acoFile )
     return result
 #end def
@@ -242,7 +242,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     if errorCount:
         NTerror("Found number of errors importing upl file: " + `errorCount`)
 
-    NTmessage("Imported upl items: " + `len(result)`)
+#    NTmessage("Imported upl items: " + `len(result)`)
     NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
 #    sys.exit(1)
     return result

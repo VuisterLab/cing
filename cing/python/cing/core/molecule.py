@@ -6,6 +6,7 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
@@ -22,9 +23,12 @@ from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import NTpath
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
+from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import isNaN
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
@@ -37,11 +41,12 @@ from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
-from cing.core.sml import SMLhandler
+#from cing.core.sml import SMLhandler
 from database     import NTdb
 from parameters   import plotParameters
 import math
 import os
+import sys
 
 #==============================================================================
 # Global variables
@@ -145,30 +150,28 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
 
-#        self.__FORMAT__ =  self.header( dots ) + '\n' +\
-#                          'chains:     %(chainCount)d %(chains)s\n' +\
-#                          'residues:   %(residueCount)d\n' +\
-#                          'atoms:      %(atomCount)d\n' +\
-#                          'models:     %(modelCount)d\n' +\
-#                          'resonances: %(resonanceCount)d per atom\n' + \
-#                           self.footer( dots )
-
         self.chains       = self._children
+
+        # These will be set on the fly
         self.chainCount   = 0
         self.residueCount = 0
         self.atomCount    = 0
 
-        self.resonanceCount = 0
+        # These will be maintained by the appropriate routines
+        self.resonanceCount   = 0
+        self.resonanceSources = NTlist()
+        self.modelCount       = 0
 
-        self.modelCount   = 0
-        self._coordinates = NTlist()   # internal array with coordinate references
+#        self._coordinates = NTlist()        # internal array with coordinate references
+        self._nameTupleDict   = {}           # Internal namedict for decodeNameTuple
 
-        self.xeasy        = None # reference to xeasy class, used in parsing
-        self.rogScore     = ROGscore()
+        self.xeasy            = None         # reference to xeasy class, used in parsing
+        self.rogScore         = ROGscore()
 
         self.saveXML('chainCount','residueCount','atomCount')
 
-        # save the content definitions
+        # save the content definitions; depreciated since version 0.75
+        # Maintained for compatibility
         self.content = NTdict( name = self.name, convention = INTERNAL )
         self.content.update( NTmolParameters )
         self.content.saveAllXML()
@@ -192,7 +195,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                           'residues:    %d\n' +\
                           'atoms:       %d\n' +\
                           'models:      %d\n' +\
-                          'resonances:  %d per atom\n' +\
+                          'resonances:  %d per atom; sources %s\n' +\
                           'assignments: %d (%d stereo)\n' +\
                           '%s',
                            self.header( dots ),
@@ -201,6 +204,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                            self.atomCount,
                            self.modelCount,
                            self.resonanceCount,
+                           self.resonanceSources,
                            self.nAssigned, self.nStereoAssigned,
                            self.footer(dots)
                          )
@@ -267,7 +271,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
     def decodeNameTuple( self, nameTuple, fromCYANA2CING=False ):
         """
-            Decode a (convention, chainName, resNum, atomName) tuple
+            Decode a 7-element nameTuple
+                (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+            or older 4-element nameTuple
+                 (convention, chainName, resNum, atomName)
+
             generated with the nameTuple methods of Chain, Residue, or Atom Classes.
             Return a Molecule, Chain, Residue or Atom instance on success or
             None on error.
@@ -285,7 +293,20 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             A and B in PDB but just [1-104] and [201-304] in the upls.
         """
 #        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
-        convention, chainName, resNum, atomName = nameTuple
+        if nameTuple == None: return None
+
+        if self._nameTupleDict.has_key(nameTuple):
+            return self._nameTupleDict[nameTuple]
+
+        if len(nameTuple) == 4:
+            convention, chainName, resNum, atomName = nameTuple
+            moleculeName = self.name
+            resonanceIndex = None
+            model = None
+        else:
+            moleculeName, chainName, resNum, atomName, model, resonanceIndex, convention = nameTuple
+
+        if moleculeName != self.name: return None
 
         if not fromCYANA2CING:
             if chainName == None:
@@ -300,6 +321,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             chain = self[chainName]
 
             if resNum == None:
+                self._nameTupleDict[nameTuple] = chain
                 return chain
 
             if not chain.has_key(resNum):
@@ -308,7 +330,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             res = chain[resNum]
 
             if atomName == None:
-                return res
+               self._nameTupleDict[nameTuple] = res
+               return res
 
             resTranslated = res.translate(convention)
             an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
@@ -320,7 +343,24 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             if not res.has_key(an):
     #            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
                 return None
-            return res[an]
+
+            atm = res[an]
+            if resonanceIndex == None and model == None:
+                self._nameTupleDict[nameTuple] = atm
+                return atm
+
+            if model != None and resonanceIndex == None and model<len(atm.coordinates):
+                c = atm.coordinates[model]
+                self._nameTupleDict[nameTuple] = c
+                return c
+
+            if model == None and resonanceIndex != None and resonanceIndex<len(atm.resonances):
+                r = atm.resonances[resonanceIndex]
+                self._nameTupleDict[nameTuple] = r
+                return r
+
+            return None
+
         else: # fromCYANA2CING
             if chainName != None:
                 NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
@@ -352,6 +392,13 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
             return None
         # end else
+    #end def
+
+    def nameTuple(self,convention=INTERNAL):
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+        """
+        return (self.name, None, None, None, None, None, convention)
     #end def
 
     def getResidue( self, resName, chains = None):
@@ -442,8 +489,6 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             result.append(r)
         return result
 
-
-
     def models2list( self, models ):
         """
             Convert
@@ -502,15 +547,12 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return None
     #end def
 
+    def _save075( self, path = None)   :
+        """Save sequence, resonances, stereo assignments and coordinates in <=0.75 format
 
-    def save( self, path = None)   :
-        """Create a directory path (or use name.NTmol)
-           Save sequence, resonances, stereo assignments and coordinates.
            gwv 13 Jun 08: Return self or None on error
         """
         if not path: path = self.name + '.NTmol'
-        if os.path.exists( path ): removedir( path )
-        os.mkdir( path )
 
         content = NTdict( name = self.name, convention = INTERNAL )
         content.update( NTmolParameters )
@@ -525,24 +567,66 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self._saveSequence(   os.path.join( path, NTmolParameters.sequenceFile   ) )
         self._saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self._saveStereoAssignments( os.path.join( path, NTmolParameters.stereoFile ) )
-        self.saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
-
-        NTmessage('==> Saved %s to "%s"', self, path)
+        self._saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
+        NTdetail('==> Saved %s to "%s"', self, smlFile)
         return self
     #end def
 
-    def open( path)   :
-        """Static method to restore molecule from directory path
-           return self or None on error
+    def save( self, path = None)   :
+        """Create a SML file
+           Save sequence, resonances, stereo assignments and coordinates.
+           Return self or None on error
+        """
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('Molecule.save: failed creating "%s"', path)
+            return None
+        #end if
+
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
+    #end def
+
+    def open( path )   :
+        """Static method to restore molecule from SML file path
+           returns Molecule instance or None on error
         """
         if (not os.path.exists( path )):
-            NTerror('Molecule.open: path "%s" not found\n', path)
+            NTerror('Molecule.open: smlFile "%s" not found\n', path)
+            return None
+        #end if
+
+        mol = Molecule.SMLhandler.fromFile(path)
+        if not mol:
+            NTerror('Molecule.open: open from "%s" failed', path)
+            return None
+        #end if
+
+        mol._check()
+        mol.updateAll()
+
+        NTdetail('%s', mol.format())
+
+        return mol
+    #end def
+    open = staticmethod(open)
+
+    def _open075( path )   :
+        """Static method to restore molecule from directory path
+           implements the <=0.75 storage model
+           returns Molecule instance or None on error
+        """
+        # old format
+        NTdetail('Molecule._open075: opening from old format "%s"', path)
+
+        if (not os.path.exists( path )):
+            NTerror('Molecule._open075: path "%s" not found\n', path)
             return None
         #end if
 
         content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
         if not content:
-            NTerror('Molecule.open: error reading xml file "%s"\n',
+            NTerror('Molecule._open075: error reading xml file "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
                    )
             return None
@@ -550,30 +634,52 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         content.keysformat()
         NTdebug('content from xml-file: %s', content.format())
 
-        NTmessage('==> Restoring Molecule from "%s" ... ', path )
-
         mol = Molecule( name = content.name )
         if not mol:
-            NTerror('Molecule.open: initializing molecule\n')
+            NTerror('Molecule._open075: initializing molecule\n')
             return None
         #end if
 
         mol.content = content
-        if not mol._restoreSequence(    os.path.join( path, content.sequenceFile   ) ):
+        if content.has_key('sequenceFile') and not mol._restoreSequence(    os.path.join( path, content.sequenceFile   ) ):
             return None
-        if mol._restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False ) < 0:
+        if content.has_key('resonanceFile') and mol._restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False ) < 0:
             return None
-        if mol._restoreStereoAssignments( os.path.join( path, content.stereoFile ) ) < 0:
+        if content.has_key('stereoFile') and mol._restoreStereoAssignments( os.path.join( path, content.stereoFile ) ) < 0:
             return None
-        mol.restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
+        mol._restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
 
-        mol.updateAll(   )
+        mol._check()
+        mol.updateAll()
 
-        NTmessage('%s', mol.format())
+        NTdebug('%s', mol.format())
 
         return mol
     #end def
-    open = staticmethod(open)
+    _open075 = staticmethod(_open075)
+
+    def _check(self):
+        # check for potential atoms with incomplete resonances
+        # Might occur after change of database
+        # convert old NOSHIFT values to NaN
+        for atm in self.allAtoms():
+            for r in atm.resonances:
+                if r.value == NOSHIFT:
+                    r.value = NaN
+                    r.error = NaN
+                #end if
+            #end for
+            l = len(atm.resonances)
+            if l < self.resonanceCount:
+                NTerror('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
+                        atm, l, self.resonanceCount
+                        )
+                for i in range(l,self.resonanceCount):
+                    atm.addResonance()
+                #end for
+            #end if
+        #end for
+    #end def
 
     def _saveSequence( self, fileName ):
         """Write a xml sequence file.
@@ -668,14 +774,17 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return self.resonanceCount
     #end def
 
-    def newResonances( self ):
+    def newResonances( self, source=None ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
         """
+        if not source:
+            source = 'source_%d' % self.resonanceCount
         for atom in self.allAtoms():
-            atom.addResonance( value=NOSHIFT, error = 0.000 )
+            atom.addResonance()
         #end for
         self.resonanceCount += 1
+        self.resonanceSources.append(source)
     #end def
 
     def initResonances( self)   :
@@ -685,6 +794,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             atom.resonances = NTlist()
         #end for
         self.resonanceCount = 0
+        self.resonanceSources = NTlist()
         #NTmessage("==> Initialized resonances")
         #end if
     #end def
@@ -738,7 +848,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return count
     #end def
 
-    def saveCoordinates( self, fileName ):
+    def _saveCoordinates( self, fileName ):
         """Write a plain text file with code for saving coordinates"""
         fp = open( fileName, 'w' )
         fprintf( fp, 'self.modelCount = %d\n', self.modelCount )
@@ -749,13 +859,13 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         fp.close()
         #NTdebug('Molecule.saveCoordinates: %s', fileName)
 
-    def restoreCoordinates( self, fileName, append = True ):
+    def _restoreCoordinates( self, fileName, append = True ):
         """Restore coordinates from fileName
            Optionally append to existing settings
            Return self or None on error
         """
         if not os.path.exists( fileName ):
-            NTerror('Error Molecule.restoreCoordinates: file "%s" not found\n', fileName )
+            NTerror('Error Molecule._restoreCoordinates: file "%s" not found\n', fileName )
             return None
         #end if
         if not append:
@@ -806,7 +916,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     #end def
 
     #--------------------------------------------------------------------------
-    def initialize( name, path = None, convention=LOOSE   ):
+    def initialize( name, path = None, convention=LOOSE, **kwds   ):
 
         """
 Static method to initialize a Molecule from a file
@@ -818,7 +928,7 @@ Return an Molecule instance or None on error
                            >
         """
         #print '>', path, convention
-        molecule = Molecule( name=name )
+        molecule = Molecule( name=name, **kwds )
 
         sequenceS = ''
         if path:
@@ -995,33 +1105,42 @@ Return an Molecule instance or None on error
         pdbFile.append( record )
         return pdbFile
     #end def
-#end class
 
-class XMLMoleculeHandler( XMLhandler ):
-    """Molecule handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='Molecule')
-    #end def
-
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
-        if attrs == None: return None
-        result = Molecule( name = attrs['name'] )
-
-        # update the attrs values
-        result.update( attrs )
-
-        # restore the tree structure
-        for child in result._children:
-#           print '>child>', repr(child)
-            result[child.name] = child
-            child._parent = result
-        return result
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(Molecule,'SMLhandler'):
+            Molecule.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('Molecule.toSML: no SMLhandler defined')
+        #end if
     #end def
 #end class
 
-#register this handler
-moleculehandler = XMLMoleculeHandler()
+#class XMLMoleculeHandler( XMLhandler ):
+#    """Molecule handler class"""
+#    def __init__( self ):
+#        XMLhandler.__init__( self, name='Molecule')
+#    #end def
+#
+#    def handle( self, node ):
+#        attrs = self.handleDictElements( node )
+#        if attrs == None: return None
+#        result = Molecule( name = attrs['name'] )
+#
+#        # update the attrs values
+#        result.update( attrs )
+#
+#        # restore the tree structure
+#        for child in result._children:
+##           print '>child>', repr(child)
+#            result[child.name] = child
+#            child._parent = result
+#        return result
+#    #end def
+##end class
+#
+##register this handler
+#Molecule.XMLhandler = XMLMoleculeHandler()
+
 
 #
 #==============================================================================
@@ -1185,11 +1304,10 @@ Chain class: defines chain properties and methods
     #end def
 
     def nameTuple( self, convention = INTERNAL ):
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
-        Return a (convention, chainName, None, None) tuple
-           for usage with Molecule.decodeNameTuple
-        """
-        return (convention, self.name, None, None)
+        return (self.molecule.name, self.name, None, None, None, None, convention)
     #end def
 
     def residuesWithProperties(self, *properties ):
@@ -1221,40 +1339,45 @@ Chain class: defines chain properties and methods
         #end for
         return result
     #end def
-#end class
 
-
-class XMLChainHandler( XMLhandler ):
-    """Chain handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='Chain')
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(Chain,'SMLhandler'):
+            Chain.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('Chain.toSML: no SMLhandler defined')
+        #end if
     #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
-        if attrs == None: return None
-        result = Molecule( name = attrs['name'] )
-
-        # update the attrs values
-        result.update( attrs )
-
-        # restore the tree structure and references
-        for res in result._children:
-#           print '>child>', repr(child)
-            result[res.name] = res
-            result[res.shortName] = res
-            result[res.resNum] = res
-            res._parent = result
-        return result
-    #end def
 #end class
 
-#register this handler
-chainhandler = XMLChainHandler()
+#class XMLChainHandler( XMLhandler ):
+#    """Chain handler class"""
+#    def __init__( self ):
+#        XMLhandler.__init__( self, name='Chain')
+#    #end def
+#
+#    def handle( self, node ):
+#        attrs = self.handleDictElements( node )
+#        if attrs == None: return None
+#        result = Molecule( name = attrs['name'] )
+#
+#        # update the attrs values
+#        result.update( attrs )
+#
+#        # restore the tree structure and references
+#        for res in result._children:
+##           print '>child>', repr(child)
+#            result[res.name] = res
+#            result[res.shortName] = res
+#            result[res.resNum] = res
+#            res._parent = result
+#        return result
+#    #end def
+##end class
+#
+##register this handler
+#Chain.XMLhandler = XMLChainHandler()
 
-#
-#==============================================================================
-#
 class Residue( NTtree ):
     """
 -------------------------------------------------------------------------------
@@ -1388,7 +1511,6 @@ Residue class: Defines residue properties
         return self
     #end def
 
-
     def mutate( self, resName   ):
         """
         Mutate residue to resName:
@@ -1443,7 +1565,7 @@ Residue class: Defines residue properties
             else:
                 atm = newRes.addAtom( atmDef.name )
                 for dummy in range(newRes.chain.molecule.resonanceCount):
-                    atm.addResonance( value=NOSHIFT, error = 0.000 )
+                    atm.addResonance()
                 #end for
             #end if
         #end for
@@ -1542,11 +1664,10 @@ Residue class: Defines residue properties
     #end def
 
     def nameTuple( self, convention = INTERNAL ):
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
-        Return a (convention, chainName, resNum, None) tuple
-           for usage with Molecule.decodeNameTuple
-        """
-        return (convention, self.chain.name, self.resNum, None)
+        return (self.chain.molecule.name, self.chain.name, self.resNum, None, None, None, convention)
     #end def
 
     def getAtom( self, atomName, convention = INTERNAL ):
@@ -1633,33 +1754,39 @@ Residue class: Defines residue properties
         return result
     #end def
 
-#end class
-
-class XMLResidueHandler( XMLhandler ):
-    """Residue handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='Residue')
-    #end def
-
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
-        if attrs == None: return None
-        result = Residue( resName = attrs['resName'], resNum = attrs['resNum'] )
-
-        # update the attrs values
-        result.update( attrs )
-
-        # restore the tree structure
-        for atm in result._children:
-            result[atm.name] = atm
-            atm._parent = result
-        return result
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(Residue,'SMLhandler'):
+            Residue.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('Residue.toSML: no SMLhandler defined')
+        #end if
     #end def
 #end class
 
-#register this handler
-residuehandler = XMLResidueHandler()
-
+#class XMLResidueHandler( XMLhandler ):
+#    """Residue handler class"""
+#    def __init__( self ):
+#        XMLhandler.__init__( self, name='Residue')
+#    #end def
+#
+#    def handle( self, node ):
+#        attrs = self.handleDictElements( node )
+#        if attrs == None: return None
+#        result = Residue( resName = attrs['resName'], resNum = attrs['resNum'] )
+#
+#        # update the attrs values
+#        result.update( attrs )
+#
+#        # restore the tree structure
+#        for atm in result._children:
+#            result[atm.name] = atm
+#            atm._parent = result
+#        return result
+#    #end def
+##end class
+#
+##register this handler
+#Residue.XMLhandler = XMLResidueHandler()
 
 #==============================================================================
 class Atom( NTtree ):
@@ -1773,16 +1900,17 @@ Atom class: Defines object for storing atom properties
 
     def addCoordinate( self, x, y, z, Bfac, **kwds ):
         """Append coordinate to coordinates list
-        Convenience method."""
+        Convenience method.
+        """
         c = Coordinate( x, y, z, Bfac=Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, atom=self )
 #        c.update( **kwds )
         c.model = len(self.coordinates)
         self.coordinates.append( c )
-        self._parent._parent._parent._coordinates.append(c)
     #end def
 
-    def addResonance( self, value, error=0.0 ):
+    def addResonance( self, value=NaN, error=NaN ):
         r = Resonance( atom=self, value=value, error = error )
+        r.resonanceIndex = len(self.resonances)
         self.resonances.append( r )
     #end def
 
@@ -1910,7 +2038,7 @@ Atom class: Defines object for storing atom properties
     def isAssigned( self ):
         """return true if atom current resonance has a valid assignment"""
         if (self.resonances() != None):
-            return (self.resonances().value != NOSHIFT)
+            return not isNaN(self.resonances().value)
         #end if
         return False
     #end def
@@ -1919,9 +2047,23 @@ Atom class: Defines object for storing atom properties
         if self.isAssigned():
             return self.resonances().value
         else:
-            return NOSHIFT
+            return NaN
         #end if
     #end def
+
+    def swapAssignments( self, other ):
+        """
+        Swap the assignments of self with other
+        """
+        for r in self.resonances:
+            r.atom = other
+        for r in other.resonances:
+            r.atom = self
+        tmp = self.resonances
+        self.resonances = other.resonances
+        other.resonances = self
+    #end def
+
 
     def isStereoAssigned( self ):
         """
@@ -2177,13 +2319,19 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def nameTuple( self, convention = INTERNAL ):
-        """Return a (convention, chainName, resNum, atomName) tuple
-           for usage with Molecule.decodeNameTuple
-           or None on translate error of atomName
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
         an = self.translate( convention )
-        if not an: return None
-        return ( convention, self.residue.chain.name, self.residue.resNum, an )
+        if not an: return (None,None,None,None,None,None,convention)
+        return (self.residue.chain.molecule.name,
+                self.residue.chain.name,
+                self.residue.resNum,
+                an,
+                None,
+                None,
+                convention
+               )
     #end def
 
     def isPseudoAtom( self ):
@@ -2362,33 +2510,39 @@ Atom class: Defines object for storing atom properties
         return record
     #end def
 
-#end class
-
-
-class XMLAtomHandler( XMLhandler ):
-    """Atom handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='Atom')
-    #end def
-
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
-        if attrs == None: return None
-        result = Atom( resName = attrs['resName'], atomName = attrs['name'] )
-
-        # update the attrs values
-        result.update( attrs )
-
-        # restore the resonance references
-        for r in result.resonances:
-            r.atom = result
-
-        return result
+    def toSML(self, stream=sys.stdout ):
+        if hasattr(Atom,'SMLhandler'):
+            Atom.SMLhandler.toSML( self, stream )
+        else:
+            NTerror('Atom.toSML: no SMLhandler defined')
+        #end if
     #end def
 #end class
 
-#register this handler
-atomhandler = XMLAtomHandler()
+
+#class XMLAtomHandler( XMLhandler ):
+#    """Atom handler class"""
+#    def __init__( self ):
+#        XMLhandler.__init__( self, name='Atom')
+#    #end def
+#
+#    def handle( self, node ):
+#        attrs = self.handleDictElements( node )
+#        if attrs == None: return None
+#        result = Atom( resName = attrs['resName'], atomName = attrs['name'] )
+#
+#        # update the attrs values
+#        result.update( attrs )
+#
+#        # restore the resonance references
+#        for r in result.resonances:
+#            r.atom = result
+#
+#        return result
+#    #end def
+##end class
+##register this handler
+#Atom.XMLhandler = XMLAtomHandler()
 
 class CoordinateOld( list ):
     """
@@ -2534,74 +2688,26 @@ e.g.
     #end def
 
     def __repr__(self):
-        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f )', self.e[0], self.e[1], self.e[2], self.Bfac )
-#end class
+        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f, occupancy=%f )',
+                       self.e[0], self.e[1], self.e[2], self.Bfac, self.occupancy
+                      )
 
-class SMLCoordinateHandler( SMLhandler ):
-
-    def __init__(self):
-        SMLhandler.__init__( self, name = 'Coordinate' )
-    #end def
-
-    def handle(self, line, fp, project=None):
-        # Explicit coding saved ca 30%
-        c = Coordinate(x=float(line[2]), y=float(line[3]), z=float(line[4]), Bfac=float(line[5]),occupancy=float(line[6]))
-        c.model = int(line[7])
-        line = self.readline( fp )
-        c.atomNameTuple = eval(line[0])
-#        return self.dictHandler(c, fp, project)
-        line = self.readline( fp )
-        if line[0] == self.endTag:
-            self.endHandler(c, project)
-            return c
-        #end if
-        # We should not be here
-        NTerror('SMLCoordinateHandler.handle: missing Coordinate endTag')
-        return None
-    #end def
-
-    def endHandler(self, c, project):
-        # Map the atomNameTuple
-        if project == None: return None
-        # Misuse project as molecule here
-        molecule = project
-        atm = molecule.decodeNameTuple(c.atomNameTuple)
-        if atm == None:
-            NTerror('SMLCoordinateHandler.endHandler: invalid atomNameTuple (%s)', c.atomNameTuple)
-            return None
-        #end if
-        c.atom = atm
-        atm.coordinates.append(c)
-        return c
-    #end def
-
-    def toSML(self, c, stream ):
+    def nameTuple(self, convention=INTERNAL):
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
-            For coordinate
-        """
-#        fprintf( stream, "%s\n", self.startTag)
-#        for a in ['x','y','z','Bfac','occupancy','model']:
-#            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
-#        #end for
-
-        # print x,y,z,Bfac,occupancy, model ontag line to speed up parsing and initialization
-        fprintf( stream, "%s %.3f %.3f %.3f %.3f %.3f %d\n",
-                         self.startTag,
-                         c.e[0], c.e[1], c.e[2],
-                         c.Bfac, c.occupancy,
-                         c.model
-               )
-        fprintf( stream, '%s\n', repr( c.atom.nameTuple(CYANA) ) )
-#        Can add attributes here; update handle
-#        for a in ['model']:
-#            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
-        #end for
-
-        fprintf( stream, "%s\n", self.endTag )
+        if not self.atom: return (None, None, None,None,self.model,None,convention)
+        else:
+            return (self.atom.residue.chain.molecule.name,
+                    self.atom.residue.chain.name,
+                    self.atom.residue.resNum,
+                    self.atom.translate(convention),
+                    self.model,
+                    None,
+                    convention
+                   )
     #end def
 #end class
-Coordinate.SMLhandler = SMLCoordinateHandler()
-
 
 #==============================================================================
 def NTdistance( c1, c2 ):
@@ -2722,12 +2828,13 @@ class Resonance( NTvalue  ):
     """Resonance class; implemented as an NTvalue object
     """
 
-    def __init__( self, atom=None, value=NOSHIFT, error=0.000 ):
+    def __init__( self, atom=None, value=NaN, error=NaN ):
         NTvalue.__init__( self, __CLASS__  = 'Resonance',
                                 value      = value,
                                 error      = error,
                                 fmt        = '<%7.3f  (%7.3f)>',
-                                atom       = atom
+                                atom       = atom,
+                                resonanceIndex = -1 # undefined
                          )
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'atom:  %(atom)-12s\n' +\
@@ -2741,6 +2848,9 @@ class Resonance( NTvalue  ):
         return sprintf('<Resonance: %.3f %.3f %s>', self.value, self.error, self.atom )
     #end def
 
+    def __repr__( self ):
+        return sprintf('Resonance( value=%r, error=%r)', self.value, self.error)
+
     def match( self, other ):
         """Return probability of matching between self and other
         """
@@ -2751,26 +2861,45 @@ class Resonance( NTvalue  ):
 
         return math.exp( -(self.value-other.value )**2 / (sigma1*sigma2*2) )
     #end def
+
+    def nameTuple(self, convention=INTERNAL):
+        """Return the 7-element name tuple.
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+
+        """
+        if not self.atom: return (None, None, None,None,None,self.resonanceIndex,convention)
+        else:
+            return (self.atom.residue.chain.molecule.name,
+                    self.atom.residue.chain.name,
+                    self.atom.residue.resNum,
+                    self.atom.translate(convention),
+                    None,
+                    self.resonanceIndex,
+                    convention
+                   )
+    #end def
 #end class
 
-class XMLResonanceHandler( XMLhandler ):
-    """Resonance handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='Resonance')
-    #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
-        if attrs == None: return None
-        result = Resonance( value = attrs['value'], error = attrs['error'] )
-        # update the attrs values
-        result.update( attrs )
-        return result
-    #end def
-#end class
+#class XMLResonanceHandler( XMLhandler ):
+#    """Resonance handler class"""
+#    def __init__( self ):
+#        XMLhandler.__init__( self, name='Resonance')
+#    #end def
+#
+#    def handle( self, node ):
+#        attrs = self.handleDictElements( node )
+#        if attrs == None: return None
+#        result = Resonance( value = attrs['value'], error = attrs['error'] )
+#        # update the attrs values
+#        result.update( attrs )
+#        return result
+#    #end def
+##end class
+#
+##register this handler
+#Resonance.XMLhandler = XMLResonanceHandler()
 
-#register this handler
-resonancehandler = XMLResonanceHandler()
 
 
 #==============================================================================
@@ -2826,37 +2955,37 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
 #end def
 
 #==============================================================================
-def saveMolecule( molecule, fileName=None)   :
-    """save to fileName for restoring with restoreMolecule"""
-    if not fileName:
-        fileName = molecule.name + '.xml'
-    #end if
-
-    if (molecule == None):
-        NTerror("saveMolecule: molecule not defined\n")
-        return
-    #end if
-
-    obj2XML( molecule, path=fileName )
-
-    NTmessage( '==> saveMolecule: saved to %s', fileName )
-    #end if
+#def saveMolecule( molecule, fileName=None)   :
+#    """save to fileName for restoring with restoreMolecule"""
+#    if not fileName:
+#        fileName = molecule.name + '.xml'
+#    #end if
+#
+#    if (molecule == None):
+#        NTerror("saveMolecule: molecule not defined\n")
+#        return
+#    #end if
+#
+#    obj2XML( molecule, path=fileName )
+#
+#    NTmessage( '==> saveMolecule: saved to %s', fileName )
+#    #end if
 #end def
 
 #==============================================================================
-def restoreMolecule( fileName)   :
-    """restore from fileName, return Molecule instance """
-
-    mol = XML2obj( path=fileName )
-    if (mol == None): return None
-
-    mol.source = fileName
-
-    NTmessage( '==> restoreMolecule: restored %s', mol.format())
-    #end if
-
-    return mol
-#end def
+#def restoreMolecule( fileName)   :
+#    """restore from fileName, return Molecule instance """
+#
+#    mol = XML2obj( path=fileName )
+#    if (mol == None): return None
+#
+#    mol.source = fileName
+#
+#    NTmessage( '==> restoreMolecule: restored %s', mol.format())
+#    #end if
+#
+#    return mol
+##end def
 
 def rmsd( atomList ):
     """
