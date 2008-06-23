@@ -2956,6 +2956,10 @@ NTmessageNoEOL = PrintWrap(verbose=verbosityOutput,noEOL=True)
 NTcodeerror.prefix += " IN CODE"
 NTcodeerror.prefix += " EXCEPTION CAUGHT"
 
+def NTexit( msg, exitCode=1 ):
+    NTerror(msg)
+    sys.exit(exitCode)
+
 #def setVerbosity(verbosity):
 #    cing.verbosity = verbosity
 #    # Notify instances.
@@ -3770,3 +3774,13 @@ class ROGscore( NTdict ):
                 if comment not in self.colorCommentList:
                     self.colorCommentList.append( comment )
 
+def stripExtension( path ):
+    directory, basename, _extension = NTpath(path)
+    return os.path.join(directory, basename)
+            
+def stripExtensions( pathList ):
+    result = []
+    for path in pathList:
+        result.append( stripExtension(path))        
+    return result
+        

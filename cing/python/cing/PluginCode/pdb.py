@@ -194,7 +194,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
 
             # check if this chain,fullName,atmName already exists in the molecule
             # if not, add chain or residue
-            if not chainId in mol:
+            if not chainId in mol:                
                 mol.addChain( chainId )
             #end if
 
