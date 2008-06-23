@@ -13,7 +13,6 @@ from memops.general import Io as genIo # common to ccpn 1 and 2, used only by cc
 sys.stdout = _returnMyTerminal
 del(_bitBucket)
 
-from cing import NTdbGetResidue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -23,6 +22,7 @@ from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
+from cing.core.dictionaries import NTdbGetResidue
 from cing.core.molecule import Molecule
 from cing.main import format
 import os

@@ -32,8 +32,6 @@ from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
-from cing.core.constants import NOSHIFT
-from cing.core.constants import CYANA
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
@@ -2238,7 +2236,7 @@ class HTMLfile:
         self.stream.write(self.openTag('div', id = 'footer'))
         #self.defaultFooter()
         self.stream.writelines(self._footer)
-        msg = programName + ' ' + cingVersion + ' '
+        msg = programName + ' ' + `cingVersion` + ' '
         i=0
         n=len(authorList)
         for author in authorList:

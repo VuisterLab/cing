@@ -39,7 +39,7 @@ class AllChecks(TestCase):
                          suppress_small = None, separator='') 
             NTdebug( '\n%s' % strHist )
 
-    def testparse(self):        
+    def testRunWhatif(self):        
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
