@@ -56,7 +56,6 @@ format(peaks)
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import header
-from cing import programVersion
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -68,6 +67,7 @@ from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 from string import join
+from cing import cingVersion
 import cing
 import os
 import sys
@@ -178,7 +178,7 @@ def main():
     # Options
     #------------------------------------------------------------------------------------
 
-    parser = OptionParser(usage=usage, version=programVersion)
+    parser = OptionParser(usage=usage, version=cingVersion)
     parser.add_option("--test",
                       action="store_true",
                       dest="test",

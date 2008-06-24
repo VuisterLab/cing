@@ -8,12 +8,7 @@ import os
 import sys
 
 cingVersion     = 0.76
-
 programName     = 'CING'
-CING_STR        = programName # key to the entities (atoms, residues, etc under which the results will be stored
-
-programVersion  = cingVersion
-
 header = """
 ======================================================================================================
 | CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
