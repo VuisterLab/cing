@@ -8,9 +8,8 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import val2Str
-from cing.Libs.fpconst import NaN
-from unittest import TestCase
 from cing.Libs.fpconst import isNaN
+from unittest import TestCase
 import cing
 import os
 import unittest

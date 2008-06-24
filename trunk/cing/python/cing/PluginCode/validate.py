@@ -561,7 +561,6 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
 
     Optionally print output to file in analysis directory of project.
     """
-
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')

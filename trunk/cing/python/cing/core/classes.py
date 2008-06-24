@@ -236,9 +236,8 @@ Project: Top level Cing project class
 
 
     def readValidationSettings(self, fn=None):
-        if fn:
-            validationConfigurationFile = fn
-        else:
+        validationConfigurationFile = fn
+        if not fn:
             validationConfigurationFile = os.path.join(cingPythonCingDir, 'valSets.cfg')
         config = ConfigParser()
         config.readfp(open(validationConfigurationFile))

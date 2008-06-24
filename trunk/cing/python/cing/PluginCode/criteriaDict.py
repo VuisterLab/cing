@@ -1,4 +1,4 @@
-from cing import CING_STR
+from cing import programName
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.PluginCode.Whatif import WHATIF_STR
@@ -22,7 +22,7 @@ criteriaDict = {
                  },
     }
   },
-  CING_STR: {
+  programName: {
     ANY_ENTITY_LEVEL: {
     # See Fig2. in 
      'dr_maxall': { POOR_PROP:  ( OPERATION_GREATER_THAN, 0.5 ),
@@ -45,7 +45,7 @@ criteriaDict = {
   }
 }
 
-cingCriticismDict = criteriaDict[ CING_STR ]
+cingCriticismDict = criteriaDict[ programName ]
 
 #NTmessage( `criteriaDict` )
 NTdebug( "Read criteriDict.py version 0.0.0" )
