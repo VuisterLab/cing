@@ -542,6 +542,7 @@ Project: Top level Cing project class
         # Save the molecules
         for mol in self.molecules:
             mol.save( mol.objectPath)
+        mol.moleculeNames = self.molecules.names()
 
         # Save the molecules and lists
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:

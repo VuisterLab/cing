@@ -199,7 +199,7 @@ def main():
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
                      )
-    parser.add_option("--name",
+    parser.add_option("--name", "--project",
                       dest="name", default=None,
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"

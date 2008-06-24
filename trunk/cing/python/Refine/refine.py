@@ -47,9 +47,6 @@ import cing #@UnusedImport
 
 
 
-
-
-#------------------------------------------------------------------------------
 def importFromRefine( config, params, project ):
     """
     Import data from params.basePath/Refined directory as new molecule
@@ -96,7 +93,7 @@ def importFromRefine( config, params, project ):
 
 #end def
 
-#------------------------------------------------------------------------------
+
 def doSetup( config, project, basePath ):
     """Generate the directory setup and parameter.py file from project and basePath
        Export the data from project
@@ -116,6 +113,7 @@ def doSetup( config, project, basePath ):
 
     # restore the data
     project.restore()
+    NTmessage(project.format())
     if project.molecule == None:
         NTerror('doSetup: No molecule defined for project %s\n', project )
         sys.exit(1)
@@ -167,7 +165,6 @@ def doSetup( config, project, basePath ):
 #end def
 
 
-#------------------------------------------------------------------------------
 def generatePSF( config, params, doPrint = 0 ):
 
     # PSF generation
@@ -190,7 +187,7 @@ def generatePSF( config, params, doPrint = 0 ):
     psfJob.runScript()
 #end def
 
-#------------------------------------------------------------------------------
+
 def analyze( config, params, doPrint = 0 ):
 
     # first create the jobs, run later
@@ -230,7 +227,6 @@ def analyze( config, params, doPrint = 0 ):
 #end def
 
 
-#------------------------------------------------------------------------------
 def refine( config, params, doPrint = 0 ):
 
     # first create the jobs, run later
@@ -264,7 +260,6 @@ def refine( config, params, doPrint = 0 ):
         job.runScript()
     #end for
 #end def
-#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # Parsing code
@@ -437,7 +432,7 @@ class Key:
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
 
-    version = "0.7 alpha"
+    version = cing.cingVersion
     usage   = "usage: refine.py [options]"
 
     parser = OptionParser(usage=usage, version=version)
@@ -506,8 +501,20 @@ if __name__ == '__main__':
                       dest="doImport", default=False,
                       help="Import the refined structures of the refine run (default: no import)"
                      )
+    parser.add_option("-v", "--verbosity", type='int',
+                      default=cing.verbosityDefault,
+                      dest="verbosity", action='store',
+                      help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
+                     )
 
     (options, args) = parser.parse_args()
+
+    if options.verbosity >= 0 and options.verbosity <= 9:
+        cing.verbosity = options.verbosity
+    else:
+        NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+        NTerror("Ignoring setting")
+    # From this point on code may be executed that will go through the appropriate verbosity filtering
 
 
     #------------------------------------------------------------------------------
