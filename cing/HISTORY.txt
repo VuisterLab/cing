@@ -1,8 +1,4 @@
-cingVersionHistory = """
-0.75: Start of logging
-- SML 0.2: recursion
-
-0.76: 23 Jun 2008
+0.76: 23 Jun 2008: GWV
     - project.molecules is now a _ProjectList instance (used to be a NTlist instance with names)
       molecule names are stored now in moleculeNames attribute
       preferentially used the names() method of molecules, peaks, distances and rdcs to get the names of the list
@@ -21,14 +17,15 @@ cingVersionHistory = """
 
       hence
 
-      Project.decodeNameTuple( nameTuple )
+      Project.decodeNameTuple( nameTuple ); also works from the Molecule level: Molecule.DecodeNameTuple( nameTuple )
 
       Implemented for Molecule, Chain, Residue, Chain, Atom, Resonance, Coordinate
       TODO: Peak, PeakList, etc...
 
-      The 4-element nameTuple still works
+      The 4-element nameTuple still works from the Molecule level!
 
     - Hash in molecule.nameTuple
+    - SML >=0.2: recursion implemented.
     - New Molecule storage in one file using SML routines; conversion routines implemented.
     - PeakList storage updated using SML >0.2. Employs the 7-element nameTuple format.
     - Peak class updated: now has NTvalue for height and error; likewise for volume; hasHeight() and hasVolume() methods

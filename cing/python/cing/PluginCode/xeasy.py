@@ -124,17 +124,20 @@ class Xeasy( NTdict ):
     def map2molecule( self, molecule ):
         """map entries of the prot-dict onto an atom of molecule
         """
+        NTdebug('Xeasy.map2molecule: %s', molecule)
         chain = molecule.chains[0]
+        #print chain.format()
         NTdebug( 'now in XEASY#map2molecule for chain: [%s]' % ( chain.name ) )
         maxToReport = 200 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
             if not p.resNum in chain:
                 if errCount <= maxToReport:
-                    NTerror('Xeasy.map2molecule: residue "%s%d" for atom %-4s not defined in %s'%(
+                    NTerror('Xeasy.map2molecule: residue "%s %d" for atom %-4s not defined in %s'%(
                              p.resName, p.resNum, p.atomName, molecule.name ))
                 errCount += 1
                 continue
+            #end if
             res = chain[p.resNum]
             aName = translateAtomName(self.convention, p.resName, p.atomName,INTERNAL)
             if aName in res:
@@ -149,6 +152,7 @@ class Xeasy( NTdict ):
             NTerror('Xeasy.map2molecule: and so on...')
         if errCount:
             NTerror('Total number of errors: %d', errCount)
+    #end def
 
 
     def appendShifts( self, molecule)   :
@@ -157,7 +161,8 @@ class Xeasy( NTdict ):
         self.map2molecule( molecule )
 
         # first set NONE shift for all atoms
-        molecule.newResonances()
+        _root,file,ext = NTpath(self.protFile)
+        molecule.newResonances(file+ext)
 
         # now update the values
         for p in self.prot.itervalues():
@@ -202,7 +207,7 @@ class Xeasy( NTdict ):
 #                     return None
 #                 #end if
                 if not dimension:
-                    NTerror('Xeasy.importPeaks: invalid dimensionalty in file "%s" (line %d, "%s")'%(
+                    NTerror('Xeasy.importPeaks: invalid dimensionality in file "%s" (line %d, "%s")'%(
                              peakFile, f.NR, f.dollar[0]))
                     return None
                 #end if
@@ -433,7 +438,6 @@ def importXeasy( project, seqFile, protFile, convention ):
         project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Append the shifts to molecule
         project.xeasy.appendShifts( project.molecule   )
-        project.molecule.resonanceSources.append(protFile)
 
         project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
 
