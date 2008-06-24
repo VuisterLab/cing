@@ -404,7 +404,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
         #end for
     #end if
 
-    NTdebug( project.format())
+    NTdebug( 'cyana2cing: %s', project.format())
     return sources
 #end def
 

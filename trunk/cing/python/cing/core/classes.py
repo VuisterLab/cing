@@ -143,7 +143,7 @@ Project: Top level Cing project class
     """
 
 #    project.valSets.OMEGA_MAXALL_POOR = 15. # Normally 15 but may be set low for testing 1brv to
-#    OMEGA_MAXALL_BAD  = 20. # Normally 20 
+#    OMEGA_MAXALL_BAD  = 20. # Normally 20
 
     def __init__( self, name ):
 
@@ -186,7 +186,7 @@ Project: Top level Cing project class
 
         # These Project lists are dynamic and will be filled  on restoring a project
         # They also maintain some internal settings
-        # new( name ), append( instance), save(), restore() and path( name ) comprise core functionality
+        # new( name ), append( instance), save(), restore() and path( name ) and names() comprise core functionality
         self.molecules  =  _ProjectList( project     = self,
                                          classDef    = Molecule,
                                          nameListKey = 'moleculeNames',
@@ -214,15 +214,13 @@ Project: Top level Cing project class
                                        )
 
         # store reference to self
-        self[name] = self
+        #self[name] = self
         self.objectPath = self.path( cingPaths.project )
 #        self.makeObjectPaths() # generates the objectPaths dict from the nameLists
-
 
         self.rogScore   = ROGscore()
         self.valSets = NTdict()
         self.readValidationSettings(fn=None)
-        
 
         self.saveXML( 'version',
                       'name',  'created',
@@ -416,6 +414,7 @@ Project: Top level Cing project class
             pr.addHistory( 'New project'  )
             # Save the project data
             obj2XML( pr, path = pr.objectPath )
+            NTdebug('New project %s', pr)
 
         elif (status == 'create'):
             root,dummy = Project.rootPath( name )
@@ -492,6 +491,8 @@ Project: Top level Cing project class
             if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
+
+            NTdebug('Opened old project %s', pr)
 
         else:
             NTerror('ERROR Project.open: invalid status option "%s"\n', status )
@@ -624,14 +625,15 @@ Project: Top level Cing project class
     def appendMolecule( self, molecule ):
         if not molecule: return None
 
+        # Store names and references and append
+        self.molecule = molecule
+        self.molecules.append( molecule )
+
         # generate the required directories for export and HTML data
         for dir in moleculeDirectories.values():
             self.mkdir( molecule.name, dir )
         #end for
 
-        # Store names and references and append
-        self.molecule = molecule
-        self.molecules.append( molecule )
 # GV 21 Jun 08: do not know why we would need a save here
 #        self.molecule.save( path = self.molecule.objectPath )
         return self.molecule
@@ -772,7 +774,7 @@ Project: Top level Cing project class
         if not os.path.exists(pathString):
             NTwarning("No cing project is found at: " + pathString)
             return None
-        NTmessage("Removing existing cing project")
+        NTmessage('Removing existing cing project "%s"', self)
         if rmtree( pathString ):
             NTerror("Failed to remove existing cing project")
             return True
@@ -831,6 +833,7 @@ class _ProjectList( NTlist ):
         """Append instance to self, storing instance.name in project
         """
         #print '>>',instance, self.project
+        #print 'append>', instance.name,self.project.keys(),self.project.uniqueKey( instance.name )
         instance.name = self.project.uniqueKey( instance.name )
         NTlist.append( self, instance )
         # add reference in project

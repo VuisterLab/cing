@@ -30,6 +30,7 @@ from cing.Libs import PyMMLib
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTdetail
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
@@ -115,7 +116,7 @@ def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
     #end if
     molecule.modelCount += modelCount
 
-    NTmessage( 'read %d records; added %d structure models', len(pdb), modelCount )
+    NTdetail( 'importFromPDB: read %d records; added %d structure models', len(pdb), modelCount )
     #end if
 
     del( pdb )
@@ -221,7 +222,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
     # Patch to get modelCount right for X-ray structures with only one model
     if not foundModel:
         mol.modelCount += 1
-    NTmessage( '==> PDB2Molecule: completed, added %d structure models', mol.modelCount )
+    NTdetail( '==> PDB2Molecule: new Molecule %s from %s', mol, pdbFile )
     # delete the PyMMlib pdbFile instance # JFD: why?
     del(pdb)
     return mol
