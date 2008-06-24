@@ -36,17 +36,28 @@ format file:
 
 
     """
-
+    atomDict = molecule._getAtomDict(IUPAC)
     for line in AwkLike( fileName, commentString = '#', minNF = 4 ):
         if (line.float(4) != -666.000):
             lineCol1 = int(line.dollar[1].strip('*'))
-            atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, line.dollar[3]) )
-            if not atm:
-                atm = molecule.decodeNameTuple( (IUPAC, None, lineCol1, line.dollar[3]), fromCYANA2CING=True )
+            if chainId != None:
+                atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, line.dollar[3]) )
+            else:
+                atm =None
+                if atomDict.has_key( (lineCol1,line.dollar[3]) ):
+                    atm = atomDict[ (lineCol1,line.dollar[3]) ]
+            #end if
+#            if not atm:
+#                atm = molecule.decodeNameTuple( (IUPAC, None, lineCol1, line.dollar[3]), fromCYANA2CING=True )
+
             if not atm:
                 NTerror('parseShiftxOutput: chainId [%s] line %d (%s)\n', chainId, line.NR, line.dollar[0] )
             else:
                 atm.shiftx.append( line.float(4) )
+            #end if
+        #end if
+    #end for
+#end def
 
 def predictWithShiftx( project, model=None   ):
     """

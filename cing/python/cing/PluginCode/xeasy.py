@@ -125,20 +125,18 @@ class Xeasy( NTdict ):
         """map entries of the prot-dict onto an atom of molecule
         """
         NTdebug('Xeasy.map2molecule: %s', molecule)
-        chain = molecule.chains[0]
-        #print chain.format()
-        NTdebug( 'now in XEASY#map2molecule for chain: [%s]' % ( chain.name ) )
+        resNumDict = molecule._getResNumDict()
         maxToReport = 200 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
-            if not p.resNum in chain:
+            if not p.resNum in resNumDict:
                 if errCount <= maxToReport:
                     NTerror('Xeasy.map2molecule: residue "%s %d" for atom %-4s not defined in %s'%(
                              p.resName, p.resNum, p.atomName, molecule.name ))
                 errCount += 1
                 continue
             #end if
-            res = chain[p.resNum]
+            res = resNumDict[p.resNum]
             aName = translateAtomName(self.convention, p.resName, p.atomName,INTERNAL)
             if aName in res:
                 p.atom = res[aName]

@@ -123,13 +123,17 @@ def importAco( project, acoFile, convention ):
     #end if
 
     dir,name,_ext = NTpath( acoFile )
-    result       = project.dihedrals.new( name=name, status='keep')
+    result     = project.dihedrals.new( name=name, status='keep')
+    resNumDict = molecule._getResNumDict()
 
     NTdebug("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
+
         resNum = line.int(1)
-        res    = molecule.decodeNameTuple( (convention, None, resNum, None ),
-                                           fromCYANA2CING=True )
+        res    = None
+        if resNum in resNumDict:
+            res = resNumDict[resNum]
+
         angle  = line.dollar[3]
         lower  = line.float(4)
         upper  = line.float(5)
@@ -184,27 +188,30 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     #end if
 
     dir,name,_ext = NTpath( uplFile )
-#    result       = project.newDistanceRestraintList( name )
-    result       = project.distances.new( name=name, status='keep')
+    result        = project.distances.new( name=name, status='keep')
+    atomDict      = molecule._getAtomDict(convention)
 
-    for line in AwkLike( uplFile, commentString="#" ):
-        if line.isComment():
-#            NTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
-            continue
-        if line.NF < 7:
-#            NTdebug("Skipping upl file line with too few fields: [" + line.dollar[0] +']')
-            continue
+    for line in AwkLike( uplFile, commentString="#", minNF=7 ):
+#        if line.isComment():
+##            NTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
+#            continue
+#        if line.NF < 7:
+##            NTdebug("Skipping upl file line with too few fields: [" + line.dollar[0] +']')
+#            continue
         atmIdxList = [[1,3],[4,6]]
         atmList = []
         i=0
         for atmIdx in atmIdxList:
 #            NTdebug("Doing atmIdx: " + `atmIdx`)
-            atm = molecule.decodeNameTuple( (convention, None, line.int(atmIdx[0]), line.dollar[atmIdx[1]]),
-                                            fromCYANA2CING=True)
+            t = (line.int(atmIdx[0]), line.dollar[atmIdx[1]])
+            atm = None
+            if atomDict.has_key(t):
+                atm = atomDict[t]
+#            atm = molecule.decodeNameTuple( (convention, None, line.int(atmIdx[0]), line.dollar[atmIdx[1]]),
+#                                            fromCYANA2CING=True)
             if not atm:
                 if errorCount <= maxErrorCount:
-                    NTerror("Failed to decode for atom: ["+`i+1`+"] the tuple (residue number and atom name) ["+
-                               `line.int(atmIdx[0])` +'], ['+ line.dollar[atmIdx[1]]+'] for line: [' + line.dollar[0] +']')
+                    NTerror('Failed to decode for atom %s; line: %s', t, line.dollar[0] )
                 if errorCount == maxErrorCount+1:
                     NTerror("And so on")
                 errorCount += 1
@@ -239,6 +246,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
             r.SUP = line.float( 11 )
         if line.NF >= 13:
             r.QF = line.float( 13 )
+    #end for
     if errorCount:
         NTerror("Found number of errors importing upl file: " + `errorCount`)
 

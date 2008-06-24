@@ -266,7 +266,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return self.subNodes( depth = 3 )
     #end def
 
-    def decodeNameTuple( self, nameTuple, fromCYANA2CING=False ):
+    def decodeNameTuple( self, nameTuple ):
         """
             Decode a 7-element nameTuple
                 (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
@@ -283,12 +283,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             Caller is responsible for relaying error messages but debug
             statements within can be enabled from code.
 
-            fromCYANA2CING can be set in which case all chains will be searched
-            for the requested residue or atom. This is needed when reading
-            CYANA restraints without chain ids but numbering that is non-overlapping
-            between CING's residue numbering. E.g. in entry 1y4o there are chains:
-            A and B in PDB but just [1-104] and [201-304] in the upls.
-        """
+         """
 #        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
         if nameTuple == None: return None
 
@@ -305,90 +300,89 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
         if moleculeName != self.name: return None
 
-        if not fromCYANA2CING:
-            if chainName == None:
-                return self
-            # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
-    #        if not chainName in self:
+#        if not fromCYANA2CING:
+        if chainName == None:
+            return self
 
-            if not self.has_key(chainName):
-    #            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
-                return None
-
-            chain = self[chainName]
-
-            if resNum == None:
-                self._nameTupleDict[nameTuple] = chain
-                return chain
-
-            if not chain.has_key(resNum):
-    #            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
-                return None
-            res = chain[resNum]
-
-            if atomName == None:
-               self._nameTupleDict[nameTuple] = res
-               return res
-
-            resTranslated = res.translate(convention)
-            an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
-    #        if (not an or (an not in res)): return None
-            if not an:
-    #            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
-                return None
-
-            if not res.has_key(an):
-    #            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
-                return None
-
-            atm = res[an]
-            if resonanceIndex == None and model == None:
-                self._nameTupleDict[nameTuple] = atm
-                return atm
-
-            if model != None and resonanceIndex == None and model<len(atm.coordinates):
-                c = atm.coordinates[model]
-                self._nameTupleDict[nameTuple] = c
-                return c
-
-            if model == None and resonanceIndex != None and resonanceIndex<len(atm.resonances):
-                r = atm.resonances[resonanceIndex]
-                self._nameTupleDict[nameTuple] = r
-                return r
-
+        # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
+        if not self.has_key(chainName):
+#            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
             return None
 
-        else: # fromCYANA2CING
-            if chainName != None:
-                NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
-                return None
+        chain = self[chainName]
 
-            for chain in self.allChains():
-                if resNum == None:
-                    return chain
+        if resNum == None:
+            self._nameTupleDict[nameTuple] = chain
+            return chain
 
-                if not chain.has_key(resNum):
-#                    NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
-                    continue # perhaps in other chain?
-                res = chain[resNum]
-
-                if atomName == None:
-                    return res
-
-                resTranslated = res.translate(convention)
-                an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
-
-                if not an:
-                    NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
-                    return None
-
-                if not res.has_key(an):
-                    NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
-                    return None
-                return res[an]
-            NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
+        if not chain.has_key(resNum):
+#            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
             return None
-        # end else
+        res = chain[resNum]
+
+        if atomName == None:
+           self._nameTupleDict[nameTuple] = res
+           return res
+
+        resTranslated = res.translate(convention)
+        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
+#        if (not an or (an not in res)): return None
+        if not an:
+#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+            return None
+
+        if not res.has_key(an):
+#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+            return None
+
+        atm = res[an]
+        if resonanceIndex == None and model == None:
+            self._nameTupleDict[nameTuple] = atm
+            return atm
+
+        if model != None and resonanceIndex == None and model<len(atm.coordinates):
+            c = atm.coordinates[model]
+            self._nameTupleDict[nameTuple] = c
+            return c
+
+        if model == None and resonanceIndex != None and resonanceIndex<len(atm.resonances):
+            r = atm.resonances[resonanceIndex]
+            self._nameTupleDict[nameTuple] = r
+            return r
+
+        return None
+
+#        else: # fromCYANA2CING
+#            if chainName != None:
+#                NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
+#                return None
+#
+#            for chain in self.allChains():
+#                if resNum == None:
+#                    return chain
+#
+#                if not chain.has_key(resNum):
+##                    NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+#                    continue # perhaps in other chain?
+#                res = chain[resNum]
+#
+#                if atomName == None:
+#                    return res
+#
+#                resTranslated = res.translate(convention)
+#                an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
+#
+#                if not an:
+#                    NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+#                    return None
+#
+#                if not res.has_key(an):
+#                    NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#                    return None
+#                return res[an]
+#            NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
+#            return None
+#        # end else
     #end def
 
     def nameTuple(self,convention=INTERNAL):
@@ -416,6 +410,40 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return None
     #end def
 
+    def _getResNumDict(self):
+        """
+        Return dict instance with resNum, Residue mappings.
+        For decoding usage with CYANA/XEASY routines
+        """
+        resNumDict = dict()
+        for res in self.allResidues():
+            if resNumDict.has_key(res.resNum):
+                NTerror('Molecule._getResNumDict: multiple mapped residues (%s,%s)',
+                        res, resNumDict[res,resNum]
+                       )
+            resNumDict[res.resNum] = res
+        #end for
+        return resNumDict
+    #end def
+
+    def _getAtomDict(self, convention=INTERNAL):
+        """
+        Return a dict instance with (resNum, atomName), Atom mappings.
+        NB. atomName according to convention
+        For decoding usage with CYANA/XEASY routines
+        """
+        atomDict = NTdict()
+        for atm in self.allAtoms():
+            aname = atm.translate(convention)
+            t = (atm.residue.resNum, aname)
+            if atomDict.has_key( t ):
+                NTerror('Molecule._getAtomDict: multiple mapped atoms (%s,%s)',
+                        atm, atmDict[t]
+                       )
+            atomDict[t] = atm
+        #end for
+        return atomDict
+    #end def
 
     def ranges2list( self, ranges ):
         """
