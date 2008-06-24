@@ -277,14 +277,19 @@ atom stereo "HA1  HA2   519"   # GLY
         return None
 
     molecule = project.molecule
+    atomDict = molecule._getAtomDict(convention)
     count = 0
     for line in AwkLike( stereoFileName, minNF=5 ):
         if line.dollar[1] == 'atom' and line.dollar[2] == 'stereo':
             resnum = int (line.dollar[5].strip('"') )
             for i in [3,4]:
-                atm = molecule.decodeNameTuple( (convention, 'A', resnum, line.dollar[i].strip('"')) )
+                atm = None
+                t = (resnum, line.dollar[i].strip('"'))
+                if atomDict.has_key(t):
+                    atm = atomDict[t]
+#                atm = molecule.decodeNameTuple( (convention, 'A', resnum, line.dollar[i].strip('"')) )
                 if atm == None:
-                    NTerror(' importCyanaStereoFile: atom %s; line %d (%s)\n', line.dollar[i], line.NR, line.dollar[0] )
+                    NTerror('importCyanaStereoFile: atom %s; line %d (%s)\n', line.dollar[i], line.NR, line.dollar[0] )
                 else:
                     atm.stereoAssigned = True
                     count += 1

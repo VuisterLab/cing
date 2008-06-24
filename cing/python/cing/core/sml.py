@@ -10,6 +10,7 @@ from cing.Libs.NTutils import NTdict
 # do not remove these two: they are needed during parsing of the sml files
 from cing.Libs.NTutils import NTfill  #@UnresolvedImport
 from cing.Libs.NTutils import NTvalue #@UnresolvedImport
+from cing.core.molecule import Coordinate #@UnresolvedImport
 
 from cing.core.molecule import Molecule
 from cing.core.molecule import Chain
