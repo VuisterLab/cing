@@ -7,8 +7,8 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
@@ -25,7 +25,7 @@ class AllChecks(TestCase):
         entryId = "1brv_1model" # Small much studied PDB NMR entry 
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         ranges = None
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         restraintsConvention = CYANA
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
@@ -34,7 +34,7 @@ class AllChecks(TestCase):
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
         if entryId.startswith("1brv"):
-            pdbConvention = CYANA
+            pdbConvention = IUPAC
             
         if entryId == "2hgh":
             # Note that CING doesn't support chain ids in range selection for procheck. TODO

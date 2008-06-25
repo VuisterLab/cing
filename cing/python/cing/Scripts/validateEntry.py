@@ -7,8 +7,8 @@ from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 import cing
@@ -41,7 +41,7 @@ def main(entryId, *extraArgList):
     pdbFilePath = os.path.join( inputDir, pdbFileName)
     
     if True:
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
         if entryId.startswith("2hgh"):

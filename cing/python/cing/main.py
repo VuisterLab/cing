@@ -165,6 +165,7 @@ def testOverall():
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite)
+        NTmessage('\n\n\n')
 
 
 project = None # after running main it will be filled.

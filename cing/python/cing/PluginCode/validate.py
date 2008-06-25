@@ -74,7 +74,6 @@ from cing.core.classes import AtomList
 from cing.core.classes import HTMLfile
 from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import NOSHIFT
 from cing.core.constants import PDB
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
@@ -132,23 +131,23 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
         doProcheck = False
 
     if not doWhatif:
-        NTwarning('Skipping because not doWhatif')
+        NTmessage('Skipping because not doWhatif')
     else:
         project.runWhatif()
 
     if not doProcheck:
-        NTwarning('Skipping because not doProcheck')
+        NTmessage('Skipping because not doProcheck')
     else:
         project.procheck( ranges=ranges)
     project.criticizeByAll()
-    project.summary()
+    project.summary(doWhatif, doProcheck)
 #end def
 
 def criticizeByAll( project ):
     project.criticize()
     criticizeByWhatif( project )
 
-def summary( project ):
+def summary( project, doWhatif, doProcheck ):
     if not project.molecule:
         NTerror('Strange, there was no molecule in this project')
         return
@@ -220,13 +219,15 @@ Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
     if wiSummary:
         msg += '\n' + wiSummary
     else:
-        NTwarning('Failed to find whatif summary ')
+        if doWhatif:
+            NTerror('Failed to find whatif summary ')
 
     pcSummary = getDeepByKeys(project.molecule, 'pcSummary') # Hacked bexause should be another procheck level inbetween.
     if pcSummary:
         msg += '\n' + pcSummary +'\nThe above summary of ProcheckNMR might be incomplete'
     else:
-        NTwarning('Failed to find procheck summary')
+        if doProcheck:
+            NTerror('Failed to find procheck summary')
 
     fprintf( fp, msg )
     fp.close()
@@ -1054,7 +1055,7 @@ def validateAssignments( project, toFile = True   ):
             rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
             davStr     = val2Str(dav,   '%6.2f', 6 )
             dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-            valueStr   = val2Str(value, '%6.2f', 6, nullValue=NOSHIFT ) # was sometimes set to a NOSHIFT
+            valueStr   = val2Str(value, '%6.2f', 6 ) # was sometimes set to a NOSHIFT
             if valueStr==NaNstring:
                 error=None
             errorStr   = val2Str(error, '%6.2f', 6 )
@@ -1942,7 +1943,7 @@ def setupHtml(project):
         rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
         davStr     = val2Str(dav,   '%6.2f', 6 )
         dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-        valueStr   = val2Str(value, '%6.2f', 6, nullValue=NOSHIFT ) # was sometimes set to a NOSHIFT
+        valueStr   = val2Str(value, '%6.2f', 6 ) # was sometimes set to a NOSHIFT
         if valueStr==NaNstring:
             error=None
         errorStr   = val2Str(error, '%6.2f', 6 )
@@ -2032,7 +2033,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
     '''
 
     if htmlOnly:
-        NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
+        NTmessage('Skipping export of molecular imagery to gif because htmlOnly is True')
     else:
         molGifFileName = "mol.gif"
         pathMolGif = project.path(molGifFileName)
@@ -2072,7 +2073,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
 
                 if htmlOnly:
                     pass
-#                    NTwarning('Skipping export of molecular imagery to gif because htmlOnly is True')
+#                    NTmessage('Skipping export of molecular imagery to gif because htmlOnly is True')
                 else:
     #                    NTdebug(msg)
                     # 0: angle 1 name
@@ -2486,7 +2487,7 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
         NTerror("Failed to populateHtmlMolecules")
 
     if htmlOnly:
-        NTwarning('Skipping populateHtmlModels')
+        NTmessage('Skipping populateHtmlModels')
     else:
         if populateHtmlModels(project):
             NTerror("Failed to populateHtmlModels")

@@ -13,7 +13,7 @@ from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from matplotlib.numerix.mlab import amax
 from numpy.core.arrayprint import array2string
 from numpy.core.arrayprint import set_printoptions
@@ -45,7 +45,7 @@ class AllChecks(TestCase):
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
         entryId = "1brv_1model" 
 #        entryId = "1tgq_1model" 
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         
         os.chdir(cingDirTmp)
         project = Project( entryId )

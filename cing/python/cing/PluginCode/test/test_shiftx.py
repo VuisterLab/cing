@@ -4,9 +4,9 @@ from cing import verbosityDebug
 from cing import verbosityError
 from cing import verbosityNothing
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
+from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
@@ -17,7 +17,7 @@ import unittest
 class AllChecks(TestCase):
  
     def testRun(self):
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
 #        entryId = "1brv" # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model" 
@@ -31,6 +31,8 @@ class AllChecks(TestCase):
             pdbConvention = CYANA
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
+        if entryId.startswith("1brv"):
+            pdbConvention = IUPAC
         if entryId.startswith("H2_2Ca_53"):
             pdbConvention = CYANA2
         self.failIf( os.chdir(cingDirTmp), msg=

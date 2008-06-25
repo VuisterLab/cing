@@ -7,6 +7,7 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.core.classes import Project
 from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
@@ -29,7 +30,7 @@ class AllChecks(TestCase):
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
         if entryId.startswith("1brv"):
-            pdbConvention = CYANA
+            pdbConvention = IUPAC
         
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
