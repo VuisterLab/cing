@@ -85,6 +85,12 @@
         	enable the below exclude afterwards.-->
             <fileset dir="${server.local.dir}" excludes="example/**"/>                     
         </scp>
+        <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}/example/"
+                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
+            port="${server.cgi.port}"
+            verbose="true">
+            <fileset dir="${server.local.dir}/example"/>                     
+        </scp>
         <echo message="DEBUG: Copy to ${tmp.local.dir}"/>        
         <copy todir="${tmp.local.dir}" file="${server.local.dir}/${server.web.prog}" overwrite="true" verbose="true" />
         <!-- special case for localizing the server setting in the html code.
