@@ -135,10 +135,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
+        ...
 
     Methods inherited from NTdict:
-        format()                : Return a formatted string of with values of selected fields.
-        getAttr()       : Print a list of all attributes and their values.
+        printAttr()             : Print a list of all attributes and their values.
+        ....
 
     all dict methods
 
@@ -161,6 +162,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
 #        self._coordinates = NTlist()        # internal array with coordinate references
         self._nameTupleDict   = {}           # Internal namedict for decodeNameTuple
+        self._dihedralDict    = {}           # dihedralDict[(atoms1, atom2, atom3,atom4)] = (<Residue>, angleName, <AngleDef>)
+                                             # will be filled by calling dihedral method of residue
 
         self.xeasy            = None         # reference to xeasy class, used in parsing
         self.rogScore         = ROGscore()
@@ -913,12 +916,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
-        if self.modelCount <= 0:
-            NTdebug('No models so skipping calculating dihedral angles')
-            return
+#        if self.modelCount <= 0:
+#            NTdebug('No models so skipping calculating dihedral angles')
+#            return
 
         NTdebug('Calculating dihedral angles')
-        self.dihedralDict = {} # will be filled by calling dihedral method of residue
         for res in self.allResidues():
             for dihedral in res.db.dihedrals:
                 res.dihedral( dihedral.name )
@@ -1238,7 +1240,7 @@ Chain class: defines chain properties and methods
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        getAttr()       : Print a list of all attributes and their values.
+        printAttr()             : Print a list of all attributes and their values.
 
     all dict methods
     """
@@ -1440,7 +1442,7 @@ Residue class: Defines residue properties
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        getAttr()       : Print a list of all attributes and their values.
+        printAttr()            : Print a list of all attributes and their values.
 
     all dict methods
 
@@ -1454,7 +1456,7 @@ Residue class: Defines residue properties
         self.atomCount = 0
         self.chain     = self._parent
 
-        self._nameResidue( resName, resNum )
+        self._nameResidue( resName, resNum ) # sets all naming and links correctly
         self.saveXML('resName','resNum')
         self.rogScore = ROGscore()
 
@@ -1641,9 +1643,17 @@ Residue class: Defines residue properties
         self[dihedralName].residue  = self             # linkage to self
 
         # Get/Check the topology
+        self[dihedralName].atoms  = None
         atoms = translateTopology( self, self.db[dihedralName].atoms )
         if atoms == None or len(atoms) != 4 or None in atoms:
             return None
+        self[dihedralName].atoms  = atoms
+
+        #add dihedral to dict for lookup later
+        self.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
+            (self, dihedralName, self.db[dihedralName])
+        self.chain.molecule._dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
+            (self, dihedralName, self.db[dihedralName])
 
         # Check if all atoms have the same number of coordinates
         l = len( atoms[0].coordinates)
@@ -1652,13 +1662,6 @@ Residue class: Defines residue properties
                 return None
             #end if
         #end for
-
-        #add dihedral to dict for lookup later
-        self.chain.molecule.dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
-            (self, dihedralName, self.db[dihedralName])
-        self.chain.molecule.dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
-            (self, dihedralName, self.db[dihedralName])
-
 
         for i in range(0,l):
             self[dihedralName].append( NTdihedralOpt(
@@ -1853,7 +1856,7 @@ Atom class: Defines object for storing atom properties
 
     Methods inherited from NTdict:
         format()                : Return a formatted string of with values of selected fields.
-        getAttr()       : Print a list of all attributes and their values.
+        printAttr()             : Print a list of all attributes and their values.
 
     all dict methods
 
@@ -1873,7 +1876,7 @@ Atom class: Defines object for storing atom properties
 
         self.resonances  = NTlist()
         self.coordinates = NTlist()
-        self.rogScore = ROGscore()
+        self.rogScore    = ROGscore()
 
         self.saveXML('resName', 'resonances','coordinates')
 

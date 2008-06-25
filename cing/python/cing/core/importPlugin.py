@@ -67,7 +67,7 @@ def importPlugin( pluginName ):
         #end if
     #end for
 
-    # msg = plugin.getAttr()
+    # msg = plugin.printAttr()
 
 #    NTmessage('==> Staged plugin ' + plugin.module.__file__ )
     #end if

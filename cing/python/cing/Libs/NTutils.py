@@ -954,9 +954,9 @@ class NTdict(dict):
         Methods:
             __call__( **kwds )                            Calling will update kwds and return self
 
-            format( format=None ):                        Format the object according to format or __FORMAT__ (when
+            format( format=None )                         Format the object according to format or __FORMAT__ (when
                                                           format == None) attribute.
-            getAttr( hidden=0 ):     Print all attributes to stream (mainly for debugging purposes).
+            printAttr( hidden=0 )                         Print all attributes to stream (mainly for debugging purposes).
                                                           Also print 'hidden' attributes when hidden!=0.
 
             getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise
@@ -1123,8 +1123,8 @@ class NTdict(dict):
     #end def
 
 
-    def getAttr( self, stream=sys.stdout, hidden=0 ):
-        """Get attributes of structure
+    def printAttr( self, stream=sys.stdout, hidden=0 ):
+        """print attributes of structure; mainly fo debugging.
         """
         msg = sprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
         # append hidden keys if asked for
@@ -3828,9 +3828,9 @@ class ROGscore( NTdict ):
 def stripExtension( path ):
     directory, basename, _extension = NTpath(path)
     return os.path.join(directory, basename)
-            
+
 def stripExtensions( pathList ):
     result = []
     for path in pathList:
-        result.append( stripExtension(path))        
+        result.append( stripExtension(path))
     return result
