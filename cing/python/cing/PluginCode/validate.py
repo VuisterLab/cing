@@ -358,9 +358,9 @@ def calculateRmsd( project, ranges=None, models = None   ):
                 if atm.hasProperties('backbone','notproton'):
                     if d==None:
                         if shownWarningCount1 < 10:
-                            NTerror('Error calculateRmsd: expected coordinates1 for atom %s\n', atm)
+                            NTerror('Error calculateRmsd: expected coordinates1 for atom %s', atm)
                         elif shownWarningCount1 == 10:
-                            NTerror('and so on\n')
+                            NTerror('and so on')
                         shownWarningCount1 += 1
                     else:
                         res.rmsd.backbone[num] += d
@@ -667,13 +667,13 @@ def validateSaltbridge( residue1, residue2 ):
     #end if
 
     if residue1.db.shortName not in ['E','D','H','K','R']:
-        NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R\n', residue1)
+        NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue1)
         return None
     #end if
 
 
     if residue2.db.shortName not in ['E','D','H','K','R']:
-        NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R\n', residue2)
+        NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue2)
         return None
     #end if
 
@@ -681,7 +681,7 @@ def validateSaltbridge( residue1, residue2 ):
         for atmName in centroids[residue.db.shortName]:
             atm = residue[atmName]
             if len(atm.coordinates) == 0:
-                NTerror('validateSaltbridge: no coordinates for atom %s\n', atm)
+                NTerror('validateSaltbridge: no coordinates for atom %s', atm)
                 return None
             #end if
         #end for
@@ -1175,7 +1175,7 @@ def validateModels( self)   :
         #end for
     #end for
     for m, count in self.models.items():
-        NTmessage('Model %2d: %2d backbone dihedral outliers', m, count )
+        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
 #end def
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):

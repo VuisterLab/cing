@@ -65,7 +65,7 @@ def importBMRB( project, bmrbFile =None ):
     """
 
     if not project.molecule:
-        NTerror("Error importBMRB: no molecule defined\n" )
+        NTerror("Error importBMRB: no molecule defined" )
         return None
     #end if
 

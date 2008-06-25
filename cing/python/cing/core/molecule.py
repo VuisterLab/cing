@@ -2994,7 +2994,7 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
 #    #end if
 #
 #    if (molecule == None):
-#        NTerror("saveMolecule: molecule not defined\n")
+#        NTerror("saveMolecule: molecule not defined")
 #        return
 #    #end if
 #

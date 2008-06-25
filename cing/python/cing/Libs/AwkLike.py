@@ -93,14 +93,14 @@ class AwkLike:
         try:
             return float( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -111,14 +111,14 @@ class AwkLike:
         try:
             return int( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -220,14 +220,14 @@ class AwkLikeS:
         try:
             return float( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -241,14 +241,14 @@ class AwkLikeS:
         try:
             return int( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")\n',
+            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,

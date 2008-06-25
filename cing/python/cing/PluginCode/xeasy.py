@@ -199,7 +199,7 @@ class Xeasy( NTdict ):
 #                 elif (f.NF == 13 or f.NF == 14 or (f.NF>):
 #                     dimension = 3
 #                 else:
-#                     NTerror('Xeasy.importPeaks: invalid number of fields (%d) in file "%s" on line %d (%s)\n',
+#                     NTerror('Xeasy.importPeaks: invalid number of fields (%d) in file "%s" on line %d (%s)',
 #                              f.NF, peakFile, f.NR, f.dollar[0]
 #                            )
 #                     return None
@@ -245,7 +245,7 @@ class Xeasy( NTdict ):
                         resonances.append( None )
                     else:
                         if not aIndex in self.prot:
-                            NTerror('Xeasy.importPeaks: invalid atom id %d on line %d (%s)\n',
+                            NTerror('Xeasy.importPeaks: invalid atom id %d on line %d (%s)',
                                      aIndex, f.NR, f.dollar[0]
                                    )
                             error = 1
@@ -284,7 +284,7 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
 
     """
     if not molecule:
-        NTerror( 'Error exportShifts2Xeasy: undefined molecule\n' )
+        NTerror( 'Error exportShifts2Xeasy: undefined molecule' )
         return
     #end if
 
@@ -294,7 +294,7 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
     for res in allResidues( molecule ):
         resName = res.translate(convention)
         if (resName != None):
-            fprintf( fout, '%3s %4d\n',
+            fprintf( fout, '%3s %4d',
                      resName,
                      res.resNum
                    )
@@ -345,11 +345,11 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
        xeasyIndex: for peak
     """
     if peakList==None:
-        NTerror('exportPeaks2Xeasy: undefined peak list\n' )
+        NTerror('exportPeaks2Xeasy: undefined peak list' )
         return
     #end if
     if len(peakList) == 0:
-        NTerror('exportPeaks2Xeasy: zero-length peak list\n' )
+        NTerror('exportPeaks2Xeasy: zero-length peak list' )
         return
     #end if
 
@@ -453,27 +453,27 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
         return PeakList instance or None on error
         """
         if seqFile == None:
-            NTerror('importXeasyPeaks: undefined seqFile\n' )
+            NTerror('importXeasyPeaks: undefined seqFile' )
             return None
         #end if
         if protFile == None:
-            NTerror('importXeasyPeaks: undefined protFile\n' )
+            NTerror('importXeasyPeaks: undefined protFile' )
             return None
         #end if
         if peakFile == None:
-            NTerror('importXeasyPeaks: undefined peakFile\n' )
+            NTerror('importXeasyPeaks: undefined peakFile' )
             return None
         #end if
         if not os.path.exists( seqFile ):
-            NTerror('importXeasyPeaks: seqFile "%s" not found\n', seqFile )
+            NTerror('importXeasyPeaks: seqFile "%s" not found', seqFile )
             return None
         #end if
         if not os.path.exists( protFile ):
-            NTerror('importXeasyPeaks: protFile "%s" not found\n', protFile )
+            NTerror('importXeasyPeaks: protFile "%s" not found', protFile )
             return None
         #end if
         if not os.path.exists( peakFile ):
-            NTerror('importXeasyPeaks: peakFile "%s" not found\n', peakFile )
+            NTerror('importXeasyPeaks: peakFile "%s" not found', peakFile )
             return None
         #end if
 

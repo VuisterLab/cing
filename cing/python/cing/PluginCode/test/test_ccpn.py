@@ -5,6 +5,7 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDetail
+from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import CYANA
@@ -48,13 +49,22 @@ class AllChecks(TestCase):
         entryId = "1brv" # Small much studied PDB NMR entry
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
-        project = Project( entryId )
-        self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
+        self.assertTrue(project, 'Failed opening project: ' + entryId)
+
         ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId)
-        project.initCcpn(ccpnFile=ccpnFile)
+        self.assertFalse(project.initCcpn(ccpnFile=ccpnFile))
         self.failIf(project.save())
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
+        
+        self.assertFalse(project.validate(htmlOnly=htmlOnly,
+                                          doProcheck = doProcheck,
+                                          doWhatif=doWhatif ))
+        
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
+    cing.verbosity = verbosityOutput
     unittest.main()

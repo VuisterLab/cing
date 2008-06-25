@@ -140,6 +140,7 @@ class Whatif( NTdict ):
                 ('MO2CHK', 'Missing C-terminal oxygen atoms', 'Missing C-terminal oxygen atoms'),
                 ('NAMCHK', 'Atom names', 'Atom names'),
                 ('NQACHK', 'Qualities',                                                 'New quality'),
+                ('NTCHK',  'Acid group conformation check',                             'COOH check'),
                 ('PC2CHK', 'Proline puckers', 'Proline puckers'),
                 ('PDBLST', 'List of residues', 'List of residues'),
                 ('PL2CHK', 'Connections to aromatic rings',                             'Plan. to aromatic'),

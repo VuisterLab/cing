@@ -110,7 +110,7 @@ def importAco( project, acoFile, convention ):
     errorCount = 0
     # check the molecule
     if (not project or not project.molecule ):
-        NTerror("importAco: initialize molecule first\n")
+        NTerror("importAco: initialize molecule first")
         return None
     #end if
     molecule = project.molecule

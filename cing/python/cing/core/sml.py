@@ -97,7 +97,7 @@ Example file:
 #            if len(line) > 0 and SMLendhandlers.has_key(line[1]):
 #                handler = SMLendhandlers[line[1]]
 #                if (handler != self):
-#                    NTerror('Error SMLhandler.listHandler: badly formed SML list (%s)\n', line[1] )
+#                    NTerror('Error SMLhandler.listHandler: badly formed SML list (%s)', line[1] )
 #                    return None
 #                #end if
 #                handler.endHandler( listObj, obj )
@@ -140,7 +140,7 @@ Example file:
 #            if len(line) > 0 and SMLendhandlers.has_key(line[1]):
 #                handler = SMLendhandlers[line[1]]
 #                if (handler != self):
-#                    NTerror('Error SMLhandler.dictHandler: badly formed SML list (%s)\n', line[0] )
+#                    NTerror('Error SMLhandler.dictHandler: badly formed SML list (%s)', line[0] )
 #                    return None
 #                #end if
 #                handler.endHandler( dictObj, obj )
@@ -153,10 +153,10 @@ Example file:
 #            elif len(line) > 3:
 #                dictObj[line[1]] = eval(''.join(line[3:]))
 #            else:
-#                NTerror('Error SMLhandler.dictHandler: incomplete line "%s"\n', line[0])
+#                NTerror('Error SMLhandler.dictHandler: incomplete line "%s"', line[0])
 #            #end if
 #            line = SMLhandler.readline( fp )
-#            if self.debug: printf('%s> %s\n', self, line)
+#            if self.debug: printf('%s> %s', self, line)
 
             if len(line) > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )

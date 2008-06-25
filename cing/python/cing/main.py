@@ -412,7 +412,7 @@ def main():
     if options.xeasy:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 3):
-            NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required\n")
+            NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required")
         else:
             project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
 
@@ -422,7 +422,7 @@ def main():
     if options.xeasyPeaks:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 4):
-            NTerror("--xeasyPeaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required\n")
+            NTerror("--xeasyPeaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
 
@@ -439,7 +439,7 @@ def main():
     if (options.generatePeaks):
         gp = options.generatePeaks.split(',')
         if len(gp) != 2:
-            NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required\n")
+            NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
         else:
             peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] ) #@UnusedVariable
         #end if

@@ -2394,15 +2394,15 @@ class HTMLfile:
         '''
 
         if not section:
-            NTerror("No HTML section defined here\n")
+            NTerror("No HTML section defined here")
             return None
 
         if not source:
-            NTerror("No Cing object source defined here\n")
+            NTerror("No Cing object source defined here")
             return None
 
         if not destination:
-            NTerror("No Cing object destination defined here\n")
+            NTerror("No Cing object destination defined here")
             return None
 
         link = self.findHtmlLocation( source, destination, id )

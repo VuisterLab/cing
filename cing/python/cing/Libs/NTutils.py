@@ -2224,7 +2224,7 @@ class XMLhandler:
             return None
         #end if
         result = node.childNodes[0].nodeValue
-#        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s",repr(node), result)
         return result
     #end def
 
@@ -2240,7 +2240,7 @@ class XMLhandler:
                 result.append( NThandle( subNode) )
             #end if
         #end for
-#        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s",repr(node), result)
         return  result
     #end def
 
@@ -2303,13 +2303,13 @@ class XMLhandler:
 #            print ">>", keyName, value
             result[keyName] = value
         #end while
-#        NTdebug("==>%s %s\n",repr(node), result)
+#        NTdebug("==>%s %s",repr(node), result)
         return result
     #end def
 
     def printDebugNode( self, node ):
         pass
-#        NTdebug("   %s, type %s, subnodes %d\n", str(node), node.nodeType, len(node.childNodes) )
+#        NTdebug("   %s, type %s, subnodes %d", str(node), node.nodeType, len(node.childNodes) )
     #end def
 #end class
 
@@ -2655,10 +2655,10 @@ def obj2XML( obj, stream=None, path=None ):
        gwv 13 Jun08: return object or None on error
     """
     if obj == None:
-        NTerror("obj2XML: no object\n")
+        NTerror("obj2XML: no object")
         return None
     if stream == None and path == None:
-        NTerror("obj2XML: no output defined\n")
+        NTerror("obj2XML: no output defined")
         return None
 
     closeFile = 0
@@ -3092,7 +3092,7 @@ def removedir(path):
         try:
             filelist=os.listdir(path)
         except:
-            NTerror("ERROR: Subdirectory %s could not be entered\n", path)
+            NTerror("ERROR: Subdirectory %s could not be entered", path)
         # DELETE ALL THE FILES
         for file in filelist:
             file=os.path.join(path,file)
@@ -3104,7 +3104,7 @@ def removedir(path):
         try:
             os.rmdir(path)
         except:
-            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.\n")
+            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.")
             continue
         break
 
