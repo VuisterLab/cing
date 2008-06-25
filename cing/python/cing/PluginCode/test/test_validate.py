@@ -21,7 +21,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         pdbConvention = CYANA
@@ -29,9 +29,9 @@ class AllChecks(TestCase):
 
 
 #        entryId = "1ai0"
-        entryId = "1brv"        # Small much studied PDB NMR entry
+#        entryId = "1brv"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
-#        entryId = "1brv_1model"
+        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB
 #        entryId = "1y4o_1model"
 #        entryId = "1y4o"

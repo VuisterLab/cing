@@ -4,6 +4,7 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
@@ -56,8 +57,8 @@ class AllChecks(TestCase):
         self.assertFalse(project.initCcpn(ccpnFile=ccpnFile))
         self.failIf(project.save())
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
-        doProcheck = True
+        doWhatif = False # disables whatif actual run
+        doProcheck = False
         
         self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                           doProcheck = doProcheck,
@@ -67,4 +68,5 @@ class AllChecks(TestCase):
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
     cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityDebug
     unittest.main()

@@ -1336,9 +1336,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     ssTypeList.sort()
     # The assumption is that the derived residues can be represented by the regular.
     resNamePdb = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
+    if len( resNamePdb ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
+        resNamePdb = resNamePdb[:3]  # .pdb files have a max of 3 chars in their residue name.
+#    NTdebug('Looked up residue.resName %s to resNamePdb %s' % ( residue.resName,resNamePdb ))
 
     for ssType in ssTypeList:
-#        NTdebug('Looking up ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
         hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
         if isSingleResiduePlot:
             hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)

@@ -27,7 +27,7 @@ from cing.core.dictionaries import NTdbGetResidue
 from cing.core.molecule import Molecule
 from cing.main import format
 import os
-import string
+#import string
 #from string import digits
 
 """
