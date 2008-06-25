@@ -31,6 +31,36 @@ class SimpleCgiServer():
     <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
     </div>
     for help, when required."""
+        self.timer = """
+<SCRIPT LANGUAGE="JavaScript">
+<!-- Hide script>
+    var seconds = 0
+    var minutes = 0
+    var hours = 0
+    var timerID = setTimeout("showtime()",1000);
+
+    function showtime() { 
+      seconds ++;
+      if (seconds == 60) {
+       seconds=0;
+       minutes ++;
+      }
+      if (minutes == 60){
+        minutes=0;
+        hours ++;
+      }
+      if (hours == 24){
+        hours = 0;
+      }
+      var timeValue =""+(hours)
+      timeValue +=((minutes < 10) ? ":0" : ":")+minutes
+      timeValue +=((seconds < 10) ? ":0":":")+seconds
+      document.clock.face.value = timeValue;
+      timerID = setTimeout("showtime()",1000);
+    }
+// End script hiding --></SCRIPT>";        
+    
+    """
         NTmessage( "Content-Type: text/html\n" )     # HTML is following # blank line, end of headers
         
     def main(self):
@@ -165,7 +195,7 @@ class SimpleCgiServer():
         #    pdbConvention = CYANA
         #if entryId.startswith("1tgq"):
         #    pdbConvention = PDB                        
-        
+        NTmessage( self.timer )
         NTmessage(  "<pre>")
         project = Project.open( entryId, status='new' )
         pdbFileName = entryId+".pdb"

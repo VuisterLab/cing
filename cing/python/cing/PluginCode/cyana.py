@@ -325,7 +325,8 @@ def export2cyana( project, tmp=None ):
 #end def
 
 #-----------------------------------------------------------------------------
-def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, update=True, **kwds):
+def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, update=True, 
+                coordinateConvention=None, **kwds):
     """
      kwds options:
                 seqFile   = None,
@@ -344,6 +345,8 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
     Return list of sources or None on error.
     """
 
+    if not coordinateConvention:
+        coordinateConvention = convention
     sources   = NTlist()
     sourceDir = project.mkdir( project.directories.sources, 'Cyana' )
 
@@ -364,7 +367,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, 
     # This goes first so that peaks, upls and acos refer to this molecule
     if (kwds['pdbFile'] != None):
         pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
-        mol = project.initPDB( pdbFile, convention, nmodels=kwds['nmodels'], update=update )
+        mol = project.initPDB( pdbFile, coordinateConvention, nmodels=kwds['nmodels'], update=update )
         if not mol:
             NTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
             return None
