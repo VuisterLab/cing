@@ -531,9 +531,9 @@ if __name__ == '__main__':
     parser.check_required('--name')
     parser.check_required('--project')
 
-    NTmessage(dots*10+"\n")
-    NTmessage("     Refine version %s\n", version)
-    NTmessage(dots*10+"\n")
+    NTmessage(dots*10)
+    NTmessage("     Refine version %s", version)
+    NTmessage(dots*10)
 
     #------------------------------------------------------------------------------
     # Project
@@ -556,11 +556,11 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     # Some output
     #------------------------------------------------------------------------------
-    NTmessage("==> Reading configuration\n")
-    NTmessage('refinePath:     %s\n', config.refinePath )
-    NTmessage('xplor:          %s\n', config.XPLOR )
-    NTmessage("parameterFiles: %s\n", config.parameterFiles )
-    NTmessage("topologyFiles:  %s\n", config.topologyFiles )
+    NTmessage("==> Reading configuration")
+    NTmessage('refinePath:     %s', config.refinePath )
+    NTmessage('xplor:          %s', config.XPLOR )
+    NTmessage("parameterFiles: %s", config.parameterFiles )
+    NTmessage("topologyFiles:  %s", config.topologyFiles )
 
     #------------------------------------------------------------------------------
     # read parameters file

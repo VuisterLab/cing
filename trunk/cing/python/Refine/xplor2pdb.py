@@ -92,7 +92,7 @@ verbose = 1
 #=======================================================================
 
 pdbFile = open( options.outFile, 'w' )
-NTmessage("==> Opened %s\n", options.outFile )
+NTmessage("==> Opened %s", options.outFile )
 
 xplorCount = 0
 for fName in files:

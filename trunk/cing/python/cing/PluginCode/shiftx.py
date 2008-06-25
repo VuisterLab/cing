@@ -4,15 +4,16 @@ Methods:
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import sprintf
-from cing.core.constants import IUPAC
-from cing.Libs.fpconst import NaN
-from cing.core.parameters import cingPaths
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import sprintf
+from cing.Libs.fpconst import NaN
+from cing.core.constants import IUPAC
+from cing.core.parameters import cingPaths
 import cing
 import os
 
@@ -132,7 +133,7 @@ def predictWithShiftx( project, model=None   ):
             shiftx(chainId, rootname + '.pdb', outputFile )
             outputFile = os.path.join(root,outputFile)
 #            outputFile = os.path.abspath(outputFile)
-            NTmessage('==> Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+            NTdebug('==> Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
             parseShiftxOutput( outputFile, project.molecule, chain.name )
         del( pdbFile )
 

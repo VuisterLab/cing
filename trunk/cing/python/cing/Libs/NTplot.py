@@ -1137,7 +1137,7 @@ class NTplotSet( NTdict ):
 
         else:
             if not haveBiggles:
-                NTerror("NTplotSet.__init__: No biggles\n")
+                NTerror("NTplotSet.__init__: No biggles")
             else:
                 #initialize the biggles plot
                 biggles.configure('persistent','no')

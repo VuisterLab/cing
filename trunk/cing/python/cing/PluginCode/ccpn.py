@@ -1,4 +1,5 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+from cing.Libs.NTutils import NTdebug
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -336,7 +337,7 @@ def loadCcpn( cingProject = None, ccpnFile = None ):
     return ccpnProject
 # end def loadCcpn
 
-def initCcpn( cingProject, ccpnFile = None ):
+def initCcpn( cingProject, ccpnFile=None ):
     '''Descrn: Create a new Cing Project instance from a Ccpn Xml file.
        Inputs: Cing.Project instance, Ccpn project Xml file.
        Output: Cing.Project or None or error.
@@ -349,7 +350,7 @@ def initCcpn( cingProject, ccpnFile = None ):
         return None
     # end if
 
-    if ( not ccpnFile or not os.path.exists(ccpnFile) ):
+    if not ccpnFile or not os.path.exists(ccpnFile):
         NTerror(" '%s': ccpnFile '%s' not found", funcName, ccpnFile)
         return None
     # end if
@@ -370,7 +371,9 @@ def initCcpn( cingProject, ccpnFile = None ):
         return None
     # end if
 
-    importFromCcpn( cingProject, ccpnProject )
+    if not importFromCcpn( cingProject, ccpnProject ):
+        NTerror(" %s: failed to importFromCcpn", funcName)
+        return None
 
     cingProject.addHistory(sprintf('%s from "%s"', funcName, ccpnFile))
 
@@ -398,7 +401,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
     if ( ccpnProject ):
 
         NTmessage( '==> Importing data from Ccpn project "%s"', ccpnProject.name )
-        NTmessage.flush()
+#        NTmessage.flush() # auto flushed (except for in Eclipse it seems)
 
         if not importFromCcpnMolecules(cingProject, ccpnProject, coords = True): #True is the correct, just for test now
             return None
@@ -421,6 +424,7 @@ def importFromCcpn( cingProject = None, ccpnProject = None ):
         return None
     # end if
     cingProject.addHistory( sprintf(funcName) )
+    return True # To distinguish success from failure.
 # end def importFromCcpn
 
 def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
@@ -472,7 +476,7 @@ def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
         if coords:
             # WIM TODO: guess this only makes sense if coords available...
             NTmessage('==> Calculating dihedrals ... ' )
-            NTmessage.flush()
+#            NTmessage.flush()
 
             cingProject.molecule.updateAll()
             cingProject.dssp()     # TODO: move these calls toproject.molecule.updateAll()
@@ -596,7 +600,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
             # end if
             # residue Name according namingSystem
             resNameInSysName = chemCompSysName.sysName
-            NTmessage("Res %s name '%s' (CCPN) ==> '%s' ('%s')",
+            NTdebug("Res %s name '%s' (CCPN) ==> '%s' ('%s')",
                       ccpnResidue.seqCode, ccpnResidue.ccpCode, resNameInSysName, namingSystem)
 
             if ccpnVersion == 1:
@@ -790,7 +794,7 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
         if ( moleculeName not in cingProject.moleculeNames ):
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
-            NTmessage( "You may want to import '%s' from Ccpn first",
+            NTerror( "You may want to import '%s' from Ccpn first",
                        moleculeName )
             continue
         else:
@@ -800,14 +804,14 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
         _getCcpnCoordinates( molecule )
 
         # WIM TODO: guess this only makes sense if coords available...
-        NTmessage('==> Calculating dihedrals ... ' )
-        NTmessage.flush()
+        NTmessage('==> Updating molecule (dihedrals etc.) ... ' )
+#        NTmessage.flush()
 
         cingProject.molecule.updateAll()
         cingProject.dssp()
 
         NTmessage('done' )
-        NTmessage.flush()
+#        NTmessage.flush()
 
         NTmessage( "Ccpn coordinates for molecule '%s' imported", moleculeName )
         NTmessage( '%s', cingProject.molecule.format() )
@@ -939,7 +943,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
         if ( moleculeName not in cingProject.moleculeNames ):
             NTerror( " '%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
-            NTmessage( "You may want to import '%s' from Ccpn first",
+            NTerror( "You may want to import '%s' from Ccpn first",
                        moleculeName )
             continue
         else:
@@ -1633,20 +1637,20 @@ def _getConstraintAtoms(ccpnConstraint):
     return list(atoms)
 # end def _getConstraintAtoms
 
-def _checkName(name, prefix='Ccpn'):
+def _checkName(name, prefix='CING'):
     '''Descrn: For checking string names from Ccpn.Project.
-               If 'name' start with a digit, 'Ccpn_' will prefix 'name'.
+               If 'name' start with a digit, 'CING_' will prefix 'name'.
                Cing doesn't like names starting with digits, spaces neither '|'.
        Inputs: a string 'name'.
        Output: same string 'name', 'prefix' + string 'name' or
                just 'prefix' if 'name' = None
     '''
 
-    if name:
-        if name[0] in string.digits:
-            name = prefix + '_' + name
-        # end if
-    else:
+    if not name:
+#        if name[0] in string.digits:
+#            name = prefix + '_' + name
+#        # end if
+#    else:
         name = prefix
     # end if
 

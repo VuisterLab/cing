@@ -148,7 +148,7 @@ class SuperposeModel( NTcMatrix ):
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
         if len(v1) != len(v2):
-            NTerror("SuperposeModel.superpose: unequal length fitCoordinates (%s and %s)\n", self, other)
+            NTerror("SuperposeModel.superpose: unequal length fitCoordinates (%s and %s)", self, other)
             return -1.0
         #end if
 
@@ -171,7 +171,7 @@ class SuperposeModel( NTcMatrix ):
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
         if len(v1) != len(v2):
-            NTerror("SuperposeModel.calculateRMSD: unequal length fitCoordinates (%s and %s)\n", self, other)
+            NTerror("SuperposeModel.calculateRMSD: unequal length fitCoordinates (%s and %s)", self, other)
             return -1.0
         #end if
         self.rmsd = calculateRMSD( v1, v2 )
@@ -247,7 +247,7 @@ def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False,
     #end for
     
     if verbose:
-        NTmessage("==> Superposing: fitting on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)\n", 
+        NTmessage("==> Superposing: fitting on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)", 
                   len(fitted), ranges, backboneOnly, includeProtons
                  )
                  

@@ -180,7 +180,7 @@ def dssp(project)   :
         return None
 
     if not project.molecule:
-        NTerror('dssp: no molecule defined\n')
+        NTerror('dssp: no molecule defined')
         return None
     #end if
 
