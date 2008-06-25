@@ -422,7 +422,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         for res in self.allResidues():
             if resNumDict.has_key(res.resNum):
                 NTerror('Molecule._getResNumDict: multiple mapped residues (%s,%s)',
-                        res, resNumDict[res,resNum]
+                        res, resNumDict[res,res.resNum]
                        )
             resNumDict[res.resNum] = res
         #end for
@@ -433,15 +433,17 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
-        For decoding usage with CYANA/XEASY routines
+        For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
         atomDict = NTdict()
         for atm in self.allAtoms():
             aname = atm.translate(convention)
             t = (atm.residue.resNum, aname)
             if atomDict.has_key( t ):
-                NTerror('Molecule._getAtomDict: multiple mapped atoms (%s,%s)',
-                        atm, atmDict[t]
+                # GV needs to check if this still needs to be an error or as is, down graded to warning level.
+                # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
+                NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+                        atm, atomDict[t]
                        )
             atomDict[t] = atm
         #end for

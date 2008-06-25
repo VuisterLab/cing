@@ -2239,7 +2239,9 @@ class HTMLfile:
         self.stream.write(self.openTag('div', id = 'footer'))
         #self.defaultFooter()
         self.stream.writelines(self._footer)
-        msg = programName + ' ' + `cingVersion` + ' '
+#        msg = programName + ' ' + `cingVersion` + ' '
+        msg = programName
+        msg += ' %s ' % cingVersion
         i=0
         n=len(authorList)
         for author in authorList:

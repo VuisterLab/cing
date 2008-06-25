@@ -1446,9 +1446,7 @@ def setupHtml(project):
     project.mainPageObjects = NTdict()
 
     # Do Molecules HTML pages
-    for molecule in project.moleculeNames:
-        molecule = project[molecule]
-
+    for molecule in project.molecules:
         if not project.molecule.modelCount:
             NTerror('setupHtml(): No structural models\n' )
             return True
@@ -1471,19 +1469,19 @@ def setupHtml(project):
         molecule.html = HTMLfile( molecule.htmlLocation[0],
                                   title = 'Molecule ' + molecule.name )
 
-    for molecule in project.moleculeNames:
-        index = project.moleculeNames.index(molecule)
-        molecule = project[molecule]
+    for molecule in project.molecules:
+        index = project.molecules.index(molecule)
+#        molecule = project[molecule]
         molecule.html.header('h1', 'Molecule: ' + molecule.name)
 
         previous = None
         next = None
-        lastMoleculeIndex = len(project.moleculeNames) - 1
+        lastMoleculeIndex = len(project.molecules) - 1
         if index > 0:
-            previous = project[ project.moleculeNames[index-1] ]
+            previous = project[ project.molecules[index-1] ]
 
         if index < lastMoleculeIndex:
-            next = project[ project.moleculeNames[index+1] ]
+            next = project[ project.molecules[index+1] ]
 
         molecule.html.insertHtmlLink(     molecule.html.header, molecule, project, text='Home' )
         if previous:
@@ -2042,7 +2040,8 @@ def populateHtmlMolecules( project, htmlOnly=False,
         if project.molecule.export2gif(pathMolGif, project=project):
             NTerror("Failed to generated a Molmol picture; continuelng.")
 
-    for molecule in [project[mol] for mol in project.moleculeNames]:
+#    for molecule in [project[mol] for mol in project.moleculeNames]:
+    for molecule in project.molecules:
         for chain in molecule.allChains():
             chainId = chain.name
             NTmessage("Generating residue html pages for chain: " + chainId)
@@ -2432,7 +2431,8 @@ def populateHtmlModels(project):
     "Output: return None for success is standard."
 #    NTdebug("Starting: populateHtmlModels")
     # Models page
-    for molecule in [project[mol] for mol in project.moleculeNames]:
+#    for molecule in [project[mol] for mol in project.moleculeNames]:
+    for molecule in project.molecules:
 #        NTdebug("Starting: populateHtmlModels for molecule: " + molecule.name)
         # should go to setupHtml
         molecule.modelPage = HTMLfile( project.htmlPath( 'models.html' ),title = 'Outliers' )

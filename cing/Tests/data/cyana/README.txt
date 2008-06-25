@@ -46,3 +46,7 @@
     
 2hm9:
     - entry from Nadia K.W.
+    
+H2_2Ca_53:
+    - from Mark H. with 2 Ca. Demonstrated a bug in shiftx or core/molecule.py.
+    - truncated to first 2 models.
