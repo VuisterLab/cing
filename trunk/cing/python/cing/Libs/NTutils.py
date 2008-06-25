@@ -1812,9 +1812,9 @@ class NTvalue( NTdict ):
 
     def __str__( self ):
         # Note that the below cases for None value/error loose fixed width formatting.
-        if self.value == None:
+        if self.value == None or isNaN( self.value ):
             return '%s (+- %s)' % (NaNstring, NaNstring)
-        if self.error == None:
+        if self.error == None or isNaN( self.error ):
             return `self.value`+' (+- %s)' % (NaNstring)
         return  self.fmt % ( self.value, self.error )
     #end def

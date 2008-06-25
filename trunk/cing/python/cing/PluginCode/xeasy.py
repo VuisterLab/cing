@@ -15,27 +15,26 @@ Methods:
         Export to Xeasy in CYANA/XEASY and CYANA2 formats
 """
 from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
+from cing.Libs.fpconst import isNaN
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
-from cing.core.constants import X_AXIS
 from cing.core.constants import NOSHIFT
-from cing.Libs.fpconst import isNaN
+from cing.core.constants import X_AXIS
 from cing.core.dictionaries import isValidAtomName
 from cing.core.dictionaries import isValidResidueName
 from cing.core.dictionaries import translateAtomName
 from cing.core.molecule import allResidues
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessageNoEOL
 import os
 
 #==============================================================================

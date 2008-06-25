@@ -37,14 +37,24 @@ def abspath(path):
 # COPY FILE
 # =========
 def copy(srcfilename,dstfilename,timespreserved=1,mod=None):
-    if (timespreserved):
+    """Throws an exception on some  failures and returns True
+    on other. If all went fine it will return the default None
+    """ 
+    if timespreserved:
         # copy2 CAN FAIL ON FAT PARTITIONS
-        try: shutil.copy2(srcfilename,dstfilename)
+        try: 
+            shutil.copy2(srcfilename,dstfilename)
         except: timespreserved=0
-    if (not timespreserved):
-        try: shutil.copy(srcfilename,dstfilename)
-        except: shutil.copyfile(srcfilename,dstfilename)
-    if (mod!=None): chmod(dstfilename,mod)
+    if not timespreserved:
+        try:
+            shutil.copy(srcfilename,dstfilename)
+        except: 
+            shutil.copyfile(srcfilename,dstfilename)
+    if mod != None: 
+        chmod(dstfilename,mod)
+    # Whatever above, if the target is absent now the copy failed.
+    if not os.path.exists(dstfilename):
+        return True
 
 # COPY DIRECTORY
 # ==============

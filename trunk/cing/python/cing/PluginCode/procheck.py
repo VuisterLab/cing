@@ -29,6 +29,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.disk import copy
 from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 import cing
@@ -228,8 +229,14 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             NTdebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
             os.unlink(pcNmrParameterFileDestination)
         NTdebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
-        if os.link(pcNmrParameterFile, pcNmrParameterFileDestination):
-            NTerror("Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+        
+        try: # Don't allow this to mess up CING.
+            if copy(pcNmrParameterFile, pcNmrParameterFileDestination):
+    #        if os.link(pcNmrParameterFile, pcNmrParameterFileDestination):
+                NTerror("Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+                return True
+        except:
+            NTerror("Failed to copy (by exception) from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
             return True
         
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')

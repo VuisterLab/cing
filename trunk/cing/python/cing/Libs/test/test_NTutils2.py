@@ -4,12 +4,13 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import getTextBetween
 from cing.core.molecule import Molecule
 from random import random
 from unittest import TestCase
-from cing.Libs.NTutils import appendDeepByKeys
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import getTextBetween
+from cing.Libs.fpconst import NaN
 import cing
 import unittest
 
@@ -62,7 +63,7 @@ class AllChecks(TestCase):
         aStringToBe = 123
         NTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
-        NTerror("testing messaging system for MESSAGE TYPE error: "+`aStringToBe`)
+        NTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
         NTdebug("testing messaging system: "+`aStringToBe`)
         NTdebug("testing messaging system: %s", aStringToBe)
 
@@ -112,6 +113,12 @@ class AllChecks(TestCase):
         self.assertEquals( s, '3000.000 (+- 300.000)')
         s = "%s"  % NTvalue(value=3e7, error=3e6,    fmt='%.3e (+- %.3e)')
         self.assertEquals( s, '3.000e+07 (+- 3.000e+06)')
+        s = "%s"  % NTvalue(value=0.75, error=None )
+        self.assertEquals( s, '0.75 (+- .)')
+        s = "%s"  % NTvalue(value=0.75, error=None, fmt='%.2f (+- %.2f)' )
+        self.assertEquals( s, '0.75 (+- .)')
+        s = "%s"  % NTvalue(value=0.75, error=NaN, fmt='%.2f (+- %.2f)' )
+        self.assertEquals( s, '0.75 (+- .)')
 
     def testGetTextBetween(self):
 

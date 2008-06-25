@@ -6,6 +6,7 @@ from cing import verbosityNothing
 from cing.core.classes import Project
 from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import CYANA2
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
@@ -19,16 +20,19 @@ class AllChecks(TestCase):
         pdbConvention = BMRB
 #        entryId = "1brv" # Small much studied PDB NMR entry 
 #        entryId = "2hgh_1model" # RNA-protein complex.
-        entryId = "1brv_1model" 
+#        entryId = "1brv_1model" 
 #        entryId = "1tgq_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
-        
+        entryId = "H2_2Ca_53" 
+
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
         if entryId.startswith("2hgh"):
             pdbConvention = CYANA
         if entryId.startswith("1tgq"):
             pdbConvention = PDB
+        if entryId.startswith("H2_2Ca_53"):
+            pdbConvention = CYANA2
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
