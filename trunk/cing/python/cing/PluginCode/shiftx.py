@@ -52,7 +52,7 @@ format file:
 #                atm = molecule.decodeNameTuple( (IUPAC, None, lineCol1, line.dollar[3]), fromCYANA2CING=True )
 
             if not atm:
-                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)\n', chainId, line.NR, line.dollar[0] )
+                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
             else:
                 atm.shiftx.append( line.float(4) )
             #end if
@@ -74,15 +74,15 @@ def predictWithShiftx( project, model=None   ):
     one at the time.
     """
     if project.molecule == None:
-        NTerror('predictWithShiftx: no molecule defined\n')
+        NTerror('predictWithShiftx: no molecule defined')
         return None
     #end if
     if project.molecule.modelCount == 0:
-        NTerror('predictWithShiftx: no models for "%s"\n', project.molecule)
+        NTerror('predictWithShiftx: no models for "%s"', project.molecule)
         return None
     #end if
     if model != None and model >= project.molecule.modelCount:
-        NTerror('predictWithShiftx: invalid model (%d) for "%s"\n', model, project.molecule)
+        NTerror('predictWithShiftx: invalid model (%d) for "%s"', model, project.molecule)
         return None
     #end if
 
@@ -95,7 +95,7 @@ def predictWithShiftx( project, model=None   ):
                 atm.pdbSkipRecord = True
                 skippedAtoms.append( atm )
     if skippedResidues:
-        NTwarning('predictWithShiftx: non-protein residues will be skipped:\n' + `skippedResidues`)
+        NTwarning('predictWithShiftx: non-protein residues will be skipped:' + `skippedResidues`)
 
     if model!=None:
         models = NTlist( model )
