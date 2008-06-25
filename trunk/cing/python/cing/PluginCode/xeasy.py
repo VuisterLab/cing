@@ -35,6 +35,7 @@ from cing.core.dictionaries import isValidResidueName
 from cing.core.dictionaries import translateAtomName
 from cing.core.molecule import allResidues
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTmessageNoEOL
 import os
 
 #==============================================================================
@@ -56,7 +57,7 @@ class Xeasy( NTdict ):
                     pass
 
                 elif (not isValidResidueName( f.dollar[1], convention ) ):
-                    NTerror( 'Xeasy: residue "%s" invalid for convention "%s" in "%s:%d"\n',
+                    NTerror( 'Xeasy: residue "%s" invalid for convention "%s" in "%s:%d"',
                              f.dollar[1], convention, seqFile, f.NR
                            )
                     self.error = 1
@@ -87,14 +88,14 @@ class Xeasy( NTdict ):
                 atomName  = f.dollar[4]
                 resNum    = f.int( 5 )
                 if resNum not in self.seq:
-                    NTerror( 'Xeasy: undefined residue number %d in "%s:%d" (%s)\n',
+                    NTerror( 'Xeasy: undefined residue number %d in "%s:%d" (%s)',
                              resNum, protFile, f.NR, f.dollar[0]
                            )
                     self.error = 1
                 else:
                     resName   = self.seq[resNum]
                     if (not isValidAtomName( resName, atomName, convention)):
-                        NTerror( 'Xeasy: invalid atom "%s" for residue "%s %d" in "%s:%d" (%s)\n',
+                        NTerror( 'Xeasy: invalid atom "%-4s" for residue "%s %d" in "%s:%d" (%s)',
                                   atomName, resName, resNum, protFile, f.NR, f.dollar[0]
                                )
                         self.error = 1
@@ -126,7 +127,7 @@ class Xeasy( NTdict ):
         """
         NTdebug('Xeasy.map2molecule: %s', molecule)
         resNumDict = molecule._getResNumDict()
-        maxToReport = 200 # no need to fill screen.
+        maxToReport = 100 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
             if not p.resNum in resNumDict:
