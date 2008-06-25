@@ -8,9 +8,9 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict
 # do not remove these two: they are needed during parsing of the sml files
-from cing.Libs.NTutils import NTfill  #@UnresolvedImport
-from cing.Libs.NTutils import NTvalue #@UnresolvedImport
-from cing.core.molecule import Coordinate #@UnresolvedImport
+from cing.Libs.NTutils import NTfill  
+from cing.Libs.NTutils import NTvalue  
+from cing.core.molecule import Coordinate #@UnusedImport
 
 from cing.core.molecule import Molecule
 from cing.core.molecule import Chain

@@ -1132,25 +1132,25 @@ class DistanceRestraint( NTdict ):
 #        NTdebug( '%s' % self )
         if self.violMax >= project.valSets.DR_MAXALL_POOR:
             comment = '[crit.1] violMax: %8.3f' % self.violMax
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         if self.violMax >= project.valSets.DR_MAXALL_BAD:
             comment = '[crit.2] violMax: %8.3f' % self.violMax
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
             comment = '[crit.3b]: fractionAbove: %8.3f' % fractionAbove
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_BAD )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
             comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         if self.violSd >= project.valSets.DR_RMSALL_BAD:
             comment = '[crit.4] violSd: %8.3f' % self.violSd
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
     def appendPair( self, pair ):
@@ -1494,25 +1494,25 @@ class DihedralRestraint( NTdict ):
 #        NTdebug( '%s (dih)' % self )
         if self.violMax >= project.valSets.AC_MAXALL_POOR:
             comment = '[crit.1] violMax: %8.3f' % self.violMax
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         if self.violMax >= project.valSets.AC_MAXALL_BAD:
             comment = '[crit.2] violMax: %8.3f' % self.violMax
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
             comment = '[crit.3a]: fractionAbove: %8.3f' % fractionAbove
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_BAD )
         if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
             comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         if self.violSd >= project.valSets.AC_RMSALL_BAD:
             comment = '[crit.4] violSd: %8.3f' % self.violSd
-            NTdebug(comment)
+#            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
 
