@@ -336,7 +336,6 @@ def semicolon_block_collapse( text ):
     count = 0
     startpos = 0
 
-    # TODO: this is not good - since text[startpos:] is used it's always the start of a line, so if string starts with ;...
     pattern_semicolon_only = re.compile("^\;", re.MULTILINE)
     # Added special _end pattern with $ for better pattern matching - Wim 31/10/2005
     pattern_semicolon_only_end = re.compile("(^\;\s*$)", re.MULTILINE)

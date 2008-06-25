@@ -91,7 +91,7 @@ class Whatif( NTdict ):
 
     Whatif.checks:                  NTlist instance of individual parsed checks
     Whatif.molSpecificChecks:       NTlist instance of those check pertaining to
-                                    molecules; i.e Level : MOLECULE. TODO: implement in What If and here..
+                                    molecules; i.e Level : MOLECULE. Not implemented in What If yet.
     Whatif.residueSpecificChecks:   NTlist instance of those check pertaining to
                                     residues; i.e Level : RESIDUE.
     Whatif.atomSpecificChecks:      NTlist instance of those check pertaining to
@@ -106,9 +106,6 @@ class Whatif( NTdict ):
 
     All file references relative to rootPath ('.' by default) using the .path()
     method.
-    TODO:   - Use hydrogen atoms
-            - For more details see: http://spreadsheets.google.com/pub?key=p1emRxxfe3f4PkJ798dwPIg
-                and sf.net
     """
     #define some more user friendly names
     # List of defs at:

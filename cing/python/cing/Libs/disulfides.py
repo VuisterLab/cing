@@ -1,8 +1,7 @@
 from cing.core.molecule import NTdistance
-from math import acos, pi
+from math import acos
+from math import pi
 import cing
-
-# TODO: incorporate into CING
 
 def chi3SS( dCbCb ):
     """
@@ -10,15 +9,10 @@ def chi3SS( dCbCb ):
     fie of the distance between the Cb atoms of each Cys residue
     
     Dombkowski, A.A., Crippen, G.M, Protein Enginering, 13, 679-89, 2000
-    DOI: ??
-    
     Page 684, eq. 9
     """
     return acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
-#end def
 
-
-mol = project.molecule #@UndefinedVariable
 
 def disulfideScore( cys1, cys2 ):
     """
@@ -42,7 +36,7 @@ def disulfideScore( cys1, cys2 ):
         [d(Ca-Ca) count, d(Cb-Cb) count, S-S count, final score]
         
     """
-    mc = len(cys1.CA.coordinates)
+    mc = len(cys1.CA.coordinates) # model count
     score = cing.NTlist(0.0, 0.0, 0.0, 0.0)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
@@ -62,29 +56,3 @@ def disulfideScore( cys1, cys2 ):
         
     score[3] = score.sum() / (3.0*float(mc))
     return score
-#end def
-
-
-###
-# testing
-###
-cys=mol.residuesWithProperties('C')
-# all cys(i), cys(j) pairs with j>i
-for i in range(len(cys)):
-    c1 = cys[i]
-    for j in range(i+1, len(cys)):
-        c2 = cys[j]
-        da = c1.CA.distance( c2.CA )
-        db = c1.CB.distance( c2.CB )
-        dg = c1.SG.distance( c2.SG )
-        print '===='
-        print c1, c1.CA.shift(), c1.CB.shift(), c1.CA.shift() - c1.CB.shift()
-        print c2, c2.CA.shift(), c2.CB.shift(), c2.CA.shift() - c2.CB.shift()
-        print 'Ca-Ca', da
-        print 'Cb-Cb', db
-        print 'Sg-Sg', dg
-        print 'chi3 ', chi3SS( db[0] )
-        print 'scores', disulfideScore( c1, c2)
-        print ""
-
-                
