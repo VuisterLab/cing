@@ -1614,7 +1614,7 @@ class DihedralRestraint( NTdict ):
     def retrieveDefinition(self):
         """
         Retrieve a (<Residue>, angleName, <AngleDef>) tuple from
-        the molecule.dihedralDict
+        the molecule._dihedralDict
         or
         (None,None,None) on error
         """
@@ -1623,8 +1623,8 @@ class DihedralRestraint( NTdict ):
         #end if
         mol = self.atoms[0].residue.chain.molecule
 
-        if mol.dihedralDict.has_key(tuple(self.atoms)):
-            return mol.dihedralDict[tuple(self.atoms)]
+        if mol._dihedralDict.has_key(tuple(self.atoms)):
+            return mol._dihedralDict[tuple(self.atoms)]
         else:
             return (None,None,None)
         #end if

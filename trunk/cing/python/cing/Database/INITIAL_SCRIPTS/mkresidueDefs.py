@@ -5,7 +5,7 @@ from cing.Libs.NTutils import fprintf
 import sys
 cyanaLib = """
 # RESIDUE resName Number_of_dihedral_defs number_of_atom_defs start_atom_of_residue stop_atom_of_residue
-# gv: connected pseudo's of Protein residues to carbon, but not carbon to pseudo as this is done indirectly 
+# gv: connected pseudo's of Protein residues to carbon, but not carbon to pseudo as this is done indirectly
 # inserted one-letter code into residue field
 RESIDUE   ALA  A    4   14    3   13
    1 OMEGA   -1    2   10.0000    2    1    3    4    0
@@ -1314,7 +1314,7 @@ at = dict(
           P = '31P'
          )
 
-    
+
 #-----------------------------------------------------------------------
 # create the residue definitions from atomTable.def
 #-----------------------------------------------------------------------
@@ -1325,11 +1325,11 @@ for r in AwkLike( 'atomTable.def' ):
 #    print '>', doresidue,'<',r.dollar[0]
     if (r.isComment() or r.isEmpty()):
         pass
-    elif (r.dollar[1] == 'RESIDUE'):        
+    elif (r.dollar[1] == 'RESIDUE'):
         res = residueDefs.appendResidue( r.dollar[2], r.dollar[3] )
     elif (r.dollar[1] == 'END_RESIDUE'):
         pass
-    else:   
+    else:
         aname = r.dollar[1]
         res.appendAtom( aname, spinType = at[aname[0]] )
 # now update the table using the internal routine
@@ -1353,9 +1353,9 @@ for r in AwkLikeS( cyanaLib ):
             for i in range(0, ndihed):
                 r.next()
                 tmp2[r.dollar[2]] = [r.int(6), r.int(7), r.int(8), r.int(9)]
-            
+
             # print '>>>', tmp2
-            
+
             # temporarily store data from the atom lines
             tmp = {}
             for i in range(0, natom):
@@ -1363,7 +1363,7 @@ for r in AwkLikeS( cyanaLib ):
                 idx = r.int(1)
                 aname = r.dollar[2]
                 tmp[idx] = (idx, aname, r.dollar[3], [r.int(9), r.int(10), r.int(11),r.int(12)], r.int(13) )
-            
+
             # process the dihedral lines
             for name, atoms in tmp2.iteritems():
                 dihedralDef = []
@@ -1375,9 +1375,9 @@ for r in AwkLikeS( cyanaLib ):
                     elif a>astop:
                         dihedralDef.append( ( 1,tmp[a][1]) )
                     else:
-                        dihedralDef.append( ( 0,tmp[a][1]) ) 
+                        dihedralDef.append( ( 0,tmp[a][1]) )
                 res.appendDihedral( name, atoms=dihedralDef )
-                
+
             # process the atom lines
             for idx, aname, type, topol, pseudo in tmp.itervalues():
                 if idx >= astart and idx <= astop and (aname in res):
@@ -1393,22 +1393,22 @@ for r in AwkLikeS( cyanaLib ):
                             atm.topology.append( (1,tmp[t][1]) )
                         else:
                             atm.topology.append( (0,tmp[t][1]) )
-                    
+
                     if pseudo==0:
                         pass
                     else:
                         pseudoName = tmp[pseudo][1]
                         atm.pseudo = pseudoName
                         res[pseudoName].real.append( aname )
-                                                
-                
+
+
 
 def saveDefs( stream = sys.stdout ):
-    
+
     fprintf( stream, 'from NTutils   import *\n')
     fprintf( stream, 'from classes   import *\n')
     fprintf( stream, 'from constants import *\n\n')
-     
+
     residueDefs.printit()
 #        residueDefs[key].printit( stream )
 #-----------------------------------------------------------------------
@@ -1416,11 +1416,11 @@ def saveDefs( stream = sys.stdout ):
 #-----------------------------------------------------------------------
 
 if __name__ == '__main__':
-#    residueDefs['GLU'].getAttr()
+#    residueDefs['GLU'].printAttr()
 #    for aname in residueDefs.GLU.atoms:
-#        residueDefs.GLU[aname].getAttr()
+#        residueDefs.GLU[aname].printAttr()
 
-    
+
 #    residueDefs['GLU'].printit()
 
 #    residueDefs.VAL.printit()
