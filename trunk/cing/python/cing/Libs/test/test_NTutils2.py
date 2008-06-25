@@ -90,8 +90,12 @@ class AllChecks(TestCase):
         mol = Molecule('mol')
         mol.addChain('top')
         top = mol.allChains()[0]
+        # Disable warnings temporarily
+        v = cing.verbosity
+        cing.verbosity = verbosityNothing
         for i in range( 1*10):
             top.addResidue( `random()`,i )
+        cing.verbosity = v
 
         resList = top.allResidues()
         middleValue = resList[len(resList)/2]

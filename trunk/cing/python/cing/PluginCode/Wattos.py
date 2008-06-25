@@ -116,9 +116,9 @@ def runWattos( project, tmp=None ):
 
     # Let's ask the user to be nice and not kill us
     # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
-    timeRunEstimated = 0.025 *project.molecule.modelCount * len(project.molecule.allResidues())
+    timeRunEstimated = 0.0025 *project.molecule.modelCount * len(project.molecule.allResidues())
     timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimated*60)
-    NTmessage('==> Running Wattos checks for an estimated (5,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    NTmessage('==> Running Wattos read for an estimated (50,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
     scriptFileName = "wattos.script"
     scriptFullFileName =  os.path.join( wattosDir, scriptFileName )
     open(scriptFullFileName,"w").write(scriptComplete)

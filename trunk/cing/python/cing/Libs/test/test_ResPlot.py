@@ -2,10 +2,11 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
+from cing.Libs.Imagery import joinPdfPages
+from cing.Libs.NTmoleculePlot import convertPointsToPlotRange
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTplot import circlePoint
-from cing.Libs.NTmoleculePlot import convertPointsToPlotRange
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import pointAttributes
@@ -26,11 +27,10 @@ from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from random import random
 from unittest import TestCase
-from cing.Libs.Imagery import joinPdfPages
 import cing
 import os #@Reimport
 import unittest
@@ -54,7 +54,7 @@ class AllChecks(TestCase):
 #        entryId = "2hgh_1model"
         entryId = "1brv_1model"
 
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         ranges = None
         if entryId.startswith("2hgh"):
             pdbConvention = CYANA

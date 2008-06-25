@@ -4,12 +4,12 @@ python $CINGROOT/python/cing/PluginCode/test/test_pdb.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from unittest import TestCase
-from cing import verbosityDebug
 import cing
 import os
 import unittest
@@ -17,7 +17,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         entryId = "1brv"
 #        entryId = "2vb1_simple" # Protein solved by X-ray.
 

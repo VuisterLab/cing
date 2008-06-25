@@ -24,8 +24,8 @@ from cing.PluginCode.Whatif import Whatif
 from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.core.classes import Project
-from cing.core.constants import BMRB
 from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from random import random
 from unittest import TestCase
 import cing
@@ -53,7 +53,7 @@ class AllChecks(TestCase):
         entryId = "1brv_1model"
 #        entryId = "1brv_1model"
         
-        pdbConvention = BMRB
+        pdbConvention = IUPAC
         ranges = None
         if entryId.startswith("2hgh"):
             pdbConvention = CYANA        

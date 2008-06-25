@@ -3296,12 +3296,12 @@ def findFiles( pattern, startdir, exclude=[]):
     return result
 #end def
 
-def val2Str( value, fmt, count=None, nullValue=None):
+def val2Str( value, fmt, count=None ):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is
     None the count determines how long the return string will be.
     Regular formatting is used otherwise."""
-    if value==nullValue:
+    if value==None or isNaN(value):
         value = None
     if value == None:
         if not count:
