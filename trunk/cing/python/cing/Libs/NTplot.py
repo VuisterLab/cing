@@ -1147,7 +1147,7 @@ class NTplotSet( NTdict ):
     #end def
 
     def close( self ):
-        "Attempts to close a window but fails so far. TODO: fix."
+        "Closes a 'window'"
         if useMatPlotLib:
             close('all')
             cla() # clear current axes
@@ -1370,9 +1370,6 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
             resChar = resChar.upper()
             color = 'green'
-#            if not i%3: # TODO: use something usefull.
-#                color='red'
-#            NTdebug("color: %8s %-80s" % (accessibilityZscore, color))
             x = iconBoxXstart + i + 0.5
             y = self.convert_yunits([ iconBoxYstart ])[0]          # data coordinates
             text = resChar

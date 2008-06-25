@@ -3764,7 +3764,7 @@ class ROGscore( NTdict ):
 
 
     # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
-    # TODO: get aligned to left using a better .css.
+    # Can be aligned to left using a better .css.
     def addHTMLkeywords(self, kw ):
         if not self.isCritiqued():
             return
