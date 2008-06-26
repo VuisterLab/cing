@@ -33,6 +33,7 @@ Atom, Molecule and Project classes.
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.core.classes import DihedralRestraint
@@ -181,7 +182,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 
        NB model_000.pdb becomes model number 0. Ie model=0
     """
-    print '>', path, name, models
+#    print '>', path, name, models
 #    NTmessage(name,models[0])
 
     if models == None:
@@ -210,9 +211,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
     #end if
-    molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR,
-
-                                         )
+    molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR)
     project.appendMolecule( molecule )
 
     # now the other models:
@@ -229,7 +228,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()
-    NTmessage( '%s', molecule.format() )
+    NTdetail( '%s', molecule.format() )
 
     return molecule
 

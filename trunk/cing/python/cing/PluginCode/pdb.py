@@ -30,6 +30,7 @@ from cing.Libs import PyMMLib
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTdetail
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
@@ -44,7 +45,7 @@ from cing.core.molecule import ensureValidChainId
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
+def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None)   :
     """Import coordinates from pdbFile (optionally: first nmodels)
        convention eq PDB, CYANA, CYANA2, XPLOR, IUPAC
 
@@ -52,12 +53,11 @@ def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
     """
     if not molecule: return None
 
-    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile )
-
-    #end if
+    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
 
     pdb = PyMMLib.PDBFile( pdbFile)
-#    molecule.pdb = pdb; no longer save it: it eats massive memory and we don't use it
+
+#    atomDict = molecule._getAtomDict(convention)
 
     foundModel = False
     modelCount = 0
@@ -95,24 +95,32 @@ def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
             if record.has_key('chainID'):
                 chainId = record.chainID.strip()
                 chainId = ensureValidChainId(chainId)
+#                print '>chain>', '>'+chainId+'<', len(chainId)
 
             resID = record.resSeq
+#            if chainId == Chain.defaultChainId:
+#                # use the atomDict
+#                t = (resID, atmName)
+#                if atomDict.has_key(t):
+#                    atom = atomDict[t]
+#                else:
+#                    atom = None
+#            else:
             atom  = molecule.decodeNameTuple( (convention, chainId, resID, atmName) )
 
             if not atom:
-                NTerror('WARNING in cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)\n',
+                NTerror('cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)',
                          convention, modelCount, record )
                 #print '>>', convention, cname, resID, atmName
                 continue
-            atom.addCoordinate( record[0], record[1], record[2], record[3] )
-            record.atom = atom
-            atom.pdbRecord = record
-
+            atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
+        #end if
+    #end for
 
     # Patch to get modelCount right for X-ray or XPLOR structures with only one model
     if not foundModel:
         modelCount += 1
-    #end if
+
     molecule.modelCount += modelCount
 
     NTdetail( 'importFromPDB: read %d records; added %d structure models', len(pdb), modelCount )
@@ -125,7 +133,7 @@ def importFromPDB( molecule, pdbFile, convention='PDB', nmodels=None)   :
 # Add as a method to Molecule class
 Molecule.importFromPDB = importFromPDB
 
-def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
+def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
     """Initialize  Molecule 'moleculeName' from pdbFile
        convention eq PDB, CYANA, CYANA2 or XPLOR, IUPAC
        optionally only include nmodels
@@ -134,7 +142,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention, nmodels=None)   :
     """
     showMaxNumberOfWarnings = 100 # was 100
     shownWarnings = 0
-    NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile )
+    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
 
     pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
@@ -241,6 +249,8 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     NB model should be ZERO for the first model. Not one.
     Returns True on error.
     """
+    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s', 
+             molecule, path, model, convention)
     pdbFile = molecule.toPDB( model=model, convention = convention)
     if not pdbFile:
         return True

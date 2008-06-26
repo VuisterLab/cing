@@ -7,7 +7,7 @@ CING: Common Interface for NMR structure Generation
 import os
 import sys
 # Version number is a float. Watch out, version 0.100 will be older than 0.99 
-cingVersion     = 0.76
+cingVersion     = 0.761
 programName     = 'CING'
 header = """
 ======================================================================================================

@@ -40,12 +40,13 @@ import sys
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
-SMLversion       = 0.22
+SMLversion       = 0.221
 # version history:
 #  0.1: initial version
 #  0.2: NTlist and NTdict SML handlers; recursion in dict-like handlers
 #  0.21: Explicitly require endHandler to return obj or None on error.
 #  0.22: SML Molecule, Chain, Residue, Atom handlers
+#  0.221: Atom saves shiftx
 
 SMLsaveFormat  = CYANA
 SMLfileVersion = None
@@ -156,7 +157,7 @@ Example file:
 #                NTerror('Error SMLhandler.dictHandler: incomplete line "%s"', line[0])
 #            #end if
 #            line = SMLhandler.readline( fp )
-#            if self.debug: printf('%s> %s', self, line)
+#            if self.debug: printf('%s> %s\n', self, line)
 
             if len(line) > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )
@@ -592,8 +593,9 @@ class SMLAtomHandler( SMLhandler ):
         """
         fprintf( stream, "%s  %r\n", self.startTag, atm.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
-        for a in []:
-            fprintf( stream, '%s = %r\n', a, atm[a] )
+        for a in ['shiftx']:
+            if atm.has_key(a):
+                fprintf( stream, '%s = %r\n', a, atm[a] )
         #end for
 
         # coordinates; only write when present

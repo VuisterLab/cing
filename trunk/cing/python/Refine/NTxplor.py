@@ -39,35 +39,35 @@ class refineParameters( NTdict ):
 
     def __init__(self, **kwds):
         NTdict.__init__( self, __CLASS__ = "refineParameters",
-                
+
       baseName          = 'model%03d.pdb',      # Basename used for pdb files
       models            = '',
       overwrite         = False,                # Overwrite existing files
       verbose           = False,                # verbose on/off
-      useCluster        = False,                # use cluster; not yet implemented     
+      useCluster        = False,                # use cluster; not yet implemented
 
       # PSF generation
-      psfFile           = 'name.psf',            
+      psfFile           = 'name.psf',
       patchHISD         = [],                   # HISD patches are needed for CYANA->XPLOR compatibility.
       patchHISE         = [],                   # HISE patches are needed for CYANA->XPLOR compatibility.
       patchCISP         = [],                   # Cis prolines
-      
+
       # initial analysis
       minimizeProtons   = False,
-            
+
       # NOE restraints
       noeMaxRestraints  = 30000,
-      noeCeiling        = 100,    
+      noeCeiling        = 100,
       noeRestraints     = [],                   # Noe restraint lists, should be in the Tables directory
 
       # dihedral restraints
       dihedralMaxRestraints = 10000,
       dihedralScale      = 200,
       dihedralRestraints = [],                  # dihedral restraint lists, should be in the Tables directory
-                          
-      # water refinement protocol      
-      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX" 
-      # The water refinement uses the OPLSX parameters 
+
+      # water refinement protocol
+      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"
+      # The water refinement uses the OPLSX parameters
       nonBonded         = 'OPLSX',
       temp              = 500,                  # temperature (K); 500 initially
       mdheat            = NTdict( # 100,0.003 initially with Chris
@@ -82,72 +82,72 @@ class refineParameters( NTdict ):
                                     nstep  = 200,       # number of MD steps
                                     timest = 0.004,     # timestep of MD (ps)
                                  ),
-      
+
       # Analysis
       bestModels        = '',
       superpose         = '',
-      
+
       # Run time
       inPath            = '',       # Run time, no need to edit
       outPath           = '',       # Run time, no need to edit
       basePath          = '',       # Run time, no need to edit
-      
+
       __FORMAT__ = """
 parameters = refineParameters(
       baseName          = "%(baseName)s",
-      
+
       # ascilist to select the model(s) to refine; e.g 0-19
       # can also be modified as command-line argument
       models            = '%(models)s',
 
       # Overwrite existing files
-      overwrite         = %(overwrite)s, 
+      overwrite         = %(overwrite)s,
       # verbose on/off
-      verbose           = %(verbose)s, 
+      verbose           = %(verbose)s,
       # use cluster; not yet implemented
-      useCluster        = %(useCluster)s,            
+      useCluster        = %(useCluster)s,
 
       # PSF generation
-      psfFile           = "%(psfFile)s",            
+      psfFile           = "%(psfFile)s",
       # HISD patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
-      patchHISD         = %(patchHISD)s,        
+      patchHISD         = %(patchHISD)s,
       # HISE patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
       patchHISE         = %(patchHISE)s,
       # Cis-roline patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
       patchCISP         = %(patchCISP)s,
-      
+
       # initial analysis
       minimizeProtons   = %(minimizeProtons)s,
-            
+
       # NOE restraints
       noeMaxRestraints  = %(noeMaxRestraints)s,
       noeCeiling        = %(noeCeiling)s,
       # Noe restraint lists, should be in the Tables directory
-      noeRestraints     = %(noeRestraints)r, 
-      
+      noeRestraints     = %(noeRestraints)r,
+
       # dihedral restraints
       dihedralMaxRestraints = %(dihedralMaxRestraints)s,
       dihedralScale      = %(dihedralScale)s,
       # dihedral restraint lists, should be in the Tables directory
-      dihedralRestraints = %(dihedralRestraints)r,                  
+      dihedralRestraints = %(dihedralRestraints)r,
 
-      # water refinement protocol      
-      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX" 
-      # The water refinement uses the OPLSX parameters 
+      # water refinement protocol
+      # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"
+      # The water refinement uses the OPLSX parameters
       nonBonded         = "%(nonBonded)s",
       # temperature (K); 500 initially
-      temp              = %(temp)s,            
+      temp              = %(temp)s,
       # nstep: number of MD steps; timest: # timestep of MD (ps)
       mdheat            = %(mdheat)r,            # 100,  0.003 initially with Chris
       mdhot             = %(mdhot)r,             # 2000, 0.004 initially with Chris
       mdcool            = %(mdcool)r,            # 200, 0.004 initially with Chris
-      
+
       # analysis
       # bestModels; ascilist, e.g. '3,4,1,7,20,5'; typically generated by --best option
       bestModels        = "%(bestModels)s",
       # Superpose residues; ascilist e.g. 200-270,276-300,320-350
       superpose         = "%(superpose)s",
-      
+
       # Run time, no need to edit
       # basePath        = %(basePath)s
       # inPath          = %(inPath)s
@@ -158,19 +158,19 @@ parameters = refineParameters(
         if kwds:
             self.update( kwds )
     #end def
-    
+
     def toFile( self, path ):
         f = open( path, 'w' )
         fprintf( f, '%s', self )
         f.close()
     #end def
-    
+
     def __str__( self ):
         return self.format()
     #end def
 #end class
 
-class refineNoeParameters( NTdict ):    
+class refineNoeParameters( NTdict ):
     def __init__( self, name, **kwds ):
         NTdict.__init__( self, __CLASS__ = "refineNoeParameters",
 
@@ -188,13 +188,13 @@ class refineNoeParameters( NTdict ):
                                     accept    = %(accept)s,
                                     fileName  = "%(fileName)s" \t# should be in the Tables directory
                                   )
-                            """        
+                            """
 )
-    
+
         if kwds:
             self.update( kwds )
     #end def
-    
+
     def __str__( self ):
         return self.format()
     #end def
@@ -203,7 +203,7 @@ class refineNoeParameters( NTdict ):
     #end def
 #end class
 
-class refineDihedralParameters( NTdict ):    
+class refineDihedralParameters( NTdict ):
     def __init__( self, name, **kwds ):
         NTdict.__init__( self, __CLASS__ = "refineDihedralParameters",
 
@@ -217,13 +217,13 @@ class refineDihedralParameters( NTdict ):
                                     accept    = %(accept)s,
                                     fileName  = "%(fileName)s" \t# should be in the Tables directory
                                   )
-                            """        
+                            """
 )
-    
+
         if kwds:
             self.update( kwds )
     #end def
-    
+
     def __str__( self ):
         return self.format()
     #end def
@@ -242,23 +242,23 @@ class Xplor( refineParameters ):
         for arg in args:
             self.update( arg )
         self.update( kwds )
-        
+
         # check for directories relative to basePath
         self.setdefault( 'basePath', '.')
         for dummy_dirname, dirpath in self.directories.items():
             self.makePath( self.joinPath( dirpath ) )
         #end for
-        
+
         self.script = None
 
         self.setdefault( 'run_cluster', 'n' )
-        self.setdefault( 'queu_cluster', '/usr/local/pbs/bin/qsub -l nodes=1:ppn=1 ')  
-        
+        self.setdefault( 'queu_cluster', '/usr/local/pbs/bin/qsub -l nodes=1:ppn=1 ')
+
         self.setdefault( 'seed',          12397 )
-        
+
         self.setdefault( 'overwrite', False )
         self.setdefault( 'verbose', True )
-        
+
     #------------------------------------------------------------------------
     def cleanPath( self, path ):
         if not os.path.exists(path):
@@ -278,7 +278,7 @@ class Xplor( refineParameters ):
         """
         return os.path.join( self.basePath, *args )
     #end def
-    
+
     #------------------------------------------------------------------------
     def checkPath( self, *args):
         """Check existance of path relative to basePath
@@ -286,15 +286,15 @@ class Xplor( refineParameters ):
         """
         path = self.joinPath( *args )
         if not os.path.exists( path ):
-            NTerror('Error: path "%s" does not exist\n', path )
+            NTerror('path "%s" does not exist', path )
             sys.exit(1)
         #end if
         return path
     #end def
-        
+
     #------------------------------------------------------------------------
     def newPath( self, *args):
-        """Check existance of joined path, relative to basePath, 
+        """Check existance of joined path, relative to basePath,
            remove if exists and overwrite
            Return joined path or do a system exit.
         """
@@ -303,7 +303,7 @@ class Xplor( refineParameters ):
             if self.overwrite:
                 os.remove( path )
             else:
-                NTerror('Error: path "%s" already exists; use --overwrite\n', path )        
+                NTerror('path "%s" already exists; use --overwrite', path )
                 sys.exit(1)
             #end if
         #end if
@@ -326,23 +326,23 @@ evaluate ( $par_nonbonded = "''' + self.nonBonded + '''" )
 parameter
   @""" + self.joinPath( self.directories.toppar, filename ) + """
 end
-""" 
+"""
         for filename in self.topologyFiles:
             code = code + """
 topology
   @""" + self.joinPath( self.directories.toppar, filename ) + """
-end"""     
+end"""
         return code
-        
-        
-    #------------------------------------------------------------------------        
+
+
+    #------------------------------------------------------------------------
     def readMolCode( self ):
         """Return code for setup of molecular files"""
         code = """
 {*==========================================================================*}
 {*=== READ MOLECULAR FILES =================================================*}
 {*==========================================================================*}
-"""     
+"""
         for mol in self.molecules:
             code = code + """
 structure
@@ -366,18 +366,18 @@ coordinates
 """
         for mol in self.molecules:
             code = code + """
-write coordinates 
-  sele=""" + mol.selectionCode + """ 
-  output=""" + self.newPath( self.outPath, mol.pdbFile ) + """ 
-end                 
+write coordinates
+  sele=""" + mol.selectionCode + """
+  output=""" + self.newPath( self.outPath, mol.pdbFile ) + """
+end
 """
         return code
 
 
     #------------------------------------------------------------------------
     def restraintsCode( self ):
-        """Return code for restraints"""        
-        code = """      
+        """Return code for restraints"""
+        code = """
 {*==========================================================================*}
 {*========================= READ THE EXPERIMENTAL DATA =====================*}
 {*==========================================================================*}
@@ -387,13 +387,13 @@ set message off echo off end
             code = code + """
 noe reset
   nrestraints = """ + str(self.noeMaxRestraints) + """
-  ceiling     = """ + str(self.noeCeiling ) 
-  
+  ceiling     = """ + str(self.noeCeiling )
+
             for noe in self.noeRestraints:
                 noe.setdefault( 'averaging', 'sum' )
                 noe.setdefault( 'scale',      50 )
                 noe.setdefault( 'sqconstant', 1.0 )
-                code = code + """ 
+                code = code + """
   class      """ + noe.name + """
   averaging  """ + noe.name + ' ' + noe.averaging + """
   potential  """ + noe.name + """ soft
@@ -405,22 +405,22 @@ noe reset
   sqoffset   """ + noe.name + """ 0.0
   asymptote  """ + noe.name + """ 2.0
   @@""" + self.checkPath( self.directories.tables, noe.fileName ) + """
-"""         
-            #end for      
+"""
+            #end for
             code = code + """
 end
-"""     
+"""
         #end if
 
-        if ( len(self.dihedralRestraints) > 0 ): 
+        if ( len(self.dihedralRestraints) > 0 ):
             code = code + """
-restraints dihedral reset 
+restraints dihedral reset
   nassign = """ + str( self.dihedralMaxRestraints )
-  
+
             for dihed in self.dihedralRestraints:
                 code = code + """
   @@""" + self.checkPath( self.directories.tables, dihed.fileName ) + """
-  scale   = """ + str(self.dihedralScale)  
+  scale   = """ + str(self.dihedralScale)
             #end for
             code = code + """
 end
@@ -452,7 +452,7 @@ evaluate ( $viol.noe.viol01 = $violations )
 evaluate ( $rms.noe = $result )
 
 ! NOES per category analysis
-""" 
+"""
 # THE NOE RESTRAINT TABLES HAVE TO BE RESET AND READ AGAIN
 # TO MAKE THE ANALYSIS OF SEPARATE CLASSES WITH DIFFERENT
 # ACCEPTANCE CRITERIA POSSIBLE. THIS IS A WORKAROUND
@@ -486,7 +486,7 @@ evaluate ( $viol.noe.total = $violations + $viol.noe.total )
 # DO ALL THE CDIH CLASSES SEPARATELY:
         for dihed in self.dihedralRestraints:
             code = code + """
-restraints dihedral reset 
+restraints dihedral reset
   nassign = """ + str( self.dihedralMaxRestraints ) + """
   @@"""  + self.checkPath( self.directories.tables, dihed.fileName) + """
   scale   = """ + str(self.dihedralScale) + """
@@ -499,7 +499,7 @@ evaluate ( $viol.cdih.total = $viol.cdih.total + $violations )
 {*==========================================================================*}
 {*======================= CHECK ACCEPTANCE CRITERIA ========================*}
 {*==========================================================================*}
-    
+
 if ( $viol.cdih.total  > 0 ) then  evaluate ( $accept=$accept + 1 ) end if
 if ( $viol.noe.total  > 0 ) then  evaluate ( $accept=$accept + 1 ) end if
 
@@ -509,7 +509,7 @@ else
   evaluate ( $label = "NOT ACCEPTED" )
 end if
 
-"""             
+"""
         return code
 
 
@@ -520,11 +520,11 @@ end if
 {* Script sould be created elsewhere *}
 """
         pass
-        
+
     #------------------------------------------------------------------------
     def printScript( self, stream = sys.stdout ):
         fprintf( stream, self.script )
-        
+
     #------------------------------------------------------------------------
     def runScript( self ):
 
@@ -537,9 +537,9 @@ end if
             NTmessage('==> Created script "%s"\n',  scriptFileName)
 
         # Create job/log file
-        jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh') 
+        jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh')
         jobFile=open( jobFileName, 'w' )
-        logFileName = self.joinPath(self.directories.jobs, self.jobName + '.log') 
+        logFileName = self.joinPath(self.directories.jobs, self.jobName + '.log')
 
         fprintf( jobFile, '#!/bin/tcsh\n' )
         fprintf( jobFile, 'setenv SOLVENT %s\n',           self.protocolsPath )
@@ -547,11 +547,11 @@ end if
 #        fprintf( jobFile, 'setenv TABLES %s\n',            self.tablePath )
 #        fprintf( jobFile, 'setenv INPUTCOORDINATES %s\n',  self.inPath )
 #        fprintf( jobFile, 'setenv OUTPUTCOORDINATES %s\n', self.outPath )
-        fprintf( jobFile, 'cd %s \n', os.getcwd() )
-        fprintf( jobFile, '%s < %s > %s  \n', self.XPLOR, scriptFileName, logFileName )
+        fprintf( jobFile, 'cd %r \n', os.getcwd() )
+        fprintf( jobFile, '%r < %r > %r  \n', self.XPLOR, scriptFileName, logFileName )
         jobFile.close()
 
-        os.system('/bin/chmod +x %s' % jobFileName)
+        os.system('/bin/chmod +x %r' % jobFileName)
         if self.verbose:
             NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
 
@@ -568,7 +568,7 @@ end if
     #------------------------------------------------------------------------
     def seed( self ):
         return random.randint(10000,1000000)
-        
+
 # END class Xplor -----------------------------------------------------------
 
 #==============================================================================
@@ -579,10 +579,10 @@ class WaterRefine( Xplor ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-    
+
         Xplor.__init__( self, config, *args, **kwds )
         self.inPath  = self.directories.analyzed
-        self.outPath = self.directories.refined 
+        self.outPath = self.directories.refined
 
         if self.verbose:
             #self.keysformat()
@@ -592,15 +592,15 @@ class WaterRefine( Xplor ):
     #------------------------------------------------------------------------
     def createScript( self ):
         """ Create script"""
-                
+
         self.script = """
 {*==========================================================================*}
-remarks Solvent refinement protocol from ARIA1.2 (Nilges and Linge), 
+remarks Solvent refinement protocol from ARIA1.2 (Nilges and Linge),
 remarks modified for XPLOR-NIH
 {*==========================================================================*}
 
 """ + \
-self.setupPTcode() + self.readMolCode() + """   
+self.setupPTcode() + self.readMolCode() + """
 
 set message on echo on end
 
@@ -695,7 +695,7 @@ end
 ! fix the protein for initial minimization
 constraints fix (not resn tip3) end
 minimize powell nstep=500 drop=100 nprint=10 end
- 
+
 ! release protein and restrain harmonically
 constraints fix (not all) end
 vector do (refx=x) (all)
@@ -715,7 +715,7 @@ constraints
 interaction (not resname ANI) (not resname ANI)
 interaction ( resname ANI) ( resname ANI)
 end
-    
+
 evaluate ($mini_steps = 10)
 evaluate ($mini_step = 1)
 while ($mini_step <= $mini_steps) loop mini
@@ -744,7 +744,7 @@ vector do (vz=maxwell($bath)) (all)
 dynamics verlet
         nstep="""  + str(self.mdheat.nstep)  + """
         timest=""" + str(self.mdheat.timest) + """
-        tbath=$bath  
+        tbath=$bath
         tcoupling = true
         iasvel=current
         nprint=50
@@ -768,7 +768,7 @@ vector do (vz=maxwell($bath)) (all)
 dynamics verlet
         nstep="""  + str(self.mdhot.nstep)  + """
         timest=""" + str(self.mdhot.timest) + """
-        tbath=$bath  
+        tbath=$bath
         tcoupling = true
         iasvel=current
         nprint=50
@@ -818,7 +818,7 @@ vector do (vz=maxwell($bath)) (all)
 dynamics verlet
         nstep     = """ + str(self.mdcool.nstep)  + """
         timest    = """ + str(self.mdcool.timest) + """
-        tbath     = $bath  
+        tbath     = $bath
         tcoupling = true
         iasvel    = current
         nprint    = 50
@@ -854,7 +854,7 @@ self.writeMolCode() + """
 
 stop
 """
-        
+
 # END class Refine -----------------------------------------------------------
 
 
@@ -869,10 +869,10 @@ class Analyze( Xplor ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-    
+
         Xplor.__init__( self, config, *args, **kwds )
         self.inPath  = self.directories.converted
-        self.outPath = self.directories.analyzed 
+        self.outPath = self.directories.analyzed
 
         if self.verbose:
             #self.keysformat()
@@ -882,22 +882,22 @@ class Analyze( Xplor ):
     #------------------------------------------------------------------------
     def createScript( self ):
         """ Create script"""
-                
+
         self.script = """
 {*==========================================================================*}
-remarks initial analysis refinement protocol 
+remarks initial analysis refinement protocol
 remarks modified for XPLOR-NIH
 {*==========================================================================*}
 
 """ + \
-self.setupPTcode() + self.readMolCode() + """   
-set message on echo on end 
+self.setupPTcode() + self.readMolCode() + """
+set message on echo on end
 
 constraints
   interaction (not resname ANI) (not resname ANI)
   interaction ( resname ANI) ( resname ANI)
 end
-    
+
 ! Set occupancies to 1.00
 vector do (Q = 1.00) (all)
 """
@@ -964,7 +964,7 @@ vector do (harmonic = 0.0) (resname ANI and name Y )
 constraints
 interaction ( resname ANI) ( resname ANI)
 end
-    
+
 minimize powell nstep=100 drop=10 nprint=50 end
 minimize powell nstep=100 drop=10 nprint=50 end
 
@@ -981,7 +981,7 @@ self.writeMolCode() + """
 
 stop
 """
-            
+
 # END class Analyze------------------------------------------------------------
 
 
@@ -993,7 +993,7 @@ class GeneratePSF( Xplor ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-    
+
         Xplor.__init__( self, config, *args, **kwds )
         # make relative Path
         self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
@@ -1002,24 +1002,24 @@ class GeneratePSF( Xplor ):
         if self.verbose:
             #self.keysformat()
             NTmessage('%s\n', self.format())
-        #end if        
+        #end if
     #endif
 
     #------------------------------------------------------------------------
     def createScript( self ):
         """ Create script"""
-        
+
         self.script = """
 {*==========================================================================*}
 remarks Generation of psf-file
 remarks modified for XPLOR-NIH
 {*==========================================================================*}
 """ + \
-self.setupPTcode() + """   
-set message on echo on end 
+self.setupPTcode() + """
+set message on echo on end
 
 segment
-  chain 
+  chain
     @""" + os.path.realpath(os.path.join(self.topparPath,'topallhdg5.3.pep')) + """
     coord @""" + self.pdbFile + """
   end
@@ -1027,28 +1027,28 @@ end
 """
         for resid in self.patchHISD:
             self.script = self.script + """
-patch HISD 
-   reference=nil=( resid """ + str(resid) + """ ) 
+patch HISD
+   reference=nil=( resid """ + str(resid) + """ )
 end
 """
         for resid in self.patchHISE:
             self.script = self.script + """
-patch HISE 
-   reference=nil=( resid """ + str(resid) + """ ) 
+patch HISE
+   reference=nil=( resid """ + str(resid) + """ )
 end
 """
         for resid in self.patchCISP:
             self.script = self.script + """
 patch CISP
-   reference=nil=( resid """ + str(resid) + """ ) 
+   reference=nil=( resid """ + str(resid) + """ )
 end
 """
 
         self.script = self.script + """
-write psf output=""" + self.psfFile  + """ end 
+write psf output=""" + self.psfFile  + """ end
 
-stop 
-""" 
-  
+stop
+"""
+
 # END class GeneratePSF---------------------------------------------------------
-  
+

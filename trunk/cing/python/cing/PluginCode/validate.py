@@ -2505,6 +2505,7 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
 methods  = [(validateDihedrals, None),
             (validateModels,None),
             (validateAssignments, None),
+            (validateRestraints, None),
             (validate, None),
             (criticizeByAll, None),
             (checkForSaltbridges, None),
@@ -2515,9 +2516,9 @@ methods  = [(validateDihedrals, None),
             (calculateRmsd, None),
             (summary, None),
             (makeDihedralHistogramPlot, None),
-            (makeDihedralPlot, None)
+            (makeDihedralPlot, None),
            ]
 #saves    = []
-restores = [(validateRestraints, None),
-           ]
+#restores = [
+#           ]
 #exports  = []

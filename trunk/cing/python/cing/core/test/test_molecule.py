@@ -1,5 +1,6 @@
 from cing import cingDirTmp
 from cing import verbosityError
+from cing.core.molecule import Chain
 from cing.core.molecule import Coordinate
 from cing.core.molecule import NTangleOpt
 from cing.core.molecule import NTdihedralOpt
@@ -33,11 +34,11 @@ class AllChecks(TestCase):
         self.assertEquals( ensureValidChainId('A'), 'A')
         self.assertEquals( ensureValidChainId('ABCD'), 'A')
         self.assertEquals( ensureValidChainId('BCDE'), 'B')
-        self.assertEquals( ensureValidChainId('1'), '_')
-        self.assertEquals( ensureValidChainId('$'), '_')
-        self.assertEquals( ensureValidChainId('-'), '_')
-        self.assertEquals( ensureValidChainId('_'), '_')
-        self.assertEquals( ensureValidChainId(None), '_')
+        self.assertEquals( ensureValidChainId('1'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId('$'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId('-'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId('_'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId(None), Chain.defaultChainId)
 
 if __name__ == "__main__":
     fn = 'fooprof'
