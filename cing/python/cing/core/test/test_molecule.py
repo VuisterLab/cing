@@ -37,7 +37,7 @@ class AllChecks(TestCase):
         self.assertEquals( ensureValidChainId('1'), Chain.defaultChainId)
         self.assertEquals( ensureValidChainId('$'), Chain.defaultChainId)
         self.assertEquals( ensureValidChainId('-'), Chain.defaultChainId)
-        self.assertEquals( ensureValidChainId('_'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId('A'), Chain.defaultChainId) # They are the same.
         self.assertEquals( ensureValidChainId(None), Chain.defaultChainId)
 
 if __name__ == "__main__":
