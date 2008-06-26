@@ -61,10 +61,10 @@ parser.add_option("--pdbFile",
                   help="Define pdbFile (no .pdb extention).",
                   metavar="PDBFILE"
                  )
-parser.add_option("-n", "--nmodels",
+parser.add_option("--nmodels",
                   dest="nmodels", default=20,
-                  help="Define number of models to extract from PDBFILE.",
-                  metavar="PDBFILE"
+                  help="Define number of models to extract from PDBFILE (default=20).",
+                  metavar="NMODELS"
                  )
 parser.add_option("--peakFiles",
                   dest="peakFiles",

@@ -40,7 +40,7 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
-from cing.core.parameters import parameters
+#from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 #from cing.core.sml import SMLhandler
@@ -89,14 +89,13 @@ Project: Top level Cing project class
   ccpnResidue in ccpnChain.sortedResidues()  :: (ccp.molecule.MolSystem.Residue)
   ccpnAtom    in ccpnResidue.sortedAtoms()   :: (ccp.molecule.MolSystem.Atom)
 
-  Project  -> molecules[Molecule-1, Molecule-2, ...] # Molecules name list
-           -> molecule <-> ... (See Molecule)        # 'Current' molecule
+  Project <-> molecules[<Molecule-1>, <Molecule-2>, ...] #  Molecule instances list
+           -> molecule <-> ... (See Molecule)            # 'Current' molecule
 
-           -> peakLists[<Peaklist [<Peak>, ...]>]
+          <-> peaks[<Peaklist [<Peak>, ...]>]
           <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]
           <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]
 
-           -> parameters
            -> directories
            -> cingPaths
            -> plotParameters
@@ -135,7 +134,7 @@ Project: Top level Cing project class
                                 list to one merged entry
 
     to define and add a new PeakList to project:
-        peakList = project.newPeakList( name, status='keep' ):
+        peakList = project.peaks.new( name, status='keep' ):
 
     to define and add a new DistanceRestraintList to project:
         distanceRestraintList = project.distances.new( name, status='keep' ):
@@ -174,9 +173,8 @@ Project: Top level Cing project class
                            storedInCcpnFormat       =  False,       #
 
 
-                         # store a reference to te global things we might need
+                           # store a reference to the global things we might need
                            gui                      =  None,        # Reference to CingGui instance
-                           parameters               =  parameters,
                            directories              =  directories,
                            moleculeDirectories      =  moleculeDirectories,
                            cingPaths                =  cingPaths,
@@ -542,7 +540,8 @@ Project: Top level Cing project class
         # Save the molecules
         for mol in self.molecules:
             mol.save( mol.objectPath)
-        mol.moleculeNames = self.molecules.names()
+        self.moleculeNames = self.molecules.names()
+        self.saveXML('moleculeNames')
 
         # Save the molecules and lists
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:
@@ -588,6 +587,9 @@ Project: Top level Cing project class
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:
              pl.restore()
         #end for
+
+        for l in self.distances + self.dihedrals:
+            l.analyze()
 
         # Plugin registered functions
         for p in self.plugins.values():
@@ -782,7 +784,6 @@ Project: Top level Cing project class
 
 #end class
 
-#-----------------------------------------------------------------------------
 
 class XMLProjectHandler( XMLhandler ):
     """Project handler class"""
@@ -805,8 +806,7 @@ class XMLProjectHandler( XMLhandler ):
 #register this handler
 projecthandler = XMLProjectHandler()
 
-#
-#-----------------------------------------------------------------------------
+
 class _ProjectList( NTlist ):
     """Generic Project list class; only to be used internally
        Creates classDef instance when calling the new() method
@@ -904,6 +904,23 @@ class _ProjectList( NTlist ):
         for l in self:
             names.append(l.name)
         return names
+
+    def rename(self, oldName, newName):
+        """
+        Rename listitem oldName to newName
+        return the listitem of None on error
+        """
+        if not oldName in self.names():
+            NTerror('_ProjectList.rename: name"%s" not found', oldName)
+            return None
+        #end if
+        l = self.project[oldName]
+        del(self.project[oldName])
+        l.name = newName
+        self.project[newName] = l
+        l.objectPath = self.path( l.name )
+        return l
+    #end def
 
     def className(self):
         """Return a string describing the class of lists of this project list
@@ -1013,7 +1030,6 @@ class Peak( NTdict ):
 #end class
 
 
-#-----------------------------------------------------------------------------
 class PeakList( NTlist ):
 
     def __init__( self, name, status='keep' ):
@@ -1090,7 +1106,7 @@ def getAtomsFromAtomPairs(atomPairs):
                 result.append( real_atm )
     return result
 
-#-----------------------------------------------------------------------------
+
 class DistanceRestraint( NTdict ):
     """DistanceRestraint class:
        atomPairs: list of (atom_1,atom_2) tuples,
@@ -1321,7 +1337,6 @@ class DistanceRestraint( NTdict ):
 #end class
 
 
-#-----------------------------------------------------------------------------
 class DistanceRestraintList( NTlist ):
     """
     Class based on NTlist that holds distanceRestraints.
@@ -1420,7 +1435,7 @@ class DistanceRestraintList( NTlist ):
 
     def format( self ):
         return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n'+\
-                        'rmsd: %7s %6s        Violations > 0.1,0.3,0.5: %d, %d, %d\n',
+                        'rmsd: %7s %6s        Violations > 0.1,0.3,0.5: %d, %d, %d',
                       dots, self.name,self.status,len(self), dots,
                       val2Str(self.rmsdAv,         "%7.3f", 7),
                       val2Str(self.rmsdSd,         "%6.3f", 6),
@@ -1445,7 +1460,6 @@ class DistanceRestraintList( NTlist ):
 #end class
 
 
-#-----------------------------------------------------------------------------
 class DihedralRestraint( NTdict ):
     """
         DihedralRestraint class:
@@ -1738,7 +1752,7 @@ class DihedralRestraintList( NTlist ):
 
     def format( self ):
         return sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n'+\
-                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d\n',
+                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d',
                       dots, self.name,self.status,len(self), dots,
                       val2Str(self.rmsdAv,         "%7.3f", 7),
                       val2Str(self.rmsdSd,         "%6.3f", 6),
@@ -1951,9 +1965,10 @@ class RDCRestraintList( NTlist ):
 
     def format( self ):
         s = sprintf( '%s RDCRestraintList "%s" (%s,%d) %s\n' +\
-                     'rmsd: %7.3f %6.3f\n',
+                     'rmsd: %7.3f %6.3f',
                       dots, self.name,self.status,len(self), dots,
-                      self.rmsdAv, self.rmsdSd )
+                      self.rmsdAv, self.rmsdSd
+                   )
         return s
     #end def
 
@@ -2464,7 +2479,7 @@ def getFractionAbove( valueList, threshold ):
             n += 1.
     return n / len(valueList)
 
-#-----------------------------------------------------------------------------
+
 class AtomList( NTlist ):
     """
     Class based on NTlist that holds atoms.

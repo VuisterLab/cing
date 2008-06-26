@@ -195,12 +195,7 @@ def main():
                       dest="docdoc",
                       help="Print full documentation to stdout"
                      )
-    parser.add_option("-n",
-                      dest="name", default=None,
-                      help="NAME of the project (required)",
-                      metavar="PROJECTNAME"
-                     )
-    parser.add_option("--name", "--project",
+    parser.add_option("-n", "--name", "--project",
                       dest="name", default=None,
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
@@ -275,10 +270,15 @@ def main():
                       dest="validate",
                       help="Do validation"
                      )
-    parser.add_option("-v", "--verbosity", type='int',
-                      default=cing.verbosityDefault,
-                      dest="verbosity", action='store',
-                      help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
+    parser.add_option("--shiftx",
+                      action="store_true", default=False,
+                      dest="shiftx",
+                      help="Predict with shiftx"
+                     )
+    parser.add_option("--ranges",
+                      dest="ranges", default=None,
+                      help="Ranges for superpose, procheck, validate etc; e.g. 503-547,550-598,800,801",
+                      metavar="RANGES"
                      )
     parser.add_option( "--nosave",
                       action="store_true",
@@ -289,6 +289,11 @@ def main():
                       action="store_true",
                       dest="export",
                       help="Export before exit (default: noexport)"
+                     )
+    parser.add_option("-v", "--verbosity", type='int',
+                      default=cing.verbosityDefault,
+                      dest="verbosity", action='store',
+                      help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
 
     (options, _args) = parser.parse_args()
@@ -446,17 +451,23 @@ def main():
     #end if
 
     #------------------------------------------------------------------------------------
-    # Script
-    #------------------------------------------------------------------------------------
-    if options.script:
-        script( options.script )
-
-    #------------------------------------------------------------------------------------
     # Validate
     #------------------------------------------------------------------------------------
     if options.validate:
         project.validate()
     #end if
+
+    #------------------------------------------------------------------------------------
+    # Shiftx
+    #------------------------------------------------------------------------------------
+    if options.shiftx:
+        project.predictWithShiftx()
+
+    #------------------------------------------------------------------------------------
+    # Script
+    #------------------------------------------------------------------------------------
+    if options.script:
+        script( options.script )
 
     #------------------------------------------------------------------------------------
     # ipython

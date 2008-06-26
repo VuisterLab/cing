@@ -50,7 +50,7 @@ CING_SHELL_TEMPLATE = \
 # No changes needed below this line.
 #############################################
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
-%(export)s  CYTHON%(equals)s%(cingRoot)s/python/Cython
+%(export)s  CYTHON%(equals)s%(cingRoot)s/dist/Cython
 
 if %(conditional)s then
     %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYTHONPATH}

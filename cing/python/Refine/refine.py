@@ -37,10 +37,13 @@ from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.disk    import copy
+from cing.core.constants import XPLOR
 from cing.core.classes import Project
 from cing.core.molecule import dots
+from cing.core.molecule import mapMolecules
 from string import find
 from cing.Libs.NTutils import printf
+from fnmatch import fnmatch
 import os
 import sys
 import cing #@UnusedImport
@@ -63,38 +66,35 @@ def importFromRefine( config, params, project ):
         return None
     #end if
 
+    project.restore()
+
+    # import the coordinates from Xplor PDB files
     path = xplor.joinPath( xplor.directories.refined, xplor.baseName )
+    NTmessage('==> Importing coordinates from %s, models %s', path, models)
+    project.molecule.initCoordinates()
     for m in models:
-        p = sprintf(path, m)
-        if not os.path.exists( p ):
-            NTerror('moleculeFromRefine: model "%s" not found\n', p)
-            return None
+        xplorFile = sprintf(path, m)
+        if not os.path.exists( xplorFile ):
+            NTerror('importFromRefine: model "%s" not found\n', xplorFile)
+            continue
         #end if
+        project.molecule.importFromPDB( xplorFile, convention=XPLOR, nmodels=1)
     #end for
 
-    # import structures from Xplor PDB files
-    molecule = project.newMoleculeFromXplor( path, xplor.name, models )
+    # rename the molecule
+    project.molecules.rename(project.molecule.name, xplor.name)
+    print project.molecule.format()
+
     if 'superpose' in xplor and len(xplor.superpose) > 0:
-        molecule.superpose( ranges = xplor.superpose )
+        project.molecule.superpose( ranges = xplor.superpose )
 
-    #copy the  resonances from first molecule
-    rFile = project.path(project.directories.molecules,project.molecules[0], molecule.content.resonanceFile )
-    molecule.restoreResonances(  rFile, append=False )
-    print molecule.format()
     print project.format()
 
-    molecule.save( project.path(project.directories.molecules, molecule.name ) )
-
-    # remove original molecule
-    project.molecules.pop(0)
-    print project.format()
-    # Save the project file
-    obj2XML( project, path = project.path( project.cingPaths.project ) )
-
+    project.close()
 #end def
 
 
-def doSetup( config, project, basePath ):
+def doSetup( config, project, basePath, options ):
     """Generate the directory setup and parameter.py file from project and basePath
        Export the data from project
     """
@@ -106,9 +106,10 @@ def doSetup( config, project, basePath ):
     xplor = Xplor( config, basePath = basePath ) # generates the directories and initialize parameter setup
 
     # copy xplor parameter and topology files
-    for f in config.parameterFiles + config.topologyFiles:
-        copy( os.path.join(xplor.refinePath,'toppar',f), xplor.joinPath( xplor.directories.toppar, f ) )
-    #end for
+    for fname in os.listdir(os.path.join(xplor.refinePath,'toppar')):
+        if not fnmatch(fname,'.*'):
+#            print '>>',fname
+            copy( os.path.join(xplor.refinePath,'toppar', fname), xplor.joinPath( xplor.directories.toppar, fname ) )
     #print ">>", xplor
 
     # restore the data
@@ -118,6 +119,12 @@ def doSetup( config, project, basePath ):
         NTerror('doSetup: No molecule defined for project %s\n', project )
         sys.exit(1)
     #end if
+
+    project.validateRestraints( toFile=True )
+
+    if options.superpose and len(options.superpose) > 0:
+        xplor.superpose = options.superpose
+        project.molecule.superpose( ranges = xplor.superpose )
 
     # export the data
     NTmessage('\n' + dots*10 )
@@ -261,9 +268,6 @@ def refine( config, params, doPrint = 0 ):
     #end for
 #end def
 
-#------------------------------------------------------------------------------
-# Parsing code
-#------------------------------------------------------------------------------
 
 def parseRefineOutput( config, params, options ):
     """
@@ -279,7 +283,7 @@ def parseRefineOutput( config, params, options ):
     for i in asci2list( params.models ):
 
         file = xplor.checkPath( xplor.directories.jobs, 'refine_%d.log'%i )
-        NTmessage('==> Parsing %s\n', file )
+        NTmessage('==> Parsing %s', file )
 
         data = NTdict( fileName = file,
                          model = i
@@ -395,8 +399,8 @@ def parseRefineOutput( config, params, options ):
     resultFile.close()
     params.toFile( xplor.joinPath( 'parameters.py' ) )
 
-    print '>>>'
-    print xplor.format( params.__FORMAT__ )
+    #print '>>>'
+    #print xplor.format( params.__FORMAT__ )
 
     return results
 #end def
@@ -441,15 +445,15 @@ if __name__ == '__main__':
                       dest ="doc", default=False,
                       help="print extended documentation to stdout"
                      )
-    parser.add_option("-n", "--name",
+    parser.add_option("--project",
+                      dest="project", default=None,
+                      help="Cing project name (required); data will be in PROJECT.cing/Refine/NAME",
+                      metavar="PROJECT"
+                     )
+    parser.add_option("--name",
                       dest="name", default=None,
                       help="NAME of the refinement run (required)",
                       metavar="NAME"
-                     )
-    parser.add_option("--project",
-                      dest="project", default=None,
-                      help="Cing project name (required); data will be in PROJECT/Refine/NAME",
-                      metavar="PROJECT"
                      )
     parser.add_option("-s", "--setup",
                       action="store_true",
@@ -481,6 +485,11 @@ if __name__ == '__main__':
                       help="Model indices (e.g. 0,2-5,7,10-13)",
                       metavar="MODELS"
                      )
+    parser.add_option("--overwrite",
+                      action="store_true",
+                      dest="overwrite", default=False,
+                      help="Overwrite existing files (default: from parameters.py)"
+                     )
     parser.add_option("--parse",
                       action="store_true",
                       dest="doParse", default=False,
@@ -499,7 +508,12 @@ if __name__ == '__main__':
     parser.add_option("--import",
                       action="store_true",
                       dest="doImport", default=False,
-                      help="Import the refined structures of the refine run (default: no import)"
+                      help="Import the best models from PROJECT.cing/NAME/Refined (default: no import)"
+                     )
+    parser.add_option("--superpose",
+                      dest="superpose", default=None,
+                      help="superpose ranges; e.g. 503-547,550-598,800,801",
+                      metavar="SUPERPOSE"
                      )
     parser.add_option("-v", "--verbosity", type='int',
                       default=cing.verbosityDefault,
@@ -531,9 +545,9 @@ if __name__ == '__main__':
     parser.check_required('--name')
     parser.check_required('--project')
 
-    NTmessage(dots*10)
-    NTmessage("     Refine version %s", version)
-    NTmessage(dots*10)
+    NTmessage(dots*10+"\n")
+    NTmessage("     Refine version %s\n", version)
+    NTmessage(dots*10+"\n")
 
     #------------------------------------------------------------------------------
     # Project
@@ -549,7 +563,7 @@ if __name__ == '__main__':
     # Setup
     #------------------------------------------------------------------------------
     if options.doSetup:
-        doSetup( config, project, basePath )
+        doSetup( config, project, basePath, options )
         sys.exit(0)
     #end if
 
@@ -580,6 +594,13 @@ if __name__ == '__main__':
     #end if
 
     #------------------------------------------------------------------------------
+    # Overwrrite selection
+    #------------------------------------------------------------------------------
+    if options.overwrite:
+        parameters.overwrite = options.overwrite
+    #end if
+
+    #------------------------------------------------------------------------------
     # Action selection
     #------------------------------------------------------------------------------
     if options.doPSF:
@@ -597,7 +618,7 @@ if __name__ == '__main__':
     elif options.doImport:
         mol = importFromRefine( config, parameters, project )
     else:
-        NTerror('Error: refine.py, invalid option\n')
+        NTerror('refine.py, invalid option\n')
     #end if
 
 

@@ -1,6 +1,6 @@
 """
 Test superpose
-        
+
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
@@ -19,13 +19,13 @@ class SuperposeEnsemble( NTlist ):
         NTlist.__init__( self )
         self.averageModel = None
         self.molecule     = molecule
-        
+
         for i in range(0,molecule.modelCount):
             m = SuperposeModel('model'+str(i), i )
             self.append( m )
         #end for
         self.averageModel = SuperposeModel('averageModel', molecule.modelCount )
-        
+
         # Assemble the coordinates of the models
         for atm in molecule.allAtoms():
             if len(atm.coordinates) == molecule.modelCount:
@@ -36,26 +36,27 @@ class SuperposeEnsemble( NTlist ):
             #end if
         #end for
     #end def
-    
+
     def calculateAverageModel( self ):
         """
         Calculate averageModel from members of self
         Calculate rmsd to average for each model using fitCoordinates
+        and store values in NTlist instance in rmsd attribute of self
         Set rmsd of average model to <rmsd>
         Return averageModel or None on error
-        
+
         """
         for atm in self.molecule.allAtoms():
             atm.calculateMeanCoordinate()
         #end for
-        rmsd = NTlist()
+        self.rmsd = NTlist()
         for m in self:
-            rmsd.append( m.calculateRMSD( self.averageModel ) )
+            self.rmsd.append( m.calculateRMSD( self.averageModel ) )
         #end for
-        self.averageModel.rmsd, _tmp, _tmp = rmsd.average()
+        self.averageModel.rmsd, _tmp, _tmp = self.rmsd.average()
         return self.averageModel
     #end def
-    
+
     def setFitCoordinates( self, fitAtoms ):
         """
         Initialize the fitCoordinates lists of models of self from fitAtoms
@@ -64,7 +65,7 @@ class SuperposeEnsemble( NTlist ):
             model.fitCoordinates = NTlist()
         #end for
         self.averageModel.fitCoordinates = NTlist()
-    
+
         for atm in fitAtoms:
             for i in range(0, len(self) ):
                 self[i].fitCoordinates.append( atm.coordinates[i] )
@@ -72,7 +73,7 @@ class SuperposeEnsemble( NTlist ):
             self.averageModel.fitCoordinates.append( atm.meanCoordinate )
         #end for
     #end def
-    
+
     def superpose( self, fitAtoms, iterations=2 ):
         # superpose the members of the ensemble using fitAtoms
         # calculate averageModel
@@ -81,11 +82,11 @@ class SuperposeEnsemble( NTlist ):
         # iterations 1-n: calculate average; superpose on average
         #
         # return averageModel or None on error
-    
-        if len( self) == 0 or len( fitAtoms ) == 0: 
+
+        if len( self) == 0 or len( fitAtoms ) == 0:
             return None
         #end if
-        
+
         # Assemble the coordinates for the fitting
         self.setFitCoordinates( fitAtoms )
 
@@ -97,7 +98,7 @@ class SuperposeEnsemble( NTlist ):
             #end if
             m.superpose( m0 )
         #end for
-        
+
         niter = 1
         while ( niter < iterations ):
             av = self.calculateAverageModel()
@@ -106,14 +107,16 @@ class SuperposeEnsemble( NTlist ):
             #end for
             niter = niter + 1
         #end while
-        
+
         return self.calculateAverageModel()
     #end def
-    
+
     def __str__( self ):
-        return sprintf( '<Ensemble ("%s", models:%d)>', self.molecule.name, len(self) )
+        return sprintf( '<SuperposeEnsemble ("%s", models:%d, rmsd to mean: %.2f)>',
+                        self.molecule.name, len(self), self.averageModel.rmsd
+                      )
     #end def
-        
+
     def __repr__( self ):
         return str(self)
     #end def
@@ -127,14 +130,14 @@ class SuperposeEnsemble( NTlist ):
 class SuperposeModel( NTcMatrix ):
     """
     SuperposeModel class, rotation translation 4x4  superpose
-    
+
     """
     def __init__( self, name, index ):
-        
+
         NTcMatrix.__init__( self )
         self.name              = name
         self.index             = index
-        self.coordinates       = NTlist()  # All coordinate instances of SuperposeModel 
+        self.coordinates       = NTlist()  # All coordinate instances of SuperposeModel
         self.fitCoordinates    = NTlist()  # Coordinates used for fitting
         self.rmsd              = 0.0
     #end def
@@ -155,13 +158,13 @@ class SuperposeModel( NTcMatrix ):
         smtx = superposeVectors( v1, v2 )
         #copy the result to self
         smtx.copy( self )
-    
+
         # transform and calculate rmsd
         self.transform()
         self.rmsd = calculateRMSD( v1, v2 )
         return self.rmsd
     #end def
-    
+
     def calculateRMSD( self, other ):
         """
         Calculate rmsd of fitCoordinates of SuperposeModel with respect to other
@@ -177,7 +180,7 @@ class SuperposeModel( NTcMatrix ):
         self.rmsd = calculateRMSD( v1, v2 )
         return self.rmsd
     #end def
-    
+
     def transform( self ):
         # Transform all coordinates according to rotation/translation matrix
         for c in self.coordinates:
@@ -188,11 +191,11 @@ class SuperposeModel( NTcMatrix ):
     def __str__( self ):
         return sprintf('<SuperposeModel "%s" (coor:%d,fit:%d)>', self.name, len(self.coordinates), len(self.fitCoordinates) )
     #end def
-        
+
     def __repr__( self ):
         return str(self)
     #end def
-    
+
     def format( self ):
         # generate a string representation
         s = sprintf('%s %s %s\n', dots, str(self), dots)
@@ -206,11 +209,11 @@ class SuperposeModel( NTcMatrix ):
 #-----------------------------------------------------------------------------
 # Superpose routines
 #-----------------------------------------------------------------------------
-def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False, 
+def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False,
                iterations=2, verbose = True ):
     """
     Superpose the coordinates of molecule
-    returns ensemble or NoneObject on error 
+    returns ensemble or NoneObject on error
     """
 
     if not molecule:
@@ -220,9 +223,9 @@ def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False,
     if molecule.modelCount <= 0:
         return NoneObject
     #end if
-    
+
     ensemble = SuperposeEnsemble( molecule )
-    
+
     # Partition the Atoms
     fitted        = []
     notFitted     = []
@@ -245,13 +248,12 @@ def superpose( molecule, ranges=None, backboneOnly=True, includeProtons = False,
             #end if
         #end for
     #end for
-    
-    if verbose:
-        NTmessage("==> Superposing: fitting on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)", 
-                  len(fitted), ranges, backboneOnly, includeProtons
-                 )
-                 
+
+    NTmessage("==> Superposing: fitted %s on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)",
+                  molecule, len(fitted), ranges, backboneOnly, includeProtons
+             )
     ensemble.superpose( fitted, iterations=iterations )
+    NTmessage("    rmsd's: [ %s] average: %.2f +- %.2f", ensemble.rmsd.format('%.2f '), ensemble.rmsd.av, ensemble.rmsd.sd)
     #molecule.calculateRmsd( ranges=ranges )
     return ensemble
 #end def
