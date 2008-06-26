@@ -2,11 +2,11 @@ from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
@@ -24,9 +24,9 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -38,12 +38,14 @@ from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.dictionaries import translateAtomName
 from cing.core.dictionaries import translateResidueName
-#from cing.core.sml import SMLhandler
-from database     import NTdb
+from database import NTdb
+from math import acos
+from math import pi
 from parameters   import plotParameters
 import math
 import os
 import sys
+#from cing.core.sml import SMLhandler
 
 #==============================================================================
 # Global variables
@@ -219,6 +221,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def __repr__(self):
         return str(self)
     #end def
+
 
     def setAllChildrenByKey(self, key, value):
         "Set chain,res, and atom children's keys to value"
@@ -941,12 +944,65 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             for dihedral in res.db.dihedrals:
                 res.dihedral( dihedral.name )
 
-    def updateMean( self)   :
+    def updateMean( self):
         """Calculate mean coordinates for all atoms
         """
         NTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
         for atm in self.allAtoms():
             atm.calculateMeanCoordinate()
+
+    def idDisulfides(self):
+        """Just identify the disulfide bonds.
+        """
+        CUTOFF_SCORE = 0.9 # Default is 0.9
+        NTdebug('Identify the disulfide bonds.')
+        cys=self.residuesWithProperties('C')
+        pairList = []
+        cyssDict2Pair = {}
+        # all cys(i), cys(j) pairs with j>i
+        for i in range(len(cys)):
+            c1 = cys[i]
+            for j in range(i+1, len(cys)):
+                c2 = cys[j]
+                scoreList = disulfideScore( c1, c2)
+#                if cing.verbosity > cing.verbosityDebug: # impossible of course
+                if False:
+                    da = c1.CA.distance( c2.CA )
+                    db = c1.CB.distance( c2.CB )
+                    dg = c1.SG.distance( c2.SG )
+                    chi3SS( db[0] )                        
+                    NTdebug( 'Considering pair : %s with %s' % (c1, c2)) 
+                    NTdebug( 'Ca-Ca            : %s', da)
+                    NTdebug( 'Cb-Cb            : %s', db)
+                    NTdebug( 'Sg-Sg            : %s', dg)
+                    NTdebug( 'chi3             : %s', chi3SS( db[0] ))
+                    NTdebug( 'scores           : %s', disulfideScore( c1, c2))
+                    NTdebug( '\n\n' )
+                if scoreList[3] >= CUTOFF_SCORE:
+                    toAdd = True
+                    for c in ( c1, c2 ):
+                        if cyssDict2Pair.has_key( c ):
+                            toAdd = False
+                            c_partner_found_before = cyssDict2Pair[c][0]
+                            if c_partner_found_before == c:
+                                c_partner_found_before = cyssDict2Pair[c][1]
+                            c_partner_found = c1
+                            if c_partner_found == c:
+                                c_partner_found = c2
+                            NTwarning('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
+                                  c, c_partner_found_before, c_partner_found ))
+                    if toAdd:
+                        pair = (c1, c2)
+                        pairList.append(pair)
+                        cyssDict2Pair[c1] = pair
+                        cyssDict2Pair[c2] = pair
+        if pairList:
+            NTmessage( 'Recognized the following disulfide bridged residues.' )
+            for pair in pairList:
+                NTmessage( '%s %s' % (pair[0], pair[1] ))
+        else:
+            NTmessage( 'No disulfide bridged residues found' )
+    # end def
 
     def updateAll( self)   :
         """Calculate the dihedral angles for all residues
@@ -955,6 +1011,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         if self.modelCount > 0:
             self.updateDihedrals()
             self.updateMean()
+            self.idDisulfides()
 #            self.dssp() # TODO move dssp to this location.
         #end if
     #end def
@@ -3103,3 +3160,58 @@ def rmsd( atomList ):
     #end for
     return (math.sqrt( result/n ), n)
 #end def
+
+
+def chi3SS( dCbCb ):
+    """
+    Return approximation of the chi3 torsion angle as 
+    fie of the distance between the Cb atoms of each Cys residue
+    
+    Dombkowski, A.A., Crippen, G.M, Protein Enginering, 13, 679-89, 2000
+    Page 684, eq. 9
+    """
+    return acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
+
+
+def disulfideScore( cys1, cys2 ):
+    """
+    Define a score [0.0,1.0] for a potential cys1-cys2 disulfide bridge.
+    Based upon simple counting:
+    - Ca-Ca distance
+    - Cb-Cb distance
+    - Ability to form S-S dihedral within specified range or the presence 
+      of short distance SG-SG
+      
+    Initial test show that existing disulfides have scores > 0.9
+    Potential disulfides score > ~0.25
+    
+    Limits based upon analysis by:
+      Pellequer J-L and Chen, S-W.W, Proteins, Struct, Func and Bioinformatics 
+      65, 192-2002 (2006)
+      DOI: 10.1002/prot.21059
+    
+    cys1, cys2: Residue instances
+    returns a NTlist with four numbers:
+        [d(Ca-Ca) count, d(Cb-Cb) count, S-S count, final score]
+        
+    """
+    mc = len(cys1.CA.coordinates) # model count
+    score = NTlist(0., 0., 0., 0.)
+    for m in range( mc ):
+        da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
+        if da >= 3.72 and da <= 6.77: 
+            score[0] += 1
+            
+        db = NTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
+        if db >= 3.18 and db <= 4.78: 
+            score[1] += 1
+        
+        dg = NTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
+        chi3 = chi3SS( db )
+        if (dg >= 1.63 and dg <= 2.72) or (chi3 >= 27.0 and chi3 <= 153.0): 
+            score[2] += 1
+        #print '>', da, db, dg, chi3, score
+    #end for
+        
+    score[3] = score.sum() / (3. * mc)
+    return score
