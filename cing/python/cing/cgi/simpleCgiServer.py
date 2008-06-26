@@ -64,7 +64,8 @@ class SimpleCgiServer():
         NTmessage( "Content-Type: text/html\n" )     # HTML is following # blank line, end of headers
         
     def main(self):
-        NTmessage( "<TITLE>CGI script output</TITLE>")
+        NTmessage( '<TITLE>CGI script output</TITLE>')
+        NTmessage( '<LINK REL="SHORTCUT ICON" href="cing.ico">')
         NTmessage( "<H1>This is my first CGI script</H1>")
         NTmessage( "Hello, worldddd!")
         NTerror( "Where does this error show up/")
