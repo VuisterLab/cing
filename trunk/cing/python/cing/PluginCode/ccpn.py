@@ -724,7 +724,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                                           ccpnResSeq, atomName) )
 
         if not atom:
-            NTwarning( ' atom not found in Cing DB: %s, %s, %s, %s, %s, %s, %s Res name = %s',
+            NTwarning( 'Atom not found in Cing DB: %s, %s, %s, %s, %s, %s, %s Res name = %s',
                      namingSystem, convention, ccpnChainLetter,
                      ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName,
                      namingSystem, resNameInSysName )
@@ -742,7 +742,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                         #TODO: it usully happens for H in N-term, which CING is not mapping yet.
                         NTwarning('Atom not found in Ccpn: %s, %s', ccpnAtom, atom)
                         continue
-#                        NTwarning(' atom not found in Ccpn: %s, %s, %s, %s, %s, %s, Diana Res name = %s',
+#                        NTwarning('Atom not found in Ccpn: %s, %s, %s, %s, %s, %s, Diana Res name = %s',
 #                           namingSystem, convention, ccpnChainLetter,
 #                           ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName,
 #                           resNameInSysName)
@@ -791,7 +791,7 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
 
         moleculeName = _checkName(ccpnMolecule.code)
 
-        if ( moleculeName not in cingProject.moleculeNames ):
+        if ( moleculeName not in [mol.name for mol in cingProject.molecules] ):
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
             NTerror( "You may want to import '%s' from Ccpn first",
@@ -940,8 +940,8 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
         moleculeName = _checkName(ccpnMolecule.code)
 
-        if ( moleculeName not in cingProject.moleculeNames ):
-            NTerror( " '%s': molecule '%s' not found in Cing.Project",
+        if ( moleculeName not in [mol.name for mol in cingProject.molecules] ):
+            NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
             NTerror( "You may want to import '%s' from Ccpn first",
                        moleculeName )
@@ -952,33 +952,34 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
         if ( molecule ):
 
-            if ( ccpnNmrProject ):
+            ccpnShiftLists = ccpnNmrProject.findAllMeasurementLists \
+                                             (className = 'ShiftList') or ()
+            doneSetShifts = False
 
-                ccpnShiftLists = ccpnNmrProject.findAllMeasurementLists \
-                                                 (className = 'ShiftList') or ()
+            for ccpnShiftList in ccpnShiftLists:
 
-                for ccpnShiftList in ccpnShiftLists:
-
-                    shiftMapping = _getShiftAtomNameMapping( ccpnShiftList,
-                                                             ccpnMolecule )
-                    _setShifts( molecule, shiftMapping, ccpnShiftList )
-                # end for
-
+                shiftMapping = _getShiftAtomNameMapping( ccpnShiftList,
+                                                         ccpnMolecule )
+                doneSetShifts = _setShifts( molecule, shiftMapping,
+                                            ccpnShiftList )
+            # end for
+            if doneSetShifts:
                 NTmessage( "Ccpn shifts (resonances) for molecule '%s' imported", moleculeName )
                 NTmessage( '%s', cingProject.molecule.format() )
-            # end if
         # end if
     # end for
 
     # Get ALL peaks from Ccpn NmrProject and link them to resonances
     # It's supposed to be done only once
-    _setPeaks( cingProject, ccpnNmrProject )
+    doneSetPeaks = _setPeaks( cingProject, ccpnNmrProject )
 
-    NTmessage( "Ccpn peaks for Cing.Project '%s' imported", cingProject.name )
-    NTmessage( '%s', cingProject.format() )
+    if doneSetPeaks:
+        NTmessage( "Ccpn peaks for Cing.Project '%s' imported", cingProject.name )
+        NTmessage( '%s', cingProject.format() )
 
-    cingProject.addHistory( sprintf(funcName) )
-    cingProject.updateProject()
+    if doneSetPeaks or doneSetShifts:
+        cingProject.addHistory( sprintf(funcName) )
+        cingProject.updateProject()
 # end def importFromCcpnPeaksAndShifts
 
 def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
@@ -1103,14 +1104,16 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList ):
     # end for
     NTmessage( "ShiftList '%s' imported from Ccpn Nmr project '%s'",
                    ccpnShiftList.name, ccpnShiftList.parent.name )
+    return True
 # end def _setShifts
 
 def _setPeaks( cingProject, ccpnNmrProject ):
     '''Descrn: Core function that sets peaks imported from Ccpn for a
                Cing.Project and links to resonances.
        Inputs: Cing.Project instance, ccp.nmr.Nmr.NmrProject.
-       Output: Cing.Project or None or error.
+       Output: Cing.Project or None or error. Returns True if peaks found.
     '''
+    done = False
 
     for ccpnExperiment in ccpnNmrProject.experiments:
         shiftList = ccpnExperiment.shiftList
@@ -1203,9 +1206,11 @@ def _setPeaks( cingProject, ccpnNmrProject ):
 
                 NTmessage("PeakList '%s' imported from Ccpn Nmr project '%s'",
                               peakListName, ccpnNmrProject.name)
+                done = True
             # end for
         # end for
     # end for
+    if done: return True
 # end def _setPeaks
 
 def _restraintsValues(constraint):
