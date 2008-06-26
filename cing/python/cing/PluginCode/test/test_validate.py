@@ -21,7 +21,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         pdbConvention = CYANA
