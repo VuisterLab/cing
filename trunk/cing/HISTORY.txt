@@ -1,3 +1,13 @@
+0.764: 1 July 2008: GWV
+    - Rewrote RMSD calculation routine (much, much quicker); now part of molecule class (moved RmsdResult, Ensemble, Model, etc
+      classes as well).
+    - Ranges used for superpose are stored as molecule attribute and used for rmsd calculations on restoring the molecule instance.
+    - Fixed bug using script option on command line.
+    - changed numpy.arange import in NTplot to Numeric.
+    - worked on the refine routines.
+    - Improved the Makefile
+    - main: --shiftx, --superpose options
+
 0.76: 23 Jun 2008: GWV
     - project.molecules is now a _ProjectList instance (used to be a NTlist instance with names)
       molecule names are stored now in moleculeNames attribute

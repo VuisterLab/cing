@@ -1020,7 +1020,7 @@ set message on echo on end
 
 segment
   chain
-    @""" + os.path.realpath(os.path.join(self.topparPath,'topallhdg5.3.pep')) + """
+    @""" + self.joinPath( self.directories.toppar,'topallhdg5.3.pep') + """
     coord @""" + self.pdbFile + """
   end
 end

@@ -106,7 +106,11 @@ def formatall( object ):
     #end try
 #end def
 
+args = []
+kwds = {}
+
 def script( scriptFile, *a, **k ):
+    # Hack to get arguments to routine as global variables to use in script
     global args
     global kwds
     args = a
@@ -124,7 +128,7 @@ def script( scriptFile, *a, **k ):
         #end if
     #end if
 
-    NTmessage('==> Executing script '+ scriptFile )
+    NTmessage('==> Executing script "%s"', scriptFile )
     execfile( scriptFile, globals() )
 
 #end def
@@ -171,6 +175,8 @@ def testOverall():
 project = None # after running main it will be filled.
 
 def main():
+
+    global project
 
     root,file,_ext  = NTpath( __file__ )
     usage          = "usage: cing [options]       use -h or --help for listing"
@@ -279,6 +285,11 @@ def main():
                       dest="ranges", default=None,
                       help="Ranges for superpose, procheck, validate etc; e.g. 503-547,550-598,800,801",
                       metavar="RANGES"
+                     )
+    parser.add_option("--superpose",
+                      action="store_true", default=False,
+                      dest="superpose",
+                      help="Do superposition; optionally uses RANGES"
                      )
     parser.add_option( "--nosave",
                       action="store_true",
@@ -462,6 +473,12 @@ def main():
     #------------------------------------------------------------------------------------
     if options.shiftx:
         project.predictWithShiftx()
+
+    #------------------------------------------------------------------------------------
+    # Superpose
+    #------------------------------------------------------------------------------------
+    if options.superpose:
+        project.superpose(ranges=options.ranges)
 
     #------------------------------------------------------------------------------------
     # Script

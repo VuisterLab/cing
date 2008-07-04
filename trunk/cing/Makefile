@@ -8,7 +8,8 @@ install:
 
 superpose:
 	@echo "==> Installing the cython dependency"
-	@/bin/rm -f python/cing/Libs/cython/Superpose.so
+	@/bin/rm -f python/cing/Libs/cython/superpose.so
+	@/bin/rm -f python/cing/Libs/cython/superpose.c
 	@cd python/cing/Libs/cython; python compile.py build_ext --inplace
 
 test:

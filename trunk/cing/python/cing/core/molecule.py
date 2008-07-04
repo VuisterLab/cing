@@ -5,6 +5,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
@@ -19,6 +20,7 @@ from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import length3Dopt
+from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import sprintf
 from cing.Libs.PyMMLib import ATOM
@@ -27,6 +29,9 @@ from cing.Libs.PyMMLib import PDBFile
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.Libs.cython.superpose import NTcMatrix #@UnresolvedImport
+from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
+from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -47,6 +52,8 @@ import os
 import sys
 #from cing.core.sml import SMLhandler
 
+
+
 #==============================================================================
 # Global variables
 #==============================================================================
@@ -54,6 +61,7 @@ AtomIndex = 1
 
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
+# Superseeded by SML routines
 NTmolParameters = NTdict(
     version        = 0.92,
     contentFile    = 'content.xml',
@@ -83,10 +91,11 @@ A Zinc ion will usually be part of the same chain in CING whereas it will be
 in a different assembly entity in NMR-STAR. This has consequences for numbering.
 -------------------------------------------------------------------------------
 
-                                     Coordinate
-                                       ^
-                                       |
-                                       v
+  Ensemble <-> [Model1, ..] -> [Coordinate_atom1, ..]
+    ^                             [Coordinate1, ..]
+    |                                  ^
+    |                                  |
+    v                                  v
   Molecule <-> Chain <-> Residue <-> Atom <-> Resonance <- Peak
                             |          |
                             v          v
@@ -169,8 +178,9 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
         self.xeasy            = None         # reference to xeasy class, used in parsing
         self.rogScore         = ROGscore()
+        self.ranges           = None         # ranges used for superposition/rmsd calculations
 
-        self.saveXML('chainCount','residueCount','atomCount')
+#        self.saveXML('chainCount','residueCount','atomCount')
 
         # save the content definitions; depreciated since version 0.75
         # Maintained for compatibility
@@ -237,17 +247,17 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
     def addChain( self, name=None, **kwds ):
         """
-            Add Chain instance name
+        Add Chain instance name
            or
-           pick next chain identifier when chain=None
+        pick next chain identifier when chain=None
 
-           Return Chain instance or None upon error
+        Return Chain instance or None upon error
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
         if name==None:
             name = self.getChainIdForChainCount()
         if name in self:
-            NTerror( 'ERROR Molecule.addChain: chain "%s" already present\n', name )
+            NTerror( 'Molecule.addChain: chain "%s" already present', name )
             return None
         #end if
         chain = Chain( name=name, **kwds )
@@ -935,10 +945,6 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
-#        if self.modelCount <= 0:
-#            NTdebug('No models so skipping calculating dihedral angles')
-#            return
-
         NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
             for dihedral in res.db.dihedrals:
@@ -1007,16 +1013,21 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def updateAll( self)   :
         """Calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
+           Generate an ensemble from coordinates
+           Calculate the rmsd's
         """
         if self.modelCount > 0:
             self.updateDihedrals()
             self.updateMean()
+            self.ensemble = Ensemble( self )
+            if self.has_key('ranges'):
+                self.calculateRMSDs(ranges=self.ranges)
             self.idDisulfides()
 #            self.dssp() # TODO move dssp to this location.
         #end if
     #end def
 
-    #--------------------------------------------------------------------------
+
     def initialize( name, path = None, convention=LOOSE, **kwds   ):
 
         """
@@ -1132,6 +1143,154 @@ Return an Molecule instance or None on error
         return result
     #end def
 
+
+    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
+        """
+        Superpose the coordinates of molecule
+        returns ensemble or NoneObject on error
+        """
+        #@TODO: replace molecule by self
+        molecule=self
+        if molecule.modelCount <= 0:
+            return NoneObject
+        #end if
+
+##        self.ensemble = Ensemble( molecule )
+
+        # Partition the Atoms
+        fitted        = []
+        notFitted     = []
+        noCoordinates = []
+        fitResidues   = molecule.ranges2list( ranges )
+        # store the ranges
+        self.ranges   = list2asci( fitResidues.zap('resNum'))
+
+        for res in molecule.allResidues():
+            fitResidue = res in fitResidues
+            for a in res.allAtoms():
+                if len(a.coordinates) != molecule.modelCount:
+                    noCoordinates.append( a )
+                    continue
+                if ( (not fitResidue) or
+                     (not includeProtons and a.isProton()) ):
+                    notFitted.append( a )
+                    continue
+                if backboneOnly and a.isSidechain():
+                    notFitted.append( a )
+                else:
+                    fitted.append( a )
+                #end if
+            #end for
+        #end for
+        #print fitted
+
+        NTmessage("==> Superposing: fitted %s on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)",
+                      molecule, len(fitted), ranges, backboneOnly, includeProtons
+                 )
+        self.ensemble.superpose( fitted, iterations=iterations )
+        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
+               )
+        r = molecule.calculateRMSDs(ranges=ranges)
+        NTdetail( r.format() )
+        return self.ensemble
+    #end def
+
+
+    def calculateRMSDs( self, ranges=None, models = None   ):
+        """
+        Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
+        Optionally  select for rnages and models.
+        return rmsd result of molecule, or None on error
+        """
+        #@TODO: replace molecule by self
+        molecule = self
+
+        if molecule.modelCount == 0:
+            NTerror('Molecule.calculateRMSDs: no coordinates for %s', project.molecule)
+            return None
+        #end if
+
+        selectedResidues = molecule.ranges2list( ranges )
+        selectedModels   = molecule.models2list( models )
+
+        molecule.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
+        for res in molecule.allResidues():
+            res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
+            res.rmsd.bbtemp = NTlist() # list of included bb-atms
+            res.rmsd.hvtemp = NTlist() # list of included heavy-atms
+
+            for atm in res.allAtoms():
+                if not atm.isProton() and len(atm.coordinates)>0:
+                    res.rmsd.hvtemp.append(atm)
+                    if not atm.isSidechain():
+                        res.rmsd.bbtemp.append(atm)
+            #end for
+            res.rmsd.backboneCount   = len(res.rmsd.bbtemp)
+            res.rmsd.heavyAtomsCount = len(res.rmsd.hvtemp)
+            if res in selectedResidues:
+                res.rmsd.included = True
+                molecule.rmsd.backboneCount += res.rmsd.backboneCount
+                molecule.rmsd.heavyAtomsCount += res.rmsd.heavyAtomsCount
+                #print '>>',res.rmsd.bbtemp
+            else:
+                res.rmsd.included = False
+            #end if
+        #end for
+
+        NTdebug("Calculating rmsd's: %s", ranges)
+
+        for res in molecule.allResidues():
+            if res.rmsd.backboneCount > 0:
+                Vmean = []
+                for atm in res.rmsd.bbtemp:
+                    Vmean.append(atm.meanCoordinate.e)
+                #end for
+                for i,model in enumerate(selectedModels):     # number of evaluated models (does not have to coincide with model
+                                                              # since we may supply an external list
+                    Vbb = []
+                    for atm in res.rmsd.bbtemp:
+                        Vbb.append(atm.coordinates[model].e)
+                    #end for
+                    res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
+
+                    if res.rmsd.included:
+                        molecule.rmsd.backbone[i] += (res.rmsd.backbone[i]**2)*res.rmsd.backboneCount
+                    #end if
+                #end for
+            #end if
+            if res.rmsd.heavyAtomsCount > 0:
+                Vmean = []
+                for atm in res.rmsd.hvtemp:
+                    Vmean.append(atm.meanCoordinate.e)
+                #end for
+                for i,model in enumerate(selectedModels):     # number of evaluated models (does not have to coincide with model
+                                                              # since we may supply an external list
+                    Vhv = []
+                    for atm in res.rmsd.hvtemp:
+                        Vhv.append(atm.coordinates[model].e)
+                    #end for
+                    res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
+
+                    if res.rmsd.included:
+                        molecule.rmsd.heavyAtoms[i] += (res.rmsd.heavyAtoms[i]**2)*res.rmsd.heavyAtomsCount
+                    #end if
+                #end for
+            #end if
+            res.rmsd._closest()
+            res.rmsd._average()
+        #end for
+
+        for i, model in enumerate(selectedModels):
+            molecule.rmsd.backbone[i]   = math.sqrt(molecule.rmsd.backbone[i]/max(molecule.rmsd.backboneCount,1))
+            molecule.rmsd.heavyAtoms[i] = math.sqrt(molecule.rmsd.heavyAtoms[i]/max(molecule.rmsd.heavyAtomsCount,1))
+        #end for
+        molecule.rmsd._closest()
+        molecule.rmsd._average()
+
+        return molecule.rmsd
+    #end def
+
     def toPDB( self, model = None, convention = IUPAC   ):
         """
         Return a PyMMlib PDBfile instance or None on error
@@ -1215,6 +1374,268 @@ Return an Molecule instance or None on error
         #end if
     #end def
 #end class
+
+
+
+class Ensemble( NTlist ):
+    """
+    Ensemble class hold is a list of Models instances.
+    Initialization is done from a Molecule instance, thus the class represents
+    a different arrangement of the coordinate instances of a molecule.
+    """
+    def __init__( self, molecule ):
+        NTlist.__init__( self )
+        self.averageModel = None
+        self.molecule     = molecule
+
+        for i in range(0,molecule.modelCount):
+            m = Model('model'+str(i), i )
+            self.append( m )
+        #end for
+        self.averageModel = Model('averageModel', molecule.modelCount )
+
+        # Assemble the coordinates of the models
+        for atm in molecule.allAtoms():
+            if len(atm.coordinates) == molecule.modelCount:
+                for i in range(0,molecule.modelCount):
+                    self[i].coordinates.append( atm.coordinates[i] )
+                #end for
+                self.averageModel.coordinates.append( atm.meanCoordinate )
+            #end if
+        #end for
+    #end def
+
+    def calculateAverageModel( self ):
+        """
+        Calculate averageModel from members of self
+        Calculate rmsd to average for each model using fitCoordinates
+        and store values in NTlist instance in rmsd attribute of self
+        Set rmsd of average model to <rmsd>
+        Return averageModel or None on error
+
+        """
+        for atm in self.molecule.allAtoms():
+            atm.calculateMeanCoordinate()
+        #end for
+        self.rmsd = NTlist()
+        for m in self:
+            self.rmsd.append( m.calculateRMSD( self.averageModel ) )
+        #end for
+        self.averageModel.rmsd, _tmp, _tmp = self.rmsd.average()
+        return self.averageModel
+    #end def
+
+    def setFitCoordinates( self, fitAtoms ):
+        """
+        Initialize the fitCoordinates lists of models of self from fitAtoms
+        """
+        for model in self:
+            model.fitCoordinates = NTlist()
+        #end for
+        self.averageModel.fitCoordinates = NTlist()
+
+        for atm in fitAtoms:
+            for i in range(0, len(self) ):
+                self[i].fitCoordinates.append( atm.coordinates[i] )
+            #end for
+            self.averageModel.fitCoordinates.append( atm.meanCoordinate )
+        #end for
+    #end def
+
+    def superpose( self, fitAtoms, iterations=2 ):
+        """
+        superpose the members of the ensemble using fitAtoms
+        calculate averageModel
+
+        iteration 0: superpose on model[0]
+        iterations 1-n: calculate average; superpose on average
+
+        return averageModel or None on error
+        """
+        if len( self) == 0 or len( fitAtoms ) == 0:
+            return None
+        #end if
+
+        # Assemble the coordinates for the fitting
+        self.setFitCoordinates( fitAtoms )
+
+        # iteration 1: fit to first model
+        m0 = self[0]
+        for m in self[1:]:
+            if len(m.fitCoordinates) != len(m0.fitCoordinates):
+                return None
+            #end if
+            m.superpose( m0 )
+        #end for
+
+        niter = 1
+        while ( niter < iterations ):
+            av = self.calculateAverageModel()
+            for m in self:
+                m.superpose( av )
+            #end for
+            niter = niter + 1
+        #end while
+
+        return self.calculateAverageModel()
+    #end def
+
+    def __str__( self ):
+        return sprintf( '<Ensemble ("%s", models:%d, rmsd to mean: %.2f)>',
+                        self.molecule.name, len(self), self.averageModel.rmsd
+                      )
+    #end def
+
+    def __repr__( self ):
+        return str(self)
+    #end def
+
+    def format( self ):
+        return str( self )
+    #end def
+#end class
+
+
+class Model( NTcMatrix ):
+    """
+    Model class, rotation translation 4x4  superpose
+    Contains a list of fitCooridinates and
+
+    """
+    def __init__( self, name, index ):
+
+        NTcMatrix.__init__( self )
+        self.name              = name
+        self.index             = index
+        self.coordinates       = NTlist()  # All coordinate instances of Model
+        self.fitCoordinates    = NTlist()  # Coordinates used for fitting
+        self.rmsd              = 0.0
+    #end def
+
+    def superpose( self, other ):
+        """
+        Superpose coordinates of self onto other.
+        Use vectors of fitCoordinates for superposition.
+        return rmsd between self and other using fitCoordinates or -1.0 on Error
+        """
+        v1 = self.fitCoordinates.zap( 'e' )
+        v2 = other.fitCoordinates.zap( 'e' )
+        if len(v1) != len(v2):
+            NTerror("Model.superpose: unequal length fitCoordinates (%s and %s)", self, other)
+            return -1.0
+        #end if
+
+        smtx = superposeVectors( v1, v2 )
+        #copy the result to self
+        smtx.copy( self )
+
+        # transform and calculate rmsd
+        self.transform()
+        self.rmsd = calculateRMSD( v1, v2 )
+        return self.rmsd
+    #end def
+
+    def calculateRMSD( self, other ):
+        """
+        Calculate rmsd of fitCoordinates of Model with respect to other
+        store in rmsd attribute
+        return rmsd or -1.0 on Error
+        """
+        v1 = self.fitCoordinates.zap( 'e' )
+        v2 = other.fitCoordinates.zap( 'e' )
+        if len(v1) != len(v2):
+            NTerror("Model.calculateRMSD: unequal length fitCoordinates (%s and %s)", self, other)
+            return -1.0
+        #end if
+        self.rmsd = calculateRMSD( v1, v2 )
+        return self.rmsd
+    #end def
+
+    def transform( self ):
+        # Transform all coordinates according to rotation/translation matrix
+        for c in self.coordinates:
+            self.transformVector( c.e )
+        #end for
+    #end def
+
+    def __str__( self ):
+        return sprintf('<Model "%s" (coor:%d,fit:%d)>', self.name, len(self.coordinates), len(self.fitCoordinates) )
+    #end def
+
+    def __repr__( self ):
+        return str(self)
+    #end def
+
+    def format( self ):
+        # generate a string representation
+        s = sprintf('%s %s %s\n', dots, str(self), dots)
+        s = s + "rmsd:  %10.3f\n" %  (self.rmsd, )
+        s = s + "matrix:\n%s\n" % (NTcMatrix.__str__(self), )
+        return s
+    #end def
+#end class
+
+
+class RmsdResult( NTdict ):
+    """Class to store rmsd results
+    """
+    def __init__(self, modelList, ranges, comment='' ):
+        NTdict.__init__( self,
+                         __CLASS__       = 'RmsdResult',
+                         backbone        = NTfill(0.0, len(modelList)),
+                         backboneCount   = 0,
+                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)' ),
+
+                         heavyAtoms      = NTfill(0.0, len(modelList)),
+                         heavyAtomsCount = 0,
+                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)' ),
+
+                         models          = modelList,
+                         closestToMean   = -1,    #indicates undefined
+                         ranges          = ranges,
+                         comment         = comment
+                       )
+    #end def
+
+    def _closest(self):
+        """Internal routine to calculate the model closest to mean
+        """
+        c = zip(self.heavyAtoms, self.models)
+        c.sort()
+        self.closestToMean = c[0][1]
+    #end def
+
+    def _average(self):
+        """Calculate the averages
+        """
+        self.backboneAverage.value, self.backboneAverage.error, _n = self.backbone.average()
+        self.heavyAtomsAverage.value, self.heavyAtomsAverage.error, _n = self.heavyAtoms.average()
+    #end def
+
+    def __str__(self):
+        return sprintf('<RmsdResult %s>', self.comment)
+
+    def format(self):
+        return sprintf('%s %s %s\n' +\
+                       'backboneAverage:      %s\n'  +\
+                       'heavyAtomsAverage:    %s\n'  +\
+                       'models:               %s\n' +\
+                       'backbone   (n=%4d): [%s]\n' +\
+                       'heavyAtoms (n=%4d): [%s]\n' +\
+                       'closestToMean:        model %d',
+                       dots, self, dots,
+                       str(self.backboneAverage),
+                       str(self.heavyAtomsAverage),
+                       self.models.format('%4d '),
+                       self.backboneCount,
+                       self.backbone.format(fmt='%4.2f '),
+                       self.heavyAtomsCount,
+                       self.heavyAtoms.format(fmt='%4.2f '),
+                       self.closestToMean
+                      )
+    #end def
+#end class
+
 
 #class XMLMoleculeHandler( XMLhandler ):
 #    """Molecule handler class"""
