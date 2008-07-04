@@ -9,6 +9,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
@@ -86,6 +87,8 @@ def predictWithShiftx( project, model=None   ):
         return None
     #end if
 
+    NTmessage('==> Running shiftx ...' )
+
     skippedAtoms = [] # Keep a list of skipped atoms for later
     skippedResidues = []
     for res in project.molecule.allResidues():
@@ -94,8 +97,11 @@ def predictWithShiftx( project, model=None   ):
             for atm in res.allAtoms():
                 atm.pdbSkipRecord = True
                 skippedAtoms.append( atm )
+            #end for
+        #end if
+    #end for
     if skippedResidues:
-        NTwarning('predictWithShiftx: non-protein residues will be skipped:' + `skippedResidues`)
+        NTwarning('predictWithShiftx: non-protein residues %s will be skipped.',  skippedResidues)
 
     if model!=None:
         models = NTlist( model )
@@ -110,7 +116,6 @@ def predictWithShiftx( project, model=None   ):
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'),
                              rootPath = root, redirectOutput = False)
-#    NTmessage('==> Running shiftx' )
 
     for model in models:
         # set filenames
@@ -133,16 +138,16 @@ def predictWithShiftx( project, model=None   ):
             shiftx(chainId, rootname + '.pdb', outputFile )
             outputFile = os.path.join(root,outputFile)
 #            outputFile = os.path.abspath(outputFile)
-            NTdebug('==> Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+            NTdebug('Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
             parseShiftxOutput( outputFile, project.molecule, chain.name )
         del( pdbFile )
-
-    NTmessage(' averaging ...')
+    #end for
 
     # Restore the 'default' state
     for atm in skippedAtoms:
         atm.pdbSkipRecord = False
 
+    NTdetail('... averaging')
     # Average the methyl proton shifts and b-methylene, before calculating average per atom
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():

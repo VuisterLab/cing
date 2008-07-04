@@ -8,8 +8,8 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict
 # do not remove these two: they are needed during parsing of the sml files
-from cing.Libs.NTutils import NTfill  
-from cing.Libs.NTutils import NTvalue  
+from cing.Libs.NTutils import NTfill
+from cing.Libs.NTutils import NTvalue
 from cing.core.molecule import Coordinate #@UnusedImport
 
 from cing.core.molecule import Molecule
@@ -442,8 +442,9 @@ class SMLMoleculeHandler( SMLhandler ):
         fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
 
 #       Can add attributes here; update endHandler if needed
-        for a in ['resonanceCount','resonanceSources','modelCount']:
-            fprintf( stream, '%s = %r\n', a, mol[a] )
+        for a in ['resonanceCount','resonanceSources','modelCount','ranges']:
+            if mol.has_key(a):
+                fprintf( stream, '%s = %r\n', a, mol[a] )
         #end for
         fprintf( stream, '_sequence = ')
         mol._sequence.toSML( stream )

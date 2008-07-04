@@ -122,7 +122,7 @@ def setupValidation( project, ranges=None, doProcheck=True, doWhatif=True ):
     project.validateAssignments(toFile=True)
     project.checkForSaltbridges(toFile=True)
     project.validateRestraints( toFile=True)
-    project.calculateRmsd(      ranges=ranges)
+    project.molecule.calculateRMSDs( ranges=ranges)
 
     if cingPaths.whatif == 'PLEASE_ADD_EXECUTABLE_HERE':
         doWhatif = False
@@ -147,7 +147,7 @@ def criticizeByAll( project ):
     project.criticize()
     criticizeByWhatif( project )
 
-def summary( project, doWhatif, doProcheck ):
+def summary( project, doWhatif=False, doProcheck=False ):
     if not project.molecule:
         NTerror('Strange, there was no molecule in this project')
         return
@@ -187,7 +187,7 @@ def summary( project, doWhatif, doProcheck ):
         msg += msgTmp
     else:
         p = map( lambda x: 100*x/total, c)
-        msg += '----------- CING %s analysis -----------' % level
+        msg += '\n----------- CING %s analysis -----------' % level
         msg += """
 Color  Count (Percentage)
 *------*-----*-----------
@@ -233,196 +233,200 @@ Total    %3d (100)\n""" % ( c[0], p[0], c[1], p[1], c[2], p[2], total )
     fp.close()
 #end def
 
+#
+#class RmsdResult( NTdict ):
+#    """Class to store rmsd results
+#    """
+#    def __init__(self, modelList, ranges, comment='' ):
+#        NTdict.__init__( self,
+#                         __CLASS__       = 'RmsdResult',
+#                         backbone        = NTfill(NaN, len(modelList)),
+#                         backboneCount   = 0,
+#                         backboneAverage = NTvalue( NaN, NaN, fmt='%5.3f (+- %5.3f)' ),
+#                         heavyAtoms      = NTfill(NaN, len(modelList)),
+#                         heavyAtomsCount = 0,
+#                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%5.3f (+- %5.3f)' ),
+#                         models          = modelList,
+#                         closestToMean   = 0,
+#                         ranges          = ranges,
+#                         comment         = comment
+#                       )
+#    #end def
+#
+#    def _closest(self):
+#        """Internal routine to calculate the model closest to mean
+#        """
+#        c = zip(self.heavyAtoms, self.models)
+#        c.sort()
+#        self.closestToMean = c[0][1]
+#    #end def
+#
+#    def _average(self):
+#        """Calculate the averages
+#        """
+#        self.backboneAverage.value, self.backboneAverage.error, _n = self.backbone.average()
+#        self.heavyAtomsAverage.value, self.heavyAtomsAverage.error, _n = self.heavyAtoms.average()
+#    #end def
+#
+#    def __str__(self):
+#        return sprintf('<RmsdResult %s>', self.comment)
+#
+#    def format(self):
+#        return sprintf('%s %s %s\n' +\
+#                       'backboneAverage:    %s\n'  +\
+#                       'heavyAtomsAverage:  %s\n'  +\
+#                       'models:             %s\n' +\
+#                       'backbone:          [%s]\n' +\
+#                       'heavyAtoms:        [%s]\n' +\
+#                       'closestToMean:      model %d',
+#                       dots, self, dots,
+#                       str(self.backboneAverage),
+#                       str(self.heavyAtomsAverage),
+#                       self.models.format('%5d '),
+#                       self.backbone.format(fmt='%5.3f '),
+#                       self.heavyAtoms.format(fmt='%5.3f '),
+#                       self.closestToMean
+#                      )
+#    #end def
+##end class
 
-class RmsdResult( NTdict ):
-    """Class to store rmsd results
-    """
-    def __init__(self, modelList, ranges, comment='' ):
-        NTdict.__init__( self,
-                         __CLASS__       = 'RmsdResult',
-                         backbone        = NTfill(0.0, len(modelList)),
-                         backboneCount   = 0,
-                         backboneAverage = NTvalue( 0.0, 0.0, fmt='%5.3f (+- %5.3f)' ),
-                         heavyAtoms      = NTfill(0.0, len(modelList)),
-                         heavyAtomsCount = 0,
-                         heavyAtomsAverage = NTvalue( 0.0, 0.0, fmt='%5.3f (+- %5.3f)' ),
-                         models          = modelList,
-                         closestToMean   = 0,
-                         ranges          = ranges,
-                         comment         = comment
-                       )
-    #end def
 
-    def _closest(self):
-        """Internal routine to calculate the model closest to mean
-        """
-        c = zip(self.heavyAtoms, self.models)
-        c.sort()
-        self.closestToMean = c[0][1]
-    #end def
-
-    def _average(self):
-        """Calculate the averages
-        """
-        self.backboneAverage.value, self.backboneAverage.error, _n = self.backbone.average()
-        self.heavyAtomsAverage.value, self.heavyAtomsAverage.error, _n = self.heavyAtoms.average()
-    #end def
-
-    def __str__(self):
-        return sprintf('<RmsdResult %s>', self.comment)
-
-    def format(self):
-        return sprintf('%s %s %s\n' +\
-                       'backboneAverage:    %s\n'  +\
-                       'heavyAtomsAverage:  %s\n'  +\
-                       'models:             %s\n' +\
-                       'backbone:          [%s]\n' +\
-                       'heavyAtoms:        [%s]\n' +\
-                       'closestToMean:      model %d',
-                       dots, self, dots,
-                       str(self.backboneAverage),
-                       str(self.heavyAtomsAverage),
-                       self.models.format('%5d '),
-                       self.backbone.format(fmt='%5.3f '),
-                       self.heavyAtoms.format(fmt='%5.3f '),
-                       self.closestToMean
-                      )
-    #end def
-#end class
+#def calculateRmsd( project, ranges=None, models = None   ):
+#    """
+#    Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
+#    return rmsd result of molecule, or None on error
+#
+#    """
+#
+#    if not project.molecule:
+#        NTerror('Error calculateRmsd: undefined molecule\n')
+#        return None
+#    #end if
+#
+#    if project.molecule.modelCount == 0:
+#        NTerror('Error calculateRmsd: no coordinates for %s\n', project.molecule)
+#        return None
+#    #end if
+#    return project.molecule.calculateRMSDs( ranges, models )
 
 
-def calculateRmsd( project, ranges=None, models = None   ):
-    """
-    Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
-    return rmsd result of molecule, or None on error
-
-    """
-
-    if not project.molecule:
-        NTerror('Error calculateRmsd: undefined molecule\n')
-        return None
-    #end if
-
-    if project.molecule.modelCount == 0:
-        NTerror('Error calculateRmsd: no coordinates for %s\n', project.molecule)
-        return None
-    #end if
-
-    selectedResidues = project.molecule.ranges2list( ranges )
-    selectedModels   = project.molecule.models2list( models )
-
-    project.molecule.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
-    for res in project.molecule.allResidues():
-        res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
-    #end for
-
-    NTmessage("==> Calculating rmsd's ")
-
-    num = 0 # number of evaluated models (does not have to coincinde with model
-            # since we may supply an external list
-    shownWarningCount1 = 0
-#            shownWarningCount2 = 0
-    for model in selectedModels:
-        NTmessageNoEOL(".")
-        if model % 80 == 0 and model != 0:
-            NTmessageNoEOL("\n")
-        project.molecule.rmsd.backbone[num]   = 0.0
-        project.molecule.rmsd.backboneCount   = 0
-        project.molecule.rmsd.heavyAtoms[num] = 0.0
-        project.molecule.rmsd.heavyAtomsCount = 0
-
-        for res in project.molecule.allResidues():
-            res.rmsd.backbone[num]   = 0.0
-            res.rmsd.backboneCount   = 0
-            res.rmsd.heavyAtoms[num] = 0.0
-            res.rmsd.heavyAtomsCount = 0
-            # calculate rmsd over backbone atms for this residue
-            for atm in res.allAtoms():
-                d=None
-                if atm.meanCoordinate:
-                    d=0.0
-                    tmp0 = atm.coordinates[model][0]-atm.meanCoordinate[0]
-                    tmp1 = atm.coordinates[model][0]-atm.meanCoordinate[0]
-                    tmp2 = atm.coordinates[model][0]-atm.meanCoordinate[0]
-                    d += tmp0*tmp0
-                    d += tmp1*tmp1
-                    d += tmp2*tmp2
-
-#                    for i in ['x','y','z']: #JFD speed this up by unlooping if needed.
-#                        tmp = atm.coordinates[modelId][i]-atm.meanCoordinate[i]
-#                        d += tmp*tmp
-                    #end for
-                #end if
-
-                # rmsd over backbone atms for this residue
-                if atm.hasProperties('backbone','notproton'):
-                    if d==None:
-                        if shownWarningCount1 < 10:
-                            NTerror('Error calculateRmsd: expected coordinates1 for atom %s', atm)
-                        elif shownWarningCount1 == 10:
-                            NTerror('and so on')
-                        shownWarningCount1 += 1
-                    else:
-                        res.rmsd.backbone[num] += d
-                        res.rmsd.backboneCount += 1
-                    #end if
-                #endif
-
-                # rmsd over all atms for this residue
-                if atm.hasProperties('notproton'):
-                    if d==None:
-#                        shownWarningCount2 += 1
-#                        if shownWarningCount2 < 10:
-#                            NTerror('Error calculateRmsd: expected coordinates2 for atom %s\n', atm)
-#                        elif shownWarningCount2 == 10:
-#                            NTerror('and so on\n')
-                        pass
-                    else:
-                        res.rmsd.heavyAtoms[num] += d
-                        res.rmsd.heavyAtomsCount += 1
-                    #end if
-                #endif
-            #end for
-
-            # sum for the rmsd of selected residues
-            if res in selectedResidues:
-                project.molecule.rmsd.backbone[num]   += res.rmsd.backbone[num]
-                project.molecule.rmsd.backboneCount   += res.rmsd.backboneCount
-                project.molecule.rmsd.heavyAtoms[num] += res.rmsd.heavyAtoms[num]
-                project.molecule.rmsd.heavyAtomsCount += res.rmsd.heavyAtomsCount
-            #end if
-
-            # calculate rmsd for the model of this residue
-            res.rmsd.backbone[num]   = math.sqrt(res.rmsd.backbone[num]/max(res.rmsd.backboneCount,1))
-            res.rmsd.heavyAtoms[num] = math.sqrt(res.rmsd.heavyAtoms[num]/max(res.rmsd.heavyAtomsCount,1))
-        #end for
-
-        # rmsd of selected residues for this model
-        project.molecule.rmsd.backbone[num]   = math.sqrt(project.molecule.rmsd.backbone[num]/max(project.molecule.rmsd.backboneCount,1))
-        project.molecule.rmsd.heavyAtoms[num] = math.sqrt(project.molecule.rmsd.heavyAtoms[num]/max(project.molecule.rmsd.heavyAtomsCount,1))
-
-        # Increment the evaluated number of models
-        num += 1
-    #end for
-    NTmessage("")
-
-    if shownWarningCount1 > 10:
-        NTerror('Error calculateRmsd: expected coordinates1 for '+`shownWarningCount1`+' atoms\n')
-#            if shownWarningCount2 > 10:
-#                NTerror('Error calculateRmsd: expected coordinates2 for '+`shownWarningCount2`+' atoms')
-
-    # get the closest to mean models and averages
-    for res in project.molecule.allResidues():
-        res.rmsd._closest()
-        res.rmsd._average()
-    #end for
-    project.molecule.rmsd._closest()
-    project.molecule.rmsd._average()
-
-    NTdebug(" done\n")
-
-    return project.molecule.rmsd
-#end def
+#
+#    selectedResidues = project.molecule.ranges2list( ranges )
+#    selectedModels   = project.molecule.models2list( models )
+#
+#    project.molecule.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
+#
+#    for res in project.molecule.allResidues():
+#        res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
+#    #end for
+#
+#    NTmessage("==> Calculating rmsd's ")
+#
+#    num = 0 # number of evaluated models (does not have to coincinde with model
+#            # since we may supply an external list
+#    shownWarningCount1 = 0
+##            shownWarningCount2 = 0
+#    for model in selectedModels:
+#        NTmessageNoEOL(".")
+#        if model % 80 == 0 and model != 0:
+#            NTmessageNoEOL("\n")
+#        project.molecule.rmsd.backbone[num]   = 0.0
+#        project.molecule.rmsd.backboneCount   = 0
+#        project.molecule.rmsd.heavyAtoms[num] = 0.0
+#        project.molecule.rmsd.heavyAtomsCount = 0
+#
+#        for res in project.molecule.allResidues():
+#            res.rmsd.backbone[num]   = 0.0
+#            res.rmsd.backboneCount   = 0
+#            res.rmsd.heavyAtoms[num] = 0.0
+#            res.rmsd.heavyAtomsCount = 0
+#            # calculate rmsd over backbone atms for this residue
+#            for atm in res.allAtoms():
+#                d=None
+#                if atm.meanCoordinate:
+#                    d=0.0
+#                    tmp0 = atm.coordinates[model][0]-atm.meanCoordinate[0]
+#                    tmp1 = atm.coordinates[model][0]-atm.meanCoordinate[0]
+#                    tmp2 = atm.coordinates[model][0]-atm.meanCoordinate[0]
+#                    d += tmp0*tmp0
+#                    d += tmp1*tmp1
+#                    d += tmp2*tmp2
+#
+##                    for i in ['x','y','z']: #JFD speed this up by unlooping if needed.
+##                        tmp = atm.coordinates[modelId][i]-atm.meanCoordinate[i]
+##                        d += tmp*tmp
+#                    #end for
+#                #end if
+#
+#                # rmsd over backbone atms for this residue
+#                if atm.hasProperties('backbone','notproton'):
+#                    if d==None:
+#                        if shownWarningCount1 < 10:
+#                            NTerror('Error calculateRmsd: expected coordinates1 for atom %s', atm)
+#                        elif shownWarningCount1 == 10:
+#                            NTerror('and so on')
+#                        shownWarningCount1 += 1
+#                    else:
+#                        res.rmsd.backbone[num] += d
+#                        res.rmsd.backboneCount += 1
+#                    #end if
+#                #endif
+#
+#                # rmsd over all atms for this residue
+#                if atm.hasProperties('notproton'):
+#                    if d==None:
+##                        shownWarningCount2 += 1
+##                        if shownWarningCount2 < 10:
+##                            NTerror('Error calculateRmsd: expected coordinates2 for atom %s\n', atm)
+##                        elif shownWarningCount2 == 10:
+##                            NTerror('and so on\n')
+#                        pass
+#                    else:
+#                        res.rmsd.heavyAtoms[num] += d
+#                        res.rmsd.heavyAtomsCount += 1
+#                    #end if
+#                #endif
+#            #end for
+#
+#            # sum for the rmsd of selected residues
+#            if res in selectedResidues:
+#                project.molecule.rmsd.backbone[num]   += res.rmsd.backbone[num]
+#                project.molecule.rmsd.backboneCount   += res.rmsd.backboneCount
+#                project.molecule.rmsd.heavyAtoms[num] += res.rmsd.heavyAtoms[num]
+#                project.molecule.rmsd.heavyAtomsCount += res.rmsd.heavyAtomsCount
+#            #end if
+#
+#            # calculate rmsd for the model of this residue
+#            res.rmsd.backbone[num]   = math.sqrt(res.rmsd.backbone[num]/max(res.rmsd.backboneCount,1))
+#            res.rmsd.heavyAtoms[num] = math.sqrt(res.rmsd.heavyAtoms[num]/max(res.rmsd.heavyAtomsCount,1))
+#        #end for
+#
+#        # rmsd of selected residues for this model
+#        project.molecule.rmsd.backbone[num]   = math.sqrt(project.molecule.rmsd.backbone[num]/max(project.molecule.rmsd.backboneCount,1))
+#        project.molecule.rmsd.heavyAtoms[num] = math.sqrt(project.molecule.rmsd.heavyAtoms[num]/max(project.molecule.rmsd.heavyAtomsCount,1))
+#
+#        # Increment the evaluated number of models
+#        num += 1
+#    #end for
+#    NTmessage("")
+#
+#    if shownWarningCount1 > 10:
+#        NTerror('Error calculateRmsd: expected coordinates1 for '+`shownWarningCount1`+' atoms\n')
+##            if shownWarningCount2 > 10:
+##                NTerror('Error calculateRmsd: expected coordinates2 for '+`shownWarningCount2`+' atoms')
+#
+#    # get the closest to mean models and averages
+#    for res in project.molecule.allResidues():
+#        res.rmsd._closest()
+#        res.rmsd._average()
+#    #end for
+#    project.molecule.rmsd._closest()
+#    project.molecule.rmsd._average()
+#
+#    NTdebug(" done\n")
+#
+#    return project.molecule.rmsd
+##end def
 
 def validateRestraints( project, toFile = True)   :
     """
@@ -540,7 +544,8 @@ def validateRestraints( project, toFile = True)   :
                  res.distanceRestraints.rmsd
                    )
         except:
-            NTerror("No coordinates for residue %s\n", res)
+            pass
+#            NTerror("validateRestraints: No Phi,Psi result for residue %s", res)
         count += 1
     #end for
     NTdebug(msg)
@@ -573,7 +578,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
 
     if toFile:
         fprintf( fp, '%s\n', project.molecule.format() )
-    NTmessage(     '%s', project.molecule.format() )
+#    NTmessage(     '%s', project.molecule.format() )
 
     residues1 = project.molecule.residuesWithProperties('E') + \
                 project.molecule.residuesWithProperties('D')
@@ -892,7 +897,7 @@ def validateAssignments( project, toFile = True   ):
 
     return None on code error.
     """
-    NTmessage("Starting validateAssignments")
+    NTdebug("Starting validateAssignments")
     funcName = validateAssignments.func_name
     result = NTlist()
     if project.molecule.resonanceCount == 0:
@@ -1023,7 +1028,7 @@ def validateAssignments( project, toFile = True   ):
         if not fp:
             NTerror("Failed to open for writing: " + fname)
             return None
-        NTmessage("Writing assignment validation to: " + fname)
+        NTdebug("Writing assignment validation to: " + fname)
         for atm in project.molecule.allAtoms():
             sav     = None
             ssd     = None
@@ -1071,7 +1076,7 @@ def validateAssignments( project, toFile = True   ):
                    )
         #end for
         fp.close()
-        NTmessage('==> validateAssignments: result to "%s"', fname)
+        NTmessage('==> validateAssignments: output to "%s"', fname)
     #end if
 
     return result
@@ -2472,11 +2477,11 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
     """
 
     if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif ):
-        NTerror("Failed to setupValidation")
+        NTerror("validate: Failed to setupValidation")
         return True
 
     if setupHtml(project):
-        NTerror("Failed to setupHtml")
+        NTerror("validate: Failed to setupHtml")
         return True
 
     # populate Molecule (Procheck) and Residues
@@ -2486,16 +2491,16 @@ def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhati
             doWhatif=doWhatif,
             ranges=ranges
             ):
-        NTerror("Failed to populateHtmlMolecules")
+        NTerror("validate: Failed to populateHtmlMolecules")
 
     if htmlOnly:
         NTmessage('Skipping populateHtmlModels')
     else:
         if populateHtmlModels(project):
-            NTerror("Failed to populateHtmlModels")
+            NTerror("validate: Failed to populateHtmlModels")
             return True
     if renderHtml(project):
-        NTerror("Failed to renderHtml")
+        NTerror("validate: Failed to renderHtml")
         return True
 
     NTmessage("Done with overall validation")
@@ -2513,7 +2518,7 @@ methods  = [(validateDihedrals, None),
             (populateHtmlMolecules, None), # for debugging.
             (populateHtmlModels, None), # for debugging.
             (renderHtml, None), # for debugging.
-            (calculateRmsd, None),
+#            (calculateRmsd, None),
             (summary, None),
             (makeDihedralHistogramPlot, None),
             (makeDihedralPlot, None),

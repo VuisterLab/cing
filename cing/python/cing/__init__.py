@@ -6,8 +6,8 @@ CING: Common Interface for NMR structure Generation
 """
 import os
 import sys
-# Version number is a float. Watch out, version 0.100 will be older than 0.99 
-cingVersion     = 0.761
+# Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
+cingVersion     = 0.764
 programName     = 'CING'
 header = """
 ======================================================================================================
@@ -33,10 +33,10 @@ verbosityDefault  = verbosityOutput
 Reference to it as cing.verbosity if you want to see non-default behavior
 """
 verbosity = verbosityDefault
-prefixError     = "ERROR"
-prefixWarning   = "WARNING"
-prefixDetail    = "DETAIL"
-prefixDebug     = "DEBUG"
+prefixError     = "ERROR: "
+prefixWarning   = "WARNING: "
+prefixDetail    = ""
+prefixDebug     = "DEBUG: "
 
 #- configure local settings:
 #    Create a file localConstants parallel to the setup.py file and add definitions that

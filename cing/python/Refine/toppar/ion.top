@@ -17,21 +17,21 @@ autogenerate  angles=true  end
 
 MASS  LI      6.9410   ! lithium
 MASS   F     18.9984   ! fluorine
-MASS  NA     22.9898   ! sodium   
+MASS  NA     22.9898   ! sodium
 MASS  MG     24.3050   ! magnesium
 MASS  AL     26.9815   ! aluminum
-MASS  CL     35.4530   ! chlorine 
+MASS  CL     35.4530   ! chlorine
 MASS   K     39.0980   ! potassium
 MASS  AR     39.9480   ! argon
-MASS  CA     40.0800   ! calcium  
+MASS  CA     40.0800   ! calcium
 MASS   V     50.9415   ! vanadium
 MASS  CR     51.9960   ! chromium
 MASS  MN     54.9380   ! manganese
-MASS  FE     55.8470   ! iron     
+MASS  FE     55.8470   ! iron
 MASS  NI     58.6900   ! nickel
 MASS  CO     58.9332   ! cobalt
-MASS  CU     63.5460   ! copper   
-MASS  ZN     65.3700   ! zinc     
+MASS  CU     63.5460   ! copper
+MASS  ZN     65.3700   ! zinc
 MASS  AS     74.9216   ! arsenic
 MASS  BR     79.9040   ! bromine
 MASS  KR     83.8000   ! krypton
@@ -46,8 +46,8 @@ MASS  HO    164.9304   ! holmium
 MASS  YB    173.0400   ! ytterbium
 MASS  OS    190.2000   ! osmium
 MASS  IR    192.2200   ! iridium
-MASS  PT    195.0800   ! platinum 
-MASS  AU    196.9665   ! gold     
+MASS  PT    195.0800   ! platinum
+MASS  AU    196.9665   ! gold
 MASS  HG    200.5900   ! mercury
 MASS  PB    207.2000   ! lead
 MASS   U    238.0289   ! uranium
@@ -67,7 +67,7 @@ MASS  CR+3   51.9960   ! chromium 3+
 MASS  MN+2   54.9380   ! manganese 2+
 MASS  MN+3   54.9380   ! manganese 3+
 MASS  FE+2   55.8470   ! iron 2+
-MASS  FE+3   55.8470   ! iron 3+  
+MASS  FE+3   55.8470   ! iron 3+
 MASS  NI+2   58.6900   ! nickel 2+
 MASS  CO+2   58.9332   ! cobalt 2+
 MASS  CO+3   58.9332   ! cobalt 3+
@@ -88,15 +88,15 @@ MASS  YB+3  173.0400   ! ytterbium 3+
 MASS  OS+4  190.2000   ! osmium 4+
 MASS  IR+3  192.2200   ! iridium 3+
 MASS  PT+2  195.0800   ! platinum 2+
-MASS  AU+1  196.9665   ! gold 1+    
-MASS  AU+3  196.9665   ! gold 3+    
+MASS  AU+1  196.9665   ! gold 1+
+MASS  AU+3  196.9665   ! gold 3+
 MASS  HG+1  200.5900   ! mercury 1+
 MASS  HG+2  200.5900   ! mercury 2+
 MASS  PB+2  207.2000   ! lead 2+
 MASS   U+3  238.0289   ! uranium 3+
 MASS   U+4  238.0289   ! uranium 4+
 
-MASS  SUF    32.0600   ! sulphate anion sulphur 
+MASS  SUF    32.0600   ! sulphate anion sulphur
 MASS  OUF    15.9994   ! sulphate anion oxygen
 MASS  PHF    30.9740   ! phosphate anion phosphorus
 MASS  OHF    15.9994   ! phosphate anion oxygen
@@ -551,5 +551,10 @@ RESIdue WO4 {Tungstate}
   BOND W  O4
 
 END {WO4}
+
+!gv inserted 1 Jul 08
+PRESidue IONS
+end
+
 
 set echo=true end

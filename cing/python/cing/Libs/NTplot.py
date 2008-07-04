@@ -62,10 +62,14 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-try:
-    from numpy.core.ma import arange #@UnusedImport
-except:
-    from numpy.core import arange # for numpy 1.1.0 and matplotlib 0.91.x @Reimport
+from Numeric import arange
+
+#=======
+#try:
+#    from numpy.core.ma import arange #@UnusedImport
+#except:
+#    from numpy.core import arange # for numpy 1.1.0 and matplotlib 0.91.x @Reimport
+#>>>>>>> .r250
 try:
     import Image
     haveImage = True

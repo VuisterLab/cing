@@ -491,9 +491,6 @@ def NThistogram( theList, low, high, bins ):
     return his
 #end def
 
-#
-# -----------------------------------------------------------------------------
-#
 
 class NTvector( list ):
     """Lightweight class to implement a few vector operations
@@ -849,9 +846,6 @@ class NTset( NTlist ):
 
 #end class
 
-#
-# -----------------------------------------------------------------------------
-#
 #class odict(dict):
 #    """ Ordered dictionary.
 #        Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747
@@ -1471,9 +1465,6 @@ NoneObject = NoneObjectClass()
 noneobject = NoneObject
 
 
-#
-# -----------------------------------------------------------------------------
-#
 class NTtree( NTdict ):
     """NTTree class
        Linked tree-like structure class
@@ -1673,9 +1664,8 @@ class NTtree( NTdict ):
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
 
 #end class
-#
-# -----------------------------------------------------------------------------
-#
+
+
 class NTparameter( NTtree ):
     """
     Class to generate a parameter tree
@@ -1999,9 +1989,6 @@ class NTvalue( NTdict ):
     fromTuple = staticmethod(fromTuple)
 #end class
 
-#
-# -----------------------------------------------------------------------------
-#
 
 class NTplist( NTdict ):
     """
@@ -2012,9 +1999,7 @@ class NTplist( NTdict ):
     #end def
 #end class
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def NTlimit( theList, min, max, byItem=None ):
     """
     Limit the the values of theList between min and max, assuming periodicity
@@ -2041,9 +2026,7 @@ def NTlimit( theList, min, max, byItem=None ):
     #end for
 #end def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def NTaverage( theList, byIndex=None ):
     """returns (av, sd, n) tuple of theList or
        (None, None, 0) in case of zero elements in theList
@@ -2741,9 +2724,8 @@ class Sorter:
     #end def
 #end class
 NTsort = Sorter()
-#
-#------------------------------------------------------------------------------
-#
+
+
 def quote( inputString ):
     "return a single or double quoted string"
     single = (find( inputString, "'" ) >= 0)
@@ -2754,9 +2736,9 @@ def quote( inputString ):
     if double:
         return "'" + inputString + "'"
     return '"' + inputString + '"'
-#
-#------------------------------------------------------------------------------
-#
+#end def
+
+
 def asci2list( string ):
     """ Convert a string with "," and "-" to a list of integers
     eg. 1,2,5-8,11,20-40
@@ -2978,7 +2960,7 @@ class PrintWrap:
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
         if self.prefix:
-            format = self.prefix + ":" + format
+            format = self.prefix + format
         if not self.noEOL:
             format += '\n'
         fprintf( self.stream, format, *args )
@@ -3083,9 +3065,7 @@ represent the full range of C's unsigned (long) integers.
 #end class
 NTopen = NTfile
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def removedir(path):
     """Recursive remove"""
     while (1):
@@ -3107,10 +3087,10 @@ def removedir(path):
             NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.")
             continue
         break
+    #end while
+#end def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def NTpath( path ):
 
     """Return a triple (directory, basename, extension) form path"
@@ -3121,10 +3101,9 @@ def NTpath( path ):
         dirname = '.'
     f = os.path.splitext( d[1] )
     return dirname, f[0], f[1]
+#end def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def show( NTobject=None ):
     if NTobject != None and hasattr( NTobject, 'format' ):
         NTmessage( "%s", NTobject.format() )
@@ -3133,9 +3112,7 @@ def show( NTobject=None ):
     #end if
 #End def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def formatList( theList, fmt = '%s\n' ):
     """
     Apply the format method to every element of theList,
@@ -3164,9 +3141,7 @@ def NTgetoutput( cmd ):
     return (output,errors)
 #end def
 
-#
-#-----------------------------------------------------------------------------
-#
+
 class ExecuteProgram( NTdict ):
     """
     Base Class for executing external programs on Unix like systems.
@@ -3232,27 +3207,24 @@ class ExecuteProgram( NTdict ):
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
-#
-# -----------------------------------------------------------------------------
-#
-"""
-OptionParser.py: implement required options
-from: http://docs.python.org/lib/optparse-extending-examples.html
 
-"""
 
 class OptionParser (optparse.OptionParser):
+    """
+    OptionParser.py: implement required options
+    from: http://docs.python.org/lib/optparse-extending-examples.html
 
+    """
     def check_required (self, opt):
         option = self.get_option(opt)
 
         # Assumes the option's 'default' is set to None!
         if getattr(self.values, option.dest) is None:
             self.error("%s option not supplied" % option)
+    #end def
+#end class
 
-"""
-Taken from O'Reilly book
-"""
+
 def findFiles_old(pattern, startdir=os.curdir):
     matches = []
     os.path.walk(startdir, findvisitor, (matches, pattern))
