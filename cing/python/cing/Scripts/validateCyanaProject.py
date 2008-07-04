@@ -18,14 +18,15 @@ import os
 import sys
 
 class ValidateCyanaProject():
-    def __init__(self, cyanaProjectDir):
+    def __init__(self, cyanaProjectDir, htmlOnly=True, doWhatif=False, doProcheck=False,
+                 pdbConvention=CYANA2, restraintsConvention=CYANA2):
         """Retrieves all needed info from path"""
 
-        self.htmlOnly               = True # default is False but enable it for faster runs without some actual data.
-        self.doWhatif               = False # disables whatif actual run
-        self.doProcheck             = False
-        self.pdbConvention          = CYANA2
-        self.restraintsConvention   = CYANA2
+        self.htmlOnly               = htmlOnly # default is False but enable it for faster runs without some actual data.
+        self.doWhatif               = doWhatif # disables whatif actual run
+        self.doProcheck             = doProcheck
+        self.pdbConvention          = pdbConvention
+        self.restraintsConvention   = restraintsConvention
 
         if not ( os.path.exists(cyanaProjectDir) and os.path.isdir(cyanaProjectDir)):
             NTexit("Given path is not an existing directory: [%s]" % cyanaProjectDir )      

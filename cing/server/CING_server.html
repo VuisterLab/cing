@@ -1,13 +1,18 @@
 <html>
 <head>
 	<title>CING Server</title>
-	<link media="screen" href="cing.css" type="text/css" rel="stylesheet"/>
-    <LINK REL="SHORTCUT ICON" href="cing.ico">
+<link   href="cing.ico"                                                   rel="shortcut icon">
+<link   href="cing.css"                      type="text/css"              rel="stylesheet" media="screen">
+<script src= "javascript/formval.js"         type="text/javascript">     </script>
+<script src= "javascript/multilineTitles.js" type="text/javascript">     </script>
+<script src= "javascript/timer.js"           type="text/javascript">     </script>
+<script src= "javascript/utils.js"           type="text/javascript">     </script>
 </head>
 <body>
-
+<!-- from http://localhost/~jd/cing/server/CING_server.html
+     to   http://localhost/cgi-bin/simpleCgiServer.py-->
 <FORM METHOD="POST" name="myform"
-ACTION="http://TO_BE_LOCALIZED_LIKE.NMR.cmbi.umcn.nl/cgi-bin/simpleCgiServer.py" 
+ACTION="../../../cgi-bin/simpleCgiServer.py" 
 ENCTYPE="multipart/form-data">
 
 <div id="container">
@@ -101,7 +106,7 @@ NAME="ACCESS_KEY"
 VALUE="4A2EM9kt"
 SIZE=8 >
 [a-Z0-9]{6}
-<INPUT TYPE="button" Value="Regenerate" onClick="regenerate(this.form)">
+<INPUT TYPE="button" Value="Regenerate" onClick="regenerate(this.form)" class="GRAY">
 </TD></TR>
 </table>
 
@@ -275,37 +280,16 @@ Observable atoms:</DT>
 <input TEXT="" name="DR_THRESHOLD_OVER_BAD " value="0.5" size="4" class="red">frac.  [0,1]
 </td></tr>
 </table></DL>
-</TD>
-</TR>
 </TABLE>
 
 <P><INPUT 
 TYPE="submit" 
 NAME="SUBMIT"
 VALUE="Start validation"></FORM>
-        </td>
-        </tr>
-        </table>
-    </div><!-- end main -->
-    <br style="clear: both;"/>
-</div><!-- end container -->
 
 <div id="footer">
-<p>CING 0.75 alfa <a href="mailto:vuister@science.ru.nl">Geerten Vuister</a>, <a href="mailto:jurgend@cmbi.ru.nl">Jurgen F. Doreleijers</a> and <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
+<p>CING <a href="mailto:vuister@science.ru.nl">Geerten Vuister</a>, <a href="mailto:jurgend@cmbi.ru.nl">Jurgen F. Doreleijers</a> and <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
 </div><!-- end footer -->
 
-<script type="text/javascript">
-function regenerate(form) {
-    var requiredLength = 6
-	var allowedCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	var new_access=""
-	for (i = 1; i <= requiredLength; i++)
-	{
-	    var idxChar=Math.floor(Math.random()*(allowedCharacters.length))
-	    new_access = new_access + allowedCharacters[idxChar]
-	}
-    form.ACCESS_KEY.value = new_access
-}
-</script>
 </body>
 </html>

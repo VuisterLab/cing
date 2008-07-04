@@ -1,4 +1,5 @@
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -10,8 +11,8 @@ import os
 import time
 import types
 import unittest
-def my_sleep( arg ):
 
+def my_sleep( arg ):
     ## Check types
     if type(arg) == types.TupleType:
         NTerror("Type of args [%s] is tuple" % arg)
@@ -28,7 +29,7 @@ class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
 
-    def tttestRun(self):
+    def testRun(self):
         ## Test is disable because it takes 10 seconds to run.
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
@@ -49,7 +50,7 @@ class AllChecks(TestCase):
         done_list   = f.forkoff_start( job_list, 0 )    
         NTmessage("Finished ids: %s", done_list)
         
-    def testRun2(self):
+    def tttestRun2(self):
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(
@@ -73,5 +74,5 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError
-#    cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityDebug
     unittest.main()
