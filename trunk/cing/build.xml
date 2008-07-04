@@ -20,37 +20,50 @@
 	</target>
 
 	
-    <!-- 
-    ======================
-    CGI-BIN SECTION
-    ======================  
-        <antcall target="server_cgi_replacements"/>             
-    -->
-    <target name="server-install" depends="init, server-cgi-install, server-web-install"
+    <target name="server-install" depends="init, home-web-install, server-cgi-install"
             description="Publish the server.">
     </target>
-    
+
     <target name="server-local-install" depends="init"
             description="Run this target locally on the server.">
-    	<mkdir dir="${server.cgi.dir.log}" />
+        <mkdir dir="${server.cgi.dir.log}" />
+        <mkdir dir="${server.cgi.cing-home.dir}" />
+
     	<!-- set permissions for executable but not readible so it's secret -->
         <chmod perm="a+wx" dir="${server.cgi.dir.tmp}" />
-        <chmod perm="o-r" dir="${server.cgi.dir.tmp}" />
+        <chmod perm="o-r"  dir="${server.cgi.dir.tmp}" />
+        <chmod perm="a+wx" dir="${server.cgi.cing-home.dir}" />
+        <chmod perm="a+x" file="${server.cgi.dir}/${server.cgi.python.prog}" />
     </target>
-   
+
+	<target name="home-web-install" depends="init">
+        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}"/>
+        <!-- for some reason JFD can't get the example copied over with ** without blocking
+        further ant targets. Perhaps permissions or special files prevent it?
+        Perhaps the nestedness of the .svn dir ? The work around is to ant on this once, kill it and
+        enable the below exclude afterwards. Or fix it: http://www.symphonious.net/2007/10/23/ant-scpssh-task-hangs-or-never-disconnects/ -->
+        <scp    todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}"
+                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
+            port="${home.web.port}"
+            verbose="true"
+            >
+            <fileset dir="${server.local.dir}"/>                     
+        </scp>
+    </target>    
+	   
     <target name="server-cgi-install" depends="init">
-        <echo message="Installing cgi scripts to server engine: ${server.cgi.user}@${server.cgi.machine}:${server.cgi.dir}"/>
+        <echo message="Installing cgi program to server engine: ${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}"/>
 
         <copy todir="${tmp.local.dir}" file="${server.cgi.dir.local}/${server.cgi.python.prog}" overwrite="true"
-            verbose="false"/>
+            verbose="true"/>
     	<!-- TODO use nested match/replace for conciseness -->
         <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
                                match="PYTHON_EXECUTABLE" 
                                replace='${server.cgi.python} ${server.cgi.python.flags}'
                                byline="true"/>
         <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="CING_ROOT_PYTHON" 
-                               replace='${server.cgi.cing.python.dir}'
+                               match="CING_ROOT" 
+                               replace='${server.cgi.cing.root.dir}'
                                byline="true"/>
         <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
                                match="CING_SERVER_TMP" 
@@ -60,8 +73,11 @@
                                match="SERVER_CGI_URL_TMP" 
                                replace='${server.cgi.url.tmp}'
                                byline="true"/>
-    	
-    	
+        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
+                               match="WEB_URL"
+                               replace='${server.url}'
+                               byline="true"/>
+    	    	
     	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}"
             keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
             verbose="true"
@@ -72,70 +88,5 @@
     	
     </target>
 
-    <target name="server-web-install" depends="init">
-        <echo message="Installing HTML to server engine: ${server.web.machine.looped}:${server.web.dir}"/>
-        <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}"
-                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
-            port="${server.cgi.port}"
-            verbose="true"
-            >
-        	<!-- for some reason JFD can't get the example copied over with ** without blocking
-        	further ant targets. Perhaps permissions or special files prevent it?
-        	Perhaps the nestedness of the .svn dir ? The work around is to ant on this once, kill it and
-        	enable the below exclude afterwards.-->
-            <fileset dir="${server.local.dir}" excludes="example/**"/>                     
-        </scp>
-        <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}/example/"
-                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
-            port="${server.cgi.port}"
-            verbose="true">
-            <fileset dir="${server.local.dir}/example"/>                     
-        </scp>
-        <echo message="DEBUG: Copy to ${tmp.local.dir}"/>        
-        <copy todir="${tmp.local.dir}" file="${server.local.dir}/${server.web.prog}" overwrite="true" verbose="true" />
-        <!-- special case for localizing the server setting in the html code.
-        includes="*.html" excludes=".svn"
-        ACTION="http://stella.cmbi.umcn.nl/cgi-bin/simpleCgiServer.py" --> 
-        <echo message="DEBUG: Replacing some localizations in temp dir ${tmp.local.dir}"/>        
-        <replaceregexp file="${tmp.local.dir}/${server.web.prog}"
-                               match="(ACTION.*)" 
-                               replace='ACTION="http://${server.cgi.machine}/cgi-bin/${server.cgi.python.prog}"'
-                               byline="true"
-        />
-        <scp    todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}"
-            keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
-            port="${server.cgi.port}"
-            verbose="true"
-            >
-            <fileset dir="${tmp.local.dir}"  includes="${server.web.prog}"/>                     
-        </scp>
-    </target>    
 
-    
-
-	<!-- Is done automatically by ant build but can be used externally such as on tang. -->
-	<target name="compile" description="compile" depends="init">
-        <javac srcdir="${src.dir}" destdir="${build.classes.dir}">
-            <classpath>
-                <path path="${javac.classpath}"/>
-            </classpath>
-    	</javac>
-    </target>
-	
-    
-    <!--
-        Found that after checkout to Windows there were extra eols but fixed with the below.
-Default is based on the platform on which you are running this task. 
-For Unix platforms, the default is "lf". 
-For DOS based systems (including Windows), the default is "crlf". 
-For Mac OS, the default is "cr".        
-    -->                    
-    <target name="fixcrlf" description="Change the end-of-line string to single cr like under Linux"
-            depends="init" >
-        <property name="dir_todo" value="scripts"/>        
-        <echo message="Starting to fixcrlf on dir: ${dir_todo}"/>
-        <fixcrlf srcDir="${dir_todo}" eol="lf"/>     
-    </target>
-    
-	
 </project>

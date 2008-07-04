@@ -2,12 +2,14 @@ Directories:
 
 python                  Python code for CING and Refine.
 bin                     Binaries for distribution.
+cing_home               Homepage HTML, icons, images, javascript for server etc.
 data                    Larger data that should not reside under PYTHONOPATH directory.
 Documentation           Installation, setup etc. info
 HTML                    Html, stylesheet, images etc. for CING web pages. Everything
                         will be copied verbatim to those pages.
 java                    Java code, including Wattos.
 scripts                 Loose pieces of CING code in several programming languages.
+server                  Web server HTML, examples, etc.
 Tests                   Extensive test case data. Data that is run before each commit.
 
 Files:

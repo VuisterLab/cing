@@ -2,37 +2,45 @@
 # -1- First setup cing:
 #     Localized by ant build.xml script.
 import sys
-sys.path.insert(0, "CING_ROOT_PYTHON")
-sys.stderr = sys.stdout # Errors from python script will need to flow to user.        
+sys.path.insert(0, "CING_ROOT/python")
 
 from cgi import FieldStorage
 from cing import verbosityDebug
 from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
-from cing.core.classes import Project
-from cing.core.constants import IUPAC
-from cing.Libs.NTutils import removedir
-from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import removedir
+from cing.Libs.forkoff import ForkOff
+from cing.Scripts.validateCyanaProject import ValidateCyanaProject
+from cing.core.constants import CYANA2
+from cing.core.constants import IUPAC
 import cgitb; 
 import cing
 import os
+#sys.stderr = sys.stdout # Errors from python script will need to flow to user.        
+
 
 class SimpleCgiServer:
     MAX_FILE_SIZE_BYTES = 1024 * 1024 * 50
     def __init__(self):
         self.logUrl = 'log.txt'
         self.form = None
+        
         self.header = """
 <head>
 <title>Project PROJECT</title>
-<LINK REL="SHORTCUT ICON" href="cing.ico">
-<link media="screen" href="%s/cing.css" type="text/css" rel="stylesheet"/>
-<script src="%s/multilineTitles.js" type="text/javascript">
-</script>
+<!-- Next section verbatum from index.html -->
+<!-- from http://localhost/cgi-bin/simpleCgiServer.py
+     to   http://localhost/~jd/cing/CING_server.html-->
+<link   href="../~jd/cing/cing.ico"                                                   rel="shortcut icon">
+<link   href="../~jd/cing/cing.css"                       type="text/css"             rel="stylesheet" media="screen">
+<script src= "../~jd/cing/javascript/formval.js"          type="text/javascript">     </script>
+<script src= "../~jd/cing/javascript/multilineTitles.js"  type="text/javascript">     </script>
+<script src= "../~jd/cing/javascript/timer.js"            type="text/javascript">     </script>
 </head>
-""" % ( 'TODO:' )
+"""
         self.footer = """<div id="footer">
     <p>Contact
     <a href="mailto:vuister@science.ru.nl">Geerten Vuister</a>, 
@@ -40,38 +48,32 @@ class SimpleCgiServer:
     <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
     </div>
     for help, when required."""
-        self.timer = """
-<SCRIPT LANGUAGE="JavaScript">
-<!-- Hide script>
-    var seconds = 0
-    var minutes = 0
-    var hours = 0
-    var timerID = setTimeout("showtime()",1000);
-
-    function showtime() { 
-      seconds ++;
-      if (seconds == 60) {
-       seconds=0;
-       minutes ++;
-      }
-      if (minutes == 60){
-        minutes=0;
-        hours ++;
-      }
-      if (hours == 24){
-        hours = 0;
-      }
-      var timeValue =""+(hours)
-      timeValue +=((minutes < 10) ? ":0" : ":")+minutes
-      timeValue +=((seconds < 10) ? ":0":":")+seconds
-      document.clock.face.value = timeValue;
-      timerID = setTimeout("showtime()",1000);
-    }
-// End script hiding --></SCRIPT>";        
-    
+        self.timerForm = """
+        <!-- This timer form works with the javascript/timer.js code. -->
+<form name="theTimer"><table>
+   <tr>
+      <td align=center>
+       Now showing a clock:
+      </td>
+      <td align=center>
+         <input type=text name="theTime" size=6>
+      </td>
+      <td>
+         <input type=button name="start" value="Start" onclick="startTimer()">
+      </td>
+      <td>
+         <input type=button name="stop" value="Stop" onclick="stopTimer()">
+      </td>
+      <td>
+         <input type=button name="reset" value="Reset" onclick="resetTimer()">
+      </td>
+   </tr>
+</table>
+</form>
     """
         NTmessage( "Content-Type: text/html\n" )     # HTML is following # blank line, end of headers
-        
+        NTmessage( "<HTML>" )     # HTML is following # blank line, end of headers
+        NTmessage(  self.header )
     def main(self):            
         
         #os.putenv('HOME', '/Users/jd/Sites/tmp/cing') # not recommended on mac os for memory leaks may occur.
@@ -136,6 +138,7 @@ class SimpleCgiServer:
 #        cgitb.enable(display=1, logdir="CING_SERVER_TMP")
         cgitb.enable()
         access_key_value = self.form[ACCESS_KEY].value
+        self.tmpUrl = os.path.join( "SERVER_CGI_URL_TMP", access_key_value)        
         cing.cingDirTmp = os.path.join( "CING_SERVER_TMP", access_key_value )
         cingDirTmp = cing.cingDirTmp
         if os.path.exists(cingDirTmp):
@@ -152,8 +155,9 @@ class SimpleCgiServer:
         _directory, basename, _extension = NTpath( fileitem.filename )
         entryId = basename
 
-        myHeader = self.header.replace( 'PROJECT', entryId)
-        NTmessage( myHeader )        
+#        myHeader = self.header.replace( 'PROJECT', entryId)
+#        NTmessage( myHeader )        
+        NTmessage( "testing 123" )        
         if not fileitem.file:
             self.endError("Please provide a PDB_FILE actual file.")    
         #    If an error is encountered when obtaining the contents of an uploaded file (for example, when the user interrupts the form 
@@ -189,51 +193,53 @@ class SimpleCgiServer:
         NTmessage(  "Estimated time independent of size: %3d" % totalTimeInSecondsExpected)
         NTmessage(  "Estimated total time:               %3d" % overallTime)
         NTmessage(  "</pre>")
+        NTmessage(  self.timerForm )
         
         self.save_uploaded_file (form_field=COOR_FILE, upload_dir=cingDirTmp)
             
-        pdbConvention = IUPAC
-#        restraintsConvention = CYANA
+        pdbConvention = IUPAC            
             
-            
+        NTmessage(  "<pre>")
+        f = ForkOff( processes_max       = 1,
+                     max_time_to_wait    = 60*5,
+                     verbosity           = cing.verbosity)
+        v = ValidateCyanaProject(cingDirTmp,
+                htmlOnly=htmlOnly,doProcheck=doProcheck, doWhatif=doWhatif,
+                pdbConvention=pdbConvention, restraintsConvention=CYANA2)
+        job_0       = ( v.validate(), () )
+        job_list    = [ job_0 ]
+        done_list   = f.forkoff_start( job_list, 0 )    
+        NTdebug("Finished ids: %s", done_list)
+        
         #if entryId.startswith("1YWUcdGMP"):
         #    pdbConvention = XPLOR
         #if entryId.startswith("2hgh"):
         #    pdbConvention = CYANA
         #if entryId.startswith("1tgq"):
         #    pdbConvention = PDB                        
-        NTmessage( self.timer )
-        NTmessage(  "<pre>")
-        project = Project.open( entryId, status='new' )
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cingDirTmp, pdbFileName)
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-        NTmessage(  "</pre>")
-        #NTdebug("Reading files from directory: " + cyanaDirectory)
-        #kwds = {'uplFiles': [ entryId ],
-        #        'acoFiles': [ entryId ]         
-        #          }
-        if project.save():
-            self.endError( 'Failed to save project.')
-            
-        NTmessage(  "<pre>")
-        if project.validate(htmlOnly=htmlOnly,doProcheck=doProcheck, doWhatif=doWhatif ):
+        if not done_list:
             self.endError( 'Failed to run the validate step.' )
         NTmessage(  "</pre>")
         
         # Localized in ant script.
         # SERVER_CGI_URL_TMP is like: localhost/~jd/tmp/cing
-        tmpUrl = os.path.join( "SERVER_CGI_URL_TMP", access_key_value)        
-        cingResultUrl = os.path.join( tmpUrl, entryId+".cing", "index.html")
+        cingResultUrl = os.path.join( self.tmpUrl, entryId+".cing", "index.html")
         NTmessage(  '<P>Please find the results <a href="http://%s"> here </A>' % cingResultUrl)
-        NTmessage(  '<P>Your uploads and logs are available from <a href="http://%s"> here </A>' % tmpUrl)
+        NTmessage(  '<P>Your uploads and logs are available from <a href="http://%s"> here </A>' % self.tmpUrl)
+        self.endAlways(0)
         
     def endError( self, message ):    
 #        reference2Log = "Please inspect the log %s" % self.logUrl
         NTerror( "<P>"+message+self.footer )
+        self.endAlways(1)
+
+    def endAlways( self, exit_code=0 ):
+        if self.tmpUrl:
+            NTmessage(  '<P>Your uploads and logs are available from <a href="http://%s"> here </A>' % self.tmpUrl)
+        NTmessage( '</HTML>' )
 #        sys.stderr = initial_stderr
 #        NTerror( message )         
-        sys.exit(1)
+        sys.exit(exit_code)
         
     def save_uploaded_file (self, form_field, upload_dir):
         """This saves a file uploaded by an HTML form.
