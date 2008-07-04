@@ -1,5 +1,4 @@
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTparameter
 import os
 
 #-----------------------------------------------------------------------------

@@ -33,14 +33,14 @@ from cing.Libs.NTutils import NTdict #@UnusedImport just nice to have.
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import obj2XML #@UnusedImport
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.disk    import copy
 from cing.core.constants import XPLOR
 from cing.core.classes import Project
 from cing.core.molecule import dots
-from cing.core.molecule import mapMolecules
+from cing.core.molecule import mapMolecules #@UnusedImport
 from string import find
 from cing.Libs.NTutils import printf
 from fnmatch import fnmatch

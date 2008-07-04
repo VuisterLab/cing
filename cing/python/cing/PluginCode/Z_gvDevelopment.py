@@ -11,11 +11,11 @@ Residue
 """
 
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import *
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-import cing
+import cing #@Reimport
 
-import os
+import os #@Reimport
 
 def procheckString2float( string ):
     """Convert a string to float, return None in case of value of 999.90

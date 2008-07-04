@@ -56,13 +56,13 @@ class AllChecks(TestCase):
         ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId)
         self.assertFalse(project.initCcpn(ccpnFile=ccpnFile))
         self.failIf(project.save())
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+#        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+#        doWhatif = False # disables whatif actual run
+#        doProcheck = False
         
-        self.assertFalse(project.validate(htmlOnly=htmlOnly,
-                                          doProcheck = doProcheck,
-                                          doWhatif=doWhatif ))
+#        self.assertFalse(project.validate(htmlOnly=htmlOnly,
+#                                          doProcheck = doProcheck,
+#                                          doWhatif=doWhatif ))
         
 
 if __name__ == "__main__":
