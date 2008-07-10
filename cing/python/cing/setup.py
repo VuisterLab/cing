@@ -209,9 +209,9 @@ def check_cython():
         pass
 
     if not result:
-         NTwarning('Failed to find Cython')
+        NTwarning('Failed to find Cython')
     else:
-         NTmessage("........ Found 'Cython'")
+        NTmessage("........ Found 'Cython'")
 
     return result
 
