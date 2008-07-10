@@ -53,7 +53,7 @@ from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import list2asci
+from cing.Libs.NTutils import list2asci #@UnusedImport
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str

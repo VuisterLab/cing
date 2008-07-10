@@ -171,10 +171,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         self.resonanceSources = NTlist()
         self.modelCount       = 0
 
-#        self._coordinates = NTlist()        # internal array with coordinate references
-        self._nameTupleDict   = {}           # Internal namedict for decodeNameTuple
-        self._dihedralDict    = {}           # dihedralDict[(atoms1, atom2, atom3,atom4)] = (<Residue>, angleName, <AngleDef>)
-                                             # will be filled by calling dihedral method of residue
+#        self._coordinates = NTlist()       # internal array with coordinate references
+        self._nameTupleDict   = {}          # Internal namedict for decodeNameTuple
+        self._dihedralDict    = {}          # dihedralDict[(atoms1, atom2, atom3,atom4)] = (<Residue>, angleName, <AngleDef>)
+                                            # will be filled by calling dihedral method of residue
 
         self.xeasy            = None         # reference to xeasy class, used in parsing
         self.rogScore         = ROGscore()
@@ -221,7 +221,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                            self.footer(dots)
                          )
         return result
-   #end def
+    #end def
 
     def __str__(self):
         return sprintf('<Molecule "%s" (C:%d,R:%d,A:%d,M:%d)>',
@@ -337,8 +337,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         res = chain[resNum]
 
         if atomName == None:
-           self._nameTupleDict[nameTuple] = res
-           return res
+            self._nameTupleDict[nameTuple] = res
+            return res
 
         resTranslated = res.translate(convention)
         an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
@@ -454,12 +454,12 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             if aname != None:
                 t = (atm.residue.resNum, aname)
                 if atomDict.has_key( t ):
-                	# GV needs to check if this still needs to be an error or as is, down graded to warning level.
-                	# see example in H2_2Ca_53 with test_shiftx routine. FIXME:
-                	# GV, Yes maintain, but  test for aname should reduce warnings
-                	NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
-                    	       atm, atomDict[t]
-                        	 )
+                    # GV needs to check if this still needs to be an error or as is, down graded to warning level.
+                    # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
+                    # GV, Yes maintain, but  test for aname should reduce warnings
+                    NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+                            atm, atomDict[t]
+                            )
                 else:
                     atomDict[t] = atm
                 #end if
@@ -976,8 +976,8 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                     da = c1.CA.distance( c2.CA )
                     db = c1.CB.distance( c2.CB )
                     dg = c1.SG.distance( c2.SG )
-                    chi3SS( db[0] )                        
-                    NTdebug( 'Considering pair : %s with %s' % (c1, c2)) 
+                    chi3SS( db[0] )
+                    NTdebug( 'Considering pair : %s with %s' % (c1, c2))
                     NTdebug( 'Ca-Ca            : %s', da)
                     NTdebug( 'Cb-Cb            : %s', db)
                     NTdebug( 'Sg-Sg            : %s', dg)
@@ -1149,9 +1149,8 @@ Return an Molecule instance or None on error
         Superpose the coordinates of molecule
         returns ensemble or NoneObject on error
         """
-        #@TODO: replace molecule by self
-        molecule=self
-        if molecule.modelCount <= 0:
+
+        if self.modelCount <= 0:
             return NoneObject
         #end if
 
@@ -1161,14 +1160,14 @@ Return an Molecule instance or None on error
         fitted        = []
         notFitted     = []
         noCoordinates = []
-        fitResidues   = molecule.ranges2list( ranges )
+        fitResidues   = self.ranges2list( ranges )
         # store the ranges
         self.ranges   = list2asci( fitResidues.zap('resNum'))
 
-        for res in molecule.allResidues():
+        for res in self.allResidues():
             fitResidue = res in fitResidues
             for a in res.allAtoms():
-                if len(a.coordinates) != molecule.modelCount:
+                if len(a.coordinates) != self.modelCount:
                     noCoordinates.append( a )
                     continue
                 if ( (not fitResidue) or
@@ -1185,13 +1184,13 @@ Return an Molecule instance or None on error
         #print fitted
 
         NTmessage("==> Superposing: fitted %s on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)",
-                      molecule, len(fitted), ranges, backboneOnly, includeProtons
+                      self, len(fitted), ranges, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
         NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
                 self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
                )
-        r = molecule.calculateRMSDs(ranges=ranges)
+        r = self.calculateRMSDs(ranges=ranges)
         NTdetail( r.format() )
         return self.ensemble
     #end def
@@ -1203,19 +1202,17 @@ Return an Molecule instance or None on error
         Optionally  select for rnages and models.
         return rmsd result of molecule, or None on error
         """
-        #@TODO: replace molecule by self
-        molecule = self
 
-        if molecule.modelCount == 0:
-            NTerror('Molecule.calculateRMSDs: no coordinates for %s', project.molecule)
+        if self.modelCount == 0:
+            NTerror('Molecule.calculateRMSDs: no coordinates for %s', self)
             return None
         #end if
 
-        selectedResidues = molecule.ranges2list( ranges )
-        selectedModels   = molecule.models2list( models )
+        selectedResidues = self.ranges2list( ranges )
+        selectedModels   = self.models2list( models )
 
-        molecule.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
-        for res in molecule.allResidues():
+        self.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
+        for res in self.allResidues():
             res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
             res.rmsd.bbtemp = NTlist() # list of included bb-atms
             res.rmsd.hvtemp = NTlist() # list of included heavy-atms
@@ -1230,8 +1227,8 @@ Return an Molecule instance or None on error
             res.rmsd.heavyAtomsCount = len(res.rmsd.hvtemp)
             if res in selectedResidues:
                 res.rmsd.included = True
-                molecule.rmsd.backboneCount += res.rmsd.backboneCount
-                molecule.rmsd.heavyAtomsCount += res.rmsd.heavyAtomsCount
+                self.rmsd.backboneCount += res.rmsd.backboneCount
+                self.rmsd.heavyAtomsCount += res.rmsd.heavyAtomsCount
                 #print '>>',res.rmsd.bbtemp
             else:
                 res.rmsd.included = False
@@ -1240,14 +1237,14 @@ Return an Molecule instance or None on error
 
         NTdebug("Calculating rmsd's: %s", ranges)
 
-        for res in molecule.allResidues():
+        for res in self.allResidues():
             if res.rmsd.backboneCount > 0:
                 Vmean = []
                 for atm in res.rmsd.bbtemp:
                     Vmean.append(atm.meanCoordinate.e)
                 #end for
-                for i,model in enumerate(selectedModels):     # number of evaluated models (does not have to coincide with model
-                                                              # since we may supply an external list
+                for i,model in enumerate(selectedModels):   # number of evaluated models (does not have to coincide with model
+                                                            # since we may supply an external list
                     Vbb = []
                     for atm in res.rmsd.bbtemp:
                         Vbb.append(atm.coordinates[model].e)
@@ -1255,7 +1252,7 @@ Return an Molecule instance or None on error
                     res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
 
                     if res.rmsd.included:
-                        molecule.rmsd.backbone[i] += (res.rmsd.backbone[i]**2)*res.rmsd.backboneCount
+                        self.rmsd.backbone[i] += (res.rmsd.backbone[i]**2)*res.rmsd.backboneCount
                     #end if
                 #end for
             #end if
@@ -1264,8 +1261,8 @@ Return an Molecule instance or None on error
                 for atm in res.rmsd.hvtemp:
                     Vmean.append(atm.meanCoordinate.e)
                 #end for
-                for i,model in enumerate(selectedModels):     # number of evaluated models (does not have to coincide with model
-                                                              # since we may supply an external list
+                for i,model in enumerate(selectedModels):   # number of evaluated models (does not have to coincide with model
+                                                            # since we may supply an external list
                     Vhv = []
                     for atm in res.rmsd.hvtemp:
                         Vhv.append(atm.coordinates[model].e)
@@ -1273,7 +1270,7 @@ Return an Molecule instance or None on error
                     res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
 
                     if res.rmsd.included:
-                        molecule.rmsd.heavyAtoms[i] += (res.rmsd.heavyAtoms[i]**2)*res.rmsd.heavyAtomsCount
+                        self.rmsd.heavyAtoms[i] += (res.rmsd.heavyAtoms[i]**2)*res.rmsd.heavyAtomsCount
                     #end if
                 #end for
             #end if
@@ -1282,13 +1279,13 @@ Return an Molecule instance or None on error
         #end for
 
         for i, model in enumerate(selectedModels):
-            molecule.rmsd.backbone[i]   = math.sqrt(molecule.rmsd.backbone[i]/max(molecule.rmsd.backboneCount,1))
-            molecule.rmsd.heavyAtoms[i] = math.sqrt(molecule.rmsd.heavyAtoms[i]/max(molecule.rmsd.heavyAtomsCount,1))
+            self.rmsd.backbone[i]   = math.sqrt(self.rmsd.backbone[i]/max(self.rmsd.backboneCount,1))
+            self.rmsd.heavyAtoms[i] = math.sqrt(self.rmsd.heavyAtoms[i]/max(self.rmsd.heavyAtomsCount,1))
         #end for
-        molecule.rmsd._closest()
-        molecule.rmsd._average()
+        self.rmsd._closest()
+        self.rmsd._average()
 
-        return molecule.rmsd
+        return self.rmsd
     #end def
 
     def toPDB( self, model = None, convention = IUPAC   ):
@@ -3585,9 +3582,9 @@ def rmsd( atomList ):
 
 def chi3SS( dCbCb ):
     """
-    Return approximation of the chi3 torsion angle as 
+    Return approximation of the chi3 torsion angle as
     fie of the distance between the Cb atoms of each Cys residue
-    
+
     Dombkowski, A.A., Crippen, G.M, Protein Enginering, 13, 679-89, 2000
     Page 684, eq. 9
     """
@@ -3600,39 +3597,39 @@ def disulfideScore( cys1, cys2 ):
     Based upon simple counting:
     - Ca-Ca distance
     - Cb-Cb distance
-    - Ability to form S-S dihedral within specified range or the presence 
+    - Ability to form S-S dihedral within specified range or the presence
       of short distance SG-SG
-      
+
     Initial test show that existing disulfides have scores > 0.9
     Potential disulfides score > ~0.25
-    
+
     Limits based upon analysis by:
-      Pellequer J-L and Chen, S-W.W, Proteins, Struct, Func and Bioinformatics 
+      Pellequer J-L and Chen, S-W.W, Proteins, Struct, Func and Bioinformatics
       65, 192-2002 (2006)
       DOI: 10.1002/prot.21059
-    
+
     cys1, cys2: Residue instances
     returns a NTlist with four numbers:
         [d(Ca-Ca) count, d(Cb-Cb) count, S-S count, final score]
-        
+
     """
     mc = len(cys1.CA.coordinates) # model count
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
-        if da >= 3.72 and da <= 6.77: 
+        if da >= 3.72 and da <= 6.77:
             score[0] += 1
-            
+
         db = NTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
-        if db >= 3.18 and db <= 4.78: 
+        if db >= 3.18 and db <= 4.78:
             score[1] += 1
-        
+
         dg = NTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
         chi3 = chi3SS( db )
-        if (dg >= 1.63 and dg <= 2.72) or (chi3 >= 27.0 and chi3 <= 153.0): 
+        if (dg >= 1.63 and dg <= 2.72) or (chi3 >= 27.0 and chi3 <= 153.0):
             score[2] += 1
         #print '>', da, db, dg, chi3, score
     #end for
-        
+
     score[3] = score.sum() / (3. * mc)
     return score
