@@ -585,7 +585,7 @@ Project: Top level Cing project class
 
         # restore the lists
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs]:
-             pl.restore()
+            pl.restore()
         #end for
 
         for l in self.distances + self.dihedrals:

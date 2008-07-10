@@ -2054,8 +2054,7 @@ def populateHtmlMolecules( project, htmlOnly=False,
             chainId = chain.name
             NTmessage("Generating residue html pages for chain: " + chainId)
             printedDots = 0
-            #NB: it's falling with malloc for AWSS if >~ 140 residues
-            resRange = chain.allResidues()#[:60]
+            resRange = chain.allResidues()
             for res in resRange:
 #                write without extra space
                 if not printedDots % 10:
