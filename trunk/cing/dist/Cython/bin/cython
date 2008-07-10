@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-#   Cython -- Main Program, Unix
+#  Cython -- Main Program, Unix
 #
 
 from Cython.Compiler.Main import main
