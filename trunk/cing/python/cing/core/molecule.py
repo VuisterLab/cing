@@ -3588,7 +3588,11 @@ def chi3SS( dCbCb ):
     Dombkowski, A.A., Crippen, G.M, Protein Enginering, 13, 679-89, 2000
     Page 684, eq. 9
     """
-    return acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
+    try:
+        val = acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
+    except:
+        val = 'nan'
+    return val
 
 
 def disulfideScore( cys1, cys2 ):
