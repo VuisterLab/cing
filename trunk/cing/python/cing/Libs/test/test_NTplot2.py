@@ -18,7 +18,8 @@ from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
 from unittest import TestCase
-from numpy.core.ma import arange
+#from numpy.core.ma import arange
+from Numeric import arange
 import cing
 import os #@Reimport
 import unittest
