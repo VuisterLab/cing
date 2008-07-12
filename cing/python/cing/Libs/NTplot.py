@@ -547,8 +547,9 @@ class NTplot( NTdict ):
                 result['markeredgecolor'] =  markerColor
                 result['markerfacecolor'] =  markerColor
             else:
-                result['markerfacecolor'] =  None # it might have been set above.
-
+                # AWSS: for matplotlib 0.91.3 , None is not acceptable anymore.
+                result['markerfacecolor'] =  'none' #None # it might have been set above.
+                #attributes.alpha = 0.0
 #    a.pointType  = None   # in matplotlib: marker
 #    a.pointSize  = 2.0    # in matplotlib: markersize
 #    a.pointColor = 'blue' # in matplotlib: markeredgecolor
