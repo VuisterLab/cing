@@ -18,7 +18,7 @@ import os
 import sys
 
 class ValidateCyanaProject():
-    def __init__(self, cyanaProjectDir, htmlOnly=True, doWhatif=False, doProcheck=False,
+    def __init__(self, cyanaProjectDir, htmlOnly=False, doWhatif=True, doProcheck=True,
                  pdbConvention=CYANA2, restraintsConvention=CYANA2):
         """Retrieves all needed info from path"""
 
@@ -68,12 +68,12 @@ class ValidateCyanaProject():
         if peakList:
             NTdebug('found peakList: [%s]' % peakList)
             kwds[ 'peakFiles' ] = stripExtensions( peakList )
-        if not project.cyana2cing(cyanaDirectory=".", convention=self.restraintsConvention,
-                        copy2sources = True, **kwds ):
+        if project.cyana2cing(cyanaDirectory=".", convention=self.restraintsConvention,
+                        copy2sources = True, **kwds ) == None:
             NTexit('Failed to project.cyana2cing')
         project.save()
         
-        if project.validate(htmlOnly=self.htmlOnly,
+        if not project.validate(htmlOnly=self.htmlOnly,
                             doProcheck = self.doProcheck, 
                             doWhatif=self.doWhatif ):
             NTerror('Failed to project.validate')

@@ -1,4 +1,12 @@
 <module>
 	<inherits name="com.google.gwt.user.User"/>
 	<entry-point class="cing.client.iCing"/>
+        <!-- Inherit sound support                           -->
+        <inherits name='com.allen_sauer.gwt.voices.gwt-voices'/>
+   <inherits name='com.gwtsolutions.components.Components'/>
+<inherits name="com.google.gwt.json.JSON" />
+   <!-- Specify the servlet that handles file uploads.        -->  
+   <servlet path="/fileupload"
+     class="com.gwtsolutions.server.FileUploadServlet"/>
+        	
 </module>

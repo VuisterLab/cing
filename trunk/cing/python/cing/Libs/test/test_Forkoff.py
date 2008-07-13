@@ -35,14 +35,14 @@ class AllChecks(TestCase):
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(
                 processes_max       = 3,
-                max_time_to_wait    = 10,
+                max_time_to_wait    = 5,
                 verbosity           = 2
                 )
     
         ## Sleep long
         job_0       = ( my_sleep, (9999,) )
         ## Sleep
-        job_1       = ( my_sleep, (5.1,) )
+        job_1       = ( my_sleep, (3.1,) )
         ## Sleep short
         job_2       = ( my_sleep, (1.2,) )
         job_list    = [ job_0, job_1, job_2 ]
