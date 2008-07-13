@@ -58,8 +58,8 @@ public class iCing implements EntryPoint {
 		verticalPanel.add(fileUploadRow_);
 //	    final ArrayList<NmrFileUpload> fileUploadList = new ArrayList<NmrFileUpload>();
 //		int firstFileUploadWidgetIdxInPanel = verticalPanel.getWidgetCount();
-		final Options options = new Options();
-		verticalPanel.add(options);
+//		final Options options = new Options();
+//		verticalPanel.add(options);
 		
 		// Create the dialog box
 		final DialogBox dialogBox = new DialogBox();
@@ -82,7 +82,7 @@ public class iCing implements EntryPoint {
 		showAllCheckBox.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
 				boolean isChecked = showAllCheckBox.isChecked();
-				options.setVisible(isChecked);
+//				options.setVisible(isChecked);
 				if ( showDialogBoxesBox.isChecked() ) {
 					String msg = "Closed the panels";
 					if ( isChecked ) {
@@ -95,7 +95,7 @@ public class iCing implements EntryPoint {
 			}
 		});
 
-		final Criteria criteria = new Criteria();
-		verticalPanel.add(criteria);				
+//		final Criteria criteria = new Criteria();
+//		verticalPanel.add(criteria);				
 	}
 }

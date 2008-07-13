@@ -41,7 +41,7 @@ public class fileUploadRow extends Composite {
 
 		final CheckBox filepresentCheckBox = new CheckBox();
 		horizontalPanel.add(filepresentCheckBox);
-		filepresentCheckBox.setVisible(false);
+		filepresentCheckBox.setVisible(false);    
 
 	    FileUpload fileUpload = new FileUpload();
 		horizontalPanel.add(fileUpload);
