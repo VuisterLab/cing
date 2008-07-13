@@ -3591,7 +3591,7 @@ def chi3SS( dCbCb ):
     try:
         val = acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
     except:
-        val = 'nan'
+        val = NaN
     return val
 
 
