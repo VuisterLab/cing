@@ -49,7 +49,7 @@ def convertPs2Pdf(inputPath,outputPath,options,extraOptions=None):
     if convert( cmd ):
         NTerror("Failed to run conversion: " + cmd)
         return True
-        
+         
 def joinPdfPagesByConvert( inputFileList, outputPath):
     """Rasterizes which reduces the quality in general"""
     # convert -adjoin -delay 200 residuePlotSet001.png residuePlotSet002.png residuePlotSetAll.gif    

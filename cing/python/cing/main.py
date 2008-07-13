@@ -118,7 +118,7 @@ def script( scriptFile, *a, **k ):
 
     if not os.path.exists( scriptFile ):
         NTdebug('Missed in current working directory the script file: %s' % scriptFile)
-        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts)
+        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts) 
         scriptFileAbs = os.path.join( scriptsDir, scriptFile)
         if not os.path.exists( scriptFileAbs ):
             NTerror('Missed in current working directory and Scripts directory\n'+
