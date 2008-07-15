@@ -4,7 +4,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -16,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class fileUploadRow extends Composite {
 
-//	 private final Message statusMessage = new Message(
+//	 private final Message moreFileTypesDialogBox = new Message(
 //			 null, Message.SHAKE, 0.5);
 	
 	public fileUploadRow() {
@@ -33,8 +32,8 @@ public class fileUploadRow extends Composite {
 		HorizontalPanel dialogPanel = new HorizontalPanel();
 		verticalPanel.add(dialogPanel);
 		dialogPanel.setSpacing(5);
-		final DialogBox moreFileTypesDialogBox = new DialogBox();
-		dialogPanel.add(moreFileTypesDialogBox);
+//		final DialogBox moreFileTypesDialogBox = new DialogBox();
+//		dialogPanel.add(moreFileTypesDialogBox);
 		final HorizontalPanel horizontalPanel = new HorizontalPanel();
 		verticalPanel.add(horizontalPanel);
 		horizontalPanel.setSpacing(5);
@@ -77,11 +76,11 @@ public class fileUploadRow extends Composite {
 		dialogPanel.add(closeButton);		
 		closeButton.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
-				moreFileTypesDialogBox.hide();
+//				moreFileTypesDialogBox.hide();
 			}
 		});
-		moreFileTypesDialogBox.setText("More file types to come soon.");
-		moreFileTypesDialogBox.center();
-		moreFileTypesDialogBox.show();
+//		moreFileTypesDialogBox.setText("More file types to come soon.");
+//		moreFileTypesDialogBox.center();
+//		moreFileTypesDialogBox.show();
 	}
 }

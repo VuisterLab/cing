@@ -2,11 +2,10 @@
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.json.JSON" />
 	<entry-point class="cing.client.iCing" />
-    <!-- Inherit sound support                           -->
-	<inherits name='com.allen_sauer.gwt.voices.gwt-voices' />
-    <!-- Some cool effects; like a shaking dialog box called Message -->
+    <!-- Inherit sound support                        -->
+	<inherits name='com.allen_sauer.gwt.voices.gwt-voices' />     
+    <!-- Some cool effects; like a shaking dialog box called Message --> 
 	<inherits name='com.gwtsolutions.components.Components' />
-	 
-   <!-- Specify the servlet that handles file uploads.        -->
-	<servlet path="/fileupload" class="cing.server.FileUploadServlet" />
+   <!-- Specify the servlet that handles file uploads. -->       
+	<servlet path="/fileupload" class="cing.server.FileUploadServlet" />     
 </module> 
