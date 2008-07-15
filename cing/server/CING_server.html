@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>CING Server</title>
+    <title>CING Server</title>
 <link   href="cing.ico"                                                   rel="shortcut icon">
 <link   href="cing.css"                      type="text/css"              rel="stylesheet" media="screen">
 <script src= "javascript/formval.js"         type="text/javascript">     </script>
@@ -12,7 +12,7 @@
 <!-- from http://localhost/~jd/cing/server/CING_server.html
      to   http://localhost/cgi-bin/simpleCgiServer.py-->
 <FORM METHOD="POST" name="myform"
-ACTION="../../../cgi-bin/simpleCgiServer.py" 
+ACTION="../../../cgi-bin/simpleCgiServer.py"
 ENCTYPE="multipart/form-data">
 
 <div id="container">
@@ -25,7 +25,7 @@ The gray-ed out parameters can not yet be provided or changed.
 <table>
     <TR class=GRAY>
         <td>Project
-        (.tgz if n>1)<td><INPUT TYPE="file" NAME="PROJECT_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.tgz">eg</A>
+        (.tgz if n&gt;1)<td><INPUT TYPE="file" NAME="PROJECT_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.tgz">eg</A>
         <BR><INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-cyana" CHECKED>
         CCPN <INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-xplor">
         NMR-STAR <INPUT TYPE="radio" NAME="PROJECT_TYPE" VALUE="-pdb"> CING
@@ -37,10 +37,10 @@ The gray-ed out parameters can not yet be provided or changed.
         <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="IUPAC" checked="checked"> IUPAC
         <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="CYANA">CYANA
         <INPUT class=GRAY TYPE="radio" NAME="COOR_TYPE" VALUE="XPLOR">XPLOR
-        
+
     </tr>
     <TR class=GRAY>
-    
+
         <td>Sequence
         <TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.seq">eg</A>
         <BR>
@@ -49,12 +49,12 @@ The gray-ed out parameters can not yet be provided or changed.
         <td>Distance<TD><INPUT TYPE="file" NAME="NOE_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.upl">eg</A>
         <BR>
         <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>CYANA
-	<TR class=GRAY>
-		<td>Dihedral<TD><INPUT TYPE="file" NAME="ACO_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.aco">eg</A>
+    <TR class=GRAY>
+        <td>Dihedral<TD><INPUT TYPE="file" NAME="ACO_FILE" VALUE="" SIZE=50> <A HREF="example/1brv.aco">eg</A>
         <BR>
         <INPUT TYPE="radio" NAME="PDB_TYPE" VALUE="-cyana" CHECKED>CYANA
-		</TD>
-	</tr>
+        </TD>
+    </tr>
     <tr class=GRAY>
         <td>Peak</td>
         <td><INPUT TYPE="file" NAME="PEAK_FILE" VALUE="" SIZE=50>
@@ -65,7 +65,7 @@ The gray-ed out parameters can not yet be provided or changed.
 </table>
 
 Please use the <a href="http://www.ccpn.ac.uk/ccpn/software/ccpnmr-formatconverter">FormatConverter</a>
-to create a CCPN project file. 
+to create a CCPN project file.
 
 
 
@@ -74,18 +74,18 @@ to create a CCPN project file.
 
 <TR><TD>
 Residues:
-<TD><INPUT 
-TYPE="input" 
-NAME="range" 
-VALUE="" 
+<TD><INPUT
+TYPE="input"
+NAME="range"
+VALUE=""
 SIZE=20 > (E.g. 175,177-189)
 
 <TR><TD>
 Ensemble models:
-<TD><INPUT 
-TYPE="input" 
-NAME="ensemble" 
-VALUE="" 
+<TD><INPUT
+TYPE="input"
+NAME="ensemble"
+VALUE=""
 SIZE=20 > (E.g. 2-19)
 
 <TR><TD>
@@ -100,9 +100,9 @@ Verbosity (in ascending order)
 </SELECT><input name="DO_IMAGES" type="checkbox" checked="checked">Create imagery
 <TR class="GRAY"><TD>
 Access key
-<TD><INPUT 
-TYPE="input" 
-NAME="ACCESS_KEY" 
+<TD><INPUT
+TYPE="input"
+NAME="ACCESS_KEY"
 VALUE="4A2EM9kt"
 SIZE=8 >
 [a-Z0-9]{6}
@@ -121,7 +121,7 @@ SIZE=8 >
 
 <h2><input name="TODO_PARAM" type="checkbox" checked="checked">CING</h2>
 
-<input name="DO_OMEGA" type="checkbox" checked="checked">Omega 
+<input name="DO_OMEGA" type="checkbox" checked="checked">Omega
 <input TEXT="" name="OMEGA_MAXALL_DEFAULT_POOR_VALUE" value="15" size="2" class="orange"> and
 <input TEXT="" name="OMEGA_MAXALL_DEFAULT_BAD_VALUE" value="20" size="2" class="red">
 &deg;
@@ -149,7 +149,7 @@ SIZE=8 >
 <input TEXT="" name="WI_POOR_BBCCHK" value="3.0" size="4" class="orange">
 <input TEXT="" name=" WI_BAD_BBCCHK" value="10.0" size="4" class="red">
 </td><td>
-occurances in db [0-80]
+occurrences in db [0-80]
 </td></tr>
 
 <tr>
@@ -165,25 +165,25 @@ residue sigmas [-2,2]
 
 
 <br><h2><input name="DO_PROCHECK" type="checkbox" >ProcheckNMR/<input name="DO_RAMCHK" type="checkbox" checked="checked">Aqua</h2>
-		<table class=GRAY>
+        <table class=GRAY>
 
 
-			<tr>
-				<td colspan="3"><input name="DO_FLAG_MISSING_COOR"
-					type="checkbox" checked="checked"> Include intra-residual
-				contacts</td>
-			</tr>
+            <tr>
+                <td colspan="3"><input name="DO_FLAG_MISSING_COOR"
+                    type="checkbox" checked="checked"> Include intra-residual
+                contacts</td>
+            </tr>
 
-			<tr>
-				<td>NOE completeness per residue</td>
-				<td><input TEXT="" name="WI_POOR_C12CHK" value="20" size="4"
-					class="orange"> <input TEXT="" name=" WI_BAD_C12CHK"
-					value="10" size="4" class="red"></td>
-				<td>per residue [0,100%]</td>
-			</tr>
+            <tr>
+                <td>NOE completeness per residue</td>
+                <td><input TEXT="" name="WI_POOR_C12CHK" value="20" size="4"
+                    class="orange"> <input TEXT="" name=" WI_BAD_C12CHK"
+                    value="10" size="4" class="red"></td>
+                <td>per residue [0,100%]</td>
+            </tr>
 
-			<tr>
-				<td colspan="3"><DT>
+            <tr>
+                <td colspan="3"><DT>
 Observable atoms:</DT>
 
 <DD>
@@ -196,12 +196,12 @@ Observable atoms:</DT>
 <OPTION VALUE="theor">All theoretically possible with NMR
 <OPTION VALUE="heavy">All non-hydrogens
 </SELECT></DD>
-				</td>
-				
-				
-			</tr>
-		</table>
-		</TD>
+                </td>
+
+
+            </tr>
+        </table>
+        </TD>
 
 
 <TD>
@@ -217,7 +217,7 @@ Observable atoms:</DT>
 <TD>
 <INPUT TEXT NAME="DR_MAXALL_POOR"  VALUE="0.1" size=4 class="orange">
 <INPUT TEXT NAME="DR_MAXALL_BAD "  VALUE="0.3" size=4 class="red">
-<TD>&Aring; <0,99]
+<TD>&Aring; &lt;0,99]
 </TR>
 <TR>
 <TD>
@@ -226,19 +226,19 @@ Observable atoms:</DT>
 <INPUT TEXT NAME="DR_RMSALL_BAD"  VALUE="0.5" size=4 class="orange">
 <INPUT TEXT NAME="DR_RMSALL_BAD"  VALUE="2.0" size=4 class="red">
 <TD>
-&Aring; <0,99]
+&Aring; &lt;0,99]
 </TR>
 
 <TR>
 <TD rowspan="2">
 <input name="WI_DO" type="checkbox">Maximum over in frac.
 <TD colspan="2">
-<INPUT TEXT NAME="DR_THRESHOLD_OVER_POOR"  VALUE="0.25" size=4 class="orange">&Aring; <0,99]
+<INPUT TEXT NAME="DR_THRESHOLD_OVER_POOR"  VALUE="0.25" size=4 class="orange">&Aring; &lt;0,99]
 <INPUT TEXT NAME="DR_THRESHOLD_OVER_BAD "  VALUE="0.33" size=4 class="orange">frac. [0,1]
 </TR>
 <TR>
 <TD colspan="2">
-<INPUT TEXT NAME="DR_THRESHOLD_OVER_POOR"  VALUE="0.5" size=4 class="red">&Aring;  <0,99]
+<INPUT TEXT NAME="DR_THRESHOLD_OVER_POOR"  VALUE="0.5" size=4 class="red">&Aring;  &lt;0,99]
 <INPUT TEXT NAME="DR_THRESHOLD_OVER_BAD "  VALUE="0.5" size=4 class="red">frac.  [0,1]
 </TR>
 
@@ -282,10 +282,13 @@ Observable atoms:</DT>
 </table></DL>
 </TABLE>
 
-<P><INPUT 
-TYPE="submit" 
+<P><INPUT
+TYPE="submit"
 NAME="SUBMIT"
-VALUE="Start validation"></FORM>
+VALUE="Start validation">
+</div>
+</div>
+</FORM>
 
 <div id="footer">
 <p>CING <a href="mailto:vuister@science.ru.nl">Geerten Vuister</a>, <a href="mailto:jurgend@cmbi.ru.nl">Jurgen F. Doreleijers</a> and <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
