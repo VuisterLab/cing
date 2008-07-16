@@ -4,7 +4,7 @@
     run as:
     cyana2cing.py  [options] CyanaDirectoryName
 
-    Use the flags to detrmine which files get imported.
+    Use the flags to determine which files get imported.
 
     Uses the CING API to convert cyana run to cing framework.
     Optionally export on-the-fly to a xplor refine setup.
