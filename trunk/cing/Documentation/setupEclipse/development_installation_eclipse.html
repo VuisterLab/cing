@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -20,15 +20,15 @@ Install the requirements:<br><br>
  <PRE>unicode = 0</pre>
 This was reported and fixed for Matlibplot version: 0.91?
 See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
-Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example). 
-Make sure the back end set here allows rendering without going to an X server. 
+Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example).
+Make sure the back end set here allows rendering without going to an X server.
 So perhaps you need to create the file and then change from:
 <pre>backend     : GTKAgg </pre>
-to: 
+to:
 <pre>backend     : Agg </pre>
 See this <a href="http://matplotlib.sourceforge.net/backends.html">discussion</a>.
-Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool. 
- 
+Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool.
+
 <li><b>Install cython</b>
 <pre>fink install cython-py25</pre>This package has been absent at times but was installed to: Cython-0.9.6.13.1-py2.5.egg-info. Strange.<li><b>Install gawk</b>
 <pre>fink install gawk</pre>
@@ -69,7 +69,7 @@ Register with google code to get a user account. Configure Eclipse for SVN; for 
 This is a two wizard step process; first the SVN then the Pydev wizard.<br><br>
 <img src="svn_setup.png">
 <Br>
-<li><b>Project tree</b> 
+<li><b>Project tree</b>
 <br>The project tree with the python code expanded should look something like:<br>
 <img src="project_overview.png">
 <Br>

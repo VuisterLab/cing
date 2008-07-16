@@ -89,6 +89,7 @@ import sys
 
 NotAvailableText = 'Not available'
 OpenText         = 'Open'
+help_html        = 'Help.html'
 #def printm( fps, fmt, *args ):
 #    """
 #    Print to list of filepointers (fps) using format and args.
@@ -1604,6 +1605,7 @@ def setupHtml(project):
                 resHeader = res.html.header
                 resHeader('h1', res._Cname(-1) )
                 res.html.insertHtmlLink( resHeader, res, project, text = 'Home' )
+                res.html.header('a', 'Help', href = res.html.relativePath()+help_html)
 
                 # Refs to move to previous, next residue or UP
                 previous = res.sibling(-1)
@@ -1613,6 +1615,7 @@ def setupHtml(project):
                 res.html.insertHtmlLink(     resHeader, res, chain,   text = 'UP' )
                 if next:
                     res.html.insertHtmlLink( resHeader, res, next,    text = next._Cname(-1) )
+
             #end for over res in residues
 
             for obj in htmlList:
