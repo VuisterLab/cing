@@ -2074,7 +2074,7 @@ class HTMLfile:
 
         # definition of content-less  tags
         self.noContent = [ 'base','basefont','br','col','frame','hr','img',
-                           'input','link','meta','ccsrule', 'script' ]
+                           'input','link','meta','ccsrule']#, 'script' ]
 
         self.title = title
         self.indent = 0
@@ -2208,7 +2208,8 @@ class HTMLfile:
 #        NTdebug('writing to file: %s' % self.fileName)
         self.indent = 0
         # JFD proposes to drop the below tags because they hinder javascript beyond my knowledge.
-#        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"'))
+        # AWSS updated it: it should work fine with javascript
+        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"'))
         self.stream.write(self.openTag('html'))
         self.stream.write(self.openTag('head'))
         if self.title:
