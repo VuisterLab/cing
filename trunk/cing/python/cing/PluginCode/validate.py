@@ -89,7 +89,7 @@ import sys
 
 NotAvailableText = 'Not available'
 OpenText         = 'Open'
-help_html        = 'Help.html'
+help_html        = 'help.html'
 #def printm( fps, fmt, *args ):
 #    """
 #    Print to list of filepointers (fps) using format and args.
