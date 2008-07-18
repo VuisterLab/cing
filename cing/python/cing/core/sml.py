@@ -483,7 +483,7 @@ class SMLChainHandler( SMLhandler ):
     #end def
 
     def endHandler(self, chain, molecule=None):
-       # Restore linkage
+        # Restore linkage
         chain.residues = chain._children
         return chain
     #end def
