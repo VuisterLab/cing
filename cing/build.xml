@@ -19,6 +19,27 @@
 	  <mkdir dir="${build.classes.dir}"/>
 	</target>
 
+	<target name="iweb-install" depends="init">
+        <echo message="Please insure the iWeb has been compile first. This ant target can alternatively be done from within iWeb."/>
+        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${iweb.dir}"/>
+        <scp    todir="${home.web.user}@${home.web.machine.looped}:${iweb.dir}"
+                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
+            port="${home.web.port}"
+            verbose="true"
+            >
+            <fileset dir="${iweb.local.dir}"/>                     
+        </scp>
+		<sync verbose="true"></sync>
+		<copydir dest="" src="" ></copydir>
+    </target>    
+	
+	<target name="iweb-zip" description="Zips files from iWeb directory to project's workspace." depends="init"> 	 
+		<zip destfile="iWeb/CING_iWeb.zip" 
+		       basedir="${iweb.internal.dir}"
+		       update="true"
+		  />
+		<echo message="Files moved to production succesfully."/>
+	</target>
 	
     <target name="server-install" depends="init, home-web-install, server-cgi-install"
             description="Publish the server.">
