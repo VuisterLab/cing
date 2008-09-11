@@ -2,7 +2,6 @@ package cing.client;
 
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -10,8 +9,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-//import com.gwtsolutions.components.client.ui.Message;
 
 public class fileUploadRow extends Composite {
 
@@ -26,9 +23,8 @@ public class fileUploadRow extends Composite {
 		initWidget(formPanel);
 
 		VerticalPanel verticalPanel = new VerticalPanel();
-		formPanel.add(verticalPanel);
+		formPanel.add(verticalPanel); 
 		verticalPanel.setSpacing(5);
- 		
 		HorizontalPanel dialogPanel = new HorizontalPanel();
 		verticalPanel.add(dialogPanel);
 		dialogPanel.setSpacing(5);
@@ -44,23 +40,20 @@ public class fileUploadRow extends Composite {
 
 	    FileUpload fileUpload = new FileUpload();
 		horizontalPanel.add(fileUpload);
+		fileUpload.setTitle("choose file");
+		fileUpload.setName("choose file");
 
-		final ListBox listBox_1 = new ListBox();
-		horizontalPanel.add(listBox_1);
-		listBox_1.addItem("Coordinate");
-		listBox_1.setVisibleItemCount(1);
+		final ListBox listBox_FileType = new ListBox();
+		horizontalPanel.add(listBox_FileType);
+		listBox_FileType.addItem("Coordinate");
+		listBox_FileType.setVisibleItemCount(1);
 
-		final ListBox listBox = new ListBox();
-		horizontalPanel.add(listBox);
-		listBox.addItem("PDB");
-		listBox.addItem("CYANA");
-		listBox.addItem("IUPAC");
-		listBox.setVisibleItemCount(1);
-
-		final Button submitButton = new Button();
-		horizontalPanel.add(submitButton);
-		submitButton.setEnabled(false);
-		submitButton.setText("Submit");
+		final ListBox listBox_FileFormat = new ListBox();
+		horizontalPanel.add(listBox_FileFormat);
+		listBox_FileFormat.addItem("PDB");
+		listBox_FileFormat.addItem("CYANA");
+		listBox_FileFormat.addItem("IUPAC");
+		listBox_FileFormat.setVisibleItemCount(1);
 
 		final Button removeButton = new Button();
 		horizontalPanel.add(removeButton);
@@ -72,15 +65,5 @@ public class fileUploadRow extends Composite {
 //		dialogPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
 		// Set the contents of the Widget
 //		dialogBox.setWidget(dialogPanel);		
-		Button closeButton = new Button("Close");
-		dialogPanel.add(closeButton);		
-		closeButton.addClickListener(new ClickListener() {
-			public void onClick(Widget sender) {
-//				moreFileTypesDialogBox.hide();
-			}
-		});
-//		moreFileTypesDialogBox.setText("More file types to come soon.");
-//		moreFileTypesDialogBox.center();
-//		moreFileTypesDialogBox.show();
 	}
 }
