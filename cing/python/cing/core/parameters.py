@@ -1,4 +1,4 @@
-from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTdict, NTdebug
 import os
 
 #-----------------------------------------------------------------------------
@@ -77,6 +77,7 @@ cingPaths = NTdict(
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
 )
+#print 'using dssp: ' + `cingPaths.dssp`
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
 
