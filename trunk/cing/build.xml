@@ -20,7 +20,7 @@
 	</target>
 
 	<target name="iweb-install" depends="init">
-        <echo message="Please insure the iWeb has been compile first. This ant target can alternatively be done from within iWeb."/>
+        <echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb."/>
         <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${iweb.dir}"/>
         <scp    todir="${home.web.user}@${home.web.machine.looped}:${iweb.dir}"
                 keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
@@ -29,8 +29,10 @@
             >
             <fileset dir="${iweb.local.dir}"/>                     
         </scp>
+		<!--
 		<sync verbose="true"></sync>
 		<copydir dest="" src="" ></copydir>
+		-->
     </target>    
 	
 	<target name="iweb-zip" description="Zips files from iWeb directory to project's workspace." depends="init"> 	 
@@ -109,5 +111,21 @@
     	
     </target>
 
+    <target name="iCing-install" depends="init">
+        <echo message="Ensure that the iCing dir already exists remotely."/>
+    	
+	<!--	scp -P 39676 -r $CINGROOT/iCing/www/cing.iCing jd@localhost-mini:/Users/jd/Sites/iCing 
+icing.server.dir.local=${icing.root}/www/cing.iCing
+icing.server.dir=${user.root}/Sites/icing
+	
+	-->
+    	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${icing.server.dir}"
+            keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
+            verbose="true"
+    		port="${server.cgi.port}"
+            >
+            <fileset dir="${icing.server.dir.local}"/>                     
+        </scp>
+    </target>
 
 </project>

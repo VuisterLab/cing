@@ -31,12 +31,12 @@
     - generic pdb structure as example for something I forgot.
     
 1tgq:
-    - SG group structure now withdrawn?
+    - SG group structure now replaced by the dimeric interpretation in 2b95.
 
 1tkv: replaced 1ka3
 
 1y4o:
-    - SG group structure now withdrawn?
+    - CESG group structure from Jikui Song. Nice dimer.
 
 1YWUcdGMP:
     - user prelim data

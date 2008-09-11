@@ -4,6 +4,7 @@ superpose.py
 Adds superpose() method to Project class (works on current molecule)
 
 """
+from cing.Libs.NTutils import NTerror
 
 def superpose( project, ranges=None, backboneOnly=True, includeProtons = False, iterations=2  ):
     """

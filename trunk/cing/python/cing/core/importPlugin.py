@@ -81,7 +81,7 @@ pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #NTdebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 
-try:
+try: 
     import ccpnmr #@UnusedImport
 except:
     NTdetail('Running CING without CCPN support')
