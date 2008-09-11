@@ -21,14 +21,14 @@ public class FileUploadServlet extends HttpServlet {
       serialVersionUID = 6098745782027999297L;
   
   private static final String 
-      UPLOAD_DIRECTORY = "/Users/jd";
+      UPLOAD_DIRECTORY = "/Users/jd/tmp";
   
-  private static final long MAX_SIZE = 50000;
-  private static final String ACCEPTABLE_CONTENT_TYPE =
-      "image/jpeg";
-  private static final String CONTENT_TYPE_UNACCEPTABLE =
-      "{error: 'File upload failed. "
-      + " Only JPEG images can be uploaded'}";
+  private static final long MAX_SIZE = 500000;
+//  private static final String ACCEPTABLE_CONTENT_TYPE =
+//      "image/jpeg";
+//  private static final String CONTENT_TYPE_UNACCEPTABLE =
+//      "{error: 'File upload failed. "
+//      + " Only text files can be uploaded'}";
 
   private static final String SIZE_UNACCEPTABLE =
       "{error: 'File upload failed. File size must be " 
@@ -62,8 +62,8 @@ public class FileUploadServlet extends HttpServlet {
   }
   
   private String processFile(FileItem item) {
-    if (!isContentTypeAcceptable(item))
-      return CONTENT_TYPE_UNACCEPTABLE;
+//    if (!isContentTypeAcceptable(item))
+//      return CONTENT_TYPE_UNACCEPTABLE;
 
     if (!isSizeAcceptable(item))
       return SIZE_UNACCEPTABLE;
@@ -84,8 +84,8 @@ public class FileUploadServlet extends HttpServlet {
   private boolean isSizeAcceptable(FileItem item) {
     return item.getSize() <= MAX_SIZE;
   }
-  private boolean isContentTypeAcceptable(FileItem item) {
-    return item.getContentType().equals(
-        ACCEPTABLE_CONTENT_TYPE);
-  }
+//  private boolean isContentTypeAcceptable(FileItem item) {
+//    return item.getContentType().equals(
+//        ACCEPTABLE_CONTENT_TYPE);
+//  }
 }
