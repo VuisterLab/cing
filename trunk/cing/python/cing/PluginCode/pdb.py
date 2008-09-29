@@ -41,6 +41,7 @@ from cing.core.molecule import Molecule
 from cing.Libs.NTutils import NTwarning
 from cing.core.molecule import Chain
 from cing.core.molecule import ensureValidChainId
+import os
 
 #==============================================================================
 # PDB stuff
@@ -54,6 +55,8 @@ def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None)   :
     if not molecule: return None
 
     NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
+    if not os.path.exists(pdbFile):
+        NTerror('importFromPDB: missing PDB-file "%s"', pdbFile)
 
     pdb = PyMMLib.PDBFile( pdbFile)
 
@@ -143,6 +146,8 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
     showMaxNumberOfWarnings = 100 # was 100
     shownWarnings = 0
     NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
+    if not os.path.exists(pdbFile):
+        NTerror('PDB2Molecule: missing PDB-file "%s"', pdbFile)
 
     pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
@@ -249,7 +254,7 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     NB model should be ZERO for the first model. Not one.
     Returns True on error.
     """
-    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s', 
+    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
              molecule, path, model, convention)
     pdbFile = molecule.toPDB( model=model, convention = convention)
     if not pdbFile:
@@ -273,6 +278,11 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None, upda
 
        returns molecule instance or None on error
     """
+    if not os.path.exists(pdbFile):
+        NTerror('Project.initPDB: missing PDB-file "%s"', pdbFile)
+
+    NTmessage('==> initializing from PDB file "%s"', pdbFile)
+
     if not name:
         _path,name,_ext  = NTpath( pdbFile )
     molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
@@ -283,7 +293,7 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None, upda
     project.appendMolecule( molecule )
     if update:
         project.molecule.updateAll()
-        project.dssp()   # TODO: move these calls toproject.molecule.updateAll()
+#        project.dssp()   # TODO: move these calls toproject.molecule.updateAll()
     #end if
     project.addHistory( sprintf('New molecule from PDB-file "%s"', pdbFile ) )
     project.updateProject()

@@ -29,7 +29,7 @@ class Molgrap(NTdict):
         self.projectDirTmp = cingDirTmp
         if project:
             self.projectDirTmp = os.path.abspath( project.path( directories.tmp ) )
-        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp) 
+        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
 
     """Creates a large gif to path for the given molecule.
     Return True on error and False on success.
@@ -47,9 +47,9 @@ class Molgrap(NTdict):
         root,file,_ext  = NTpath(path)
         entry_code = file
 
-        
+
         if root and not os.path.exists(root):
-            NTerror("Given path root is absent; not creating.")
+            NTerror("Molgrap.run: Given path root is absent; not creating.")
             return True
 
         pdb_first_file_name = os.path.join(self.projectDirTmp, file + "_001.pdb")
@@ -76,7 +76,7 @@ class Molgrap(NTdict):
                         atm.pdbSkipRecord = True
                         skippedAtoms.append( atm )
             if skippedResidues:
-                NTwarning('molgrap: non-protein residues will be skipped:' + `skippedResidues`)
+                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             #
             molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=0)
@@ -85,7 +85,7 @@ class Molgrap(NTdict):
                 atm.pdbSkipRecord = False
 
         if not os.path.exists(pdb_first_file_name):
-            NTerror("Failed to materialize first model PDB file")
+            NTerror("Molgrap.run: Failed to materialize first model PDB file")
             return True
 
 #        NTdebug("Doing molmol on: "+ entry_code)
@@ -97,12 +97,11 @@ class Molgrap(NTdict):
         )
 
         if status:
-            NTerror( "while doing molmol for: "+ entry_code)
+            NTerror( "Molgrap.run: while doing molmol for: "+ entry_code)
             return True
 
         if not os.path.isfile( pov_file_name ):
-            NTerror("Doing molmol for: "+ entry_code)
-            NTerror("ERROR: no pov ray file generated: "+pov_file_name)
+            NTerror('Molgrap.run: failed to generate povray file "%s" for %s', pov_file_name, entry_code)
             return True
 
         status = self._substitute_nans(
@@ -110,11 +109,11 @@ class Molgrap(NTdict):
                 pov_cor_file_name
             )
         if status:
-            NTerror("Doing molmol_povray_substitute._substitute_nans for: "+ entry_code)
+            NTerror("Molgrap.run: Doing molmol_povray_substitute._substitute_nans for: "+ entry_code)
             return True
 
         if not os.path.isfile( pov_cor_file_name ):
-            NTerror("no corrected pov ray file generated for: " + entry_code)
+            NTerror("Molgrap.run: no corrected pov ray file generated for: " + entry_code)
             return True
 
 #        print "DEBUG: Doing render/convert", entry_code
@@ -125,7 +124,7 @@ class Molgrap(NTdict):
             results_dir     =root,
             )
         if status:
-            print "ERROR: Doing render/convert for entry:", entry_code
+            print "Molgrap.run: rendering/converting entry:", entry_code
             return True
 
 #        ## Remove temporary files if successful and possible

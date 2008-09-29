@@ -15,15 +15,15 @@ import os
 import unittest
 
 class AllChecks(TestCase):
- 
+
     def testRun(self):
         pdbConvention = IUPAC
-#        entryId = "1brv" # Small much studied PDB NMR entry 
+#        entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
-#        entryId = "1brv_1model" 
+#        entryId = "1brv_1model"
 #        entryId = "1tgq_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
-        entryId = "H2_2Ca_53" 
+        entryId = "H2_2Ca_53"
 
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
@@ -43,10 +43,10 @@ class AllChecks(TestCase):
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        
+
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-        project.predictWithShiftx()
-                
+        project.runShiftx()
+
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityError

@@ -80,6 +80,7 @@ def importFromRefine( config, params, project ):
         #end if
         project.molecule.importFromPDB( xplorFile, convention=XPLOR, nmodels=1)
     #end for
+    project.molecule.updateAll()
 
     # rename the molecule
     project.molecules.rename(project.molecule.name, xplor.name)
@@ -508,7 +509,7 @@ if __name__ == '__main__':
     parser.add_option("--import",
                       action="store_true",
                       dest="doImport", default=False,
-                      help="Import the best models from PROJECT.cing/NAME/Refined (default: no import)"
+                      help="Import the best models from PROJECT.cing/Refine/NAME/Refined (default: no import)"
                      )
     parser.add_option("--superpose",
                       dest="superpose", default=None,

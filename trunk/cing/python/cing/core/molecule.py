@@ -263,6 +263,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         chain = Chain( name=name, **kwds )
         self._addChild( chain )
         chain.molecule = self
+        #self[chain]    = chain
         self.chainCount += 1
         return chain
     #end def
@@ -410,8 +411,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
 
     def getResidue( self, resName, chains = None):
         """
-        Return Residue instances corresponding to Name, or None if not
-           found. Search all chains when chains = None
+        Return Residue instances corresponding to 'resName', or None if not
+           found. Search all chains when chains = None.
+
+           Since chain contain resNum, resName and <Residue> keys to <Residue> instances,
+           either of these are valid for the 'resName' argument.
         """
         if not chains:
             chains = self.chains
@@ -1003,11 +1007,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                         cyssDict2Pair[c1] = pair
                         cyssDict2Pair[c2] = pair
         if pairList:
-            NTmessage( 'Recognized the following disulfide bridged residues.' )
+            NTmessage( '==> Molecule %s: Potential disulfide bridged residues:' , self.name)
             for pair in pairList:
                 NTmessage( '%s %s' % (pair[0], pair[1] ))
         else:
-            NTmessage( 'No disulfide bridged residues found' )
+            NTdetail( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
     # end def
 
     def updateAll( self)   :
@@ -1020,10 +1024,10 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             self.updateDihedrals()
             self.updateMean()
             self.ensemble = Ensemble( self )
-            if self.has_key('ranges'):
-                self.calculateRMSDs(ranges=self.ranges)
+            if not self.has_key('ranges'):
+                self.ranges = None
+            self.calculateRMSDs(ranges=self.ranges)
             self.idDisulfides()
-#            self.dssp() # TODO move dssp to this location.
         #end if
     #end def
 
@@ -2765,6 +2769,12 @@ Atom class: Defines object for storing atom properties
         return (self.db.spinType == '32S')
     #end def
 
+    def isOxygen( self ):
+        """Return Tue if atm is 16O
+        """
+        return (self.db.spinType == '16O')
+    #end def
+
     def hasProperties(self, *properties):
         """
         Returns True if Atom has properties, expand with db properties for atom
@@ -3476,6 +3486,8 @@ def mapMolecules( mol1, mol2, molMap=None ):
     #end if
 
     # Initialize (should not be neccessary! but alas)
+    for res in mol1.allResidues(): res.map = None
+    for res in mol2.allResidues(): res.map = None
     for atm in mol1.allAtoms(): atm.map = None
     for atm in mol2.allAtoms(): atm.map = None
 

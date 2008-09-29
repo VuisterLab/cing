@@ -325,7 +325,7 @@ def export2cyana( project, tmp=None ):
 #end def
 
 #-----------------------------------------------------------------------------
-def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=False, update=True, 
+def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, update=True,
                 coordinateConvention=None, **kwds):
     """
      kwds options:

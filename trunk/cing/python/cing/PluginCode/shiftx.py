@@ -10,6 +10,7 @@ from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTdetail
+from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
@@ -61,7 +62,7 @@ format file:
     #end for
 #end def
 
-def predictWithShiftx( project, model=None   ):
+def runShiftx( project, model=None   ):
     """
     Use shiftx program to predict chemical shifts
     Works only for protein residues.
@@ -75,19 +76,19 @@ def predictWithShiftx( project, model=None   ):
     one at the time.
     """
     if project.molecule == None:
-        NTerror('predictWithShiftx: no molecule defined')
+        NTerror('runShiftx: no molecule defined')
         return None
     #end if
     if project.molecule.modelCount == 0:
-        NTerror('predictWithShiftx: no models for "%s"', project.molecule)
+        NTerror('runShiftx: no models for "%s"', project.molecule)
         return None
     #end if
     if model != None and model >= project.molecule.modelCount:
-        NTerror('predictWithShiftx: invalid model (%d) for "%s"', model, project.molecule)
+        NTerror('runShiftx: invalid model (%d) for "%s"', model, project.molecule)
         return None
     #end if
 
-    NTmessage('==> Running shiftx ...' )
+    NTmessage('==> Running shiftx' )
 
     skippedAtoms = [] # Keep a list of skipped atoms for later
     skippedResidues = []
@@ -101,7 +102,7 @@ def predictWithShiftx( project, model=None   ):
         #end if
     #end for
     if skippedResidues:
-        NTwarning('predictWithShiftx: non-protein residues %s will be skipped.',  skippedResidues)
+        NTwarning('runShiftx: non-protein residues %s will be skipped.',  skippedResidues)
 
     if model!=None:
         models = NTlist( model )
@@ -117,14 +118,14 @@ def predictWithShiftx( project, model=None   ):
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'),
                              rootPath = root, redirectOutput = False)
 
-    for model in models:
+    for model in NTprogressIndicator(models):
         # set filenames
         rootname =  sprintf('model_%03d', model)
         model_base_name =  os.path.join( root, rootname )
 
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
         if not pdbFile:
-            NTerror("Failed to generate a pdb file for model: " + `model`)
+            NTerror("runShiftx: Failed to generate a pdb file for model: " + `model`)
             return None
 
         pdbFile.save( model_base_name + '.pdb'   )
@@ -138,7 +139,7 @@ def predictWithShiftx( project, model=None   ):
             shiftx(chainId, rootname + '.pdb', outputFile )
             outputFile = os.path.join(root,outputFile)
 #            outputFile = os.path.abspath(outputFile)
-            NTdebug('Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+            NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
             parseShiftxOutput( outputFile, project.molecule, chain.name )
         del( pdbFile )
     #end for
@@ -179,20 +180,38 @@ def predictWithShiftx( project, model=None   ):
     #end for
 
     # Average's for each atom
-    for atm in project.molecule.allAtoms():
-        # Set averages
-        atm.shiftx.average()
-        if atm.shiftx.av == None:
-            atm.shiftx.av = NaN
-            atm.shiftx.sd = NaN
+    averageShiftx(project)
 
     return project
 #end def
 
+def averageShiftx( project, tmp=None ):
+    """Average shiftx array for each atom
+    """
+
+    NTdebug('doing averageShiftx')
+    if project.molecule == None:
+        return
+    #end if
+
+    for atm in project.molecule.allAtoms():
+        # Set averages
+        if atm.has_key('shiftx'):
+            atm.shiftx.average()
+            if atm.shiftx.av == None:
+                atm.shiftx.av = NaN
+                atm.shiftx.sd = NaN
+            #end if
+        #end if
+    #end for
+#end def
+
 
 # register the functions
-methods  = [(predictWithShiftx,None)
+methods  = [(runShiftx,None),
            ]
 #saves    = []
-#restores = []
+restores = [
+            (averageShiftx,None)
+           ]
 #exports  = []

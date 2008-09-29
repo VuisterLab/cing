@@ -211,11 +211,11 @@ class NTlist( list ):
         return item
     #end def
 
-    def zap( self, byItem ):
+    def zap( self, *byItems ):
         """use NTzap to yield a new list from self, extracting byItem from each
            element of self.
         """
-        return NTzap( self, byItem )
+        return NTzap( self, *byItems )
     #end def
 
     def removeDuplicates( self ):
@@ -407,17 +407,17 @@ class NTlist( list ):
         return string
     #end def
 
-    def formatHtml(self):
-        if not self.format():
-            return ''
-        #end if
-        htmlLine = ''
-        formatLine = self.format().split('\n')[:-1]
-        for item in formatLine:
-            htmlLine = htmlLine + '<a> %s</a><br/>' % item
-        #end for
-        return htmlLine
-    #end def
+#    def formatHtml(self):
+#        if not self.format():
+#            return ''
+#        #end if
+#        htmlLine = ''
+#        formatLine = self.format().split('\n')[:-1]
+#        for item in formatLine:
+#            htmlLine = htmlLine + '<a> %s</a><br/>' % item
+#        #end for
+#        return htmlLine
+#    #end def
 
     def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
         NTindent( depth, stream, indent )
@@ -794,9 +794,7 @@ class NTvector( list ):
     #end def
 #end class
 
-#
-# -----------------------------------------------------------------------------
-#
+
 class NTset( NTlist ):
     """
     Class to define sets; i.e. list of objects
@@ -922,8 +920,7 @@ class NTset( NTlist ):
 #        for key, value in items:
 #           self.__setitem__( key, value )
 
-# -----------------------------------------------------------------------------
-#
+
 NTdictObjectId = 0
 # Variables to limit recursion and prevent cycles in __repr__() call
 NTdictDepth    = 0
@@ -987,7 +984,7 @@ class NTdict(dict):
         self.setdefault('__CLASS__',  'NTdict' )
         self.setdefault('__FORMAT__',  None )      # set to None, which means by default not shown in repr() and toXML() methods
         self.setdefault('__SAVEXML__', None )      # set to None, which means by default not shown in repr() and toXML() methods
-        self.setdefault('__SAVEALLXML__', False )  # when True, save all attributes in toXML() methods
+        self.setdefault('__SAVEALLXML__', True )   # when True, save all attributes in toXML() methods
 #        self.__getstate__ =  self  # Trick for fooling shelve.
 
         self.__OBJECTID__ = NTdictObjectId
@@ -1017,6 +1014,7 @@ class NTdict(dict):
 
     def __cmp__( self, other ):
         """Optimized for speed a bit"""
+        if not hasattr(other,'__OBJECTID__'): return -1
         if self.__OBJECTID__ == other.__OBJECTID__:
             return 0
         if self.__OBJECTID__ < other.__OBJECTID__:
@@ -1096,11 +1094,13 @@ class NTdict(dict):
            Uses format or stored attribute __FORMAT__ or default
         """
         if (format == None):
+            # use the predefined format if no format given
             format = self.__FORMAT__
-        # use the default format if None
-#    if (format == None):
-#        format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
-#    #end if
+
+        if (format == None):
+            # use the default format if None
+            format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
+
         return format % self
     #end def
 
@@ -1120,7 +1120,7 @@ class NTdict(dict):
     def printAttr( self, stream=sys.stdout, hidden=0 ):
         """print attributes of structure; mainly fo debugging.
         """
-        msg = sprintf( stream, '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
+        msg = sprintf( '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
         # append hidden keys if asked for
         keys = self.keys()
         if hidden:
@@ -1129,6 +1129,7 @@ class NTdict(dict):
         for key in keys:
             msg += sprintf( '%-12s : %s\n', key, str(self[key]))
         return msg
+    #end def
 
     def header( self, dots = '-'*20  ):
         """Generate a header using __CLASS__ and dots.
@@ -1378,9 +1379,13 @@ class NTdict(dict):
         """
         if (self.__SAVEXML__ == None):
             self.__SAVEXML__ =  []
+        self.__SAVEALLXML__ = False
+
         for a in attrs:
             if a not in self.__SAVEXML__:
                 self.__SAVEXML__.append( a )
+        #end for
+    #end def
 
     def removeXML( self, *attrs ):
         """remove attrributes from __SAVEXML__ list
@@ -1519,10 +1524,12 @@ class NTtree( NTdict ):
     #end def
 
     def _addChild( self, child ):
-        "Internal routine"
+        """Internal routine, set references
+        """
         self._children.append( child )
         self[child.name] = child
-        child._parent = self
+        self[child]      = child
+        child._parent    = self
         return child
     #end def
 
@@ -2042,8 +2049,10 @@ def NTaverage( theList, byIndex=None ):
                 val = item
             else:
                 val = item[byIndex]
-            sum   += val
-            n += 1
+            if not isNaN(val):
+                sum   += val
+                n += 1
+            #end if
     #end fpr
 
     if n == 0:
@@ -2060,7 +2069,8 @@ def NTaverage( theList, byIndex=None ):
                 val = item
             else:
                 val = item[byIndex]
-            sumsqd += (val-av)*(val-av) # sum of squared deviations.
+            if not isNaN(val):
+                sumsqd += (val-av)*(val-av) # sum of squared deviations.
 
     # some python implementations (Linux) crash in case of all same numbers,
     # => zero sd, but roundoffs likely generate a very small negative number
@@ -2133,23 +2143,39 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
     return (cav, cv, n)
 #end def
 
-def NTzap( theList, byItem ):
-    """yield a new list from theList, extracting byItem from each
+def NTzap( theList, *byItems ):
+    """yield a new list from theList, extracting byItems from each
        element of theList or None if not present
     """
     result = NTlist()
     for v in theList:
         if v:
-            try:
-                result.append(v[byItem])
-            except KeyError, AttributeError:
-                result.append( None )
+            result.append( getDeepByKeysOrAttributes(v, *byItems) )
         else:
-            result.append( None )
+            result.append(None)
         #end if
     #end for
     return result
 #end def
+
+
+#def NTzap( theList, byItem ):
+#    """yield a new list from theList, extracting byItem from each
+#       element of theList or None if not present
+#    """
+#    result = NTlist()
+#    for v in theList:
+#        if v:
+#            try:
+#                result.append(v[byItem])
+#            except KeyError, AttributeError:
+#                result.append( None )
+#        else:
+#            result.append( None )
+#        #end if
+#    #end for
+#    return result
+##end def
 
 def NTsq( value ):
     return value*value # fastest
@@ -2801,9 +2827,7 @@ def list2asci( theList ):
     #end for
     return result[0:-1]
 #end def
-#
-# -----------------------------------------------------------------------------
-#
+
 def list2string( mylist ):
     "Return a string representation of mylist"
     if len(mylist) == 0: return ''
@@ -2814,9 +2838,7 @@ def list2string( mylist ):
     return result[0:-1]
 #end def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def NTsign( value ):
     """return sign of value:
     """
@@ -2827,9 +2849,7 @@ def NTsign( value ):
     #end if
 #end def
 
-#
-# -----------------------------------------------------------------------------
-#
+
 def length( object ):
     """return length object
     """
@@ -2853,9 +2873,7 @@ def object2list( object ):
 #  """Set var to None
 #  """
 #  var = None
-#
-# -----------------------------------------------------------------------------
-#
+
 class CommandWrap:
     """Wrapper for command callbacks
        From Python Cookbook, section 9.1 (p. 302)
@@ -2868,9 +2886,8 @@ class CommandWrap:
 
     def __call__(self):
         return self.callback( *self.args, **self.kwargs)
-#
-# -----------------------------------------------------------------------------
-#
+
+
 class EventWrap:
     """Wrapper for event callbacks
          Adapted from Python Cookbook, section 9.1 (p. 302)
@@ -2884,9 +2901,7 @@ class EventWrap:
     def __call__(self, event):
         return self.callback( event, *self.args, **self.kwargs)
 
-#
-# -----------------------------------------------------------------------------
-#
+
 class EventSkip:
     """Wrapper for callbacks, skipping the event argument
          Adapted from Python Cookbook, section 9.1 (p. 302)
@@ -2899,16 +2914,52 @@ class EventSkip:
 
     def __call__(self, event):
         return self.callback( *self.args, **self.kwargs)
-#
-# -----------------------------------------------------------------------------
-#
+
 def NTinspect( something ):
     m = inspect.getmembers(something)
     for item in m:
         print str(item)
-#
-# -----------------------------------------------------------------------------
-#
+
+class NTprogressIndicator:
+    """
+    Iterator class to loop over myList and print dots
+    """
+    def __init__( self, theList, charactersPerLine = 80 ):
+        self._iter = -1
+        self._len   = len(theList)
+        self._list  = theList
+        self._charactersPerLine = charactersPerLine
+    #end def
+
+    def __iter__( self ):
+        """iteration routine: loop of children"""
+        self._iter = 0
+        self._printedDots = 0
+        return self
+    #end def
+
+    def next( self ):
+        if self._iter >= self._len:
+            NTmessage("")
+            raise StopIteration
+            return None
+
+        if not self._printedDots % 10:
+            digit = self._printedDots / 10
+            NTmessageNoEOL(`digit`)
+        else:
+            NTmessageNoEOL('.')
+        #end if
+        self._printedDots += 1
+        if not self._printedDots % self._charactersPerLine:
+            NTmessage("")
+            self._printedDots = 0
+
+        s = self._list[self._iter]
+        self._iter += 1
+        return s
+#end class
+
 def fprintf( stream, format, *args ):
     """C's fprintf routine"""
     if args:
@@ -3103,6 +3154,31 @@ def NTpath( path ):
     return dirname, f[0], f[1]
 #end def
 
+def NTmkdir(path):
+
+    """ creates missing directories for the given path and
+        returns a normalized absolute version of the path.
+
+    - if the given path already exists in the filesystem
+      the filesystem is not modified.
+
+    - otherwise makepath creates directories along the given path
+      using the dirname() of the path. You may append
+      a '/' to the path if you want it to be a directory path.
+
+    from holger@trillke.net 2002/03/18
+    Adusted gv with expanduser
+
+    """
+
+    from os import makedirs
+    from os.path import normpath,dirname,exists,expanduser
+
+    path=expanduser(path)
+    dpath = normpath(dirname(path))
+    if not exists(dpath): makedirs(dpath)
+    return normpath(path)
+#end def
 
 def show( NTobject=None ):
     if NTobject != None and hasattr( NTobject, 'format' ):
@@ -3606,6 +3682,78 @@ def getDeepByKeys(c, *keyList):
 #  NTdebug("Going one level deeper")
     reducedKeyList = keyList[1:]
     return getDeepByKeys(value, *reducedKeyList)
+#end def
+
+
+def getDeepByKeysOrAttributes(c, *keyList):
+    """Return arbitrary deep element or None if key is absent at some point.
+    The essence here is silence.
+
+    If the key is an integer and the dict is not a dict but a list of sorts
+    then the nice thing is that the element can be returned too!
+
+    c for complex objects.
+    Hacked for attributes too, in case key does not exist
+
+    """
+    lk  = len(keyList)
+    key = keyList[0]
+
+    #NTdebug("getDeepByKeysOrAtributes: c:%s  keylist:%s  lk:%d  key: %s", c, keyList, lk, key)
+
+    if not lk:
+        return None
+
+    value = None
+    if isinstance(c, dict):
+        if c.has_key(key):
+            value = c[key]
+        elif hasattr(c, key):
+            value = getattr(c,key)
+        else:
+            return None
+        #endif
+
+        if lk == 1:
+            return value
+
+    elif isinstance(c, list):
+        if isinstance(key, int):
+            if key < len(c):
+                value = c[key]
+            else:
+                return None
+            #endif
+        elif hasattr(c, key):
+            value = getattr(c,key)
+        else:
+            return None
+        #endif
+
+    elif isinstance(c, tuple):
+        if isinstance(key, int) and key < len(c):
+            value = c[key]
+        else:
+            return None
+
+    else:
+        if hasattr(c, key):
+            value = getattr(c,key)
+        else:
+            return None
+        #endif
+    #end if
+
+    #NTdebug("getDeepByKeysOrAtributes: value: %s", value)
+
+    if lk-1 == 0 or value==None:
+        return value
+
+    # still have keys left; use recursion for next element
+    reducedKeyList = keyList[1:]
+    return getDeepByKeysOrAttributes(value, *reducedKeyList)
+#end def
+
 
 
 def gunzip(fileNameZipped, outputFileName=None):
@@ -3721,13 +3869,24 @@ class ROGscore( NTdict ):
     MAX_TO_REPORT_IN_POPUP = 5
 
     def __init__( self ):
-        NTdict.__init__( self )
+        NTdict.__init__( self,
+                         __CLASS__  = 'ROGscore',
+                         __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
+                       )
+        self.reset()
+
+    def __str__(self):
+        return str(self.colorLabel)
+
+    def reset(self):
         self.colorLabel = COLOR_GREEN
         self.colorCommentList = NTlist()
 
     def isCritiqued(self):
         if self.colorLabel != COLOR_GREEN:
             return True
+        else:
+            return False
 
     def isRed(self):
         return self.colorLabel == COLOR_RED
@@ -3738,18 +3897,19 @@ class ROGscore( NTdict ):
     # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
     # Can be aligned to left using a better .css.
     def addHTMLkeywords(self, kw ):
-        if not self.isCritiqued():
-            return
-        if self.colorCommentList:
-            ln = len( self.colorCommentList )
-            subList = self.colorCommentList
-            if ln > self.MAX_TO_REPORT_IN_POPUP:
-                subList = self.colorCommentList[:self.MAX_TO_REPORT_IN_POPUP]
-            kw[ 'cavtitle' ] = '\n'.join( subList )
-            if ln > self.MAX_TO_REPORT_IN_POPUP:
-                kw[ 'cavtitle' ] += '\nand so on for %d comments in total' % ln
-            kw[ 'onmousemove' ] = 'SetCavTimer(event);'
-            kw[ 'onmouseout' ]  = "CancelCavTimer(event);"
+        pass ##GWV 20 August: problem with this in tables and links
+#        if not self.isCritiqued():
+#            return
+#        if self.colorCommentList:
+#            ln = len( self.colorCommentList )
+#            subList = self.colorCommentList
+#            if ln > self.MAX_TO_REPORT_IN_POPUP:
+#                subList = self.colorCommentList[:self.MAX_TO_REPORT_IN_POPUP]
+#            kw[ 'cavtitle' ] = '\n'.join( subList )
+#            if ln > self.MAX_TO_REPORT_IN_POPUP:
+#                kw[ 'cavtitle' ] += '\nand so on for %d comments in total' % ln
+#            kw[ 'onmousemove' ] = 'SetCavTimer(event);'
+#            kw[ 'onmouseout' ]  = "CancelCavTimer(event);"
 
     def createHtmlForComments(self, dst ):
         if not self.isCritiqued():
@@ -3766,6 +3926,8 @@ class ROGscore( NTdict ):
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The socalled ROG score.
+
+        GV: changed
         The comment is optional and will only be appended when the color lable is
         at least as severe as the current one. The less severe levels of comments
         will also be wiped out.
@@ -3781,7 +3943,7 @@ class ROGscore( NTdict ):
 
         if colorLabel == COLOR_RED:
             if self.colorLabel != COLOR_RED:
-                self.colorCommentList = NTlist()
+                #self.colorCommentList = NTlist()
                 self.colorLabel = COLOR_RED
         elif colorLabel == COLOR_ORANGE: # independent of colorLabel being green or orange.
             if self.colorLabel == COLOR_RED:
@@ -3796,6 +3958,10 @@ class ROGscore( NTdict ):
             else:
                 if comment not in self.colorCommentList:
                     self.colorCommentList.append( comment )
+            #end if
+        #end if
+    #end def
+#end class
 
 def stripExtension( path ):
     directory, basename, _extension = NTpath(path)

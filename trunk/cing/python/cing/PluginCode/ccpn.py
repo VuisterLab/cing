@@ -19,6 +19,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import sprintf
+from cing.core.constants import INTERNAL
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
@@ -111,7 +112,7 @@ Methods:
                As input either Cing.Project instance or Ccpn.Project instance,
                or both, since it'll check if instances has attribute .ccpn or
                .cing, respectively.
-               Molecules should be imported previouly.
+               Molecules should be imported previously.
        Inputs: Ccpn Implementation.Project, Cing.Project instance,
                moleculeName (string)
        Output: Cing.Project or None or error.
@@ -222,7 +223,7 @@ except:
 
 #NTmessage("Done importing readXmlProjectFile; which is impossible")
 
-convention = 'INTERNAL' #'CYANA2'
+convention = INTERNAL #'CYANA2'
 dictCif2Cing = {'ZN':'ZN2P', 'CA':'CA2P'}
 
 def _checkCingProject( cingProject, funcName ):

@@ -109,6 +109,22 @@ def formatall( object ):
 args = []
 kwds = {}
 
+def scriptPath( scriptFile ):
+    # get path to scriptFile
+
+    if not os.path.exists( scriptFile ):
+        NTdebug('Missed in current working directory the script file: %s' % scriptFile)
+        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts)
+        scriptFileAbs = os.path.join( scriptsDir, scriptFile)
+        if not os.path.exists( scriptFileAbs ):
+            NTerror('Missed in current working directory and Scripts directory\n'+
+                    '[%s] the script file [%s]' % ( scriptsDir, scriptFile ))
+            return None
+        return scriptFileAbs
+    #end if
+    return scriptFile
+#end def
+
 def script( scriptFile, *a, **k ):
     # Hack to get arguments to routine as global variables to use in script
     global args
@@ -116,21 +132,11 @@ def script( scriptFile, *a, **k ):
     args = a
     kwds = k
 
-    if not os.path.exists( scriptFile ):
-        NTdebug('Missed in current working directory the script file: %s' % scriptFile)
-        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts) 
-        scriptFileAbs = os.path.join( scriptsDir, scriptFile)
-        if not os.path.exists( scriptFileAbs ):
-            NTerror('Missed in current working directory and Scripts directory\n'+
-                    '[%s] the script file [%s]' % ( scriptsDir, scriptFile ))
-            return True
-        scriptFile = scriptFileAbs
-        #end if
+    path = scriptPath( scriptFile )
+    if path:
+        NTmessage('==> Executing script "%s"', path )
+        execfile( path, globals() )
     #end if
-
-    NTmessage('==> Executing script "%s"', scriptFile )
-    execfile( scriptFile, globals() )
-
 #end def
 
 
@@ -209,7 +215,7 @@ def main():
     parser.add_option("--gui",
                       action="store_true",
                       dest="gui",
-                      help="Start graphical user inteface"
+                      help="Start graphical user interface"
                      )
     parser.add_option("--new",
                       action="store_true",
@@ -272,9 +278,8 @@ def main():
                       help="Start ipython interpreter"
                      )
     parser.add_option("--validate",
-                      action="store_true", default=False,
-                      dest="validate",
-                      help="Do validation"
+                      action="store_true", dest="validate", default=False,
+                      help="Run doValidate.py script [in current or cing directory]"
                      )
     parser.add_option("--shiftx",
                       action="store_true", default=False,
@@ -422,6 +427,14 @@ def main():
 
     NTmessage( project.format() )
 
+    # shortcuts
+    p = project
+    mol = project.molecule
+    m  = project.molecule
+ #   pr = print
+    f  = format
+    fa = formatall
+
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
@@ -462,17 +475,10 @@ def main():
     #end if
 
     #------------------------------------------------------------------------------------
-    # Validate
-    #------------------------------------------------------------------------------------
-    if options.validate:
-        project.validate()
-    #end if
-
-    #------------------------------------------------------------------------------------
     # Shiftx
     #------------------------------------------------------------------------------------
     if options.shiftx:
-        project.predictWithShiftx()
+        project.runShiftx()
 
     #------------------------------------------------------------------------------------
     # Superpose
@@ -481,10 +487,25 @@ def main():
         project.superpose(ranges=options.ranges)
 
     #------------------------------------------------------------------------------------
+    # Validate; just run doValidate script
+    #------------------------------------------------------------------------------------
+    if options.validate:
+        path = scriptPath('doValidate.py')
+        if path:
+            NTmessage('==> Executing script "%s"', path )
+            execfile( path )
+    #end if
+
+    #------------------------------------------------------------------------------------
     # Script
     #------------------------------------------------------------------------------------
     if options.script:
-        script( options.script )
+        path = scriptPath( options.script )
+        if path:
+            NTmessage('==> Executing script "%s"', scriptFile )
+            execfile( scriptFile, globals() )
+        #end if
+    #end if
 
     #------------------------------------------------------------------------------------
     # ipython

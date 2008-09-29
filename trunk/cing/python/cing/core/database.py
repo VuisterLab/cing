@@ -1,3 +1,4 @@
+from cing.core.constants import INTERNAL
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTpath
@@ -6,6 +7,8 @@ from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTerror
 import os
 import sys
 
@@ -38,12 +41,15 @@ Included shifts info from BMRB using the addSHIFTS.py routine.
 Residues CYSS, HIS+, HIST, and DNA/RNA are not yet included.
 
 22 March 2006:
-Slightly changed the way the datbase is loaded: now a plain textfile; path is
+Slightly changed the way the database is loaded: now a plain textfile; path is
 taken from NTmolPath, which is set on init
 
 19 Feb 2007:
 Simplified code for parsing dbTable file
 Removed \n from all __FORMAT__ defs
+
+29 Sep 2008:
+Removed XML saves; patch the properties for duplicates
 
 """
 
@@ -52,6 +58,7 @@ class MolDef( NTtree ):
     def __init__( self, name, *args, **kwds ):
         NTtree.__init__( self,
                          __CLASS__   = 'MolDef',
+                         convention  = INTERNAL,
                          name        = name,
                          residueDict = {},    # contains definitions of residues, sorted by convention
                        )
@@ -61,10 +68,10 @@ class MolDef( NTtree ):
         #end for
         self.update( kwds )
 
-        self.__FORMAT__ = '=== MolDef %(name)s ===\n' + \
-                          'residues: %(residues)s'
+        self.__FORMAT__ = '=== MolDef %(name)s (%(convention)r) ===\n' + \
+                          'residues:   %(residues)s\n'
 
-        self.saveXML('name')
+#        self.saveXML('name')
     #end def
 
     def appendResidue( self, name, shortName, **kwds ):
@@ -76,7 +83,7 @@ class MolDef( NTtree ):
 
     def residuesWithProperties(self, *properties ):
         """
-        Return a NTlist instance with residueDefs that have propeties
+        Return a NTlist instance with residueDefs that have properties
         """
         result = NTlist()
 
@@ -91,7 +98,7 @@ class MolDef( NTtree ):
 
     def atomsWithProperties(self, *properties ):
         """
-        Return a NTlist instance with atomDefs that have propeties
+        Return a NTlist instance with atomDefs that have properties
         """
         result = NTlist()
 
@@ -121,26 +128,27 @@ class MolDef( NTtree ):
 class ResidueDef( NTtree ):
     def __init__( self, name, shortName, **kwds ):
         NTtree.__init__(   self,
-                           __CLASS__ = 'ResidueDef',
-                           name      = name,
-                           shortName = shortName,
-                           comment   = None,
-                           nameDict  = {},
-                           atomDict  = {}, # contains definition of atoms, sorted by convention, dynamically created on initialisation
-                           dihedrals = NTlist(),
-                           properties = [] # list of properties for residue
+                           __CLASS__   = 'ResidueDef',
+                           convention  = INTERNAL,
+                           name        = name,
+                           shortName   = shortName,
+                           comment     = None,
+                           nameDict    = {},
+                           atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialisation
+                           dihedrals   = NTlist(),
+                           properties  = [] # list of properties for residue
                        )
         self.atoms = self._children
         self.update( kwds )
 
-        self.__FORMAT__ = '=== ResidueDef %(name)s ===\n' +\
+        self.__FORMAT__ = '=== ResidueDef %(name)s (%(convention)r) ===\n' +\
                           'shortName:  %(shortName)s\n' +\
                           'comment:    %(comment)s\n' +\
                           'atoms:      %(atoms)s\n' +\
                           'dihedrals:  %(dihedrals)s\n' +\
                           'properties: %(properties)s'
 
-        self.saveXML('name', 'shortName', 'comment', 'nameDict','dihedrals', 'properties')
+#        self.saveXML('name', 'shortName', 'comment', 'nameDict','dihedrals', 'properties')
         #NB atoms is a derived attribute (from _children), no need to save it explicitly
 
     def appendAtom( self, name, **kwds ):
@@ -161,7 +169,7 @@ class ResidueDef( NTtree ):
 
     def residuesWithProperties(self, *properties ):
         """
-        Return a NTlist instance with residueDefs that have propeties
+        Return a NTlist instance with residueDefs that have properties
         """
         result = NTlist()
 
@@ -238,40 +246,44 @@ class AtomDef( NTtree ):
     def __init__( self, name, **kwds ):
         #print '>>', args, kwds
         NTtree.__init__( self,
-                           __CLASS__ = 'AtomDef' ,
-                           name     = name,     # Internal name
-                           nameDict = {},
-                           aliases  = [],       # list of aliases
+                           __CLASS__   = 'AtomDef' ,
+                           convention  = INTERNAL,
+                           name        = name,     # Internal name
+                           nameDict    = {},
+                           aliases     = [],       # list of aliases
 
-                           topology = [],       # List of bound atoms: (i, name) tuple
-                                                # i:  -1=previous residue; 0=current residue; 1=next residue
-                           pseudo   = None,     # Corresponding pseudo atom (for real atoms)
-                           real     = [],       # List of corresponding real atoms (for pseudo atoms)
+                           topology    = [],       # List of bound atoms: (i, name) tuple
+                                                   # i:  -1=previous residue; 0=current residue; 1=next residue
+                           pseudo      = None,     # Corresponding pseudo atom (for real atoms)
+                           real        = [],       # List of corresponding real atoms (for pseudo atoms)
 
-                           type     = None,     # Cyana type of atom
-                           spinType = None,     # NMR spin type; i.e. 1H, 13C ...
-                           shift    = None,      # NTdict with average and sd
+                           type        = None,     # Cyana type of atom
+                           spinType    = None,     # NMR spin type; i.e. 1H, 13C ...
+                           shift       = None,      # NTdict with average and sd
 
-                           hetatm   = False,    # PDB HETATM type
+                           hetatm      = False,    # PDB HETATM type
 
-                           properties = []      # List with properties
+                           properties  = []        # List with properties
                          )
         self.update( kwds )
 
-        self.__FORMAT__ = '=== AtomDef %(residueDef)s.%(name)s ===\n' +\
+        self.__FORMAT__ = '=== AtomDef %(residueDef)s.%(name)s (%(convention)r) ===\n' +\
+                          'topology:   %(topology)s\n' +\
                           'pseudo:     %(pseudo)s\n' +\
                           'real:       %(real)s\n' +\
                           'spinType:   %(spinType)s\n' +\
                           'hetatm:     %(hetatm)s\n' +\
                           'properties: %(properties)s'
 
-        self.saveXML('name', 'nameDict'
-                     'topology','pseudo','real',
-                     'type','spinType','shift', 'hetatm','properties'
-                    )
+#        self.saveXML('name', 'nameDict'
+#                     'topology','pseudo','real',
+#                     'type','spinType','shift', 'hetatm','properties'
+#                    )
 
     def translate( self, convention ):
-        if convention in self.nameDict:
+#        if convention in self.nameDict:
+# speed
+        if self.nameDict.has_key(convention):
             # XPLOR definitions potentially have multiple
             # entries, separated by ','. Take the first.
             if self.nameDict[convention] != None:
@@ -281,9 +293,80 @@ class AtomDef( NTtree ):
         return None
     #end def
 
+#    def _changeConvention(self, newConvention):
+#        """Change convention for this atom.
+#        Not to be used without proper knowledge of the effects; i.e. only for updating dbTable
+#
+#        return True on error
+#        """
+#        newName = self.translate(newConvention)
+#        if not newName:
+#            NTerror('AtomDef.changeConvention: not defined for %r', newConvention)
+#            return True
+#        oldName = self.name
+#        if newName == oldName:
+#            # do nothing except changing convention
+#            self.convention = newConvention
+#            return False
+#
+#        if self.residueDef.renameChild(self, newName) != self:
+#            NTerror('AtomDef.changeConvention: changing %s to %s', self, newName)
+#            return True
+#
+#        # changing topology fields
+#        # of course this gives problems for sequential connectivities; so we will
+#        # simply only put a warning for those
+#        for resId, atmName in self.topology:
+#            if resId != 0:
+#                NTwarning('AtomDef.changeConvention: checking %s topology (%d,%s) skipped', self, resId,atmName)
+#            else:
+#                if not atmName in self.residueDef:
+#                    NTerror('AtomDef.changeConvention: checking %s topology (%d,%s)', self, resId,atmName)
+#                    return True
+#                #end if
+#                NTdebug('AtomDef.changeConvention: changing %s topology (%d,%s)', self, resId,atmName)
+#                atm = self.residueDef[atmName]
+#                for i, top in enumerate(atm.topology):
+#                    if top[1] == oldName:
+#                        atm.topology[i] = (top[0],newName)
+#                        break
+#                    #end if
+#                #end for
+#            #end if
+#        #end for
+#
+#        # changing dihedral fields
+#        # of course this gives problems for sequential connectivities; so we will
+#        # simply only put a warning for those
+#        for dihed in self.residue.dihedrals:
+#            for resId, atmName in dihed.atoms:
+#                if resId != 0:
+#                    NTwarning('AtomDef.changeConvention: checking %s topology (%d,%s) skipped', dihed, resId,atmName)
+#                else:
+#                    if not atmName in self.residueDef:
+#                        NTerror('AtomDef.changeConvention: checking %s topology (%d,%s)', self, resId,atmName)
+#                        return True
+#                    #end if
+#                    NTdebug('AtomDef.changeConvention: changing %s topology (%d,%s)', self, resId,atmName)
+#                    atm = self.residueDef[atmName]
+#                    for i, top in enumerate(atm.topology):
+#                        if top[1] == oldName:
+#                            atm.topology[i] = (top[0],newName)
+#                            break
+#                        #end if
+#                    #end for
+#                #end if
+#        #end for
+#
+#        # change properties
+#        changeProperty( self, oldName, newName)
+#
+#        self.convention = newConvention
+#    #end def
+
     def atomsWithProperties(self, *properties ):
         """
-        Return a NTlist instance with self if it has propeties
+        Return a NTlist instance with self if it has properties
         """
         result = NTlist()
 
@@ -308,48 +391,96 @@ class AtomDef( NTtree ):
         return True
     #end def
 
-    def exportDef( self, stream = sys.stdout ):
+    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
         "export definitions to stream"
         fprintf( stream, '\t#---------------------------------------------------------------\n')
-        fprintf( stream, '\tATOM %-8s\n',self.name)
+        fprintf( stream, '\tATOM %-8s\n',self.translate(convention))
         fprintf( stream, '\t#---------------------------------------------------------------\n')
 
-        for attr in ['nameDict','topology','pseudo','real','type','spinType','shift','hetatm','properties']:
-            fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
+        if convention == INTERNAL:
+            top2 = self.topology
+        else:
+            # convert topology
+            top2 = []
+            for resId,atmName in self.topology:
+                if resId != 0:
+                    NTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
+                    top2.append( (resId,atmName) )
+                elif not atmName in self.residueDef:
+                    NTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
+                    top2.append( (resId,atmName) )
+                else:
+                    atm = self.residueDef[atmName]
+                    top2.append( (resId,atm.translate(convention)) )
+                #end if
+            #end for
+            #print 'top2', top2
+
+            #convert properties
+            prop
+        #end if
+        fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
+
+        for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm','properties']:
+            if self.has_key(attr):
+                fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
         fprintf( stream, '\tEND_ATOM\n')
 #        fprintf( stream, '\t#---------------------------------------------------------------\n')
-
+    #end def
+#end class
 
 class DihedralDef( NTtree ):
     def __init__( self, name, **kwds ):
         NTtree.__init__(   self,
-                           __CLASS__  = 'DihedralDef',
-                           name       = name,
-                           residueDef = None,
-                           atoms      = [],    # List of atoms: (i, name) tuple
-                                               # i:  -1=previous residue
-                                               #      0=current residue
-                                               #      1=next residue
-                           karplus    = None   # Karplus parameters: (A,B,C,teta) tuple
+                           __CLASS__   = 'DihedralDef',
+                           convention  = INTERNAL,
+                           name        = name,
+                           residueDef  = None,
+                           atoms       = [],    # List of atoms: (i, name) tuple
+                                                # i:  -1=previous residue
+                                                #      0=current residue
+                                                #      1=next residue
+                           karplus     = None   # Karplus parameters: (A,B,C,teta) tuple
                           )
         self.update( kwds )
 
-        self.__FORMAT__ = '=== DihedralDef %(residueDef)s.%(name)s ===\n' +\
-                          '... atoms:   %(atoms)s\n' +\
-                          '... karplus: %(karplus)s'
+        self.__FORMAT__ = '=== DihedralDef %(residueDef)s.%(name)s (%(convention)r) ===\n' +\
+                          'atoms:   %(atoms)s\n' +\
+                          'karplus: %(karplus)s'
 
-        self.saveXML( 'name', 'atoms', 'karplus' )
+#        self.saveXML( 'name', 'atoms', 'karplus' )
     #end def
 
-    def exportDef( self, stream = sys.stdout ):
+    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
         "export definitions to stream"
         fprintf( stream, '\t#---------------------------------------------------------------\n')
         fprintf( stream, '\tDIHEDRAL %-8s\n',self.name)
         fprintf( stream, '\t#---------------------------------------------------------------\n')
 
-        for attr in ['atoms','karplus']:
+        if convention == INTERNAL:
+            atms = self.atoms
+        else:
+            # convert atoms
+            atms = []
+            for resId,atmName in self.atoms:
+                if resId != 0:
+                    NTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
+                    atms.append( (resId,atmName) )
+                elif not atmName in self.residueDef:
+                    NTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
+                    atms.append( (resId,atmName) )
+                else:
+                    atm = self.residueDef[atmName]
+                    atms.append( (resId,atm.translate(convention)) )
+                #end if
+            #end for
+            #print 'atms', atms
+        #end if
+        fprintf( stream, "\t\t%s = %s\n", 'atoms', repr(atms) )
+
+        for attr in ['karplus']:
             fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
@@ -357,6 +488,18 @@ class DihedralDef( NTtree ):
 #        fprintf( stream, '\t#---------------------------------------------------------------\n')
     #end for
 #end class
+
+def changeProperty( obj, oldProperty, newProperty):
+    """
+    Change oldProperty in obj.properties list to newProperty
+    """
+    if not obj.has_key('properties'):
+        return
+    props = obj['properties']
+    i = props.index(oldProperty)
+    if i>=0:
+        props[i] = newProperty
+#end def
 
 
 def importNameDefs( tableFile, name)   :
@@ -413,6 +556,27 @@ def importNameDefs( tableFile, name)   :
         #endif
     #end for
     mol.name=name
+
+    #Path the properties for duplicates
+    for res in mol:
+        p = []
+        # Do it a dumb way (check and copy) to preserve order
+        for prop in res.properties:
+            if not prop in p:
+                p.append(prop)
+            #end if
+        #end for
+        res.properties = p
+        for atm in res:
+            p = []
+            for prop in res.properties:
+                if not prop in p:
+                    p.append(prop)
+                #end if
+            #end for
+            atm.properties = p
+        #end for
+    #end for
     return mol
 #end def
 

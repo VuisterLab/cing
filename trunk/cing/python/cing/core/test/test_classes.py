@@ -2,7 +2,7 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import removedir
-from cing.core.classes import HTMLfile
+from cing.PluginCode.html import HTMLfile
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import htmlDirectories
@@ -15,9 +15,11 @@ import unittest
 class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
-    
-    def test_HTMLfile_simple(self):         
-        myhtml = HTMLfile('myTest.html', 'A Test')
+
+    proj = Project('test', 'new')
+
+    def test_HTMLfile_simple(self):
+        myhtml = HTMLfile('myTest.html', proj, 'A Test')
         myhtml.header("a header")
         myhtml('h1', 'It is a test')
         myhtml.main("a main")
@@ -26,35 +28,35 @@ class AllChecks(TestCase):
         myhtml.closeTag('a')
         myhtml('a', 'testing link', href="http://www.bioc.cam.ac.uk/")
         myhtml.render()
-    
+
     ###############
-        myhtml = HTMLfile('myTest2.html', 'A Test 2')
-    
+        myhtml = HTMLfile('myTest2.html', proj, 'A Test 2')
+
         myhtml.header('h1', 'It is a test 2')
         myhtml.header('h2','another line')
-    
+
         myhtml.main('a', href="http://www.apple.com", closeTag=False)
         myhtml.main('img', src = 'apple1.jpg')
         myhtml.main('a', openTag=False)
         myhtml.main('a', 'testing link', href="http://www.bioc.cam.ac.uk/")
-    
+
         myhtml('br','used call')
-    
+
         myhtml.render()
         #project = openProject('im2', 'old' )
 
     def test_rootPath(self):
         p = Project('1brv')
-        self.assertEquals( './1brv.cing', p.rootPath('1brv')[0] )         
-        self.assertEquals( '1brv',        p.rootPath('1brv')[1] )         
+        self.assertEquals( './1brv.cing', p.rootPath('1brv')[0] )
+        self.assertEquals( '1brv',        p.rootPath('1brv')[1] )
 
     def test_HTMLfile(self):
-        
+
         """
         Create two html files (project and moleucle) that have relative links to each other.
         Exercising the machinery in HTMLfile class.
         """
-        entryId = "test_HTMLfile" 
+        entryId = "test_HTMLfile"
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
@@ -65,7 +67,7 @@ class AllChecks(TestCase):
         # initialize project html page
         # per item always set 2 top level attributes:
         project.htmlLocation = (project.path('index.html'), top)
-        project.html = HTMLfile( project.htmlLocation[0], title = 'Project' )
+        project.html = HTMLfile( project.htmlLocation[0], proj, title = 'Project' )
         NTdebug("project.htmlLocation[0]: %s" % project.htmlLocation[0])
         #create new folders for Molecule/HTML
         htmlPath = project.htmlPath()
@@ -81,14 +83,14 @@ class AllChecks(TestCase):
         # NB project.htmlPath is different from project.path
         molecule.htmlLocation = (project.htmlPath('indexMolecule.html'), top)
         NTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
-        molecule.html = HTMLfile( molecule.htmlLocation[0],
+        molecule.html = HTMLfile( molecule.htmlLocation[0], proj,
                                   title = 'Molecule ' + molecule.name )
-        
-        # nb: destination is a destination obj (eg molecule object) that is to 
+
+        # nb: destination is a destination obj (eg molecule object) that is to
         # have a html attribute that points to an HTMLfile instance.
-        # In the validate.py code, the source argument is the 'main' section in 
+        # In the validate.py code, the source argument is the 'main' section in
         # project.html. JFD doesn't understand why.
-        project.html.insertHtmlLinkInTag(     'li',    section=project.html.main, 
+        project.html.insertHtmlLinkInTag(     'li',    section=project.html.main,
             source=project,  destination=molecule, text='mol ref', id=top)
         # rerun for testing.
         link = project.html.findHtmlLocation( project, molecule,id=top )

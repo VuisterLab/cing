@@ -93,12 +93,41 @@ Added ION residue, to accomodate the Ca2+ in CBD structures.
 When importing peaks from Xeasy, I now update the peak index with the
 peakid from the original file
 
+17 April 2007: fixed error in QE topology (was SD, should be CE)
+18 April 2007: changed defs QR for PHE and TYR, now similar to VAL QQG and LEU QQD
+24 May   2007: Reordered dihedrals for more useful output during validation:
+               PHI, PSI, CHIs, OMEGA
+               Introduced PRO PHI
+               Renamed ILE CHI21 to CHI2
+               Added cPRO residue, CB and CG shifts from Shubert et al,
+               JBNMR 24, 149-54, 2002
+                CYSS as CYS with HG removed
+23 Jul    2007: Changed internal name HIST into HISE
+ 7 Sep    2007: Changed internal name ION to CA2P, included hetatm attribute for PDB
+11 Sep    2007: Added properties attribute.
+25 Sep    2007: Commented irrelevant dihedral of methyl containing residues:
+                ALA CHI1; ILE CHI22, CHI31 ; LEU CHI31, CHI32; MET CHI4
+                THR CHI22, renamed CHI21 to CHI2; VAL CHI21, CHI22
+26 Sep    2007: Gave Cyana pseudo residues the cyanaPseudoResidue property
+10 Oct    2007: OMEGA IUPAC
+05 Dec    2007: Renamed NTdict to NTdict
+19 Dec    2007: remapped BMRB nucleic acid residue names to reflect PDB;
+                  added Zn, His HE2, with BMRB map. Added nucleic prop to n.a.
+11 Apr    2008: Added Aqua mappings and improved others.
+29 Apr    2008: Fixed entry HIS: removed HE2, now is prot HD1; deprot HE2
+30 Apr    2008: Fixed entry HISH: nameDict = { ..., 'CYANA': 'HIS+', ...}
+08 May    2008: Renamed RURA to URA
+15 May    2008: Defined CE1 for BRMB, AQUA in HISE
+20 May    2008: BRMB, AQUA atom names for HISH
+01 Jun    2008: BRMB, AQUQ residue names for LYSx, ARGx
 
 15 Jun 2008:
-Changing INTERNAL format to IUPAC
-- Need to use INTERNAL everywhere rather then 'INTERNAL': ccpn plugin needs adjustment
+For changing INTERNAL format to IUPAC
+- Need to use INTERNAL everywhere rather then 'INTERNAL': ccpn plugin needs adjustment (27 Sep 08: done)
 - INTERNAL will map on 'INTERNAL0' string: allows for future changes ('INTERNAL1', 'INTERNAL2') etc.
 - After update: Molecule._saveSequence, _saveStereoAssignments: CYANA->INTERNAL
 - old cing projects will fail on restoring peaks, restraints, etc.
-
 - For 'alias': implemented in Residue.addAtom; update Residue.mutate
+
+18 Jul    2008: Removed quotes ("") from Q1' and Q2' of ZN2P
+

@@ -20,6 +20,8 @@ from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import ROGscore
+from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTmkdir
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
@@ -112,8 +114,7 @@ Project: Top level Cing project class
                                                           otherwise
 
     to initialize a Molecule:
-        project.initializeMolecule( name, sequenceFile, convention )
-
+        project.newMolecule( name, sequenceFile, convention )
                                     convention = CYANA, CYANA2, INTERNAL, LOOSE
 
     to save a project:
@@ -140,9 +141,6 @@ Project: Top level Cing project class
         distanceRestraintList = project.distances.new( name, status='keep' ):
 
     """
-
-#    project.valSets.OMEGA_MAXALL_POOR = 15. # Normally 15 but may be set low for testing 1brv to
-#    OMEGA_MAXALL_BAD  = 20. # Normally 20
 
     def __init__( self, name ):
 
@@ -171,6 +169,10 @@ Project: Top level Cing project class
 
                            contentIsRestored        =  False,       # True if Project.restore() has been called
                            storedInCcpnFormat       =  False,       #
+
+                           procheckStatus           =  NTdict( completed=False, ranges=None ),
+                           dsspStatus               =  NTdict( completed=False ),
+                           whatifStatus             =  NTdict( completed=False ),
 
 
                            # store a reference to the global things we might need
@@ -226,7 +228,8 @@ Project: Top level Cing project class
                       'peakListNames','distanceListNames','dihedralListNames','rdcListNames',
                       'storedInCcpnFormat',
                       'reports',
-                      'history'
+                      'history',
+                      'procheckStatus', 'dsspStatus', 'whatifStatus'
                     )
     #end def
 
@@ -241,34 +244,9 @@ Project: Top level Cing project class
             key = item[0].upper()  # upper only.
             value = float(item[1])
             self.valSets[key] = value # name value pairs.
-
-    def criticize(self):
-        # funny things not in what if.
-        for res in self.molecule.allResidues():
-            dihed = 'OMEGA'
-            if dihed in res and res[dihed]:
-                d = res[dihed] # NTlist object
-                if d == None:
-                    continue
-                modelId = 0
-                for value in d:
-                    v = violationAngle(value=value, lowerBound=180., upperBound=180)
-                    if v > 90.: # Never mind a cis
-                        v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
-#                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
-#                            res, modelId, v) )
-                    if v >= self.valSets.OMEGA_MAXALL_BAD:
-                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
-#                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
-                        NTdebug('Set to red')
-                    elif v >= self.valSets.OMEGA_MAXALL_POOR:
-                        res.rogScore.setMaxColor( COLOR_ORANGE, ROGscore.ROG_COMMENT_BAD_OMEGA )
-                        NTdebug('Set to orange (perhaps)')
-                    modelId += 1
-
-        # distance and dihedral restraints
-        for drl in self.distances + self.dihedrals:
-            drl.criticize(self)
+        #end for
+        self.valSets.keysformat()
+    #end def
 
     #-------------------------------------------------------------------------
     # Path stuff
@@ -277,7 +255,7 @@ Project: Top level Cing project class
     def path( self, *args ):
         """Return joined args as path relative to root of project
         """
-        return os.path.join( self.root, *args )
+        return os.path.normpath( os.path.join( self.root, *args ) )
     #end def
 
     def rootPath( name ):
@@ -305,7 +283,7 @@ Project: Top level Cing project class
         #print '>>',rootp,name
 
         return rootp, name
-
+    #end def
     rootPath = staticmethod( rootPath )
 
     def mkdir( self, *args ):
@@ -337,27 +315,6 @@ Project: Top level Cing project class
         """
         return self.moleculePath( 'html', *args )
     #end def
-
-#    def makeObjectPaths(self):
-#        """
-#        Generate paths for all the currently defined names in the project
-#        """
-#        self.objectPaths = NTdict()
-#        for name in self.moleculeNames:
-##            self.objectPaths[name] = self.path(directories.molecules, name+'.molecule')
-#            self.objectPaths[name] = self.molecules.path(name)
-#        for name in self.peakListNames:
-#            self.objectPaths[name] = self.peaks.path(name)
-#        for name in self.distanceListNames:
-#            self.objectPaths[name] = self.distances.path(name)
-#        for name in self.dihedralListNames:
-#            self.objectPaths[name] = self.dihedrals.path(name)
-#        for name in self.rdcListNames:
-#            self.objectPaths[name] = self.rdcs.path(name)
-#
-#        self.objectPaths.keysformat()
-#        NTdebug('objectPaths: %s', self.objectPaths.format())
-#    #end def
 
     def decodeNameTuple(self, nameTuple):
         """
@@ -590,6 +547,7 @@ Project: Top level Cing project class
 
         for l in self.distances + self.dihedrals:
             l.analyze()
+#            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
         for p in self.plugins.values():
@@ -658,7 +616,7 @@ Project: Top level Cing project class
         self.addHistory( sprintf('Initialized molecule "%s" from "%s"', uname, sequenceFile ) )
         return molecule
     #end def
-    initializeMolecule = newMolecule # keep old name
+    #initializeMolecule = newMolecule # keep old name
 
 
     #-------------------------------------------------------------------------
@@ -741,6 +699,11 @@ Project: Top level Cing project class
         self.peaks.append( peaklist )
         return peaklist
     #end def
+
+    def allRestraintLists(self):
+        """Return an NTlist instance with all restraints lists
+        """
+        return self.distances + self.dihedrals + self.rdcs
 
     def header( self, dots = '---------'  ):
         """Subclass header to generate using __CLASS__, name and dots.
@@ -839,7 +802,9 @@ class _ProjectList( NTlist ):
         NTlist.append( self, instance )
         # add reference in project
         self.project[instance.name] = instance
-        instance.objectPath = self.path(instance.name)
+        instance.project     = self.project
+        instance.objectPath  = self.path(instance.name)
+        instance.projectList = self
     #end def
 
     def new( self, name,*args, **kwds ):
@@ -911,7 +876,11 @@ class _ProjectList( NTlist ):
         return the listitem of None on error
         """
         if not oldName in self.names():
-            NTerror('_ProjectList.rename: name"%s" not found', oldName)
+            NTerror('_ProjectList.rename: old name "%s" not found', oldName)
+            return None
+        #end if
+        if newName in self.project:
+            NTerror('_ProjectList.rename: new name "%s" aleady exists in %s', oldName, self.project)
             return None
         #end if
         l = self.project[oldName]
@@ -919,6 +888,21 @@ class _ProjectList( NTlist ):
         l.name = newName
         self.project[newName] = l
         l.objectPath = self.path( l.name )
+        return l
+    #end def
+
+    def delete(self, name):
+        """
+        Delete listitem name from the project
+        return the listitem of None on error
+        """
+        if not name in self.names():
+            NTerror('_ProjectList.delete: name "%s" not found', name)
+            return None
+        #end if
+        l = self.project[name]
+        del(self.project[name])
+        NTlist.remove(self, l)
         return l
     #end def
 
@@ -967,6 +951,7 @@ class Peak( NTdict ):
                            'height:     %(height)s\n'   +\
                            'volume:     %(volume)s\n' +\
                            'resonances: %(resonances)s\n' +\
+                           'rogScore:   %(rogScore)s\n' +\
                            self.footer(dots)
 
         self.dimension=dimension
@@ -987,6 +972,8 @@ class Peak( NTdict ):
 
         self.height = NTvalue(height, heightError, Peak.HEIGHT_VOLUME_FORMAT)
         self.volume = NTvalue(volume, volumeError, Peak.HEIGHT_VOLUME_FORMAT)
+
+        self.rogScore = ROGscore()
     #end def
 
     def isAssigned( self, axis ):
@@ -1037,6 +1024,7 @@ class PeakList( NTlist ):
         self.name = name
         self.status = status
         self.listIndex = -1 # list is not appended to anything yet
+        self.rogScore  = ROGscore()
     #end def
 
     def peakFromAtoms( self, atoms, onlyAssigned=True ):
@@ -1074,7 +1062,7 @@ class PeakList( NTlist ):
     #end def
 
     def format( self ):
-        s = sprintf( '%s PeakList "%s" (%s,%d) %s\n', dots, self.name,self.status,len(self), dots )
+        s = sprintf( '%s PeakList "%s" (%s,%d,%s) %s\n', dots, self.name,self.status,len(self),self.rogScore, dots )
         for peak in self:
             s = s + str(peak) + '\n'
         #end for
@@ -1094,6 +1082,10 @@ class PeakList( NTlist ):
 
         NTdetail('==> Saved %s to "%s"', self, path)
         return self
+    #end def
+
+    def rename( self, newName ):
+        return self.projectList.rename( self.name, newName )
     #end def
 #end class
 
@@ -1145,33 +1137,37 @@ class DistanceRestraint( NTdict ):
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
+
+        self.rogScore.reset()
 #        NTdebug( '%s' % self )
         if self.violMax >= project.valSets.DR_MAXALL_POOR:
-            comment = '[crit.1] violMax: %8.3f' % self.violMax
+            comment = 'ORANGE: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
-        if self.violMax >= project.valSets.DR_MAXALL_BAD:
-            comment = '[crit.2] violMax: %8.3f' % self.violMax
+        elif self.violMax >= project.valSets.DR_MAXALL_BAD:
+            comment = 'RED: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
-            comment = '[crit.3b]: fractionAbove: %8.3f' % fractionAbove
+            comment = 'ORANGE: fractionAbove: %8.3f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_BAD )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
-            comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
+            comment = 'RED: fractionAbove: %8.3f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         if self.violSd >= project.valSets.DR_RMSALL_BAD:
-            comment = '[crit.4] violSd: %8.3f' % self.violSd
+            comment = 'RED: violSd: %8.3f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
     def appendPair( self, pair ):
-        # check if atom already present, keep order
-        # otherwise: keep atom with lower residue index first
+        """ pair is a (atom1,atom2) tuple
+        check if atom1 already present, keep order
+        otherwise: keep atom with lower residue index first
+        """
         a0 = self.atomPairs.zap(0)
         a1 = self.atomPairs.zap(1)
         if (pair[0] in a0 or pair[1] in a1):
@@ -1182,6 +1178,34 @@ class DistanceRestraint( NTdict ):
             self.atomPairs.append( (pair[1],pair[0]) )
         else:
             self.atomPairs.append( pair )
+    #end def
+
+    def classify(self):
+        """
+        Return 0,1,2,3 depending on sequential, intra-residual, medium-range or long-range
+        Simply ignore ambigious assigned NOEs for now and take it as the first atom pair
+        """
+        atm1, atm2 = self.atomPairs[0]
+        if atm1.residue.chain != atm2.residue.chain:
+            return 3
+        elif atm1.residue == atm2.residue:
+            return 0
+        else:
+            r1 = atm1.residue
+            r2 = atm2.residue
+            delta = int(math.fabs(r1.chain._children.index(r1)-r2.chain._children.index(r2)))
+            if delta == 1:
+                return 1
+            elif delta > 4:
+                return 3
+            else:
+                return 2
+            #end if
+        #end if
+    #end def
+
+    def isAmbigious(self):
+        return len(self.atomPairs) > 1
     #end def
 
     def calculateAverage(self):
@@ -1215,12 +1239,17 @@ class DistanceRestraint( NTdict ):
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = None     # Sd of violations
+        self.violSum    = 0.0      # Sum of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
         if modelCount:
             for i in range( modelCount):
                 d = 0.0
                 for atm1,atm2 in self.atomPairs:
+                    # skip trivial cases
+                    if atm1 == atm2:
+                        break
+
                     #expand pseudoatoms
                     atms1 = atm1.realAtoms()
                     atms2 = atm2.realAtoms()
@@ -1228,9 +1257,11 @@ class DistanceRestraint( NTdict ):
                         #print '>>>', a1.format()
                         if (len( a1.coordinates ) > i ):
                             for a2 in atms2:
+                                #print '>>', atm1, a1, atm2, a2
                                 if (len(a2.coordinates) > i ):
                                     tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
-                                    d += math.pow( tmp, -6.0 )
+                                    if tmp > 0.0:
+                                        d += math.pow( tmp, -6.0 )
                                 else:
                                     self.error = True
                                 #end if
@@ -1270,21 +1301,21 @@ class DistanceRestraint( NTdict ):
             for d in self.violations:
                 dabs = math.fabs(d)
 #               print '>>', d,dabs
-                if ( dabs > 0.1):
-                    self.violCount1 += 1
-                if ( dabs > 0.3):
-                    self.violCount3 += 1
                 if ( dabs > 0.5):
                     self.violCount5 += 1
+                elif ( dabs > 0.3):
+                    self.violCount3 += 1
+                elif ( dabs > 0.1):
+                    self.violCount1 += 1
             #end for
             if self.violations:
                 # JFD doesn't understand why the values need to be mapped to floats.
                 self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
                 self.violMax = max( map(math.fabs,self.violations) )
+                self.violSum = self.violations.sum()
         #end if
 
         return (self.av,self.sd,self.min,self.max )
-
     #end def
 
     def listViolatingModels(self, cutoff = 0.3 ):
@@ -1323,16 +1354,23 @@ class DistanceRestraint( NTdict ):
 
     def format( self ):
         return  \
-            sprintf('%-25s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f)'+\
-                    '(Violations: av %6s max %6.1f counts %2d,%2d,%2d) %s',
-                        str(self),
-                        self.lower, self.upper,
-                val2Str(self.av,         "%6.1f", 6),
-                val2Str(self.sd,         "%7.3f", 7),
-                self.min, self.max,
-                val2Str(self.violAv,     "%4.1f", 4),
-                self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                self._names())
+            sprintf('%-25s %-6s (Target: %4.1f %4.1f)  (Models: min %4.1f  av %4.1f+-%4.2f  max %4.1f) '+\
+                    '(Violations: av %4.2f max %4.2f counts %2d,%2d,%2d) %s',
+                     str(self), self.rogScore,
+                     self.lower, self.upper,
+                     self.min, self.av, self.sd, self.max,
+                     self.violAv, self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                     self._names()
+                    )
+#            sprintf('%-25s %-6s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f) '+\
+#                    '(Violations: av %6s max %6.1f counts %2d,%2d,%2d) %s',
+#                     str(self), self.rogScore,
+#                     self.lower, self.upper,
+#                     val2Str(self.av,"%6.1f", 6), val2Str(self.sd,"%7.3f", 7), self.min, self.max,
+#                     val2Str(self.violAv,"%4.1f", 4),self.violMax, self.violCount1, self.violCount3, self.violCount5,
+#                     self._names()
+#                    )
+
     #end def
 #end class
 
@@ -1345,6 +1383,7 @@ class DistanceRestraintList( NTlist ):
     """
     def __init__( self, name, status='keep' ):
         NTlist.__init__( self )
+        self.__CLASS__ = 'DistanceRestraintList'
         self.name   = name        # Name of the list
         self.status = status      # Status of the list; 'keep' indicates storage required
         self.Hbond  = False       # Hbond: fix to keep information about Hbond restraints from CCPN
@@ -1356,13 +1395,32 @@ class DistanceRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 0.1 A
         self.violCount3 = 0       # Total violations over 0.3 A
         self.violCount5 = 0       # Total violations over 0.5 A
+
+        # partitioning in intra, sequential, medium-range and long-range, ambigous
+        self.intraResidual = NTlist()
+        self.sequential    = NTlist()
+        self.mediumRange   = NTlist()
+        self.longRange     = NTlist()
+        self.ambigious     = NTlist()
+
         self.rogScore   = ROGscore()
     #end def
 
-    def criticize(self, project):
+    def criticize(self, project, toFile = True):
         for dr in self:
             dr.criticize(project)
-            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
+            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s' % dr )
+        if toFile:
+            path = project.moleculePath('analysis', self.name + '.txt')
+            f = file( path, 'w')
+            fprintf(f, '%s\n\n', self.format())
+            for dr in self:
+                fprintf(f, '%s\n', dr.format())
+            #end for
+            f.close()
+            NTdetail('Distance restraint analysis %s, output to %s', self, path)
+        #end if
+    #end def
 
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
@@ -1411,6 +1469,18 @@ class DistanceRestraintList( NTlist ):
                 #end for
                 count += 1
             #end if
+
+            c = dr.classify()
+            if c == 0:
+                self.intraResidual.append(dr)
+            elif c == 1:
+                self.sequential.append(dr)
+            elif c == 2:
+                self.mediumRange.append(dr)
+            elif c == 3:
+                self.longRange.append(dr)
+            #end if
+            if dr.isAmbigious(): self.ambigious.append(dr)
         #end for
 
         for i in range(0, modelCount):
@@ -1433,13 +1503,44 @@ class DistanceRestraintList( NTlist ):
         return sprintf( '<DistanceRestraintList "%s" (%s,%d)>',self.name,self.status,len(self) )
     #end def
 
+    def __repr__( self ):
+        return self.__str__()
+    #end def
+
     def format( self ):
-        return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n'+\
-                        'rmsd: %7s %6s        Violations > 0.1,0.3,0.5: %d, %d, %d',
-                      dots, self.name,self.status,len(self), dots,
-                      val2Str(self.rmsdAv,         "%7.3f", 7),
-                      val2Str(self.rmsdSd,         "%6.3f", 6),
-                      self.violCount1, self.violCount3, self.violCount5)
+        return sprintf(
+'''%s DistanceRestraintList "%s" (%s,%d) %s
+sequential:        %4d
+intra-residual:    %4d
+medium-range:      %4d
+long-range:        %4d
+ambigious:         %4d
+
+rmsd:               %7s +-%6s
+violations >0.1 A: %4d
+violations >0.3 A: %4d
+violations >0.5 A: %4d
+
+ROG score:         %s''',
+                        dots, self.name,self.status,len(self), dots,
+                        len(self.intraResidual),len(self.sequential),len(self.mediumRange),len(self.longRange),len(self.ambigious),
+                        val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
+                        self.violCount1, self.violCount3, self.violCount5,
+                        self.rogScore
+                      )
+#       return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n' +\
+#                        'Violations\n' +\
+#                        '  > 0.1 A:%7d\n' +\
+#                        '  > 0.3 A:%7d\n' +\
+#                        '  > 0.5 A:%7d\n' +\
+#                        'rmsd:     %7s +-%6s',
+#                        dots, self.name,self.status,len(self), dots,
+#                        self.violCount1,
+#                        self.violCount3,
+#                        self.violCount5,
+#                        val2Str(self.rmsdAv, "%7.3f", 7),
+#                        val2Str(self.rmsdSd, "%6.3f", 6)
+#                       )
 
     #end def
 
@@ -1456,6 +1557,10 @@ class DistanceRestraintList( NTlist ):
 
         NTdetail('==> Saved %s to "%s"', self, path)
         return self
+    #end def
+
+    def rename( self, newName ):
+        return self.projectList.rename( self.name, newName )
     #end def
 #end class
 
@@ -1506,30 +1611,31 @@ class DihedralRestraint( NTdict ):
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
-        if self.violMax >= project.valSets.AC_MAXALL_POOR:
-            comment = '[crit.1] violMax: %8.3f' % self.violMax
-#            NTdebug(comment)
-            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         if self.violMax >= project.valSets.AC_MAXALL_BAD:
-            comment = '[crit.2] violMax: %8.3f' % self.violMax
+            comment = 'ORANGE: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
+        elif self.violMax >= project.valSets.AC_MAXALL_POOR:
+            comment = 'RED: violMax: %8.3f' % self.violMax
+#            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
+
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_POOR )
-        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
-            comment = '[crit.3a]: fractionAbove: %8.3f' % fractionAbove
+        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
+            comment = 'RED: fractionAbove: %8.3f' % fractionAbove
+#            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_RED, comment )
+        elif fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
+            comment = 'ORANGE: fractionAbove: %8.3f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_BAD )
-        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
-            comment = '[crit.3]: fractionAbove: %8.3f' % fractionAbove
-#            NTdebug(comment)
-            self.rogScore.setMaxColor( COLOR_RED, comment )
+
         if self.violSd >= project.valSets.AC_RMSALL_BAD:
-            comment = '[crit.4] violSd: %8.3f' % self.violSd
+            comment = 'RED: violSd: %8.3f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-
-
+    #end def
 
     def calculateAverage(self):
         """Calculate the values and violations for each model
@@ -1644,22 +1750,32 @@ class DihedralRestraint( NTdict ):
         #end if
     #end def
 
+    def getName(self):
+        """
+        Construct a name;
+        have to do dynamically because upon restoring, the atoms are not yet defined
+        """
+        res, name, _tmp = self.retrieveDefinition()
+        if name:
+            return res.name + '.' + name
+        else:
+            return ''
+    #end def
+
     def __str__(self):
-        return sprintf('<DihedralRestraint %d>', self.id )
+        return sprintf('<DihedralRestraint %d (%s)>', self.id, self.getName() )
     #end def
 
     def format( self ):
         return  \
-            sprintf('%-25s (Target: %6.1f %6.1f)  (Models: cav %6s cv %4s)  '+\
+            sprintf('%-25s %-6s (Target: %6.1f %6.1f)  (Models: cav %6s cv %4s)  '+\
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
-                        self, self.lower, self.upper,
-                val2Str(self.cav,         "%6.1f", 6),
-                val2Str(self.cv,          "%4.1f", 4),
-                val2Str(self.violAv,      "%4.1f", 4),
-                self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                        self.atoms.format('%-11s ')
-                       )
-
+                     self, self.rogScore,
+                     self.lower, self.upper,
+                     val2Str(self.cav,"%6.1f", 6),val2Str(self.cv,"%4.1f", 4),
+                     val2Str(self.violAv,"%4.1f", 4), self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                     self.atoms.format('%-11s ')
+                    )
     #end def
 #end class
 
@@ -1668,6 +1784,7 @@ class DihedralRestraintList( NTlist ):
 
     def __init__( self, name, status='keep' ):
         NTlist.__init__( self )
+        self.__CLASS__ = 'DihedralRestraintList'
         self.name       = name
         self.status     = status
         self.currentId  = 0       # Id for each element of list
@@ -1681,10 +1798,20 @@ class DihedralRestraintList( NTlist ):
         self.rogScore   = ROGscore()
     #end def
 
-    def criticize(self, project):
+    def criticize(self, project, toFile=True):
         for dr in self:
             dr.criticize(project)
-            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'%`dr` )
+            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'% dr )
+        if toFile:
+            path = project.moleculePath('analysis', self.name + '.txt')
+            f = file( path, 'w')
+            fprintf(f, '%s\n\n', self.format())
+            for dr in self:
+                fprintf(f, '%s\n', dr.format())
+            #end for
+            f.close()
+            NTdetail('Dihedral restraint analysis %s, output to %s', self, path)
+        #end if
 
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
@@ -1750,13 +1877,32 @@ class DihedralRestraintList( NTlist ):
         return sprintf( '<DihedralRestraintList "%s" (%s,%d)>', self.name, self.status, len(self) )
     #end def
 
+    def __repr__( self ):
+        return self.__str__()
+    #end def
+
     def format( self ):
-        return sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n'+\
-                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d',
-                      dots, self.name,self.status,len(self), dots,
-                      val2Str(self.rmsdAv,         "%7.3f", 7),
-                      val2Str(self.rmsdSd,         "%6.3f", 6),
-                      self.violCount1, self.violCount3, self.violCount5)
+        return sprintf(
+'''%s DihedralRestraintList "%s" (%s,%d) %s
+rmsd:                 %7s +-%6s
+violations >1 degree: %4d
+violations >3 degree: %4d
+violations >5 degree: %4d
+ROG score:            %s''',
+                        dots, self.name,self.status,len(self), dots,
+                        val2Str(self.rmsdAv, "%7.3f", 7),
+                        val2Str(self.rmsdSd, "%6.3f", 6),
+                        self.violCount1,
+                        self.violCount3,
+                        self.violCount5,
+                        self.rogScore
+                      )
+#        return sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n'+\
+#                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d',
+#                      dots, self.name,self.status,len(self), dots,
+#                      val2Str(self.rmsdAv,         "%7.3f", 7),
+#                      val2Str(self.rmsdSd,         "%6.3f", 6),
+#                      self.violCount1, self.violCount3, self.violCount5)
     #end def
 
     def save(self,path=None):
@@ -1773,6 +1919,10 @@ class DihedralRestraintList( NTlist ):
         NTdetail('==> Saved %s to "%s"', self, path)
         return self
     #end def
+
+    def rename( self, newName ):
+        return self.projectList.rename( self.name, newName )
+    #end def
 #end class
 
 
@@ -1788,7 +1938,7 @@ class RDCRestraint( NTdict ):
                               **kwds
                        )
         self.id         = -1       # Undefined index number
-        self.rdcs        = None     # list with backcalculated rdc values for each model, None indicates no analysis done
+        self.rdcs       = None     # list with backcalculated rdc values for each model, None indicates no analysis done
         self.rogScore   = ROGscore()
 
         for pair in atomPairs:
@@ -1880,8 +2030,9 @@ class RDCRestraint( NTdict ):
 #            s = s + sprintf('%-11s ', p._Cname(1) )
 #        #end for
 #        s = s.strip() + ')'
-        return  sprintf('%-25s (Target: %6.1f %6.1f) %s',
-                        str(self), self.lower, self.upper,
+        return  sprintf('%-25s %-6s (Target: %6.1f %6.1f) %s',
+                        str(self), self.rogScore,
+                        self.lower, self.upper,
                         self._names()
                        )
 
@@ -1893,6 +2044,8 @@ class RDCRestraintList( NTlist ):
 
     def __init__( self, name, status='keep' ):
         NTlist.__init__( self )
+        self.__CLASS__ = 'RDCRestraintList'
+
         self.name       = name
         self.status     = status
         self.currentId  = 0       # Id for each element of list
@@ -1963,6 +2116,10 @@ class RDCRestraintList( NTlist ):
         return sprintf( '<RDCRestraintList "%s" (%s,%d)>', self.name, self.status, len(self) )
     #end def
 
+    def __repr__( self ):
+        return self.__str__()
+    #end def
+
     def format( self ):
         s = sprintf( '%s RDCRestraintList "%s" (%s,%d) %s\n' +\
                      'rmsd: %7.3f %6.3f',
@@ -1985,6 +2142,10 @@ class RDCRestraintList( NTlist ):
 
         NTdetail('==> Saved %s to "%s"', self, path)
         return self
+    #end def
+
+    def rename( self, newName ):
+        return self.projectList.rename( self.name, newName )
     #end def
 #end class
 
@@ -2049,410 +2210,446 @@ class XMLHistoryHandler( XMLhandler ):
 #register this handler
 historyhandler = XMLHistoryHandler()
 
-
-htmlObjects = NTlist() # A list of all htmlobject for rendering purposes
-
-class HTMLfile:
-    '''Description: Class to create a Html file; to be used with cing.css layout.
-       Inputs: file name, title
-       Output: a Html file.
-    '''
-    # A list of all htmlobject for rendering purposes
-    #htmlObjects = NTlist() # Local track-keeping list
-
-    def __init__( self, fileName, title = None ):
-        '''Description: __init__ for HTMLfile class.
-           Inputs: file name, title
-           Output: an instanciated HTMLfile obj.
-
-           The file is immidiately tested by a quick open for writing and closing.
-        '''
-
-        self.fileName = os.path.normpath( fileName )
-        self.stream = open( self.fileName, 'w' )
-        self.stream.close()
-
-        # definition of content-less  tags
-        self.noContent = [ 'base','basefont','br','col','frame','hr','img',
-                           'input','link','meta','ccsrule']#, 'script' ]
-
-        self.title = title
-        self.indent = 0
-
-        self._header    = NTlist()
-        self._call      = NTlist()
-        self._main      = NTlist()
-        self._left      = NTlist()
-        self._right     = NTlist()
-        self._footer    = NTlist()
-
-        htmlObjects.append( self )
-    #end def
-
-    # Having a del method might upset the gc.
-#    def __del__(self):
-#        print '>>deleting>', self.title, self.fileName
-#        print self
-#        if self in htmlObjects:
-#            htmlObjects.remove(self)
-#        del( self )
+#
+#htmlObjects = NTlist() # A list of all htmlobject for rendering purposes
+#
+#class HTMLfile:
+#    '''Description: Class to create a Html file; to be used with cing.css layout.
+#       Inputs: file name, title
+#       Output: a Html file.
+#
+#       gv 1 Sep 2008: Implemented 'None' tag
+#    '''
+#    # A list of all htmlobject for rendering purposes
+#    #htmlObjects = NTlist() # Local track-keeping list
+#
+#    def __init__( self, fileName, title = None, **kwds ):
+#        '''Description: __init__ for HTMLfile class.
+#           Inputs: file name, title
+#           Output: an instanciated HTMLfile obj.
+#
+#           The file is immidiately tested by a quick open for writing and closing.
+#        '''
+#
+#        self.fileName = NTmkdir( fileName )
+#        self.rootPath, _tmp, _tmp = NTpath( fileName )
+#        self.stream = open( self.fileName, 'w' )
+#        self.stream.close()
+#
+#        # definition of content-less  tags
+#        self.noContent = [ 'base','basefont','br','col','frame','hr','img',
+#                           'input','link','meta','ccsrule']#, 'script' ]
+#
+#        self.title = title
+#        self.reset()
+#        htmlObjects.append( self )
+#
+#        for key,value in kwds.iteritems():
+#            setattr(self,key,value)
 #    #end def
-
-    def killHtmlObjects():  # note there is no 'self', it's going to be a static method!
-        """ Remove all objects from the htmlObjects list
-            """
-        while htmlObjects.pop():
-            pass # I think this should work to clear the list
-
-    killHtmlObjects = staticmethod( killHtmlObjects)
-
-    def _appendTag( self, htmlList, tag, *args, **kwds ):
-        '''Description: core routine for generating Tags.
-           Inputs: HTMLfile obj, list, tag, openTag, closeTag, *args, **kwds.
-           Output: list.
-        '''
-        self.indent += 1
-        htmlList.append( self._generateTag( tag, *args, **kwds ) )
-        self.indent -= 1
-    #end def
-
-    def _generateTag( self, tag, *args, **kwds ):
-        '''Description: core routine for generating Tags.
-           Inputs: HTMLfile obj, tag, openTag, closeTag,
-                   newLine, *args, **kwds.
-           Output: list.
-        '''
-
-        #self.indent += 1
-
-        if kwds.has_key('openTag'):
-            openTag = kwds['openTag']
-            del kwds['openTag']
-        else:
-            openTag = True
-
-        if kwds.has_key('closeTag'):
-            closeTag = kwds['closeTag']
-            del kwds['closeTag']
-        else:
-            closeTag = True
-
-        if kwds.has_key('newLine'):
-            newLine = kwds['newLine']
-            del kwds['newLine']
-        else:
-            newLine = True
-        v = { True: None, False: -1 }
-
-        #print '****', htmlList,'*',tag,'*', openTag,'*', closeTag, '*', args
-
-        if openTag and closeTag:
-            s = ( self.openTag( tag, *args, **kwds )[:-1] +
-                  self.closeTag(tag)[self.indent:v[newLine]] )
-        elif openTag:
-            s = ( self.openTag( tag, *args, **kwds ) )
-        elif closeTag:
-            s = ( self.closeTag( tag, *args, **kwds ) )
-        #end if
-        #self.indent -=1
-
-        return s
-    #end def
-
-    def header( self, tag, *args, **kwds ):
-        self.indent +=1
-        self._appendTag( self._header, tag, *args, **kwds )
-        self.indent -=1
-    #end def
-
-    def __call__( self, tag, *args, **kwds ):
-        "Write openTag, content, closeTag (if appropriate)"
-        self.indent +=1
-        self._appendTag( self._call, tag, *args, **kwds )
-        self.indent -=1
-    #end def
-
-    def main( self, tag, *args, **kwds ):
-        self.indent +=1
-        self._appendTag( self._main, tag, *args, **kwds )
-        self.indent -=1
-    #end def
-
-    def left( self, tag, *args, **kwds ):
-        self.indent +=1
-        self._appendTag( self._left, tag, *args, **kwds )
-        self.indent -=1
-    #end def
-
-    def right( self, tag, *args, **kwds ):
-        self.indent +=1
-        self._appendTag( self._right, tag, *args, **kwds )
-        self.indent -=1
-    #end def
-
-    def footer( self, tag, *args, **kwds ):
-        self._appendTag( self._footer, tag, *args, **kwds )
-    #end def
-
-    def render(self):
-        '''Description: write container to file Html.
-           Inputs: a HTMLfile obj.
-           Output: written lines and close file.
-
-           JFD notes it is simpler to code this as constructing the whole content
-           first and then writing. It would be just as fast for the size
-           of html files we render.
-        '''
-
-        self.stream = open( self.fileName, 'w' )
-#        NTdebug('writing to file: %s' % self.fileName)
-        self.indent = 0
-        # JFD proposes to drop the below tags because they hinder javascript beyond my knowledge.
-        # AWSS updated it: it should work fine with javascript
-        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"'))
-        self.stream.write(self.openTag('html'))
-        self.stream.write(self.openTag('head'))
-        if self.title:
-            self.stream.write( self._generateTag( 'title', self.title ))
-
-        relativePath = self.relativePath()
-        cssLink = os.path.join(relativePath, cingPaths.css)
-        jsMultiLineLink = os.path.join(relativePath, cingPaths.jsMultiLine)
-        self.stream.write(self._generateTag( 'link',
-            rel="stylesheet", type="text/css", media="screen", href=cssLink))
-        self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
-            type="text/javascript", src=jsMultiLineLink))
-
-        self.stream.write(self.closeTag('head'))
-        self.stream.write(self.openTag('body'))
-        self.stream.write(self.openTag('div', id="container"))
-        self.indent += 1
-
-        self.stream.write( self.openTag('div', id = 'header') )
-        self.stream.writelines(self._header)
-        self.stream.write(self.closeTag('div', '<!-- end header -->'))
-
-        self.stream.write( self.openTag('div', id = 'main') )
-        self.stream.writelines(self._call + self._main)
-
-        for divId, htmlList in [ ('left', self._left), ('right', self._right) ]:
-
-            if htmlList:
-                self.indent += 1
-
-                self.stream.write( self.openTag('div', id = divId) )
-                self.stream.writelines(htmlList)
-                self.stream.write(self.closeTag('div',sprintf('<!-- end %s -->',
-                                                              divId)))
-                self.indent -= 1
-        self.stream.write(self.closeTag('div', '<!-- end main -->'))
-        self.stream.write(self._generateTag( 'br', style="clear: both;" ))
-
-        self.indent = 0
-
-        self.stream.write(self.closeTag('div', '<!-- end container -->'))
-
-        self.stream.write(self.openTag('div', id = 'footer'))
-        #self.defaultFooter()
-        self.stream.writelines(self._footer)
-#        msg = programName + ' ' + `cingVersion` + ' '
-        msg = programName
-        msg += ' %s ' % cingVersion
-        i=0
-        n=len(authorList)
-        for author in authorList:
-            i+=1
-            msg +=  '<a href="mailto:%s">%s</a>' % ( author[1],author[0])
-            if i==(n-1):
-                msg += ' and '
-            elif i<n:
-                msg += ', '
-        self.stream.write(self._generateTag( 'p', msg))
-        self.stream.write(self.closeTag('div', '<!-- end footer -->'))
-
-        self.stream.write(self.closeTag('body'))
-        self.stream.write(self.closeTag('html'))
-
-        self.stream.close()
-
-    def tag( self, tag, *args, **kwds ):
-        "Return (openingTag, content, closingTag) triple"
-
-        #print '*****', tag, [args], (kwds)
-        openTag = sprintf('<%s',tag)
-        for key,value in kwds.iteritems():
-            openTag = openTag + sprintf(' %s="%s"', key, value)
-        #end for
-
-        if (tag in self.noContent):
-            openTag = openTag +  '/>'
-        else:
-            openTag = openTag +  '>'
-        #end if
-
-        content = ''.join(args)
-        if (tag in self.noContent):
-            closeTag = ''
-        else:
-            closeTag = sprintf('</%s>',tag)
-        #end if
-        return (openTag,content,closeTag)
-    #end def
-
-    def openTag( self, tag, *args, **kwds ):
-        "Write openTag, content; NO closeTag"
-        openTag, content, dummyCloseTag = self.tag( tag, *args, **kwds )
-        return sprintf( '%s%s%s\n', '' + '\t' * self.indent, openTag, content )
-    #end def
-
-    def closeTag( self, tag, *args, **kwds ):
-        "Write closeTag *args"
-        dummyOpenTag, content, closeTag = self.tag( tag, *args, **kwds )
-        return sprintf( '%s%s%s\n', '' + '\t' * self.indent, closeTag, content )
-    #end def
-
-    def relativePath(self):
-        ''' Description: return relative path between htmlObj and project
-            directory.
-            Inputs: htmlObj
-            Output: relative path to project root
-            Example: htmlObj molecule: Ccpn_1brv
-                     project.molecule.html.fileName (1brvV1.cing/Ccpn_1brv/HTML/index.html)
-                     returns: '../../'
-        '''
-        fileName = self.fileName
-        sep = os.path.sep
-        #pardir = os.path.pardir
-        pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
-        countSep = fileName.count(sep)
-        return (countSep - 1) * pardirSep
-
-    def findHtmlLocation(self, source, destination, id=None ):
-        '''Description: given 2 Cing objects returns the relative path between them.
-           Inputs: Cing objects souce, destination
-           Output: string path or None or error
-
-           E.g. input: source.htmlLocation[0]     : test_HTMLfile.cing/index.html
-                       destination.htmlLocation[0]: test_HTMLfile.cing/moleculeName/HTML/indexMolecule.html
-                output                            : moleculeName/HTML/indexMolecule.html
-        '''
-        # Debugger perspecitive put at source (me)
-        # Destination is the target.
-        for item in [source, destination]:
-            if not hasattr(item,'htmlLocation'):
-                NTerror('No htmlLocation attribute associated to obj %s\n', item)
-                return None
-
-        # Strip leading dot for rest of algorithm.
-        # Normalize path, eliminating double slashes, etc.
-        sourcePath = os.path.normpath(     source.htmlLocation[0])
-        destPath   = os.path.normpath(destination.htmlLocation[0])
-        # Get default id.
-        destId     = destination.htmlLocation[1]
-        # Or override.
-        if id:
-            destId = '#' + id
-
-        listSourcePath = sourcePath.split('/')
-        listDestPath   = destPath.split('/')
-
-        # JFD next code is disabled because the comparison might shortcircuit
-        # when identical names are matched 'by accident'.
-#        for index in range(lenSP):
-#            if listSourcePath[index] != listDestPath[index]:
-#                #location = index * ['..'] + listDestPath
+#
+#    def reset(self):
+#        """
+#        Reset all HTML code
+#        """
+#        self.indent  = 0
+#        self._header = NTlist()
+#        self._call   = NTlist()
+#        self._main   = NTlist()
+#        self._left   = NTlist()
+#        self._right  = NTlist()
+#        self._footer = NTlist()
+#    #end def
+#
+#    def _resetCingContent(self):
+#        """
+#        Reset HTML content (call, main, left, right) code
+#        """
+#        self._header = NTlist()
+#        self._main   = NTlist()
+#        self._left   = NTlist()
+#        self._right  = NTlist()
+#        self._footer = NTlist()
+#    #end def
+#
+#    # Having a del method might upset the gc.
+##    def __del__(self):
+##        print '>>deleting>', self.title, self.fileName
+##        print self
+##        if self in htmlObjects:
+##            htmlObjects.remove(self)
+##        del( self )
+##    #end def
+#
+#    def killHtmlObjects():  # note there is no 'self', it's going to be a static method!
+#        """ Remove all objects from the htmlObjects list
+#            """
+#        while htmlObjects.pop():
+#            pass # I think this should work to clear the list
+#    #end def
+#    killHtmlObjects = staticmethod( killHtmlObjects)
+#
+#    def _appendTag( self, htmlList, tag, *args, **kwds ):
+#        '''Description: core routine for generating Tags.
+#           Inputs: HTMLfile obj, list, tag, openTag, closeTag, *args, **kwds.
+#           Output: list.
+#        '''
+#        self.indent += 1
+#        if tag:
+#            htmlList.append( self._generateTag( tag, *args, **kwds ) )
+#        else:
+#            for arg in args:
+#                htmlList.append( str(arg) )
+#        self.indent -= 1
+#    #end def
+#
+#    def _generateTag( self, tag, *args, **kwds ):
+#        '''Description: core routine for generating Tags.
+#           Inputs: HTMLfile obj, tag, openTag, closeTag,
+#                   newLine, *args, **kwds.
+#           Output: list.
+#        '''
+#
+#        #self.indent += 1
+#
+#        if kwds.has_key('openTag'):
+#            openTag = kwds['openTag']
+#            del kwds['openTag']
+#        else:
+#            openTag = True
+#
+#        if kwds.has_key('closeTag'):
+#            closeTag = kwds['closeTag']
+#            del kwds['closeTag']
+#        else:
+#            closeTag = True
+#
+#        if kwds.has_key('newLine'):
+#            newLine = kwds['newLine']
+#            del kwds['newLine']
+#        else:
+#            newLine = True
+#        v = { True: None, False: -1 }
+#
+#        #print '****', htmlList,'*',tag,'*', openTag,'*', closeTag, '*', args
+#
+#        if openTag and closeTag:
+#            s = ( self.openTag( tag, *args, **kwds )[:-1] +
+#                  self.closeTag(tag)[self.indent:v[newLine]] )
+#        elif openTag:
+#            s = ( self.openTag( tag, *args, **kwds ) )
+#        elif closeTag:
+#            s = ( self.closeTag( tag, *args, **kwds ) )
+#        #end if
+#        #self.indent -=1
+#
+#        return s
+#    #end def
+#
+#    def header( self, tag, *args, **kwds ):
+#        self.indent +=1
+#        self._appendTag( self._header, tag, *args, **kwds )
+#        self.indent -=1
+#    #end def
+#
+#    def __call__( self, tag, *args, **kwds ):
+#        "Write openTag, content, closeTag (if appropriate)"
+#        self.indent +=1
+#        self._appendTag( self._call, tag, *args, **kwds )
+#        self.indent -=1
+#    #end def
+#
+#    def main( self, tag, *args, **kwds ):
+#        self.indent +=1
+#        self._appendTag( self._main, tag, *args, **kwds )
+#        self.indent -=1
+#    #end def
+#
+#    def left( self, tag, *args, **kwds ):
+#        self.indent +=1
+#        self._appendTag( self._left, tag, *args, **kwds )
+#        self.indent -=1
+#    #end def
+#
+#    def right( self, tag, *args, **kwds ):
+#        self.indent +=1
+#        self._appendTag( self._right, tag, *args, **kwds )
+#        self.indent -=1
+#    #end def
+#
+#    def footer( self, tag, *args, **kwds ):
+#        self._appendTag( self._footer, tag, *args, **kwds )
+#    #end def
+#
+#    def generateHtml(self, htmlOnly=False):
+#        """This is a prototype and this method should be superseeded
+#        """
+#        pass
+#    #end def
+#
+#    def render(self):
+#        '''Description: write container to file Html.
+#           Inputs: a HTMLfile obj.
+#           Output: written lines and closed file.
+#
+#           JFD notes it is simpler to code this as constructing the whole content
+#           first and then writing. It would be just as fast for the size
+#           of html files we render.
+#        '''
+#
+#        self.stream = open( self.fileName, 'w' )
+##        NTdebug('writing to file: %s' % self.fileName)
+#        self.indent = 0
+#        # JFD proposes to drop the below tags because they hinder javascript beyond my knowledge.
+#        # AWSS updated it: it should work fine with javascript
+#        self.stream.write(self.openTag('!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"'))
+#        self.stream.write(self.openTag('html'))
+#        self.stream.write(self.openTag('head'))
+#        if self.title:
+#            self.stream.write( self._generateTag( 'title', self.title ))
+#
+#        relativePath = self.relativePath()
+#        cssLink = os.path.join(relativePath, cingPaths.css)
+#        jsMultiLineLink = os.path.join(relativePath, cingPaths.jsMultiLine)
+#        self.stream.write(self._generateTag( 'link',
+#            rel="stylesheet", type="text/css", media="screen", href=cssLink))
+#        self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
+#            type="text/javascript", src=jsMultiLineLink))
+#
+#        self.stream.write(self.closeTag('head'))
+#        self.stream.write(self.openTag('body'))
+#        self.stream.write(self.openTag('div', id="container"))
+#        self.indent += 1
+#
+#        self.stream.write( self.openTag('div', id = 'header') )
+#        self.stream.writelines(self._header)
+#        self.stream.write(self.closeTag('div', '<!-- end header -->'))
+#
+#        self.stream.write( self.openTag('div', id = 'main') )
+#
+#        self.stream.write( self.openTag('a', id='_top', name='_top') )
+#        self.stream.write( self.closeTag('a') )
+#
+#        self.stream.writelines(self._call + self._main)
+#
+#        for divId, htmlList in [ ('left', self._left), ('right', self._right) ]:
+#
+#            if htmlList:
+#                self.indent += 1
+#
+#                self.stream.write( self.openTag('div', id = divId) )
+#                self.stream.writelines(htmlList)
+#                self.stream.write(self.closeTag('div',sprintf('<!-- end %s -->',
+#                                                              divId)))
+#                self.indent -= 1
+#        self.stream.write(self.closeTag('div', '<!-- end main -->'))
+#        self.stream.write(self._generateTag( 'br', style="clear: both;" ))
+#
+#        self.indent = 0
+#
+#        self.stream.write(self.closeTag('div', '<!-- end container -->'))
+#
+#        self.stream.write(self.openTag('div', id = 'footer'))
+#        #self.defaultFooter()
+#        self.stream.writelines(self._footer)
+##        msg = programName + ' ' + `cingVersion` + ' '
+#        msg = programName
+#        msg += ' %s ' % cingVersion
+#        i=0
+#        n=len(authorList)
+#        for author in authorList:
+#            i+=1
+#            msg +=  '<a href="mailto:%s">%s</a>' % ( author[1],author[0])
+#            if i==(n-1):
+#                msg += ' and '
+#            elif i<n:
+#                msg += ', '
+#        self.stream.write(self._generateTag( 'p', msg))
+#        self.stream.write(self.closeTag('div', '<!-- end footer -->'))
+#
+#        self.stream.write(self.closeTag('body'))
+#        self.stream.write(self.closeTag('html'))
+#
+#        self.stream.close()
+#
+#    def tag( self, tag, *args, **kwds ):
+#        "Return (openingTag, content, closingTag) triple"
+#
+#        #print '*****', tag, [args], (kwds)
+#        openTag = sprintf('<%s',tag)
+#        for key,value in kwds.iteritems():
+#            openTag = openTag + sprintf(' %s="%s"', key, value)
+#        #end for
+#
+#        if (tag in self.noContent):
+#            openTag = openTag +  '/>'
+#        else:
+#            openTag = openTag +  '>'
+#        #end if
+#
+#        content = ''.join(args)
+#        if (tag in self.noContent):
+#            closeTag = ''
+#        else:
+#            closeTag = sprintf('</%s>',tag)
+#        #end if
+#        return (openTag,content,closeTag)
+#    #end def
+#
+#    def openTag( self, tag, *args, **kwds ):
+#        "Write openTag, content; NO closeTag"
+#        openTag, content, dummyCloseTag = self.tag( tag, *args, **kwds )
+#        return sprintf( '%s%s%s\n', '' + '\t' * self.indent, openTag, content )
+#    #end def
+#
+#    def closeTag( self, tag, *args, **kwds ):
+#        "Write closeTag *args"
+#        dummyOpenTag, content, closeTag = self.tag( tag, *args, **kwds )
+#        return sprintf( '%s%s%s\n', '' + '\t' * self.indent, closeTag, content )
+#    #end def
+#
+#    def relativePath(self):
+#        ''' Description: return relative path between htmlObj and project
+#            directory.
+#            Inputs: htmlObj
+#            Output: relative path to project root
+#            Example: htmlObj molecule: Ccpn_1brv
+#                     project.molecule.html.fileName (1brvV1.cing/Ccpn_1brv/HTML/index.html)
+#                     returns: '../../'
+#        '''
+#        fileName = self.fileName
+#        sep = os.path.sep
+#        #pardir = os.path.pardir
+#        pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
+#        countSep = fileName.count(sep)
+#        return (countSep - 1) * pardirSep
+#
+#    def findHtmlLocation(self, source, destination, id=None ):
+#        '''Description: given 2 Cing objects returns the relative path between them.
+#           Inputs: Cing objects souce, destination
+#           Output: string path or None or error
+#
+#           E.g. input: source.htmlLocation[0]     : test_HTMLfile.cing/index.html
+#                       destination.htmlLocation[0]: test_HTMLfile.cing/moleculeName/HTML/indexMolecule.html
+#                output                            : moleculeName/HTML/indexMolecule.html
+#        '''
+#        # Debugger perspecitive put at source (me)
+#        # Destination is the target.
+#        for item in [source, destination]:
+#            if not hasattr(item,'htmlLocation'):
+#                NTerror('No htmlLocation attribute associated to object %s', item)
+#                return None
+#
+#        # Strip leading dot for rest of algorithm.
+#        # Normalize path, eliminating double slashes, etc.
+#        sourcePath = os.path.normpath(     source.htmlLocation[0])
+#        destPath   = os.path.normpath(destination.htmlLocation[0])
+#        # Get default id.
+#        destId     = destination.htmlLocation[1]
+#        # Or override.
+#        if id:
+#            destId = '#' + id
+#
+#        listSourcePath = sourcePath.split('/')
+#        listDestPath   = destPath.split('/')
+#
+#        # JFD next code is disabled because the comparison might shortcircuit
+#        # when identical names are matched 'by accident'.
+##        for index in range(lenSP):
+##            if listSourcePath[index] != listDestPath[index]:
+##                #location = index * ['..'] + listDestPath
+##                break
+##        i = lenSP - 1 - index
+##        locationList = (index + i) * ['..'] + listDestPath
+##        loc = ''
+##        for item in location:
+##            loc = os.path.join(loc,item)
+##        loc = os.path.join( *locationList )
+#
+#        # How far away (in dir changes) am I from the first (left/cing) dir?
+#        # The list will look like:  list: ['test_HTMLfile.cing', 'index.html']
+#        # One jump is one directory.
+#        # E.g. 1brv/1brv/index.html has 2 jumps.
+#
+#        toLeftNumberOfJumpsSource = len(listSourcePath) - 1
+#        toLeftNumberOfJumpsDest   = len(listDestPath)   - 1
+#
+#        # Any same leading directories may be ommited.
+#        # using the fact that they are rooted in the same starting dir (curdir)
+#        toLeftNumberOfJumpsSourceNew = toLeftNumberOfJumpsSource
+#        i = 0
+#        while i < toLeftNumberOfJumpsDest and i < toLeftNumberOfJumpsSource:
+#            if listSourcePath[i] == listDestPath[i]:
+#                toLeftNumberOfJumpsSourceNew -= 1
+#            else:
 #                break
-#        i = lenSP - 1 - index
-#        locationList = (index + i) * ['..'] + listDestPath
-#        loc = ''
-#        for item in location:
-#            loc = os.path.join(loc,item)
+#            i += 1
+#        jumpsToRemove = toLeftNumberOfJumpsSource - toLeftNumberOfJumpsSourceNew
+#        listDestPathNew = listDestPath[jumpsToRemove:]
+#        locationList = toLeftNumberOfJumpsSourceNew * ['..']
+#        locationList += listDestPathNew
 #        loc = os.path.join( *locationList )
-
-        # How far away (in dir changes) am I from the first (left/cing) dir?
-        # The list will look like:  list: ['test_HTMLfile.cing', 'index.html']
-        # One jump is one directory.
-        # E.g. 1brv/1brv/index.html has 2 jumps.
-
-        toLeftNumberOfJumpsSource = len(listSourcePath) - 1
-        toLeftNumberOfJumpsDest   = len(listDestPath)   - 1
-
-        # Any same leading directories may be ommited.
-        # using the fact that they are rooted in the same starting dir (curdir)
-        toLeftNumberOfJumpsSourceNew = toLeftNumberOfJumpsSource
-        i = 0
-        while i < toLeftNumberOfJumpsDest and i < toLeftNumberOfJumpsSource:
-            if listSourcePath[i] == listDestPath[i]:
-                toLeftNumberOfJumpsSourceNew -= 1
-            else:
-                break
-            i += 1
-        jumpsToRemove = toLeftNumberOfJumpsSource - toLeftNumberOfJumpsSourceNew
-        listDestPathNew = listDestPath[jumpsToRemove:]
-        locationList = toLeftNumberOfJumpsSourceNew * ['..']
-        locationList += listDestPathNew
-        loc = os.path.join( *locationList )
-        loc = os.path.normpath(loc) # I don't think it's needed anymore but can't hurt either.
-        return loc + destId
-
-    def insertHtmlLink( self, section, source, destination, text=None, id=None ):
-        '''Description: create the html command for linking Cing objects.
-           Inputs: section (main, header, left etc.), source obj., destination
-                   obj., html text, id.
-           Output: <a class="red" href="link">text</a> inside section
-
-           Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
-
-           And the funny thing is that if the destination has an attribute:
-               'rogScore.colorLabel' then it will be used to define an html class with
-               which through the cing.css can be used for defining coloring
-               schemes.
-        '''
-
-        if not section:
-            NTerror("No HTML section defined here")
-            return None
-
-        if not source:
-            NTerror("No Cing object source defined here")
-            return None
-
-        if not destination:
-            NTerror("No Cing object destination defined here")
-            return None
-
-        link = self.findHtmlLocation( source, destination, id )
-#        NTdebug('From source: [%s] to destination [%s] id [%s] using relative link: %s' % (source, destination, id,link))
-
-
-        kw = {'href':link}
-        #if not destination.has_key('colorLabel'):
-        if hasattr(destination, 'rogScore'):
-#            destination.colorLabel = COLOR_GREEN
-            if destination.rogScore.isCritiqued():
-                # solution for avoiding python 'class' command with html syntax
-                kw['class'] = destination.rogScore.colorLabel
-                destination.rogScore.addHTMLkeywords( kw )
-        section('a', text, **kw)
-    #end def
-
-    def insertHtmlLinkInTag( self, tag, section, source, destination, text=None,
-                             id=None):
-        '''Description: create the html command for linking Cing objs inside a tag.
-           Inputs: tag, section (main, header, left etc.), source obj.,
-                   destination obj., html text, id.
-           Output: <h1><a class="red" href="link">text</a></h1> inside section
-
-        Example call:
-                    project.html.insertHtmlLinkInTag( 'li', main, project, item, text=item.name )
-
-        '''
-
-        section(tag, closeTag=False)
-        self.insertHtmlLink(section, source, destination, text=text, id=id)
-        section(tag, openTag=False)
-
-#end class
+#        loc = os.path.normpath(loc) # I don't think it's needed anymore but can't hurt either.
+#        return loc + destId
+#
+#    def insertHtmlLink( self, section, source, destination, text=None, id=None, *kwds ):
+#        '''Description: create the html command for linking Cing objects.
+#           Inputs: section (main, header, left etc.), source obj., destination
+#                   obj., html text, id.
+#           Output: <a class="red" href="link">text</a> inside section
+#
+#           Example call: project.html.insertHtmlLink( main, project, item, text=item.name )
+#
+#           And the funny thing is that if the destination has an attribute:
+#               'rogScore.colorLabel' then it will be used to define an html class with
+#               which through the cing.css can be used for defining coloring
+#               schemes.
+#        '''
+#
+#        if not section:
+#            NTerror("No HTML section defined here")
+#            return None
+#
+#        if not source:
+#            NTerror("No Cing object source defined here")
+#            return None
+#
+#        if not destination:
+#            NTerror("No Cing object destination defined here")
+#            return None
+#
+#        link = self.findHtmlLocation( source, destination, id )
+##        NTdebug('From source: [%s] to destination [%s] id [%s] using relative link: %s' % (source, destination, id,link))
+#
+#
+#        kw = {'href':link}
+#        #if not destination.has_key('colorLabel'):
+#        if hasattr(destination, 'rogScore'):
+##            destination.colorLabel = COLOR_GREEN
+#            if destination.rogScore.isCritiqued():
+#                # solution for avoiding python 'class' command with html syntax
+#                kw['class'] = destination.rogScore.colorLabel
+#                destination.rogScore.addHTMLkeywords( kw )
+#        #end if
+#        kw.update(kwds)
+#        section('a', text, **kw)
+#    #end def
+#
+#    def insertHtmlLinkInTag( self, tag, section, source, destination, text=None, id=None, **kwds):
+#        '''Description: create the html command for linking Cing objs inside a tag.
+#           Inputs: tag, section (main, header, left etc.), source obj.,
+#                   destination obj., html text, id.
+#           Output: <h1><a class="red" href="link">text</a></h1> inside section
+#
+#        Example call:
+#                    project.html.insertHtmlLinkInTag( 'li', main, project, item, text=item.name )
+#
+#        '''
+#
+#        section(tag, closeTag=False)
+#        self.insertHtmlLink(section, source, destination, text=text, id=id, **kwds)
+#        section(tag, openTag=False)
+##end class
 
 def path( *args ):
     """
@@ -2492,10 +2689,10 @@ class AtomList( NTlist ):
     """
     def __init__( self, project, status='keep' ):
         NTlist.__init__( self )
-        self.name       = 'Atom List'
+        self.name       = project.molecule.name + '.atoms'
         self.status     = status      # Status of the list; 'keep' indicates storage required
-        self.currentId  = 0       # Id for each element of list
-        self.rogScore = ROGscore()
+        self.currentId  = 0           # Id for each element of list
+        self.rogScore   = ROGscore()
         self.appendFromMolecule( project.molecule )
         self.criticize()
     #end def
@@ -2503,7 +2700,7 @@ class AtomList( NTlist ):
     def criticize(self):
         for atom in self:
 #            atom.criticize()
-            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s'%atom.toString() )
+            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
 
     def append( self, o ):
         o.id = self.currentId
