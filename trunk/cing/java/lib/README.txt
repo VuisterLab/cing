@@ -14,4 +14,7 @@ jfreechart-1.0.1.jar	Plotting tool
 printf_hb15.jar			Formatted printing like c.
 starlibj_with_source.jarSteve's lib to STAR
 
-NB The binaries here should be CVS checked in as binaries otherwise there might be problems. 
+NB The binaries here should be CVS checked in as binaries otherwise there might be problems.
+
+For some reason JFD could not link these jars straight into an Eclipse User Library.
+Made them external to the project and voila. 
