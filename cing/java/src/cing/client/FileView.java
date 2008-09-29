@@ -72,6 +72,9 @@ public class FileView extends Composite {
 				addUploadRow();
 			}
 		});
+		showUpload();
+		addUploadRow();
+		
 
 	}
 
@@ -223,6 +226,28 @@ public class FileView extends Composite {
 					}
 				}
 				listBox_Type.setItemSelected(0, true);				
+			}			
+		});
+		
+		listBox_Type.addChangeListener( new ChangeListener() {
+			public void onChange(Widget sender) {
+				ListBox listBox_Type = (ListBox) sender;
+				String program = listBox_Program.getValue( listBox_Program.getSelectedIndex()); 				
+				String type = listBox_Type.getValue( listBox_Type.getSelectedIndex()); 				
+				updateListBox_Subtype(listBox_Subtype, program, type);
+			}
+
+			private void updateListBox_Subtype(ListBox listBox_Subtype, String program, String type) {
+				listBox_Subtype.clear();
+				ArrayList<String> subTypeList = Classification.getSubTypeList(program, type);
+				if (subTypeList == null) { // impossible but modeled for consistency with below boxes.
+					listBox_Subtype.addItem(Defs.STRING_NA);
+				} else {
+					for (String item : subTypeList) {
+						listBox_Subtype.addItem(item); 
+					}
+				}
+				listBox_Subtype.setItemSelected(0, true);				
 			}			
 		});
 		
