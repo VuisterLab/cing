@@ -2,7 +2,38 @@
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2 instead of 1, look for the settings file httpd.conf in: 
     /private/etc/apache2/httpd.conf
-    
+* Doing https on mac:
+	- Ask Wilmar Teunissen's help
+	- Study http://www.madboa.com/geek/openssl/#cert-request
+	  and http://www.ru.nl/uci/diensten_voor/medewerkers/ict-beveiliging/
+	- Generated a key:
+		"""[mini:etc/apache2/extra] root# openssl req -new -newkey rsa:1024 -nodes -keyout nmrkey.pem -out nmr_request.pem
+Generating a 1024 bit RSA private key
+......++++++
+......++++++
+writing new private key to 'nmrkey.pem'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:NL
+State or Province Name (full name) [Some-State]:Gelderland
+Locality Name (eg, city) []:Nijmegen
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Radboud Universiteit Nijmegen
+Organizational Unit Name (eg, section) []:CMBI
+Common Name (eg, YOUR name) []:nmr.cmbi.ru.nl
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+		"""
+		
     In last conf file:
     
 ScriptAliasMatch ^/cgi-bin/((?!(?i:webobjects)).*$) "/Library/WebServer/CGI-Executables/$1"
