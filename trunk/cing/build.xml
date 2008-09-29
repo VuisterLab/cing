@@ -114,10 +114,8 @@
     <target name="iCing-install" depends="init">
         <echo message="Ensure that the iCing dir already exists remotely."/>
     	
-	<!--	scp -P 39676 -r $CINGROOT/iCing/www/cing.iCing jd@localhost-mini:/Users/jd/Sites/iCing 
-icing.server.dir.local=${icing.root}/www/cing.iCing
-icing.server.dir=${user.root}/Sites/icing
-	
+	<!-- modelled after:
+		scp -P 39676 -r $WS/cing/www/cing.iCing jd@localhost-mini:/Users/jd/Sites/iCing 	
 	-->
     	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${icing.server.dir}"
             keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
