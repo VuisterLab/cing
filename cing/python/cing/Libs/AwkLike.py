@@ -21,7 +21,7 @@ class AwkLike:
     """
 
     def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
-                 skipHeaderLines = 0 ):
+                 skipHeaderLines = 0, separator = None ):
         if filename:
             self.f = open(filename,'r')
             self.FILENAME = filename
@@ -33,10 +33,11 @@ class AwkLike:
         self.commentString = commentString
         self.minNF = minNF
         self.skipHeaderLines = skipHeaderLines
-        
+
         self.NR = 0
         self.NF = 0
         self.dollar = []
+        self.separator = separator
 
 
     def __iter__( self ):
@@ -52,7 +53,7 @@ class AwkLike:
 
         if len(self.line):
             self.NR += 1
-            for f in self.line.split():
+            for f in self.line.split(self.separator):
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
 #                    NTdebug("Skipping fields after comment on line: " + self.dollar[0] )
@@ -75,7 +76,7 @@ class AwkLike:
                     return self.next()
             if self.skipHeaderLines >= self.NR:
 #                NTdebug('skipping header line [%d] which is less than or equal to [%d]' % (
-#                    self.NR, self.skipHeaderLines))                              
+#                    self.NR, self.skipHeaderLines))
                 return self.next()
             return self
         self.close()

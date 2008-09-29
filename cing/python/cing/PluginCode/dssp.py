@@ -1,5 +1,6 @@
 """
 Runs and retrieves DSSP
+Add's runDssp method to project class
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
@@ -9,6 +10,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import sprintf
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.parameters import cingPaths
@@ -55,7 +57,7 @@ class Dssp:
         if export:
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
-                    NTwarning('non-protein residue %s found and will be written out for Dssp' % `res`)
+                    NTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
 
             models = NTlist(*range( self.project.molecule.modelCount ))
             # Can't use IUPAC here because aqua doesn't understand difference between
@@ -66,25 +68,29 @@ class Dssp:
                 NTdebug('==> Materializing model '+`model`+" to disk" )
                 pdbFile = self.project.molecule.toPDB( model=model, convention = "BMRB" )
                 if not pdbFile:
-                    NTerror("Failed to write a temporary file with a model's coordinate")
+                    NTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
                     return True
                 pdbFile.save( fullname   )
+            #end for
+        #end if
 
-        NTdebug("Running dssp")
-
+        NTmessage('==> Calculating secondary structure by DSSP')
         now = time.time()
         for model in models:
             fullname =     'model_%03d.pdb'  % model
             fullnameOut =  'model_%03d.dssp' % model
             cmd = fullname + ' ' + fullnameOut
             if self.dssp(cmd):
-                NTerror("Failed to run DSSP; please consult the log file (.log etc). in the molecules dssp directory.")
+                NTerror("Dssp.run: Failed to run DSSP; please consult the log file (.log etc). in the molecules dssp directory.")
                 return True
+            #end if
+        #end for
         taken = time.time() - now
-        NTdebug("Took number of seconds: %8.1f" % taken)
-        NTdebug("Finished dssp successfully")
+        NTdebug("Finished dssp successfully in %8.1f seconds", taken)
+
         self.parseResult()
-#        self.postProcess()
+
+        self.project.dsspStatus.completed = True
         return True
     #end def
 
@@ -105,17 +111,6 @@ class Dssp:
             result[ field ] = func(line[c1:c2])
         return result
 
-    def postProcess(self):
-        item = SECSTRUCT_STR
-#        for item in [ SECSTRUCT_STR ]:
-        for res in self.project.molecule.allResidues():
-            if res.has_key( item ):
-                itemList = res[ item ]
-                c = itemList.setConsensus()
-                NTdebug('consensus: %s', c)
-
-
-
 
     def parseResult(self):
         """
@@ -129,6 +124,9 @@ class Dssp:
         for model in range(modelCount):
             fullnameOut =  'model_%03d.dssp' % model
             path = os.path.join(self.rootPath, fullnameOut)
+            if not os.path.exists(path):
+                NTerror('Dssp.parseResult: file "%s" not found', path)
+                return True
 
 #            NTmessage("Parsing " + path)
             isDataStarted = False
@@ -166,12 +164,31 @@ class Dssp:
                     residue.dssp.setdefault(field, NTlist())
                     residue.dssp[field].append(value)
 #                    NTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
+                #end for
+            #end for
+        #end for
+        for residue in self.molecule.allResidues():
+            if residue.has_key(DSSP_STR):
+                residue[DSSP_STR].consensus = residue[DSSP_STR].secStruct.setConsensus( CONSENSUS_SEC_STRUCT_FRACTION )
+                residue[DSSP_STR].keysformat()
+        #end for
+    #end def
+
+
+#    def postProcess(self):
+#        item = SECSTRUCT_STR
+##        for item in [ SECSTRUCT_STR ]:
+#        for res in self.project.molecule.allResidues():
+#            if res.has_key( item ):
+#                itemList = res[ item ]
+#                c = itemList.setConsensus()
+#                NTdebug('consensus: %s', c)
 
 #end class
 
-def dssp(project)   :
+def runDssp(project, parseOnly=False)   :
     """
-    Adds <Procheck> instance to molecule. Run dssp and parse result.
+    Adds <Dssp> instance to molecule. Run dssp and parse result.
     Return None on error.
     """
     # check if dssp is present
@@ -193,12 +210,24 @@ def dssp(project)   :
         NTerror("Failed to get dssp instance of project")
         return None
 
-    NTmessage('==> Calculating secondary structure by DSSP')
-    dcheck.run()
+    if parseOnly:
+        dcheck.parseResult()
+    else:
+        dcheck.run()
     project.molecule.dssp = dcheck
 
     return dcheck
 #end def
+
+def restoreDssp( project, tmp=None ):
+    """
+    Optionally restore dssp results
+    """
+    if project.dsspStatus.completed:
+        NTmessage('==> restoring dssp results')
+        project.runDssp(parseOnly=True)
+#end def
+
 
 def to3StateUpper( strNTList ):
     """Personal communications JFD with Rob Hooft and Gert Vriend.
@@ -231,8 +260,8 @@ def getDsspSecStructConsensus( res ):
     return result
 
 # register the functions
-methods  = [(dssp, None)
+methods  = [(runDssp, None)
            ]
 #saves    = []
-#restores = []
+restores = [(restoreDssp, None)]
 #exports  = []

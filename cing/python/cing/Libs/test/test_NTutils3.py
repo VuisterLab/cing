@@ -1,7 +1,7 @@
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import ROGscore
-from cing.core.classes import HTMLfile
+from cing.PluginCode.html import HTMLfile
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
@@ -36,11 +36,11 @@ class AllChecks(TestCase):
         kw = {}
         a.rogScore.addHTMLkeywords( kw )
         myhtml.main("a", 'or by popup', **kw)
-        
-        myhtml.render()
-        
 
-        
+        myhtml.render()
+
+
+
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug

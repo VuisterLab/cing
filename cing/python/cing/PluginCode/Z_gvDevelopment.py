@@ -13,6 +13,7 @@ Residue
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
+from cing.core.molecule import dots
 import cing #@Reimport
 
 import os #@Reimport
@@ -233,10 +234,197 @@ def procheck_old( project, ranges=None ):
     return project.molecule.procheck
 #end def
 
+from math import sqrt
+from cing.Libs.NTutils import NTfill, NTlist, printf, fprintf, sprintf, getDeepByKeys
+from cing.Libs.fpconst import NaN, isNaN
+
+#import yasaramodule as yasara
+
+def mkYasaraMacros( project ):
+    """
+    Generate the Yasara macros in the moleculeDirectories.yasara dir.
+    """
+    if not project.molecule:
+        NTerror('mkYasaraMacros: no molecule defined')
+        return
+    #end if
+    mkYasaraByResidueMacro(project, ['procheck','gf'],
+                           minValue=-3.0,maxValue=1.0,
+                           reverseColorScheme=True,
+                           path=project.moleculePath('yasara','gf.mcr')
+                          )
+
+    mkYasaraByResidueMacro(project, ['Qshift','backbone'],
+                           minValue=0.0,maxValue=0.05,
+                           reverseColorScheme=False,
+                           path=project.moleculePath('yasara','Qshift.mcr')
+                          )
+
+    mkYasaraByResidueROGMacro(project,path=project.moleculePath('yasara','rog.mcr'))
+#end def
+
+
+def mkMacros( project ):
+    """
+    Generate the macros in the moleculeDirectories.macros dir.
+    """
+    # Only one kind thus far
+    NTmessage('==> Generating Macros')
+    mkYasaraMacros(project)
+#end def
+
+
+def _calcQshift( atmList ):
+    """
+    Calculate Qshift value for list of atoms
+    """
+    # for each model + av + heavyatom + proton + bb
+    sumDeltaSq    = 0.0
+    sumMeasuredSq = 0.0
+    for atm in atmList:
+        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned():
+            atm.shiftx.average()
+            measured = atm.shift()
+            sumMeasuredSq += measured**2
+            # delta with shiftx average
+            sumDeltaSq = (measured-atm.shiftx.av)**2
+            #print atm, measured, av
+#            sumDeltaSq[project.molecule.modelCount] += (av-measured)**2
+#            if not atm.isProton():
+#                sumDeltaSq[project.molecule.modelCount+1] += (av-measured)**2
+#            if atm.isProton():
+#                #print atm, measured, av
+#                sumDeltaSq[project.molecule.modelCount+2] += (av-measured)**2
+#            if not atm.isBackbone():
+#                sumDeltaSq[project.molecule.modelCount+3] += (av-measured)**2
+        #end if
+    #end for
+
+    if sumMeasuredSq >0.0:
+            Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
+    else:
+            Qshift=NaN
+
+    return Qshift
+#end def
+
+def calcQshift( project, tmp=None ):
+    """Calculate per residue Q factors between assignment and shiftx results
+    """
+    if not project.molecule:
+        NTdebug('calcQshift: no molecule defined')
+        return None
+    #end if
+    NTdetail('==> calculating Q-factors for chemical shift')
+    for res in project.molecule.allResidues():
+        atms = res.allAtoms()
+        bb = NTlist()
+        heavy = NTlist()
+        protons = NTlist()
+        res.Qshift  = NTdict(allAtoms = None, backbone=None, heavyAtoms=None, protons=None,
+                             residue = res,
+                             __FORMAT__ = \
+dots + ' shiftx Qfactor %(residue)s ' + dots + """
+allAtoms:   %(allAtoms)6.3f
+backbone:   %(backbone)6.3f
+heavyAtoms: %(heavyAtoms)6.3f
+protons:    %(protons)6.3f"""
+
+                        )
+
+        for a in atms:
+            if a.isBackbone(): bb.append(a)
+            if a.isProton(): protons.append(a)
+            else: heavy.append(a)
+        #end for
+
+        res.Qshift.allAtoms   = _calcQshift( atms )
+        res.Qshift.backbone   = _calcQshift( bb )
+        res.Qshift.heavyAtoms = _calcQshift( heavy )
+        res.Qshift.protons    = _calcQshift( protons )
+    #end for
+#end def
+
+
+def mkYasaraByResidueMacro( project, keys,
+                            minValue=0.0, maxValue=1.0, reverseColorScheme=False,
+                            path=None
+                           ):
+
+    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
+
+    if path:
+        stream = open( path, 'w')
+    else:
+        stream = sys.stdout
+    #end if
+
+    fprintf( stream, 'Console off\n' )
+    fprintf( stream, 'ColorRes All, Gray\n' )
+    fprintf( stream, 'PropRes All, -999\n' )
+    if reverseColorScheme:
+        fprintf( stream, 'ColorPar Property Min,red,%f\n', minValue )
+        fprintf( stream, 'ColorPar Property Max,blue,%f\n', maxValue )
+    else:
+        fprintf( stream, 'ColorPar Property Min,blue,%f\n', minValue )
+        fprintf( stream, 'ColorPar Property Max,red,%f\n', maxValue )
+
+    for res in project.molecule.allResidues():
+        value = getDeepByKeysOrAttributes( res, *keys )
+#        if res.has_key(property) and res[property] != None and not isNaN(res[property]):
+        if value != None and not isNaN(value):
+            fprintf( stream,'PropRes Residue %d,%.4f\n', res.resNum, value)
+    #end for
+
+    fprintf( stream, 'ColorAll Property\n' )
+    fprintf( stream, 'Console on\n' )
+
+    if path:
+        stream.close()
+#end def
+
+def mkYasaraByResidueROGMacro( project, path=None ):
+    if path:
+        stream = open( path, 'w')
+#     else:
+#         stream = sys.stdout
+#     #end if
+
+    if path:
+        fprintf( stream, 'Console off\n' )
+        fprintf( stream, 'ColorRes  All, Gray\n')
+    else:
+        yasara.Console('off')
+        yasara.ColorRes( 'All, Gray' )
+
+
+    YasaraColorDict = dict( green=240, orange=150, red=120)
+
+    for res in project.molecule.allResidues():
+        cmd = sprintf('residue %d,%s', res.resNum, YasaraColorDict[res.rogScore.colorLabel] )
+        if path:
+            fprintf( stream, 'ColorRes %s\n', cmd )
+        else:
+            yasara.ColorRes( cmd )
+    #end for
+
+    if path:
+        fprintf( stream, 'Console on\n' )
+        stream.close()
+    else:
+        yasara.Console('on')
+#end def
+
+
 # register the functions
-methods  = [(procheck_old, None)
+methods  = [(procheck_old, None),
+            (mkYasaraByResidueROGMacro,None),
+            (mkYasaraByResidueMacro,None),
+            (mkYasaraMacros,None),
+            (mkMacros,None),
            ]
 #saves    = []
-#restores = []
+restores = [(calcQshift,None)
+           ]
 #exports  = []
 

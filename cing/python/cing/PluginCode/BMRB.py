@@ -9,6 +9,8 @@ from cing.Libs.NTutils import NTmessage
 from cing.core.constants import BMRBd
 from cing.core.molecule import Molecule
 from cing.core.molecule import Chain
+from cing.Libs.fpconst import NaN
+
 
 class NMRrestraintsGrid:
     def __init__(self):
@@ -20,7 +22,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
         Initialize from edited BMRB file
         Return molecule instance
     """
-    mol = Molecule( name=moleculeName )   
+    mol = Molecule( name=moleculeName )
     project.appendMolecule( mol )
 
     error = False
@@ -51,13 +53,13 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
     #end if
     NTmessage("%s", mol.format() )
 
-    if error: 
+    if error:
         return None
     return mol
 #end def
 
 #==============================================================================
-def importBMRB( project, bmrbFile =None ):
+def importFromBMRB( project, bmrbFile ):
     """
         Import chemical shifts from edited BMRB file
         No reassigned Pseudo atoms yet;
@@ -70,46 +72,79 @@ def importBMRB( project, bmrbFile =None ):
     #end if
 
     mol = project.molecule
-    mol.newResonances()
+    mol.newResonances(source=bmrbFile)
 
     error = False
-    for f in AwkLike( bmrbFile, minNF = 8, commentString = '#' ):
+#    for f in AwkLike( bmrbFile, minNF = 8, commentString = '#' ):
+#
+#        resName = f.dollar[3]
+#        resNum  = f.int(2)
+#
+#        atomName= f.dollar[4]
+#        shift   = f.float(6)
+#        serror  = f.float(7)
+#        _ambig   = f.int(8)
 
-        resName = f.dollar[3]
+    for f in AwkLike( bmrbFile, minNF = 9, commentString = '#' ):
+
+        resName = f.dollar[4]
         resNum  = f.int(2)
 
-        atomName= f.dollar[4]
-        shift   = f.float(6)
-        serror  = f.float(7)
-        _ambig   = f.int(8)
+        atomName= f.dollar[5]
+        shift   = f.float(7)
+        serror  = f.float(8)
+        _ambig   = f.int(9)
 
         atm = mol.decodeNameTuple( (BMRBd, Chain.defaultChainId, resNum, atomName) )
 
         if not atm:
-            NTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)\n',
+            NTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)',
                     resName, atomName, f.NR, f.dollar[0] )
             error = True
         else:
             atm.resonances().value = shift
             atm.resonances().error = serror
+            if _ambig == 1 and atm.isProChiral():
+                atm.stereoAssigned = True
+        #end if
+    #end for
+
+    # now fix the assignments;
+    for atm in mol.allAtoms():
+        # Check if all realAtoms are assigned in case there is a pseudo atom
+        if atm.isAssigned() and not atm.isStereoAssigned() and atm.hasPseudoAtom():
+            fix = False
+            pseudo = atm.pseudoAtom()
+            for a in pseudo.realAtoms():
+                if not a.isAssigned():
+                    fix = True
+                    break
+                #end if
+            #end for
+            if fix:
+                pseudo.resonances().value = atm.resonances().value
+                pseudo.resonances().error = atm.resonances().error
+                atm.resonances().value = NaN
+                atm.resonances().value = NaN
+                NTmessage('Deassigned %s, assigned %s', atm, pseudo)
+            #end if
         #end if
     #end for
 
     if error:
-        NTmessage( '==> importBMRB: completed with error(s)' )
+        NTerror( '==> importFromBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> importBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
+        NTmessage( '==> importFromBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
     #end if
-    NTmessage("%s", mol.format() )
 
-    if error: 
+    if error:
         return None
     return mol
 #end def
 
 # register the functions
 methods  = [(initBMRB, None),
-            (importBMRB, None)
+            (importFromBMRB, None)
            ]
 saves    = []
 restores = []

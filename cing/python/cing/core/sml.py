@@ -57,17 +57,21 @@ class SMLhandler:
 
 Example file:
 
-<SML> 0.1
+<SML> 0.221
 <PeakList> n15 keep
-<Peak>
-    dimension       = 3
+<Peak>  3  0
     positions       = NTlist(122.892, 1.3480000000000001, 8.0530000000000008)
-    atoms           = [('INTERNAL', 'A', 502, 'N'), ('INTERNAL', 'A', 502, 'QB'), ('INTERNAL', 'A', 502, 'HN')]
+    height          = (12190.0, 0.0)
+    volume          = (nan, nan)
+    xeasyIndex      = 20000
+    resonances      = NTlist(('refine2', 'A', 502, 'N', None, 0, 'CYANA'), ('refine2', 'A', 502, 'QB', None, 0, 'CYANA'), ('refine2', 'A', 502, 'HN', None, 0, 'CYANA'))
 </Peak>
-<Peak>
-    dimension       = 3
-    positions       = NTlist(121.06, 3.633, 8.1780000000000008)
-    atoms           = [('INTERNAL', 'A', 504, 'N'), ('INTERNAL', 'A', 503, 'HA1'), ('INTERNAL', 'A', 504, 'HN')]
+<Peak>  3  1
+    positions       = NTlist(121.06, 3.9929999999999999, 8.1780000000000008)
+    height          = (6104.0, 0.0)
+    volume          = (nan, nan)
+    xeasyIndex      = 20001
+    resonances      = NTlist(('refine2', 'A', 504, 'N', None, 0, 'CYANA'), ('refine2', 'A', 503, 'HA1', None, 0, 'CYANA'), ('refine2', 'A', 504, 'HN', None, 0, 'CYANA'))
 </Peak>
 </PeakList>
 </SML>

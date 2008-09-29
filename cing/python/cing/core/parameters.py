@@ -1,4 +1,4 @@
-from cing.Libs.NTutils import NTdict, NTdebug
+from cing.Libs.NTutils import NTdict
 import os
 
 #-----------------------------------------------------------------------------
@@ -32,8 +32,9 @@ directories.keysformat() #define a format string for 'pretty' output
 
 # These directories get created upon opening/appending a molecule to project
 # Can be accessed as:
-# e.g.
-# project.path( molecule.name, moleculeDirectories.procheck )
+#    project.moleculePath( key, *args )
+#     e.g.
+#    project.moleculePath( 'whatif' )
 moleculeDirectories = NTdict(
     # Directories generated
     procheck   = 'Procheck',
@@ -43,16 +44,17 @@ moleculeDirectories = NTdict(
     analysis   = 'Cing',
     shiftx     = 'Shiftx',
     html       = 'HTML',
+    yasara     = 'Macros/Yasara'
 )
 moleculeDirectories.keysformat() #define a format string for 'pretty' output
 
 #These directories get generated below the HLML root of a molecule
 htmlDirectories = NTdict(
-    # Directories generated
-    procheck= 'Models', # CHECK:weird mapping!
+    molecule    = 'Molecule',
+#    atoms       = 'Atoms',
+    models      = 'Molecule/Models',
     restraints  = 'Restraints',
-    atoms   = 'Atoms',
-    peaks   = 'Peaks'
+    peaks       = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output
 
@@ -77,7 +79,6 @@ cingPaths = NTdict(
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
 )
-#print 'using dssp: ' + `cingPaths.dssp`
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
 
@@ -114,34 +115,6 @@ plotParameters.CHI2.xlabelLat = '$\chi 2$'
 
 plotParameters.CHI3 = plotParameters.dihedralDefault.copy()
 plotParameters.CHI3.xlabelLat = '$\chi 3$'
-
-#-----------------------------------------------------------------------------
-# Parameter definitions (value user adaptable)
-#-----------------------------------------------------------------------------
-#parameters = NTparameter( name = 'parameters', branch = True,
-#
-#    programs = NTparameter( name = 'programs', branch = True,
-#
-#        procheck_nmr = NTparameter( name       = 'procheck_nmr',
-#                                    partype    = 'string',
-#                                    default    = 'procheck_nmr',
-#                                    prettyS    = 'path to procheck_nmr',
-#                                    help       = 'Path to procheck_nmr',
-#                                    __FORMAT__ = '%(value)s'
-#        ),
-#        whatif =    NTparameter( name       = 'whatif',
-#                                    partype    = 'string',
-#                                    default    = 'whatif',
-#                                    prettyS    = 'path to whatif',
-#                                    help       = 'Path to whatif',
-#                                    __FORMAT__ = '%(value)s'
-#        ),
-#    )
-#)
-#parameters.programs.procheck_nmr.value   = 'procheck_nmr'
-#
-#if os.path.exists( 'cing.par'):
-#    execfile('cing.par')
 
 
 

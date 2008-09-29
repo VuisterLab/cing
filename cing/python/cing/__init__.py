@@ -7,7 +7,7 @@ CING: Common Interface for NMR structure Generation
 import os
 import sys
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.764
+cingVersion     = 0.776
 programName     = 'CING'
 header = """
 ======================================================================================================
@@ -16,7 +16,7 @@ header = """
 """ % (cingVersion)
 footer = """------------------------------------------------------------------------------------------------------
 """
-authorList = [  ('Geerten Vuister',             'g.vuister@science.ru.nl'),
+authorList = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
                 ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
                 ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
                 ]
@@ -51,7 +51,7 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 #    criteriaDict = criteriaDict
 
 
-CHARS_PER_LINE_OF_PROGRESS = 80
+CHARS_PER_LINE_OF_PROGRESS = 100
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
 

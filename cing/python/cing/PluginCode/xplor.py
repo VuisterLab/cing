@@ -65,18 +65,29 @@ Atom.export2xplor = exportAtom2xplor
 #-----------------------------------------------------------------------------
 def exportDistanceRestraint2xplor( distanceRestraint ):
     """Return string with restraint in Xplor format"""
-    s = sprintf( 'assi %-30s %-30s  %8.3f  %8.3f  %8.3f',
-                 distanceRestraint.atomPairs[0][0].export2xplor(),
-                 distanceRestraint.atomPairs[0][1].export2xplor(),
-                 distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
+    # Strange xplor syntax
+    atm1,atm2 = distanceRestraint.atomPairs[0]
+    s = sprintf('assi %-30s %-30s %8.3f  %8.3f  %8.3f',
+                atm1.export2xplor(),atm2.export2xplor(),
+                distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
                )
-    for _pair in distanceRestraint.atomPairs[1:]:
-        s = s + sprintf( '\n  or %-30s %-30s',
-                        distanceRestraint.atomPairs[0][0].export2xplor(),
-                        distanceRestraint.atomPairs[0][1].export2xplor(),
-                       )
+
+    for atm1,atm2 in distanceRestraint.atomPairs[1:]:
+        s = s + sprintf( '\n  or %-30s %-30s ', atm1.export2xplor(), atm2.export2xplor() )
     #end for
     return s
+#    s = sprintf( 'assi %-30s %-30s  %8.3f  %8.3f  %8.3f',
+#                 distanceRestraint.atomPairs[0][0].export2xplor(),
+#                 distanceRestraint.atomPairs[0][1].export2xplor(),
+#                 distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
+#               )
+#    for atm1,atm2 in distanceRestraint.atomPairs[1:]:
+#        s = s + sprintf( '\n  or %-30s %-30s',
+#                        distanceRestraint.atomPairs[0][0].export2xplor(),
+#                        distanceRestraint.atomPairs[0][1].export2xplor(),
+#                       )
+#    #end for
+#    return s
 #end def
 # add as a method to DistanceRestraint Class
 DistanceRestraint.export2xplor = exportDistanceRestraint2xplor
@@ -252,7 +263,7 @@ def export2xplor( project, tmp=None ):
 
     for molName in project.moleculeNames:
         mol   = project[molName]
-        path = project.path( project.directories.xplor, mol.name + '%03d.pdb' )
+        path = project.path( project.directories.xplor, mol.name + '_%03d.pdb' )
         mol.export2xplor( path)
     #end for
 #end def
