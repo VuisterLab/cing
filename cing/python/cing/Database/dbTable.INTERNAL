@@ -1,5 +1,6 @@
 #See notes.txt for history
 #
+convention = 'INTERNAL'
 #=======================================================================
 #   internal short
 RESIDUE ALA      A
@@ -1689,6 +1690,7 @@ RESIDUE ASP      D
 END_RESIDUE
 #=======================================================================
 
+#TODO: implement topology ad CHI2 CYSS
 #=======================================================================
 #   internal short
 RESIDUE CYSS     C
@@ -1714,12 +1716,12 @@ RESIDUE CYSS     C
         atoms = [(0, 'N'), (0, 'CA'), (0, 'CB'), (0, 'SG')]
         karplus = None
     END_DIHEDRAL
-    #---------------------------------------------------------------
-    DIHEDRAL CHI2
-    #---------------------------------------------------------------
-        atoms = [(0, 'CA'), (0, 'CB'), (0, 'SG'), (0, 'HG')]
-        karplus = None
-    END_DIHEDRAL
+#    #---------------------------------------------------------------
+#    DIHEDRAL CHI2
+#    #---------------------------------------------------------------
+#        atoms = [(0, 'CA'), (0, 'CB'), (0, 'SG'), (0, 'HG')]
+#        karplus = None
+#    END_DIHEDRAL
     #---------------------------------------------------------------
     DIHEDRAL OMEGA
     #---------------------------------------------------------------
@@ -1834,10 +1836,11 @@ RESIDUE CYSS     C
     ATOM SG
     #---------------------------------------------------------------
         nameDict = {'INTERNAL': 'SG', 'AQUA': 'SG', 'BMRBd': 'SG', 'CYANA': 'SG', 'CYANA2': 'SG', 'PDB': 'SG', 'XPLOR': 'SG', 'BMRB': 'SG'}
-        topology = [(0, 'CB'), (0, 'HG')]
+  #      topology = [(0, 'CB'), (0, 'HG')]
+        topology = [(0, 'CB')]
         pseudo = None
         real = []
-        type = 'S_RED'
+        type = 'S_OXI'
         spinType = '32S'
         shift = None
         hetatm = False
@@ -3112,7 +3115,7 @@ RESIDUE HISE     H
     #---------------------------------------------------------------
     ATOM HN
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'HN', 'AQUA': 'HN', 'BMRBd': None, 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': 'HN'}
+        nameDict = {'INTERNAL': 'HN', 'AQUA': 'HN', 'BMRBd': None, 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None, 'BMRB': 'H'}
         topology = [(0, 'N')]
         pseudo = None
         real = []
@@ -9043,7 +9046,7 @@ END_RESIDUE
 RESIDUE CYT      c
 #=======================================================================
     nameDict = {'INTERNAL': 'CYT', 'AQUA': 'C', 'BMRBd': 'CYT', 'CYANA': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT', 'BMRB': 'DC'}
-    comment = None
+    comment = 'deoxy cytosine'
     properties = ['nucleic']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
@@ -13085,7 +13088,7 @@ RESIDUE LGLY     LGLY
     #---------------------------------------------------------------
     DIHEDRAL OMEGA
     #---------------------------------------------------------------
-        atoms = [(-1, 'CA'), (-1, 'C'), (0, 'N'), (0, 'CA')]
+        atoms = [(-1, 'CA'), (-1, 'C'), (0, 'N'), (0, 'Q1')]
         karplus = None
     END_DIHEDRAL
     #---------------------------------------------------------------
@@ -13571,13 +13574,13 @@ END_RESIDUE
 #   internal short
 RESIDUE HOH      O
 #=======================================================================
-    nameDict = {'INTERNAL': 'HOH', 'AQUA': 'HOH', 'BMRBd': 'HOH', 'CYANA': 'HOH', 'CYANA2': 'HOH', 'PDB': 'HOH', 'XPLOR': 'HOH', 'BMRB': 'HOH'}
+    nameDict = {'INTERNAL': 'HOH', 'AQUA': 'HOH', 'BMRBd': 'HOH', 'CYANA': None, 'CYANA2': None, 'PDB': 'HOH', 'XPLOR': 'HOH', 'BMRB': 'HOH'}
     comment = 'Regular Water residue'
-    properties = ['small', 'neutral']
+    properties = ['small', 'polar']
     #---------------------------------------------------------------
     ATOM O
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'O', 'AQUA': 'O', 'BMRBd': 'O', 'CYANA': 'O', 'CYANA2': 'O', 'PDB': 'O', 'XPLOR': 'O', 'BMRB': 'O'}
+        nameDict = {'INTERNAL': 'O', 'AQUA': 'O', 'BMRBd': 'O', 'CYANA': None, 'CYANA2': None, 'PDB': 'O', 'XPLOR': 'O', 'BMRB': 'O'}
         topology = [(0, 'H1'), (0, 'H2')]
         pseudo = None
         real = []
@@ -13590,8 +13593,8 @@ RESIDUE HOH      O
     #---------------------------------------------------------------
     ATOM H1
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'H1', 'AQUA': 'H1', 'BMRBd': 'H1', 'CYANA': 'H1', 'CYANA2': 'H1', 'PDB': 'H1', 'XPLOR': 'H1', 'BMRB': 'H1'}
-        topology = [(0, 'O'), (0, 'H2')]
+        nameDict = {'INTERNAL': 'H1', 'AQUA': 'H1', 'BMRBd': 'H1', 'CYANA': None, 'CYANA2': None, 'PDB': 'H1', 'XPLOR': 'H1', 'BMRB': 'H1'}
+        topology = [(0, 'O')]
         pseudo = None
         real = []
         type = 'H_OXY'
@@ -13603,8 +13606,8 @@ RESIDUE HOH      O
     #---------------------------------------------------------------
     ATOM H2
     #---------------------------------------------------------------
-        nameDict = {'INTERNAL': 'H2', 'AQUA': 'H2', 'BMRBd': 'H2', 'CYANA': 'H2', 'CYANA2': 'H2', 'PDB': 'H2', 'XPLOR': 'H2', 'BMRB': 'H2'}
-        topology = [(0, 'O'), (0, 'H1')]
+        nameDict = {'INTERNAL': 'H2', 'AQUA': 'H2', 'BMRBd': 'H2', 'CYANA': None, 'CYANA2': None, 'PDB': 'H2', 'XPLOR': 'H2', 'BMRB': 'H2'}
+        topology = [(0, 'O')]
         pseudo = None
         real = []
         type = 'H_OXY'

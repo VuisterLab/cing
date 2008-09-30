@@ -12,6 +12,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.core.constants import BMRB
 from cing.core.parameters import cingPaths
 from cing.setup import time
 import os
@@ -65,7 +66,7 @@ class Dssp:
                 fullname =  os.path.join( self.rootPath, 'model_%03d.pdb' % model )
                 # DSSP prefers what?
                 NTdebug('==> Materializing model '+`model`+" to disk" )
-                pdbFile = self.project.molecule.toPDB( model=model, convention = "BMRB" )
+                pdbFile = self.project.molecule.toPDB( model=model, convention = BMRB )
                 if not pdbFile:
                     NTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
                     return True

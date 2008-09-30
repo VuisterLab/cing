@@ -1,15 +1,16 @@
 
 AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
-BMRB       = 'BMRB' # since IUPAC is set to be equivalent to BMRB; remove one of them. BMRB is used in dbTable. 
-SPARKY     = BMRB
-IUPAC      = BMRB
+IUPAC      = 'IUPAC'
+BMRB       =  IUPAC # since IUPAC is set to be equivalent to BMRB; remove one of them. IUPAC is used in dbTable.
+SPARKY     =  IUPAC
 BMRBd      = 'BMRBd'
 CYANA      = 'CYANA'
 XEASY      = CYANA
 CYANA2     = 'CYANA2'
 XPLOR      = 'XPLOR'
 PDB        = 'PDB'
-INTERNAL   = 'INTERNAL'
+INTERNAL   = 'INTERNAL_1' # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention
+                          # INTERNAL_1 is the second convention used: IUPAC for IUPAC defined atoms, CYANA2 for non-IUPAC atoms
 LOOSE      = 'LOOSE'
 
 # Wim added
