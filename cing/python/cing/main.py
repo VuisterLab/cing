@@ -153,7 +153,7 @@ def testOverall():
                           ]
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
-    NTdebug('will unit check: ' + `nameList`)
+    NTmessage('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
@@ -429,11 +429,11 @@ def main():
 
     # shortcuts
     p = project
-    mol = project.molecule
-    m  = project.molecule
+    mol = project.molecule #@UnusedVariable
+    m  = project.molecule #@UnusedVariable
  #   pr = print
-    f  = format
-    fa = formatall
+    f  = format #@UnusedVariable
+    fa = formatall #@UnusedVariable
 
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
@@ -500,8 +500,8 @@ def main():
     # Script
     #------------------------------------------------------------------------------------
     if options.script:
-        path = scriptPath( options.script )
-        if path:
+        scriptFile = scriptPath( options.script )
+        if scriptFile:
             NTmessage('==> Executing script "%s"', scriptFile )
             execfile( scriptFile, globals() )
         #end if
