@@ -1,27 +1,23 @@
 from ConfigParser import ConfigParser
-from cing import authorList
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
-from cing import programName
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTindent
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
+from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import ROGscore
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTmkdir
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
@@ -42,18 +38,14 @@ from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
-#from cing.core.parameters import parameters
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
-#from cing.core.sml import SMLhandler
 from shutil import rmtree
+import cing
 import math
 import os
 import sys
 import time
-
-import cing
-
 
 projects = NTlist()
 

@@ -27,18 +27,9 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
-import cing
-from cing import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
 from cing import cingPythonCingDir
-from cing import cingRoot
 from cing.Libs.Geometry import violationAngle
-from cing.Libs.Imagery import convert2Web
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import boxAttributes
-from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
@@ -48,56 +39,34 @@ from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlimit
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTmkdir
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTzap
+from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
 from cing.Libs.NTutils import list2asci #@UnusedImport
-from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.Libs.NTutils import ROGscore
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.peirceTest import peirceTest
-from cing.PluginCode.Whatif import C12CHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-#from cing.PluginCode.Whatif import criticizeByWhatif
-from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
-from cing.PluginCode.Whatif import histJaninBySsAndResType
-from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
-from cing.PluginCode.Whatif import histRamaBySsAndResType
-from cing.PluginCode.Whatif import wiPlotList
-from cing.core.classes import AtomList
-#from cing.core.classes import HTMLfile
-#from cing.core.classes import htmlObjects
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
-from cing.core.constants import PDB
 from cing.core.molecule import Residue
-from cing.core.molecule import dots
 from cing.core.molecule import disulfideScore
-from cing.core.parameters import cingPaths
-from cing.core.parameters import htmlDirectories
-from cing.core.parameters import moleculeDirectories
-from cgi import escape
-import cing
+from cing.core.molecule import dots
+from cing.core.constants import NOSHIFT
+from cing.core.molecule import Atom
 import math
 import os
 import shelve
-import shutil
 import sys
+#from cing.PluginCode.Whatif import criticizeByWhatif
+#from cing.core.classes import HTMLfile
+#from cing.core.classes import htmlObjects
 
 dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
 dbase = shelve.open( dbaseFileName )
@@ -113,11 +82,29 @@ def runCingChecks( project, ranges=None ):
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
     project.validateRestraints( toFile=True)
-    if project.molecule: project.molecule.calculateRMSDs( ranges=ranges)
+    if project.molecule: 
+        project.molecule.calculateRMSDs( ranges=ranges)
     project.criticize(toFile=True)
     project.summary(toFile=True)
     project.mkMacros()
 #end def
+
+"""Stolen from doValidate.py in Script directory. Need this here so the
+code can be tested. I.e. returns a meaningful status if needed.
+"""
+def validate( project, ranges=None, parseOnly=False, htmlOnly=False,  
+        doProcheck = True, doWhatif=True ):
+    project.runShiftx()
+    project.runDssp(parseOnly=parseOnly)
+    if doProcheck:
+        project.runProcheck(ranges=ranges, parseOnly=parseOnly)
+    if doWhatif:
+        project.runWhatif(parseOnly=parseOnly)
+    project.runCingChecks(ranges=ranges)
+    project.setupHtml()
+    project.generateHtml(htmlOnly = htmlOnly)    
+    NTmessage("Done with overall validation")
+    
 
 def criticizePeaks( project, toFile=True ):
     """
@@ -139,7 +126,7 @@ def criticizePeaks( project, toFile=True ):
             peak.rogScore.reset()
             for i in range(peak.dimension):
                 resonance = peak.resonances[i]
-                if resonance and resonance.atom != None and resonance.value != cing.NOSHIFT:
+                if resonance and resonance.atom != None and resonance.value != NOSHIFT:
                     resonance.atom.peakPositions.append(peak.positions[i])
                     if not resonance.atom.isAssigned():
                          peak.rogScore.setMaxColor( COLOR_ORANGE,
@@ -196,7 +183,7 @@ def _criticizeResidue( residue, valSets ):
 
     residue.rogScore.reset()
 
-    result = NTdict()
+#    result = NTdict()
     # WHATIF
     if residue.has_key('whatif'):
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
@@ -395,7 +382,10 @@ def summary( project, toFile = True ):
 
     pc = getDeepByKeys(project.molecule, 'procheck')
     if pc:
-        msg += '\n' + pc.summary.format()
+        if hasattr(pc, "summary"):
+            msg += '\n' + pc.summary.format()
+        else:
+            NTerror("Failed to find the procheck summary attribute")
 
     if toFile:
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
@@ -912,7 +902,7 @@ def checkHbond( donorH, acceptor,
     del angles
     return result
 #end def
-cing.Atom.checkHbond = checkHbond
+Atom.checkHbond = checkHbond
 
 def _fixStereoAssignments( project  ):
     """Action is implemented here; this routine needs to be called twice to propagate the adjustments
@@ -1287,7 +1277,7 @@ def validateModels( self)   :
         NTerror("validateModels: no molecule defined")
         return True
     if not self.molecule.modelCount:
-        NTerror("validateModels: no model for molecule %s defined", project.molecule)
+        NTerror("validateModels: no model for molecule %s defined", project.molecule) #@UndefinedVariable
         return True
 
     backbone = ['PHI','PSI','OMEGA']
@@ -1347,6 +1337,7 @@ methods  = [(validateDihedrals, None),
             (validateRestraints, None),
 #            (validate, None),
             (runCingChecks, None),
+            (validate,None),
             (criticizePeaks, None),
             (summary, None),
 

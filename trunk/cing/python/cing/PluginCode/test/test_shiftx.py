@@ -19,7 +19,7 @@ class AllChecks(TestCase):
     def testRun(self):
         pdbConvention = IUPAC
 #        entryId = "1brv" # Small much studied PDB NMR entry
-#        entryId = "2hgh_1model" # RNA-protein complex.
+#        entryId = "2hgh_1model"  RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1tgq_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan

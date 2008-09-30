@@ -85,7 +85,7 @@ class AllChecks(TestCase):
                         **kwds )
 
         project.save()
-        self.failIf(project.procheck(ranges = ranges, createPlots=True, runAqua=runAqua) is None)
+        self.failIf(project.runProcheck(ranges = ranges, createPlots=True, runAqua=runAqua) is None)
         
         if showProcheckResults:                                    
             for res in project.molecule.allResidues():

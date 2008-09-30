@@ -51,13 +51,9 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
 from cing.core.parameters import cingPaths
 from glob import glob
 from shutil import copy
@@ -506,7 +502,7 @@ fullstop y
             t = ['PDB',a[0].strip(),int(a[1]), None]
             if len(a) == 4: # Is there an atom name too?#                print '>', a
                 try:
-                    i = int(a[3])    # @TODO this is a whatif bug and should not be possible
+                    i = int(a[3])    # @TODO this is a whatif bug and should not be possible @UnusedVariable
                 except:
                     t[3] = a[3].strip()
             return tuple( t )

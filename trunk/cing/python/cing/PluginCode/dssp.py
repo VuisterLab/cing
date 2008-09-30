@@ -10,7 +10,6 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import sprintf
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.parameters import cingPaths

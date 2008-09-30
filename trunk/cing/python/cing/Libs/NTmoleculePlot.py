@@ -12,7 +12,7 @@ from cing.Libs.NTplot import pointAttributes
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
 import os
 
 KEY_LIST_STR = 'keyList'

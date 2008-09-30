@@ -17,7 +17,6 @@ Residue
 
 """
 from cing import cingPythonCingDir
-from cing import verbosityDetail
 from cing import verbosityDebug
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
@@ -31,14 +30,12 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.disk import copy
 from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 from cing.core.molecule import dots
 import cing
 import os
-import stat
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
 SECSTRUCT_STR      = 'secStruct'

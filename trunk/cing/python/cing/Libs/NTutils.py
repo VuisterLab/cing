@@ -3926,8 +3926,6 @@ class ROGscore( NTdict ):
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The socalled ROG score.
-
-        GV: changed
         The comment is optional and will only be appended when the color lable is
         at least as severe as the current one. The less severe levels of comments
         will also be wiped out.
@@ -3943,7 +3941,7 @@ class ROGscore( NTdict ):
 
         if colorLabel == COLOR_RED:
             if self.colorLabel != COLOR_RED:
-                #self.colorCommentList = NTlist()
+                self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
                 self.colorLabel = COLOR_RED
         elif colorLabel == COLOR_ORANGE: # independent of colorLabel being green or orange.
             if self.colorLabel == COLOR_RED:

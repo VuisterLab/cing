@@ -9,7 +9,7 @@ Residue
     procheck: NTdict instance with procheck values for this residue
 
 """
-
+#@PydevCodeAnalysisIgnore
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths

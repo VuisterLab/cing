@@ -37,7 +37,7 @@ class AllChecks(TestCase):
         a.rogScore.addHTMLkeywords( kw )
         myhtml.main("a", 'or by popup', **kw)
 
-        myhtml.render()
+#        myhtml.render() # Can't be done without whole project and content anymore.
 
 
 
