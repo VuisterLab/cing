@@ -1,7 +1,6 @@
 from cing.core.constants import INTERNAL
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
