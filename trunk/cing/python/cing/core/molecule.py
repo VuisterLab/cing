@@ -2602,8 +2602,8 @@ Atom class: Defines object for storing atom properties
         Return True if atm is pro-chiral and thus can have stereo assignment
         Should be in in database
         """
-        LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1',
-                       CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1'
+        LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1', MD1 = 'MD2', MD2 = 'MD1',
+                       CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1', MG1 = 'MG2', MG2 = 'MG1'
                      )
         self.db.proChiralPartnerAtom = None
         if self.residue.db.name in ['LEU', 'VAL'] and self.db.name in LVdict:

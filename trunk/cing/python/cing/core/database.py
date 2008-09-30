@@ -9,11 +9,11 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTerror
+
 import os
 import sys
 
-
-patches = True
+patches = False
 
 """
 NTdb: database of topology, nomenclature and NMR properties
@@ -81,6 +81,14 @@ class MolDef( NTtree ):
         return res
     #end def
 
+    def allResidueDefs(self):
+        return self.subNodes( depth = 1 )
+    #end def
+
+    def allAtomDefs(self):
+        return self.subNodes( depth = 2 )
+    #end def
+
     def residuesWithProperties(self, *properties ):
         """
         Return a NTlist instance with residueDefs that have properties
@@ -103,7 +111,7 @@ class MolDef( NTtree ):
         result = NTlist()
 
         if len(properties) == 0: return result
-        for atm in self.subNodes(depth=2):
+        for atm in self.allAtomDefs():
             if atm.hasProperties(*properties):
                 result.append(atm)
             #end if
@@ -111,17 +119,12 @@ class MolDef( NTtree ):
         return result
     #end def
 
-    def exportDef( self, fileName=None, stream = sys.stdout ):
-        "export name definitions to fileName/stream"
-        if fileName != None:
-            stream = open( fileName, 'w')
-        #end if
-
-#        fprintf( stream, 'dbTable = """\n')
+    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
+        "export name definitions to stream"
+        fprintf(stream,'convention = %r\n', convention)
         for res in self:
-            res.exportDef( stream=stream )
+            res.exportDef( stream=stream, convention=convention )
         #end for
-#        fprintf( stream, '"""\n' )
     #end def
 #end class
 
@@ -165,6 +168,14 @@ class ResidueDef( NTtree ):
         dh._parent = self
         dh.residueDef = self
         return dh
+    #end def
+
+    def allResidueDefs(self):
+        return self
+    #end def
+
+    def allAtomDefs(self):
+        return self.subNodes( depth = 1 )
     #end def
 
     def residuesWithProperties(self, *properties ):
@@ -217,11 +228,25 @@ class ResidueDef( NTtree ):
         return None
     #end def
 
-    def exportDef( self, stream = sys.stdout ):
+    def postProcess(self):
+        """
+        Any post-reading actions
+        """
+        # Remove the duplicates;
+        props2 =  []
+        for prop in self.properties:
+            if not prop in props2:
+                props2.append(prop)
+            #end if
+        #end for
+        self.properties = props2
+    #end def
+
+    def exportDef( self, stream = sys.stdout, convention = INTERNAL ):
         "export definitions to stream"
         fprintf( stream, '\n#=======================================================================\n')
         fprintf( stream,   '#\t%-8s %-8s\n','internal', 'short')
-        fprintf( stream,   'RESIDUE\t%-8s %-8s\n',self.name, self.shortName )
+        fprintf( stream,   'RESIDUE\t%-8s %-8s\n', self.translate(convention), self.shortName )
         fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
@@ -230,17 +255,123 @@ class ResidueDef( NTtree ):
         #end for
 
         for dh in self.dihedrals:
-            dh.exportDef( stream )
+            dh.exportDef( stream=stream, convention=convention )
         #end for
 
         for atm in self.atoms:
-            atm.exportDef( stream )
+            atm.exportDef( stream=stream, convention=convention )
         #end for
 
         fprintf( stream,   'END_RESIDUE\n')
         fprintf( stream,   '#=======================================================================\n')
     #end def
 #end class
+
+# Use dictionaries for quick lookup.
+# Note it does not include the carbonyl anymore. Just like molmol doesn't.
+backBoneProteinAtomDict = { 'C':1,'N'  :1,'H'  :1,'HN' :1,'H1' :1,'H2':1,'H3':1,'CA':1,'HA':1,'HA1':1,'HA2':1,'HA3':1 }
+backBoneNucleicAtomDict = { 'P':1,"O3'":1,"C3'":1,"C4'":1,"C5'":1,"O5'":1 } # skipping 'backbone protons'
+
+def isAromatic( atmDef ):
+    """Return true if it is an atom belonging to an aromatic ring
+       Patched for now, have to store it in database
+    """
+    if not atmDef.residueDef.hasProperties('aromatic'): return False
+
+    if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
+        return True
+    if (isNitrogen(atmDef) and atmDef.shift != None and atmDef.shift.average > 130.0):
+        return True
+    elif (isProton(atmDef)):
+        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        heavy = atmDef.residueDef[atmDef.topology[0][1]]
+        return isAromatic( heavy )
+    #end if
+    return False
+#end def
+
+def isBackbone( atmDef ):
+    """
+    Return True if it is a backbone atom.
+    Patch for now, based upon explicit enumeration
+    """
+    if atmDef.residueDef.hasProperties('protein') and \
+       backBoneProteinAtomDict.has_key( atmDef.name ):
+            return True
+    if atmDef.residueDef.hasProperties('nucleic') and \
+       backBoneNucleicAtomDict.has_key( atmDef.name ):
+            return True
+    return False
+
+def isSidechain( atmDef ):
+    """
+    Return True if it is a sidechain atom,
+    i.e. not isBackbone
+    """
+    return not isBackbone( atmDef )
+
+def isMethyl( atmDef ):
+    """
+    Return True atm is a methyl (either carbon or proton)
+    """
+    if isCarbon(atmDef):
+        count = 0
+        for dummy,p in atmDef.topology:
+            if p in atmDef.residueDef and isProton( atmDef.residueDef[p] ):
+                count += 1
+            #end if
+        #end for
+        return (count == 3) # Methyls have three protons!
+    elif isProton(atmDef):
+        # should be attched to a heavy atomo
+        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        heavy = atmDef.residueDef[atmDef.topology[0][1]]
+        return isMethyl( heavy )
+    else:
+        return False
+    #end if
+#end def
+
+def isMethylProton( atmDef ):
+    """
+    Return True if atm is a methyl proton
+    """
+    return isProton(atmDef) and isMethyl(atmDef)
+#end def
+
+def isProton( atmDef ):
+    """Return Tue if atm is 1H
+    """
+    return (atmDef.spinType == '1H')
+#end def
+
+def isCarbon( atmDef ):
+    """Return Tue if atm is 13C
+    """
+    return (atmDef.spinType == '13C')
+#end def
+
+def isNitrogen( atmDef ):
+    """Return Tue if atm is 15N
+    """
+    return (atmDef.spinType == '15N')
+#end def
+
+def isSulfur( atmDef ):
+    """Return Tue if atm is 32S
+    """
+    return (atmDef.spinType == '32S')
+#end def
+
+def isPseudoAtom( atmDef ):
+    """Return True if atom is pseudoAtom"""
+    return ( len(atmDef.real) > 0 )
+#end def
+
+def hasPseudoAtom( atmDef ):
+    """Return True if atom has a correponding pseudoAtom"""
+    return ( atmDef.pseudo != None )
+#end def
 
 class AtomDef( NTtree ):
     def __init__( self, name, **kwds ):
@@ -280,6 +411,9 @@ class AtomDef( NTtree ):
 #                     'type','spinType','shift', 'hetatm','properties'
 #                    )
 
+    def __str__(self):
+        return '<AtomDef %s.%s>' % (self.residueDef.name, self.name)
+
     def translate( self, convention ):
 #        if convention in self.nameDict:
 # speed
@@ -293,76 +427,9 @@ class AtomDef( NTtree ):
         return None
     #end def
 
-#    def _changeConvention(self, newConvention):
-#        """Change convention for this atom.
-#        Not to be used without proper knowledge of the effects; i.e. only for updating dbTable
-#
-#        return True on error
-#        """
-#        newName = self.translate(newConvention)
-#        if not newName:
-#            NTerror('AtomDef.changeConvention: not defined for %r', newConvention)
-#            return True
-#        oldName = self.name
-#        if newName == oldName:
-#            # do nothing except changing convention
-#            self.convention = newConvention
-#            return False
-#
-#        if self.residueDef.renameChild(self, newName) != self:
-#            NTerror('AtomDef.changeConvention: changing %s to %s', self, newName)
-#            return True
-#
-#        # changing topology fields
-#        # of course this gives problems for sequential connectivities; so we will
-#        # simply only put a warning for those
-#        for resId, atmName in self.topology:
-#            if resId != 0:
-#                NTwarning('AtomDef.changeConvention: checking %s topology (%d,%s) skipped', self, resId,atmName)
-#            else:
-#                if not atmName in self.residueDef:
-#                    NTerror('AtomDef.changeConvention: checking %s topology (%d,%s)', self, resId,atmName)
-#                    return True
-#                #end if
-#                NTdebug('AtomDef.changeConvention: changing %s topology (%d,%s)', self, resId,atmName)
-#                atm = self.residueDef[atmName]
-#                for i, top in enumerate(atm.topology):
-#                    if top[1] == oldName:
-#                        atm.topology[i] = (top[0],newName)
-#                        break
-#                    #end if
-#                #end for
-#            #end if
-#        #end for
-#
-#        # changing dihedral fields
-#        # of course this gives problems for sequential connectivities; so we will
-#        # simply only put a warning for those
-#        for dihed in self.residue.dihedrals:
-#            for resId, atmName in dihed.atoms:
-#                if resId != 0:
-#                    NTwarning('AtomDef.changeConvention: checking %s topology (%d,%s) skipped', dihed, resId,atmName)
-#                else:
-#                    if not atmName in self.residueDef:
-#                        NTerror('AtomDef.changeConvention: checking %s topology (%d,%s)', self, resId,atmName)
-#                        return True
-#                    #end if
-#                    NTdebug('AtomDef.changeConvention: changing %s topology (%d,%s)', self, resId,atmName)
-#                    atm = self.residueDef[atmName]
-#                    for i, top in enumerate(atm.topology):
-#                        if top[1] == oldName:
-#                            atm.topology[i] = (top[0],newName)
-#                            break
-#                        #end if
-#                    #end for
-#                #end if
-#        #end for
-#
-#        # change properties
-#        changeProperty( self, oldName, newName)
-#
-#        self.convention = newConvention
-#    #end def
+    def allAtomDefs(self):
+        return self
+    #end def
 
     def atomsWithProperties(self, *properties ):
         """
@@ -391,12 +458,85 @@ class AtomDef( NTtree ):
         return True
     #end def
 
+    def postProcess(self):
+        """
+        Any post-reading actions
+        """
+        props = NTlist( self.name, self.residueDef.name, self.residueDef.shortName, self.spinType, *self.properties)
+
+        # Append these defs so we will always have them. If they were already present, they will be removed again below.
+        if isProton(self):
+            props.append('isProton','proton')
+        else:
+            props.append('isNotProton','notproton')
+        #end if
+        if isCarbon(self):
+            props.append('isCarbon','carbon')
+        else:
+            props.append('isNotCarbon','notcarbon')
+        #end if
+        if isNitrogen(self):
+            props.append('isNitrogen','nitrogen')
+        else:
+            props.append('isNotNitrogen','notnitrogen')
+        #end if
+        if isSulfur(self):
+            props.append('isSulfur','isSulphur','sulfur','sulphur')
+        else:
+            props.append('isNotSulfur','isNotSulphur','notsulfur','notsulphur')
+        #end if
+        if isBackbone(self):
+            props.append('isBackbone','backbone')
+        else:
+            props.append('isSidechain','sidechain')
+        #endif
+        if isAromatic(self):
+            props.append('isAromatic','aromatic')
+        else:
+            props.append('isNotAromatic','notaromatic')
+        #end if
+        if isMethyl(self):
+            props.append('isMethyl','methyl')
+        else:
+            props.append('isNotMethyl','notmethyl')
+        #end if
+        if isMethylProton(self):
+            props.append('isMethylProton','methylproton')
+        else:
+            props.append('isNotMethylProton','notmethylproton')
+        #end if
+        if isPseudoAtom(self):
+            props.append('isPseudoAtom','pseudoatom')
+        else:
+            props.append('isNotPseudoAtom','notpseudoatom')
+        #end if
+        if hasPseudoAtom(self):
+            props.append('hasPseudoAtom','haspseudoatom')
+        else:
+            props.append('hasNoPseudoAtom','hasnopseudoatom')
+        #end if
+
+        # Remove the duplicates; copy is much quicker then in-place props.removeDuplicates()
+        props2 =  []
+        for prop in props:
+            if not prop in props2:
+                props2.append(prop)
+            #end if
+        #end for
+        self.properties = props2
+
+        #Add aliases
+        for aname in self.aliases:
+            self.residueDef[aname] = self
+    #end def
+
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
         "export definitions to stream"
         fprintf( stream, '\t#---------------------------------------------------------------\n')
         fprintf( stream, '\tATOM %-8s\n',self.translate(convention))
         fprintf( stream, '\t#---------------------------------------------------------------\n')
 
+        # Topology; optionally convert
         if convention == INTERNAL:
             top2 = self.topology
         else:
@@ -415,13 +555,21 @@ class AtomDef( NTtree ):
                 #end if
             #end for
             #print 'top2', top2
-
-            #convert properties
-#            prop
         #end if
         fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
 
-        for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm','properties']:
+        # clean the properties list
+        props = []
+        for prop in self.properties:
+            # Do not store name and residueDef.name as property. Add those dynamically upon reading
+            if not prop in [self.name, self.residueDef.name, self.residueDef.shortName, self.spinType] and not prop in props:
+                props.append(prop)
+            #end if
+        #end for
+        fprintf( stream, "\t\t%s = %s\n", 'properties', repr(props) )
+
+        # Others
+        for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm']:
             if self.has_key(attr):
                 fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
@@ -429,6 +577,7 @@ class AtomDef( NTtree ):
         fprintf( stream, '\tEND_ATOM\n')
 #        fprintf( stream, '\t#---------------------------------------------------------------\n')
     #end def
+
 #end class
 
 class DihedralDef( NTtree ):
@@ -452,6 +601,9 @@ class DihedralDef( NTtree ):
 
 #        self.saveXML( 'name', 'atoms', 'karplus' )
     #end def
+
+    def __str__(self):
+        return '<DihedralDef %s.%s>' % (self.residueDef.name, self.name)
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
         "export definitions to stream"
@@ -489,18 +641,6 @@ class DihedralDef( NTtree ):
     #end for
 #end class
 
-def changeProperty( obj, oldProperty, newProperty):
-    """
-    Change oldProperty in obj.properties list to newProperty
-    """
-    if not obj.has_key('properties'):
-        return
-    props = obj['properties']
-    i = props.index(oldProperty)
-    if i>=0:
-        props[i] = newProperty
-#end def
-
 
 def importNameDefs( tableFile, name)   :
     "Import residue and atoms name defs from tableFile"
@@ -508,7 +648,7 @@ def importNameDefs( tableFile, name)   :
     NTdebug('==> Importing database file '+ tableFile )
 
     mol = MolDef( name = 'mol' )
-    obj = mol # object point to 'active' object, mol, residue, dihedral or atom attributes get appended to obj.
+    obj = mol # object point to 'active' object (i.e. mol, residue, dihedral or atom); attributes get appended to obj.
     for r in AwkLike( tableFile ):
 #            print '>',r.dollar[0]
         if r.isComment() or r.isEmpty():
@@ -557,198 +697,30 @@ def importNameDefs( tableFile, name)   :
     #end for
     mol.name=name
 
-    #Path the properties for duplicates
-    for res in mol:
-        p = []
-        # Do it a dumb way (check and copy) to preserve order
-        for prop in res.properties:
-            if not prop in p:
-                p.append(prop)
-            #end if
-        #end for
-        res.properties = p
-        for atm in res:
-            p = []
-            for prop in res.properties:
-                if not prop in p:
-                    p.append(prop)
-                #end if
-            #end for
-            atm.properties = p
-        #end for
-    #end for
+    if mol.convention != INTERNAL:
+        NTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
+                INTERNAL, tableFile, mol.convention
+               )
+        sys.exit(1)
+
+    #Post-processing
+    for res in mol.allResidueDefs():
+        res.postProcess()
+    for atm in mol.allAtomDefs():
+        atm.postProcess()
+
     return mol
 #end def
 
 
-path, fname, ext = NTpath( __file__ )
+#path, fname, ext = NTpath( __file__ )
 #print '>>', __file__, path
 # import the database table and generate the db-tree
-NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable'), name='NTdb')
+NTdebug('importing NTdb')
+print '>', INTERNAL
+NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
 
-# Use dictionaries for quick lookup.
-# Note it does not include the carbonyl anymore. Just like molmol doesn't.
-backBoneProteinAtomDict = { 'C':1,'N'  :1,'H'  :1,'HN' :1,'H1' :1,'H2':1,'H3':1,'CA':1,'HA':1,'HA1':1,'HA2':1,'HA3':1 }
-backBoneNucleicAtomDict = { 'P':1,"O3'":1,"C3'":1,"C4'":1,"C5'":1,"O5'":1 } # skipping 'backbone protons'
-# Patches for attributes
-if patches:
-    def isAromatic( atmDef ):
-        """Return true if it is an atom belonging to an aromatic ring
-           Patched for now, have to store it in database
-        """
-        if not atmDef.residueDef.hasProperties('aromatic'): return False
 
-        if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
-            return True
-        if (isNitrogen(atmDef) and atmDef.shift != None and atmDef.shift.average > 130.0):
-            return True
-        elif (isProton(atmDef)):
-            if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
-            heavy = atmDef.residueDef[atmDef.topology[0][1]]
-            return isAromatic( heavy )
-        #end if
-        return False
-    #end def
 
-    def isBackbone( atmDef ):
-        """
-        Return True if it is a backbone atom.
-        Patch for now, based upon explicit enumeration
-        """
-        if atmDef.residueDef.hasProperties('protein') and \
-           backBoneProteinAtomDict.has_key( atmDef.name ):
-                return True
-        if atmDef.residueDef.hasProperties('nucleic') and \
-           backBoneNucleicAtomDict.has_key( atmDef.name ):
-                return True
-        return False
 
-    def isSidechain( atmDef ):
-        """
-        Return True if it is a sidechain atom,
-        i.e. not isBackbone
-        """
-        return not isBackbone( atmDef )
-
-    def isMethyl( atmDef ):
-        """
-        Return True atm is a methyl (either carbon or proton)
-        """
-        if isCarbon(atmDef):
-            count = 0
-            for dummy,p in atmDef.topology:
-                if p in atmDef.residueDef and isProton( atmDef.residueDef[p] ):
-                    count += 1
-                #end if
-            #end for
-            return (count == 3) # Methyls have three protons!
-        elif isProton(atmDef):
-            # should be attched to a heavy atomo
-            if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
-            heavy = atmDef.residueDef[atmDef.topology[0][1]]
-            return isMethyl( heavy )
-        else:
-            return False
-        #end if
-    #end def
-
-    def isMethylProton( atmDef ):
-        """
-        Return True if atm is a methyl proton
-        """
-        return isProton(atmDef) and isMethyl(atmDef)
-    #end def
-
-    def isProton( atmDef ):
-        """Return Tue if atm is 1H
-        """
-        return (atmDef.spinType == '1H')
-    #end def
-
-    def isCarbon( atmDef ):
-        """Return Tue if atm is 13C
-        """
-        return (atmDef.spinType == '13C')
-    #end def
-
-    def isNitrogen( atmDef ):
-        """Return Tue if atm is 15N
-        """
-        return (atmDef.spinType == '15N')
-    #end def
-
-    def isSulfur( atmDef ):
-        """Return Tue if atm is 32S
-        """
-        return (atmDef.spinType == '32S')
-    #end def
-
-    def isPseudoAtom( atmDef ):
-        """Return True if atom is pseudoAtom"""
-        return ( len(atmDef.real) > 0 )
-    #end def
-
-    def hasPseudoAtom( atmDef ):
-        """Return True if atom has a correponding pseudoAtom"""
-        return ( atmDef.pseudo != None )
-    #end def
-
-    for atmDef in NTdb.subNodes( depth = 2 ):
-        props = NTlist( atmDef.name, atmDef.residueDef.name, atmDef.residueDef.shortName, atmDef.spinType, *atmDef.properties)
-
-        if isProton(atmDef):
-            props.append('isProton','proton')
-        else:
-            props.append('isNotProton','notproton')
-        #end if
-        if isCarbon(atmDef):
-            props.append('isCarbon','carbon')
-        else:
-            props.append('isNotCarbon','notcarbon')
-        #end if
-        if isNitrogen(atmDef):
-            props.append('isNitrogen','nitrogen')
-        else:
-            props.append('isNotNitrogen','notnitrogen')
-        #end if
-        if isSulfur(atmDef):
-            props.append('isSulfur','isSulphur','sulfur','sulphur')
-        else:
-            props.append('isNotSulfur','isNotSulphur','notsulfur','notsulphur')
-        #end if
-        if isBackbone(atmDef):
-            props.append('isBackbone','backbone')
-        else:
-            props.append('isSidechain','sidechain')
-        #endif
-        if isAromatic(atmDef):
-            props.append('isAromatic','aromatic')
-        else:
-            props.append('isNotAromatic','notaromatic')
-        #end if
-        if isMethyl(atmDef):
-            props.append('isMethyl','methyl')
-        else:
-            props.append('isNotMethyl','notmethyl')
-        #end if
-        if isMethylProton(atmDef):
-            props.append('isMethylProton','methylproton')
-        else:
-            props.append('isNotMethylProton','notmethylproton')
-        #end if
-        if isPseudoAtom(atmDef):
-            props.append('isPseudoAtom','pseudoatom')
-        else:
-            props.append('isNotPseudoAtom','notpseudoatom')
-        #end if
-        if hasPseudoAtom(atmDef):
-            props.append('hasPseudoAtom','haspseudoatom')
-        else:
-            props.append('hasNoPseudoAtom','hasnopseudoatom')
-        #end if
-
-        atmDef.properties = props
-
-        #print atmDef, atmDef.properties
-#end if
 

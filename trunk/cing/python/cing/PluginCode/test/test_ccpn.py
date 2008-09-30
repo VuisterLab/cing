@@ -10,6 +10,7 @@ from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
 from cing.core.constants import CYANA
+from cing.core.constants import BMRB
 from unittest import TestCase
 import cing
 import os
@@ -27,7 +28,7 @@ class AllChecks(TestCase):
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        project.initPDB( pdbFile=pdbFilePath, convention = "BMRB" )
+        project.initPDB( pdbFile=pdbFilePath, convention = BMRB )
         NTdebug("Reading files from directory: " + cyanaDirectory)
         project.cyana2cing(cyanaDirectory=cyanaDirectory, convention=CYANA,
                     uplFiles  = [ entryId ],
@@ -59,11 +60,11 @@ class AllChecks(TestCase):
 #        htmlOnly = False # default is False but enable it for faster runs without some actual data.
 #        doWhatif = False # disables whatif actual run
 #        doProcheck = False
-        
+
 #        self.assertFalse(project.validate(htmlOnly=htmlOnly,
 #                                          doProcheck = doProcheck,
 #                                          doWhatif=doWhatif ))
-        
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail

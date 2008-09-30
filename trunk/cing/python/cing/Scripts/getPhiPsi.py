@@ -1,5 +1,5 @@
 """
-Read PDB files for their dihedrals. 
+Read PDB files for their dihedrals.
 """
 from cing import verbosityDebug
 from cing import verbosityOutput
@@ -14,13 +14,14 @@ from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import doRamachandran # once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.localConstants import pdbz_dir
+from cing.core.constants import BMRB
 from cing.core.classes import Project
 from cing.core.molecule import Chain
 import cing
 import os
 import sys
 #from cing.core.constants import NAN_FLOAT
- 
+
 
 # Can be called for phi, psi or any other combo like chi1, chi2
 DIHEDRAL_NAME_1 = 'CHI1'
@@ -37,28 +38,28 @@ def doEntry( entryCode, chainCode ):
     if not os.path.exists(pdbFileNameZipped):
         NTerror("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
         return True
-    
+
     if Chain.isNullValue(chainCode):
         NTerror("didn't expect null value for chain")
         return True
-    
+
     gunzip(pdbFileNameZipped)
     localPdbFileName = entryCode+chainCode+".pdb"
     os.rename(pdbFileName, localPdbFileName)
-    
+
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
-    project.initPDB( pdbFile=localPdbFileName, convention = 'BMRB' )
-    os.unlink(localPdbFileName)    
-#    project.procheck(createPlots=False, runAqua=False)                   
-#    if not project.dssp(): 
+    project.initPDB( pdbFile=localPdbFileName, convention = BMRB )
+    os.unlink(localPdbFileName)
+#    project.procheck(createPlots=False, runAqua=False)
+#    if not project.dssp():
 #        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
-#        return True          
-    
+#        return True
+
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
-    
+
     strSum = ''
     for chain in project.molecule.allChains():
         if chain.name != chainCode:
@@ -72,10 +73,10 @@ def doEntry( entryCode, chainCode ):
                     NTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
             else:
-                if not (res.has_key(DIHEDRAL_NAME_1) or res.has_key(DIHEDRAL_NAME_2)): 
+                if not (res.has_key(DIHEDRAL_NAME_1) or res.has_key(DIHEDRAL_NAME_2)):
                     NTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
-            secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR) 
+            secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR)
             if secStruct == None:
                 NTdebug('Skipping because no dssp secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                 continue
@@ -87,25 +88,25 @@ def doEntry( entryCode, chainCode ):
                 d1_value_list = [ NaN ]
             if len( d2_value_list ) == 0:
                 d2_value_list = [ NaN ]
-                
+
             d1_value_str = floatFormat( d1_value_list[0], "%6.1f" ) # counterpart is floatParse
             d2_value_str = floatFormat( d2_value_list[0], "%6.1f" )
-            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s\n" % (entryCode, chain.name, res.resName, res.resNum, secStruct, 
+            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s\n" % (entryCode, chain.name, res.resName, res.resNum, secStruct,
                 d1_value_str, d2_value_str )
 #            NTmessageNoEOL(str)
             strSum += str # expensive
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode)
-        
+
     file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
     resultsFileName = file_name_base + '_wi_db_%s.csv' % ( entryCode+chainCode )
-    resultsFile = file(resultsFileName, 'w') 
+    resultsFile = file(resultsFileName, 'w')
     resultsFile.flush()
     resultsFile.write(strSum)
     NTdebug( '\n'+strSum )
     resultsFile.flush()
-    
-  
+
+
 if __name__ == "__main__":
     cing.verbosity = verbosityWarning
     cing.verbosity = verbosityOutput
