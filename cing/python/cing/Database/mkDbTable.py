@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore
 from cing.Libs.NTutils import fprintf
 from cing.core.database import ResidueDef
 import cing

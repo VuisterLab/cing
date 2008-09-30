@@ -1,12 +1,11 @@
 """
 Adds html generation methods
 """
-import cing
+from cgi import escape
 from cing import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing.Libs.Geometry import violationAngle
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
@@ -15,11 +14,8 @@ from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlimit
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTmessageNoEOL
@@ -28,49 +24,36 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
-from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import list2asci #@UnusedImport
-from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.Libs.NTutils import ROGscore
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
-from cing.Libs.fpconst import NaN
-from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.Whatif import C12CHK_STR
 from cing.PluginCode.Whatif import RAMCHK_STR
 from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
-#from cing.PluginCode.Whatif import criticizeByWhatif
 from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
 from cing.PluginCode.Whatif import histJaninBySsAndResType
 from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import wiPlotList
 from cing.core.classes import AtomList
-#from cing.core.classes import HTMLfile
-#from cing.core.classes import htmlObjects
-from cing.core.constants import COLOR_GREEN
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
 from cing.core.constants import PDB
-from cing.core.molecule import Residue
-from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cgi import escape
-import cing
-import math
+from cing import programName
+from cing import cingVersion
+from cing import authorList
 import os
 import shelve
 import shutil
-import sys
+#from cing.PluginCode.Whatif import criticizeByWhatif
+#from cing.core.classes import HTMLfile
+#from cing.core.classes import htmlObjects
 
 
 dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
@@ -322,7 +305,7 @@ def _matchDihedrals(residue, dihedralName):
 
 def setupHtml(project):
     '''Description: create all folders and subfolders related to a Cing Project
-                    under Molecul/HTML directory and initiatilise attribute html
+                    under Molecul/HTML directory and initialize attribute html
                     for the due Cing objects.
        Inputs:      project instance
        Output:      returns None on success or True on failure.
@@ -870,9 +853,9 @@ class HTMLfile:
         # Append a default footer
         defaultFooter = NTlist()
         self._appendTag( defaultFooter, 'p', closeTag=False)
-        self._appendTag( defaultFooter, None, sprintf( ' %s  version %s ', cing.programName, cing.cingVersion) )
-        n = len(cing.authorList)-1
-        for i,author in enumerate(cing.authorList):
+        self._appendTag( defaultFooter, None, sprintf( ' %s  version %s ', programName, cingVersion) )
+        n = len(authorList)-1
+        for i,author in enumerate(authorList):
             self._appendTag( defaultFooter, 'a', author[0], href=sprintf("mailto:%s", author[1]))
             if i==(n-1):
                 self._appendTag( defaultFooter, None,' and ')
@@ -941,7 +924,9 @@ class HTMLfile:
         #pardir = os.path.pardir
         pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
         upSep   = fileName.count(sep)
-        downSep = self.project.htmlPath().count(sep)
+        htmlPath = self.project.htmlPath()
+        NTdebug("htmlPath: ["+htmlPath+"]" )
+        downSep = htmlPath.count(sep)
         return (upSep-downSep-1) * pardirSep
 
     def findHtmlLocation(self, source, destination, id=None ):
@@ -1507,7 +1492,7 @@ class ResidueHTMLfile( HTMLfile ):
         """
         residue = self.residue
         project = self.project
-        resNum  = residue.resNum
+#        resNum  = residue.resNum
         resdir, _tmp, _tmp = NTpath( self.fileName )
 
         # Reset CING content
@@ -1933,17 +1918,17 @@ class RestraintListHTMLfile( HTMLfile ):
         index = allRestraintLists.index(restraintList)
         if index > 0:
             try:
-                previous = allRestraintList[index-1]
+                previous = allRestraintLists[index-1]
                 self.insertHtmlLink( self.header, restraintList, previous, text = previous.name)
             except: pass
         self.insertHtmlLink( self.header, restraintList, self.project, text = 'UP' )
         try:
-            next = allRestraintList[index+1]
+            next = allRestraintLists[index+1]
             self.insertHtmlLink( self.header, restraintList, next, text = next.name )
         except: pass
 
         # main section html
-        restrMain = self.main
+#        restrMain = self.main
         self.main('h3',closeTag=False)
         for l in restraintList.format().split('\n')[:-1]:
             self.main('br', l )

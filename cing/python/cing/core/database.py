@@ -417,7 +417,7 @@ class AtomDef( NTtree ):
             #print 'top2', top2
 
             #convert properties
-            prop
+#            prop
         #end if
         fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
 

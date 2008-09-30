@@ -480,7 +480,7 @@ def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
 #            NTmessage.flush()
 
             cingProject.molecule.updateAll()
-            cingProject.dssp()     # TODO: move these calls toproject.molecule.updateAll()
+#            cingProject.dssp()     # TODO: move these calls toproject.molecule.updateAll()
 
             NTmessage('done with coordinate import' )
 #            NTmessage.flush() # No longer needed.
