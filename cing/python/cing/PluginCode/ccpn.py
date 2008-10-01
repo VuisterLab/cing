@@ -343,7 +343,7 @@ def initCcpn( cingProject, ccpnFile=None ):
        Inputs: Cing.Project instance, Ccpn project Xml file.
        Output: Cing.Project or None or error.
     '''
-
+    
     funcName = initCcpn.func_name
 
     _checkCingProject( cingProject, funcName )
