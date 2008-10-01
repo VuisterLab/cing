@@ -21,12 +21,16 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
+        fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
+        if fastestTest:
+            htmlOnly = True 
+            doWhatif = False
+            doProcheck = False
         pdbConvention = CYANA
         restraintsConvention = CYANA
-
 
 #        entryId = "1ai0"
 #        entryId = "1brv"        # Small much studied PDB NMR entry

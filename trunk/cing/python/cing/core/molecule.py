@@ -966,7 +966,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
         NTdebug('Identify the disulfide bonds.')
-        cys=self.residuesWithProperties('C')
+        cys=self.residuesWithProperties('C','protein') # was starting to pick up nucleic acid cytosines.
         pairList = []
         cyssDict2Pair = {}
         # all cys(i), cys(j) pairs with j>i

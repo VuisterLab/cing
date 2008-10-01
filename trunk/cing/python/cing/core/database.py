@@ -716,7 +716,7 @@ def importNameDefs( tableFile, name)   :
 #print '>>', __file__, path
 # import the database table and generate the db-tree
 NTdebug('importing NTdb')
-print '>', INTERNAL
+NTdebug( '>' + INTERNAL )
 NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
 
 

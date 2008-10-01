@@ -1109,7 +1109,7 @@ Redirecting to %s
         html = HTMLfile( fileName, title = 'Project summary', project=self.project )
         html.htmlLocation = (fileName, HTMLfile.top) # Fake an object location; see below
 
-        html.header('h1', 'Summary project ' + self.project.name )
+        html.header('h1', 'Summary: ' + self.project.name )
         html.insertHtmlLink(html.header, html, self.project, text='Home' )
 
 #        htmlsum = HTMLfile( self.project.htmlPath( 'summary.html' ),title = 'Project summary' )
@@ -1167,15 +1167,17 @@ Redirecting to %s
             del(self.summary)
         self.summary = self._generateSummaryHtml()
         self.insertHtmlLinkInTag( 'li', self.main, self.project, self.summary, text='Summary')
+
+        #Use a dummy object for referencing the text-files for now
+        flatFiles = NTdict()
+        flatFiles.htmlLocation = (self.project.moleculePath('analysis'), HTMLfile.top )
+#        self.main('p')
+        self.insertHtmlLinkInTag('li',self.main, self.project, flatFiles, text="Details (flat)")
+
         if hasattr(self, 'history'):
             del(self.history)
         self.history = self._generateHistoryHtml()
         self.insertHtmlLinkInTag( 'li', self.main, self.project, self.history, text='History')
-        #Use a dummy object for referencing the text-files for now
-        _dummy = NTdict()
-        _dummy.htmlLocation = (self.project.moleculePath('analysis'), HTMLfile.top )
-        self.main('p')
-        self.insertHtmlLinkInTag('li',self.main, self.project, _dummy, text="CING's flat text files")
         self.main('ul', openTag=False)
 
         # Molecule page and assignment links
@@ -1209,8 +1211,10 @@ Redirecting to %s
         #end if
 
         # Credits
-        self.main('p')
-        self.main('a',  'Credits', href = 'credits.html' )
+        htmlMain('h1', 'Other')
+        htmlMain('ul', closeTag=False)
+        htmlMain('a',  'Credits', href = 'credits.html' )
+        htmlMain('ul', openTag=False)
 
         # Try to put nice gif of first page
         molGifFileName = "mol.gif"
