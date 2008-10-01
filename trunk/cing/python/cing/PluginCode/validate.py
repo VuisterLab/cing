@@ -547,8 +547,9 @@ def checkForDisulfides(project, toFile=True):
         NTerror('checkForDisulfides: no molecule defined')
         return None
     #end if
+    cys=[]
 
-    cys=project.molecule.residuesWithProperties('C','protein')
+#    cys=project.molecule.residuesWithProperties('CYS')
     disulfides = NTlist()
     # all cys(i), cys(j) pairs with j>i
     for i in range(len(cys)):
