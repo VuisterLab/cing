@@ -212,6 +212,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("cn", i++);
 		localeMap.put("de", i++);
 		localeMap.put("en", i++);
+		localeMap.put("es", i++);
 		localeMap.put("it", i++); // not avail yet.
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
@@ -219,6 +220,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		listBoxLocale.addItem(c.cn(), "cn");
 		listBoxLocale.addItem(c.de(), "de");
 		listBoxLocale.addItem(c.en(), "en");
+		listBoxLocale.addItem(c.es(), "es"); 
 		listBoxLocale.addItem(c.it(), "it");
 		listBoxLocale.addItem(c.nl(), "nl");
 		listBoxLocale.addItem(c.pt(), "pt");
@@ -229,7 +231,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	    	idx = 2; // en is default
 	    } 
     	listBoxLocale.setSelectedIndex(idx);
-    	boolean unsupportedLanguageSelected = ! ( idx == 0 || idx == 1 || idx == 2 || idx == 4 || idx == 5);
+    	boolean unsupportedLanguageSelected = ! ( idx == 0 || idx == 1 || idx == 2 || idx == 3 || idx == 5 || idx == 6);
     	if ( unsupportedLanguageSelected ) {
     		Window.alert("Unsupported language selected; defaulting to English");
     	}

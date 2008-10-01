@@ -360,6 +360,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Welcome();
 
   /**
+   * Translated "Español".
+   * 
+   * @return translated "Español"
+   * @gwt.key es
+   */
+  String es();
+
+  /**
    * Translated "Debug mode".
    * 
    * @return translated "Debug mode"
