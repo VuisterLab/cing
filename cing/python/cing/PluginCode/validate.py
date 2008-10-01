@@ -103,6 +103,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)    
+    project.renderHtml()
     NTmessage("Done with overall validation")
     
 
@@ -378,7 +379,7 @@ def summary( project, toFile = True ):
 
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
-        msg += '\n' + wiSummary
+        msg += '\n<PRE>' + wiSummary + '</PRE>'
 
     pc = getDeepByKeys(project.molecule, 'procheck')
     if pc:
@@ -547,7 +548,7 @@ def checkForDisulfides(project, toFile=True):
         return None
     #end if
 
-    cys=project.molecule.residuesWithProperties('C')
+    cys=project.molecule.residuesWithProperties('C','protein')
     disulfides = NTlist()
     # all cys(i), cys(j) pairs with j>i
     for i in range(len(cys)):
@@ -1277,7 +1278,7 @@ def validateModels( self)   :
         NTerror("validateModels: no molecule defined")
         return True
     if not self.molecule.modelCount:
-        NTerror("validateModels: no model for molecule %s defined", project.molecule) #@UndefinedVariable
+        NTerror("validateModels: no model for molecule %s defined", self.molecule)
         return True
 
     backbone = ['PHI','PSI','OMEGA']
