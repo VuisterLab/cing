@@ -9,7 +9,8 @@ from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.core.classes import Project
 from unittest import TestCase
-from shutil import move
+from shutil import move #@UnusedImport
+from shutil import rmtree
 import cing
 import os
 import tarfile
@@ -18,26 +19,32 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-#        entryId = "1brv" # Small much studied PDB NMR entry
-        entryId = "2k0e" # Small much studied PDB NMR entry
-#        entryId = "berlin_demo" # Small much studied PDB NMR entry
-        entryList = [ ]
+#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
+#1iv6 needs better ccpn file from FC
+        entryList = ["berlin_demo"]
+#        entryList = ["1iv6"]
+        
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
-        project = Project.open( entryId, status='new' )
-        self.assertTrue(project, 'Failed opening project: ' + entryId)
-
-        ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
-        tar = tarfile.open(ccpnFile, "r:gz")
-        for itar in tar:
-            tar.extract(itar.name, '.')
-            
-#        move( 'linkNmrStarData', entryId)
-        self.assertFalse(project.initCcpn(ccpnFile=entryId))
-        self.failIf(project.save())
-        self.assertFalse(project.validate(htmlOnly=True,
-                                          doProcheck = False,
-                                          doWhatif=False ))
+        for entryId in entryList:
+            project = Project.open( entryId, status='new' )
+            self.assertTrue(project, 'Failed opening project: ' + entryId)
+    
+            ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
+            try:
+                rmtree( entryId )
+            except:
+                pass 
+            tar = tarfile.open(ccpnFile, "r:gz")
+            for itar in tar:
+                tar.extract(itar.name, '.')
+                
+            move( 'linkNmrStarData', entryId)
+            self.assertFalse(project.initCcpn(ccpnFile=entryId))
+            self.failIf(project.save())
+            self.assertFalse(project.validate(htmlOnly=True,
+                                              doProcheck = False,
+                                              doWhatif=False ))
 
 
 if __name__ == "__main__":

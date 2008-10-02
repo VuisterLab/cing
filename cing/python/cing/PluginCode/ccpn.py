@@ -1,5 +1,6 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.fpconst import NaN
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -1013,7 +1014,7 @@ def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
             atomSets = list(resonance.resonanceSet.atomSets)
             residue = atomSets[0].findFirstAtom().residue
             chemCompVar = residue.chemCompVar
-
+            namingSystemObject = chemCompVar.chemComp.findFirstNamingSystem(name=namingSystem)
             # to skip residues outside molSystem whose atoms has resonances
             if residue.chain.molSystem != molSystem:
                 continue
@@ -1038,9 +1039,8 @@ def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
                 for atom in atomSet.atoms:
                     # Now create list, with namingSystem
                     # (could be set to other one)
-
-                    chemAtomSysName = chemCompVar.findFirstChemAtomSysName \
-                             (namingSystem = namingSystem, atomName = atom.name)
+                    chemAtom = atom.chemAtom
+                    chemAtomSysName = namingSystemObject.findFirstAtomSysName(atomName = chemAtom, atomSubType=chemAtom.subType)
 
                     if chemAtomSysName:
                         atomName = chemAtomSysName.sysName
@@ -1148,6 +1148,9 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                         vValue = 0.00
                         vError = 0.00
                     # end if
+                    
+                    if str(vValue) == 'inf':
+                        vValue = NaN
 
                     ccpnHeight = ccpnPeak.findFirstPeakIntensity( intensityType=
                                                                   'height' )
@@ -1158,6 +1161,9 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                         hValue = 0.00
                         hError = 0.00
                     # end if
+                    if str(hValue) == 'inf':
+                        hValue = NaN
+                    
 
                     if not (ccpnVolume or ccpnHeight):
                         NTwarning(" peak '%s' missing both volume and height",

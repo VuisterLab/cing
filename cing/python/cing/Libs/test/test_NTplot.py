@@ -1,5 +1,4 @@
 from cing import cingDirTmp
-from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet

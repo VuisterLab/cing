@@ -1475,10 +1475,11 @@ class DistanceRestraintList( NTlist ):
             if dr.isAmbigious(): self.ambigious.append(dr)
         #end for
 
-        for i in range(0, modelCount):
-            self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
-        #end for
-
+            for i in range(0, modelCount):
+                if count:
+                    self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
+                else:
+                    self.rmsd[i] = None
         self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
