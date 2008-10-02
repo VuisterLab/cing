@@ -984,10 +984,13 @@ def validateAssignments( project, toFile = True   ):
             # Check database
             #print '===>', atm
             if not atm.db.shift:
-                dummy = atm.pseudoAtom()
-                if dummy.db.shift:
-                    av = dummy.db.shift.average
-                    sd = dummy.db.shift.sd
+                pseudo = atm.pseudoAtom()
+                if not pseudo:
+                    NTerror("Failed to find pseudo atom for atom: [" +`atm` + "]")
+                    continue
+                if pseudo.db.shift:
+                    av = pseudo.db.shift.average
+                    sd = pseudo.db.shift.sd
                 else:
                     NTerror("%s: '%s' not in in DB SHIFTS\n", funcName, atm)
                     continue

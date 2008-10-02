@@ -557,6 +557,7 @@ h.render()
 def _makeResidueTableHtml( obj, residues, text=None ):
     """
     Make a table with links to residues in html.main of obj
+    Return True on error.
     """
     #TODO: use makHtmlTable class
     ncols = 10
@@ -564,6 +565,10 @@ def _makeResidueTableHtml( obj, residues, text=None ):
 
     if text:
         obj.html.main('h1',text)
+    if not residues:
+        NTerror("Failed to _makeResidueTableHtml")
+        return True
+        
     r0 = residues[0]
     r1 = r0.resNum
     r2 = r0.resNum/ncols *ncols + ncols-1
