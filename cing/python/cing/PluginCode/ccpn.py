@@ -344,7 +344,7 @@ def initCcpn( cingProject, ccpnFile=None ):
        Inputs: Cing.Project instance, Ccpn project Xml file.
        Output: Cing.Project or None or error.
     '''
-    
+
     funcName = initCcpn.func_name
 
     _checkCingProject( cingProject, funcName )
@@ -464,7 +464,7 @@ def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
 
         molecule = Molecule(name = moleculeName)
 
-        molecule.ccpn = ccpnMolecule
+        molecule.ccpn = ccpnMolecule # ccpn molSystem
         ccpnMolecule.cing = molecule
 
         moleculeList.append(molecule)
@@ -525,7 +525,8 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
             ccpnMolCoords = ccpnMolStructures
         else: # ccpn 2.x
             #ccpnMolStructures = ccpnMolecule.parent.findFirstStructureEnsemble()
-            ccpnAllStructureEnsembles = ccpnMolecule.findAllStructureEnsembles()
+            # we are taking all Ensembles!!!
+            ccpnAllStructureEnsembles = ccpnMolecule.findAllStructureEnsembles() #TODO: currentStructureEnsemble
             for ccpnStructureEnsemble in ccpnAllStructureEnsembles:
                 molecule.modelCount += len(ccpnStructureEnsemble.models)
             # end for
@@ -535,7 +536,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
 
     # Set all the chains for this molSystem
     for ccpnChain in ccpnMolecule.sortedChains():
-
+        #TODO: check valid chain id
         # AWSS: Sometimes ccpn systems with only one chain will not have
         # a letter for chain, but CING definitely doesn't like it at all.
         # JFD: Update: CING better get used to it.
@@ -547,6 +548,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
         # end if
 
         # check if Cing.Project.Molecule.Chain already exists, if so, it's used
+        # TODO: use CING API here not direct access
         if ( not molecule.has_key(ccpnChainLetter) ):
             chain = molecule.addChain(ccpnChainLetter)
         else:
@@ -561,7 +563,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
         if coords:
             # Get coord info for chains from Ccpn
             ccpnCoordChains = []
-            for ccpnMolCoord in ccpnMolCoords:
+            for ccpnMolCoord in ccpnMolCoords: #TODO rename variable
                 ccpnCoordChain = ccpnMolCoord.findFirstCoordChain( chain = ccpnChain )
                 if ccpnCoordChain:
                     ccpnCoordChains.append(ccpnCoordChain)
@@ -572,6 +574,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
         for ccpnResidue in ccpnChain.sortedResidues():
 
             #chemCompVar tells which residue variant is being used
+            # TODO: mantaining CING namingSystem for CCPN.
             chemCompVar = ccpnResidue.chemCompVar
             newNamingSystem = 'CIF'
 
@@ -627,7 +630,9 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
             # But since we are always importing Molecule as new, chains
             # will be always empty at first.
             #if not chain.has_key(ccpnResidue.ccpCode.upper()+str(ccpnResidue.seqCode)):
+
             if not chain.has_key(resNameInSysName+str(ccpnResidue.seqCode)):
+                # TODO: use the CING API
                 #residue = chain.addResidue(ccpnResidue.ccpCode.upper(), ccpnResidue.seqCode)
                 # For When Cing NameSystem is included in Ccpn DB.
                 residue=chain.addResidue(resNameInSysName,ccpnResidue.seqCode)
@@ -647,6 +652,7 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
             ccpnCoordResidues = []
             if coords:
                 # Get coord info for residues from Ccpn
+                # TODO reuse prev coord chains
                 for ccpnCoordChain in ccpnCoordChains:
                     ccpnCoordResidue = ccpnCoordChain.findFirstResidue( residue = ccpnResidue )
                     if ccpnCoordResidue:
@@ -669,6 +675,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                a chain letter (string).
        Output: Cing.Project or None or error.
     '''
+    #TODO: link ccpn ensembles and cing molecule
     atomNamingSys = 'DIANA' # 'IUPAC'
     chemCompVar = ccpnResidue.chemCompVar
 
@@ -753,6 +760,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
                     if ccpnCoordAtom.coords:
                         if ccpnVersion == 1:
                             ccpnCoord = ccpnCoordAtom.findFirstCoord()
+                            # TODO: Add occupancy
                             atom.addCoordinate( ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor )
                         else: # ccpn 2.x
                             for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
@@ -942,6 +950,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
         moleculeName = _checkName(ccpnMolecule.code)
 
+        #TODO: use CING API
         if ( moleculeName not in [mol.name for mol in cingProject.molecules] ):
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
@@ -1039,6 +1048,7 @@ def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
                 for atom in atomSet.atoms:
                     # Now create list, with namingSystem
                     # (could be set to other one)
+                    # TODO: use cing object link made earlier.
                     chemAtom = atom.chemAtom
                     chemAtomSysName = namingSystemObject.findFirstAtomSysName(atomName = chemAtom, atomSubType=chemAtom.subType)
 
@@ -1064,7 +1074,7 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList ):
        Inputs: Cing.Molecule instance (obj), ccp.molecule.MolSystem.MolSystem.
        Output: Cing.Project or None or error.
     '''
-
+    # TODO: shiftMapping should pass cing objects
     molecule.newResonances()
 
     ccpnShifts = shiftMapping.keys()
@@ -1092,6 +1102,7 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList ):
                     atom.resonances().value = shiftValue
                     atom.resonances().error = shiftError
                     index = len(atom.resonances) - 1
+                    # TODO set setStereoAssigned
 
                     # Make mutual linkages between Ccpn and Cing objects
                     # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
@@ -1116,6 +1127,8 @@ def _setPeaks( cingProject, ccpnNmrProject ):
     '''
     done = False
 
+    #TODO Peaks objects has changed in CING
+
     for ccpnExperiment in ccpnNmrProject.experiments:
         shiftList = ccpnExperiment.shiftList
         if not shiftList:
@@ -1127,7 +1140,11 @@ def _setPeaks( cingProject, ccpnNmrProject ):
             ccpnNumDim = ccpnDataSource.numDim
             for ccpnPeakList in ccpnDataSource.peakLists:
                 #Cing doen't like names with '|', like Aria does.
-                peakListName = _checkName(ccpnPeakList.name, 'Peak')
+                # TODO decide on better peakList naming and merge uniqueness check
+                plName = '%d_%d_%s' % (ccpnExperiment.name, ccpnDataSource.name,
+                                       ccpnPeakList.serial)
+                peakListName = _checkName(plName, 'Peak')
+                peakListName = cingProject.uniqueKey(peakListName)
 
                 #pl = cingProject.newPeakList(peakListName)
                 pl = cingProject.peaks.new(peakListName, status = 'keep')
@@ -1148,7 +1165,7 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                         vValue = 0.00
                         vError = 0.00
                     # end if
-                    
+
                     if str(vValue) == 'inf':
                         vValue = NaN
 
@@ -1163,7 +1180,6 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                     # end if
                     if str(hValue) == 'inf':
                         hValue = NaN
-                    
 
                     if not (ccpnVolume or ccpnHeight):
                         NTwarning(" peak '%s' missing both volume and height",
@@ -1263,9 +1279,11 @@ def importFromCcpnDistanceRestraints( cingProject = None, ccpnProject = None ):
     # loop over all constraint stores
     for ccpnConstraintStore in ccpnNmrProject.nmrConstraintStores:
 
+        # Add hBond lists too!
         for ccpnDistanceList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'DistanceConstraintList'):
 
+            # TODO better name for tracking
             ccpnDistanceListName = _checkName( ccpnDistanceList.name,
                                                'DistRestraint' )
 
@@ -1337,7 +1355,7 @@ def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None ):
 
         for ccpnDihedralList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'DihedralConstraintList'):
-
+            # TODO better name
             ccpnDihedralListName = _checkName( ccpnDihedralList.name,
                                                'DihRestraint' )
 
@@ -1348,7 +1366,7 @@ def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None ):
             dihedralRestraintList.ccpn = ccpnDihedralList
 
             for ccpnDihedralConstraint in ccpnDihedralList.constraints:
-
+                # TODO merge (dilute) ambig dihedrals
                 dihConsItem = ccpnDihedralConstraint.findFirstItem()
                 lower, upper, _value, _error = _restraintsValues(dihConsItem)
 
@@ -1363,11 +1381,11 @@ def importFromCcpnDihedralRestraints( cingProject = None, ccpnProject = None ):
                 # end if
 
                 residue = atoms[2].residue
-
+                # TODO remove angle name - this is generated
                 dihedralName = _getTorsionAngleName(atoms, molSysTorsions)
                 angleName = '%s_%i' % ( dihedralName, residue.resNum )
                 #print angleName
-
+                # TODO remove below
                 if dihedralName not in ['PHI', 'PSI']:
                     if lower < 0.0:
                         lower += 360
@@ -1422,7 +1440,7 @@ def importFromCcpnRdcRestraints( cingProject = None, ccpnProject = None ):
 
         for ccpnRdcList in ccpnConstraintStore.findAllConstraintLists \
                                          (className = 'RdcConstraintList'):
-
+            # TODO better name
             ccpnRdcListName = _checkName( ccpnRdcList.name, 'RdcRestraint' )
 
             rdcRestraintList = cingProject.rdcs.new \
@@ -1657,6 +1675,7 @@ def _checkName(name, prefix='CING'):
        Output: same string 'name', 'prefix' + string 'name' or
                just 'prefix' if 'name' = None
     '''
+    #TODO better peak list name
 
     if not name:
 #        if name[0] in string.digits:
@@ -1685,6 +1704,8 @@ def createCcpn( cingProject = None ):
         return None
     # end if
 
+    #TODO: Check CING to CCPN link before making new
+
     #create ccpnProject
     # First you always have to create a project (this is the root object)
     projectName = cingProject.name
@@ -1706,6 +1727,7 @@ def createCcpn( cingProject = None ):
     #createCcpnRestraints( cingProject )
 
     if ccpnVersion == 2:
+        # TODO: check about saveModified()
         ccpnProject.saveAll()
     # end if
     return ccpnProject
