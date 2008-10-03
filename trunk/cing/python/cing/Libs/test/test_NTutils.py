@@ -25,10 +25,10 @@ class AllChecks(TestCase):
     def testRemoveRecursivelyAttribute(self):
         testje = { 0: 1, "ccpn": 77}
         self.assertEqual( len(testje.keys()), 2 )
-#        print testje
+        print testje
         removeRecursivelyAttribute(testje, "ccpn")
         self.assertEqual( len(testje.keys()), 1 )
-#        print testje
+        print testje
 
 
     def testFind(self):

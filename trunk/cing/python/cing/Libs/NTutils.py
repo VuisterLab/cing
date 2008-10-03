@@ -3971,18 +3971,38 @@ def stripExtensions( pathList ):
         result.append( stripExtension(path))
     return result
 
+_visitedHashes = {}
 def removeRecursivelyAttribute(x, attributeToRemove):
-    """Watch out because this can remove any attribute; be carefull what argument you give"""
+    _visitedHashes.clear()
+    _removeRecursivelyAttribute(x, attributeToRemove)
+    _visitedHashes.clear()
+    
+
+def _removeRecursivelyAttribute(x, attributeToRemove):
+    """Watch out because this can remove any attribute; be carefull what argument you give.
+    """
+    #    Needed for cyclic graphed objects such as project...
+    # TODO: make it work more than once...
+    if isinstance(x, int ) or isinstance(x, float ) or x == None:
+        return
+
+    h = id(x)
+    if not h:
+        return
+    if _visitedHashes.has_key(h):
+        return
+    _visitedHashes[h] = None        
+        
     if isinstance(x, list ) or isinstance(x, tuple ):
         for e in x:
             if e == attributeToRemove:
                 del x[e]
-            removeRecursivelyAttribute(e, attributeToRemove)
+            _removeRecursivelyAttribute(e, attributeToRemove)
     if isinstance(x, dict ):
         for k in x.keys():
             if k == attributeToRemove:
                 del x[k]
             else:
-                removeRecursivelyAttribute(x[k], attributeToRemove)
+                _removeRecursivelyAttribute(x[k], attributeToRemove)
             
 
