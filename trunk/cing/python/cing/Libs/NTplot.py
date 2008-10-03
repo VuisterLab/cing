@@ -814,13 +814,13 @@ class NTplot( NTdict ):
             if isinstance(self.yTicks, list):
                 yticks(self.yTicks)# A list with actual values like 0,60,120...
 
-            if self.xRange:
+            if self.xRange is not None:
                 xlim(self.xRange)
 #                NTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
-            if self.yRange:
+            if self.yRange is not None:
                 ylim(self.yRange)
 #                NTmessage("Set the ylim in MatPlotLib")
-            if self.xGrid:
+            if self.xGrid is not None:
                 grid(True)
             else:
                 grid(False)
@@ -2018,9 +2018,12 @@ class MultipleLocatorByOffset(MultipleLocator):
     def __call__(self):
         'Return the locations of the ticks'
 
-        self.verify_intervals()
+        try:
+            self.verify_intervals()
+            vmin, vmax = self.viewInterval.get_bounds()
+        except:
+            vmin, vmax = self.axis.get_view_interval()
 
-        vmin, vmax = self.viewInterval.get_bounds()
         if vmax<vmin:
             vmin, vmax = vmax, vmin
         vmin = self._base.ge(vmin)

@@ -92,7 +92,7 @@ class AllChecks(TestCase):
 
         ylim = plot.get_ylim()
         ylimMax = 5 # Just assume.
-        if ylim:
+        if ylim is not None:
             ylimMax = ylim[1]
         # note plotparams.lower is a color!
         bounds = NTlist(lower, upper)

@@ -416,7 +416,7 @@ def main():
     elif options.initCcpn:
     ##    init = options.initCcpn.split(',')
         project = Project.open( options.name, status='new' )
-        project.initCcpn( ccpnFile = options.initCcpn )
+        project.initCcpn( ccpnFolder = options.initCcpn )
     else:
         project = Project.open( options.name, status='create' )
 
@@ -431,7 +431,7 @@ def main():
     p = project
     mol = project.molecule #@UnusedVariable
     m  = project.molecule #@UnusedVariable
- #   pr = print
+#   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 
