@@ -21,8 +21,8 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #1iv6 needs better ccpn file from FC
-        entryList = ["berlin_demo"]
-#        entryList = ["1iv6"]
+#        entryList = ["berlin_demo"]
+        entryList = ["1brv"]
 
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
@@ -45,6 +45,8 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly=True,
                                               doProcheck = False,
                                               doWhatif=False ))
+
+            self.assertFalse(project.removeCcpnReferences())
 
 
 if __name__ == "__main__":
