@@ -568,7 +568,7 @@ def _makeResidueTableHtml( obj, residues, text=None ):
     if not residues:
         NTerror("Failed to _makeResidueTableHtml")
         return True
-        
+
     r0 = residues[0]
     r1 = r0.resNum
     r2 = r0.resNum/ncols *ncols + ncols-1
@@ -1459,7 +1459,7 @@ class ChainHTMLfile( HTMLfile ):
         """
         Generate the HTML code and/or Figs depending htmlOnly
         """
-       # Reset CING content
+        # Reset CING content
         self._resetCingContent()
         self._generateHeader()
 

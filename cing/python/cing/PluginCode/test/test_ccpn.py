@@ -23,24 +23,24 @@ class AllChecks(TestCase):
 #1iv6 needs better ccpn file from FC
         entryList = ["berlin_demo"]
 #        entryList = ["1iv6"]
-        
+
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
         for entryId in entryList:
             project = Project.open( entryId, status='new' )
             self.assertTrue(project, 'Failed opening project: ' + entryId)
-    
+
             ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
             try:
                 rmtree( entryId )
             except:
-                pass 
+                pass
             tar = tarfile.open(ccpnFile, "r:gz")
             for itar in tar:
                 tar.extract(itar.name, '.')
-                
+
             move( 'linkNmrStarData', entryId)
-            self.assertFalse(project.initCcpn(ccpnFile=entryId))
+            self.assertFalse(project.initCcpn(ccpnFolder=entryId))
             self.failIf(project.save())
             self.assertFalse(project.validate(htmlOnly=True,
                                               doProcheck = False,
