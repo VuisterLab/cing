@@ -647,14 +647,12 @@ def storeResidueValidations(validStore, context, keyword, residues, scores):
   return validObjs
 
 
-def storeValidationInCcpn( project, residue ):
+def storeResidueValidationInCcpn( project, residue, context='CING'):
     """
-    Store ROG result in ccpn
-    Return ccpn residueValidation obj on succes or None on error
+    Store residue ROG result in ccpn
+    Return ccpn StructureValidation.ResidueValidation obj on success or None on error
     """
-
-    print '>',residue.ccpn.className; residue.ccpn
-    context = 'CING'
+    
     keyword = 'ROGscore'
 
     ccpnMolSystem = project.molecule.ccpn
@@ -668,20 +666,22 @@ def storeValidationInCcpn( project, residue ):
                                                                 )
     #end if
 
-    ccpnEnsembleResidue = None
+    # Need to convert the CCPN MolSystem.Residue to MolStructure.Residue
+    ccpnStrucResidue = None
     for ccpnChain in ccpnEnsemble.coordChains:
-      ccpnEnsembleResidue = ccpnChain.findFirstResidue(residue=residue.ccpn)
-      if ccpnEnsembleResidue:
+      ccpnStrucResidue = ccpnChain.findFirstResidue(residue=residue.ccpn)
+      if ccpnStrucResidue:
         break
 
-    if not ccpnEnsembleResidue:
+    if not ccpnStrucResidue:
       return
 
     # Find any existing residue validation objects
-    validObj = getResidueValidation(project.ccpnValidationStore, ccpnEnsembleResidue, context=context, keyword=keyword)
+    validObj = getResidueValidation(project.ccpnValidationStore, ccpnStrucResidue,
+                                    context=context, keyword=keyword)
 
     # Validated object(s) must be in a list
-    residueObjs = [ccpnEnsembleResidue, ]
+    residueObjs = [ccpnStrucResidue, ]
 
     # Make a new validation object if none was found
     if not validObj:
@@ -691,16 +691,17 @@ def storeValidationInCcpn( project, residue ):
 
     # Set value of the score
     validObj.textValue = residue.rogScore.colorLabel
-    validObj.details   = '\n'.join(residue.rogScore.commentList)
+    validObj.details   = '\n'.join(residue.rogScore.colorCommentList) or None
 
     return validObj
+    
 #end def
 
 def exportValidation2ccpn( project ):
 
     for residue in project.molecule.allResidues():
-        if not storeValidationInCcpn( project, residue):
-            print 'bummer'
+        if not storeResidueValidationInCcpn( project, residue):
+            print 'WARNING: Residue validation '
 
 
 # register the functions
