@@ -3970,3 +3970,19 @@ def stripExtensions( pathList ):
     for path in pathList:
         result.append( stripExtension(path))
     return result
+
+def removeRecursivelyAttribute(x, attributeToRemove):
+    """Watch out because this can remove any attribute; be carefull what argument you give"""
+    if isinstance(x, list ) or isinstance(x, tuple ):
+        for e in x:
+            if e == attributeToRemove:
+                del x[e]
+            removeRecursivelyAttribute(e, attributeToRemove)
+    if isinstance(x, dict ):
+        for k in x.keys():
+            if k == attributeToRemove:
+                del x[k]
+            else:
+                removeRecursivelyAttribute(x[k], attributeToRemove)
+            
+
