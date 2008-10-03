@@ -22,6 +22,7 @@ from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
@@ -553,6 +554,12 @@ Project: Top level Cing project class
         self.updateProject()
     #end def
 
+    
+    def removeCcpnReferences(self):
+        """to slim down the memory footprint; should allow garbage collection. TODO: test"""
+        attributeToRemove = "ccpn"
+        removeRecursivelyAttribute( self, attributeToRemove )
+        
     def export( self):
         """Call export routines from the plugins to export the project
         """
@@ -1457,7 +1464,8 @@ class DistanceRestraintList( NTlist ):
                 self.violCount3 += dr.violCount3
                 self.violCount5 += dr.violCount5
                 for i in range(0, modelCount):
-                    self.rmsd[i] += dr.violations[i]*dr.violations[i]
+                    if dr.violations[i]:
+                        self.rmsd[i] += dr.violations[i]*dr.violations[i]
                 #end for
                 count += 1
             #end if
@@ -1477,7 +1485,8 @@ class DistanceRestraintList( NTlist ):
 
             for i in range(0, modelCount):
                 if count:
-                    self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
+                    if self.rmsd[i]:
+                        self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
                 else:
                     self.rmsd[i] = None
         self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )

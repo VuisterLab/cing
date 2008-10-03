@@ -7,6 +7,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import findFiles
+from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import val2Str
 from cing.Libs.fpconst import isNaN
 from unittest import TestCase
@@ -20,6 +21,15 @@ class AllChecks(TestCase):
 #        NTexception("Now in testPrints")
 #        NTerror("test")
         pass
+
+    def testRemoveRecursivelyAttribute(self):
+        testje = { 0: 1, "ccpn": 77}
+        self.assertEqual( len(testje.keys()), 2 )
+#        print testje
+        removeRecursivelyAttribute(testje, "ccpn")
+        self.assertEqual( len(testje.keys()), 1 )
+#        print testje
+
 
     def testFind(self):
         self.failIf( os.chdir(cingDirTmp), msg=
