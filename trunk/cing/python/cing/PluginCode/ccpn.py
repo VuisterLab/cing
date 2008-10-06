@@ -628,7 +628,7 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
        Output: Cing.Project or None or error.
     '''
     #TODO: link ccpn ensembles and cing molecule
-    atomNamingSys = 'IUPAC' # IUPAC for INTERNAL_1 and DIANA for INTERNAL_0
+    atomNamingSys = 'DIANA' # IUPAC for INTERNAL_1 and DIANA for INTERNAL_0
     chemCompVar = ccpnResidue.chemCompVar
 
     chemComp = chemCompVar.chemComp

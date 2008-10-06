@@ -9,7 +9,7 @@ XEASY      = CYANA
 CYANA2     = 'CYANA2'
 XPLOR      = 'XPLOR'
 PDB        = 'PDB'
-INTERNAL   = 'INTERNAL_1'   # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention
+INTERNAL   = 'INTERNAL_0'   # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention
                             # INTERNAL_1 is the second convention used: IUPAC for IUPAC defined atoms, CYANA2 for non-IUPAC atoms
 LOOSE      = 'LOOSE'
 

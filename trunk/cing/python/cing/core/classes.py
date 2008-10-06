@@ -554,12 +554,11 @@ Project: Top level Cing project class
         self.updateProject()
     #end def
 
-    
     def removeCcpnReferences(self):
         """to slim down the memory footprint; should allow garbage collection. TODO: test"""
         attributeToRemove = "ccpn"
         removeRecursivelyAttribute( self, attributeToRemove )
-        
+
     def export( self):
         """Call export routines from the plugins to export the project
         """
@@ -1483,12 +1482,12 @@ class DistanceRestraintList( NTlist ):
             if dr.isAmbigious(): self.ambigious.append(dr)
         #end for
 
-            for i in range(0, modelCount):
-                if count:
-                    if self.rmsd[i]:
-                        self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
-                else:
-                    self.rmsd[i] = None
+        for i in range(0, modelCount):
+            if count:
+                if self.rmsd[i]:
+                    self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
+            else:
+                self.rmsd[i] = None
         self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
