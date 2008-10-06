@@ -111,7 +111,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
                   )
     ylim = plot.get_ylim()
     ylimMax = 5.0 # Just assume.
-    if ylim:
+    if ylim is not None:
         ylimMax = ylim[1]
 
     # AWSS
