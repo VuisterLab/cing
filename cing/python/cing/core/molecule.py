@@ -1670,6 +1670,23 @@ class RmsdResult( NTdict ):
 #==============================================================================
 #
 
+
+def isValidChainId( chainId ):
+    """TODO: test routine; See doc for next method: ensureValidChainId.
+    For use by ccpn importer; call this routine to see if chain id is valid
+    otherwise call ensureValidChainId to make it a valid one.
+    """
+    if chainId==None:
+        return False
+    if len(chainId) != 1:
+        return False
+    if chainId.islower():
+        return False
+    if not (chainId in Chain.validChainIdListBesidesTheAlphabet):
+        return False
+    return True
+        
+    
 def ensureValidChainId( chainId ):
     """
     In CING all chains must have one non-space character (chain id) because:
@@ -1742,7 +1759,7 @@ Chain class: defines chain properties and methods
     """
 
     DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#^_'
-    validChainIdListBesidesTheAlphabet = '#^_' # last 3 chars of above.
+    validChainIdListBesidesTheAlphabet = '^_' # last 3 chars of above.; JFD removed pound because has a special meaning in STAR files.
     'Nothing that is a special character in Python, or tcsh.'
     defaultChainId = 'A'
     'See documentation: molecule#ensureValidChainId'
