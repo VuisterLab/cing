@@ -1685,8 +1685,8 @@ def isValidChainId( chainId ):
     if not (chainId in Chain.validChainIdListBesidesTheAlphabet):
         return False
     return True
-        
-    
+
+
 def ensureValidChainId( chainId ):
     """
     In CING all chains must have one non-space character (chain id) because:
@@ -1713,6 +1713,8 @@ def ensureValidChainId( chainId ):
     Bottom line: use a chain id character on input!
     """
     if chainId==None:
+        return Chain.defaultChainId
+    if chainId=='':
         return Chain.defaultChainId
     if len(chainId) > 1:
         chainId = chainId[0]
