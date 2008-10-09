@@ -7,6 +7,7 @@
 	border: thin solid #aaaaaa;
 }
 
+
 .gwtsolutions-Message { 
    padding: 20px; 
    margin-bottom: 10px; 
@@ -15,6 +16,15 @@
    width: 250px; 
    height: 2em; 
 }
+
+.successBorder { 
+   border: thin solid darkGray; 
+} 
+ 
+.failureBorder { 
+   border: thick solid red; 
+} 
+
 .nameField {
 	width: 15em;
 }

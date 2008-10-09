@@ -1,5 +1,7 @@
 package cing.client;
 
+import java.util.ArrayList;
+
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -90,5 +92,41 @@ public class Utils {
 			flexTable.removeRow(row);
 		}			
 	}
+	
+    
+    /** Will even work when objects are null */
+    public static String toString(ArrayList<String> a, boolean printEOLAfterEach, 
+        boolean useBrackets, String separator ) {
+        if ( a == null ) {
+            return null;
+        }        
+        if ( a.size() == 0 ) {
+            if ( useBrackets ) {
+                return "[empty]";
+            } else {
+                return "empty";
+            }
+        }
+        
+        StringBuffer result = new StringBuffer();
+        if ( useBrackets ) {
+            result.append('[');
+        }
+        for (int i=0;i<a.size();i++) {
+            if ( i != 0 ) {
+                if ( printEOLAfterEach ) {
+                    result.append('\n');
+                } else {
+                    result.append(separator);
+                }
+            }
+            result.append( a.get(i) );
+        }
+        if ( useBrackets ) {
+            result.append(']');
+        }
+        return result.toString();
+    }    
+	
 	
 }

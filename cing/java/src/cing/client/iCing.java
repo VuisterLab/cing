@@ -40,6 +40,9 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String CRITERIA_STATE = "criteria";
 	public static final String PREFERENCES_STATE = "preferences";
 
+	public static final String FORM_ACCESS_KEY = "AccessKey";
+	public static final String FORM_USER_ID = "UserId";
+	
 	/**
 	 * The available style themes that the user can select.
 	 */
@@ -59,7 +62,11 @@ public class iCing implements EntryPoint, HistoryListener {
 	protected static boolean debugOn = true;
 
 	public static iCingConstants c;
+	public static String currentAccessKey;
+	public static String currentUserId = "JoeNmr";  // TODO: implement security functionality later.
 
+	/** Can be queried for the length of the array e.g. */
+	public static final String[] fileFormItemList = new String[] { null, FORM_ACCESS_KEY, FORM_USER_ID };
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextAreaIcing area = new RichTextAreaIcing();
 	public static final RichTextAreaIcing statusArea = new RichTextAreaIcing();
@@ -80,7 +87,8 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be off. JFD prefers
-		// to see these in the hosted mode browser.
+		// to see these in the hosted mode browser. When the below statement is enabled the
+		// hosted mode doesn't show a popup!
 //		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 //			public void onUncaughtException(Throwable e) {
 //				Window.alert(c.Uncaught_ex() + "\n" + e);

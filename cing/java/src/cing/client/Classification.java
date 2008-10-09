@@ -7,17 +7,17 @@ public class Classification {
 	 * don't know if GWT supports them on the client side.
 	 */
 	static final String[][] classi = new String[][] { 
-		{ "CCPN", "project", null, null },
-		{ "CCPN", "bogus", "blabla", null },
-		{ "CING", "project", null, null },
-		{ "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
-		{ "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
-		{ "DYANA/DIANA", "dihedral angle", null, null },
-		{ "DYANA/DIANA", "distance", "NOE", null },
-		{ "XPLOR/CNS", "distance", "hydrogen bond", null },
-		{ "XPLOR/CNS", "distance", "NOE", null },
-		{ "PDB", "coordinate", null, null },
-		{ "CING", "project", null, null }
+		{ "CING", "project", Defs.STRING_NA, Defs.STRING_NA },
+		{ "CCPN", "project", Defs.STRING_NA, Defs.STRING_NA },
+//		{ "CCPN", "bogus", "blabla", Defs.STRING_NA },
+//		{ "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
+//		{ "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
+//		{ "DYANA/DIANA", "distance", "NOE", "upper" },
+//		{ "DYANA/DIANA", "distance", "NOE", "lower" },
+//		{ "DYANA/DIANA", "dihedral angle", Defs.STRING_NA, Defs.STRING_NA },
+//		{ "XPLOR/CNS", "distance", "hydrogen bond", Defs.STRING_NA },
+//		{ "XPLOR/CNS", "distance", "NOE", Defs.STRING_NA },
+//		{ "PDB", "coordinate", Defs.STRING_NA, Defs.STRING_NA },
 	};
 
 	public static ArrayList<String> getProgramList() {
@@ -27,65 +27,56 @@ public class Classification {
 				r.add(o[0]);
 			}
 		}
+//		General.showDebug("getProgramList: " + Utils.toString(r,false,true,","));
 		return r;
 	}
 	
 	/**
-	 * @return null if no types are present or the list of allowed types.
+	 * @return empty if no types are present or the list of allowed types.
 	 */
 	public static ArrayList<String> getTypeList(String program) {
-		if ( program == null ) {
-			return null;
-		}
 		ArrayList<String> r = new ArrayList<String>();
-		for (String[] o : classi ) {
-			if ( o[0].equals(program ) ) {
-				if ( ! r.contains( o[1] )) {
-					r.add(o[1]);
+		if ( program != null ) {
+			for (String[] o : classi ) {
+				if ( o[0].equals(program ) ) {
+					if ( ! r.contains( o[1] )) {
+						r.add(o[1]);
+					}
 				}
 			}
 		}
+//		General.showDebug("getTypeList: " + Utils.toString(r,false,true,","));
 		return r;
 	}
 	/**
-	 * @return null if no types are present or the list of allowed types.
+	 * @return empty if no types are present or the list of allowed types.
 	 */
 	public static ArrayList<String> getSubTypeList(String program, String type) {
-		if ( program == null || type == null ) {
-			return null;
-		}
 		ArrayList<String> r = new ArrayList<String>();
 		for (String[] o : classi ) {
-			if ( o[0] == null || o[1] == null ) { // impossible but just noting.
-				continue;
-			}
 			if ( o[0].equals(program) && o[1].equals(type) ) {
 				if ( ! r.contains( o[2] )) {
 					r.add(o[2]);
 				}
 			}
 		}
+//		General.showDebug("getSubTypeList: " + Utils.toString(r,false,true,","));		
 		return r;
 	}
 	/**
-	 * @return null if no types are present or the list of allowed types.
+	 * @return empty if no types are present or the list of allowed types.
 	 */
 	public static ArrayList<String> getOtherList(String program, String type, String subType) {
-		if ( program == null || type == null || subType == null ) {
-			return null;
-		}
 		ArrayList<String> r = new ArrayList<String>();
 		for (String[] o : classi ) {
-			General.showDebug("Looking at string[0]: ["+o[0]+"]");
-			if ( o[0] == null || o[1] == null || o[2] == null ) {
-				continue;
-			}
+//			General.showDebug("Looking at string[0]: ["+o[0]+"]");
 			if ( o[0].equals(program) && o[1].equals(type) && o[2].equals(subType) ) {
 				if ( ! r.contains( o[3] )) {
 					r.add(o[3]);
 				}
 			}
 		}
+//		General.showDebug("getOtherList: " + Utils.toString(r,false,true,","));		
 		return r;
 	}
 	

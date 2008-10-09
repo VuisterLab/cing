@@ -7,14 +7,18 @@
 		from gwt for instantiations. <inherits
 		name='com.google.gwt.user.theme.standard.Standard' />
 	-->
-	<inherits name="com.google.gwt.json.JSON" />
 	<inherits name='com.allen_sauer.gwt.voices.gwt-voices' /> <!-- Inherit sound support                        -->
+	<inherits name='com.gwtsolutions.components.Components' /> <!-- Inherit message support                        -->
+	<inherits name="com.google.gwt.json.JSON" />
+
 	<inherits name='com.google.gwt.i18n.I18N' /> <!--  Language support -->
 	<inherits name="com.google.gwt.user.theme.standard.StandardResources" />
 	<inherits name="com.google.gwt.user.theme.chrome.ChromeResources" />
 	<inherits name="com.google.gwt.user.theme.dark.DarkResources" />
+
 	<entry-point class="cing.client.iCing" />
-	<extend-property name="locale" values="cn" />
+
+\	<extend-property name="locale" values="cn" />
 	<extend-property name="locale" values="de" />
 	<extend-property name="locale" values="en" />
 	<extend-property name="locale" values="es" />
