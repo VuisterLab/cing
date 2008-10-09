@@ -9,7 +9,7 @@ public class Status extends Composite {
 		initWidget(statusArea);
 
 		statusArea.setHTML("Status bar with last line from log; see View->Log iCing");
-		statusArea.setHeight("5em");
+		statusArea.setHeight("10em");
 		statusArea.setWidth(iCing.widthMenu);
 	}
 }

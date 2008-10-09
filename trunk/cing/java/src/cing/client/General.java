@@ -369,7 +369,7 @@ public class General {
 		}
 		if (verbosity > verbosityOutput) {
 			Date today = new Date();
-			String date_str = DateTimeFormat.getShortTimeFormat().format(today);
+			String date_str = DateTimeFormat.getLongTimeFormat().format(today);
 			message = date_str + " " + message;
 		}
 

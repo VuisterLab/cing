@@ -131,7 +131,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * Translated "ERROR".
    * 
    * @return translated "ERROR"
-   * @gwt.key ERROR
    */
   String ERROR();
 
