@@ -1,63 +1,6 @@
 * apache on mac
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2 instead of 1, look for the settings file httpd.conf in: 
-    /private/etc/apache2/httpd.conf
-* Doing https on mac:
-	- Ask Wilmar Teunissen's help
-	- Study http://www.madboa.com/geek/openssl/#cert-request
-	  and http://www.ru.nl/uci/diensten_voor/medewerkers/ict-beveiliging/
-	- Generated a key:
-		"""[mini:etc/apache2/extra] root# openssl req -new -newkey rsa:1024 -nodes -keyout nmrkey.pem -out nmr_request.pem
-Generating a 1024 bit RSA private key
-......++++++
-......++++++
-writing new private key to 'nmrkey.pem'
------
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:NL
-State or Province Name (full name) [Some-State]:Gelderland
-Locality Name (eg, city) []:Nijmegen
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:Radboud Universiteit Nijmegen
-Organizational Unit Name (eg, section) []:CMBI
-Common Name (eg, YOUR name) []:nmr.cmbi.ru.nl
-Email Address []:
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:
-An optional company name []:
-		"""
-		
-    In last conf file:
-    
-ScriptAliasMatch ^/cgi-bin/((?!(?i:webobjects)).*$) "/Library/WebServer/CGI-Executables/$1"
-
-<Directory "/Library/WebServer/CGI-Executables">    AllowOverride None    Options None    Order allow,deny    Allow from all</Directory>
-
-So that the following url is available:
-http://stella.cmbi.umcn.nl/cgi-bin/simpleCgiServer.py?name=jfd&addr=test
-
-Add settings to /private/etc/apache2/users/jd.conf  like:
-SetEnv  xplorPath /usr/local/bin/xplor
-SetEnv  procheckPath /Users/jd/progs/procheck/procheck_nmr.scr
-SetEnv  aqpcPath /Users/jd/progs/aquad/scripts/aqpc
-SetEnv  whatifPath /home/vriend/whatif/DO_WHATIF.COM
-SetEnv  dsspPath /home/vriend/whatif/dssp/DSSP.EXE
-SetEnv  convertPath /sw/bin/convert
-SetEnv  ghostscriptPath /sw/bin/gs
-SetEnv  ps2pdfPath /sw/bin/ps2pdf14
-SetEnv  molmolPath /Users/jd/progs/molmolM/molmol
-SetEnv  povrayPath /sw/bin/povray
-# To home a .matplotlibrc directory with settings will be added.
-SetEnv  HOME /Users/jd/Sites/cing/cing-home
-# Make sure the CING python directory referenced in the simpleCgiServer.py is
-# rwx to world.
 
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
@@ -73,9 +16,8 @@ tail -f /private/var/log/apache2/*_log &
     So don't use the suEXEC way.
     
 apache_setup_instructions.txt
-    Just do:
+Info:
     httpd -V
-    for a lot of info on settings.
 
     Restart by:
     /usr/sbin/httpd -k restart

@@ -9,15 +9,15 @@ public class Classification {
 	static final String[][] classi = new String[][] { 
 		{ "CING", "project", Defs.STRING_NA, Defs.STRING_NA },
 		{ "CCPN", "project", Defs.STRING_NA, Defs.STRING_NA },
-//		{ "CCPN", "bogus", "blabla", Defs.STRING_NA },
-//		{ "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
-//		{ "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
-//		{ "DYANA/DIANA", "distance", "NOE", "upper" },
-//		{ "DYANA/DIANA", "distance", "NOE", "lower" },
-//		{ "DYANA/DIANA", "dihedral angle", Defs.STRING_NA, Defs.STRING_NA },
-//		{ "XPLOR/CNS", "distance", "hydrogen bond", Defs.STRING_NA },
-//		{ "XPLOR/CNS", "distance", "NOE", Defs.STRING_NA },
-//		{ "PDB", "coordinate", Defs.STRING_NA, Defs.STRING_NA },
+		{ "CCPN", "bogus", "blabla", Defs.STRING_NA },
+		{ "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
+		{ "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
+		{ "DYANA/DIANA", "distance", "NOE", "upper" },
+		{ "DYANA/DIANA", "distance", "NOE", "lower" },
+		{ "DYANA/DIANA", "dihedral angle", Defs.STRING_NA, Defs.STRING_NA },
+		{ "XPLOR/CNS", "distance", "hydrogen bond", Defs.STRING_NA },
+		{ "XPLOR/CNS", "distance", "NOE", Defs.STRING_NA },
+		{ "PDB", "coordinate", Defs.STRING_NA, Defs.STRING_NA },
 	};
 
 	public static ArrayList<String> getProgramList() {

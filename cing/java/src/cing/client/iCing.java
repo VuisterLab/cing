@@ -33,6 +33,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 
+	public static final String VERSION = "0.0.0";
+	public static final String RPC_URL = "../cgi-bin/iCing";
+	
 	public static final String LOGIN_STATE = "login";
 	public static final String WELCOME_STATE = "welcome";
 	public static final String FILE_STATE = "file";
@@ -42,11 +45,19 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public static final String FORM_ACCESS_KEY = "AccessKey";
 	public static final String FORM_USER_ID = "UserId";
+	public static final String FORM_UPLOAD_FILE_BASE = "UploadFile";
+	public static final String JSON_ERROR_STATUS = "error";
+
+	
+	/** WATCH out, this needs to be in sync with FileView form.
+	 * It's the file and the access key and user id.
+	 * */
+	public static final int FORM_PART_COUNT = 3;
 	
 	/**
 	 * The available style themes that the user can select.
 	 */
-	String[] STYLE_THEMES = { "standard", "chrome", "dark" };
+	String[] STYLE_THEMES = { "standard", "chrome", "dark" }; 
 
 	/**
 	 * The current style theme.
@@ -62,11 +73,9 @@ public class iCing implements EntryPoint, HistoryListener {
 	protected static boolean debugOn = true;
 
 	public static iCingConstants c;
-	public static String currentAccessKey;
+	public static String currentAccessKey = Options.getNewAccessKey();
 	public static String currentUserId = "JoeNmr";  // TODO: implement security functionality later.
 
-	/** Can be queried for the length of the array e.g. */
-	public static final String[] fileFormItemList = new String[] { null, FORM_ACCESS_KEY, FORM_USER_ID };
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextAreaIcing area = new RichTextAreaIcing();
 	public static final RichTextAreaIcing statusArea = new RichTextAreaIcing();
@@ -96,18 +105,19 @@ public class iCing implements EntryPoint, HistoryListener {
 //		});
 		c = GWT.create(iCingConstants.class);
 		General.setVerbosityToDebug();
+
 		showMenu();
 
-		views = new ArrayList();
+		status = new Status();
+		login = new Login();
 		welcome = new Welcome();
 		fileView = new FileView();
 		logView = new LogView();
-		login = new Login();
 		options = new Options();
 		preferences = new Preferences();
 		criteria = new Criteria();
-		status = new Status();
 
+		views = new ArrayList();
 		views.add(welcome);
 		views.add(fileView);
 		views.add(logView);
@@ -119,11 +129,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		views.add(status);
 
 		for (Composite v : views) {
-			// flowPanel.add(v, margin, yLocMainWindow); // All on top of each
 			vPanel.add(v); // All on top of each
-			// other.
 		}
-		// flowPanel.setStylePrimaryName("FlowPanel");
 		vPanel.setSpacing(5);
 		clearAllViews();
 		setupHistory();
@@ -131,7 +138,8 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	private void setupHistory() {
 		History.addHistoryListener(this);
-		this.onHistoryChanged(FILE_STATE);
+		this.onHistoryChanged(FILE_STATE);	
+//		this.onHistoryChanged(WELCOME_STATE);	
 	}
 
 	public void onHistoryChanged(String historyToken) {
@@ -221,6 +229,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("de", i++);
 		localeMap.put("en", i++);
 		localeMap.put("es", i++);
+		localeMap.put("fr", i++);
 		localeMap.put("it", i++); 
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
@@ -229,6 +238,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		listBoxLocale.addItem(c.de(), "de");
 		listBoxLocale.addItem(c.en(), "en");
 		listBoxLocale.addItem(c.es(), "es"); 
+		listBoxLocale.addItem(c.fr(), "fr");
 		listBoxLocale.addItem(c.it(), "it");
 		listBoxLocale.addItem(c.nl(), "nl");
 		listBoxLocale.addItem(c.pt(), "pt");
@@ -239,10 +249,6 @@ public class iCing implements EntryPoint, HistoryListener {
 	    	idx = 2; // en is default
 	    } 
     	listBoxLocale.setSelectedIndex(idx);
-//    	boolean unsupportedLanguageSelected = ! ( idx == 0 || idx == 1 || idx == 2 || idx == 3 || idx == 5 || idx == 6);
-//    	if ( unsupportedLanguageSelected ) {
-//    		Window.alert("Unsupported language selected; defaulting to English");
-//    	}
 
 		listBoxLocale.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {

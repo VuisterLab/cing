@@ -8,9 +8,9 @@ package cing.client;
 public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   
   /**
-   * Translated "and   ".
+   * Translated "and".
    * 
-   * @return translated "and   "
+   * @return translated "and"
    * @gwt.key and
    */
   String and();
@@ -32,17 +32,17 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Verbosity();
 
   /**
-   * Translated "New        ".
+   * Translated "New".
    * 
-   * @return translated "New        "
+   * @return translated "New"
    * @gwt.key New
    */
   String New();
 
   /**
-   * Translated "Help       ".
+   * Translated "Help".
    * 
-   * @return translated "Help       "
+   * @return translated "Help"
    * @gwt.key Help
    */
   String Help();
@@ -56,9 +56,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Sound_is_turn();
 
   /**
-   * Translated "is part of the ".
+   * Translated "is part of the".
    * 
-   * @return translated "is part of the "
+   * @return translated "is part of the"
    * @gwt.key is_part
    */
   String is_part();
@@ -72,9 +72,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Ensemble_mode();
 
   /**
-   * Translated "Options    ".
+   * Translated "Options".
    * 
-   * @return translated "Options    "
+   * @return translated "Options"
    * @gwt.key Options
    */
   String Options();
@@ -88,9 +88,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Preferences();
 
   /**
-   * Translated "Close       ".
+   * Translated "Close".
    * 
-   * @return translated "Close       "
+   * @return translated "Close"
    * @gwt.key Close
    */
   String Close();
@@ -104,9 +104,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Residues();
 
   /**
-   * Translated "Edit       ".
+   * Translated "Edit".
    * 
-   * @return translated "Edit       "
+   * @return translated "Edit"
    * @gwt.key Edit
    */
   String Edit();
@@ -131,6 +131,7 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * Translated "ERROR".
    * 
    * @return translated "ERROR"
+   * @gwt.key ERROR
    */
   String ERROR();
 
@@ -143,9 +144,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Bad();
 
   /**
-   * Translated "Save        ".
+   * Translated "Save".
    * 
-   * @return translated "Save        "
+   * @return translated "Save"
    * @gwt.key Save
    */
   String Save();
@@ -157,6 +158,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key All_non-hydro
    */
   String All_non_hydro();
+
+  /**
+   * Translated "Français".
+   * 
+   * @return translated "Français"
+   * @gwt.key fr
+   */
+  String fr();
 
   /**
    * Translated "Detail".
@@ -207,9 +216,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Regenerate();
 
   /**
-   * Translated "Report     ".
+   * Translated "Report".
    * 
-   * @return translated "Report     "
+   * @return translated "Report"
    * @gwt.key Report
    */
   String Report();
@@ -335,9 +344,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Only_amides();
 
   /**
-   * Translated "Exit       ".
+   * Translated "Exit".
    * 
-   * @return translated "Exit       "
+   * @return translated "Exit"
    * @gwt.key Exit
    */
   String Exit();
@@ -351,9 +360,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Standard_all();
 
   /**
-   * Translated "Welcome ".
+   * Translated "Welcome".
    * 
-   * @return translated "Welcome "
+   * @return translated "Welcome"
    * @gwt.key Welcome
    */
   String Welcome();
@@ -391,9 +400,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String iCing_subtitle();
 
   /**
-   * Translated "Criteria   ".
+   * Translated "Criteria".
    * 
-   * @return translated "Criteria   "
+   * @return translated "Criteria"
    * @gwt.key Criteria
    */
   String Criteria();
@@ -479,9 +488,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Standard();
 
   /**
-   * Translated "About      ".
+   * Translated "About".
    * 
-   * @return translated "About      "
+   * @return translated "About"
    * @gwt.key About
    */
   String About();
@@ -559,17 +568,17 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String unfortunatel();
 
   /**
-   * Translated "3D         ".
+   * Translated "3D".
    * 
-   * @return translated "3D         "
+   * @return translated "3D"
    * @gwt.key threeD
    */
   String threeD();
 
   /**
-   * Translated "occurances in db".
+   * Translated "occurrences in db".
    * 
-   * @return translated "occurances in db"
+   * @return translated "occurrences in db"
    * @gwt.key occurances_in
    */
   String occurances_in();
@@ -599,9 +608,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String E_g_();
 
   /**
-   * Translated "Log        ".
+   * Translated "Log".
    * 
-   * @return translated "Log        "
+   * @return translated "Log"
    * @gwt.key Log
    */
   String Log();
@@ -615,9 +624,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Login();
 
   /**
-   * Translated "File       ".
+   * Translated "File".
    * 
-   * @return translated "File       "
+   * @return translated "File"
    * @gwt.key File
    */
   String File();
@@ -631,9 +640,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String All_theoretic();
 
   /**
-   * Translated "View       ".
+   * Translated "View".
    * 
-   * @return translated "View       "
+   * @return translated "View"
    * @gwt.key View
    */
   String View();
@@ -671,9 +680,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String nl();
 
   /**
-   * Translated "Uncaught exception ".
+   * Translated "Uncaught exception".
    * 
-   * @return translated "Uncaught exception "
+   * @return translated "Uncaught exception"
    * @gwt.key Uncaught_ex
    */
   String Uncaught_ex();
@@ -703,9 +712,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Warning();
 
   /**
-   * Translated "Run        ".
+   * Translated "Run".
    * 
-   * @return translated "Run        "
+   * @return translated "Run"
    * @gwt.key Run
    */
   String Run();

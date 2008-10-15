@@ -374,7 +374,7 @@ public class General {
 		}
 
 		appendHtml(message + "<br>\n");
-		// out.println(message);
+		System.out.println(message); // Echo
 	}
 
 	public static boolean appendHtml(String message) {

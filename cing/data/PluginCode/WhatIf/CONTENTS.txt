@@ -6,3 +6,6 @@ phipsi_wi_entry.csv     Per entry Z-scores by jackknife procedure.
 phipsi_wi_overall.txt   Overall results.
 phipsi_wi_db.dat        Python pickle with histograms from Scripts/convertPhiPsi2Db.py
 
+
+Note that the .dat files were made writable because of cgi server implementation.
+No clue how to do this in svn yet.

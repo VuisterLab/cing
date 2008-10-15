@@ -32,13 +32,8 @@ class SimpleCgiServer:
 <head>
 <title>Project PROJECT</title>
 <!-- Next section verbatum from index.html -->
-<!-- from http://localhost/cgi-bin/simpleCgiServer.py
-     to   http://localhost/~jd/cing/CING_server.html-->
-<link   href="../~jd/cing/cing.ico"                                                   rel="shortcut icon">
-<link   href="../~jd/cing/cing.css"                       type="text/css"             rel="stylesheet" media="screen">
-<script src= "../~jd/cing/javascript/formval.js"          type="text/javascript">     </script>
-<script src= "../~jd/cing/javascript/multilineTitles.js"  type="text/javascript">     </script>
-<script src= "../~jd/cing/javascript/timer.js"            type="text/javascript">     </script>
+<link   href="../cing/cing.ico"                                                   rel="shortcut icon">
+<link   href="../cing/cing.css"                       type="text/css"             rel="stylesheet" media="screen">
 </head>
 """
         self.footer = """<div id="footer">
@@ -48,29 +43,6 @@ class SimpleCgiServer:
     <a href="mailto:alanwilter@gmail.com">Alan Wilter Sousa da Silva</a></p>
     </div>
     for help, when required."""
-        self.timerForm = """
-        <!-- This timer form works with the javascript/timer.js code. -->
-<form name="theTimer"><table>
-   <tr>
-      <td align=center>
-       Now showing a clock:
-      </td>
-      <td align=center>
-         <input type=text name="theTime" size=6>
-      </td>
-      <td>
-         <input type=button name="start" value="Start" onclick="startTimer()">
-      </td>
-      <td>
-         <input type=button name="stop" value="Stop" onclick="stopTimer()">
-      </td>
-      <td>
-         <input type=button name="reset" value="Reset" onclick="resetTimer()">
-      </td>
-   </tr>
-</table>
-</form>
-    """
         NTmessage( "Content-Type: text/html\n" )     # HTML is following # blank line, end of headers
         NTmessage( "<HTML>" )     # HTML is following # blank line, end of headers
         NTmessage(  self.header )
@@ -222,7 +194,7 @@ class SimpleCgiServer:
         NTmessage(  "</pre>")
 
         # Localized in ant script.
-        # SERVER_CGI_URL_TMP is like: localhost/~jd/tmp/cing
+        # SERVER_CGI_URL_TMP is like: localhost/tmp/cing
         cingResultUrl = os.path.join( self.tmpUrl, entryId+".cing", "index.html")
         NTmessage(  '<P>Please find the results <a href="http://%s"> here </A>' % cingResultUrl)
         NTmessage(  '<P>Your uploads and logs are available from <a href="http://%s"> here </A>' % self.tmpUrl)

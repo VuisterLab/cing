@@ -17,7 +17,7 @@ public class Options extends Composite {
 	private TextBox textBox_1;
 	private TextBox textBox;
 
-	public int accessKeyLength = 6;
+	public static int accessKeyLength = 6;
 	
 	iCingConstants c = iCing.c;
 
@@ -76,15 +76,20 @@ public class Options extends Composite {
 		regeneratePushButton.setEnabled(false);
 		generateAccessKey();
 	}
-
-	protected void generateAccessKey() {
+	
+	public static String getNewAccessKey() {
 		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		String new_access = "";
+		String result = "";
 		for (int i = 1; i <= accessKeyLength; i++) {
 			int idxChar = Random.nextInt( allowedCharacters.length() ); // equal chance for A as for others.
-			new_access = new_access + allowedCharacters.charAt(idxChar);
+			result += allowedCharacters.charAt(idxChar);
 			// TODO: generate on server with cross check on availability...
 		}
+		return result;
+	}
+	
+	protected void generateAccessKey() {		
+		String new_access = getNewAccessKey();
 		accessKeyLabelValue.setText(new_access);
 		iCing.currentAccessKey = new_access;
 	}

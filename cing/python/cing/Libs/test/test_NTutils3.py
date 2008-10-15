@@ -1,13 +1,14 @@
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import ROGscore
+from cing.Libs.NTutils import bytesToFormattedString
 from cing.PluginCode.html import HTMLfile
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
 from unittest import TestCase
 import cing
-import os
+import os 
 import unittest
 
 class AllChecks(TestCase):
@@ -39,8 +40,13 @@ class AllChecks(TestCase):
 
 #        myhtml.render() # Can't be done without whole project and content anymore.
 
-
-
+    def testBytesToFormattedString(self):
+        byteList = [ 1, 1000, 1300, 13000*1024, 130*1000*1024*1024  ]
+        expectedResults= [ '1 bytes', '1000 bytes', '1.27 kb', '12.70 Mb', '126.95 Gb' ]
+        for i in range(len(byteList)):
+            r = bytesToFormattedString(byteList[i])
+            self.assertEqual( r, expectedResults[i] )
+        
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
