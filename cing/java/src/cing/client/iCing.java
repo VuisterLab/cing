@@ -244,10 +244,19 @@ public class iCing implements EntryPoint, HistoryListener {
 		listBoxLocale.addItem(c.pt(), "pt");
 	    String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-	    int idx = localeMap.get(currentLocale);
-	    if ( idx < 0 ) {
-	    	idx = 2; // en is default
-	    } 
+	    int idx = 2;	    
+	    if ( currentLocale != null ) {
+	    	if ( localeMap != null ) { // shouldn't have happened.
+		    	idx = localeMap.get(currentLocale);
+			    if ( idx < 0 ) {
+			    	idx = 2; // en is default
+			    }
+	    	} else {
+	    		General.showWarning("Failed to find localeMap");
+	    	}
+	    } else {
+    		General.showWarning("Failed to find currentLocale");
+	    }
     	listBoxLocale.setSelectedIndex(idx);
 
 		listBoxLocale.addChangeListener(new ChangeListener() {

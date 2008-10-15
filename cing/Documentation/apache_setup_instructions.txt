@@ -1,6 +1,8 @@
 * apache on mac
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
-    On leopard which has apache 2 instead of 1, look for the settings file httpd.conf in: 
+    On leopard which has apache 2:
+        /private/etc/apache2/httpd.conf and
+        /private/etc/apache2/users/jd.conf
 
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
@@ -8,11 +10,7 @@ ErrorLog /private/var/log/apache2/error_log
 monitor with:
 tail -f /private/var/log/apache2/*_log &
 
-- allow indexing on home dirs and beyond for  e.g.:
-    http://tang.bmrb.wisc.edu/~jurgen/tmp/Aqua/900971/
-    by including settings:<Directory /home/*/external_html> in /etc/httpd/conf/httpd.conf
-
-- processing is done as _www:admin user:group account.
+- processing is done as _www:admin account.
     So don't use the suEXEC way.
     
 apache_setup_instructions.txt
@@ -33,4 +31,9 @@ Info:
     In the System Preference of the Mac
         Sharing
             Turn on "Web Sharing" and check server in browser.
+            
+        ProxyPass         /iCing/servlets http://localhost:8080/iCing/servlets
+        ProxyPassReverse  /iCing/servlets http://localhost:8080/iCing/servlets
+
+        The tomcat server in eclipse works together with the apache configured here.
             
