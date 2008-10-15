@@ -94,7 +94,7 @@ class FileUpload():
             try:
                 os.makedirs(pathProject) # defaults to False return.
             except Exception, e:
-                self.endError("Failed to makedirs for project at: [" + pathProject + "] with Exception: ["+e+"]")
+                self.endError("Failed to makedirs for project at: [" + pathProject + "] with Exception: ["+`e`+"]")
             else:
                 logToLog('pathProject created')
                 

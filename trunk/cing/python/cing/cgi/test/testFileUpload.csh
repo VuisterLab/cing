@@ -3,7 +3,7 @@
 # Script for testing of FileUpload.py at the CGI server.
 # Run: $CINGROOT/python/cing/cgi/test/testFileUpload.csh
 
-set localTesting = 1
+set localTesting = 0
 
 set machineUrl = nmr.cmbi.ru.nl
 if ( $localTesting ) then
