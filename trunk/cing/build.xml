@@ -3,127 +3,124 @@
 <!-- TODO: remove the unneeded settings. -->
 
 
-<project name="cing" default="server-install" basedir="." >
-    <description>Builds, tests, and runs the project cing.</description>
-    <echo>Starting Ant with updated build file</echo>
-    <property file="cing.properties"/>
+<project name="cing" default="iCing-cgi-install" basedir=".">
+	<description>Builds, tests, and runs the project cing.</description>
+	<echo>Starting Ant with updated build file</echo>
+	<property file="cing.properties" />
 
-    <!-- Added for functionality. Requires a ant-contrib.jar in classpath. -->
-    <taskdef resource="net/sf/antcontrib/antlib.xml" />
-    
-	<target name="init" description="init"  >
-  	  <tstamp>
-  	    	<format property="cing_version" pattern="yyyyMMdd-HHmm" />
-  	  </tstamp>
-	  <echo message="Initiating cing version: ${cing_version}"/>
-	  <mkdir dir="${build.classes.dir}"/>
+	<!-- Added for functionality. Requires a ant-contrib.jar in classpath. -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+	<target name="init" description="init">
+		<tstamp>
+			<format property="cing_version" pattern="yyyyMMdd-HHmm" />
+		</tstamp>
+		<echo message="Initiating cing version: ${cing_version}" />
+		<mkdir dir="${build.classes.dir}" />
 	</target>
 
-	<target name="iweb-install" depends="init">
-        <echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb."/>
-        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${iweb.dir}"/>
-        <scp    todir="${home.web.user}@${home.web.machine.looped}:${iweb.dir}"
-                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
-            port="${home.web.port}"
-            verbose="true"
-            >
-            <fileset dir="${iweb.local.dir}"/>                     
-        </scp>
+	<target name="home-web-install" depends="init">
+		<echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
+		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
+		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
+			<fileset dir="${home.web.local.dir}" />
+		</scp>
 		<!--
 		<sync verbose="true"></sync>
 		<copydir dest="" src="" ></copydir>
 		-->
-    </target>    
-	
-	<target name="iweb-zip" description="Zips files from iWeb directory to project's workspace." depends="init"> 	 
-		<zip destfile="iWeb/CING_iWeb.zip" 
-		       basedir="${iweb.internal.dir}"
-		       update="true"
-		  />
-		<echo message="Files moved to production succesfully."/>
 	</target>
-	
-    <target name="server-install" depends="init, home-web-install, server-cgi-install"
-            description="Publish the server.">
-    </target>
 
-    <target name="server-local-install" depends="init"
-            description="Run this target locally on the server.">
-        <mkdir dir="${server.cgi.dir.log}" />
-        <mkdir dir="${server.cgi.cing-home.dir}" />
-
-    	<!-- set permissions for executable but not readible so it's secret -->
-        <chmod perm="a+wx" dir="${server.cgi.dir.tmp}" />
-        <chmod perm="o-r"  dir="${server.cgi.dir.tmp}" />
-        <chmod perm="a+wx" dir="${server.cgi.cing-home.dir}" />
-        <chmod perm="a+x" file="${server.cgi.dir}/${server.cgi.python.prog}" />
-    </target>
-
-	<target name="home-web-install" depends="init">
-        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}"/>
-        <!-- for some reason JFD can't get the example copied over with ** without blocking
+	<!--
+	<target name="home.web-install" depends="init">
+		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
+		<! for some reason JFD can't get the example copied over with ** without blocking
         further ant targets. Perhaps permissions or special files prevent it?
         Perhaps the nestedness of the .svn dir ? The work around is to ant on this once, kill it and
-        enable the below exclude afterwards. Or fix it: http://www.symphonious.net/2007/10/23/ant-scpssh-task-hangs-or-never-disconnects/ -->
-        <scp    todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}"
-                keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}"
-            port="${home.web.port}"
-            verbose="true"
-            >
-            <fileset dir="${server.local.dir}"/>                     
-        </scp>
-    </target>    
-	   
-    <target name="server-cgi-install" depends="init">
-        <echo message="Installing cgi program to server engine: ${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}"/>
-
-        <copy todir="${tmp.local.dir}" file="${server.cgi.dir.local}/${server.cgi.python.prog}" overwrite="true"
-            verbose="true"/>
-    	<!-- TODO use nested match/replace for conciseness -->
-        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="PYTHON_EXECUTABLE" 
-                               replace='${server.cgi.python} ${server.cgi.python.flags}'
-                               byline="true"/>
-        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="CING_ROOT" 
-                               replace='${server.cgi.cing.root.dir}'
-                               byline="true"/>
-        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="CING_SERVER_TMP" 
-                               replace='${server.cgi.dir.tmp}'
-                               byline="true"/>
-        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="SERVER_CGI_URL_TMP" 
-                               replace='${server.cgi.url.tmp}'
-                               byline="true"/>
-        <replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}"
-                               match="WEB_URL"
-                               replace='${server.url}'
-                               byline="true"/>
-    	    	
-    	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}"
-            keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
-            verbose="true"
-    		port="${server.cgi.port}"
-            >
-            <fileset dir="${tmp.local.dir}"  includes="${server.cgi.python.prog}"/>                     
-        </scp>
-    	
-    </target>
-
-    <target name="iCing-install" depends="init">
-        <echo message="Ensure that the iCing dir already exists remotely."/>
-    	
-	<!-- modelled after:
-		scp -P 39676 -r $WS/cing/www/cing.iCing jd@localhost-mini:/Users/jd/Sites/iCing 	
+        enable the below exclude afterwards. Or fix it: http://www.symphonious.net/2007/10/23/ant-scpssh-task-hangs-or-never-disconnects/ >
+		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
+			<fileset dir="${server.local.dir}" />
+		</scp>
+	</target>
 	-->
-    	<scp    todir="${server.cgi.user}@${server.cgi.machine.looped}:${icing.server.dir}"
-            keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" 
-            verbose="true"
-    		port="${server.cgi.port}"
-            >
-            <fileset dir="${icing.server.dir.local}"/>                     
-        </scp>
-    </target>
+
+
+	<!--
+	<target name="home-web-zip" description="Zips files from iWeb directory to project's workspace." depends="init">
+		<zip destfile="iWeb/CING_iWeb.zip" basedir="${home.web.internal.dir}" update="true" />
+		<echo message="Files moved to production succesfully." />
+	</target>
+	-->
+
+
+	<target name="iCing-local-install" depends="init" description="Run this target locally on the server.">
+		<mkdir dir="${server.cgi.dir.log}" />
+		<!-- Used by python HOME -->
+		<mkdir dir="${server.cgi.cing-home.dir}" />
+
+		<!-- set permissions for executable but not readible so it's secret -->
+		<chmod perm="a+wx" dir="${server.cgi.dir.tmp}" />
+		<chmod perm="o-r" dir="${server.cgi.dir.tmp}" />
+		<chmod perm="a+wx" dir="${server.cgi.cing-home.dir}" />
+		<chmod perm="a+x" file="${server.cgi.dir}/${server.cgi.python.prog}" />
+	</target>
+
+	<target name="iCing-install" depends="init,iCing-static-install,iCing-cgi-install">
+	</target>
+
+	<target name="iCing-static-install" depends="init">
+		<echo message="Ensure that the iCing dir already exists remotely." />
+
+		<scp todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.web.dir}" keyfile="${home.web.keyfile}" 
+			knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${server.cgi.port}">
+			<fileset dir="${server.web.dir.local}" />
+		</scp>
+	</target>
+
+	<target name="iCing-cgi-install" depends="init">
+
+		<echo message="Installing cgi program at: ${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}" />
+		<echo message="server.cgi.url.tmp: ${server.cgi.url.tmp}" />
+
+		<!-- 
+		<copy todir="${tmp.local.dir}" overwrite="true" verbose="true">
+			<fileset dir="${server.cgi.dir.local}" includes="*.py" />
+		</copy>
+
+		TODO use nested match/replace for conciseness 
+		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="CING_SERVER_TMP" replace='${server.cgi.dir.tmp}' byline="true" />
+		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="SERVER_CGI_URL_TMP" replace='${server.cgi.url.tmp}' byline="true" />
+		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="WEB_URL" replace='${server.url}' byline="true" />
+-->
+		<scp todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${server.cgi.port}">
+			<fileset dir="${server.cgi.dir.local}" includes="*.py" />
+		</scp>
+
+	</target>
+
+	<!-- 
+	<target name="iCing-servlet-install" depends="init">
+		<echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
+
+		<!
+		compile to "classes" this is now done automatically to:
+    	java/bin/cing/server/FileUploadServlet.class
+    	when calling the gwt compile.
+    	     	
+
+		<copy todir="${icing.production.local.dir}/WEB-INF/classes/cing" >
+			<fileset dir="java/bin/cing"/>
+		</copy>
+
+		<zip destfile="java/${icing.war.file}">
+			<fileset dir="${icing.production.local.dir}" />
+			<includesfile name="WEB-INF, README.txt" />
+
+		</zip>
+
+		<scp todir="${server.cgi.user}@${server.cgi.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${server.cgi.port}">
+			<fileset file="java/${icing.war.file}" />
+		</scp>
+	</target> -->
 
 </project>

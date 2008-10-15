@@ -25,6 +25,10 @@ import com.gwtsolutions.components.client.ui.Message;
 
 public class FileView extends Composite {
 
+	
+	private static final String FILE_UPLOAD_SERVLET_RELATIVE_URL = iCing.RPC_URL+"/FileUpload.py";
+	// Development:
+	// http://localhost:8888/cing.iCing/iCing.html
 	final Button startButton = new Button();
 	final FlexTable flexTable = new FlexTable();
 	final Button addButton = new Button();
@@ -61,7 +65,7 @@ public class FileView extends Composite {
 		verticalPanel.add(label);
 		verticalPanel.add(statusMessage);
 		// Since there is no status initially, hide the status message
-		statusMessage.setVisible(true);
+		statusMessage.setVisible(false);
 
 		DecoratorPanel decPanel = new DecoratorPanel();
 		final HorizontalPanel horizontalPanel = new HorizontalPanel();
@@ -126,47 +130,58 @@ public class FileView extends Composite {
 		// General.showDebug("currentRowIdx" + currentRowIdx);
 		flexTable.insertRow(currentRowIdx); // push the Add button down.
 
-		final CheckBox checkBox = new CheckBox();
-		flexTable.setWidget(currentRowIdx, checkBoxIdx, checkBox);
-		checkBox.setChecked(true);
-		checkBox.setText("");
-		checkBox.setVisible(false);
+		final CheckBox checkBoxUseFile = new CheckBox();
+		flexTable.setWidget(currentRowIdx, checkBoxIdx, checkBoxUseFile);
+		checkBoxUseFile.setChecked(true);
+		checkBoxUseFile.setText("");
+//		checkBoxUseFile.setVisible(false);
 
+		final Label labelFileUploadDone = new Label("This message should not show up.");
+		labelFileUploadDone.setVisible(false);
+		
 		final FileUpload fileUpload = new FileUpload();
-		/** Set the current element but with a number that in the end might not make sense. */
-		fileUpload.setName("uploadFormElement"+Integer.toString(currentRowIdx));
-
+		fileUpload.setName(iCing.FORM_UPLOAD_FILE_BASE);
+		Button submitButton = new Button(c.Submit());
+		
 		final FormPanel formPanel = new FormPanel();
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
-		formPanel.setAction(GWT.getModuleBaseURL() + "/fileupload");
+//		formPanel.setMethod(FormPanel.METHOD_GET);
+		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
+//		General.showDebug("moduleBaseUrlWithPort: " + moduleBaseUrlWithPort);
+//		int endIndex = moduleBaseUrlWithPort.lastIndexOf(':');
+//		if ( endIndex < 0 ) {
+//			endIndex = moduleBaseUrlWithPort.length();
+//		}
+//		String moduleBaseUrl = moduleBaseUrlWithPort.substring(0, endIndex);
+//		String actionUrl = "http://localhost/cgi/iCing/bla";
+		
+		// Testing:
+		// moduleBaseUrlWithPort: http://localhost:8888/cing.iCing/
+		// Production:
+		// moduleBaseUrlWithPort: https://nmr.cmbi.ru.nl/iCing/
+		String actionUrl = moduleBaseUrlWithPort + "/" + FILE_UPLOAD_SERVLET_RELATIVE_URL;
+//		General.showDebug("actionUrl: [" + actionUrl +"]");
+		formPanel.setAction(actionUrl);
 		/** Since not more than one element can be added to formpanel; the individual items 
 		 * need to be wrapped in another element that can contain them.
 		 */
 		VerticalPanel formLayoutPanel = new VerticalPanel();
+		HorizontalPanel fileUploadHorizontalPanel = new HorizontalPanel();
+		fileUploadHorizontalPanel.add(fileUpload); // will switch between these two.
+		fileUploadHorizontalPanel.add(labelFileUploadDone);
 		formPanel.setWidget(formLayoutPanel);
-		formLayoutPanel.add(fileUpload);
+		formLayoutPanel.add(fileUploadHorizontalPanel);
 		flexTable.setWidget(currentRowIdx, fileIdx, formPanel);
 		// The GWT calls this form handler after the form
 		// is submitted.
 		FileFormHandler fileFormHandler = new FileFormHandler();
-		fileFormHandler.setFileUpload(fileUpload);
-		fileFormHandler.setStatusMessage(statusMessage);
-		formPanel.addFormHandler(fileFormHandler);
-		// When the user clicks on the button, we submit
-		// the surrounding form
-		Button submitButton = new Button(c.Submit());
-		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
-		submitButton.addClickListener(new ClickListener() {
-			public void onClick(Widget sender) {
-				formPanel.submit();
-			}
-		});
-		/** Invisible parameters to pass */
-		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey) ); // TODO: update when updated.
-		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId) ); // TODO: update when updated.
 		
-
+		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
+		/** Invisible parameters to pass */
+		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey) ); 
+		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId) ); 
+		
 		final ListBox listBox_Program = new ListBox();
 		flexTable.setWidget(currentRowIdx, programIdx, listBox_Program);
 		listBox_Program.setVisibleItemCount(1);
@@ -230,11 +245,22 @@ public class FileView extends Composite {
 		}
 		listBox_Other.setItemSelected(0, true);
 
+		
+		fileFormHandler.setFileUpload(fileUpload);
+		fileFormHandler.setLabelFileUploadDone(labelFileUploadDone);
+		fileFormHandler.setStatusMessage(statusMessage);
+		fileFormHandler.setSubmitButton(submitButton);
+		fileFormHandler.setCheckBoxUseFile(checkBoxUseFile);
+		fileFormHandler.setListBox_Program(listBox_Program);
+		fileFormHandler.setListBox_Type(listBox_Type);
+		fileFormHandler.setListBox_Subtype(listBox_Subtype);
+		fileFormHandler.setListBox_Other(listBox_Other);
+		
 		/** Removing file while not (fully) transmitted to server. */
-		final Button removeButton = new Button();
-		flexTable.setWidget(currentRowIdx, removeIdx, removeButton);
-		removeButton.setText("Remove");
-		removeButton.addClickListener(new ClickListener() {
+//		final Button removeButton = new Button();
+//		flexTable.setWidget(currentRowIdx, removeIdx, removeButton);
+//		removeButton.setText("Remove");
+		checkBoxUseFile.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				int[] indices = Utils.getIndicesFromTable(flexTable, sender);
 				if (indices == null) {
@@ -253,10 +279,10 @@ public class FileView extends Composite {
 				}
 			}
 		});
+		
 
 		// setEnableAllWidgetAtByRow(currentRowIdx, false);
-		removeButton.setEnabled(true);
-
+//		removeButton.setEnabled(true);
 		listBox_Program.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
 				updateListBox();
@@ -345,6 +371,14 @@ public class FileView extends Composite {
 				// need to propagate
 			}
 		});
+		formPanel.addFormHandler(fileFormHandler);
+		submitButton.addClickListener(new ClickListener() {
+			public void onClick(Widget sender) {
+//				General.showWarning("Submit button thinks it's clicked (and does a GET instead of a POST) but does so on load of GWT module");
+				formPanel.submit();
+			}
+		});
+		
 		return false;
 	}
 

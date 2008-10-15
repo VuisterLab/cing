@@ -74,10 +74,25 @@ public class LogView extends Composite {
 
 	    area.setHTML( iniMsg );
 //	    General.showDebug("1 Found text area html: ["+area.getHTML()+"]");   
-	    General.showDebug(  "Test debug msg");   
-		General.showOutput( "Test output msg");
-		General.showWarning("Test warning msg");
+//	    General.showDebug(  "Test debug msg");   
+//		General.showOutput( "Test output msg");
+//		General.showWarning("Test warning msg");
 //		General.showError(  "Test error msg");
+
+		/** Section for testing within GWT hosted mode without having to do Junit testing 
+		 * 
+		 * 
+		 * PLACEHOLDER
+		 * 
+		 * 
+		int[] inputList = new int[] { 0, 1, 1050, 1000000, 2000000 };
+		String[] expectedResultList = new String[] { "0 bytes", "1 bytes", "1.03 kb", "976.56 kb", "1.91 Mb" };
+		for (int i = 0; i < inputList.length; i++) {
+			String result = Utils.bytesToFormattedString(inputList[i]);
+			General.showDebug("Converted input: ["+inputList[i]+"] to ["+result+"] and expected: [" + expectedResultList[i] +"]");
+//			assertEquals(result, expectedResultList[i]);
+		}
+		 * */
 	    
 	}	
 }

@@ -45,9 +45,9 @@ class AllChecks(TestCase):
             move( org, entryId)
             self.assertFalse(project.initCcpn(ccpnFolder=entryId))
             self.failIf(project.save())
-            self.assertFalse(project.validate(htmlOnly=False,
-                                              doProcheck = True,
-                                              doWhatif=True ))
+            self.assertFalse(project.validate(htmlOnly=True,
+                                              doProcheck = False,
+                                              doWhatif=False ))
 
             self.assertFalse(project.removeCcpnReferences())
 
