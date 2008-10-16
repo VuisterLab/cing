@@ -1,6 +1,6 @@
 """
 Unit test
-python $CINGROOT/python/cing/PluginCode/test/test_validate.py
+python $CINGROOT/python/cing/PluginCode/test/test_validate.py  |& tee ~/test_validate.log &
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -21,7 +21,8 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        fastestTest = False
+        fastestTest = True
+        
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -34,8 +35,7 @@ class AllChecks(TestCase):
 
 #        entryId = "1ai0"
 #        entryId = "1brv"        # Small much studied PDB NMR entry
-#        entryId = "1brv_1model"        # Small much studied PDB NMR entry
-        entryId = "B08011R"        # Small much studied PDB NMR entry
+        entryId = "1brv_1model"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB

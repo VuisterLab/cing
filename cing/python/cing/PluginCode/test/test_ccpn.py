@@ -24,6 +24,15 @@ class AllChecks(TestCase):
         entryList = ["Parvulustat"]
 #        entryList = ["1brv"]
 
+        fastestTest = True
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
+        if fastestTest:
+            htmlOnly = True 
+            doWhatif = False
+            doProcheck = False
+
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
         for entryId in entryList:
@@ -45,9 +54,9 @@ class AllChecks(TestCase):
             move( org, entryId)
             self.assertFalse(project.initCcpn(ccpnFolder=entryId))
             self.failIf(project.save())
-            self.assertFalse(project.validate(htmlOnly=True,
-                                              doProcheck = False,
-                                              doWhatif=False ))
+            self.assertFalse(project.validate(htmlOnly=htmlOnly,
+                                              doProcheck = doProcheck,
+                                              doWhatif=doWhatif ))
 
             self.assertFalse(project.removeCcpnReferences())
 

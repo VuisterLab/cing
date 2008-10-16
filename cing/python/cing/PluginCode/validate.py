@@ -232,8 +232,8 @@ def _criticizeResidue( residue, valSets ):
             if isinstance(actualValue, NTlist):
                 actualValue = actualValue.average()[0]
 
-            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
-                    actualValue, thresholdValuePoor, thresholdValueBad)
+#            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
+#                    actualValue, thresholdValuePoor, thresholdValueBad)
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
@@ -241,8 +241,8 @@ def _criticizeResidue( residue, valSets ):
 #                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
-#                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
-                NTdebug(comment)
+                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
@@ -986,13 +986,13 @@ def validateAssignments( project, toFile = True   ):
             if not atm.db.shift:
                 pseudo = atm.pseudoAtom()
                 if not pseudo:
-                    NTerror("Failed to find pseudo atom for atom: [" +`atm` + "]")
+                    NTwarning("Failed to find pseudo atom for atom: [" +`atm` + "]") # lowered priority msg as seen for hish
                     continue
                 if pseudo.db.shift:
                     av = pseudo.db.shift.average
                     sd = pseudo.db.shift.sd
                 else:
-                    NTerror("%s: '%s' not in in DB SHIFTS\n", funcName, atm)
+                    NTwarning("%s: '%s' not in in DB SHIFTS\n", funcName, atm)
                     continue
                 #end if
             else:

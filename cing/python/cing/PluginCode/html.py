@@ -1,11 +1,13 @@
 """
 Adds html generation methods
 """
-from cgi import escape
 from cing import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
+from cing import authorList
 from cing import cingPythonCingDir
 from cing import cingRoot
+from cing import cingVersion
+from cing import programName
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
@@ -24,6 +26,7 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
@@ -45,9 +48,6 @@ from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
-from cing import programName
-from cing import cingVersion
-from cing import authorList
 import os
 import shelve
 import shutil
@@ -184,11 +184,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
 
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
 
 #    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
@@ -893,8 +893,10 @@ class HTMLfile:
         else:
             openTag = openTag +  '>'
         #end if
-
-        content = escape(''.join(args))
+        # JFD found bug with using "from cgi import escape"; didn't work for me. Changed to below is also good
+        # idea because of security according to first comment at: http://code.activestate.com/recipes/52220/
+        # Can't seem to get this fixed so jus inlining the method.
+        content = self.escape(''.join(args))
         if (tag in self.noContent):
             closeTag = ''
         else:
@@ -1061,6 +1063,18 @@ class HTMLfile:
         section(tag, closeTag=False)
         self.insertHtmlLink(section, source, destination, text=text, id=id, **kwds)
         section(tag, openTag=False)
+        
+    def escape(self, s, quote=None): # TODO: fall back to cgi.escape() when possible.
+        '''Replace special characters "&", "<" and ">" to HTML-safe sequences.
+        If the optional flag quote is true, the quotation mark character (")
+        is also translated.'''
+        s = s.replace("&", "&amp;") # Must be done first!
+        s = s.replace("<", "&lt;")
+        s = s.replace(">", "&gt;")
+        if quote:
+            s = s.replace('"', "&quot;")
+        return s
+
 #end class
 
 class ProjectHTMLfile( HTMLfile ):
@@ -1369,7 +1383,7 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
 #            NTdebug('wiLinkReal: ' + wiLinkReal)
             if not os.path.exists( wiLinkReal ):
-                NTerror('Failed to find expected wiLinkReal: ' + wiLinkReal)
+                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
