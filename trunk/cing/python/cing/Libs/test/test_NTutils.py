@@ -23,12 +23,12 @@ class AllChecks(TestCase):
         pass
 
     def testRemoveRecursivelyAttribute(self):
-        testje = { 0: 1, "ccpn": 77}
-        self.assertEqual( len(testje.keys()), 2 )
-        print testje
-        removeRecursivelyAttribute(testje, "ccpn")
-        self.assertEqual( len(testje.keys()), 1 )
-        print testje
+        testDict = { 0: 1, "ccpn": 77}
+        self.assertEqual( len(testDict.keys()), 2 )
+        NTdebug( `testDict` )
+        removeRecursivelyAttribute(testDict, "ccpn")
+        self.assertEqual( len(testDict.keys()), 1 )
+        NTdebug( `testDict` )
 
 
     def testFind(self):

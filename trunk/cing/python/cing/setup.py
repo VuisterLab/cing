@@ -83,7 +83,7 @@ cingRoot = os.path.split(cingPythonDir)[0]
 ######################################################################################################
 # This code is repeated in cing/setup.py and cing/Libs/NTutils.py please keep it sync-ed
 ######################################################################################################
-def NTgetoutput( cmd ):
+def _NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
     inp,out,err = os.popen3( cmd )
     output = ''
@@ -96,18 +96,18 @@ def NTgetoutput( cmd ):
     out.close()
     err.close()
     return (output,errors)
-def NTwarning(msg):
+def _NTwarning(msg):
     print "WARNING:",msg
-def NTmessage(msg):
+def _NTmessage(msg):
     print msg
 
 def check_python():
     version = float(sys.version[:3])
     if version < 2.4:
-        NTwarning('Failed to find Python version 2.4 or higher.')
+        _NTgetoutput('Failed to find Python version 2.4 or higher.')
 #        print 'Current version is', sys.version[:5]
     else:
-        NTmessage("........ Found 'Python'")
+        _NTmessage("........ Found 'Python'")
 
 def check_pylab():
 #    print 'Matplotlib module  ',
@@ -117,9 +117,9 @@ def check_pylab():
 #        print 'ok.'
         result = 1
     except:
-        NTwarning('Failed to find Matplotlib.')
+        _NTwarning('Failed to find Matplotlib.')
     if not result:
-        NTmessage("........ Found 'Matplotlib'")
+        _NTmessage("........ Found 'Matplotlib'")
     return result
 
 def check_ccpn():
@@ -138,7 +138,7 @@ def check_ccpn():
     # JFD disabled these since they aren't used in CING (?yet).
 #    try:
 #        import ccpnmr.format #@UnusedImport @Reimport
-#        NTmessage("Found 'FormatConverter'")
+#        _NTmessage("Found 'FormatConverter'")
 #    except:
 #        missing.append('ccpnmr.format')
 #
@@ -149,12 +149,12 @@ def check_ccpn():
 #        missing.append('ccpnmr.analysis')
 
     if gotRequiredCcpnModules:
-        NTmessage("........ Found 'CCPN'")
+        _NTmessage("........ Found 'CCPN'")
     else:
-        NTwarning('Failed to find CCPN.')
+        _NTwarning('Failed to find CCPN.')
 
     if missing:
-        NTwarning( 'Missing (optional) packages: ' + ', '.join(missing))
+        _NTwarning( 'Missing (optional) packages: ' + ', '.join(missing))
 
 # disabled for this needs to be no extra- dependency. A version of numarray should
 # be in matplotlib. In fact the code doesn't refer to numarray anywhere. Or JFD
@@ -209,9 +209,9 @@ def check_cython():
         pass
 
     if not result:
-        NTwarning('Failed to find Cython')
+        _NTwarning('Failed to find Cython')
     else:
-        NTmessage("........ Found 'Cython'")
+        _NTmessage("........ Found 'Cython'")
 
     return result
 
@@ -265,10 +265,10 @@ def _writeCingShellFile(isTcsh):
     print ''
     print '    %s %s' % ( sourceCommand, cname)
     print ''
-#    print ''
-#    print '==> Note'
-#    print ' There is another dependency; cython. Please install it and run:'
-#    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
+    print ''
+    print '==> Note by JFD'
+    print ' There is another dependency; cython. Please install it and run:'
+    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
 #end def
 #------------------------------------------------------------------------------------
 
@@ -299,45 +299,45 @@ if __name__ == '__main__':
     parametersDict['cingPythonDir'] = cingPythonDir
     parametersDict['cingRoot']      = cingRoot
 
-    xplorPath,err  = NTgetoutput('which xplor')
+    xplorPath,err  = _NTgetoutput('which xplor')
     if not xplorPath:
-        NTwarning("Could not find 'xplor'")
+        _NTwarning("Could not find 'xplor'")
         parametersDict['xplorPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'xplor'")
+        _NTmessage("........ Found 'xplor'")
         parametersDict['xplorPath']  = strip(xplorPath)
 
-#    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
+#    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("prodir"):
         procheckPath = os.path.join( os.environ["prodir"], "procheck_nmr.scr")
         if not os.path.exists(procheckPath):
-            NTwarning("Found the system variable prodir but the script below was not found")
-            NTwarning( procheckPath )
-            NTwarning("Could not find 'procheck_nmr'")
+            _NTwarning("Found the system variable prodir but the script below was not found")
+            _NTwarning( procheckPath )
+            _NTwarning("Could not find 'procheck_nmr'")
             parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
         else:
-            NTmessage("........ Found 'procheck_nmr'")
+            _NTmessage("........ Found 'procheck_nmr'")
             parametersDict['procheckPath'] = procheckPath
     else:
-        NTwarning("Could not find 'procheck_nmr'")
+        _NTwarning("Could not find 'procheck_nmr'")
         parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
 
-#    procheckPath,err  = NTgetoutput('which $prodir/procheck_nmr.scr')
+#    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("aquaroot"):
         aqpcPath = os.path.join( os.environ["aquaroot"], "scripts", "aqpc")
         if not os.path.exists(aqpcPath):
-            NTwarning("Found the system variable aquaroot but the script below wasn't found")
-            NTwarning( aqpcPath )
-            NTwarning("Could not find 'aqua'")
+            _NTwarning("Found the system variable aquaroot but the script below wasn't found")
+            _NTwarning( aqpcPath )
+            _NTwarning("Could not find 'aqua'")
             parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
         else:
-            NTmessage("........ Found 'aqua'")
+            _NTmessage("........ Found 'aqua'")
             parametersDict['aqpcPath'] = aqpcPath
     else:
-        NTwarning("Could not find 'aqua'")
+        _NTwarning("Could not find 'aqua'")
         parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
 
-    whatifPath,err  = NTgetoutput('which DO_WHATIF.COM')
+    whatifPath,err  = _NTgetoutput('which DO_WHATIF.COM')
     parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     parametersDict['dsspPath']    = "PLEASE_ADD_EXECUTABLE_HERE"
     if not whatifPath:
@@ -345,22 +345,22 @@ if __name__ == '__main__':
         if os.path.exists(defaultWhatifPath):
             whatifPath = defaultWhatifPath
     if not whatifPath:
-        NTwarning("Could not find 'what if'")
+        _NTwarning("Could not find 'what if'")
     else:
-        NTmessage("........ Found 'what if'")
+        _NTmessage("........ Found 'what if'")
         whatifPath = strip(whatifPath)
         parametersDict['whatifPath'] = whatifPath
         head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
-            NTwarning("Could not find 'dssp'")
+            _NTwarning("Could not find 'dssp'")
         else:
-            NTmessage("........ Found 'dssp'")
+            _NTmessage("........ Found 'dssp'")
             parametersDict['dsspPath'] = dsspPath
 
     time = 0
     try:
-        wattosAtTheReady,err  = NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
+        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
         #    NTdebug("wattosAtTheReady: " + wattosAtTheReady)
         #    NTdebug("err: " + err)
         time = atoi(wattosAtTheReady)
@@ -368,49 +368,49 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        NTwarning("Could not find 'Wattos'")
-#        NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
+        _NTwarning("Could not find 'Wattos'")
+#        _NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
-        NTmessage("........ Found 'wattos'")
+        _NTmessage("........ Found 'wattos'")
 
-    convertPath,err  = NTgetoutput('which convert')
+    convertPath,err  = _NTgetoutput('which convert')
     if not convertPath:
-        NTwarning("Could not find 'convert' (from ImageMagick)")
+        _NTwarning("Could not find 'convert' (from ImageMagick)")
         parametersDict['convertPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'convert'")
+        _NTmessage("........ Found 'convert'")
         parametersDict['convertPath'] = strip(convertPath)
 
-    ghostscriptPath,err  = NTgetoutput('which gs')
+    ghostscriptPath,err  = _NTgetoutput('which gs')
     if not ghostscriptPath:
-        NTwarning("Could not find 'ghostscript' (from ImageMagick)")
+        _NTwarning("Could not find 'ghostscript' (from ImageMagick)")
         parametersDict['ghostscriptPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'ghostscript'")
+        _NTmessage("........ Found 'ghostscript'")
         parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
 
-    ps2pdfPath,err  = NTgetoutput('which ps2pdf14')
+    ps2pdfPath,err  = _NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
-        NTwarning("Could not find 'ps2pdf' (from Ghostscript)")
+        _NTwarning("Could not find 'ps2pdf' (from Ghostscript)")
         parametersDict['ps2pdfPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'ps2pdf'")
+        _NTmessage("........ Found 'ps2pdf'")
         parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
 
-    molmolPath,err  = NTgetoutput('which molmol')
+    molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
-        NTwarning("Could not find 'molmol'")
+        _NTwarning("Could not find 'molmol'")
         parametersDict['molmolPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'molmol'")
+        _NTmessage("........ Found 'molmol'")
         parametersDict['molmolPath'] = strip(molmolPath)
 
-    povrayPath,err  = NTgetoutput('which povray')
+    povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
-        NTwarning("Could not find 'povray'")
+        _NTwarning("Could not find 'povray'")
         parametersDict['povrayPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
     else:
-        NTmessage("........ Found 'povray'")
+        _NTmessage("........ Found 'povray'")
         parametersDict['povrayPath'] = strip(povrayPath)
 
 
