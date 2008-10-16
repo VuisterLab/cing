@@ -21,7 +21,7 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #1iv6 needs better ccpn file from FC
-        entryList = ["SRYBDNA"]
+        entryList = ["Parvulustat"]
 #        entryList = ["1brv"]
 
         self.failIf( os.chdir(cingDirTmp), msg=
@@ -40,7 +40,7 @@ class AllChecks(TestCase):
                 tar.extract(itar.name, '.')
 
             org = 'linkNmrStarData'
-            if entryId == 'SRYBDNA': # TODO: mod the NRG examples to follow this convention too.
+            if not entryId[0].isdigit(): # TODO: mod the NRG examples to follow this convention too.
                 org = entryId
             move( org, entryId)
             self.assertFalse(project.initCcpn(ccpnFolder=entryId))

@@ -65,7 +65,7 @@ class Dssp:
             for model in models:
                 fullname =  os.path.join( self.rootPath, 'model_%03d.pdb' % model )
                 # DSSP prefers what?
-                NTdebug('==> Materializing model '+`model`+" to disk" )
+#                NTdebug('==> Materializing model '+`model`+" to disk" )
                 pdbFile = self.project.molecule.toPDB( model=model, convention = BMRB )
                 if not pdbFile:
                     NTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")

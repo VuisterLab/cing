@@ -21,7 +21,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        fastestTest = True
+        fastestTest = False
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -34,7 +34,8 @@ class AllChecks(TestCase):
 
 #        entryId = "1ai0"
 #        entryId = "1brv"        # Small much studied PDB NMR entry
-        entryId = "1brv_1model"        # Small much studied PDB NMR entry
+#        entryId = "1brv_1model"        # Small much studied PDB NMR entry
+        entryId = "B08011R"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB
@@ -69,6 +70,8 @@ class AllChecks(TestCase):
             pdbConvention = CYANA
         elif entryId.startswith("1tgq"):
             pdbConvention = PDB
+        elif entryId.startswith("B") and entryId.endswith("R"):
+            pdbConvention = XPLOR
 #            project.initPDB( pdbFile=os.path.join(cyanaDirectory,entryId+'.pdb'), convention = pdbConvention )
         elif entryId.startswith("1brv_1model"):
             pdbConvention = IUPAC
