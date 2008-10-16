@@ -181,7 +181,12 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
                 a = moveFirstDigitToEnd(a)
             # strip is already done in function
             atm = NTdbGetAtom( record.resName, a, convention )
-            if not atm:
+            # JFD adds.
+            if not atm: # some besides cyana have this too; just too easy to hack here
+#                print "Atom ["+a+"] was mismatched at first"
+                a = moveFirstDigitToEnd(a)
+                atm = NTdbGetAtom( record.resName, a, convention )
+            if not atm:                
                 if shownWarnings <= showMaxNumberOfWarnings:
                     NTwarning('in #PDB2Molecule: %s, model %d incompatible record (%s)' % (
                              convention, mol.modelCount+1, record))

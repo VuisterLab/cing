@@ -930,7 +930,7 @@ class HTMLfile:
         pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
         upSep   = fileName.count(sep)
         htmlPath = self.project.htmlPath()
-        NTdebug("htmlPath: ["+htmlPath+"]" )
+#        NTdebug("htmlPath: ["+htmlPath+"]" )
         downSep = htmlPath.count(sep)
         return (upSep-downSep-1) * pardirSep
 
@@ -1367,7 +1367,7 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
             wiLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
-            NTdebug('wiLinkReal: ' + wiLinkReal)
+#            NTdebug('wiLinkReal: ' + wiLinkReal)
             if not os.path.exists( wiLinkReal ):
                 NTerror('Failed to find expected wiLinkReal: ' + wiLinkReal)
                 continue # Skip their inclusion.
@@ -1520,8 +1520,10 @@ class ResidueHTMLfile( HTMLfile ):
 
         if not htmlOnly:
             # Generate 2D plots
+            NTdebug("Residue %s: generating dihedral plots", self.residue )
+            
             for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
-                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
+#                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
                 ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2)
                 tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
                 if ps:
@@ -1532,7 +1534,7 @@ class ResidueHTMLfile( HTMLfile ):
             for dihed in residue.db.dihedrals.zap('name'):
                 if dihed in residue and residue[dihed]:
                     d = residue[dihed] # List of values with outliers etc attached.
-                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
+#                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
                     ps = makeDihedralHistogramPlot( project, residue, dihed )
                     tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
                     if ps:

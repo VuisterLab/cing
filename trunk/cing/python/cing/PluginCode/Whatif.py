@@ -169,6 +169,8 @@ class Whatif( NTdict ):
     DEFAULT_RESIDUE_BAD_SCORES[  C12CHK_STR ] =  -1.2
     DEFAULT_RESIDUE_POOR_SCORES[ C12CHK_STR ] =  -0.9 # Guessing on basis of 1ai0, 1brv
 
+    NUMBER_RESIDUES_PER_SECONDS = 7 # Was 13 before.
+    
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
     nameDict = NTdict()
@@ -738,10 +740,10 @@ def runWhatif( project, parseOnly=False ):
         # Let's ask the user to be nice and not kill us
         # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
         totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
-        timeRunEstimatedInSeconds    = totalNumberOfResidues / 13.
+        timeRunEstimatedInSeconds    = totalNumberOfResidues / Whatif.NUMBER_RESIDUES_PER_SECONDS
         timeRunEstimatedInSecondsStr = sprintf("%.0f",timeRunEstimatedInSeconds)
         NTmessage('==> Running What If checks on '+`totalNumberOfResidues`+
-                     " residues for an estimated (13 residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
+                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`++" residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
         if totalNumberOfResidues < 100:
             NTmessage("It takes much longer per residue for a small molecule/ensemble")
 
