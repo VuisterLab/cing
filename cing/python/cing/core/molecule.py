@@ -452,11 +452,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         NB. atomName according to convention
         For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
-        NTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
+#        NTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
         atomDict = NTdict()
         for chain in self.allChains():
             if chain.name != ChainId:
-                NTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
+#                NTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
                 continue            
             for atm in chain.allAtoms():
                 aname = atm.translate(convention)
@@ -1322,8 +1322,8 @@ Return an Molecule instance or None on error
                 return None
             models = NTlist( model )
 
-        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
-                   convention, models[0], models.last()                 )
+#        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
+#                   convention, models[0], models.last()                 )
 
         pdbFile = PDBFile()
 

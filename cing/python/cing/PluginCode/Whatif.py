@@ -743,7 +743,7 @@ def runWhatif( project, parseOnly=False ):
         timeRunEstimatedInSeconds    = totalNumberOfResidues / Whatif.NUMBER_RESIDUES_PER_SECONDS
         timeRunEstimatedInSecondsStr = sprintf("%.0f",timeRunEstimatedInSeconds)
         NTmessage('==> Running What If checks on '+`totalNumberOfResidues`+
-                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`++" residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
+                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`+" residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
         if totalNumberOfResidues < 100:
             NTmessage("It takes much longer per residue for a small molecule/ensemble")
 

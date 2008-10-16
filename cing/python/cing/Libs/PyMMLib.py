@@ -1583,7 +1583,7 @@ class PDBFile(list):
 #            NTdebug("now at record: %6d" % i )
             i += 1
         fp.close()
-        NTdebug("Written %d PDB records to %s", len( self ), path )
+#        NTdebug("Written %d PDB records to %s", len( self ), path )
         #end if
     #end def
     ## end gv adds

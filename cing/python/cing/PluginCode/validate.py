@@ -237,8 +237,8 @@ def _criticizeResidue( residue, valSets ):
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
-#                comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
-                NTdebug(comment)
+                comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
 #                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
@@ -528,7 +528,7 @@ def validateRestraints( project, toFile = True)   :
 #            NTerror("validateRestraints: No Phi,Psi result for residue %s", res)
         count += 1
     #end for
-    NTdebug(msg)
+#    NTdebug(msg)
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
