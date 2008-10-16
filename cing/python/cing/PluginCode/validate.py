@@ -188,7 +188,7 @@ def _criticizeResidue( residue, valSets ):
     # WHATIF
     if residue.has_key('whatif'):
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
-            NTdebug('Now criticizing %s, whatif key %s', residue, key )
+#            NTdebug('Now criticizing %s, whatif key %s', residue, key )
 
             thresholdValuePoor = valSets[ 'WI_POOR_'+key ]
             thresholdValueBad  = valSets[ 'WI_BAD_'+key ]
@@ -200,17 +200,17 @@ def _criticizeResidue( residue, valSets ):
             if isinstance(actualValue, NTlist):
                 actualValue = actualValue.average()[0]
 
-            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
-                    actualValue, thresholdValuePoor, thresholdValueBad)
+#            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
+#                    actualValue, thresholdValuePoor, thresholdValueBad)
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'RED: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
-                NTdebug(comment)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'ORANGE: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
-                NTdebug(comment)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
@@ -220,7 +220,7 @@ def _criticizeResidue( residue, valSets ):
     #Procheck
     if residue.has_key('procheck'):
         for key in ['gf']:
-            NTdebug('Now criticizing %s, procheck key %s', residue, key )
+#            NTdebug('Now criticizing %s, procheck key %s', residue, key )
 
             thresholdValuePoor = valSets[ 'PC_POOR_'+key.upper() ]
             thresholdValueBad  = valSets[ 'PC_BAD_'+key.upper() ]
@@ -237,11 +237,11 @@ def _criticizeResidue( residue, valSets ):
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
-                comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
+#                comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
                 NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
-                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
+#                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
                 NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
@@ -263,10 +263,10 @@ def _criticizeResidue( residue, valSets ):
             if v >= valSets.OMEGA_MAXALL_BAD:
                 residue.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
 #                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
-                NTdebug('Set to red')
+#                NTdebug('Set to red')
             elif v >= valSets.OMEGA_MAXALL_POOR:
                 residue.rogScore.setMaxColor( COLOR_ORANGE, ROGscore.ROG_COMMENT_BAD_OMEGA )
-                NTdebug('Set to orange (perhaps)')
+#                NTdebug('Set to orange (perhaps)')
             modelId += 1
         #end for
         residue.rogScore['OMEGA'] = v

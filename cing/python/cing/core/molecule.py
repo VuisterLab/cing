@@ -446,28 +446,33 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return resNumDict
     #end def
 
-    def _getAtomDict(self, convention=INTERNAL):
+    def _getAtomDict(self, convention=INTERNAL, ChainId = 'A'):
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
         For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
+        NTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
         atomDict = NTdict()
-        for atm in self.allAtoms():
-            aname = atm.translate(convention)
-            if aname != None:
-                t = (atm.residue.resNum, aname)
-                if atomDict.has_key( t ):
-                    # GV needs to check if this still needs to be an error or as is, down graded to warning level.
-                    # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
-                    # GV, Yes maintain, but  test for aname should reduce warnings
-                    NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
-                            atm, atomDict[t]
-                            )
-                else:
-                    atomDict[t] = atm
+        for chain in self.allChains():
+            if chain.name != ChainId:
+                NTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
+                continue            
+            for atm in chain.allAtoms():
+                aname = atm.translate(convention)
+                if aname != None:
+                    t = (atm.residue.resNum, aname)
+                    if atomDict.has_key( t ):
+                        # GV needs to check if this still needs to be an error or as is, down graded to warning level.
+                        # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
+                        # GV, Yes maintain, but  test for aname should reduce warnings
+                        NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+                                atm, atomDict[t])
+                    else:
+                        atomDict[t] = atm
+                    #end if
                 #end if
-            #end if
+            #end for
         #end for
         return atomDict
     #end def

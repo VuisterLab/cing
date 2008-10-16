@@ -9,7 +9,6 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import pointAttributes
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
@@ -86,7 +85,7 @@ class MoleculePlotSet:
                 # end for row
             # end for res
         # end for resList
-        NTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
+#        NTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
 
         fileNameList = []
         pathPngList = []
@@ -95,7 +94,7 @@ class MoleculePlotSet:
         nrows = len(self.keyLoLoL)
         for resList in rangeList:
             r += 1
-            NTdebug("resList: %s" % resList)
+#            NTdebug("resList: %s" % resList)
             ps = ResPlotSet() # closes any previous plots
             ntPlotList = []
             # create all subplots
@@ -116,7 +115,7 @@ class MoleculePlotSet:
                     mainOrAlt = row[m]
                     key   = mainOrAlt[0] # take first main first
                     label = key[YLABEL_STR]
-                    NTdebug( 'row %d Label: %s' % (m,label))
+#                    NTdebug( 'row %d Label: %s' % (m,label))
                     if not m:      # main y-axis?
                         ntPlotList[i].yLabel = label
                     else: # alternative y-axis?

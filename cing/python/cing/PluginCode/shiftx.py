@@ -39,7 +39,7 @@ format file:
 
 
     """
-    atomDict = molecule._getAtomDict(IUPAC)
+    atomDict = molecule._getAtomDict(IUPAC, chainId)
     for line in AwkLike( fileName, commentString = '#', minNF = 4 ):
         if (line.float(4) != -666.000):
             lineCol1 = int(line.dollar[1].strip('*'))

@@ -146,22 +146,20 @@ class FileUpload():
 
 
 
-def bytesToFormattedString(size):        
+def bytesToFormattedString(size):
+    """1600 bytes will be rounded to 2K"""        
     k = 1024
     M = 1024*1024
     G = 1024*1024*1024
     T = 1024*1024*1024*1024
-    cs = 's'
-    ck = 'k'
+    ck = 'K'
     cM = 'M'
     cG = 'G' 
     cT = 'T'
-    postFix = cs
+    postFix = ck
     
-    divider = 1
-    if size < 1024:
-        pass
-    elif  size < M:
+    divider = k
+    if  size < M:
         divider = k
         postFix = ck
     elif size < G:
@@ -175,10 +173,7 @@ def bytesToFormattedString(size):
         postFix = cT
     
     r = size/float(divider)
-    if postFix == cs:
-        result = `int(r)` + " bytes"
-    else:            
-        result = ("%.2f" % r) + " " + postFix + "b"        
+    result = ("%.0f" % r) + postFix
     return result
 
 def logToLog(msg):
