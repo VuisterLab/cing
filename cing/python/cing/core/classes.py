@@ -927,6 +927,7 @@ class Peak( NTdict ):
     """
 
     HEIGHT_VOLUME_FORMAT  = '%9.2e +- %8.1e'
+    HEIGHT_VOLUME_FORMAT2 = '%9.2e'
 
     def __init__( self,
                   dimension,
@@ -968,8 +969,8 @@ class Peak( NTdict ):
             self.positions = NTfill( NaN, dimension )
         #end if
 
-        self.height = NTvalue(height, heightError, Peak.HEIGHT_VOLUME_FORMAT)
-        self.volume = NTvalue(volume, volumeError, Peak.HEIGHT_VOLUME_FORMAT)
+        self.height = NTvalue(height, heightError, Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2)
+        self.volume = NTvalue(volume, volumeError, Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2)
 
         self.rogScore = ROGscore()
     #end def

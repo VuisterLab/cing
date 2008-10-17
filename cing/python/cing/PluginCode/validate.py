@@ -504,14 +504,14 @@ def validateRestraints( project, toFile = True)   :
             msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv --')
         #end if
         if res.has_key('PHI'):
-            phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f' )
+            phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
         else:
-            phi = NTvalue( '-', '-', fmt='%7s %7s' )
+            phi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
         #end if
         if res.has_key('PSI'):
-            psi = NTvalue( res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f' )
+            psi = NTvalue( res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
         else:
-            psi = NTvalue( '-', '-', fmt='%7s %7s' )
+            psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
         #end if
         try:
             msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f\n',

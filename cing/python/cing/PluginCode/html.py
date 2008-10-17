@@ -1586,7 +1586,7 @@ class ResidueHTMLfile( HTMLfile ):
                     if isinstance(av, NTlist):
                         ( av, sd, _n ) = av.average()
 
-                    pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)')
+                    pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)', fmt2='%.2f' )
                     strToShow += ': %s' % pointNTvalueStr
                     residue.html.left( 'p', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
                 #end if

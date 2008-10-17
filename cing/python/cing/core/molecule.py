@@ -1591,11 +1591,11 @@ class RmsdResult( NTdict ):
                          __CLASS__       = 'RmsdResult',
                          backbone        = NTfill(0.0, len(modelList)),
                          backboneCount   = 0,
-                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)' ),
+                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)', fmt2='%4.2f' ),
 
                          heavyAtoms      = NTfill(0.0, len(modelList)),
                          heavyAtomsCount = 0,
-                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)' ),
+                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)', fmt2='%4.2f'  ),
 
                          models          = modelList,
                          closestToMean   = -1,    #indicates undefined

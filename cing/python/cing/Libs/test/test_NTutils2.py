@@ -15,7 +15,7 @@ import cing
 import unittest
 
 class AllChecks(TestCase):
-
+ 
     def testNTdict(self):
         a = NTdict( b=NTdict( anItem='there'))
 #        NTdebug( '0 '+ `a` )
@@ -109,7 +109,7 @@ class AllChecks(TestCase):
         self.assertEquals( s, '. (+- .)')
         s = "%s"  % NTvalue(value=1.0,   error=None, fmt='%.3f (+- %.3f)')
         self.assertEquals( s, '1.0 (+- .)')
-        s = "%s"  % NTvalue(value=1.000, error=None, fmt='%.3f (+- %.3f)')
+        s = "%s"  % NTvalue(value=1.000, error=None, fmt='%.3f (+- %.3f)') # still this mistake was not detected for a number:  -0.54700000000000004 (+- .) that's why the below extra tests.
         self.assertEquals( s, '1.0 (+- .)')
         s = "%s"  % NTvalue(value=2.000, error=0.2,  fmt='%.3f (+- %.3f)')
         self.assertEquals( s, '2.000 (+- 0.200)')
@@ -123,6 +123,11 @@ class AllChecks(TestCase):
         self.assertEquals( s, '0.75 (+- .)')
         s = "%s"  % NTvalue(value=0.75, error=NaN, fmt='%.2f (+- %.2f)' )
         self.assertEquals( s, '0.75 (+- .)')
+        fmt = '%.2f (+- %.2f)'
+        fmt2 = '%.2f'
+        self.assertEquals(  "-0.55 (+- 1.23)", "%s"  % NTvalue(value=-0.5471, error=1.23, fmt=fmt, fmt2=fmt2 ))
+        self.assertEquals(  "-0.55 (+- .)",    "%s"  % NTvalue(value=-0.5471, error=None, fmt=fmt, fmt2=fmt2 ))
+        self.assertEquals(  ". (+- .)",        "%s"  % NTvalue(value=None,    error=None, fmt=fmt, fmt2=fmt2 ))
 
     def testGetTextBetween(self):
 

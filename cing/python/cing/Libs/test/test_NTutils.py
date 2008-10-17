@@ -102,7 +102,7 @@ class AllChecks(TestCase):
         NTdebug( "av %s, sd %s, n %s" % (av,sd,n) )
         self.assertAlmostEqual( av, 10.22, places=1) # verified in Excel stddev function.
         self.assertAlmostEqual( sd,  4.18, places=1)
-        self.assertEquals(       n, 9)
+        self.assertEquals(       n, 9) 
 
         l = NTlist( 1,None,1,1 )
         (av,sd,n) = l.average()
