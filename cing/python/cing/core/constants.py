@@ -1,9 +1,7 @@
 
 AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
 IUPAC      = 'IUPAC'
-BMRB       =  IUPAC # since IUPAC is set to be equivalent to BMRB; remove one of them. IUPAC is used in dbTable.
 SPARKY     =  IUPAC
-BMRBd      = 'BMRBd'
 CYANA      = 'CYANA'
 XEASY      = CYANA
 CYANA2     = 'CYANA2'

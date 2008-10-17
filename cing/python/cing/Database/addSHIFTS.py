@@ -1,6 +1,6 @@
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTdict
-from cing.core.constants import BMRBd
+from cing.core.constants import IUPAC
 from cing.core.database import NTdb
 from cing.core.dictionaries import NTdbGetAtom
 from cing.Libs.NTutils import NTmessage
@@ -366,7 +366,7 @@ for line in AwkLikeS( shifts ):
         for resName in resNames:
             res = NTdb[resName]
 
-            atm = NTdbGetAtom( resName, line.dollar[2], BMRBd )
+            atm = NTdbGetAtom( resName, line.dollar[2], IUPAC )
             if atm != None:
                 atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
             else:

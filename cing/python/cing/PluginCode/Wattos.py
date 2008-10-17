@@ -2,7 +2,7 @@
     Wattos Module
     First version: jfd Dec 11, 2007
 """
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -106,7 +106,7 @@ def runWattos( project, tmp=None ):
     wattosDir = project.mkdir( project.molecule.name, project.moleculeDirectories.wattos  )
     pdbFileName = 'project.pdb'
     fullname =  os.path.join( wattosDir, pdbFileName )
-    pdbFile = project.molecule.toPDB( convention = BMRB )
+    pdbFile = project.molecule.toPDB( convention = IUPAC )
     if not pdbFile:
         NTerror("Failed to write a temporary PDB formatted coordinate file for ensemble.")
         return None

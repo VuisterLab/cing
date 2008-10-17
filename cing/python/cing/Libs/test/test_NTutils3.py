@@ -41,7 +41,6 @@ class AllChecks(TestCase):
         a.rogScore.addHTMLkeywords( kw )
         myhtml.main("a", 'or by popup', **kw)
 
-#        myhtml.render() # Can't be done without whole project and content anymore.
         
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing

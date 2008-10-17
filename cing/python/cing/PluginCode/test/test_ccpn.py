@@ -24,7 +24,7 @@ class AllChecks(TestCase):
 #        entryList = ["Parvulustat"]
         entryList = ["1a4d"]
 
-        fastestTest = False
+        fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True

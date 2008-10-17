@@ -146,14 +146,14 @@ def testOverall():
     # Add the ones you don't want to test (perhaps you know they don't work yet)
     excludedModuleList = [ cingPythonDir + "/Cython*",
                            cingPythonDir + "/cyana2cing*",
-#                           cingPythonDir + "/cing.PluginCode.test.test_Procheck",
+#                           cingPythonDir + "/cing.PluginCode",
 #                           cingPythonDir + "/cing.PluginCode.test.test_Whatif",
 #                           cingPythonDir + "/cing.Scripts.test.test_cyana2cing",
 #                           cingPythonDir + "/cing.STAR.FileTest",
                           ]
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
-    NTmessage('will unit check: ' + `nameList`)
+    NTerror('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
@@ -162,10 +162,7 @@ def testOverall():
     # translate: '/Users/jd/workspace/cing/python/cing/Libs/test/test_NTplot.py'
     # to: cing.Libs.test.test_NTplot
     lenCingPythonDirStr = len(cingPythonDir)
-    # Next line is to fool pydev extensions into thinking suite is defined in the regular way.
-    suite = None
     for name in nameList:
-#      print "In cing.main#testOverall found cing.verbosity: %d\n" % cing.verbosity
         tailPathStr = name[lenCingPythonDirStr+1:-3]
         mod_name = join(tailPathStr.split('/'), '.')
 #        if mod_name in excludedModuleList:
@@ -174,7 +171,7 @@ def testOverall():
         exec("import %s" % (mod_name)   )
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
         testVerbosity = 2
-        unittest.TextTestRunner(verbosity=testVerbosity).run(suite)
+        unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
 
 

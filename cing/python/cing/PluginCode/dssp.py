@@ -12,9 +12,10 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
 from cing.setup import time
+from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 import os
 
 # don't change:
@@ -70,7 +71,7 @@ class Dssp:
                 fullname =  os.path.join( self.rootPath, 'model_%03d.pdb' % model )
                 # DSSP prefers what?
 #                NTdebug('==> Materializing model '+`model`+" to disk" )
-                pdbFile = self.project.molecule.toPDB( model=model, convention = BMRB )
+                pdbFile = self.project.molecule.toPDB( model=model, convention = IUPAC )
                 if not pdbFile:
                     NTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
                     return True
@@ -196,10 +197,10 @@ def runDssp(project, parseOnly=False)   :
     Return None on error.
     """
     # check if dssp is present
-    if cingPaths.dssp == 'PLEASE_ADD_EXECUTABLE_HERE':
-        NTdebug('dssp: skipping since executable is not defined')
-        return None
-
+    if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
+        NTmessage("No whatif installed so skipping this step")
+        return
+    
     if not project.molecule:
         NTerror('dssp: no molecule defined')
         return None

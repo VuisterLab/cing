@@ -34,6 +34,7 @@ from cing.Libs.disk import copy
 from cing.core.constants import AQUA
 from cing.core.parameters import cingPaths
 from cing.core.molecule import dots
+from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 import cing
 import os
 
@@ -355,46 +356,52 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             # G and DG.(oxy/deoxy).
 
         canAqpc = True
-        # Save restraints for Aqua
-        if self.project.export2aqua():
+        
+        if cingPaths.aqpc == None or cingPaths.aqpc == PLEASE_ADD_EXECUTABLE_HERE:
+            NTmessage("No aqpc installed so skipping this step")
             canAqpc = False
-            NTwarning("Failed to export restraints to Aqua; will run pc without restraints")
-        else:
-            hasRestraints = False
-            for extensionRestraintFile in [ "noe", "tor" ]:
-                srcDir = os.path.join(self.project.rootPath(self.project.name)[0], self.project.directories.aqua )
-                if not os.path.exists(srcDir):
-                    NTcodeerror("Aqua export dir is absent")
-                    return True
-                fileName = self.project.name +'.' + extensionRestraintFile
-                path = os.path.join(srcDir, fileName )
-                if not os.path.exists(path):
-                    NTdebug("No "+ path+" file found (in Aqua export dir)")
-                    pass
-                else:
-                    # Map from Aqua per project file to Cing per molecule file.
-                    dstFileName = self.molecule.name + '.' + extensionRestraintFile
-                    dstPath = os.path.join( self.rootPath, dstFileName )
-                    if os.path.exists(dstPath):
-                        NTdebug("Removing existing copy: " + dstPath)
-                        os.unlink(dstPath)
-                    NTdebug("Trying to copy from: " + path+" to: "+dstPath)
-                    if os.link(path, dstPath):
-                        NTcodeerror("Failed to copy from: " + path+" to: "+self.rootPath)
-                        return True
-                    hasRestraints = True
-            # run aqpc
-            if not canAqpc:
-                NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
-            elif not hasRestraints:
-                NTdebug("Skipping qapc because no Aqua restraints were copied for Aqua")
+        
+        if canAqpc:
+            # Save restraints for Aqua
+            if self.project.export2aqua():
+                canAqpc = False
+                NTwarning("Failed to export restraints to Aqua; will run pc without restraints")
             else:
-                NTdebug("Trying aqpc")
-                if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
-                    NTcodeerror("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
-                    return True
+                hasRestraints = False
+                for extensionRestraintFile in [ "noe", "tor" ]:
+                    srcDir = os.path.join(self.project.rootPath(self.project.name)[0], self.project.directories.aqua )
+                    if not os.path.exists(srcDir):
+                        NTcodeerror("Aqua export dir is absent")
+                        return True
+                    fileName = self.project.name +'.' + extensionRestraintFile
+                    path = os.path.join(srcDir, fileName )
+                    if not os.path.exists(path):
+                        NTdebug("No "+ path+" file found (in Aqua export dir)")
+                        pass
+                    else:
+                        # Map from Aqua per project file to Cing per molecule file.
+                        dstFileName = self.molecule.name + '.' + extensionRestraintFile
+                        dstPath = os.path.join( self.rootPath, dstFileName )
+                        if os.path.exists(dstPath):
+                            NTdebug("Removing existing copy: " + dstPath)
+                            os.unlink(dstPath)
+                        NTdebug("Trying to copy from: " + path+" to: "+dstPath)
+                        if os.link(path, dstPath):
+                            NTcodeerror("Failed to copy from: " + path+" to: "+self.rootPath)
+                            return True
+                        hasRestraints = True
+                # run aqpc
+                if not canAqpc:
+                    NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
+                elif not hasRestraints:
+                    NTdebug("Skipping qapc because no Aqua restraints were copied for Aqua")
                 else:
-                    NTmessage("==> Finished aqpc successfully")
+                    NTdebug("Trying aqpc")
+                    if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
+                        NTcodeerror("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
+                        return True
+                    else:
+                        NTmessage("==> Finished aqpc successfully")
 
         NTdebug("Trying procheck_nmr")
         cmd = self.molecule.name +'.pdb'
@@ -566,10 +573,10 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     """
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
-    if cingPaths.procheck_nmr == 'PLEASE_ADD_EXECUTABLE_HERE':
-        NTerror('runProcheck: no executable defined')
-        return None
-
+    if cingPaths.procheck_nmr == None or cingPaths.procheck_nmr == PLEASE_ADD_EXECUTABLE_HERE:
+        NTmessage("No whatif installed so skipping this step")
+        return
+    
     if not project.molecule:
         NTerror('runProcheck: no molecule defined')
         return None

@@ -379,7 +379,7 @@ def summary( project, toFile = True ):
 
     wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
-        msg += '\n<PRE>' + wiSummary + '</PRE>'
+        msg += wiSummary
 
     pc = getDeepByKeys(project.molecule, 'procheck')
     if pc:

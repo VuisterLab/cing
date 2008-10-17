@@ -1434,7 +1434,7 @@
 ##
 ## Note-7: from BMRB atom_nom.tbl and pseudoatom_nom.txt
 ##	  Augmented with '-' to make a fixed collumn number table.
-##         Augmented BMRBd collumn to match BMRB shifts format
+##         Augmented IUPAC collumn to match BMRB shifts format
 ##
 ## Note-8: Original pseudoatom_nom.txt
 ## Amino Acid Pseudoatom Nomenclature
@@ -1442,13 +1442,13 @@
 ##(The original table was prepared by Jane Caldwell)
 ##
 ## BMRB = BioMagResBank, derived from IUPAC recommendations
-## BMRBd= BioMagResBank, from depositions
+## IUPAC= BioMagResBank, from depositions
 ## UCSF = Mardigras and Corma, based on 1993 manual (still current, summer 1995)
 ## XPLOR= X-PLOR 3.1f
 #
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
-## A.A.		BMRB	BMRBd	SC	PDB	UCSF	MSI	XPLOR	SYBYL* MIDAS* CYANA
+## A.A.		BMRB	IUPAC	SC	PDB	UCSF	MSI	XPLOR	SYBYL* MIDAS* CYANA
 ## ----		----	----	----	----	----	----	-----	-----	-----	-----
 #
 ## Terminal amine protons protons
@@ -2223,7 +2223,7 @@
 #        #print '>>', resname, r.dollar[1], r.dollar[11]
 #        fullName = resname + '.' + r.dollar[11]
 #        names[fullName] = dict( BMRB = r.dollar[2],
-#                                BMRBd = r.dollar[3],
+#                                IUPAC = r.dollar[3],
 #                                PDB = r.dollar[5],
 #                                XPLOR = r.dollar[8],
 #                                CYANA = r.dollar[11],
@@ -2237,7 +2237,7 @@
 #        #print '>>', resname, r.dollar[1], r.dollar[11]
 #        fullName = resname + '.' + r.dollar[3]
 #        names[fullName] = dict( BMRB = r.dollar[3],
-#                                BMRBd = '-',
+#                                IUPAC = '-',
 #                                PDB = '-',
 #                                XPLOR = '-',
 #                                CYANA = '-',
@@ -2251,7 +2251,7 @@
 #        #print '>>', resname, r.dollar[1], r.dollar[11]
 #        fullName = resname + '.' + r.dollar[3]
 #        names[fullName] = dict( BMRB = r.dollar[3],
-#                                BMRBd = '-',
+#                                IUPAC = '-',
 #                                PDB = '-',
 #                                XPLOR = '-',
 #                                CYANA = '-',
@@ -2275,14 +2275,14 @@
 #
 #            NTmessage('\n#-----------------------------------------------------------------------')
 #            NTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
-#                   'internal', 'short', BMRB, BMRBd, PDB, CYANA, XPLOR
+#                   'internal', 'short', BMRB, IUPAC, PDB, CYANA, XPLOR
 #                  )
 #            NTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
 #                    resname, shortName, resname, resname, resname, resname, resname
 #                  )
 #            NTmessage('\n#-----------------------------------------------------------------------')
 #            NTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s',
-#                   'internal', BMRB, BMRBd, PDB, CYANA, XPLOR
+#                   'internal', BMRB, IUPAC, PDB, CYANA, XPLOR
 #                  )
 #           # parse data from the atom lines
 #            for i in range(0, natom):
@@ -2292,7 +2292,7 @@
 #                    fullName = resname + '.' + r.dollar[2]
 #                    nameDefs = names.setdefault( fullName, 
 #                                                 dict( BMRB  = '-',
-#                                                       BMRBd = '-',
+#                                                       IUPAC = '-',
 #                                                       PDB   = '-',
 #                                                       XPLOR = '-',
 #                                                       CYANA = r.dollar[2],
@@ -2303,7 +2303,7 @@
 #                    nameDefs[INTERNAL] = r.dollar[2]
 #                                       
 #                    NTmessage( '\t%-8s          ', nameDefs['INTERNAL'] )
-#                    for n in [BMRB, BMRBd, PDB, CYANA, XPLOR]:
+#                    for n in [BMRB, IUPAC, PDB, CYANA, XPLOR]:
 #                        NTmessage( '%-8s ', nameDefs[n] )
 #                    NTmessage('')
 #            NTmessage( 'END_RESIDUE')

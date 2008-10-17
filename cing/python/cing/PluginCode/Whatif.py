@@ -54,8 +54,9 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
@@ -663,6 +664,11 @@ def runWhatif( project, parseOnly=False ):
 
         returns True on error.
     """
+    
+    if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
+        NTmessage("No whatif installed so skipping this step")
+        return
+    
     if not project.molecule:
         NTerror("runWhatif: no molecule defined")
         return True
@@ -721,9 +727,9 @@ def runWhatif( project, parseOnly=False ):
 
         for model in models:
             fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
-            # WI prefers IUPAC like PDB now. In CING the closest is BMRBd?
+            # WI prefers IUPAC like PDB now. In CING the closest is IUPAC?
 #            NTdebug('==> Materializing model '+`model`+" to disk" )
-            pdbFile = project.molecule.toPDB( model=model, convention = BMRB )
+            pdbFile = project.molecule.toPDB( model=model, convention = IUPAC )
             if not pdbFile:
                 NTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
                 return True

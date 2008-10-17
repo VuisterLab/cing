@@ -1104,7 +1104,8 @@ class DistanceRestraint( NTdict ):
        lower and upper bounds
     """
 
-    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
+#    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
+    def __init__( self, atomPairs=[], lower=None, upper=None, **kwds ):
 
         NTdict.__init__(self,__CLASS__  = 'DistanceRestraint',
                                atomPairs  = NTlist(),
@@ -1115,10 +1116,10 @@ class DistanceRestraint( NTdict ):
         self.id         = -1       # Undefined index number
 
         self.distances  = None     # list with distances for each model; None: not yet defined
-        self.av         = 0.0      # Average distance
-        self.sd         = 0.0      # sd on distance
-        self.min        = 0.0      # Minimum distance
-        self.max        = 0.0      # Max distance
+        self.av         = None      # Average distance
+        self.sd         = None      # sd on distance
+        self.min        = None      # Minimum distance
+        self.max        = None      # Max distance
         self.violations = None     # list with violations for each model; None: not yet defined
         self.violCount1 = 0        # Number of violations over 0.1A
         self.violCount3 = 0        # Number of violations over 0.3A
@@ -1162,6 +1163,22 @@ class DistanceRestraint( NTdict ):
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
+        modelCount = self.getModelCount()
+        for atm1,atm2 in self.atomPairs:
+            atms1 = atm1.realAtoms()
+            atms2 = atm2.realAtoms()
+            for a in atms1 + atms2:
+                if len( a.coordinates ) < modelCount:
+                    msg = "Missing coordinates (%s)" %  a.toString()
+                    NTdebug(msg)
+                    self.rogScore.setMaxColor( COLOR_RED, msg )
+
+    def getModelCount(self):
+        modelCount = 0
+        if len(self.atomPairs) :
+            modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
+        return modelCount
+    
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
         check if atom1 already present, keep order
@@ -1227,10 +1244,10 @@ class DistanceRestraint( NTdict ):
         #end if
 
         self.distances  = NTlist() # list with distances for each model
-        self.av         = 0.0      # Average distance
-        self.sd         = 0.0      # sd on distance
-        self.min        = 0.0      # Minimum distance
-        self.max        = 0.0      # Max distance
+        self.av         = None      # Average distance
+        self.sd         = None      # sd on distance
+        self.min        = None      # Minimum distance
+        self.max        = None      # Max distance
         self.violations = NTlist() # list with violations for each model INCLUDING non violating models!
         self.violCount1 = 0        # Number of violations over 0.1A
         self.violCount3 = 0        # Number of violations over 0.3A
@@ -1241,78 +1258,76 @@ class DistanceRestraint( NTdict ):
         self.violSum    = 0.0      # Sum of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
-        if modelCount:
-            for i in range( modelCount):
-                d = 0.0
-                for atm1,atm2 in self.atomPairs:
-                    # skip trivial cases
-                    if atm1 == atm2:
-                        break
+        for i in range( modelCount):
+            d = 0.0
+            for atm1,atm2 in self.atomPairs:
+                # skip trivial cases
+                if atm1 == atm2:
+                    break
 
-                    #expand pseudoatoms
-                    atms1 = atm1.realAtoms()
-                    atms2 = atm2.realAtoms()
-                    for a1 in atms1:
-                        #print '>>>', a1.format()
-                        if (len( a1.coordinates ) > i ):
-                            for a2 in atms2:
-                                #print '>>', atm1, a1, atm2, a2
-                                if (len(a2.coordinates) > i ):
-                                    tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
-                                    if tmp > 0.0:
-                                        d += math.pow( tmp, -6.0 )
-                                else:
-                                    self.error = True
-                                #end if
-                            #end for
-                        else:
-                            self.error = True
-                        #end if
-                    #end for
+                #expand pseudoatoms
+                atms1 = atm1.realAtoms()
+                atms2 = atm2.realAtoms()
+                for a1 in atms1:
+                    #print '>>>', a1.format()
+                    if len( a1.coordinates ) > i:
+                        for a2 in atms2:
+                            #print '>>', atm1, a1, atm2, a2
+                            if len(a2.coordinates) > i:
+                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
+                                if tmp > 0.0:
+                                    d += math.pow( tmp, -6.0 )
+                            else:
+                                self.error = True
+                            #end if
+                        #end for
+                    else:
+                        self.error = True
+                    #end if
                 #end for
-                try:
-                    self.distances.append( math.pow(d, -0.166666666666666667) )
-                except:
-                    self.error = True
-                    msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
-                    NTdebug(msg)
-                    self.rogScore.setMaxColor( COLOR_RED, msg )
-                    return (None, None, None, None)
-                #end try
             #end for
+            try:
+                self.distances.append( math.pow(d, -0.166666666666666667) )
+            except:
+                self.error = True
+                msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
+                NTdebug(msg)
+                self.rogScore.setMaxColor( COLOR_RED, msg )
+                return (None, None, None, None)
+            #end try
+        #end for loop over models
 
-            self.av, self.sd, self.n = NTaverage( self.distances )
-            self.min = min( self.distances )
-            self.max = max( self.distances )
+        self.av, self.sd, self.n = NTaverage( self.distances )
+        self.min = min( self.distances )
+        self.max = max( self.distances )
 
-            # calculate violations
-            for d in self.distances:
-                if (d < self.lower):
-                    self.violations.append( d-self.lower )
-                elif (d > self.upper):
-                    self.violations.append( d-self.upper )
-                else:
-                    self.violations.append( 0.0 )
-                #end if
-            #end for
+        # calculate violations
+        for d in self.distances:
+            if (d < self.lower):
+                self.violations.append( d-self.lower )
+            elif (d > self.upper):
+                self.violations.append( d-self.upper )
+            else:
+                self.violations.append( 0.0 )
+            #end if
+        #end for
 
-            # analyze violations
-            for d in self.violations:
-                dabs = math.fabs(d)
+        # analyze violations
+        for d in self.violations:
+            dabs = math.fabs(d)
 #               print '>>', d,dabs
-                if ( dabs > 0.5):
-                    self.violCount5 += 1
-                elif ( dabs > 0.3):
-                    self.violCount3 += 1
-                elif ( dabs > 0.1):
-                    self.violCount1 += 1
-            #end for
-            if self.violations:
-                # JFD doesn't understand why the values need to be mapped to floats.
-                self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
-                self.violMax = max( map(math.fabs,self.violations) )
-                self.violSum = self.violations.sum()
-        #end if
+            if ( dabs > 0.5):
+                self.violCount5 += 1
+            elif ( dabs > 0.3):
+                self.violCount3 += 1
+            elif ( dabs > 0.1):
+                self.violCount1 += 1
+        #end for
+        if self.violations:
+            # JFD doesn't understand why the values need to be mapped to floats.
+            self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
+            self.violMax = max( map(math.fabs,self.violations) )
+            self.violSum = self.violations.sum()
 
         return (self.av,self.sd,self.min,self.max )
     #end def
@@ -1353,11 +1368,15 @@ class DistanceRestraint( NTdict ):
 
     def format( self ):
         return  \
-            sprintf('%-25s %-6s (Target: %4.1f %4.1f)  (Models: min %4.1f  av %4.1f+-%4.2f  max %4.1f) '+\
+            sprintf('%-25s %-6s (Target: %s %s)  (Models: min %s  av %s+-%s  max %s) '+\
                     '(Violations: av %4.2f max %4.2f counts %2d,%2d,%2d) %s',
                      str(self), self.rogScore,
-                     self.lower, self.upper,
-                     self.min, self.av, self.sd, self.max,
+                     val2Str(self.lower, "%4.1f", 4),
+                     val2Str(self.upper, "%4.1f", 4),
+                     val2Str(self.min, "%4.1f", 4),
+                     val2Str(self.av,  "%4.2f", 4),
+                     val2Str(self.sd,  "%4.1f", 4),
+                     val2Str(self.max, "%4.1f", 4),
                      self.violAv, self.violMax, self.violCount1, self.violCount3, self.violCount5,
                      self._names()
                     )
@@ -1596,11 +1615,11 @@ class DihedralRestraint( NTdict ):
                        )
         self.id         = -1       # Undefined index number
         self.dihedrals  = None     # list with dihedral values for each model, None indicates no analysis done
-        self.cav        = 0.0      # Average dihedral value
-        self.cv         = 0.0      # cv on dihedral
+        self.cav        = None      # Average dihedral value
+        self.cv         = None      # cv on dihedral
 #        self.min        = 0.0      # Minimum dihedral
 #        self.max        = 0.0      # Max dihedral
-        self.violations = None     # list with violations for each model, None indicates no alalysis done
+        self.violations = None     # list with violations for each model, None indicates no analysis done
         self.violCount1 = 0        # Number of violations over 1 degree
         self.violCount3 = 0        # Number of violations over 3 degrees
         self.violCount5 = 0        # Number of violations over 5 degrees
@@ -1609,6 +1628,12 @@ class DihedralRestraint( NTdict ):
         self.violSd     = 0.0      # Sd of violations
         self.rogScore   = ROGscore()
     #end def
+
+    def getModelCount(self):
+        modelCount = 0
+        if len(self.atoms) :
+            modelCount = self.atoms[0].residue.chain.molecule.modelCount
+        return modelCount
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
@@ -1637,6 +1662,15 @@ class DihedralRestraint( NTdict ):
             comment = 'RED: violSd: %8.3f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
+            
+        modelCount = self.getModelCount()
+        for atm in self.atoms:
+            atms = atm.realAtoms()
+            for a in atms:
+                if len( a.coordinates ) < modelCount:
+                    msg = "Missing coordinates (%s)" %  a.toString()
+                    NTdebug(msg)
+                    self.rogScore.setMaxColor( COLOR_RED, msg )            
     #end def
 
     def calculateAverage(self):
@@ -1644,12 +1678,8 @@ class DihedralRestraint( NTdict ):
         return cav and cv tuple or (None, None) tuple on error
         """
 
-        modelCount = 0
-        if len(self.atoms):
-            modelCount = self.atoms[0].residue.chain.molecule.modelCount
-        #end if
-
-        if (modelCount == 0):
+        modelCount = self.getModelCount()
+        if modelCount == 0:
             NTerror('Error DihedralRestraint: no structure models\n' )
             return (None,None)
         #end if
@@ -1666,8 +1696,8 @@ class DihedralRestraint( NTdict ):
 
         #set the default values
         self.dihedrals  = NTlist() # list with dihedral values for each model
-        self.cav        = 0.0      # Average dihedral value
-        self.cv         = 0.0      # cv on dihedral
+        self.cav        = None      # Average dihedral value
+        self.cv         = None      # cv on dihedral
 #        self.min        = 0.0      # Minimum dihedral
 #        self.max        = 0.0      # Max dihedral
         self.violations = NTlist() # list with violations for each model
@@ -1678,16 +1708,19 @@ class DihedralRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = 0.0      # Sd of violations
 
-        for i in range(modelCount):
-            d = NTdihedralOpt(
-                            self.atoms[0].coordinates[i],
-                            self.atoms[1].coordinates[i],
-                            self.atoms[2].coordinates[i],
-                            self.atoms[3].coordinates[i]
-                          )
-            self.dihedrals.append( d )
-        #end for
-
+        try:
+            for i in range(modelCount):
+                d = NTdihedralOpt(
+                                self.atoms[0].coordinates[i],
+                                self.atoms[1].coordinates[i],
+                                self.atoms[2].coordinates[i],
+                                self.atoms[3].coordinates[i]
+                              )
+                self.dihedrals.append( d )
+            #end for
+        except:
+            pass # ignore missing coordinates. They're reported by criticize()
+        
         #find the range to store these dihedral values
         #limit = 0.0
         #if limit > self.lower: limit = -180.0
@@ -1706,7 +1739,8 @@ class DihedralRestraint( NTdict ):
             if fv > 1.0: self.violCount1 += 1
             if fv > 3.0: self.violCount3 += 1
             if fv > 5.0: self.violCount5 += 1
-            if fv > self.violMax: self.violMax = fv
+            if fv > self.violMax: 
+                self.violMax = fv
             #end if
         #end for
         self.violAv,self.violSd,_n = self.violations.average()
@@ -1770,12 +1804,15 @@ class DihedralRestraint( NTdict ):
 
     def format( self ):
         return  \
-            sprintf('%-25s %-6s (Target: %6.1f %6.1f)  (Models: cav %6s cv %4s)  '+\
+            sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %4s)  '+\
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
-                     self, self.rogScore,
-                     self.lower, self.upper,
-                     val2Str(self.cav,"%6.1f", 6),val2Str(self.cv,"%4.1f", 4),
-                     val2Str(self.violAv,"%4.1f", 4), self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                     self, self.rogScore,                    
+                     val2Str(self.lower, "%4.1f", 4),
+                     val2Str(self.upper, "%4.1f", 4),
+                     val2Str(self.cav,"%6.1f", 6),
+                     val2Str(self.cv,"%4.1f", 4),
+                     val2Str(self.violAv,"%4.1f", 4), 
+                     self.violMax, self.violCount1, self.violCount3, self.violCount5,
                      self.atoms.format('%-11s ')
                     )
     #end def
@@ -1849,8 +1886,9 @@ class DihedralRestraintList( NTlist ):
         for dr in self:
             if calculateFirst:
                 (cav, _cv) = dr.calculateAverage()
-                if not cav:
+                if cav == None:
                     NTdebug("Failed to calculate average for: "+self.format())
+                    continue # skipping dihedral with a missing coordinate or so.
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5
