@@ -687,17 +687,17 @@ def validateSaltbridge( residue1, residue2 ):
     )
 
     if residue1 == None:
-        NTerror('validateSaltbridge: undefined residue1\n')
+        NTerror('validateSaltbridge: undefined residue1')
         return None
     #end if
     if residue2 == None:
-        NTerror('validateSaltbridge: undefined residue2\n')
+        NTerror('validateSaltbridge: undefined residue2')
         return None
     #end if
 
     modelCount = residue1.chain.molecule.modelCount
     if modelCount == 0:
-        NTerror('validateSaltbridge: no structure models\n')
+        NTerror('validateSaltbridge: no structure models')
         return None
     #end if
 
