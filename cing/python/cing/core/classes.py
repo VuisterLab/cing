@@ -1139,14 +1139,14 @@ class DistanceRestraint( NTdict ):
 
         self.rogScore.reset()
 #        NTdebug( '%s' % self )
-        if self.violMax >= project.valSets.DR_MAXALL_POOR:
-            comment = 'ORANGE: violMax: %8.3f' % self.violMax
-#            NTdebug(comment)
-            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
-        elif self.violMax >= project.valSets.DR_MAXALL_BAD:
+        if self.violMax >= project.valSets.DR_MAXALL_BAD:
             comment = 'RED: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
+        elif self.violMax >= project.valSets.DR_MAXALL_POOR:
+            comment = 'ORANGE: violMax: %8.3f' % self.violMax
+#            NTdebug(comment)
+            self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
             comment = 'ORANGE: fractionAbove: %8.3f' % fractionAbove
@@ -1614,11 +1614,11 @@ class DihedralRestraint( NTdict ):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
         if self.violMax >= project.valSets.AC_MAXALL_BAD:
-            comment = 'ORANGE: violMax: %8.3f' % self.violMax
+            comment = 'RED: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         elif self.violMax >= project.valSets.AC_MAXALL_POOR:
-            comment = 'RED: violMax: %8.3f' % self.violMax
+            comment = 'ORANGE: violMax: %8.3f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
 

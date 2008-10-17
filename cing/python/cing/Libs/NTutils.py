@@ -29,7 +29,7 @@ import sys
 
 CONSENSUS_STR = 'consensus'
 
-class NTlist( list ):
+class NTlist(list):
     """
     NTlist: list which is callable:
       __call__(index=-1) index<0: returns last item added or None for empty list
@@ -64,11 +64,11 @@ class NTlist( list ):
     #--------------------------------------------------------------
     # Basic methods
     #--------------------------------------------------------------
-    def __init__( self, *args ):
-        list.__init__( self )
+    def __init__(self, *args):
+        list.__init__(self)
         self.current = None
         for a in args:
-            self.append( a )
+            self.append(a)
         #end for
         self.av = None
         self.sd = None
@@ -76,7 +76,7 @@ class NTlist( list ):
 
     #end def
 
-    def __call__( self, index=-1 ):
+    def __call__(self, index=-1):
         if index < 0:
             return self.current
         else:
@@ -84,21 +84,21 @@ class NTlist( list ):
         #end if
     #end def
 
-    def __getslice__( self, i, j ):
+    def __getslice__(self, i, j):
         """To implement slicing"""
-        return NTlist( *list.__getslice__( self, i, j) )
+        return NTlist(*list.__getslice__(self, i, j))
     #end def
 
-    def __getitem__( self, item ):
+    def __getitem__(self, item):
         """To implement extended slicing"""
         if type(item) == slice:
-            return NTlist( *list.__getitem__( self, item) )
+            return NTlist(*list.__getitem__(self, item))
         else:
-            return list.__getitem__( self, item)
+            return list.__getitem__(self, item)
     #end def
 
-    def __add__( self, other ):
-        return NTlist( *list.__add__(self,other) )
+    def __add__(self, other):
+        return NTlist(*list.__add__(self, other))
     #end def
 
     def getConsensus(self, minFraction=1.):
@@ -119,7 +119,7 @@ class NTlist( list ):
         count = {}
         n = len(self)
         for v in self:
-            count.setdefault(v,0)
+            count.setdefault(v, 0)
             count[v] +=1
         for v in count:
             if count[v] >= minFraction*n:
@@ -129,57 +129,57 @@ class NTlist( list ):
 
 
 
-    def append( self, *items ):
+    def append(self, *items):
         for item in items:
-            list.append( self, item )
+            list.append(self, item)
             self.current = item
 
-    def add( self, *items ):
+    def add(self, *items):
         '''Add a new item to a list only if not there before, like 'add' method
            for set() - AWSS 24OCT07'''
         for item in items:
             if not self.count(item):
-                list.append( self, item )
+                list.append(self, item)
                 self.current = item
             #end if
         #end for
     #end def
 
-    def addList( self, list_new ):
+    def addList(self, list_new):
         for item in list_new:
-            list.append( self, item )
+            list.append(self, item)
             self.current = item
         #end for
     #end def
 
-    def insert( self, i, item ):
-        list.insert( self, i, item )
+    def insert(self, i, item):
+        list.insert(self, i, item)
         self.current = item
     #end def
 
-    def remove( self, item ):
-        list.remove( self, item )
+    def remove(self, item):
+        list.remove(self, item)
         if item == self.current:
             self.current = self.last()
         #end if
     #end def
 
-    def replace( self, item, newItem ):
-        index = self.index( item )
+    def replace(self, item, newItem):
+        index = self.index(item)
         if (index < 0):
             return
-        self.remove( item )
-        self.insert( index, newItem )
+        self.remove(item)
+        self.insert(index, newItem)
     #end def
 
-    def index( self, item ):
+    def index(self, item):
         # JFD notes that this method is now twice as fast.
         # This was a very rate limiting piece of code when a chain
         # had many residues (E.g. an X-ray structure with many waters).
 
 
         try:
-            return list.index( self, item )
+            return list.index(self, item)
         except ValueError:
             pass
         return -1
@@ -187,7 +187,7 @@ class NTlist( list ):
 #            return list.index( self, item )
 #        return -1
 
-    def last( self ):
+    def last(self):
         l = len(self)
         if (l == 0):
             return None
@@ -195,30 +195,30 @@ class NTlist( list ):
         return self[l-1]  # equivalent to self[-1:][0] or simply self[-1]
     #end def
 
-    def push( self, item ):
-        self.insert( 0, item )
+    def push(self, item):
+        self.insert(0, item)
     #end def
 
-    def pop( self, index=0 ):
+    def pop(self, index=0):
         """Return index'ed item from list or None on empty list
         """
-        if len( self ) == 0:
+        if len(self) == 0:
             return None
-        item = list.pop( self, index )
+        item = list.pop(self, index)
         if item == self.current:
             self.current = self.last()
         #end if
         return item
     #end def
 
-    def zap( self, *byItems ):
+    def zap(self, *byItems):
         """use NTzap to yield a new list from self, extracting byItem from each
            element of self.
         """
-        return NTzap( self, *byItems )
+        return NTzap(self, *byItems)
     #end def
 
-    def removeDuplicates( self ):
+    def removeDuplicates(self):
         """Can be optimized when needed by doing a sorted lookup table"""
         if len(self) <= 1:
             return
@@ -226,35 +226,35 @@ class NTlist( list ):
         while i < len(self):
 #            print '>i=',i,  'list=',self[0:i],  'item=',self[i], 'len=',len(self)
             if self[i] in self[0:i]:
-                self.pop( i )
+                self.pop(i)
             else:
                 i += 1
 
-    def reorder( self, indices ):
+    def reorder(self, indices):
         """Return a new NTlist, ordered according to indices or None on error
         """
         if (len(indices) != len(self)): return None
 
         result = NTlist()
         for idx in indices:
-            result.append( self[idx] )
+            result.append(self[idx])
         #end for
         return result
     #end def
 
-    def setCurrent( self, item ):
+    def setCurrent(self, item):
         if item in self:
             self.current = item
         #end if
     #end def
 
-    def getDeepByKeysOrDefault( self, default, *keyList ):
-        result = self.getDeepByKeys( *keyList )
+    def getDeepByKeysOrDefault(self, default, *keyList):
+        result = self.getDeepByKeys(*keyList)
         if result == None:
             return default
         return result
 
-    def getDeepByKeys( self, *keyList ):
+    def getDeepByKeys(self, *keyList):
         """Return arbitrary deep element or None if key is absent at some point.
         The essence here is silence."""
         lk = len(keyList)
@@ -264,7 +264,7 @@ class NTlist( list ):
             return None
         key = keyList[0]
 
-        if not isinstance(key, int ):
+        if not isinstance(key, int):
             NTdebug("no int key in NTlist.getDeepByKeys: " + `key`)
             return None
 
@@ -276,7 +276,7 @@ class NTlist( list ):
         if lk == 1:
 #            NTdebug("value : " + `value`)
             return value
-        if hasattr( value,'getDeepByKeys'):
+        if hasattr(value, 'getDeepByKeys'):
 #            NTdebug("Going one level deeper")
             reducedKeyList = keyList[1:]
             return value.getDeepByKeys(*reducedKeyList)
@@ -288,17 +288,17 @@ class NTlist( list ):
     #--------------------------------------------------------------
     # numeric lists, None elements ignored
     #--------------------------------------------------------------
-    def average( self, byItem=None ):
+    def average(self, byItem=None):
         """return (av,sd,n) tuple of self
            Store av,sd,n as attributes of self
            Assumes numeric list, None elements ignored
            See also NTaverage routine
         """
-        self.av, self.sd, self.n = NTaverage( self, byItem )
-        return ( self.av, self.sd, self.n )
+        self.av, self.sd, self.n = NTaverage(self, byItem)
+        return (self.av, self.sd, self.n)
     #end def
 
-    def cAverage( self, min=0.0, max=360.0, radians = 0, byItem=None ):
+    def cAverage(self, min=0.0, max=360.0, radians = 0, byItem=None):
         """ Circular average.
            return (cav,cv,cn) tuple of a list
            return cav on min-max interval (that has to be spaced
@@ -309,8 +309,8 @@ class NTlist( list ):
                ( None, None, 0)
            See also NTcAverage routine
         """
-        self.cav, self.cv, self.cn = NTcAverage( self, min, max, radians, byItem )
-        return ( self.cav, self.cv, self.cn )
+        self.cav, self.cv, self.cn = NTcAverage(self, min, max, radians, byItem)
+        return (self.cav, self.cv, self.cn)
     #end def
 
     def min(self):
@@ -324,17 +324,17 @@ class NTlist( list ):
     #end def
 
     def minItem(self):
-        if len(self) == 0: return (None,None)
-        c = zip(self,range(len(self)))
+        if len(self) == 0: return (None, None)
+        c = zip(self, range(len(self)))
         c.sort()
-        return (c[0][1],c[0][0])
+        return (c[0][1], c[0][0])
     #end def
 
     def maxItem(self):
-        if len(self) == 0: return (None,None)
-        c = zip(self,range(len(self)))
+        if len(self) == 0: return (None, None)
+        c = zip(self, range(len(self)))
         c.sort()
-        return (c[-1][1],c[-1][0])
+        return (c[-1][1], c[-1][0])
     #end def
 
     def sum(self, start=0):
@@ -342,34 +342,34 @@ class NTlist( list ):
     #end def
 
     def sumsq(self, start=0):
-        return sum( map( NTsq, self), start)
+        return sum(map(NTsq, self), start)
     #end def
 
-    def limit( self, min, max,  byItem=None ):
+    def limit(self, min, max, byItem=None):
         """Use NTlimit on self, return self
         """
-        NTlimit( self, min, max, byItem )
+        NTlimit(self, min, max, byItem)
         return self
     #end def
 
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
-    def __str__( self ):
+    def __str__(self):
         if len(self) == 0:
             return '[]'
         #end if
 
         string = '['
         for item in self:
-            string = string + str( item ) +', '
+            string = string + str(item) +', '
         #end for
         string = string[:-2]+']'
         return string
     #end def
 
 # gv 19 Jun 08: reintroduced functionality, but shorter
-    def __repr__( self ):
+    def __repr__(self):
         string = list.__repr__(self)
         return 'NTlist(' + string[1:-1] + ')'
 
@@ -384,12 +384,12 @@ class NTlist( list ):
 #        return string
     #end def
 
-    def format( self, fmt = None ):
+    def format(self, fmt = None):
         if len(self) == 0:
             return ''
         #end if
 
-        if (fmt == None and hasattr( self, '__FORMAT__')):
+        if (fmt == None and hasattr(self, '__FORMAT__')):
             fmt = self.__FORMAT__
         #end if
         string = ''
@@ -419,29 +419,29 @@ class NTlist( list ):
 #        return htmlLine
 #    #end def
 
-    def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<NTlist>")
-        fprintf( stream, lineEnd )
+    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<NTlist>")
+        fprintf(stream, lineEnd)
 
         for a in self:
-            NTtoXML( a, depth+1, stream, indent, lineEnd )
+            NTtoXML(a, depth+1, stream, indent, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</NTlist>")
-        fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</NTlist>")
+        fprintf(stream, lineEnd)
     #end def
 
-    def toSML(self, stream=sys.stdout ):
-        if hasattr(NTlist,'SMLhandler'):
-            NTlist.SMLhandler.toSML( self, stream )
+    def toSML(self, stream=sys.stdout):
+        if hasattr(NTlist, 'SMLhandler'):
+            NTlist.SMLhandler.toSML(self, stream)
         else:
             NTerror('NTlist.toSML: no SMLhandler defined')
         #end if
     #end def
 #end class
 
-def NTfill( value, n ):
+def NTfill(value, n):
     """Return a NTlist instance with n elements of value
 
     """
@@ -454,13 +454,13 @@ def NTfill( value, n ):
     return result
 #end def
 
-def NThistogram( theList, low, high, bins ):
+def NThistogram(theList, low, high, bins):
     """Return a histogram of theList
     """
     if bins < 1:
         return None
 
-    his = NTfill( 0, bins) # Returns NTlist
+    his = NTfill(0, bins) # Returns NTlist
     binSize = (high-low)/bins
 
     his.low = low
@@ -492,7 +492,7 @@ def NThistogram( theList, low, high, bins ):
 #end def
 
 
-class NTvector( list ):
+class NTvector(list):
     """Lightweight class to implement a few vector operations
        Numeric or Numpy has compiled code; this is a python
        only class based on list
@@ -500,15 +500,15 @@ class NTvector( list ):
        http://www.python.org/doc/2.4/ref/numeric-types.html
     """
 
-    def __init__( self, *values ):
-        list.__init__( self )
+    def __init__(self, *values):
+        list.__init__(self)
         for v in values:
-            self.append( v )
+            self.append(v)
         #end for
         self.fmt = '%.2f'
     #end def
 
-    def length( self ):
+    def length(self):
         result = 0
         for i in range(0, len(self)):
             result += self[i]*self[i]
@@ -516,16 +516,16 @@ class NTvector( list ):
         return math.sqrt(result)
     #end def
 
-    def norm( self ):
+    def norm(self):
         lgth = 1.0/self.length()
         result = NTvector()
         for i in range(0, len(self)):
-            result.append( self[i]*lgth )
+            result.append(self[i]*lgth)
         #end for
         return result
     #end def
 
-    def polar( self, radians = False ):
+    def polar(self, radians = False):
         """
         return triple of polar coordinates (r,u,v)
         with:
@@ -541,13 +541,13 @@ class NTvector( list ):
         if not radians: fac = 180.0/math.pi
 
         r = self.length()
-        u = math.atan2( self[1], self[0] )
+        u = math.atan2(self[1], self[0])
 #        if u<0: u+=math.pi*2.0
-        v = math.asin( self[2]/r )
+        v = math.asin(self[2]/r)
         return r, u*fac, v*fac
     #end def
 
-    def setFromPolar( self, polarCoordinates, radians = False ):
+    def setFromPolar(self, polarCoordinates, radians = False):
         """
         set vector using polarCoordinates (r,u,v)
         with:
@@ -562,45 +562,45 @@ class NTvector( list ):
         fac = 1.0
         if not radians: fac = math.pi/180.0
 
-        r,u,v = polarCoordinates
+        r, u, v = polarCoordinates
         self[0] = r*math.cos(v*fac)*math.cos(u*fac)
         self[1] = r*math.cos(v*fac)*math.sin(u*fac)
         self[2] = r*math.sin(v*fac)
     #end def
 
-    def rotX( self, angle, radians=False ):
+    def rotX(self, angle, radians=False):
         if len(self) != 3: return None
 
         fac = 1.0
         if not radians: fac = math.pi/180.0
         result = NTvector()
-        m = [ NTvector( 1.0,  0.0,                    0.0                   ),
-              NTvector( 0.0,  math.cos( angle*fac ), -math.sin( angle*fac ) ),
-              NTvector( 0.0,  math.sin( angle*fac ),  math.cos( angle*fac ) )
+        m = [ NTvector(1.0, 0.0, 0.0),
+              NTvector(0.0, math.cos(angle*fac), -math.sin(angle*fac)),
+              NTvector(0.0, math.sin(angle*fac), math.cos(angle*fac))
             ]
         for v in m:
-            result.append( v.dot( self ) )
+            result.append(v.dot(self))
         #end for
         return result
     #end def
 
-    def rotY( self, angle, radians=False ):
+    def rotY(self, angle, radians=False):
         if len(self) != 3: return None
 
         fac = 1.0
         if not radians: fac = math.pi/180.0
         result = NTvector()
-        m = [ NTvector(  math.cos( angle*fac ), 0.0, -math.sin( angle*fac ) ),
-              NTvector(  0.0,                   1.0,  0.0                   ),
-              NTvector(  math.sin( angle*fac ), 0.0,  math.cos( angle*fac ) )
+        m = [ NTvector(math.cos(angle*fac), 0.0, -math.sin(angle*fac)),
+              NTvector(0.0, 1.0, 0.0),
+              NTvector(math.sin(angle*fac), 0.0, math.cos(angle*fac))
             ]
         for v in m:
-            result.append( v.dot( self ) )
+            result.append(v.dot(self))
         #end for
         return result
     #end def
 
-    def rotZ( self, angle, radians=False ):
+    def rotZ(self, angle, radians=False):
         """rotate clockwise along z-axis
         """
         if len(self) != 3: return None
@@ -609,17 +609,17 @@ class NTvector( list ):
         if not radians: fac = math.pi/180.0
         result = NTvector()
         m = [
-              NTvector(  math.cos( angle*fac ), -math.sin( angle*fac ), 0.0 ),
-              NTvector(  math.sin( angle*fac ),  math.cos( angle*fac ), 0.0 ),
-              NTvector(  0.0,                    0.0,                   1.0 ),
+              NTvector(math.cos(angle*fac), -math.sin(angle*fac), 0.0),
+              NTvector(math.sin(angle*fac), math.cos(angle*fac), 0.0),
+              NTvector(0.0, 0.0, 1.0),
             ]
         for v in m:
-            result.append( v.dot( self ) )
+            result.append(v.dot(self))
         #end for
         return result
     #end def
 
-    def dot( self, other ):
+    def dot(self, other):
         l = len(self)
         if l != len(other): return None
         result = 0
@@ -629,7 +629,7 @@ class NTvector( list ):
         return result
     #end def
 
-    def cross( self, other ):
+    def cross(self, other):
         """
         return cross vector spanned by self and other
 
@@ -648,9 +648,9 @@ class NTvector( list ):
             return None
 
         result = NTvector()
-        result.append( self[1]*other[2]-self[2]*other[1] ) # x-coordinate
-        result.append( self[2]*other[0]-self[0]*other[2] ) # y-coordinate
-        result.append( self[0]*other[1]-self[1]*other[0] ) # z-coordinate
+        result.append(self[1]*other[2]-self[2]*other[1]) # x-coordinate
+        result.append(self[2]*other[0]-self[0]*other[2]) # y-coordinate
+        result.append(self[0]*other[1]-self[1]*other[0]) # z-coordinate
         return result
     #end def
 
@@ -669,7 +669,7 @@ class NTvector( list ):
 #                + self[2] * (b[0]*c[1]-b[1]*c[0] )
 
 
-    def angle( self, other, radians = False ):
+    def angle(self, other, radians = False):
         """
         return angle spanned by self and other
         or None on error
@@ -685,13 +685,13 @@ class NTvector( list ):
 
 
         c = self.dot(other) /(self.length()*other.length())
-        c = min( c, 1.0 )
-        c = max( c, -1.0 )
-        angle = math.acos( c )
+        c = min(c, 1.0)
+        c = max(c, -1.0)
+        angle = math.acos(c)
         return (angle * fac)
     #end def
 
-    def distance( self, other ):
+    def distance(self, other):
         """
         return distance between self and other
         or None on error
@@ -702,27 +702,27 @@ class NTvector( list ):
         return diff.length()
     #end def
 
-    def __add__( self, other ):
+    def __add__(self, other):
         l = len(self)
         if l != len(other): return None
         result = NTvector()
         for i in range(0, l):
-            result.append( self[i]+other[i] )
+            result.append(self[i]+other[i])
         #end for
         return result
     #end def
 
-    def __radd__( self, other ):
+    def __radd__(self, other):
         l = len(self)
         if l != len(other): return None
         result = NTvector()
         for i in range(0, l):
-            result.append( self[i]+other[i] )
+            result.append(self[i]+other[i])
         #end for
         return result
     #end def
 
-    def __iadd__( self, other ):
+    def __iadd__(self, other):
         l = len(self)
         if l != len(other): return None
         for i in range(0, l):
@@ -731,27 +731,27 @@ class NTvector( list ):
         return self
     #end def
 
-    def __sub__( self, other ):
+    def __sub__(self, other):
         l = len(self)
         if l != len(other): return None
         result = NTvector()
         for i in range(0, l):
-            result.append( self[i]-other[i] )
+            result.append(self[i]-other[i])
         #end for
         return result
     #end def
 
-    def __rsub__( self, other ):
+    def __rsub__(self, other):
         l = len(self)
         if l != len(other): return None
         result = NTvector()
         for i in range(0, l):
-            result.append( other[i]-self[i] )
+            result.append(other[i]-self[i])
         #end for
         return result
     #end def
 
-    def __isub__( self, other ):
+    def __isub__(self, other):
         l = len(self)
         if l != len(other): return None
         for i in range(0, l):
@@ -760,27 +760,27 @@ class NTvector( list ):
         return self
     #end def
 
-    def __neg__( self ):
+    def __neg__(self):
         l = len(self)
         result = NTvector()
         for i in range(0, l):
-            result.append( -self[i] )
+            result.append(-self[i])
         #end for
         return result
     #end def
 
-    def __pos__( self ):
+    def __pos__(self):
         l = len(self)
         result = NTvector()
         for i in range(0, l):
-            result.append( self[i] )
+            result.append(self[i])
         #end for
         return result
-    #end def
+    #end def 
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
-    def __str__( self ):
+    def __str__(self):
         if len(self) == 0:
             return '(V:)'
         #end if
@@ -795,13 +795,13 @@ class NTvector( list ):
 #end class
 
 
-class NTset( NTlist ):
+class NTset(NTlist):
     """
     Class to define sets; i.e. list of objects
     A set is equal to another set if they have at least one element in common
     """
 
-    def __eq__( self, other):
+    def __eq__(self, other):
         if other == None:
             return False
         else:
@@ -813,33 +813,33 @@ class NTset( NTlist ):
         #end if
     #end def
 
-    def __ne__( self, other):
+    def __ne__(self, other):
         return not (self == other)
     #end def
 
-    def __str__( self ):
+    def __str__(self):
 
         if len(self) == 0:
             return '//'
 
         string = '/'
         for item in self:
-            string = string + str( item ) +', '
+            string = string + str(item) +', '
         string = string[:-2]+'/'
         return string
     #end def
 
-    def toXML( self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<NTset>")
-        fprintf( stream, lineEnd )
+    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<NTset>")
+        fprintf(stream, lineEnd)
 
         for a in self:
-            NTtoXML( a, depth+1, stream, indent, lineEnd )
+            NTtoXML(a, depth+1, stream, indent, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</NTset>")
-        fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</NTset>")
+        fprintf(stream, lineEnd)
     #end def
 
 #end class
@@ -976,20 +976,20 @@ class NTdict(dict):
           removed implementation with global storage in NTstructObjects since it was never used and
           will result in objects persisting even if they could be deleted (i.e. a memory leak).
     """
-    def __init__( self, *args, **kwds ):
+    def __init__(self, *args, **kwds):
         global NTdictObjectId
 
         #print '>>>', args, kwds
-        dict.__init__( self, *args, **kwds )
-        self.setdefault('__CLASS__',  'NTdict' )
-        self.setdefault('__FORMAT__',  None )      # set to None, which means by default not shown in repr() and toXML() methods
-        self.setdefault('__SAVEXML__', None )      # set to None, which means by default not shown in repr() and toXML() methods
-        self.setdefault('__SAVEALLXML__', True )   # when True, save all attributes in toXML() methods
+        dict.__init__(self, *args, **kwds)
+        self.setdefault('__CLASS__', 'NTdict')
+        self.setdefault('__FORMAT__', None)      # set to None, which means by default not shown in repr() and toXML() methods
+        self.setdefault('__SAVEXML__', None)      # set to None, which means by default not shown in repr() and toXML() methods
+        self.setdefault('__SAVEALLXML__', True)   # when True, save all attributes in toXML() methods
 #        self.__getstate__ =  self  # Trick for fooling shelve.
 
         self.__OBJECTID__ = NTdictObjectId
         NTdictObjectId += 1
-        self.__HIDDEN__  = ['__HIDDEN__','__OBJECTID__','__CLASS__','__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
+        self.__HIDDEN__  = ['__HIDDEN__', '__OBJECTID__', '__CLASS__', '__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
     #end def
 
     #------------------------------------------------------------------
@@ -1009,45 +1009,45 @@ class NTdict(dict):
         self[attr] = value
 
     def __delattr__(self, attr):
-        del( self[attr] )
+        del(self[attr])
 
 
-    def __cmp__( self, other ):
+    def __cmp__(self, other):
         """Optimized for speed a bit"""
-        if not hasattr(other,'__OBJECTID__'): return -1
+        if not hasattr(other, '__OBJECTID__'): return -1
         if self.__OBJECTID__ == other.__OBJECTID__:
             return 0
         if self.__OBJECTID__ < other.__OBJECTID__:
             return -1
         return 1
 
-    def __hash__( self ):
-        return hash( self.__OBJECTID__ )
+    def __hash__(self):
+        return hash(self.__OBJECTID__)
     #end def
 
-    def __eq__( self, other):
+    def __eq__(self, other):
         if other == None:
             return False
-        if not isinstance(other,NTdict): # eg when comparing with tuple.
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
             return False
         return self.__OBJECTID__ == other.__OBJECTID__
 
-    def __ne__( self, other):
+    def __ne__(self, other):
         return not (self == other)
 
     #------------------------------------------------------------------
     # Print/repr/output routines
     #------------------------------------------------------------------
-    def __str__( self ):
+    def __str__(self):
 #        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
 #        return self.format()
-        return '<%s-object (%d)>' % ( self._className(), self.__OBJECTID__ )
+        return '<%s-object (%d)>' % (self._className(), self.__OBJECTID__)
 
-    def _className( self ):
+    def _className(self):
         return str(self.__class__)[7:-2].split('.')[-1:][0]
     #end def
 
-    def __repr__( self ):
+    def __repr__(self):
 #        return dict.__repr__( self )
 #        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
         global NTdictDepth, NTdictMaxDepth, NTdictCycles
@@ -1058,26 +1058,26 @@ class NTdict(dict):
         #end if
 
         if (self.__OBJECTID__ in NTdictCycles):
-            return  '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+            return  '<%s-object (%d)>' % (self.__CLASS__, self.__OBJECTID__)
         #end if
-        NTdictCycles.append( self.__OBJECTID__ )
+        NTdictCycles.append(self.__OBJECTID__)
 
         NTdictDepth += 1
         if (NTdictDepth > NTdictMaxDepth):
             NTdictDepth -= 1
-            return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
+            return '<%s-object (%d)>' % (self.__CLASS__, self.__OBJECTID__)
         #end if
 
         string = self.__CLASS__ + '( '
         remove2chars = 0
         for k in self.keys():
-            string = string + str(k) + ' = ' + repr( self[k] ) + ', '
+            string = string + str(k) + ' = ' + repr(self[k]) + ', '
             remove2chars = 1
         #end for
         #check if we also need to store some internals
-        for k in ['__FORMAT__','__SAVEXML__']:
+        for k in ['__FORMAT__', '__SAVEXML__']:
             if self[k] != None:
-                string = string + k + ' = ' + repr( self[k] ) + ', '
+                string = string + k + ' = ' + repr(self[k]) + ', '
                 remove2chars = 1
         #end for
         #check if we need to remove the final (not needed) 2 chars
@@ -1089,7 +1089,7 @@ class NTdict(dict):
         return string
     #end def
 
-    def format( self, format=None ):
+    def format(self, format=None):
         """Return a formatted string of the items
            Uses format or stored attribute __FORMAT__ or default
         """
@@ -1104,7 +1104,7 @@ class NTdict(dict):
         return format % self
     #end def
 
-    def keysformat( self, dots='-'*20 ):
+    def keysformat(self, dots='-'*20):
         """set __FORMAT__ to list all keys
         """
         fmt = self.header(dots) + '\n'
@@ -1117,30 +1117,30 @@ class NTdict(dict):
     #end def
 
 
-    def printAttr( self, stream=sys.stdout, hidden=0 ):
+    def printAttr(self, stream=sys.stdout, hidden=0):
         """print attributes of structure; mainly fo debugging.
         """
-        msg = sprintf( '=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__ )
+        msg = sprintf('=== <%s-object (%d)> ===\n', self.__CLASS__, self.__OBJECTID__)
         # append hidden keys if asked for
         keys = self.keys()
         if hidden:
             keys = keys + self.__HIDDEN__
 #    print '>>',keys
         for key in keys:
-            msg += sprintf( '%-12s : %s\n', key, str(self[key]))
+            msg += sprintf('%-12s : %s\n', key, str(self[key]))
         return msg
     #end def
 
-    def header( self, dots = '-'*20  ):
+    def header(self, dots = '-'*20):
         """Generate a header using __CLASS__ and dots.
         """
-        return sprintf('%s %s %s', dots, self.__CLASS__, dots )
+        return sprintf('%s %s %s', dots, self.__CLASS__, dots)
     #end def
 
-    def footer( self, dots = '-'*20  ):
+    def footer(self, dots = '-'*20):
         """Generate a footer using dots of the same length as header.
         """
-        header = self.header( dots )
+        header = self.header(dots)
         lheader = len(header)
         s = dots
         while len(s) < lheader:
@@ -1153,20 +1153,20 @@ class NTdict(dict):
     # Misc routines
     #------------------------------------------------------------------
 
-    def copy( self ):
+    def copy(self):
         """Generate a copy with 'shallow' references"""
-        newInstance = self.__class__( **dict( self.items() ) )
+        newInstance = self.__class__(**dict(self.items()))
         for k in ['__SAVEXML__', '__FORMAT__']:
             newInstance[k] = self[k]
         #end for
         return newInstance
 
-    def __call__( self, **kwds ):
-        self.update( kwds )
+    def __call__(self, **kwds):
+        self.update(kwds)
         return self
     #end def
 
-    def setDeepByKeys( self, value, *keyList ):
+    def setDeepByKeys(self, value, *keyList):
         """Set arbitrary deep element to value by keyList.
         The essence here is silence.
         keyList needs to have at least one key.
@@ -1189,9 +1189,9 @@ class NTdict(dict):
             self[k] = deeper
 
         reducedKeyList = keyList[1:]
-        return deeper.setDeepByKeys(value,*reducedKeyList)
+        return deeper.setDeepByKeys(value, *reducedKeyList)
 
-    def appendDeepByKeys( self, value, *keyList ):
+    def appendDeepByKeys(self, value, *keyList):
         """Append value to arbitrary deep list.
         The essence here is silence.
         keyList needs to have at least one key.
@@ -1217,16 +1217,16 @@ class NTdict(dict):
             self[k] = deeper
 
         reducedKeyList = keyList[1:]
-        return deeper.appendDeepByKeys(value,*reducedKeyList)
+        return deeper.appendDeepByKeys(value, *reducedKeyList)
 
 
-    def getDeepByKeysOrDefault( self, default, *keyList ):
-        result = self.getDeepByKeys( *keyList )
+    def getDeepByKeysOrDefault(self, default, *keyList):
+        result = self.getDeepByKeys(*keyList)
         if result == None:
             return default
         return result
 
-    def getDeepByKeys( self, *keyList ):
+    def getDeepByKeys(self, *keyList):
         """Return arbitrary deep element or default=None if key is absent at some point.
         The essence here is silence."""
         lk = len(keyList)
@@ -1236,14 +1236,14 @@ class NTdict(dict):
             return None
         key = keyList[0]
 
-        if not self.has_key( key ):
+        if not self.has_key(key):
 #          NTdebug("no key: " + `key`)
             return None
         value = self[key]
         if lk == 1:
 #          NTdebug("value : " + `value`)
             return value
-        if hasattr( value,'getDeepByKeys'):
+        if hasattr(value, 'getDeepByKeys'):
 #          NTdebug("Going one level deeper")
             reducedKeyList = keyList[1:]
             return value.getDeepByKeys(*reducedKeyList)
@@ -1256,15 +1256,15 @@ class NTdict(dict):
 
 
 
-    def getdefault( self, key, defaultKey ):
+    def getdefault(self, key, defaultKey):
         'Return self[key] if key exists, self[defaultKey] otherwise'
-        if self.has_key( key ):
+        if self.has_key(key):
             return self[key]
         else:
             return self[defaultKey]
     #end def
 
-    def uniqueKey( self, key ):
+    def uniqueKey(self, key):
         """return a unique key derived from key"""
         i = 1
         newkey = key
@@ -1282,8 +1282,8 @@ class NTdict(dict):
     #         len(),      popitem(),     clear(),   update()
     # now all decend from method keys().
     #------------------------------------------------------------------
-    def keys( self ):
-        keys = dict.keys( self )
+    def keys(self):
+        keys = dict.keys(self)
         # i.e. we only need to remove the 'local' stuff here
         # remove keys that should be hidden
         for key in self.__HIDDEN__:
@@ -1292,33 +1292,33 @@ class NTdict(dict):
         keys.sort()
         return keys
 
-    def __iter__( self ):
+    def __iter__(self):
         """__iter__ returns keys
         """
         for key in self.keys():
             yield key
     #end def
 
-    def iterkeys( self ):
+    def iterkeys(self):
         for key in self.keys():
             yield key
 
-    def values( self ):
-        return map( self.get, self.keys() )
+    def values(self):
+        return map(self.get, self.keys())
 
-    def itervalues( self ):
+    def itervalues(self):
         for value in self.values():
             yield value
 
-    def items( self ):
-        return zip( self.keys(), self.values() )
+    def items(self):
+        return zip(self.keys(), self.values())
 
-    def iteritems( self ):
+    def iteritems(self):
         for item in self.items():
             yield item
 
-    def __len__( self ):
-        return len( self.keys() )
+    def __len__(self):
+        return len(self.keys())
 
     def popitem(self):
         keys = self.keys()
@@ -1331,22 +1331,22 @@ class NTdict(dict):
         del self[key]
         return (key, val)
 
-    def clear( self ):
+    def clear(self):
         p = self.popitem()
         while p:
             p = self.popitem()
 
-    def update( self, fromDict ):
-        for key,value in fromDict.iteritems():
+    def update(self, fromDict):
+        for key, value in fromDict.iteritems():
             self[key] = value
 
     #------------------------------------------------------------------
     # XML routines
     #------------------------------------------------------------------
-    def toXML( self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n' ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<%s>", self.__CLASS__ )
-        fprintf( stream, lineEnd )
+    def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<%s>", self.__CLASS__)
+        fprintf(stream, lineEnd)
 #       print node
 
         # check for what we need to write out
@@ -1359,22 +1359,22 @@ class NTdict(dict):
         #end if
 
         for a in keys:
-            NTindent( depth+1, stream, indent )
-            fprintf( stream, "<Attr name=%s>", quote( a) )
-            fprintf( stream, lineEnd )
+            NTindent(depth+1, stream, indent)
+            fprintf(stream, "<Attr name=%s>", quote(a))
+            fprintf(stream, lineEnd)
 
-            NTtoXML( self[a], depth+2, stream, indent, lineEnd )
+            NTtoXML(self[a], depth+2, stream, indent, lineEnd)
 
-            NTindent( depth+1, stream, indent )
-            fprintf( stream, "</Attr>" )
-            fprintf( stream, lineEnd )
+            NTindent(depth+1, stream, indent)
+            fprintf(stream, "</Attr>")
+            fprintf(stream, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</%s>", self.__CLASS__ )
-        fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</%s>", self.__CLASS__)
+        fprintf(stream, lineEnd)
     #end def
 
-    def saveXML( self, *attrs ):
+    def saveXML(self, *attrs):
         """add attrributes to save list
         """
         if (self.__SAVEXML__ == None):
@@ -1383,31 +1383,31 @@ class NTdict(dict):
 
         for a in attrs:
             if a not in self.__SAVEXML__:
-                self.__SAVEXML__.append( a )
+                self.__SAVEXML__.append(a)
         #end for
     #end def
 
-    def removeXML( self, *attrs ):
+    def removeXML(self, *attrs):
         """remove attrributes from __SAVEXML__ list
         """
         if self.__SAVEXML__:
             for a in attrs:
                 if a in self.__SAVEXML__:
-                    self.__SAVEXML__.remove( a )
+                    self.__SAVEXML__.remove(a)
                 #end if
             #end for
         #end if
     #end def
 
-    def saveAllXML( self ):
+    def saveAllXML(self):
         """Define __SAVEALLXML__
         """
         self.__SAVEALLXML__ = True
     #end def
 
-    def toSML(self, stream=sys.stdout ):
-        if hasattr(NTdict,'SMLhandler'):
-            NTdict.SMLhandler.toSML( self, stream )
+    def toSML(self, stream=sys.stdout):
+        if hasattr(NTdict, 'SMLhandler'):
+            NTdict.SMLhandler.toSML(self, stream)
         else:
             NTerror('NTdict.toSML: no SMLhandler defined')
         #end if
@@ -1418,7 +1418,7 @@ class NTdict(dict):
 # Discouraged name for NTdict; please replace in your scripts asap.
 NTstruct = NTdict
 
-class NoneObjectClass( NTdict ):
+class NoneObjectClass(NTdict):
     """
     Class representing None; based on NTdict
 
@@ -1434,8 +1434,8 @@ class NoneObjectClass( NTdict ):
 
     Experimental
     """
-    def __init__( self ):
-        NTdict.__init__( self, __CLASS__ = 'NoneObjectClass' )
+    def __init__(self):
+        NTdict.__init__(self, __CLASS__ = 'NoneObjectClass')
     #end def
     def __getattr__(self, attr):
         return self
@@ -1453,7 +1453,7 @@ class NoneObjectClass( NTdict ):
         return []
     #end def
 
-    def __call__(self, *args, **kwds ):
+    def __call__(self, *args, **kwds):
         return self
     #end def
 
@@ -1463,21 +1463,21 @@ class NoneObjectClass( NTdict ):
     def __repr__(self):
         return 'NoneObject'
 
-    def format(self,*args,**kwds):
+    def format(self, *args, **kwds):
         return '<NoneObject>'
 #end def
 NoneObject = NoneObjectClass()
 noneobject = NoneObject
 
 
-class NTtree( NTdict ):
+class NTtree(NTdict):
     """NTTree class
        Linked tree-like structure class
     """
 
-    def __init__(self, name, **kwds ):
-        kwds.setdefault('__CLASS__','NTtree')
-        NTdict.__init__( self, **kwds )
+    def __init__(self, name, **kwds):
+        kwds.setdefault('__CLASS__', 'NTtree')
+        NTdict.__init__(self, **kwds)
         self._parent   = None
         self._children = NTlist()
 
@@ -1485,10 +1485,10 @@ class NTtree( NTdict ):
         self.name = name        # keeping name is essential for later referencing
 
         # saving name and children will allow to save the tree as XML and reconstruct
-        self.saveXML('name','_children')
+        self.saveXML('name', '_children')
     #end def
 
-    def _Cname( self, depth=0 ):
+    def _Cname(self, depth=0):
         """Return name constructor with 'depth' levels"""
         result = self.name
         parent = self._parent
@@ -1498,70 +1498,70 @@ class NTtree( NTdict ):
             parent = parent._parent
         return result
 
-    def _Cname2( self, depth=0 ):
+    def _Cname2(self, depth=0):
         """Return name constructor using ['name']
            with 'depth' levels
         """
-        result = sprintf( '[%s]', quote(self.name) )
+        result = sprintf('[%s]', quote(self.name))
         parent = self._parent
         while (depth != 0 and parent != None):
-            result = sprintf( '[%s]', quote(parent.name) ) + result
+            result = sprintf('[%s]', quote(parent.name)) + result
             depth -= 1
             parent = parent._parent
         return result
 
-    def __str__( self ):
-        return '<%s %s>' % ( self._className(), self.name )
+    def __str__(self):
+        return '<%s %s>' % (self._className(), self.name)
 
 #    def __repr__( self ):
 #        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
 #    #end def
 
-    def addChild( self, name, **kwds ):
-        child = NTtree( name=name, **kwds )
-        self._addChild( child )
+    def addChild(self, name, **kwds):
+        child = NTtree(name=name, **kwds)
+        self._addChild(child)
         return child
     #end def
 
-    def _addChild( self, child ):
+    def _addChild(self, child):
         """Internal routine, set references
         """
-        self._children.append( child )
+        self._children.append(child)
         self[child.name] = child
         self[child]      = child
         child._parent    = self
         return child
     #end def
 
-    def removeChild( self, child ):
+    def removeChild(self, child):
         if not child in self._children:
             return None
         if child.name in self:
-            del( self[ child.name ] )
-        self._children.remove( child )
+            del(self[ child.name ])
+        self._children.remove(child)
         child._parent = None
         return child
 
-    def renameChild( self, child, newName ):
+    def renameChild(self, child, newName):
         if not child in self._children:
             return None
         if child.name in self:
-            del( self[ child.name ] )
+            del(self[ child.name ])
         child.name = newName
         self[child.name] = child
         return child
 
-    def replaceChild( self, child, newChild ):
+    def replaceChild(self, child, newChild):
         if (not child in self._children): return None
-        if child.name in self: del( self[ child.name ] )
+        if child.name in self: del(self[ child.name ])
         child._parent = None
-        self._children.replace( child, newChild )
+        self._children.replace(child, newChild)
         self[newChild.name] = newChild
         newChild._parent = self
         return newChild
     #end def
 
-    def _sibling( self, relativeIndex ):
+    def _sibling(self, relativeIndex):
         """Internal routine: Return index relative to self
            or -1 if it does not exist.
            This routine is the slowest part in a typical read of a molecule
@@ -1571,10 +1571,10 @@ class NTtree( NTdict ):
         if not self._parent:
             return -1
 
-        selfIndex = self._parent._children.index( self )
+        selfIndex = self._parent._children.index(self)
         if selfIndex < 0:
             NTerror('NTtree.sibling: child "%s" not in parent "%s". This should never happen!!\n',
-                    str( self ), str( self._parent)
+                    str(self), str(self._parent)
                    )
             return -1
 
@@ -1586,7 +1586,7 @@ class NTtree( NTdict ):
 
         return targetIndex
 
-    def sibling( self, relativeIndex ):
+    def sibling(self, relativeIndex):
         """Return NTtree instance (relative to self)
            or None if it does not exist
         """
@@ -1594,40 +1594,40 @@ class NTtree( NTdict ):
         if relativeIndex == 0:
             return self
 
-        targetIndex = self._sibling( relativeIndex )
+        targetIndex = self._sibling(relativeIndex)
         if targetIndex < 0:
             return None
         else:
             return self._parent._children[targetIndex]
 
-    def youngerSiblings( self ):
+    def youngerSiblings(self):
         """return NTlist of elements following self
            or None in case of error
         """
         if self._parent == None:
             return None
-        sibling = self._sibling( 1 )
+        sibling = self._sibling(1)
         if sibling < 0:
             return []
         return self._parent._children[sibling:]
 
-    def olderSiblings( self ):
+    def olderSiblings(self):
         """return NTlist of elements preceding self
            or None if it does not exist
         """
         if self._parent == None:
             return None
-        sibling = self.sibling( -1 )
+        sibling = self.sibling(-1)
         if sibling == None:
             return []
         return self._parent._children[0:sibling+1]
 
-    def __iter__( self ):
+    def __iter__(self):
         """iteration routine: loop of children"""
         self._iter = 0
         return self
 
-    def next( self ):
+    def next(self):
         if self._iter >= len(self._children):
             raise StopIteration
             return None
@@ -1635,7 +1635,7 @@ class NTtree( NTdict ):
         self._iter += 1
         return s
 
-    def traverse( self, depthFirst=1, result = None, depth = -1 ):
+    def traverse(self, depthFirst=1, result = None, depth = -1):
         """Traverse the tree,
            infinite depth recursion for depth < 0
            finite depth recursion for depth > 0
@@ -1644,13 +1644,13 @@ class NTtree( NTdict ):
         if result == None:
             result = NTlist()
 
-        result.append( self )
+        result.append(self)
         for child in self._children:
             if depth != 0:
-                child.traverse( depthFirst=depthFirst, result = result, depth = depth-1 )
+                child.traverse(depthFirst=depthFirst, result = result, depth = depth-1)
         return result
 
-    def subNodes( self, result = None, depth = -1 ):
+    def subNodes(self, result = None, depth = -1):
         """Traverse the tree, returning all subnodes at depth
         """
 #        print '>>', self, depth
@@ -1659,13 +1659,13 @@ class NTtree( NTdict ):
             result = NTlist()
         #end if
         if depth == 0:
-            result.append( self )
+            result.append(self)
         elif depth > 0:
             for child in self._children:
-                child.subNodes( result = result, depth = depth-1 )
+                child.subNodes(result = result, depth = depth-1)
         return result
 
-    def header( self, dots = '---------'  ):
+    def header(self, dots = '---------'):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
@@ -1673,7 +1673,7 @@ class NTtree( NTdict ):
 #end class
 
 
-class NTparameter( NTtree ):
+class NTparameter(NTtree):
     """
     Class to generate a parameter tree
 
@@ -1692,14 +1692,14 @@ class NTparameter( NTtree ):
 
     """
 
-    def __init__( self, name, **kwds ):
-        NTtree.__init__(  self,
+    def __init__(self, name, **kwds):
+        NTtree.__init__(self,
                            __CLASS__ = 'NTparameter',
-                           branch    =  False,     # branch=True indicate a node
+                           branch    =  False, # branch=True indicate a node
                                                    # without a value
                                                    # Leaves carry a value
                            mutable   =  True,
-                           parType   = 'generic',  # 'generic', 'string', 'integer'
+                           parType   = 'generic', # 'generic', 'string', 'integer'
                                                    # 'float', 'enumerate','boolean'
                            name      =  name,
                            value     =  None,
@@ -1710,139 +1710,139 @@ class NTparameter( NTtree ):
                            prettyS   =  None,
                            help      =  None,
                          )
-        self.update( kwds )
+        self.update(kwds)
         self.value = self.default
 
-    def update( self, fromDict ):
+    def update(self, fromDict):
         """Update preserves/establises the linked structure
         """
-        for key,value in fromDict.iteritems():
+        for key, value in fromDict.iteritems():
 #            print '>>', repr(self), type(self), repr(value), type(value)
-            if (type(self) == type(value) and not self.has_key( key ) ):
-                self._addChild( value )
+            if (type(self) == type(value) and not self.has_key(key)):
+                self._addChild(value)
             else:
                 self[key] = value
             #end if
         #end for
     #end def
 
-    def set( self, value ):
-        if ( self.mutable ):
+    def set(self, value):
+        if (self.mutable):
             self.value = value
         #end if
     #end def
 
-    def __call__( self ):
+    def __call__(self):
         return self.value
     #end def
 
-    def setDefault( self, recursion = True ):
+    def setDefault(self, recursion = True):
         if (recursion):
             for p in self.allLeaves():
-                p.set( p.default )
+                p.set(p.default)
             #end for
         else:
-            self.set( self.default )
+            self.set(self.default)
         #end if
     #end def
 
-    def allLeaves( self ):
+    def allLeaves(self):
         leaves = NTlist()
         for p in self.traverse():
             if not p.branch:
-                leaves.append( p )
+                leaves.append(p)
             #end if
         #end for
         return leaves
     #end def
 
-    def allBranches( self ):
+    def allBranches(self):
         branches = NTlist()
         for p in self.traverse():
             if p.branch:
-                branches.append( p )
+                branches.append(p)
             #end if
         #end for
         return branches
     #end def
 
-    def writeFile( self, fileName)   :
-        fp = open( fileName, 'w' )
+    def writeFile(self, fileName)   :
+        fp = open(fileName, 'w')
         for p in self.allLeaves():
-            fprintf( fp, '%-40s = %s\n', p._Cname(-1) + '.value', repr( p ) )
+            fprintf(fp, '%-40s = %s\n', p._Cname(-1) + '.value', repr(p))
         #end for
         fp.close()
     #end def
 
-    def __str__( self ):
-        return self._Cname( -1 )
+    def __str__(self):
+        return self._Cname(-1)
     #end def
 
-    def __repr__( self ):
-        return repr( self.value )
+    def __repr__(self):
+        return repr(self.value)
     #end def
 
-    def format( self ):
+    def format(self):
         if self.branch:
-            return str( self )
+            return str(self)
         else:
-            return sprintf('%s: %s', str(self), str(self.value) )
+            return sprintf('%s: %s', str(self), str(self.value))
     #end def
 #end class
 
 
-class NTvalue( NTdict ):
+class NTvalue(NTdict):
     """
     Class to store a value and its error
     Callable: returns value
     Simple arithmic: +, -, *, /, ==, !=, >, >=, <, <=,
     fmt2 will be used when value exists but error does not.
     """
-    def __init__( self, value, error=0.0, fmt='%s (+- %s)', fmt2='%s', **kwds ):
-        kwds.setdefault('__CLASS__','NTvalue')
-        NTdict.__init__( self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds )
-        self.saveXML( 'value', 'error', 'fmt', 'fmt2' )
+    def __init__(self, value, error=0.0, fmt='%s (+- %s)', fmt2='%s', **kwds):
+        kwds.setdefault('__CLASS__', 'NTvalue')
+        NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
+        self.saveXML('value', 'error', 'fmt', 'fmt2')
     #end def
 
-    def __call__( self ):
+    def __call__(self):
         return self.value
     #end def
 
-    def __str__( self ):
+    def __str__(self):
         # Note that the below cases for None value/error loose fixed width formatting.
-        if self.value == None or isNaN( self.value ):
+        if self.value == None or isNaN(self.value):
             return '%s (+- %s)' % (NaNstring, NaNstring)
-        if self.error == None or isNaN( self.error ):
+        if self.error == None or isNaN(self.error):
 #            return `self.value`+' (+- %s)' % (NaNstring)
             # The problem here is of course that the whole fmt is lost if only the error is unknonw.
             # Added new parameter to init of this class to cover it.
             r = self.fmt2 % self.value
             return r + ' (+- %s)' % (NaNstring)
-        return  self.fmt % ( self.value, self.error )
+        return  self.fmt % (self.value, self.error)
     #end def
 
     def __repr__(self):
         return sprintf('NTvalue( value = %s, error = %s, fmt = %s, fmt2 = %s )',
-                       repr(self.value), repr(self.error), self.fmt, self.fmt2 )
+                       repr(self.value), repr(self.error), self.fmt, self.fmt2)
     #end def
 
-    def __add__( self, other ):
-        if hasattr(other,'value'):
+    def __add__(self, other):
+        if hasattr(other, 'value'):
             v = self.value+other.value
             e = math.sqrt(self.error**2+other.error**2)
         else:
             v = self.value+other
             e = self.error
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __radd__( self, other ):
+    def __radd__(self, other):
         v = other + self.value
-        return NTvalue( v, self.error, self.fmt, self.fmt2 )
+        return NTvalue(v, self.error, self.fmt, self.fmt2)
     #end def
 
-    def __iadd__( self, other ):
-        if hasattr(other,'value'):
+    def __iadd__(self, other):
+        if hasattr(other, 'value'):
             self.value += other.value
             self.error = math.sqrt(self.error**2+other.error**2)
         else:
@@ -1850,23 +1850,23 @@ class NTvalue( NTdict ):
         return self
     #end def
 
-    def __sub__( self, other ):
-        if hasattr(other,'value'):
+    def __sub__(self, other):
+        if hasattr(other, 'value'):
             v = self.value-other.value
             e = math.sqrt(self.error**2+other.error**2)
         else:
             v = self.value-other
             e = self.error
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __rsub__( self, other ):
+    def __rsub__(self, other):
         v = other - self.value
-        return NTvalue( v, self.error, self.fmt, self.fmt2 )
+        return NTvalue(v, self.error, self.fmt, self.fmt2)
     #end def
 
-    def __isub__( self, other ):
-        if hasattr(other,'value'):
+    def __isub__(self, other):
+        if hasattr(other, 'value'):
             self.value -= other.value
             self.error = math.sqrt(self.error**2+other.error**2)
         else:
@@ -1874,24 +1874,24 @@ class NTvalue( NTdict ):
         return self
     #end def
 
-    def __mul__( self, other ):
-        if hasattr(other,'value'):
+    def __mul__(self, other):
+        if hasattr(other, 'value'):
             v = self.value*other.value
             e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
             v = self.value*other
             e = self.error*other
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __rmul__( self, other ):
+    def __rmul__(self, other):
         v = other * self.value
         e = v*self.error/self.value
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __imul__( self, other ):
-        if hasattr(other,'value'):
+    def __imul__(self, other):
+        if hasattr(other, 'value'):
             v = self.value
             self.value *= other.value
             self.error = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
@@ -1901,24 +1901,24 @@ class NTvalue( NTdict ):
         return self
     #end def
 
-    def __div__( self, other ):
-        if hasattr(other,'value'):
+    def __div__(self, other):
+        if hasattr(other, 'value'):
             v = self.value/other.value
             e = v*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
         else:
             v = self.value/other
             e = self.error/other
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __rdiv__( self, other ):
+    def __rdiv__(self, other):
         v = other / self.value
         e = v*self.error/self.value
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __idiv__( self, other ):
-        if hasattr(other,'value'):
+    def __idiv__(self, other):
+        if hasattr(other, 'value'):
             self.value /= other.value
             # JFD: Next line should be checked
             self.error = self.value*math.sqrt((self.error/self.value)**2+(other.error/other.value)**2)
@@ -1928,26 +1928,26 @@ class NTvalue( NTdict ):
         return self
     #end def
 
-    def __neg__( self ):
+    def __neg__(self):
         v = -self.value
         e = self.error
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __pos__( self ):
+    def __pos__(self):
         v = self.value
         e = self.error
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __abs__( self ):
+    def __abs__(self):
         v = abs(self.value)
         e = self.error
-        return NTvalue( v, e, self.fmt, self.fmt2 )
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
-    def __cmp__( self, other ):
-        if isinstance( other, NTvalue ):
+    def __cmp__(self, other):
+        if isinstance(other, NTvalue):
             value = other.value
         else:
             value = other
@@ -1961,20 +1961,20 @@ class NTvalue( NTdict ):
         #end if
     #end def
 
-    def __eq__( self, other):
+    def __eq__(self, other):
         if other == None:
             return False
-        elif isinstance( other, NTvalue ):
+        elif isinstance(other, NTvalue):
             return self.value == other.value
         else:
             return self.value == other
         #end if
     #end def
 
-    def __ne__( self, other):
+    def __ne__(self, other):
         if other == None:
             return True
-        elif isinstance( other, NTvalue ):
+        elif isinstance(other, NTvalue):
             return self.value != other.value
         else:
             return self.value != other
@@ -2002,17 +2002,17 @@ class NTvalue( NTdict ):
 #end class
 
 
-class NTplist( NTdict ):
+class NTplist(NTdict):
     """
     Class to parse plist files
     """
-    def __init__( self ):
-        NTdict.__init__( self, __CLASS__ = 'plist' )
+    def __init__(self):
+        NTdict.__init__(self, __CLASS__ = 'plist')
     #end def
 #end class
 
 
-def NTlimit( theList, min, max, byItem=None ):
+def NTlimit(theList, min, max, byItem=None):
     """
     Limit the the values of theList between min and max, assuming periodicity
     i.e, like for angles.
@@ -2020,7 +2020,7 @@ def NTlimit( theList, min, max, byItem=None ):
     Elements are modified in-place
     byItem allows for list of lists
     """
-    l = len( theList )
+    l = len(theList)
     listRange = max-min
     for i in range(0, l):
         if (theList[i] != None):
@@ -2039,7 +2039,7 @@ def NTlimit( theList, min, max, byItem=None ):
 #end def
 
 
-def NTaverage( theList, byIndex=None ):
+def NTaverage(theList, byIndex=None):
     """returns (av, sd, n) tuple of theList or
        (None, None, 0) in case of zero elements in theList
        Assumes numeric list, None elements are ignored
@@ -2061,9 +2061,9 @@ def NTaverage( theList, byIndex=None ):
     #end fpr
 
     if n == 0:
-        return ( NaN, NaN, 0 )
+        return (NaN, NaN, 0)
     if n == 1:
-        return ( sum, NaN, 1 ) # sd not defined for serie of length one.
+        return (sum, NaN, 1) # sd not defined for serie of length one.
 #    fn = float(n)
 #    print '>>', n, sum, sumsq, sumsq/(fn-1.0), (sum*sum)/(fn*(fn-1.0))
     av = sum/n
@@ -2083,11 +2083,11 @@ def NTaverage( theList, byIndex=None ):
     sd = sumsqd/(n-1)
     if sd <= 0.0:
         sd = 0.0
-    sd = math.sqrt( sd )
-    return ( av, sd, int(round(n)) )
+    sd = math.sqrt(sd)
+    return (av, sd, int(round(n)))
 #end def
 
-def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
+def NTcAverage(theList, min=0.0, max=360.0, radians = 0, byIndex=None):
     """return (circularAverage,circularVariance,n) tuple of thelist or
        (None, None, 0) in case of zero elements in theList
        return circularMean on min-max interval (that has to be spaced
@@ -2113,22 +2113,22 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
                 v = item[byIndex]
             #end if
             if (v != None):
-                csum += math.cos( v*fac )
-                ssum += math.sin( v*fac )
+                csum += math.cos(v*fac)
+                ssum += math.sin(v*fac)
                 n += 1
             #end if
         #end if
     #end for
 
     if not n:
-        return( None, None, 0 )
+        return(None, None, 0)
     #end if
 
     #calculate cmean, avoid zero divisions
-    if (math.fabs( csum ) < 1e-10 ):
+    if (math.fabs(csum) < 1e-10):
         csum = 1e-10
     #end if
-    cav = math.atan( ssum/csum )
+    cav = math.atan(ssum/csum)
     if (csum < 0):
         cav += math.pi
     #end if
@@ -2143,19 +2143,19 @@ def NTcAverage( theList, min=0.0, max=360.0, radians = 0, byIndex=None ):
     #end while
 
     #calculate cv
-    cv = 1.0 - math.sqrt( csum*csum + ssum*ssum ) / n
+    cv = 1.0 - math.sqrt(csum*csum + ssum*ssum) / n
 
     return (cav, cv, n)
 #end def
 
-def NTzap( theList, *byItems ):
+def NTzap(theList, *byItems):
     """yield a new list from theList, extracting byItems from each
        element of theList or None if not present
     """
     result = NTlist()
     for v in theList:
         if v:
-            result.append( getDeepByKeysOrAttributes(v, *byItems) )
+            result.append(getDeepByKeysOrAttributes(v, *byItems))
         else:
             result.append(None)
         #end if
@@ -2182,7 +2182,7 @@ def NTzap( theList, *byItems ):
 #    return result
 ##end def
 
-def NTsq( value ):
+def NTsq(value):
     return value*value # fastest
     # only problem might be the returned type which is not garanteed
     # to be a double like below.
@@ -2192,11 +2192,11 @@ def NTsq( value ):
 # XML code
 # -----------------------------------------------------------------------------
 
-def NTindent( depth, stream, indent ):
+def NTindent(depth, stream, indent):
     """Indent strem to depth; to prettty format XML
     """
-    for dummy in range( depth ):
-        fprintf(stream,indent)
+    for dummy in range(depth):
+        fprintf(stream, indent)
     #end for
 #end def
 
@@ -2213,23 +2213,23 @@ class XMLhandler:
        handleDictElements       : for dict, NTdict and the like
 
     """
-    def __init__( self, name ):
+    def __init__(self, name):
         global XMLhandlers
         self.name = name
         XMLhandlers[name] = self
 
-    def handle( self, node ):
+    def handle(self, node):
         pass
     #end def
 
-    def handleSingleElement( self, node ):
+    def handleSingleElement(self, node):
         """Returns single element below node from DOM tree"""
-        self.printDebugNode( node )
+        self.printDebugNode(node)
         if node.nodeName != self.name:
             NTerror('XML%sHandler: invalid XML handler for node <%s>', self.name, node.nodeName)
             return None
         #end if
-        if len( node.childNodes ) != 1:
+        if len(node.childNodes) != 1:
             NTerror("XML%sHandler: malformed DOM tree", self.name)
             return None
         #end if
@@ -2242,8 +2242,8 @@ class XMLhandler:
         return result
     #end def
 
-    def handleMultipleElements( self, node ):
-        self.printDebugNode( node )
+    def handleMultipleElements(self, node):
+        self.printDebugNode(node)
         if node.nodeName != self.name:
             NTerror('XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
@@ -2251,15 +2251,15 @@ class XMLhandler:
         result = []
         for subNode in node.childNodes:
             if subNode.nodeType == Node.ELEMENT_NODE:
-                result.append( NThandle( subNode) )
+                result.append(NThandle(subNode))
             #end if
         #end for
 #        NTdebug("==>%s %s",repr(node), result)
         return  result
     #end def
 
-    def handleDictElements( self, node ):
-        self.printDebugNode( node )
+    def handleDictElements(self, node):
+        self.printDebugNode(node)
         if node.nodeName != self.name:
             NTerror('XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
             return None
@@ -2296,22 +2296,22 @@ class XMLhandler:
         subNodes = []
         for n in node.childNodes:
 #            print '>>',n
-            if n.nodeType == Node.ELEMENT_NODE: subNodes.append( n )
+            if n.nodeType == Node.ELEMENT_NODE: subNodes.append(n)
         #end for
-        if len( subNodes) == 0: return result
+        if len(subNodes) == 0: return result
 
         #append all keys, checking for 'format' as outlined above
         i = 0
         while (i < len(subNodes)):
-            self.printDebugNode( subNodes[i] )
+            self.printDebugNode(subNodes[i])
 
             try:
                 keyName = subNodes[i].attributes.get('name').nodeValue
-                value = NThandle( subNodes[i].childNodes[1] )
+                value = NThandle(subNodes[i].childNodes[1])
                 i += 1
             except AttributeError:
                 keyName = subNodes[i].childNodes[0].nodeValue
-                value = NThandle( subNodes[i+1] )
+                value = NThandle(subNodes[i+1])
                 i += 2
 
 #            print ">>", keyName, value
@@ -2321,196 +2321,196 @@ class XMLhandler:
         return result
     #end def
 
-    def printDebugNode( self, node ):
+    def printDebugNode(self, node):
         pass
 #        NTdebug("   %s, type %s, subnodes %d", str(node), node.nodeType, len(node.childNodes) )
     #end def
 #end class
 
-class XMLNoneHandler( XMLhandler ):
+class XMLNoneHandler(XMLhandler):
     """None handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='None')
+    def __init__(self):
+        XMLhandler.__init__(self, name='None')
     #end def
 
-    def handle( self, node ):
+    def handle(self, node):
         return None
     #end def
 #end class
 
-class XMLintHandler( XMLhandler ):
+class XMLintHandler(XMLhandler):
     """int handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='int')
+    def __init__(self):
+        XMLhandler.__init__(self, name='int')
     #end def
 
-    def handle( self, node ):
-        result = self.handleSingleElement( node )
+    def handle(self, node):
+        result = self.handleSingleElement(node)
         if result == None:  return None
-        return int( result )
+        return int(result)
     #end def
 #end class
 
-class XMLboolHandler( XMLhandler ):
+class XMLboolHandler(XMLhandler):
     """bool handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='bool')
+    def __init__(self):
+        XMLhandler.__init__(self, name='bool')
     #end def
 
-    def handle( self, node ):
-        result = self.handleSingleElement( node )
+    def handle(self, node):
+        result = self.handleSingleElement(node)
         if result == None:  return None
         # NB: bool('False') returns True!
-        return bool( result=='True' )
+        return bool(result=='True')
     #end def
 #end class
 
-class XMLfloatHandler( XMLhandler ):
+class XMLfloatHandler(XMLhandler):
     """float handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='float')
+    def __init__(self):
+        XMLhandler.__init__(self, name='float')
     #end def
 
-    def handle( self, node ):
-        result = self.handleSingleElement( node )
+    def handle(self, node):
+        result = self.handleSingleElement(node)
         if result == None:  return None
-        return float( result )
+        return float(result)
     #end def
 #end class
 
-class XMLstringHandler( XMLhandler ):
+class XMLstringHandler(XMLhandler):
     """string handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='string')
+    def __init__(self):
+        XMLhandler.__init__(self, name='string')
     #end def
 
-    def handle( self, node ):
+    def handle(self, node):
         # strings can be empty
-        if len( node.childNodes ) == 0: return ''
+        if len(node.childNodes) == 0: return ''
 
-        result = self.handleSingleElement( node )
+        result = self.handleSingleElement(node)
         if result == None:  return None
-        return str(saxutils.unescape( result ))
+        return str(saxutils.unescape(result))
     #end def
 #end class
 
-class XMLunicodeHandler( XMLhandler ):
+class XMLunicodeHandler(XMLhandler):
     """unicode handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='unicode')
+    def __init__(self):
+        XMLhandler.__init__(self, name='unicode')
     #end def
 
-    def handle( self, node ):
+    def handle(self, node):
         # strings can be empty
-        if len( node.childNodes ) == 0: return unicode('')
+        if len(node.childNodes) == 0: return unicode('')
 
-        result = self.handleSingleElement( node )
+        result = self.handleSingleElement(node)
         if result == None:  return None
-        return unicode(saxutils.unescape( result ))
+        return unicode(saxutils.unescape(result))
     #end def
 #end class
 
-class XMLlistHandler( XMLhandler ):
+class XMLlistHandler(XMLhandler):
     """list handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='list')
+    def __init__(self):
+        XMLhandler.__init__(self, name='list')
     #end def
 
-    def handle( self, node ):
-        result = self.handleMultipleElements( node )
+    def handle(self, node):
+        result = self.handleMultipleElements(node)
         if result == None: return None
         return result
     #end def
 #end class
 
-class XMLNTlistHandler( XMLhandler ):
+class XMLNTlistHandler(XMLhandler):
     """NTlist handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='NTlist')
+    def __init__(self):
+        XMLhandler.__init__(self, name='NTlist')
     #end def
 
-    def handle( self, node ):
-        items = self.handleMultipleElements( node )
+    def handle(self, node):
+        items = self.handleMultipleElements(node)
         if items == None: return None
         result = NTlist()
         for item in items:
-            result.append( item )
+            result.append(item)
         return result
     #end def
 #end class
 
-class XMLtupleHandler( XMLhandler ):
+class XMLtupleHandler(XMLhandler):
     """tuple handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='tuple')
+    def __init__(self):
+        XMLhandler.__init__(self, name='tuple')
     #end def
 
-    def handle( self, node ):
-        result = self.handleMultipleElements( node )
+    def handle(self, node):
+        result = self.handleMultipleElements(node)
         if result == None: return None
         return tuple(result)
     #end def
 #end class
 
 
-class XMLdictHandler( XMLhandler ):
+class XMLdictHandler(XMLhandler):
     """dict handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='dict')
+    def __init__(self):
+        XMLhandler.__init__(self, name='dict')
     #end def
 
-    def handle( self, node ):
-        result = self.handleDictElements( node )
+    def handle(self, node):
+        result = self.handleDictElements(node)
         if result == None: return None
         return result
     #end def
 #end class
 
-class XMLNTdictHandler( XMLhandler ):
+class XMLNTdictHandler(XMLhandler):
     """NTdict handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='NTdict')
+    def __init__(self):
+        XMLhandler.__init__(self, name='NTdict')
     #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
         if attrs == None: return None
         result = NTdict()
-        result.update( attrs )
+        result.update(attrs)
         return result
     #end def
 #end class
 
 # dummy: leave for compatibility
-class XMLNTstructHandler( XMLhandler ):
+class XMLNTstructHandler(XMLhandler):
     """NTstruct handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='NTstruct')
+    def __init__(self):
+        XMLhandler.__init__(self, name='NTstruct')
     #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
         if attrs == None: return None
         result = NTdict()
-        result.update( attrs )
+        result.update(attrs)
         return result
     #end def
 #end class
 
-class XMLNTtreeHandler( XMLhandler ):
+class XMLNTtreeHandler(XMLhandler):
     """NTtree handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='NTtree')
+    def __init__(self):
+        XMLhandler.__init__(self, name='NTtree')
     #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
         if attrs == None: return None
 #       print ">>attrs", attrs
-        result = NTtree( name = attrs['name'])
+        result = NTtree(name = attrs['name'])
 
         # update the attrs values
-        result.update( attrs )
+        result.update(attrs)
 
         # restore the tree structure
         for child in result._children:
@@ -2522,34 +2522,34 @@ class XMLNTtreeHandler( XMLhandler ):
 #end class
 
 
-class XMLNTvalueHandler( XMLhandler ):
+class XMLNTvalueHandler(XMLhandler):
     """NTvalue handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='NTvalue')
+    def __init__(self):
+        XMLhandler.__init__(self, name='NTvalue')
     #end def
 
-    def handle( self, node ):
-        attrs = self.handleDictElements( node )
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
         if attrs == None: return None
-        result = NTvalue( value = attrs['value'], error = attrs['error'], fmt = attrs['fmt'], fmt2 = attrs['fmt2'] )
-        result.update( attrs )
+        result = NTvalue(value = attrs['value'], error = attrs['error'], fmt = attrs['fmt'], fmt2 = attrs['fmt2'])
+        result.update(attrs)
         return result
     #end def
 #end class
 
-class XMLNTplistHandler( XMLhandler ):
+class XMLNTplistHandler(XMLhandler):
     """NTplist handler class"""
-    def __init__( self ):
-        XMLhandler.__init__( self, name='plist')
+    def __init__(self):
+        XMLhandler.__init__(self, name='plist')
     #end def
 
-    def handle( self, node ):
+    def handle(self, node):
         result = NTplist()
         for subNode in node.childNodes:
             if (subNode.nodeType == Node.ELEMENT_NODE):
-                attrs = NThandle( subNode )
+                attrs = NThandle(subNode)
                 if attrs == None: return None
-                result.update( attrs )
+                result.update(attrs)
             #end if
         #end for
         return result
@@ -2575,7 +2575,7 @@ NTvalue.XMLhandler = XMLNTvalueHandler()
 NTplist.XMLhandler = XMLNTplistHandler()
 
 
-def NThandle( node ):
+def NThandle(node):
     """Handle a given node, return object of None in case of Error
     """
     if node == None:
@@ -2586,84 +2586,84 @@ def NThandle( node ):
         NTerror('NThandle: no handler for XML <%s>', node.nodeName)
         return None
     #end if
-    return XMLhandlers[node.nodeName].handle( node )
+    return XMLhandlers[node.nodeName].handle(node)
 #end def
 
-def NTtoXML( obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n' ):
+def NTtoXML(obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
     """Generate XML:
        check for method toXML
        or
        standard types int, float, tuple, list, dict
     """
     if (obj == None):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<None/>" )
-        fprintf( stream, lineEnd )
-    elif hasattr( obj, 'toXML'):
-        obj.toXML( depth, stream, indent, lineEnd )
-    elif ( type( obj ) == int ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<int>%s</int>", repr( obj ) )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == bool ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<bool>%s</bool>", repr( obj ) )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == float ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<float>%s</float>", repr( obj ) )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == str ):
-        NTindent( depth, stream, indent )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<None/>")
+        fprintf(stream, lineEnd)
+    elif hasattr(obj, 'toXML'):
+        obj.toXML(depth, stream, indent, lineEnd)
+    elif (type(obj) == int):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<int>%s</int>", repr(obj))
+        fprintf(stream, lineEnd)
+    elif (type(obj) == bool):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<bool>%s</bool>", repr(obj))
+        fprintf(stream, lineEnd)
+    elif (type(obj) == float):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<float>%s</float>", repr(obj))
+        fprintf(stream, lineEnd)
+    elif (type(obj) == str):
+        NTindent(depth, stream, indent)
 #        fprintf( stream, "<string>%s</string>",  saxutils.escape( obj )  )
-        fprintf( stream, "<string>%s</string>",  unicode(saxutils.escape( obj ))  )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == unicode ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<unicode>%s</unicode>",  unicode(saxutils.escape( obj ))  )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == list ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<list>" )
-        fprintf( stream, lineEnd )
+        fprintf(stream, "<string>%s</string>", unicode(saxutils.escape(obj)))
+        fprintf(stream, lineEnd)
+    elif (type(obj) == unicode):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<unicode>%s</unicode>", unicode(saxutils.escape(obj)))
+        fprintf(stream, lineEnd)
+    elif (type(obj) == list):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<list>")
+        fprintf(stream, lineEnd)
         for a in obj:
-            NTtoXML( a, depth+1, stream, indent, lineEnd )
+            NTtoXML(a, depth+1, stream, indent, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</list>" )
-        fprintf( stream, lineEnd )
-    elif ( type( obj) == tuple ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<tuple>" )
-        fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</list>")
+        fprintf(stream, lineEnd)
+    elif (type(obj) == tuple):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<tuple>")
+        fprintf(stream, lineEnd)
         for a in list(obj):
-            NTtoXML( a, depth+1, stream, indent, lineEnd )
+            NTtoXML(a, depth+1, stream, indent, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</tuple>" )
-        fprintf( stream, lineEnd )
-    elif ( type( obj ) == dict ):
-        NTindent( depth, stream, indent )
-        fprintf( stream, "<dict>" )
-        fprintf( stream, lineEnd )
-        for key,value in obj.iteritems():
-            NTindent(depth+1,stream,indent)
-            fprintf( stream, "<key name=%s>", quote( key ) )
-            fprintf( stream, lineEnd )
-            NTtoXML( value, depth+2, stream, indent, lineEnd )
-            NTindent(depth+1,stream,indent)
-            fprintf( stream, "</key>" )
-            fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</tuple>")
+        fprintf(stream, lineEnd)
+    elif (type(obj) == dict):
+        NTindent(depth, stream, indent)
+        fprintf(stream, "<dict>")
+        fprintf(stream, lineEnd)
+        for key, value in obj.iteritems():
+            NTindent(depth+1, stream, indent)
+            fprintf(stream, "<key name=%s>", quote(key))
+            fprintf(stream, lineEnd)
+            NTtoXML(value, depth+2, stream, indent, lineEnd)
+            NTindent(depth+1, stream, indent)
+            fprintf(stream, "</key>")
+            fprintf(stream, lineEnd)
         #end for
-        NTindent( depth, stream, indent )
-        fprintf( stream, "</dict>" )
-        fprintf( stream, lineEnd )
+        NTindent(depth, stream, indent)
+        fprintf(stream, "</dict>")
+        fprintf(stream, lineEnd)
     else:
-        NTerror('NTtoXML: undefined object "%s": cannot generate XML\n', obj )
+        NTerror('NTtoXML: undefined object "%s": cannot generate XML\n', obj)
     #end if
 #end def
 
-def obj2XML( obj, stream=None, path=None ):
+def obj2XML(obj, stream=None, path=None):
     """Convert an object to XML
        output to stream or path
        gwv 13 Jun08: return object or None on error
@@ -2677,11 +2677,11 @@ def obj2XML( obj, stream=None, path=None ):
 
     closeFile = 0
     if not stream:
-        stream = open( path, 'w')
+        stream = open(path, 'w')
         closeFile = 1
 
-    fprintf( stream, '<?xml version="1.0" encoding="ISO-8859-1"?>\n' )
-    NTtoXML( obj, depth=0, stream=stream, indent='    ' )
+    fprintf(stream, '<?xml version="1.0" encoding="ISO-8859-1"?>\n')
+    NTtoXML(obj, depth=0, stream=stream, indent='    ')
 
     if closeFile:
         stream.close()
@@ -2689,7 +2689,7 @@ def obj2XML( obj, stream=None, path=None ):
     return obj
 #end def
 
-def XML2obj( path=None, string=None ):
+def XML2obj(path=None, string=None):
     """Convert XML file to object
        returns object or None on error
     """
@@ -2699,13 +2699,13 @@ def XML2obj( path=None, string=None ):
 
     NTdebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
     if path:
-        doc = minidom.parse( path )
+        doc = minidom.parse(path)
     else:
-        doc = minidom.parseString( string )
+        doc = minidom.parseString(string)
     NTdebug("Done reading XML")
     root = doc.documentElement
 
-    result = NThandle( root )
+    result = NThandle(root)
     doc.unlink()
     return result
 
@@ -2738,9 +2738,9 @@ class Sorter:
                 try:
                     aux.append((data[i][itemindex], i))
                 except KeyError:
-                    aux.append( (None, i) )
+                    aux.append((None, i))
                 except IndexError:
-                    aux.append( (None, i) )
+                    aux.append((None, i))
 #           aux = [(data[i][itemindex], i) for i in range(len(data))]
             return self._helper(data, aux, inplace)
         #end if
@@ -2750,17 +2750,17 @@ class Sorter:
     __call__ = byItem
 
     def byAttribute(self, data, attributename, inplace=False):
-        aux = [(getattr(data[i],attributename),i) for i in range(len(data))]
+        aux = [(getattr(data[i], attributename), i) for i in range(len(data))]
         return self._helper(data, aux, inplace)
     #end def
 #end class
 NTsort = Sorter()
 
 
-def quote( inputString ):
+def quote(inputString):
     "return a single or double quoted string"
-    single = (find( inputString, "'" ) >= 0)
-    double = (find( inputString, '"' ) >= 0)
+    single = (find(inputString, "'") >= 0)
+    double = (find(inputString, '"') >= 0)
     if single and double:
         NTerror("in quote: both single and double quotes in [%s]" % inputString)
         return None
@@ -2770,7 +2770,7 @@ def quote( inputString ):
 #end def
 
 
-def asci2list( string ):
+def asci2list(string):
     """ Convert a string with "," and "-" to a list of integers
     eg. 1,2,5-8,11,20-40
     returns empty list on empty string
@@ -2783,20 +2783,20 @@ def asci2list( string ):
 
     for elm in string.split(','):
         tmp = elm.split('-')
-        if len( tmp ) == 1:
-            result.append( int( tmp[0] ) )
-        elif len( tmp ) == 2:
-            for i in range( int(tmp[0]), int(tmp[1])+1 ):
-                result.append( i )
+        if len(tmp) == 1:
+            result.append(int(tmp[0]))
+        elif len(tmp) == 2:
+            for i in range(int(tmp[0]), int(tmp[1])+1):
+                result.append(i)
         else:
-            NTerror('asci2list: invalid construct "%s"\n', string )
+            NTerror('asci2list: invalid construct "%s"\n', string)
         #end if
     #end for
 
     return result
 #end def
 
-def list2asci( theList ):
+def list2asci(theList):
     """ Converts the numeric integer list theList to a string with "," and "-"
     eg. 1,3,5-8,11,20-40
     nb. inverse of asci2list
@@ -2810,7 +2810,7 @@ def list2asci( theList ):
     # reduce this sorted list l to pairs start, stop
     ls = l[0:1]
     #print '>>',ls
-    for i in range(0,len(l)-1):
+    for i in range(0, len(l)-1):
         if l[i] < l[i+1]-1:
             ls.append(l[i])
             ls.append(l[i+1])
@@ -2822,29 +2822,29 @@ def list2asci( theList ):
 
     # generate the string from ls
     result = ''
-    for i in range(0,len(ls),2):
+    for i in range(0, len(ls), 2):
         #print '>', i, result
         if ls[i] == ls[i+1]:
-            result = sprintf('%s%s,', result, str(ls[i]) )
+            result = sprintf('%s%s,', result, str(ls[i]))
         else:
-            result = sprintf('%s%s-%s,', result, str(ls[i]), str(ls[i+1]) )
+            result = sprintf('%s%s-%s,', result, str(ls[i]), str(ls[i+1]))
         #end if
     #end for
     return result[0:-1]
 #end def
 
-def list2string( mylist ):
+def list2string(mylist):
     "Return a string representation of mylist"
     if len(mylist) == 0: return ''
     result = ''
     for e in mylist:
-        result = result + str( e ) + ' '
+        result = result + str(e) + ' '
     #end for
     return result[0:-1]
 #end def
 
 
-def NTsign( value ):
+def NTsign(value):
     """return sign of value:
     """
     if (value < 0.0):
@@ -2855,7 +2855,7 @@ def NTsign( value ):
 #end def
 
 
-def length( object ):
+def length(object):
     """return length object
     """
     try:
@@ -2864,12 +2864,12 @@ def length( object ):
     except TypeError:
         return 1
 
-def object2list( object ):
+def object2list(object):
     """return object as list
     """
     if object==None:
         return []
-    if isinstance( object, list):
+    if isinstance(object, list):
         return object
     else:
         return [object]
@@ -2890,7 +2890,7 @@ class CommandWrap:
         self.kwargs = kwargs
 
     def __call__(self):
-        return self.callback( *self.args, **self.kwargs)
+        return self.callback(*self.args, **self.kwargs)
 
 
 class EventWrap:
@@ -2904,7 +2904,7 @@ class EventWrap:
         self.kwargs = kwargs
 
     def __call__(self, event):
-        return self.callback( event, *self.args, **self.kwargs)
+        return self.callback(event, *self.args, **self.kwargs)
 
 
 class EventSkip:
@@ -2918,9 +2918,9 @@ class EventSkip:
         self.kwargs = kwargs
 
     def __call__(self, event):
-        return self.callback( *self.args, **self.kwargs)
+        return self.callback(*self.args, **self.kwargs)
 
-def NTinspect( something ):
+def NTinspect(something):
     m = inspect.getmembers(something)
     for item in m:
         print str(item)
@@ -2929,21 +2929,21 @@ class NTprogressIndicator:
     """
     Iterator class to loop over myList and print dots
     """
-    def __init__( self, theList, charactersPerLine = 80 ):
+    def __init__(self, theList, charactersPerLine = 80):
         self._iter = -1
         self._len   = len(theList)
         self._list  = theList
         self._charactersPerLine = charactersPerLine
     #end def
 
-    def __iter__( self ):
+    def __iter__(self):
         """iteration routine: loop of children"""
         self._iter = 0
         self._printedDots = 0
         return self
     #end def
 
-    def next( self ):
+    def next(self):
         if self._iter >= self._len:
             NTmessage("")
             raise StopIteration
@@ -2965,32 +2965,32 @@ class NTprogressIndicator:
         return s
 #end class
 
-def fprintf( stream, format, *args ):
+def fprintf(stream, format, *args):
     """C's fprintf routine"""
     if args:
-        stream.write( (format) % (args) )
+        stream.write((format) % (args))
     else:
-        stream.write( format )
+        stream.write(format)
 
-def mprintf( fps, fmt, *args ):
+def mprintf(fps, fmt, *args):
     """
     Print to list of filepointers (fps) using format and args.
     Use fp only if it evaluates to True.
     """
     for fp in fps:
         if fp:
-            fprintf( fp, fmt, *args )
+            fprintf(fp, fmt, *args)
 
-def sprintf( format, *args ):
+def sprintf(format, *args):
     """return a string according to C's sprintf routine"""
-    return ( (format) % (args) )
+    return ((format) % (args))
 
-def printf( format, *args ):
+def printf(format, *args):
     """print string according to C's printf routine"""
-    fprintf(  sys.stdout, format, *args  )
+    fprintf(sys.stdout, format, *args)
 
 class PrintWrap:
-    def __init__( self, stream = None,
+    def __init__(self, stream = None,
                   autoFlush = True,
                   verbose=verbosityOutput,
                   noEOL=False):
@@ -3012,14 +3012,14 @@ class PrintWrap:
             self.prefix = prefixDetail
         elif self.verbose == verbosityDebug:
             self.prefix = prefixDebug
-    def __call__( self, format, *args ):
+    def __call__(self, format, *args):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
         if self.prefix:
             format = self.prefix + format
         if not self.noEOL:
             format += '\n'
-        fprintf( self.stream, format, *args )
+        fprintf(self.stream, format, *args)
         if self.prefix.find('EXCEPTION')>=0:
             pass
 #            fprintf( self.stream, "Exception below:\n" )
@@ -3027,9 +3027,9 @@ class PrintWrap:
         if self.autoFlush:
             self.stream.flush()
             self.flush()
-    def flush( self ):
+    def flush(self):
         self.stream.flush()
-    def setVerbosity(self,verbose):
+    def setVerbosity(self, verbose):
         self.verbose=verbose
 
 NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
@@ -3041,11 +3041,11 @@ NTmessage = PrintWrap(verbose=verbosityOutput)
 NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug)
 
-NTmessageNoEOL = PrintWrap(verbose=verbosityOutput,noEOL=True)
+NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
 NTcodeerror.prefix += " IN CODE"
 NTcodeerror.prefix += " EXCEPTION CAUGHT"
 
-def NTexit( msg, exitCode=1 ):
+def NTexit(msg, exitCode=1):
     NTerror(msg)
     sys.exit(exitCode)
 
@@ -3059,14 +3059,14 @@ def NTexit( msg, exitCode=1 ):
 #    NTdetail.setVerbosity(verbosity):
 #    NTdebug.setVerbosity(verbosity):
 
-class SetupError( Exception ):
+class SetupError(Exception):
     "Setup check error"
 
-class CodeError( Exception ):
+class CodeError(Exception):
     "Program code error"
 
 
-class NTfile( file ):
+class NTfile(file):
     """File class with a binary read/write
            typecode as defined for array module:
 
@@ -3094,27 +3094,27 @@ mentation). The actual size can be accessed through the itemsize attribute. The 
 'I' items will be represented as Python long integers when retrieved, because Python's plain integer type cannot
 represent the full range of C's unsigned (long) integers.
     """
-    def __init__( self, *args, **kwds ):
-        file.__init__( self, *args, **kwds )
+    def __init__(self, *args, **kwds):
+        file.__init__(self, *args, **kwds)
     #end def
 
-    def binaryWrite( self, typecode, *numbers ):
+    def binaryWrite(self, typecode, *numbers):
         """Binary write of numbers
            typecode as defined for array module
         """
-        n = array.array(typecode,numbers)
+        n = array.array(typecode, numbers)
         self.write(n.tostring())
     #end def
 
-    def binaryRead( self, typecode, size ):
+    def binaryRead(self, typecode, size):
         """Return a list of numbers
         """
         n = array.array(typecode)
-        n.fromfile( self, size )
+        n.fromfile(self, size)
         return n.tolist()
     #end def
 
-    def rewind( self ):
+    def rewind(self):
         """rewind the file"""
         self.seek(0)
     #end def
@@ -3131,7 +3131,7 @@ def removedir(path):
             NTerror("ERROR: Subdirectory %s could not be entered", path)
         # DELETE ALL THE FILES
         for file in filelist:
-            file=os.path.join(path,file)
+            file=os.path.join(path, file)
             try:
                 os.remove(file)
             except:
@@ -3147,15 +3147,15 @@ def removedir(path):
 #end def
 
 
-def NTpath( path ):
+def NTpath(path):
 
     """Return a triple (directory, basename, extension) form path"
     """
-    d = os.path.split( path )
+    d = os.path.split(path)
     dirname = d[0]
     if len(dirname) == 0:
         dirname = '.'
-    f = os.path.splitext( d[1] )
+    f = os.path.splitext(d[1])
     return dirname, f[0], f[1]
 #end def
 
@@ -3177,7 +3177,7 @@ def NTmkdir(path):
     """
 
     from os import makedirs
-    from os.path import normpath,dirname,exists,expanduser
+    from os.path import normpath, dirname, exists, expanduser
 
     path=expanduser(path)
     dpath = normpath(dirname(path))
@@ -3185,16 +3185,16 @@ def NTmkdir(path):
     return normpath(path)
 #end def
 
-def show( NTobject=None ):
-    if NTobject != None and hasattr( NTobject, 'format' ):
-        NTmessage( "%s", NTobject.format() )
+def show(NTobject=None):
+    if NTobject != None and hasattr(NTobject, 'format'):
+        NTmessage("%s", NTobject.format())
     else:
-        NTmessage( "%s %s", type(NTobject), str(NTobject) )
+        NTmessage("%s %s", type(NTobject), str(NTobject))
     #end if
 #End def
 
 
-def formatList( theList, fmt = '%s\n' ):
+def formatList(theList, fmt = '%s\n'):
     """
     Apply the format method to every element of theList,
     and return their joined strings.
@@ -3202,16 +3202,16 @@ def formatList( theList, fmt = '%s\n' ):
     result = []
     for element in theList:
 #        NTdebug("Doing element: " +`element`)
-        result.append( fmt%element.format()  )
+        result.append(fmt%element.format())
     return ''.join(result)
 #end def
 
 ######################################################################################################
 # This code is repeated in cing/setup.py and cing/Libs/NTutils.py please keep it sync-ed
 ######################################################################################################
-def NTgetoutput( cmd ):
+def NTgetoutput(cmd):
     """Return output from command as (stdout,sterr) tuple"""
-    inp,out,err = os.popen3( cmd )
+    inp, out, err = os.popen3(cmd)
     output = ''
     for line in out.readlines(): output += line
     errors = ''
@@ -3219,11 +3219,11 @@ def NTgetoutput( cmd ):
     inp.close()
     out.close()
     err.close()
-    return (output,errors)
+    return (output, errors)
 #end def
 
 
-class ExecuteProgram( NTdict ):
+class ExecuteProgram(NTdict):
     """
     Base Class for executing external programs on Unix like systems.
     """
@@ -3234,7 +3234,7 @@ class ExecuteProgram( NTdict ):
                  redirectInputFromDummy = False,
                  redirectInputFromFile = False,
                  *args, **kwds):
-        NTdict.__init__( self, pathToProgram  = pathToProgram,
+        NTdict.__init__(self, pathToProgram  = pathToProgram,
                                rootPath       = rootPath,
                                redirectOutput = redirectOutput,
                                redirectOutputToFile   = redirectOutputToFile,
@@ -3271,11 +3271,11 @@ class ExecuteProgram( NTdict ):
         if self.redirectInputFromDummy:
             cmd = sprintf('%s < /dev/null', cmd)
         elif self.redirectInputFromFile:
-            cmd = '%s < %s' % ( cmd, self.redirectInputFromFile)
+            cmd = '%s < %s' % (cmd, self.redirectInputFromFile)
 
 
         if self.redirectOutput:
-            dir,name,_ext = NTpath( self.pathToProgram )
+            dir, name, _ext = NTpath(self.pathToProgram)
             # python call shell sh and in some os (e.g. linux) >& may not work
             # see http://diveintomark.org/archives/2006/09/19/bad-fd-number
             cmd = sprintf('%s > %s.out%d 2>&1', cmd, name, self.jobcount)
@@ -3284,7 +3284,7 @@ class ExecuteProgram( NTdict ):
             cmd = sprintf('%s > %s 2>&1', cmd, self.redirectOutputToFile)
             self.jobcount += 1
         NTdebug('==> Executing ('+cmd+') ... ')
-        code = os.system( cmd )
+        code = os.system(cmd)
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
 #end class
@@ -3318,7 +3318,7 @@ def findvisitor((matches, pattern), thisdir, nameshere):
             fullpath = os.path.join(thisdir, name)
             matches.append(fullpath)
 
-def findFiles( pattern, startdir, exclude=[]):
+def findFiles(pattern, startdir, exclude=[]):
     """
     Find files matching pattern, based upon os.walk
     """
@@ -3338,8 +3338,8 @@ def findFiles( pattern, startdir, exclude=[]):
 
         if not excludePath:
             for file in files:
-                if fnmatch(file,pattern):
-                    result.append(os.path.join(dirpath,file))
+                if fnmatch(file, pattern):
+                    result.append(os.path.join(dirpath, file))
                 #end if
             #end for
         #end if
@@ -3349,7 +3349,7 @@ def findFiles( pattern, startdir, exclude=[]):
     return result
 #end def
 
-def val2Str( value, fmt, count=None ):
+def val2Str(value, fmt, count=None):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is
     None the count determines how long the return string will be.
@@ -3362,7 +3362,7 @@ def val2Str( value, fmt, count=None ):
         return ("%"+`count`+"s") % NaNstring
     return fmt % value
 
-def limitToRange( v, low, hi):
+def limitToRange(v, low, hi):
     """Return a value in range [low,hi}
     truncating the value to given bounds
     E.g. a value of 5 with bounds [0,1] will
@@ -3489,23 +3489,23 @@ def NTmin(*args):
 ##    base = os.path.getBase(fileName)
 ##    return base + "_" + sprintf( "%03i", modelId ) + ext
 
-def cross3Dopt( a, b ):
+def cross3Dopt(a, b):
     return [
     a[1]*b[2]-a[2]*b[1], # x-coordinate
     a[2]*b[0]-a[0]*b[2], # y-coordinate
     a[0]*b[1]-a[1]*b[0]  # z-coordinate
     ]
 
-def dot3Dopt( a, b ):
+def dot3Dopt(a, b):
     return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
 
-def length3Dopt( a ):
-    return math.sqrt( a[0]*a[0]+a[1]*a[1]+a[2]*a[2] )
+def length3Dopt(a):
+    return math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2])
 
 FAC = 180.0/math.pi
 
 
-def angle3Dopt( a, b ):
+def angle3Dopt(a, b):
     """
     return angle spanned by a and b
     or None on error
@@ -3515,16 +3515,16 @@ def angle3Dopt( a, b ):
     """
     # optimized out.
 #        c = self.dot(other) /(self.length()*other.length())
-    c = dot3Dopt(a,b)
+    c = dot3Dopt(a, b)
     c /= length3Dopt(a)
     c /= length3Dopt(b)
 
     # Are the below needed for rounding effects?
-    c = min( c, 1.0 )
-    c = max( c, -1.0 )
+    c = min(c, 1.0)
+    c = max(c, -1.0)
 #        if radians:
 #            return math.acos( c )
-    return math.acos( c ) * FAC
+    return math.acos(c) * FAC
 
 
 def appendDeepByKeys(c, value, *keyList):
@@ -3568,7 +3568,7 @@ def appendDeepByKeys(c, value, *keyList):
             # Make sure the list already has an element with the key as index.
             if key >= len(c):
                 NTdebug("Impossible situation: trying to go into a list at an index that isn't present.")
-                NTdebug("key: %d and list length: %d" % ( key, len(c)))
+                NTdebug("key: %d and list length: %d" % (key, len(c)))
                 return True
         elif isinstance(c, dict):
             if not c.has_key(key):
@@ -3714,7 +3714,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
         if c.has_key(key):
             value = c[key]
         elif hasattr(c, key):
-            value = getattr(c,key)
+            value = getattr(c, key)
         else:
             return None
         #endif
@@ -3730,7 +3730,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
                 return None
             #endif
         elif hasattr(c, key):
-            value = getattr(c,key)
+            value = getattr(c, key)
         else:
             return None
         #endif
@@ -3743,7 +3743,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
 
     else:
         if hasattr(c, key):
-            value = getattr(c,key)
+            value = getattr(c, key)
         else:
             return None
         #endif
@@ -3778,7 +3778,7 @@ def gunzip(fileNameZipped, outputFileName=None):
     outF.close()
 
 
-def getEnsembleAverageAndSigmaFromHistogram( his ):
+def getEnsembleAverageAndSigmaFromHistogram(his):
     """According to Rob's paper. Note that weird cases exist which to me
     are counter intuitive
 [[ 0.  0.  0.  0.  0.  0.]
@@ -3798,12 +3798,12 @@ Rob might have caught this by requiring c_av be at least 2.0.
 
     """
 #    NTdebug("getEnsembleAverageAndSigmaFromHistogram on his:\n%s" % his)
-    (nr,nc) = his.shape
+    (nr, nc) = his.shape
     sum = 0.
     sumsq = 0.
     for r in range(nr):
         for c in range(nc):
-            v = his[r,c] # convenience variable
+            v = his[r, c] # convenience variable
             sum += v
             sumsq += v*v
     c_av = sumsq / sum # this is not a regular average as far as I can tell.
@@ -3812,21 +3812,21 @@ Rob might have caught this by requiring c_av be at least 2.0.
     sumsdsq = 0.
     for r in range(nr):
         for c in range(nc):
-            v = his[r,c] # convenience variable
+            v = his[r, c] # convenience variable
             v2 = v - c_av # convenience variable
             sumsdsq += v * v2*v2
 #    NTdebug("sumsdsq: %8.3f" % sumsdsq)
     c_sd = sumsdsq / (sum-1)
-    c_sd = math.sqrt( c_sd )
+    c_sd = math.sqrt(c_sd)
     return (c_av, c_sd)
 
-def floatFormat( v, format ):
+def floatFormat(v, format):
     ''' Just check for nans.'''
     if isNaN(v):
         return NaNstring
     return format % v
 
-def floatParse( v_str ):
+def floatParse(v_str):
     '''Just check for nans.'''
 #    NTdebug('''NaNstring [%s]''' % NaNstring)
 #    NTdebug('''v_str [%s]''' % v_str)
@@ -3834,7 +3834,7 @@ def floatParse( v_str ):
         return NaN
     return float(v_str)
 
-def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):
+def getTextBetween(s, startString, endString, startIncl=True, endIncl=True):
     """Slice the text to include only that inbetween. Input strings maybe None"""
     if startString:
         startIdx = s.find(startString)
@@ -3844,7 +3844,7 @@ def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):
         NTwarning('Failed to find starting string in given string')
         return
     if endString:
-        endIdx = s.find(endString,startIdx)
+        endIdx = s.find(endString, startIdx)
     else:
         endIdx = len(s)
 
@@ -3863,7 +3863,7 @@ def getTextBetween( s, startString, endString,startIncl=True, endIncl=True ):
 
 
 
-class ROGscore( NTdict ):
+class ROGscore(NTdict):
     """
     Red orange green with comments.
     """
@@ -3873,12 +3873,13 @@ class ROGscore( NTdict ):
 
     MAX_TO_REPORT_IN_POPUP = 5
 
-    def __init__( self ):
-        NTdict.__init__( self,
+    def __init__(self):
+        NTdict.__init__(self,
                          __CLASS__  = 'ROGscore',
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
         self.reset()
+        
 
     def __str__(self):
         return str(self.colorLabel)
@@ -3901,7 +3902,7 @@ class ROGscore( NTdict ):
 
     # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
     # Can be aligned to left using a better .css.
-    def addHTMLkeywords(self, kw ):
+    def addHTMLkeywords(self, kw):
         pass ##GWV 20 August: problem with this in tables and links
 #        if not self.isCritiqued():
 #            return
@@ -3916,7 +3917,7 @@ class ROGscore( NTdict ):
 #            kw[ 'onmousemove' ] = 'SetCavTimer(event);'
 #            kw[ 'onmouseout' ]  = "CancelCavTimer(event);"
 
-    def createHtmlForComments(self, dst ):
+    def createHtmlForComments(self, dst):
         if not self.isCritiqued():
             return
 #        dst('ul', 'Critiques:', closeTag=False )
@@ -3930,50 +3931,48 @@ class ROGscore( NTdict ):
 
 
     def setMaxColor(self, colorLabel, comment=None):
-        """priority: red, orange, green. The socalled ROG score.
+        """priority: red, orange, green. The so called ROG score.
         The comment is optional and will only be appended when the color lable is
         at least as severe as the current one. The less severe levels of comments
         will also be wiped out.
-        Only orange and green levels can add comments.
-        comment may also be a list of comments.
+        Only orange and RED levels can add comments.
+        Parameter comment may also be a list of comments.
         """
     #    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
     #    if not hasattr(o,'colorLabel'):
     #        o.colorLabel = COLOR_GREEN
 
-        if colorLabel == COLOR_GREEN:
+        if colorLabel == COLOR_GREEN or (
+           colorLabel == COLOR_ORANGE and self.colorLabel == COLOR_RED):
             return
 
-        if colorLabel == COLOR_RED:
-            if self.colorLabel != COLOR_RED:
-                self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
-                self.colorLabel = COLOR_RED
-        elif colorLabel == COLOR_ORANGE: # independent of colorLabel being green or orange.
-            if self.colorLabel == COLOR_RED:
-                return
-#                self.colorCommentList = NTlist() # redundant because self was green without comments.
-            self.colorLabel = colorLabel
+        # certain to stay at or upgrade to given color. 
+        if colorLabel == COLOR_RED and self.colorLabel != COLOR_RED:
+            self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
+        self.colorLabel = colorLabel
 
         if comment:
-            if isinstance(comment, list ):
+            if isinstance(comment, list):
                 self.colorCommentList += comment # grow list with potentially multiple comments.
                 self.colorCommentList.removeDuplicates()
+            #end if
             else:
                 if comment not in self.colorCommentList:
-                    self.colorCommentList.append( comment )
-            #end if
+                    self.colorCommentList.append(comment)
+                #end if
+            #end else
         #end if
     #end def
 #end class
 
-def stripExtension( path ):
+def stripExtension(path):
     directory, basename, _extension = NTpath(path)
     return os.path.join(directory, basename)
 
-def stripExtensions( pathList ):
+def stripExtensions(pathList):
     result = []
     for path in pathList:
-        result.append( stripExtension(path))
+        result.append(stripExtension(path))
     return result
 
 _visitedHashes = {}
@@ -3988,7 +3987,7 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
     """
     #    Needed for cyclic graphed objects such as project...
     # TODO: make it work more than once...
-    if isinstance(x, int ) or isinstance(x, float ) or x == None:
+    if isinstance(x, int) or isinstance(x, float) or x == None:
         return
 
     h = id(x)
@@ -3998,12 +3997,12 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
         return
     _visitedHashes[h] = None        
         
-    if isinstance(x, list ) or isinstance(x, tuple ):
+    if isinstance(x, list) or isinstance(x, tuple):
         for e in x:
             if e == attributeToRemove:
                 del x[e]
             _removeRecursivelyAttribute(e, attributeToRemove)
-    if isinstance(x, dict ):
+    if isinstance(x, dict):
         for k in x.keys():
             if k == attributeToRemove:
                 del x[k]

@@ -26,7 +26,6 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport

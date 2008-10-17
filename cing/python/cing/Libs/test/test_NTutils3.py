@@ -21,11 +21,15 @@ class AllChecks(TestCase):
         self.assertEquals(a.rogScore.colorLabel, COLOR_ORANGE )
         self.assertEquals(a.rogScore.colorCommentList[0], ROGscore.ROG_COMMENT_NO_COOR )
         LOTR_remark = 'One ring to rule them all'
+        Preserved_remark = 'Preserved'
         # Next line will have to wipe out the orange comments.
         a.rogScore.setMaxColor(COLOR_RED, LOTR_remark)
         a.rogScore.setMaxColor(COLOR_ORANGE, 'No effect')
-        a.rogScore.setMaxColor(COLOR_RED, 'Preserved')
+        a.rogScore.setMaxColor(COLOR_RED, Preserved_remark)
+        a.rogScore.setMaxColor(COLOR_ORANGE, 'No effect either')
+        self.assertEquals(len(a.rogScore.colorCommentList), 2 )
         self.assertEquals(a.rogScore.colorCommentList[0], LOTR_remark )
+        self.assertEquals(a.rogScore.colorCommentList[1], Preserved_remark )
 
         # Note that this inserts some multi line popups by use of a alternative tag
         # which gets rendered by java script.
