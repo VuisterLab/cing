@@ -87,6 +87,9 @@ def runShiftx( project, model=None   ):
         NTerror('runShiftx: invalid model (%d) for "%s"', model, project.molecule)
         return None
     #end if
+    if not project.molecule.hasAminoAcid():
+        NTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
+        return project
 
     NTmessage('==> Running shiftx' )
 

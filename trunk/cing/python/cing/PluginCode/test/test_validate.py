@@ -48,7 +48,6 @@ class AllChecks(TestCase):
 #        entryId = "1tgq_1model" # withdrawn entry
 #        entryId = "1brv_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
-#        entryId = "1hkt" # Geerten's first structure in PDB
 
 
         self.failIf( os.chdir(cingDirTmp),
