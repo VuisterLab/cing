@@ -1157,7 +1157,12 @@ Return an Molecule instance or None on error
         return result
     #end def
 
-
+    def hasAminoAcid(self):
+        for res in self.allResidues():
+            if res.hasProperties('protein'):
+                return True
+        return None # is actually the default of course.
+             
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
         """
         Superpose the coordinates of molecule

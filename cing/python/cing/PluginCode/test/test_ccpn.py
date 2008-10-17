@@ -21,10 +21,10 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #1iv6 needs better ccpn file from FC
-        entryList = ["Parvulustat"]
-#        entryList = ["1brv"]
+#        entryList = ["Parvulustat"]
+        entryList = ["1a4d"]
 
-        fastestTest = True
+        fastestTest = False
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True

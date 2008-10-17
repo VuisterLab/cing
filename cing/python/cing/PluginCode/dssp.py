@@ -55,6 +55,10 @@ class Dssp:
     # Return True on error ( None on success; Python default)
     def run(self, export = True):
         if export:
+            if not self.project.molecule.hasAminoAcid():
+                NTmessage('Dssp.run: skipping because no amino acid in this molecule')
+                return
+                
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
                     NTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
