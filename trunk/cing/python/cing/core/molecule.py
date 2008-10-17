@@ -971,8 +971,11 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
         NTdebug('Identify the disulfide bonds.')
-#        cys=self.residuesWithProperties('CYS')
-        cys=[]
+        cys=self.residuesWithProperties('CYS')
+        cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
+        for c in cyss:
+            if c not in cys:
+                cys.append(c)
         pairList = []
         cyssDict2Pair = {}
         # all cys(i), cys(j) pairs with j>i
@@ -1129,7 +1132,8 @@ Return an Molecule instance or None on error
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if not len(properties): 
+            return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
                 result.append(res)
@@ -2025,7 +2029,7 @@ Residue class: Defines residue properties
 
     #end def
 
-    def renumber( self, newResNum ):
+    def renumber( self, newResNum ): 
         """
         Renumber residue
            Return self or None on error
