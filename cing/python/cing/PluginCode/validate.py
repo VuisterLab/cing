@@ -540,6 +540,7 @@ def validateRestraints( project, toFile = True)   :
 
 def checkForDisulfides(project, toFile=True):
     """Just check for potential disulfide bonds.
+    TODO: merge this code with identical one in molecules.py#idDisulfides
     """
     NTdebug('Identify the disulfide bonds.')
 
@@ -547,9 +548,12 @@ def checkForDisulfides(project, toFile=True):
         NTerror('checkForDisulfides: no molecule defined')
         return None
     #end if
-    cys=[]
+    cys=project.molecule.residuesWithProperties('CYS')
+    cyss=project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
+    for c in cyss:
+        if c not in cys:
+            cys.append(c)
 
-#    cys=project.molecule.residuesWithProperties('CYS')
     disulfides = NTlist()
     # all cys(i), cys(j) pairs with j>i
     for i in range(len(cys)):
