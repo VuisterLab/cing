@@ -574,21 +574,26 @@ def _makeResidueTableHtml( obj, residues, text=None ):
     obj.html.main('table', closeTag=False)
     obj.html.main('tr', closeTag=False)
     obj.html.main( 'td',sprintf('%d-%d',r1,r2), style="width: %s" % width )
-    for dummy in range( r0.resNum%ncols ):
+    for _emptyCell in range( r0.resNum%ncols ):
         obj.html.main('td', style="width: %s" % width)
 
+    prevRes = None
     for res in residues:
-        if res.resNum%ncols == 0:
+        chainBreakDetected = (prevRes!=None) and (prevRes.resNum != (res.resNum - 1))
+        if chainBreakDetected or res.resNum%ncols == 0:
             r1 = res.resNum/ncols *ncols
             r2 = r1+ncols-1
             obj.html.main('tr', openTag=False)
             obj.html.main('tr', closeTag=False)
             obj.html.main('td',sprintf('%d-%d',r1,r2), style="width: %s" % width )
+            for _emptyCell in range( res.resNum%ncols ):
+                obj.html.main('td', style="width: %s" % width)
 
         # add residue to table
         obj.html.main('td', style="width: %s" % width, closeTag=False)
         obj.html.insertHtmlLink(obj.html.main, obj, res, text=res.name)
         obj.html.main('td', openTag=False)
+        prevRes = res
     #end for over res in residues
 
     obj.html.main('tr', openTag=False)
