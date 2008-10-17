@@ -179,7 +179,17 @@ def bytesToFormattedString(size):
 def logToLog(msg):
         sys.stderr.write(msg)
         sys.stderr.write('\n')
+#        myhtml.render() # Can't be done without whole project and content anymore.
 
+def testBytesToFormattedString():
+    byteList = [ 1, 1000, 1300, 1600, 13000*1024, 130*1000*1024*1024  ]
+    expectedResults= [ '0K', '1K', '1K', '2K', '13M', '127G' ]
+    for i in range(len(byteList)):
+        r = bytesToFormattedString(byteList[i])
+#        self.assertEqual( r, expectedResults[i] )
+        if r != expectedResults[i]:
+            print( "result [%s] is not expected [%s]" % ( r, expectedResults[i]))
+                     
 if __name__ == '__main__':
     f = FileUpload()
     f.serve()

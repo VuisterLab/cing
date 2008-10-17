@@ -1713,8 +1713,10 @@ class ResidueHTMLfile( HTMLfile ):
                                                  text=angleName, id=angleName )
                 #end if
                 resRight('br')
-                resRight( 'a', type + ': Lower/Av/Upper: %.2f/ %.2f / %.2f' %
-                          (dr.lower, av, dr.upper) )
+                resRight( 'a', type + ': Lower/Av/Upper: %s/ %s / %s' %
+                          (val2Str(dr.lower, "%.2f"),
+                           val2Str(av,       "%.2f"),
+                           val2Str(dr.upper, "%.2f") ))
                 resRight('br')
                 #resRight('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
                 #                 % (restraint.av, restraint.min, restraint.max))
@@ -2001,10 +2003,13 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( restrMain, self.restraintList, res1, text = atomName1 )
                 self.insertHtmlLink( restrMain, self.restraintList, res2, text = atomName2 )
             #end for
-            restrMain('li', 'Lower/Upper: %.2f / %.2f' % (restraint.lower,
-                                                          restraint.upper))
-            restrMain('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
-                             % (restraint.av, restraint.min, restraint.max))
+            restrMain('li', 'Lower/Upper: %s / %s' % (
+                                val2Str(restraint.lower, '%.2f'), 
+                                val2Str(restraint.upper, '%.2f'))) 
+            restrMain('li', 'Average (Min/Max):  %s (%s / %s)'
+                             % (val2Str(restraint.av,  '%.3e'), 
+                                val2Str(restraint.min, '%.3e'), 
+                                val2Str(restraint.max, '%.3e'))) 
             restrMain('li', 'ViolCount3: %i' % restraint.violCount3)
 
             restrMain('li', 'Viol Average / SD / Max: %s / %s / %s' %
@@ -2042,11 +2047,13 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( restrMain, self.restraintList, res, text = atomName )
                 ind += 1
             #end for
-            restrMain('li', openTag=False)
-            restrMain('li', 'Lower/Upper: %.2f / %.2f' % (restraint.lower,
-                                                          restraint.upper))
-            restrMain('li', 'Average (CV):  %.2f (%.2f)'
-                             % (restraint.cav, restraint.cv))
+            restrMain('li', openTag=False)            
+            restrMain('li', 'Lower/Upper: %s / %s' % (
+                                val2Str(restraint.lower, '%.2f'), 
+                                val2Str(restraint.upper, '%.2f')))             
+            restrMain('li', 'Average (CV):  %s (%s)'
+                             % (val2Str(restraint.cav, '%.2f'), 
+                                val2Str(restraint.cv, '%.2f')))             
             restrMain('li', 'ViolCount3: %i' % restraint.violCount3)
             restrMain('li', 'Viol Average / SD / Max: %s / %s / %s' % (
                 val2Str(restraint.violAv,  "%.2f"),

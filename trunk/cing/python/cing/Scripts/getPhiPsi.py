@@ -14,7 +14,7 @@ from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import doRamachandran # once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.localConstants import pdbz_dir
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.core.classes import Project
 from cing.core.molecule import Chain
 import cing
@@ -51,7 +51,7 @@ def doEntry( entryCode, chainCode ):
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
-    project.initPDB( pdbFile=localPdbFileName, convention = BMRB )
+    project.initPDB( pdbFile=localPdbFileName, convention = IUPAC )
     os.unlink(localPdbFileName)
 #    project.procheck(createPlots=False, runAqua=False)
 #    if not project.dssp():

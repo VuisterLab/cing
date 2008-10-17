@@ -31,6 +31,8 @@ respective functionalities.
 # generate setup csh or bash script
 #------------------------------------------------------------------------------------
 
+PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE"
+
 CING_SHELL_TEMPLATE = \
 '''
 #############################################
@@ -302,7 +304,7 @@ if __name__ == '__main__':
     xplorPath,err  = _NTgetoutput('which xplor')
     if not xplorPath:
         _NTwarning("Could not find 'xplor'")
-        parametersDict['xplorPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['xplorPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'xplor'")
         parametersDict['xplorPath']  = strip(xplorPath)
@@ -314,13 +316,13 @@ if __name__ == '__main__':
             _NTwarning("Found the system variable prodir but the script below was not found")
             _NTwarning( procheckPath )
             _NTwarning("Could not find 'procheck_nmr'")
-            parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+            parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
             _NTmessage("........ Found 'procheck_nmr'")
             parametersDict['procheckPath'] = procheckPath
     else:
         _NTwarning("Could not find 'procheck_nmr'")
-        parametersDict['procheckPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
 
 #    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("aquaroot"):
@@ -329,17 +331,17 @@ if __name__ == '__main__':
             _NTwarning("Found the system variable aquaroot but the script below wasn't found")
             _NTwarning( aqpcPath )
             _NTwarning("Could not find 'aqua'")
-            parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+            parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
             _NTmessage("........ Found 'aqua'")
             parametersDict['aqpcPath'] = aqpcPath
     else:
         _NTwarning("Could not find 'aqua'")
-        parametersDict['aqpcPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
 
     whatifPath,err  = _NTgetoutput('which DO_WHATIF.COM')
-    parametersDict['whatifPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
-    parametersDict['dsspPath']    = "PLEASE_ADD_EXECUTABLE_HERE"
+    parametersDict['whatifPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    parametersDict['dsspPath']    = PLEASE_ADD_EXECUTABLE_HERE
     if not whatifPath:
         defaultWhatifPath = '/home/vriend/whatif/DO_WHATIF.COM'
         if os.path.exists(defaultWhatifPath):
@@ -376,7 +378,7 @@ if __name__ == '__main__':
     convertPath,err  = _NTgetoutput('which convert')
     if not convertPath:
         _NTwarning("Could not find 'convert' (from ImageMagick)")
-        parametersDict['convertPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['convertPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'convert'")
         parametersDict['convertPath'] = strip(convertPath)
@@ -384,7 +386,7 @@ if __name__ == '__main__':
     ghostscriptPath,err  = _NTgetoutput('which gs')
     if not ghostscriptPath:
         _NTwarning("Could not find 'ghostscript' (from ImageMagick)")
-        parametersDict['ghostscriptPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['ghostscriptPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'ghostscript'")
         parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
@@ -392,7 +394,7 @@ if __name__ == '__main__':
     ps2pdfPath,err  = _NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
         _NTwarning("Could not find 'ps2pdf' (from Ghostscript)")
-        parametersDict['ps2pdfPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['ps2pdfPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'ps2pdf'")
         parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
@@ -400,7 +402,7 @@ if __name__ == '__main__':
     molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
         _NTwarning("Could not find 'molmol'")
-        parametersDict['molmolPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['molmolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'molmol'")
         parametersDict['molmolPath'] = strip(molmolPath)
@@ -408,7 +410,7 @@ if __name__ == '__main__':
     povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
         _NTwarning("Could not find 'povray'")
-        parametersDict['povrayPath']  = "PLEASE_ADD_EXECUTABLE_HERE"
+        parametersDict['povrayPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'povray'")
         parametersDict['povrayPath'] = strip(povrayPath)

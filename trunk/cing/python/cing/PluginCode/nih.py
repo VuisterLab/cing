@@ -13,7 +13,7 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTfile
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import fprintf
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.core.molecule import allAtoms
 from cing.core.molecule import allResidues
 import array
@@ -706,7 +706,7 @@ def exportShifts2Talos( molecule, fileName=None)   :
 
     count = 0
     for ac in allAtoms( molecule ):
-        atomName    = ac.translate(BMRB)
+        atomName    = ac.translate(IUPAC)
         if (ac.isAssigned() and (atomName in talosUsed)):
             fprintf( f, '%4d    %1s     %4s      %8.3f\n',
                         ac._parent.resNum,

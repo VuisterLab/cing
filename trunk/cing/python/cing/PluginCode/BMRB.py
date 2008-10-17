@@ -6,7 +6,7 @@ Methods:
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.core.constants import BMRBd
+from cing.core.constants import IUPAC
 from cing.core.molecule import Molecule
 from cing.core.molecule import Chain
 from cing.Libs.fpconst import NaN
@@ -35,7 +35,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
 #        shift   = f.float(6)
 #        serror  = f.float(7)
 #        ambig   = f.int(8)
-        res = mol._addResidue( Chain.defaultChainId, resName, resNum, BMRBd )
+        res = mol._addResidue( Chain.defaultChainId, resName, resNum, IUPAC )
 
         if (not res):
             NTerror( 'Error initBMRB: invalid residue %s %s line %d (%s)\n',
@@ -95,7 +95,7 @@ def importFromBMRB( project, bmrbFile ):
         serror  = f.float(8)
         _ambig   = f.int(9)
 
-        atm = mol.decodeNameTuple( (BMRBd, Chain.defaultChainId, resNum, atomName) )
+        atm = mol.decodeNameTuple( (IUPAC, Chain.defaultChainId, resNum, atomName) )
 
         if not atm:
             NTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)',
