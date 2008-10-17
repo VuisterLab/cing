@@ -63,10 +63,11 @@ dbase = shelve.open( dbaseFileName )
 dbase.close()
 
 
-def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
+def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
     Return NTplot instance with histogram of dihedralName
     or None on error.
+    Return True if it could be created if htmlOnly is not set.
     '''
     if project == None:
         return None
@@ -74,6 +75,9 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
         return None
     if residue[dihedralName] == None:
         return None
+    
+    if htmlOnly:
+        return True
 
     bins       = 360/binsize
     plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
@@ -145,7 +149,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5 ):
 
 
 def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
-                      plotTitle = None ):
+                      plotTitle = None, htmlOnly=False ):
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
@@ -173,6 +177,16 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #        if res.resName != residue.resName:
 #            allSameResType = False
 #            break
+    if dihedralName1 not in residue or residue[dihedralName1] == None:
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+        return None
+
+    if dihedralName2 not in residue or residue[dihedralName2] == None:
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+        return None
+    if htmlOnly:
+        return True # indicating success
+
     isSingleResiduePlot = len(residueList) == 1
 
     if not plotTitle:
@@ -182,13 +196,6 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             plotTitle = '%d residues'
 
 
-    if dihedralName1 not in residue or residue[dihedralName1] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
-        return None
-
-    if dihedralName2 not in residue or residue[dihedralName2] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
-        return None
 
 #    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
 
@@ -1539,30 +1546,34 @@ class ResidueHTMLfile( HTMLfile ):
                     ['CHI1', 'CHI2', 'Janin',        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR), C12CHK_STR]
                    ]
         graphicsFormatExtension = 'png'
-
+        plottedList = []
+#        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)  
         if not htmlOnly:
-            # Generate 2D plots
             NTdebug("Residue %s: generating dihedral plots", self.residue )
             
-            for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
+        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
 #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
-                ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2)
-                tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
-                if ps:
+            ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
+            if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
+                plottedList.append(plotDihedralComboName)
+                if isinstance(ps, NTplotSet): # actually created.
+                    tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
                     ps.hardcopy( fileName = tmpPath )
-            #end for
+        #end for
 
-            # Dihedral plots
-            for dihed in residue.db.dihedrals.zap('name'):
-                if dihed in residue and residue[dihed]:
-                    d = residue[dihed] # List of values with outliers etc attached.
+        # Dihedral plots
+        for dihed in residue.db.dihedrals.zap('name'):
+            if dihed in residue and residue[dihed]:
+                d = residue[dihed] # List of values with outliers etc attached.
 #                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
-                    ps = makeDihedralHistogramPlot( project, residue, dihed )
-                    tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
-                    if ps:
+                ps = makeDihedralHistogramPlot( project, residue, dihed, htmlOnly=htmlOnly )
+                tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
+                if ps:
+                    plottedList.append(dihed)
+                    if isinstance(ps, NTplotSet): # actually created.
                         ps.hardcopy( fileName = tmpPath )
                 #end if
-            #end for
+        #end for
         #end if htmlOnly:
 
         # Generate HTML
@@ -1578,31 +1589,38 @@ class ResidueHTMLfile( HTMLfile ):
             residue.rogScore.createHtmlForComments(residue.html.left)
         #end if
 
+        residue.html.left( 'h2', 'Dihedrals', id='Plots')
+        for plot in plottedList:
+            kw = {'href':'#'+plot}
+            residue.html.left('a' , plot, **kw)
+#        residue.html.left( 'h2', openTag=False)
+
         # 2D plots
         for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
-
             plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
+            if not plotDihedralComboName in plottedList: # failed on first attempt already. No sense in trying again.
+                continue
             tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
-            if os.path.exists(tmpPath):
-                residue.html.left( 'h2', plotDihedralComboName, id=plotDihedralComboName)
-                residue.html.left( 'img', src = plotFileNameDihedral2D )
-                # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
-                strToShow = '.'.join( keys )
-                av = getDeepByKeys(residue,*keys)
-                if av != None:
-                    sd = None
-                    if isinstance(av, NTlist):
-                        ( av, sd, _n ) = av.average()
-
-                    pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)', fmt2='%.2f' )
-                    strToShow += ': %s' % pointNTvalueStr
-                    residue.html.left( 'p', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
-                #end if
+            residue.html.left( 'h2', plotDihedralComboName, id=plotDihedralComboName)
+            residue.html.left( 'img', src = plotFileNameDihedral2D )
+            # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
+            strToShow = '.'.join( keys )
+            av = getDeepByKeys(residue,*keys)
+            if av != None:
+                sd = None
+                if isinstance(av, NTlist):
+                    ( av, sd, _n ) = av.average()
+                pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)', fmt2='%.2f' )
+                strToShow += ': %s' % pointNTvalueStr
+                residue.html.left( 'p', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
+            #end if
         #end for
 
         # Dihedrals
         for dihed in residue.db.dihedrals.zap('name'):
             if dihed in residue and residue[dihed]:
+                if not dihed in plottedList: # failed on first attempt already. No sense in trying again.
+                    continue
     #                            NTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
                 d = residue[dihed] # List of values with outliers etc attached.
 
