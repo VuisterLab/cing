@@ -951,6 +951,7 @@ MULTIPLE_ASSIGNMENT             = 'MULTIPLE_ASSIGNMENT'
 MISSING_ASSIGNMENT              = 'MISSING_ASSIGNMENT'
 EXPECTED_ASSIGNMENT             = 'EXPECTED_ASSIGNMENT'
 INVALID_STEREO_ASSIGNMENT       = 'STEREO_ASSIGNMENT'
+SHIFT                           = 'SHIFT'
 
 def validateAssignments( project, toFile = True   ):
     """
@@ -1005,8 +1006,8 @@ def validateAssignments( project, toFile = True   ):
             # Check the shift against the database
             delta = math.fabs(shift - av) / sd
             if delta > 3.0:
-                string = sprintf('%s: %.2f ppm is %.1f*sd away from average (%.2f,%.2f)',
-                                 'SHIFT', shift, delta, av, sd
+                string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
+                                 SHIFT, shift, delta, av, sd
                                 )
 #                NTmessage('%-20s %s', atm, string)
                 result.append( atm )
@@ -1015,7 +1016,7 @@ def validateAssignments( project, toFile = True   ):
 
             # Check if not both realAtom and pseudoAtom are assigned
             if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
-                string = sprintf('%s: atm also has %s assigned', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
+                string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
 #                NTmessage('%-20s %s', atm, string)
                 result.append( atm )
                 atm.validateAssignment.append(string)
@@ -1025,7 +1026,7 @@ def validateAssignments( project, toFile = True   ):
             if atm.isPseudoAtom():
                 for a in atm.realAtoms():
                     if a.isAssigned():
-                        string = sprintf('%s: atm also has %s assigned', MULTIPLE_ASSIGNMENT, a )
+                        string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
 #                        NTmessage('%-20s %s', atm, string)
                         result.append( atm )
                         atm.validateAssignment.append(string)
@@ -1037,7 +1038,7 @@ def validateAssignments( project, toFile = True   ):
             if atm.hasPseudoAtom():
                 for a in atm.pseudoAtom().realAtoms():
                     if not a.isAssigned():
-                        string = sprintf('%s: expected also %s to be assigned.', MISSING_ASSIGNMENT, a )
+                        string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
 #                        NTmessage('%-20s %s', atm, string )
                         result.append( atm )
                         atm.validateAssignment.append(string)
@@ -1049,7 +1050,7 @@ def validateAssignments( project, toFile = True   ):
             if atm.isProton():
                 heavyAtm = atm.topology()[0]
                 if not heavyAtm.isAssigned():
-                    string = sprintf('%s: expected %s to be assigned', EXPECTED_ASSIGNMENT, heavyAtm )
+                    string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
 #                    NTmessage('%-20s %s', atm, string )
                     result.append( atm )
                     atm.validateAssignment.append(string)
@@ -1059,7 +1060,7 @@ def validateAssignments( project, toFile = True   ):
             # stereo assignments checks
             if atm.isStereoAssigned():
                 if not atm.isProChiral():
-                    string = sprintf('%s: %s not a prochiral atom', INVALID_STEREO_ASSIGNMENT, atm )
+                    string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
                     result.append( atm )
                     atm.validateAssignment.append(string)
                 else:
@@ -1067,12 +1068,12 @@ def validateAssignments( project, toFile = True   ):
                     partner = atm.proChiralPartner()
                     if partner:
                         if not partner.isAssigned():
-                            string = sprintf('%s: prochiral partner %s not assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                            string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
                             result.append( atm )
                             atm.validateAssignment.append(string)
                         else:
                             if not partner.isStereoAssigned():
-                                string = sprintf('%s: prochiral partner %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
                                 result.append( atm )
                                 atm.validateAssignment.append(string)
                             #end if
@@ -1086,12 +1087,12 @@ def validateAssignments( project, toFile = True   ):
                 heavy = atm.heavyAtom()
                 if heavy and heavy.isAssigned():
                     if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                        string = sprintf('%s: prochiral methyl carbon %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                         result.append( atm )
                         atm.validateAssignment.append(string)
                     #end if
                     if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                        string = sprintf('%s: prochiral methyl carbon %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                         result.append( atm )
                         atm.validateAssignment.append(string)
                     #end if
@@ -1103,12 +1104,12 @@ def validateAssignments( project, toFile = True   ):
                 pseudo = atm.attachedProtons(includePseudo=True).last()
                 if pseudo and pseudo.isAssigned():
                     if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                        string = sprintf('%s: prochiral methyl proton %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                         result.append( atm )
                         atm.validateAssignment.append(string)
                     #end if
                     if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                        string = sprintf('%s: prochiral methyl proton %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                         result.append( atm )
                         atm.validateAssignment.append(string)
                     #end if

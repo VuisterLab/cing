@@ -3921,14 +3921,23 @@ class ROGscore(NTdict):
         if not self.isCritiqued():
             return
 #        dst('ul', 'Critiques:', closeTag=False )
-        kw = {'href':''}
-        kw['class'] = self.colorLabel
-        for comment in self.colorCommentList:
-            dst('li' , closeTag=False)
-            dst('a' , comment, **kw)
-            dst('li' , openTag=False)
-#        dst('ul', openTag=False)
-
+        refExists = False
+        if refExists:
+            kw = {'href':''}
+            kw['class'] = self.colorLabel
+            for comment in self.colorCommentList:
+                dst('li' , closeTag=False)
+                dst('a' , comment, **kw)
+                dst('li' , openTag=False)
+    #        dst('ul', openTag=False)
+        else:
+            kw = {'color':self.colorLabel}
+            for comment in self.colorCommentList:
+                dst('li' , closeTag=False)
+                dst('font' , comment, **kw)
+                dst('li' , openTag=False)
+    #        dst('ul', openTag=False)
+            
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The so called ROG score.
