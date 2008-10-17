@@ -398,14 +398,14 @@ def _navigateHtml( obj ):
     # Refs to move to previous, next residue or UP
     previous = obj.sibling(-1)
     if previous:
-        obj.html.insertHtmlLink( obj.html.header, obj, previous, text = previous._Cname(-1) )
+        obj.html.insertHtmlLink( obj.html.header, obj, previous, text = previous._Cname(-1), id=HTMLfile.headerSectionId )
 
     if obj._parent:
         obj.html.insertHtmlLink( obj.html.header, obj, obj._parent, text = 'UP' )
 
     next = obj.sibling(1)
     if next:
-        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next._Cname(-1) )
+        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next._Cname(-1), id=HTMLfile.headerSectionId )
 #end def
 
 class MakeHtmlTable():
@@ -614,6 +614,7 @@ class HTMLfile:
     OpenText         = 'Open'
     help_html        = 'help.html'
     top              = '#_top'
+    headerSectionId  = 'header'
 
     def __init__( self, fileName, project, title = None, **kwds ):
         '''Description: __init__ for HTMLfile class.
@@ -822,7 +823,7 @@ class HTMLfile:
 
         #main
         self.stream.write( self.openTag('div', id = 'main') )
-        self.stream.write( self._generateTag('a', id='_top', name='_top') )
+        self.stream.write( self._generateTag('a', id=self.top, name=self.top) )
 #        self.stream.write( self.closeTag('a') )
         self.stream.writelines(self._call + self._main)
 
@@ -1383,7 +1384,7 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
 #            NTdebug('wiLinkReal: ' + wiLinkReal)
             if not os.path.exists( wiLinkReal ):
-                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
+#                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
