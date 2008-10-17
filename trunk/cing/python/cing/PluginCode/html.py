@@ -408,7 +408,7 @@ def _navigateHtml( obj ):
 #end def
 
 class MakeHtmlTable():
-    """Iterative class that generates a rows of html Table
+    """Iterative class that generates rows of html Table
         columnFormats:     a list of (header, dict()) tuples describing the column
                              header can be None for no header above column
 
@@ -453,7 +453,10 @@ h.render()
     def __call__(self, tag, *args, **kwds):
         self.html( tag, *args, **kwds)
     #end def
-
+    
+    def getRows(self):
+        return self._rows
+    
     def rows(self, rows):
         self._rows = rows
         return self
@@ -1852,19 +1855,19 @@ class AtomsHTMLfile( HTMLfile ):
 
         # generate the html table template
         table = MakeHtmlTable( self.main,
-                               columnFormats = [('#',         dict(width="150px", valign="top" ) ),
+                               columnFormats = [('atom',      dict(width="150px", valign="top" ) ),
                                                 #nb align="char", char="." does not work
-                                                ('resonance', dict(width="100px", align="right",  valign="top") ),
+                                                ('obs.',      dict(width= "50px", align="right",  valign="top") ),
                                                 ('error',     dict(width= "50px", align="right",  valign="top") ),
                                                 ('stereo',    dict(width= "75px", align="center", valign="top") ),
 
-                                                ('shiftx',    dict(width="100px", align="right",  valign="top") ),
+                                                ('shiftx',    dict(width= "50px", align="right",  valign="top") ),
                                                 ('error',     dict(width= "50px", align="right",  valign="top") ),
 
-                                                ('delta',     dict(width="100px", align="right",  valign="top") ),
+                                                ('delta',     dict(width= "50px", align="right",  valign="top") ),
                                                 ('error',     dict(width= "50px", align="right",  valign="top") ),
 
-                                                ('dbase',     dict(width="100px", align="right",  valign="top") ),
+                                                ('dbase',     dict(width= "50px", align="right",  valign="top") ),
                                                 ('sd',        dict(width= "50px", align="right",  valign="top") ),
 
                                                 ( None,       dict(width="50px")), # empty
@@ -1877,9 +1880,11 @@ class AtomsHTMLfile( HTMLfile ):
             if atom.rogScore.isCritiqued():
                 critiqued.append(atom)
         #end for
-        atomMain('h1', 'Critiqued')
-        for atom in table.rows(critiqued):
-            self._atomRow( atom, table )
+        tableSelection = table.rows(critiqued)
+        if len(tableSelection.getRows()):
+            atomMain('h1', 'Critiqued')
+            for atom in tableSelection:
+                self._atomRow( atom, tableSelection )
 
         atomMain('h1', 'Atoms')
         for res in self.atomList.molecule.allResidues():
