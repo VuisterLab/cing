@@ -1670,18 +1670,8 @@ class ResidueHTMLfile( HTMLfile ):
             #resRight('br')
             resRL = tmpDict[k]
             # sort list by 'violCount3' reverse order (higher to lower values)
-            NTsort(resRL, 'violCount3', inplace=True)
-            resRL.reverse()
-            # sort by color: 1st red, 2nd orange, then green and by violCount3 reverse order
-            listRed, listOrange, listGreen = [], [], []
-            for dr in resRL:
-                if dr.rogScore.isRed():
-                    listRed.append(dr)
-                elif dr.rogScore.isOrange():
-                    listOrange.append(dr)
-                else:
-                    listGreen.append(dr)
-            resRL = listRed + listOrange + listGreen
+            resRL = sortListByRogAndKey(resRL, 'violCount3' )
+
             # display restraint by number, in line, sorted by violCount3 reverse
             #for dr in resRL:
             #    residue.html.insertHtmlLink(resRight, residue, dr, text=str(dr.id))
@@ -1918,7 +1908,9 @@ class RestraintListHTMLfile( HTMLfile ):
         if hasattr(restraintList, 'html'):
             del(restraintList.html)
         restraintList.html = self
-        self.restraintList = restraintList
+        
+        self.restraintList = restraintList 
+        self.restraintListSorted = sortListByRogAndKey(self.restraintList, sortKey='violMax') 
 
         # set the fileName and tags to locate each atom
         for restraint in self.restraintList:
@@ -1976,7 +1968,8 @@ class RestraintListHTMLfile( HTMLfile ):
         """Generate html code for distance restraints
         """
         restrMain = self.main
-        for restraint in self.restraintList:
+                
+        for restraint in self.restraintListSorted:
             restrMain('h2', 'Restraint ', id = restraint.htmlLocation[1][1:], closeTag=False)
             # Strangely JFD doesn't know how to get the coloring into the next text
             # without creating a html link. So just put in a self reference.
@@ -2018,7 +2011,7 @@ class RestraintListHTMLfile( HTMLfile ):
         """Generate html code for dihedral restraints
         """
         restrMain = self.main
-        for restraint in self.restraintList:
+        for restraint in self.restraintListSorted:
             restrMain('h2', 'Restraint ', id = restraint.htmlLocation[1][1:], closeTag=False)
             self.insertHtmlLink(restrMain,self.restraintList,restraint,'%i'%restraint.id)
             restrMain('h2', openTag=False)
@@ -2057,6 +2050,7 @@ class RestraintListHTMLfile( HTMLfile ):
             restrMain('li', 'Angle Name:', closeTag=False)
             self.insertHtmlLink( restrMain, self.restraintList, restraint.residue, text=restraint.angle )
             restrMain('li', openTag=False)
+            restraint.rogScore.createHtmlForComments(restrMain)
             restrMain('ul', openTag=False)
         #end for
     #end def
@@ -2187,6 +2181,23 @@ class EnsembleHTMLfile( HTMLfile ):
         self.render()
     #end def
 #end class
+
+def sortListByRogAndKey(theList, sortKey=None, descending=True):
+    if sortKey!=None:
+        NTsort(theList, sortKey, inplace=False)
+        if descending:
+            theList.reverse()
+    # sort by color: 1st red, 2nd orange, then green and by violCount3 reverse order
+    listRed, listOrange, listGreen = [], [], []
+    for item in theList:
+        if item.rogScore.isRed():
+            listRed.append(item)
+        elif item.rogScore.isOrange():
+            listOrange.append(item)
+        else:
+            listGreen.append(item)
+    theList = listRed + listOrange + listGreen
+    return theList
 
 
 # register the functions
