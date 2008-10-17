@@ -1796,11 +1796,12 @@ class NTvalue( NTdict ):
     Class to store a value and its error
     Callable: returns value
     Simple arithmic: +, -, *, /, ==, !=, >, >=, <, <=,
+    fmt2 will be used when value exists but error does not.
     """
-    def __init__( self, value, error=0.0, fmt='%s (+- %s)', **kwds ):
+    def __init__( self, value, error=0.0, fmt='%s (+- %s)', fmt2='%s', **kwds ):
         kwds.setdefault('__CLASS__','NTvalue')
-        NTdict.__init__( self, value=value, error=error, fmt=fmt, **kwds )
-        self.saveXML( 'value', 'error', 'fmt' )
+        NTdict.__init__( self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds )
+        self.saveXML( 'value', 'error', 'fmt', 'fmt2' )
     #end def
 
     def __call__( self ):
@@ -1812,14 +1813,17 @@ class NTvalue( NTdict ):
         if self.value == None or isNaN( self.value ):
             return '%s (+- %s)' % (NaNstring, NaNstring)
         if self.error == None or isNaN( self.error ):
-            return `self.value`+' (+- %s)' % (NaNstring)
+#            return `self.value`+' (+- %s)' % (NaNstring)
+            # The problem here is of course that the whole fmt is lost if only the error is unknonw.
+            # Added new parameter to init of this class to cover it.
+            r = self.fmt2 % self.value
+            return r + ' (+- %s)' % (NaNstring)
         return  self.fmt % ( self.value, self.error )
     #end def
 
     def __repr__(self):
-        return sprintf('NTvalue( value = %s, error = %s, fmt = %s )',
-                       repr(self.value), repr(self.error), self.fmt
-                      )
+        return sprintf('NTvalue( value = %s, error = %s, fmt = %s, fmt2 = %s )',
+                       repr(self.value), repr(self.error), self.fmt, self.fmt2 )
     #end def
 
     def __add__( self, other ):
@@ -1829,12 +1833,12 @@ class NTvalue( NTdict ):
         else:
             v = self.value+other
             e = self.error
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __radd__( self, other ):
         v = other + self.value
-        return NTvalue( v, self.error, self.fmt )
+        return NTvalue( v, self.error, self.fmt, self.fmt2 )
     #end def
 
     def __iadd__( self, other ):
@@ -1853,12 +1857,12 @@ class NTvalue( NTdict ):
         else:
             v = self.value-other
             e = self.error
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __rsub__( self, other ):
         v = other - self.value
-        return NTvalue( v, self.error, self.fmt )
+        return NTvalue( v, self.error, self.fmt, self.fmt2 )
     #end def
 
     def __isub__( self, other ):
@@ -1877,13 +1881,13 @@ class NTvalue( NTdict ):
         else:
             v = self.value*other
             e = self.error*other
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __rmul__( self, other ):
         v = other * self.value
         e = v*self.error/self.value
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __imul__( self, other ):
@@ -1904,13 +1908,13 @@ class NTvalue( NTdict ):
         else:
             v = self.value/other
             e = self.error/other
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __rdiv__( self, other ):
         v = other / self.value
         e = v*self.error/self.value
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __idiv__( self, other ):
@@ -1927,19 +1931,19 @@ class NTvalue( NTdict ):
     def __neg__( self ):
         v = -self.value
         e = self.error
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __pos__( self ):
         v = self.value
         e = self.error
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __abs__( self ):
         v = abs(self.value)
         e = self.error
-        return NTvalue( v, e, self.fmt )
+        return NTvalue( v, e, self.fmt, self.fmt2 )
     #end def
 
     def __cmp__( self, other ):
@@ -1990,7 +1994,8 @@ class NTvalue( NTdict ):
         (value,error) tuple
         or None on error
         """
-        if len(theTuple)!=2: return None
+        if len(theTuple)!=2: 
+            return None
         return NTvalue(value=theTuple[0], error=theTuple[1])
     #end def
     fromTuple = staticmethod(fromTuple)
@@ -2526,7 +2531,7 @@ class XMLNTvalueHandler( XMLhandler ):
     def handle( self, node ):
         attrs = self.handleDictElements( node )
         if attrs == None: return None
-        result = NTvalue( value = attrs['value'], error = attrs['error'], fmt = attrs['fmt'] )
+        result = NTvalue( value = attrs['value'], error = attrs['error'], fmt = attrs['fmt'], fmt2 = attrs['fmt2'] )
         result.update( attrs )
         return result
     #end def

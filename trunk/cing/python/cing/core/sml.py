@@ -720,9 +720,9 @@ class SMLPeakHandler( SMLhandler ):
             pk.positions  = NTlist(*pk.positions)
             del(pk['hasHeight'])
             del(pk['hasVolume'])
-            pk.height = NTvalue( pk.height, pk.heightError, Peak.HEIGHT_VOLUME_FORMAT )
+            pk.height = NTvalue( pk.height, pk.heightError, Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2 )
             del(pk['heightError'])
-            pk.volume = NTvalue( pk.volume, pk.volumeError, Peak.HEIGHT_VOLUME_FORMAT )
+            pk.volume = NTvalue( pk.volume, pk.volumeError, Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2 )
             del(pk['volumeError'])
 
             ### REMARK: This restoring of resonances is dangerous, because it is not guranteed that the order and hence last
@@ -741,8 +741,8 @@ class SMLPeakHandler( SMLhandler ):
                 #end for
             #end if
         else:
-            pk.height = NTvalue(pk.height[0],pk.height[1], Peak.HEIGHT_VOLUME_FORMAT)
-            pk.volume = NTvalue(pk.volume[0],pk.volume[1], Peak.HEIGHT_VOLUME_FORMAT)
+            pk.height = NTvalue(pk.height[0],pk.height[1], Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2)
+            pk.volume = NTvalue(pk.volume[0],pk.volume[1], Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2)
             pk.resonances = decode(pk.resonances, project)
         #end if
         return pk
