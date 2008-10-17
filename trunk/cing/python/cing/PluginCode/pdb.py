@@ -159,14 +159,14 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
     for record in pdb:
         recordName = record._name.strip()
         if  recordName == 'REMARK':
-            pass
+            continue # JFD: this used to be a pass but that's weird.
 
         if recordName == "MODEL":
             foundModel = True
             continue
         if recordName == "ENDMDL":
             mol.modelCount += 1
-            if nmodels and mol.modelCount >= nmodels:
+            if nmodels and (mol.modelCount >= nmodels):
                 break
             continue
 
@@ -174,6 +174,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
             # Skip records with a
             # see if we can find a definition for this residue, atom name in the database
             a = record.name
+            a = a.strip() # this improved reading 1y4o
             if convention == CYANA or convention == CYANA2:
                 # the residue names are in Cyana1.x convention (i.e. for GLU-)
                 # atm names of the Cyana1.x PDB files are in messed-up Cyana format
@@ -181,13 +182,22 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
                 a = moveFirstDigitToEnd(a)
             # strip is already done in function
             atm = NTdbGetAtom( record.resName, a, convention )
-            # JFD adds.
+            
+            
+            # JFD adds to just hack these debilitating simple variations.
             if not atm: # some besides cyana have this too; just too easy to hack here
 #                print "Atom ["+a+"] was mismatched at first"
                 a = moveFirstDigitToEnd(a)
                 atm = NTdbGetAtom( record.resName, a, convention )
+            if not atm: 
+                if a == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
+                    a = 'HN'
+                elif a == 'HN': # for future examples.
+                    a = 'H'
+                atm = NTdbGetAtom( record.resName, a, convention )
             if not atm:                
                 if shownWarnings <= showMaxNumberOfWarnings:
+#                    NTdebug("atom: ["+a+"]")
                     NTwarning('in #PDB2Molecule: %s, model %d incompatible record (%s)' % (
                              convention, mol.modelCount+1, record))
                     if shownWarnings == showMaxNumberOfWarnings:
@@ -231,6 +241,8 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
             numModels     = mol.modelCount + 1 # current model counts already
             if numCoorinates < numModels:
                 atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
+            else:
+                NTwarning('Skipping duplicate coordinate within same record (%s)' % record)
         #end if
     #end for
     if shownWarnings:
