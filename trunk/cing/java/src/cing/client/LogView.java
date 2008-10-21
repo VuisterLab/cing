@@ -1,7 +1,5 @@
 package cing.client;
 
-import cing.client.content.text.RichTextToolbar;
-
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -21,15 +19,15 @@ public class LogView extends Composite {
 //	    RichTextArea area = new RichTextArea();
 //	    area.setText("Expect to see the iCing messages scroll by here. \\nVerbosity may be controlled from iCing->Preferences.");
 	    area.ensureDebugId("cwRichText-area");
-	    RichTextToolbar toolbar = new RichTextToolbar(area);
-	    toolbar.ensureDebugId("cwRichText-toolbar");
+//	    RichTextToolbar toolbar = new RichTextToolbar(area);
+//	    toolbar.ensureDebugId("cwRichText-toolbar");
 	    
 	 // Add the components to a panel
 	    Grid grid = new Grid(3, 1);
 		initWidget(grid);
 		grid.setSize("100%", "100%");
 	    grid.setStyleName("cw-RichText");
-	    grid.setWidget(1, 0, toolbar);
+//	    grid.setWidget(1, 0, toolbar);
 	    grid.setWidget(2, 0, area);
 	    area.setSize("100%", "25em");
 	    grid.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
