@@ -29,16 +29,21 @@ public class Login extends Composite {
 		final PasswordTextBox passwordTextbox = new PasswordTextBox();
 		final Button button = new Button(c.Login());
 
+		nameTextbox.setEnabled(false);
+		passwordTextbox.setEnabled(false);
+
 		button.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
 				History.newItem(iCing.WELCOME_STATE);
 			}
 		});
 
+		
 		loginPrompt.addStyleName("loginPrompt");
+		/**
 		nameTextbox.addStyleName("nameField");
 		passwordTextbox.addStyleName("passwordField");
-
+*/
 		grid.setWidget(0, 1, loginPrompt);
 		grid.setWidget(1, 0, namePrompt);
 		grid.setWidget(1, 1, nameTextbox);

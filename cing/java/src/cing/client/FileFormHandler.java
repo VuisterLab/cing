@@ -6,6 +6,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -19,6 +20,7 @@ import com.gwtsolutions.components.client.ui.Message;
 
 public class FileFormHandler implements FormHandler {
 
+	private Button nextButton = null;
 	private FileUpload fileUpload = null;
 	private Message statusMessage = null;
 	private Button submitButton = null;
@@ -28,6 +30,7 @@ public class FileFormHandler implements FormHandler {
 	private ListBox listBox_Type = null;
 	private ListBox listBox_Subtype = null;
 	private ListBox listBox_Other = null;
+	private Timer timer = null;
 
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
@@ -37,6 +40,7 @@ public class FileFormHandler implements FormHandler {
 			event.setCancelled(true);
 			return;
 		}
+		getTimer().cancel();		
 		getSubmitButton().setVisible(false);
 //		getCheckBoxUseFile().setVisible(true);
 		getFileUpload().setVisible(false);
@@ -46,10 +50,10 @@ public class FileFormHandler implements FormHandler {
 		
 		getLabelFileUploadDone().setText("Uploading " + fnNoPath );
 		getLabelFileUploadDone().setVisible(true);
-		getListBox_Program().setEnabled(false);
-		getListBox_Type().setEnabled(false);
-		getListBox_Subtype().setEnabled(false);
-		getListBox_Other().setEnabled(false);
+//		getListBox_Program().setEnabled(false);
+//		getListBox_Type().setEnabled(false);
+//		getListBox_Subtype().setEnabled(false);
+//		getListBox_Other().setEnabled(false);
 	}
 
 	// After the submit, get the JSON result and parse it.
@@ -118,14 +122,17 @@ public class FileFormHandler implements FormHandler {
 		// Swap between these two widgets.
 		getLabelFileUploadDone().setVisible(false);
 		getFileUpload().setVisible(true);
+		statusMessage.setText(msg);
+//		getFileUpload().clear....
 
 		/** Allow a retry at same row. */
-		getSubmitButton().setVisible(true);
+//		getTimer().scheduleRepeating(FileView.REFRESH_INTERVAL); Can't do another time.
+//		getSubmitButton().setVisible(true);
 //		getCheckBoxUseFile().setVisible(true);
-		getListBox_Program().setEnabled(true);
-		getListBox_Type().setEnabled(true);
-		getListBox_Subtype().setEnabled(true);
-		getListBox_Other().setEnabled(true);
+//		getListBox_Program().setEnabled(true);
+//		getListBox_Type().setEnabled(true);
+//		getListBox_Subtype().setEnabled(true);
+//		getListBox_Other().setEnabled(true);
 
 	}
 
@@ -140,6 +147,8 @@ public class FileFormHandler implements FormHandler {
 		String labelTxt = fnNoPath + " (" + type + ") " + msg;
 		statusMessage.setText(labelTxt + " uploaded.");
 		getLabelFileUploadDone().setText(labelTxt);
+		
+		nextButton.setEnabled(true);
 	}
 
 	private String getFileNameWithoutPath(String fn) {
@@ -167,7 +176,7 @@ public class FileFormHandler implements FormHandler {
 	// GWT 1.5.1 gives: response is: [<pre
 	// style="word-wrap: break-word; white-space: pre-wrap;">{message:
 	// 'File upload succeeded'}</pre>]
-	private String removePreTags(String response) {
+	public static String removePreTags(String response) {
 		if (response == null) {
 			return null;
 		}
@@ -249,5 +258,21 @@ public class FileFormHandler implements FormHandler {
 
 	public ListBox getListBox_Other() {
 		return listBox_Other;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setNextButton(Button nextButton) {
+		this.nextButton = nextButton;
+	}
+
+	public Button getNextButton() {
+		return nextButton;
 	}
 }

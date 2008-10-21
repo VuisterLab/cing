@@ -9,11 +9,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class LogView extends Composite {
 	
-    final static RichTextAreaIcing area = iCing.area;
+    final static RichTextArea area = iCing.area;
 	iCingConstants c = iCing.c;
 	public LogView() {
 	    // Create the text area and toolbar
@@ -50,7 +51,7 @@ public class LogView extends Composite {
 	    		String html = area.getHTML();
 	    		html = Utils.reverse( html);
 	    		area.setHTML(html);
-	    		area.textIsReversed = tailCheckBox.isChecked();
+	    		iCing.textIsReversedArea = tailCheckBox.isChecked();
 	    	}
 		});
 

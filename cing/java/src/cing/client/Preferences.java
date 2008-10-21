@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -15,7 +16,7 @@ public class Preferences extends Composite {
 
 	DecoratorPanel decPanel = new DecoratorPanel();
 	iCingConstants c = iCing.c;	
-    final static RichTextAreaIcing statusArea = iCing.statusArea;
+    final static RichTextArea statusArea = iCing.statusArea;
 
 	public Preferences() {
 
