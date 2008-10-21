@@ -193,7 +193,7 @@ def check_cython():
 #    print 'Cython module   ',
     result = 0
     try:
-        import Cython.Distutils #@UnusedImport
+        import Cython.Distutils #@UnusedImport @UnresolvedImport
 #        print 'ok.'
         result = 1
 #        print "Great you have Cython! Please try to compile CING's Cython libs running:"

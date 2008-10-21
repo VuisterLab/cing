@@ -25,7 +25,7 @@ from cing.core.classes import RDCRestraint
 from cing.core.dictionaries import NTdbGetResidue
 from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
-from cing.main import format
+#from cing.main import format
 import os
 
 """
@@ -434,19 +434,24 @@ def importFromCcpnMolecules( cingProject = None, ccpnProject = None,
 
     listMolSystems = _checkCcpnMolecules( ccpnProject, moleculeName, funcName )
 
-    for ccpnMolecule in listMolSystems:
+    for ccpnMolSys in listMolSystems:
 
         # add molecule from Ccpn to Cing
-        moleculeName = cingProject.uniqueKey(_checkName(ccpnMolecule.code))
+        moleculeName = cingProject.uniqueKey(_checkName(ccpnMolSys.code))
 
         molecule = Molecule(name = moleculeName)
 
-        molecule.ccpn = ccpnMolecule # ccpn molSystem
-        ccpnMolecule.cing = molecule
+        molecule.ccpn = ccpnMolSys # ccpn molSystem
+        ccpnMolSys.cing = molecule
 
         moleculeList.append(molecule)
 
         cingProject.appendMolecule( molecule )
+
+        if not len(ccpnMolSys.structureEnsembles):
+            NTmessage("There's no coordinates for %s", molecule.name)
+            coords = False
+        # end if
 
         # stuff molecule with chains, residues and atoms
         # and coords if specified
@@ -482,20 +487,36 @@ def _getCcpnChainsResiduesAtomsCoords( molecule, coords=True ):
        Output: Cing.Molecule or None or error.
     '''
 
-    ccpnMolecule = molecule.ccpn
+    ccpnMolSys = molecule.ccpn
 
     if coords:
         # we are taking just the current Ensemble now
-        ccpnStructureEnsemble = ccpnMolecule.parent.currentStructureEnsemble
+        ccpnStructureEnsemble = ccpnMolSys.parent.currentStructureEnsemble
+        if ccpnStructureEnsemble.molSystem is not ccpnMolSys:
+            ccpnStructureEnsemble = ccpnMolSys.findFirstStructureEnsemble(
+                                    molSystem = ccpnMolSys)
+        # end if
+
+        try:
+            ensembleName = ccpnStructureEnsemble.structureGeneration.name
+        except AttributeError:
+            ensembleName = 'no_name'
+        # end try
+
+        NTmessage("Using CCPN Structure Ensemble '%s'", ensembleName)
+
         molecule.modelCount += len(ccpnStructureEnsemble.models)
 
         ccpnMolCoords = [ccpnStructureEnsemble]
     # end if
 
     # Set all the chains for this molSystem
-    for ccpnChain in ccpnMolecule.sortedChains():
+    for ccpnChain in ccpnMolSys.sortedChains():
         ccpnChainLetter = ensureValidChainId(ccpnChain.pdbOneLetterCode)
         chain = molecule.addChain(ccpnChainLetter)
+        #NOTE: if for some reason two or more ccpnChains have the same
+        #pdbOneLetterCode, only the first will be imported. Maybe addChain
+        #should deal with that.
 
         # Make mutual linkages between Ccpn and Cing instances
         chain.ccpn = ccpnChain
@@ -684,12 +705,12 @@ def importFromCcpnCoordinates( cingProject = None, ccpnProject = None,
 
     listMolSystems = _checkCcpnMolecules( ccpnProject, moleculeName, funcName )
 
-    for ccpnMolecule in listMolSystems:
+    for ccpnMolSys in listMolSystems:
 
-        moleculeName = _checkName(ccpnMolecule.code)
+        moleculeName = _checkName(ccpnMolSys.code)
 
         try:
-            molecule = ccpnMolecule.cing
+            molecule = ccpnMolSys.cing
         except KeyError:
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
@@ -719,16 +740,16 @@ def _getCcpnCoordinates( molecule ):
        Output: Cing.Project or None or error.
     '''
 
-    ccpnMolecule = molecule.ccpn
+    ccpnMolSys = molecule.ccpn
 
     # we are taking just the current Ensemble now
-    ccpnStructureEnsemble = ccpnMolecule.parent.currentStructureEnsemble
+    ccpnStructureEnsemble = ccpnMolSys.parent.currentStructureEnsemble
     molecule.modelCount += len(ccpnStructureEnsemble.models)
 
     ccpnMolCoords = [ccpnStructureEnsemble]
 
 #   Set all the chains for this molSystem
-    for ccpnChain in ccpnMolecule.sortedChains():
+    for ccpnChain in ccpnMolSys.sortedChains():
 
         chain = ccpnChain.cing
 
@@ -812,12 +833,12 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
     # Get shift lists (linking resonances to atoms) from Ccpn for a Cing.Molecule
     # need to do it before importing Peaks
-    for ccpnMolecule in listMolSystems:
+    for ccpnMolSys in listMolSystems:
 
-        moleculeName = _checkName(ccpnMolecule.code)
+        moleculeName = _checkName(ccpnMolSys.code)
 
         try:
-            molecule = ccpnMolecule.cing
+            molecule = ccpnMolSys.cing
         except KeyError:
             NTerror( "'%s': molecule '%s' not found in Cing.Project",
                      funcName, moleculeName )
@@ -833,7 +854,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
             for ccpnShiftList in ccpnShiftLists:
 
                 shiftMapping = _getShiftAtomNameMapping( ccpnShiftList,
-                                                         ccpnMolecule )
+                                                         ccpnMolSys )
                 doneSetShifts = _setShifts( molecule, shiftMapping,
                                             ccpnShiftList )
             # end for
@@ -860,79 +881,81 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 # end def importFromCcpnPeaksAndShifts
 
 def _getShiftAtomNameMapping( ccpnShiftList, molSystem ):
-    '''Descrn: Core function that maps resonances (shifts) to residues and
-               actual atom names (not sets). All objects are Ccpn, not Cing.
-               (molSystem is equivalent to ccpnMolecule.)
+    '''Descrn: Core function that maps Ccpn resonances (shifts) to Ccpn residues
+               and actual atoms.
        Inputs: ccp.nmr.Nmr.ShiftList, ccp.molecule.MolSystem.MolSystem.
        Output: A tupled dict mapping shifts (resonances) to residues/atoms.
     '''
 
-    resonances = []
-    resonanceToShift = {}
+    ccpnResonances = []
+    ccpnResonanceToShift = {}
 
-    for shift in ccpnShiftList.measurements:
-        resonance = shift.resonance
-        resonances.append(resonance)
-        resonanceToShift[resonance] = shift
+    for ccpnShift in ccpnShiftList.measurements:
+        ccpnResonance = ccpnShift.resonance
+        ccpnResonances.append(ccpnResonance)
+        ccpnResonanceToShift[ccpnResonance] = ccpnShift
     # end for
 
-    shiftMapping = {}
+    ccpnShiftMapping = {}
 
     # First make quick link for resonance -> atom
 
-    for resonance in resonances:
+    for ccpnResonance in ccpnResonances:
 
         # Only a link from the resonance to an atom if there is a resonanceSet
 
-        if ( resonance.resonanceSet ):
+        if ccpnResonance.resonanceSet:
 
-            atomSets = list(resonance.resonanceSet.atomSets)
-            residue = atomSets[0].findFirstAtom().residue
-            chemCompVar = residue.chemCompVar
-            namingSystemObject = chemCompVar.chemComp.findFirstNamingSystem(name=namingSystem)
+            ccpnAtomSets = list(ccpnResonance.resonanceSet.atomSets)
+            ccpnResidue = ccpnAtomSets[0].findFirstAtom().residue
+#            chemCompVar = ccpnResidue.chemCompVar
+#            namingSystemObject = chemCompVar.chemComp.findFirstNamingSystem(name=namingSystem)
+
             # to skip residues outside molSystem whose atoms has resonances
-            if residue.chain.molSystem != molSystem:
+            if ccpnResidue.chain.molSystem != molSystem:
                 continue
             # end if
 
             # Go over the atomSets and atoms, get right naming system for them
 
-            atomNameList = []
+            atomList = []
 
-            for atomSet in atomSets:
+            for ccpnAtomSet in ccpnAtomSets:
 
-                refAtom = atomSet.findFirstAtom()
-                curResidue = refAtom.residue
+                ccpnRefAtom = ccpnAtomSet.findFirstAtom()
+                currentCcpnResidue = ccpnRefAtom.residue
 
                 # Check if all is OK (no mapping to different residues)
-
-                if curResidue != residue:
-                    NTerror(" two residues to same resonance!")
+                if currentCcpnResidue != ccpnResidue:
+                    NTerror("two residues to same resonance! (%s and %s)",
+                            currentCcpnResidue.cing, ccpnResidue.cing)
                     break
                 # end if
 
-                for atom in atomSet.atoms:
-                    # Now create list, with namingSystem
-                    # (could be set to other one)
-                    # TODO: use cing object link made earlier.
-                    chemAtom = atom.chemAtom
-                    chemAtomSysName = namingSystemObject.findFirstAtomSysName(atomName = chemAtom, atomSubType=chemAtom.subType)
+                for ccpnAtom in ccpnAtomSet.atoms:
+#                    # Now create list, with namingSystem
+#                    # (could be set to other one)
+#                    # TODO: use cing object link made earlier.
+#                    chemAtom = ccpnAtom.chemAtom
+#                    chemAtomSysName = namingSystemObject.findFirstAtomSysName(atomName = chemAtom, atomSubType=chemAtom.subType)
+#
+#                    if chemAtomSysName:
+#                        atomName = chemAtomSysName.sysName
+#                    else:
+#                        atomName = atom.name
+#                    # end if
 
-                    if chemAtomSysName:
-                        atomName = chemAtomSysName.sysName
-                    else:
-                        atomName = atom.name
-                    # end if
 
-                    atomNameList.append(atomName)
+                    #atomNameList.append(atomName)
+                    atomList.append(ccpnAtom)
                 # end for
             # end for
 
-            shiftMapping[resonanceToShift[resonance]] = [ residue, tuple(atomNameList) ]
+            ccpnShiftMapping[ccpnResonanceToShift[ccpnResonance]] = [ccpnResidue, tuple(atomList) ]
         # end if
     # end for
 
-    return (shiftMapping)
+    return (ccpnShiftMapping)
 # end def _getShiftAtomNameMapping
 
 def _setShifts( molecule, shiftMapping, ccpnShiftList ):
@@ -948,38 +971,27 @@ def _setShifts( molecule, shiftMapping, ccpnShiftList ):
     for ccpnShift in ccpnShifts:
         shiftValue = ccpnShift.value
         shiftError = ccpnShift.error
-        ccpnResidue, atomNames = shiftMapping[ccpnShift]
-        seqCode = ccpnResidue.seqCode
-        chainCode = ccpnResidue.chain.pdbOneLetterCode
+        ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
 
-        # This should always be OK
-        residue = molecule[chainCode][seqCode]
-#        atoms = residue.atoms
+        for ccpnAtom in ccpnAtoms:
+            try:
+                atom = ccpnAtom.cing
+                atom.resonances().value = shiftValue
+                atom.resonances().error = shiftError
+                index = len(atom.resonances) - 1
+                # TODO: set setStereoAssigned
 
-        for atomName in atomNames:
-            # Bit of debugging, atomName (from DIANA namingSystem) may not be
-            # correctly named according to INTERNAL naming system
-            if not residue.has_key(atomName):
-                print "_setShifts:: ", residue.keys()
-                print "_setShifts:: ", ccpnResidue.ccpCode, seqCode, atomName
-            else:
-                try:
-                    atom = residue[atomName]
-                    atom.resonances().value = shiftValue
-                    atom.resonances().error = shiftError
-                    index = len(atom.resonances) - 1
-                    # TODO: set setStereoAssigned
-
-                    # Make mutual linkages between Ccpn and Cing objects
-                    # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
-                    atom.resonances[index].ccpn = ccpnShift
-                    ccpnShift.cing = atom.resonances[index]
-                except:
-                    print "_setShifts (try):: ", format(residue)
-                # end try
-            # end if
+                # Make mutual linkages between Ccpn and Cing objects
+                # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
+                atom.resonances[index].ccpn = ccpnShift
+                ccpnShift.cing = atom.resonances[index]
+            except:
+                NTwarning("_setShifts (try):: %s, %s", ccpnResidue.cing,
+                          ccpnAtom.name)
+            # end try
         # end for
     # end for
+
     NTmessage( "ShiftList '%s' imported from Ccpn Nmr project '%s'",
                    ccpnShiftList.name, ccpnShiftList.parent.name )
     return True
@@ -1019,8 +1031,8 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                     ccpnPeakDims = ccpnPeak.sortedPeakDims()
                     ccpnPositions = [pd.value for pd in ccpnPeakDims] #ppm
 
-                    ccpnVolume = ccpnPeak.findFirstPeakIntensity( intensityType=
-                                                                  'volume' )
+                    ccpnVolume = ccpnPeak.findFirstPeakIntensity(intensityType =
+                                                                  'volume')
                     if ( ccpnVolume ):
                         vValue = ccpnVolume.value or 0.00
                         vError = ccpnVolume.error or 0.00
@@ -1033,8 +1045,8 @@ def _setPeaks( cingProject, ccpnNmrProject ):
                         vValue = NaN
                     # end if
 
-                    ccpnHeight = ccpnPeak.findFirstPeakIntensity( intensityType=
-                                                                  'height' )
+                    ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType =
+                                                                  'height')
                     if ( ccpnHeight ):
                         hValue = ccpnVolume.value or 0.00
                         hError = ccpnVolume.error or 0.00
@@ -1632,7 +1644,7 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
 
         # add molecule from Cing to Ccpn
         # Cing.Molecule <=> molSystem
-        # Cing.Chain <=> ccpnMolecule
+        # Cing.Chain <=> ccpnMolSys
         moleculeName = molecule.name
 
         molSystem = ccpnProject.newMolSystem(code = moleculeName, name = moleculeName)
@@ -1645,12 +1657,13 @@ def createCcpnMolecules( cingProject = None, ccpnProject = None,
 
             moleculeChainName = moleculeName+'_'+chain.name
 
-            #ccpnMolecule = ccpnProject.newMolecule(name = moleculeChainName)
+            #ccpnMolSys = ccpnProject.newMolecule(name = moleculeChainName)
             sequence = [ res.name for res in chain ]
-            ccpnMolecule = makeMolecule(ccpnProject,'protein', molName = moleculeChainName, sequence=sequence )
+            ccpnMolSys = makeMolecule(ccpnProject,'protein',
+                                molName = moleculeChainName, sequence=sequence )
 
             ccpnChain = molSystem.newChain(code = chain.name,
-                                         molecule = ccpnMolecule)
+                                         molecule = ccpnMolSys)
             ccpnChain.cing = chain
             chain.ccpn = ccpnChain
 
