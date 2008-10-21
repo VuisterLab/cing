@@ -82,7 +82,7 @@ def runCingChecks( project, ranges=None ):
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
     project.validateRestraints( toFile=True)
-    if project.molecule: 
+    if project.molecule:
         project.molecule.calculateRMSDs( ranges=ranges)
     project.criticize(toFile=True)
     project.summary(toFile=True)
@@ -92,7 +92,7 @@ def runCingChecks( project, ranges=None ):
 """Stolen from doValidate.py in Script directory. Need this here so the
 code can be tested. I.e. returns a meaningful status if needed.
 """
-def validate( project, ranges=None, parseOnly=False, htmlOnly=False,  
+def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True ):
     project.runShiftx()
     project.runDssp(parseOnly=parseOnly)
@@ -102,10 +102,10 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         project.runWhatif(parseOnly=parseOnly)
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
-    project.generateHtml(htmlOnly = htmlOnly)    
+    project.generateHtml(htmlOnly = htmlOnly)
     project.renderHtml()
     NTmessage("Done with overall validation")
-    
+
 
 def criticizePeaks( project, toFile=True ):
     """
@@ -130,7 +130,7 @@ def criticizePeaks( project, toFile=True ):
                 if resonance and resonance.atom != None and resonance.value != NOSHIFT:
                     resonance.atom.peakPositions.append(peak.positions[i])
                     if not resonance.atom.isAssigned():
-                         peak.rogScore.setMaxColor( COLOR_ORANGE,
+                        peak.rogScore.setMaxColor( COLOR_ORANGE,
                                                     sprintf('ORANGE: dimension %d: Atom %s not assigned', i, resonance.atom)
                                                   )
                     else:
