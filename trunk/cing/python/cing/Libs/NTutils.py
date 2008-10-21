@@ -3140,8 +3140,8 @@ def removedir(path):
         try:
             os.rmdir(path)
         except:
-            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Trying again.")
-            continue
+            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Try again later.")
+#            continue # disabled because was leading to a infinite loop
         break
     #end while
 #end def
@@ -4018,4 +4018,34 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
             else:
                 _removeRecursivelyAttribute(x[k], attributeToRemove)
             
+
+def bytesToFormattedString(size):
+    """1600 bytes will be rounded to 2K"""        
+    k = 1024
+    M = k*k
+    G = k*M
+    T = M*M
+    ck = 'K'
+    cM = 'M'
+    cG = 'G' 
+    cT = 'T'
+    postFix = ck
+    
+    divider = k
+    if  size < M:
+        divider = k
+        postFix = ck
+    elif size < G:
+        divider = M
+        postFix = cM  
+    elif size < T:
+        divider = G
+        postFix = cG
+    else:
+        divider = T
+        postFix = cT
+    
+    r = size/float(divider)
+    result = ("%.0f" % r) + postFix
+    return result
 
