@@ -31,9 +31,32 @@ Info:
     In the System Preference of the Mac
         Sharing
             Turn on "Web Sharing" and check server in browser.
-            
-        ProxyPass         /iCing/servlets http://localhost:8080/iCing/servlets
-        ProxyPassReverse  /iCing/servlets http://localhost:8080/iCing/servlets
 
-        The tomcat server in eclipse works together with the apache configured here.
+
+Add settings to /private/etc/apache2/httpd.conf  like:
+SetEnv  xplorPath /usr/local/bin/xplor
+SetEnv  procheckPath /Users/jd/progs/procheck/procheck_nmr.scr
+SetEnv  aqpcPath /Users/jd/progs/aquad/scripts/aqpc
+SetEnv  whatifPath /home/vriend/whatif/DO_WHATIF.COM
+SetEnv  dsspPath /home/vriend/whatif/dssp/DSSP.EXE
+SetEnv  convertPath /sw/bin/convert
+SetEnv  ghostscriptPath /sw/bin/gs
+SetEnv  ps2pdfPath /sw/bin/ps2pdf14
+SetEnv  molmolPath /Users/jd/progs/molmolM/molmol
+SetEnv  povrayPath /sw/bin/povray
+# To home a .matplotlibrc directory with settings will be added.
+SetEnv  HOME /Library/WebServer/Documents/cgi-cing-home
+SetEnv  CINGROOT /Users/jd/workspace34/cing
+
+# For the gwt embedded tomcat server
+ProxyPass         /cgi-bin/iCing http://localhost:8888/
+ProxyPassReverse  /cgi-bin/iCing http://localhost:8888/
+# For the python stand-alone servers.
+ProxyPass         /iCing/cgi-bin http://localhost:8001/cgi-bin
+ProxyPassReverse  /iCing/cgi-bin http://localhost:8001/cgi-bin
+
+ProxyPass         /iCingServer.py http://localhost:8000/iCingServer.py
+ProxyPassReverse  /iCingServer.py http://localhost:8000/iCingServer.py
+
+The tomcat server in eclipse works together with the apache configured here.
             
