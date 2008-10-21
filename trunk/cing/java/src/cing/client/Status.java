@@ -1,9 +1,10 @@
 package cing.client;
 
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.RichTextArea;
 
 public class Status extends Composite {
-    final static RichTextAreaIcing statusArea = iCing.statusArea;
+    final static RichTextArea statusArea = iCing.statusArea;
 
 	public Status() {
 		initWidget(statusArea);

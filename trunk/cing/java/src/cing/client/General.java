@@ -16,6 +16,7 @@ import java.util.Date;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.RichTextArea;
 
 /**
  * Static settings and methods for output stream handling, memory reporting,
@@ -30,8 +31,8 @@ public class General {
 	/**
 	 * The stream to print to. Default is System.out of course.
 	 */
-	private static RichTextAreaIcing area = iCing.area;
-	private static RichTextAreaIcing statusArea = iCing.statusArea;
+	private static RichTextArea area = iCing.area;
+	private static RichTextArea statusArea = iCing.statusArea;
 
 	/**
 	 * The stream to print to. Default is System.out of course.
@@ -380,7 +381,7 @@ public class General {
 	public static boolean appendHtml(String message) {
 		statusArea.setHTML(message+statusArea.getHTML());
 		statusArea.setVisible(verbosity >= verbosityDetail);
-		if (area.textIsReversed) {
+		if (iCing.textIsReversedArea) {
 			area.setHTML(message + area.getHTML());
 		} else {
 			area.setHTML(area.getHTML() + message);

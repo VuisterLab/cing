@@ -15,11 +15,11 @@
 		<meta name='gwt:module' content='cing.iCing'/>
 
 		<!--                                           -->
-		<!-- Link CSS file                             -->
-		<!--                                           -->
+		<!-- Link CSS file done from xml file.                            -->
+		<!--    	<link type="text/css" rel='stylesheet' href='css/gwt/standard/standard.css'/>                                       
 		<link type="text/css" rel='stylesheet' href='css/iCing.css'/>		
- 		<link type="text/css" rel='stylesheet' href='css/gwt/standard/standard.css'/>
  		<link type="text/css" rel='stylesheet' href='css/sc/standard/Showcase.css'/>
+ 		-->
 	</head>
 
 	<!--                                           -->
@@ -42,10 +42,26 @@
 		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 		</script>
+		
 		<script type="text/javascript">
 		var pageTracker = _gat._getTracker("UA-4413187-1");
 		pageTracker._trackPageview();
 		</script>
 		
-	</body>
+		<div id=loading> <!--Will be invisible after loaded. -->
+		<p align="center">
+		Loading iCing
+		<img src="images/loading.gif"
+		</p>
+		</div>
+		
+<script language=javascript type='text/javascript'> 
+function hidediv() { 
+document.getElementById('loading').style.display = 'none'; 
+} 
+</script>
+<!-- 		
+<a href="javascript:hidediv()">Hide div</a>
+ -->
+        </body>
 </html>
