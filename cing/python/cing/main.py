@@ -32,6 +32,9 @@ cing --name test --script MYSCRIPT.py
 - To test CING without any messages (not even errors):
 cing --test --verbose 0
 
+- To test CING without any messages (not even errors):
+cing --server [--port 8000]
+
 --------------------------------------------------------------------------------
 Some simple script examples:
 --------------------------------------------------------------------------------
@@ -53,8 +56,11 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+from BaseHTTPServer import HTTPServer
+from CGIHTTPServer import CGIHTTPRequestHandler
 from cing import cingPythonCingDir
 from cing import cingPythonDir
+from cing import cingVersion
 from cing import header
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
@@ -66,14 +72,14 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from cing.iCing import PORT_CGI
+from cing.iCing import PORT_SERVER
+from cing.iCing.iCingServer import iCingServerHandler
 from string import join
-from cing import cingVersion
 import cing
 import os
 import sys
 import unittest
-
-
 
 #------------------------------------------------------------------------------------
 # Support routines
@@ -173,6 +179,25 @@ def testOverall():
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
+
+def serve():
+    # Now the cgi python code is actually a part of the package.
+    # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
+    localDir = os.path.join( cingPythonCingDir, "iCing" )
+    os.chdir(localDir)
+    NTmessage("Starting a server at port %s" % PORT_SERVER )
+    httpd = HTTPServer(('', PORT_SERVER), CGIHTTPRequestHandler)
+    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
+    httpd_cgi = HTTPServer(('', PORT_CGI), iCingServerHandler)
+    try:
+        httpd.serve_forever()
+        httpd_cgi.serve_forever()
+    except KeyboardInterrupt:
+        print '^C received'        
+    finally:
+        print 'shutting down server'        
+        httpd.socket.close()
+        httpd_cgi.socket.close()
 
 
 project = None # after running main it will be filled.
@@ -308,6 +333,11 @@ def main():
                       dest="verbosity", action='store',
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
+    parser.add_option( "--server",
+                      action="store_true",
+                      dest="server",
+                      help="Start a server at port 8000 by default"
+                     )
 
     (options, _args) = parser.parse_args()
     if options.verbosity >= 0 and options.verbosity <= 9:
@@ -325,6 +355,10 @@ def main():
 
     if options.test:
         testOverall()
+        sys.exit(0)
+
+    if options.server:
+        serve()
         sys.exit(0)
 
     #------------------------------------------------------------------------------------

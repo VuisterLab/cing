@@ -1,5 +1,5 @@
 from cing.core.constants import AQUA
-from cing.core.constants import BMRB
+from cing.core.constants import IUPAC
 from cing.core.database import NTdb
 
 """Copy BMRB to Aqua with mods.
@@ -24,13 +24,13 @@ mapCing2Aqua = {
 
 
 for res in NTdb:
-    res.nameDict[AQUA] = res.nameDict[BMRB]
+    res.nameDict[AQUA] = res.nameDict[IUPAC]
       
     if res.name in nuclList:
         res.nameDict[AQUA] = mapCing2Aqua[res.name]
         
     for atm in res:
-        atm.nameDict[AQUA] = atm.nameDict[BMRB]
+        atm.nameDict[AQUA] = atm.nameDict[IUPAC]
 
 stream = open('dbTable-new', 'w')
 NTdb.exportDef(stream=stream)
