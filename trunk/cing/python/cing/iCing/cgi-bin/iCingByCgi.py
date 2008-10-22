@@ -1,50 +1,29 @@
 #!/sw/bin/python -u
-# TODO: make python executable configurable. JFD's mac defaults to wrong one if using env trick.
 """
+The reason that this code isn't integrated with the regular iCing server is that the large file uploads require
+cgi parameters to be parsed with FieldStorage() and can thus not be done with subclassing BaseHTTPRequestHandler.
+
 Inspired by: 
 http://www.python.org/doc/2.5/lib/module-cgi.html
 http://fragments.turtlemeat.com/pythonwebserver.php
 http://code.google.com/support/bin/answer.py?answer=65632&topic=11368
 """
-from cing.Libs.NTutils import NTerror
+from cgi import FieldStorage
 from cing.Libs.NTutils import bytesToFormattedString
-from posixpath import curdir
-from posixpath import sep
-import cgi
 import cgitb
 import os
 import sys
 import time
-
-FORM_ACCESS_KEY = "AccessKey"
-FORM_USER_ID = "UserId"
-FORM_UPLOAD_FILE_BASE = "UploadFile"
-FORM_ACTION = "Action"
-FORM_ACTION_RUN = "Run"
-FORM_ACTION_SAVE = "Save"
-FORM_DO_WHATIF = "doWhatif"
-FORM_DO_PROCHECK = "doProcheck"
-FORM_DO_IMAGES = "doImages"
-
-FORM_LIST_REQUIRED = [ FORM_ACCESS_KEY, FORM_USER_ID, FORM_ACTION ]
-JSON_ERROR_STATUS = "error"
-
-MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1 # 50 Mb when time out issue is resolved. TODO: update. 
-BUFFER_WRITE = 100*1000
-
-server_cgi_url_tmp = "localhost/tmp/cing"
-cing_server_tmp = "/Library/WebServer/Documents/tmp/cing"
-
 
 class iCingByCgi():
     def serve(self):
         print "Content-Type: text/plain"
         print        
 #        cgitb.enable(display=0, logdir="/tmp") 
-        self.form = cgi.FieldStorage()            
+        self.form = FieldStorage()            
 #        msg = "form: %r" % self.form
 #        self.logToLog(msg)
-        for expectedKey in FORM_LIST_REQUIRED:
+        for expectedKey in FORM_LIST_REQUIRED: 
             if not self.form.has_key(expectedKey):
                 msg = "Missing form field: [" + expectedKey + ']'
                 self.endError(msg)
@@ -184,5 +163,5 @@ class iCingByCgi():
 #        sys.stderr.write(msg+'\n')
 
 if __name__ == '__main__':
-    f = iCingServer()
+    f = iCingByCgi()
     f.serve()

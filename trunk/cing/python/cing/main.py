@@ -72,10 +72,10 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.iCing import PORT_CGI
-from cing.iCing import PORT_SERVER
 from cing.iCing.iCingServer import iCingServerHandler
 from string import join
+from cing.iCing.iCingServer import PORT_SERVER
+from cing.iCing.iCingServer import PORT_CGI
 import cing
 import os
 import sys
@@ -186,18 +186,24 @@ def serve():
     localDir = os.path.join( cingPythonCingDir, "iCing" )
     os.chdir(localDir)
     NTmessage("Starting a server at port %s" % PORT_SERVER )
-    httpd = HTTPServer(('', PORT_SERVER), CGIHTTPRequestHandler)
-    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
-    httpd_cgi = HTTPServer(('', PORT_CGI), iCingServerHandler)
+    httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
+#    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
+#    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
     try:
         httpd.serve_forever()
-        httpd_cgi.serve_forever()
+#        httpd_cgi.serve_forever()
     except KeyboardInterrupt:
         print '^C received'        
     finally:
-        print 'shutting down server'        
-        httpd.socket.close()
-        httpd_cgi.socket.close()
+        print 'shutting down server'
+        try:        
+            httpd.socket.close()
+        except:
+            pass
+        try:
+            httpd_cgi.socket.close() #@UndefinedVariable
+        except:
+            pass
 
 
 project = None # after running main it will be filled.
