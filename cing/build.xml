@@ -3,7 +3,7 @@
 <!-- TODO: remove the unneeded settings. -->
 
 
-<project name="cing" default="iCing-cgi-install" basedir=".">
+<project name="cing" default="iCing-static-install" basedir=".">
 	<description>Builds, tests, and runs the project cing.</description>
 	<echo>Starting Ant with updated build file</echo>
 	<property file="cing.properties" />
@@ -65,7 +65,7 @@
 		<chmod perm="a+x" file="${server.cgi.dir}/${server.cgi.python.prog}" />
 	</target>
 
-	<target name="iCing-install" depends="init,iCing-static-install,iCing-cgi-install">
+	<target name="iCing-install" depends="init,iCing-static-install">
 	</target>
 
 	<target name="iCing-static-install" depends="init">
@@ -77,12 +77,12 @@
 		</scp>
 	</target>
 
-	<target name="iCing-cgi-install" depends="init">
+
+	<!--	<target name="iCing-cgi-install" depends="init">
 
 		<echo message="Installing cgi program at: ${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}" />
 		<echo message="server.cgi.url.tmp: ${server.cgi.url.tmp}" />
-
-		<!-- 
+ 
 		<copy todir="${tmp.local.dir}" overwrite="true" verbose="true">
 			<fileset dir="${server.cgi.dir.local}" includes="*.py" />
 		</copy>
@@ -91,12 +91,12 @@
 		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="CING_SERVER_TMP" replace='${server.cgi.dir.tmp}' byline="true" />
 		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="SERVER_CGI_URL_TMP" replace='${server.cgi.url.tmp}' byline="true" />
 		<replaceregexp file="${tmp.local.dir}/${server.cgi.python.prog}" match="WEB_URL" replace='${server.url}' byline="true" />
--->
 		<scp todir="${server.cgi.user}@${server.cgi.machine.looped}:${server.cgi.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${server.cgi.port}">
 			<fileset dir="${server.cgi.dir.local}" includes="*.py" />
 		</scp>
 
 	</target>
+-->
 
 	<!-- 
 	<target name="iCing-servlet-install" depends="init">
