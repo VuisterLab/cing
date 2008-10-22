@@ -7,6 +7,7 @@ from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
 from unittest import TestCase
+from cing.Libs.NTutils import quoteForJson
 import cing
 import os 
 import unittest
@@ -49,6 +50,14 @@ class AllChecks(TestCase):
             r = bytesToFormattedString(byteList[i])
     #        self.assertEqual( r, expectedResults[i] )
             self.assertEquals(r,expectedResults[i])
+    def testQuoteForJson(self):
+        inList = [ "a", "a b", "a'b" ]
+        expectedResults= [ 'a', "'a b'" , 'a"b'  ]
+        i = 0
+        for inputStr in inList:
+            r = quoteForJson(inputStr)
+            self.assertEquals(r,expectedResults[i])
+            i += 1
 
         
 if __name__ == "__main__":

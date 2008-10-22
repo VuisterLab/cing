@@ -4049,3 +4049,16 @@ def bytesToFormattedString(size):
     result = ("%.0f" % r) + postFix
     return result
 
+def quoteForJson(msg):
+    """Use single quotes on the outside if needed.
+    Replace any internal single quotes with double quotes
+    Strip any surrounding double quotes
+    """ 
+    msg = msg.replace("'", '"')
+    if msg.find(" ") >= 0:
+        if msg[0] == '"': 
+            msg = msg[1:-1]
+        if msg[0] != "'":
+            msg = "'" + msg + "'"
+    return msg
+

@@ -25,7 +25,7 @@ ___date__     = "$Date$"
 Returns 0 for success.
 """
 def do_cmd( cmd ):
-    NTdebug( "Doing command: %s", cmd )
+    NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
     pipe = os.popen( cmd )
@@ -298,7 +298,7 @@ class Process:
         if pid:
             ## Parent here
             if self.verbosity > 3:
-                NTmessage("Forked an independent process with pid: ", pid)
+                NTmessage("Forked an independent process with pid: %s" % pid)
             return pid
 
         if pid == None:
@@ -314,7 +314,7 @@ class Process:
             str = "ERROR: code error in Fork, process_start, pid =" + `os.getpid()`
             raise str
         if self.verbosity > 2:
-            NTdebug("Starting subprocess with pid:", os.getpid())
+            NTdebug("Starting subprocess with pid: %s" % os.getpid())
         if self.verbosity > 8:
             NTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
 
@@ -399,7 +399,7 @@ class Process:
         ## Took 2 days to figure out...
         self.process_signal( -pid, signal.SIGTERM )
         if self.verbosity > 2:
-            NTmessage("Sleeping ", self.max_time_to_wait_kill)
+            NTmessage("Sleeping %s" % self.max_time_to_wait_kill)
         time.sleep(self.max_time_to_wait_kill)
         exit_pid, exit_status = self.process_wait( pid, os.WNOHANG )
         if exit_pid:
@@ -410,7 +410,7 @@ class Process:
                 NTmessage("Process was not killed, now it will be signaled a KILL signal")
             self.process_signal( -pid, signal.SIGKILL )
             if self.verbosity > 2:
-                NTdebug("Sleeping ", self.max_time_to_wait_kill)
+                NTdebug("Sleeping %s" % self.max_time_to_wait_kill)
             time.sleep(self.max_time_to_wait_kill)
             exit_pid, exit_status = self.process_wait( pid, os.WNOHANG )
             if exit_pid > 1:
@@ -419,7 +419,7 @@ class Process:
                 NTerror("  Process could NOT be killed by HUP or KILL signal")
                 NTerror("  Process has turned into zombie")
         if self.verbosity >= 9:
-            NTmessage("Got exit_pid, exit_status:", exit_pid, exit_status)
+            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status))
         
         return exit_pid, exit_status
 

@@ -50,7 +50,7 @@ class AllChecks(TestCase):
         done_list   = f.forkoff_start( job_list, 0 )    
         NTmessage("Finished ids: %s", done_list)
         
-    def tttestRun2(self):
+    def testRun2(self):
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(

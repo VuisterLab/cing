@@ -130,7 +130,7 @@ def check_ccpn():
     missing = []
     gotRequiredCcpnModules = False
     try:
-        import ccpnmr #@UnusedImport
+        import ccpnmr #@UnusedImport @UnresolvedImport
         gotRequiredCcpnModules = True
 #        print 'ok.'
     except:

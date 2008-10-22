@@ -32,7 +32,7 @@ for index,name in resonances:
 NTmessage('')
 
 # Generate peaks for all residues
-for residue in project.molecule.allResidues(): 
+for residue in project.molecule.allResidues(): #@UndefinedVariable
     atoms = translateTopology( residue, resonances )
     NTmessage('%-8s  ', residue.name)
     for atm in atoms:
