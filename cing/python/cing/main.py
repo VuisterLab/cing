@@ -32,8 +32,8 @@ cing --name test --script MYSCRIPT.py
 - To test CING without any messages (not even errors):
 cing --test --verbose 0
 
-- To test CING without any messages (not even errors):
-cing --server [--port 8000]
+- To start the iCing server with plenty of debug
+cing --server -v 9
 
 --------------------------------------------------------------------------------
 Some simple script examples:
@@ -66,6 +66,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.Libs.forkoff import ForkOff
@@ -75,13 +76,12 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 from cing.iCing.iCingServer import PORT_CGI
 from cing.iCing.iCingServer import PORT_SERVER
-from string import join
 from cing.iCing.iCingServer import iCingServerHandler
+from string import join
 import cing
 import os
 import sys
 import unittest
-#from cing.iCing.iCingServer import iCingServerHandler
 
 
 
@@ -189,7 +189,8 @@ def serve():
     # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
     localDir = os.path.join( cingPythonCingDir, "iCing" )
     os.chdir(localDir)
-    NTmessage("Starting a server at port %s" % PORT_SERVER )
+    NTmessage("Starting servers at ports %s and %s" % (PORT_SERVER, PORT_CGI) )
+    NTwarning("Manually kill the two servers when done; sorry no functionality for that yet.")
     httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
 #    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
     httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
@@ -357,7 +358,7 @@ def main():
     parser.add_option( "--server",
                       action="store_true",
                       dest="server",
-                      help="Start a server at port 8000 by default"
+                      help="Start a server at ports 8000 and 8001 by default"
                      )
 
     (options, _args) = parser.parse_args()

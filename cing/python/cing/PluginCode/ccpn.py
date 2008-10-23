@@ -2,6 +2,9 @@
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.fpconst import NaN
 from string import digits
+from shutil import rmtree
+from shutil import move
+import tarfile
 import sys
 _bitBucket = open('/dev/null','aw')
 _returnMyTerminal = sys.stdout
@@ -321,7 +324,7 @@ def loadCcpn( cingProject = None, ccpnFolder = None ):
 
 def initCcpn( cingProject, ccpnFolder = None ):
     '''Descrn: Create a new Cing Project instance from a Ccpn folder project.
-       Inputs: Cing.Project instance, Ccpn project Xml file.
+       Inputs: Cing.Project instance, Ccpn project Xml file or a gzipped tar file such as .tgz or .tar.gz
        Output: Cing.Project or None or error.
     '''
 
@@ -332,6 +335,42 @@ def initCcpn( cingProject, ccpnFolder = None ):
         return None
     # end if
 
+    NTdebug("ccpnFolder: %s", ccpnFolder) 
+    if not ccpnFolder:
+        NTerror("No ccpnFolder" ) 
+        return None
+        
+    if os.path.exists(ccpnFolder) and os.path.isfile(ccpnFolder) and (\
+        ccpnFolder.endswith(".tgz") or ccpnFolder.endswith(".tar.gz")):        
+        try:
+            rmtree( cingProject.name )
+        except:
+            pass
+        # Example layout.
+#        linkNmrStarData/
+#        linkNmrStarData/ccp/
+#        linkNmrStarData/ccp/nmr/
+#        linkNmrStarData/ccp/nmr/NmrConstraint/
+#        linkNmrStarData/ccp/nmr/NmrConstraint/1+1brv_user_2008-08-19-09-46-57-171_00002.xml
+        
+        # Get a TarFile class.
+        ccpnRootDirectory = None # Will become linkNmrStarData at first.
+        tar = tarfile.open(ccpnFolder, "r:gz") 
+        for itar in tar:                        
+            tar.extract(itar.name, '.') # itar is a TarInfo object
+            if _isRootDirectory(itar.name):
+                if not ccpnRootDirectory: # pick the first one.
+                    ccpnRootDirectory = _trimTrailingSlash( itar.name )
+                    if not ccpnRootDirectory:
+                        NTerror("Skipping potential ccpnRootDirectory")
+        if not ccpnRootDirectory:
+            NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % ccpnFolder ) 
+            return None
+            
+        if ccpnRootDirectory != cingProject.name:
+            move( ccpnRootDirectory, cingProject.name)
+        ccpnFolder = cingProject.name # Now it is a folder.
+                 
     if not ccpnFolder or not os.path.exists(ccpnFolder):
         NTerror(" '%s': ccpnFolder '%s' not found", funcName, ccpnFolder)
         return None
@@ -1810,6 +1849,37 @@ def createCcpnRestraints( cingProject = None, ccpnProject = None ):
     # end for
     return ccpnProject
 # end def createCcpnRestraints
+
+def _isRootDirectory(f=""):
+    """ Algorithm for finding just the root dir
+    TODO: check with ccpn crowd.
+    """
+#        linkNmrStarData/
+#        linkNmrStarData/ccp/
+
+#    NTdebug("Checking _isRootDirectory on : ["+f+"]")
+    if f.count("/") != 2: 
+        return False
+    if f.count("//") != 1: 
+        return False
+    n = len(f)
+    if f[n-1] != '/':
+        return False
+    if n == 2:
+        NTerror("Found a // entry in tar file.")
+        return None
+    return True
+
+def _trimTrailingSlash(f):
+#DEBUG: Checking _isRootDirectory on : [linkNmrStarData//]
+#DEBUG: Checking _isRootDirectory on : [linkNmrStarData/ccp//]
+#DEBUG: Checking _isRootDirectory on : [linkNmrStarData/ccp/nmr//]
+#    n = len(f)
+#    if f[len(f)-1] != '/':
+#        return f
+    r = f[:-2]
+    NTdebug("Found RootDirectory: [" + r + "]")
+    return r # because of check in _isRootDirectory the length of f is at least 3
 
 def _makeNmrConstraintStore(nmrProject):
     '''Descrn: Make a new NMR constraint head object for a project which will

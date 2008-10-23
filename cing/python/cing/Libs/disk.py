@@ -365,11 +365,10 @@ def unzipped(filename):
     return(data)
 
 
-# $Id$
-
-
 class Tailer(object):
     """\
+    Courtesy of msthornton
+    from: http://code.google.com/p/pytailer/
     Implements tailing and heading functionality like GNU tail and head
     commands.
     """
