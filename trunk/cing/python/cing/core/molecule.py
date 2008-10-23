@@ -457,7 +457,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         for chain in self.allChains():
             if chain.name != ChainId:
 #                NTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
-                continue            
+                continue
             for atm in chain.allAtoms():
                 aname = atm.translate(convention)
                 if aname != None:
@@ -467,7 +467,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
                         # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
                         # GV, Yes maintain, but  test for aname should reduce warnings
                         NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
-                                atm, atomDict[t])
+                                    atm, atomDict[t])
                     else:
                         atomDict[t] = atm
                     #end if
@@ -1132,7 +1132,7 @@ Return an Molecule instance or None on error
         """
         result = NTlist()
 
-        if not len(properties): 
+        if not len(properties):
             return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
@@ -1162,7 +1162,7 @@ Return an Molecule instance or None on error
             if res.hasProperties('protein'):
                 return True
         return None # is actually the default of course.
-             
+
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
         """
         Superpose the coordinates of molecule
@@ -2034,7 +2034,7 @@ Residue class: Defines residue properties
 
     #end def
 
-    def renumber( self, newResNum ): 
+    def renumber( self, newResNum ):
         """
         Renumber residue
            Return self or None on error
@@ -2346,7 +2346,136 @@ Residue class: Defines residue properties
 ##register this handler
 #Residue.XMLhandler = XMLResidueHandler()
 
-#==============================================================================
+
+class Coordinate:
+    """
+-------------------------------------------------------------------------------
+Coordinate class
+-------------------------------------------------------------------------------
+coordinates stored in attribute e (NTcVector instance)
+
+Several mappings implemented
+e.g.
+    c=Coordinate(5.0, 6.0, 7.0)
+
+    c[0] == c.x == c.e[0]
+-------------------------------------------------------------------------------
+    """
+
+    DEFAULT_BFACTOR   = 0.0
+    DEFAULT_OCCUPANCY = 1.0
+
+    def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
+        self.e         = NTcVector( x, y, z )
+        self.Bfac      = Bfac
+        self.occupancy = occupancy
+        self.atom      = atom
+        self.model     = -1    # index of the model
+    #end def
+
+    #implement  x,y,z attributes mapped to e vector
+    def __getattr__(self, item):
+        if  item == 'x':
+            return self.e[0]
+        elif  item == 'y':
+            return self.e[1]
+        elif  item == 'z':
+            return self.e[2]
+        else:
+            raise AttributeError
+    #end def
+
+    def __setattr__(self, item, value):
+        if  item == 'x':
+            self.e[0] = value
+        elif  item == 'y':
+            self.e[1] = value
+        elif  item == 'z':
+            self.e[2] = value
+        else:
+            self.__dict__[item] = value
+    #end def
+
+    # Implement a dict-like functionality
+    # map integers and x,y,z
+    def __getitem__(self, item):
+        if isinstance( item, int ):
+            return NTcVector.__getitem__(self.e, item)
+        elif  item == 'x':
+            return self.e[0]
+        elif  item == 'y':
+            return self.e[1]
+        elif  item == 'z':
+            return self.e[2]
+        else:
+            return self.__dict__[item]
+    #end def
+
+    def __setitem__(self, item, value):
+        if isinstance( item, int ):
+            NTcVector.__setitem__( self.e, item, value )
+        elif  item == 'x':
+            self.e[0] = value
+        elif  item == 'y':
+            self.e[1] = value
+        elif  item == 'z':
+            self.e[2] = value
+        else:
+            self.__dict__[item] = value
+    #end def
+
+    def __delitem__(self, item):
+        if isinstance( item, int ):
+            pass
+        elif  item == 'x':
+            pass
+        elif  item == 'y':
+            pass
+        elif  item == 'z':
+            pass
+        else:
+            del(self.__dict__[item])
+    #end def
+
+    def distance( self, other ):
+        return self.e.distance( other.e )
+    #end def
+
+    def dot( self, other ):
+        return self.e.dot( other.e )
+    #end def
+
+    def format(self):
+        return sprintf( '<Coordinate: %s>', self )
+    #end def
+
+    def __str__(self):
+        return sprintf('(%6.2f,%6.2f,%6.2f)', self.e[0], self.e[1], self.e[2])
+    #end def
+
+    def __repr__(self):
+        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f, occupancy=%f )',
+                       self.e[0], self.e[1], self.e[2], self.Bfac, self.occupancy
+                      )
+
+    def nameTuple(self, convention=INTERNAL):
+        """Return the 7-element name tuple:
+           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+        """
+        if not self.atom: return (None, None, None,None,self.model,None,convention)
+        else:
+            return (self.atom.residue.chain.molecule.name,
+                    self.atom.residue.chain.name,
+                    self.atom.residue.resNum,
+                    self.atom.translate(convention),
+                    self.model,
+                    None,
+                    convention
+                   )
+    #end def
+#end class
+
+
 class Atom( NTtree ):
     """
 -------------------------------------------------------------------------------
@@ -2456,11 +2585,11 @@ Atom class: Defines object for storing atom properties
 
         return result
 
-    def addCoordinate( self, x, y, z, Bfac, **kwds ):
+    def addCoordinate( self, x, y, z, Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, **kwds ):
         """Append coordinate to coordinates list
         Convenience method.
         """
-        c = Coordinate( x, y, z, Bfac=Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, atom=self )
+        c = Coordinate( x, y, z, Bfac=Bfac, occupancy=occupancy, atom=self )
 #        c.update( **kwds )
         c.model = len(self.coordinates)
         self.coordinates.append( c )
@@ -2621,6 +2750,16 @@ Atom class: Defines object for storing atom properties
         self.resonances = other.resonances
 #        other.resonances = self
         other.resonances = tmp
+    #end def
+
+
+    def setStereoAssigned( self ):
+        """
+        Return stereoAssigned flag to True
+        """
+        if not self.isProChiral():
+            NTerror('Atom.setStereoAssigned: %s is not prochiral', self)
+        self.stereoAssigned = True
     #end def
 
 
@@ -3145,136 +3284,7 @@ Added getter/setters for the non obvious ones.
     def __call__( self ):
         return self
 
-#==============================================================================
-class Coordinate:
-    """
--------------------------------------------------------------------------------
-Coordinate class
--------------------------------------------------------------------------------
-coordinates stored in attribute e (NTcVector instance)
 
-Several mappings implemented
-e.g.
-    c=Coordinate(5.0, 6.0, 7.0)
-
-    c[0] == c.x == c.e[0]
--------------------------------------------------------------------------------
-    """
-
-    DEFAULT_BFACTOR   = 0.0
-    DEFAULT_OCCUPANCY = 1.0
-
-    def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
-        self.e         = NTcVector( x, y, z )
-        self.Bfac      = Bfac
-        self.occupancy = occupancy
-        self.atom      = atom
-        self.model     = -1    # index of the model
-    #end def
-
-    #implement  x,y,z attributes mapped to e vector
-    def __getattr__(self, item):
-        if  item == 'x':
-            return self.e[0]
-        elif  item == 'y':
-            return self.e[1]
-        elif  item == 'z':
-            return self.e[2]
-        else:
-            raise AttributeError
-    #end def
-
-    def __setattr__(self, item, value):
-        if  item == 'x':
-            self.e[0] = value
-        elif  item == 'y':
-            self.e[1] = value
-        elif  item == 'z':
-            self.e[2] = value
-        else:
-            self.__dict__[item] = value
-    #end def
-
-    # Implement a dict-like functionality
-    # map integers and x,y,z
-    def __getitem__(self, item):
-        if isinstance( item, int ):
-            return NTcVector.__getitem__(self.e, item)
-        elif  item == 'x':
-            return self.e[0]
-        elif  item == 'y':
-            return self.e[1]
-        elif  item == 'z':
-            return self.e[2]
-        else:
-            return self.__dict__[item]
-    #end def
-
-    def __setitem__(self, item, value):
-        if isinstance( item, int ):
-            NTcVector.__setitem__( self.e, item, value )
-        elif  item == 'x':
-            self.e[0] = value
-        elif  item == 'y':
-            self.e[1] = value
-        elif  item == 'z':
-            self.e[2] = value
-        else:
-            self.__dict__[item] = value
-    #end def
-
-    def __delitem__(self, item):
-        if isinstance( item, int ):
-            pass
-        elif  item == 'x':
-            pass
-        elif  item == 'y':
-            pass
-        elif  item == 'z':
-            pass
-        else:
-            del(self.__dict__[item])
-    #end def
-
-    def distance( self, other ):
-        return self.e.distance( other.e )
-    #end def
-
-    def dot( self, other ):
-        return self.e.dot( other.e )
-    #end def
-
-    def format(self):
-        return sprintf( '<Coordinate: %s>', self )
-    #end def
-
-    def __str__(self):
-        return sprintf('(%6.2f,%6.2f,%6.2f)', self.e[0], self.e[1], self.e[2])
-    #end def
-
-    def __repr__(self):
-        return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f, occupancy=%f )',
-                       self.e[0], self.e[1], self.e[2], self.Bfac, self.occupancy
-                      )
-
-    def nameTuple(self, convention=INTERNAL):
-        """Return the 7-element name tuple:
-           (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
-        """
-        if not self.atom: return (None, None, None,None,self.model,None,convention)
-        else:
-            return (self.atom.residue.chain.molecule.name,
-                    self.atom.residue.chain.name,
-                    self.atom.residue.resNum,
-                    self.atom.translate(convention),
-                    self.model,
-                    None,
-                    convention
-                   )
-    #end def
-#end class
-
-#==============================================================================
 def NTdistance( c1, c2 ):
     """
     Return distance defined by Coordinate instances c1-c2

@@ -81,6 +81,8 @@ import os
 import sys
 import unittest
 
+
+
 #------------------------------------------------------------------------------------
 # Support routines
 #------------------------------------------------------------------------------------
@@ -195,9 +197,10 @@ def serve():
     except KeyboardInterrupt:
         print '^C received'        
     finally:
-        print 'shutting down server'
+        print 'shutting down server'        
         try:        
-            httpd.socket.close()
+        httpd.socket.close()
+        httpd_cgi.socket.close()
         except:
             pass
         try:
@@ -295,6 +298,11 @@ def main():
                       help="Generate EXP_NAME peaks with AXIS_ORDER from the resonance data",
                       metavar="EXP_NAME,AXIS_ORDER"
                      )
+    parser.add_option("--molecule",
+                      dest="moleculeName", default=None,
+                      help="Restore Molecule MOLECULENAME as active molecule",
+                      metavar="MOLECULENAME"
+                     )
     parser.add_option("--script",
                       dest="script", default=None,
                       help="Run script from SCRIPTFILE",
@@ -346,6 +354,7 @@ def main():
                      )
 
     (options, _args) = parser.parse_args()
+
     if options.verbosity >= 0 and options.verbosity <= 9:
 #        print "In main, setting verbosity to:", options.verbosity
         cing.verbosity = options.verbosity
@@ -354,6 +363,10 @@ def main():
         NTerror("Ignoring setting")
     # From this point on code may be executed that will go through the appropriate verbosity filtering
     NTmessage(header)
+
+    NTdebug('options: %s', options)
+    NTdebug('args: %s', _args)
+
     # The weird location of this import is because we want it to be verbose.
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
 
@@ -462,13 +475,25 @@ def main():
         sys.exit(2)
     #end if
 
+    #------------------------------------------------------------------------------------
+    # check for alternative molecule
+    #------------------------------------------------------------------------------------
+    if options.moleculeName:
+        if options.moleculeName in project:
+            project.molecule = project[options.moleculeName]
+        else:
+            project.restoreMolecule(options.moleculeName)
+        #end if
+    #end if
+
     NTmessage( project.format() )
 
     # shortcuts
-    p = project
+    p   = project
     mol = project.molecule #@UnusedVariable
-    m  = project.molecule #@UnusedVariable
-#   pr = print
+    m   = project.molecule #@UnusedVariable
+
+ #   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 

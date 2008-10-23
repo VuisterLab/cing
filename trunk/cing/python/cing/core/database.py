@@ -231,8 +231,8 @@ class ResidueDef( NTtree ):
         """
         Any post-reading actions
         """
-        # Remove the duplicates;
-        props2 =  []
+        # Add name and shortName; Remove the duplicates;
+        props2 =  [self.name, self.shortName]
         for prop in self.properties:
             if not prop in props2:
                 props2.append(prop)
@@ -249,9 +249,19 @@ class ResidueDef( NTtree ):
         fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
-        for attr in ['nameDict', 'comment','properties']:
+        for attr in ['nameDict', 'comment']:
             fprintf( stream, "\t%s = %s\n", attr, repr(self[attr]) )
         #end for
+
+        # clean the properties list
+        props = []
+        for prop in self.properties:
+            # Do not store name and residueDef.name as property. Add those dynamically upon reading
+            if not prop in [self.name, self.shortName] and not prop in props:
+                props.append(prop)
+            #end if
+        #end for
+        fprintf( stream, "\t%s = %s\n", 'properties', repr(props) )
 
         for dh in self.dihedrals:
             dh.exportDef( stream=stream, convention=convention )

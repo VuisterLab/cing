@@ -37,6 +37,7 @@ from cing.Libs.NTutils import sprintf
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.molecule import translateTopology
@@ -76,7 +77,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
 # add as a method to DihedralRestraint Class
 DihedralRestraint.export2cyana = exportDihedralRestraint2cyana
 
-#-----------------------------------------------------------------------------
+
 def exportDihedralRestraintList2cyana( drl, path, convention)   :
     """Export a dihedralRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
@@ -99,7 +100,7 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
 # add as a method to DistanceRestraintList Class
 DihedralRestraintList.export2cyana = exportDihedralRestraintList2cyana
 
-#-----------------------------------------------------------------------------
+
 def importAco( project, acoFile, convention ):
     """Read Cyana acoFile
        ( 512 THR   PSI     116.0   148.0)
@@ -164,8 +165,89 @@ def importAco( project, acoFile, convention ):
     return result
 #end def
 
+def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
+    """
+    Export a upper (upper=True) or lower (Upper=False) distance restraint in CYANA or CYANA2 format
+    Return a string or None on error
+    """
+    if convention != CYANA and convention != CYANA2:
+        NTerror('exportDistanceRestraint2cyana: invalid convention "%s"', convention)
+        return None
+    #end if
 
-#-----------------------------------------------------------------------------
+    first = True
+    if upper:
+        val = dr.upper
+    else:
+        val = dr.lower
+    #end if
+
+    if val == 0.0: # this will interfere with Cyana's def for ambigious restraints
+        val = 0.01
+    #end if
+
+    for atm1,atm2 in dr.atomPairs:
+        if first:
+            result = sprintf('%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f',
+                             atm1.residue.resNum, atm1.residue.translate(convention), atm1.translate(convention),
+                             atm2.residue.resNum, atm2.residue.translate(convention), atm2.translate(convention),
+                             val
+                            )
+            first = False
+        else:
+            #Ambigous
+            result = result + '\n' + \
+                     sprintf('%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f',
+                             atm1.residue.resNum, atm1.residue.translate(convention), atm1.translate(convention),
+                             atm2.residue.resNum, atm2.residue.translate(convention), atm2.translate(convention),
+                             0.0
+                            )
+        #end if
+    #end for
+    return result
+#end def
+#Add as method to DistanceRestraint class
+DistanceRestraint.export2cyana = exportDistanceRestraint2cyana
+
+def exportDistanceRestraintList2cyana( drl, path, convention=CYANA2)   :
+    """Export a distanceRestraintList (drl) to cyana format:
+       convention = CYANA or CYANA2
+       generate both .upl and .lol files from path
+       return drl or None on error
+    """
+    if convention != CYANA and convention != CYANA2:
+        NTerror('exportDistanceRestraintList2cyana: invalid convention "%s"', convention)
+        return None
+    #end if
+
+    root, name, _tmp = NTpath(path)
+    path = os.path.join(root,name)
+    uplfile = open( path + '.upl', 'w' )
+    if not uplfile:
+        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path + '.upl' )
+        return None
+    #end def
+    lolfile = open( path + '.lol', 'w' )
+    if not lolfile:
+        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path + '.lol' )
+        return None
+    #end def
+
+    for dr in drl:
+        fprintf( uplfile, '%s\n', dr.export2cyana( upper=True, convention=convention ) )
+        fprintf( lolfile, '%s\n', dr.export2cyana( upper=False, convention=convention ) )
+    #end for
+
+    uplfile.close()
+    lolfile.close()
+    NTmessage('==> Exported %s in %s format to "%s" and "%s"', drl, convention, path+'.upl', path+'.lol')
+    #end if
+    return drl
+#end def
+# add as a method to DistanceRestraintList Class
+DistanceRestraintList.export2cyana = exportDistanceRestraintList2cyana
+
+
 def importUpl( project, uplFile, convention, lower = 0.0 ):
     """Read Cyana upl file
        return a DistanceRestraintList or None on error
@@ -319,6 +401,16 @@ def export2cyana( project, tmp=None ):
             drl.export2cyana( drlFile, convention=CYANA)
             #Cyana 2.x format
             drlFile = project.path( project.directories.xeasy2, drl.name+'.aco' )
+            drl.export2cyana( drlFile, convention=CYANA2)
+        #end if
+    #end for
+    for drl in project.distances:
+        if (drl.status == 'keep'):
+            #Xeasy/Cyana 1.x format
+            drlFile = project.path( project.directories.xeasy, drl.name ) # extensions get appended
+            drl.export2cyana( drlFile, convention=CYANA)
+            #Cyana 2.x format
+            drlFile = project.path( project.directories.xeasy2, drl.name ) # extensions get appended
             drl.export2cyana( drlFile, convention=CYANA2)
         #end if
     #end for

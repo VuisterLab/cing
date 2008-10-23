@@ -195,10 +195,9 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
                 elif a == 'HN': # for future examples.
                     a = 'H'
                 atm = NTdbGetAtom( record.resName, a, convention )
-            if not atm:                
+            if not atm:
                 if shownWarnings <= showMaxNumberOfWarnings:
-#                    NTdebug("atom: ["+a+"]")
-                    NTwarning('in #PDB2Molecule: %s, model %d incompatible record (%s)' % (
+                    NTwarning('PDB2Molecule: %s format, model %d incompatible record (%s)' % (
                              convention, mol.modelCount+1, record))
                     if shownWarnings == showMaxNumberOfWarnings:
                         NTwarning('And so on.')

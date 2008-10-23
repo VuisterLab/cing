@@ -18,6 +18,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import fprintf
@@ -45,11 +46,13 @@ class Xeasy( NTdict ):
     def __init__( self, seqFile, protFile, convention)   :
         NTdict.__init__( self )
 
+        #print '>', seqFile, protFile
         # parse the seqFile
         self.seq = {}
         resNum = 1
         self.resCount = 0
         for f in AwkLike( seqFile ):
+            #print '>>', f.dollar[0]
             if (not f.isEmpty() and not f.isComment( '#')):
                 if ( f.dollar[1] in CYANA_NON_RESIDUES         # skip the bloody CYANA non-residue stuff
                    ):
@@ -87,16 +90,16 @@ class Xeasy( NTdict ):
                 atomName  = f.dollar[4]
                 resNum    = f.int( 5 )
                 if resNum not in self.seq:
-                    NTerror( 'Xeasy: undefined residue number %d in "%s:%d" (%s)',
+                    NTwarning( 'Xeasy: undefined residue number %d in "%s:%d" (%s)',
                              resNum, protFile, f.NR, f.dollar[0]
                            )
                     self.error = 1
                 else:
                     resName   = self.seq[resNum]
-                    if (not isValidAtomName( resName, atomName, convention)):
-                        NTerror( 'Xeasy: invalid atom "%-4s" for residue "%s %d" in "%s:%d" (%s)',
-                                  atomName, resName, resNum, protFile, f.NR, f.dollar[0]
-                               )
+                    if not isValidAtomName( resName, atomName, convention):
+                        NTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d',
+                                   protFile, f.NR,  atomName, resName, resNum
+                                )
                         self.error = 1
                     else:
                         p = NTdict(index     = index,
@@ -277,6 +280,24 @@ class Xeasy( NTdict ):
     #end def
 #end class
 
+def exportSequence2Xeasy( molecule, seqFile, convention ):
+    """export sequence to Xeasy seq file
+    """
+    fout = open( seqFile, 'w' )
+    resCount = 0
+    for res in molecule.allResidues():
+        resName = res.translate(convention)
+        if (resName != None):
+            fprintf( fout, '%3s %4d\n',
+                     resName,
+                     res.resNum
+                   )
+        #end if
+        resCount += 1
+    #end for
+    fout.close()
+#end def
+
 #==============================================================================
 def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
     """Export shifts to Xeasy prot and seq file
@@ -289,19 +310,20 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
     #end if
 
 #   export seq file
-    fout = open( seqFile, 'w' )
-    resCount = 0
-    for res in allResidues( molecule ):
-        resName = res.translate(convention)
-        if (resName != None):
-            fprintf( fout, '%3s %4d',
-                     resName,
-                     res.resNum
-                   )
-        #end if
-        resCount += 1
-    #end for
-    fout.close()
+    exportSequence2Xeasy( molecule, seqFile, convention)
+#    fout = open( seqFile, 'w' )
+#    resCount = 0
+#    for res in allResidues( molecule ):
+#        resName = res.translate(convention)
+#        if (resName != None):
+#            fprintf( fout, '%3s %4d\n',
+#                     resName,
+#                     res.resNum
+#                   )
+#        #end if
+#        resCount += 1
+#    #end for
+#    fout.close()
 
 #   export prot file
     fout = open( protFile, 'w' )
