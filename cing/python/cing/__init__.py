@@ -89,7 +89,8 @@ if not os.path.exists(cingDirTmp):
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist, NTvalue
+from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist, NTvalue, NTpath
+from cing.Libs.AwkLike      import AwkLike
 from cing.Libs.fpconst      import NaN
 
 from cing.core.constants    import *
@@ -100,7 +101,7 @@ from cing.core.classes      import DihedralRestraint, DihedralRestraintList
 #from cing.core.parameters import *
 from cing.core.database     import NTdb
 #from cing.core.dictionaries import *
-from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance
+from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance, mapMolecules
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML    # This also initializes the SMLhandler methods
 from cing.core.sml          import SML2obj    # This also initializes the SMLhandler methods

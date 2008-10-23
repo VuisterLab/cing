@@ -616,6 +616,19 @@ Project: Top level Cing project class
     #end def
     #initializeMolecule = newMolecule # keep old name
 
+    def restoreMolecule(self, name):
+        """Restore molecule 'name'
+        Return Molecle instance or None on error
+        """
+        path = self.molecules.path( name )
+        mol = Molecule.open( path )
+        if mol:
+            mol.status = 'keep'
+            self.appendMolecule(mol)
+        #end if
+        self.molecule = mol
+        return mol
+    #end def
 
     #-------------------------------------------------------------------------
     # Resonances stuff
@@ -1172,13 +1185,18 @@ class DistanceRestraint( NTdict ):
                     msg = "Missing coordinates (%s)" %  a.toString()
                     NTdebug(msg)
                     self.rogScore.setMaxColor( COLOR_RED, msg )
+                #end if
+            #end for
+        #end for
+    #end def
 
     def getModelCount(self):
         modelCount = 0
         if len(self.atomPairs) :
             modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
         return modelCount
-    
+    #end def
+
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
         check if atom1 already present, keep order
@@ -1315,7 +1333,7 @@ class DistanceRestraint( NTdict ):
         # analyze violations
         for d in self.violations:
             dabs = math.fabs(d)
-#               print '>>', d,dabs
+#           print '>>', d,dabs
             if ( dabs > 0.5):
                 self.violCount5 += 1
             elif ( dabs > 0.3):
@@ -1328,6 +1346,7 @@ class DistanceRestraint( NTdict ):
             self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
             self.violMax = max( map(math.fabs,self.violations) )
             self.violSum = self.violations.sum()
+        #end if
 
         return (self.av,self.sd,self.min,self.max )
     #end def
@@ -1506,8 +1525,11 @@ class DistanceRestraintList( NTlist ):
             if count:
                 if self.rmsd[i]:
                     self.rmsd[i] = math.sqrt(self.rmsd[i]/count)
-            else:
-                self.rmsd[i] = None
+                else:
+                    self.rmsd[i] = None
+                #end if
+            #end if
+        #end for
         self.rmsdAv, self.rmsdSd, _n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
@@ -1613,6 +1635,8 @@ class DihedralRestraint( NTdict ):
                               upper      = upper,
                               **kwds
                        )
+        self.setdefault('discontinuous', False)
+
         self.id         = -1       # Undefined index number
         self.dihedrals  = None     # list with dihedral values for each model, None indicates no analysis done
         self.cav        = None      # Average dihedral value
@@ -1634,6 +1658,7 @@ class DihedralRestraint( NTdict ):
         if len(self.atoms) :
             modelCount = self.atoms[0].residue.chain.molecule.modelCount
         return modelCount
+    #end def
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
@@ -1662,7 +1687,7 @@ class DihedralRestraint( NTdict ):
             comment = 'RED: violSd: %8.3f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
-            
+
         modelCount = self.getModelCount()
         for atm in self.atoms:
             atms = atm.realAtoms()
@@ -1670,7 +1695,7 @@ class DihedralRestraint( NTdict ):
                 if len( a.coordinates ) < modelCount:
                     msg = "Missing coordinates (%s)" %  a.toString()
                     NTdebug(msg)
-                    self.rogScore.setMaxColor( COLOR_RED, msg )            
+                    self.rogScore.setMaxColor( COLOR_RED, msg )
     #end def
 
     def calculateAverage(self):
@@ -1711,16 +1736,16 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-                                self.atoms[0].coordinates[i],
-                                self.atoms[1].coordinates[i],
-                                self.atoms[2].coordinates[i],
-                                self.atoms[3].coordinates[i]
-                              )
+        	                    self.atoms[0].coordinates[i],
+            	                self.atoms[1].coordinates[i],
+                	            self.atoms[2].coordinates[i],
+                    	        self.atoms[3].coordinates[i]
+                        	  )
                 self.dihedrals.append( d )
             #end for
         except:
             pass # ignore missing coordinates. They're reported by criticize()
-        
+
         #find the range to store these dihedral values
         #limit = 0.0
         #if limit > self.lower: limit = -180.0
@@ -1739,7 +1764,7 @@ class DihedralRestraint( NTdict ):
             if fv > 1.0: self.violCount1 += 1
             if fv > 3.0: self.violCount3 += 1
             if fv > 5.0: self.violCount5 += 1
-            if fv > self.violMax: 
+            if fv > self.violMax:
                 self.violMax = fv
             #end if
         #end for
@@ -1806,12 +1831,12 @@ class DihedralRestraint( NTdict ):
         return  \
             sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %4s)  '+\
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
-                     self, self.rogScore,                    
+                     self, self.rogScore,
                      val2Str(self.lower, "%4.1f", 4),
                      val2Str(self.upper, "%4.1f", 4),
                      val2Str(self.cav,"%6.1f", 6),
                      val2Str(self.cv,"%4.1f", 4),
-                     val2Str(self.violAv,"%4.1f", 4), 
+                     val2Str(self.violAv,"%4.1f", 4),
                      self.violMax, self.violCount1, self.violCount3, self.violCount5,
                      self.atoms.format('%-11s ')
                     )
