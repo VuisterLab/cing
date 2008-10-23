@@ -10,10 +10,8 @@ from cing import verbosityOutput
 from cing.core.classes import Project
 from unittest import TestCase
 from shutil import move #@UnusedImport
-from shutil import rmtree
 import cing
 import os
-import tarfile
 import unittest
 
 class AllChecks(TestCase):
@@ -40,19 +38,7 @@ class AllChecks(TestCase):
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
             ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
-            try:
-                rmtree( entryId )
-            except:
-                pass
-            tar = tarfile.open(ccpnFile, "r:gz")
-            for itar in tar:
-                tar.extract(itar.name, '.')
-
-            org = 'linkNmrStarData'
-            if not entryId[0].isdigit(): # TODO: mod the NRG examples to follow this convention too.
-                org = entryId
-            move( org, entryId)
-            self.assertFalse(project.initCcpn(ccpnFolder=entryId))
+            self.assertFalse(project.initCcpn(ccpnFolder=ccpnFile))
             self.failIf(project.save())
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,

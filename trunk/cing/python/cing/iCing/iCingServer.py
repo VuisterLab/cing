@@ -11,13 +11,17 @@ ProxyPass         /iCingServer.py http://localhost:8000/iCingServer.py
 ProxyPassReverse  /iCingServer.py http://localhost:8000/iCingServer.py
 """
 from BaseHTTPServer import BaseHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
+from cing import cingDirTmp
+from cing import verbosityDebug
+from cing import verbosityDetail
+from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import quoteForJson
 from cing.Libs.disk import tail
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
-from cing.Libs.test.test_Forkoff import my_sleep
 import cgi
 import cing
 import os
@@ -45,8 +49,8 @@ MAX_TIME_TO_WAIT_FORKOFF = 2
 MAX_TIME_TO_RUN = 10 * 60
 
 PYTHON_EXECUTABLE = "/sw/bin/python"
-#CING_SCRIPT = "$CINGROOT/python/cing/main.py"
-CING_SCRIPT = "$CINGROOT/python/cing/iCing/dummyRun.py"
+CING_SCRIPT = "$CINGROOT/python/cing/main.py"
+#CING_SCRIPT = "$CINGROOT/python/cing/iCing/test/dummyRun.py"
 CING_OPTIONS = "--initCcpn"
 
 server_cgi_url_tmp = "localhost/tmp/cing"
@@ -237,9 +241,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         job_1       = ( do_cmd, (cmdRunKiller,) )
         ## Runner
         job_2       = ( do_cmd, (cmdRun,) )
-        ## For debugging. Sleep too long.
-        job_3       = ( my_sleep, (9999,) ) # will be killed by forker
-        job_list    = [ job_0, job_1, job_2, job_3 ]    
+        job_list    = [ job_0, job_1, job_2 ]    
         NTmessage("Submitting jobs to the shell")
         done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=0 )    
         NTmessage("Finished ids: %s", done_list)
@@ -273,24 +275,24 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         self.sendJSON({RESPONSE_STATUS_ERROR: "Access denied through do_GET()"})
 
 
-#def main():
-#    os.chdir(cingDirTmp)
-#    
-#    try:
-#        server = HTTPServer(('', 8000), iCingServerHandler)
-#        print 'started httpserver...'
-#        server.serve_forever()
-#    except KeyboardInterrupt:
-#        print '^C received'
-#    finally:
-#        print 'shutting down server'
-#        try:
-#            server.socket.close()
-#        except:
-#            pass
-#
-#if __name__ == '__main__':
-#    cing.verbosity = verbosityDetail
-#    cing.verbosity = verbosityOutput
-#    cing.verbosity = verbosityDebug    
-#    main()
+def main():
+    os.chdir(cingDirTmp)
+    
+    try:
+        server = HTTPServer(('', 8000), iCingServerHandler)
+        print 'started httpserver...'
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print '^C received'
+    finally:
+        print 'shutting down server'
+        try:
+            server.socket.close()
+        except:
+            pass
+
+if __name__ == '__main__':
+    cing.verbosity = verbosityDetail
+    cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityDebug   
+    main()
