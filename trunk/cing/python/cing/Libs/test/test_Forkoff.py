@@ -26,10 +26,10 @@ def my_sleep( arg ):
     return 0
 
 class AllChecks(TestCase):
-    # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
 
     def testRun(self):
+        # important to switch to temp space before starting to generate files for the project.
+        os.chdir(cingDirTmp)
         ## Test is disable because it takes 10 seconds to run.
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.

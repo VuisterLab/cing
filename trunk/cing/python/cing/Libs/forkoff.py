@@ -345,8 +345,8 @@ class Process:
 
 
     def process_wait( self, pid=0, options=0 ):
-        if self.verbosity > 8:
-            NTdebug("Wait for process: [%s] with options: [%s] " % ( pid, options ))
+#        if self.verbosity > 8:
+#            NTdebug("Wait for process: [%s] with options: [%s] " % ( pid, options ))
 
         ## Indicating failure
         exit_pid, exit_status = 0, self.exit_status_failure

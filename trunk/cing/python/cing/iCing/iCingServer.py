@@ -11,11 +11,6 @@ ProxyPass         /iCingServer.py http://localhost:8000/iCingServer.py
 ProxyPassReverse  /iCingServer.py http://localhost:8000/iCingServer.py
 """
 from BaseHTTPServer import BaseHTTPRequestHandler
-from BaseHTTPServer import HTTPServer
-from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import quoteForJson
@@ -159,6 +154,54 @@ class iCingServerHandler(BaseHTTPRequestHandler):
     def run(self):
         """Start a validation run.
         """        
+        
+#    def run(self):        
+#
+#        logToLog('Now in pathProject: ' + pathProject)        
+#        doWhatif   =      form.has_key(FORM_DO_WHATIF)  and form[FORM_DO_WHATIF].value   == 'on'
+#        doProcheck =      form.has_key(FORM_DO_PROCHECK) and form[FORM_DO_PROCHECK].value == 'on'
+#        htmlOnly   = not (form.has_key(FORM_DO_IMAGES)   and form[FORM_DO_IMAGES].value   == 'on')
+#        msg = "<p>doWhatif     %3s" % doWhatif
+#        msg +="\n<p>doProcheck   %3s" % doProcheck
+#        msg +="\n<p>htmlOnly     %3s" % htmlOnly
+#        
+#        fastestTest = True
+#        if fastestTest:
+#            htmlOnly = True 
+#            doWhatif = False
+#            doProcheck = False
+#
+#        
+#        projectList = glob("*.tgz")
+#        if len(projectList) == 0:
+#            endError("Failed to get any ccpn project on disk with .tgz")
+#        projectFile = projectList[0]
+#        if len(projectList) > 1:
+#            logToLog("Got more than one project file; taking first one: " + projectFile)            
+#        (_directory, entryId, _extension)  = NTpath(projectFile)
+#        project = Project.open(entryId, status='new')
+#        
+#        ccpnFile = projectFile
+#        try:
+#            rmtree(entryId) # remove if present before.
+#        except:
+#            pass
+#        tar = tarfile.open(ccpnFile, "r:gz")
+#        for itar in tar:
+#            tar.extract(itar.name, '.')
+#
+#        org = 'linkNmrStarData' # TODO: mod the NRG examples to follow this convention too.
+#        if not entryId[0].isdigit():  # pdb file?
+#            org = entryId
+#        move(org, entryId)
+#        project.initCcpn(ccpnFolder=entryId)
+#        project.save()
+#        project.validate(
+#          htmlOnly=htmlOnly,
+#          doProcheck = doProcheck,
+#          doWhatif=doWhatif)
+#        msg = "Finished validation"        
+#        endMessage(msg)        
         if os.path.exists(DONE_FILE):
             os.remove(DONE_FILE) # Can't be done when not started.
         if os.path.exists(CING_RUN_LOG_FILE):
@@ -227,27 +270,27 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         
         
     def do_GET(self):
-        self.sendJSONResponse("Access denied through do_GET()")
+        self.sendJSON({RESPONSE_STATUS_ERROR: "Access denied through do_GET()"})
 
 
-def main():
-    os.chdir(cingDirTmp)
-    
-    try:
-        server = HTTPServer(('', 8000), iCingServerHandler)
-        print 'started httpserver...'
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print '^C received'
-    finally:
-        print 'shutting down server'
-        try:
-            server.socket.close()
-        except:
-            pass
-
-if __name__ == '__main__':
-    cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityOutput
-    cing.verbosity = verbosityDebug    
-    main()
+#def main():
+#    os.chdir(cingDirTmp)
+#    
+#    try:
+#        server = HTTPServer(('', 8000), iCingServerHandler)
+#        print 'started httpserver...'
+#        server.serve_forever()
+#    except KeyboardInterrupt:
+#        print '^C received'
+#    finally:
+#        print 'shutting down server'
+#        try:
+#            server.socket.close()
+#        except:
+#            pass
+#
+#if __name__ == '__main__':
+#    cing.verbosity = verbosityDetail
+#    cing.verbosity = verbosityOutput
+#    cing.verbosity = verbosityDebug    
+#    main()
