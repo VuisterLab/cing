@@ -68,18 +68,20 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
+from cing.Libs.forkoff import ForkOff
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.iCing.iCingServer import iCingServerHandler
-from string import join
-from cing.iCing.iCingServer import PORT_SERVER
 from cing.iCing.iCingServer import PORT_CGI
+from cing.iCing.iCingServer import PORT_SERVER
+from string import join
+from cing.iCing.iCingServer import iCingServerHandler
 import cing
 import os
 import sys
 import unittest
+#from cing.iCing.iCingServer import iCingServerHandler
 
 
 
@@ -190,23 +192,28 @@ def serve():
     NTmessage("Starting a server at port %s" % PORT_SERVER )
     httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
 #    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
-#    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
-    try:
-        httpd.serve_forever()
-#        httpd_cgi.serve_forever()
-    except KeyboardInterrupt:
-        print '^C received'        
-    finally:
-        print 'shutting down server'        
-        try:        
+    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
+    year = 365*24*60*60
+    f = ForkOff(
+            processes_max           = 2,
+            max_time_to_wait        = year, # leave the server up for a year.                
+            verbosity               = cing.verbosity )
+    job_0       = ( httpd.serve_forever, () )
+    job_1       = ( httpd_cgi.serve_forever, () )
+    job_list    = [ job_0, job_1 ]    
+    done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=0 )    
+    NTmessage("Finished forked ids: %s", done_list)
+    
+    NTmessage( 'Shutting down server' )        
+    try:        
         httpd.socket.close()
         httpd_cgi.socket.close()
-        except:
-            pass
-        try:
-            httpd_cgi.socket.close() #@UndefinedVariable
-        except:
-            pass
+    except:
+        pass
+    try:
+        httpd_cgi.socket.close() #@UndefinedVariable
+    except:
+        pass
 
 
 project = None # after running main it will be filled.
@@ -493,7 +500,7 @@ def main():
     mol = project.molecule #@UnusedVariable
     m   = project.molecule #@UnusedVariable
 
- #   pr = print
+#   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 

@@ -35,7 +35,7 @@ from cing.core.constants import X_AXIS
 from cing.core.dictionaries import isValidAtomName
 from cing.core.dictionaries import isValidResidueName
 from cing.core.dictionaries import translateAtomName
-from cing.core.molecule import allResidues
+from cing.core.molecule import allResidues #@UnusedImport
 import os
 
 #==============================================================================
