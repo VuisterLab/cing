@@ -17,11 +17,15 @@ from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import quoteForJson
 from cing.Libs.disk import tail
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
+from glob import glob
+from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTpath
 import cgi
 import cing
 import os
@@ -51,7 +55,6 @@ MAX_TIME_TO_RUN = 10 * 60
 PYTHON_EXECUTABLE = "/sw/bin/python"
 CING_SCRIPT = "$CINGROOT/python/cing/main.py"
 #CING_SCRIPT = "$CINGROOT/python/cing/iCing/test/dummyRun.py"
-CING_OPTIONS = "--initCcpn"
 
 server_cgi_url_tmp = "localhost/tmp/cing"
 cing_server_tmp = "/Library/WebServer/Documents/tmp/cing"
@@ -136,6 +139,14 @@ class iCingServerHandler(BaseHTTPRequestHandler):
 #            NTdebug('pathProject does not exist')
             try:
                 os.makedirs(self.pathProject) # defaults to False return.
+                if os.path.exists(self.pathUser):
+                    mod = 0555 # dir is not readible but is executable
+#                    mod = 'u-r'
+                    NTdebug("Setting mod")
+                    os.chmod(self.pathUser, mod) 
+                    # This prevents people from seeing a user x but not the project's secret access_id's
+                    # If the secret access_id is know that dir can be retrieved. Same as Aqua server
+                    # which worked fine for a million years.
             except Exception, e:
                 msg = "Failed to makedirs for project at: [" + self.pathProject + "] with Exception: ["+`e`+"]"
                 self.sendJSON({RESPONSE_STATUS_ERROR: msg})
@@ -224,10 +235,24 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         cmdRunStarting = "(date;echo 'Starting cing run') >> %s 2>&1" % CING_RUN_LOG_FILE
         cmdRunKiller = "(date;echo 'Pretending to start cing killer run') >> %s 2>&1 &" % CING_RUN_LOG_FILE
         cmdRunDone = "touch %s" % DONE_FILE
+        
+        projectFile = self._getProjectFile()
+        if not projectFile:
+            self.sendJSON({RESPONSE_STATUS_ERROR: "Failed to find project file"})
+            return
+            
+        projectName = self._getProjectName(projectFile)
+        if not projectName:
+            self.sendJSON({RESPONSE_STATUS_ERROR: "Failed to find project name"})
+            return
+        
+        cing_options = "--name %s --initCcpn %s --nosave -v %s" % (
+            projectName, projectFile, cing.verbosity )
+
         cmdRun = "(%s -u %s %s; %s ) >> %s 2>&1 &" % (
             PYTHON_EXECUTABLE,
             CING_SCRIPT,
-            CING_OPTIONS,
+            cing_options,
             cmdRunDone,
             CING_RUN_LOG_FILE
             )
@@ -274,6 +299,28 @@ class iCingServerHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.sendJSON({RESPONSE_STATUS_ERROR: "Access denied through do_GET()"})
 
+    def _getProjectFile(self):
+        if not self.user_id:
+            NTerror("Failed to get user id")
+            return
+        if not self.access_key:
+            NTerror("Failed to get access key")
+            return
+        projectFileList = glob( "*.tgz" ) + glob( "*.tar.gz" )
+        if len( projectFileList ) == 0:
+            NTerror("Failed to get any project file")
+            return
+        if len( projectFileList ) > 1:
+            NTwarning("Get multiple project files %s; picking first one." % projectFileList)
+        return projectFileList[0]
+
+    def _getProjectName(self, projectFile):
+        if not projectFile:
+            NTerror("In _getProjectName: Failed to get any project file")
+            return
+        (_directory, basename, _extension) = NTpath( projectFile )            
+        projectName = basename
+        return projectName
 
 def main():
     os.chdir(cingDirTmp)

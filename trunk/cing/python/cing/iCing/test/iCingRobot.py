@@ -12,16 +12,19 @@ from cing.iCing.iCingServer import PORT_SERVER
 import cing
 import os
 
-def testiCing():
-    NTwarning("Excpect errors whitout a server; disable this test.")
-    NTmessage("Firing up the iCing robot; aka CCPN Analysis interface to CING")
+def iCingRobot():
+    NTwarning("Excpect errors whitout a server up and running.")
+    NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
     localTesting = True
-    doSave = False
+    doSave = True
     doRun = False
-    doStatus = True
-    
-    user_id = "Tim"
-    access_key = "TimsDirtySecret"
+    doStatus = False
+    user_id = "jd3"
+    access_key = "234567"
+
+#    user_id = "Tim"
+#    access_key = "TimsDirtySecret"
+
     entryId = '1a4d' # smallest for quick testing.
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
     
@@ -67,4 +70,4 @@ def testiCing():
     
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    testiCing()
+    iCingRobot()

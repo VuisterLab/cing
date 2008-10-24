@@ -1,8 +1,8 @@
 * apache on mac
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
-        /private/etc/apache2/httpd.conf and
-        /private/etc/apache2/users/jd.conf
+        vi /private/etc/apache2/httpd.conf
+        vi /private/etc/apache2/users/jd.conf
 
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
@@ -23,8 +23,8 @@ Info:
     [Tue Jun 17 15:20:45 2008] [warn] PassEnv variable procheckPath was undefined
     [Tue Jun 17 15:20:45 2008] [warn] PassEnv variable aqpcPath was undefined
     Processing config directory: /private/etc/httpd/users/*.conf
-     Processing config file: /private/etc/httpd/users/ca.conf
-     Processing config file: /private/etc/httpd/users/jd.conf
+    Processing config file: /private/etc/httpd/users/ca.conf
+    Processing config file: /private/etc/httpd/users/jd.conf
 
     Install /Library/WebServer/Documents/favicon.ico
     
