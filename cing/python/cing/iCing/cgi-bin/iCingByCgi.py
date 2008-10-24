@@ -1,5 +1,8 @@
 #!/sw/bin/python -u
 """
+
+TODO: why doesn't pydev extensions analyze this code?
+
 The reason that this code isn't integrated with the regular iCing server is that the large file uploads require
 cgi parameters to be parsed with FieldStorage() and can thus not be done with subclassing BaseHTTPRequestHandler.
 
@@ -10,9 +13,18 @@ http://code.google.com/support/bin/answer.py?answer=65632&topic=11368
 """
 from cgi import FieldStorage
 from cing.Libs.NTutils import bytesToFormattedString
+from cing.iCing.iCingServer import BUFFER_WRITE
+from cing.iCing.iCingServer import FORM_ACCESS_KEY
+from cing.iCing.iCingServer import FORM_ACTION
+from cing.iCing.iCingServer import FORM_ACTION_SAVE
+from cing.iCing.iCingServer import FORM_LIST_REQUIRED
+from cing.iCing.iCingServer import FORM_UPLOAD_FILE_BASE
+from cing.iCing.iCingServer import FORM_USER_ID
+from cing.iCing.iCingServer import MAX_FILE_SIZE_BYTES
+from cing.iCing.iCingServer import cing_server_tmp
 import cgitb
 import os
-import sys
+import sys 
 import time
 
 class iCingByCgi():
@@ -93,53 +105,7 @@ class iCingByCgi():
         fout.close()
         self.endMessage(bytesToFormattedString(fileLength))
 
-    def run(self):        
 
-        logToLog('Now in pathProject: ' + pathProject)        
-        doWhatif   =      form.has_key(FORM_DO_WHATIF)  and form[FORM_DO_WHATIF].value   == 'on'
-        doProcheck =      form.has_key(FORM_DO_PROCHECK) and form[FORM_DO_PROCHECK].value == 'on'
-        htmlOnly   = not (form.has_key(FORM_DO_IMAGES)   and form[FORM_DO_IMAGES].value   == 'on')
-        msg = "<p>doWhatif     %3s" % doWhatif
-        msg +="\n<p>doProcheck   %3s" % doProcheck
-        msg +="\n<p>htmlOnly     %3s" % htmlOnly
-        
-        fastestTest = True
-        if fastestTest:
-            htmlOnly = True 
-            doWhatif = False
-            doProcheck = False
-
-        
-        projectList = glob("*.tgz")
-        if len(projectList) == 0:
-            endError("Failed to get any ccpn project on disk with .tgz")
-        projectFile = projectList[0]
-        if len(projectList) > 1:
-            logToLog("Got more than one project file; taking first one: " + projectFile)            
-        (_directory, entryId, _extension)  = NTpath(projectFile)
-        project = Project.open(entryId, status='new')
-        
-        ccpnFile = projectFile
-        try:
-            rmtree(entryId) # remove if present before.
-        except:
-            pass
-        tar = tarfile.open(ccpnFile, "r:gz")
-        for itar in tar:
-            tar.extract(itar.name, '.')
-
-        org = 'linkNmrStarData' # TODO: mod the NRG examples to follow this convention too.
-        if not entryId[0].isdigit():  # pdb file?
-            org = entryId
-        move(org, entryId)
-        project.initCcpn(ccpnFolder=entryId)
-        project.save()
-        project.validate(
-          htmlOnly=htmlOnly,
-          doProcheck = doProcheck,
-          doWhatif=doWhatif)
-        msg = "Finished validation"        
-        endMessage(msg)
 
     def endError(self, message):
         self.endNow(message, isError=True)
