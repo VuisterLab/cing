@@ -149,6 +149,7 @@ public class FileFormHandler implements FormHandler {
 		getLabelFileUploadDone().setText(labelTxt);
 		
 		nextButton.setEnabled(true);
+		RunView.runButton.setEnabled(true);	
 	}
 
 	private String getFileNameWithoutPath(String fn) {

@@ -419,7 +419,7 @@ class Process:
                 NTerror("  Process could NOT be killed by HUP or KILL signal")
                 NTerror("  Process has turned into zombie")
         if self.verbosity >= 9:
-            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status))
+            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status)) 
         
         return exit_pid, exit_status
 

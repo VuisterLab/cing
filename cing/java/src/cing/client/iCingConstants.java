@@ -160,14 +160,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String All_non_hydro();
 
   /**
-   * Translated "Français".
-   * 
-   * @return translated "Français"
-   * @gwt.key fr
-   */
-  String fr();
-
-  /**
    * Translated "Detail".
    * 
    * @return translated "Detail"
@@ -248,14 +240,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String CING();
 
   /**
-   * Translated "Deutsch".
-   * 
-   * @return translated "Deutsch"
-   * @gwt.key de
-   */
-  String de();
-
-  /**
    * Translated "Start".
    * 
    * @return translated "Start"
@@ -278,14 +262,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Remove
    */
   String Remove();
-
-  /**
-   * Translated "Italiano".
-   * 
-   * @return translated "Italiano"
-   * @gwt.key it
-   */
-  String it();
 
   /**
    * Translated "Submit".
@@ -368,14 +344,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Welcome();
 
   /**
-   * Translated "Español".
-   * 
-   * @return translated "Español"
-   * @gwt.key es
-   */
-  String es();
-
-  /**
    * Translated "Debug mode".
    * 
    * @return translated "Debug mode"
@@ -414,14 +382,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Load_state
    */
   String Load_state();
-
-  /**
-   * Translated "English".
-   * 
-   * @return translated "English"
-   * @gwt.key en
-   */
-  String en();
 
   /**
    * Translated "Include intra-residual contacts".
@@ -496,14 +456,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String About();
 
   /**
-   * Translated "Português".
-   * 
-   * @return translated "Português"
-   * @gwt.key pt
-   */
-  String pt();
-
-  /**
    * Translated "per residue".
    * 
    * @return translated "per residue"
@@ -558,6 +510,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Silly_sound
    */
   String Silly_sound();
+
+  /**
+   * Translated "Next".
+   * 
+   * @return translated "Next"
+   * @gwt.key Next
+   */
+  String Next();
 
   /**
    * Translated "Unfortunately not possible yet; stay tuned".
@@ -662,22 +622,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Imagery_repor
    */
   String Imagery_repor();
-
-  /**
-   * Translated "中文".
-   * 
-   * @return translated "中文"
-   * @gwt.key cn
-   */
-  String cn();
-
-  /**
-   * Translated "Nederlands".
-   * 
-   * @return translated "Nederlands"
-   * @gwt.key nl
-   */
-  String nl();
 
   /**
    * Translated "Uncaught exception".

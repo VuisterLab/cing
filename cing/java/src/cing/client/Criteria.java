@@ -3,7 +3,6 @@ package cing.client;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Criteria extends Composite {
+public class Criteria extends iCingView {
 
 	public Criteria() {
 		iCingConstants c = iCing.c;
@@ -29,6 +28,7 @@ public class Criteria extends Composite {
 		final Label html_4 = new Label( c.Bad());
 		fp.add(html_1);
 		fp.add(html_2);
+//		html_2.setStyleName("h1-orange"); fails!
 		fp.add(html_3);
 		fp.add(html_4);
 		html_1.setStylePrimaryName("h1");
@@ -40,7 +40,7 @@ public class Criteria extends Composite {
 		
 		verticalPanel.add(fp);
 		DecoratedTabPanel tabPanel = new DecoratedTabPanel();
-		tabPanel.setWidth("400px");
+//		tabPanel.setWidth(iCing.widthMenu+"px"); // free is more elegant.
 		tabPanel.setAnimationEnabled(true);
 		verticalPanel.add(tabPanel);
 
@@ -172,7 +172,7 @@ public class Criteria extends Composite {
 
 		final CheckBox checkBox = new CheckBox();
 		cingTable.setWidget(1, 0, checkBox);
-		checkBox.setEnabled(false);
+		checkBox.setEnabled(true);
 		checkBox.setChecked(true);
 		checkBox.setHTML("Omega");
 
@@ -221,13 +221,19 @@ public class Criteria extends Composite {
 		cingTable.getFlexCellFormatter().setColSpan(0, 0, 5);
 		noneCingCheckBox.setHTML(c.none());
 
-		final Button saveButton = new Button();
-		verticalPanel.add(saveButton);
-		verticalPanel.setCellHorizontalAlignment(saveButton, HasHorizontalAlignment.ALIGN_CENTER);
-		saveButton.setText(c.Save());
+		final Button nextButton = new Button();
+		nextButton.setText(c.Next());
+		nextButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				icing.onHistoryChanged(iCing.OPTIONS_STATE);					
+			}
+		});	
+		verticalPanel.add(nextButton);
+		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
+		
+		
 		// Return the content
 		tabPanel.ensureDebugId("criteriaTabPanel");
 		tabPanel.selectTab(0);
-	}
-	
+	}	
 }

@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RichTextArea;
 
 /**
@@ -69,10 +68,9 @@ public class General {
 	 * 9 and debug info
 	 * </PRE>
 	 */
-	public static final int verbosityNothing = 0; // Even errors will be
-													// supressed
-	public static final int verbosityError = 1; // show only errrors
-	public static final int verbosityWarning = 2; // show errrors and warnings
+	public static final int verbosityNothing = 0; // Even errors will be suppressed
+	public static final int verbosityError = 1; // show only errors
+	public static final int verbosityWarning = 2; // show errors and warnings
 	public static final int verbosityOutput = 3; // and regular output DEFAULT
 	public static final int verbosityDetail = 4; // show more details
 	public static final int verbosityDebug = 5; // add debugging info (not
@@ -278,7 +276,7 @@ public class General {
 				message = prefix + ": null";
 			}
 		}
-		Window.alert(message);
+//		Window.alert(message);
 		showOutput(message);
 	}
 
@@ -379,8 +377,8 @@ public class General {
 	}
 
 	public static boolean appendHtml(String message) {
-		statusArea.setHTML(message+statusArea.getHTML());
-		statusArea.setVisible(verbosity >= verbosityDetail);
+		statusArea.setHTML(message + statusArea.getHTML());
+		statusArea.setVisible(verbosity == verbosityDebug);
 		if (iCing.textIsReversedArea) {
 			area.setHTML(message + area.getHTML());
 		} else {
@@ -496,4 +494,27 @@ public class General {
 	// showError(string + date);
 	// }
 	//    
+	/**
+	public static final int verbosityNothing = 0; // Even errors will be suppressed
+	public static final int verbosityError = 1; // show only errors
+	public static final int verbosityWarning = 2; // show errors and warnings
+	public static final int verbosityOutput = 3; // and regular output DEFAULT
+	public static final int verbosityDetail = 4; // show more details
+	public static final int verbosityDebug = 5; // add debugging info (not
+
+verbosityNothing  = 0 # Even errors will be suppressed
+verbosityError    = 1 # show only errors
+verbosityWarning  = 2 # show errors and warnings
+verbosityOutput   = 3 # and regular output DEFAULT
+verbosityDetail   = 4 # show more details
+verbosityDebug    = 9 # add debugging info (not recommended for casual user)
+	 * @param verbosity
+	 * @return
+	 */
+	public static int map2CingVerbosity(int verbosity) {
+		if ( verbosity == 5) {
+			return 9;
+		}
+		return verbosity;
+	}
 }

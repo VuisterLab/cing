@@ -3,18 +3,20 @@ package cing.client;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.Widget;
 
-public class LogView extends Composite {
+public class LogView extends iCingView {
 	
-    final static RichTextArea area = iCing.area;
 	iCingConstants c = iCing.c;
-	public LogView() {
+    public final RichTextArea area = iCing.area;
+    
+    final Label logLabel = new Label(c.Log()+" "+c.iCing());
+
+    public LogView() {
 	    // Create the text area and toolbar
 //	    RichTextArea area = new RichTextArea();
 //	    area.setText("Expect to see the iCing messages scroll by here. \\nVerbosity may be controlled from iCing->Preferences.");
@@ -36,9 +38,8 @@ public class LogView extends Composite {
 	    grid.setWidget(0, 0, gridTop);
 //	    horizontalPanel.setSpacing(11);
 
-	    final Label logIcingLabel = new Label(c.Log()+" "+c.iCing());
-	    logIcingLabel.setStylePrimaryName("h1");
-	    gridTop.setWidget(0, 0, logIcingLabel);
+	    logLabel.setStylePrimaryName("h1");
+	    gridTop.setWidget(0, 0, logLabel);
 		
 	    final CheckBox tailCheckBox = new CheckBox();
 	    gridTop.setWidget(0, 1, tailCheckBox);

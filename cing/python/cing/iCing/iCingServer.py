@@ -37,6 +37,8 @@ FORM_ACTION = "Action"
 FORM_ACTION_RUN = "Run"
 FORM_ACTION_SAVE = "Save"
 FORM_ACTION_STATUS = "Status"
+FORM_ACTION_PROJECT_NAME = "ProjectName"
+FORM_ACTION_LOG = "Log"
 FORM_DO_WHATIF = "doWhatif"
 FORM_DO_PROCHECK = "doProcheck"
 FORM_DO_IMAGES = "doImages"
@@ -67,15 +69,21 @@ PORT_SERVER = 8000
 PORT_CGI = 8001
 
 DONE_FILE = "DONE"
+"Contains the string representation of the byte length already read from the log file before"
+LAST_LOG_SEND_FILE = ".LAST_LOG_SEND" 
 CING_RUN_LOG_FILE = "cingRun.log"
 
 # server response codes.
 RESPONSE_STATUS = "status" # follows a clien request FORM_ACTION_STATUS 
 RESPONSE_STATUS_DONE = "done"
-RESPONSE_STATUS_NOT_DONE = "not done"
+RESPONSE_STATUS_NOT_DONE = "notDone"
 RESPONSE_STATUS_ERROR = "error"
 RESPONSE_STATUS_MESSAGE = "message"
-RESPONSE_TAIL_PROGRESS = "tail progress"
+RESPONSE_TAIL_PROGRESS = "tailProgress"
+RESPONSE_PROJECT_NAME = "projectName"
+RESPONSE_NONE = "None"
+
+
  
 class iCingServerHandler(BaseHTTPRequestHandler):
     def sendJSON(self, kwds={} ):        
@@ -87,12 +95,15 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         For list of codes look at: BaseHTTPRequestHandler.responses dictionary
         Make sure that the caller exits.
         """        
-        body =  "{\n"
-        for key in kwds.keys():
+        body =  "{"
+        keyList = kwds.keys()
+        for key in keyList:
             keyStr = quoteForJson(key)
-            valueStr = quoteForJson(kwds[key])
-            body += "%s: %s,\n" % ( keyStr, valueStr ) # extra comma is harmless.
-        body +=  "}\n"
+            valueStr = quoteForJson(kwds[key], isValue=True)
+            body += "%s: %s," % ( keyStr, valueStr ) # extra comma is harmless.
+        if len(keyList):
+            body = body[:-1] # get rid of the extra comma anywho.
+        body +=  "}"
 
         try: # gives a broken pipe but works fine otherwise.... TODO: figure out why 
             self.send_response(RESPONSE_CODE_200_OK) # otherwise we can't send a body?
@@ -140,7 +151,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
             try:
                 os.makedirs(self.pathProject) # defaults to False return.
                 if os.path.exists(self.pathUser):
-                    mod = 0555 # dir is not readible but is executable
+                    mod = 0555 # dir is not readable but is executable
 #                    mod = 'u-r'
                     NTdebug("Setting mod")
                     os.chmod(self.pathUser, mod) 
@@ -161,6 +172,11 @@ class iCingServerHandler(BaseHTTPRequestHandler):
             self.run()
         if action == FORM_ACTION_STATUS:
             self.getStatus()
+        if action == FORM_ACTION_LOG:
+            self.getLog()
+        if action == FORM_ACTION_PROJECT_NAME:
+            self.getProjectName()
+            
         else:
             msg = "Unknown action: %s" % action
             self.sendJSON({RESPONSE_STATUS_ERROR: msg})
@@ -226,8 +242,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
                 processes_max       = 9999,
                 max_time_to_wait    = MAX_TIME_TO_WAIT_FORKOFF,
                 max_time_to_wait_kill = 1, # not sure if this should be changed from the default 5
-                verbosity           = cing.verbosity,
-                
+                verbosity           = cing.verbosity                
                 )
     
     
@@ -246,7 +261,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
             self.sendJSON({RESPONSE_STATUS_ERROR: "Failed to find project name"})
             return
         
-        cing_options = "--name %s --initCcpn %s --nosave -v %s" % (
+        cing_options = "--name %s --initCcpn %s --nosave -v %s --script doValidateiCing.py" % (
             projectName, projectFile, cing.verbosity )
 
         cmdRun = "(%s -u %s %s; %s ) >> %s 2>&1 &" % (
@@ -282,18 +297,58 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         if os.path.exists(DONE_FILE):
             responseStatus = RESPONSE_STATUS_DONE
         kwd[ RESPONSE_STATUS ] = responseStatus 
+        self.sendJSON(kwd)
+        
 
-        kwd[ RESPONSE_TAIL_PROGRESS ] = "No log file so far"
+    def getLog(self):
+        NTdebug('Retrieving cing log tail.')
+        kwd={}
+        lastLog = "No log file so far"
         if os.path.exists(CING_RUN_LOG_FILE):
             try:
-                f = open(CING_RUN_LOG_FILE,'r')
-                lastLineList = tail(f,1)
-                if lastLineList:
-                    kwd[ RESPONSE_TAIL_PROGRESS ] = lastLineList[0]
+                cingrunLogFileSize = os.path.getsize(CING_RUN_LOG_FILE)
+                cingrunLogFileSizeLast = 0
+                if os.path.exists(LAST_LOG_SEND_FILE):
+                    fl = open(LAST_LOG_SEND_FILE,'r')
+                    cingrunLogFileSizeLast = fl.getline()
+                    fl.close()
+                    if cingrunLogFileSizeLast:
+                        cingrunLogFileSizeLast = int(cingrunLogFileSizeLast)
+                    os.remove(fl)
+                # doesn't exist because it was just removed.
+                fl = open(LAST_LOG_SEND_FILE,'w')
+                fl.write( `cingrunLogFileSize` )
+                fl.close()
+                        
+                if cingrunLogFileSize > cingrunLogFileSizeLast:
+                    f = open(CING_RUN_LOG_FILE,'r')
+                    f.seek(cingrunLogFileSizeLast)
+                    lastLog = f.read( cingrunLogFileSize - cingrunLogFileSize )
+                
+#                lastLineList = tail(f,1)
+#                if lastLineList:
+#                    kwd[ RESPONSE_TAIL_PROGRESS ] = lastLineList[0]
+            except:
+                pass
             finally:
-                f.close()
-            
+                f.close()            
+        kwd[ RESPONSE_TAIL_PROGRESS ] = lastLog
         self.sendJSON(kwd)
+
+    def getProjectName(self):
+        NTdebug('Retrieving project name.')
+        projectFile = self._getProjectFile()
+        if not projectFile:
+            NTerror( "Failed to find project file" )
+            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_NONE})
+            return
+            
+        projectName = self._getProjectName(projectFile)
+        if not projectName:
+            NTerror( "Failed to find project name" )
+            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_NONE})
+            return
+        self.sendJSON({RESPONSE_PROJECT_NAME: projectName})
         
         
     def do_GET(self):

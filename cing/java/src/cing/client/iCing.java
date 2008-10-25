@@ -1,6 +1,7 @@
 package cing.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.HeadElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -17,12 +19,9 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -31,23 +30,28 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 
-	public static final String VERSION = "0.0.2";
-//	public static final String RPC_URL = "../cgi-bin/iCing"; original
-	public static final String RPC_URL = "cgi-bin"; // ProxyPass         /iCing/cgi-bin http://localhost:8000/cgi-bin
+	public static String VERSION;
+	// public static final String RPC_URL = "../cgi-bin/iCing"; original
 	public static final String RESULT_URL = "../tmp/cing";
-
+	static final String FILE_UPLOAD_URL = "cgi-bin/iCingByCgi.py";
+	static final String SERVER_URL = "server-bin"; // proxied to: :8000
+													// iCingServer.py
+	static final String NOT_AVAILABLE = "not available";
+	
 	public static final String LOGIN_STATE = "login";
 	public static final String WELCOME_STATE = "welcome";
+	public static final String PREFERENCES_STATE = "preferences";
 	public static final String FILE_STATE = "file";
 	public static final String LOG_STATE = "log";
+	public static final String CING_LOG_STATE = "cingLog";
 	public static final String CRITERIA_STATE = "criteria";
-	public static final String PREFERENCES_STATE = "preferences";
+	public static final String OPTIONS_STATE = "options";
+	public static final String RUN_STATE = "run";
 	public static final String REPORT_STATE = "report";
 
 	public static final String FORM_ACCESS_KEY = "AccessKey";
@@ -57,8 +61,18 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String RUN_SERVER_ACTION = "Action";
 	public static final String RUN_SERVER_ACTION_RUN = "Run";
 	public static final String RUN_SERVER_ACTION_SAVE = "Save";
+	public static final String RUN_SERVER_ACTION_STATUS = "Status";
+	public static final String RUN_SERVER_ACTION_PROJECT_NAME = "ProjectName";
+	public static final String RUN_SERVER_ACTION_LOG = "Log";
 
-	private static final String RUN_SERVER_RELATIVE_URL = iCing.RPC_URL + "/iCingServer.py";
+	public static final String RESPONSE_STATUS = "status";
+	public static final String RESPONSE_STATUS_DONE = "done";
+	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
+	public static final String RESPONSE_STATUS_ERROR = "error";
+	public static final String RESPONSE_STATUS_MESSAGE = "message";
+	public static final String RESPONSE_STATUS_PROJECT_NAME = "projectName";
+	public static final String RESPONSE_STATUS_NONE = "None";
+	public static final String RESPONSE_TAIL_PROGRESS = "tailProgress";
 
 	/**
 	 * WATCH out, this needs to be in sync with FileView form. It's the file and
@@ -82,36 +96,46 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final int yLocMainWindow = 110;
 	public static final String widthMenu = "900";
 	public static final int WIDTH_MENU = 900;
-	protected static boolean soundOn = true;
-	protected static boolean debugOn = true;
+	static boolean soundOn = true;
 
 	public static iCingConstants c;
-	public static String currentAccessKey = Options.getNewAccessKey();
-	public static String currentUserId = "JoeNmr"; // TODO: implement security
+	public static String currentAccessKey = "234567";
+	// public static String currentAccessKey = Options.getNewAccessKey();
+	public static String currentUserId = "jd3"; // TODO: implement security
 	// functionality later.
+	/** How often does iCing check and update asynchronously; DEFAULT 1000 */
+	public static final int REFRESH_INTERVAL = 2000;
 
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextArea area = new RichTextArea();
 	public static final RichTextArea statusArea = new RichTextArea();
+	public static final RichTextArea cingArea = new RichTextArea();
 	public static boolean textIsReversedArea = false;
+	public static boolean textIsReversedCingArea = false;
 	public static boolean textIsReversedStatusArea = false;
 
 	// public static final int areaTail = new Boolean(false);
 
-	ArrayList<Composite> views;
+	ArrayList<iCingView> views;
 	Welcome welcome;
 	FileView fileView;
 	LogView logView;
+	CingLogView cingLogView;
 	Login login;
 	Options options;
 	Preferences preferences;
 	Criteria criteria;
 	Report report;
+	RunView runView;
 	Status status;
 	Footer footer;
 
 	private RootPanel rootPanel = RootPanel.get();
 	VerticalPanel vPanel = new VerticalPanel();
+	public String projectName = null;
+
+	static {
+	}
 
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
@@ -125,7 +149,9 @@ public class iCing implements EntryPoint, HistoryListener {
 		// }
 		// });
 		c = GWT.create(iCingConstants.class);
-		General.setVerbosityToDebug();
+//		General.setVerbosityToDebug();
+		Date today = new Date();
+		VERSION = DateTimeFormat.getLongTimeFormat().format(today);
 
 		showMenu();
 
@@ -134,30 +160,33 @@ public class iCing implements EntryPoint, HistoryListener {
 		welcome = new Welcome();
 		fileView = new FileView();
 		logView = new LogView();
+		cingLogView = new CingLogView();
 		options = new Options();
 		preferences = new Preferences();
 		criteria = new Criteria();
+		runView = new RunView();
 		report = new Report();
 		footer = new Footer();
-
-		fileView.setIcing(this);
 
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
 		views.add(welcome);
 		views.add(fileView);
 		views.add(logView);
+		views.add(cingLogView);
 		views.add(login);
 		views.add(options);
 		views.add(preferences);
 		views.add(welcome);
 		views.add(criteria);
 		views.add(report);
+		views.add(runView);
 		views.add(status);
 		views.add(footer);
 
-		for (Composite v : views) {
+		for (iCingView v : views) {
 			vPanel.add(v); // All on top of each
+			v.setIcing(this);
 		}
 		vPanel.setSpacing(5);
 		clearAllViews();
@@ -169,10 +198,10 @@ public class iCing implements EntryPoint, HistoryListener {
 	/**
 	 * Disable the loading message.
 	 */
-	public void showLoadingMessage(boolean status) {
+	public void showLoadingMessage(boolean statusLoaded) {
 		Element loadingDiv = DOM.getElementById("loading");
 		String styleDisplay = "none";
-		if (status) {
+		if (statusLoaded) {
 			styleDisplay = "block";
 		}
 		loadingDiv.getStyle().setProperty("display", styleDisplay);
@@ -180,8 +209,9 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	private void setupHistory() {
 		History.addHistoryListener(this);
-//		this.onHistoryChanged(LOGIN_STATE);
+		// this.onHistoryChanged(LOGIN_STATE);
 		this.onHistoryChanged(FILE_STATE);
+//		this.onHistoryChanged(CING_LOG_STATE);
 		// this.onHistoryChanged(WELCOME_STATE);
 	}
 
@@ -198,11 +228,20 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (LOG_STATE.equals(historyToken)) {
 			loadLogView();
 		}
+		if (CING_LOG_STATE.equals(historyToken)) {
+			loadCingLogView();
+		}
 		if (CRITERIA_STATE.equals(historyToken)) {
 			loadCriteriaView();
 		}
 		if (REPORT_STATE.equals(historyToken)) {
 			loadReportView();
+		}
+		if (OPTIONS_STATE.equals(historyToken)) {
+			loadOptionsView();
+		}
+		if (RUN_STATE.equals(historyToken)) {
+			loadRunView();
 		}
 		if (PREFERENCES_STATE.equals(historyToken)) {
 			loadPreferencesView();
@@ -283,14 +322,14 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
 
-		listBoxLocale.addItem(c.cn(), "cn");
-		listBoxLocale.addItem(c.de(), "de");
-		listBoxLocale.addItem(c.en(), "en");
-		listBoxLocale.addItem(c.es(), "es");
-		listBoxLocale.addItem(c.fr(), "fr");
-		listBoxLocale.addItem(c.it(), "it");
-		listBoxLocale.addItem(c.nl(), "nl");
-		listBoxLocale.addItem(c.pt(), "pt");
+		listBoxLocale.addItem("中文", "cn");
+		listBoxLocale.addItem("Deutsch", "de");
+		listBoxLocale.addItem("English", "en");
+		listBoxLocale.addItem("Español", "es");
+		listBoxLocale.addItem("Français", "fr");
+		listBoxLocale.addItem("Italiano", "it");
+		listBoxLocale.addItem("Nederlands", "nl");
+		listBoxLocale.addItem("Português", "pt");
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
 		int idx = 2;
@@ -315,37 +354,37 @@ public class iCing implements EntryPoint, HistoryListener {
 			}
 		});
 
-		// Add the option to change the style
-		final HorizontalPanel styleWrapper = new HorizontalPanel();
-		verticalPanel_1.add(styleWrapper);
-
-		for (i = 0; i < STYLE_THEMES.length; i++) {
-			final ThemeButton button = new ThemeButton(STYLE_THEMES[i]);
-			styleWrapper.add(button);
-			button.addClickListener(new ClickListener() {
-				public void onClick(Widget sender) {
-					Window.alert("Style selection currently buggy; disabled for now.");
-					return;
-					// // Update the current theme
-					// CUR_THEME = button.getTheme();
-					// General.showError("Selecting theme: " +
-					// button.getTheme());
-					//Window.alert("Feature currently buggy; best to reload now."
-					// );
-					// // if ( debugOn ) {
-					// // // Reload the current tab, loading the new theme if
-					// // necessary
-					// // TabBar bar = ((TabBar) this.getContentTitle());
-					// // bar.selectTab(bar.getSelectedTab());
-					// // Load the new style sheets
-					// updateStyleSheets();
-					// } else {
-					//Window.alert("Feature currently buggy; best to reload now."
-					// );
-					// }
-				}
-			});
-		}
+		// // Add the option to change the style
+		// final HorizontalPanel styleWrapper = new HorizontalPanel();
+		// verticalPanel_1.add(styleWrapper);
+		//
+		// for (i = 0; i < STYLE_THEMES.length; i++) {
+		// final ThemeButton button = new ThemeButton(STYLE_THEMES[i]);
+		// styleWrapper.add(button);
+		// button.addClickListener(new ClickListener() {
+		// public void onClick(Widget sender) {
+		// Window.alert("Style selection currently buggy; disabled for now.");
+		// return;
+		// // // Update the current theme
+		// // CUR_THEME = button.getTheme();
+		// // General.showError("Selecting theme: " +
+		// // button.getTheme());
+		// //Window.alert("Feature currently buggy; best to reload now."
+		// // );
+		// // // if ( debugOn ) {
+		// // // // Reload the current tab, loading the new theme if
+		// // // necessary
+		// // // TabBar bar = ((TabBar) this.getContentTitle());
+		// // // bar.selectTab(bar.getSelectedTab());
+		// // // Load the new style sheets
+		// // updateStyleSheets();
+		// // } else {
+		// //Window.alert("Feature currently buggy; best to reload now."
+		// // );
+		// // }
+		// }
+		// });
+		// }
 
 		final MenuBar menuBar = new MenuBar();
 		final MenuBar menuBar_file = new MenuBar(true);
@@ -364,6 +403,11 @@ public class iCing implements EntryPoint, HistoryListener {
 		Command commandLog = new Command() {
 			public void execute() {
 				loadLogView();
+			}
+		};
+		Command commandCingLog = new Command() {
+			public void execute() {
+				loadCingLogView();
 			}
 		};
 		Command commandExit = new Command() {
@@ -389,8 +433,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		Command commandRun = new Command() {
 			public void execute() {
-				// Window.alert(c.unfortunatel());
-				run();
+				loadRunView();
 			}
 		};
 		Command commandReport = new Command() {
@@ -429,8 +472,8 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		menuBar_view.addItem(c.Report(), commandReport);
 		// menuItemReport.addStyleDependentName("disabled");
-		MenuItem menuItemLogCing = menuBar_view.addItem(c.Log() + " CING", (Command) null);
-		menuItemLogCing.addStyleDependentName("disabled");
+		menuBar_view.addItem(c.Log() + " CING", commandCingLog);
+		// menuItemLogCing.addStyleDependentName("disabled");
 		menuBar_view.addItem(c.Log() + " iCing", commandLog);
 		MenuItem menuItem3D = menuBar.addItem(c.threeD(), (Command) null);
 		menuItem3D.addStyleDependentName("disabled"); // try to improve styling.
@@ -441,35 +484,13 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_help.addItem(c.Help(), commandHelp);
 
 		rootPanel.add(vPanel);
-//		rootPanel.setWidth("950px");
+		// rootPanel.setWidth("950px");
 		vPanel.setWidth("100%");
 		vPanel.add(topPanel);
 		topPanel.setWidth("100%");
 		topPanel.setSpacing(11);
 		vPanel.add(menuBar);
 
-	}
-
-	protected void run() {
-		final FormPanel formPanel = new FormPanel();
-		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
-		formPanel.setMethod(FormPanel.METHOD_POST);
-		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
-		String actionUrl = moduleBaseUrlWithPort + "/" + RUN_SERVER_RELATIVE_URL;
-		General.showDebug("actionUrl: [" + actionUrl + "]");
-		formPanel.setAction(actionUrl);
-		VerticalPanel formLayoutPanel = new VerticalPanel();
-		formPanel.setWidget(formLayoutPanel);
-		/** Only invisible parameters to pass */
-		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey));
-		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId));
-		formLayoutPanel.add(new Hidden(iCing.RUN_SERVER_ACTION, RUN_SERVER_ACTION_RUN));
-
-		// The GWT calls this form handler after the form
-		// is submitted.
-		ServerFormHandler serverFormHandler = new ServerFormHandler();
-		formPanel.addFormHandler(serverFormHandler);
-		formPanel.submit();
 	}
 
 	public void loadLoginView() {
@@ -490,6 +511,11 @@ public class iCing implements EntryPoint, HistoryListener {
 	public void loadOptionsView() {
 		clearAllViews();
 		options.setVisible(true);
+	}
+
+	public void loadRunView() {
+		clearAllViews();
+		runView.setVisible(true);
 	}
 
 	public void loadPrefView() {
@@ -515,6 +541,11 @@ public class iCing implements EntryPoint, HistoryListener {
 	public void loadLogView() {
 		clearAllViews();
 		logView.setVisible(true);
+	}
+
+	public void loadCingLogView() {
+		clearAllViews();
+		cingLogView.setVisible(true);
 	}
 
 	/**
@@ -626,45 +657,47 @@ public class iCing implements EntryPoint, HistoryListener {
 		return gwtRef;
 	}
 
-	/**
-	 * A special version of the ToggleButton that cannot be clicked if down. If
-	 * one theme button is pressed, all of the others are depressed.
-	 */
-	private static class ThemeButton extends ToggleButton {
-		private static List<ThemeButton> allButtons = null;
+	// /**
+	// * A special version of the ToggleButton that cannot be clicked if down.
+	// If
+	// * one theme button is pressed, all of the others are depressed.
+	// */
+	// private static class ThemeButton extends ToggleButton {
+	// private static List<ThemeButton> allButtons = null;
+	//
+	// private String theme;
+	//
+	// public ThemeButton(String theme) {
+	// super();
+	// this.theme = theme;
+	// addStyleName("sc-ThemeButton-" + theme);
+	//
+	// // Add this button to the static list
+	// if (allButtons == null) {
+	// allButtons = new ArrayList<ThemeButton>();
+	// setDown(true);
+	// }
+	// allButtons.add(this);
+	// }
+	//
+	// public String getTheme() {
+	// return theme;
+	// }
+	//
+	// @Override
+	// protected void onClick() {
+	// if (!isDown()) {
+	// // Raise all of the other buttons
+	// for (ThemeButton button : allButtons) {
+	// if (button != this) {
+	// button.setDown(false);
+	// }
+	// }
+	//
+	// // Fire the click listeners
+	// super.onClick();
+	// }
+	// }
+	// }
 
-		private String theme;
-
-		public ThemeButton(String theme) {
-			super();
-			this.theme = theme;
-			addStyleName("sc-ThemeButton-" + theme);
-
-			// Add this button to the static list
-			if (allButtons == null) {
-				allButtons = new ArrayList<ThemeButton>();
-				setDown(true);
-			}
-			allButtons.add(this);
-		}
-
-		public String getTheme() {
-			return theme;
-		}
-
-		@Override
-		protected void onClick() {
-			if (!isDown()) {
-				// Raise all of the other buttons
-				for (ThemeButton button : allButtons) {
-					if (button != this) {
-						button.setDown(false);
-					}
-				}
-
-				// Fire the click listeners
-				super.onClick();
-			}
-		}
-	}
 }
