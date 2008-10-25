@@ -38,7 +38,7 @@ class AllChecks(TestCase):
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
             ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
-            self.assertFalse(project.initCcpn(ccpnFolder=ccpnFile))
+            self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile))
             self.failIf(project.save())
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,

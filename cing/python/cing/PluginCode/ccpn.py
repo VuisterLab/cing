@@ -1,5 +1,5 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
-from cing.Libs.NTutils import NTdebug
+#from cing.Libs.NTutils import NTdebug
 from cing.Libs.fpconst import NaN
 from string import digits
 from shutil import rmtree
@@ -21,7 +21,7 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import sprintf
-from cing.core.constants import INTERNAL
+#from cing.core.constants import INTERNAL
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
@@ -873,7 +873,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
     # Molecule selection is only appropriate for ShiftLists, not for PeakLists
     listMolSystems = _checkCcpnMolecules( ccpnProject, moleculeName, funcName )
 
-    doneSetShifts = False
+    doneSetShifts = False #@UnusedVariable
 
     # Get shift lists (linking resonances to atoms) from Ccpn for a Cing.Molecule
     # need to do it before importing Peaks
@@ -899,7 +899,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
                 shiftMapping = _getShiftAtomNameMapping( ccpnShiftList,
                                                          ccpnMolSys )
-                doneSetShifts = _setShifts( molecule, shiftMapping,
+                doneSetShifts = _setShifts( molecule, shiftMapping, #@UnusedVariable
                                             ccpnShiftList )
             # end for
 #            if doneSetShifts:
@@ -911,7 +911,7 @@ def importFromCcpnPeaksAndShifts( cingProject = None, ccpnProject = None,
 
     # Get ALL peaks from Ccpn NmrProject and link them to resonances
     # It's supposed to be done only once
-    doneSetPeaks = _setPeaks( cingProject, ccpnNmrProject )
+    doneSetPeaks = _setPeaks( cingProject, ccpnNmrProject ) #@UnusedVariable
 
 #    if doneSetPeaks:
 #        NTmessage( "==> Ccpn peaks imported" )

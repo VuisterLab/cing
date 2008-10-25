@@ -233,7 +233,7 @@ def main():
 
     global project
 
-    root,file,_ext  = NTpath( __file__ )
+    _root,file,_ext  = NTpath( __file__ )
     usage          = "usage: cing [options]       use -h or --help for listing"
 
     #------------------------------------------------------------------------------------

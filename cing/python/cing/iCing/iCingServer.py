@@ -19,16 +19,16 @@ from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import quoteForJson
-from cing.Libs.disk import tail
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from glob import glob
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTpath
 import cgi
 import cing
 import os
+#from cing.Libs.disk import tail
 
 FORM_ACCESS_KEY = "AccessKey"
 FORM_USER_ID = "UserId"

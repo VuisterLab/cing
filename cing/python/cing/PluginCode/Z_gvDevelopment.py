@@ -581,7 +581,7 @@ VALID_VALUE_TYPE_ATTRS = {type(0.0): 'floatValue',
                           type(True): 'booleanValue'}
 
 
-from ccpnmr.analysis.core.Util import getSoftware
+#from ccpnmr.analysis.core.Util import getSoftware JFD disabled because it builds a dep I don't have.
 
 # # # # # # #  C I N G  E X A M P L E  # # # # # # #
 
