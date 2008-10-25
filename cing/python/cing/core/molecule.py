@@ -857,6 +857,51 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         #end if
     #end def
 
+    def mergeResonances( self, order=None, selection=None, append=True ):
+        """ Merge resonances for all the atoms
+            check all the resonances in the list, optionally using selection
+            and take the first one which has a assigned value,
+            append or collapse the resonances list to single entry depending on append.
+        """
+        for atom in self.allAtoms():
+            if ( len(atom.resonances) != self.resonanceCount ):
+                NTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
+                         atom, len(atom.resonances), self.resonanceCount
+                       )
+                return
+            else:
+                rm = None
+                if (selection == None or atom.name in selection):
+                    for res in atom.resonances:
+                        if not isNaN(res.value):
+                            rm=res
+                            break
+                        #end if
+                    #end for
+                #end if
+            #end if
+
+            if (rm):
+                atom.resonances.append(rm)
+            else:
+                rm = atom.resonances[0]
+                atom.resonances.append(rm)
+            #end if
+
+            # Optionally reduce the list
+            if not append:
+                atom.resonances = NTlist( atom.resonances() )
+        #end for
+
+        if not append:
+            self.resonanceCount = 1
+            self.resonanceSources = NTlist('merged')
+        else:
+            self.resonanceCount += 1
+            self.resonanceSources.append('merged')
+        #end if
+    #end def
+
     def _saveStereoAssignments( self, stereoFileName ):
         """
         Save the stereo assignments to xml stereoFileName.
@@ -1033,6 +1078,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
             self.updateDihedrals()
             self.updateMean()
             self.ensemble = Ensemble( self )
+            self.atomList = AtomList( self )
             if not self.has_key('ranges'):
                 self.ranges = None
             self.calculateRMSDs(ranges=self.ranges)
@@ -1631,15 +1677,19 @@ class RmsdResult( NTdict ):
     def __str__(self):
         return sprintf('<RmsdResult %s>', self.comment)
 
+    def header(self, dots='-'*20):
+        return sprintf('%s %s %s', dots, self, dots)
+
     def format(self):
-        return sprintf('%s %s %s\n' +\
+        return sprintf('%s\n' +\
                        'backboneAverage:      %s\n'  +\
                        'heavyAtomsAverage:    %s\n'  +\
                        'models:               %s\n' +\
                        'backbone   (n=%4d): [%s]\n' +\
                        'heavyAtoms (n=%4d): [%s]\n' +\
-                       'closestToMean:        model %d',
-                       dots, self, dots,
+                       'closestToMean:        model %d\n' +\
+                       '%s',
+                       self.header(),
                        str(self.backboneAverage),
                        str(self.heavyAtomsAverage),
                        self.models.format('%4d '),
@@ -1647,7 +1697,8 @@ class RmsdResult( NTdict ):
                        self.backbone.format(fmt='%4.2f '),
                        self.heavyAtomsCount,
                        self.heavyAtoms.format(fmt='%4.2f '),
-                       self.closestToMean
+                       self.closestToMean,
+                       self.footer()
                       )
     #end def
 #end class
@@ -3247,6 +3298,53 @@ Atom class: Defines object for storing atom properties
 ##end class
 ##register this handler
 #Atom.XMLhandler = XMLAtomHandler()
+
+class AtomList( NTlist ):
+    """
+    Class based on NTlist that holds atoms.
+    Also manages the "id's". GV wants to know why as atoms have an id???
+    Sort by item of Atom Class.
+
+    NB this list is only instantiated for the validate plugin. It has very little
+    functionality. Most functionality should be in Residue, Chains, etc.
+    """
+    def __init__( self, molecule ):
+        NTlist.__init__( self )
+        self.name       = molecule.name + '.atoms'
+#        self.status     = status      # Status of the list; 'keep' indicates storage required
+        self.currentId  = 0           # Id for each element of list
+        self.rogScore   = ROGscore()
+        self.appendFromMolecule( molecule )
+        self.criticize()
+    #end def
+
+    def criticize(self):
+        for atom in self:
+#            atom.criticize()
+            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
+
+    def append( self, o ):
+        o.id = self.currentId
+        NTlist.append( self, o )
+        self.currentId += 1
+
+    def appendFromMolecule( self, molecule ):
+        for atom in molecule.allAtoms():
+            self.append( atom )
+        #end for
+        # Mutual references
+        self.molecule = molecule
+        molecule.atomList = self
+    #end def
+
+    def __str__( self ):
+        return sprintf( '<AtomList "%s" (%d)>',self.name, len(self) )
+    #end def
+
+    def format( self ):
+        return str(self)
+    #end def
+#end class
 
 class CoordinateOld( list ):
     """

@@ -171,7 +171,7 @@ class Whatif( NTdict ):
     DEFAULT_RESIDUE_POOR_SCORES[ C12CHK_STR ] =  -0.9 # Guessing on basis of 1ai0, 1brv
 
     NUMBER_RESIDUES_PER_SECONDS = 7 # Was 13 before.
-    
+
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
     nameDict = NTdict()
@@ -409,7 +409,7 @@ fullstop y
                     "valeList": [ 0.009, 0.100 ],
                     }}"""
 
-        NTmessage("Processing the whatif results into CING data model")
+        NTdetail("==> Processing the WHATIF results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
@@ -664,11 +664,11 @@ def runWhatif( project, parseOnly=False ):
 
         returns True on error.
     """
-    
+
     if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
         NTmessage("No whatif installed so skipping this step")
         return
-    
+
     if not project.molecule:
         NTerror("runWhatif: no molecule defined")
         return True
@@ -796,20 +796,20 @@ def runWhatif( project, parseOnly=False ):
     #end if
 
 
-    NTmessageNoEOL('Parsing whatif checks ')
+#    NTmessageNoEOL('Parsing whatif checks ')
     for model in models:
         modelNumberString = sprintf('%03d', model)
 #        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
 #        os.unlink( fullname )
         modelCheckDbFileName = "check_"+modelNumberString+".db"
-        NTmessageNoEOL('.')
+#        NTmessageNoEOL('.')
         modelCheckDbFullFileName =  os.path.join( whatifDir, modelCheckDbFileName )
 
         if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
             NTerror("\nrunWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
     #end if
-    NTmessage(' done')
+#    NTmessage(' done')
 
     if whatif._processCheckdb():
         NTerror("runWhatif: Failed to process check db")
@@ -848,7 +848,7 @@ def restoreWhatif( project, tmp=None ):
     Optionally restore dssp results
     """
     if project.whatifStatus.completed:
-        NTdetail('==> restoring whatif results')
+        NTmessage('==> restoring whatif results')
         project.runWhatif(parseOnly=True)
 #end def
 

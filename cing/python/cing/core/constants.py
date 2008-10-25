@@ -4,6 +4,7 @@ IUPAC      = 'IUPAC'
 SPARKY     =  IUPAC
 CYANA      = 'CYANA'
 XEASY      = CYANA
+DYANA      = CYANA
 CYANA2     = 'CYANA2'
 XPLOR      = 'XPLOR'
 PDB        = 'PDB'

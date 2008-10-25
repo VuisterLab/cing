@@ -5,7 +5,8 @@ Methods:
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
@@ -13,11 +14,21 @@ from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import XML2obj
 from cing.Libs.fpconst import NaN
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing.core.molecule import dots
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.fpconst import isNaN
+
+from math import sqrt
+
 import cing
 import os
+
+contentFile = 'content.xml'
 
 def parseShiftxOutput( fileName, molecule, chainId ):
     """
@@ -62,7 +73,7 @@ format file:
     #end for
 #end def
 
-def runShiftx( project, model=None   ):
+def runShiftx( project, parseOnly=False, model=None   ):
     """
     Use shiftx program to predict chemical shifts
     Works only for protein residues.
@@ -75,6 +86,10 @@ def runShiftx( project, model=None   ):
     Shiftx works on pdb files, uses only one model (first), so we have to write the files separately and analyze them
     one at the time.
     """
+
+    if parseOnly:
+        return restoreShiftx( project )
+
     if project.molecule == None:
         NTerror('runShiftx: no molecule defined')
         return None
@@ -95,14 +110,23 @@ def runShiftx( project, model=None   ):
 
     skippedAtoms = [] # Keep a list of skipped atoms for later
     skippedResidues = []
-    for res in project.molecule.allResidues():
-        if not res.hasProperties('protein'):
-            skippedResidues.append(res)
-            for atm in res.allAtoms():
-                atm.pdbSkipRecord = True
-                skippedAtoms.append( atm )
-            #end for
-        #end if
+    skippedChains = []
+
+    for chain in project.molecule.allChains():
+        skippChain = True
+        for res in chain.allResidues():
+            if not res.hasProperties('protein'):
+                skippedResidues.append(res)
+                for atm in res.allAtoms():
+                    atm.pdbSkipRecord = True
+                    skippedAtoms.append( atm )
+                #end for
+            else:
+                skippChain = False
+            #end if
+            if skippChain:
+                skippedChains.append(chain)
+        #end for
     #end for
     if skippedResidues:
         NTwarning('runShiftx: non-protein residues %s will be skipped.',  skippedResidues)
@@ -118,12 +142,21 @@ def runShiftx( project, model=None   ):
     #end for
 
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)
+    baseName = 'model_%03d'
     shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'),
                              rootPath = root, redirectOutput = False)
 
+    # Storage of results for later
+    shiftxResult = NTdict( version      = cing.cingVersion,
+                           moleculeName = project.molecule.name, # just to have it
+                           models       = models,
+                           baseName     = baseName,
+                           chains       = NTlist()    # list of (chainNames, outputFile) tuples to be parsed
+                         )
+
     for model in NTprogressIndicator(models):
         # set filenames
-        rootname =  sprintf('model_%03d', model)
+        rootname =  sprintf( baseName, model)
         model_base_name =  os.path.join( root, rootname )
 
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
@@ -133,17 +166,25 @@ def runShiftx( project, model=None   ):
 
         pdbFile.save( model_base_name + '.pdb'   )
         for chain in project.molecule.allChains():
-#            NTmessage('Doing chain code [%s]' % (chain.name))
-            # quotes needed because by default the chain id is a space now.
-#            chainId =  "'" + chain.name + "'"
-            # According to the readme in shiftx with the source this is the way to call it.
-            chainId =  "1" + chain.name
-            outputFile = rootname + '_' + chain.name + '.out'
-            shiftx(chainId, rootname + '.pdb', outputFile )
-            outputFile = os.path.join(root,outputFile)
-#            outputFile = os.path.abspath(outputFile)
-            NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
-            parseShiftxOutput( outputFile, project.molecule, chain.name )
+
+            if chain in skippedChains:
+                NTdebug('Skipping chain code [%s]: no protein residues' % (chain.name))
+            else:
+                NTdebug('Doing chain code [%s]' % (chain.name))
+                # quotes needed because by default the chain id is a space now.
+    #            chainId =  "'" + chain.name + "'"
+                # According to the readme in shiftx with the source this is the way to call it.
+                chainId =  "1" + chain.name
+                outputFile = rootname + '_' + chain.name + '.out'
+                shiftxResult.chains.append( (chain.name, outputFile) )
+
+                shiftx(chainId, rootname + '.pdb', outputFile )
+                outputFile = os.path.join(root,outputFile)
+    #            outputFile = os.path.abspath(outputFile)
+                NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+                parseShiftxOutput( outputFile, project.molecule, chain.name )
+            #end if
+        #end for
         del( pdbFile )
     #end for
 
@@ -151,8 +192,24 @@ def runShiftx( project, model=None   ):
     for atm in skippedAtoms:
         atm.pdbSkipRecord = False
 
-    NTdetail('... averaging')
-    # Average the methyl proton shifts and b-methylene, before calculating average per atom
+    # Average the methyl proton shifts and b-methylene
+    _averageMethylAndMethylene( project, models )
+
+    # Calculate average's for each atom
+    averageShiftx(project)
+
+    # store the xmlFile
+    obj2XML( shiftxResult, path=os.path.join( root, contentFile ))
+
+    return project
+#end def
+
+
+def _averageMethylAndMethylene( project, models ):
+    """
+    Routine to average the methyl proton shifts and b-methylene, before calculating average per atom
+    """
+    NTdebug('shiftx: doing _averageMethylAndMethylene')
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():
 
@@ -181,18 +238,13 @@ def runShiftx( project, model=None   ):
             #end if
         #end if
     #end for
-
-    # Average's for each atom
-    averageShiftx(project)
-
-    return project
 #end def
 
 def averageShiftx( project, tmp=None ):
     """Average shiftx array for each atom
     """
 
-    NTdebug('doing averageShiftx')
+    NTdebug('shiftx: doing averageShiftx')
     if project.molecule == None:
         return
     #end if
@@ -209,12 +261,138 @@ def averageShiftx( project, tmp=None ):
     #end for
 #end def
 
+def restoreShiftx( project, tmp=None ):
+    """restore shiftx results for project.molecule
+    Return project or None on error
+    """
+
+    if project.molecule == None:
+        NTdebug('restoreShiftx: no molecule defined')
+        return None
+    #end if
+
+    root = project.moleculePath( 'shiftx' )
+    xmlFile = os.path.join( root, contentFile )
+
+    if os.path.exists( xmlFile ):
+        NTdetail('==> Restoring shiftx results')
+        NTdebug('Using xmlFile "%s"', xmlFile)
+    else:
+        NTdebug('Shiftx results xmlFile "%s" not found', xmlFile)
+        return None
+    #end if
+
+    shiftxResult = XML2obj( xmlFile )
+    if not shiftxResult:
+        return None
+
+    shiftxResult.keysformat()
+    NTdebug( 'shiftxResult:\n%s', shiftxResult.format() )
+
+    if shiftxResult.moleculeName != project.molecule.name:
+        NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
+                   project.molecule.name, shiftxResult.moleculeName
+                 )
+
+    # initialize the shiftx attributes
+    for atm in project.molecule.allAtoms():
+        atm.shiftx = NTlist()
+    #end for
+
+    for chainName, outputFile in shiftxResult.chains:
+        parseShiftxOutput( os.path.join(root,outputFile), project.molecule, chainName )
+    #end for
+
+    # Average the methyl proton shifts and b-methylene
+    _averageMethylAndMethylene( project, shiftxResult.models )
+
+    # Calculate average's for each atom
+    averageShiftx(project)
+
+    calcQshift( project )
+
+    return project
+#end def
+
+def _calcQshift( atmList ):
+    """
+    Calculate Qshift value for list of atoms
+    """
+    # for each model + av + heavyatom + proton + bb
+    sumDeltaSq    = 0.0
+    sumMeasuredSq = 0.0
+    for atm in atmList:
+        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned():
+            atm.shiftx.average()
+            measured = atm.shift()
+            sumMeasuredSq += measured**2
+            # delta with shiftx average
+            sumDeltaSq = (measured-atm.shiftx.av)**2
+            #print atm, measured, av
+#            sumDeltaSq[project.molecule.modelCount] += (av-measured)**2
+#            if not atm.isProton():
+#                sumDeltaSq[project.molecule.modelCount+1] += (av-measured)**2
+#            if atm.isProton():
+#                #print atm, measured, av
+#                sumDeltaSq[project.molecule.modelCount+2] += (av-measured)**2
+#            if not atm.isBackbone():
+#                sumDeltaSq[project.molecule.modelCount+3] += (av-measured)**2
+        #end if
+    #end for
+
+    if sumMeasuredSq >0.0:
+            Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
+    else:
+            Qshift=NaN
+
+    return Qshift
+#end def
+
+
+def calcQshift( project, tmp=None ):
+    """Calculate per residue Q factors between assignment and shiftx results
+    """
+    if not project.molecule:
+        NTdebug('calcQshift: no molecule defined')
+        return None
+    #end if
+    NTdetail('==> calculating Q-factors for chemical shift')
+    for res in project.molecule.allResidues():
+        atms = res.allAtoms()
+        bb = NTlist()
+        heavy = NTlist()
+        protons = NTlist()
+        res.Qshift  = NTdict(allAtoms = None, backbone=None, heavyAtoms=None, protons=None,
+                             residue = res,
+                             __FORMAT__ = \
+dots + ' shiftx Qfactor %(residue)s ' + dots + """
+allAtoms:   %(allAtoms)6.3f
+backbone:   %(backbone)6.3f
+heavyAtoms: %(heavyAtoms)6.3f
+protons:    %(protons)6.3f"""
+
+                        )
+
+        for a in atms:
+            if a.isBackbone(): bb.append(a)
+            if a.isProton(): protons.append(a)
+            else: heavy.append(a)
+        #end for
+
+        res.Qshift.allAtoms   = _calcQshift( atms )
+        res.Qshift.backbone   = _calcQshift( bb )
+        res.Qshift.heavyAtoms = _calcQshift( heavy )
+        res.Qshift.protons    = _calcQshift( protons )
+    #end for
+#end def
 
 # register the functions
 methods  = [(runShiftx,None),
+            (averageShiftx,None),
+            (calcQshift,None),
            ]
 #saves    = []
 restores = [
-            (averageShiftx,None)
+            (restoreShiftx, None),
            ]
 #exports  = []

@@ -77,6 +77,7 @@ from cing.core.parameters import plugins
 from cing.iCing.iCingServer import PORT_CGI
 from cing.iCing.iCingServer import PORT_SERVER
 from cing.iCing.iCingServer import iCingServerHandler
+
 from string import join
 import cing
 import os
@@ -97,6 +98,16 @@ def format( object ):
         print object
     #end if
 #end def
+
+def verbosity( value ):
+    """Set CING verbosity
+    """
+    try:
+        cing.verbosity = int(value)
+    except:
+        NTerror('verbosity: value should be integer in the interval [0-9] (%s)', value)
+#end def
+
 
 def formatall( object ):
     if isinstance( object, list ):
@@ -184,6 +195,31 @@ def testOverall():
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
 
+#def serve():
+#    # Now the cgi python code is actually a part of the package.
+#    # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
+#    localDir = os.path.join( cingPythonCingDir, "iCing" )
+#    os.chdir(localDir)
+#    NTmessage("Starting a server at port %s" % PORT_SERVER )
+#    httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
+##    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
+##    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
+#    try:
+#        httpd.serve_forever()
+##        httpd_cgi.serve_forever()
+#    except KeyboardInterrupt:
+#        print '^C received'
+#    finally:
+#        print 'shutting down server'
+#        try:
+#            httpd.socket.close()
+#            httpd_cgi.socket.close()
+#        except:
+#            pass
+#        try:
+#            httpd_cgi.socket.close() #@UndefinedVariable
+#        except:
+#            pass
 def serve():
     # Now the cgi python code is actually a part of the package.
     # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
@@ -251,40 +287,45 @@ def main():
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
                      )
-    parser.add_option("--gui",
-                      action="store_true",
-                      dest="gui",
-                      help="Start graphical user interface"
-                     )
+#    parser.add_option("--gui",
+#                      action="store_true",
+#                      dest="gui",
+#                      help="Start graphical user interface"
+#                     )
     parser.add_option("--new",
                       action="store_true",
                       dest="new",
-                      help="Start new project"
+                      help="Start new project PROJECTNAME (overwrite if already present)"
                      )
     parser.add_option("--old",
                       action="store_true",
                       dest="old",
-                      help="Open a old project"
+                      help="Open a old project PROJECTNAME (error if not present)"
                      )
     parser.add_option("--init",
                       dest="init", default=None,
-                      help="Initialize from SEQUENCEFILE[,CONVENTION]",
+                      help="Initialize new project PROJECTNAME and new molecule from SEQUENCEFILE[,CONVENTION]",
                       metavar="SEQUENCEFILE[,CONVENTION]"
                      )
     parser.add_option("--initPDB",
                       dest="initPDB", default=None,
-                      help="Initialize from PDBFILE[,CONVENTION]",
+                      help="Initialize new project PROJECTNAME from PDBFILE[,CONVENTION]",
                       metavar="PDBFILE[,CONVENTION]"
                      )
     parser.add_option("--initBMRB",
                       dest="initBMRB", default=None,
-                      help="Initialize from edited BMRB file",
+                      help="Initialize new project PROJECTNAME from edited BMRB file",
                       metavar="BMRBFILE"
                      )
     parser.add_option("--initCcpn",
                       dest="initCcpn", default=None,
-                      help="Initialize from CCPNFILE",
-                      metavar="CCPNFILE"
+                      help="Initialize new project PROJECTNAME from CCPNFOLDER",
+                      metavar="CCPNFOLDER"
+                     )
+    parser.add_option("--loadCcpn",
+                      dest="loadCcpn", default=None,
+                      help="Open project PROJECTNAME and load data from CCPNFOLDER",
+                      metavar="CCPNFOLDER"
                      )
     parser.add_option("--xeasy",
                       dest="xeasy", default=None,
@@ -423,19 +464,19 @@ def main():
     #------------------------------------------------------------------------------------
 
     # GUI
-    if options.gui:
-        import Tkinter
-        from cing.core.gui import CingGui
-
-        root = Tkinter.Tk()
-
-        popup = CingGui(root, options=options)
-        popup.open()
-
-        root.withdraw()
-        root.mainloop()
-        exit()
-    #end if
+#    if options.gui:
+#        import Tkinter
+#        from cing.core.gui import CingGui
+#
+#        root = Tkinter.Tk()
+#
+#        popup = CingGui(root, options=options)
+#        popup.open()
+#
+#        root.withdraw()
+#        root.mainloop()
+#        exit()
+#    #end if
 
     #check for the required name option
     parser.check_required('-n')
@@ -472,9 +513,11 @@ def main():
         project = Project.open( options.name, status='new' )
         project.initBMRB( bmrbFile = options.initBMRB, moleculeName = project.name )
     elif options.initCcpn:
-    ##    init = options.initCcpn.split(',')
         project = Project.open( options.name, status='new' )
         project.initCcpn( ccpnFolder = options.initCcpn )
+    elif options.loadCcpn:
+        project = Project.open( options.name, status='create', restore=False )
+        project.initCcpn( ccpnFolder = options.loadCcpn )
     else:
         project = Project.open( options.name, status='create' )
 
@@ -501,7 +544,7 @@ def main():
     mol = project.molecule #@UnusedVariable
     m   = project.molecule #@UnusedVariable
 
-#   pr = print
+ #   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 

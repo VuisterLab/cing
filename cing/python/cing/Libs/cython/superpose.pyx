@@ -20,6 +20,7 @@ from math   import acos
 from math   import atan2
 from math   import pi
 from math   import fabs
+from math   import pow
 
 from sys import stderr
 from sys import stdout
@@ -277,6 +278,27 @@ cdef class NTcVector:
     #end def
 
 #end cdef NTcVector
+
+def Rm6dist( NTcVector v1, NTcVector v2 ):
+    """
+    Return R-6 distance of vector v1 and v2
+    """
+    cdef double d, tmp
+    cdef int i
+    d = 0.0
+    for i from 0 <= i < VECTOR_SIZE:
+        tmp = v1.e[i]-v2.e[i]
+        d = d+tmp*tmp
+    #end for
+    # no need to take sqrt first and then pow
+    # R = sqrt(d) = l**0.5
+    # R**-6 = 1/R**6 = 1/(d**0.5)**6 = 1/d**3=d**-3
+    if d>0.0:
+        return pow(d, -3)
+    else:
+        return 0.0
+#end def
+
 
 def isNTcVector(x):
     """

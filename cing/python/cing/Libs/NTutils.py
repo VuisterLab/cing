@@ -776,7 +776,7 @@ class NTvector(list):
             result.append(self[i])
         #end for
         return result
-    #end def 
+    #end def
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
@@ -1994,7 +1994,7 @@ class NTvalue(NTdict):
         (value,error) tuple
         or None on error
         """
-        if len(theTuple)!=2: 
+        if len(theTuple)!=2:
             return None
         return NTvalue(value=theTuple[0], error=theTuple[1])
     #end def
@@ -3349,6 +3349,20 @@ def findFiles(pattern, startdir, exclude=[]):
     return result
 #end def
 
+def matchString( source, target ):
+    """
+    Poor mans approach to match a target with wildcards (*) to source.
+    Does not properly match XZS* yet because aaXZSxx wil also yield True
+    Returns True upon match or False otherwise
+    """
+    parts = target.split('*')
+    for p in parts:
+        if source.find(p) < 0:
+            return False
+    #end for
+    return True
+#end def
+
 def val2Str(value, fmt, count=None):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is
@@ -3879,7 +3893,7 @@ class ROGscore(NTdict):
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
         self.reset()
-        
+
 
     def __str__(self):
         return str(self.colorLabel)
@@ -3937,7 +3951,7 @@ class ROGscore(NTdict):
                 dst('font' , comment, **kw)
                 dst('li' , openTag=False)
     #        dst('ul', openTag=False)
-            
+
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The so called ROG score.
@@ -3955,7 +3969,7 @@ class ROGscore(NTdict):
            colorLabel == COLOR_ORANGE and self.colorLabel == COLOR_RED):
             return
 
-        # certain to stay at or upgrade to given color. 
+        # certain to stay at or upgrade to given color.
         if colorLabel == COLOR_RED and self.colorLabel != COLOR_RED:
             self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
         self.colorLabel = colorLabel
@@ -3989,7 +4003,7 @@ def removeRecursivelyAttribute(x, attributeToRemove):
     _visitedHashes.clear()
     _removeRecursivelyAttribute(x, attributeToRemove)
     _visitedHashes.clear()
-    
+
 
 def _removeRecursivelyAttribute(x, attributeToRemove):
     """Watch out because this can remove any attribute; be carefull what argument you give.
@@ -4004,8 +4018,8 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
         return
     if _visitedHashes.has_key(h):
         return
-    _visitedHashes[h] = None        
-        
+    _visitedHashes[h] = None
+
     if isinstance(x, list) or isinstance(x, tuple):
         for e in x:
             if e == attributeToRemove:
@@ -4017,34 +4031,34 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
                 del x[k]
             else:
                 _removeRecursivelyAttribute(x[k], attributeToRemove)
-            
+
 
 def bytesToFormattedString(size):
-    """1600 bytes will be rounded to 2K"""        
+    """1600 bytes will be rounded to 2K"""
     k = 1024
     M = k*k
     G = k*M
     T = M*M
     ck = 'K'
     cM = 'M'
-    cG = 'G' 
+    cG = 'G'
     cT = 'T'
     postFix = ck
-    
+
     divider = k
     if  size < M:
         divider = k
         postFix = ck
     elif size < G:
         divider = M
-        postFix = cM  
+        postFix = cM
     elif size < T:
         divider = G
         postFix = cG
     else:
         divider = T
         postFix = cT
-    
+
     r = size/float(divider)
     result = ("%.0f" % r) + postFix
     return result
@@ -4053,10 +4067,10 @@ def quoteForJson(msg):
     """Use single quotes on the outside if needed.
     Replace any internal single quotes with double quotes
     Strip any surrounding double quotes
-    """ 
+    """
     msg = msg.replace("'", '"')
     if msg.find(" ") >= 0:
-        if msg[0] == '"': 
+        if msg[0] == '"':
             msg = msg[1:-1]
         if msg[0] != "'":
             msg = "'" + msg + "'"

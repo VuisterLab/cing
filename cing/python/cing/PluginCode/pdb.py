@@ -136,18 +136,148 @@ def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None)   :
 # Add as a method to Molecule class
 Molecule.importFromPDB = importFromPDB
 
+def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
+    """
+    Generate a new molecule from PyMMLib record list of parsed PDB records
+    """
+
+    # Residue names that are ambigously defined by different PDB files
+    checks = NTdict(
+        HIS = NTdict( atoms = ['HE2', 'HD1'],
+                      HIS   = ['HD1'],
+                      HISE  = ['HE2'],
+                      HISH  = ['HE2', 'HD1']
+                    ),
+        GLU = ['HE2'],
+        ASP = ['HD2'],
+    )
+
+    maps = NTdict(
+
+    )
+
+    mol = Molecule( name=moleculeName )
+
+    foundModel = False
+    lastResidue = None
+    lastChain   = None
+
+    for record in pdb:
+        recordName = record._name.strip()
+        if  recordName == 'REMARK':
+            continue # JFD: this used to be a pass but that's weird.
+
+        if recordName == "MODEL":
+            foundModel = True
+            continue
+        if recordName == "ENDMDL":
+            break
+
+        if recordName == "ATOM" or recordName == "HETATM":
+
+            # Not all PDB files have chainID's !@%^&*
+            # They do; if none returned then take the space that is always present!
+            chainId = Chain.defaultChainId
+            if record.has_key('chainID'):
+                chainId = record.chainID.strip()
+                chainId = ensureValidChainId(chainId)
+
+
+            # Skip records with a
+            # see if we can find a definition for this residue, atom name in the database
+            a = record.name
+            a = a.strip() # this improved reading 1y4o
+            if convention == CYANA or convention == CYANA2:
+                # the residue names are in Cyana1.x convention (i.e. for GLU-)
+                # atm names of the Cyana1.x PDB files are in messed-up Cyana format
+                # So: 1HD2 becomes HD21 where needed:
+                a = moveFirstDigitToEnd(a)
+            # strip is already done in function
+            atm = NTdbGetAtom( record.resName, a, convention )
+
+
+            # JFD adds to just hack these debilitating simple variations.
+            if not atm: # some besides cyana have this too; just too easy to hack here
+#                print "Atom ["+a+"] was mismatched at first"
+                a = moveFirstDigitToEnd(a)
+                atm = NTdbGetAtom( record.resName, a, convention )
+            if not atm:
+                if a == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
+                    a = 'HN'
+                elif a == 'HN': # for future examples.
+                    a = 'H'
+                atm = NTdbGetAtom( record.resName, a, convention )
+            if not atm:
+                if shownWarnings <= showMaxNumberOfWarnings:
+                    NTwarning('PDB2Molecule: %s format, model %d incompatible record (%s)' % (
+                             convention, mol.modelCount+1, record))
+                    if shownWarnings == showMaxNumberOfWarnings:
+                        NTwarning('And so on.')
+                    shownWarnings += 1
+                continue
+            if atm.residueDef.hasProperties('cyanaPseudoResidue'):
+                # skip CYANA pseudo residues
+                continue
+
+            # we did find a match in the database
+            # Not all PDB files have chainID's !@%^&*
+            # They do; if none returned then take the space that is always present!
+            chainId = Chain.defaultChainId
+            if record.has_key('chainID'):
+                chainId = record.chainID.strip()
+                chainId = ensureValidChainId(chainId)
+
+            resID    = record.resSeq
+            resName  = atm.residueDef.name
+            fullName = resName+str(resID)
+            atmName  = atm.name
+
+            # check if this chain,fullName,atmName already exists in the molecule
+            # if not, add chain or residue
+            if not chainId in mol:
+                mol.addChain( chainId )
+            #end if
+
+            if not fullName in mol[chainId]:
+                res = mol[chainId].addResidue( resName, resID )
+                res.addAllAtoms()
+            #end if
+
+            atom = mol[chainId][fullName][atmName]
+
+            # Check if the coordinate already exists for this model
+            # This might happen when alternate locations are being
+            # specified. Simplify to one coordinate per model.
+            numCoorinates = len(atom.coordinates)
+            numModels     = mol.modelCount + 1 # current model counts already
+            if numCoorinates < numModels:
+                atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
+            else:
+                NTwarning('Skipping duplicate coordinate within same record (%s)' % record)
+        #end if
+    #end for
+    if shownWarnings:
+        NTwarning('Total number of warnings: ' + `shownWarnings`)
+
+    NTdetail( '==> _PDB2Molecule: new Molecule %s from %s', mol, pdbFile )
+    return mol
+#end def
+
 def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
     """Initialize  Molecule 'moleculeName' from pdbFile
        convention eq PDB, CYANA, CYANA2 or XPLOR, IUPAC
        optionally only include nmodels
 
-       Return molecule instance
+       Return molecule instance or None on error
     """
     showMaxNumberOfWarnings = 100 # was 100
     shownWarnings = 0
-    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
+
     if not os.path.exists(pdbFile):
         NTerror('PDB2Molecule: missing PDB-file "%s"', pdbFile)
+        return None
+
+    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
 
     pdb = PyMMLib.PDBFile( pdbFile )
     mol = Molecule( name=moleculeName )
@@ -182,14 +312,14 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
                 a = moveFirstDigitToEnd(a)
             # strip is already done in function
             atm = NTdbGetAtom( record.resName, a, convention )
-            
-            
+
+
             # JFD adds to just hack these debilitating simple variations.
             if not atm: # some besides cyana have this too; just too easy to hack here
 #                print "Atom ["+a+"] was mismatched at first"
                 a = moveFirstDigitToEnd(a)
                 atm = NTdbGetAtom( record.resName, a, convention )
-            if not atm: 
+            if not atm:
                 if a == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
                     a = 'HN'
                 elif a == 'HN': # for future examples.

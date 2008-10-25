@@ -42,7 +42,7 @@ from cing.PluginCode.Whatif import histJaninBySsAndResType
 from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import wiPlotList
-from cing.core.classes import AtomList
+#from cing.core.classes import AtomList
 from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
@@ -75,7 +75,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
         return None
     if residue[dihedralName] == None:
         return None
-    
+
     if htmlOnly:
         return True
 
@@ -311,7 +311,7 @@ def _matchDihedrals(residue, dihedralName):
 
 def setupHtml(project):
     '''Description: create all folders and subfolders related to a Cing Project
-                    under Molecul/HTML directory and initialize attribute html
+                    under Molecule/HTML directory and initialize attribute html
                     for the due Cing objects.
        Inputs:      project instance
        Output:      returns None on success or True on failure.
@@ -334,10 +334,10 @@ def setupHtml(project):
     for res in molecule.allResidues():
         ResidueHTMLfile( project, res )
 
-    atomList = AtomList(project) # instantiated only for this purpose locally; TODO: should be in molecule section updateAll
-    project.molecule.atoms = atomList
-    atomList.molecule = project.molecule
-    AtomsHTMLfile( project, atomList )
+#    atomList = AtomList(project) # instantiated only for this purpose locally; TODO: should be in molecule section updateAll
+#    project.molecule.atoms = atomList
+#    atomList.molecule = project.molecule
+    AtomsHTMLfile( project, project.molecule.atomList )
 
     EnsembleHTMLfile( project, project.molecule.ensemble )
 
@@ -374,7 +374,7 @@ def generateHtml( project, htmlOnly=False ):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
     NTmessage("Html for atoms and models")
-    project.molecule.atoms.html.generateHtml(htmlOnly=htmlOnly)
+    project.molecule.atomList.html.generateHtml(htmlOnly=htmlOnly)
     project.molecule.ensemble.html.generateHtml(htmlOnly=htmlOnly)
 
     NTmessage('Html for peaks and restraints')
@@ -400,18 +400,27 @@ def _navigateHtml( obj ):
     """
     Create navigation code for NTtree object in header of obj.html
     """
-    obj.html.insertHtmlLink( obj.html.header, obj, obj.html.project, text = 'Home' )
+    obj.html.insertHtmlLink( obj.html.header, obj, obj.html.project, text = 'Home', title = 'goto Home of project' )
     # Refs to move to previous, next residue or UP
     previous = obj.sibling(-1)
     if previous:
-        obj.html.insertHtmlLink( obj.html.header, obj, previous, text = previous._Cname(-1), id=HTMLfile.headerSectionId )
+        name = previous._Cname(-1)
+        obj.html.insertHtmlLink( obj.html.header, obj, previous, text = name, id=HTMLfile.headerSectionId,
+                                 title = sprintf('goto %s', name)
+                               )
 
     if obj._parent:
-        obj.html.insertHtmlLink( obj.html.header, obj, obj._parent, text = 'UP' )
+        name = obj._parent._Cname(-1)
+        obj.html.insertHtmlLink( obj.html.header, obj, obj._parent, text = 'UP',
+                                 title = sprintf('goto %s', name)
+                               )
 
     next = obj.sibling(1)
     if next:
-        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next._Cname(-1), id=HTMLfile.headerSectionId )
+        name = next._Cname(-1)
+        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next._Cname(-1), id=HTMLfile.headerSectionId,
+                                 title = sprintf('goto %s', name)
+                               )
 #end def
 
 class MakeHtmlTable():
@@ -460,10 +469,10 @@ h.render()
     def __call__(self, tag, *args, **kwds):
         self.html( tag, *args, **kwds)
     #end def
-    
+
     def getRows(self):
         return self._rows
-    
+
     def rows(self, rows):
         self._rows = rows
         return self
@@ -635,13 +644,13 @@ class HTMLfile:
            Inputs: file name, title
            Output: an instanciated HTMLfile obj.
 
-           The file is immidiately tested by a quick open for writing and closing.
+           GV Not any longer as I do not see the need: The file is immidiately tested by a quick open for writing and closing.
         '''
 
         self.fileName = NTmkdir( fileName )
 #        self.rootPath, _tmp, _tmp = NTpath( fileName )
-        self.stream = open( self.fileName, 'w' )
-        self.stream.close()
+#        self.stream = open( self.fileName, 'w' )
+#        self.stream.close()
 
         # definition of content-less  tags
         self.noContent = [ 'base','basefont','br','col','frame','hr','img',
@@ -1078,7 +1087,7 @@ class HTMLfile:
         section(tag, closeTag=False)
         self.insertHtmlLink(section, source, destination, text=text, id=id, **kwds)
         section(tag, openTag=False)
-        
+
     def escape(self, s, quote=None): # TODO: fall back to cgi.escape() when possible.
         '''Replace special characters "&", "<" and ">" to HTML-safe sequences.
         If the optional flag quote is true, the quotation mark character (")
@@ -1220,7 +1229,7 @@ Redirecting to %s
         self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule,
                                         text=self.project.molecule.name
                                 )
-        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atoms, text='Assignments' )
+        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
         htmlMain('ul', openTag=False)
 
         # peaks
@@ -1515,14 +1524,23 @@ class ResidueHTMLfile( HTMLfile ):
             del(residue['html'])
         residue.html = self
 #        self.resdir = self.rootPath
+        self._mkDistanceTableTemplate()
+        self._mkDihedralTableTemplate()
 
-    def _generateHeader(self):
+    def _generateHeader(self, plottedList):
         # generate header html for this residue
         self.header('h1', self.residue._Cname(-1) )
         _navigateHtml( self.residue )
 
-        self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html)
-    #end def
+        self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
+
+ #@todo: Remove styling from below, should be in css
+        self.header( 'br' )
+        self.header( 'br' )
+        for plot in plottedList:
+            kw = {'href':'#'+plot}
+            self.header('a' , plot, style="font-size: 10px", title=sprintf('goto %s plot on this page',plot), **kw)
+   #end def
 
     def generateHtml(self, htmlOnly=False):
         """
@@ -1535,7 +1553,6 @@ class ResidueHTMLfile( HTMLfile ):
 
         # Reset CING content
         self._resetCingContent()
-        self._generateHeader()
 
         # 0: angle 1 name
         # 1: angle 2 name
@@ -1547,10 +1564,10 @@ class ResidueHTMLfile( HTMLfile ):
                    ]
         graphicsFormatExtension = 'png'
         plottedList = []
-#        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)  
+#        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)
         if not htmlOnly:
             NTdebug("Residue %s: generating dihedral plots", self.residue )
-            
+
         for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
 #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
             ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
@@ -1577,6 +1594,9 @@ class ResidueHTMLfile( HTMLfile ):
         #end if htmlOnly:
 
         # Generate HTML
+        self._generateHeader(plottedList)
+
+
         # Left side page
 
         # summary also to file
@@ -1589,10 +1609,11 @@ class ResidueHTMLfile( HTMLfile ):
             residue.rogScore.createHtmlForComments(residue.html.left)
         #end if
 
-        residue.html.left( 'h2', 'Dihedrals', id='Plots')
-        for plot in plottedList:
-            kw = {'href':'#'+plot}
-            residue.html.left('a' , plot, **kw)
+
+#        residue.html.left( 'h2', 'Dihedrals', id='Plots')
+#        for plot in plottedList:
+#            kw = {'href':'#'+plot}
+#            residue.html.left('a' , plot, **kw)
 #        residue.html.left( 'h2', openTag=False)
 
         # 2D plots
@@ -1653,6 +1674,104 @@ class ResidueHTMLfile( HTMLfile ):
         self.render()
     #end def
 
+    def _mkDistanceTableTemplate(self):
+
+        self.distanceTable =   MakeHtmlTable( self.right,
+                                       columnFormats = [('id',        dict(width= "20px", align="left",  valign="top", style="font-size: 10px") ),
+                                                        ('atoms',     dict(width="180px", align="left", valign="top", style="font-size: 10px" ) ),
+                                                        #nb align="char", char="." does not work
+                                                        ('lower',     dict(width= "25px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('upper',     dict(width= "25px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('actual',    dict(width= "55px", align="right",  valign="top", style="font-size: 10px") ),
+
+                                                        ('violations',dict(width= "55px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('Max',       dict(width= "25px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('>0.3A',     dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
+
+                                                        ('Critique',  dict(align="left",  valign="top", style="font-size: 10px") )
+                                                       ],
+                              )
+    #end def
+
+    def _generateDistanceRestraintCode(self, drl):
+
+        t = self.distanceTable
+        for dr in t.rows(drl):
+            t.nextColumn()
+            self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto distance restraint %d', dr.id))
+
+            t.nextColumn()
+            count = 0
+            for atm1,atm2 in dr.atomPairs:
+#                t(None,sprintf('(%s,%s)', atm1._Cname(2), atm2._Cname(2)))
+#                t(None,'(')
+                _generateAtomLink( self.residue, atm1, self.right)
+                t(None,',')
+                _generateAtomLink( self.residue, atm2, self.right)
+#                t(None,')')
+                t('br')
+                count += 1
+                if count == 3:
+                    t(None,'etc, etc. ')
+                    self.insertHtmlLink(self.right, self.residue, dr, text='(full list)')
+                    break
+                #end if
+            #end for
+
+            t.nextColumn(val2Str(dr.lower,'%.1f'))
+            t.nextColumn(val2Str(dr.upper,'%.1f'))
+            t.nextColumn(sprintf('%s+-%s', val2Str(dr.av,'%.1f'), val2Str(dr.sd,'%.1f')) )
+
+            t.nextColumn(sprintf('%s+-%s', val2Str(dr.violAv,'%.1f'), val2Str(dr.violSd,'%.1f')) )
+            t.nextColumn(val2Str(dr.violMax,'%.1f'))
+            t.nextColumn(val2Str(dr.violCount3,'%d'))
+
+            t.nextColumn()
+            dr.rogScore.createHtmlForComments(self.right)
+        #end for
+    #end def
+
+    def _mkDihedralTableTemplate(self):
+
+        self.dihedralTable =   MakeHtmlTable( self.right,
+                                       columnFormats = [('id',        dict(width= "20px", align="left",  valign="top", style="font-size: 10px") ),
+                                                        ('dihedral',  dict(width= "80px", align="left", valign="top", style="font-size: 10px" ) ),
+                                                        #nb align="char", char="." does not work
+                                                        ('lower',     dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('upper',     dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('actual',    dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
+
+                                                        ('violations',dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('Max',       dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('>0.3A',     dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
+
+                                                        ('Critique',  dict(align="left",  valign="top", style="font-size: 10px") )
+                                                       ],
+                              )
+    #end def
+
+    def _generateDihedralRestraintCode(self, drl):
+
+        t = self.dihedralTable
+        for dr in t.rows(drl):
+            t.nextColumn()
+            self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto dihedral restraint %d', dr.id))
+
+            t.nextColumn(dr.getName())
+
+            t.nextColumn(val2Str(dr.lower,'%.1f'))
+            t.nextColumn(val2Str(dr.upper,'%.1f'))
+            t.nextColumn(sprintf('%s+-%s', val2Str(dr.cav,'%.1f'), val2Str(dr.cv,'%.1f')) )
+
+            t.nextColumn(sprintf('%s+-%s', val2Str(dr.violAv,'%.1f'), val2Str(dr.violSd,'%.1f')) )
+            t.nextColumn(val2Str(dr.violMax,'%.1f'))
+            t.nextColumn(val2Str(dr.violCount3,'%d'))
+
+            t.nextColumn()
+            dr.rogScore.createHtmlForComments(self.right)
+        #end for
+    #end def
+
     def _generateRestraintsHtml( self, type = None ):
         '''Description: internal routine to generate the Html content for restraints
                    linked to a particular residue.
@@ -1675,6 +1794,7 @@ class ResidueHTMLfile( HTMLfile ):
 
         resRight = residue.html.right
         resRight('h2','%s Restraints' % type)
+
 
         tmpDict = NTdict()
         for restraint in restraintList:
@@ -1704,66 +1824,81 @@ class ResidueHTMLfile( HTMLfile ):
             #end for
             # display restraint by line
             toShow = 5 # number of restraints to show on the right side of Residue page
-            for dr in resRL:
-                text = '%s:' % (str(dr.id))
-                residue.html.insertHtmlLink(resRight, residue, dr, text=text)
-                #resRight('ul', closeTag=False)
-                if type == 'Distance':
-                    av = dr.av
-                    for atomPair in dr.atomPairs:
-                        res1 = atomPair[0]._parent
-                        res2 = atomPair[1]._parent
-                        atomName1 = "(" + atomPair[0].toString() +','
-                        atomName2 =       atomPair[1].toString() +')'
-    #                    atomName1 = "(%s.%s," % ( res1.name, atomPair[0].name )
-    #                    atomName2 = "%s.%s)" % ( res2.name, atomPair[1].name )
-                        residue.html.insertHtmlLink( resRight, residue, res1,
-                                                     text = atomName1 )
-                        residue.html.insertHtmlLink( resRight, residue, res2,
-                                                     text = atomName2 )
-                    #end for
-                #end if
-                if type == 'Dihedral':
-                    av = dr.cav
-                    #resRight( 'a', '%s' % dr.angle)
-                    angleName = dr.angle.split('_')[0]
-                    residue.html.insertHtmlLink( resRight, residue, residue,
-                                                 text=angleName, id=angleName )
-                #end if
-                resRight('br')
-                resRight( 'a', type + ': Lower/Av/Upper: %s/ %s / %s' %
-                          (val2Str(dr.lower, "%.2f"),
-                           val2Str(av,       "%.2f"),
-                           val2Str(dr.upper, "%.2f") ))
-                resRight('br')
-                #resRight('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
-                #                 % (restraint.av, restraint.min, restraint.max))
-                resRight( 'a', 'Violations: violCount3 / Average / SD / Max: %d / %s / %s / %s' %
-                            (       dr.violCount3,
-                                    val2Str(dr.violAv,  "%.2f"),
-                                    val2Str(dr.violSd,  "%.2f"),
-                                    val2Str(dr.violMax, "%.2f") ))
-                resRight('br')
-                dr.rogScore.createHtmlForComments(resRight)
 
-                #resRight('ul', openTag=False)
-                resRight('br')
-                if resRL.index(dr) + 1 == toShow:
-                    if len(resRL) > toShow :
-                        resRight('a','More: ')
-                        for dr in resRL[toShow:]:
-                            residue.html.insertHtmlLink( resRight, residue, dr,
-                                                     text=str(dr.id) )
-                            #end for
-                        resRight('br')
-                    break
-                #end if
-            #end for
+            if type == 'Distance':
+                self._generateDistanceRestraintCode(resRL[0:toShow])
+            elif type == 'Dihedral':
+                self._generateDihedralRestraintCode(resRL[0:toShow])
+#                for dr in resRL:
+#                    text = '%s:' % (str(dr.id))
+#                    residue.html.insertHtmlLink(resRight, residue, dr, text=text)
+#                    #resRight('ul', closeTag=False)
+#                    if type == 'Distance':
+#                        av = dr.av
+#                        for atomPair in dr.atomPairs:
+#                            res1 = atomPair[0]._parent
+#                            res2 = atomPair[1]._parent
+#                            atomName1 = "(" + atomPair[0].toString() +','
+#                            atomName2 =       atomPair[1].toString() +')'
+#        #                    atomName1 = "(%s.%s," % ( res1.name, atomPair[0].name )
+#        #                    atomName2 = "%s.%s)" % ( res2.name, atomPair[1].name )
+#                            residue.html.insertHtmlLink( resRight, residue, res1,
+#                                                         text = atomName1 )
+#                            residue.html.insertHtmlLink( resRight, residue, res2,
+#                                                         text = atomName2 )
+#                        #end for
+#                    #end if
+#                    if type == 'Dihedral':
+#                        av = dr.cav
+#                        #resRight( 'a', '%s' % dr.angle)
+#                        #angleName = dr.angle.split('_')[0]
+#                        angleName = dr.getName()
+#                        residue.html.insertHtmlLink( resRight, residue, residue,
+#                                                     text=angleName, id=angleName )
+#                    #end if
+#                    resRight('br')
+#                    resRight( 'a', type + ': Lower/Av/Upper: %s/ %s / %s' %
+#                              (val2Str(dr.lower, "%.2f"),
+#                               val2Str(av,       "%.2f"),
+#                               val2Str(dr.upper, "%.2f") ))
+#                    resRight('br')
+#                    #resRight('li', 'Average (Min/Max):  %.3e (%.3e / %.3e)'
+#                    #                 % (restraint.av, restraint.min, restraint.max))
+#                    resRight( 'a', 'Violations: violCount3 / Average / SD / Max: %d / %s / %s / %s' %
+#                                (       dr.violCount3,
+#                                        val2Str(dr.violAv,  "%.2f"),
+#                                        val2Str(dr.violSd,  "%.2f"),
+#                                        val2Str(dr.violMax, "%.2f") ))
+#                    resRight('br')
+#                    dr.rogScore.createHtmlForComments(resRight)
+#
+#                    #resRight('ul', openTag=False)
+#                    resRight('br')
+#                    if resRL.index(dr) + 1 == toShow:
+#                        if len(resRL) > toShow :
+#                            resRight('a','More: ')
+#                            for dr in resRL[toShow:]:
+#                                residue.html.insertHtmlLink( resRight, residue, dr,
+#                                                         text=str(dr.id) )
+#                                #end for
+#                            resRight('br')
+#                        break
+#                    #end if
+#                #end for
+#            #end if
             resRight('p', openTag=False)
         #end for
     #end def
 #end class
 
+def _generateAtomLink( refObj, atom, section):
+
+    residue = atom.residue
+    chain   = atom.residue.chain
+    refObj.html.insertHtmlLink( section, refObj, chain,   text =       chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)) )
+    refObj.html.insertHtmlLink( section, refObj, residue, text = '.' + residue.name, title = sprintf('goto residue %s', residue._Cname(-1)) )
+    refObj.html.insertHtmlLink( section, refObj, atom,    text = '.' + atom.name,    title = sprintf('goto atom %s', atom._Cname(-1)) )
+#end def
 
 class AtomsHTMLfile( HTMLfile ):
     """Generate an Atoms html file for listing resonances
@@ -1895,16 +2030,17 @@ class AtomsHTMLfile( HTMLfile ):
                                                 ('Critique',  dict(align="left") )
                                                ],
                             )
-        critiqued = []
-        for atom in self.atomList:
-            if atom.rogScore.isCritiqued():
-                critiqued.append(atom)
-        #end for
-        tableSelection = table.rows(critiqued)
-        if len(tableSelection.getRows()):
-            atomMain('h1', 'Critiqued')
-            for atom in tableSelection:
-                self._atomRow( atom, tableSelection )
+        # Make table with only critigued atoms
+#        critiqued = []
+#        for atom in self.atomList:
+#            if atom.rogScore.isCritiqued():
+#                critiqued.append(atom)
+#        #end for
+#        tableSelection = table.rows(critiqued)
+#        if len(tableSelection.getRows()):
+#            atomMain('h1', 'Critiqued')
+#            for atom in tableSelection:
+#                self._atomRow( atom, tableSelection )
 
         atomMain('h1', 'Atoms')
         for res in self.atomList.molecule.allResidues():
@@ -1938,9 +2074,9 @@ class RestraintListHTMLfile( HTMLfile ):
         if hasattr(restraintList, 'html'):
             del(restraintList.html)
         restraintList.html = self
-        
-        self.restraintList = restraintList 
-        self.restraintListSorted = sortListByRogAndKey(self.restraintList, sortKey='violMax') 
+
+        self.restraintList = restraintList
+        self.restraintListSorted = sortListByRogAndKey(self.restraintList, sortKey='violMax')
 
         # set the fileName and tags to locate each atom
         for restraint in self.restraintList:
@@ -1998,7 +2134,7 @@ class RestraintListHTMLfile( HTMLfile ):
         """Generate html code for distance restraints
         """
         restrMain = self.main
-                
+
         for restraint in self.restraintListSorted:
             restrMain('h2', 'Restraint ', id = restraint.htmlLocation[1][1:], closeTag=False)
             # Strangely JFD doesn't know how to get the coloring into the next text
@@ -2007,7 +2143,7 @@ class RestraintListHTMLfile( HTMLfile ):
             restrMain('h2', openTag=False)
 
             restrMain('ul', closeTag=False)
-            restrMain('li', 'Pair of Atoms:', closeTag=False)
+            restrMain('li', 'Atoms::', closeTag=False)
             if len(restraint.atomPairs) < 1:
                 restrMain('b', 'None')
 
@@ -2021,19 +2157,24 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( restrMain, self.restraintList, res1, text = atomName1 )
                 self.insertHtmlLink( restrMain, self.restraintList, res2, text = atomName2 )
             #end for
-            restrMain('li', 'Lower/Upper: %s / %s' % (
-                                val2Str(restraint.lower, '%.2f'), 
-                                val2Str(restraint.upper, '%.2f'))) 
-            restrMain('li', 'Average (Min/Max):  %s (%s / %s)'
-                             % (val2Str(restraint.av,  '%.3e'), 
-                                val2Str(restraint.min, '%.3e'), 
-                                val2Str(restraint.max, '%.3e'))) 
-            restrMain('li', 'ViolCount3: %i' % restraint.violCount3)
+            restrMain('li', 'Restraint:: Lower | Upper: %s | %s' % (
+                                val2Str(restraint.lower, '%.2f'),
+                                val2Str(restraint.upper, '%.2f')))
+            restrMain('li', 'Actual:: Av +- Sd | Min | Max:  %s +- %s | %s | %s'
+                             % (val2Str(restraint.av,  '%.2f'),
+                                val2Str(restraint.sd,  '%.2f'),
+                                val2Str(restraint.min, '%.2f'),
+                                val2Str(restraint.max, '%.2f')))
 
-            restrMain('li', 'Viol Average / SD / Max: %s / %s / %s' %
+            restrMain('li', 'Violations:: Av +- Sd | Max: %s +- %s | %s' %
                     (       val2Str(restraint.violAv,  "%.2f"),
                             val2Str(restraint.violSd,  "%.2f"),
                             val2Str(restraint.violMax, "%.2f") ))
+
+            restrMain('li', 'Counts:: > 0.1 | 0.3 | 0.5 A: %i | %i | %i' %
+                             (restraint.violCount1,restraint.violCount3,restraint.violCount5)
+                     )
+
             restraint.rogScore.createHtmlForComments(restrMain)
             #restrMain('li', openTag=False)
             restrMain('ul', openTag=False)
@@ -2045,8 +2186,9 @@ class RestraintListHTMLfile( HTMLfile ):
         """
         restrMain = self.main
         for restraint in self.restraintListSorted:
-            restrMain('h2', 'Restraint ', id = restraint.htmlLocation[1][1:], closeTag=False)
-            self.insertHtmlLink(restrMain,self.restraintList,restraint,'%i'%restraint.id)
+
+            restrMain('h2', '', id = restraint.htmlLocation[1][1:], closeTag=False)
+            self.insertHtmlLink( restrMain,self.restraintList,restraint, str(restraint)[1:-1] )
             restrMain('h2', openTag=False)
 
             restrMain('ul', closeTag=False)
@@ -2065,28 +2207,40 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( restrMain, self.restraintList, res, text = atomName )
                 ind += 1
             #end for
-            restrMain('li', openTag=False)            
-            restrMain('li', 'Lower/Upper: %s / %s' % (
-                                val2Str(restraint.lower, '%.2f'), 
-                                val2Str(restraint.upper, '%.2f')))             
+            restrMain('li', openTag=False)
+            restrMain('li', 'Lower | Upper: %s | %s' % (
+                                val2Str(restraint.lower, '%.2f'),
+                                val2Str(restraint.upper, '%.2f')))
             restrMain('li', 'Average (CV):  %s (%s)'
-                             % (val2Str(restraint.cav, '%.2f'), 
-                                val2Str(restraint.cv, '%.2f')))             
+                             % (val2Str(restraint.cav, '%.2f'),
+                                val2Str(restraint.cv, '%.2f')))
             restrMain('li', 'ViolCount3: %i' % restraint.violCount3)
-            restrMain('li', 'Viol Average / SD / Max: %s / %s / %s' % (
-                val2Str(restraint.violAv,  "%.2f"),
-                val2Str(restraint.violSd,  "%.2f"),
-                val2Str(restraint.violMax, "%.2f") ))
+            restrMain('li', 'Viol Average | SD | Max: %s | %s | %s' % (
+                             val2Str(restraint.violAv,  "%.2f"),
+                             val2Str(restraint.violSd,  "%.2f"),
+                             val2Str(restraint.violMax, "%.2f") )
+                     )
 
 #                 val1, val2, _val3 = restraint.retrieveDefinition()
 #                 restraint.residue = val1
 #                 restraint.angle = '%s_%i' % (val2, val1.resNum)
 
-            restrMain('li', 'Angle Name:', closeTag=False)
-            self.insertHtmlLink( restrMain, self.restraintList, restraint.residue, text=restraint.angle )
-            restrMain('li', openTag=False)
-            restraint.rogScore.createHtmlForComments(restrMain)
+#            residue, angleName, _tmp = restraint.retrieveDefinition()
+#
+#            if residue:
+#                restrMain('li', 'Angle name:', closeTag=False)
+#                self.insertHtmlLink( restrMain, self.restraintList, residue, text=residue.name + '.' +  angleName)
+#                restrMain('li', openTag=False)
+#                restraint.rogScore.createHtmlForComments(restrMain)
+#            else:
+#                restrMain('li', 'Angle atoms:', closeTag=False)
+#                for i in restraint.atoms:
+#                    self.insertHtmlLink( restrMain, self.restraintList, atom.residue, text=atom.name )
+#                restrMain('li', openTag=False)
+#                restraint.rogScore.createHtmlForComments(restrMain)
+#            #end if
             restrMain('ul', openTag=False)
+
         #end for
     #end def
 #end class

@@ -13,14 +13,14 @@ options = options #@UndefinedVariable
 #==================================================
 # Check for molecule
 #==================================================
-if project.molecule == None: 
+if project.molecule == None:
     NTerror('script doValidate.py: no molecule defined')
     exit(1)
 #end if
 #==================================================
 # Run the tests
 #==================================================
-project.runShiftx()
+project.runShiftx(parseOnly=parseOnly)
 project.runDssp(parseOnly=parseOnly)
 project.runProcheck(ranges=options.ranges, parseOnly=parseOnly)
 project.runWhatif(parseOnly=parseOnly)
