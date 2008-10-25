@@ -27,20 +27,22 @@ Methods:
 
 """
 from cing.Libs import PyMMLib
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.constants import IUPAC
 from cing.core.dictionaries import NTdbGetAtom
-from cing.core.molecule import Molecule
-from cing.Libs.NTutils import NTwarning
 from cing.core.molecule import Chain
+from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
+import pdb
 import os
 
 #==============================================================================
@@ -142,7 +144,7 @@ def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
     """
 
     # Residue names that are ambigously defined by different PDB files
-    checks = NTdict(
+    checks = NTdict( #@UnusedVariable
         HIS = NTdict( atoms = ['HE2', 'HD1'],
                       HIS   = ['HD1'],
                       HISE  = ['HE2'],
@@ -152,15 +154,15 @@ def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
         ASP = ['HD2'],
     )
 
-    maps = NTdict(
+    maps = NTdict( #@UnusedVariable
 
     )
 
     mol = Molecule( name=moleculeName )
 
-    foundModel = False
-    lastResidue = None
-    lastChain   = None
+    foundModel = False #@UnusedVariable
+    lastResidue = None #@UnusedVariable
+    lastChain   = None #@UnusedVariable
 
     for record in pdb:
         recordName = record._name.strip()
@@ -168,7 +170,7 @@ def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
             continue # JFD: this used to be a pass but that's weird.
 
         if recordName == "MODEL":
-            foundModel = True
+            foundModel = True #@UnusedVariable
             continue
         if recordName == "ENDMDL":
             break
@@ -208,12 +210,12 @@ def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
                     a = 'H'
                 atm = NTdbGetAtom( record.resName, a, convention )
             if not atm:
-                if shownWarnings <= showMaxNumberOfWarnings:
+                if shownWarnings <= showMaxNumberOfWarnings: #@UndefinedVariable
                     NTwarning('PDB2Molecule: %s format, model %d incompatible record (%s)' % (
                              convention, mol.modelCount+1, record))
-                    if shownWarnings == showMaxNumberOfWarnings:
+                    if shownWarnings == showMaxNumberOfWarnings: #@UndefinedVariable
                         NTwarning('And so on.')
-                    shownWarnings += 1
+                    shownWarnings += 1 #@UndefinedVariable
                 continue
             if atm.residueDef.hasProperties('cyanaPseudoResidue'):
                 # skip CYANA pseudo residues
@@ -256,10 +258,10 @@ def _PDB2Molecule( recordList, moleculeName, convention=IUPAC ):
                 NTwarning('Skipping duplicate coordinate within same record (%s)' % record)
         #end if
     #end for
-    if shownWarnings:
-        NTwarning('Total number of warnings: ' + `shownWarnings`)
+    if shownWarnings: #@UndefinedVariable
+        NTwarning('Total number of warnings: ' + `shownWarnings`) #@UndefinedVariable
 
-    NTdetail( '==> _PDB2Molecule: new Molecule %s from %s', mol, pdbFile )
+    NTdetail( '==> _PDB2Molecule: new Molecule %s from %s', mol, pdbFile ) #@UndefinedVariable
     return mol
 #end def
 

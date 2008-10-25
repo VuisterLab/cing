@@ -32,12 +32,12 @@ from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
-from cing.core.molecule import NTdistanceOpt
+from cing.core.molecule import NTdistanceOpt #@UnusedImport
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories

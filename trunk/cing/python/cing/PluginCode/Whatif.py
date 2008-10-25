@@ -49,7 +49,7 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
+#from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import setDeepByKeys

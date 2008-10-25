@@ -5,7 +5,6 @@ Methods:
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
@@ -20,10 +19,11 @@ from cing.Libs.fpconst import NaN
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
 from cing.core.molecule import dots
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.fpconst import isNaN
+#from cing.Libs.NTutils import getDeepByKeys
+#from cing.Libs.fpconst import isNaN
 
 from math import sqrt
+from cing.Libs.NTutils import NTerror
 
 import cing
 import os
