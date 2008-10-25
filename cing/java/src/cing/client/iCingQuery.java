@@ -5,14 +5,14 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class CingQuery {
+public class iCingQuery {
 
 	final FormPanel formPanel = new FormPanel();
 	final VerticalPanel formLayoutPanel = new VerticalPanel();
 	final Hidden action = new Hidden(iCing.RUN_SERVER_ACTION);
 	ServerFormHandler serverFormHandler = new ServerFormHandler();
 	
-	public CingQuery() {
+	public iCingQuery() {
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();

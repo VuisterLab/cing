@@ -14,8 +14,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -25,6 +23,7 @@ from cing.Libs.NTutils import quoteForJson
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from glob import glob
+from cing.iCing import json
 import cgi
 import cing
 import os
@@ -70,7 +69,7 @@ PORT_CGI = 8001
 
 DONE_FILE = "DONE"
 "Contains the string representation of the byte length already read from the log file before"
-LAST_LOG_SEND_FILE = ".LAST_LOG_SEND" 
+LAST_LOG_SEND_FILE = "LAST_LOG_SEND" 
 CING_RUN_LOG_FILE = "cingRun.log"
 
 # server response codes.
@@ -95,16 +94,19 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         For list of codes look at: BaseHTTPRequestHandler.responses dictionary
         Make sure that the caller exits.
         """        
-        body =  "{"
-        keyList = kwds.keys()
-        for key in keyList:
-            keyStr = quoteForJson(key)
-            valueStr = quoteForJson(kwds[key], isValue=True)
-            body += "%s: %s," % ( keyStr, valueStr ) # extra comma is harmless.
-        if len(keyList):
-            body = body[:-1] # get rid of the extra comma anywho.
-        body +=  "}"
-
+        
+        
+#        body =  "{"
+#        keyList = kwds.keys()
+#        for key in keyList:
+#            keyStr = quoteForJson(key)
+#            valueStr = quoteForJson(kwds[key], isValue=True)
+#            body += "%s: %s," % ( keyStr, valueStr ) # extra comma is harmless.
+#        if len(keyList):
+#            body = body[:-1] # get rid of the extra comma anywho.
+#        body +=  "}"
+        body = json.write(kwds)
+        
         try: # gives a broken pipe but works fine otherwise.... TODO: figure out why 
             self.send_response(RESPONSE_CODE_200_OK) # otherwise we can't send a body?
             self.send_header('Content-Type', 'text/plain')
@@ -301,37 +303,47 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         
 
     def getLog(self):
+        "Message will be byte by byte and end up in a <PRE> block"
         NTdebug('Retrieving cing log tail.')
         kwd={}
-        lastLog = "No log file so far"
+        lastLog = "No new log to add.\n" 
         if os.path.exists(CING_RUN_LOG_FILE):
-            try:
-                cingrunLogFileSize = os.path.getsize(CING_RUN_LOG_FILE)
-                cingrunLogFileSizeLast = 0
-                if os.path.exists(LAST_LOG_SEND_FILE):
-                    fl = open(LAST_LOG_SEND_FILE,'r')
-                    cingrunLogFileSizeLast = fl.getline()
-                    fl.close()
-                    if cingrunLogFileSizeLast:
-                        cingrunLogFileSizeLast = int(cingrunLogFileSizeLast)
-                    os.remove(fl)
-                # doesn't exist because it was just removed.
-                fl = open(LAST_LOG_SEND_FILE,'w')
-                fl.write( `cingrunLogFileSize` )
+            cingrunLogFileSize = os.path.getsize(CING_RUN_LOG_FILE)
+            NTdebug("cingrunLogFileSize: %s" % cingrunLogFileSize)
+            cingrunLogFileSizeLast = 0
+            if os.path.exists(LAST_LOG_SEND_FILE):
+                NTdebug("Checking LAST_LOG_SEND_FILE: %s" % LAST_LOG_SEND_FILE)
+                fl = open(LAST_LOG_SEND_FILE,'r')
+                cingrunLogFileSizeLast = fl.readline()
+                NTdebug("cingrunLogFileSizeLast (str): %s" % cingrunLogFileSizeLast)
                 fl.close()
-                        
-                if cingrunLogFileSize > cingrunLogFileSizeLast:
-                    f = open(CING_RUN_LOG_FILE,'r')
-                    f.seek(cingrunLogFileSizeLast)
-                    lastLog = f.read( cingrunLogFileSize - cingrunLogFileSize )
+                if cingrunLogFileSizeLast:
+                    cingrunLogFileSizeLast = long(cingrunLogFileSizeLast)
+                else:
+                    cingrunLogFileSizeLast = 0
+                NTdebug("cingrunLogFileSizeLast (long): %s" % cingrunLogFileSizeLast)
+                os.remove(LAST_LOG_SEND_FILE)
+#                lastLog = "" # So this is a repeat
+            else:
+                NTdebug("no LAST_LOG_SEND_FILE: %s" % LAST_LOG_SEND_FILE)
                 
-#                lastLineList = tail(f,1)
-#                if lastLineList:
-#                    kwd[ RESPONSE_TAIL_PROGRESS ] = lastLineList[0]
-            except:
-                pass
-            finally:
-                f.close()            
+                    
+            # doesn't exist because it was just removed.
+            fl = open(LAST_LOG_SEND_FILE,'w')
+            NTdebug("writing to LAST_LOG_SEND_FILE: %s" % LAST_LOG_SEND_FILE)
+            fl.write( '%s\n'  %  cingrunLogFileSize) # don't use %r or it will write a 1223L format.
+            fl.close()
+                    
+            if cingrunLogFileSize > cingrunLogFileSizeLast:
+                newLogSize = cingrunLogFileSize - cingrunLogFileSizeLast
+                NTdebug("New log %s" % newLogSize)
+                f = open(CING_RUN_LOG_FILE,'r')
+                f.seek(cingrunLogFileSizeLast)
+                lastLog = f.read( newLogSize )
+                f.close()
+            else:
+                NTdebug("No new log")
+                                                                    
         kwd[ RESPONSE_TAIL_PROGRESS ] = lastLog
         self.sendJSON(kwd)
 
@@ -394,7 +406,5 @@ def main():
             pass
 
 if __name__ == '__main__':
-    cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug   
     main()
