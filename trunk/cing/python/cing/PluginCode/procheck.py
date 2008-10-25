@@ -356,11 +356,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             # G and DG.(oxy/deoxy).
 
         canAqpc = True
-        
+
         if cingPaths.aqpc == None or cingPaths.aqpc == PLEASE_ADD_EXECUTABLE_HERE:
             NTmessage("No aqpc installed so skipping this step")
             canAqpc = False
-        
+
         if canAqpc:
             # Save restraints for Aqua
             if self.project.export2aqua():
@@ -450,7 +450,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         """
         modelCount = self.molecule.modelCount
-        NTdetail("Parse procheck files and store result in each residue for " + `modelCount` + " models")
+        NTdetail("==> Parsing procheck results")
 
         # reset the procheck dictionary of each residue
         for res in self.molecule.allResidues():
@@ -574,9 +574,9 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
     if cingPaths.procheck_nmr == None or cingPaths.procheck_nmr == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("No whatif installed so skipping this step")
+        NTmessage("No procheck_nmr installed so skipping this step")
         return
-    
+
     if not project.molecule:
         NTerror('runProcheck: no molecule defined')
         return None

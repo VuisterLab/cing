@@ -55,6 +55,7 @@ from cing.Libs.peirceTest import peirceTest
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
+from cing.core.molecule import Chain
 from cing.core.molecule import Residue
 from cing.core.molecule import disulfideScore
 from cing.core.molecule import dots
@@ -76,12 +77,14 @@ dbase = shelve.open( dbaseFileName )
 dbase.close()
 
 def runCingChecks( project, ranges=None ):
+    project.partitionRestraints()
+    project.analyzeRestraints()
+    project.validateRestraints( toFile=True)
     project.validateDihedrals()
     project.validateModels()
-    project.validateAssignments(toFile=True)
+#    project.validateAssignments(toFile=True) in criticize now
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
-    project.validateRestraints( toFile=True)
     if project.molecule:
         project.molecule.calculateRMSDs( ranges=ranges)
     project.criticize(toFile=True)
@@ -94,7 +97,7 @@ code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True ):
-    project.runShiftx()
+    project.runShiftx(parseOnly=parseOnly)
     project.runDssp(parseOnly=parseOnly)
     if doProcheck:
         project.runProcheck(ranges=ranges, parseOnly=parseOnly)
@@ -122,6 +125,9 @@ def criticizePeaks( project, toFile=True ):
     # make a list of all assigned peaks positions for each atom
     errorMargins = {'15N':0.15, '13C':0.15, '1H':0.01, '31P':0.15} # single sided
     for pl in project.peaks:
+
+        NTdebug('criticizePeaks %s', pl)
+
         pl.rogScore.reset()
         for peak in pl:
             peak.rogScore.reset()
@@ -171,11 +177,26 @@ def criticizePeaks( project, toFile=True ):
                 fprintf(f, '%s  %s\n', peak, peak.rogScore.format())
             #end for
             f.close()
-            NTdetail('Peak analysis %s, output to: %s', pl, path)
+            NTdetail('==> Analyzing %s, output to: %s', pl, path)
         #end for
     #end if
 #end def
 
+def _criticizeChain( chain, valSets ):
+    """Convenience method
+    """
+    for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+        chain[color] = NTlist()
+
+    chain.rogScore.reset()
+
+    for res in chain.allResidues():
+        _criticizeResidue( res, valSets )
+        chain[res.rogScore.colorLabel].append(res)
+        chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
+    #end for
+#end def
+Chain.criticize = _criticizeChain
 
 def _criticizeResidue( residue, valSets ):
     """
@@ -186,7 +207,8 @@ def _criticizeResidue( residue, valSets ):
 
 #    result = NTdict()
     # WHATIF
-    if residue.has_key('whatif'):
+    if residue.has_key('whatif') and residue.hasProperties('protein'):
+        #print '>', residue, residue.rogScore
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
 #            NTdebug('Now criticizing %s, whatif key %s', residue, key )
 
@@ -251,7 +273,7 @@ def _criticizeResidue( residue, valSets ):
 
     #OMEGA
     dihed = 'OMEGA'
-    if dihed in residue and residue[dihed]:
+    if residue.hasProperties('protein') and dihed in residue and residue[dihed]:
         d = residue[dihed] # NTlist object
         modelId = 0
         for value in d:
@@ -273,21 +295,24 @@ def _criticizeResidue( residue, valSets ):
     #end if
     return residue.rogScore
 #end def
-
+#Convenience method
+Residue.criticize = _criticizeResidue
 
 def criticize(project, toFile=True):
     # initialize
-    NTdetail('==> criticizing project')
 
     if project.molecule:
         project.molecule.rogScore.reset()
         for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
             project.molecule[color] = NTlist()
 
-        for res in project.molecule.allResidues():
-            _criticizeResidue( res, project.valSets )
-            project.molecule[res.rogScore.colorLabel].append(res)
-            res.chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
+        for chain in project.molecule.allChains():
+            _criticizeChain( chain, project.valSets )
+            # also list the residues in molecule color lists
+            for res in chain.allResidues():
+#                _criticizeResidue( res, project.valSets ) # now done in _criticizeChain
+                project.molecule[res.rogScore.colorLabel].append(res)
+#                res.chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
         #end for
 
         if len(project.molecule[COLOR_RED]) > 0:
@@ -311,15 +336,21 @@ def criticize(project, toFile=True):
                 fprintf(f,'%s\n', residue.rogScore.colorCommentList)
             #end for
             f.close()
-            NTdetail('Project.critique: output to "%s"', path)
+            NTdetail('==> Criticizing project: output to "%s"', path)
+        else:
+            NTdetail('==> Criticizing project')
         #end if
     #end if
 
-    # distance and dihedral restraints
-    for drl in project.distances + project.dihedrals:
+    # Restraints lists
+    for drl in project.allRestraintLists():
         drl.criticize(project, toFile=toFile)
+
     #Peaks
     criticizePeaks( project, toFile=toFile )
+
+    # Assignments
+    validateAssignments( project, toFile=toFile )
 
 #end def
 
@@ -399,6 +430,48 @@ def summary( project, toFile = True ):
     return msg
 #end def
 
+def partitionRestraints( project, tmp=None ):
+    """
+    Partition the restraints and generate per-residue lists
+    """
+    NTdebug('partionRestraints of project %s', project)
+
+    if not project.molecule:
+        return
+
+    # distances and dihedrals
+    for res in project.molecule.allResidues():
+        res.distanceRestraints = NTlist()
+        res.dihedralRestraints = NTlist()
+        res.rdcRestraints      = NTlist()
+    #end for
+
+    for drl in project.distances:
+        for restraint in drl:
+            for atm1,atm2 in restraint.atomPairs:
+                atm1.residue.distanceRestraints.add( restraint ) #AWSS
+                atm2.residue.distanceRestraints.add( restraint ) #AWSS
+            #end for
+        #end for
+    #end for
+    # dihedrals
+    for drl in project.dihedrals:
+        for restraint in drl:
+            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
+        #end for
+    #end for
+    #RDCs
+    for drl in project.rdcs:
+        for restraint in drl:
+            for atm1,atm2 in restraint.atomPairs:
+                atm1.residue.rdcRestraints.add( restraint ) #AWSS
+                if atm2.residue != atm1.residue:
+                    atm2.residue.rdcRestraints.add( restraint ) #AWSS
+            #end for
+        #end for
+    #end for
+#end def
+
 
 def validateRestraints( project, toFile = True)   :
     """
@@ -413,15 +486,15 @@ def validateRestraints( project, toFile = True)   :
     msg = ""
     msg += sprintf('%s\n', project.format() )
 
-    # distances and dihedrals
-    for res in project.molecule.allResidues():
-        res.distanceRestraints = NTlist()
-        res.dihedralRestraints = NTlist()
-    #end for
+#    # distances and dihedrals
+#    for res in project.molecule.allResidues():
+#        res.distanceRestraints = NTlist()
+#        res.dihedralRestraints = NTlist()
+#    #end for
 
     # distances
     for drl in project.distances:
-        drl.analyze()
+#        drl.analyze()
         msg += sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
         msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
@@ -434,18 +507,18 @@ def validateRestraints( project, toFile = True)   :
 #        NTdebug("Found list: " + `theList`)
         msg += sprintf( '%s\n', formatList( theList ) )
 
-        # Sort restraints on a per-residue basis
-        for restraint in drl:
-            for atm1,atm2 in restraint.atomPairs:
-                atm1.residue.distanceRestraints.add( restraint ) #AWSS
-                atm2.residue.distanceRestraints.add( restraint ) #AWSS
-            #end for
-        #end for
+        # Sort restraints on a per-residue basis # now in partitionRestrainst
+#        for restraint in drl:
+#            for atm1,atm2 in restraint.atomPairs:
+#                atm1.residue.distanceRestraints.add( restraint ) #AWSS
+#                atm2.residue.distanceRestraints.add( restraint ) #AWSS
+#            #end for
+#        #end for
     #end for
 
     # dihedrals
     for drl in project.dihedrals:
-        drl.analyze()
+#        drl.analyze()
         msg += sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
         msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
@@ -456,9 +529,9 @@ def validateRestraints( project, toFile = True)   :
         msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         # sort the restraint on a per residue basis
-        for restraint in drl:
-            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
-        #end for
+#        for restraint in drl:
+#            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
+#        #end for
     #end for
 
     # Process the per residue restraints data
@@ -972,7 +1045,7 @@ def validateAssignments( project, toFile = True   ):
     """
     NTdebug("Starting validateAssignments")
     if not project.molecule:
-        NTerror('validateAssignments: no molecule defined')
+        NTdebug('validateAssignments: no molecule defined')
         return None
     #end if
 
@@ -986,36 +1059,32 @@ def validateAssignments( project, toFile = True   ):
         atm.rogScore.reset()
         atm.validateAssignment = NTlist()
         if atm.isAssigned():
-            # Check database
-            #print '===>', atm
-            if not atm.db.shift:
-                pseudo = atm.pseudoAtom()
-                if not pseudo:
-                    NTwarning("Failed to find pseudo atom for atom: [" +`atm` + "]") # lowered priority msg as seen for hish
-                    continue
-                if pseudo.db.shift:
-                    av = pseudo.db.shift.average
-                    sd = pseudo.db.shift.sd
-                else:
-                    NTwarning("%s: '%s' not in in DB SHIFTS\n", funcName, atm)
-                    continue
-                #end if
-            else:
-                av = atm.db.shift.average
-                sd = atm.db.shift.sd
-            #end if
 
             shift = atm.shift()
+            pseudo = atm.pseudoAtom()
 
             # Check the shift against the database
-            delta = math.fabs(shift - av) / sd
-            if delta > 3.0:
-                string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
-                                 SHIFT, shift, delta, av, sd
-                                )
-#                NTmessage('%-20s %s', atm, string)
-                result.append( atm )
-                atm.validateAssignment.append(string)
+            if atm.db.shift:
+                av = atm.db.shift.average
+                sd = atm.db.shift.sd
+            elif pseudo and pseudo.db.shift:
+                av = pseudo.db.shift.average
+                sd = pseudo.db.shift.sd
+            else:
+                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
+                av = None
+                sd = None
+            #end if
+
+            if av and sd:
+                delta = math.fabs(shift - av) / sd
+                if delta > 3.0:
+                    string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
+                                     SHIFT, shift, delta, av, sd
+                                    )
+                    result.append( atm )
+                    atm.validateAssignment.append(string)
+                #end if
             #end if
 
             # Check if not both realAtom and pseudoAtom are assigned
@@ -1140,6 +1209,7 @@ def validateAssignments( project, toFile = True   ):
 
         if atm.validateAssignment:
             atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
+            project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
         #end if
     #end for
 
@@ -1212,7 +1282,7 @@ def validateAssignments( project, toFile = True   ):
             #end for
         #end for
         fp.close()
-        NTmessage('==> validateAssignments: output to "%s"', fname)
+        NTdetail('==> validateAssignments: output to "%s"', fname)
     #end if
 
     return result
@@ -1320,51 +1390,23 @@ def validateModels( self)   :
 #end def
 
 
-#def validate( project, ranges=None, htmlOnly = False, doProcheck = True, doWhatif = True ):
-#    """Validatation tests returns None on success or True on failure.
-#    """
-#    # OBSOLETE; eplaced by script doValidate
-#    if setupValidation( project, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif ):
-#        NTerror("validate: Failed to setupValidation")
-#        return True
-#
-#    if setupHtml(project):
-#        NTerror("validate: Failed to setupHtml")
-#        return True
-#
-#
-#    if renderHtml(project):
-#        NTerror("validate: Failed to renderHtml")
-#        return True
-#
-#    NTmessage("Done with overall validation")
-##end def
-
 # register the functions
 methods  = [(validateDihedrals, None),
             (validateModels,None),
             (validateAssignments, None),
             (validateRestraints, None),
-#            (validate, None),
+            (partitionRestraints,None),
+#
             (runCingChecks, None),
             (validate,None),
             (criticizePeaks, None),
             (summary, None),
+            (criticize,None),
 
             (checkForSaltbridges, None),
             (checkForDisulfides, None),
             (fixStereoAssignments, None),
-#            (setupValidation, None),
-
-#            (setupHtml, None),
-#            (generateHtml, None),
-#            (renderHtml, None),
-
-#            (calculateRmsd, None),
-#            (makeDihedralHistogramPlot, None),
-#            (makeDihedralPlot, None),
            ]
 #saves    = []
-restores = [(criticize,False)
-           ]
+#restores = []
 #exports  = []

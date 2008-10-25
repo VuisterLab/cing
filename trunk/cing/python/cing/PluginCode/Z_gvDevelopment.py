@@ -276,77 +276,6 @@ def mkMacros( project ):
 #end def
 
 
-def _calcQshift( atmList ):
-    """
-    Calculate Qshift value for list of atoms
-    """
-    # for each model + av + heavyatom + proton + bb
-    sumDeltaSq    = 0.0
-    sumMeasuredSq = 0.0
-    for atm in atmList:
-        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned():
-            atm.shiftx.average()
-            measured = atm.shift()
-            sumMeasuredSq += measured**2
-            # delta with shiftx average
-            sumDeltaSq = (measured-atm.shiftx.av)**2
-            #print atm, measured, av
-#            sumDeltaSq[project.molecule.modelCount] += (av-measured)**2
-#            if not atm.isProton():
-#                sumDeltaSq[project.molecule.modelCount+1] += (av-measured)**2
-#            if atm.isProton():
-#                #print atm, measured, av
-#                sumDeltaSq[project.molecule.modelCount+2] += (av-measured)**2
-#            if not atm.isBackbone():
-#                sumDeltaSq[project.molecule.modelCount+3] += (av-measured)**2
-        #end if
-    #end for
-
-    if sumMeasuredSq >0.0:
-            Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
-    else:
-            Qshift=NaN
-
-    return Qshift
-#end def
-
-def calcQshift( project, tmp=None ):
-    """Calculate per residue Q factors between assignment and shiftx results
-    """
-    if not project.molecule:
-        NTdebug('calcQshift: no molecule defined')
-        return None
-    #end if
-    NTdetail('==> calculating Q-factors for chemical shift')
-    for res in project.molecule.allResidues():
-        atms = res.allAtoms()
-        bb = NTlist()
-        heavy = NTlist()
-        protons = NTlist()
-        res.Qshift  = NTdict(allAtoms = None, backbone=None, heavyAtoms=None, protons=None,
-                             residue = res,
-                             __FORMAT__ = \
-dots + ' shiftx Qfactor %(residue)s ' + dots + """
-allAtoms:   %(allAtoms)6.3f
-backbone:   %(backbone)6.3f
-heavyAtoms: %(heavyAtoms)6.3f
-protons:    %(protons)6.3f"""
-
-                        )
-
-        for a in atms:
-            if a.isBackbone(): bb.append(a)
-            if a.isProton(): protons.append(a)
-            else: heavy.append(a)
-        #end for
-
-        res.Qshift.allAtoms   = _calcQshift( atms )
-        res.Qshift.backbone   = _calcQshift( bb )
-        res.Qshift.heavyAtoms = _calcQshift( heavy )
-        res.Qshift.protons    = _calcQshift( protons )
-    #end for
-#end def
-
 
 def mkYasaraByResidueMacro( project, keys,
                             minValue=0.0, maxValue=1.0, reverseColorScheme=False,
@@ -467,11 +396,192 @@ Development of a Software Pipeline. Accepted by Proteins (2004).
 
 """
 
+#VALID_VALUE_TYPE_ATTRS = {type(0.0): 'floatValue',
+#                          type(1): 'intValue',
+#                          type('a'): 'textValue',
+#                          type(True): 'booleanValue'}
+#
+#
+## # # # # # #  C I N G  E X A M P L E  # # # # # # #
+#
+#def storeRogScores(ccpnEnsemble, scores, context='CING'):
+#   # Assumes scores in same order as residues
+#
+#   keyword    = 'ROG'
+#   definition = 'Overall per-residue validation score for display. ROG=Red/Orange/Green'
+#   synonym    = 'Residue ROG Score'
+#
+#   validStore = getEnsembleValidationStore(ccpnEnsemble, context,
+#                                           keywords=[keyword, ],
+#                                           definitions=[definition, ],
+#                                           synonyms=[synonym, ])
+#
+#   residues = []
+#   for chain in ccpnEnsemble.sortedCoordChains():
+#     residues.extend(chain.sortedResidues())
+#
+#   storeResidueValidations(validStore, context, keyword, residues, scores)
+#
+## # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#
+#
+#def getEnsembleValidationStore(ensemble, context, keywords,
+#                               definitions=None, synonyms=None):
+#  """Descrn: Get a CCPN object to store validation results for an ensemble
+#             in a given program context. Requires a list of keywords which will
+#             be used in this context. Allows optional lists of definitions and
+#             user-friendly synonyms for these keywords.
+#     Inputs: MolStructure.StructureEnsemble, Word, List of Words,
+#             List of Lines, List of Words
+#     Output: StructureValidation.StructureValidationStore
+#  """
+#
+#  memopsRoot = ensemble.root
+#  eid = '%s_%s' % (context, ensemble.guid)
+#  validStore = ensemble.findFirstStructureValidationStore(name=eid)
+#
+#  if validStore is None:
+#    validStore = memopsRoot.newStructureValidationStore(name=eid,
+#                                      structureEnsemble=ensemble)
+#
+#  validStore.nmrProject = memopsRoot.currentNmrProject
+#
+#  keywordStore = memopsRoot.findFirstKeywordDefinitionStore(context=context)
+#
+#  if not keywordStore:
+#    keywordStore = memopsRoot.newKeywordDefinitionStore(context=context)
+#
+#  for i, keyword in enumerate(keywords):
+#    keywordDefinition = keywordStore.findFirstKeywordDefinition(keyword=keyword)
+#
+#    if not keywordDefinition:
+#      keywordDefinition = keywordStore.newKeywordDefinition(keyword=keyword)
+#
+#    if definitions and (i < len(definitions)):
+#      keywordDefinition.explanation = definitions[i]
+#
+#    if synonyms and (i < len(synonyms)):
+#      keywordDefinition.name = synonyms[i]
+#
+#  return validStore
+#
+#
+#def getValidationObjects(validStore, className, context, keyword):
+#  """Descrn: Find a given class of validation objects in a validation store
+#             in a given (program) context, with a given keyword.
+#     Inputs: StructureValidation.StructureValidationStore, Word, Word, Word
+#     Output: List of StructureValidation.Validations
+#  """
+#  return validStore.findAllValidationResults(context=context,
+#                                             keyword=keyword,
+#                                             className=className)
+#
+#
+#def replaceValidationObjects(validStore, className, keyword, context, dataList):
+#  """Descrn: Store validation data as CCPN validation objects,
+#             overwriting all previous records of such information
+#             in the validation store object. Finds a given class of
+#             validation objects a given keyword in a given context.
+#             The input data list is a 2-tuple containing a list of the
+#             CCPN objects validated and the value associated with that
+#             validation. Note that the validated CCPN object types must
+#             match the type required by the validation object className.
+#             *NOTE* this is a slow function and should often be replaced
+#             with a class-specific equivalent.
+#     Inputs: StructureValidation.StructureValidationStore, Word, Word, Word,
+#             List of 2-Tuples of (List of CCPN objects, )
+#     Output: None
+#  """
+#
+#  for validObj in getValidationObjects(validStore, className, keyword, context):
+#    validObj.delete()
+#
+#  newObject = getattr(validStore, 'new%s' % className)
+#
+#  validatedObjAttr = None
+#
+#  for validatedObjects, value in dataList:
+#    validObj = newObject(context=context, keyword=keyword)
+#
+#    if not validatedObjAttr:
+#      for role in validObj.metaclass.roles:
+#        if role.locard == 0:
+#          validatedObjAttr = role.name
+#
+#    if validatedObjAttr:
+#      setattr(validObj, validatedObjAttr, validatedObjects)
+#
+#    valueAttr = VALID_VALUE_TYPE_ATTRS.get(type(value), 'textValue')
+#    setattr(validObj, valueAttr, value)
+#
+#
+#def getResidueValidation(validStore, residue, context, keyword):
+#  """Descrn: Get any existing residue validation results from a CCPN
+#             validation store which have the given keywords in the
+#             given (program) context.
+#             *NOTE* This function may be quicker than using the generic
+#             getValidationObjects() because the link is queried from the
+#             validated object, not the validation store, which often
+#             has fewer total validation objects.
+#     Inputs: StructureValidation.StructureValidationStore,
+#             MolStructure.Residue, Word, Word
+#     Output: StructureValidation.ResidueValidation
+#  """
+#
+#  # Define data model call to find exting result
+#  findValidation = residue.findFirstResidueValidation
+#
+#  validObj = findValidation(structureValidationStore=validStore,
+#                            context=context, keyword=keyword)
+#
+#  return validObj
+#
+#
+#def storeResidueValidations(validStore, context, keyword, residues, scores):
+#  """Descrn: Store the per-residue scores for a an ensemble within
+#             CCPN validation objects.
+#             *NOTE* This function may be quicker than using the generic
+#             replaceValidationObjects() because it is class specifc
+#     Inputs: StructureValidation.StructureValidationStore,
+#             List of MolStructure.Residues, List if Floats
+#     Output: List of StructureValidation.ResidueValidations
+#  """
+#
+#  validObjs = []
+#
+#  # Define data model call for new result
+#  newValidation = validStore.newResidueValidation
+#
+#  for i, residue in enumerate(residues):
+#
+#    score = scores[i]
+#
+#    # Find any existing residue validation objects
+#    validObj = getResidueValidation(validStore, residue, context, keyword)
+#
+#    # Validated object(s) must be in a list
+#    residueObjs = [residue, ]
+#
+#    # Make a new validation object if none was found
+#    if not validObj:
+#      validObj = newValidation(context=context, keyword=keyword,
+#                               residues=residueObjs)
+#
+#    # Set value of the score
+#    validObj.floatValue = score
+#
+#    validObjs.append(validObj)
+#
+#  return validObjs
+
 VALID_VALUE_TYPE_ATTRS = {type(0.0): 'floatValue',
                           type(1): 'intValue',
                           type('a'): 'textValue',
                           type(True): 'booleanValue'}
 
+
+from ccpnmr.analysis.core.Util import getSoftware
 
 # # # # # # #  C I N G  E X A M P L E  # # # # # # #
 
@@ -497,24 +607,31 @@ def storeRogScores(ccpnEnsemble, scores, context='CING'):
 
 
 
-def getEnsembleValidationStore(ensemble, context, keywords,
-                               definitions=None, synonyms=None):
+def getEnsembleValidationStore(ensemble, context, keywords=None,
+                               definitions=None, synonyms=None,
+                               software=None):
   """Descrn: Get a CCPN object to store validation results for an ensemble
              in a given program context. Requires a list of keywords which will
              be used in this context. Allows optional lists of definitions and
              user-friendly synonyms for these keywords.
+             Optional argument for passing software specification (otherwise
+             defaults to current CcpNmr Analysis)
      Inputs: MolStructure.StructureEnsemble, Word, List of Words,
-             List of Lines, List of Words
-     Output: StructureValidation.StructureValidationStore
+             List of Lines, List of Words, Method.Software
+     Output: Validation.ValidationStore
   """
+
+  if not keywords:
+    keywords = []
 
   memopsRoot = ensemble.root
   eid = '%s_%s' % (context, ensemble.guid)
-  validStore = ensemble.findFirstStructureValidationStore(name=eid)
+  validStore = ensemble.findFirstValidationStore(name=eid)
 
   if validStore is None:
-    validStore = memopsRoot.newStructureValidationStore(name=eid,
-                                      structureEnsemble=ensemble)
+    software = getSoftware(memopsRoot)
+    validStore = memopsRoot.newValidationStore(name=eid, software=software,
+                                               structureEnsemble=ensemble)
 
   validStore.nmrProject = memopsRoot.currentNmrProject
 
@@ -541,8 +658,8 @@ def getEnsembleValidationStore(ensemble, context, keywords,
 def getValidationObjects(validStore, className, context, keyword):
   """Descrn: Find a given class of validation objects in a validation store
              in a given (program) context, with a given keyword.
-     Inputs: StructureValidation.StructureValidationStore, Word, Word, Word
-     Output: List of StructureValidation.Validations
+     Inputs: Validation.ValidationStore, Word, Word, Word
+     Output: List of Validation.Validations
   """
   return validStore.findAllValidationResults(context=context,
                                              keyword=keyword,
@@ -560,7 +677,7 @@ def replaceValidationObjects(validStore, className, keyword, context, dataList):
              match the type required by the validation object className.
              *NOTE* this is a slow function and should often be replaced
              with a class-specific equivalent.
-     Inputs: StructureValidation.StructureValidationStore, Word, Word, Word,
+     Inputs: Validation.ValidationStore, Word, Word, Word,
              List of 2-Tuples of (List of CCPN objects, )
      Output: None
   """
@@ -595,15 +712,15 @@ def getResidueValidation(validStore, residue, context, keyword):
              getValidationObjects() because the link is queried from the
              validated object, not the validation store, which often
              has fewer total validation objects.
-     Inputs: StructureValidation.StructureValidationStore,
+     Inputs: Validation.ValidationStore,
              MolStructure.Residue, Word, Word
-     Output: StructureValidation.ResidueValidation
+     Output: Validation.ResidueValidation
   """
 
   # Define data model call to find exting result
   findValidation = residue.findFirstResidueValidation
 
-  validObj = findValidation(structureValidationStore=validStore,
+  validObj = findValidation(validationStore=validStore,
                             context=context, keyword=keyword)
 
   return validObj
@@ -614,9 +731,9 @@ def storeResidueValidations(validStore, context, keyword, residues, scores):
              CCPN validation objects.
              *NOTE* This function may be quicker than using the generic
              replaceValidationObjects() because it is class specifc
-     Inputs: StructureValidation.StructureValidationStore,
+     Inputs: Validation.ValidationStore,
              List of MolStructure.Residues, List if Floats
-     Output: List of StructureValidation.ResidueValidations
+     Output: List of Validation.ResidueValidations
   """
 
   validObjs = []
@@ -652,7 +769,7 @@ def storeResidueValidationInCcpn( project, residue, context='CING'):
     Store residue ROG result in ccpn
     Return ccpn StructureValidation.ResidueValidation obj on success or None on error
     """
-    
+
     keyword = 'ROGscore'
 
     ccpnMolSystem = project.molecule.ccpn
@@ -690,18 +807,33 @@ def storeResidueValidationInCcpn( project, residue, context='CING'):
                                residues=residueObjs)
 
     # Set value of the score
-    validObj.textValue = residue.rogScore.colorLabel
+    validObj.textValue = residue.rogScore.colorLabel or None
     validObj.details   = '\n'.join(residue.rogScore.colorCommentList) or None
 
     return validObj
-    
+
 #end def
 
 def exportValidation2ccpn( project ):
+    """
+    Proof of principle: export validation scores to ccpn project
 
+    Return Project or None on error.
+    """
+    if not project.has_key('ccpn'):
+        NTerror('exportValidation2ccpn: No open CCPN project present')
+        return None
+    NTmessage('==> Exporting to Ccpn')
     for residue in project.molecule.allResidues():
-        if not storeResidueValidationInCcpn( project, residue):
-            print 'WARNING: Residue validation '
+        valObj = storeResidueValidationInCcpn( project, residue)
+        if not valObj:
+            NTerror('exportValidation2ccpn: exporting validation for residue %s', residue)
+        else:
+            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
+    #end for
+    project.ccpn.saveModified()
+    return project
+#end def
 
 
 # register the functions
@@ -714,7 +846,6 @@ methods  = [(procheck_old, None),
 
            ]
 #saves    = []
-restores = [(calcQshift,None)
-           ]
+#restores = []
 #exports  = []
 

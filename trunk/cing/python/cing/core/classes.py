@@ -26,11 +26,14 @@ from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import matchString
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
+from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
@@ -367,9 +370,9 @@ Project: Top level Cing project class
         elif (status == 'create'):
             root,dummy = Project.rootPath( name )
             if os.path.exists( root ):
-                return Project.open( name, 'old')
+                return Project.open( name, 'old', restore=restore )
             else:
-                return Project.open( name, 'new')
+                return Project.open( name, 'new', restore=restore )
             #end if
 
         elif (status == 'old'):
@@ -538,8 +541,7 @@ Project: Top level Cing project class
             pl.restore()
         #end for
 
-        for l in self.distances + self.dihedrals:
-            l.analyze()
+        self.analyzeRestraints()
 #            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
@@ -634,61 +636,25 @@ Project: Top level Cing project class
     # Resonances stuff
     #-------------------------------------------------------------------------
 
-    def mergeResonances( self, order=None, selection=None, status='reduce' ):
-
+    def mergeResonances( self, order=None, selection=None, append=True ):
         """ Merge resonances for all the atoms
-            check all the resonances in the list, optionally using selection
-            and take the first one which has a assigned value,
-            append or reduce the resonances list to this entry depending on status.
-
         """
-
         if not self.molecule:
             NTerror('Project.mergeResonances: No molecule defined\n')
             return
         #end if
-
-        for atom in self.molecule.allAtoms():
-            if ( len(atom.resonances) == 0 ):
-                NTerror('mergeResonances: zero length resonance list for atom "%s"\n',
-                         atom
-                       )
-                return
-            else:
-                rm = None
-                if (selection == None or atom.name in selection):
-                    for res in atom.resonances:
-                        if not isNaN(res.value):
-                            rm=res
-                            break
-                        #end if
-                    #end for
-                #end if
-            #end if
-
-            if (rm):
-                atom.resonances.append(rm)
-            else:
-                rm = atom.resonances[0]
-                atom.resonances.append(rm)
-            #end if
-
-            # Optionally reduce the list
-            if (status == 'reduce'):
-                atom.resonances = NTlist( atom.resonances() )
-                self.molecule.resonanceCount = 1
-            else:
-                self.molecule.resonanceCount = len( atom.resonances )
-        NTmessage("==> Merged resonances")
+        self.molecule.mergeResonances( order=order, selection=selection, append=append )
+        NTdetail("==> Merged resonances")
+    #end def
 
     def initResonances( self ):
-
         """ Initialize resonances for all the atoms
         """
         if not self.molecule:
             NTerror('Project.initResonances: No molecule defined\n')
             return
         self.molecule.initResonances()
+    #end def
 
     #-------------------------------------------------------------------------
     # actions other
@@ -711,6 +677,14 @@ Project: Top level Cing project class
         return peaklist
     #end def
 
+    def analyzeRestraints(self):
+        """Call analyze method for all restraint lists
+        """
+        NTdetail( '==> Analyzing restraints' )
+        for drl in self.allRestraintLists():
+            drl.analyze()
+    #end def
+
     def allRestraintLists(self):
         """Return an NTlist instance with all restraints lists
         """
@@ -729,18 +703,45 @@ Project: Top level Cing project class
     def __repr__(self):
         return str(self)
 
+    def _list2string(self, theList, firstString, maxItems):
+        result = firstString
+        if len(theList) <= maxItems:
+            result = result + str(theList)
+        else:
+            ls = len(firstString)
+            result = result + '['
+            for item in theList:
+                result = result + sprintf('%s,\n%s ', item, ' '*ls)
+            #end for
+            result = result[:-1] +']'
+        #end if
+        return result
+    #end def
+
     def format( self ):
         dots =              '-----------'
-        self.__FORMAT__   =  self.header( dots ) + '\n' + \
-                            'created:    %(created)s\n' +\
-                            'molecules:  %(molecules)s\n' +\
-                            'peaks:      %(peaks)s\n' +\
-                            'distances:  %(distances)s\n' +\
-                            'dihedrals:  %(dihedrals)s\n' +\
-                            'rdcs:       %(rdcs)s\n' +\
-                            'reports:    %(reports)s\n' +\
-                             self.footer( dots )
-        return NTdict.format( self )
+#        self.__FORMAT__   =  self.header( dots ) + '\n' + \
+#                            'created:    %(created)s\n' +\
+#                            'molecules:  %(molecules)s\n' +\
+#                            'peaks:      %(peaks)s\n' +\
+#                            'distances:  %(distances)s\n' +\
+#                            'dihedrals:  %(dihedrals)s\n' +\
+#                            'rdcs:       %(rdcs)s\n' +\
+#                             self.footer( dots )
+#        return NTdict.format( self )
+        result =  self.header( dots ) + '\n' + \
+                            'created:    %(created)s\n'
+        result = result%self
+        for firstString,item in [('molecules:  ', 'molecules'),
+                                 ('peaks:      ', 'peaks'),
+                                 ('distances:  ', 'distances'),
+                                 ('dihedrals:  ', 'dihedrals'),
+                                 ('rdcs:       ', 'rdcs'),
+                                ]:
+            result = result + self._list2string( self[item], firstString, 2) + '\n'
+        #end for
+        result = result + self.footer( dots )
+        return result
     #end def
 
     def removeFromDisk(self):
@@ -874,11 +875,21 @@ class _ProjectList( NTlist ):
         #end for
     #end def
 
-    def names(self):
-        "Return a list of name of self"
+    def names(self, *patterns ):
+        "Return a list of names of self, optionally screen using "
         names = NTlist()
         for l in self:
-            names.append(l.name)
+            if len(patterns) == 0:
+                names.append(l.name)
+            else:
+                for p in patterns:
+                    if matchString( l.name, p):
+                        names.append(l.name)
+                        break
+                    #end if
+                #end for
+            #end if
+        #end for
         return names
 
     def rename(self, oldName, newName):
@@ -1154,25 +1165,25 @@ class DistanceRestraint( NTdict ):
         self.rogScore.reset()
 #        NTdebug( '%s' % self )
         if self.violMax >= project.valSets.DR_MAXALL_BAD:
-            comment = 'RED: violMax: %8.3f' % self.violMax
+            comment = 'RED: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         elif self.violMax >= project.valSets.DR_MAXALL_POOR:
-            comment = 'ORANGE: violMax: %8.3f' % self.violMax
+            comment = 'ORANGE: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
-            comment = 'ORANGE: fractionAbove: %8.3f' % fractionAbove
+            comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.DR_THRESHOLD_OVER_BAD )
         if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
-            comment = 'RED: fractionAbove: %8.3f' % fractionAbove
+            comment = 'RED: fractionAbove: %7.2f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         if self.violSd >= project.valSets.DR_RMSALL_BAD:
-            comment = 'RED: violSd: %8.3f' % self.violSd
+            comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
@@ -1292,9 +1303,14 @@ class DistanceRestraint( NTdict ):
                         for a2 in atms2:
                             #print '>>', atm1, a1, atm2, a2
                             if len(a2.coordinates) > i:
-                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
-                                if tmp > 0.0:
-                                    d += math.pow( tmp, -6.0 )
+#                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
+#                                e1 = a1.coordinates[i].e
+#                                e2 = a2.coordinates[i].e
+#                                v = NTcVector(e1[0]-e2[0],e1[1]-e2[1],e1[2]-e2[2]
+#                                tmp = v.length()
+#                                if tmp > 0.0:
+#                                    d += math.pow( tmp, -6.0 )
+                                d += Rm6dist(a1.coordinates[i].e,a2.coordinates[i].e)
                             else:
                                 self.error = True
                             #end if
@@ -1444,6 +1460,13 @@ class DistanceRestraintList( NTlist ):
     #end def
 
     def criticize(self, project, toFile = True):
+        """
+        Criticize restraints of this list; infer own ROG score from individual restraints.
+        """
+        NTdebug('DistanceRestraintList.criticize %s', self)
+
+        self.rogScore.reset()
+
         for dr in self:
             dr.criticize(project)
             self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s' % dr )
@@ -1455,7 +1478,7 @@ class DistanceRestraintList( NTlist ):
                 fprintf(f, '%s\n', dr.format())
             #end for
             f.close()
-            NTdetail('Distance restraint analysis %s, output to %s', self, path)
+            NTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
     #end def
 
@@ -1471,6 +1494,8 @@ class DistanceRestraintList( NTlist ):
         Return <rmsd>, sd and total violations over 0.1, 0.3, 0.5 A as tuple
         or (None, None, None, None, None) on error
         """
+
+        NTdebug('DistanceRestraintList.analyze: %s', self )
 
         if (len( self ) == 0):
             NTerror('ERROR DistanceRestraintList.analyze: "%s" empty list', self.name )
@@ -1664,27 +1689,27 @@ class DihedralRestraint( NTdict ):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
         if self.violMax >= project.valSets.AC_MAXALL_BAD:
-            comment = 'RED: violMax: %8.3f' % self.violMax
+            comment = 'RED: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         elif self.violMax >= project.valSets.AC_MAXALL_POOR:
-            comment = 'ORANGE: violMax: %8.3f' % self.violMax
+            comment = 'ORANGE: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
 
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_POOR )
         if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
-            comment = 'RED: fractionAbove: %8.3f' % fractionAbove
+            comment = 'RED: fractionAbove: %7.2f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
         elif fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
-            comment = 'ORANGE: fractionAbove: %8.3f' % fractionAbove
+            comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_ORANGE, comment )
         fractionAbove = getFractionAbove( self.violations, project.valSets.AC_THRESHOLD_OVER_BAD )
 
         if self.violSd >= project.valSets.AC_RMSALL_BAD:
-            comment = 'RED: violSd: %8.3f' % self.violSd
+            comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor( COLOR_RED, comment )
 
@@ -1863,6 +1888,13 @@ class DihedralRestraintList( NTlist ):
     #end def
 
     def criticize(self, project, toFile=True):
+        """
+        Criticize restraints of this list; infer own ROG score from individual restraints.
+        """
+        NTdebug('DihedralRestraintList.criticize %s', self)
+
+        self.rogScore.reset()
+
         for dr in self:
             dr.criticize(project)
             self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s'% dr )
@@ -1874,8 +1906,9 @@ class DihedralRestraintList( NTlist ):
                 fprintf(f, '%s\n', dr.format())
             #end for
             f.close()
-            NTdetail('Dihedral restraint analysis %s, output to %s', self, path)
+            NTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
+    #end def
 
     def append( self, dihedralRestraint ):
         dihedralRestraint.id = self.currentId
@@ -1889,6 +1922,9 @@ class DihedralRestraintList( NTlist ):
         Return <rmsd>, sd and total violations over 1, 3, and 5 degrees as tuple
         or (None, None, None, None, None) on error
         """
+
+        NTdebug('DihedralRestraintList.analyze: %s', self )
+
         if not len( self ):
             NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
@@ -2132,6 +2168,9 @@ class RDCRestraintList( NTlist ):
         Calculate averages for every restraint.
 
         """
+
+        NTdebug('RDCRestraintList.analyze: %s', self )
+
         if (len( self ) == 0):
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
@@ -2167,6 +2206,32 @@ class RDCRestraintList( NTlist ):
 
         self.rmsdAv, self.rmsdSd, dummy_n = NTaverage( self.rmsd )
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
+    #end def
+
+    def criticize(self, project, toFile = True):
+        """
+        Criticize restraints of this list; infer own ROG score from individual restraints.
+
+        Need implementation
+        """
+
+        NTdebug('RDCRestraintList.criticize %s', self)
+
+        self.rogScore.reset()
+
+#        for dr in self:
+#            dr.criticize(project)
+#            self.rogScore.setMaxColor( dr.rogScore.colorLabel, comment='Cascaded from: %s' % dr )
+#        if toFile:
+#            path = project.moleculePath('analysis', self.name + '.txt')
+#            f = file( path, 'w')
+#            fprintf(f, '%s\n\n', self.format())
+#            for dr in self:
+#                fprintf(f, '%s\n', dr.format())
+#            #end for
+#            f.close()
+#            NTdetail('Distance restraint analysis %s, output to %s', self, path)
+#        #end if
     #end def
 
     def sort(self, byItem ):
@@ -2304,43 +2369,45 @@ def getFractionAbove( valueList, threshold ):
     return n / len(valueList)
 
 
-class AtomList( NTlist ):
-    """
-    Class based on NTlist that holds atoms.
-    Also manages the "id's".
-    Sort by item of Atom Class.
-
-    NB this list is only instantiated for the validate plugin. It has very little
-    functionality. Most functionality should be in Residue, Chains, etc.
-    """
-    def __init__( self, project, status='keep' ):
-        NTlist.__init__( self )
-        self.name       = project.molecule.name + '.atoms'
-        self.status     = status      # Status of the list; 'keep' indicates storage required
-        self.currentId  = 0           # Id for each element of list
-        self.rogScore   = ROGscore()
-        self.appendFromMolecule( project.molecule )
-        self.criticize()
-    #end def
-
-    def criticize(self):
-        for atom in self:
-#            atom.criticize()
-            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
-
-    def append( self, o ):
-        o.id = self.currentId
-        NTlist.append( self, o )
-        self.currentId += 1
-
-    def appendFromMolecule( self, molecule ):
-        for atom in molecule.allAtoms():
-            self.append( atom )
-
-    def __str__( self ):
-        return sprintf( '<AtomList "%s" (%s,%d)>',self.name,self.status,len(self) )
-    #end def
-
-    def format( self ):
-        return sprintf( '%s AtomList "%s" (%s,%d) %s\n',
-                      dots, self.name,self.status,len(self), dots)
+#class AtomList( NTlist ):
+#    """
+#    Class based on NTlist that holds atoms.
+#    Also manages the "id's". GV wants to know why as atoms have an id???
+#    Sort by item of Atom Class.
+#
+#    NB this list is only instantiated for the validate plugin. It has very little
+#    functionality. Most functionality should be in Residue, Chains, etc.
+#    """
+#    def __init__( self, project, status='keep' ):
+#        NTlist.__init__( self )
+#        self.name       = project.molecule.name + '.atoms'
+#        self.status     = status      # Status of the list; 'keep' indicates storage required
+#        self.currentId  = 0           # Id for each element of list
+#        self.rogScore   = ROGscore()
+#        self.appendFromMolecule( project.molecule )
+#        self.criticize()
+#    #end def
+#
+#    def criticize(self):
+#        for atom in self:
+##            atom.criticize()
+#            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
+#
+#    def append( self, o ):
+#        o.id = self.currentId
+#        NTlist.append( self, o )
+#        self.currentId += 1
+#
+#    def appendFromMolecule( self, molecule ):
+#        for atom in molecule.allAtoms():
+#            self.append( atom )
+#
+#    def __str__( self ):
+#        return sprintf( '<AtomList "%s" (%s,%d)>',self.name,self.status,len(self) )
+#    #end def
+#
+#    def format( self ):
+#        return sprintf( '%s AtomList "%s" (%s,%d) %s\n',
+#                      dots, self.name,self.status,len(self), dots)
+#    #end def
+##end class
