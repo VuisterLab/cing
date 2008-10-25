@@ -9,11 +9,12 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -23,11 +24,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtsolutions.components.client.ui.Message;
 
-public class FileView extends Composite {
+public class FileView extends iCingView {
 
-	
-	private iCing icing = null;
-	private static final String FILE_UPLOAD_SERVLET_RELATIVE_URL = iCing.RPC_URL+"/iCingServer.py";
+	// private iCing icing = null;
 	// Development:
 	// http://localhost:8888/cing.iCing/iCing.html
 	final Button startButton = new Button();
@@ -47,12 +46,12 @@ public class FileView extends Composite {
 	final int otherIdx = i++;
 	final int removeIdx = i++;
 	final int submitIdx = i++;
+	final int egIdx = i++;
 
 	iCingConstants c = iCing.c;
-	static final int REFRESH_INTERVAL = 500;
 
 	public FileView() {
-
+		super();
 		// Now create the user interface, wrapped in a
 		// vertical panel
 		VerticalPanel verticalPanel = new VerticalPanel();
@@ -66,8 +65,9 @@ public class FileView extends Composite {
 		verticalPanel.add(label);
 		verticalPanel.add(statusMessage);
 		// Since there is no status initially, hide the status message
-//		statusMessage.setVisible(false);
-//		statusMessage.setWidth(Integer.toString(iCing.WIDTH_MENU-iCing.margin));
+		statusMessage.setVisible(false);
+		//statusMessage.setWidth(Integer.toString(iCing.WIDTH_MENU-iCing.margin)
+		// );
 
 		DecoratorPanel decPanel = new DecoratorPanel();
 		final HorizontalPanel horizontalPanel = new HorizontalPanel();
@@ -97,19 +97,22 @@ public class FileView extends Composite {
 		addUploadRow();
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-//				loadOptionsView();
-				icing.onHistoryChanged(iCing.CRITERIA_STATE);					
+				// loadOptionsView();
+				icing.onHistoryChanged(iCing.CRITERIA_STATE);
 			}
-		});	
+		});
 		nextButton.setEnabled(false);
 		verticalPanel.add(nextButton);
+		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_LEFT);
+
 	}
 
 	public boolean showStartButton() {
 		flexTable.setWidget(0, 0, startButton);
 		startButton.setText("Upload file");
 		startButton.setVisible(true);
-//		flexTable.getCellFormatter().setHorizontalAlignment(1, 1, HasHorizontalAlignment.ALIGN_CENTER);
+		// flexTable.getCellFormatter().setHorizontalAlignment(1, 1,
+		// HasHorizontalAlignment.ALIGN_CENTER);
 
 		return false;
 	}
@@ -130,7 +133,8 @@ public class FileView extends Composite {
 
 		flexTable.setWidget(1, 1, addButton);
 		addButton.setText("Upload another file");
-//		flexTable.getCellFormatter().setHorizontalAlignment(1, 1, HasHorizontalAlignment.ALIGN_LEFT);
+		// flexTable.getCellFormatter().setHorizontalAlignment(1, 1,
+		// HasHorizontalAlignment.ALIGN_LEFT);
 		return false;
 	}
 
@@ -143,11 +147,11 @@ public class FileView extends Composite {
 		flexTable.setWidget(currentRowIdx, checkBoxIdx, checkBoxUseFile);
 		checkBoxUseFile.setChecked(true);
 		checkBoxUseFile.setText("");
-//		checkBoxUseFile.setVisible(false);
+		// checkBoxUseFile.setVisible(false);
 
 		final Label labelFileUploadDone = new Label("This message should not show up.");
 		labelFileUploadDone.setVisible(false);
-		
+
 		final FileUpload fileUpload = new FileUpload();
 		fileUpload.setName(iCing.FORM_UPLOAD_FILE_BASE);
 		Button submitButton = new Button(c.Upload());
@@ -155,48 +159,47 @@ public class FileView extends Composite {
 		final FormPanel formPanel = new FormPanel();
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
-//		formPanel.setMethod(FormPanel.METHOD_GET);
-		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
-//		General.showDebug("moduleBaseUrlWithPort: " + moduleBaseUrlWithPort);
-//		int endIndex = moduleBaseUrlWithPort.lastIndexOf(':');
-//		if ( endIndex < 0 ) {
-//			endIndex = moduleBaseUrlWithPort.length();
-//		}
-//		String moduleBaseUrl = moduleBaseUrlWithPort.substring(0, endIndex);
-//		String actionUrl = "http://localhost/cgi/iCing/bla";
-		
-		// Testing:
-		// moduleBaseUrlWithPort: http://localhost:8888/cing.iCing/
+		// formPanel.setMethod(FormPanel.METHOD_GET);
+		String moduleBaseUrl = GWT.getModuleBaseURL();
+
+		// Testing with apache, (-noserver and URL: http://localhost/iCing/)
+		// moduleBaseUrlWithPort: http://localhost/iCing/
 		// Production:
 		// moduleBaseUrlWithPort: https://nmr.cmbi.ru.nl/iCing/
-		String actionUrl = moduleBaseUrlWithPort + FILE_UPLOAD_SERVLET_RELATIVE_URL;
-		General.showDebug("actionUrl: [" + actionUrl +"]");
+		String actionUrl = moduleBaseUrl + iCing.FILE_UPLOAD_URL;
+		General.showDebug("actionUrl: [" + actionUrl + "]");
 		formPanel.setAction(actionUrl);
-		/** Since not more than one element can be added to formpanel; the individual items 
-		 * need to be wrapped in another element that can contain them.
+		/**
+		 * Since not more than one element can be added to formpanel; the
+		 * individual items need to be wrapped in another element that can
+		 * contain them.
 		 */
 		HorizontalPanel formLayoutPanel = new HorizontalPanel();
 		HorizontalPanel fileUploadHorizontalPanel = new HorizontalPanel();
-		fileUploadHorizontalPanel.add(fileUpload); // will switch between these two.
+		fileUploadHorizontalPanel.add(fileUpload); // will switch between these
+													// two.
 		fileUploadHorizontalPanel.add(labelFileUploadDone);
 		formPanel.setWidget(formLayoutPanel);
 		formLayoutPanel.add(fileUploadHorizontalPanel);
 		flexTable.setWidget(currentRowIdx, fileIdx, formPanel);
 
 		// No effect.
-//		formLayoutPanel.setCellVerticalAlignment(fileUploadHorizontalPanel, HasVerticalAlignment.ALIGN_BOTTOM);
-//		fileUploadHorizontalPanel.setCellVerticalAlignment(fileUpload, HasVerticalAlignment.ALIGN_BOTTOM);
-//		fileUploadHorizontalPanel.setCellVerticalAlignment(labelFileUploadDone, HasVerticalAlignment.ALIGN_BOTTOM);
-		
+		// formLayoutPanel.setCellVerticalAlignment(fileUploadHorizontalPanel,
+		// HasVerticalAlignment.ALIGN_BOTTOM);
+		// fileUploadHorizontalPanel.setCellVerticalAlignment(fileUpload,
+		// HasVerticalAlignment.ALIGN_BOTTOM);
+		//fileUploadHorizontalPanel.setCellVerticalAlignment(labelFileUploadDone
+		// , HasVerticalAlignment.ALIGN_BOTTOM);
+
 		// The GWT calls this form handler after the form is submitted.
 		FileFormHandler fileFormHandler = new FileFormHandler();
-		
+
 		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
 		/** Invisible parameters to pass */
-		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey) ); 
-		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId) ); 
-		formLayoutPanel.add(new Hidden(iCing.RUN_SERVER_ACTION, iCing.RUN_SERVER_ACTION_SAVE) ); 
-		
+		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey));
+		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId));
+		formLayoutPanel.add(new Hidden(iCing.RUN_SERVER_ACTION, iCing.RUN_SERVER_ACTION_SAVE));
+
 		final ListBox listBox_Program = new ListBox();
 		flexTable.setWidget(currentRowIdx, programIdx, listBox_Program);
 		listBox_Program.setVisibleItemCount(1);
@@ -210,6 +213,9 @@ public class FileView extends Composite {
 			}
 		}
 		listBox_Program.setItemSelected(0, true);
+		if (listBox_Program.getItemCount() == 1) {
+			listBox_Program.setEnabled(false);
+		}
 
 		final ListBox listBox_Type = new ListBox();
 		flexTable.setWidget(currentRowIdx, typeIdx, listBox_Type);
@@ -225,6 +231,9 @@ public class FileView extends Composite {
 			}
 		}
 		listBox_Type.setItemSelected(0, true);
+		if (listBox_Type.getItemCount() == 1) {
+			listBox_Type.setEnabled(false);
+		}
 
 		final ListBox listBox_Subtype = new ListBox();
 		flexTable.setWidget(currentRowIdx, subTypeIdx, listBox_Subtype);
@@ -240,8 +249,12 @@ public class FileView extends Composite {
 				}
 				listBox_Subtype.addItem(item);
 			}
+
 		}
 		listBox_Subtype.setItemSelected(0, true);
+		if (listBox_Subtype.getItemCount() == 1) {
+			listBox_Subtype.setEnabled(false);
+		}
 
 		final ListBox listBox_Other = new ListBox();
 		flexTable.setWidget(currentRowIdx, otherIdx, listBox_Other);
@@ -259,8 +272,16 @@ public class FileView extends Composite {
 			}
 		}
 		listBox_Other.setItemSelected(0, true);
+		if (listBox_Other.getItemCount() == 1) {
+			listBox_Other.setEnabled(false);
+		}
 
-		
+		String exampleUrl = "example/1brv.tgz";
+		exampleUrl = "<A HREF=\"" + exampleUrl + "\">eg</a>";
+		HTML egHtml = new HTML();
+		egHtml.setHTML(exampleUrl);
+		flexTable.setWidget(currentRowIdx, egIdx, egHtml);
+
 		// setup timer to refresh list automatically
 		Timer timer = new Timer() {
 			public void run() {
@@ -270,8 +291,8 @@ public class FileView extends Composite {
 				formPanel.submit();
 			}
 		};
-		timer.scheduleRepeating(REFRESH_INTERVAL);
-		
+		timer.scheduleRepeating(iCing.REFRESH_INTERVAL);
+
 		fileFormHandler.setFileUpload(fileUpload);
 		fileFormHandler.setLabelFileUploadDone(labelFileUploadDone);
 		fileFormHandler.setStatusMessage(statusMessage);
@@ -284,9 +305,9 @@ public class FileView extends Composite {
 		fileFormHandler.setTimer(timer);
 		fileFormHandler.setNextButton(nextButton);
 		/** Removing file while not (fully) transmitted to server. */
-//		final Button removeButton = new Button();
-//		flexTable.setWidget(currentRowIdx, removeIdx, removeButton);
-//		removeButton.setText("Remove");
+		// final Button removeButton = new Button();
+		// flexTable.setWidget(currentRowIdx, removeIdx, removeButton);
+		// removeButton.setText("Remove");
 		checkBoxUseFile.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				int[] indices = Utils.getIndicesFromTable(flexTable, sender);
@@ -306,10 +327,9 @@ public class FileView extends Composite {
 				}
 			}
 		});
-		
 
 		// setEnableAllWidgetAtByRow(currentRowIdx, false);
-//		removeButton.setEnabled(true);
+		// removeButton.setEnabled(true);
 		listBox_Program.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
 				updateListBox();
@@ -401,11 +421,13 @@ public class FileView extends Composite {
 		formPanel.addFormHandler(fileFormHandler);
 		submitButton.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
-//				General.showWarning("Submit button thinks it's clicked (and does a GET instead of a POST) but does so on load of GWT module");
+				// General.showWarning(
+				// "Submit button thinks it's clicked (and does a GET instead of a POST) but does so on load of GWT module"
+				// );
 				formPanel.submit();
 			}
 		});
-				
+
 		return false;
 	}
 
@@ -415,13 +437,9 @@ public class FileView extends Composite {
 			Widget w = flexTable.getWidget(row, i);
 			Utils.setEnabled(w, b);
 		}
-	} 
+	}
 
 	public void setIcing(iCing icing) {
 		this.icing = icing;
-	}
-
-	public iCing getIcing() {
-		return icing;
 	}
 }

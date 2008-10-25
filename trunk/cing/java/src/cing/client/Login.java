@@ -3,21 +3,30 @@ package cing.client;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Login extends Composite {
+public class Login extends iCingView {
 	iCingConstants c = iCing.c;	
+	DecoratorPanel decPanel = new DecoratorPanel();
 
 	public Login() {
 
+		final VerticalPanel verticalPanelTop = new VerticalPanel();
+		initWidget(verticalPanelTop);
+		final Label html_1 = new Label( c.Login() );
+		html_1.setStylePrimaryName("h1");
+		verticalPanelTop.add(html_1);
+		verticalPanelTop.add(decPanel);
+				
 		final Grid grid = new Grid(4, 2);
-		initWidget(grid);
-		grid.setTitle(c.Login());
+		decPanel.setWidget(grid);
+		grid.setTitle(c.Login()); // pretty useless.
 		grid.setCellPadding(10);
 		setTitle(c.Login());
 

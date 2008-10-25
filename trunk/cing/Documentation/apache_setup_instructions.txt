@@ -48,15 +48,18 @@ SetEnv  povrayPath /sw/bin/povray
 SetEnv  HOME /Library/WebServer/Documents/cgi-cing-home
 SetEnv  CINGROOT /Users/jd/workspace34/cing
 
-# For the gwt embedded tomcat server
+# For the gwt embedded tomcat server NOT IN USE ANYMORE
 ProxyPass         /cgi-bin/iCing http://localhost:8888/
 ProxyPassReverse  /cgi-bin/iCing http://localhost:8888/
-# For the python stand-alone servers.
+
+# For the python stand-alone CGI server.
 ProxyPass         /iCing/cgi-bin http://localhost:8001/cgi-bin
 ProxyPassReverse  /iCing/cgi-bin http://localhost:8001/cgi-bin
 
-ProxyPass         /iCingServer.py http://localhost:8000/iCingServer.py
-ProxyPassReverse  /iCingServer.py http://localhost:8000/iCingServer.py
+# For the python regular server, still essential to have the iCing in there for ssl url rewriting done by cmbi.ru.nl.
+# Note that the server-bin at the end is optional? 
+ProxyPass         /iCing/server-bin http://localhost:8000
+ProxyPassReverse  /iCing/server-bin http://localhost:8000
 
 The tomcat server in eclipse works together with the apache configured here.
             

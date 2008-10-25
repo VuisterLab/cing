@@ -1,9 +1,8 @@
 package cing.client;
 
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 
-public class Footer extends Composite {
+public class Footer extends iCingView {
 
 	public Footer() {
 

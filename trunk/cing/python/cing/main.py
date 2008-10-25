@@ -77,7 +77,6 @@ from cing.core.parameters import plugins
 from cing.iCing.iCingServer import PORT_CGI
 from cing.iCing.iCingServer import PORT_SERVER
 from cing.iCing.iCingServer import iCingServerHandler
-
 from string import join
 import cing
 import os
@@ -195,31 +194,6 @@ def testOverall():
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
 
-#def serve():
-#    # Now the cgi python code is actually a part of the package.
-#    # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
-#    localDir = os.path.join( cingPythonCingDir, "iCing" )
-#    os.chdir(localDir)
-#    NTmessage("Starting a server at port %s" % PORT_SERVER )
-#    httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
-##    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
-##    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
-#    try:
-#        httpd.serve_forever()
-##        httpd_cgi.serve_forever()
-#    except KeyboardInterrupt:
-#        print '^C received'
-#    finally:
-#        print 'shutting down server'
-#        try:
-#            httpd.socket.close()
-#            httpd_cgi.socket.close()
-#        except:
-#            pass
-#        try:
-#            httpd_cgi.socket.close() #@UndefinedVariable
-#        except:
-#            pass
 def serve():
     # Now the cgi python code is actually a part of the package.
     # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
@@ -544,7 +518,7 @@ def main():
     mol = project.molecule #@UnusedVariable
     m   = project.molecule #@UnusedVariable
 
- #   pr = print
+#   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 
@@ -616,7 +590,7 @@ def main():
         scriptFile = scriptPath( options.script )
         if scriptFile:
             NTmessage('==> Executing script "%s"', scriptFile )
-            execfile( scriptFile, globals() )
+            execfile( scriptFile ) # JFD removed: Used to have: , globals() because options weren't coming thru.
         #end if
     #end if
 

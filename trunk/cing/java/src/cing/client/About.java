@@ -18,7 +18,7 @@ public class About extends DialogBox {
 
 	public About() {
 		setHTML(c.About());
-		details.setHTML(c.iCing() + " " + c.is_part() + " <A href=\"http://proteins.dyndns.org/cing/\">" + c.CING()
+		details.setHTML(c.iCing() + " " + c.is_part() + " <A href=\"http://nmr.cmbi.ru.nl/cing/\">" + c.CING()
 				+ "</a> " + c.software() + ".");
 		// Create a table to layout the content
 		VerticalPanel dialogContents = new VerticalPanel();
