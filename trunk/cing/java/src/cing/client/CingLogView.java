@@ -2,7 +2,6 @@ package cing.client;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -19,10 +18,10 @@ public class CingLogView extends iCingView {
 	static boolean logTimerBusy = false;
 	iCingConstants c = iCing.c;
 	public final RichTextArea area = iCing.cingArea;
-	CingQuery cingQueryLogTail = null; 
-	CingQuery cingQueryStatus = null; 
-	CingQuery cingQueryProjectName = null; 
-	
+	iCingQuery cingQueryLogTail = null;
+	iCingQuery cingQueryStatus = null;
+	iCingQuery cingQueryProjectName = null;
+
 	Timer statusTimer = null;
 	Timer logTimer = null;
 
@@ -66,29 +65,29 @@ public class CingLogView extends iCingView {
 
 		logLabel.setStylePrimaryName("h1");
 
-		final CheckBox tailCheckBox = new CheckBox();
-		gridTop.setWidget(0, 1, tailCheckBox);
-		tailCheckBox.setChecked(false);
-		tailCheckBox.setText(c.Tail());
-		tailCheckBox.addClickListener(new ClickListener() {
-			public void onClick(final Widget sender) {
-				String html = area.getHTML();
-				html = Utils.reverse(html);
-				area.setHTML(html);
-				iCing.textIsReversedCingArea = tailCheckBox.isChecked();
-			}
-		});
+//		final CheckBox tailCheckBox = new CheckBox();
+//		gridTop.setWidget(0, 1, tailCheckBox);
+//		tailCheckBox.setChecked(false);
+//		tailCheckBox.setText(c.Tail());
+//		tailCheckBox.addClickListener(new ClickListener() {
+//			public void onClick(final Widget sender) {
+//				String html = area.getHTML();
+//				html = Utils.reverse(html);
+//				area.setHTML(html);
+//				iCing.textIsReversedCingArea = tailCheckBox.isChecked();
+//			}
+//		});
 
 		final Button clearButton = new Button();
 		gridTop.setWidget(0, 2, clearButton);
 		clearButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				area.setHTML("");
+				area.setHTML("<PRE></PRE>");
 			}
 		});
 		clearButton.setText("Clear");
-		area.setFocus(true);
-		String iniMsg = "Expect to see CING log lines here; once CING is running."+"<br>";
+		area.setFocus(false);
+		String iniMsg = "<PRE>Expect to see CING log lines here; once CING is running.";
 		area.setHTML(iniMsg);
 
 		nextButton.setText(c.Next());
@@ -101,7 +100,6 @@ public class CingLogView extends iCingView {
 
 		verticalPanel.add(nextButton);
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-
 
 		// For debugging logger.
 		final Button startLogButton = new Button();
@@ -139,18 +137,18 @@ public class CingLogView extends iCingView {
 		verticalPanel.add(startStatusButton);
 		verticalPanel.add(stopStatusButton);
 
-		cingQueryLogTail = new CingQuery(); 
+		cingQueryLogTail = new iCingQuery();
 		cingQueryLogTail.action.setValue(iCing.RUN_SERVER_ACTION_LOG);
 		cingQueryLogTail.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryLogTail.formPanel);
-		
-		cingQueryStatus = new CingQuery(); 
-		cingQueryStatus.action.setValue(iCing.RUN_SERVER_ACTION_STATUS);						
+
+		cingQueryStatus = new iCingQuery();
+		cingQueryStatus.action.setValue(iCing.RUN_SERVER_ACTION_STATUS);
 		cingQueryStatus.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryStatus.formPanel);
 
-		cingQueryProjectName = new CingQuery(); 
-		cingQueryProjectName.action.setValue(iCing.RUN_SERVER_ACTION_PROJECT_NAME);						
+		cingQueryProjectName = new iCingQuery();
+		cingQueryProjectName.action.setValue(iCing.RUN_SERVER_ACTION_PROJECT_NAME);
 		cingQueryProjectName.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryProjectName.formPanel);
 	}
@@ -160,13 +158,14 @@ public class CingLogView extends iCingView {
 		if (statusTimerScheduled) {
 			return;
 		}
-		if ( statusTimerBusy ) {
-//			General.showCodeBug("statusTimerBusy but not statusTimerScheduled");
+		if (statusTimerBusy) {
+			//General.showCodeBug("statusTimerBusy but not statusTimerScheduled"
+			// );
 			return;
 		}
 		Timer timer = new Timer() {
 			public void run() {
-//				General.showDebug("checking run status");
+				// General.showDebug("checking run status");
 				if (statusTimerBusy) {
 					return;
 				}
@@ -191,16 +190,16 @@ public class CingLogView extends iCingView {
 		}
 		statusTimerBusy = false;
 	}
-	
+
 	/** Needs to be called by ServerFormHandler */
-	protected void setProjectName(String projectName) {		
+	protected void setProjectName(String projectName) {
 		if ((projectName != null) && projectName.equals(iCing.RESPONSE_STATUS_NONE)) {
 			icing.projectName = projectName;
-		}		
+		}
 	}
-	
+
 	protected void stopLogRetrieval() {
-//		General.showDebug("Now in stopLogRetrieval");
+		// General.showDebug("Now in stopLogRetrieval");
 		logTimer.cancel();
 		logTimerScheduled = false;
 		logTimerBusy = false; // should have done by setLogTail
@@ -208,14 +207,14 @@ public class CingLogView extends iCingView {
 
 	public void startLogRetrieval() {
 		// setup timer to refresh list automatically
-		if (logTimerScheduled ) {
+		if (logTimerScheduled) {
 			return;
 		}
-		if ( logTimerBusy ) {
-//			General.showCodeBug("logTimerBusy but not logTimerScheduled");
+		if (logTimerBusy) {
+			// General.showCodeBug("logTimerBusy but not logTimerScheduled");
 			return;
 		}
-		
+
 		Timer timer = new Timer() {
 			public void run() {
 				if (logTimerBusy) {
@@ -223,7 +222,7 @@ public class CingLogView extends iCingView {
 					return;
 				}
 				logTimerBusy = true;
-//				General.showDebug("getting CING log");
+				// General.showDebug("getting CING log");
 				getLogTail();
 			}
 		};
@@ -233,46 +232,50 @@ public class CingLogView extends iCingView {
 	}
 
 	protected void setLogTail(String message) {
-//		General.showDebug("Now in setLogTail");
-//		appendLog("In iCing: Now in setLogTail");
-		if (message != null) {
-			appendLog("<PRE>"+message+"</PRE>");
+		// General.showDebug("Now in setLogTail");
+		// appendLog("In iCing: Now in setLogTail");
+		if (message != null && message.length() > 0) {
+			appendLog(message);
 		}
 		logTimerBusy = false;
 	}
 
 	protected void getLogTail() {
-//		Date today = new Date();
-//		String d = DateTimeFormat.getLongTimeFormat().format(today);
-//		String msg = "In iCing: Now in getLogTail "+d+"<BR>";
-//		General.showDebug(msg);
-//		appendLog(msg);		
+		// Date today = new Date();
+		// String d = DateTimeFormat.getLongTimeFormat().format(today);
+		// String msg = "In iCing: Now in getLogTail "+d+"<BR>";
+		// General.showDebug(msg);
+		// appendLog(msg);
 		cingQueryLogTail.formPanel.submit();
 	}
 
 	protected void appendLog(String message) {
-//		General.showDebug("Now in appendLog");
-		if (iCing.textIsReversedArea) {
-			area.setHTML(message + area.getHTML());
+		// General.showDebug("Now in appendLog");
+		String orgHTML = area.getHTML();
+		String orgText = "";
+		int n = orgHTML.length();
+		if ( n < 11 ) {
+			General.showCodeBug("In appendLog. Expected at least the string: <PRE></PRE>	");
 		} else {
-			area.setHTML(area.getHTML() + message);
-		}
-
+			int x = n - 6; // </PRE>
+			orgText = orgHTML.substring(5,x);			
+		}						
+		area.setHTML( "<PRE>"+orgText+message+"</PRE>");
 	}
 
 	protected void stopStatusChecker() {
-//		General.showDebug("Now in stopStatusChecker");
+		// General.showDebug("Now in stopStatusChecker");
 		statusTimer.cancel();
 		statusTimerScheduled = false;
 	}
 
 	protected void getStatus() {
-//		General.showDebug("Now in getStatus");
+		// General.showDebug("Now in getStatus");
 		cingQueryStatus.formPanel.submit();
 	}
 
 	protected void getProjectName() {
-//		General.showDebug("Now in getProjectName");
+		// General.showDebug("Now in getProjectName");
 		cingQueryProjectName.formPanel.submit();
 	}
 

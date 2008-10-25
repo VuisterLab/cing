@@ -30,7 +30,8 @@
 	<entry-point class="cing.client.iCing" />
 
 	<extend-property name="locale" values="en" />
-<!-- Disable for quicker testing/compiling.
+<!-- Disable for quicker testing/compiling. -->
+
 	<extend-property name="locale" values="cn" />
 	<extend-property name="locale" values="de" />
 	<extend-property name="locale" values="es" />
@@ -38,7 +39,6 @@
 	<extend-property name="locale" values="it" />
 	<extend-property name="locale" values="nl" />
 	<extend-property name="locale" values="pt" />
--->
     <!-- Specify the servlet that handles file uploads. 
 	<servlet path="/servlets/fileupload" class="cing.server.FileUploadServlet" />	
 	-->

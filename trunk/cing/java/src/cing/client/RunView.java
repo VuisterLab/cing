@@ -15,7 +15,7 @@ public class RunView extends iCingView {
 	DecoratorPanel decPanel = new DecoratorPanel();
 	static final Button runButton = new Button();
 	static final Button nextButton = new Button();
-	CingQuery cingQueryRun; 
+	iCingQuery cingQueryRun; 
 	
 	public RunView() {
 		initWidget(decPanel);
@@ -53,7 +53,7 @@ public class RunView extends iCingView {
 		verticalPanel.add(nextButton);
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 		
-		cingQueryRun = new CingQuery(); 
+		cingQueryRun = new iCingQuery(); 
 		cingQueryRun.action.setValue(iCing.RUN_SERVER_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);
 		
