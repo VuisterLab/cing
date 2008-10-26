@@ -31,7 +31,7 @@ public class RunView extends iCingView {
 		final Label html_2 = new Label( "Please press the button when you are ready." );
 		verticalPanel.add(html_2);
 		
-		runButton.setText(c.Run());
+		runButton.setText(c.Submit());
 		runButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				runButton.setText("Running...");
@@ -41,6 +41,7 @@ public class RunView extends iCingView {
 		runButton.setEnabled(true);
 		
 		verticalPanel.add(runButton);
+		runButton.setTitle("Run the validation.");
 		verticalPanel.setCellHorizontalAlignment(runButton, HasHorizontalAlignment.ALIGN_LEFT);
 				
 		nextButton.setText(c.Next());
@@ -51,8 +52,9 @@ public class RunView extends iCingView {
 		});	
 //		nextButton.setEnabled(false); //disable for testing it will be triggered by a run; or not...
 		verticalPanel.add(nextButton);
+		nextButton.setTitle("Goto CING log.");
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-		
+		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(); 
 		cingQueryRun.action.setValue(iCing.RUN_SERVER_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);
@@ -69,7 +71,7 @@ public class RunView extends iCingView {
 		icing.report.showTemporaryResults();
 		nextButton.setEnabled(true); // or switch my self. or enable after run submitted.
 		/** Needs to be called by ServerFormHandler */
-		icing.cingLogView.getProjectName();		
+//		icing.cingLogView.getProjectName();		
 		icing.cingLogView.startLogAndStatuscCheckers();
 		// Call it right away.
 		cingQueryRun.formPanel.submit();		

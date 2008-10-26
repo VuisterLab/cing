@@ -46,14 +46,19 @@ public class Welcome extends iCingView {
 		cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
 		playButton.setText( c.Silly_sound());
 		layout.setWidget(4, 0, playButton);
+		playButton.setTitle("Make some noise.");
 
 		// add the load state status
 		// RootPanel.get().add(loadStateHTML);
 //		layout.setWidget(5, 0, loadStateHTML);
 //		loadStateHTML.setVisible(false);
 		
-		layout.setWidget(2, 0, new Hyperlink(c.Start(), iCing.FILE_STATE));
-		layout.setWidget(3, 0, new Hyperlink(c.Logout(), iCing.LOGIN_STATE));
+		final Hyperlink hyperlink = new Hyperlink(c.Start(), iCing.FILE_STATE);
+		layout.setWidget(2, 0, hyperlink);
+		hyperlink.setTitle("Begin with file upload.");
+		final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);
+		layout.setWidget(3, 0, hyperlink_1);
+		hyperlink_1.setTitle("Start new session.");
 
 		// use deferred command to catch initialization exceptions
 		DeferredCommand.addCommand(new Command() {

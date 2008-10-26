@@ -14,6 +14,6 @@ public class Status extends iCingView {
 		statusArea.setHeight("10em");
 		statusArea.setWidth(iCing.widthMenu);
 		statusArea.setWidth(iCing.widthMenu);
-		statusArea.setVisible(General.verbosity == General.verbosityDebug);
+		statusArea.setVisible(General.getVerbosity() == General.verbosityDebug);
 	}
 }

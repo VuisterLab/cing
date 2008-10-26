@@ -20,9 +20,11 @@ public class ServerFormHandler implements FormHandler {
 	static {		
 		validResponseKeys.add(iCing.RESPONSE_STATUS);
 		validResponseKeys.add(iCing.RESPONSE_TAIL_PROGRESS);
+		validResponseKeys.add(iCing.RESPONSE_STATUS_PROJECT_NAME);
 		
 		validResponseStatusValues.add( iCing.RESPONSE_STATUS_DONE );
 		validResponseStatusValues.add( iCing.RESPONSE_STATUS_NOT_DONE );
+		validResponseStatusValues.add( iCing.RESPONSE_STATUS_STARTED );
 	}
 		
 	// When the submit starts, make sure the user selected a file to upload
@@ -82,16 +84,17 @@ public class ServerFormHandler implements FormHandler {
 				General.showError("Found invalid response value: [" + value + "]");
 				return;
 			}
+			if ( cingLogView == null ) {
+				General.showError("Found null for cingLogView.");
+				return;
+			}
 			General.showDebug("will do next; cingLogView.setStatus(value)");
+			
 			cingLogView.setStatus(value);
 			return;
 		}
 		if ( key.equals(iCing.RESPONSE_TAIL_PROGRESS)) {
 			General.showDebug("will do next; cingLogView.setLogTail(value);");
-//			if ( cingLogView == null ) {
-//				General.showError("Got null for cingLogView");
-//				return;
-//			}
 			cingLogView.setLogTail(value);
 			return;
 		}
@@ -105,7 +108,7 @@ public class ServerFormHandler implements FormHandler {
 			return;
 		}
 		// shouldn't happen.
-		General.showCodeBug("Found invalid response key: [" + key + "]");
+		General.showCodeBug("Weird, found invalid response key: [" + key + "]");
 		return;
 	}
 

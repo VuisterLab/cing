@@ -103,12 +103,14 @@ public class FileView extends iCingView {
 		});
 		nextButton.setEnabled(false);
 		verticalPanel.add(nextButton);
+		nextButton.setTitle("Set the criteria.");
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_LEFT);
 
 	}
 
 	public boolean showStartButton() {
 		flexTable.setWidget(0, 0, startButton);
+		startButton.setTitle("Select file(s) to upload.");
 		startButton.setText("Upload file");
 		startButton.setVisible(true);
 		// flexTable.getCellFormatter().setHorizontalAlignment(1, 1,
@@ -132,6 +134,7 @@ public class FileView extends iCingView {
 		flexTable.setWidget(0, otherIdx, otherLabel);
 
 		flexTable.setWidget(1, 1, addButton);
+		addButton.setTitle("Add another upload.");
 		addButton.setText("Upload another file");
 		// flexTable.getCellFormatter().setHorizontalAlignment(1, 1,
 		// HasHorizontalAlignment.ALIGN_LEFT);
