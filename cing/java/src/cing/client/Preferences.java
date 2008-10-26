@@ -48,18 +48,14 @@ public class Preferences extends iCingView {
 //		flexTable.setWidget(0, 1, listBox);
 		listBox.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget sender) {
-				General.verbosity = Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() ));
-				General.showOutput("verbosity now: " + General.verbosityDebug );
-				boolean visibilityStatusArea = General.verbosity == General.verbosityDebug;
-				General.showOutput("visibilityStatusArea: " + visibilityStatusArea );
-				if ( statusArea == null ) {
-					General.showOutput("in Preferences: statusArea == null");
-					return;
-				}
-				statusArea.setVisible( visibilityStatusArea );
+				General.setVerbosity(Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() )));
+				General.showOutput("verbosity now: " + General.getVerbosity() );				
+				boolean doDebugNow = General.getVerbosity() == General.verbosityDebug;
+				icing.setVerbosityToDebug(doDebugNow);
+				General.showOutput("visibilityStatusArea: " + doDebugNow );
 			}
 		});
-		listBox.setSelectedIndex(General.verbosityOutput);
+		listBox.setSelectedIndex(General.getVerbosity());
 		flexTable.setWidget(optionVerbosityIdx, 1, listBox);
 		
 		

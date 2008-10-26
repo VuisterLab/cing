@@ -74,8 +74,9 @@ public class General {
 	public static final int verbosityOutput = 3; // and regular output DEFAULT
 	public static final int verbosityDetail = 4; // show more details
 	public static final int verbosityDebug = 5; // add debugging info (not
+	
 	// recommended for casual user)
-	public static int verbosity = verbosityOutput;
+	private static int verbosity = verbosityOutput;
 	// public static int verbosity = verbosityDebug;
 
 	/**
@@ -222,7 +223,7 @@ public class General {
 
 	public static void showCodeBug(String message, String lastKnownPosition, Throwable t, Class c) {
 
-		if (verbosity < verbosityError) {
+		if (getVerbosity() < verbosityError) {
 			return;
 		}
 		if (lastKnownPosition != null) {
@@ -250,7 +251,7 @@ public class General {
 
 	public static void showError(String message, String lastKnownPosition, Throwable t, Class cl) {
 
-		if (verbosity < verbosityError) {
+		if (getVerbosity() < verbosityError) {
 			return;
 		}
 		String prefix = "<font color=\"red\">" + constants.ERROR() + "</font>";
@@ -295,7 +296,7 @@ public class General {
 	}
 
 	public static void showWarning(String message, String lastKnownPosition, Throwable t, Class c) {
-		if (verbosity < verbosityWarning) {
+		if (getVerbosity() < verbosityWarning) {
 			return;
 		}
 		String prefix = "<font color=\"orange\">" + constants.WARNING() + "</font>";
@@ -325,7 +326,7 @@ public class General {
 	}
 
 	public static void showDebug(String message, String lastKnownPosition, Throwable t, Class c) {
-		if (verbosity < verbosityDebug) {
+		if (getVerbosity() < verbosityDebug) {
 			return;
 		}
 
@@ -356,17 +357,17 @@ public class General {
 	}
 
 	public static void showDetail(String message) {
-		if (verbosity < verbosityDetail) {
+		if (getVerbosity() < verbosityDetail) {
 			return;
 		}
 		showOutput(message);
 	}
 
 	public static void showOutput(String message) {
-		if (verbosity < verbosityOutput) {
+		if (getVerbosity() < verbosityOutput) {
 			return;
 		}
-		if (verbosity > verbosityOutput) {
+		if (getVerbosity() > verbosityOutput) {
 			Date today = new Date();
 			String date_str = DateTimeFormat.getLongTimeFormat().format(today);
 			message = date_str + " " + message;
@@ -378,7 +379,7 @@ public class General {
 
 	public static boolean appendHtml(String message) {
 		statusArea.setHTML(message + statusArea.getHTML());
-		statusArea.setVisible(verbosity == verbosityDebug);
+		statusArea.setVisible(getVerbosity() == verbosityDebug);
 		if (iCing.textIsReversedArea) {
 			area.setHTML(message + area.getHTML());
 		} else {
@@ -482,7 +483,7 @@ public class General {
 	}
 
 	public static void setVerbosityToDebug() {
-		verbosity = verbosityDebug;
+		setVerbosity(verbosityDebug);
 	}
 
 	// /** Shows an error message with the string prepended to the current date
@@ -515,6 +516,14 @@ verbosityDebug    = 9 # add debugging info (not recommended for casual user)
 		if ( verbosity == 5) {
 			return 9;
 		}
+		return verbosity;
+	}
+
+	public static void setVerbosity(int verbosity) {
+		General.verbosity = verbosity;
+	}
+
+	public static int getVerbosity() {
 		return verbosity;
 	}
 }

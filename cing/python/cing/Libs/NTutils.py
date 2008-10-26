@@ -4063,28 +4063,28 @@ def bytesToFormattedString(size):
     result = ("%.0f" % r) + postFix
     return result
 
-def quoteForJson(msg, isValue=False):
-    """Use single quotes on the outside if needed.
-    Replace any internal single quotes with double quotes
-    Strip any surrounding double quotes
-    """ 
-    if not msg:
-        if isValue:
-            msg = "''"
-        else:
-            msg = ""
-        return msg
-    
-    msg = msg.replace("'", '"')
-    if msg.find(" ") >= 0:
-        if msg[0] == '"':
-            msg = msg[1:-1]
-        if msg[0] != "'":
-            msg = "'" + msg + "'"
-    if isValue:
-        # Values always need to be quoted.
-        # They might be done already.
-        if msg[0] != "'":
-            msg = "'" + msg + "'"
-    return msg
+#def quoteForJson(msg, isValue=False):
+#    """Use single quotes on the outside if needed.
+#    Replace any internal single quotes with double quotes
+#    Strip any surrounding double quotes
+#    """ 
+#    if not msg:
+#        if isValue:
+#            msg = "''"
+#        else:
+#            msg = ""
+#        return msg
+#    
+#    msg = msg.replace("'", '"')
+#    if msg.find(" ") >= 0:
+#        if msg[0] == '"':
+#            msg = msg[1:-1]
+#        if msg[0] != "'":
+#            msg = "'" + msg + "'"
+#    if isValue:
+#        # Values always need to be quoted.
+#        # They might be done already.
+#        if msg[0] != "'":
+#            msg = "'" + msg + "'"
+#    return msg
 

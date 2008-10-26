@@ -35,14 +35,17 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 
+	/** Just the initial startup state */
+	private static final boolean doDebug = true;
+
 	public static String VERSION;
 	// public static final String RPC_URL = "../cgi-bin/iCing"; original
 	public static final String RESULT_URL = "../tmp/cing";
 	static final String FILE_UPLOAD_URL = "cgi-bin/iCingByCgi.py";
 	static final String SERVER_URL = "server-bin"; // proxied to: :8000
-													// iCingServer.py
+	// iCingServer.py
 	static final String NOT_AVAILABLE = "not available";
-	
+
 	public static final String LOGIN_STATE = "login";
 	public static final String WELCOME_STATE = "welcome";
 	public static final String PREFERENCES_STATE = "preferences";
@@ -67,6 +70,8 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public static final String RESPONSE_STATUS = "status";
 	public static final String RESPONSE_STATUS_DONE = "done";
+	public static final String RESPONSE_STATUS_STARTED = "started";
+	
 	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
 	public static final String RESPONSE_STATUS_ERROR = "error";
 	public static final String RESPONSE_STATUS_MESSAGE = "message";
@@ -114,8 +119,6 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static boolean textIsReversedCingArea = false;
 	public static boolean textIsReversedStatusArea = false;
 
-	// public static final int areaTail = new Boolean(false);
-
 	ArrayList<iCingView> views;
 	Welcome welcome;
 	FileView fileView;
@@ -132,10 +135,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	private RootPanel rootPanel = RootPanel.get();
 	VerticalPanel vPanel = new VerticalPanel();
-	public String projectName = null;
-
-	static {
-	}
+	public String projectName = "9xxx";
 
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
@@ -149,7 +149,11 @@ public class iCing implements EntryPoint, HistoryListener {
 		// }
 		// });
 		c = GWT.create(iCingConstants.class);
-//		General.setVerbosityToDebug();
+		// Watch out because although this setting is needed here; there's
+		// another needed at the end of this routine too.
+		if (doDebug) {
+			General.setVerbosityToDebug();
+		}
 		Date today = new Date();
 		VERSION = DateTimeFormat.getLongTimeFormat().format(today);
 
@@ -192,6 +196,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		clearAllViews();
 		setupHistory();
 
+		setVerbosityToDebug(doDebug); // partner with the above call to
+		// General.setVerbosityToDebug
 		showLoadingMessage(false);
 	}
 
@@ -210,8 +216,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	private void setupHistory() {
 		History.addHistoryListener(this);
 		// this.onHistoryChanged(LOGIN_STATE);
-		this.onHistoryChanged(FILE_STATE);
-//		this.onHistoryChanged(CING_LOG_STATE);
+//		this.onHistoryChanged(FILE_STATE);
+		 this.onHistoryChanged(CING_LOG_STATE);
 		// this.onHistoryChanged(WELCOME_STATE);
 	}
 
@@ -655,6 +661,50 @@ public class iCing implements EntryPoint, HistoryListener {
 			gwtRef += "-rtl";
 		}
 		return gwtRef;
+	}
+
+	/**
+	 * So this method is not in General because all methods there are static
+	 * Make sure that where ever the verbosity can be set to debug it is also
+	 * callign this routine.
+	 * 
+	 * @param doDebugNow
+	 */
+	public void setVerbosityToDebug(boolean doDebugNow) {
+		if (doDebugNow) {
+			General.setVerbosityToDebug();
+		}
+//		##################
+//		if (logView == null) {
+//			General.showError("in iCing.setVerbosityToDebug got null for logView.");
+//			return;
+//		}
+//		if (logView.startPnameButton == null) {
+//			General.showError("in iCing.setVerbosityToDebug got null for logView.startPnameButton.");
+//			return;
+//		}
+		logView.startPnameButton.setVisible(doDebugNow);
+//		##################
+//		if (cingLogView == null) {
+//			General.showError("in iCing.setVerbosityToDebug got null for cingLogView.");
+//			return;
+//		}
+//		if (cingLogView.startStatusButton == null) {
+//			General.showError("in iCing.setVerbosityToDebug got null for cingLogView.startStatusButton.");
+//			return;
+//		}
+		cingLogView.startStatusButton.setVisible(doDebugNow);
+		cingLogView.stopStatusButton.setVisible(doDebugNow);
+		cingLogView.startLogButton.setVisible(doDebugNow);
+		cingLogView.stopLogButton.setVisible(doDebugNow);
+		
+//		##################
+		
+//		if (statusArea == null) {
+//			General.showError("in iCing.setVerbosityToDebug got null for statusArea.");
+//			return;
+//		}
+		statusArea.setVisible(doDebugNow);
 	}
 
 	// /**

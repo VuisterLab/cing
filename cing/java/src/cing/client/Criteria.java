@@ -229,6 +229,7 @@ public class Criteria extends iCingView {
 			}
 		});	
 		verticalPanel.add(nextButton);
+		nextButton.setTitle("Goto CING run options.");
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 		
 		

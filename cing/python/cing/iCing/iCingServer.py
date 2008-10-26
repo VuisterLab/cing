@@ -19,14 +19,14 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import quoteForJson
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
-from glob import glob
 from cing.iCing import json
+from glob import glob
 import cgi
 import cing
 import os
+import time
 #from cing.Libs.disk import tail
 
 FORM_ACCESS_KEY = "AccessKey"
@@ -42,8 +42,18 @@ FORM_DO_WHATIF = "doWhatif"
 FORM_DO_PROCHECK = "doProcheck"
 FORM_DO_IMAGES = "doImages"
 
+# server response codes.
+RESPONSE_STATUS = "status" # follows a clien request FORM_ACTION_STATUS 
+RESPONSE_STATUS_DONE = "done"
+RESPONSE_STATUS_NOT_DONE = "notDone"
+RESPONSE_STATUS_STARTED = "started"
+RESPONSE_STATUS_ERROR = "error"
+RESPONSE_STATUS_MESSAGE = "message"
+RESPONSE_TAIL_PROGRESS = "tailProgress"
+RESPONSE_PROJECT_NAME = "projectName"
+RESPONSE_NONE = "None"
+
 FORM_LIST_REQUIRED = [ FORM_ACCESS_KEY, FORM_USER_ID, FORM_ACTION ]
-JSON_ERROR_STATUS = "error"
 
 MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1 # 50 Mb when time out issue is resolved. TODO: update. 
 BUFFER_WRITE = 100*1000
@@ -71,16 +81,6 @@ DONE_FILE = "DONE"
 "Contains the string representation of the byte length already read from the log file before"
 LAST_LOG_SEND_FILE = "LAST_LOG_SEND" 
 CING_RUN_LOG_FILE = "cingRun.log"
-
-# server response codes.
-RESPONSE_STATUS = "status" # follows a clien request FORM_ACTION_STATUS 
-RESPONSE_STATUS_DONE = "done"
-RESPONSE_STATUS_NOT_DONE = "notDone"
-RESPONSE_STATUS_ERROR = "error"
-RESPONSE_STATUS_MESSAGE = "message"
-RESPONSE_TAIL_PROGRESS = "tailProgress"
-RESPONSE_PROJECT_NAME = "projectName"
-RESPONSE_NONE = "None"
 
 
  
@@ -288,7 +288,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=0 )    
         NTmessage("Finished ids: %s", done_list)
                 
-        self.sendJSON({RESPONSE_STATUS_MESSAGE: "Started a run"})
+        self.sendJSON({RESPONSE_STATUS: "started"})
         
     def getStatus(self):
         """Fails because form can't be loaded with large data thru non-cgi
@@ -306,7 +306,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         "Message will be byte by byte and end up in a <PRE> block"
         NTdebug('Retrieving cing log tail.')
         kwd={}
-        lastLog = "No new log to add.\n" 
+        lastLog = time.asctime() + " No new log to add.\n" 
         if os.path.exists(CING_RUN_LOG_FILE):
             cingrunLogFileSize = os.path.getsize(CING_RUN_LOG_FILE)
             NTdebug("cingrunLogFileSize: %s" % cingrunLogFileSize)

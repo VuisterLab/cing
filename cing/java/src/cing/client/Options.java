@@ -75,7 +75,7 @@ public class Options extends iCingView {
 			}
 		});
 		listBoxVerbosity.setSelectedIndex(General.verbosityOutput);
-		cingVerbosity = General.map2CingVerbosity( General.verbosity );
+		cingVerbosity = General.map2CingVerbosity( General.getVerbosity() );
 		
 		final CheckBox createImageryCheckBox = new CheckBox();
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
@@ -142,6 +142,7 @@ public class Options extends iCingView {
 			}
 		});	
 		verticalPanelTop.add(nextButton);
+		nextButton.setTitle("Submit to CING server.");
 		verticalPanelTop.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 		
 	}

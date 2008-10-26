@@ -56,6 +56,9 @@ ProxyPassReverse  /cgi-bin/iCing http://localhost:8888/
 ProxyPass         /iCing/cgi-bin http://localhost:8001/cgi-bin
 ProxyPassReverse  /iCing/cgi-bin http://localhost:8001/cgi-bin
 
+ProxyPass         /iCing/cgi-bin http://localhost:8888/cgi-bin
+ProxyPassReverse  /iCing/cgi-bin http://localhost:8888/cgi-bin
+
 # For the python regular server, still essential to have the iCing in there for ssl url rewriting done by cmbi.ru.nl.
 # Note that the server-bin at the end is optional? 
 ProxyPass         /iCing/server-bin http://localhost:8000

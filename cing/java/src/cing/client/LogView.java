@@ -3,10 +3,11 @@ package cing.client;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class LogView extends iCingView {
@@ -15,8 +16,13 @@ public class LogView extends iCingView {
     public final RichTextArea area = iCing.area;
     
     final Label logLabel = new Label(c.Log()+" "+c.iCing());
+	final Button startPnameButton = new Button();
 
     public LogView() {
+		// Add the components to a panel
+		final VerticalPanel verticalPanel = new VerticalPanel();
+		// Grid grid = new Grid(countRows, 1);
+		initWidget(verticalPanel);
 	    // Create the text area and toolbar
 //	    RichTextArea area = new RichTextArea();
 //	    area.setText("Expect to see the iCing messages scroll by here. \\nVerbosity may be controlled from iCing->Preferences.");
@@ -25,24 +31,33 @@ public class LogView extends iCingView {
 //	    toolbar.ensureDebugId("cwRichText-toolbar");
 	    
 	 // Add the components to a panel
-	    Grid grid = new Grid(3, 1);
-		initWidget(grid);
-		grid.setSize("100%", "100%");
-	    grid.setStyleName("cw-RichText");
+//	    Grid grid = new Grid(3, 1);
+//		initWidget(grid);
+//		grid.setSize("100%", "100%");
+//	    grid.setStyleName("cw-RichText");
 //	    grid.setWidget(1, 0, toolbar);
-	    grid.setWidget(2, 0, area);
-	    area.setSize("100%", "25em");
-	    grid.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
+//	    grid.setWidget(2, 0, area);
+	    logLabel.setStylePrimaryName("h1");
+//	    gridTop.setWidget(0, 0, logLabel);
 
-	    Grid gridTop = new Grid(1, 3);
-	    grid.setWidget(0, 0, gridTop);
+	    verticalPanel.add( logLabel );
+	    verticalPanel.add( area );
+		area.setSize(iCing.widthMenu, "25em");
+	    
+//	    grid.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
+
+//	    Grid gridTop = new Grid(1, 3);
+//	    grid.setWidget(0, 0, gridTop);
 //	    horizontalPanel.setSpacing(11);
 
-	    logLabel.setStylePrimaryName("h1");
-	    gridTop.setWidget(0, 0, logLabel);
-		
+
+	    HorizontalPanel horizontalPanel = new HorizontalPanel();
+	    verticalPanel.add( horizontalPanel );
+	    horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+	    horizontalPanel.setSpacing(iCing.margin);
+	    
 	    final CheckBox tailCheckBox = new CheckBox();
-	    gridTop.setWidget(0, 1, tailCheckBox);
+//	    gridTop.setWidget(0, 1, tailCheckBox);
 	    tailCheckBox.setChecked(false);
 	    tailCheckBox.setText(c.Tail());	    
 	    tailCheckBox.addClickListener(new ClickListener() {
@@ -55,14 +70,18 @@ public class LogView extends iCingView {
 		});
 
 	    final Button clearButton = new Button();
-	    gridTop.setWidget(0, 2, clearButton);
+//	    gridTop.setWidget(0, 2, clearButton);
 	    clearButton.addClickListener(new ClickListener() {
 	    	public void onClick(final Widget sender) {
 	    		area.setHTML("");
 	    	}
 	    });
 	    clearButton.setText("Clear");
-	    area.setFocus(true);
+	    horizontalPanel.add(clearButton);
+	    clearButton.setTitle("Clears the log window.");
+	    horizontalPanel.add(tailCheckBox);
+	    tailCheckBox.setTitle("Reverse the order of lines in the log.");
+//	    area.setFocus(true);
 	    String iniMsg = c.Expect_to_see()+"<br>";
 	    iniMsg += c.Verbosity_may()+"<br>"; //Verbosity may be controlled from iCing->Preferences.\n";
 //	    iniMsg += "<PRE>[debug] 1</PRE>\n";
@@ -93,6 +112,13 @@ public class LogView extends iCingView {
 //			assertEquals(result, expectedResultList[i]);
 		}
 		 * */
-	    
+		// For debugging logger.
+		startPnameButton.setText("get Project name");
+		startPnameButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				icing.cingLogView.getProjectName();		
+			}
+		});
+		verticalPanel.add(startPnameButton);
 	}	
 }

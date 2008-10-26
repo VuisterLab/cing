@@ -2,9 +2,10 @@ package cing.client;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -35,6 +36,10 @@ public class CingLogView extends iCingView {
 	// final int countRows = i;
 
 	final Button nextButton = new Button();
+	final Button startLogButton = new Button();
+	final Button stopLogButton = new Button();
+	final Button startStatusButton = new Button();
+	final Button stopStatusButton = new Button();
 
 	public CingLogView() {
 		// Create the text area and toolbar
@@ -53,9 +58,7 @@ public class CingLogView extends iCingView {
 		// grid.setSize("100%", "100%");
 		// grid.setStyleName("cw-RichText");
 		// grid.setWidget(gridToolbarIdx, 0, toolbar);
-		Grid gridTop = new Grid(1, 3);
 		verticalPanel.add(logLabel);
-		verticalPanel.add(gridTop);
 		verticalPanel.add(area);
 		area.setSize(iCing.widthMenu, "25em");
 		// grid.getCellFormatter().setVerticalAlignment(1, 0,
@@ -65,31 +68,34 @@ public class CingLogView extends iCingView {
 
 		logLabel.setStylePrimaryName("h1");
 
-//		final CheckBox tailCheckBox = new CheckBox();
-//		gridTop.setWidget(0, 1, tailCheckBox);
-//		tailCheckBox.setChecked(false);
-//		tailCheckBox.setText(c.Tail());
-//		tailCheckBox.addClickListener(new ClickListener() {
-//			public void onClick(final Widget sender) {
-//				String html = area.getHTML();
-//				html = Utils.reverse(html);
-//				area.setHTML(html);
-//				iCing.textIsReversedCingArea = tailCheckBox.isChecked();
-//			}
-//		});
+		final CheckBox tailCheckBox = new CheckBox();
+		tailCheckBox.setChecked(false);
+		tailCheckBox.setText(c.Tail());
+		tailCheckBox.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				String html = area.getHTML();
+				html = Utils.reverse(html);
+				if ( html == null ) {
+					General.showError("Failed to get reversed html");
+					return;
+				}
+				area.setHTML(html);
+				iCing.textIsReversedCingArea = tailCheckBox.isChecked();
+			}
+		});
 
 		final Button clearButton = new Button();
-		gridTop.setWidget(0, 2, clearButton);
 		clearButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				area.setHTML("<PRE></PRE>");
 			}
 		});
 		clearButton.setText("Clear");
-		area.setFocus(false);
-		String iniMsg = "<PRE>Expect to see CING log lines here; once CING is running.";
+//		area.setFocus(false);
+		String iniMsg = 
+			"<PRE>"+
+			"Expect to see CING log lines here; once CING is running.\n";
 		area.setHTML(iniMsg);
-
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -98,18 +104,25 @@ public class CingLogView extends iCingView {
 		});
 		nextButton.setEnabled(false); // will be enabled automatically.
 
-		verticalPanel.add(nextButton);
-		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
+		HorizontalPanel horizontalPanel = new HorizontalPanel();
+		horizontalPanel.setSpacing(iCing.margin);
+		
+		verticalPanel.add(horizontalPanel);
+		horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		horizontalPanel.add(clearButton);		
+		clearButton.setTitle("Clears the log window.");
+		horizontalPanel.add(tailCheckBox );		
+		tailCheckBox.setTitle("Reverse the order of lines in the log.");
+		horizontalPanel.add(nextButton);
+		nextButton.setTitle("Goto CING report.");
 
 		// For debugging logger.
-		final Button startLogButton = new Button();
 		startLogButton.setText("start log");
 		startLogButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				startLogRetrieval();
 			}
 		});
-		final Button stopLogButton = new Button();
 		stopLogButton.setText("stop log");
 		stopLogButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -120,14 +133,12 @@ public class CingLogView extends iCingView {
 		verticalPanel.add(stopLogButton);
 
 		// For debugging logger.
-		final Button startStatusButton = new Button();
 		startStatusButton.setText("start status");
 		startStatusButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				startStatusChecker();
 			}
 		});
-		final Button stopStatusButton = new Button();
 		stopStatusButton.setText("stop status");
 		stopStatusButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -137,6 +148,12 @@ public class CingLogView extends iCingView {
 		verticalPanel.add(startStatusButton);
 		verticalPanel.add(stopStatusButton);
 
+		startStatusButton.setVisible(false);
+		stopStatusButton.setVisible(false);
+		startLogButton.setVisible(false);
+		stopLogButton.setVisible(false);
+		
+		
 		cingQueryLogTail = new iCingQuery();
 		cingQueryLogTail.action.setValue(iCing.RUN_SERVER_ACTION_LOG);
 		cingQueryLogTail.serverFormHandler.setCingLogView(this);
@@ -188,13 +205,19 @@ public class CingLogView extends iCingView {
 			icing.report.showResults();
 			icing.onHistoryChanged(iCing.REPORT_STATE);
 		}
+//		if ( value.equals(iCing.RESPONSE_STATUS_STARTED)) {
+//			return;
+//		}
+		
 		statusTimerBusy = false;
 	}
 
 	/** Needs to be called by ServerFormHandler */
 	protected void setProjectName(String projectName) {
-		if ((projectName != null) && projectName.equals(iCing.RESPONSE_STATUS_NONE)) {
+		General.showDebug("Now in setProjectName");
+		if (projectName != null) {
 			icing.projectName = projectName;
+			icing.report.showResults();
 		}
 	}
 
@@ -259,7 +282,11 @@ public class CingLogView extends iCingView {
 		} else {
 			int x = n - 6; // </PRE>
 			orgText = orgHTML.substring(5,x);			
-		}						
+		}
+		message = message.replace("DEBUG", "<font color=\"green\">DEBUG</font>");
+		message = message.replace("ERROR", "<font color=\"red\">ERROR</font>");
+		message = message.replace("WARNING", "<font color=\"orange\">WARNING</font>");
+		message = message.replace("Warning", "<font color=\"orange\">Warning</font>");
 		area.setHTML( "<PRE>"+orgText+message+"</PRE>");
 	}
 

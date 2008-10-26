@@ -56,11 +56,14 @@ public class Login extends iCingView {
 		grid.setWidget(0, 1, loginPrompt);
 		grid.setWidget(1, 0, namePrompt);
 		grid.setWidget(1, 1, nameTextbox);
+		nameTextbox.setTitle("Short name like JoeNmr (no special characters)");
 
 		grid.setWidget(2, 0, passwordPrompt);
 		grid.setWidget(2, 1, passwordTextbox);
+		passwordTextbox.setTitle("Short secret word like 234567.");
 
 		grid.setWidget(3, 1, button);
+		button.setTitle("Advance to file upload.");
 	}
 
 }
