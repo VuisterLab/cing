@@ -1,10 +1,12 @@
 package cing.client;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,6 +20,7 @@ public class RunView extends iCingView {
 	iCingQuery cingQueryRun; 
 	
 	public RunView() {
+		setState(iCing.RUN_STATE);
 		initWidget(decPanel);
 		iCingConstants c = iCing.c;
 		final VerticalPanel verticalPanel = new VerticalPanel();
@@ -44,6 +47,8 @@ public class RunView extends iCingView {
 		runButton.setTitle("Run the validation.");
 		verticalPanel.setCellHorizontalAlignment(runButton, HasHorizontalAlignment.ALIGN_LEFT);
 				
+		
+		
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -51,10 +56,24 @@ public class RunView extends iCingView {
 			}
 		});	
 //		nextButton.setEnabled(false); //disable for testing it will be triggered by a run; or not...
-		verticalPanel.add(nextButton);
+		
+		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+		horizontalPanelBackNext.setSpacing(iCing.margin);
+		verticalPanel.add(horizontalPanelBackNext);
+		final Button backButton = new Button();
+		horizontalPanelBackNext.add(backButton);
+		backButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				History.back();
+			}
+		});
+		backButton.setText(c.Back());
+		horizontalPanelBackNext.add(backButton);
+		horizontalPanelBackNext.add(nextButton);
+		
 		nextButton.setTitle("Goto CING log.");
-		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-		nextButton.setVisible(false);
+//		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
+//		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(); 
 		cingQueryRun.action.setValue(iCing.RUN_SERVER_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);

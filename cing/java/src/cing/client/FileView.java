@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -14,7 +15,6 @@ import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -51,7 +51,8 @@ public class FileView extends iCingView {
 	iCingConstants c = iCing.c;
 
 	public FileView() {
-		super();
+		setState(iCing.FILE_STATE);
+		
 		// Now create the user interface, wrapped in a
 		// vertical panel
 		VerticalPanel verticalPanel = new VerticalPanel();
@@ -95,16 +96,29 @@ public class FileView extends iCingView {
 		});
 		showUpload();
 		addUploadRow();
+
+		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+		horizontalPanelBackNext.setSpacing(iCing.margin);
+		verticalPanel.add(horizontalPanelBackNext);
+		final Button backButton = new Button();
+		horizontalPanelBackNext.add(backButton);
+		backButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				History.back();
+			}
+		});
+		backButton.setText(c.Back());
+		horizontalPanelBackNext.add(backButton);
+		horizontalPanelBackNext.add(nextButton);
+
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				// loadOptionsView();
-				icing.onHistoryChanged(iCing.CRITERIA_STATE);
+				icing.onHistoryChanged(iCing.RUN_STATE);
 			}
 		});
 		nextButton.setEnabled(false);
-		verticalPanel.add(nextButton);
 		nextButton.setTitle("Set the criteria.");
-		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_LEFT);
 
 	}
 

@@ -19,6 +19,7 @@ public class LogView extends iCingView {
 	final Button startPnameButton = new Button();
 
     public LogView() {
+		setState(iCing.LOG_STATE);
 		// Add the components to a panel
 		final VerticalPanel verticalPanel = new VerticalPanel();
 		// Grid grid = new Grid(countRows, 1);

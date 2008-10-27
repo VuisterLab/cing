@@ -1,5 +1,6 @@
 package cing.client;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -42,6 +43,7 @@ public class CingLogView extends iCingView {
 	final Button stopStatusButton = new Button();
 
 	public CingLogView() {
+		setState(iCing.CING_LOG_STATE);
 		// Create the text area and toolbar
 		// RichTextArea area = new RichTextArea();
 		// area.setText(
@@ -102,7 +104,7 @@ public class CingLogView extends iCingView {
 				icing.onHistoryChanged(iCing.REPORT_STATE);
 			}
 		});
-		nextButton.setEnabled(false); // will be enabled automatically.
+//		nextButton.setEnabled(false); // will be enabled automatically.
 
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		horizontalPanel.setSpacing(iCing.margin);
@@ -113,9 +115,24 @@ public class CingLogView extends iCingView {
 		clearButton.setTitle("Clears the log window.");
 		horizontalPanel.add(tailCheckBox );		
 		tailCheckBox.setTitle("Reverse the order of lines in the log.");
-		horizontalPanel.add(nextButton);
+//		horizontalPanel.add(nextButton);
 		nextButton.setTitle("Goto CING report.");
 
+		
+		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+		horizontalPanelBackNext.setSpacing(iCing.margin);
+		verticalPanel.add(horizontalPanelBackNext);
+		final Button backButton = new Button();
+		horizontalPanelBackNext.add(backButton);
+		backButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				History.back();
+			}
+		});
+		backButton.setText(c.Back());
+		horizontalPanelBackNext.add(backButton);
+		horizontalPanelBackNext.add(nextButton);
+		
 		// For debugging logger.
 		startLogButton.setText("start log");
 		startLogButton.addClickListener(new ClickListener() {

@@ -39,6 +39,7 @@ public class Options extends iCingView {
 	int cingVerbosity;
     
 	public Options() {
+		setState(iCing.OPTIONS_STATE);
 		
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);

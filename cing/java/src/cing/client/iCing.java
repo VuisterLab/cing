@@ -2,7 +2,6 @@ package cing.client;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -17,9 +16,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -31,12 +27,11 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 
 	/** Just the initial startup state */
-	private static final boolean doDebug = true;
+	private static final boolean doDebug = false;
 
 	public static String VERSION;
 	// public static final String RPC_URL = "../cgi-bin/iCing"; original
@@ -71,7 +66,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String RESPONSE_STATUS = "status";
 	public static final String RESPONSE_STATUS_DONE = "done";
 	public static final String RESPONSE_STATUS_STARTED = "started";
-	
+
 	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
 	public static final String RESPONSE_STATUS_ERROR = "error";
 	public static final String RESPONSE_STATUS_MESSAGE = "message";
@@ -137,6 +132,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	VerticalPanel vPanel = new VerticalPanel();
 	public String projectName = "9xxx";
 
+	public HistoryListener historyListener;
+
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
 		// off. JFD prefers
@@ -191,14 +188,86 @@ public class iCing implements EntryPoint, HistoryListener {
 		for (iCingView v : views) {
 			vPanel.add(v); // All on top of each
 			v.setIcing(this);
+
+			if (v instanceof Status) { // always present view. (when debugging)
+				continue;
+			}
+			if (v instanceof Footer) { // always present view.
+				continue;
+			}
+			v.setVisible(false);
 		}
 		vPanel.setSpacing(5);
-		clearAllViews();
-		setupHistory();
 
 		setVerbosityToDebug(doDebug); // partner with the above call to
 		// General.setVerbosityToDebug
 		showLoadingMessage(false);
+
+		// History.addHistoryListener(historyListener);
+		// History.addHistoryListener(this);
+		// this.onHistoryChanged(LOGIN_STATE);
+		// this.onHistoryChanged(CING_LOG_STATE);
+		// this.onHistoryChanged(WELCOME_STATE);
+		// Now that we've setup our listener, fire the initial history state.
+		// History.fireCurrentHistoryState();
+
+		History.addHistoryListener(this);
+		// If the application starts with no history token, redirect to a new
+		// state.
+		String initToken = History.getToken();
+		if (initToken.length() == 0) {
+			// History.newItem();
+			initToken = FILE_STATE;
+		}
+		onHistoryChanged(initToken);
+	}
+
+	public void onHistoryChanged(String historyToken) {
+		if (historyToken == null || historyToken.length() == 0) {
+			General.showError("Got an unknown history token: [" + historyToken + "]");
+		}
+		if (WELCOME_STATE.equals(historyToken)) {
+			loadWelcomeView();
+			return;
+		}
+		if (LOGIN_STATE.equals(historyToken)) {
+			loadLoginView();
+			return;
+		}
+		if (FILE_STATE.equals(historyToken)) {
+			loadFileView();
+			return;
+		}
+		if (LOG_STATE.equals(historyToken)) {
+			loadLogView();
+			return;
+		}
+		if (CING_LOG_STATE.equals(historyToken)) {
+			loadCingLogView();
+			return;
+		}
+		if (CRITERIA_STATE.equals(historyToken)) {
+			loadCriteriaView();
+			return;
+		}
+		if (REPORT_STATE.equals(historyToken)) {
+			loadReportView();
+			return;
+		}
+		if (OPTIONS_STATE.equals(historyToken)) {
+			loadOptionsView();
+			return;
+		}
+		if (RUN_STATE.equals(historyToken)) {
+			loadRunView();
+			return;
+		}
+		if (PREFERENCES_STATE.equals(historyToken)) {
+			loadPreferencesView();
+			return;
+		}
+
+		General.showError("Got an unknown history token: " + historyToken);
 	}
 
 	/**
@@ -213,49 +282,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		loadingDiv.getStyle().setProperty("display", styleDisplay);
 	}
 
-	private void setupHistory() {
-		History.addHistoryListener(this);
-		// this.onHistoryChanged(LOGIN_STATE);
-//		this.onHistoryChanged(FILE_STATE);
-		 this.onHistoryChanged(CING_LOG_STATE);
-		// this.onHistoryChanged(WELCOME_STATE);
-	}
-
-	public void onHistoryChanged(String historyToken) {
-		if (WELCOME_STATE.equals(historyToken)) {
-			loadWelcomeView();
-		}
-		if (LOGIN_STATE.equals(historyToken)) {
-			loadLoginView();
-		}
-		if (FILE_STATE.equals(historyToken)) {
-			loadFileView();
-		}
-		if (LOG_STATE.equals(historyToken)) {
-			loadLogView();
-		}
-		if (CING_LOG_STATE.equals(historyToken)) {
-			loadCingLogView();
-		}
-		if (CRITERIA_STATE.equals(historyToken)) {
-			loadCriteriaView();
-		}
-		if (REPORT_STATE.equals(historyToken)) {
-			loadReportView();
-		}
-		if (OPTIONS_STATE.equals(historyToken)) {
-			loadOptionsView();
-		}
-		if (RUN_STATE.equals(historyToken)) {
-			loadRunView();
-		}
-		if (PREFERENCES_STATE.equals(historyToken)) {
-			loadPreferencesView();
-		}
-	}
-
 	public void clearAllViews() {
-		for (Composite v : views) {
+		// General.showDebug("Now in clearAllViews");
+		for (iCingView v : views) {
+			// General.showDebug("Analyzing view: " + v.getClass().toString());
 			// RootPanel.get().add(v, margin, yLocMainWindow);
 			if (v instanceof Status) { // not a real view.
 				continue;
@@ -313,52 +343,52 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		final ListBox listBoxLocale = new ListBox();
 		horizontalPanel_1.add(listBoxLocale);
-		listBoxLocale.setTabIndex(1);
+//		listBoxLocale.setTabIndex(1);
 		listBoxLocale.setWidth("15em");
+		listBoxLocale.setEnabled(false);
+//		// Map to location in list.
+//		HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
+//		int i = 0;
+//		localeMap.put("cn", i++);
+//		localeMap.put("de", i++);
+//		localeMap.put("en", i++);
+//		localeMap.put("es", i++);
+//		localeMap.put("fr", i++);
+//		localeMap.put("it", i++);
+//		localeMap.put("nl", i++);
+//		localeMap.put("pt", i++);
 
-		// Map to location in list.
-		HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
-		int i = 0;
-		localeMap.put("cn", i++);
-		localeMap.put("de", i++);
-		localeMap.put("en", i++);
-		localeMap.put("es", i++);
-		localeMap.put("fr", i++);
-		localeMap.put("it", i++);
-		localeMap.put("nl", i++);
-		localeMap.put("pt", i++);
-
-		listBoxLocale.addItem("中文", "cn");
-		listBoxLocale.addItem("Deutsch", "de");
+//		listBoxLocale.addItem("中文", "cn");
+//		listBoxLocale.addItem("Deutsch", "de");
 		listBoxLocale.addItem("English", "en");
-		listBoxLocale.addItem("Español", "es");
-		listBoxLocale.addItem("Français", "fr");
-		listBoxLocale.addItem("Italiano", "it");
-		listBoxLocale.addItem("Nederlands", "nl");
-		listBoxLocale.addItem("Português", "pt");
-		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
+//		listBoxLocale.addItem("Español", "es");
+//		listBoxLocale.addItem("Français", "fr");
+//		listBoxLocale.addItem("Italiano", "it");
+//		listBoxLocale.addItem("Nederlands", "nl");
+//		listBoxLocale.addItem("Português", "pt");
+//		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-		int idx = 2;
-		if (currentLocale != null) {
-			if (localeMap != null) { // shouldn't have happened.
-				idx = localeMap.get(currentLocale);
-				if (idx < 0) {
-					idx = 2; // en is default
-				}
-			} else {
-				General.showWarning("Failed to find localeMap");
-			}
-		} else {
-			General.showWarning("Failed to find currentLocale");
-		}
-		listBoxLocale.setSelectedIndex(idx);
-
-		listBoxLocale.addChangeListener(new ChangeListener() {
-			public void onChange(Widget sender) {
-				String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
-				Window.open(UtilsJS.getHostPageLocation() + "?locale=" + localeName, "_self", "");
-			}
-		});
+//		int idx = 2;
+//		if (currentLocale != null) {
+//			if (localeMap != null) { // shouldn't have happened.
+//				idx = localeMap.get(currentLocale);
+//				if (idx < 0) {
+//					idx = 2; // en is default
+//				}
+//			} else {
+//				General.showWarning("Failed to find localeMap");
+//			}
+//		} else {
+//			General.showWarning("Failed to find currentLocale");
+//		}
+//		listBoxLocale.setSelectedIndex(idx);
+//
+//		listBoxLocale.addChangeListener(new ChangeListener() {
+//			public void onChange(Widget sender) {
+//				String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
+//				Window.open(UtilsJS.getHostPageLocation() + "?locale=" + localeName, "_self", "");
+//			}
+//		});
 
 		// // Add the option to change the style
 		// final HorizontalPanel styleWrapper = new HorizontalPanel();
@@ -469,7 +499,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_file.addItem(c.New(), commandFile);
 		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
-		menuBar.addItem(c.Edit(), menuBar_edit);
+		menuBar_edit.setVisible(false);// doesn't 'help'
+//		menuBar.addItem(c.Edit(), menuBar_edit);
 		menuBar_edit.addItem(c.Criteria(), commandCriteria);
 		menuBar_edit.addItem(c.Options(), commandOptions);
 		menuBar.addItem(c.Run(), commandRun);
@@ -501,57 +532,57 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public void loadLoginView() {
 		clearAllViews();
-		login.setVisible(true);
+		login.enterView();
 	}
 
 	public void loadWelcomeView() {
 		clearAllViews();
-		welcome.setVisible(true);
+		welcome.enterView();
 	}
 
 	public void loadReportView() {
 		clearAllViews();
-		report.setVisible(true);
+		report.enterView();
 	}
 
 	public void loadOptionsView() {
 		clearAllViews();
-		options.setVisible(true);
+		options.enterView();
 	}
 
 	public void loadRunView() {
 		clearAllViews();
-		runView.setVisible(true);
+		runView.enterView();
 	}
 
 	public void loadPrefView() {
 		clearAllViews();
-		preferences.setVisible(true);
+		preferences.enterView();
 	}
 
 	public void loadCriteriaView() {
 		clearAllViews();
-		criteria.setVisible(true);
+		criteria.enterView();
 	}
 
 	public void loadPreferencesView() {
 		clearAllViews();
-		preferences.setVisible(true);
+		preferences.enterView();
 	}
 
 	public void loadFileView() {
 		clearAllViews();
-		fileView.setVisible(true);
+		fileView.enterView();
 	}
 
 	public void loadLogView() {
 		clearAllViews();
-		logView.setVisible(true);
+		logView.enterView();
 	}
 
 	public void loadCingLogView() {
 		clearAllViews();
-		cingLogView.setVisible(true);
+		cingLogView.enterView();
 	}
 
 	/**
@@ -674,36 +705,43 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (doDebugNow) {
 			General.setVerbosityToDebug();
 		}
-//		##################
-//		if (logView == null) {
-//			General.showError("in iCing.setVerbosityToDebug got null for logView.");
-//			return;
-//		}
-//		if (logView.startPnameButton == null) {
-//			General.showError("in iCing.setVerbosityToDebug got null for logView.startPnameButton.");
-//			return;
-//		}
+		// ##################
+		// if (logView == null) {
+		//General.showError("in iCing.setVerbosityToDebug got null for logView."
+		// );
+		// return;
+		// }
+		// if (logView.startPnameButton == null) {
+		// General.showError(
+		// "in iCing.setVerbosityToDebug got null for logView.startPnameButton."
+		// );
+		// return;
+		// }
 		logView.startPnameButton.setVisible(doDebugNow);
-//		##################
-//		if (cingLogView == null) {
-//			General.showError("in iCing.setVerbosityToDebug got null for cingLogView.");
-//			return;
-//		}
-//		if (cingLogView.startStatusButton == null) {
-//			General.showError("in iCing.setVerbosityToDebug got null for cingLogView.startStatusButton.");
-//			return;
-//		}
+		// ##################
+		// if (cingLogView == null) {
+		// General.showError(
+		// "in iCing.setVerbosityToDebug got null for cingLogView.");
+		// return;
+		// }
+		// if (cingLogView.startStatusButton == null) {
+		// General.showError(
+		// "in iCing.setVerbosityToDebug got null for cingLogView.startStatusButton."
+		// );
+		// return;
+		// }
 		cingLogView.startStatusButton.setVisible(doDebugNow);
 		cingLogView.stopStatusButton.setVisible(doDebugNow);
 		cingLogView.startLogButton.setVisible(doDebugNow);
 		cingLogView.stopLogButton.setVisible(doDebugNow);
-		
-//		##################
-		
-//		if (statusArea == null) {
-//			General.showError("in iCing.setVerbosityToDebug got null for statusArea.");
-//			return;
-//		}
+
+		// ##################
+
+		// if (statusArea == null) {
+		// General.showError(
+		// "in iCing.setVerbosityToDebug got null for statusArea.");
+		// return;
+		// }
 		statusArea.setVisible(doDebugNow);
 	}
 
