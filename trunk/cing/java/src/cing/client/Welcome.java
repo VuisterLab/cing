@@ -1,10 +1,10 @@
 package cing.client;
 
-import com.allen_sauer.gwt.voices.client.Sound;
-import com.allen_sauer.gwt.voices.client.SoundController;
-import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
-import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
-import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
+//import com.allen_sauer.gwt.voices.client.Sound;
+//import com.allen_sauer.gwt.voices.client.SoundController;
+//import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
+//import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
+//import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
@@ -26,6 +26,7 @@ public class Welcome extends iCingView {
 	Button playButton = new Button();
 
 	public Welcome() {
+		setState(iCing.WELCOME_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 
@@ -47,7 +48,7 @@ public class Welcome extends iCingView {
 		playButton.setText( c.Silly_sound());
 		layout.setWidget(4, 0, playButton);
 		playButton.setTitle("Make some noise.");
-
+		playButton.setVisible(false);
 		// add the load state status
 		// RootPanel.get().add(loadStateHTML);
 //		layout.setWidget(5, 0, loadStateHTML);
@@ -69,21 +70,21 @@ public class Welcome extends iCingView {
 	}
 
 	public void onModuleLoad2() {
-		SoundController soundController = new SoundController();
-		final Sound sound = soundController.createSound(Sound.MIME_TYPE_AUDIO_MPEG, "sound/ngmater.mp3");
+//		SoundController soundController = new SoundController();
+//		final Sound sound = soundController.createSound(Sound.MIME_TYPE_AUDIO_MPEG, "sound/ngmater.mp3");
 
 		// add a sound handler so we know when the sound has loaded
 		// create a place holder for the load state
 //		final HTML loadStateHTML = new HTML();
 		// loadStateHTML.setHTML( iCing.soundLoadState );
-		sound.addEventHandler(new SoundHandler() {
-			public void onPlaybackComplete(PlaybackCompleteEvent event) {
-			}
-
-			public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
-//				loadStateHTML.setHTML(c.Load_state() + ": " + event.getLoadStateAsString());
-			}
-		});
+//		sound.addEventHandler(new SoundHandler() {
+//			public void onPlaybackComplete(PlaybackCompleteEvent event) {
+//			}
+//
+//			public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
+////				loadStateHTML.setHTML(c.Load_state() + ": " + event.getLoadStateAsString());
+//			}
+//		});
 
 		// create a (disabled) play button
 		// playButton = new Button("Silly sound");
@@ -91,7 +92,7 @@ public class Welcome extends iCingView {
 		playButton.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
 				if (iCing.soundOn) {
-					sound.play();
+//					sound.play();
 				} else {
 					Window.alert(c.Sound_is_turn());
 				}

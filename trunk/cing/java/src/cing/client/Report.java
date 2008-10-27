@@ -1,9 +1,14 @@
 package cing.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class Report extends iCingView {
 
@@ -14,6 +19,7 @@ public class Report extends iCingView {
 	// final Timer refreshShowResultsTimer;
 
 	public Report() {
+		setState(iCing.REPORT_STATE);
 
 		iCingConstants c = iCing.c;
 
@@ -29,6 +35,20 @@ public class Report extends iCingView {
 		reportHTML.setHTML(htmlText);
 		verticalPanel.add(reportHTML);
 
+		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+		horizontalPanelBackNext.setSpacing(iCing.margin);
+		verticalPanel.add(horizontalPanelBackNext);
+		final Button backButton = new Button();
+		horizontalPanelBackNext.add(backButton);
+		backButton.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				History.back();
+			}
+		});
+		backButton.setText(c.Back());
+		horizontalPanelBackNext.add(backButton);
+//		horizontalPanelBackNext.add(nextButton);
+		
 		showTemporaryResults();
 		// refreshShowResultsTimer = new Timer() {
 		// public void run() {

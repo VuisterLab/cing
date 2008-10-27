@@ -22,6 +22,7 @@ public class Preferences extends iCingView {
 	final int optionSoundIdx = i++;
     
 	public Preferences() {
+		setState(iCing.PREFERENCES_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 
@@ -71,5 +72,6 @@ public class Preferences extends iCingView {
 		});
 		soundCheckBox.setChecked(true);
 		soundCheckBox.setText(c.Sound());
+		soundCheckBox.setVisible(false);
 	}
 }

@@ -7,8 +7,11 @@
 		from gwt for instantiations. <inherits
 		name='com.google.gwt.user.theme.standard.Standard' />
 	-->
-	<inherits name='com.allen_sauer.gwt.voices.gwt-voices' /> <!-- Inherit sound support                        -->
-	<inherits name='com.gwtsolutions.components.Components' /> <!-- Inherit message support                        -->
+	<!-- Inherit sound support                        
+	<inherits name='com.allen_sauer.gwt.voices.gwt-voices' />
+	--> 
+	<!-- Inherit message support                        	-->	
+	<inherits name='com.gwtsolutions.components.Components' /> 
 	<inherits name="com.google.gwt.json.JSON" />
 
 	<inherits name='com.google.gwt.i18n.I18N' /> <!--  Language support -->
@@ -17,6 +20,7 @@
 	<stylesheet src='gwt-standard.css'/>	
 	<stylesheet src='gwt-iCing.css'/>	
 	<stylesheet src='Showcase.css'/>	
+	
 	<inherits name="com.google.gwt.user.theme.standard.Standard" />
 	<!--
 	<inherits name="com.google.gwt.user.theme.standard.StandardResources" />

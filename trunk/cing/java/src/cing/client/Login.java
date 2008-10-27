@@ -16,7 +16,7 @@ public class Login extends iCingView {
 	DecoratorPanel decPanel = new DecoratorPanel();
 
 	public Login() {
-
+		setState(iCing.LOGIN_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 		final Label html_1 = new Label( c.Login() );

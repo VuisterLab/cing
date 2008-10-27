@@ -336,6 +336,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Standard_all();
 
   /**
+   * Translated "Back".
+   * 
+   * @return translated "Back"
+   * @gwt.key Back
+   */
+  String Back();
+
+  /**
    * Translated "Welcome".
    * 
    * @return translated "Welcome"
