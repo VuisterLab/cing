@@ -559,7 +559,10 @@ Project: Top level Cing project class
     def removeCcpnReferences(self):
         """to slim down the memory footprint; should allow garbage collection. TODO: test"""
         attributeToRemove = "ccpn"
-        removeRecursivelyAttribute( self, attributeToRemove )
+        try:
+            removeRecursivelyAttribute( self, attributeToRemove )
+        except:
+            NTerror("Failed removeCcpnReferences")
 
     def export( self):
         """Call export routines from the plugins to export the project
@@ -2171,14 +2174,18 @@ class RDCRestraintList( NTlist ):
 
         NTdebug('RDCRestraintList.analyze: %s', self )
 
-        if (len( self ) == 0):
+        if len( self ) == 0:
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
         modelCount = 0
-        if (len(self[0].atoms) > 0):
-            modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
+        firstRestraint = self[0] 
+        if not hasattr(firstRestraint, "atoms"):
+            NTerror("Failed to get the model count for no atoms are available.")
+        else:
+            if len(self[0].atoms):
+                modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
         #end if
 
         if (modelCount == 0):
