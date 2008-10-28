@@ -40,7 +40,7 @@ from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
-from cing.core.molecule import translateTopology
+from cing.core.molecule import translateTopology #@UnresolvedImport
 import os
 import shutil
 #from cing.Libs.NTutils import printWarning

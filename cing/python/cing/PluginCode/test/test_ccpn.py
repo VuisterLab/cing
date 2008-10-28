@@ -4,7 +4,6 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.core.classes import Project
@@ -17,10 +16,13 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
+        # failing entries: 1ai0, 1kr8 (same for 2hgh)
+        entryList = "1ai0".split()
+#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #1iv6 needs better ccpn file from FC
 #        entryList = ["Parvulustat"]
-        entryList = ["1a4d"]
+#        entryList = ["1a4d"]
 
         fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
@@ -50,5 +52,5 @@ class AllChecks(TestCase):
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
     cing.verbosity = verbosityOutput
-    cing.verbosity = verbosityDebug
+    #cing.verbosity = verbosityDebug
     unittest.main()

@@ -1,0 +1,115 @@
+THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
+
+* On Stella/mini (mac):
+-Using mac installed version (Apache Tomcat/5.5.23):
+    as root
+    export CATALINA_HOME=/Library/Tomcat
+	$CATALINA_HOME/bin/shutdown.sh
+	$CATALINA_HOME/bin/startup.sh
+	
+- Logs:
+	tail -f $CATALINA_HOME/logs/* &
+- Webapps:
+	$CATALINA_HOME/webapps
+	
+	
+- NOT DONE YET: add a proxy port in $CATALINA_HOME/conf/server.xml:
+    <Connector
+      className="org.apache.catalina.connector.http.HttpConnector"
+      port="8080"
+      proxyPort="80"
+    > 
+    Add the proxyPort setting to the Connector tag in your server.xml.
+	And to the apache setup with proxies?	
+	
+# Fink specific	
+    setenv CATALINA_HOME /sw/var/tomcat5
+- Status:
+	ps -a | grep TOMCAT5LAUNCH | grep -v grep 
+
+
+- Use fink installed apache tomcat5 
+	
+- Restart:
+	/sw/bin/tomcat5 restart
+
+    
+    /sw/etc/tomcat5/tomcat.conf (just one file here)
+    /sw/share/webapps
+    
+    
+    
+    
+- Then configure Apache such that it will forward the requests on 80 to 8080:
+    http://tomcat.apache.org/tomcat-5.5-doc/proxy-howto.html and the apache
+    setup instructions in this local dir.
+    
+* New installation of NRG31 on tang:
+    * only changed 'WebModule' to 'NRG' from the below. Keeping all ports the same.
+    * put web.xml in: /usr/share/tomcat5/webapps/NRG/WEB-INF (no changes from old one needed)
+
+* servlet engine Apache Tomcat/5.5.20 installed on tang
+    * port 8080 but redirection from standard port 80 should occur as per above for Stella.
+    * tomcat:x:151:101:Tomacat web user:/share/tomcat:/sbin/nologin
+        not allowed to be a login-able user. 
+    * CATALINA_HOME /usr/share/tomcat5
+    * -/conf Configuration but only change:
+            /servlet_data/ diff -w /usr/share/tomcat5/conf/tomcat5.conf*
+            27c27
+            < JAVA_OPTS="-Dcatalina.ext.dirs=/usr/share/tomcat5/shared/lib:/usr/share/tomcat5/common/lib"
+            ---
+            > JAVA_OPTS="$JAVA_OPTS -Dcatalina.ext.dirs=$CATALINA_HOME/shared/lib:$CATALINA_HOME/common/lib"
+    
+    * /usr/share/tomcat5/webapps/NRG/WEB-INF/lib Place for jars.
+    * OLD /usr/share/tomcat5/webapps/WebModule/WEB-INF/lib Place for jars.
+
+    * /etc/init.d/tomcat5 restart
+    * For now use old setup in: 
+-       rwxr--r-- 1 jurgen users 1570717 Jan 19 10:25 /share/wattos/Wattos/lib/Wattos.jar*
+    * Access logs configured in:/conf/server.xml. Note that the filename format
+        seems to be unconfigurable to do by week but is ok.
+            <Valve className="org.apache.catalina.valves.AccessLogValve"
+                 directory=".."  prefix="access_log." suffix=".txt"
+                 pattern="combined" resolveHosts="false"/>
+
+     * disabling default servlet icon etc.:
+        cd /usr/share/tomcat5/webapps/ROOT
+        cp /var/www/html/index.html .
+        cp /bmrb/htdocs/favicon.ico .
+        touch robots.txt
+
+
+--- OLD ---
+
+* servlet engine tomcat 5.5.4 now installed on halfbeak
+    * /usr/local/jakarta-tomcat/conf Configuration
+    * Fix jsvc:
+        - follow instructions in INSTALL.txt and patch for the differences
+            with java sdk's using google's answers.
+                * no need to comment the set_caps.
+                * add the new paths to java resources.
+    * /etc/init.d/tomcat stop; /etc/init.d/tomcat start
+        which needs to be done as root because it won't run under tomcat user.
+        The startup is automated (and tested) to start under run level 5 (default run level on tang)
+        and killed on all levels
+        through invocation in /etc/rc.d:
+lrwxrwxrwx    1 root     root           16 Dec 14 16:42 /etc/rc.d/rc5.d/K19tomcat -> ../init.d/tomcat
+lrwxrwxrwx    1 root     root           16 Dec 14 16:39 /etc/rc.d/rc5.d/S98tomcat -> ../init.d/tomcat
+        Tomcat starts after the mysql daemon and stops before mysqld stops.
+    * jsvc is the program that is the tomcat daemon and it runs under
+        root and another part under tomcat user names.        
+    * access logs in: 
+        /var/log/tomcat (up to date)
+        /bmrb/admin/logs/tang/mrgridservlets/access_log.2004-12.txt etc. (old)
+    * access and error logs in:
+        /usr/local/jakarta-tomcat/logs/catalina.err and out.
+    * version similar to the tomcat 5.0.19 installation that comes with NetBeans 
+        (on windows for JFDs development machine)
+    * the internal administration features aren't installed for safety.
+    * There are additional log files from before 2005 that tracked access when the servlets were
+        still running on a machine different than tang or halfbeak. During that time there were around
+        a little less than 324,804 requests for /servlets/MRGridServlet.
+    * Robots like:
+        72.30.132.34 - - [01/Jun/2006:00:07:29 -0600] "GET /robots.txt HTTP/1.0" 404 983 "-" "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)"
+        they caused a large overhead; 3 million requests in 9 months for tomcat alone.
+        
