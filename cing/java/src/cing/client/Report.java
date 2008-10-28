@@ -14,7 +14,9 @@ public class Report extends iCingView {
 
 	final HTML reportHTML = new HTML();
 
-	final String pleaseWriteDown = "<P>Please copy down the url for future reference.</P>";
+	final String pleaseWriteDown = "<P>Please copy down the url for future reference.</P>"
+			+ "<P>Also, open the link in another window or tab.\n"
+			+ "This, because when you would go back here, your iCing environment is reinitialized and your previous work is lost.";
 
 	// final Timer refreshShowResultsTimer;
 
@@ -47,8 +49,8 @@ public class Report extends iCingView {
 		});
 		backButton.setText(c.Back());
 		horizontalPanelBackNext.add(backButton);
-//		horizontalPanelBackNext.add(nextButton);
-		
+		// horizontalPanelBackNext.add(nextButton);
+
 		showTemporaryResults();
 		// refreshShowResultsTimer = new Timer() {
 		// public void run() {
@@ -64,37 +66,38 @@ public class Report extends iCingView {
 	 */
 	public String getRunUrl() {
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
-		String runUrl = moduleBaseUrlWithPort + "/" + iCing.RESULT_URL + "/" + iCing.currentUserId + "/"
-				+ iCing.currentAccessKey + "/";
-		General.showDebug("runUrl: [" + runUrl + "]");
+		// iCing part should be replaced by tmp/cing
+		moduleBaseUrlWithPort = moduleBaseUrlWithPort.replace("iCing", iCing.RESULT_URL);
+		String runUrl = moduleBaseUrlWithPort + "/" + iCing.currentUserId + "/" + iCing.currentAccessKey + "/";
+		General.showDebug("runUrl: [" + runUrl + "] doesn't look well under local gwt hosted mode.");
 		return runUrl;
 	}
 
-//	/**
-//	 * E.g. http://localhost/iCing/../tmp/cing/JoeNmr/123456/9xxx.cing
-//	 * 
-//	 * @return
-//	 */
-//	public String getProjectUrl() {
-//		String runUrl = getRunUrl();
-//		if (runUrl == null) {
-//			General.showError("Failed to getResultDir");
-//			return null;
-//		}
-//		if (icing.projectName == null) {
-//			General.showError("Failed to icing.projectName");
-//			return null;
-//		}
-//
-//		String projectDir = runUrl + "/" + icing.projectName + ".cing";
-//		General.showDebug("projectDir: [" + projectDir + "]");
-//		return projectDir;
-//	}
+	// /**
+	// * E.g. http://localhost/iCing/../tmp/cing/JoeNmr/123456/9xxx.cing
+	// *
+	// * @return
+	// */
+	// public String getProjectUrl() {
+	// String runUrl = getRunUrl();
+	// if (runUrl == null) {
+	// General.showError("Failed to getResultDir");
+	// return null;
+	// }
+	// if (icing.projectName == null) {
+	// General.showError("Failed to icing.projectName");
+	// return null;
+	// }
+	//
+	// String projectDir = runUrl + "/" + icing.projectName + ".cing";
+	// General.showDebug("projectDir: [" + projectDir + "]");
+	// return projectDir;
+	// }
 
 	public void showResults() {
 		showTemporaryResults();
 		String runUrl = getRunUrl();
-//		String urlToReport = getProjectUrl();
+		// String urlToReport = getProjectUrl();
 		// if ( urlToReport == null ) {
 		// General.showDebug(
 		// "Failed to getProjectUrl; sleeping 2 seconds; as problem is timing related..."
@@ -114,10 +117,11 @@ public class Report extends iCingView {
 			General.showError("Failed to getRunUrl; not changing the report url.");
 			runUrl = iCing.NOT_AVAILABLE;
 		}
+		@SuppressWarnings("unused")
 		final String linkToZipFile = "<P>Results can be download from this <A HREF=\"" + runUrl + "/"
 				+ icing.projectName + ".zip" + "\">zip</a>.</P>\n";
 		String htmlTextEnabled = "CING has finished running. Please find the results <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\">here</a>.\n" + pleaseWriteDown + linkToZipFile;
+				+ icing.projectName + ".cing" + "\">here</a>.\n" + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 

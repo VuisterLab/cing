@@ -1,6 +1,5 @@
 package cing.client;
 
-import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -23,8 +22,6 @@ public class Options extends iCingView {
 	private Label accessKeyLabelValue;
 	private TextBox textBoxModel;
 	private TextBox textBoxResidue;
-
-	public static int accessKeyLength = 6;
 	
 	iCingConstants c = iCing.c;
 	DecoratorPanel decPanel = new DecoratorPanel();
@@ -133,7 +130,7 @@ public class Options extends iCingView {
 		regeneratePushButton.setHTML(c.Randomizing());
 		regeneratePushButton.setText(c.Regenerate());
 		regeneratePushButton.setEnabled(false);
-//		generateAccessKey(); # TODO: enable to declutter
+//		generateAccessKey(); 
 		
 		final Button nextButton = new Button();
 		nextButton.setText(c.Next());
@@ -148,21 +145,13 @@ public class Options extends iCingView {
 		
 	}
 	
-	public static String getNewAccessKey() {
-		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		String result = "";
-		for (int i = 1; i <= accessKeyLength; i++) {
-			int idxChar = Random.nextInt( allowedCharacters.length() ); // equal chance for A as for others.
-			result += allowedCharacters.charAt(idxChar);
-			// TODO: generate on server with cross check on availability...
-		}
-		return result;
-	}
 	
-	protected void generateAccessKey() {		
-		String new_access = getNewAccessKey();
+	protected void generateAccessKey() { 
+		/** Not used at the moment... */		
+		String new_access = iCing.getNewAccessKey();
 		accessKeyLabelValue.setText(new_access);
 		iCing.currentAccessKey = new_access;
+		General.showDebug("Set access key to: " + iCing.currentAccessKey);
 	}
 
 	public TextBox getTextBoxResidue() {

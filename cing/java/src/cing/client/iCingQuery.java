@@ -9,7 +9,7 @@ public class iCingQuery {
 
 	final FormPanel formPanel = new FormPanel();
 	final VerticalPanel formLayoutPanel = new VerticalPanel();
-	final Hidden action = new Hidden(iCing.RUN_SERVER_ACTION);
+	final Hidden action = new Hidden(iCing.FORM_ACTION);
 	ServerFormHandler serverFormHandler = new ServerFormHandler();
 	
 	public iCingQuery() {

@@ -100,8 +100,8 @@ public class FileFormHandler implements FormHandler {
 			return;
 		}
 		String messageStr = message.stringValue();
-		General.showOutput("message: [" + messageStr + "]");
-		if ( status.equals(iCing.JSON_ERROR_STATUS)) {
+		General.showOutput(iCing.RESPONSE_STATUS_MESSAGE+": [" + messageStr + "]");
+		if ( status.equals(iCing.RESPONSE_STATUS_ERROR)) {
 			showUploadError(messageStr);
 			return;
 		}		
