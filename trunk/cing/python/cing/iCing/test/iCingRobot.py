@@ -1,6 +1,6 @@
 # Script for testing of FileUpload at the CGI server and the other commands at the main iCing server.
 # Run: python -u $CINGROOT/python/cing/iCing/test/iCingRobot.py
-from cing import cingDirTestsData
+from cing import cingDirTestsData 
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import do_cmd
@@ -20,9 +20,9 @@ def iCingRobot():
     ## queries possible
     doSave  = 0
     doRun   = 0
-    doStatus= 0
+    doStatus= 1
     doLog   = 1
-    doPname = 0
+    doPname = 1
     ## credentials.
     user_id = "jd3"
     access_key = "234567"
@@ -30,11 +30,13 @@ def iCingRobot():
 #    user_id = "Tim"
 #    access_key = "TimsDirtySecret"
 
-    entryId = '1a4d' # smallest for quick testing.
+#    entryId = '1brv' # 68K, smallest for quick testing.
+    entryId = '2k0e' # 388K
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
     
     machineUrl = "nmr.cmbi.ru.nl"
-    rpcCGIUrl = "iCing/cgi-bin/iCingByCgi.py"
+    rpcCGIUrl = "iCing/servlets/fileupload"
+#    rpcCGIUrl = "iCing/cgi-bin/iCingByCgi.py"
     rpcUrl = "iCing/server-bin"
 #    rpcUrl = ""
     port = ""
@@ -73,7 +75,7 @@ def iCingRobot():
         %s """ % (credentialSettings, FORM_ACTION_STATUS, urlRun)
     if doStatus:
         NTmessage("Curling to: " + urlRun)
-        do_cmd(cmdStatus)
+        do_cmd(cmdStatus) 
     
 ##############################################################################################################
     cmdLog = """curl %s\

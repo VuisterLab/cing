@@ -57,7 +57,6 @@ format(peaks)
 """
 #==============================================================================
 from BaseHTTPServer import HTTPServer
-from CGIHTTPServer import CGIHTTPRequestHandler
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
@@ -66,15 +65,12 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
-from cing.Libs.forkoff import ForkOff
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.iCing.iCingServer import PORT_CGI
 from cing.iCing.iCingServer import PORT_SERVER
 from cing.iCing.iCingServer import iCingServerHandler
 from string import join
@@ -199,32 +195,33 @@ def serve():
     # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
     localDir = os.path.join( cingPythonCingDir, "iCing" )
     os.chdir(localDir)
-    NTmessage("Starting servers at ports %s and %s" % (PORT_SERVER, PORT_CGI) )
-    NTwarning("Manually kill the two servers when done; sorry no functionality for that yet.")
+    NTmessage("Starting server at port %s " % PORT_SERVER )
+#    NTmessage("Starting servers at ports %s and %s" % (PORT_SERVER, PORT_CGI) )
+#    NTwarning("Manually kill the two servers when done; sorry no functionality for that yet.")
     httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
 #    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
-    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
-    year = 365*24*60*60
-    f = ForkOff(
-            processes_max           = 2,
-            max_time_to_wait        = year, # leave the server up for a year.                
-            verbosity               = cing.verbosity )
-    job_0       = ( httpd.serve_forever, () )
-    job_1       = ( httpd_cgi.serve_forever, () )
-    job_list    = [ job_0, job_1 ]    
-    done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=0 )    
-    NTmessage("Finished forked ids: %s", done_list)
-    
+#    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
+#    year = 365*24*60*60
+#    f = ForkOff(
+#            processes_max           = 2,
+#            max_time_to_wait        = year, # leave the server up for a year.                
+#            verbosity               = cing.verbosity )
+#    job_0       = ( httpd.serve_forever, () )
+#    job_1       = ( httpd_cgi.serve_forever, () )
+#    job_list    = [ job_0, job_1 ]    
+#    done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=1 )    
+#    NTmessage("Finished forked ids: %s", done_list)
+    httpd.serve_forever()
     NTmessage( 'Shutting down server' )        
     try:        
         httpd.socket.close()
-        httpd_cgi.socket.close()
+#        httpd_cgi.socket.close()
     except:
         pass
-    try:
-        httpd_cgi.socket.close() #@UndefinedVariable
-    except:
-        pass
+#    try:
+##        httpd_cgi.socket.close()
+#    except:
+#        pass
 
 
 project = None # after running main it will be filled.

@@ -153,10 +153,11 @@ class iCingServerHandler(BaseHTTPRequestHandler):
             try:
                 os.makedirs(self.pathProject) # defaults to False return.
                 if os.path.exists(self.pathUser):
-                    mod = 0555 # dir is not readable but is executable
+                    pass
+#                    mod = 0555 # dir is not readable but is executable
 #                    mod = 'u-r'
-                    NTdebug("Setting mod")
-                    os.chmod(self.pathUser, mod) 
+#                    NTdebug("Setting mod")
+#                    os.chmod(self.pathUser, mod) TODO: fix 
                     # This prevents people from seeing a user x but not the project's secret access_id's
                     # If the secret access_id is know that dir can be retrieved. Same as Aqua server
                     # which worked fine for a million years.

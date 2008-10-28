@@ -5,10 +5,16 @@ from cing.Libs.NTutils import NTerror, NTmessage
 
 # Run and parse/Only parse the results
 parseOnly = False
-# Do/do not generate images
-htmlOnly  = True
-doProcheck = False
-doWhatif = False
+
+fastestTest = True
+
+htmlOnly = False # default is False but enable it for faster runs without some actual data.
+doWhatif = True # disables whatif actual run
+doProcheck = True
+if fastestTest:
+    htmlOnly = True 
+    doWhatif = False
+    doProcheck = False
 
 project = project #@UndefinedVariable for Pydev extensions.
 options = options #@UndefinedVariable
