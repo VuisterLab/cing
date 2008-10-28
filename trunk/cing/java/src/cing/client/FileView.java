@@ -191,32 +191,25 @@ public class FileView extends iCingView {
 		 * individual items need to be wrapped in another element that can
 		 * contain them.
 		 */
-		HorizontalPanel formLayoutPanel = new HorizontalPanel();
+		HorizontalPanel formWrapper = new HorizontalPanel();
 		HorizontalPanel fileUploadHorizontalPanel = new HorizontalPanel();
 		fileUploadHorizontalPanel.add(fileUpload); // will switch between these
 													// two.
 		fileUploadHorizontalPanel.add(labelFileUploadDone);
-		formPanel.setWidget(formLayoutPanel);
-		formLayoutPanel.add(fileUploadHorizontalPanel);
+		formPanel.setWidget(formWrapper);
 		flexTable.setWidget(currentRowIdx, fileIdx, formPanel);
-
-		// No effect.
-		// formLayoutPanel.setCellVerticalAlignment(fileUploadHorizontalPanel,
-		// HasVerticalAlignment.ALIGN_BOTTOM);
-		// fileUploadHorizontalPanel.setCellVerticalAlignment(fileUpload,
-		// HasVerticalAlignment.ALIGN_BOTTOM);
-		//fileUploadHorizontalPanel.setCellVerticalAlignment(labelFileUploadDone
-		// , HasVerticalAlignment.ALIGN_BOTTOM);
 
 		// The GWT calls this form handler after the form is submitted.
 		FileFormHandler fileFormHandler = new FileFormHandler();
 
 		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
 		/** Invisible parameters to pass */
-		formLayoutPanel.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey));
-		formLayoutPanel.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId));
-		formLayoutPanel.add(new Hidden(iCing.RUN_SERVER_ACTION, iCing.RUN_SERVER_ACTION_SAVE));
+		formWrapper.add(new Hidden(iCing.FORM_ACTION, iCing.RUN_SERVER_ACTION_SAVE));
+		formWrapper.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey));
+		formWrapper.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId));
+		formWrapper.add(fileUploadHorizontalPanel);
 
+		
 		final ListBox listBox_Program = new ListBox();
 		flexTable.setWidget(currentRowIdx, programIdx, listBox_Program);
 		listBox_Program.setVisibleItemCount(1);

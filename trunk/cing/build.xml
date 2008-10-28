@@ -3,7 +3,7 @@
 <!-- TODO: remove the unneeded settings. -->
 
 
-<project name="cing" default="iCing-static-install" basedir=".">
+<project name="cing" default="iCing-servlet-install" basedir=".">
 	<description>Builds, tests, and runs the project cing.</description>
 	<echo>Starting Ant with updated build file</echo>
 	<property file="cing.properties" />
@@ -98,29 +98,25 @@
 	</target>
 -->
 
-	<!-- 
 	<target name="iCing-servlet-install" depends="init">
 		<echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
 
-		<!
+		<!-- 
 		compile to "classes" this is now done automatically to:
     	java/bin/cing/server/FileUploadServlet.class
     	when calling the gwt compile.
-    	     	
-
-		<copy todir="${icing.production.local.dir}/WEB-INF/classes/cing" >
-			<fileset dir="java/bin/cing"/>
+-->
+		<copy todir="${icing.production.local.dir}/WEB-INF/classes/cing/server" >
+			<fileset dir="java/bin/cing/server"/>
 		</copy>
 
 		<zip destfile="java/${icing.war.file}">
 			<fileset dir="${icing.production.local.dir}" />
-			<includesfile name="WEB-INF, README.txt" />
-
-		</zip>
+			<!-- <includesfile name="WEB-INF, README.txt" /> -->
+		</zip> 
 
 		<scp todir="${server.cgi.user}@${server.cgi.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${server.cgi.port}">
 			<fileset file="java/${icing.war.file}" />
 		</scp>
-	</target> -->
-
+	</target>
 </project>

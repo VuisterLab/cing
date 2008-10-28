@@ -16,6 +16,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -31,15 +32,19 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class iCing implements EntryPoint, HistoryListener {
 
 	/** Just the initial startup state */
-	private static final boolean doDebug = false;
+	private static final boolean doDebug = true;
 
 	public static String VERSION;
 	// public static final String RPC_URL = "../cgi-bin/iCing"; original
-	public static final String RESULT_URL = "../tmp/cing";
-	static final String FILE_UPLOAD_URL = "cgi-bin/iCingByCgi.py";
+	public static final String RESULT_URL = "tmp/cing";
+//	static final String FILE_UPLOAD_URL = "cgi-bin/iCingByCgi.py";
+//	static final String FILE_UPLOAD_URL = "servlets/fileupload";
+	static final String FILE_UPLOAD_URL = "serv/fileupload";
+
 	static final String SERVER_URL = "server-bin"; // proxied to: :8000
 	// iCingServer.py
 	static final String NOT_AVAILABLE = "not available";
+	public static int accessKeyLength = 6;
 
 	public static final String LOGIN_STATE = "login";
 	public static final String WELCOME_STATE = "welcome";
@@ -52,11 +57,12 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String RUN_STATE = "run";
 	public static final String REPORT_STATE = "report";
 
+	public static final String FORM_ACTION = "Action";
 	public static final String FORM_ACCESS_KEY = "AccessKey";
 	public static final String FORM_USER_ID = "UserId";
 	public static final String FORM_UPLOAD_FILE_BASE = "UploadFile";
-	public static final String JSON_ERROR_STATUS = "error";
-	public static final String RUN_SERVER_ACTION = "Action";
+	
+	
 	public static final String RUN_SERVER_ACTION_RUN = "Run";
 	public static final String RUN_SERVER_ACTION_SAVE = "Save";
 	public static final String RUN_SERVER_ACTION_STATUS = "Status";
@@ -70,6 +76,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
 	public static final String RESPONSE_STATUS_ERROR = "error";
 	public static final String RESPONSE_STATUS_MESSAGE = "message";
+	
 	public static final String RESPONSE_STATUS_PROJECT_NAME = "projectName";
 	public static final String RESPONSE_STATUS_NONE = "None";
 	public static final String RESPONSE_TAIL_PROGRESS = "tailProgress";
@@ -77,17 +84,18 @@ public class iCing implements EntryPoint, HistoryListener {
 	/**
 	 * WATCH out, this needs to be in sync with FileView form. It's the file and
 	 * the access key and user id.
-	 * */
+	 * 
 	public static final int FORM_PART_COUNT = 3;
+	*/
 
-	/**
-	 * The available style themes that the user can select.
-	 */
-	String[] STYLE_THEMES = { "standard", "chrome", "dark" };
-
-	/**
-	 * The current style theme.
-	 */
+//	/**
+//	 * The available style themes that the user can select.
+//	 */
+//	String[] STYLE_THEMES = { "standard", "chrome", "dark" };
+//
+//	/**
+//	 * The current style theme.
+//	 */
 	public static String CUR_THEME = "standard";
 
 	public static final int margin = 11;
@@ -99,8 +107,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	static boolean soundOn = true;
 
 	public static iCingConstants c;
-	public static String currentAccessKey = "234567";
-	// public static String currentAccessKey = Options.getNewAccessKey();
+//	public static String currentAccessKey = "234567";
+	public static String currentAccessKey = null;
 	public static String currentUserId = "jd3"; // TODO: implement security
 	// functionality later.
 	/** How often does iCing check and update asynchronously; DEFAULT 1000 */
@@ -110,6 +118,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final RichTextArea area = new RichTextArea();
 	public static final RichTextArea statusArea = new RichTextArea();
 	public static final RichTextArea cingArea = new RichTextArea();
+
 	public static boolean textIsReversedArea = false;
 	public static boolean textIsReversedCingArea = false;
 	public static boolean textIsReversedStatusArea = false;
@@ -151,15 +160,15 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (doDebug) {
 			General.setVerbosityToDebug();
 		}
+		currentAccessKey = getNewAccessKey();
 		Date today = new Date();
-		VERSION = DateTimeFormat.getLongTimeFormat().format(today);
+		VERSION = DateTimeFormat.getShortDateTimeFormat().format(today);
 
 		showMenu();
 
 		status = new Status();
 		login = new Login();
 		welcome = new Welcome();
-		fileView = new FileView();
 		logView = new LogView();
 		cingLogView = new CingLogView();
 		options = new Options();
@@ -168,6 +177,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		runView = new RunView();
 		report = new Report();
 		footer = new Footer();
+		fileView = new FileView();
 
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
@@ -201,6 +211,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		setVerbosityToDebug(doDebug); // partner with the above call to
 		// General.setVerbosityToDebug
+
 		showLoadingMessage(false);
 
 		// History.addHistoryListener(historyListener);
@@ -343,52 +354,54 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		final ListBox listBoxLocale = new ListBox();
 		horizontalPanel_1.add(listBoxLocale);
-//		listBoxLocale.setTabIndex(1);
+		// listBoxLocale.setTabIndex(1);
 		listBoxLocale.setWidth("15em");
 		listBoxLocale.setEnabled(false);
-//		// Map to location in list.
-//		HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
-//		int i = 0;
-//		localeMap.put("cn", i++);
-//		localeMap.put("de", i++);
-//		localeMap.put("en", i++);
-//		localeMap.put("es", i++);
-//		localeMap.put("fr", i++);
-//		localeMap.put("it", i++);
-//		localeMap.put("nl", i++);
-//		localeMap.put("pt", i++);
+		// // Map to location in list.
+		// HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
+		// int i = 0;
+		// localeMap.put("cn", i++);
+		// localeMap.put("de", i++);
+		// localeMap.put("en", i++);
+		// localeMap.put("es", i++);
+		// localeMap.put("fr", i++);
+		// localeMap.put("it", i++);
+		// localeMap.put("nl", i++);
+		// localeMap.put("pt", i++);
 
-//		listBoxLocale.addItem("中文", "cn");
-//		listBoxLocale.addItem("Deutsch", "de");
+		// listBoxLocale.addItem("中文", "cn");
+		// listBoxLocale.addItem("Deutsch", "de");
 		listBoxLocale.addItem("English", "en");
-//		listBoxLocale.addItem("Español", "es");
-//		listBoxLocale.addItem("Français", "fr");
-//		listBoxLocale.addItem("Italiano", "it");
-//		listBoxLocale.addItem("Nederlands", "nl");
-//		listBoxLocale.addItem("Português", "pt");
-//		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
+		// listBoxLocale.addItem("Español", "es");
+		// listBoxLocale.addItem("Français", "fr");
+		// listBoxLocale.addItem("Italiano", "it");
+		// listBoxLocale.addItem("Nederlands", "nl");
+		// listBoxLocale.addItem("Português", "pt");
+		// String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-//		int idx = 2;
-//		if (currentLocale != null) {
-//			if (localeMap != null) { // shouldn't have happened.
-//				idx = localeMap.get(currentLocale);
-//				if (idx < 0) {
-//					idx = 2; // en is default
-//				}
-//			} else {
-//				General.showWarning("Failed to find localeMap");
-//			}
-//		} else {
-//			General.showWarning("Failed to find currentLocale");
-//		}
-//		listBoxLocale.setSelectedIndex(idx);
-//
-//		listBoxLocale.addChangeListener(new ChangeListener() {
-//			public void onChange(Widget sender) {
-//				String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
-//				Window.open(UtilsJS.getHostPageLocation() + "?locale=" + localeName, "_self", "");
-//			}
-//		});
+		// int idx = 2;
+		// if (currentLocale != null) {
+		// if (localeMap != null) { // shouldn't have happened.
+		// idx = localeMap.get(currentLocale);
+		// if (idx < 0) {
+		// idx = 2; // en is default
+		// }
+		// } else {
+		// General.showWarning("Failed to find localeMap");
+		// }
+		// } else {
+		// General.showWarning("Failed to find currentLocale");
+		// }
+		// listBoxLocale.setSelectedIndex(idx);
+		//
+		// listBoxLocale.addChangeListener(new ChangeListener() {
+		// public void onChange(Widget sender) {
+		// String localeName =
+		// listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
+		// Window.open(UtilsJS.getHostPageLocation() + "?locale=" + localeName,
+		// "_self", "");
+		// }
+		// });
 
 		// // Add the option to change the style
 		// final HorizontalPanel styleWrapper = new HorizontalPanel();
@@ -500,7 +513,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
 		menuBar_edit.setVisible(false);// doesn't 'help'
-//		menuBar.addItem(c.Edit(), menuBar_edit);
+		// menuBar.addItem(c.Edit(), menuBar_edit);
 		menuBar_edit.addItem(c.Criteria(), commandCriteria);
 		menuBar_edit.addItem(c.Options(), commandOptions);
 		menuBar.addItem(c.Run(), commandRun);
@@ -592,11 +605,12 @@ public class iCing implements EntryPoint, HistoryListener {
 	private void updateStyleSheets() {
 		// Generate the names of the style sheets to include
 		String gwtStyleSheet = "css/gwt/" + CUR_THEME + "/" + CUR_THEME + ".css";
-		String showcaseStyleSheet = "css/sc/" + CUR_THEME + "/Showcase.css";
-		if (LocaleInfo.getCurrentLocale().isRTL()) {
-			gwtStyleSheet = gwtStyleSheet.replace(".css", "_rtl.css");
-			showcaseStyleSheet = showcaseStyleSheet.replace(".css", "_rtl.css");
-		}
+		// String showcaseStyleSheet = "css/sc/" + CUR_THEME + "/Showcase.css";
+		// if (LocaleInfo.getCurrentLocale().isRTL()) {
+		// gwtStyleSheet = gwtStyleSheet.replace(".css", "_rtl.css");
+		// // showcaseStyleSheet = showcaseStyleSheet.replace(".css",
+		// "_rtl.css");
+		// }
 
 		// Find existing style sheets that need to be removed
 		boolean styleSheetsFound = false;
@@ -611,10 +625,11 @@ public class iCing implements EntryPoint, HistoryListener {
 						&& elem.getPropertyString("rel").equalsIgnoreCase("stylesheet")) {
 					styleSheetsFound = true;
 					String href = elem.getPropertyString("href");
-					// If the correct style sheets are already loaded, then we
-					// should have
+					// If the correct style sheets are already loaded, then we should have
 					// nothing to remove.
-					if (!href.contains(gwtStyleSheet) && !href.contains(showcaseStyleSheet)) {
+					// if (!href.contains(gwtStyleSheet) &&
+					// !href.contains(showcaseStyleSheet)) {
+					if (!href.contains(gwtStyleSheet)) {
 						toRemove.add(elem);
 					}
 				}
@@ -669,13 +684,14 @@ public class iCing implements EntryPoint, HistoryListener {
 		// Load the showcase specific style sheet after the GWT theme style
 		// sheet so
 		// that custom styles supercede the theme styles.
-		StyleSheetLoader.loadStyleSheet(modulePath + showcaseStyleSheet, getCurrentReferenceStyleName("Application"), // should
-				// this
-				// really
-				// be
-				// Application
-				// instead of iCing? YES
-				callback);
+		// StyleSheetLoader.loadStyleSheet(modulePath + showcaseStyleSheet,
+		// getCurrentReferenceStyleName("Application"), // should
+		// // this
+		// // really
+		// // be
+		// // Application
+		// // instead of iCing? YES
+		// callback);
 	}
 
 	/**
@@ -787,5 +803,18 @@ public class iCing implements EntryPoint, HistoryListener {
 	// }
 	// }
 	// }
-
+	/** Watch out; can't use General.showDebug yet because status hasn't been inited.
+	 * 
+	 */
+	public static String getNewAccessKey() {
+		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		String result = "";
+		for (int i = 1; i <= accessKeyLength; i++) {
+			int idxChar = Random.nextInt( allowedCharacters.length() ); // equal chance for A as for others.
+			result += allowedCharacters.charAt(idxChar);
+			// TODO: generate on server with cross check on availability...
+		}
+//		General.showDebug("Got access key: [" + result +"]"); see above
+		return result;
+	}
 }

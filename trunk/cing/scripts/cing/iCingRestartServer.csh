@@ -1,9 +1,7 @@
-#!/bin/csh -f
+#!/bin/csh 
+#  A simple script to restart the iCing server.
 
-#  A simple script to remove temporary data.
-#
-#  As this is meant to be run by cron, avoid any output to STDOUT or STDERR.
-#  else it sends e-mail.  I want to control the e-mail and send it myself:
+#  Since it isn't possible to determine if the server is in an ok state. Just plainly kill it.
 #
 # verbosity argument can be set to:
 #   terse   (no output and no logging)
@@ -12,9 +10,9 @@
 #                including all logged from last verbose run.)
 #   nomail  (for direct output of to screen)
 
-# Run from cron as root
+# Run from cron as jd
 # Remove per directory.
-set script = iCingRemoveOldFiles
+set script = iCingRestartServer
 
 # Executables, might need full-path depending on the environs:
 set mail_exe = mail
@@ -24,16 +22,14 @@ set verbosity = "$1"
 # Whom to send the report to when it is done:
 set mailto = jurgenfd@gmail.com
 
-# Find options.
-set dirToClean = /Library/WebServer/Documents/tmp/cing
-@ maxMinutes = 24 * 60
-#set maxMinutes = 1
 # Where to put the report for a bit before it gets mailed:
 set tmpdir = /tmp
 set logfile = $tmpdir/$script.log
 
 ## maximum number of bytes when all is successful
-set maxtmpoutsize = 0
+set maxtmpoutsize = 150
+
+set sleepTimeCing = 5
 
 #No admin changes below this line (I hope): - - - - - -
 ###################################################################
@@ -43,8 +39,30 @@ set maxtmpoutsize = 0
 set tmpout = $tmpdir/"$script"_$$.txt
 set tmphead = $tmpdir/"$script"_head_$$.txt
 
-find $dirToClean -mmin +$maxMinutes -type d -mindepth 1 -maxdepth 1 -exec \rm -rf {} \; >& $tmpout
-#find $dirToClean -mmin +$maxMinutes -type d -mindepth 1 -maxdepth 1 >& $tmpout
+set procList1 = (`ps -x | grep "python/cing/main.py --server" | grep -v grep | gawk '{print $1}'`) >& $tmpout
+set procList2 = (`ps -x | grep "iCingByCgi.py"                | grep -v grep | gawk '{print $1}'`) >& $tmpout
+set procList = ( $procList1 $procList2 )
+echo "Found $#procList server processes: $procList to kill." >>& $tmpout
+
+foreach procId ( $procList )
+	kill -9 $procId  >>& $tmpout
+end
+
+sleep $sleepTimeCing
+
+# Add to the tmpout if anything there...
+ps -x | grep server | grep python | grep -i cing | grep -v grep  >>& $tmpout
+
+#/usr/sbin/httpd -k restart
+#sleep $sleepTimeApache
+
+cing --server -v 9 >>& ~jd/cingServer.log &
+
+
+#if ( $status ) then
+#	echo "Failed to startup a new cing server:" >>& $tmpout
+#	tail -100 ~/cingServer.log  >>& $tmpout
+#end
 
 @ tmpoutsize = 0
 if ( ! -z $tmpout ) then
