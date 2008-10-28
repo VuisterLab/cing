@@ -94,7 +94,7 @@ class iCingByCgi():
         if fileLength > MAX_FILE_SIZE_BYTES:
             self.endError("The send file [%s] was larger than the allowed number of bytes compare: [%s] and [%s]" %
                           (fileitem.filename, fileLength, MAX_FILE_SIZE_BYTES))
-                            
+        
         fullFileName = os.path.join(self.pathProject, fileitem.filename)
         fout = file(fullFileName, 'wb')
         while 1:
