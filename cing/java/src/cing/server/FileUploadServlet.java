@@ -32,15 +32,15 @@ public class FileUploadServlet extends HttpServlet {
 
 	// Can't import iCing settings here; stupid!
 	public static final int FORM_PART_COUNT = 4; // action, key, user, file.
-	private static final String RESPONSE_STATUS_ERROR = "error";
-	private static final String RESPONSE_STATUS_MESSAGE = "message";
+	private static final String RESPONSE_GENERAL_ERROR = "error";
+	private static final String RESPONSE_SAVE_MESSAGE = "message";
 
-	private static final String ERROR_SIZE_UNACCEPTABLE = "{" + RESPONSE_STATUS_ERROR
+	private static final String ERROR_SIZE_UNACCEPTABLE = "{" + RESPONSE_GENERAL_ERROR
 			+ ": 'File upload failed. File size must be " + MAX_SIZE + " bytes or less'}";
-	private static final String ERROR_PARSE_REQUEST = "{" + RESPONSE_STATUS_ERROR + ": 'Failed to parse request'}";
-	private static final String ERROR_WRITE_FAILED = "{" + RESPONSE_STATUS_ERROR
+	private static final String ERROR_PARSE_REQUEST = "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to parse request'}";
+	private static final String ERROR_WRITE_FAILED = "{" + RESPONSE_GENERAL_ERROR
 			+ ": 'File upload failed. File write failed.'}";
-	private static final String ERROR_NOT_MULTI_PART = "{" + RESPONSE_STATUS_ERROR
+	private static final String ERROR_NOT_MULTI_PART = "{" + RESPONSE_GENERAL_ERROR
 			+ ": 'File upload failed. Not multipart message.'}";
 
 	/**
@@ -131,13 +131,13 @@ public class FileUploadServlet extends HttpServlet {
 		}
 
 		if (items == null) {
-			json = "{" + RESPONSE_STATUS_ERROR + ": 'Got a serious error while: upload.parseRequest(request).'}";
+			json = "{" + RESPONSE_GENERAL_ERROR + ": 'Got a serious error while: upload.parseRequest(request).'}";
 			writeJson(response, json);
 			return;
 		}
 
 		if (items.size() != FORM_PART_COUNT) {
-			json = "{" + RESPONSE_STATUS_ERROR + ": 'Got " + items.size() + " file items instead of expected one.'}";
+			json = "{" + RESPONSE_GENERAL_ERROR + ": 'Got " + items.size() + " file items instead of expected one.'}";
 			writeJson(response, json);
 			return;
 		}
@@ -168,7 +168,7 @@ public class FileUploadServlet extends HttpServlet {
 				}
 				int endIndex = Math.min(100, value.length());
 				value = value.substring(0, endIndex);
-				json = "{" + RESPONSE_STATUS_ERROR + ": 'File item parameter [" + name
+				json = "{" + RESPONSE_GENERAL_ERROR + ": 'File item parameter [" + name
 						+ "] with value (first 100 bytes): [" + value + "] was unexpected.'}";
 				writeJson(response, json);
 				return;
@@ -178,18 +178,18 @@ public class FileUploadServlet extends HttpServlet {
 		}
 		// Process actual file after other parameters are retrieved.
 		if (actualFileItem == null) {
-			json = "{" + RESPONSE_STATUS_ERROR + ": 'No actual file item retrieved'}";
+			json = "{" + RESPONSE_GENERAL_ERROR + ": 'No actual file item retrieved'}";
 			writeJson(response, json);
 			return;
 		}
 
 		if (currentAccessKey == null) {
-			json = "{" + RESPONSE_STATUS_ERROR + ": 'Failed to retrieve AccessKey.'}";
+			json = "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to retrieve AccessKey.'}";
 			writeJson(response, json);
 			return;
 		}
 		if (currentUserId == null) {
-			json = "{" + RESPONSE_STATUS_ERROR + ": 'Failed to retrieve UserId.'}";
+			json = "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to retrieve UserId.'}";
 			writeJson(response, json);
 			return;
 		}
@@ -234,34 +234,36 @@ public class FileUploadServlet extends HttpServlet {
 			System.err.println("Size not acceptable.");
 			return ERROR_SIZE_UNACCEPTABLE;
 		}
-
+		
+		/** Name without path part */		
 		String fileName = item.getName();
 		/**
 		 * TODO read up on safety issues here.
 		 * 
 		 * No .. or forward slash allowed.
 		 */
-		if (fileName.indexOf("..") >= 0 || fileName.charAt(0) == '/') {
-			return "{" + RESPONSE_STATUS_ERROR + ": 'Filename not considered safe: [" + fileName + "].'}";
+
+		if (fileName.indexOf(":") >= 0 || fileName.indexOf("..") >= 0 || fileName.charAt(0) == '/') {
+			return "{" + RESPONSE_GENERAL_ERROR + ": 'Filename not considered safe: [" + fileName + "].'}";
 		}
 		File pathUser = new File(FILE_UPLOAD_DIR, currentUserId);
 		if (!pathUser.exists()) {
 			if (!pathUser.mkdir()) {
-				return "{" + RESPONSE_STATUS_ERROR + ": 'Failed to mkdir for user at: [" + pathUser + "].'}";
+				return "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to mkdir for user at: [" + pathUser + "].'}";
 			}
 			General.chmod( pathUser, "a+rw");
 		}
 		File pathProject = new File(pathUser, currentAccessKey);
 		if (!pathProject.exists()) {
 			if (!pathProject.mkdir()) {
-				return "{" + RESPONSE_STATUS_ERROR + ": 'Failed to mkdir for project at: [" + pathProject + "].'}";
+				return "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to mkdir for project at: [" + pathProject + "].'}";
 			}
 			General.chmod( pathProject, "a+rw");
 		}
 		File uploadedFile = new File(pathProject, fileName);
 		if (uploadedFile.exists()) {
 			if (pathProject.delete()) {
-				return "{" + RESPONSE_STATUS_ERROR + ": 'Failed to remove existing file with the same name: ["
+				return "{" + RESPONSE_GENERAL_ERROR + ": 'Failed to remove existing file with the same name: ["
 						+ uploadedFile + "].'}";
 			}
 		}
@@ -274,7 +276,7 @@ public class FileUploadServlet extends HttpServlet {
 		General.chmod( uploadedFile, "a+rw");
 
 		String sizeStr = Utils.bytesToFormattedString(item.getSize());
-		return "{" + RESPONSE_STATUS_MESSAGE + ": '" + sizeStr + "'}";
+		return "{" + RESPONSE_SAVE_MESSAGE + ": '" + sizeStr + "'}";
 	}
 
 	/**

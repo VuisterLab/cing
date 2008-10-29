@@ -1,7 +1,6 @@
 package cing.client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.HeadElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -35,78 +33,14 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 
-	/** Just the initial startup state */
-	private static final boolean doDebug = false;
-
-	public static String VERSION;
-	// public static final String RPC_URL = "../cgi-bin/iCing"; original
-	public static final String RESULT_URL = "tmp/cing";
-	// static final String FILE_UPLOAD_URL = "cgi-bin/iCingByCgi.py";
-	// static final String FILE_UPLOAD_URL = "servlets/fileupload";
-	static final String FILE_UPLOAD_URL = "serv/fileupload";
-
-	static final String SERVER_URL = "server-bin"; // proxied to: :8000
-	// iCingServer.py
-	static final String NOT_AVAILABLE = "not available";
-	public static int accessKeyLength = 6;
-
-	public static final String LOGIN_STATE = "login";
-	public static final String WELCOME_STATE = "welcome";
-	public static final String PREFERENCES_STATE = "preferences";
-	public static final String FILE_STATE = "file";
-	public static final String LOG_STATE = "log";
-	public static final String CING_LOG_STATE = "cingLog";
-	public static final String CRITERIA_STATE = "criteria";
-	public static final String OPTIONS_STATE = "options";
-	public static final String RUN_STATE = "run";
-	public static final String REPORT_STATE = "report";
-
-	public static final String FORM_ACTION = "Action";
-	public static final String FORM_ACCESS_KEY = "AccessKey";
-	public static final String FORM_USER_ID = "UserId";
-	public static final String FORM_UPLOAD_FILE_BASE = "UploadFile";
-
-	public static final String RUN_SERVER_ACTION_RUN = "Run";
-	public static final String RUN_SERVER_ACTION_SAVE = "Save";
-	public static final String RUN_SERVER_ACTION_STATUS = "Status";
-	public static final String RUN_SERVER_ACTION_PROJECT_NAME = "ProjectName";
-	public static final String RUN_SERVER_ACTION_LOG = "Log";
-
-	public static final String RESPONSE_STATUS = "status";
-	public static final String RESPONSE_STATUS_DONE = "done";
-	public static final String RESPONSE_STATUS_STARTED = "started";
-
-	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
-	public static final String RESPONSE_STATUS_ERROR = "error";
-	public static final String RESPONSE_STATUS_MESSAGE = "message";
-
-	public static final String RESPONSE_STATUS_PROJECT_NAME = "projectName";
-	public static final String RESPONSE_STATUS_NONE = "None";
-	public static final String RESPONSE_TAIL_PROGRESS = "tailProgress";
-
-	/**
-	 * WATCH out, this needs to be in sync with FileView form. It's the file and
-	 * the access key and user id.
-	 * 
-	 * public static final int FORM_PART_COUNT = 3;
-	 */
-
-	// /**
-	// * The available style themes that the user can select.
-	// */
-	// String[] STYLE_THEMES = { "standard", "chrome", "dark" };
-	//
-	// /**
-	// * The current style theme.
-	// */
-	public static String CUR_THEME = "standard";
+	public static String CURRENT_THEME = "standard";
 
 	public static final int margin = 11;
 	public static final int yLocTopPanel = 11;
 	public static final int yLocMenu = 60;
 	public static final int yLocMainWindow = 110;
-	public static final String widthMenu = "900";
 	public static final int WIDTH_MENU = 900;
+	public static final String widthMenuStr = "900";
 	static boolean soundOn = true;
 
 	public static iCingConstants c;
@@ -119,6 +53,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	 * production.
 	 */
 	public static final int REFRESH_INTERVAL = 2000;
+	public static final int REFRESH_INTERVAL_LOG = 4000;
 
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextArea area = new RichTextArea();
@@ -149,6 +84,8 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public HistoryListener historyListener;
 
+	public static final String LOGIN_STATE = "login";
+
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
 		// off. JFD prefers
@@ -163,12 +100,12 @@ public class iCing implements EntryPoint, HistoryListener {
 		c = GWT.create(iCingConstants.class);
 		// Watch out because although this setting is needed here; there's
 		// another needed at the end of this routine too.
-		if (doDebug) {
+		if (Keys.doDebug) {
 			General.setVerbosityToDebug();
 		}
 		currentAccessKey = getNewAccessKey();
-		Date today = new Date();
-		VERSION = DateTimeFormat.getShortDateTimeFormat().format(today);
+		// Date today = new Date();
+		// VERSION = DateTimeFormat.getShortDateTimeFormat().format(today);
 
 		showMenu();
 
@@ -215,18 +152,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		}
 		vPanel.setSpacing(5);
 
-		setVerbosityToDebug(doDebug); // partner with the above call to
-		// General.setVerbosityToDebug
-
+		setVerbosityToDebug(Keys.doDebug); // partner with the above call to
 		showLoadingMessage(false);
-
-		// History.addHistoryListener(historyListener);
-		// History.addHistoryListener(this);
-		// this.onHistoryChanged(LOGIN_STATE);
-		// this.onHistoryChanged(CING_LOG_STATE);
-		// this.onHistoryChanged(WELCOME_STATE);
-		// Now that we've setup our listener, fire the initial history state.
-		// History.fireCurrentHistoryState();
 
 		History.addHistoryListener(this);
 		// If the application starts with no history token, redirect to a new
@@ -234,7 +161,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		String initToken = History.getToken();
 		if (initToken.length() == 0) {
 			// History.newItem();
-			initToken = FILE_STATE;
+			initToken = Keys.FILE_STATE;
 		}
 		onHistoryChanged(initToken);
 	}
@@ -243,7 +170,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (historyToken == null || historyToken.length() == 0) {
 			General.showError("Got an unknown history token: [" + historyToken + "]");
 		}
-		if (WELCOME_STATE.equals(historyToken)) {
+		if (Keys.WELCOME_STATE.equals(historyToken)) {
 			loadWelcomeView();
 			return;
 		}
@@ -251,35 +178,35 @@ public class iCing implements EntryPoint, HistoryListener {
 			loadLoginView();
 			return;
 		}
-		if (FILE_STATE.equals(historyToken)) {
+		if (Keys.FILE_STATE.equals(historyToken)) {
 			loadFileView();
 			return;
 		}
-		if (LOG_STATE.equals(historyToken)) {
+		if (Keys.LOG_STATE.equals(historyToken)) {
 			loadLogView();
 			return;
 		}
-		if (CING_LOG_STATE.equals(historyToken)) {
+		if (Keys.CING_LOG_STATE.equals(historyToken)) {
 			loadCingLogView();
 			return;
 		}
-		if (CRITERIA_STATE.equals(historyToken)) {
+		if (Keys.CRITERIA_STATE.equals(historyToken)) {
 			loadCriteriaView();
 			return;
 		}
-		if (REPORT_STATE.equals(historyToken)) {
+		if (Keys.REPORT_STATE.equals(historyToken)) {
 			loadReportView();
 			return;
 		}
-		if (OPTIONS_STATE.equals(historyToken)) {
+		if (Keys.OPTIONS_STATE.equals(historyToken)) {
 			loadOptionsView();
 			return;
 		}
-		if (RUN_STATE.equals(historyToken)) {
+		if (Keys.RUN_STATE.equals(historyToken)) {
 			loadRunView();
 			return;
 		}
-		if (PREFERENCES_STATE.equals(historyToken)) {
+		if (Keys.PREFERENCES_STATE.equals(historyToken)) {
 			loadPreferencesView();
 			return;
 		}
@@ -362,7 +289,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		horizontalPanel_1.add(listBoxLocale);
 		// listBoxLocale.setTabIndex(1);
 		listBoxLocale.setWidth("15em");
-//		listBoxLocale.setEnabled(false);
+		// listBoxLocale.setEnabled(false);
 		// // Map to location in list.
 		HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
 		int i = 0;
@@ -375,14 +302,14 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
 
-		listBoxLocale.addItem("中文", "cn");
+		listBoxLocale.addItem("??????", "cn");
 		listBoxLocale.addItem("Deutsch", "de");
 		listBoxLocale.addItem("English", "en");
-		listBoxLocale.addItem("Español", "es");
-		listBoxLocale.addItem("Français", "fr");
+		listBoxLocale.addItem("Espa??ol", "es");
+		listBoxLocale.addItem("Fran??ais", "fr");
 		listBoxLocale.addItem("Italiano", "it");
 		listBoxLocale.addItem("Nederlands", "nl");
-		listBoxLocale.addItem("Português", "pt");
+		listBoxLocale.addItem("Portugu??s", "pt");
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
 		int idx = 2;
@@ -531,7 +458,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_view.addItem(c.Log() + " iCing", commandLog);
 		MenuItem menuItem3D = menuBar.addItem(c.threeD(), (Command) null);
 		menuItem3D.addStyleDependentName("disabled"); // try to improve styling.
-		menuBar.setWidth(widthMenu);
+		menuBar.setWidth(widthMenuStr);
 		final MenuBar menuBar_help = new MenuBar(true);
 		menuBar.addItem(c.Help(), menuBar_help);
 		menuBar_help.addItem(c.Welcome(), commandWelcome);
@@ -608,7 +535,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	@SuppressWarnings("unused")
 	private void updateStyleSheets() {
 		// Generate the names of the style sheets to include
-		String gwtStyleSheet = "css/gwt/" + CUR_THEME + "/" + CUR_THEME + ".css";
+		String gwtStyleSheet = "css/gwt/" + CURRENT_THEME + "/" + CURRENT_THEME + ".css";
 		// String showcaseStyleSheet = "css/sc/" + CUR_THEME + "/Showcase.css";
 		// if (LocaleInfo.getCurrentLocale().isRTL()) {
 		// gwtStyleSheet = gwtStyleSheet.replace(".css", "_rtl.css");
@@ -708,7 +635,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	 * @return the style name
 	 */
 	private String getCurrentReferenceStyleName(String prefix) {
-		String gwtRef = prefix + "-Reference-" + CUR_THEME;
+		String gwtRef = prefix + "-Reference-" + CURRENT_THEME;
 		if (LocaleInfo.getCurrentLocale().isRTL()) {
 			gwtRef += "-rtl";
 		}
@@ -816,7 +743,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static String getNewAccessKey() {
 		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		String result = "";
-		for (int i = 1; i <= accessKeyLength; i++) {
+		for (int i = 1; i <= Keys.accessKeyLength; i++) {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal
 			// chance
 			// for A

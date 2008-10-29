@@ -64,7 +64,7 @@ public class FileFormHandler implements FormHandler {
 //		http://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&s=google-web-toolkit-doc-1-5&t=GettingStartedJSON
 			
 		String response = event.getResults();
-		General.showDebug("response is: [" + response + "]");
+		General.showOutput("response is: [" + response + "]");
 		if (response == null) {
 			showUploadError("Failed to get any response from server.");
 			return;
@@ -100,8 +100,7 @@ public class FileFormHandler implements FormHandler {
 			return;
 		}
 		String messageStr = message.stringValue();
-		General.showOutput(iCing.RESPONSE_STATUS_MESSAGE+": [" + messageStr + "]");
-		if ( status.equals(iCing.RESPONSE_STATUS_ERROR)) {
+		if ( status.equals(Keys.RESPONSE_GENERAL_ERROR)) {
 			showUploadError(messageStr);
 			return;
 		}		
@@ -154,9 +153,14 @@ public class FileFormHandler implements FormHandler {
 
 	private String getFileNameWithoutPath(String fn) {
 		int idxSlash = fn.lastIndexOf('/');
-		if (fn.charAt(fn.length() - 1) == '/') {
-			return "/"; // error of course but prevents an exception to be
-			// thrown.
+		int n = fn.length();
+		if ( idxSlash < 0 ) {
+			idxSlash = fn.lastIndexOf('\\');
+		}		
+		char lastChar = fn.charAt(n- 1); 
+		if ( lastChar == '/' || lastChar == '\\' ) {
+			General.showError("Failed to getFileNameWithoutPath");
+			return fn;
 		}
 		return fn.substring(idxSlash + 1);
 	}

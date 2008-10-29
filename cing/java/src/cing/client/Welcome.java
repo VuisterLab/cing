@@ -5,6 +5,8 @@ package cing.client;
 //import com.allen_sauer.gwt.voices.client.handler.PlaybackCompleteEvent;
 //import com.allen_sauer.gwt.voices.client.handler.SoundHandler;
 //import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
+//import cing.server.General;
+
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
@@ -26,7 +28,7 @@ public class Welcome extends iCingView {
 	Button playButton = new Button();
 
 	public Welcome() {
-		setState(iCing.WELCOME_STATE);
+		setState(Keys.WELCOME_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 
@@ -54,7 +56,7 @@ public class Welcome extends iCingView {
 //		layout.setWidget(5, 0, loadStateHTML);
 //		loadStateHTML.setVisible(false);
 		
-		final Hyperlink hyperlink = new Hyperlink(c.Start(), iCing.FILE_STATE);
+		final Hyperlink hyperlink = new Hyperlink(c.Start(), Keys.FILE_STATE);
 		layout.setWidget(2, 0, hyperlink);
 		hyperlink.setTitle("Begin with file upload.");
 		final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);

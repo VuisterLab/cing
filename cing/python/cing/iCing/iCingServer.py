@@ -26,8 +26,6 @@ from glob import glob
 import cgi
 import cing
 import os
-import time
-#from cing.Libs.disk import tail
 
 FORM_ACCESS_KEY = "AccessKey"
 FORM_USER_ID = "UserId"
@@ -43,6 +41,8 @@ FORM_DO_PROCHECK = "doProcheck"
 FORM_DO_IMAGES = "doImages"
 
 # server response codes.
+RESPONSE_ACTION = 'action'
+RESPONSE_ACTION_UNKNOWN = 'unknown'
 RESPONSE_STATUS = "status" # follows a clien request FORM_ACTION_STATUS 
 RESPONSE_STATUS_DONE = "done"
 RESPONSE_STATUS_NOT_DONE = "notDone"
@@ -51,7 +51,8 @@ RESPONSE_STATUS_ERROR = "error"
 RESPONSE_STATUS_MESSAGE = "message"
 RESPONSE_TAIL_PROGRESS = "tailProgress"
 RESPONSE_PROJECT_NAME = "projectName"
-RESPONSE_NONE = "None"
+RESPONSE_PROJECT_NAME_NONE = "None"
+RESPONSE_TAIL_VALUE_NONE = "None"
 
 FORM_LIST_REQUIRED = [ FORM_ACCESS_KEY, FORM_USER_ID, FORM_ACTION ]
 
@@ -82,10 +83,25 @@ DONE_FILE = "DONE"
 LAST_LOG_SEND_FILE = "LAST_LOG_SEND" 
 CING_RUN_LOG_FILE = "cingRun.log"
 
-
+UNKNOWN_USER_ID = "Unknown user id"
+UNKNOWN_ACCESS_KEY = "Unknown access key"
+UNKNOWN_PATH_PROJECT = "Unknown path project"
  
 class iCingServerHandler(BaseHTTPRequestHandler):
-    def sendJSON(self, kwds={} ):        
+    
+    """According to doc; the super class will be instantiated for each request again.
+    That means it's safe to use instance variables specific to only one request
+    """
+    def __init__(self):
+        BaseHTTPRequestHandler.__init__(self)
+        self.replyDict = {}    
+        self.user_id = UNKNOWN_USER_ID
+        self.access_key = UNKNOWN_ACCESS_KEY
+        self.form=None
+        self.formDict={}
+        self.pathProject = UNKNOWN_PATH_PROJECT        
+
+    def sendJSON(self ):        
 #        self.send_response(responseCode)   
 #        self.send_header('Content-type',    'text/plain')                 
 #        self.end_headers()
@@ -96,36 +112,30 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         """        
         
         
-#        body =  "{"
-#        keyList = kwds.keys()
-#        for key in keyList:
-#            keyStr = quoteForJson(key)
-#            valueStr = quoteForJson(kwds[key], isValue=True)
-#            body += "%s: %s," % ( keyStr, valueStr ) # extra comma is harmless.
-#        if len(keyList):
-#            body = body[:-1] # get rid of the extra comma anywho.
-#        body +=  "}"
-        body = json.write(kwds)
+        body = json.write(self.replyDict)
         
-        try: # gives a broken pipe but works fine otherwise.... TODO: figure out why 
-            self.send_response(RESPONSE_CODE_200_OK) # otherwise we can't send a body?
-            self.send_header('Content-Type', 'text/plain')
-            self.send_header('Content-Length', len(body))
-            self.send_header('Expires', '-1')
-            self.send_header('Cache-Control', 'no-cache')
-            self.send_header('Pragma', 'no-cache')
-            self.end_headers()
-            
-            self.wfile.write(body)
-            self.wfile.flush()
-            self.connection.shutdown(1)
-        except:
-            pass
+#        try: # gives a broken pipe but works fine otherwise.... TODO: figure out why 
+        self.send_response(RESPONSE_CODE_200_OK) # otherwise we can't send a body?
+        self.send_header('Content-Type', 'text/plain')
+        self.send_header('Content-Length', len(body))
+        self.send_header('Expires', '-1')
+        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Pragma', 'no-cache')
+        self.end_headers()
         
-    def do_POST(self):    
+        self.wfile.write(body)
+        self.wfile.flush()
+        self.connection.shutdown(1)
+#        except:
+#            pass
+        
+    def do_POST(self):
+        self.replyDict = {}    
+        self.replyDict[ RESPONSE_ACTION ] = RESPONSE_ACTION_UNKNOWN # yet            
         ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
         if ctype != 'multipart/form-data':
-            self.sendJSON({RESPONSE_STATUS_ERROR: 'Received data is not: multipart/form-data'})
+            self.replyDict[ RESPONSE_STATUS_ERROR ] = 'Received data is not: multipart/form-data'            
+            self.sendJSON(self.replyDict)
             return
         self.form=cgi.parse_multipart(self.rfile, pdict)
 
@@ -307,7 +317,7 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         "Message will be byte by byte and end up in a <PRE> block"
         NTdebug('Retrieving cing log tail.')
         kwd={}
-        lastLog = time.asctime() + " No new log to add.\n" 
+        lastLog = RESPONSE_TAIL_VALUE_NONE 
         if os.path.exists(CING_RUN_LOG_FILE):
             cingrunLogFileSize = os.path.getsize(CING_RUN_LOG_FILE)
             NTdebug("cingrunLogFileSize: %s" % cingrunLogFileSize)
@@ -353,13 +363,13 @@ class iCingServerHandler(BaseHTTPRequestHandler):
         projectFile = self._getProjectFile()
         if not projectFile:
             NTerror( "Failed to find project file" )
-            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_NONE})
+            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_PROJECT_NAME_NONE})
             return
             
         projectName = self._getProjectName(projectFile)
         if not projectName:
             NTerror( "Failed to find project name" )
-            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_NONE})
+            self.sendJSON({RESPONSE_PROJECT_NAME: RESPONSE_PROJECT_NAME_NONE})
             return
         self.sendJSON({RESPONSE_PROJECT_NAME: projectName})
         

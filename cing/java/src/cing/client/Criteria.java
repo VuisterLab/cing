@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class Criteria extends iCingView {
 
 	public Criteria() {
-		setState(iCing.CRITERIA_STATE);
+		setState(Keys.CRITERIA_STATE);
 		iCingConstants c = iCing.c;
 
 		final VerticalPanel verticalPanel = new VerticalPanel();
@@ -226,7 +226,7 @@ public class Criteria extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.OPTIONS_STATE);					
+				icing.onHistoryChanged(Keys.OPTIONS_STATE);					
 			}
 		});	
 		verticalPanel.add(nextButton);

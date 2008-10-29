@@ -1,5 +1,8 @@
 package cing.client;
 
+import java.util.Date;
+
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
@@ -43,7 +46,7 @@ public class CingLogView extends iCingView {
 	final Button stopStatusButton = new Button();
 
 	public CingLogView() {
-		setState(iCing.CING_LOG_STATE);
+		setState(Keys.CING_LOG_STATE);
 		// Create the text area and toolbar
 		// RichTextArea area = new RichTextArea();
 		// area.setText(
@@ -62,7 +65,7 @@ public class CingLogView extends iCingView {
 		// grid.setWidget(gridToolbarIdx, 0, toolbar);
 		verticalPanel.add(logLabel);
 		verticalPanel.add(area);
-		area.setSize(iCing.widthMenu, "25em");
+		area.setSize(iCing.widthMenuStr, "25em");
 		// grid.getCellFormatter().setVerticalAlignment(1, 0,
 		// HasVerticalAlignment.ALIGN_TOP);
 
@@ -77,7 +80,7 @@ public class CingLogView extends iCingView {
 			public void onClick(final Widget sender) {
 				String html = area.getHTML();
 				html = Utils.reverse(html);
-				if ( html == null ) {
+				if (html == null) {
 					General.showError("Failed to get reversed html");
 					return;
 				}
@@ -93,32 +96,29 @@ public class CingLogView extends iCingView {
 			}
 		});
 		clearButton.setText("Clear");
-//		area.setFocus(false);
-		String iniMsg = 
-			"<PRE>"+
-			"Expect to see CING log lines here; once CING is running.\n";
+		// area.setFocus(false);
+		String iniMsg = "<PRE>" + "Expect to see CING log lines here; once CING is running.\n";
 		area.setHTML(iniMsg);
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.REPORT_STATE);
+				icing.onHistoryChanged(Keys.REPORT_STATE);
 			}
 		});
-//		nextButton.setEnabled(false); // will be enabled automatically.
+		// nextButton.setEnabled(false); // will be enabled automatically.
 
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		horizontalPanel.setSpacing(iCing.margin);
-		
+
 		verticalPanel.add(horizontalPanel);
 		horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		horizontalPanel.add(clearButton);		
+		horizontalPanel.add(clearButton);
 		clearButton.setTitle("Clears the log window.");
-		horizontalPanel.add(tailCheckBox );		
+		horizontalPanel.add(tailCheckBox);
 		tailCheckBox.setTitle("Reverse the order of lines in the log.");
-//		horizontalPanel.add(nextButton);
+		// horizontalPanel.add(nextButton);
 		nextButton.setTitle("Goto CING report.");
 
-		
 		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
 		horizontalPanelBackNext.setSpacing(iCing.margin);
 		verticalPanel.add(horizontalPanelBackNext);
@@ -132,7 +132,7 @@ public class CingLogView extends iCingView {
 		backButton.setText(c.Back());
 		horizontalPanelBackNext.add(backButton);
 		horizontalPanelBackNext.add(nextButton);
-		
+
 		// For debugging logger.
 		startLogButton.setText("start log");
 		startLogButton.addClickListener(new ClickListener() {
@@ -169,20 +169,19 @@ public class CingLogView extends iCingView {
 		stopStatusButton.setVisible(false);
 		startLogButton.setVisible(false);
 		stopLogButton.setVisible(false);
-		
-		
+
 		cingQueryLogTail = new iCingQuery();
-		cingQueryLogTail.action.setValue(iCing.RUN_SERVER_ACTION_LOG);
+		cingQueryLogTail.action.setValue(Keys.RUN_SERVER_ACTION_LOG);
 		cingQueryLogTail.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryLogTail.formPanel);
 
 		cingQueryStatus = new iCingQuery();
-		cingQueryStatus.action.setValue(iCing.RUN_SERVER_ACTION_STATUS);
+		cingQueryStatus.action.setValue(Keys.RUN_SERVER_ACTION_STATUS);
 		cingQueryStatus.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryStatus.formPanel);
 
 		cingQueryProjectName = new iCingQuery();
-		cingQueryProjectName.action.setValue(iCing.RUN_SERVER_ACTION_PROJECT_NAME);
+		cingQueryProjectName.action.setValue(Keys.RUN_SERVER_ACTION_PROJECT_NAME);
 		cingQueryProjectName.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryProjectName.formPanel);
 	}
@@ -209,23 +208,31 @@ public class CingLogView extends iCingView {
 		};
 		statusTimer = timer;
 		statusTimerScheduled = true;
-		statusTimer.scheduleRepeating(iCing.REFRESH_INTERVAL);
+		statusTimer.scheduleRepeating(iCing.REFRESH_INTERVAL_LOG);
 	}
 
-	/** Needs to be called by ServerFormHandler */
+	/** Needs to be called by ServerFormHandler.
+	 * 
+	 *  */
 	protected void setStatus(String statusStr) {
-		if ((statusStr != null) && statusStr.equals(iCing.RESPONSE_STATUS_DONE)) {
+		if ((statusStr != null) && statusStr.equals(Keys.RESPONSE_STATUS_DONE)) {
 			stopStatusChecker();
 			startLogRetrieval();
 			stopLogRetrieval();
 			nextButton.setEnabled(true); // or switch my self. or ...
 			icing.report.showResults();
-			icing.onHistoryChanged(iCing.REPORT_STATE);
+			icing.onHistoryChanged(Keys.REPORT_STATE);
 		}
-//		if ( value.equals(iCing.RESPONSE_STATUS_STARTED)) {
-//			return;
-//		}
-		
+		if (statusStr.equals(Keys.RESPONSE_GENERAL_ERROR)) {
+			General.showError("Failed to get status from server; assume it crashed; Stopping");
+			stopStatusChecker();
+			startLogRetrieval();
+			stopLogRetrieval();
+			nextButton.setEnabled(true);
+			icing.report.showCrash();
+			icing.onHistoryChanged(Keys.REPORT_STATE);
+		}
+
 		statusTimerBusy = false;
 	}
 
@@ -268,13 +275,17 @@ public class CingLogView extends iCingView {
 		};
 		logTimer = timer;
 		logTimerScheduled = true;
-		logTimer.scheduleRepeating(iCing.REFRESH_INTERVAL);
+		logTimer.scheduleRepeating(iCing.REFRESH_INTERVAL_LOG);
 	}
 
 	protected void setLogTail(String message) {
 		// General.showDebug("Now in setLogTail");
 		// appendLog("In iCing: Now in setLogTail");
-		if (message != null && message.length() > 0) {
+		if (message.equals(Keys.RESPONSE_TAIL_VALUE_NONE)) {
+			Date today = new Date();
+			String dateTime = DateTimeFormat.getShortDateTimeFormat().format(today);
+			General.showDebug(dateTime + " no new log to display");
+		} else if (message != null && message.length() > 0) {
 			appendLog(message);
 		}
 		logTimerBusy = false;
@@ -294,17 +305,17 @@ public class CingLogView extends iCingView {
 		String orgHTML = area.getHTML();
 		String orgText = "";
 		int n = orgHTML.length();
-		if ( n < 11 ) {
+		if (n < 11) {
 			General.showCodeBug("In appendLog. Expected at least the string: <PRE></PRE>	");
 		} else {
 			int x = n - 6; // </PRE>
-			orgText = orgHTML.substring(5,x);			
+			orgText = orgHTML.substring(5, x);
 		}
 		message = message.replace("DEBUG", "<font color=\"green\">DEBUG</font>");
 		message = message.replace("ERROR", "<font color=\"red\">ERROR</font>");
 		message = message.replace("WARNING", "<font color=\"orange\">WARNING</font>");
 		message = message.replace("Warning", "<font color=\"orange\">Warning</font>");
-		area.setHTML( "<PRE>"+orgText+message+"</PRE>");
+		area.setHTML("<PRE>" + orgText + message + "</PRE>");
 	}
 
 	protected void stopStatusChecker() {

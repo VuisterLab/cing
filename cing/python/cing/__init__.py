@@ -4,6 +4,7 @@ CING: Common Interface for NMR structure Generation
 (c) AW,JFD,GWV 2004-2008
 
 """
+import time
 import os
 import sys
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
@@ -16,6 +17,8 @@ header = """
 """ % (cingVersion)
 footer = """------------------------------------------------------------------------------------------------------
 """
+usage          = "usage: cing [options]       use -h or --help for listing"
+
 authorList = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
                 ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
                 ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
@@ -83,6 +86,8 @@ if not os.path.exists(cingDirTmp):
     if os.mkdir(cingDirTmp):
         print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)
         sys.exit(1)
+
+starttime = time.time()
 
 # Define some we are used to use from the toplevel Cing api
 # dont move these to the top as they become circular.

@@ -20,7 +20,7 @@ public class RunView extends iCingView {
 	iCingQuery cingQueryRun; 
 	
 	public RunView() {
-		setState(iCing.RUN_STATE);
+		setState(Keys.RUN_STATE);
 		initWidget(decPanel);
 		iCingConstants c = iCing.c;
 		final VerticalPanel verticalPanel = new VerticalPanel();
@@ -52,7 +52,7 @@ public class RunView extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.CING_LOG_STATE);					
+				icing.onHistoryChanged(Keys.CING_LOG_STATE);					
 			}
 		});	
 //		nextButton.setEnabled(false); //disable for testing it will be triggered by a run; or not...
@@ -75,7 +75,7 @@ public class RunView extends iCingView {
 //		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 //		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(); 
-		cingQueryRun.action.setValue(iCing.RUN_SERVER_ACTION_RUN);
+		cingQueryRun.action.setValue(Keys.RUN_SERVER_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);
 		
 	}	
@@ -94,6 +94,6 @@ public class RunView extends iCingView {
 		icing.cingLogView.startLogAndStatuscCheckers();
 		// Call it right away.
 		cingQueryRun.formPanel.submit();		
-		icing.onHistoryChanged(iCing.CING_LOG_STATE);							
+		icing.onHistoryChanged(Keys.CING_LOG_STATE);							
 	}			
 }

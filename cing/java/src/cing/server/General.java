@@ -17,7 +17,7 @@ public class General {
 	}
 
 	/**
-	 * 
+	 *  
 	 * @return true for error
 	 */
 	public static boolean chmod(File f, String mod) {

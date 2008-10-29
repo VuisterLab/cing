@@ -51,7 +51,7 @@ public class FileView extends iCingView {
 	iCingConstants c = iCing.c;
 
 	public FileView() {
-		setState(iCing.FILE_STATE);
+		setState(Keys.FILE_STATE);
 		
 		// Now create the user interface, wrapped in a
 		// vertical panel
@@ -114,7 +114,7 @@ public class FileView extends iCingView {
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				// loadOptionsView();
-				icing.onHistoryChanged(iCing.RUN_STATE);
+				icing.onHistoryChanged(Keys.RUN_STATE);
 			}
 		});
 		nextButton.setEnabled(false);
@@ -170,7 +170,7 @@ public class FileView extends iCingView {
 		labelFileUploadDone.setVisible(false);
 
 		final FileUpload fileUpload = new FileUpload();
-		fileUpload.setName(iCing.FORM_UPLOAD_FILE_BASE);
+		fileUpload.setName(Keys.FORM_UPLOAD_FILE_BASE);
 		Button submitButton = new Button(c.Upload());
 		submitButton.setVisible(false);
 		final FormPanel formPanel = new FormPanel();
@@ -183,7 +183,7 @@ public class FileView extends iCingView {
 		// moduleBaseUrlWithPort: http://localhost/iCing/
 		// Production:
 		// moduleBaseUrlWithPort: https://nmr.cmbi.ru.nl/iCing/
-		String actionUrl = moduleBaseUrl + iCing.FILE_UPLOAD_URL;
+		String actionUrl = moduleBaseUrl + Keys.FILE_UPLOAD_URL;
 		General.showDebug("actionUrl: [" + actionUrl + "]");
 		formPanel.setAction(actionUrl);
 		/**
@@ -204,9 +204,9 @@ public class FileView extends iCingView {
 
 		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
 		/** Invisible parameters to pass */
-		formWrapper.add(new Hidden(iCing.FORM_ACTION, iCing.RUN_SERVER_ACTION_SAVE));
-		formWrapper.add(new Hidden(iCing.FORM_ACCESS_KEY, iCing.currentAccessKey));
-		formWrapper.add(new Hidden(iCing.FORM_USER_ID, iCing.currentUserId));
+		formWrapper.add(new Hidden(Keys.FORM_ACTION, Keys.RUN_SERVER_ACTION_SAVE));
+		formWrapper.add(new Hidden(Keys.FORM_ACCESS_KEY, iCing.currentAccessKey));
+		formWrapper.add(new Hidden(Keys.FORM_USER_ID, iCing.currentUserId));
 		formWrapper.add(fileUploadHorizontalPanel);
 
 		
