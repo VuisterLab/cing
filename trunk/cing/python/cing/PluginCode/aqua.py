@@ -99,7 +99,11 @@ def export2aqua( project, tmp=None ):
                         if warningCountAngle == warningCountMax+1:
                             NTwarning("And so on")
                         elif warningCountAngle <= warningCountMax:
-                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.", dr.id, dr.residue)
+                            strResidue ="Unknown"
+                            if hasattr(dr, 'residue'):
+                                strResidue = '%s' % dr.residue
+                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.", 
+                                      dr.id, strResidue)
                         warningCountAngle += 1
                         #return None
 

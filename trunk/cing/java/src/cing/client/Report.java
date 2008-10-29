@@ -21,7 +21,7 @@ public class Report extends iCingView {
 	// final Timer refreshShowResultsTimer;
 
 	public Report() {
-		setState(iCing.REPORT_STATE);
+		setState(Keys.REPORT_STATE);
 
 		iCingConstants c = iCing.c;
 
@@ -67,7 +67,7 @@ public class Report extends iCingView {
 	public String getRunUrl() {
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
 		// iCing part should be replaced by tmp/cing
-		moduleBaseUrlWithPort = moduleBaseUrlWithPort.replace("iCing", iCing.RESULT_URL);
+		moduleBaseUrlWithPort = moduleBaseUrlWithPort.replace("iCing", Keys.RESULT_URL);
 		String runUrl = moduleBaseUrlWithPort + "/" + iCing.currentUserId + "/" + iCing.currentAccessKey + "/";
 		General.showDebug("runUrl: [" + runUrl + "] doesn't look well under local gwt hosted mode.");
 		return runUrl;
@@ -95,27 +95,10 @@ public class Report extends iCingView {
 	// }
 
 	public void showResults() {
-		showTemporaryResults();
 		String runUrl = getRunUrl();
-		// String urlToReport = getProjectUrl();
-		// if ( urlToReport == null ) {
-		// General.showDebug(
-		// "Failed to getProjectUrl; sleeping 2 seconds; as problem is timing related..."
-		// );
-		// refreshShowResultsTimer.schedule(2000);
-		// return;
-		// // Don't bother stopping process because only done once and then
-		// again...?
-		// }
-
-		// if (urlToReport == null) {
-		// General.showError(
-		// "Failed to getProjectUrl; not changing the report url.");
-		// urlToReport = iCing.NOT_AVAILABLE;
-		// }
 		if (runUrl == null) {
 			General.showError("Failed to getRunUrl; not changing the report url.");
-			runUrl = iCing.NOT_AVAILABLE;
+			runUrl = Keys.NOT_AVAILABLE;
 		}
 		@SuppressWarnings("unused")
 		final String linkToZipFile = "<P>Results can be download from this <A HREF=\"" + runUrl + "/"
@@ -136,6 +119,18 @@ public class Report extends iCingView {
 				+ " or switch to View->Log CING.\n"
 				+ "<P>After a while it might be nice to check here anyway as iCing might have timed out checking\n"
 				+ " but CING might be finished anywho.</P>\n" + pleaseWriteDown;
+		reportHTML.setHTML(htmlTextEnabled);
+	}
+
+	public void showCrash() {
+		String runUrl = getRunUrl();
+		if (runUrl == null) {
+			General.showError("Failed to getRunUrl; not changing the report url.");
+			runUrl = Keys.NOT_AVAILABLE;
+		}
+		String htmlTextEnabled = "CING might have crashed as the server status could not be retrieved."+
+		"It might also still be running. Please check the results sofar <A HREF=\"" + runUrl + "/"
+				+ icing.projectName + ".cing" + "\">here</a>.\n" + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 }

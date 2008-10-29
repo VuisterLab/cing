@@ -1,5 +1,6 @@
 package cing.client;
 
+
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -43,7 +44,7 @@ public class Login extends iCingView {
 
 		button.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
-				History.newItem(iCing.WELCOME_STATE);
+				History.newItem(Keys.WELCOME_STATE);
 			}
 		});
 

@@ -74,6 +74,9 @@ from cing.core.parameters import plugins
 from cing.iCing.iCingServer import PORT_SERVER
 from cing.iCing.iCingServer import iCingServerHandler
 from string import join
+from cing import starttime
+from cing import usage
+import time
 import cing
 import os
 import sys
@@ -94,6 +97,34 @@ def format( object ):
     #end if
 #end def
 
+"""Copy catted from xplor
+"""
+def getStartMessage():
+#    user = "jd"           
+#    on   = "Stella.loc(darwin/x86    )"
+#    at   = "29-Oct-08 15:36:22"
+    user = os.getenv("USER", "Unknown user")
+    machine = os.getenv("HOST", "Unknown host")
+    ostype = os.getenv("OSTYPE", "Unknown os")
+    on = "%s (%s)" % ( machine, ostype )
+    at = time.asctime()
+    return "User: %-15s on: %-45s at: %s" % ( user, on, at )
+    
+"""From Wattos
+"""
+def getStopMessage():
+#    Wattos started at: October 29, 2008 4:04:44 PM CET
+#    Wattos stopped at: October 29, 2008 4:04:49 PM CET
+#    Wattos took (#ms): 4915
+    at = time.asctime( time.localtime(starttime) )
+    now = time.asctime()
+
+#    memory TODO print "in use and allocated"
+    msg =  "CING started at : %s\n" % at
+    msg += "CING stopped at : %s\n" % now
+    msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
+    return msg
+    
 def verbosity( value ):
     """Set CING verbosity
     """
@@ -223,16 +254,7 @@ def serve():
 #    except:
 #        pass
 
-
-project = None # after running main it will be filled.
-
-def main():
-
-    global project
-
-    _root,file,_ext  = NTpath( __file__ )
-    usage          = "usage: cing [options]       use -h or --help for listing"
-
+def getParser():
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
@@ -372,25 +394,32 @@ def main():
                       dest="server",
                       help="Start a server at ports 8000 and 8001 by default"
                      )
+    return parser
+project = None # after running main it will be filled.
 
+def main():
+
+    global project
+
+    _root,file,_ext  = NTpath( __file__ )
+
+    parser = getParser()
     (options, _args) = parser.parse_args()
 
     if options.verbosity >= 0 and options.verbosity <= 9:
-#        print "In main, setting verbosity to:", options.verbosity
         cing.verbosity = options.verbosity
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
     # From this point on code may be executed that will go through the appropriate verbosity filtering
     NTmessage(header)
+    NTmessage(getStartMessage())
 
     NTdebug('options: %s', options)
     NTdebug('args: %s', _args)
 
     # The weird location of this import is because we want it to be verbose.
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
-
-#    root,file,ext  = NTpath( __file__ )
 
     if options.test:
         testOverall()
@@ -613,6 +642,10 @@ def main():
     if project:
         project.close(save=not options.nosave)
     #------------------------------------------------------------------------------------
-
+    
+        
 if __name__ == '__main__':
-    main() # Just to get a name
+    try:
+        main()
+    finally:
+        NTmessage(getStopMessage())

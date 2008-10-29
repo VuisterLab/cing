@@ -18,13 +18,13 @@ public class ServerFormHandler implements FormHandler {
 	private CingLogView cingLogView = null;
 
 	static {		
-		validResponseKeys.add(iCing.RESPONSE_STATUS);
-		validResponseKeys.add(iCing.RESPONSE_TAIL_PROGRESS);
-		validResponseKeys.add(iCing.RESPONSE_STATUS_PROJECT_NAME);
+		validResponseKeys.add(Keys.RESPONSE_STATUS);
+		validResponseKeys.add(Keys.RESPONSE_TAIL_PROGRESS);
+		validResponseKeys.add(Keys.RESPONSE_STATUS_PROJECT_NAME);
 		
-		validResponseStatusValues.add( iCing.RESPONSE_STATUS_DONE );
-		validResponseStatusValues.add( iCing.RESPONSE_STATUS_NOT_DONE );
-		validResponseStatusValues.add( iCing.RESPONSE_STATUS_STARTED );
+		validResponseStatusValues.add( Keys.RESPONSE_STATUS_DONE );
+		validResponseStatusValues.add( Keys.RESPONSE_STATUS_NOT_DONE );
+		validResponseStatusValues.add( Keys.RESPONSE_GENERAL_ERROR );
 	}
 		
 	// When the submit starts, make sure the user selected a file to upload
@@ -35,6 +35,11 @@ public class ServerFormHandler implements FormHandler {
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
 		
+		if ( cingLogView == null ) {
+			General.showCodeBug("Found null for cingLogView.");
+			return;
+		}
+		
 		String response = event.getResults();
 		if (response == null) {
 			General.showError("Failed to get any response from server.");
@@ -42,7 +47,6 @@ public class ServerFormHandler implements FormHandler {
 		}
 		General.showDebug("response is: [" + response + "]");
 		String jsonResult = FileFormHandler.removePreTags(response);
-		// String status = iCing.JSON_ERROR_STATUS; // reset below.
 		// JSONObject, JSONValue, and JSONString are all part of the GWT's JSON
 		// parsing package
 		JSONValue jsv;
@@ -75,32 +79,33 @@ public class ServerFormHandler implements FormHandler {
 		General.showDebug("Received key, value: [" + key + "], [" + value + "]");
 //		General.showError("Not a real error.");
 //		General.showCodeBug("Not a real error either.");
-		if ( ! validResponseKeys.contains(key) ) {
+		if ( ! validResponseKeys.contains(key) ) {			
 			General.showError("Found invalid response key: [" + key + "]");
 			return;
 		}
-		if ( key.equals(iCing.RESPONSE_STATUS)) {
+		if ( key.equals(Keys.RESPONSE_GENERAL_ERROR)) {
+			General.showDebug("will do next; cingLogView.setStatus(value)");			
+			cingLogView.setStatus(value);
+			return;
+		}
+
+		if ( key.equals(Keys.RESPONSE_STATUS)) {
 			if ( ! validResponseStatusValues.contains(value) ) {
 				General.showError("Found invalid response value: [" + value + "]");
 				return;
 			}
-			if ( cingLogView == null ) {
-				General.showError("Found null for cingLogView.");
-				return;
-			}
-			General.showDebug("will do next; cingLogView.setStatus(value)");
-			
+			General.showDebug("will do next; cingLogView.setStatus(value)");			
 			cingLogView.setStatus(value);
 			return;
 		}
-		if ( key.equals(iCing.RESPONSE_TAIL_PROGRESS)) {
+		if ( key.equals(Keys.RESPONSE_TAIL_PROGRESS)) {
 			General.showDebug("will do next; cingLogView.setLogTail(value);");
 			cingLogView.setLogTail(value);
 			return;
 		}
-		if ( key.equals(iCing.RESPONSE_STATUS_PROJECT_NAME)) {
+		if ( key.equals(Keys.RESPONSE_STATUS_PROJECT_NAME)) {
 			General.showDebug("will do next; cingLogView.setProjectName(value);");
-			if ((value == null) || value.equals(iCing.RESPONSE_STATUS_NONE)) {
+			if ((value == null) || value.equals(Keys.RESPONSE_STATUS_NONE)) {
 				General.showError("Found invalid response value: [" + value + "]");
 				return;
 			}

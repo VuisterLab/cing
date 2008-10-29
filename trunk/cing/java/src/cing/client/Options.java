@@ -36,7 +36,7 @@ public class Options extends iCingView {
 	int cingVerbosity;
     
 	public Options() {
-		setState(iCing.OPTIONS_STATE);
+		setState(Keys.OPTIONS_STATE);
 		
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
@@ -136,7 +136,7 @@ public class Options extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.RUN_STATE);					
+				icing.onHistoryChanged(Keys.RUN_STATE);					
 			}
 		});	
 		verticalPanelTop.add(nextButton);

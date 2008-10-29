@@ -13,7 +13,7 @@ public class Status extends iCingView {
 
 		statusArea.setHTML("Status bar with last line from log; see View->Log iCing");
 		statusArea.setHeight("10em");
-		statusArea.setWidth(iCing.widthMenu);
-		statusArea.setWidth(iCing.widthMenu);
+		statusArea.setWidth(iCing.widthMenuStr);
+		statusArea.setWidth(iCing.widthMenuStr);
 	}
 }

@@ -1,0 +1,16 @@
+======================================================================================================
+| CING: Common Interface for NMR structure Generation version 0.82              AW,JFD,GWV 2004-2008 |
+======================================================================================================
+ User: jd           on: surfer-30-0-10.surfnet.iacbox (darwin) at: Wed Oct 29 16:16:42 2008
+
+
+DEBUG: json is [{message: '734.64 kb'}]
+ERROR: Failed to get any project file
+localhost-mini - - [29/Oct/2008 12:52:54] "POST / HTTP/1.1" 200 -
+localhost-mini - - [29/Oct/2008 12:52:54] "POST / HTTP/1.1" 200 -
+ERROR: Failed to get any project file
+ERROR: Failed to find project file
+localhost-mini - - [29/Oct/2008 12:52:54] "POST / HTTP/1.1" 200 -
+
+
+

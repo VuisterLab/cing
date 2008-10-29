@@ -16,9 +16,17 @@
 			<format property="cing_version" pattern="yyyyMMdd-HHmm" />
 		</tstamp>
 		<echo message="Initiating cing version: ${cing_version}" />
+		
 		<mkdir dir="${build.classes.dir}" />
 	</target>
 
+    <target name="set_version" depends="init">
+    	  <replaceregexp file="java/src/cing/client/iCing.java"
+    	                         match="String VERSION = (.*)" 
+    	                         replace='String VERSION ="${cing_version}";'
+    	                         byline="true"/>       
+    </target>
+	
 	<target name="home-web-install" depends="init">
 		<echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
 		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
