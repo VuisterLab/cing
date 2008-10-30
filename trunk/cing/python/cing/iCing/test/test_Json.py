@@ -1,3 +1,4 @@
+from unittest import TestCase
 from cing.iCing import json
 import unittest
 
@@ -31,7 +32,7 @@ import unittest
 def _removeWhitespace(str):
     return str.replace(" ", "")
 
-class JsonTest(unittest.TestCase):
+class JsonTest(TestCase):
     def testReadEmptyObject(self):
         obj = json.read("{}")
         self.assertEqual({}, obj)
@@ -365,8 +366,6 @@ class JsonTest(unittest.TestCase):
         s = json.write({ "name" : "Patrick \n me\n" })
         self.assertEqual('{"name":"Patrick \\n me\\n"}', s )
 
-def main():
-    unittest.main()
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

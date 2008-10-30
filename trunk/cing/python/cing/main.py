@@ -200,6 +200,7 @@ def testOverall():
                           ]
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/iCing/test/test_Json.py']
     NTerror('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
@@ -210,11 +211,12 @@ def testOverall():
     # to: cing.Libs.test.test_NTplot
     lenCingPythonDirStr = len(cingPythonDir)
     for name in nameList:
+#        print name
         tailPathStr = name[lenCingPythonDirStr+1:-3]
         mod_name = join(tailPathStr.split('/'), '.')
-#        if mod_name in excludedModuleList:
-#            print "Skipping module:  " + mod_name
-#            continue
+        if mod_name in excludedModuleList:
+            print "Skipping module:  " + mod_name
+            continue
         exec("import %s" % (mod_name)   )
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
         testVerbosity = 2
