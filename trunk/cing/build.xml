@@ -21,7 +21,7 @@
 	</target>
 
     <target name="set_version" depends="init">
-    	  <replaceregexp file="java/src/cing/client/iCing.java"
+    	  <replaceregexp file="java/src/cing/client/Keys.java"
     	                         match="String VERSION = (.*)" 
     	                         replace='String VERSION ="${cing_version}";'
     	                         byline="true"/>       

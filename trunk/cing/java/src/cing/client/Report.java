@@ -15,13 +15,13 @@ public class Report extends iCingView {
 	final HTML reportHTML = new HTML();
 
 	final String pleaseWriteDown = "<P>Please copy down the url for future reference.</P>"
-			+ "<P>Also, open the link in another window or tab.\n"
+			+ "<P>Also, open the link in another window or tab."+General.eol
 			+ "This, because when you would go back here, your iCing environment is reinitialized and your previous work is lost.";
 
 	// final Timer refreshShowResultsTimer;
 
 	public Report() {
-		setState(Keys.REPORT_STATE);
+		setState(iCing.REPORT_STATE);
 
 		iCingConstants c = iCing.c;
 
@@ -102,9 +102,9 @@ public class Report extends iCingView {
 		}
 		@SuppressWarnings("unused")
 		final String linkToZipFile = "<P>Results can be download from this <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".zip" + "\">zip</a>.</P>\n";
+				+ icing.projectName + ".zip" + "\">zip</a>.</P>"+General.eol;
 		String htmlTextEnabled = "CING has finished running. Please find the results <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\">here</a>.\n" + pleaseWriteDown;
+				+ icing.projectName + ".cing" + "\">here</a>."+General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
@@ -114,11 +114,11 @@ public class Report extends iCingView {
 			General.showError("Failed to getRunUrl; not changing the report url.");
 			return;
 		}
-		String htmlTextEnabled = "<P>CING has not finished running.</P>\n" + "<P>A <A HREF=\"" + runUrl
+		String htmlTextEnabled = "<P>CING has not finished running.</P>"+General.eol + "<P>A <A HREF=\"" + runUrl
 				+ "\">directory</a> in which results are being created may be consulted in the meanwhile"
-				+ " or switch to View->Log CING.\n"
-				+ "<P>After a while it might be nice to check here anyway as iCing might have timed out checking\n"
-				+ " but CING might be finished anywho.</P>\n" + pleaseWriteDown;
+				+ " or switch to View->Log CING."+General.eol
+				+ "<P>After a while it might be nice to check here anyway as iCing might have timed out checking"+General.eol
+				+ " but CING might be finished anywho.</P>"+General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
@@ -128,9 +128,19 @@ public class Report extends iCingView {
 			General.showError("Failed to getRunUrl; not changing the report url.");
 			runUrl = Keys.NOT_AVAILABLE;
 		}
-		String htmlTextEnabled = "CING might have crashed as the server status could not be retrieved."+
-		"It might also still be running. Please check the results sofar <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\">here</a>.\n" + pleaseWriteDown;
+		String htmlTextEnabled = "CING might have crashed as the server status could not be retrieved."
+				+ "It might also still be running. Please check the results sofar <A HREF=\"" + runUrl + "/"
+				+ icing.projectName + ".cing" + "\">here</a>."+General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
+	}
+
+	public void setProjectName(String projectName) {
+		General.showDebug("Now in Report.setProjectName");
+		if (projectName == null) {
+			General.showError("Error in Report.setProjectName; got a null for project name.");
+			return;
+		}
+		icing.projectName = projectName;
+		showTemporaryResults();		
 	}
 }

@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,7 +24,6 @@ public class Options extends iCingView {
 	
 	iCingConstants c = iCing.c;
 	DecoratorPanel decPanel = new DecoratorPanel();
-    final static RichTextArea statusArea = iCing.statusArea;
 
 	int i = 0;
 	final int optionVerbosityIdx = i++;
@@ -36,7 +34,7 @@ public class Options extends iCingView {
 	int cingVerbosity;
     
 	public Options() {
-		setState(Keys.OPTIONS_STATE);
+		setState(iCing.OPTIONS_STATE);
 		
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
@@ -73,7 +71,7 @@ public class Options extends iCingView {
 			}
 		});
 		listBoxVerbosity.setSelectedIndex(General.verbosityOutput);
-		cingVerbosity = General.map2CingVerbosity( General.getVerbosity() );
+		cingVerbosity = General.map2CingVerbosity( General.verbosity );
 		
 		final CheckBox createImageryCheckBox = new CheckBox();
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
@@ -136,7 +134,7 @@ public class Options extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(Keys.RUN_STATE);					
+				icing.onHistoryChanged(iCing.RUN_STATE);					
 			}
 		});	
 		verticalPanelTop.add(nextButton);

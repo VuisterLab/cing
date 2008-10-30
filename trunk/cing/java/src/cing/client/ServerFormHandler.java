@@ -18,13 +18,13 @@ public class ServerFormHandler implements FormHandler {
 	private CingLogView cingLogView = null;
 
 	static {		
-		validResponseKeys.add(Keys.RESPONSE_STATUS);
-		validResponseKeys.add(Keys.RESPONSE_TAIL_PROGRESS);
-		validResponseKeys.add(Keys.RESPONSE_STATUS_PROJECT_NAME);
+		validResponseKeys.add(Keys.FORM_ACTION_READINESS);
+		validResponseKeys.add(Keys.FORM_ACTION_LOG);
+		validResponseKeys.add(Keys.FORM_ACTION_PROJECT_NAME);
 		
 		validResponseStatusValues.add( Keys.RESPONSE_STATUS_DONE );
 		validResponseStatusValues.add( Keys.RESPONSE_STATUS_NOT_DONE );
-		validResponseStatusValues.add( Keys.RESPONSE_GENERAL_ERROR );
+		validResponseStatusValues.add( Keys.RESPONSE_EXIT_CODE_ERROR );
 	}
 		
 	// When the submit starts, make sure the user selected a file to upload
@@ -54,7 +54,8 @@ public class ServerFormHandler implements FormHandler {
 			jsv = JSONParser.parse(jsonResult);
 		} catch (Exception e) {
 			e.printStackTrace();
-			General.showError("Failed to parse json result from server for json: [" + jsonResult + "]");
+			String msg = "Failed to parse json result from server for json: [" + jsonResult + "]";
+			General.showError(msg);
 			return;
 		}
 		JSONObject jso = jsv.isObject();
@@ -83,13 +84,13 @@ public class ServerFormHandler implements FormHandler {
 			General.showError("Found invalid response key: [" + key + "]");
 			return;
 		}
-		if ( key.equals(Keys.RESPONSE_GENERAL_ERROR)) {
+		if ( key.equals(Keys.RESPONSE_EXIT_CODE_ERROR)) {
 			General.showDebug("will do next; cingLogView.setStatus(value)");			
 			cingLogView.setStatus(value);
 			return;
 		}
 
-		if ( key.equals(Keys.RESPONSE_STATUS)) {
+		if ( key.equals(Keys.FORM_ACTION_READINESS)) {
 			if ( ! validResponseStatusValues.contains(value) ) {
 				General.showError("Found invalid response value: [" + value + "]");
 				return;
@@ -98,12 +99,12 @@ public class ServerFormHandler implements FormHandler {
 			cingLogView.setStatus(value);
 			return;
 		}
-		if ( key.equals(Keys.RESPONSE_TAIL_PROGRESS)) {
+		if ( key.equals(Keys.FORM_ACTION_LOG)) {
 			General.showDebug("will do next; cingLogView.setLogTail(value);");
 			cingLogView.setLogTail(value);
 			return;
 		}
-		if ( key.equals(Keys.RESPONSE_STATUS_PROJECT_NAME)) {
+		if ( key.equals(Keys.FORM_ACTION_PROJECT_NAME)) {
 			General.showDebug("will do next; cingLogView.setProjectName(value);");
 			if ((value == null) || value.equals(Keys.RESPONSE_STATUS_NONE)) {
 				General.showError("Found invalid response value: [" + value + "]");

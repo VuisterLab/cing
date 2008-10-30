@@ -51,7 +51,7 @@ public class FileView extends iCingView {
 	iCingConstants c = iCing.c;
 
 	public FileView() {
-		setState(Keys.FILE_STATE);
+		setState(iCing.FILE_STATE);
 		
 		// Now create the user interface, wrapped in a
 		// vertical panel
@@ -114,7 +114,7 @@ public class FileView extends iCingView {
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				// loadOptionsView();
-				icing.onHistoryChanged(Keys.RUN_STATE);
+				icing.onHistoryChanged(iCing.RUN_STATE);
 			}
 		});
 		nextButton.setEnabled(false);
@@ -150,15 +150,27 @@ public class FileView extends iCingView {
 		flexTable.setWidget(1, 1, addButton);
 		addButton.setTitle("Add another upload.");
 		addButton.setText("Upload another file");
+		addButton.setVisible(false);
 		// flexTable.getCellFormatter().setHorizontalAlignment(1, 1,
 		// HasHorizontalAlignment.ALIGN_LEFT);
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return true on error.
+	 */
 	public boolean addUploadRow() {
 		int currentRowIdx = flexTable.getRowCount() - 1;
+		if ( currentRowIdx > 1 ) {
+			General.showCodeBug("Not allowing more than one file now; one was already present.");
+			return true;
+		}
 		// General.showDebug("currentRowIdx" + currentRowIdx);
 		flexTable.insertRow(currentRowIdx); // push the Add button down.
+		/** Number the files in the table from 1 to n */
+		int currentFileNumber = flexTable.getRowCount() - 2;
+		General.showDebug("Added file number [1,n]: " + currentFileNumber);
 
 		final CheckBox checkBoxUseFile = new CheckBox();
 		flexTable.setWidget(currentRowIdx, checkBoxIdx, checkBoxUseFile);
@@ -170,7 +182,7 @@ public class FileView extends iCingView {
 		labelFileUploadDone.setVisible(false);
 
 		final FileUpload fileUpload = new FileUpload();
-		fileUpload.setName(Keys.FORM_UPLOAD_FILE_BASE);
+		fileUpload.setName(Keys.FORM_PARM_UPLOAD_FILE_BASE);
 		Button submitButton = new Button(c.Upload());
 		submitButton.setVisible(false);
 		final FormPanel formPanel = new FormPanel();
@@ -183,7 +195,7 @@ public class FileView extends iCingView {
 		// moduleBaseUrlWithPort: http://localhost/iCing/
 		// Production:
 		// moduleBaseUrlWithPort: https://nmr.cmbi.ru.nl/iCing/
-		String actionUrl = moduleBaseUrl + Keys.FILE_UPLOAD_URL;
+		String actionUrl = moduleBaseUrl + Keys.SERVLET_URL;
 		General.showDebug("actionUrl: [" + actionUrl + "]");
 		formPanel.setAction(actionUrl);
 		/**
@@ -204,9 +216,9 @@ public class FileView extends iCingView {
 
 		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
 		/** Invisible parameters to pass */
-		formWrapper.add(new Hidden(Keys.FORM_ACTION, Keys.RUN_SERVER_ACTION_SAVE));
-		formWrapper.add(new Hidden(Keys.FORM_ACCESS_KEY, iCing.currentAccessKey));
-		formWrapper.add(new Hidden(Keys.FORM_USER_ID, iCing.currentUserId));
+		formWrapper.add(new Hidden(Keys.FORM_PARM_ACTION, Keys.FORM_ACTION_SAVE));
+		formWrapper.add(new Hidden(Keys.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
+		formWrapper.add(new Hidden(Keys.FORM_PARM_USER_ID, iCing.currentUserId));
 		formWrapper.add(fileUploadHorizontalPanel);
 
 		
@@ -216,7 +228,7 @@ public class FileView extends iCingView {
 		ArrayList<String> programList = Classification.getProgramList();
 		if (programList == null) { // impossible but modeled for consistency
 			// with below boxes.
-			listBox_Program.addItem(Defs.STRING_NA);
+			listBox_Program.addItem(iCing.STRING_NA);
 		} else {
 			for (String item : programList) {
 				listBox_Program.addItem(item);
@@ -226,7 +238,8 @@ public class FileView extends iCingView {
 		if (listBox_Program.getItemCount() == 1) {
 			listBox_Program.setEnabled(false);
 		}
-
+		listBox_Program.setFocus(true);
+		
 		final ListBox listBox_Type = new ListBox();
 		flexTable.setWidget(currentRowIdx, typeIdx, listBox_Type);
 		listBox_Type.setVisibleItemCount(1);
@@ -234,7 +247,7 @@ public class FileView extends iCingView {
 		ArrayList<String> typeList = Classification.getTypeList(program);
 		if (typeList == null) { // impossible but modeled for consistency with
 			// below boxes.
-			listBox_Type.addItem(Defs.STRING_NA);
+			listBox_Type.addItem(iCing.STRING_NA);
 		} else {
 			for (String item : typeList) {
 				listBox_Type.addItem(item);
@@ -251,11 +264,11 @@ public class FileView extends iCingView {
 		String type = listBox_Type.getValue(listBox_Type.getSelectedIndex());
 		ArrayList<String> subTypeList = Classification.getSubTypeList(program, type);
 		if (subTypeList == null || subTypeList.size() == 0) {
-			listBox_Subtype.addItem(Defs.STRING_NA);
+			listBox_Subtype.addItem(iCing.STRING_NA);
 		} else {
 			for (String item : subTypeList) {
 				if (item == null) {
-					item = Defs.STRING_NA;
+					item = iCing.STRING_NA;
 				}
 				listBox_Subtype.addItem(item);
 			}
@@ -272,11 +285,11 @@ public class FileView extends iCingView {
 		String subType = listBox_Subtype.getValue(listBox_Subtype.getSelectedIndex());
 		ArrayList<String> otherList = Classification.getOtherList(program, type, subType);
 		if (otherList == null || otherList.size() == 0) {
-			listBox_Other.addItem(Defs.STRING_NA);
+			listBox_Other.addItem(iCing.STRING_NA);
 		} else {
 			for (String item : otherList) {
 				if (item == null) {
-					item = Defs.STRING_NA;
+					item = iCing.STRING_NA;
 				}
 				listBox_Other.addItem(item);
 			}

@@ -45,5 +45,5 @@
 	-->
     <!-- Specify the servlet that handles file uploads. 	    
 	<servlet path="/servlets/fileupload" class="cing.server.FileUploadServlet" /> -->	
-	<servlet path="/serv/fileupload" class="cing.server.FileUploadServlet" />	
+	<servlet path="/serv/iCingServlet" class="cing.server.iCingServlet" />	
 </module>

@@ -7,17 +7,17 @@ public class Classification {
 	 * don't know if GWT supports them on the client side.
 	 */
 	static final String[][] classi = new String[][] { 
-//		{ "CING", "project", Defs.STRING_NA, Defs.STRING_NA },
-		{ "CCPN", "project", Defs.STRING_NA, Defs.STRING_NA },
-//		{ "CCPN", "bogus", "blabla", Defs.STRING_NA },
+		{ "CCPN", "project", iCing.STRING_NA, iCing.STRING_NA },
+//		{ "CING", "project", iCing.STRING_NA, iCing.STRING_NA },
+//		{ "CCPN", "bogus", "blabla", iCing.STRING_NA },
 //		{ "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
 //		{ "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
 //		{ "DYANA/DIANA", "distance", "NOE", "upper" },
 //		{ "DYANA/DIANA", "distance", "NOE", "lower" },
-//		{ "DYANA/DIANA", "dihedral angle", Defs.STRING_NA, Defs.STRING_NA },
-//		{ "XPLOR/CNS", "distance", "hydrogen bond", Defs.STRING_NA },
-//		{ "XPLOR/CNS", "distance", "NOE", Defs.STRING_NA },
-//		{ "PDB", "coordinate", Defs.STRING_NA, Defs.STRING_NA },
+//		{ "DYANA/DIANA", "dihedral angle", iCing.STRING_NA, iCing.STRING_NA },
+//		{ "XPLOR/CNS", "distance", "hydrogen bond", iCing.STRING_NA },
+//		{ "XPLOR/CNS", "distance", "NOE", iCing.STRING_NA },
+//		{ "PDB", "coordinate", iCing.STRING_NA, iCing.STRING_NA },
 	};
 
 	public static ArrayList<String> getProgramList() {

@@ -1,13 +1,10 @@
 package cing.client;
 
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -15,14 +12,13 @@ public class Preferences extends iCingView {
 
 	DecoratorPanel decPanel = new DecoratorPanel();
 	iCingConstants c = iCing.c;	
-    final static RichTextArea statusArea = iCing.statusArea;
 
 	int i = 0;
 	final int optionVerbosityIdx = i++;
 	final int optionSoundIdx = i++;
     
 	public Preferences() {
-		setState(Keys.PREFERENCES_STATE);
+		setState(iCing.PREFERENCES_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 
@@ -50,28 +46,17 @@ public class Preferences extends iCingView {
 		listBox.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget sender) {
 				General.setVerbosity(Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() )));
-				General.showOutput("verbosity now: " + General.getVerbosity() );				
-				boolean doDebugNow = General.getVerbosity() == General.verbosityDebug;
+				General.showOutput("verbosity now: " + General.verbosity );				
+				boolean doDebugNow = General.verbosity == General.verbosityDebug;
 				icing.setVerbosityToDebug(doDebugNow);
 				General.showOutput("visibilityStatusArea: " + doDebugNow );
 			}
 		});
-		listBox.setSelectedIndex(General.getVerbosity());
+		listBox.setSelectedIndex(General.verbosity);
 		flexTable.setWidget(optionVerbosityIdx, 1, listBox);
 		
 		
 		final Label verbosityLabel = new Label(c.Verbosity());
 		flexTable.setWidget(optionVerbosityIdx, 0, verbosityLabel);
-
-		final CheckBox soundCheckBox = new CheckBox();
-		flexTable.setWidget(optionSoundIdx, 0, soundCheckBox);
-		soundCheckBox.addClickListener(new ClickListener() {
-			public void onClick(final Widget sender) {
-				iCing.soundOn = soundCheckBox.isChecked();
-			}
-		});
-		soundCheckBox.setChecked(true);
-		soundCheckBox.setText(c.Sound());
-		soundCheckBox.setVisible(false);
 	}
 }

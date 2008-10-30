@@ -20,7 +20,7 @@ public class RunView extends iCingView {
 	iCingQuery cingQueryRun; 
 	
 	public RunView() {
-		setState(Keys.RUN_STATE);
+		setState(iCing.RUN_STATE);
 		initWidget(decPanel);
 		iCingConstants c = iCing.c;
 		final VerticalPanel verticalPanel = new VerticalPanel();
@@ -37,7 +37,7 @@ public class RunView extends iCingView {
 		runButton.setText(c.Submit());
 		runButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				runButton.setText("Running...");
+//				runButton.setText("Running...");
 				run();
 			}
 		});
@@ -52,7 +52,7 @@ public class RunView extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(Keys.CING_LOG_STATE);					
+				icing.onHistoryChanged(iCing.CING_LOG_STATE);					
 			}
 		});	
 //		nextButton.setEnabled(false); //disable for testing it will be triggered by a run; or not...
@@ -75,25 +75,16 @@ public class RunView extends iCingView {
 //		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 //		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(); 
-		cingQueryRun.action.setValue(Keys.RUN_SERVER_ACTION_RUN);
+		cingQueryRun.action.setValue(Keys.FORM_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);
 		
 	}	
 	
 	protected void run() {		
-
-		// Fire this one off first.
-		icing.cingLogView.getProjectName();		
-
 		runButton.setEnabled(false);
-		
-		icing.report.showTemporaryResults();
-		nextButton.setEnabled(true); // or switch my self. or enable after run submitted.
-		/** Needs to be called by ServerFormHandler */
-//		icing.cingLogView.getProjectName();		
-		icing.cingLogView.startLogAndStatuscCheckers();
-		// Call it right away.
+		nextButton.setEnabled(true); 
+		icing.cingLogView.getProjectName();		
 		cingQueryRun.formPanel.submit();		
-		icing.onHistoryChanged(Keys.CING_LOG_STATE);							
+		icing.onHistoryChanged(iCing.CING_LOG_STATE);							
 	}			
 }

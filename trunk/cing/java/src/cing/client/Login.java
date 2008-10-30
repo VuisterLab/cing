@@ -44,7 +44,7 @@ public class Login extends iCingView {
 
 		button.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
-				History.newItem(Keys.WELCOME_STATE);
+				History.newItem(iCing.WELCOME_STATE);
 			}
 		});
 
