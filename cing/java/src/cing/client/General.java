@@ -15,47 +15,17 @@ import java.util.Collections;
 import java.util.Date;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.ui.RichTextArea;
 
 /**
- * Static settings and methods for output stream handling, memory reporting,
- * etc. The show... methods should always end with a non-empty line and one that
- * indicates the error, debug, warning or regular status.
+ * Static settings and methods for output stream handling, memory reporting, etc. The show... methods should always end
+ * with a non-empty line and one that indicates the error, debug, warning or regular status.
+ * 
+ * Visibility is to remain in package only.
  * 
  * @author Jurgen F. Doreleijers
  * @version 0.1
  */
-public class General {
-
-	/**
-	 * The stream to print to. Default is System.out of course.
-	 */
-	private static RichTextArea area = iCing.area;
-	private static RichTextArea statusArea = iCing.statusArea;
-
-	/**
-	 * The stream to print to. Default is System.out of course.
-	 */
-	// private static PrintStream out = System.out;
-	// public static PrintStream getOut() {
-	// return out;
-	// }
-	// /** If the argument is null then System.out will be used.
-	// */
-	// public static void setOut(PrintStream o) {
-	// if ( o == null ) {
-	// out = System.out;
-	// } else {
-	// out = o;
-	// }
-	// }
-	/**
-	 * If the argument is null then System.err will be used. never used so don't
-	 * define here.
-	 * 
-	 * public static void setErr(PrintStream o) { if ( o == null ) { out =
-	 * System.err; } else { out = o; } }
-	 */
+class General {
 
 	/**
 	 * Next variable controls e.g. how much debug statements will be done.
@@ -74,22 +44,20 @@ public class General {
 	public static final int verbosityOutput = 3; // and regular output DEFAULT
 	public static final int verbosityDetail = 4; // show more details
 	public static final int verbosityDebug = 5; // add debugging info (not
-	
+
 	// recommended for casual user)
-	private static int verbosity = verbosityOutput;
+	static int verbosity = verbosityOutput;
 	// public static int verbosity = verbosityDebug;
 
 	/**
-	 * Should be the same value as the ResultSet.getInt methods return for
-	 * nulls. This is wrongly documented in O'Reilly's
-	 * "Java enterprise in a nutshell", 1st Ed., p.25.
+	 * Should be the same value as the ResultSet.getInt methods return for nulls. This is wrongly documented in
+	 * O'Reilly's "Java enterprise in a nutshell", 1st Ed., p.25.
 	 */
 	public static final int NULL_FOR_INTS = 0;
 
 	/**
-	 * When the program was successful. This is the only exit status May be
-	 * short cut (not always mention explicitly) because it is the standard in
-	 * unix any way.
+	 * When the program was successful. This is the only exit status May be short cut (not always mention explicitly)
+	 * because it is the standard in unix any way.
 	 */
 	public static final int EXIT_STATUS_SUCCESS = 0;
 	/** When the program needs a better programmer. */
@@ -102,13 +70,13 @@ public class General {
 	public static final int EXIT_STATUS_ERROR = 9;
 
 	public static String eol;
+	public static char eolChar;
 
 	public static iCingConstants constants = iCing.c;
 
 	static {
-		eol = "\\n";
-		// showOutput("EOL is: [" + eol + "] with number of chars: " +
-		// eol.length());
+		eol = "\n";
+		eolChar = '\n';
 	}
 
 	/**
@@ -189,11 +157,11 @@ public class General {
 	/** Show a little info on memory limitations then exit. */
 	public static void doOutOfMemoryExit() {
 		String message = "";
-		message += "Ran out of memory.\n";
-		message += "A way to increase the allowed memory consumption is to\n";
-		message += "specify this when starting the Java virtual machine, like:\n";
-		message += "   java -Xmx512m Wattos.Utils.General\n";
-		message += "to set the maximum memory of the heap to 512 Mb.\n\n";
+		message += "Ran out of memory." + eol;
+		message += "A way to increase the allowed memory consumption is to" + eol;
+		message += "specify this when starting the Java virtual machine, like:" + eol;
+		message += "   java -Xmx512m Wattos.Utils.General" + eol;
+		message += "to set the maximum memory of the heap to 512 Mb." + eol + eol;
 		showError(message);
 		// if ( verbosity >= verbosityError ) {
 		// showThrowable(e);
@@ -223,11 +191,11 @@ public class General {
 
 	public static void showCodeBug(String message, String lastKnownPosition, Throwable t, Class c) {
 
-		if (getVerbosity() < verbosityError) {
+		if (verbosity < verbosityError) {
 			return;
 		}
 		if (lastKnownPosition != null) {
-			message += "\n" + constants.ERROR() + ": ran into a code bug at: ";
+			message += eol + constants.ERROR() + ": ran into a code bug at: ";
 			if (c != null) {
 				message += c.getName() + ' ';
 			} else {
@@ -251,12 +219,12 @@ public class General {
 
 	public static void showError(String message, String lastKnownPosition, Throwable t, Class cl) {
 
-		if (getVerbosity() < verbosityError) {
+		if (verbosity < verbosityError) {
 			return;
 		}
 		String prefix = "<font color=\"red\">" + constants.ERROR() + "</font>";
 		if (lastKnownPosition != null) {
-			message += "\n" + ": ran into an error at: ";
+			message += eol + ": ran into an error at: ";
 			if (cl != null) {
 				message += cl.getName() + ' ';
 			} else {
@@ -277,7 +245,7 @@ public class General {
 				message = prefix + ": null";
 			}
 		}
-//		Window.alert(message);
+		// Window.alert(message);
 		showOutput(message);
 	}
 
@@ -296,12 +264,12 @@ public class General {
 	}
 
 	public static void showWarning(String message, String lastKnownPosition, Throwable t, Class c) {
-		if (getVerbosity() < verbosityWarning) {
+		if (verbosity < verbosityWarning) {
 			return;
 		}
 		String prefix = "<font color=\"orange\">" + constants.WARNING() + "</font>";
 		if (lastKnownPosition != null) {
-			message += "\n" + constants.WARNING() + ": ran into a uncommon situation at: ";
+			message += eol + constants.WARNING() + ": ran into a uncommon situation at: ";
 			if (c != null) {
 				message += c.getName() + ' ';
 			} else {
@@ -326,7 +294,7 @@ public class General {
 	}
 
 	public static void showDebug(String message, String lastKnownPosition, Throwable t, Class c) {
-		if (getVerbosity() < verbosityDebug) {
+		if (verbosity < verbosityDebug) {
 			return;
 		}
 
@@ -347,7 +315,6 @@ public class General {
 			}
 		} else {
 			message = constants.DEBUG() + ": ".concat(message);
-			;
 		}
 		showOutput(message);
 	}
@@ -357,85 +324,35 @@ public class General {
 	}
 
 	public static void showDetail(String message) {
-		if (getVerbosity() < verbosityDetail) {
+		if (verbosity < verbosityDetail) {
 			return;
 		}
 		showOutput(message);
 	}
 
 	public static void showOutput(String message) {
-		if (getVerbosity() < verbosityOutput) {
+		if (verbosity < verbosityOutput) {
 			return;
 		}
-		if (getVerbosity() > verbosityOutput) {
+		if (verbosity > verbosityOutput) {
 			Date today = new Date();
 			String date_str = DateTimeFormat.getLongTimeFormat().format(today);
 			message = date_str + " " + message;
 		}
-
-		appendHtml(message + "<br>\n");
-		System.out.println(message); // Echo
+		Utils.appendHtml(message + eol, iCing.area);
+//		System.out.println(message); // Echo
 	}
 
-	public static boolean appendHtml(String message) {
-		statusArea.setHTML(message + statusArea.getHTML());
-		statusArea.setVisible(getVerbosity() == verbosityDebug);
-		if (iCing.textIsReversedArea) {
-			area.setHTML(message + area.getHTML());
-		} else {
-			area.setHTML(area.getHTML() + message);
-		}
-		return false;
-	}
-
-	// public static void showOutputNoEOL( String message ) {
-	// if ( verbosity < verbosityOutput) {
-	// return;
-	// }
-	// out.print(message);
-	// }
-
-	// public static void showOutput( String message, int value ) {
-	// if ( verbosity < verbosityOutput) {
-	// return;
-	// }
-	// Parameters p = new Parameters(); // Printf parameters
-	// p.add( value );
-	// String output = Format.sprintf(message, p);
-	// showOutput(output);
-	// }
-	//
-	// public static void showOutput( String message, float value ) {
-	// if ( verbosity < verbosityOutput) {
-	// return;
-	// }
-	// Parameters p = new Parameters(); // Printf parameters
-	// p.add( value );
-	// String output = Format.sprintf(message, p);
-	// showOutput(output);
-	// }
-	//
-	// public static void showOutput( String message, boolean value ) {
-	// if ( verbosity < verbosityOutput) {
-	// return;
-	// }
-	// Parameters p = new Parameters(); // Printf parameters
-	// p.add( value );
-	// String output = Format.sprintf(message, p);
-	// showOutput(output);
-	// }
 
 	/**
-	 * Sort the ArrayList with the selected element first wrapping around at the
-	 * end. If the given first element doesn't occur, a warning will be issued
-	 * and the collection will be returned in a simple sorted order. Multiple
+	 * Sort the ArrayList with the selected element first wrapping around at the end. If the given first element doesn't
+	 * occur, a warning will be issued and the collection will be returned in a simple sorted order. Multiple
 	 * occurrences of the same item in the list will be treated correctly.
 	 * 
 	 * @param al
 	 *            The ArrayList to be rotated.
 	 * @param first_element
-	 *            Element that should become the first element after this
-	 *            operation.
+	 *            Element that should become the first element after this operation.
 	 */
 	public static void rotateCollectionToFirst(ArrayList al, Object first_element) {
 		// Sort
@@ -453,16 +370,13 @@ public class General {
 			al.add(ob_temp);
 		}
 		/*
-		 * The following simpler/faster code didn't worksubList didn't cast well
-		 * and actually only generates a view...
-		 * al.subList(first_position,al.size());
-		 * al.removeRange(first_position,al.size()); al.addAll(0, al_temp);
+		 * The following simpler/faster code didn't worksubList didn't cast well and actually only generates a view...
+		 * al.subList(first_position,al.size()); al.removeRange(first_position,al.size()); al.addAll(0, al_temp);
 		 */
 	}
 
 	/**
-	 * Combine the contents in two attributes, putting the result into the first
-	 * by overwriting the original.
+	 * Combine the contents in two attributes, putting the result into the first by overwriting the original.
 	 * 
 	 * @param add
 	 *            The new stuff in here.
@@ -496,24 +410,20 @@ public class General {
 	// }
 	//    
 	/**
-	public static final int verbosityNothing = 0; // Even errors will be suppressed
-	public static final int verbosityError = 1; // show only errors
-	public static final int verbosityWarning = 2; // show errors and warnings
-	public static final int verbosityOutput = 3; // and regular output DEFAULT
-	public static final int verbosityDetail = 4; // show more details
-	public static final int verbosityDebug = 5; // add debugging info (not
-
-verbosityNothing  = 0 # Even errors will be suppressed
-verbosityError    = 1 # show only errors
-verbosityWarning  = 2 # show errors and warnings
-verbosityOutput   = 3 # and regular output DEFAULT
-verbosityDetail   = 4 # show more details
-verbosityDebug    = 9 # add debugging info (not recommended for casual user)
+	 * public static final int verbosityNothing = 0; // Even errors will be suppressed public static final int
+	 * verbosityError = 1; // show only errors public static final int verbosityWarning = 2; // show errors and warnings
+	 * public static final int verbosityOutput = 3; // and regular output DEFAULT public static final int
+	 * verbosityDetail = 4; // show more details public static final int verbosityDebug = 5; // add debugging info (not
+	 * 
+	 * verbosityNothing = 0 # Even errors will be suppressed verbosityError = 1 # show only errors verbosityWarning = 2
+	 * # show errors and warnings verbosityOutput = 3 # and regular output DEFAULT verbosityDetail = 4 # show more
+	 * details verbosityDebug = 9 # add debugging info (not recommended for casual user)
+	 * 
 	 * @param verbosity
 	 * @return
 	 */
 	public static int map2CingVerbosity(int verbosity) {
-		if ( verbosity == 5) {
+		if (verbosity == 5) {
 			return 9;
 		}
 		return verbosity;
@@ -523,7 +433,8 @@ verbosityDebug    = 9 # add debugging info (not recommended for casual user)
 		General.verbosity = verbosity;
 	}
 
-	public static int getVerbosity() {
-		return verbosity;
+	public static boolean isVerbosityDebug() {
+		return verbosity == verbosityDebug;
 	}
+
 }

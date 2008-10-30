@@ -9,16 +9,13 @@ package cing.client;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 
 public class Welcome extends iCingView {
@@ -28,7 +25,7 @@ public class Welcome extends iCingView {
 	Button playButton = new Button();
 
 	public Welcome() {
-		setState(Keys.WELCOME_STATE);
+		setState(iCing.WELCOME_STATE);
 		final VerticalPanel verticalPanelTop = new VerticalPanel();
 		initWidget(verticalPanelTop);
 
@@ -56,7 +53,7 @@ public class Welcome extends iCingView {
 //		layout.setWidget(5, 0, loadStateHTML);
 //		loadStateHTML.setVisible(false);
 		
-		final Hyperlink hyperlink = new Hyperlink(c.Start(), Keys.FILE_STATE);
+		final Hyperlink hyperlink = new Hyperlink(c.Start(), iCing.FILE_STATE);
 		layout.setWidget(2, 0, hyperlink);
 		hyperlink.setTitle("Begin with file upload.");
 		final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);
@@ -91,14 +88,14 @@ public class Welcome extends iCingView {
 		// create a (disabled) play button
 		// playButton = new Button("Silly sound");
 		// when we click, play the sound
-		playButton.addClickListener(new ClickListener() {
-			public void onClick(Widget sender) {
-				if (iCing.soundOn) {
-//					sound.play();
-				} else {
-					Window.alert(c.Sound_is_turn());
-				}
-			}
-		});
+//		playButton.addClickListener(new ClickListener() {
+//			public void onClick(Widget sender) {
+//				if (iCing.soundOn) {
+////					sound.play();
+//				} else {
+//					Window.alert(c.Sound_is_turn());
+//				}
+//			}
+//		});
 	}
 }

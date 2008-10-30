@@ -1,8 +1,12 @@
 package cing.server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.NumberFormat;
 
-public class Utils {
+public class UtilsServer {
     public static NumberFormat nf = NumberFormat.getInstance();
 
     public static String formatReal(double d, int precision) {
@@ -49,6 +53,26 @@ public class Utils {
 			result = formatReal(r,2) + " " + postFix + "b";
 		}
 		return result;
+	}
+
+	/**
+	 *  
+	 * @return true for error
+	 */
+	public static boolean chmod(File f, String mod) {
+		String cmd = "chmod " + mod + " " + f.toString();
+		GeneralServer.showDebug("Executing command: [" + cmd + "]");
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = null;
+			while ((line = in.readLine()) != null) {
+				GeneralServer.showDebug(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}    
 	
 	

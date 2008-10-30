@@ -6,10 +6,17 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Utils {
+	public static final String preStart = "<pre>";
+	public static final String preEnd = "</pre>";
+	public static final int preStartLength = preStart.length();
+	public static final int preEndLength = preEnd.length();
+	public static final int preHtmlLengthMinimal = preStartLength + preEndLength;
+	
 	public static boolean setEnabledAllInRowsButFirst(FlexTable t, boolean b) {
 		for (int row = 0; row < t.getRowCount(); row++) {
 			if (row == 0) {
@@ -31,38 +38,36 @@ public class Utils {
 	}
 
 	/**
-	 * Will very simply process a text between PRE tags.
-	 * 
+	 * Assumes that the input is wrapped in pre tags. 
+	 * Allows only font tags etc. to be inside but that's enough.
+	 *
+	 * No regular showDebugs etc can be used because this is used in the reporting in itself.
 	 * @param html
 	 * @return null on error.
 	 */
-	public static String reverse(String html) {
-		if (html == null) {
-			General.showError("In Utils.reverse: got null for html");
-			return null;
-		}
-
-		int htmlLength = html.length();
-		int htmlLengthMinimal = "<PRE></PRE>".length();
-
-		if (htmlLength < htmlLengthMinimal) {
-			General.showError("In Utils.reverse: got too short html");
-			return null;
-		}
-		int a = "<PRE>".length();
-		int b = "</PRE>".length();
-
-		html = html.substring(a, htmlLength - b);
-		String[] lines = html.split("\n");
-		int n = lines.length;
-//		General.showDebug("found number of lines: " + n);
-		String result = "<PRE>\n";
-		for (int i = n - 1; i >= 0; i--) {
-			result += lines[i] + "\n";
-		}
-		result += "</PRE>";
-//		General.showDebug("Returned html: [" + result + "]");
+	public static String reverseHtml(String html) {
+		html = unwrapPres( html );
+		html = reverseLines(html);
+		String result = preStart + html + preEnd;
+//		System.out.println("DEBUG: reverseHtml Result html: [" + result + "]");
 		return result;
+	}
+
+	/** Regardless of content
+	 * 
+	 * @param html
+	 * @return
+	 */
+	public static String reverseLines(String html) {
+		String[] lines = html.split(General.eol);
+		int n = lines.length;
+//		System.out.println("DEBUG: reverseLines found number of lines: " + n);
+		StringBuffer result = new StringBuffer();
+		for (int i = n - 1; i >= 0; i--) {
+			result.append(lines[i] + General.eol);
+		}
+//		System.out.println("DEBUG result reverseLines: [" + result + "]");
+		return result.toString();
 	}
 
 	public static void setEnabled(Widget w, boolean b) {
@@ -127,7 +132,7 @@ public class Utils {
 		for (int i = 0; i < a.size(); i++) {
 			if (i != 0) {
 				if (printEOLAfterEach) {
-					result.append('\n');
+					result.append(General.eolChar);
 				} else {
 					result.append(separator);
 				}
@@ -140,22 +145,77 @@ public class Utils {
 		return result.toString();
 	}
 
-	/**
-	 * Mostly implemented in i18n. Disabled for now because only needed on
-	 * server side, for now. //import com.google.gwt.i18n.client.NumberFormat;
-	 * public static String bytesToFormattedString(long size) {
-	 * 
-	 * long k = 1024; long M = 1024*1024; long G = 1024*1024*1024; long T =
-	 * 1024*1024*1024*1024; char cs = 's'; char ck = 'k'; char cM = 'M'; char cG
-	 * = 'G'; char cT = 'T'; char postFix = cs;
-	 * 
-	 * long divider = 1; if ( size < 1024 ) { ; } else if ( size < M ) { divider
-	 * = k; postFix = ck; } else if ( size < G ) { divider = M; postFix = cM; }
-	 * else if ( size < T ) { divider = G; postFix = cG; } else { divider = T;
-	 * postFix = cT; } double r = size/(double)divider; String result = null; if
-	 * ( postFix == cs ) { result = NumberFormat.getFormat("0").format(r) +
-	 * " bytes"; } else { result = NumberFormat.getFormat("0.00").format(r) +
-	 * " " + postFix + "b"; } return result; }
+	/** Returns text without the enclosing PRE tags.
+	 * Don't use General.showXXX because it would cycle.
+	 * @return null on error.
 	 */
+	public static String unwrapPres(String html) {
+//		System.out.println("In Utils.reverseHtml: got ["+html+"]");
+		if (html == null) {
+			System.err.println("ERROR: In Utils.reverseHtml: got null for html");
+			return null;
+		}
+
+		int htmlLength = html.length();
+		if (htmlLength < preHtmlLengthMinimal) {
+			System.err.println("ERROR: In Utils.reverseHtml: got too short html");
+			return null;
+		}
+		if (!html.startsWith(preStart)) {
+			System.err.println("ERROR: In Utils.reverseHtml: html should start with: [" + preStart + "]");
+			return null;
+		}
+		if (!html.endsWith(preEnd)) {
+			System.err.println("ERROR: In Utils.reverseHtml: html should end with: [" + preEnd + "]");
+			return null;
+		}
+
+		return  html.substring(preStartLength, htmlLength - preEndLength);
+	}
+
+	public static String wrapPres(String html) {
+		 return preStart + html + preEnd; 
+	}
+
+	public static String colorCodeHtml(String message) {
+		message = message.replace("DEBUG", "<font color=\"green\">DEBUG</font>");
+		message = message.replace("ERROR", "<font color=\"red\">ERROR</font>");
+		message = message.replace("WARNING", "<font color=\"orange\">WARNING</font>");
+		message = message.replace("Warning", "<font color=\"orange\">Warning</font>");
+		return message;
+	}
+	
+	/**
+	 * @param message
+	 * @return false on error.
+	 */
+	public static boolean appendHtml(String message, RichTextArea area ) {
+		String htmlOrg = area.getHTML();
+		htmlOrg = Utils.unwrapPres(htmlOrg);
+		if (htmlOrg == null) {
+			System.err.println("ERROR: failed to appendHtml because could not unwrapPres");
+			return false;
+		}
+
+		if (iCing.textIsReversedArea) {
+			message = Utils.reverseLines(message);
+			if (message == null ) {
+				return false;
+			}
+		}
+		message = colorCodeHtml(message);
+		
+		String htmlNew = null;
+		if (iCing.textIsReversedArea) {
+			htmlNew = message + htmlOrg;
+		} else {
+			htmlNew = htmlOrg + message;
+		}
+		
+		htmlNew = Utils.wrapPres( htmlNew ); 
+		area.setHTML(htmlNew);
+		return true;
+	}
+	
 
 }

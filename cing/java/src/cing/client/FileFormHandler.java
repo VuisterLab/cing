@@ -100,7 +100,7 @@ public class FileFormHandler implements FormHandler {
 			return;
 		}
 		String messageStr = message.stringValue();
-		if ( status.equals(Keys.RESPONSE_GENERAL_ERROR)) {
+		if ( status.equals(Keys.RESPONSE_EXIT_CODE_ERROR)) {
 			showUploadError(messageStr);
 			return;
 		}		

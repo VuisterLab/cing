@@ -32,37 +32,49 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
+	/** Just the initial startup state; for client. Server debug is set in servlet. */
+	public static final boolean doDebug = true;
+	public static final String STRING_NA = "n/a";
+	
+	/** States of the gui */
+	public static final String WELCOME_STATE = "welcome";
+	public static final String PREFERENCES_STATE = "preferences";
+	public static final String FILE_STATE = "file";
+	public static final String LOG_STATE = "log";
+	public static final String CING_LOG_STATE = "cingLog";
+	public static final String CRITERIA_STATE = "criteria";
+	public static final String OPTIONS_STATE = "options";
+	public static final String RUN_STATE = "run";
+	public static final String REPORT_STATE = "report";
+	public static final String LOGIN_STATE = "login";
 
 	public static String CURRENT_THEME = "standard";
 
+	/** GUI settings */
 	public static final int margin = 11;
-	public static final int yLocTopPanel = 11;
+	public static final int yLocTopPanel = margin;
 	public static final int yLocMenu = 60;
 	public static final int yLocMainWindow = 110;
 	public static final int WIDTH_MENU = 900;
-	public static final String widthMenuStr = "900";
-	static boolean soundOn = true;
-
-	public static iCingConstants c;
-	// public static String currentAccessKey = "234567";
-	public static String currentAccessKey = null;
-	public static String currentUserId = "jd3"; // TODO: implement security
-	// functionality later.
+	public static final String widthMenuStr = Integer.toString(WIDTH_MENU);
 	/**
-	 * How often does iCing check and update asynchronously; DEFAULT 4000 for
-	 * production.
+	 * How often does iCing check and update asynchronously; DEFAULT 4000 for production.
 	 */
 	public static final int REFRESH_INTERVAL = 2000;
 	public static final int REFRESH_INTERVAL_LOG = 4000;
 
+	/** Class settings */
+	public static iCingConstants c;
+	// public static String currentAccessKey = "234567";
+	public static String currentAccessKey = null;
+	public static String currentUserId = "jd3"; // TODO: implement security functionality later.
+
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextArea area = new RichTextArea();
-	public static final RichTextArea statusArea = new RichTextArea();
 	public static final RichTextArea cingArea = new RichTextArea();
 
 	public static boolean textIsReversedArea = false;
 	public static boolean textIsReversedCingArea = false;
-	public static boolean textIsReversedStatusArea = false;
 
 	ArrayList<iCingView> views;
 	Welcome welcome;
@@ -75,16 +87,14 @@ public class iCing implements EntryPoint, HistoryListener {
 	Criteria criteria;
 	Report report;
 	RunView runView;
-	Status status;
 	Footer footer;
 
 	private RootPanel rootPanel = RootPanel.get();
 	VerticalPanel vPanel = new VerticalPanel();
-	public String projectName = "9xxx";
+	public String projectName;
 
 	public HistoryListener historyListener;
 
-	public static final String LOGIN_STATE = "login";
 
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
@@ -94,13 +104,13 @@ public class iCing implements EntryPoint, HistoryListener {
 		// hosted mode doesn't show a popup!
 		// GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 		// public void onUncaughtException(Throwable e) {
-		// Window.alert(c.Uncaught_ex() + "\n" + e);
+		// Window.alert(c.Uncaught_ex() +General.eol + e);
 		// }
 		// });
 		c = GWT.create(iCingConstants.class);
 		// Watch out because although this setting is needed here; there's
 		// another needed at the end of this routine too.
-		if (Keys.doDebug) {
+		if (iCing.doDebug) {
 			General.setVerbosityToDebug();
 		}
 		currentAccessKey = getNewAccessKey();
@@ -109,7 +119,6 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		showMenu();
 
-		status = new Status();
 		login = new Login();
 		welcome = new Welcome();
 		logView = new LogView();
@@ -135,16 +144,12 @@ public class iCing implements EntryPoint, HistoryListener {
 		views.add(criteria);
 		views.add(report);
 		views.add(runView);
-		views.add(status);
 		views.add(footer);
 
 		for (iCingView v : views) {
 			vPanel.add(v); // All on top of each
 			v.setIcing(this);
 
-			if (v instanceof Status) { // always present view. (when debugging)
-				continue;
-			}
 			if (v instanceof Footer) { // always present view.
 				continue;
 			}
@@ -152,7 +157,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		}
 		vPanel.setSpacing(5);
 
-		setVerbosityToDebug(Keys.doDebug); // partner with the above call to
+		setVerbosityToDebug(iCing.doDebug); // partner with the above call to
 		showLoadingMessage(false);
 
 		History.addHistoryListener(this);
@@ -161,7 +166,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		String initToken = History.getToken();
 		if (initToken.length() == 0) {
 			// History.newItem();
-			initToken = Keys.FILE_STATE;
+			// initToken = Keys.FILE_STATE;
+			initToken = iCing.LOG_STATE;
 		}
 		onHistoryChanged(initToken);
 	}
@@ -170,7 +176,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (historyToken == null || historyToken.length() == 0) {
 			General.showError("Got an unknown history token: [" + historyToken + "]");
 		}
-		if (Keys.WELCOME_STATE.equals(historyToken)) {
+		if (iCing.WELCOME_STATE.equals(historyToken)) {
 			loadWelcomeView();
 			return;
 		}
@@ -178,35 +184,35 @@ public class iCing implements EntryPoint, HistoryListener {
 			loadLoginView();
 			return;
 		}
-		if (Keys.FILE_STATE.equals(historyToken)) {
+		if (iCing.FILE_STATE.equals(historyToken)) {
 			loadFileView();
 			return;
 		}
-		if (Keys.LOG_STATE.equals(historyToken)) {
+		if (iCing.LOG_STATE.equals(historyToken)) {
 			loadLogView();
 			return;
 		}
-		if (Keys.CING_LOG_STATE.equals(historyToken)) {
+		if (iCing.CING_LOG_STATE.equals(historyToken)) {
 			loadCingLogView();
 			return;
 		}
-		if (Keys.CRITERIA_STATE.equals(historyToken)) {
+		if (iCing.CRITERIA_STATE.equals(historyToken)) {
 			loadCriteriaView();
 			return;
 		}
-		if (Keys.REPORT_STATE.equals(historyToken)) {
+		if (iCing.REPORT_STATE.equals(historyToken)) {
 			loadReportView();
 			return;
 		}
-		if (Keys.OPTIONS_STATE.equals(historyToken)) {
+		if (iCing.OPTIONS_STATE.equals(historyToken)) {
 			loadOptionsView();
 			return;
 		}
-		if (Keys.RUN_STATE.equals(historyToken)) {
+		if (iCing.RUN_STATE.equals(historyToken)) {
 			loadRunView();
 			return;
 		}
-		if (Keys.PREFERENCES_STATE.equals(historyToken)) {
+		if (iCing.PREFERENCES_STATE.equals(historyToken)) {
 			loadPreferencesView();
 			return;
 		}
@@ -229,11 +235,6 @@ public class iCing implements EntryPoint, HistoryListener {
 	public void clearAllViews() {
 		// General.showDebug("Now in clearAllViews");
 		for (iCingView v : views) {
-			// General.showDebug("Analyzing view: " + v.getClass().toString());
-			// RootPanel.get().add(v, margin, yLocMainWindow);
-			if (v instanceof Status) { // not a real view.
-				continue;
-			}
 			if (v instanceof Footer) { // not a real view.
 				continue;
 			}
@@ -586,8 +587,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		String modulePath = GWT.getModuleBaseURL();
 		Command callback = new Command() {
 			/**
-			 * The number of style sheets that have been loaded and executed
-			 * this command.
+			 * The number of style sheets that have been loaded and executed this command.
 			 */
 			private int numStyleSheetsLoaded = 0;
 
@@ -627,8 +627,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	}
 
 	/**
-	 * Get the style name of the reference element defined in the current GWT
-	 * theme style sheet.
+	 * Get the style name of the reference element defined in the current GWT theme style sheet.
 	 * 
 	 * @param prefix
 	 *            the prefix of the reference style name
@@ -643,9 +642,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	}
 
 	/**
-	 * So this method is not in General because all methods there are static
-	 * Make sure that where ever the verbosity can be set to debug it is also
-	 * callign this routine.
+	 * So this method is not in General because all methods there are static Make sure that where ever the verbosity can
+	 * be set to debug it is also callign this routine.
 	 * 
 	 * @param doDebugNow
 	 */
@@ -653,108 +651,17 @@ public class iCing implements EntryPoint, HistoryListener {
 		if (doDebugNow) {
 			General.setVerbosityToDebug();
 		}
-		// ##################
-		// if (logView == null) {
-		//General.showError("in iCing.setVerbosityToDebug got null for logView."
-		// );
-		// return;
-		// }
-		// if (logView.startPnameButton == null) {
-		// General.showError(
-		// "in iCing.setVerbosityToDebug got null for logView.startPnameButton."
-		// );
-		// return;
-		// }
 		logView.startPnameButton.setVisible(doDebugNow);
-		// ##################
-		// if (cingLogView == null) {
-		// General.showError(
-		// "in iCing.setVerbosityToDebug got null for cingLogView.");
-		// return;
-		// }
-		// if (cingLogView.startStatusButton == null) {
-		// General.showError(
-		// "in iCing.setVerbosityToDebug got null for cingLogView.startStatusButton."
-		// );
-		// return;
-		// }
-		cingLogView.startStatusButton.setVisible(doDebugNow);
-		cingLogView.stopStatusButton.setVisible(doDebugNow);
-		cingLogView.startLogButton.setVisible(doDebugNow);
-		cingLogView.stopLogButton.setVisible(doDebugNow);
-
-		// ##################
-
-		// if (statusArea == null) {
-		// General.showError(
-		// "in iCing.setVerbosityToDebug got null for statusArea.");
-		// return;
-		// }
-		statusArea.setVisible(doDebugNow);
 	}
 
-	// /**
-	// * A special version of the ToggleButton that cannot be clicked if down.
-	// If
-	// * one theme button is pressed, all of the others are depressed.
-	// */
-	// private static class ThemeButton extends ToggleButton {
-	// private static List<ThemeButton> allButtons = null;
-	//
-	// private String theme;
-	//
-	// public ThemeButton(String theme) {
-	// super();
-	// this.theme = theme;
-	// addStyleName("sc-ThemeButton-" + theme);
-	//
-	// // Add this button to the static list
-	// if (allButtons == null) {
-	// allButtons = new ArrayList<ThemeButton>();
-	// setDown(true);
-	// }
-	// allButtons.add(this);
-	// }
-	//
-	// public String getTheme() {
-	// return theme;
-	// }
-	//
-	// @Override
-	// protected void onClick() {
-	// if (!isDown()) {
-	// // Raise all of the other buttons
-	// for (ThemeButton button : allButtons) {
-	// if (button != this) {
-	// button.setDown(false);
-	// }
-	// }
-	//
-	// // Fire the click listeners
-	// super.onClick();
-	// }
-	// }
-	// }
-	/**
-	 * Watch out; can't use General.showDebug yet because status hasn't been
-	 * inited.
-	 * 
-	 */
 	public static String getNewAccessKey() {
 		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		String result = "";
 		for (int i = 1; i <= Keys.accessKeyLength; i++) {
-			int idxChar = Random.nextInt(allowedCharacters.length()); // equal
-			// chance
-			// for A
-			// as
-			// for
-			// others
-			// .
+			int idxChar = Random.nextInt(allowedCharacters.length()); // equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
 			// TODO: generate on server with cross check on availability...
 		}
-		// General.showDebug("Got access key: [" + result +"]"); see above
 		return result;
 	}
 }

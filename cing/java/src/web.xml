@@ -6,15 +6,15 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" >
 
     <servlet>
-      <servlet-name>File Upload</servlet-name>
+      <servlet-name>iCingServlet</servlet-name>
       <servlet-class>
-          cing.server.FileUploadServlet
+          cing.server.iCingServlet
       </servlet-class>
    </servlet>
 
     <servlet-mapping>
-      <servlet-name>File Upload</servlet-name>
-      <url-pattern>/fileupload</url-pattern>
+      <servlet-name>iCingServlet</servlet-name>
+      <url-pattern>/iCingServlet</url-pattern>
    </servlet-mapping>
 
    <welcome-file-list>
