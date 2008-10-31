@@ -16,12 +16,11 @@ import os
 def iCingRobot():
 #    NTwarning("Expect errors without a server up and running.")
     NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
-    localTesting = True
     ## queries possible
-    doSave  = 0
+    doSave  = 1
     doRun   = 0
-    doStatus= 1
-    doLog   = 1
+    doStatus= 0
+    doLog   = 0
     doPname = 1
     ## credentials.
     user_id = "jd3"
@@ -31,66 +30,53 @@ def iCingRobot():
 #    access_key = "TimsDirtySecret"
 
 #    entryId = '1brv' # 68K, smallest for quick testing.
-    entryId = '2k0e' # 388K
+    entryId = '1a4d' # 388K
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
     
-    machineUrl = "nmr.cmbi.ru.nl"
-    rpcCGIUrl = "iCing/servlets/fileupload"
-#    rpcCGIUrl = "iCing/cgi-bin/iCingByCgi.py"
-    rpcUrl = "iCing/server-bin"
-#    rpcUrl = ""
-    port = ""
-    portCGI = ""
-            
-    if localTesting:
-        machineUrl = "localhost"        
-#            rpcUrl = "iCing/cgi-bin/iCingByCgi.py"
-#        port = ':'+`PORT_SERVER`
-#            portCGI = ':'+`PORT_CGI`
-                    
+    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet"
+                                
 ##############################################################################################################
-    urlSave = machineUrl + portCGI+ '/' + rpcCGIUrl        
     credentialSettings = "-F UserId=%s -F AccessKey=%s" % ( user_id, access_key)
-    cmdSave = """curl %s\
-        -F Action=%s \
-        -F UploadFile=@%s \
-        %s """ % (credentialSettings, FORM_ACTION_SAVE, ccpnFile, urlSave)
+    cmdSave = "curl %s -F Action=%s -F UploadFile=@%s %s" % (
+        credentialSettings, 
+        FORM_ACTION_SAVE, 
+        ccpnFile, 
+        rpcUrl)
     if doSave:
-        NTmessage("Curling to: " + urlSave)
+        NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdSave)
     
     
 ##############################################################################################################
-    urlRun = machineUrl + port+ '/' + rpcUrl        
     cmdRun = """curl %s\
         -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_RUN, urlRun)
+        %s """ % (credentialSettings, FORM_ACTION_RUN, rpcUrl)
     if doRun:
-        NTmessage("Curling to: " + urlRun)
+        NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdRun)
     
 ##############################################################################################################
     cmdStatus = """curl %s\
         -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_STATUS, urlRun)
+        %s """ % (credentialSettings, FORM_ACTION_STATUS, rpcUrl)
     if doStatus:
-        NTmessage("Curling to: " + urlRun)
+        NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdStatus) 
     
 ##############################################################################################################
     cmdLog = """curl %s\
         -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_LOG, urlRun)
+        %s """ % (credentialSettings, FORM_ACTION_LOG, rpcUrl)
     if doLog:
-        NTmessage("Curling to: " + urlRun)
+        NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdLog)
     
 ##############################################################################################################
     cmdPname = """curl %s\
         -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_PROJECT_NAME, urlRun)
+        %s """ % (credentialSettings, FORM_ACTION_PROJECT_NAME, rpcUrl)
     if doPname:
-        NTmessage("Curling to: " + urlRun)
+        NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdPname)
     
 if __name__ == "__main__":

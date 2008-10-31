@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class LogView extends iCingView {
@@ -19,9 +18,13 @@ public class LogView extends iCingView {
 	final Button startPnameButton = new Button();
 
 	public LogView() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+//		final iCing icingShadow = icing;		
 		setState(iCing.LOG_STATE);
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		initWidget(verticalPanel);
 		logLabel.setStylePrimaryName("h1");
 
 		verticalPanel.add(logLabel);

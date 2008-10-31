@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CingLogView extends iCingView {
@@ -26,16 +25,18 @@ public class CingLogView extends iCingView {
 
 	final Button nextButton = new Button();
 	final Button updateButton = new Button();
-
 	public CingLogView() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+		final iCing icingShadow = icing;		
 		setState(iCing.CING_LOG_STATE);
 		cingArea.ensureDebugId("cwRichText-cingArea");
 		// RichTextToolbar toolbar = new RichTextToolbar(cingArea);
 		// toolbar.ensureDebugId("cwRichText-toolbar");
 
-		// Add the components to a panel
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		initWidget(verticalPanel);
 		verticalPanel.add(logLabel);
 		verticalPanel.add(cingArea);
 		cingArea.setSize(iCing.widthMenuStr, "25em");
@@ -73,7 +74,7 @@ public class CingLogView extends iCingView {
 		nextButton.setFocus(true);
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.REPORT_STATE);
+				icingShadow.onHistoryChanged(iCing.REPORT_STATE);
 			}
 		});
 
@@ -87,8 +88,8 @@ public class CingLogView extends iCingView {
 		});
 
 		horizontalPanelActions.add(updateButton);
-		horizontalPanelActions.add(clearButton);
 		horizontalPanelActions.add(tailCheckBox);
+		horizontalPanelActions.add(clearButton);
 
 		verticalPanel.add(horizontalPanelActions);
 		horizontalPanelActions.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
@@ -112,23 +113,20 @@ public class CingLogView extends iCingView {
 		horizontalPanelBackNext.add(backButton);
 		horizontalPanelBackNext.add(nextButton);
 
-		cingQueryLog = new iCingQuery();
+		cingQueryLog = new iCingQuery(icing);
 		cingQueryLog.action.setValue(Keys.FORM_ACTION_LOG);
-		cingQueryLog.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryLog.formPanel);
 
-		cingQueryStatus = new iCingQuery();
-		cingQueryStatus.action.setValue(Keys.FORM_ACTION_READINESS);
-		cingQueryStatus.serverFormHandler.setCingLogView(this);
+		cingQueryStatus = new iCingQuery(icing);
+		cingQueryStatus.action.setValue(Keys.FORM_ACTION_STATUS);
 		verticalPanel.add(cingQueryStatus.formPanel);
 
-		cingQueryProjectName = new iCingQuery();
+		cingQueryProjectName = new iCingQuery(icing);
 		cingQueryProjectName.action.setValue(Keys.FORM_ACTION_PROJECT_NAME);
-		cingQueryProjectName.serverFormHandler.setCingLogView(this);
 		verticalPanel.add(cingQueryProjectName.formPanel);
 	}
 
-	/** Needs to be called by ServerFormHandler. */
+	/** Needs to be called by FormHandleriCing. */
 	protected void setStatus(String statusStr) {
 		if ((statusStr != null) && statusStr.equals(Keys.RESPONSE_STATUS_DONE)) {
 			nextButton.setEnabled(true); // or switch my self. or ...
@@ -165,7 +163,6 @@ public class CingLogView extends iCingView {
 			String d = DateTimeFormat.getLongTimeFormat().format(today);
 			String msg = "In CingLogView: Now in getLogTail " + d + "<BR>";
 			General.showDebug(msg);
-			Utils.appendHtml(msg, cingArea);
 		}
 		cingQueryLog.formPanel.submit();
 	}

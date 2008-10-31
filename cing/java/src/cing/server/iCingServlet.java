@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,65 +15,48 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import Wattos.Utils.InOut;
+import Wattos.Utils.Strings;
 import cing.client.Keys;
 
 public class iCingServlet extends HttpServlet {
 	private static final long serialVersionUID = 6098745782027999297L;
-	
+
 	/** 5 Mb ought to do */
 	public static final long FILE_UPLOAD_MAX_SIZE = 5 * 1024 * 1024;
 	public static final String SERVER_TMP_DIR = "/Library/WebServer/Documents/tmp/cing";
-	
-	public static final int FORM_PART_MINIMUM_COUNT = Keys.FORM_PARM_MINIMUM.length;
 
-	private static final String ERROR_SIZE_UNACCEPTABLE = "{" + Keys.RESPONSE_EXIT_CODE_ERROR
-			+ ": 'File upload failed. File size must be " + FILE_UPLOAD_MAX_SIZE + " bytes or less'}";
-	private static final String ERROR_PARSE_REQUEST = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to parse request'}";
-	private static final String ERROR_WRITE_FAILED = "{" + Keys.RESPONSE_EXIT_CODE_ERROR
-			+ ": 'File upload failed. File write failed.'}";
-	private static final String ERROR_NOT_MULTI_PART = "{" + Keys.RESPONSE_EXIT_CODE_ERROR
-			+ ": 'File upload failed. Not multipart message.'}";
-
-	/**
-	 * Initializes the servlet.
-	 * 
-	 * @param config
-	 * @throws ServletException
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		init2();
-	}
-
-	public void init2() throws ServletException {
-		/** Set the desired verbosity level */
-		GeneralServer.showDebug("Now in initDb");
-		// GeneralServer.showDebug("Wattos version: " + iCing.VERSION);
-		// System.setOut( System.err );
-		GeneralServer.showDebug("this message to System.out after redirect");
-	}
+	private static final String ERROR_SIZE_UNACCEPTABLE = "File larger than: " + FILE_UPLOAD_MAX_SIZE + " bytes";
+	private static final String ERROR_PARSE_REQUEST = "Failed to parse request";
+	private static final String ERROR_WRITE_FAILED = "File write failed.";
+	private static final String ERROR_NOT_MULTI_PART = "Not multipart message.";
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
-		doPost(request, response);
+		writeJsonError(response, "Denying iCingServlet.doGet. Try a POST.");
 	}
 
 	/**
-	 * Return a json string to file form handler with only one element:
-	 * {"error","reason"} or {"message","999 kb"}
+	 * Return a json string to file form handler with only one element: {"error","reason"} or {"message","999 kb"}
 	 * */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
-		System.out.println("DEBUG: processing doPost");
+		General.showDebug("processing doPost");
+		JSONObject result = new JSONObject();
+
+		File pathUser = null;
+		File pathProject = null;
 		FileItem actualFileItem = null;
 		String currentAccessKey = null;
-		String currentUserId = null;
+		String currentUserId = Keys.FORM_PARM_USER_ID_DEFAULT;
+		String currentAction = null;
 
 		FileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		List<FileItem> items = null;
-		String json = null;
 
 		// Create a progress listener on server side; pretty useless, so far but
 		// when pushed to client can be nice.
@@ -91,14 +73,13 @@ public class iCingServlet extends HttpServlet {
 					return; // no report.
 				}
 				batchesRead = batchCurrentRead;
-				String pBytesReadStr = UtilsServer.bytesToFormattedString(pBytesRead);
-				String pContentLengthStr = UtilsServer.bytesToFormattedString(pContentLength);
+				String pBytesReadStr = Ut.bytesToFormattedString(pBytesRead);
+				String pContentLengthStr = Ut.bytesToFormattedString(pContentLength);
 
 				if (pContentLength == -1) {
-					System.out
-							.println("DEBUG: So far, " + pBytesReadStr + " have been read from item[" + pItems + "].");
+					General.showDebug("So far, " + pBytesReadStr + " have been read from item[" + pItems + "].");
 				} else {
-					System.out.println("DEBUG: So far, " + pBytesReadStr + " of " + pContentLengthStr
+					General.showDebug("So far, " + pBytesReadStr + " of " + pContentLengthStr
 							+ " have been read from item[" + pItems + "].");
 				}
 			}
@@ -108,8 +89,7 @@ public class iCingServlet extends HttpServlet {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if (!isMultipart) {
-			json = ERROR_NOT_MULTI_PART;
-			writeJson(response, json);
+			writeJsonError(response, ERROR_NOT_MULTI_PART);
 			return;
 		}
 
@@ -117,23 +97,19 @@ public class iCingServlet extends HttpServlet {
 			items = upload.parseRequest(request);
 		} catch (FileUploadException e) {
 			e.printStackTrace();
-			System.err.println("ERROR: Failed to upload.parseRequest(request)");
-			json = ERROR_PARSE_REQUEST;
-			writeJson(response, json);
+			writeJsonError(response, ERROR_PARSE_REQUEST);
 			return;
 		}
 
 		if (items == null) {
-			json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Got a serious error while: upload.parseRequest(request).'}";
-			writeJson(response, json);
+			writeJsonError(response, "Got a serious error while: upload.parseRequest(request).");
 			return;
 		}
 
-		
-		if (items.size() < FORM_PART_MINIMUM_COUNT) {
-			json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Got " + items.size() + " items instead of expected at least:"+
-			FORM_PART_MINIMUM_COUNT+"'}";
-			writeJson(response, json);
+		if (items.size() < Keys.FORM_PARM_MINIMUM.length) {
+			String msg = "Got " + items.size() + " items which is less than the expected:"
+					+ Keys.FORM_PARM_MINIMUM.length + " items.";
+			writeJsonError(response, msg);
 			return;
 		}
 
@@ -141,66 +117,142 @@ public class iCingServlet extends HttpServlet {
 			FileItem item = items.get(i);
 			String name = item.getFieldName();
 			String value = item.getString();
-			// System.out.println("DEBUG: processing form item: [" + name +
-			// "] with value: ["+value+"]");
+			General.showDebug("processing form item: [" + name + "] with value: [" + value + "]");
 			if (item.isFormField()) {
 				if (name.equals(Keys.FORM_PARM_ACCESS_KEY)) {
 					currentAccessKey = value;
-					System.out.println("DEBUG: retrieved currentAccessKey: " + currentAccessKey);
+					General.showDebug("retrieved currentAccessKey: " + currentAccessKey);
 					continue;
 				}
 				if (name.equals(Keys.FORM_PARM_USER_ID)) {
 					currentUserId = value;
-					System.out.println("DEBUG: retrieved currentUserId: " + currentUserId);
+					General.showDebug("retrieved currentUserId: " + currentUserId);
 					continue;
 				}
 				if (name.equals(Keys.FORM_PARM_ACTION)) {
-					System.out.println("DEBUG: retrieved action: " + name);
+					currentAction = value;
+					jsonResultPut(result, Keys.FORM_PARM_ACTION, currentAction);
+					General.showDebug("retrieved action: " + currentAction);
 					continue;
 				}
+				// When the routine falls thru to here the parameter was not recognized.
 				if (value == null) {
-					value = "empty";
+					value = Keys.None;
 				}
 				int endIndex = Math.min(100, value.length());
 				value = value.substring(0, endIndex);
-				json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'File item parameter [" + name
-						+ "] with value (first 100 bytes): [" + value + "] was unexpected.'}";
-				writeJson(response, json);
+				String msg = "Parameter [" + name + "] with value (first 100 bytes): [" + value + "] was unexpected.";
+				writeJsonError(response, result, msg);
 				return;
 			} else {
 				actualFileItem = item;
 			}
 		}
-		// Process actual file after other parameters are retrieved.
-		if (actualFileItem == null) {
-			json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'No actual file item retrieved'}";
-			writeJson(response, json);
+
+		if (currentAction == null) {
+			writeJsonError(response, result, "Failed to retrieve Action.");
 			return;
 		}
-
 		if (currentAccessKey == null) {
-			json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to retrieve AccessKey.'}";
-			writeJson(response, json);
+			writeJsonError(response, result, "Failed to retrieve " + Keys.FORM_PARM_ACCESS_KEY);
 			return;
 		}
 		if (currentUserId == null) {
-			json = "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to retrieve UserId.'}";
-			writeJson(response, json);
+			writeJsonError(response, result, "Failed to retrieve  " + Keys.FORM_PARM_USER_ID);
 			return;
 		}
-		json = processFile(actualFileItem, currentUserId, currentAccessKey);
-		writeJson(response, json);
+
+		if (!Keys.FORM_ACTION_ALIST.contains(currentAction)) {
+			writeJsonError(response, result, "Requested action unknown:  " + currentAction);
+			return;
+		}
+
+		pathUser = new File(SERVER_TMP_DIR, currentUserId);
+		if (!pathUser.exists()) {
+			if (!pathUser.mkdir()) {
+				writeJsonError(response, result, "Failed to mkdir for user at: [" + pathUser + "]");
+				return;
+			}
+			Ut.chmod(pathUser, "a+rw");
+		}
+		pathProject = new File(pathUser, currentAccessKey);
+		if (!pathProject.exists()) {
+			if (!pathProject.mkdir()) {
+				writeJsonError(response, result, "Failed to mkdir for project at: [" + pathProject + "]");
+				return;
+			}
+			Ut.chmod(pathProject, "a+rw");
+		}
+
+		if (currentAction.equals(Keys.FORM_ACTION_SAVE)) {
+			processFile(response, result, pathProject, actualFileItem, currentUserId, currentAccessKey);
+		} else if (currentAction.equals(Keys.FORM_ACTION_PROJECT_NAME)) {
+			processPname(response, result, pathProject, actualFileItem, currentUserId, currentAccessKey);
+		} else if (currentAction.equals(Keys.FORM_ACTION_LOG)) {
+			;
+		} else if (currentAction.equals(Keys.FORM_ACTION_STATUS)) {
+			;
+		} else if (currentAction.equals(Keys.FORM_ACTION_RUN)) {
+			;
+		} else {
+			// Would be a code bug as is checked before.
+			writeJsonError(response, result, "Requested action unknown:  " + currentAction + " [CODE ERROR]");
+			return;
+		}
 	}
 
-	private void writeJson(HttpServletResponse response, String json) {
-		response.setContentType("text/plain"); // disable for debugging?
-		System.out.println("DEBUG: json is [" + json + "]");
+	private void processPname(HttpServletResponse response, JSONObject result, File pathProject,
+			FileItem actualFileItem, String currentUserId, String currentAccessKey) {
+
+		String regexp = ".*.tgz";
+		General.showOutput("Reg exp files: " + regexp);
+		General.showOutput("Dir: " + pathProject);
+		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
+		String[] list = pathProject.list(ff);
+
+		General.showOutput("Found files: " + Strings.toString(list));
+		General.showOutput("Found number of files: " + list.length);
+
+		if (list.length < 1) {
+			writeJsonError(response, result, "No project files found");
+			return;
+		}
+		String projectName = list[0];
+		projectName = InOut.getFilenameBase(projectName);
+		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
+		jsonResultPut(result, Keys.RESPONSE_RESULT, projectName);
+		writeJson(response, result);
+	}
+
+	private void jsonResultPut(JSONObject result, String key, String value) {
 		try {
-			response.getWriter().write(json);
+			result.put(key, value);
+		} catch (JSONException e) {
+			General.showError("Failed to JSONObject.put [" + key + "] [" + key + "]");
+			e.printStackTrace();
+		}
+	}
+
+	private void writeJson(HttpServletResponse response, JSONObject result) {
+		General.showDebug("Result is [" + result.toString() + "]");
+		response.setContentType("text/plain");
+		try {
+			response.getWriter().write(result.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	private void writeJsonError(HttpServletResponse response, JSONObject result, String msg) {
+		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_ERROR);
+		jsonResultPut(result, Keys.RESPONSE_RESULT, msg);
+		writeJson(response, result);
+	}
+
+	private void writeJsonError(HttpServletResponse response, String msg) {
+		JSONObject result = new JSONObject();
+		writeJsonError(response, result, msg);
 	}
 
 	/**
@@ -209,128 +261,59 @@ public class iCingServlet extends HttpServlet {
 	 * @param item
 	 * @return a JSON string.
 	 */
-	private String processFile(FileItem item, String currentUserId, String currentAccessKey) {
-		// if (!isContentTypeAcceptable(item))
-		// return CONTENT_TYPE_UNACCEPTABLE;
-		System.out.println("DEBUG: checking size...");
+	private void processFile(HttpServletResponse response, JSONObject result, File pathProject, FileItem item,
+			String currentUserId, String currentAccessKey) {
 
-		/**
-		 * Set by fileUpload.setName("uploadFormElement"+Integer.toString(
-		 * currentRowIdx));
-		 */
-		@SuppressWarnings("unused")
-		String fieldName = item.getFieldName();
-		@SuppressWarnings("unused")
-		String contentType = item.getContentType();
-		@SuppressWarnings("unused")
-		boolean isInMemory = item.isInMemory();
-
-		if (item.getSize() > FILE_UPLOAD_MAX_SIZE) {
-			System.err.println("Size not acceptable.");
-			return ERROR_SIZE_UNACCEPTABLE;
+		if (item == null) {
+			writeJsonError(response, "No actual file item retrieved");
+			return;
 		}
-		
-		/** Name without path part */		
+
+		// String fieldName = item.getFieldName();
+		// String contentType = item.getContentType();
+		// boolean isInMemory = item.isInMemory();
+
+		General.showDebug("Checking size...");
+		if (item.getSize() > FILE_UPLOAD_MAX_SIZE) {
+			General.showError("Size not acceptable.");
+			writeJsonError(response, result, "Failed to retrieve " + ERROR_SIZE_UNACCEPTABLE);
+			return;
+		}
+
+		/** Name without path part */
 		String fileName = item.getName();
 		/**
-		 * TODO read up on safety issues here.
-		 * 
-		 * No .. or forward slash allowed.
+		 * TODO: read up on safety issues here. No .. or forward slash allowed.
 		 */
-
 		if (fileName.indexOf(":") >= 0 || fileName.indexOf("..") >= 0 || fileName.charAt(0) == '/') {
-			return "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Filename not considered safe: [" + fileName + "].'}";
+			writeJsonError(response, result, "Filename not considered safe: [" + fileName + "]");
+			return;
 		}
-		File pathUser = new File(SERVER_TMP_DIR, currentUserId);
-		if (!pathUser.exists()) {
-			if (!pathUser.mkdir()) {
-				return "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to mkdir for user at: [" + pathUser + "].'}";
-			}
-			UtilsServer.chmod( pathUser, "a+rw");
-		}
-		File pathProject = new File(pathUser, currentAccessKey);
-		if (!pathProject.exists()) {
-			if (!pathProject.mkdir()) {
-				return "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to mkdir for project at: [" + pathProject + "].'}";
-			}
-			UtilsServer.chmod( pathProject, "a+rw");
-		}
+
 		File uploadedFile = new File(pathProject, fileName);
 		if (uploadedFile.exists()) {
 			if (pathProject.delete()) {
-				return "{" + Keys.RESPONSE_EXIT_CODE_ERROR + ": 'Failed to remove existing file with the same name: ["
-						+ uploadedFile + "].'}";
+				writeJsonError(response, result, "Failed to remove file with the same name: [" + uploadedFile + "]");
+				return;
 			}
 		}
 		try {
 			item.write(uploadedFile);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ERROR_WRITE_FAILED;
+			writeJsonError(response, result, ERROR_WRITE_FAILED);
+			return;
 		}
-		UtilsServer.chmod( uploadedFile, "a+rw");
+		Ut.chmod(uploadedFile, "a+rw");
 
-		String sizeStr = UtilsServer.bytesToFormattedString(item.getSize());
-		return "{" + Keys.RESPONSE_EXIT_CODE_SUCCESS + ": '" + sizeStr + "'}";
+		long length = uploadedFile.length();
+		long lengthFormElement = item.getSize();
+		// Difference?
+		General.showDebug("Fileform     length: " + lengthFormElement);
+		General.showDebug("File written length: " + length);
+		String sizeStr = Ut.bytesToFormattedString(length);
+		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
+		jsonResultPut(result, Keys.RESPONSE_RESULT, sizeStr);
+		writeJson(response, result);
 	}
-
-	/**
-	 * Next 3 not really needed normally. Show an the actual error message to
-	 * client and error log.
-	 * 
-	 * @param resp
-	 * @param message
-	 * @throws ServletException
-	 * @throws IOException
-	 *             public void showActualError(HttpServletResponse resp, String
-	 *             message) throws ServletException, java.io.IOException {
-	 *             resp.setContentType("text/html"); java.io.PrintWriter out =
-	 *             resp.getWriter(); out.println("
-	 *             <P>
-	 *             ERROR: " + message); GeneralServer.showError(message);
-	 *             GeneralServer.showError(" at: "); }
-	 * 
-	 *             /** Show a complete error message including header and
-	 *             footer.
-	 * 
-	 * @param resp
-	 * @param message
-	 * @throws ServletException
-	 * @throws IOException
-	 *             public void showCompleteError(HttpServletResponse resp,
-	 *             String message) throws ServletException, java.io.IOException
-	 *             { resp.setContentType("text/html"); java.io.PrintWriter out =
-	 *             resp.getWriter(); showHeader(resp);
-	 *             out.println("<font color='red'>ERROR:</font> " + message);
-	 *             out.println("<BR>
-	 *             "); showFooter(resp); }
-	 */
-
-	/**
-	 * Stick some html code at the top.
-	 * 
-	 * @param resp
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	public void showHeader(HttpServletResponse resp) throws ServletException, java.io.IOException {
-
-		java.io.PrintWriter out = resp.getWriter();
-		String html_header_text = "just debugging now<BR>";
-		out.println(html_header_text);
-	}
-
-	/**
-	 * Stick some html code at the end.
-	 * 
-	 * @param resp
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	public void showFooter(HttpServletResponse resp) throws ServletException, java.io.IOException {
-		java.io.PrintWriter out = resp.getWriter();
-		String html_footer_text = "and finished debugging.<BR>";
-		out.println(html_footer_text);
-	}
-
 }

@@ -95,7 +95,6 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public HistoryListener historyListener;
 
-
 	public void onModuleLoad() {
 		// set uncaught exception handler for a production version this might be
 		// off. JFD prefers
@@ -133,9 +132,9 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
+		views.add(logView); // Important to keep this one first so that others can log into it.
 		views.add(welcome);
 		views.add(fileView);
-		views.add(logView);
 		views.add(cingLogView);
 		views.add(login);
 		views.add(options);
@@ -147,10 +146,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		views.add(footer);
 
 		for (iCingView v : views) {
-			vPanel.add(v); // All on top of each
+			vPanel.add(v);
 			v.setIcing(this);
 
-			if (v instanceof Footer) { // always present view.
+			if (v instanceof Footer) { // always present footer view.
 				continue;
 			}
 			v.setVisible(false);
@@ -170,6 +169,10 @@ public class iCing implements EntryPoint, HistoryListener {
 			initToken = iCing.LOG_STATE;
 		}
 		onHistoryChanged(initToken);
+		// Just for debugging.
+		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
+		String actionServerUrl = moduleBaseUrlWithPort + Keys.SERVLET_URL;
+		General.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
 	}
 
 	public void onHistoryChanged(String historyToken) {
@@ -303,14 +306,15 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
 
-		listBoxLocale.addItem("??????", "cn");
-		listBoxLocale.addItem("Deutsch", "de");
-		listBoxLocale.addItem("English", "en");
-		listBoxLocale.addItem("Espa??ol", "es");
-		listBoxLocale.addItem("Fran??ais", "fr");
-		listBoxLocale.addItem("Italiano", "it");
-		listBoxLocale.addItem("Nederlands", "nl");
-		listBoxLocale.addItem("Portugu??s", "pt");
+		listBoxLocale.addItem("中文", "cn");
+        listBoxLocale.addItem("Deutsch", "de");
+        listBoxLocale.addItem("English", "en");
+        listBoxLocale.addItem("Español", "es");
+        listBoxLocale.addItem("Français", "fr");
+        listBoxLocale.addItem("Italiano", "it");
+        listBoxLocale.addItem("Nederlands", "nl");
+        listBoxLocale.addItem("Português", "pt");
+        
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
 		int idx = 2;
@@ -441,7 +445,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_iCing.addItem(c.Preferences(), commandPref);
 		menuBar.addItem(c.iCing(), menuBar_iCing);
 		menuBar.addItem(c.File(), menuBar_file);
-		menuBar_file.addItem(c.New(), commandFile);
+		menuBar_file.addItem(c.Upload(), commandFile);
 		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
 		menuBar_edit.setVisible(false);// doesn't 'help'
@@ -643,7 +647,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	/**
 	 * So this method is not in General because all methods there are static Make sure that where ever the verbosity can
-	 * be set to debug it is also callign this routine.
+	 * be set to debug it is also calling this routine.
 	 * 
 	 * @param doDebugNow
 	 */

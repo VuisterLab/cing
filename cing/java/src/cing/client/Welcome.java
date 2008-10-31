@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 
 public class Welcome extends iCingView {
@@ -25,16 +24,18 @@ public class Welcome extends iCingView {
 	Button playButton = new Button();
 
 	public Welcome() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+//		final iCing icingShadow = icing;		
 		setState(iCing.WELCOME_STATE);
-		final VerticalPanel verticalPanelTop = new VerticalPanel();
-		initWidget(verticalPanelTop);
 
 		final Label html_1 = new Label( c.Welcome_to() + " " + c.iCing());
 		html_1.setStylePrimaryName("h1");
-		verticalPanelTop.add(html_1);		
-		verticalPanelTop.add(decPanel);		
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		decPanel.add(verticalPanel);
+		verticalPanel.add(html_1);		
+		verticalPanel.add(decPanel);		
 		FlexTable layout = new FlexTable();
 		verticalPanel.add(layout);
 		layout.setCellSpacing(5);

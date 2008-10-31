@@ -46,7 +46,7 @@ class General {
 	public static final int verbosityDebug = 5; // add debugging info (not
 
 	// recommended for casual user)
-	static int verbosity = verbosityOutput;
+	private static int verbosity = verbosityOutput;
 	// public static int verbosity = verbosityDebug;
 
 	/**
@@ -340,9 +340,8 @@ class General {
 			message = date_str + " " + message;
 		}
 		Utils.appendHtml(message + eol, iCing.area);
-//		System.out.println(message); // Echo
+		// System.out.println(message); // Echo
 	}
-
 
 	/**
 	 * Sort the ArrayList with the selected element first wrapping around at the end. If the given first element doesn't
@@ -435,6 +434,10 @@ class General {
 
 	public static boolean isVerbosityDebug() {
 		return verbosity == verbosityDebug;
+	}
+
+	public static int getVerbosity() {
+		return verbosity;
 	}
 
 }

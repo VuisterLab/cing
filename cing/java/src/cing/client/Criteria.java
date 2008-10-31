@@ -10,17 +10,20 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Criteria extends iCingView {
 
 	public Criteria() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+		final iCing icingShadow = icing;		
 		setState(iCing.CRITERIA_STATE);
 		iCingConstants c = iCing.c;
 
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		initWidget(verticalPanel);
 		HorizontalPanel fp = new HorizontalPanel();
 		fp.setSpacing(5);
 		final Label html_1 = new Label( c.Criteria_for() );
@@ -226,7 +229,7 @@ public class Criteria extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.OPTIONS_STATE);					
+				icingShadow.onHistoryChanged(iCing.OPTIONS_STATE);					
 			}
 		});	
 		verticalPanel.add(nextButton);
