@@ -34,14 +34,18 @@ public class Options extends iCingView {
 	int cingVerbosity;
     
 	public Options() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+		final iCing icingShadow = icing;		
 		setState(iCing.OPTIONS_STATE);
 		
-		final VerticalPanel verticalPanelTop = new VerticalPanel();
-		initWidget(verticalPanelTop);
 		final Label html_1 = new Label( c.Options() );
 		html_1.setStylePrimaryName("h1");
-		verticalPanelTop.add(html_1);
-		verticalPanelTop.add(decPanel);
+		verticalPanel.add(html_1);
+		verticalPanel.add(decPanel);
 		
 		final VerticalPanel verticalPanel = new VerticalPanel();
 		decPanel.setWidget(verticalPanel);
@@ -70,8 +74,8 @@ public class Options extends iCingView {
 				cingVerbosity = General.map2CingVerbosity( selectedValue );
 			}
 		});
-		listBoxVerbosity.setSelectedIndex(General.verbosityOutput);
-		cingVerbosity = General.map2CingVerbosity( General.verbosity );
+		listBoxVerbosity.setSelectedIndex(General.getVerbosity());
+		cingVerbosity = General.map2CingVerbosity( General.getVerbosity() );
 		
 		final CheckBox createImageryCheckBox = new CheckBox();
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
@@ -134,12 +138,12 @@ public class Options extends iCingView {
 		nextButton.setText(c.Next());
 		nextButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				icing.onHistoryChanged(iCing.RUN_STATE);					
+				icingShadow.onHistoryChanged(iCing.RUN_STATE);					
 			}
 		});	
-		verticalPanelTop.add(nextButton);
+		verticalPanel.add(nextButton);
 		nextButton.setTitle("Submit to CING server.");
-		verticalPanelTop.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
+		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 		
 	}
 	

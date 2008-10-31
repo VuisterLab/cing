@@ -152,21 +152,21 @@ public class Utils {
 	public static String unwrapPres(String html) {
 //		System.out.println("In Utils.reverseHtml: got ["+html+"]");
 		if (html == null) {
-			System.err.println("ERROR: In Utils.reverseHtml: got null for html");
+			System.err.println("ERROR: In Utils.unwrapPres: got null for html");
 			return null;
 		}
 
 		int htmlLength = html.length();
 		if (htmlLength < preHtmlLengthMinimal) {
-			System.err.println("ERROR: In Utils.reverseHtml: got too short html");
+			System.err.println("ERROR: In Utils.unwrapPres: got too short html");
 			return null;
 		}
 		if (!html.startsWith(preStart)) {
-			System.err.println("ERROR: In Utils.reverseHtml: html should start with: [" + preStart + "]");
+			System.err.println("ERROR: In Utils.unwrapPres: html should start with: [" + preStart + "]");
 			return null;
 		}
 		if (!html.endsWith(preEnd)) {
-			System.err.println("ERROR: In Utils.reverseHtml: html should end with: [" + preEnd + "]");
+			System.err.println("ERROR: In Utils.unwrapPres: html should end with: [" + preEnd + "]");
 			return null;
 		}
 
@@ -190,6 +190,7 @@ public class Utils {
 	 * @return false on error.
 	 */
 	public static boolean appendHtml(String message, RichTextArea area ) {
+//		System.err.println("DEBUG: [" + message + "]");
 		String htmlOrg = area.getHTML();
 		htmlOrg = Utils.unwrapPres(htmlOrg);
 		if (htmlOrg == null) {
@@ -215,6 +216,31 @@ public class Utils {
 		htmlNew = Utils.wrapPres( htmlNew ); 
 		area.setHTML(htmlNew);
 		return true;
+	}
+
+	public static String getFileNameWithoutPath(String fn) {
+		int idxSlash = fn.lastIndexOf('/');
+		int n = fn.length();
+		if (idxSlash < 0) {
+			idxSlash = fn.lastIndexOf('\\');
+		}
+		char lastChar = fn.charAt(n - 1);
+		if (lastChar == '/' || lastChar == '\\') {
+			General.showError("Failed to getFileNameWithoutPath");
+			return fn;
+		}
+		return fn.substring(idxSlash + 1);
+	}
+
+	/** Implement for real; this is just a guess */
+	public static String getHTMLformTypeFromFileName(String fn) {
+		if (fn.endsWith(".tgz")) {
+			return "binary/tgz";
+		}
+		if (fn.endsWith(".tar")) {
+			return "binary/tgz";
+		}
+		return "text/txt";
 	}
 	
 

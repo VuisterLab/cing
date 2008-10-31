@@ -7,12 +7,12 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Report extends iCingView {
 
 	final HTML reportHTML = new HTML();
+	iCingConstants c = iCing.c;
 
 	final String pleaseWriteDown = "<P>Please copy down the url for future reference.</P>"
 			+ "<P>Also, open the link in another window or tab."+General.eol
@@ -21,13 +21,12 @@ public class Report extends iCingView {
 	// final Timer refreshShowResultsTimer;
 
 	public Report() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
 		setState(iCing.REPORT_STATE);
-
-		iCingConstants c = iCing.c;
-
-		VerticalPanel verticalPanel = new VerticalPanel();
-		initWidget(verticalPanel);
-		verticalPanel.setSpacing(iCing.margin);
 
 		Label label = new Label(c.Report());
 		label.setStylePrimaryName("h1");

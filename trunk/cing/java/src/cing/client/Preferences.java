@@ -18,14 +18,18 @@ public class Preferences extends iCingView {
 	final int optionSoundIdx = i++;
     
 	public Preferences() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+		final iCing icingShadow = icing;		
 		setState(iCing.PREFERENCES_STATE);
-		final VerticalPanel verticalPanelTop = new VerticalPanel();
-		initWidget(verticalPanelTop);
 
 		final Label html_1 = new Label( c.Preferences() );
 		html_1.setStylePrimaryName("h1");
-		verticalPanelTop.add(html_1);		
-		verticalPanelTop.add(decPanel);		
+		verticalPanel.add(html_1);		
+		verticalPanel.add(decPanel);		
 		final VerticalPanel verticalPanel = new VerticalPanel();
 		decPanel.add(verticalPanel);
 		final FlexTable flexTable = new FlexTable();
@@ -46,13 +50,12 @@ public class Preferences extends iCingView {
 		listBox.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget sender) {
 				General.setVerbosity(Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() )));
-				General.showOutput("verbosity now: " + General.verbosity );				
-				boolean doDebugNow = General.verbosity == General.verbosityDebug;
-				icing.setVerbosityToDebug(doDebugNow);
-				General.showOutput("visibilityStatusArea: " + doDebugNow );
+				General.showOutput("verbosity now: " + General.getVerbosity() );				
+				icingShadow.setVerbosityToDebug(General.isVerbosityDebug());
+				General.showOutput("visibilityStatusArea: " + General.isVerbosityDebug());
 			}
 		});
-		listBox.setSelectedIndex(General.verbosity);
+		listBox.setSelectedIndex(General.getVerbosity());
 		flexTable.setWidget(optionVerbosityIdx, 1, listBox);
 		
 		

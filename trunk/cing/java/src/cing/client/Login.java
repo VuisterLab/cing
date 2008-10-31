@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Login extends iCingView {
@@ -17,13 +16,17 @@ public class Login extends iCingView {
 	DecoratorPanel decPanel = new DecoratorPanel();
 
 	public Login() {
+		super();
+	}
+	
+	public void setIcing(iCing icing) {
+		super.setIcing(icing);
+//		final iCing icingShadow = icing;		
 		setState(iCing.LOGIN_STATE);
-		final VerticalPanel verticalPanelTop = new VerticalPanel();
-		initWidget(verticalPanelTop);
 		final Label html_1 = new Label( c.Login() );
 		html_1.setStylePrimaryName("h1");
-		verticalPanelTop.add(html_1);
-		verticalPanelTop.add(decPanel);
+		verticalPanel.add(html_1);
+		verticalPanel.add(decPanel);
 				
 		final Grid grid = new Grid(4, 2);
 		decPanel.setWidget(grid);
