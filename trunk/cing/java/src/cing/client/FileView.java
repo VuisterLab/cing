@@ -51,7 +51,6 @@ public class FileView extends iCingView {
 	public void setIcing(iCing icing) {
 		super.setIcing(icing);
 		final iCing icingShadow = icing;		
-		verticalPanel.setSpacing(iCing.margin);
 
 		Label label = new Label(c.Upload());
 		label.setStylePrimaryName("h1");
@@ -142,6 +141,8 @@ public class FileView extends iCingView {
 	}
 
 	/**
+	 * flexTable
+	 * 	->cingQuerySave.formLayoutPanel
 	 * 
 	 * @return true on error.
 	 */
@@ -164,27 +165,33 @@ public class FileView extends iCingView {
 		final Label labelFileUploadDone = new Label("This message should not show up.");
 		labelFileUploadDone.setVisible(false);
 
-		final FileUpload fileUpload = new FileUpload();
-		fileUpload.setName(Keys.FORM_PARM_UPLOAD_FILE_BASE);
 		Button submitButton = new Button(c.Upload());
 		submitButton.setVisible(false);
-		HorizontalPanel formWrapper = new HorizontalPanel();
-		HorizontalPanel fileUploadHorizontalPanel = new HorizontalPanel();
-		fileUploadHorizontalPanel.add(fileUpload); // will switch between these two.
-		fileUploadHorizontalPanel.add(labelFileUploadDone);
-		// The GWT calls this form handler after the form is submitted.
+		
+		final FileUpload fileUpload = new FileUpload();
+		fileUpload.setName(Keys.FORM_PARM_UPLOAD_FILE_BASE);
+		// The GWT calls this formPanel handler after the formPanel is submitted.
 		FormHandlerFile fileFormHandler = new FormHandlerFile(icing);
-		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
+		fileFormHandler.setFileUpload(fileUpload);
+		fileFormHandler.setLabelFileUploadDone(labelFileUploadDone);
+		fileFormHandler.setStatusMessage(statusMessage);
+		fileFormHandler.setSubmitButton(submitButton);
+		fileFormHandler.setNextButton(nextButton);
+
 		/** Invisible parameters to pass */
 
 		final iCingQuery cingQuerySave = new iCingQuery(icing);
 		cingQuerySave.action.setValue(Keys.FORM_ACTION_SAVE);
 		cingQuerySave.setFormHandler(fileFormHandler); // Override the default one.
-		cingQuerySave.formLayoutPanel.add(fileUpload);
-		formWrapper.add(cingQuerySave.formPanel);
+		cingQuerySave.formVerticalPanel.add(fileUpload); // will switch between these two.
+		cingQuerySave.formVerticalPanel.add(labelFileUploadDone);
+		
+		flexTable.setWidget(currentRowIdx, fileIdx, cingQuerySave.formPanel);
+		flexTable.setWidget(currentRowIdx, submitIdx, submitButton);
 
-		flexTable.setWidget(currentRowIdx, fileIdx, cingQuerySave.formLayoutPanel);
 
+		
+		/** Setup the 4 boxes */
 		final ListBox listBox_Program = new ListBox();
 		flexTable.setWidget(currentRowIdx, programIdx, listBox_Program);
 		listBox_Program.setVisibleItemCount(1);
@@ -272,16 +279,12 @@ public class FileView extends iCingView {
 				if (fileUpload.getFilename().length() == 0) {
 					return;
 				}
+				this.cancel();
 				cingQuerySave.formPanel.submit();
 			}
 		};
 		timer.scheduleRepeating(iCing.REFRESH_INTERVAL);
 
-		fileFormHandler.setFileUpload(fileUpload);
-		fileFormHandler.setLabelFileUploadDone(labelFileUploadDone);
-		fileFormHandler.setStatusMessage(statusMessage);
-		fileFormHandler.setSubmitButton(submitButton);
-		fileFormHandler.setNextButton(nextButton);
 
 		checkBoxUseFile.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -382,7 +385,6 @@ public class FileView extends iCingView {
 			}
 		});
 
-		cingQuerySave.formPanel.addFormHandler(fileFormHandler);
 		submitButton.addClickListener(new ClickListener() {
 			public void onClick(Widget sender) {
 				cingQuerySave.formPanel.submit();

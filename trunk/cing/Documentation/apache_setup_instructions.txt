@@ -2,7 +2,6 @@
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
-        vi /private/etc/apache2/users/jd.conf
 
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
@@ -51,6 +50,9 @@ SetEnv  CINGROOT /Users/jd/workspace34/cing
 # For the gwt tomcat server
 ProxyPass         /iCing/serv http://localhost:8080/iCing
 ProxyPassReverse  /iCing/serv http://localhost:8080/iCing
+For Geerten with 8080 being used by Chris' django server.
+ProxyPass         /iCing/serv http://localhost:8079/iCing
+ProxyPassReverse  /iCing/serv http://localhost:8079/iCing
 
 # For the python stand-alone CGI server.
 ProxyPass         /iCing/cgi-bin http://localhost:8001/cgi-bin

@@ -165,14 +165,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		String initToken = History.getToken();
 		if (initToken.length() == 0) {
 			// History.newItem();
-			// initToken = Keys.FILE_STATE;
-			initToken = iCing.LOG_STATE;
+			 initToken = iCing.FILE_STATE;
+//			initToken = iCing.LOG_STATE;
 		}
 		onHistoryChanged(initToken);
-		// Just for debugging.
-		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
-		String actionServerUrl = moduleBaseUrlWithPort + Keys.SERVLET_URL;
-		General.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
 	}
 
 	public void onHistoryChanged(String historyToken) {
@@ -666,6 +662,8 @@ public class iCing implements EntryPoint, HistoryListener {
 			result += allowedCharacters.charAt(idxChar);
 			// TODO: generate on server with cross check on availability...
 		}
+		result = "123456"; // TODO: disable for production.
+		
 		return result;
 	}
 }

@@ -1,7 +1,9 @@
 package cing.server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -19,8 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import Wattos.Utils.InOut;
+import Wattos.Utils.OSExec;
+import Wattos.Utils.StringArrayList;
 import Wattos.Utils.Strings;
 import cing.client.Keys;
+
+import com.braju.format.Format;
+import com.braju.format.Parameters;
 
 public class iCingServlet extends HttpServlet {
 	private static final long serialVersionUID = 6098745782027999297L;
@@ -34,13 +41,20 @@ public class iCingServlet extends HttpServlet {
 	private static final String ERROR_WRITE_FAILED = "File write failed.";
 	private static final String ERROR_NOT_MULTI_PART = "Not multipart message.";
 
+	private static final String PYTHON_EXECUTABLE = "/sw/bin/python";
+	private static final String CING_SCRIPT = "$CINGROOT/python/cing/main.py";
+	private static final String DONE_FILE = "DONE";
+	private static final String LAST_LOG_SEND_FILE = "LAST_LOG_SEND";
+	private static final String CING_RUN_LOG_FILE = "cingRun.log";
+	private static final int CING_VERBOSITY = 9;
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
 		writeJsonError(response, "Denying iCingServlet.doGet. Try a POST.");
 	}
 
 	/**
-	 * Return a json string to file form handler with only one element: {"error","reason"} or {"message","999 kb"}
+	 * Return a json string to file formPanel handler with only one element: {"error","reason"} or {"message","999 kb"}
 	 * */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
@@ -117,7 +131,7 @@ public class iCingServlet extends HttpServlet {
 			FileItem item = items.get(i);
 			String name = item.getFieldName();
 			String value = item.getString();
-			General.showDebug("processing form item: [" + name + "] with value: [" + value + "]");
+			// General.showDebug("processing formPanel item: [" + name + "] with value: [" + value + "]");
 			if (item.isFormField()) {
 				if (name.equals(Keys.FORM_PARM_ACCESS_KEY)) {
 					currentAccessKey = value;
@@ -146,6 +160,7 @@ public class iCingServlet extends HttpServlet {
 				return;
 			} else {
 				actualFileItem = item;
+				General.showDebug("retrieved actualFileItem: " + actualFileItem);
 			}
 		}
 
@@ -185,15 +200,15 @@ public class iCingServlet extends HttpServlet {
 		}
 
 		if (currentAction.equals(Keys.FORM_ACTION_SAVE)) {
-			processFile(response, result, pathProject, actualFileItem, currentUserId, currentAccessKey);
+			processFile(response, result, pathProject, actualFileItem);
 		} else if (currentAction.equals(Keys.FORM_ACTION_PROJECT_NAME)) {
-			processPname(response, result, pathProject, actualFileItem, currentUserId, currentAccessKey);
+			processPname(response, result, pathProject);
 		} else if (currentAction.equals(Keys.FORM_ACTION_LOG)) {
-			;
+			processLog(response, result, pathProject);
 		} else if (currentAction.equals(Keys.FORM_ACTION_STATUS)) {
-			;
+			processStatus(response, result, pathProject);
 		} else if (currentAction.equals(Keys.FORM_ACTION_RUN)) {
-			;
+			processRun(response, result, pathProject);
 		} else {
 			// Would be a code bug as is checked before.
 			writeJsonError(response, result, "Requested action unknown:  " + currentAction + " [CODE ERROR]");
@@ -201,8 +216,7 @@ public class iCingServlet extends HttpServlet {
 		}
 	}
 
-	private void processPname(HttpServletResponse response, JSONObject result, File pathProject,
-			FileItem actualFileItem, String currentUserId, String currentAccessKey) {
+	private void processPname(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		String regexp = ".*.tgz";
 		General.showOutput("Reg exp files: " + regexp);
@@ -219,7 +233,6 @@ public class iCingServlet extends HttpServlet {
 		}
 		String projectName = list[0];
 		projectName = InOut.getFilenameBase(projectName);
-		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
 		jsonResultPut(result, Keys.RESPONSE_RESULT, projectName);
 		writeJson(response, result);
 	}
@@ -233,7 +246,16 @@ public class iCingServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * If the exit code was not set yet then set it to success
+	 * 
+	 * @param response
+	 * @param result
+	 */
 	private void writeJson(HttpServletResponse response, JSONObject result) {
+		if (!result.has(Keys.RESPONSE_EXIT_CODE)) {
+			jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
+		}
 		General.showDebug("Result is [" + result.toString() + "]");
 		response.setContentType("text/plain");
 		try {
@@ -256,13 +278,110 @@ public class iCingServlet extends HttpServlet {
 	}
 
 	/**
+	 * 
+	 * @param response
+	 * @param result
+	 * @param pathProject
+	 * @return null on error.
+	 */
+	private String getProjectFile(HttpServletResponse response, JSONObject result, File pathProject) {
+
+		String regexp = ".*.tgz";
+		General.showOutput("Reg exp files: " + regexp);
+		General.showOutput("Dir: " + pathProject);
+		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
+		String[] list = pathProject.list(ff);
+
+		General.showOutput("Found files: " + Strings.toString(list));
+		General.showOutput("Found number of files: " + list.length);
+
+		if (list.length < 1) {
+			writeJsonError(response, result, "No project files found");
+			return null;
+		}
+		String projectName = list[0];
+		String projectFileName = InOut.getFileName(projectName);
+		return projectFileName;
+	}
+
+	/**
 	 * Actually saves the file
 	 * 
 	 * @param item
 	 * @return a JSON string.
 	 */
-	private void processFile(HttpServletResponse response, JSONObject result, File pathProject, FileItem item,
-			String currentUserId, String currentAccessKey) {
+	private void processRun(HttpServletResponse response, JSONObject result, File pathProject) {
+
+		File doneFile = new File(pathProject, DONE_FILE);
+		if (doneFile.exists()) {
+			doneFile.delete(); // Can't be done when not started.
+		}
+		File cingRunLogFile = new File(pathProject, CING_RUN_LOG_FILE);
+		if (cingRunLogFile.exists()) {
+			cingRunLogFile.delete();
+		}
+
+		// Note that Java has no current working directory so no Unix cd equivalent
+		// Commands will be executed in csh by Wattos by default.
+		String cmdCdProjectDir = "cd " + pathProject;
+		// String cmdRunStarting = "(" + cmdCd + ";date;echo 'Starting cing run') >> " + cingRunLogFile + " 2>&1"; //
+		// leave as an example of complex redirection under bash instead of tcsh.
+		String cmdRunStarting = "(" + cmdCdProjectDir + ";date;echo 'Starting cing run') >>& " + cingRunLogFile;
+		String cmdRunKiller = "(" + cmdCdProjectDir + ";date;echo 'As if starting killer') >>& " + cingRunLogFile
+				+ " &";
+		String cmdRunDone = "touch " + doneFile; // Using absolute path so no cd needed.
+
+		String projectFileName = getProjectFile(response, result, pathProject);
+		if (projectFileName == null) {
+			// Will already have generated a Json error back.
+			return;
+		}
+
+		String projectName = InOut.getFilenameBase(projectFileName);
+		if (projectFileName == null) {
+			writeJsonError(response, result, "Failed to find project name");
+			return;
+		}
+
+		/**
+		 * For the long command string it's real nice to have the overview layed out in a printf way
+		 */
+		Parameters p = new Parameters(); // Printf parameters autoclearing after use.
+		p.add(projectName);
+		p.add(projectFileName);
+		p.add(CING_VERBOSITY);
+		String cing_options = Format.sprintf("--name %s --initCcpn %s -v %s --script doValidateiCing.py", p);
+
+		p.add(cmdCdProjectDir);
+		p.add(PYTHON_EXECUTABLE);
+		p.add(CING_SCRIPT);
+		p.add(cing_options);
+		p.add(cmdRunDone);
+		p.add(cingRunLogFile);
+		String cmdRun = Format.sprintf("(%s; %s -u %s %s; %s) >>& %s &", p);
+
+		General.showOutput("cmdRunStarting: [" + cmdRunStarting + "]");
+		General.showOutput("cmdRunKiller:   [" + cmdRunKiller + "]");
+		General.showOutput("cmdRun:         [" + cmdRun + "]");
+
+		String[] cmdList = new String[] { cmdRunStarting, cmdRunKiller, cmdRun };
+		int delayBetweenSubmittingJobs = 500; // ms
+		int status = OSExec.exec(cmdList, delayBetweenSubmittingJobs);
+		if (status != 0) {
+			writeJsonError(response, result, "Failed to submit all jobs.");
+			return;
+		}
+		jsonResultPut(result, Keys.RESPONSE_RESULT, Keys.RESPONSE_STARTED);
+		writeJson(response, result);
+	}
+
+	/**
+	 * Actually saves the file
+	 * 
+	 * @param item
+	 * @return a JSON string.
+	 */
+	private void processFile(HttpServletResponse response, JSONObject result, File pathProject, FileItem item) {
 
 		if (item == null) {
 			writeJsonError(response, "No actual file item retrieved");
@@ -312,8 +431,104 @@ public class iCingServlet extends HttpServlet {
 		General.showDebug("Fileform     length: " + lengthFormElement);
 		General.showDebug("File written length: " + length);
 		String sizeStr = Ut.bytesToFormattedString(length);
-		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
 		jsonResultPut(result, Keys.RESPONSE_RESULT, sizeStr);
 		writeJson(response, result);
+	}
+
+	private void processStatus(HttpServletResponse response, JSONObject result, File pathProject ) {
+
+		File doneFile = new File(pathProject, DONE_FILE);
+		String status = Keys.RESPONSE_STATUS_NOT_DONE;
+		if (doneFile.exists()) {
+			status = Keys.RESPONSE_STATUS_DONE;
+		}
+		jsonResultPut(result, Keys.RESPONSE_RESULT, status);
+		writeJson(response, result);
+		return;
+	}
+
+	/**
+	 * 
+	 * @param response
+	 * @param result
+	 *            Message will be byte by byte and end up in a PRE block
+	 * @param pathProject
+	 * @param item
+	 * @param currentUserId
+	 * @param currentAccessKey
+	 */
+	private void processLog(HttpServletResponse response, JSONObject result, File pathProject) {
+
+		General.showDebug("Retrieving cing log tail.");
+		File lastLogSendFile = new File(pathProject, LAST_LOG_SEND_FILE);
+
+		String lastLog = Keys.RESPONSE_LOG_VALUE_NONE;
+
+		File cingRunLogFile = new File(pathProject, CING_RUN_LOG_FILE);
+		if (!cingRunLogFile.exists()) {
+			jsonResultPut(result, Keys.RESPONSE_RESULT, lastLog);
+			writeJson(response, result);
+		}
+		long cingrunLogFileSize = cingRunLogFile.length();
+		General.showDebug("cingrunLogFileSize: " + cingrunLogFileSize);
+		long cingrunLogFileSizeLast = 0;
+		if (lastLogSendFile.exists()) {
+			General.showDebug("Checking lastLogSendFile: " + lastLogSendFile);
+			StringArrayList sal = new StringArrayList();
+			boolean statusRead = sal.read(lastLogSendFile.toString());
+			lastLogSendFile.delete();
+			if (!statusRead) {
+				writeJsonError(response, result, "Failed to read the lastLogSendFile: " + lastLogSendFile);
+				return;
+			}
+			if (sal.size() < 1) {
+				writeJsonError(response, result, "Failed to read at least one line from the present lastLogSendFile: "
+						+ lastLogSendFile);
+				return;
+			}
+			String cingrunLogFileSizeLastStr = sal.getString(0);
+			General.showDebug("cingrunLogFileSizeLast (string): " + cingrunLogFileSizeLastStr);
+			cingrunLogFileSizeLast = Long.parseLong(cingrunLogFileSizeLastStr);
+
+			General.showDebug("cingrunLogFileSizeLast (long): " + cingrunLogFileSizeLast);
+		} else {
+			General.showDebug("no LAST_LOG_SEND_FILE: " + LAST_LOG_SEND_FILE);
+		}
+
+		// # doesn't exist because it was just removed if it even existed to start with.
+		StringArrayList sal = new StringArrayList();
+		sal.add(Long.toString(cingrunLogFileSize));
+		General.showDebug("writing to LAST_LOG_SEND_FILE: " + LAST_LOG_SEND_FILE);
+		if (!sal.write(lastLogSendFile.toString())) {
+			writeJsonError(response, result, "Failed to write to new lastLogSendFile: " + lastLogSendFile);
+			return;
+		}
+
+		if (cingrunLogFileSize > cingrunLogFileSizeLast) {
+			long newLogSize = cingrunLogFileSize - cingrunLogFileSizeLast;
+			General.showDebug("New log size: " + newLogSize);
+			try {
+				RandomAccessFile raf = new RandomAccessFile(cingRunLogFile, "r");
+				raf.seek(cingrunLogFileSizeLast);
+				byte[] b = new byte[(int) newLogSize];
+				raf.readFully(b);
+				raf.close();
+				lastLog = new String(b);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				writeJsonError(response, result, "Failed to find cingRunLogFile: " + cingRunLogFile);
+				return;
+			} catch (IOException e) {
+				e.printStackTrace();
+				writeJsonError(response, result, "Detected IOException see tomcat log");
+				return;
+			}
+		} else {
+			General.showDebug("No new log");
+		}
+		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
+		jsonResultPut(result, Keys.RESPONSE_RESULT, lastLog);
+		writeJson(response, result);
+
 	}
 }

@@ -15,7 +15,6 @@ public class FormHandleriCing implements FormHandler {
 	public iCing icing;
 	public String action;
 	public String exitCode;
-	/** May remain unset ? TODO: check. */
 	public String result;
 	public JSONObject jso;
 
@@ -26,7 +25,7 @@ public class FormHandleriCing implements FormHandler {
 
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
-		General.showDebug("Starting submit which will be dealt with exclusively from FormHandleriCing");
+		General.showDebug("Starting submit which will be dealt with from FormHandleriCing and sub class.");
 		if (icing == null) {
 			General.showCodeBug("Found null for icing.");
 			event.setCancelled(true);
@@ -36,6 +35,7 @@ public class FormHandleriCing implements FormHandler {
 
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
+		General.showDebug("Now in FormHandleriCing.onSubmitComplete");
 
 		String response = event.getResults();
 		if (response == null) {

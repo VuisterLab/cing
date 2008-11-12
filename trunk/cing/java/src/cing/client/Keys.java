@@ -10,7 +10,7 @@ public interface Keys {
 	public static final String NOT_AVAILABLE = "not available";
 	public static final String RESULT_URL = "tmp/cing";
 	/** The next statement should not be changed by a single char */
-	public static final String VERSION = "20081030-1320";
+	public static final String VERSION ="20081110-1327";
 
 	public static final String None = "None";
 
@@ -43,6 +43,7 @@ public interface Keys {
 	public static final String RESPONSE_STATUS_NOT_DONE = "notDone";
 	public static final String RESPONSE_STATUS_DONE = "done";
 	public static final String RESPONSE_RESULT_DEFAULT = None;
+	public static final String RESPONSE_STARTED = "started";
 
 	static final ArrayList<String> validResponseKeys = new ArrayList();
 	static final ArrayList<String> validResponseStatusValues = new ArrayList();
@@ -57,4 +58,5 @@ public interface Keys {
 	public static final ArrayList<String> FORM_ACTION_ALIST = new ArrayList(Arrays.asList(FORM_ACTION_LIST));
 	public static final ArrayList<String> RESPONSE_EXIT_CODE_ALIST = new ArrayList(Arrays
 			.asList(RESPONSE_EXIT_CODE_LIST));
+	public static final String RESPONSE_LOG_VALUE_NONE = RESPONSE_RESULT_DEFAULT;
 }

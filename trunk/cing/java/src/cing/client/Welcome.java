@@ -7,8 +7,6 @@ package cing.client;
 //import com.allen_sauer.gwt.voices.client.handler.SoundLoadStateChangeEvent;
 //import cing.server.General;
 
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -26,16 +24,16 @@ public class Welcome extends iCingView {
 	public Welcome() {
 		super();
 	}
-	
+
 	public void setIcing(iCing icing) {
 		super.setIcing(icing);
-//		final iCing icingShadow = icing;		
+		// final iCing icingShadow = icing;
 		setState(iCing.WELCOME_STATE);
 
-		final Label html_1 = new Label( c.Welcome_to() + " " + c.iCing());
+		final Label html_1 = new Label(c.Welcome_to() + " " + c.iCing());
 		html_1.setStylePrimaryName("h1");
-		verticalPanel.add(html_1);		
-		verticalPanel.add(decPanel);		
+		verticalPanel.add(html_1);
+		verticalPanel.add(decPanel);
 		FlexTable layout = new FlexTable();
 		verticalPanel.add(layout);
 		layout.setCellSpacing(5);
@@ -45,58 +43,13 @@ public class Welcome extends iCingView {
 
 		cellFormatter.setColSpan(0, 0, 2);
 		cellFormatter.setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
-		playButton.setText( c.Silly_sound());
-		layout.setWidget(4, 0, playButton);
-		playButton.setTitle("Make some noise.");
-		playButton.setVisible(false);
-		// add the load state status
-		// RootPanel.get().add(loadStateHTML);
-//		layout.setWidget(5, 0, loadStateHTML);
-//		loadStateHTML.setVisible(false);
-		
+
 		final Hyperlink hyperlink = new Hyperlink(c.Start(), iCing.FILE_STATE);
 		layout.setWidget(2, 0, hyperlink);
 		hyperlink.setTitle("Begin with file upload.");
 		final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);
 		layout.setWidget(3, 0, hyperlink_1);
 		hyperlink_1.setTitle("Start new session.");
-
-		// use deferred command to catch initialization exceptions
-		DeferredCommand.addCommand(new Command() {
-			public void execute() {
-				onModuleLoad2();
-			}
-		});
 	}
 
-	public void onModuleLoad2() {
-//		SoundController soundController = new SoundController();
-//		final Sound sound = soundController.createSound(Sound.MIME_TYPE_AUDIO_MPEG, "sound/ngmater.mp3");
-
-		// add a sound handler so we know when the sound has loaded
-		// create a place holder for the load state
-//		final HTML loadStateHTML = new HTML();
-		// loadStateHTML.setHTML( iCing.soundLoadState );
-//		sound.addEventHandler(new SoundHandler() {
-//			public void onPlaybackComplete(PlaybackCompleteEvent event) {
-//			}
-//
-//			public void onSoundLoadStateChange(SoundLoadStateChangeEvent event) {
-////				loadStateHTML.setHTML(c.Load_state() + ": " + event.getLoadStateAsString());
-//			}
-//		});
-
-		// create a (disabled) play button
-		// playButton = new Button("Silly sound");
-		// when we click, play the sound
-//		playButton.addClickListener(new ClickListener() {
-//			public void onClick(Widget sender) {
-//				if (iCing.soundOn) {
-////					sound.play();
-//				} else {
-//					Window.alert(c.Sound_is_turn());
-//				}
-//			}
-//		});
-	}
 }

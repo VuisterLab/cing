@@ -39,7 +39,7 @@ public class JSONML {
     /**
      * Parse XML values and store them in a JSONArray.
      * @param x       The XMLTokener containing the source string.
-     * @param arrayForm true if array form, false if object form.
+     * @param arrayForm true if array formPanel, false if object formPanel.
      * @param ja      The JSONArray that is containing the current tag or null
      *     if we are at the outermost level.
      * @return A JSONArray if the value is the outermost tag, otherwise null.

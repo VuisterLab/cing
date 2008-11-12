@@ -23,6 +23,7 @@ public class FormHandlerFile extends FormHandleriCing {
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
 		super.onSubmit(event);
+		General.showDebug("Starting submit which will be dealt with from FormHandlerFile.");
 
 		/** Extra checks here for this class */
 		if (fileUpload.getFilename().length() == 0) {
@@ -42,6 +43,7 @@ public class FormHandlerFile extends FormHandleriCing {
 
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
 		super.onSubmitComplete(event);
+		General.showDebug("Now in FormHandlerFile.onSubmitComplete");
 
 		statusMessage.removeStyleName("successBorder");
 		statusMessage.removeStyleName("failureBorder");
@@ -70,7 +72,7 @@ public class FormHandlerFile extends FormHandleriCing {
 		statusMessage.setText(labelTxt + " uploaded.");
 		labelFileUploadDone.setText(labelTxt);
 		nextButton.setEnabled(true);
-		RunView.runButton.setEnabled(true);
+		RunView.submitButton.setEnabled(true);
 	}
 
 	public void setFileUpload(FileUpload fileUpload) {
