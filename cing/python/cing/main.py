@@ -32,9 +32,6 @@ cing --name test --script MYSCRIPT.py
 - To test CING without any messages (not even errors):
 cing --test --verbose 0
 
-- To start the iCing server with plenty of debug
-cing --server -v 9
-
 --------------------------------------------------------------------------------
 Some simple script examples:
 --------------------------------------------------------------------------------
@@ -56,7 +53,6 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
-from BaseHTTPServer import HTTPServer
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
@@ -71,8 +67,6 @@ from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from cing.iCing.iCingServer import PORT_SERVER
-from cing.iCing.iCingServer import iCingServerHandler
 from string import join
 from cing import starttime
 from cing import usage
@@ -223,38 +217,6 @@ def testOverall():
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
 
-def serve():
-    # Now the cgi python code is actually a part of the package.
-    # The standard CGI handler assumes it to be in a "cgi-bin" subdir of the current working dir.
-    localDir = os.path.join( cingPythonCingDir, "iCing" )
-    os.chdir(localDir)
-    NTmessage("Starting server at port %s " % PORT_SERVER )
-#    NTmessage("Starting servers at ports %s and %s" % (PORT_SERVER, PORT_CGI) )
-#    NTwarning("Manually kill the two servers when done; sorry no functionality for that yet.")
-    httpd = HTTPServer(('', PORT_SERVER), iCingServerHandler )
-#    NTmessage("Starting a CGI server at port %s in dir: %s" % ( PORT_CGI, localDir ))
-#    httpd_cgi = HTTPServer(('', PORT_CGI), CGIHTTPRequestHandler)
-#    year = 365*24*60*60
-#    f = ForkOff(
-#            processes_max           = 2,
-#            max_time_to_wait        = year, # leave the server up for a year.                
-#            verbosity               = cing.verbosity )
-#    job_0       = ( httpd.serve_forever, () )
-#    job_1       = ( httpd_cgi.serve_forever, () )
-#    job_list    = [ job_0, job_1 ]    
-#    done_list   = f.forkoff_start( job_list, delay_between_submitting_jobs=1 )    
-#    NTmessage("Finished forked ids: %s", done_list)
-    httpd.serve_forever()
-    NTmessage( 'Shutting down server' )        
-    try:        
-        httpd.socket.close()
-#        httpd_cgi.socket.close()
-    except:
-        pass
-#    try:
-##        httpd_cgi.socket.close()
-#    except:
-#        pass
 
 def getParser():
     #------------------------------------------------------------------------------------
@@ -391,11 +353,6 @@ def getParser():
                       dest="verbosity", action='store',
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
-    parser.add_option( "--server",
-                      action="store_true",
-                      dest="server",
-                      help="Start a server at ports 8000 and 8001 by default"
-                     )
     return parser
 project = None # after running main it will be filled.
 
@@ -425,10 +382,6 @@ def main():
 
     if options.test:
         testOverall()
-        sys.exit(0)
-
-    if options.server:
-        serve()
         sys.exit(0)
 
     #------------------------------------------------------------------------------------

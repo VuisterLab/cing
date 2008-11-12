@@ -9,7 +9,7 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 	
 - Logs:
 	tail -f $CATALINA_HOME/logs/* &
-- Webapps:
+- Webapps:x
 	$CATALINA_HOME/webapps
 	
 	

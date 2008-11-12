@@ -34,7 +34,7 @@ public class Cookie {
 
     /**
      * Produce a copy of a string in which the characters '+', '%', '=', ';'
-     * and control characters are replaced with "%hh". This is a gentle form
+     * and control characters are replaced with "%hh". This is a gentle formPanel
      * of URL encoding, attempting to cause as little distortion to the
      * string as possible. The characters '=' and ';' are meta characters in
      * cookies. By convention, they are escaped using the URL-encoding. This is

@@ -6,6 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
 
+/**
+ * Add specific iCing stuff here.
+ * All other code can remain in Wattos.
+ * @author jd
+ *
+ */
 public class Ut {
     public static NumberFormat nf = NumberFormat.getInstance();
 

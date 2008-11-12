@@ -4,6 +4,23 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5 extras"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Wattos"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/AbsoluteLayout.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/ant-contrib.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/colt.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/CSVutils.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/gnujaxp.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/itext-1.4.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/jakarta-regexp.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/jcommon-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/JFlex.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/jfreechart-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/Jmol.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/printf_hb15.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/starlibj_with_source.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/lib/swing-layout-1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/build/web/WEB-INF/classes" sourcepath="/wattos/src"/>
 	<classpathentry kind="output" path="java/bin"/>
 </classpath>

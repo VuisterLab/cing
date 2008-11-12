@@ -12,11 +12,11 @@ public class iCingQuery {
 	 * Since not more than one element can be added to formpanel; the individual items need to be wrapped in another
 	 * element that can contain them.
 	 */
-	final VerticalPanel formLayoutPanel = new VerticalPanel();
+	final VerticalPanel formVerticalPanel = new VerticalPanel();
 	final Hidden action = new Hidden(Keys.FORM_PARM_ACTION);
 	public FormHandleriCing serverFormHandler = null;
 
-	public iCingQuery(iCing icing) {	
+	public iCingQuery(iCing icing) {
 		if (icing == null) {
 			General.showError("in iCingQuery() found icing: null");
 		} else {
@@ -28,14 +28,14 @@ public class iCingQuery {
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
 		String actionServerUrl = moduleBaseUrlWithPort + Keys.SERVLET_URL;
-		formPanel.setAction(actionServerUrl);
-		VerticalPanel formLayoutPanel = new VerticalPanel();
-		formPanel.setWidget(formLayoutPanel);
+		formPanel.setAction(actionServerUrl);		
+		General.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
 
-		formLayoutPanel.add(new Hidden(Keys.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
-		formLayoutPanel.add(new Hidden(Keys.FORM_PARM_USER_ID, iCing.currentUserId));
-		formLayoutPanel.add(action);
-
+		formVerticalPanel.add(action);
+		formVerticalPanel.add(new Hidden(Keys.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
+		formVerticalPanel.add(new Hidden(Keys.FORM_PARM_USER_ID, iCing.currentUserId));
+		
+		formPanel.setWidget(formVerticalPanel);
 		formPanel.addFormHandler(serverFormHandler);
 	}
 
@@ -45,7 +45,8 @@ public class iCingQuery {
 	 * @param serverFormHandler
 	 */
 	public void setFormHandler(FormHandleriCing formHandler) {
-		formPanel.removeFormHandler(formHandler);
+		General.showDebug("Now in setFormHandler.");
+		formPanel.removeFormHandler(this.serverFormHandler);
 		formPanel.addFormHandler(formHandler);
 		this.serverFormHandler = formHandler;
 		if (formHandler.icing == null) {

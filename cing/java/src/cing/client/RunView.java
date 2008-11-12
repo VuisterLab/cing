@@ -8,13 +8,14 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RunView extends iCingView {
 
 	final HTML reportHTML = new HTML();
 	DecoratorPanel decPanel = new DecoratorPanel();
-	static final Button runButton = new Button();
+	static final Button submitButton = new Button();
 	static final Button nextButton = new Button();
 	iCingQuery cingQueryRun; 
 	iCingConstants c = iCing.c;
@@ -27,28 +28,34 @@ public class RunView extends iCingView {
 		super.setIcing(icing);
 		final iCing icingShadow = icing;		
 		setState(iCing.RUN_STATE);
-		verticalPanel.add(decPanel);
 		
 
 		final Label html_1 = new Label( c.Run() );
 		html_1.setStylePrimaryName("h1");
 		verticalPanel.add(html_1);
 
-		final Label html_2 = new Label( "Please press the button when you are ready." );
-		verticalPanel.add(html_2);
+		verticalPanel.add(decPanel);
+		VerticalPanel verticalPanelDec = new VerticalPanel(); 
+		verticalPanelDec.setSpacing(iCing.margin);
+		decPanel.add(verticalPanelDec);
+
 		
-		runButton.setText(c.Submit());
-		runButton.addClickListener(new ClickListener() {
+		final Label html_2 = new Label( "Please press the button when you are ready." );
+		
+		submitButton.setText(c.Submit());
+		submitButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-//				runButton.setText("Running...");
+//				submitButton.setText("Running...");
 				run();
 			}
 		});
-		runButton.setEnabled(true);
+		submitButton.setEnabled(true);
 		
-		verticalPanel.add(runButton);
-		runButton.setTitle("Run the validation.");
-		verticalPanel.setCellHorizontalAlignment(runButton, HasHorizontalAlignment.ALIGN_LEFT);
+		verticalPanelDec.add(html_2);
+		verticalPanelDec.add( submitButton);
+		
+		submitButton.setTitle("Run the validation.");
+		verticalPanelDec.setCellHorizontalAlignment(submitButton, HasHorizontalAlignment.ALIGN_LEFT);
 				
 		
 		
@@ -84,7 +91,7 @@ public class RunView extends iCingView {
 	}	
 	
 	protected void run() {		
-		runButton.setEnabled(false);
+		submitButton.setEnabled(false);
 		nextButton.setEnabled(true); 
 		icing.cingLogView.getProjectName();		
 		cingQueryRun.formPanel.submit();		

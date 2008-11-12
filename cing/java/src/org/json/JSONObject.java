@@ -36,15 +36,15 @@ import java.util.TreeSet;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its
- * external form is a string wrapped in curly braces with colons between the
- * names and values, and commas between the values and names. The internal form
+ * external formPanel is a string wrapped in curly braces with colons between the
+ * names and values, and commas between the values and names. The internal formPanel
  * is an object having <code>get</code> and <code>opt</code> methods for
  * accessing the values by name, and <code>put</code> methods for adding or
  * replacing values by name. The values can be any of these types:
  * <code>Boolean</code>, <code>JSONArray</code>, <code>JSONObject</code>,
  * <code>Number</code>, <code>String</code>, or the <code>JSONObject.NULL</code>
- * object. A JSONObject constructor can be used to convert an external form
- * JSON text into an internal form whose values can be retrieved with the
+ * object. A JSONObject constructor can be used to convert an external formPanel
+ * JSON text into an internal formPanel whose values can be retrieved with the
  * <code>get</code> and <code>opt</code> methods, or to convert values into a
  * JSON text using the <code>put</code> and <code>toString</code> methods.
  * A <code>get</code> method returns a value if one can be found, and throws an
