@@ -9,6 +9,8 @@ from cing import verbosityOutput
 from cing.core.classes import Project
 from unittest import TestCase
 from shutil import move #@UnusedImport
+from cing import verbosityDebug
+from cing.PluginCode.ccpn import _isRootDirectory
 import cing
 import os
 import unittest
@@ -45,12 +47,16 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif ))
-
             self.assertFalse(project.removeCcpnReferences())
 
+    def testIsRootDirectory(self):
+        self.assertTrue( _isRootDirectory("linkNmrStarData/"))
+        self.assertTrue( _isRootDirectory("linkNmrStarData//"))
+        self.assertFalse( _isRootDirectory("linkNmrStarData/ccp/"))
+        self.assertFalse( _isRootDirectory("linkNmrStarData/ccp//"))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
     cing.verbosity = verbosityOutput
-    #cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityDebug
     unittest.main()

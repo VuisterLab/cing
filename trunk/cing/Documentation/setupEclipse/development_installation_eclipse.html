@@ -5,7 +5,7 @@
 <title>How to install CING for development on Eclipse</title>
 </head>
 <body>
-Install the requirements:<br><br>
+Install the requirements: Last ran on 11/11/2008<br><br>
 <ol>
 <li><b>Install Fink</b>
 <br>Make sure you have the unstable trees in your /sw/etc/fink.conf too. I had to add:
@@ -18,16 +18,22 @@ Install the requirements:<br><br>
  <PRE>unicode = cp1252.decoding_map[charcode] or 0</PRE>
  to:
  <PRE>unicode = 0</pre>
-This was reported and fixed for Matlibplot version: 0.91?
+This was reported and fixed. In Matlibplot version: 0.98.3-1 tested the problem is gone.
 See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
-Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example).
-Make sure the back end set here allows rendering without going to an X server.
+<br><br>Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example).
+ Make sure the back end set here allows rendering without going to an X server.
 So perhaps you need to create the file and then change from:
 <pre>backend     : GTKAgg </pre>
 to:
 <pre>backend     : Agg </pre>
 See this <a href="http://matplotlib.sourceforge.net/backends.html">discussion</a>.
-Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool.
+Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool and was overcome by  setting the variables in the above rc file:<br>backend     : Agg
+<pre>
+numerix     : numpy # important for other deps.<br>interactive : False
+</pre>
+Finally create a symlink for python in order to override macs:
+<pre>cd /sw/bin; ln -s python2.5 python</pre>
+
 
 <li><b>Install cython</b>
 <pre>fink install cython-py25</pre>This package has been absent at times but was installed to: Cython-0.9.6.13.1-py2.5.egg-info. Strange.<li><b>Install gawk</b>
@@ -36,6 +42,9 @@ Another note here: watch out for on JFD's mac the X server gets opened on reques
 <pre>fink install imagemagick</pre>
 
 
+ <li><b>(Optionally) install povray</b>
+ <pre>fink install povray</pre>
+ </li>
  <li><b>(Optionally) install IPython</b>
  <pre>fink install ipython-py25</pre>
  </li>
@@ -43,23 +52,25 @@ Another note here: watch out for on JFD's mac the X server gets opened on reques
  <pre>http://sourceforge.net/projects/ccpn</pre>
  </li>
  <li><b>(Optionally) install Wattos</b>
- <pre>http://sourceforge.net/projects/wattos</pre>
+ <pre>http://code.google.com/p/wattos/</pre>
  <li><b>(Optionally) install What If</b>
- <pre>Google it.</pre>
- <li><b>(Optionally) install Xplor</b>
- <pre>Google it.</pre>
+ <pre>From http://swift.cmbi.kun.nl/whatif/</pre>
+ Because the program insists on residing in /home/vriend you need to adjust /etc/auto_master
+ <PRE>/home autohome -nobrowse</PRE>
+ to e.g.:
+ <pre>/ahome autohome -nobrowse</pre>
+ So that you can create a regular /home dir.
+ <br>Note that compilation with macports gcc42 gfortran:
+/opt/local/bin/gfortran-mp-4.2
+works for compiling what if.<br>This is of course redundant with the fink setup but macports didn't have all required packages last time JFD checked (winter '07).<br>The good thing is that macport can use binary distributions so it can be much faster than fink???<br><li><b>(Optionally) install Xplor</b>
+ <pre>From http://nmr.cit.nih.gov/xplor-nih/</pre>
  <li><b>(Optionally) install Procheck NMR</b>
- <pre>Google it.</pre>
+ <pre>Google it. Or get a copy from JFD which works except for the last lines in the summary file.</pre>
  <li><b>(Optionally) install Aqua</b>
- <pre>From http://sourceforge.net/projects/aquad</pre>
- <li><b>(Optionally) install Povray</b>
- <pre>fink install povray</pre>
+ <pre>From http://code.google.com/p/faquad/</pre>
  <li><b>(Optionally) install Molmol</b>
- <pre>Google it.</pre>
- <li><b>(Optionally) install Molmol</b>
- <pre>Google it.</pre>
- </li>
-
+ <pre>Google it. Or get a copy from JFD which runs fine headless.</pre>
+ 
 <li><b>Setup Eclipse</b><BR>
 Always start from command line instead of Dock/Taskbar so that it gets your environment settings such as
 PRODIR for the PROCHECK_NMR installation.<br>

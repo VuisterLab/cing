@@ -359,9 +359,10 @@ def initCcpn( cingProject, ccpnFolder = None ):
         tar = tarfile.open(ccpnFolder, "r:gz") 
         for itar in tar:                        
             tar.extract(itar.name, '.') # itar is a TarInfo object
+#            NTdebug("extracted: " + itar.name)
             if _isRootDirectory(itar.name):
-                if not ccpnRootDirectory: # pick the first one.
-                    ccpnRootDirectory = _trimTrailingSlash( itar.name )
+                if not ccpnRootDirectory: # pick only the first one.
+                    ccpnRootDirectory = itar.name.replace("/", '')
                     if not ccpnRootDirectory:
                         NTerror("Skipping potential ccpnRootDirectory")
         if not ccpnRootDirectory:
@@ -1856,35 +1857,20 @@ def createCcpnRestraints( cingProject = None, ccpnProject = None ):
 # end def createCcpnRestraints
 
 def _isRootDirectory(f=""):
-    """ Algorithm for finding just the root dir
-    TODO: check with ccpn crowd.
+    """ Algorithm for finding just the root dir.
+    See unit test for examples.
     """
-#        linkNmrStarData/
-#        linkNmrStarData/ccp/
-
 #    NTdebug("Checking _isRootDirectory on : ["+f+"]")
-    if f.count("/") != 2: 
-        return False
-    if f.count("//") != 1: 
-        return False
-    n = len(f)
-    if f[n-1] != '/':
-        return False
-    if n == 2:
-        NTerror("Found a // entry in tar file.")
+    idxSlash = f.find("/")
+    if idxSlash < 0:
+        NTerror("Found no forward slash in entry in tar file.")
         return None
-    return True
-
-def _trimTrailingSlash(f):
-#DEBUG: Checking _isRootDirectory on : [linkNmrStarData//]
-#DEBUG: Checking _isRootDirectory on : [linkNmrStarData/ccp//]
-#DEBUG: Checking _isRootDirectory on : [linkNmrStarData/ccp/nmr//]
-#    n = len(f)
-#    if f[len(f)-1] != '/':
-#        return f
-    r = f[:-2]
-    NTdebug("Found RootDirectory: [" + r + "]")
-    return r # because of check in _isRootDirectory the length of f is at least 3
+        
+    idxLastChar = len(f) - 1
+    if idxSlash == idxLastChar or idxSlash == (idxLastChar-1):
+#        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
+        return True
+    return False
 
 def _makeNmrConstraintStore(nmrProject):
     '''Descrn: Make a new NMR constraint head object for a project which will

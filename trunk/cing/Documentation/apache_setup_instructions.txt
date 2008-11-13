@@ -26,7 +26,10 @@ Info:
     Processing config file: /private/etc/httpd/users/jd.conf
 
     Install /Library/WebServer/Documents/favicon.ico
-    
+    	Create it with gimp; square it and reduce size to 16x16 and save as pnm. Then use:
+    	http://netpbm.sourceforge.net/doc//ppmtowinicon.html to 
+    	ppmtowinicon -output favicon.ico favicon.pnm
+    	 
     In the System Preference of the Mac
         Sharing
             Turn on "Web Sharing" and check server in browser.

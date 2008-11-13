@@ -195,7 +195,7 @@ def testOverall():
     namepattern, startdir = "test_*.py", cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/iCing/test/test_Json.py']
-    NTerror('will unit check: ' + `nameList`)
+    NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
