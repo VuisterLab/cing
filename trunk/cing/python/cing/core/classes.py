@@ -1764,11 +1764,11 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-        	                    self.atoms[0].coordinates[i],
-            	                self.atoms[1].coordinates[i],
-                	            self.atoms[2].coordinates[i],
-                    	        self.atoms[3].coordinates[i]
-                        	  )
+                                self.atoms[0].coordinates[i],
+                                self.atoms[1].coordinates[i],
+                                self.atoms[2].coordinates[i],
+                                self.atoms[3].coordinates[i]
+                            )
                 self.dihedrals.append( d )
             #end for
         except:
@@ -2180,7 +2180,7 @@ class RDCRestraintList( NTlist ):
         #end if
 
         modelCount = 0
-        firstRestraint = self[0] 
+        firstRestraint = self[0]
         if not hasattr(firstRestraint, "atoms"):
             NTerror("Failed to get the model count for no atoms are available.")
         else:
