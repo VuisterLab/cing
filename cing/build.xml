@@ -13,7 +13,7 @@
 
 	<target name="init" description="init">
 		<!-- Set the below to development 0 or production 1-->
-		<property name="isProduction" value="0" />
+		<property name="isProduction" value="1" />
 		<if>
 			<equals arg1="${isProduction}" arg2="1" />
 			<then>
@@ -46,10 +46,10 @@
 				<mkdir dir="${build.classes.dir}" />
 			</then>
 		</if>
-	</target>
+		
+		<replaceregexp file="java/src/cing/client/Settings.java" match="String VERSION = (.*)" replace='String VERSION = "${cing_version}";' byline="true" />
+      <echo message="Changed Settings.java to reflect new version." />
 
-	<target name="set_version" depends="init">
-		<replaceregexp file="java/src/cing/client/Keys.java" match="String VERSION = (.*)" replace='String VERSION ="${cing_version}";' byline="true" />
 	</target>
 
 	<target name="home-web-install" depends="init">
@@ -68,7 +68,7 @@
 	<target name="iCing-static-install" depends="init">
 		<echo message="Ensure that the iCing dir already exists remotely." />
 
-		<scp todir="${server.web.user}@${server.web.machine.looped}:${server.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
+		<scp todir="${home.web.user}@${home.web.machine.looped}:${server.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
 			<fileset dir="${server.web.dir.local}" />
 		</scp>
 	</target>
@@ -77,8 +77,12 @@
 	<target name="iCing-servlet-install" depends="init">
 		<echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
 
-		<copy todir="${icing.production.local.dir}/WEB-INF/classes/cing/server">
-			<fileset dir="java/bin/cing/server" />
+		<copy todir="${icing.production.local.dir}/WEB-INF/classes">
+			<fileset dir="java/bin" />
+		</copy>
+		<!-- The Wattos code changes every now and then so it needs to be included live. Every now and then.-->
+		<copy todir="${icing.production.local.dir}/WEB-INF/classes">
+	        <fileset dir="${WS}/wattos/build/web/WEB-INF/classes"/>                     
 		</copy>
 
 		<zip destfile="java/${icing.war.file}">
