@@ -85,7 +85,7 @@ public class RunView extends iCingView {
 //		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 //		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(icing); 
-		cingQueryRun.action.setValue(Keys.FORM_ACTION_RUN);
+		cingQueryRun.action.setValue(Settings.FORM_ACTION_RUN);
 		verticalPanel.add(cingQueryRun.formPanel);
 		
 	}	

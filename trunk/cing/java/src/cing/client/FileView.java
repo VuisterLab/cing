@@ -49,7 +49,7 @@ public class FileView extends iCingView {
 	}
 	
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
+        super.setIcing(icing);
 		final iCing icingShadow = icing;		
 
 		Label label = new Label(c.Upload());
@@ -169,7 +169,7 @@ public class FileView extends iCingView {
 		submitButton.setVisible(false);
 		
 		final FileUpload fileUpload = new FileUpload();
-		fileUpload.setName(Keys.FORM_PARM_UPLOAD_FILE_BASE);
+		fileUpload.setName(Settings.FORM_PARM_UPLOAD_FILE_BASE);
 		// The GWT calls this formPanel handler after the formPanel is submitted.
 		FormHandlerFile fileFormHandler = new FormHandlerFile(icing);
 		fileFormHandler.setFileUpload(fileUpload);
@@ -181,7 +181,7 @@ public class FileView extends iCingView {
 		/** Invisible parameters to pass */
 
 		final iCingQuery cingQuerySave = new iCingQuery(icing);
-		cingQuerySave.action.setValue(Keys.FORM_ACTION_SAVE);
+		cingQuerySave.action.setValue(Settings.FORM_ACTION_SAVE);
 		cingQuerySave.setFormHandler(fileFormHandler); // Override the default one.
 		cingQuerySave.formVerticalPanel.add(fileUpload); // will switch between these two.
 		cingQuerySave.formVerticalPanel.add(labelFileUploadDone);

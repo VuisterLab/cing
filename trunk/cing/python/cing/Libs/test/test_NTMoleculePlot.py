@@ -1,3 +1,7 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
+"""
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug

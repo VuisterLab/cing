@@ -13,27 +13,27 @@ public class iCingQuery {
 	 * element that can contain them.
 	 */
 	final VerticalPanel formVerticalPanel = new VerticalPanel();
-	final Hidden action = new Hidden(Keys.FORM_PARM_ACTION);
-	public FormHandleriCing serverFormHandler = null;
+	final Hidden action = new Hidden(Settings.FORM_PARM_ACTION);
+	public FormHandlerMain serverFormHandler = null;
 
 	public iCingQuery(iCing icing) {
 		if (icing == null) {
-			General.showError("in iCingQuery() found icing: null");
+			General.showCodeBug("in iCingQuery() found icing: null");
 		} else {
 //			General.showDebug("in iCingQuery() found icing: " + icing.toString());
 		}
 		
-		serverFormHandler = new FormHandleriCing(icing);
+		serverFormHandler = new FormHandlerMain(icing);
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
-		String actionServerUrl = moduleBaseUrlWithPort + Keys.SERVLET_URL;
+		String actionServerUrl = moduleBaseUrlWithPort + Settings.SERVLET_URL;
 		formPanel.setAction(actionServerUrl);		
 		General.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
 
 		formVerticalPanel.add(action);
-		formVerticalPanel.add(new Hidden(Keys.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
-		formVerticalPanel.add(new Hidden(Keys.FORM_PARM_USER_ID, iCing.currentUserId));
+		formVerticalPanel.add(new Hidden(Settings.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
+		formVerticalPanel.add(new Hidden(Settings.FORM_PARM_USER_ID, iCing.currentUserId));
 		
 		formPanel.setWidget(formVerticalPanel);
 		formPanel.addFormHandler(serverFormHandler);
@@ -44,13 +44,13 @@ public class iCingQuery {
 	 * 
 	 * @param serverFormHandler
 	 */
-	public void setFormHandler(FormHandleriCing formHandler) {
-		General.showDebug("Now in setFormHandler.");
-		formPanel.removeFormHandler(this.serverFormHandler);
+	public void setFormHandler(FormHandlerMain formHandler) {
+		formPanel.removeFormHandler(serverFormHandler);
 		formPanel.addFormHandler(formHandler);
 		this.serverFormHandler = formHandler;
 		if (formHandler.icing == null) {
 			General.showError("Got a null for formHandler.icing in iCingQuery.setFormHandler");
 		}
+        General.showDebug("Set form handler to: [" + this.serverFormHandler.toString() +"]" );
 	}
 }

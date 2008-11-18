@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.FormSubmitEvent;
 import com.google.gwt.user.client.ui.Label;
 import com.gwtsolutions.components.client.ui.Message;
 
-public class FormHandlerFile extends FormHandleriCing {
+public class FormHandlerFile extends FormHandlerMain {
 
 	private Button nextButton = null;
 	private FileUpload fileUpload = null;
@@ -23,7 +23,7 @@ public class FormHandlerFile extends FormHandleriCing {
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
 		super.onSubmit(event);
-		General.showDebug("Starting submit which will be dealt with from FormHandlerFile.");
+//		General.showDebug("Starting submit which will be dealt with from FormHandlerFile.");
 
 		/** Extra checks here for this class */
 		if (fileUpload.getFilename().length() == 0) {
@@ -48,11 +48,14 @@ public class FormHandlerFile extends FormHandleriCing {
 		statusMessage.removeStyleName("successBorder");
 		statusMessage.removeStyleName("failureBorder");
 		statusMessage.setVisible(true);
-		if (exitCode.equals(Keys.RESPONSE_EXIT_CODE_SUCCESS)) {
+		if (exitCode.equals(Settings.RESPONSE_EXIT_CODE_SUCCESS)) {
 			showUploadMessage(result);
+			// Try to get the project name from it if not set already.
+			icing.cingLogView.getProjectName();
 		} else {
 			showUploadError(result);
 		}
+        General.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
 	}
 
 	private void showUploadError(String result) {

@@ -20,33 +20,18 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import Wattos.Utils.General;
 import Wattos.Utils.InOut;
 import Wattos.Utils.OSExec;
 import Wattos.Utils.StringArrayList;
 import Wattos.Utils.Strings;
-import cing.client.Keys;
+import cing.client.Settings;
 
 import com.braju.format.Format;
 import com.braju.format.Parameters;
 
 public class iCingServlet extends HttpServlet {
 	private static final long serialVersionUID = 6098745782027999297L;
-
-	/** 5 Mb ought to do */
-	public static final long FILE_UPLOAD_MAX_SIZE = 5 * 1024 * 1024;
-	public static final String SERVER_TMP_DIR = "/Library/WebServer/Documents/tmp/cing";
-
-	private static final String ERROR_SIZE_UNACCEPTABLE = "File larger than: " + FILE_UPLOAD_MAX_SIZE + " bytes";
-	private static final String ERROR_PARSE_REQUEST = "Failed to parse request";
-	private static final String ERROR_WRITE_FAILED = "File write failed.";
-	private static final String ERROR_NOT_MULTI_PART = "Not multipart message.";
-
-	private static final String PYTHON_EXECUTABLE = "/sw/bin/python";
-	private static final String CING_SCRIPT = "$CINGROOT/python/cing/main.py";
-	private static final String DONE_FILE = "DONE";
-	private static final String LAST_LOG_SEND_FILE = "LAST_LOG_SEND";
-	private static final String CING_RUN_LOG_FILE = "cingRun.log";
-	private static final int CING_VERBOSITY = 9;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			java.io.IOException {
@@ -65,7 +50,7 @@ public class iCingServlet extends HttpServlet {
 		File pathProject = null;
 		FileItem actualFileItem = null;
 		String currentAccessKey = null;
-		String currentUserId = Keys.FORM_PARM_USER_ID_DEFAULT;
+		String currentUserId = Settings.FORM_PARM_USER_ID_DEFAULT;
 		String currentAction = null;
 
 		FileItemFactory factory = new DiskFileItemFactory();
@@ -103,7 +88,7 @@ public class iCingServlet extends HttpServlet {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		if (!isMultipart) {
-			writeJsonError(response, ERROR_NOT_MULTI_PART);
+			writeJsonError(response, Settings.ERROR_NOT_MULTI_PART);
 			return;
 		}
 
@@ -111,7 +96,7 @@ public class iCingServlet extends HttpServlet {
 			items = upload.parseRequest(request);
 		} catch (FileUploadException e) {
 			e.printStackTrace();
-			writeJsonError(response, ERROR_PARSE_REQUEST);
+			writeJsonError(response, Settings.ERROR_PARSE_REQUEST);
 			return;
 		}
 
@@ -120,9 +105,9 @@ public class iCingServlet extends HttpServlet {
 			return;
 		}
 
-		if (items.size() < Keys.FORM_PARM_MINIMUM.length) {
+		if (items.size() < Settings.FORM_PARM_MINIMUM.length) {
 			String msg = "Got " + items.size() + " items which is less than the expected:"
-					+ Keys.FORM_PARM_MINIMUM.length + " items.";
+					+ Settings.FORM_PARM_MINIMUM.length + " items.";
 			writeJsonError(response, msg);
 			return;
 		}
@@ -133,25 +118,25 @@ public class iCingServlet extends HttpServlet {
 			String value = item.getString();
 			// General.showDebug("processing formPanel item: [" + name + "] with value: [" + value + "]");
 			if (item.isFormField()) {
-				if (name.equals(Keys.FORM_PARM_ACCESS_KEY)) {
+				if (name.equals(Settings.FORM_PARM_ACCESS_KEY)) {
 					currentAccessKey = value;
 					General.showDebug("retrieved currentAccessKey: " + currentAccessKey);
 					continue;
 				}
-				if (name.equals(Keys.FORM_PARM_USER_ID)) {
+				if (name.equals(Settings.FORM_PARM_USER_ID)) {
 					currentUserId = value;
 					General.showDebug("retrieved currentUserId: " + currentUserId);
 					continue;
 				}
-				if (name.equals(Keys.FORM_PARM_ACTION)) {
+				if (name.equals(Settings.FORM_PARM_ACTION)) {
 					currentAction = value;
-					jsonResultPut(result, Keys.FORM_PARM_ACTION, currentAction);
+					jsonResultPut(result, Settings.FORM_PARM_ACTION, currentAction);
 					General.showDebug("retrieved action: " + currentAction);
 					continue;
 				}
 				// When the routine falls thru to here the parameter was not recognized.
 				if (value == null) {
-					value = Keys.None;
+					value = Settings.NONE;
 				}
 				int endIndex = Math.min(100, value.length());
 				value = value.substring(0, endIndex);
@@ -169,26 +154,26 @@ public class iCingServlet extends HttpServlet {
 			return;
 		}
 		if (currentAccessKey == null) {
-			writeJsonError(response, result, "Failed to retrieve " + Keys.FORM_PARM_ACCESS_KEY);
+			writeJsonError(response, result, "Failed to retrieve " + Settings.FORM_PARM_ACCESS_KEY);
 			return;
 		}
 		if (currentUserId == null) {
-			writeJsonError(response, result, "Failed to retrieve  " + Keys.FORM_PARM_USER_ID);
+			writeJsonError(response, result, "Failed to retrieve  " + Settings.FORM_PARM_USER_ID);
 			return;
 		}
 
-		if (!Keys.FORM_ACTION_ALIST.contains(currentAction)) {
+		if (!Settings.FORM_ACTION_ALIST.contains(currentAction)) {
 			writeJsonError(response, result, "Requested action unknown:  " + currentAction);
 			return;
 		}
 
-		pathUser = new File(SERVER_TMP_DIR, currentUserId);
+		pathUser = new File(Settings.SERVER_TMP_DIR, currentUserId);
 		if (!pathUser.exists()) {
 			if (!pathUser.mkdir()) {
 				writeJsonError(response, result, "Failed to mkdir for user at: [" + pathUser + "]");
 				return;
 			}
-			Ut.chmod(pathUser, "a+rw");
+			InOut.chmod(pathUser, "a+rw");
 		}
 		pathProject = new File(pathUser, currentAccessKey);
 		if (!pathProject.exists()) {
@@ -196,18 +181,18 @@ public class iCingServlet extends HttpServlet {
 				writeJsonError(response, result, "Failed to mkdir for project at: [" + pathProject + "]");
 				return;
 			}
-			Ut.chmod(pathProject, "a+rw");
+			InOut.chmod(pathProject, "a+rw");
 		}
 
-		if (currentAction.equals(Keys.FORM_ACTION_SAVE)) {
+		if (currentAction.equals(Settings.FORM_ACTION_SAVE)) {
 			processFile(response, result, pathProject, actualFileItem);
-		} else if (currentAction.equals(Keys.FORM_ACTION_PROJECT_NAME)) {
+		} else if (currentAction.equals(Settings.FORM_ACTION_PROJECT_NAME)) {
 			processPname(response, result, pathProject);
-		} else if (currentAction.equals(Keys.FORM_ACTION_LOG)) {
+		} else if (currentAction.equals(Settings.FORM_ACTION_LOG)) {
 			processLog(response, result, pathProject);
-		} else if (currentAction.equals(Keys.FORM_ACTION_STATUS)) {
+		} else if (currentAction.equals(Settings.FORM_ACTION_STATUS)) {
 			processStatus(response, result, pathProject);
-		} else if (currentAction.equals(Keys.FORM_ACTION_RUN)) {
+		} else if (currentAction.equals(Settings.FORM_ACTION_RUN)) {
 			processRun(response, result, pathProject);
 		} else {
 			// Would be a code bug as is checked before.
@@ -233,7 +218,7 @@ public class iCingServlet extends HttpServlet {
 		}
 		String projectName = list[0];
 		projectName = InOut.getFilenameBase(projectName);
-		jsonResultPut(result, Keys.RESPONSE_RESULT, projectName);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, projectName);
 		writeJson(response, result);
 	}
 
@@ -253,10 +238,14 @@ public class iCingServlet extends HttpServlet {
 	 * @param result
 	 */
 	private void writeJson(HttpServletResponse response, JSONObject result) {
-		if (!result.has(Keys.RESPONSE_EXIT_CODE)) {
-			jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
+		if (!result.has(Settings.RESPONSE_EXIT_CODE)) {
+			jsonResultPut(result, Settings.RESPONSE_EXIT_CODE, Settings.RESPONSE_EXIT_CODE_SUCCESS);
 		}
-		General.showDebug("Result is [" + result.toString() + "]");
+		String responseStr = result.toString();
+		int endIndex = Math.min(responseStr.length(), Settings.MAX_RESPONSE_REPORTED_FOR_DEBUGGING);
+		String responseStrTruncate = responseStr.substring(0,endIndex).replace(General.eol, "");
+		General.showDebug("responseTruncate is: [" + responseStrTruncate + "]");
+		
 		response.setContentType("text/plain");
 		try {
 			response.getWriter().write(result.toString());
@@ -267,8 +256,8 @@ public class iCingServlet extends HttpServlet {
 	}
 
 	private void writeJsonError(HttpServletResponse response, JSONObject result, String msg) {
-		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_ERROR);
-		jsonResultPut(result, Keys.RESPONSE_RESULT, msg);
+		jsonResultPut(result, Settings.RESPONSE_EXIT_CODE, Settings.RESPONSE_EXIT_CODE_ERROR);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, msg);
 		writeJson(response, result);
 	}
 
@@ -312,15 +301,17 @@ public class iCingServlet extends HttpServlet {
 	 */
 	private void processRun(HttpServletResponse response, JSONObject result, File pathProject) {
 
-		File doneFile = new File(pathProject, DONE_FILE);
-		if (doneFile.exists()) {
-			doneFile.delete(); // Can't be done when not started.
+		File doneFile = new File(pathProject, Settings.DONE_FILE);
+		File cingRunLogFile = new File(pathProject, Settings.CING_RUN_LOG_FILE);
+		File lastLogSendFile = new File(pathProject, Settings.LAST_LOG_SEND_FILE);
+		
+		File[] fileListToDelete = new File[] { doneFile, cingRunLogFile, lastLogSendFile };
+		for (int i=0;i< fileListToDelete.length;i++) {
+			File f = fileListToDelete[i];
+			if (f.exists()) {
+				f.delete();
+			}
 		}
-		File cingRunLogFile = new File(pathProject, CING_RUN_LOG_FILE);
-		if (cingRunLogFile.exists()) {
-			cingRunLogFile.delete();
-		}
-
 		// Note that Java has no current working directory so no Unix cd equivalent
 		// Commands will be executed in csh by Wattos by default.
 		String cmdCdProjectDir = "cd " + pathProject;
@@ -349,16 +340,15 @@ public class iCingServlet extends HttpServlet {
 		Parameters p = new Parameters(); // Printf parameters autoclearing after use.
 		p.add(projectName);
 		p.add(projectFileName);
-		p.add(CING_VERBOSITY);
+		p.add(Settings.CING_VERBOSITY);
 		String cing_options = Format.sprintf("--name %s --initCcpn %s -v %s --script doValidateiCing.py", p);
 
 		p.add(cmdCdProjectDir);
-		p.add(PYTHON_EXECUTABLE);
-		p.add(CING_SCRIPT);
+		p.add(Settings.CING_WRAPPER_SCRIPT);
 		p.add(cing_options);
 		p.add(cmdRunDone);
 		p.add(cingRunLogFile);
-		String cmdRun = Format.sprintf("(%s; %s -u %s %s; %s) >>& %s &", p);
+		String cmdRun = Format.sprintf("(%s; %s %s; %s) >>& %s &", p);
 
 		General.showOutput("cmdRunStarting: [" + cmdRunStarting + "]");
 		General.showOutput("cmdRunKiller:   [" + cmdRunKiller + "]");
@@ -371,7 +361,7 @@ public class iCingServlet extends HttpServlet {
 			writeJsonError(response, result, "Failed to submit all jobs.");
 			return;
 		}
-		jsonResultPut(result, Keys.RESPONSE_RESULT, Keys.RESPONSE_STARTED);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, Settings.RESPONSE_STARTED);
 		writeJson(response, result);
 	}
 
@@ -393,9 +383,9 @@ public class iCingServlet extends HttpServlet {
 		// boolean isInMemory = item.isInMemory();
 
 		General.showDebug("Checking size...");
-		if (item.getSize() > FILE_UPLOAD_MAX_SIZE) {
+		if (item.getSize() > Settings.FILE_UPLOAD_MAX_SIZE) {
 			General.showError("Size not acceptable.");
-			writeJsonError(response, result, "Failed to retrieve " + ERROR_SIZE_UNACCEPTABLE);
+			writeJsonError(response, result, "Failed to retrieve " + Settings.ERROR_SIZE_UNACCEPTABLE);
 			return;
 		}
 
@@ -420,10 +410,10 @@ public class iCingServlet extends HttpServlet {
 			item.write(uploadedFile);
 		} catch (Exception e) {
 			e.printStackTrace();
-			writeJsonError(response, result, ERROR_WRITE_FAILED);
+			writeJsonError(response, result, Settings.ERROR_WRITE_FAILED);
 			return;
 		}
-		Ut.chmod(uploadedFile, "a+rw");
+		InOut.chmod(uploadedFile, "a+rw");
 
 		long length = uploadedFile.length();
 		long lengthFormElement = item.getSize();
@@ -431,18 +421,18 @@ public class iCingServlet extends HttpServlet {
 		General.showDebug("Fileform     length: " + lengthFormElement);
 		General.showDebug("File written length: " + length);
 		String sizeStr = Ut.bytesToFormattedString(length);
-		jsonResultPut(result, Keys.RESPONSE_RESULT, sizeStr);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, sizeStr);
 		writeJson(response, result);
 	}
 
 	private void processStatus(HttpServletResponse response, JSONObject result, File pathProject ) {
 
-		File doneFile = new File(pathProject, DONE_FILE);
-		String status = Keys.RESPONSE_STATUS_NOT_DONE;
+		File doneFile = new File(pathProject, Settings.DONE_FILE);
+		String status = Settings.RESPONSE_STATUS_NOT_DONE;
 		if (doneFile.exists()) {
-			status = Keys.RESPONSE_STATUS_DONE;
+			status = Settings.RESPONSE_STATUS_DONE;
 		}
-		jsonResultPut(result, Keys.RESPONSE_RESULT, status);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, status);
 		writeJson(response, result);
 		return;
 	}
@@ -460,13 +450,13 @@ public class iCingServlet extends HttpServlet {
 	private void processLog(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		General.showDebug("Retrieving cing log tail.");
-		File lastLogSendFile = new File(pathProject, LAST_LOG_SEND_FILE);
+		File lastLogSendFile = new File(pathProject, Settings.LAST_LOG_SEND_FILE);
 
-		String lastLog = Keys.RESPONSE_LOG_VALUE_NONE;
+		String lastLog = Settings.RESPONSE_LOG_VALUE_NONE;
 
-		File cingRunLogFile = new File(pathProject, CING_RUN_LOG_FILE);
+		File cingRunLogFile = new File(pathProject, Settings.CING_RUN_LOG_FILE);
 		if (!cingRunLogFile.exists()) {
-			jsonResultPut(result, Keys.RESPONSE_RESULT, lastLog);
+			jsonResultPut(result, Settings.RESPONSE_RESULT, lastLog);
 			writeJson(response, result);
 		}
 		long cingrunLogFileSize = cingRunLogFile.length();
@@ -492,13 +482,13 @@ public class iCingServlet extends HttpServlet {
 
 			General.showDebug("cingrunLogFileSizeLast (long): " + cingrunLogFileSizeLast);
 		} else {
-			General.showDebug("no LAST_LOG_SEND_FILE: " + LAST_LOG_SEND_FILE);
+			General.showDebug("no LAST_LOG_SEND_FILE: " + Settings.LAST_LOG_SEND_FILE);
 		}
 
 		// # doesn't exist because it was just removed if it even existed to start with.
 		StringArrayList sal = new StringArrayList();
 		sal.add(Long.toString(cingrunLogFileSize));
-		General.showDebug("writing to LAST_LOG_SEND_FILE: " + LAST_LOG_SEND_FILE);
+		General.showDebug("writing to LAST_LOG_SEND_FILE: " + Settings.LAST_LOG_SEND_FILE);
 		if (!sal.write(lastLogSendFile.toString())) {
 			writeJsonError(response, result, "Failed to write to new lastLogSendFile: " + lastLogSendFile);
 			return;
@@ -526,8 +516,8 @@ public class iCingServlet extends HttpServlet {
 		} else {
 			General.showDebug("No new log");
 		}
-		jsonResultPut(result, Keys.RESPONSE_EXIT_CODE, Keys.RESPONSE_EXIT_CODE_SUCCESS);
-		jsonResultPut(result, Keys.RESPONSE_RESULT, lastLog);
+		jsonResultPut(result, Settings.RESPONSE_EXIT_CODE, Settings.RESPONSE_EXIT_CODE_SUCCESS);
+		jsonResultPut(result, Settings.RESPONSE_RESULT, lastLog);
 		writeJson(response, result);
 
 	}

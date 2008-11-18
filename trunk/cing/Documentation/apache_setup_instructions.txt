@@ -7,7 +7,7 @@
 ErrorLog /private/var/log/apache2/error_log
 
 monitor with:
-tail -f /private/var/log/apache2/*_log &
+	tail -f /private/var/log/apache2/*_log &
 
 - processing is done as _www:admin account.
     So don't use the suEXEC way.
@@ -47,27 +47,12 @@ SetEnv  ps2pdfPath /sw/bin/ps2pdf14
 SetEnv  molmolPath /Users/jd/progs/molmolM/molmol
 SetEnv  povrayPath /sw/bin/povray
 # To home a .matplotlibrc directory with settings will be added.
-SetEnv  HOME /Library/WebServer/Documents/cgi-cing-home
+SetEnv  HOME /Library/WebServer/Documents/servlet-cing-home
 SetEnv  CINGROOT /Users/jd/workspace34/cing
 
 # For the gwt tomcat server
 ProxyPass         /iCing/serv http://localhost:8080/iCing
 ProxyPassReverse  /iCing/serv http://localhost:8080/iCing
-For Geerten with 8080 being used by Chris' django server.
-ProxyPass         /iCing/serv http://localhost:8079/iCing
-ProxyPassReverse  /iCing/serv http://localhost:8079/iCing
-
-# For the python stand-alone CGI server.
-ProxyPass         /iCing/cgi-bin http://localhost:8001/cgi-bin
-ProxyPassReverse  /iCing/cgi-bin http://localhost:8001/cgi-bin
-
-ProxyPass         /iCing/cgi-bin http://localhost:8888/cgi-bin
-ProxyPassReverse  /iCing/cgi-bin http://localhost:8888/cgi-bin
-
-# For the python regular server, still essential to have the iCing in there for ssl url rewriting done by cmbi.ru.nl.
-# Note that the server-bin at the end is optional? 
-ProxyPass         /iCing/server-bin http://localhost:8000
-ProxyPassReverse  /iCing/server-bin http://localhost:8000
 
 The tomcat server in eclipse works together with the apache configured here.
             

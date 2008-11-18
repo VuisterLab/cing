@@ -22,7 +22,7 @@ public class LogView extends iCingView {
 	}
 	
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
+        super.setIcing(icing);
 //		final iCing icingShadow = icing;		
 		setState(iCing.LOG_STATE);
 		logLabel.setStylePrimaryName("h1");

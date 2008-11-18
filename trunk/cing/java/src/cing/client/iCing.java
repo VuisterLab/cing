@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
 	/** Just the initial startup state; for client. Server debug is set in servlet. */
-	public static final boolean doDebug = true;
+	public static final boolean doDebug = false;
 	public static final String STRING_NA = "n/a";
 	
 	/** States of the gui */
@@ -45,7 +45,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static final String CRITERIA_STATE = "criteria";
 	public static final String OPTIONS_STATE = "options";
 	public static final String RUN_STATE = "run";
-	public static final String REPORT_STATE = "report";
+    public static final String REPORT_STATE = "report";
+    public static final String MAINTENANCE_STATE = "maintenance";
 	public static final String LOGIN_STATE = "login";
 
 	public static String CURRENT_THEME = "standard";
@@ -67,7 +68,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static iCingConstants c;
 	// public static String currentAccessKey = "234567";
 	public static String currentAccessKey = null;
-	public static String currentUserId = "jd3"; // TODO: implement security functionality later.
+	public static String currentUserId = "ano"; // TODO: implement security functionality later.
 
 	/** NB the html text eol have to be lowercase \<br\> or \<pre\> */
 	public static final RichTextArea area = new RichTextArea();
@@ -87,6 +88,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	Criteria criteria;
 	Report report;
 	RunView runView;
+	Maintenance maintenance;
 	Footer footer;
 
 	private RootPanel rootPanel = RootPanel.get();
@@ -129,6 +131,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		report = new Report();
 		footer = new Footer();
 		fileView = new FileView();
+		maintenance = new Maintenance();
 
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
@@ -142,7 +145,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		views.add(welcome);
 		views.add(criteria);
 		views.add(report);
-		views.add(runView);
+        views.add(runView);
+        views.add(maintenance);
 		views.add(footer);
 
 		for (iCingView v : views) {
@@ -165,7 +169,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		String initToken = History.getToken();
 		if (initToken.length() == 0) {
 			// History.newItem();
-			 initToken = iCing.FILE_STATE;
+//            initToken = iCing.MAINTENANCE_STATE;
+            initToken = iCing.FILE_STATE;
 //			initToken = iCing.LOG_STATE;
 		}
 		onHistoryChanged(initToken);
@@ -211,10 +216,14 @@ public class iCing implements EntryPoint, HistoryListener {
 			loadRunView();
 			return;
 		}
-		if (iCing.PREFERENCES_STATE.equals(historyToken)) {
-			loadPreferencesView();
-			return;
-		}
+        if (iCing.PREFERENCES_STATE.equals(historyToken)) {
+            loadPreferencesView();
+            return;
+        }
+        if (iCing.MAINTENANCE_STATE.equals(historyToken)) {
+            loadMaintenance();
+            return;
+        }
 
 		General.showError("Got an unknown history token: " + historyToken);
 	}
@@ -261,7 +270,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		verticalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		topPanel.setCellHorizontalAlignment(verticalPanel, HasHorizontalAlignment.ALIGN_LEFT);
 
-		final Label icingLabel = new Label(c.iCing());
+		final Label icingLabel = new Label(c.iCing() + " (BETA release)");
 		verticalPanel.add(icingLabel);
 		icingLabel.setStylePrimaryName("h1");
 
@@ -510,10 +519,17 @@ public class iCing implements EntryPoint, HistoryListener {
 		criteria.enterView();
 	}
 
-	public void loadPreferencesView() {
-		clearAllViews();
-		preferences.enterView();
-	}
+    public void loadPreferencesView() {
+        clearAllViews();
+        preferences.enterView();
+    }
+    
+    public void loadMaintenance() {
+        clearAllViews();
+        maintenance.enterView();
+    }
+    
+	
 
 	public void loadFileView() {
 		clearAllViews();
@@ -657,12 +673,12 @@ public class iCing implements EntryPoint, HistoryListener {
 	public static String getNewAccessKey() {
 		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		String result = "";
-		for (int i = 1; i <= Keys.accessKeyLength; i++) {
+		for (int i = 1; i <= Settings.accessKeyLength; i++) {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
 			// TODO: generate on server with cross check on availability...
 		}
-		result = "123456"; // TODO: disable for production.
+//		result = "123456"; // TODO: disable for production.
 		
 		return result;
 	}
