@@ -19,7 +19,7 @@ public class Criteria extends iCingView {
 	}
 	
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
+        super.setIcing(icing);
 		final iCing icingShadow = icing;		
 		setState(iCing.CRITERIA_STATE);
 		iCingConstants c = iCing.c;

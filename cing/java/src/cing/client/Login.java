@@ -20,7 +20,7 @@ public class Login extends iCingView {
 	}
 	
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
+        super.setIcing(icing);
 //		final iCing icingShadow = icing;		
 		setState(iCing.LOGIN_STATE);
 		final Label html_1 = new Label( c.Login() );

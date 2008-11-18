@@ -45,12 +45,11 @@ public class iCingView extends Composite {
 	 * @param icing
 	 */
 	public void setIcing(iCing icing) {
-		if (icing == null) {
-			System.err.println("ERROR: in iCingView.setiCing found icing: null");
-		} else {
-//			System.err.println("in iCingView.setiCing found icing: " + icing.toString());
-		}		
-		this.icing = icing;
+	    if ( icing ==  null ) {
+	        System.err.println("ERROR: CODE BUG in iCingView.setiCing icing is null.");
+	        return;
+	    }
+	    this.icing = icing;
 	}
 
 	public void setState(String state) {

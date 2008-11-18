@@ -25,13 +25,14 @@ public class CingLogView extends iCingView {
 
 	final Button nextButton = new Button();
 	final Button updateButton = new Button();
+
 	public CingLogView() {
 		super();
 	}
-	
+
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
-		final iCing icingShadow = icing;		
+        super.setIcing(icing);
+		final iCing icingShadow = icing;
 		setState(iCing.CING_LOG_STATE);
 		cingArea.ensureDebugId("cwRichText-cingArea");
 		// RichTextToolbar toolbar = new RichTextToolbar(cingArea);
@@ -67,8 +68,8 @@ public class CingLogView extends iCingView {
 		});
 		clearButton.setText("Clear");
 		String iniMsg = Utils.preStart
-				+ "Expect to see CING log lines here; once CING is running and you update with the below button."+General.eol
-				+ Utils.preEnd;
+				+ "Expect to see CING log lines here; once CING is running and you update with the below button."
+				+ General.eol + Utils.preEnd;
 		cingArea.setHTML(iniMsg);
 		nextButton.setText(c.Next());
 		nextButton.setFocus(true);
@@ -83,7 +84,7 @@ public class CingLogView extends iCingView {
 		updateButton.setText("Update");
 		updateButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				updateLogAndStatus();
+				update();
 			}
 		});
 
@@ -113,27 +114,35 @@ public class CingLogView extends iCingView {
 		horizontalPanelBackNext.add(backButton);
 		horizontalPanelBackNext.add(nextButton);
 
+		/** JFD is uncertain if individual instances are needed but they're cheap */
+		FormHandlerSpecific serverFormHandlerLog = new FormHandlerSpecific(icing);
+		FormHandlerSpecific serverFormHandlerStatus = new FormHandlerSpecific(icing);
+		FormHandlerSpecific serverFormHandlerProjectName = new FormHandlerSpecific(icing);
+		
 		cingQueryLog = new iCingQuery(icing);
-		cingQueryLog.action.setValue(Keys.FORM_ACTION_LOG);
+		cingQueryLog.action.setValue(Settings.FORM_ACTION_LOG);
+		cingQueryLog.setFormHandler(serverFormHandlerLog);
 		verticalPanel.add(cingQueryLog.formPanel);
 
 		cingQueryStatus = new iCingQuery(icing);
-		cingQueryStatus.action.setValue(Keys.FORM_ACTION_STATUS);
+		cingQueryStatus.action.setValue(Settings.FORM_ACTION_STATUS);
+		cingQueryStatus.setFormHandler(serverFormHandlerStatus);
 		verticalPanel.add(cingQueryStatus.formPanel);
 
 		cingQueryProjectName = new iCingQuery(icing);
-		cingQueryProjectName.action.setValue(Keys.FORM_ACTION_PROJECT_NAME);
+		cingQueryProjectName.action.setValue(Settings.FORM_ACTION_PROJECT_NAME);
+		cingQueryProjectName.setFormHandler(serverFormHandlerProjectName);
 		verticalPanel.add(cingQueryProjectName.formPanel);
 	}
 
-	/** Needs to be called by FormHandleriCing. */
+	/** Needs to be called by FormHandlerMain. */
 	protected void setStatus(String statusStr) {
-		if ((statusStr != null) && statusStr.equals(Keys.RESPONSE_STATUS_DONE)) {
+		if ((statusStr != null) && statusStr.equals(Settings.RESPONSE_STATUS_DONE)) {
 			nextButton.setEnabled(true); // or switch my self. or ...
 			icing.report.showResults();
 			icing.onHistoryChanged(iCing.REPORT_STATE);
 		}
-		if (statusStr.equals(Keys.RESPONSE_EXIT_CODE_ERROR)) {
+		if (statusStr.equals(Settings.RESPONSE_EXIT_CODE_ERROR)) {
 			General.showError("Failed to get status from server; assume it crashed; Stopping");
 			nextButton.setEnabled(true);
 			icing.report.showCrash();
@@ -145,16 +154,13 @@ public class CingLogView extends iCingView {
 		icing.report.setProjectName(projectName);
 	}
 
-	protected void setLogTail(String message) {
-		// General.showDebug("Now in setLogTail");
-		// appendLog("In iCing: Now in setLogTail");
-		if (message.equals(Keys.RESPONSE_RESULT)) {
-			Date today = new Date();
-			String dateTime = DateTimeFormat.getShortDateTimeFormat().format(today);
-			General.showDebug(dateTime + " no new log to display");
-		} else if (message != null && message.length() > 0) {
-			Utils.appendHtml(message, cingArea);
+	protected void setLogTail(String result) {
+		General.showDebug("Now in setLogTail");
+		if (result == null || result.length() == 0 || result.equals(Settings.RESPONSE_LOG_VALUE_NONE)) {
+			General.showDebug("No new log to display");
+			return;
 		}
+		Utils.appendHtml(result, cingArea);
 	}
 
 	protected void getLogTail() {
@@ -174,10 +180,13 @@ public class CingLogView extends iCingView {
 
 	protected void getProjectName() {
 		General.showDebug("Now in getProjectName");
+		if (icing.projectName != null){
+		    return;
+		}
 		cingQueryProjectName.formPanel.submit();
 	}
 
-	public void updateLogAndStatus() {
+	public void update() {
 		if (icing.projectName == null) { // Lazy load
 			getProjectName();
 		}

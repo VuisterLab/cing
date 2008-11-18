@@ -1,9 +1,5 @@
 package cing.server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.NumberFormat;
 
 /**
@@ -61,25 +57,6 @@ public class Ut {
 		return result;
 	}
 
-	/**
-	 *  
-	 * @return true for error
-	 */
-	public static boolean chmod(File f, String mod) {
-		String cmd = "chmod " + mod + " " + f.toString();
-		General.showDebug("Executing command: [" + cmd + "]");
-		try {
-			Process p = Runtime.getRuntime().exec(cmd);
-			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = null;
-			while ((line = in.readLine()) != null) {
-				General.showDebug(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}    
 	
 	
 }

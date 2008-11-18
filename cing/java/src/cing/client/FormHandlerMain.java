@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormSubmitEvent;
 
-public class FormHandleriCing implements FormHandler {
+public class FormHandlerMain implements FormHandler {
 
 	public iCing icing;
 	public String action;
@@ -18,16 +18,19 @@ public class FormHandleriCing implements FormHandler {
 	public String result;
 	public JSONObject jso;
 
-	public FormHandleriCing(iCing icing) {
+	public FormHandlerMain(iCing icing) {
 		super();
+        if (icing == null) {
+            General.showCodeBug("In FormHandlerMain constructor. Found null for icing.");
+        }
 		setiCing(icing);
 	}
 
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
-		General.showDebug("Starting submit which will be dealt with from FormHandleriCing and sub class.");
+//		General.showDebug("Starting submit which will be dealt with from FormHandlerMain and sub class.");
 		if (icing == null) {
-			General.showCodeBug("Found null for icing.");
+			General.showCodeBug("In FormHandlerMain.onSubmit Found null for icing.");
 			event.setCancelled(true);
 			return;
 		}
@@ -35,14 +38,16 @@ public class FormHandleriCing implements FormHandler {
 
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
-		General.showDebug("Now in FormHandleriCing.onSubmitComplete");
+		General.showDebug("Now in FormHandlerMain.onSubmitComplete");
 
 		String response = event.getResults();
 		if (response == null) {
 			General.showError("Failed to get any response from server.");
 			return;
 		}
-		General.showDebug("response is: [" + response + "]");
+		int endIndex = Math.min(response.length(), Settings.MAX_RESPONSE_REPORTED_FOR_DEBUGGING);
+		String responseTruncate = response.substring(0,endIndex).replace(General.eol, "");
+		General.showDebug("responseTruncate is: [" + responseTruncate + "]");
 		String jsonResult = removePreTags(response);
 		// JSONObject, JSONValue, and JSONString are all part of the GWT's JSON
 		// parsing package
@@ -72,43 +77,46 @@ public class FormHandleriCing implements FormHandler {
 				continue;
 			}
 			String value = valueObj.stringValue();
-			General.showDebug("Received key, value: [" + key + "], [" + value + "]");
-			if (key.equals(Keys.FORM_PARM_ACTION)) {
+			endIndex = Math.min(value.length(), Settings.MAX_RESPONSE_REPORTED_FOR_DEBUGGING);
+			String valueTruncate = value.substring(0,endIndex);
+			General.showDebug("Received key, valueTruncate: [" + key + "], [" + valueTruncate + "]");
+			if (key.equals(Settings.FORM_PARM_ACTION)) {
 				action = value;
-			} else if (key.equals(Keys.RESPONSE_EXIT_CODE)) {
+			} else if (key.equals(Settings.RESPONSE_EXIT_CODE)) {
 				exitCode = value;
-			} else if (key.equals(Keys.RESPONSE_RESULT)) {
+			} else if (key.equals(Settings.RESPONSE_RESULT)) {
 				result = value;
 			}
 		}
 		if (action == null) {
-			action = Keys.RESPONSE_ACTION_DEFAULT;
+			action = Settings.RESPONSE_ACTION_DEFAULT;
 			General.showDebug("Missing action; set to default: [" + action + "]");
 			return;
 		}
 
 		if (exitCode == null) {
-			exitCode = Keys.RESPONSE_EXIT_CODE_DEFAULT;
+			exitCode = Settings.RESPONSE_EXIT_CODE_DEFAULT;
 			General.showDebug("Missing exitCode; set to default: [" + exitCode + "]");
 		}
 		/** Just note here and act on it in subclass. */
-		if (!Keys.RESPONSE_EXIT_CODE_ALIST.contains(exitCode)) {
+		if (!Settings.RESPONSE_EXIT_CODE_ALIST.contains(exitCode)) {
 			General.showError("Found invalid exit code: [" + exitCode + "] set to default ["
-					+ Keys.RESPONSE_EXIT_CODE_DEFAULT + "]");
-			exitCode = Keys.RESPONSE_EXIT_CODE_DEFAULT;
+					+ Settings.RESPONSE_EXIT_CODE_DEFAULT + "]");
+			exitCode = Settings.RESPONSE_EXIT_CODE_DEFAULT;
 		}
 		if (result == null) {
-			result = Keys.RESPONSE_RESULT_DEFAULT;
+			result = Settings.RESPONSE_RESULT_DEFAULT;
 			General.showDebug("Missing result; set to default: [" + result + "]");
 			return;
 		}
+		General.showDebug("Exiting FormHandlerMain.onSubmitComplete");
 	}
 
 	public void setiCing(iCing icing) {
 		if (icing == null) {
-			General.showError("in FormHandleriCing.setiCing found icing: null");
+			General.showError("in FormHandlerMain.setiCing found icing: null");
 		} else {
-//			General.showDebug("in FormHandleriCing.setiCing found icing: " + icing.toString());
+//			General.showDebug("in FormHandlerMain.setiCing found icing: " + icing.toString());
 		}
 		this.icing = icing;
 	}

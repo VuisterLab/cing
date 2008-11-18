@@ -38,7 +38,7 @@ public class Options extends iCingView {
 	}
 	
 	public void setIcing(iCing icing) {
-		super.setIcing(icing);
+        super.setIcing(icing);
 		final iCing icingShadow = icing;		
 		setState(iCing.OPTIONS_STATE);
 		

@@ -3,7 +3,7 @@
 # USE: molmol_image.csh pdb_file tmp_dir pdb_id
 # make a pov ray file in a temporary directory as these files can become
 # quite large
-
+echo "DEBUG: 0"
 set mac_file       = molmol_images.mac
 set log_file       = molmol_images.log
 set pdb_file       = $1
@@ -20,6 +20,7 @@ set mul            = 1
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
 
+echo "DEBUG: 1"
 
 # check if we got the right amount of parameters
 if ( $# != 7 ) then
@@ -46,11 +47,12 @@ if ( -e $log_file ) then
    \rm $log_file
 endif
 
-if ( 0 ) then
+if ( 1 ) then
     echo "molmol_image.csh found pdb_file   :" $pdb_file >  $log_file
     echo "molmol_image.csh found tmp_dir    :" $tmp_dir  >> $log_file
     echo "molmol_image.csh found id         :" $id       >> $log_file
 endif
+echo "DEBUG: 2"
 
 start:
 # Make the MOLMOL macro
@@ -67,6 +69,7 @@ else
   echo "WARNING: no EXPDTA record found in pdb file"
   echo "WARNING: assuming model is from NMR because safest in context"
 endif
+echo "DEBUG: 3"
 
 # 1 kB per 1 amino acid residue for NMR; approximately
 # Anything below   100 aminoacids will be at resolution 3
@@ -91,11 +94,12 @@ endif
 
 #echo "Assuming multiplication factor:   $mul"       >> $log_file
 echo "Precision for pov file:           $precision" >> $log_file
+echo "DEBUG: 4"
 
 # Notes for the macro file:
 # -1- No empty lines allowed.
 echo "InitAll yes" > $mac_file
-echo "PathNames '' '' '' '' '/Users/jd/progs/molmol/setup/PdbAtoms' '/Users/jd/progs/molmol/setup/PropDef' '/Users/jd/progs/molmol/setup/pdb.lib' '' ''" >> $mac_file
+echo "PathNames '' '' '' '' '/Users/jd/progs/molmolM/setup/PdbAtoms' '/Users/jd/progs/molmolM/setup/PropDef' '/Users/jd/progs/molmolM/setup/pdb.lib' '' ''" >> $mac_file
 if ( $backcolor == "bmrb_yellow" ) then
     echo "BackColor 1 1 0.79688" >> $mac_file
 else
@@ -111,6 +115,7 @@ else
         endif
     endif
 endif
+echo "DEBUG: 5"
 
 cat >> $mac_file << EOD
 Rendering 1 1 0 1 1 1 1 1
@@ -181,10 +186,13 @@ EOD
 if ( -e $MOLMOLHOME/dump ) then
     \rm -f $MOLMOLHOME/dump
 endif
+echo "DEBUG: 6"
 
 # Run the stuff through molmol
-$executableMm -at -f $mac_file >>& $log_file
+setenv MOLMOLDEV TTY/NO
+$executableMm -t -f - < $mac_file >>& $log_file
 set molmol_status = $status
+echo "DEBUG: 7"
 
 if ( $molmol_status ) then
     if ( $try == 1 ) then
