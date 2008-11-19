@@ -204,8 +204,8 @@ public class iCingServlet extends HttpServlet {
 	private void processPname(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		String regexp = ".*.tgz";
-		General.showOutput("Reg exp files: " + regexp);
-		General.showOutput("Dir: " + pathProject);
+//		General.showOutput("Reg exp files: " + regexp);
+//		General.showOutput("Dir: " + pathProject);
 		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
 		String[] list = pathProject.list(ff);
 
@@ -276,7 +276,7 @@ public class iCingServlet extends HttpServlet {
 	private String getProjectFile(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		String regexp = ".*.tgz";
-		General.showOutput("Reg exp files: " + regexp);
+//		General.showOutput("Reg exp files: " + regexp);
 		General.showOutput("Dir: " + pathProject);
 		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
 		String[] list = pathProject.list(ff);

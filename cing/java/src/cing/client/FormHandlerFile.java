@@ -27,7 +27,7 @@ public class FormHandlerFile extends FormHandlerMain {
 
 		/** Extra checks here for this class */
 		if (fileUpload.getFilename().length() == 0) {
-			Window.alert("You must select a file!");
+			Window.alert(c.You_must_sele());
 			event.setCancelled(true);
 			return;
 		}
@@ -37,13 +37,13 @@ public class FormHandlerFile extends FormHandlerMain {
 		String fn = fileUpload.getFilename();
 		String fnNoPath = Utils.getFileNameWithoutPath(fn);
 
-		labelFileUploadDone.setText("Uploading " + fnNoPath);
+		labelFileUploadDone.setText(c.Uploading() +" " + fnNoPath);
 		labelFileUploadDone.setVisible(true);
 	}
 
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
 		super.onSubmitComplete(event);
-		General.showDebug("Now in FormHandlerFile.onSubmitComplete");
+//		General.showDebug("Now in FormHandlerFile.onSubmitComplete");
 
 		statusMessage.removeStyleName("successBorder");
 		statusMessage.removeStyleName("failureBorder");
@@ -55,7 +55,7 @@ public class FormHandlerFile extends FormHandlerMain {
 		} else {
 			showUploadError(result);
 		}
-        General.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
+//        General.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
 	}
 
 	private void showUploadError(String result) {
@@ -72,7 +72,7 @@ public class FormHandlerFile extends FormHandlerMain {
 		String type = Utils.getHTMLformTypeFromFileName(fn);
 		String fnNoPath = Utils.getFileNameWithoutPath(fn);
 		String labelTxt = fnNoPath + " (" + type + ") " + result;
-		statusMessage.setText(labelTxt + " uploaded.");
+		statusMessage.setText(labelTxt + " "+ c.uploaded() +".");
 		labelFileUploadDone.setText(labelTxt);
 		nextButton.setEnabled(true);
 		RunView.submitButton.setEnabled(true);

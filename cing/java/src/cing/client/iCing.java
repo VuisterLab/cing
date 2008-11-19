@@ -18,6 +18,7 @@ import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -89,7 +90,6 @@ public class iCing implements EntryPoint, HistoryListener {
 	Report report;
 	RunView runView;
 	Maintenance maintenance;
-	Footer footer;
 
 	private RootPanel rootPanel = RootPanel.get();
 	VerticalPanel vPanel = new VerticalPanel();
@@ -129,7 +129,6 @@ public class iCing implements EntryPoint, HistoryListener {
 		criteria = new Criteria();
 		runView = new RunView();
 		report = new Report();
-		footer = new Footer();
 		fileView = new FileView();
 		maintenance = new Maintenance();
 
@@ -142,26 +141,21 @@ public class iCing implements EntryPoint, HistoryListener {
 		views.add(login);
 		views.add(options);
 		views.add(preferences);
-		views.add(welcome);
 		views.add(criteria);
 		views.add(report);
         views.add(runView);
         views.add(maintenance);
-		views.add(footer);
 
 		for (iCingView v : views) {
 			vPanel.add(v);
 			v.setIcing(this);
-
-			if (v instanceof Footer) { // always present footer view.
-				continue;
-			}
 			v.setVisible(false);
 		}
 		vPanel.setSpacing(5);
 
 		setVerbosityToDebug(iCing.doDebug); // partner with the above call to
 		showLoadingMessage(false);
+        showFooter();
 
 		History.addHistoryListener(this);
 		// If the application starts with no history token, redirect to a new
@@ -176,7 +170,20 @@ public class iCing implements EntryPoint, HistoryListener {
 		onHistoryChanged(initToken);
 	}
 
-	public void onHistoryChanged(String historyToken) {
+	private void showFooter() {
+        final HTML html = new HTML("<div id=\"footer\">"+General.eol+
+                "<p align=\"center\">"+General.eol+
+                "CING  "+c.version()+" 0.8 (iCing v."+Settings.VERSION+")\t"+General.eol+
+                "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t"+General.eol+
+                "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>"+General.eol+" " + c.and() + " \t"+General.eol+
+                "<a href=\"mailto:alanwilter@gmail.com\">Alan Wilter Sousa da Silva</a>"+
+                "</p>"+General.eol+
+                "</div>"+General.eol);
+        vPanel.add(html);
+        html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+    }
+
+    public void onHistoryChanged(String historyToken) {
 		if (historyToken == null || historyToken.length() == 0) {
 			General.showError("Got an unknown history token: [" + historyToken + "]");
 		}
@@ -243,9 +250,6 @@ public class iCing implements EntryPoint, HistoryListener {
 	public void clearAllViews() {
 		// General.showDebug("Now in clearAllViews");
 		for (iCingView v : views) {
-			if (v instanceof Footer) { // not a real view.
-				continue;
-			}
 			v.setVisible(false);
 		}
 	}
@@ -270,7 +274,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		verticalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		topPanel.setCellHorizontalAlignment(verticalPanel, HasHorizontalAlignment.ALIGN_LEFT);
 
-		final Label icingLabel = new Label(c.iCing() + " (BETA release)");
+		final Label icingLabel = new Label(c.iCing() + " (BETA "+c.release()+")");
 		verticalPanel.add(icingLabel);
 		icingLabel.setStylePrimaryName("h1");
 

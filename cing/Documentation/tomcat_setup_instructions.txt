@@ -1,5 +1,8 @@
 THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 
+* Note  http://www.malisphoto.com/tips/tomcatonosx.html
+    Has most up to date instructions.
+    
 * On Stella/mini (mac):
 -Using mac installed version (Apache Tomcat/5.5.23):
     as root

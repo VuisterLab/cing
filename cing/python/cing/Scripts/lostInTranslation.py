@@ -27,7 +27,7 @@ class lostInTranslation():
         NTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
         propBaseFile = os.path.join( 'iCingConstants.properties' )
         propBaseMap = self.getPropMap( propBaseFile )
-        NTmessage (`propBaseMap` )
+        NTmessage ( `propBaseMap` )
         for propFile in propList:
             n = len(propFile)
 #            iCingConstants_XX.properties
@@ -48,7 +48,7 @@ class lostInTranslation():
                 nf.write( u"%-20s = " % key )
                 nf.write( value ) # might be utf-8
                 nf.write( u"\n" ) # might be utf-8
-                NTmessage("Lost: " + key)
+#                NTmessage("Lost: " + key)
             nf.close()
                 
     def getPropMap( self, propBaseFile ):

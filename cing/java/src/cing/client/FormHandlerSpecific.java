@@ -16,9 +16,9 @@ public class FormHandlerSpecific extends FormHandlerMain {
 
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
-        General.showDebug("Initially in FormHandlerSpecific.onSubmitComplete");
+//        General.showDebug("Initially in FormHandlerSpecific.onSubmitComplete");
 		super.onSubmitComplete(event);
-		General.showDebug("Now in FormHandlerSpecific.onSubmitComplete");
+//		General.showDebug("Now in FormHandlerSpecific.onSubmitComplete");
 
 		if (exitCode.equals(Settings.RESPONSE_EXIT_CODE_ERROR)) {
 			General.showError("Form with action: ["+action+"] came back with an error. Not processing further.");

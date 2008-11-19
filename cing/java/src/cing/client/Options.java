@@ -4,7 +4,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -12,7 +11,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Options extends iCingView {
@@ -22,9 +20,6 @@ public class Options extends iCingView {
 	private TextBox textBoxModel;
 	private TextBox textBoxResidue;
 	
-	iCingConstants c = iCing.c;
-	DecoratorPanel decPanel = new DecoratorPanel();
-
 	int i = 0;
 	final int optionVerbosityIdx = i++;
 	final int optionImagerIdx = i++;
@@ -47,13 +42,10 @@ public class Options extends iCingView {
 		verticalPanel.add(html_1);
 		verticalPanel.add(decPanel);
 		
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		decPanel.setWidget(verticalPanel);
-
 		final FlexTable flexTable = new FlexTable();
 		flexTable.setCellSpacing(5);
 		flexTable.setCellPadding(5);
-		verticalPanel.add(flexTable);
+		decPanel.add(flexTable);
 
 		
 		final Label verbosityLabel = new Label(c.Verbosity());
@@ -142,7 +134,7 @@ public class Options extends iCingView {
 			}
 		});	
 		verticalPanel.add(nextButton);
-		nextButton.setTitle("Submit to CING server.");
+		nextButton.setTitle(c.Submit_to_CING_s());
 		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 		
 	}

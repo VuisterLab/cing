@@ -23,10 +23,10 @@ import com.gwtsolutions.components.client.ui.Message;
 public class FileView extends iCingView {
 
 	final Button startButton = new Button();
-	final Button nextButton = new Button("Next");
+	final Button nextButton = new Button();
 	final FlexTable flexTable = new FlexTable();
 	final Button addButton = new Button();
-	private final Message statusMessage = new Message("empty msg", Message.SHAKE, 0.5);
+	private final Message statusMessage = new Message("invisible empty msg", Message.SHAKE, 0.5);
 
 	int i = 0;
 	final int checkBoxIdx = i++;
@@ -39,10 +39,6 @@ public class FileView extends iCingView {
 	final int submitIdx = i++;
 	final int egIdx = i++;
 
-	iCingConstants c = iCing.c;
-	/** Combine this constructor with the next real init to see the Design view if that's what you are looking for.
-	 * It's real simple by uncommenting 3 lines.
-	 */
 	public FileView() {
 		super();
 		setState(iCing.FILE_STATE);
@@ -90,7 +86,7 @@ public class FileView extends iCingView {
 		final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
 		horizontalPanelBackNext.setSpacing(iCing.margin);
 		verticalPanel.add(horizontalPanelBackNext);
-		final Button backButton = new Button();
+		final Button backButton = new Button(); 
 		horizontalPanelBackNext.add(backButton);
 		backButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -107,35 +103,36 @@ public class FileView extends iCingView {
 			}
 		});
 		nextButton.setEnabled(false);
-		nextButton.setTitle("Set the criteria.");
+        nextButton.setText(c.Next());
+        nextButton.setTitle(c.Set_the_criteria());
 
 	}
 
 	public boolean showStartButton() {
 		flexTable.setWidget(0, 0, startButton);
-		startButton.setTitle("Select file(s) to upload.");
-		startButton.setText("Upload file");
+		startButton.setTitle(c.Select_file_s_());
+		startButton.setText(c.Upload_file());
 		startButton.setVisible(true);
 		return false;
 	}
 
 	public boolean showUpload() {
 		startButton.setVisible(false);
-		final Label programLabel = new Label("Program");
+		final Label programLabel = new Label(c.Program());
 		flexTable.setWidget(0, programIdx, programLabel);
 
-		final Label typeLabel = new Label("Type");
+		final Label typeLabel = new Label(c.Type());
 		flexTable.setWidget(0, typeIdx, typeLabel);
 
-		final Label subtypeLabel = new Label("Subtype");
+		final Label subtypeLabel = new Label(c.Subtype());
 		flexTable.setWidget(0, subTypeIdx, subtypeLabel);
 
-		final Label otherLabel = new Label("Other");
+		final Label otherLabel = new Label(c.Other());
 		flexTable.setWidget(0, otherIdx, otherLabel);
 
 		flexTable.setWidget(1, 1, addButton);
-		addButton.setTitle("Add another upload.");
-		addButton.setText("Upload another file");
+		addButton.setTitle(c.Add_another_upl());
+		addButton.setText(c.Upload_another_f()); 
 		addButton.setVisible(false);
 		return false;
 	}
@@ -162,7 +159,7 @@ public class FileView extends iCingView {
 		checkBoxUseFile.setChecked(true);
 		checkBoxUseFile.setText("");
 
-		final Label labelFileUploadDone = new Label("This message should not show up.");
+		final Label labelFileUploadDone = new Label(c.This_message_sho());
 		labelFileUploadDone.setVisible(false);
 
 		Button submitButton = new Button(c.Upload());

@@ -17,6 +17,7 @@ public class FormHandlerMain implements FormHandler {
 	public String exitCode;
 	public String result;
 	public JSONObject jso;
+    iCingConstants c = iCing.c;
 
 	public FormHandlerMain(iCing icing) {
 		super();
@@ -38,7 +39,7 @@ public class FormHandlerMain implements FormHandler {
 
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
-		General.showDebug("Now in FormHandlerMain.onSubmitComplete");
+//		General.showDebug("Now in FormHandlerMain.onSubmitComplete");
 
 		String response = event.getResults();
 		if (response == null) {
@@ -109,7 +110,7 @@ public class FormHandlerMain implements FormHandler {
 			General.showDebug("Missing result; set to default: [" + result + "]");
 			return;
 		}
-		General.showDebug("Exiting FormHandlerMain.onSubmitComplete");
+//		General.showDebug("Exiting FormHandlerMain.onSubmitComplete");
 	}
 
 	public void setiCing(iCing icing) {
