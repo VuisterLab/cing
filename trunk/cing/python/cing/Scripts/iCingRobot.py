@@ -22,10 +22,10 @@ def iCingRobot():
 #    NTwarning("Expect errors without a server up and running.")
     NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
     ## queries possible
-    doSave  = 0
-    doRun   = 0
+    doSave  = 1
+    doRun   = 1
     doStatus= 1
-    doLog   = 0
+    doLog   = 1
     doPname = 1
     ## credentials.
     user_id = "jd3"
@@ -37,10 +37,10 @@ def iCingRobot():
 #    entryId = '1brv' # 68K, smallest for quick testing.
     entryId = '1a4d' # 388K
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
-    rpcUrl = "localhost/iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
+#    rpcUrl = "localhost/iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
 #    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
 #/    rpcUrl = "dodos.dyndns.org/icing/serv/iCingServlet" # testing production-like 
-#    rpcUrl = "nmr.cmbi.ru.nl/icing/serv/iCingServlet" # testing production
+    rpcUrl = "https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet" # testing production
                                 
 ##############################################################################################################
     credentialSettings = "-F UserId=%s -F AccessKey=%s" % ( user_id, access_key)
