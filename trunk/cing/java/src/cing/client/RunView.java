@@ -3,7 +3,6 @@ package cing.client;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -14,11 +13,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class RunView extends iCingView {
 
 	final HTML reportHTML = new HTML();
-	DecoratorPanel decPanel = new DecoratorPanel();
 	static final Button submitButton = new Button();
 	static final Button nextButton = new Button();
 	iCingQuery cingQueryRun; 
-	iCingConstants c = iCing.c;
 	
 	public RunView() {
 		super();
@@ -40,7 +37,7 @@ public class RunView extends iCingView {
 		decPanel.add(verticalPanelDec);
 
 		
-		final Label html_2 = new Label( "Please press the button when you are ready." );
+		final Label html_2 = new Label( c.Please_press_the() );
 		
 		submitButton.setText(c.Submit());
 		submitButton.addClickListener(new ClickListener() {
@@ -54,7 +51,7 @@ public class RunView extends iCingView {
 		verticalPanelDec.add(html_2);
 		verticalPanelDec.add( submitButton);
 		
-		submitButton.setTitle("Run the validation.");
+		submitButton.setTitle(c.Run_the_validati());
 		verticalPanelDec.setCellHorizontalAlignment(submitButton, HasHorizontalAlignment.ALIGN_LEFT);
 				
 		
@@ -81,7 +78,7 @@ public class RunView extends iCingView {
 		horizontalPanelBackNext.add(backButton);
 		horizontalPanelBackNext.add(nextButton);
 		
-		nextButton.setTitle("Goto CING log.");
+		nextButton.setTitle(c.Goto_CING_log());
 //		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
 //		nextButton.setVisible(false);
 		cingQueryRun = new iCingQuery(icing); 

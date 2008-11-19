@@ -24,7 +24,7 @@ public interface Settings {
     /** Name of log file of CING run */
     public static final String CING_RUN_LOG_FILE = "cingRun.log";
     /** TODO remove dep. Needs to be defined from interface. */
-    public static final int CING_VERBOSITY = 9;
+    public static final int CING_VERBOSITY = 3;
     /** Number of characters of the unique secret key. */
     public static final int accessKeyLength = 6;
     /** When debugging the max number of chars to show on a response that might be way too long */
@@ -40,7 +40,7 @@ public interface Settings {
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081118-1437";
+    public static final String VERSION = "20081119-1446";
 
     public static final String NONE = "NONE";
 

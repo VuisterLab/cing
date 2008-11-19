@@ -11,8 +11,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class Maintenance extends iCingView {
 
-	iCingConstants c = iCing.c;
-
 	public Maintenance() {
 		super();
 	}
@@ -22,7 +20,7 @@ public class Maintenance extends iCingView {
 		// final iCing icingShadow = icing;
 		setState(iCing.MAINTENANCE_STATE);
 
-		final Label html_1 = new Label("CING is temporarily down for maintenance; please stay tuned.");
+		final Label html_1 = new Label(c.CING_is_temporar());
 		html_1.setStylePrimaryName("h1");
 		verticalPanel.add(html_1);
 	}

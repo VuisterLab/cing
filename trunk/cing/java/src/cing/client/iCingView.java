@@ -2,6 +2,7 @@ package cing.client;
 
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
@@ -11,6 +12,8 @@ public class iCingView extends Composite {
 	private String state;
 	public iCing icing;
 	final VerticalPanel verticalPanel = new VerticalPanel();
+    final DecoratorPanel decPanel = new DecoratorPanel(); // Almost always used.
+    iCingConstants c = iCing.c;
 	
 	public iCingView() {
 		super();

@@ -12,9 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class Report extends iCingView {
 
 	final HTML reportHTML = new HTML();
-	iCingConstants c = iCing.c;
-
-	final String pleaseWriteDown = "<P>Please copy down the url for future reference.</P>";
+	final String pleaseWriteDown = "<P>"+c.Please_copy_down()+"</P>";
 
 	// final Timer refreshShowResultsTimer;
 
@@ -30,7 +28,7 @@ public class Report extends iCingView {
 		label.setStylePrimaryName("h1");
 		verticalPanel.add(label);
 
-		String htmlText = "No results yet.";
+		String htmlText = c.No_results_yet();
 		reportHTML.setHTML(htmlText);
 		verticalPanel.add(reportHTML);
 
@@ -115,8 +113,9 @@ public class Report extends iCingView {
 		if ( icing.projectName == null ) {
 		    General.showError("Failed to get project name when the results have already been generated");
 		}
-		String htmlTextEnabled = "CING has finished running. Please find the results <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\" target=\"_blank\">here</a>." + General.eol + pleaseWriteDown;
+		
+		String htmlTextEnabled = c.CING_has_finishe()+" <A HREF=\"" + runUrl + "/"
+				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." + General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
@@ -126,14 +125,16 @@ public class Report extends iCingView {
 			General.showError("In showTemporaryResults. Failed to getRunUrl; not changing the report url.");
 			return;
 		}
-		String htmlTextEnabled = "<P>CING has not finished running.</P>"
-				+ General.eol
-				+ "<P>A <A HREF=\""
+		String htmlTextEnabled = "<P>"+c.CING_has_not_fin()+"</P>"
+				+ General.eol 
+				+ "<P>"+c.A()+" <A HREF=\""
 				+ runUrl
-				+ "\"  target=\"_blank\">directory</a> in which results are being created may be consulted in the meanwhile"
-				+ " or switch to View->Log CING." + General.eol
-				+ "<P>After a while it might be nice to check here anyway as iCing might have timed out checking"
-				+ General.eol + " but CING might be finished anywho.</P>" + General.eol + pleaseWriteDown;
+				+ "\"  target=\"_blank\">"+c.directory()+"</a> "
+				+ c.in_which_results() 
+				+ c.View() + "->"+c.Log()+" CING." + General.eol
+				+ "<P>" + c.After_a_while_it()
+				+ General.eol + " </P>" 
+				+ General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
@@ -143,14 +144,13 @@ public class Report extends iCingView {
 			General.showError("In showTemporaryResults. Failed to getRunUrl; changing the report url to null.");
 			runUrl = Settings.NOT_AVAILABLE;
 		}
-		String htmlTextEnabled = "CING might have crashed as the server status could not be retrieved."
-				+ "It might also still be running. Please check the results sofar <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\" target=\"_blank\">here</a>." + General.eol + pleaseWriteDown;
+		String htmlTextEnabled = c.CING_might_have() + "<A HREF=\"" + runUrl + "/"
+				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." + General.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
 	public void setProjectName(String projectName) {
-		General.showDebug("Now in Report.setProjectName");
+//		General.showDebug("Now in Report.setProjectName");
 		if (projectName == null) {
 			General.showError("Error in Report.setProjectName; got a null for project name.");
 			return;

@@ -1,7 +1,7 @@
 #!/bin/tcsh -f
 
 # DESCRIPTION: Script that executes cing with given parameters but only after setting up the right shell environment except cwd.
-# EXAMPLE RUN: /Users/jd/workspace34/cing/scripts/cing/CingWrapper.csh --name 1a4d --initCcpn 1a4d.tgz -v 9 --script doValidateiCing.py
+# EXAMPLE RUN: $CINGROOT/scripts/cing/CingWrapper.csh --name 1a4d --initCcpn 1a4d.tgz -v 9 --script doValidateiCing.py
 
 # INITIALIZATION
 # Set all parameters in script: cing.csh
@@ -23,12 +23,14 @@ setenv MOLMOLHOME         $UJ/progs/molmolM
 setenv HOME               /Library/WebServer/Documents/servlet-cing-home
 #setenv HOME               $UJ
 
+set verbosityDebug = 0
 
 
 set script = CingWrapper.csh
 
 ##No changes required below this line
 ###############################################################################
+    
 # Requirements below:
 limit cputime    6000   # Maximum number of seconds the CPU can spend
                         # on any single process spawned. 100 minutes seems to be top.
@@ -39,33 +41,49 @@ umask 2                 # The files created will be having special permissions.
 
 unsetenv PYTHONPATH
 
-echo "DEBUG: Wrap for HOME / user           $HOME / $user"
+if ( $verbosityDebug) then
+    echo "DEBUG: Wrap for HOME / user           $HOME / $user"
+endif
 
-echo "DEBUG: Initializing CING from         $CINGROOT"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing CING from         $CINGROOT"
+endif
 source $CINGROOT/cing.csh
 
-echo "DEBUG: Initializing CCPN from         $CCPNMR_TOP_DIR"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing CCPN from         $CCPNMR_TOP_DIR"
+endif
 setenv PYTHONPATH   ${PYTHONPATH}:$CCPNMR_TOP_DIR/python
 
-echo "DEBUG: Initializing Wattos from       $WATTOSROOT"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing Wattos from       $WATTOSROOT"
+endif
 source $WATTOSROOT/scripts/wsetup
 
-echo "DEBUG: Initializing Aqua from         $aquaroot"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing Aqua from         $aquaroot"
+endif
 source $aquaroot/aqsetup
 
-echo "DEBUG: Initializing ProcheckNMR from  $procheckroot"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing ProcheckNMR from  $procheckroot"
+endif
 source $procheckroot/setup.scr
 
-echo "DEBUG: Initializing MOLMOL from       $MOLMOLHOME"
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing MOLMOL from       $MOLMOLHOME"
+endif
+
 if ( ! -e "/Users/jd/progs/molmolM/setup/PdbAtoms" ) then
     echo "ERROR: failed to find dep"
     exit 1
 endif
 
-echo "DEBUG: Initializing python from       $PYTHONPATH"
-
-echo "DEBUG: Using CING arguments:          [$argv]"
-echo "DEBUG: Starting script $script on `date`"
+if ( $verbosityDebug) then
+	echo "DEBUG: Initializing python from       $PYTHONPATH"	
+	echo "DEBUG: Using CING arguments:          [$argv]"
+	echo "DEBUG: Starting script $script on `date`"
+endif
 
 # short notation for $argv or even $argv[*] is $* but let's be verbose.
 cing $argv
@@ -73,6 +91,8 @@ cing $argv
 # Testing...
 #python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
 #$MOLMOLHOME/molmol -t -f - < 1brv_1model_molmol_images.mac
+#pwd;ls;date
 
-
-echo "DEBUG: Stopped  script $script on `date`"
+if ( $verbosityDebug) then
+    echo "DEBUG: Stopped  script $script on `date`"
+endif

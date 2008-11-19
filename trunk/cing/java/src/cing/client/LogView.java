@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class LogView extends iCingView {
 
-	iCingConstants c = iCing.c;
 	public final RichTextArea area = iCing.area;
 
 	final Label logLabel = new Label(c.Log() + " " + c.iCing());
@@ -56,11 +55,11 @@ public class LogView extends iCingView {
 				area.setHTML(Utils.wrapPres(""));
 			}
 		});
-		clearButton.setText("Clear");
+		clearButton.setText(c.Clear());
 		horizontalPanel.add(clearButton);
-		clearButton.setTitle("Clears the log window.");
+		clearButton.setTitle(c.Clears_the_log_w());
 		horizontalPanel.add(tailCheckBox);
-		tailCheckBox.setTitle("Reverse the order of lines in the log.");
+		tailCheckBox.setTitle(c.Reverse_the_orde());
 		// area.setFocus(true);
 		String iniMsg = Utils.preStart;
 		iniMsg += c.Expect_to_see() + General.eol;

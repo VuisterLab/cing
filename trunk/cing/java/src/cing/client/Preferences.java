@@ -1,7 +1,6 @@
 package cing.client;
 
 import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -9,9 +8,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Preferences extends iCingView {
-
-	DecoratorPanel decPanel = new DecoratorPanel();
-	iCingConstants c = iCing.c;	
 
 	int i = 0;
 	final int optionVerbosityIdx = i++;
@@ -30,10 +26,10 @@ public class Preferences extends iCingView {
 		html_1.setStylePrimaryName("h1");
 		verticalPanel.add(html_1);		
 		verticalPanel.add(decPanel);		
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		decPanel.add(verticalPanel);
+		final VerticalPanel verticalPanelInner = new VerticalPanel();
+		decPanel.add(verticalPanelInner);
 		final FlexTable flexTable = new FlexTable();
-		verticalPanel.add(flexTable);
+		verticalPanelInner.add(flexTable);
 		flexTable.setCellSpacing(5);
 		flexTable.setCellPadding(5);
 
