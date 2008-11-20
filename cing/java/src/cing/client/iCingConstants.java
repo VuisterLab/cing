@@ -168,9 +168,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String none();
 
   /**
-   * Translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far".
+   * Translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far.".
    * 
-   * @return translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far"
+   * @return translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far."
    * @gwt.key CING_might_have
    */
   String CING_might_have();
@@ -392,9 +392,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String A();
 
   /**
-   * Translated "After a while it might be nice to check here anyway as iCing might have timed out checking but CING might be finished anywho.".
+   * Translated "After a while it might be nice to check here anyway as iCing might have timed out checking. CING might be finished anyhow.".
    * 
-   * @return translated "After a while it might be nice to check here anyway as iCing might have timed out checking but CING might be finished anywho."
+   * @return translated "After a while it might be nice to check here anyway as iCing might have timed out checking. CING might be finished anyhow."
    * @gwt.key After_a_while_it
    */
   String After_a_while_it();
@@ -560,9 +560,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Expect_to_see();
 
   /**
-   * Translated "in which results are being created may be consulted in the meanwhile or switch to".
+   * Translated "in which results are being created that may be consulted in the meanwhile. You may also switch to".
    * 
-   * @return translated "in which results are being created may be consulted in the meanwhile or switch to"
+   * @return translated "in which results are being created that may be consulted in the meanwhile. You may also switch to"
    * @gwt.key in_which_results
    */
   String in_which_results();
