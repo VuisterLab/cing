@@ -40,7 +40,7 @@ public interface Settings {
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081119-1446";
+    public static final String VERSION = "20081120-1345";
 
     public static final String NONE = "NONE";
 
