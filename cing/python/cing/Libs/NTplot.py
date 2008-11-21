@@ -768,7 +768,7 @@ class NTplot( NTdict ):
                 max = v
 
         if min == None or max == None:
-            NTwarning('Only None values in autoScaleY pointList found')
+            NTdebug('Only None values in autoScaleY pointList found')
             min = 0.0
             max = 1.0
 

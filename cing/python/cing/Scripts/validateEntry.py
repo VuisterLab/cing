@@ -10,6 +10,7 @@ from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.disk import rmdir
+from shutil import rmtree
 import cing
 import os
 import sys
@@ -37,7 +38,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
     """
     
-    fastestTest = False
+    fastestTest = True
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -64,8 +65,10 @@ def main(entryId, *extraArgList):
     NTdebug("pdbConvention:        " + pdbConvention)
     NTdebug("restraintsConvention: " + restraintsConvention)
     # presume the directory still needs to be created.
-    if not os.path.isdir(outputDir):
-        os.mkdir(outputDir)
+    cingEntryDir = entryId+".cing"
+    if os.path.isdir(cingEntryDir):
+        rmtree(cingEntryDir)
+        
     os.chdir(outputDir)
     
     project = Project(entryId)
@@ -85,8 +88,6 @@ def main(entryId, *extraArgList):
         if not project.initCcpn(ccpnFolder=fnametgz):
             NTerror("Failed to init project from ccpn")
             return True     
-        os.unlink(fnametgz) # temporary ccpn tgz
-        rmdir(entryId) # temporary ccpn dir        
     else:
         pdbFileName = entryId + ".pdb"
     #    pdbFilePath = os.path.join( inputDir, pdbFileName)
@@ -127,6 +128,11 @@ def main(entryId, *extraArgList):
         NTerror("Failed to validate project read")
         return True
     project.save()
+    if isCcpnProject:
+        fnametgz = entryId + '.tgz'         
+        os.unlink(fnametgz) # temporary ccpn tgz
+        rmdir(entryId) # temporary ccpn dir        
+    
         
 
 if __name__ == "__main__":
