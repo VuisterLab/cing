@@ -47,7 +47,8 @@ class AllChecks(TestCase):
         gifFileName = entryId+".gif"
         pathGif = os.path.join( cingDirTmp, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=None))
-
+        self.assertTrue(os.path.exists(pathGif))
+        
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()

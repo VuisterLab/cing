@@ -13,7 +13,7 @@ NB
 for when using 3 processes. 
 """
 START_ENTRY_ID                 = 0 # default 0
-MAX_ENTRIES_TODO               = 1 # default a ridiculously large number like 999999
+MAX_ENTRIES_TODO               = 999 # default a ridiculously large number like 999999
 
 def doScriptOnEntryList(pythonScriptFileName, 
           entryListFileName, 
