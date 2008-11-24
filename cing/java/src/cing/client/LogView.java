@@ -62,8 +62,8 @@ public class LogView extends iCingView {
 		tailCheckBox.setTitle(c.Reverse_the_orde());
 		// area.setFocus(true);
 		String iniMsg = Utils.preStart;
-		iniMsg += c.Expect_to_see() + General.eol;
-		iniMsg += c.Verbosity_may() + General.eol;
+		iniMsg += c.Expect_to_see() + GenClient.eol;
+		iniMsg += c.Verbosity_may() + GenClient.eol;
 		iniMsg += Utils.preEnd; 
 		area.setHTML(iniMsg);
 	}

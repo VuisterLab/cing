@@ -25,7 +25,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * @author Jurgen F. Doreleijers
  * @version 0.1
  */
-class General {
+class GenClient {
 
 	/**
 	 * Next variable controls e.g. how much debug statements will be done.
@@ -47,7 +47,7 @@ class General {
 
 	// recommended for casual user)
 	private static int verbosity = verbosityOutput;
-	// public static int verbosity = verbosityDebug;
+//	 public static int verbosity = verbosityDebug; DON'T CHANGE HERE; USE iCing.java#onModuleLoad() call to GenClient.setVerbosityToDebug();
 
 	/**
 	 * Should be the same value as the ResultSet.getInt methods return for nulls. This is wrongly documented in
@@ -82,8 +82,8 @@ class General {
 	/**
 	 * Issues an error message saying this class can not be initiated.
 	 */
-	public General() {
-		showError("Don't try to initiate the General class; it's methods are static");
+	public GenClient() {
+		showError("Don't try to initiate the GenClient class; it's methods are static");
 	}
 
 	// public static void sleep( long sleepTimeInMilliseconds ) {
@@ -429,7 +429,7 @@ class General {
 	}
 
 	public static void setVerbosity(int verbosity) {
-		General.verbosity = verbosity;
+		GenClient.verbosity = verbosity;
 	}
 
 	public static boolean isVerbosityDebug() {

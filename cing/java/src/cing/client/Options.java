@@ -63,11 +63,11 @@ public class Options extends iCingView {
 		listBoxVerbosity.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget sender) {
 				int selectedValue = Integer.parseInt( listBoxVerbosity.getValue( listBoxVerbosity.getSelectedIndex()));
-				cingVerbosity = General.map2CingVerbosity( selectedValue );
+				cingVerbosity = GenClient.map2CingVerbosity( selectedValue );
 			}
 		});
-		listBoxVerbosity.setSelectedIndex(General.getVerbosity());
-		cingVerbosity = General.map2CingVerbosity( General.getVerbosity() );
+		listBoxVerbosity.setSelectedIndex(GenClient.getVerbosity());
+		cingVerbosity = GenClient.map2CingVerbosity( GenClient.getVerbosity() );
 		
 		final CheckBox createImageryCheckBox = new CheckBox();
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
@@ -145,7 +145,7 @@ public class Options extends iCingView {
 		String new_access = iCing.getNewAccessKey();
 		accessKeyLabelValue.setText(new_access);
 		iCing.currentAccessKey = new_access;
-		General.showDebug("Set access key to: " + iCing.currentAccessKey);
+		GenClient.showDebug("Set access key to: " + iCing.currentAccessKey);
 	}
 
 	public TextBox getTextBoxResidue() {

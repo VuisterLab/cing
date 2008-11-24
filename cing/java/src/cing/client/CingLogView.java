@@ -51,7 +51,7 @@ public class CingLogView extends iCingView {
                 String html = cingArea.getHTML();
                 html = Utils.reverseHtml(html);
                 if (html == null) {
-                    General.showError("Failed to get reversed html");
+                    GenClient.showError("Failed to get reversed html");
                     return;
                 }
                 cingArea.setHTML(html);
@@ -66,7 +66,7 @@ public class CingLogView extends iCingView {
             }
         });
         clearButton.setText(c.Clear());
-        String iniMsg = Utils.preStart + c.Expect_to_see() + ";" +c.Once_CING_is_run() + General.eol + Utils.preEnd;
+        String iniMsg = Utils.preStart + c.Expect_to_see() + ";" +c.Once_CING_is_run() + GenClient.eol + Utils.preEnd;
         cingArea.setHTML(iniMsg);
         nextButton.setText(c.Next());
         nextButton.setFocus(true);
@@ -140,7 +140,7 @@ public class CingLogView extends iCingView {
             icing.onHistoryChanged(iCing.REPORT_STATE);
         }
         if (statusStr.equals(Settings.RESPONSE_EXIT_CODE_ERROR)) {
-            General.showError("Failed to get status from server; assume it crashed; Stopping");
+            GenClient.showError("Failed to get status from server; assume it crashed; Stopping");
             nextButton.setEnabled(true);
             icing.report.showCrash();
             icing.onHistoryChanged(iCing.REPORT_STATE);
@@ -152,31 +152,31 @@ public class CingLogView extends iCingView {
     }
 
     protected void setLogTail(String result) {
-        General.showDebug("Now in setLogTail");
+        GenClient.showDebug("Now in setLogTail");
         if (result == null || result.length() == 0 || result.equals(Settings.RESPONSE_LOG_VALUE_NONE)) {
-            General.showDebug("No new log to display");
+            GenClient.showDebug("No new log to display");
             return;
         }
         Utils.appendHtml(result, cingArea);
     }
 
     protected void getLogTail() {
-        if (General.isVerbosityDebug()) {
+        if (GenClient.isVerbosityDebug()) {
             Date today = new Date();
             String d = DateTimeFormat.getLongTimeFormat().format(today);
             String msg = "In CingLogView: Now in getLogTail " + d + "<BR>";
-            General.showDebug(msg);
+            GenClient.showDebug(msg);
         }
         cingQueryLog.formPanel.submit();
     }
 
     protected void getStatus() {
-        General.showDebug("Now in getStatus");
+        GenClient.showDebug("Now in getStatus");
         cingQueryStatus.formPanel.submit();
     }
 
     protected void getProjectName() {
-        General.showDebug("Now in getProjectName");
+        GenClient.showDebug("Now in getProjectName");
         if (icing.projectName != null) {
             return;
         }

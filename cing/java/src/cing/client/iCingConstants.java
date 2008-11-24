@@ -104,6 +104,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Welcome_to();
 
   /**
+   * Translated "Example of this type.".
+   * 
+   * @return translated "Example of this type."
+   * @gwt.key Eg_of_type
+   */
+  String Eg_of_type();
+
+  /**
    * Translated "Bad".
    * 
    * @return translated "Bad"
@@ -424,6 +432,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Name();
 
   /**
+   * Translated "The filename extension should be:".
+   * 
+   * @return translated "The filename extension should be:"
+   * @gwt.key Please_end_filen
+   */
+  String Please_end_filen();
+
+  /**
    * Translated "Silly sound".
    * 
    * @return translated "Silly sound"
@@ -510,6 +526,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key View
    */
   String View();
+
+  /**
+   * Translated "Validation settings file must be named:".
+   * 
+   * @return translated "Validation settings file must be named:"
+   * @gwt.key Validation_setti
+   */
+  String Validation_setti();
 
   /**
    * Translated "Uncaught exception".
@@ -910,6 +934,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Start_new_sessi
    */
   String Start_new_sessi();
+
+  /**
+   * Translated "A zip file with the full report is available as well".
+   * 
+   * @return translated "A zip file with the full report is available as well"
+   * @gwt.key A_zip_file_with
+   */
+  String A_zip_file_with();
 
   /**
    * Translated "Only amides and alpha protons".

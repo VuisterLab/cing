@@ -18,9 +18,9 @@ public class iCingQuery {
 
 	public iCingQuery(iCing icing) {
 		if (icing == null) {
-			General.showCodeBug("in iCingQuery() found icing: null");
+			GenClient.showCodeBug("in iCingQuery() found icing: null");
 		} else {
-//			General.showDebug("in iCingQuery() found icing: " + icing.toString());
+//			GenClient.showDebug("in iCingQuery() found icing: " + icing.toString());
 		}
 		
 		serverFormHandler = new FormHandlerMain(icing);
@@ -29,7 +29,7 @@ public class iCingQuery {
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
 		String actionServerUrl = moduleBaseUrlWithPort + Settings.SERVLET_URL;
 		formPanel.setAction(actionServerUrl);		
-		General.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
+//		GenClient.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
 
 		formVerticalPanel.add(action);
 		formVerticalPanel.add(new Hidden(Settings.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
@@ -49,8 +49,8 @@ public class iCingQuery {
 		formPanel.addFormHandler(formHandler);
 		this.serverFormHandler = formHandler;
 		if (formHandler.icing == null) {
-			General.showError("Got a null for formHandler.icing in iCingQuery.setFormHandler");
+			GenClient.showError("Got a null for formHandler.icing in iCingQuery.setFormHandler");
 		}
-        General.showDebug("Set form handler to: [" + this.serverFormHandler.toString() +"]" );
+//        GenClient.showDebug("Set form handler to: [" + this.serverFormHandler.toString() +"]" );
 	}
 }

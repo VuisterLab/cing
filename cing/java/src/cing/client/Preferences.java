@@ -45,13 +45,13 @@ public class Preferences extends iCingView {
 //		flexTable.setWidget(0, 1, listBox);
 		listBox.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget sender) {
-				General.setVerbosity(Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() )));
-				General.showOutput("verbosity now: " + General.getVerbosity() );				
-				icingShadow.setVerbosityToDebug(General.isVerbosityDebug());
-				General.showOutput("visibilityStatusArea: " + General.isVerbosityDebug());
+				GenClient.setVerbosity(Integer.parseInt( listBox.getValue( listBox.getSelectedIndex() )));
+				GenClient.showOutput("verbosity now: " + GenClient.getVerbosity() );				
+				icingShadow.setVerbosityToDebug(GenClient.isVerbosityDebug());
+				GenClient.showOutput("visibilityStatusArea: " + GenClient.isVerbosityDebug());
 			}
 		});
-		listBox.setSelectedIndex(General.getVerbosity());
+		listBox.setSelectedIndex(GenClient.getVerbosity());
 		flexTable.setWidget(optionVerbosityIdx, 1, listBox);
 		
 		
