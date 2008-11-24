@@ -116,7 +116,7 @@ public class iCingServlet extends HttpServlet {
 			FileItem item = items.get(i);
 			String name = item.getFieldName();
 			String value = item.getString();
-			// General.showDebug("processing formPanel item: [" + name + "] with value: [" + value + "]");
+			// GenClient.showDebug("processing formPanel item: [" + name + "] with value: [" + value + "]");
 			if (item.isFormField()) {
 				if (name.equals(Settings.FORM_PARM_ACCESS_KEY)) {
 					currentAccessKey = value;
@@ -204,8 +204,8 @@ public class iCingServlet extends HttpServlet {
 	private void processPname(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		String regexp = ".*.tgz";
-//		General.showOutput("Reg exp files: " + regexp);
-//		General.showOutput("Dir: " + pathProject);
+//		GenClient.showOutput("Reg exp files: " + regexp);
+//		GenClient.showOutput("Dir: " + pathProject);
 		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
 		String[] list = pathProject.list(ff);
 
@@ -276,7 +276,7 @@ public class iCingServlet extends HttpServlet {
 	private String getProjectFile(HttpServletResponse response, JSONObject result, File pathProject) {
 
 		String regexp = ".*.tgz";
-//		General.showOutput("Reg exp files: " + regexp);
+//		GenClient.showOutput("Reg exp files: " + regexp);
 		General.showOutput("Dir: " + pathProject);
 		InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
 		String[] list = pathProject.list(ff);
@@ -317,9 +317,9 @@ public class iCingServlet extends HttpServlet {
 		String cmdCdProjectDir = "cd " + pathProject;
 		// String cmdRunStarting = "(" + cmdCd + ";date;echo 'Starting cing run') >> " + cingRunLogFile + " 2>&1"; //
 		// leave as an example of complex redirection under bash instead of tcsh.
-		String cmdRunStarting = "(" + cmdCdProjectDir + ";date;echo 'Starting cing run') >>& " + cingRunLogFile;
-		String cmdRunKiller = "(" + cmdCdProjectDir + ";date;echo 'As if starting killer') >>& " + cingRunLogFile
-				+ " &";
+		String cmdRunStarting = "(" + cmdCdProjectDir + ";date;echo 'DEBUG: Starting cing run') >>& " + cingRunLogFile;
+//        String cmdRunKiller = "(" + cmdCdProjectDir + ";date;echo 'As if starting killer') >>& " + cingRunLogFile
+//        + " &";
 		String cmdRunDone = "touch " + doneFile; // Using absolute path so no cd needed.
 
 		String projectFileName = getProjectFile(response, result, pathProject);
@@ -334,6 +334,11 @@ public class iCingServlet extends HttpServlet {
 			return;
 		}
 
+		/** Will zip a log file that is still being created. Since python -u is used the damage should
+		 * be limited.
+		 */
+        String cmdRunZipper = "zip -rq "+projectName+Settings.ZIP_REPORT_FILENAME_POST_FIX+".zip cingRun.log "+projectName+".cing";
+		
 		/**
 		 * For the long command string it's real nice to have the overview layed out in a printf way
 		 */
@@ -346,15 +351,19 @@ public class iCingServlet extends HttpServlet {
 		p.add(cmdCdProjectDir);
 		p.add(Settings.CING_WRAPPER_SCRIPT);
 		p.add(cing_options);
-		p.add(cmdRunDone);
+        p.add(cmdRunZipper);
+        p.add(cmdRunDone);
 		p.add(cingRunLogFile);
-		String cmdRun = Format.sprintf("(%s; %s %s; %s) >>& %s &", p);
+		String cmdRun = Format.sprintf("(%s; %s %s; %s; %s) >>& %s &", p);
 
-		General.showOutput("cmdRunStarting: [" + cmdRunStarting + "]");
-		General.showOutput("cmdRunKiller:   [" + cmdRunKiller + "]");
-		General.showOutput("cmdRun:         [" + cmdRun + "]");
+		General.showDebug("cmdRunStarting: [" + cmdRunStarting + "]");
+		General.showDebug("cmdRunZipper:   [" + cmdRunZipper + "]");
+		General.showDebug("cmdRun:         [" + cmdRun + "]");
 
-		String[] cmdList = new String[] { cmdRunStarting, cmdRunKiller, cmdRun };
+        String[] cmdList = new String[] { cmdRunStarting, cmdRun };
+        if ( General.verbosity != General.verbosityDebug ) {
+            cmdList = new String[] { cmdRun };
+        }
 		int delayBetweenSubmittingJobs = 500; // ms
 		int status = OSExec.exec(cmdList, delayBetweenSubmittingJobs);
 		if (status != 0) {
