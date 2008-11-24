@@ -462,11 +462,18 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         for i in range(1, modelCount+1):
             modelCountStr = "%03d" % i
+            
             # special case in procheck_nmr
             if modelCount == 1:
+                # special case for different versions Alan vs Jurgen...
+                # JFD adds; this fails with my pc. Adding enabling code to handle both.
                 modelCountStr = "000"
-            path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
+                path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
+                if not os.path.exists(path):
+                    NTdebug('Procheck.parseResult: file "%s" not found assuming it was pc server version. ', path)
+                modelCountStr = "***"
 
+            path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
             if not os.path.exists(path):
                 NTerror('Procheck.parseResult: file "%s" not found', path)
                 return True
