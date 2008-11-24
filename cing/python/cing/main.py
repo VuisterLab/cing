@@ -94,16 +94,16 @@ def format( object ):
 """Copy catted from xplor
 """
 def getStartMessage():
-#    user = "jd"           
+#    user = "jd"
 #    on   = "Stella.loc(darwin/x86    )"
 #    at   = "29-Oct-08 15:36:22"
     user = os.getenv("USER", "Unknown user")
-    machine = os.getenv("HOST", "Unknown host")
-    ostype = os.getenv("OSTYPE", "Unknown os")
+    machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
+    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
     on = "%s (%s)" % ( machine, ostype )
     at = time.asctime()
     return "User: %-15s on: %-45s at: %s" % ( user, on, at )
-    
+
 """From Wattos
 """
 def getStopMessage():
@@ -118,7 +118,7 @@ def getStopMessage():
     msg += "CING stopped at : %s\n" % now
     msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
     return msg
-    
+
 def verbosity( value ):
     """Set CING verbosity
     """
@@ -597,8 +597,8 @@ def main():
     if project:
         project.close(save=not options.nosave)
     #------------------------------------------------------------------------------------
-    
-        
+
+
 if __name__ == '__main__':
     try:
         main()
