@@ -45,6 +45,7 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
+from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME 
 import cing
 import math
 import os
@@ -231,9 +232,15 @@ Project: Top level Cing project class
 
 
     def readValidationSettings(self, fn=None):
-        validationConfigurationFile = fn
-        if not fn:
-            validationConfigurationFile = os.path.join(cingPythonCingDir, 'valSets.cfg')
+        if fn:
+            validationConfigurationFile = fn
+            NTmessage( "Using validation configuration file: " + validationConfigurationFile)
+        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
+            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
+            NTmessage( "Using local validation configuration file: " + validationConfigurationFile)
+        else:
+            validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
+            NTdebug( "Using default validation configuration file: " + validationConfigurationFile)
         config = ConfigParser()
         config.readfp(open(validationConfigurationFile))
         for item in config.items('DEFAULT'):

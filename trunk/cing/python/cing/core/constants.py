@@ -55,4 +55,4 @@ DRL_LEVEL      = 'DistanceRestraintList'
 POOR_PROP = 'POOR'
 BAD_PROP  = 'BAD'
 
-
+VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

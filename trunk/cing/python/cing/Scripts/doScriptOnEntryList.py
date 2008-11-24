@@ -50,6 +50,8 @@ def doScriptOnEntryList(pythonScriptFileName,
             chainCode = line[4].upper()
 #        NTdebug('Using chainCode: [%s]' % chainCode )
         chainCodeList.append(chainCode)
+    entryListFile.close()
+    
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
     lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
