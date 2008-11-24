@@ -29,21 +29,21 @@ public class iCingView extends Composite {
 	public void enterView() {
 		// Before clearing it; have the browser remember it.
 		if (isVisible()) {
-			General.showDebug("For view: " + getClass().toString() + " was already visible; no change was made.");
+			GenClient.showDebug("For view: " + getClass().toString() + " was already visible; no change was made.");
 			return;
 		}
 		String state = getState();
 		if (state == null) {
-			General.showError("Failed to get state for view" + getClass().toString() + "; making no change");
+			GenClient.showError("Failed to get state for view" + getClass().toString() + "; making no change");
 			return;
 		}
-		General.showDebug("Added history item for state: " + state);
+//		GenClient.showDebug("Added history item for state: " + state);
 		setVisible(true);
 		boolean issueEvent = false;
 		History.newItem(state, issueEvent);
 	}
 
-	/** This routine should not use General.showXXX yet
+	/** This routine should not use GenClient.showXXX yet
 	 * 
 	 * @param icing
 	 */

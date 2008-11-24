@@ -33,7 +33,7 @@ public class Utils {
 		if (!b) {
 			msg = "Disabled";
 		}
-		General.showDebug(msg + " all input fields for table: " + t.getTitle());
+		GenClient.showDebug(msg + " all input fields for table: " + t.getTitle());
 		return false; // default in python
 	}
 
@@ -59,12 +59,12 @@ public class Utils {
 	 * @return
 	 */
 	public static String reverseLines(String html) {
-		String[] lines = html.split(General.eol);
+		String[] lines = html.split(GenClient.eol);
 		int n = lines.length;
 //		System.out.println("DEBUG: reverseLines found number of lines: " + n);
 		StringBuffer result = new StringBuffer();
 		for (int i = n - 1; i >= 0; i--) {
-			result.append(lines[i] + General.eol);
+			result.append(lines[i] + GenClient.eol);
 		}
 //		System.out.println("DEBUG result reverseLines: [" + result + "]");
 		return result.toString();
@@ -132,7 +132,7 @@ public class Utils {
 		for (int i = 0; i < a.size(); i++) {
 			if (i != 0) {
 				if (printEOLAfterEach) {
-					result.append(General.eolChar);
+					result.append(GenClient.eolChar);
 				} else {
 					result.append(separator);
 				}
@@ -146,7 +146,7 @@ public class Utils {
 	}
 
 	/** Returns text without the enclosing PRE tags.
-	 * Don't use General.showXXX because it would cycle.
+	 * Don't use GenClient.showXXX because it would cycle.
 	 * @return null on error.
 	 */
 	public static String unwrapPres(String html) {
@@ -226,7 +226,7 @@ public class Utils {
 		}
 		char lastChar = fn.charAt(n - 1);
 		if (lastChar == '/' || lastChar == '\\') {
-			General.showError("Failed to getFileNameWithoutPath");
+			GenClient.showError("Failed to getFileNameWithoutPath");
 			return fn;
 		}
 		return fn.substring(idxSlash + 1);
@@ -242,6 +242,13 @@ public class Utils {
 		}
 		return "text/txt";
 	}
+
+    public static String getListBoxItemText(ListBox listBox) {
+        String result = null;
+        result = listBox.getItemText( listBox.getSelectedIndex());         
+//        GenClient.showDebug("Got text: " + result);
+        return result;
+    }
 	
 
 }

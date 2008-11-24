@@ -65,21 +65,21 @@ public class Report extends iCingView {
 		 */
 		String moduleBaseUrl = GWT.getModuleBaseURL();
 		// iCing part should be replaced by tmp/cing
-//		General.showDebug("moduleBaseUrl 0: " + moduleBaseUrl);
+//		GenClient.showDebug("moduleBaseUrl 0: " + moduleBaseUrl);
 		moduleBaseUrl = moduleBaseUrl.replaceAll(":\\d+", "");
-//		General.showDebug("moduleBaseUrl 1: " + moduleBaseUrl);
+//		GenClient.showDebug("moduleBaseUrl 1: " + moduleBaseUrl);
 		/**
 		 * When testing this will do something. The reason that these can't be the same as the production is that the
 		 * client code has to reside in cing.client
 		 */
 		moduleBaseUrl = moduleBaseUrl.replace("/cing.iCing", Settings.RESULT_URL);
-//		General.showDebug("moduleBaseUrl 2: " + moduleBaseUrl);
+//		GenClient.showDebug("moduleBaseUrl 2: " + moduleBaseUrl);
 		// When production this will do something.
 		moduleBaseUrl = moduleBaseUrl.replace("/iCing", Settings.RESULT_URL);
-//		General.showDebug("moduleBaseUrl 3: " + moduleBaseUrl);
+//		GenClient.showDebug("moduleBaseUrl 3: " + moduleBaseUrl);
 
 		String runUrl = moduleBaseUrl + iCing.currentUserId + "/" + iCing.currentAccessKey;
-		General.showDebug("runUrl: [" + runUrl + "].");
+		GenClient.showDebug("runUrl: [" + runUrl + "].");
 		return runUrl;
 	}
 
@@ -91,72 +91,75 @@ public class Report extends iCingView {
 	// public String getProjectUrl() {
 	// String runUrl = getRunUrl();
 	// if (runUrl == null) {
-	// General.showError("Failed to getResultDir");
+	// GenClient.showError("Failed to getResultDir");
 	// return null;
 	// }
 	// if (icing.projectName == null) {
-	// General.showError("Failed to icing.projectName");
+	// GenClient.showError("Failed to icing.projectName");
 	// return null;
 	// }
 	//
 	// String projectDir = runUrl + "/" + icing.projectName + ".cing";
-	// General.showDebug("projectDir: [" + projectDir + "]");
+	// GenClient.showDebug("projectDir: [" + projectDir + "]");
 	// return projectDir;
 	// }
 
 	public void showResults() {
 		String runUrl = getRunUrl();
 		if (runUrl == null) {
-			General.showError("In showResults. Failed to getRunUrl; not changing the report url.");
+			GenClient.showError("In showResults. Failed to getRunUrl; not changing the report url.");
 			runUrl = Settings.NOT_AVAILABLE;
 		}
 		if ( icing.projectName == null ) {
-		    General.showError("Failed to get project name when the results have already been generated");
+		    GenClient.showError("Failed to get project name when the results have already been generated");
 		}
 		
 		String htmlTextEnabled = c.CING_has_finishe()+" <A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." + General.eol + pleaseWriteDown;
+				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." 				
+				+ GenClient.eol + c.A_zip_file_with() +" <A HREF=\"" + runUrl + "/"
+                + icing.projectName + Settings.ZIP_REPORT_FILENAME_POST_FIX+".zip" + "\" target=\"_blank\">"+c.here()+"</a>."
+				+ GenClient.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
 	public void showTemporaryResults() {
 		String runUrl = getRunUrl();
 		if (runUrl == null) {
-			General.showError("In showTemporaryResults. Failed to getRunUrl; not changing the report url.");
+			GenClient.showError("In showTemporaryResults. Failed to getRunUrl; not changing the report url.");
 			return;
 		}
 		String htmlTextEnabled = "<P>"+c.CING_has_not_fin()+"</P>"
-				+ General.eol 
+				+ GenClient.eol 
 				+ "<P>"+c.A()+" <A HREF=\""
 				+ runUrl
 				+ "\"  target=\"_blank\">"+c.directory()+"</a> "
 				+ c.in_which_results() 
-				+ c.View() + "->"+c.Log()+" CING." + General.eol
+				+ c.View() + "->"+c.Log()+" CING." + GenClient.eol
 				+ "<P>" + c.After_a_while_it()
-				+ General.eol + " </P>" 
-				+ General.eol + pleaseWriteDown;
+				+ GenClient.eol + " </P>" 
+				+ GenClient.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
 	public void showCrash() {
 		String runUrl = getRunUrl();
 		if (runUrl == null) {
-			General.showError("In showTemporaryResults. Failed to getRunUrl; changing the report url to null.");
+			GenClient.showError("In showTemporaryResults. Failed to getRunUrl; changing the report url to null.");
 			runUrl = Settings.NOT_AVAILABLE;
 		}
 		String htmlTextEnabled = c.CING_might_have() + "<A HREF=\"" + runUrl + "/"
-				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." + General.eol + pleaseWriteDown;
+				+ icing.projectName + ".cing" + "\" target=\"_blank\">"+c.here()+"</a>." + GenClient.eol + pleaseWriteDown;
 		reportHTML.setHTML(htmlTextEnabled);
 	}
 
 	public void setProjectName(String projectName) {
-//		General.showDebug("Now in Report.setProjectName");
+//		GenClient.showDebug("Now in Report.setProjectName");
 		if (projectName == null) {
-			General.showError("Error in Report.setProjectName; got a null for project name.");
+			GenClient.showError("Error in Report.setProjectName; got a null for project name.");
 			return;
 		}
 		icing.projectName = projectName;
-        General.showDebug("Set  project name to: [" + icing.projectName +"]");
+        GenClient.showDebug("Set  project name to: [" + icing.projectName +"]");
 		showTemporaryResults();
 	}
 }

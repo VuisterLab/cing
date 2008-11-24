@@ -105,14 +105,14 @@ public class iCing implements EntryPoint, HistoryListener {
 		// hosted mode doesn't show a popup!
 		// GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 		// public void onUncaughtException(Throwable e) {
-		// Window.alert(c.Uncaught_ex() +General.eol + e);
+		// Window.alert(c.Uncaught_ex() +GenClient.eol + e);
 		// }
 		// });
 		c = GWT.create(iCingConstants.class);
 		// Watch out because although this setting is needed here; there's
 		// another needed at the end of this routine too.
 		if (iCing.doDebug) {
-			General.setVerbosityToDebug();
+			GenClient.setVerbosityToDebug();
 		}
 		currentAccessKey = getNewAccessKey();
 		// Date today = new Date();
@@ -171,21 +171,21 @@ public class iCing implements EntryPoint, HistoryListener {
 	}
 
 	private void showFooter() {
-        final HTML html = new HTML("<div id=\"footer\">"+General.eol+
-                "<p align=\"center\">"+General.eol+
-                "CING  "+c.version()+" 0.8 (iCing v."+Settings.VERSION+")\t"+General.eol+
-                "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t"+General.eol+
-                "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>"+General.eol+" " + c.and() + " \t"+General.eol+
+        final HTML html = new HTML("<div id=\"footer\">"+GenClient.eol+
+                "<p align=\"center\">"+GenClient.eol+
+                "CING  "+c.version()+" 0.8 (iCing v."+Settings.VERSION+")\t"+GenClient.eol+
+                "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t"+GenClient.eol+
+                "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>"+GenClient.eol+" " + c.and() + " \t"+GenClient.eol+
                 "<a href=\"mailto:alanwilter@gmail.com\">Alan Wilter Sousa da Silva</a>"+
-                "</p>"+General.eol+
-                "</div>"+General.eol);
+                "</p>"+GenClient.eol+
+                "</div>"+GenClient.eol);
         vPanel.add(html);
         html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
     }
 
     public void onHistoryChanged(String historyToken) {
 		if (historyToken == null || historyToken.length() == 0) {
-			General.showError("Got an unknown history token: [" + historyToken + "]");
+			GenClient.showError("Got an unknown history token: [" + historyToken + "]");
 		}
 		if (iCing.WELCOME_STATE.equals(historyToken)) {
 			loadWelcomeView();
@@ -232,7 +232,7 @@ public class iCing implements EntryPoint, HistoryListener {
             return;
         }
 
-		General.showError("Got an unknown history token: " + historyToken);
+		GenClient.showError("Got an unknown history token: " + historyToken);
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	}
 
 	public void clearAllViews() {
-		// General.showDebug("Now in clearAllViews");
+		// GenClient.showDebug("Now in clearAllViews");
 		for (iCingView v : views) {
 			v.setVisible(false);
 		}
@@ -334,10 +334,10 @@ public class iCing implements EntryPoint, HistoryListener {
 			idx = 2; // en is default
 		}
 		// } else {
-		// General.showWarning("Failed to find localeMap");
+		// GenClient.showWarning("Failed to find localeMap");
 		// }
 		// } else {
-		// General.showWarning("Failed to find currentLocale");
+		// GenClient.showWarning("Failed to find currentLocale");
 		// }
 		listBoxLocale.setSelectedIndex(idx);
 
@@ -361,7 +361,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		// return;
 		// // // Update the current theme
 		// // CUR_THEME = button.getTheme();
-		// // General.showError("Selecting theme: " +
+		// // GenClient.showError("Selecting theme: " +
 		// // button.getTheme());
 		// //Window.alert("Feature currently buggy; best to reload now."
 		// // );
@@ -590,7 +590,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		}
 
 		if (styleSheetsFound && toRemove.size() == 0) {
-			General.showError("Return since we already have the correct style sheets");
+			GenClient.showError("Return since we already have the correct style sheets");
 			return;
 		}
 
@@ -662,14 +662,14 @@ public class iCing implements EntryPoint, HistoryListener {
 	}
 
 	/**
-	 * So this method is not in General because all methods there are static Make sure that where ever the verbosity can
+	 * So this method is not in GenClient because all methods there are static Make sure that where ever the verbosity can
 	 * be set to debug it is also calling this routine.
 	 * 
 	 * @param doDebugNow
 	 */
 	public void setVerbosityToDebug(boolean doDebugNow) {
 		if (doDebugNow) {
-			General.setVerbosityToDebug();
+			GenClient.setVerbosityToDebug();
 		}
 		logView.startPnameButton.setVisible(doDebugNow);
 	}
