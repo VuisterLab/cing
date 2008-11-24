@@ -394,7 +394,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 if not canAqpc:
                     NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
                 elif not hasRestraints:
-                    NTdebug("Skipping qapc because no Aqua restraints were copied for Aqua")
+                    NTdebug("Skipping aqpc because no Aqua restraints were copied for Aqua")
                 else:
                     NTdebug("Trying aqpc")
                     if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
@@ -464,7 +464,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             modelCountStr = "%03d" % i
             # special case in procheck_nmr
             if modelCount == 1:
-                modelCountStr = "***"
+                modelCountStr = "000"
             path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
 
             if not os.path.exists(path):
