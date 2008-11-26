@@ -2,14 +2,13 @@ from cing import verbosityDebug
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.disk import rmdir
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.disk import rmdir
 from shutil import rmtree
 import cing
 import os
@@ -27,16 +26,17 @@ def retrieveTgzFromUrl(entryId, url):
     Will skip the download if it's already present.
     """
     fnametgz = entryId + '.tgz' 
-    if os.path.exists(fnametgz):
-        NTmessage("Tgz already present skip downloading")
-        return
+#    if os.path.exists(fnametgz):
+#        NTmessage("Tgz already present skip downloading")
+#        return
     unametgz = url + '/' + fnametgz 
-    NTdebug("downloading file:" + unametgz)
-    try:
-        urllib.urlretrieve(unametgz, fnametgz)
-    except:
-        NTwarning("Failed to download; " + unametgz)
-        return
+    NTdebug("downloading url: " + unametgz)
+    urllib.urlretrieve(unametgz, fnametgz)
+#    except:
+#        NTwarning("Failed to download; " + unametgz)
+#        return
+#    NTdebug("doing hard system exit")
+#    sys.exit(0)
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
@@ -86,6 +86,7 @@ def main(entryId, *extraArgList):
     if inputDir.startswith("http"):
         retrieveTgzFromUrl(entryId, inputDir)
         isCcpnProject = True
+        return True # for debugging TODO: remove.
         
     if isCcpnProject:
         fnametgz = entryId + '.tgz'         
@@ -132,15 +133,16 @@ def main(entryId, *extraArgList):
         NTerror("Failed to validate project read")
         return True
     project.save()
-#    if isCcpnProject:
-#        fnametgz = entryId + '.tgz'         
-#        os.unlink(fnametgz) # temporary ccpn tgz
-#        rmdir(entryId) # temporary ccpn dir        
+    if isCcpnProject:
+        fnametgz = entryId + '.tgz'         
+        os.unlink(fnametgz) # temporary ccpn tgz
+        rmdir(entryId) # temporary ccpn dir        
     
         
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
-    if main(*sys.argv[1:]):
-        sys.exit(1)
+    status = main(*sys.argv[1:])
+#    return status
+#        sys.exit(1) # can't be used in forkoff api

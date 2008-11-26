@@ -4,8 +4,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5 extras"/>
-	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/build/web/WEB-INF/classes" sourcepath="/wattos/src"/>
 	<classpathentry kind="lib" path="java/production/WEB-INF/lib/printf_hb15.jar"/>
 	<classpathentry kind="lib" path="java/production/WEB-INF/lib/jakarta-regexp.jar"/>
+	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/build"/>
 	<classpathentry kind="output" path="java/bin"/>
 </classpath>

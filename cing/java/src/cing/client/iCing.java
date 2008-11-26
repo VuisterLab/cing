@@ -33,8 +33,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class iCing implements EntryPoint, HistoryListener {
-	/** Just the initial startup state; for client. Server debug is set in servlet. */
-	public static final boolean doDebug = false;
 	public static final String STRING_NA = "n/a";
 	
 	/** States of the gui */
@@ -111,14 +109,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		c = GWT.create(iCingConstants.class);
 		// Watch out because although this setting is needed here; there's
 		// another needed at the end of this routine too.
-		if (iCing.doDebug) {
+		if (Settings.DO_DEBUG) {
 			GenClient.setVerbosityToDebug();
 		}
 		currentAccessKey = getNewAccessKey();
-		// Date today = new Date();
-		// VERSION = DateTimeFormat.getShortDateTimeFormat().format(today);
-
-		showMenu();
 
 		login = new Login();
 		welcome = new Welcome();
@@ -132,6 +126,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		fileView = new FileView();
 		maintenance = new Maintenance();
 
+        showMenu(); // Needs to happen after views have been initialized.
+		
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
 		views.add(logView); // Important to keep this one first so that others can log into it.
@@ -153,10 +149,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		}
 		vPanel.setSpacing(5);
 
-		setVerbosityToDebug(iCing.doDebug); // partner with the above call to
+		setVerbosityToDebug(Settings.DO_DEBUG); // partner with the above call to
 		showLoadingMessage(false);
         showFooter();
-
+        
 		History.addHistoryListener(this);
 		// If the application starts with no history token, redirect to a new
 		// state.
@@ -327,18 +323,10 @@ public class iCing implements EntryPoint, HistoryListener {
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
 
 		int idx = 2;
-		// if (currentLocale != null) {
-		// if (localeMap != null) { // shouldn't have happened.
 		idx = localeMap.get(currentLocale);
 		if (idx < 0) {
 			idx = 2; // en is default
 		}
-		// } else {
-		// GenClient.showWarning("Failed to find localeMap");
-		// }
-		// } else {
-		// GenClient.showWarning("Failed to find currentLocale");
-		// }
 		listBoxLocale.setSelectedIndex(idx);
 
 		listBoxLocale.addChangeListener(new ChangeListener() {
@@ -348,37 +336,7 @@ public class iCing implements EntryPoint, HistoryListener {
 			}
 		});
 
-		// // Add the option to change the style
-		// final HorizontalPanel styleWrapper = new HorizontalPanel();
-		// verticalPanel_1.add(styleWrapper);
-		//
-		// for (i = 0; i < STYLE_THEMES.length; i++) {
-		// final ThemeButton button = new ThemeButton(STYLE_THEMES[i]);
-		// styleWrapper.add(button);
-		// button.addClickListener(new ClickListener() {
-		// public void onClick(Widget sender) {
-		// Window.alert("Style selection currently buggy; disabled for now.");
-		// return;
-		// // // Update the current theme
-		// // CUR_THEME = button.getTheme();
-		// // GenClient.showError("Selecting theme: " +
-		// // button.getTheme());
-		// //Window.alert("Feature currently buggy; best to reload now."
-		// // );
-		// // // if ( debugOn ) {
-		// // // // Reload the current tab, loading the new theme if
-		// // // necessary
-		// // // TabBar bar = ((TabBar) this.getContentTitle());
-		// // // bar.selectTab(bar.getSelectedTab());
-		// // // Load the new style sheets
-		// // updateStyleSheets();
-		// // } else {
-		// //Window.alert("Feature currently buggy; best to reload now."
-		// // );
-		// // }
-		// }
-		// });
-		// }
+
 
 		final MenuBar menuBar = new MenuBar();
 		final MenuBar menuBar_file = new MenuBar(true);
@@ -435,11 +393,17 @@ public class iCing implements EntryPoint, HistoryListener {
 				loadReportView();
 			}
 		};
-		Command commandAbout = new Command() {
-			public void execute() {
-				(new About()).show();
-			}
-		};
+        Command commandAbout = new Command() {
+            public void execute() {
+                (new About()).show();
+            }
+        };
+
+        Command commandPurgeProject = new Command() {
+            public void execute() {
+//                loadLogView();
+                cingLogView.getPurgeProject();            }
+        };
 
 		Command commandHelp = new Command() {
 			public void execute() {
@@ -454,7 +418,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_iCing.addItem(c.Preferences(), commandPref);
 		menuBar.addItem(c.iCing(), menuBar_iCing);
 		menuBar.addItem(c.File(), menuBar_file);
-		menuBar_file.addItem(c.Upload(), commandFile);
+        menuBar_file.addItem(c.Upload(), commandFile);
+        menuBar_file.addItem(c.PurgeProject(), commandPurgeProject);
 		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
 		menuBar_edit.setVisible(false);// doesn't 'help'

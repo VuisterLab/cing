@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -19,7 +20,8 @@ public class CingLogView extends iCingView {
     iCingQuery cingQueryLog = null;
     iCingQuery cingQueryStatus = null;
     iCingQuery cingQueryProjectName = null;
-
+    iCingQuery cingQueryPurge = null;
+    
     final Label logLabel = new Label(c.Log() + " " + c.CING());
 
     final Button nextButton = new Button();
@@ -115,6 +117,7 @@ public class CingLogView extends iCingView {
         FormHandlerSpecific serverFormHandlerLog = new FormHandlerSpecific(icing);
         FormHandlerSpecific serverFormHandlerStatus = new FormHandlerSpecific(icing);
         FormHandlerSpecific serverFormHandlerProjectName = new FormHandlerSpecific(icing);
+        FormHandlerSpecific serverFormHandlerPurge = new FormHandlerSpecific(icing);
 
         cingQueryLog = new iCingQuery(icing);
         cingQueryLog.action.setValue(Settings.FORM_ACTION_LOG);
@@ -130,6 +133,13 @@ public class CingLogView extends iCingView {
         cingQueryProjectName.action.setValue(Settings.FORM_ACTION_PROJECT_NAME);
         cingQueryProjectName.setFormHandler(serverFormHandlerProjectName);
         verticalPanel.add(cingQueryProjectName.formPanel);
+
+        cingQueryPurge = new iCingQuery(icing);
+        cingQueryPurge.action.setValue(Settings.FORM_ACTION_PURGE);
+        cingQueryPurge.setFormHandler(serverFormHandlerPurge);
+        verticalPanel.add(cingQueryPurge.formPanel);
+        
+        
     }
 
     /** Needs to be called by FormHandlerMain. */
@@ -151,6 +161,11 @@ public class CingLogView extends iCingView {
         icing.report.setProjectName(projectName);
     }
 
+    protected void setPurgeProject(String result) {
+        icing.report.setPurgeProject(result);
+    }
+
+    
     protected void setLogTail(String result) {
         GenClient.showDebug("Now in setLogTail");
         if (result == null || result.length() == 0 || result.equals(Settings.RESPONSE_LOG_VALUE_NONE)) {
@@ -183,6 +198,15 @@ public class CingLogView extends iCingView {
         cingQueryProjectName.formPanel.submit();
     }
 
+    protected void getPurgeProject() {
+        GenClient.showDebug("Now in getPurgeProject");
+        if (icing.projectName == null) {
+            Window.alert(c.ERROR() + " " + c.No_Project_on_se());            
+            return;
+        }
+        cingQueryPurge.formPanel.submit();
+    }
+    
     public void update() {
         if (icing.projectName == null) { // Lazy load
             getProjectName();

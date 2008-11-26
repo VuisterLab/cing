@@ -2,6 +2,7 @@ package cing.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
@@ -22,6 +23,8 @@ public class Report extends iCingView {
 
 	public void setIcing(iCing icing) {
 		super.setIcing(icing);
+        final iCing icingShadow = icing;
+
 		setState(iCing.REPORT_STATE);
 
 		Label label = new Label(c.Report());
@@ -46,6 +49,20 @@ public class Report extends iCingView {
 		horizontalPanelBackNext.add(backButton);
 		// horizontalPanelBackNext.add(nextButton);
 
+        final HorizontalPanel horizontalPanelBackPurge = new HorizontalPanel();
+        horizontalPanelBackPurge.setSpacing(iCing.margin);
+        verticalPanel.add(horizontalPanelBackPurge);
+        final Button purgeButton = new Button();
+        horizontalPanelBackPurge.add(purgeButton);
+        purgeButton.addClickListener(new ClickListener() {
+            public void onClick(final Widget sender) {
+                icingShadow.cingLogView.getPurgeProject();
+            }
+        });
+        purgeButton.setText(c.PurgeProject());
+        purgeButton.setTitle(c.PurgeProjectTitl());        
+        horizontalPanelBackPurge.add(purgeButton);
+		
 		showTemporaryResults();
 		// refreshShowResultsTimer = new Timer() {
 		// public void run() {
@@ -162,4 +179,14 @@ public class Report extends iCingView {
         GenClient.showDebug("Set  project name to: [" + icing.projectName +"]");
 		showTemporaryResults();
 	}
+	
+    public void setPurgeProject(String result) {
+        GenClient.showDebug("Now in Report.purgeProject");
+        String msg = c.PurgedProject();
+        GenClient.showOutput(result);
+        Window.alert(msg);
+//        icing.fileView.init();
+    }
+
+	
 }

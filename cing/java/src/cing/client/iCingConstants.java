@@ -80,6 +80,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Clears_the_log_w();
 
   /**
+   * Translated "Removed project data.".
+   * 
+   * @return translated "Removed project data."
+   * @gwt.key PurgedProject
+   */
+  String PurgedProject();
+
+  /**
    * Translated "Residues".
    * 
    * @return translated "Residues"
@@ -184,6 +192,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String CING_might_have();
 
   /**
+   * Translated "Purge the project data on the iCing server.".
+   * 
+   * @return translated "Purge the project data on the iCing server."
+   * @gwt.key PurgeProjectTitl
+   */
+  String PurgeProjectTitl();
+
+  /**
    * Translated "version".
    * 
    * @return translated "version"
@@ -238,6 +254,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Error
    */
   String Error();
+
+  /**
+   * Translated "Remove project data.".
+   * 
+   * @return translated "Remove project data."
+   * @gwt.key PurgeProject
+   */
+  String PurgeProject();
 
   /**
    * Translated "Short name like JoeNmr (no special characters)".
@@ -582,6 +606,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Expect_to_see
    */
   String Expect_to_see();
+
+  /**
+   * Translated "No Project on server yet.".
+   * 
+   * @return translated "No Project on server yet."
+   * @gwt.key No_Project_on_se
+   */
+  String No_Project_on_se();
 
   /**
    * Translated "in which results are being created that may be consulted in the meanwhile. You may also switch to".

@@ -40,7 +40,7 @@ public interface Settings {
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081124-1329";
+    public static final String VERSION = "20081125-1407";
 
     public static final String NONE = "NONE";
 
@@ -57,6 +57,7 @@ public interface Settings {
     public static final String FORM_ACTION_STATUS = "Status";
     public static final String FORM_ACTION_SAVE = "Save";
     public static final String FORM_ACTION_RUN = "Run";
+    public static final String FORM_ACTION_PURGE = "Purge";
 
     public static final String ZIP_REPORT_FILENAME_POST_FIX = "_CING_report";
     /** No default response action really. */
@@ -80,7 +81,7 @@ public interface Settings {
     static final ArrayList<String> validResponseStatusValues = new ArrayList();
 
     public static final String[] FORM_ACTION_LIST = new String[] { FORM_ACTION_LOG, FORM_ACTION_PROJECT_NAME,
-            FORM_ACTION_STATUS, FORM_ACTION_SAVE, FORM_ACTION_RUN, FORM_ACTION_LOG };
+            FORM_ACTION_PURGE, FORM_ACTION_STATUS, FORM_ACTION_SAVE, FORM_ACTION_RUN, FORM_ACTION_LOG };
     public static final String[] FORM_PARM_MINIMUM = new String[] { FORM_PARM_USER_ID, FORM_PARM_ACCESS_KEY,
             FORM_PARM_ACTION };
     public static final String[] RESPONSE_EXIT_CODE_LIST = new String[] { RESPONSE_EXIT_CODE_ERROR,
@@ -95,7 +96,6 @@ public interface Settings {
     public static final String FILE_PROGRAM_CCPN = "CCPN";
     public static final String FILE_TYPE_PROJECT = "project";
     public static final String FILE_TYPE_VALIDATION_SETTINGS = "validation settings";
-    
-    
-    
+    /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
+    public static final boolean DO_DEBUG = true;
 }
