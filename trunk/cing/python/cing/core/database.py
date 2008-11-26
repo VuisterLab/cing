@@ -707,10 +707,11 @@ def importNameDefs( tableFile, name)   :
     mol.name=name
 
     if mol.convention != INTERNAL:
-        NTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
+        NTerror('Reading database: current convention setting (%s) does not match database file "%s" (%s)',
                 INTERNAL, tableFile, mol.convention
                )
-        sys.exit(1)
+#        sys.exit(1)
+        return None # TODO: should signal error. 
 
     #Post-processing
     for res in mol.allResidueDefs():

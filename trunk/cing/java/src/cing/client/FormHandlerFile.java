@@ -35,7 +35,7 @@ public class FormHandlerFile extends FormHandlerMain {
 
 		/** Extra checks here for this class */
 		if (fileUpload.getFilename().length() == 0) {
-			Window.alert(c.You_must_sele());
+			Window.alert(c.ERROR()+"\n\n"+c.You_must_sele());
 			event.setCancelled(true);
 			return;
 		}
@@ -54,7 +54,7 @@ public class FormHandlerFile extends FormHandlerMain {
         if ( program.equals(Settings.FILE_PROGRAM_CING) &&
                 type.equals(Settings.FILE_TYPE_VALIDATION_SETTINGS) ) {
             if ( ! fnNoPath.equals(Settings.VAL_SETS_CFG_DEFAULT_FILENAME)) {
-                Window.alert(c.Validation_setti() + Settings.VAL_SETS_CFG_DEFAULT_FILENAME);
+                Window.alert(c.ERROR()+"\n\n"+c.Validation_setti() + Settings.VAL_SETS_CFG_DEFAULT_FILENAME);
                 event.setCancelled(true);
                 return;
             }
@@ -63,7 +63,7 @@ public class FormHandlerFile extends FormHandlerMain {
         if ( program.equals(Settings.FILE_PROGRAM_CCPN) &&
                 type.equals(Settings.FILE_TYPE_PROJECT) ) {
             if ( ! fnNoPath.endsWith(".tgz")) {
-                Window.alert(c.Please_end_filen() + ".tgz");
+                Window.alert(c.ERROR()+"\n\n"+c.Please_end_filen() + " .tgz");
                 event.setCancelled(true);
                 return;
             }

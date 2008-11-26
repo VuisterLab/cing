@@ -101,7 +101,6 @@ useMatPlotLib = True
 #    useMatPlotLib = True
 #except ImportError:
 #    NTdebug("Failed to import MatLibPlot; check installation.")
-#    sys.exit(1)
 
 
 dpi=72.27 # Latex definition
@@ -1508,7 +1507,7 @@ class RangeIconList:
         self.kwargs   = kwargs
         if not self.axis:
             NTcodeerror('no self.axis in RangeIconList')
-            sys.exit(1)
+            return
 
     def addPatches(self):
         "Return True on error"
@@ -1749,7 +1748,8 @@ class RangeIconPoly(Polygon):
         self.axis= axis
         if not self.axis:
             NTcodeerror('no self.axis in RangeIconList')
-            sys.exit(1)
+#            sys.exit(1)
+            return
 
     def get_verts(self):
         """

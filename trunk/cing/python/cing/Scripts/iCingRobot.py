@@ -16,6 +16,7 @@ FORM_ACTION_RUN = "Run"
 FORM_ACTION_SAVE = "Save"
 FORM_ACTION_STATUS = "Status"
 FORM_ACTION_PROJECT_NAME = "ProjectName"
+FORM_ACTION_PURGE = "Purge"
 FORM_ACTION_LOG = "Log"
 
 def iCingRobot():
@@ -23,10 +24,11 @@ def iCingRobot():
     NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
     ## queries possible
     doSave  = 1
-    doRun   = 1
-    doStatus= 1
-    doLog   = 1
-    doPname = 1
+    doRun   = 0
+    doStatus= 0
+    doLog   = 0
+    doPname = 0
+    doPurge = 1
     ## credentials.
     user_id = "jd3"
     access_key = "123456"
@@ -38,9 +40,9 @@ def iCingRobot():
     entryId = '1a4d' # 388K
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
 #    rpcUrl = "localhost/iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
-#    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
+    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
 #/    rpcUrl = "dodos.dyndns.org/icing/serv/iCingServlet" # testing production-like 
-    rpcUrl = "https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet" # testing production
+#    rpcUrl = "https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet" # testing production
                                 
 ##############################################################################################################
     credentialSettings = "-F UserId=%s -F AccessKey=%s" % ( user_id, access_key)
@@ -83,6 +85,14 @@ def iCingRobot():
         -F Action=%s \
         %s """ % (credentialSettings, FORM_ACTION_PROJECT_NAME, rpcUrl)
     if doPname:
+        NTmessage("Curling to: " + rpcUrl)
+        do_cmd(cmdPname)
+    
+##############################################################################################################
+    cmdPname = """curl %s\
+        -F Action=%s \
+        %s """ % (credentialSettings, FORM_ACTION_PURGE, rpcUrl)
+    if doPurge:
         NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdPname)
     

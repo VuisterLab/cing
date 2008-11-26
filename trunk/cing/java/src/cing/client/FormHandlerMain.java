@@ -6,6 +6,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormSubmitEvent;
@@ -101,14 +102,23 @@ public class FormHandlerMain implements FormHandler {
 		}
 		/** Just note here and act on it in subclass. */
 		if (!Settings.RESPONSE_EXIT_CODE_ALIST.contains(exitCode)) {
-			GenClient.showError("Found invalid exit code: [" + exitCode + "] set to default ["
-					+ Settings.RESPONSE_EXIT_CODE_DEFAULT + "]");
-			exitCode = Settings.RESPONSE_EXIT_CODE_DEFAULT;
+			GenClient.showError("Found invalid exit code: [" + exitCode + "] set to error ["
+					+ Settings.RESPONSE_EXIT_CODE_ERROR + "]");
+			exitCode = Settings.RESPONSE_EXIT_CODE_ERROR;
 		}
 		if (result == null) {
 			result = Settings.RESPONSE_RESULT_DEFAULT;
 			GenClient.showDebug("Missing result; set to default: [" + result + "]");
 			return;
+		}
+		
+		
+		if ( exitCode.equals( Settings.RESPONSE_EXIT_CODE_ERROR)) {
+		    String msg = c.ERROR() +"\n\n"+
+		    "Action: " + action +"\n"+
+            "exitCode: " + exitCode +"\n"+
+            "result: " + result;
+		    Window.alert(msg);		    
 		}
 //		GenClient.showDebug("Exiting FormHandlerMain.onSubmitComplete");
 	}

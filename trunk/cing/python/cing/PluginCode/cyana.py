@@ -334,7 +334,6 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 
 #    NTmessage("Imported upl items: " + `len(result)`)
     NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
-#    sys.exit(1)
     return result
 #end def
 

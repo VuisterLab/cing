@@ -105,9 +105,8 @@ public class FileView extends iCingView {
         nextButton.setEnabled(false);
         nextButton.setText(c.Next());
         nextButton.setTitle(c.Set_the_criteria());
-
     }
-
+    
     public boolean showStartButton() {
         flexTable.setWidget(0, 0, startButton);
         startButton.setTitle(c.Select_file_s_());

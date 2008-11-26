@@ -55,4 +55,8 @@ ProxyPass         /iCing/serv http://localhost:8080/iCing
 ProxyPassReverse  /iCing/serv http://localhost:8080/iCing
 
 The tomcat server in eclipse works together with the apache configured here.
+
+# For the NRG tomcat web app.
+ProxyPass         / http://localhost:8080/NRG/MRGridServlet
+ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
             
