@@ -26,17 +26,12 @@ def retrieveTgzFromUrl(entryId, url):
     Will skip the download if it's already present.
     """
     fnametgz = entryId + '.tgz' 
-#    if os.path.exists(fnametgz):
-#        NTmessage("Tgz already present skip downloading")
-#        return
+    if os.path.exists(fnametgz):
+        NTmessage("Tgz already present skip downloading")
+        return
     unametgz = url + '/' + fnametgz 
     NTdebug("downloading url: " + unametgz)
-    urllib.urlretrieve(unametgz, fnametgz)
-#    except:
-#        NTwarning("Failed to download; " + unametgz)
-#        return
-#    NTdebug("doing hard system exit")
-#    sys.exit(0)
+    urllib.urlretrieve(unametgz, fnametgz) # consistently fails.
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
@@ -53,7 +48,7 @@ def main(entryId, *extraArgList):
     
     expectedNumberOfArguments = 4
     if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got arguments: %s" % extraArgList)
+        NTerror("Got arguments: " + `extraArgList`)
         NTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         return True
@@ -84,9 +79,12 @@ def main(entryId, *extraArgList):
                 
     isCcpnProject = False # TODO: refine
     if inputDir.startswith("http"):
-        retrieveTgzFromUrl(entryId, inputDir)
+        fnametgz = entryId + '.tgz' 
+        if not os.path.exists(fnametgz):
+            NTerror("Tgz should already have been present skipping entry")
+            return        
+#        retrieveTgzFromUrl(entryId, inputDir)
         isCcpnProject = True
-        return True # for debugging TODO: remove.
         
     if isCcpnProject:
         fnametgz = entryId + '.tgz'         
@@ -134,8 +132,8 @@ def main(entryId, *extraArgList):
         return True
     project.save()
     if isCcpnProject:
-        fnametgz = entryId + '.tgz'         
-        os.unlink(fnametgz) # temporary ccpn tgz
+#        fnametgz = entryId + '.tgz'         
+#        os.unlink(fnametgz) # temporary ccpn tgz
         rmdir(entryId) # temporary ccpn dir        
     
         

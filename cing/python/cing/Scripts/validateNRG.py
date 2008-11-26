@@ -24,7 +24,7 @@ extraArgList = (inputDir, outputDir, '.', '.')
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
-                    processes_max=8,
+                    processes_max=4,
                     delay_between_submitting_jobs=5,
                     max_time_to_wait=12000, # 1y4o took more than 600. This is one of the optional arguments.
                     START_ENTRY_ID=0,
