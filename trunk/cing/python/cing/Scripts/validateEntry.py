@@ -24,8 +24,12 @@ def usage():
 def retrieveTgzFromUrl(entryId, url):
     """Retrieves tgz file from url to current working dir assuming the
     source is named:      
+    Will skip the download if it's already present.
     """
     fnametgz = entryId + '.tgz' 
+    if os.path.exists(fnametgz):
+        NTmessage("Tgz already present skip downloading")
+        return
     unametgz = url + '/' + fnametgz 
     NTdebug("downloading file:" + unametgz)
     try:
@@ -38,7 +42,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
     """
     
-    fastestTest = False
+    fastestTest = True
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -128,10 +132,10 @@ def main(entryId, *extraArgList):
         NTerror("Failed to validate project read")
         return True
     project.save()
-    if isCcpnProject:
-        fnametgz = entryId + '.tgz'         
-        os.unlink(fnametgz) # temporary ccpn tgz
-        rmdir(entryId) # temporary ccpn dir        
+#    if isCcpnProject:
+#        fnametgz = entryId + '.tgz'         
+#        os.unlink(fnametgz) # temporary ccpn tgz
+#        rmdir(entryId) # temporary ccpn dir        
     
         
 
