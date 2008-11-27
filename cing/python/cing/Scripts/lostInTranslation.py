@@ -6,9 +6,9 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from glob import glob
 import cing
+import codecs
 import os
 import sys
-import codecs
 
 
 class lostInTranslation():
@@ -56,6 +56,7 @@ class lostInTranslation():
         # now the reads will result in unicode being returned.        
         r={}
         for line in f:
+#            NTdebug("line: " + line)
             (key,value) = line.split('=')
             key = key.strip()
             value = value.strip()
@@ -65,5 +66,6 @@ class lostInTranslation():
             
 
 if __name__ == '__main__':
+    cing.verbosity = cing.verbosityDebug
     lit = lostInTranslation()
     lit.findPhrases()
