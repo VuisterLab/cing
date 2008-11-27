@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 /** Settings for both the client and server code */
 public interface Settings {
+    /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
+    public static final boolean DO_DEBUG = false;
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
@@ -96,6 +98,4 @@ public interface Settings {
     public static final String FILE_PROGRAM_CCPN = "CCPN";
     public static final String FILE_TYPE_PROJECT = "project";
     public static final String FILE_TYPE_VALIDATION_SETTINGS = "validation settings";
-    /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = true;
 }

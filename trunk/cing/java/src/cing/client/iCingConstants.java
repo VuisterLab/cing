@@ -80,9 +80,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Clears_the_log_w();
 
   /**
-   * Translated "Removed project data.".
+   * Translated "Removed project data. Please reload iCing to start over.".
    * 
-   * @return translated "Removed project data."
+   * @return translated "Removed project data. Please reload iCing to start over."
    * @gwt.key PurgedProject
    */
   String PurgedProject();
@@ -192,9 +192,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String CING_might_have();
 
   /**
-   * Translated "Purge the project data on the iCing server.".
+   * Translated "Purge the project data on the iCing server. ".
    * 
-   * @return translated "Purge the project data on the iCing server."
+   * @return translated "Purge the project data on the iCing server. "
    * @gwt.key PurgeProjectTitl
    */
   String PurgeProjectTitl();
@@ -256,9 +256,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Error();
 
   /**
-   * Translated "Remove project data.".
+   * Translated "Remove project data".
    * 
-   * @return translated "Remove project data."
+   * @return translated "Remove project data"
    * @gwt.key PurgeProject
    */
   String PurgeProject();
