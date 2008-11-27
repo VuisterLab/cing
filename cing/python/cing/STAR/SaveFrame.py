@@ -1,7 +1,7 @@
 """
 Classes for dealing with STAR syntax
 """
-from cing.STAR.Utils import Lister
+from cing.Libs.NTutils import Lister
 
 
 """

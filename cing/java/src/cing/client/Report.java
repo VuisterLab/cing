@@ -150,7 +150,7 @@ public class Report extends iCingView {
 				+ "<P>"+c.A()+" <A HREF=\""
 				+ runUrl
 				+ "\"  target=\"_blank\">"+c.directory()+"</a> "
-				+ c.in_which_results() 
+				+ c.in_which_results() + " "
 				+ c.View() + "->"+c.Log()+" CING." + GenClient.eol
 				+ "<P>" + c.After_a_while_it()
 				+ GenClient.eol + " </P>" 
