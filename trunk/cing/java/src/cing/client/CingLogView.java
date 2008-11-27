@@ -68,7 +68,7 @@ public class CingLogView extends iCingView {
             }
         });
         clearButton.setText(c.Clear());
-        String iniMsg = Utils.preStart + c.Expect_to_see() + ";" +c.Once_CING_is_run() + GenClient.eol + Utils.preEnd;
+        String iniMsg = Utils.preStart + c.Expect_to_see() + "; " +c.Once_CING_is_run() + GenClient.eol + Utils.preEnd;
         cingArea.setHTML(iniMsg);
         nextButton.setText(c.Next());
         nextButton.setFocus(true);

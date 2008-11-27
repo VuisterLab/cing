@@ -1,20 +1,20 @@
 """
 Classes for dealing with STAR syntax
 """
+from cing.Libs.NTutils import Lister
 from cing.STAR import Utils
-from cing.STAR.Utils import Lister
+from cing.STAR.SaveFrame import SaveFrame
 from cing.STAR.TagTable import TagTable
 from cing.STAR.Text import comments_strip
-from cing.STAR.Text import semicolon_block_collapse
 from cing.STAR.Text import nmrView_compress
 from cing.STAR.Text import pattern_save_begin
-from cing.STAR.Text import pattern_save_end
-from cing.STAR.Text import pattern_tagtable_loop
 from cing.STAR.Text import pattern_save_begin_nws
+from cing.STAR.Text import pattern_save_end
 from cing.STAR.Text import pattern_save_end_nws
 from cing.STAR.Text import pattern_tag_name_nws
+from cing.STAR.Text import pattern_tagtable_loop
 from cing.STAR.Text import pattern_tagtable_loop_nws
-from cing.STAR.SaveFrame import SaveFrame
+from cing.STAR.Text import semicolon_block_collapse
 import os
 import re
 #import profile
