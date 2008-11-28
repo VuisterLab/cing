@@ -1353,7 +1353,7 @@ Return an Molecule instance or None on error
         return self.rmsd
     #end def
 
-    def toPDB( self, model = None, convention = IUPAC   ):
+    def toPDB( self, model = None, convention = IUPAC, max_models=None   ):
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
@@ -1377,6 +1377,11 @@ Return an Molecule instance or None on error
                 return None
             models = NTlist( model )
 
+        if max_models:
+            NTdebug("Limiting number of models exported from %d to %d" % (len( models ), max_models))
+            if len( models ) > max_models:
+                models = models[0:max_models]
+                
 #        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
 #                   convention, models[0], models.last()                 )
 

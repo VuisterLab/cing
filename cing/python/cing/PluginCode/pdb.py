@@ -391,7 +391,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
 Molecule.PDB2Molecule = staticmethod( PDB2Molecule )
 
 
-def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
+def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC, max_models = None):
     """
     Save a molecule instance to PDB file.
     Convention eq PDB, CYANA, CYANA2, XPLOR.
@@ -404,7 +404,7 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     """
     NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
              molecule, path, model, convention)
-    pdbFile = molecule.toPDB( model=model, convention = convention)
+    pdbFile = molecule.toPDB( model=model, convention = convention, max_models = max_models)
     if not pdbFile:
         return True
     pdbFile.save( path)

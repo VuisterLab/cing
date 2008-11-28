@@ -11,7 +11,7 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 	$CATALINA_HOME/bin/startup.sh
 	
 - Logs:
-	tail -f $CATALINA_HOME/logs/* &
+	tail -f $CATALINA_HOME/logs/catalina.out  &
 - Webapps:x
 	$CATALINA_HOME/webapps
 	
