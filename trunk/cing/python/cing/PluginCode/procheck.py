@@ -42,6 +42,40 @@ PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc unde
 SECSTRUCT_STR      = 'secStruct'
 CONSENSUS_SEC_STRUCT_FRACTION = 0.6
 
+#Trying to accommodate at least 
+#2k0e with 160 models of with each 148 residues, 2611 atoms
+#1ai0  
+## Adjusted to reflect original procheck_nmr settings:
+#
+#C MXATOM - Maximum number of atoms allowed for the structure (1 model)
+#was 50,000 in rmsdev, set to 100,000
+#
+#C MXCONS - Maximum number of NMR constraints that can be stored
+#was  10,000 in mplot.inc, set to 100,000
+#
+#C MXRES  - Maximum number of residues allowed for the protein structure
+#C          being plotted
+#was 20,000 in tplot.inc, set to 200,000
+#5,000 to 50,000 in mplot.inc etc.
+#
+#C MAXARR - Maximum size of constraints array
+#was 120,000 in mplot.inc set to 1,200,000
+#
+#C MXRCON - Maximum number of distance restraints per residue
+#was 500 left so.
+#
+#C MXFILE - Maximum number of .rin files allowed in the ensemble
+#was 60, left because there are also other deps in .f code that hardcode a 60 dep.
+#this limits cing/pc to 60
+#
+#MXONE 'Maximum number of residues per protein exceeded:',
+#left at 10,000
+#
+#MXMODL Maximum number of models
+#left at 60 in   viol2pdb because the same as MXFILE
+MAX_PROCHECK_NMR_MODELS = 60
+#MAX_PROCHECK_NMR_MODELS = 2
+ 
 def procheckString2float(string):
     """Convert a string to float, return None in case of value of 999.90"""
     result = float(string)
@@ -351,7 +385,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
-            self.molecule.toPDBfile(path, convention=AQUA)
+            self.molecule.toPDBfile(path, convention=AQUA, max_models = MAX_PROCHECK_NMR_MODELS)
             # Can't use IUPAC here because aqua doesn't understand difference between
             # G and DG.(oxy/deoxy).
 
@@ -452,6 +486,10 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         modelCount = self.molecule.modelCount
         NTdetail("==> Parsing procheck results")
 
+        if modelCount > MAX_PROCHECK_NMR_MODELS:
+            NTwarning("Limiting number of models analyzed from %d to %d" % (modelCount, MAX_PROCHECK_NMR_MODELS))
+            modelCount = MAX_PROCHECK_NMR_MODELS
+            
         # reset the procheck dictionary of each residue
         for res in self.molecule.allResidues():
             if res.has_key('procheck'):
@@ -470,7 +508,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 modelCountStr = "000"
                 path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
                 if not os.path.exists(path):
-                    NTdebug('Procheck.parseResult: file "%s" not found assuming it was pc server version. ', path)
+                    NTdebug('Procheck.parseResult: file "%s" not found assuming it was pc -server- version. ', path)
                     modelCountStr = "***"
 
             path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
