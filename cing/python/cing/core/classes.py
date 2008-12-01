@@ -37,6 +37,7 @@ from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
+from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
@@ -216,9 +217,16 @@ Project: Top level Cing project class
 
 
     def readValidationSettings(self, fn=None):
-        validationConfigurationFile = fn
-        if not fn:
-            validationConfigurationFile = os.path.join(cingPythonCingDir, 'valSets.cfg')
+        if fn:
+            validationConfigurationFile = fn
+            NTmessage( "Using validation configuration file: " + validationConfigurationFile)
+        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
+            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
+            NTmessage( "Using local validation configuration file: " + validationConfigurationFile)
+        else:
+            validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
+            NTdebug( "Using default validation configuration file: " + validationConfigurationFile)
+
         config = ConfigParser()
         config.readfp(open(validationConfigurationFile))
         for item in config.items('DEFAULT'):
@@ -564,7 +572,10 @@ Project: Top level Cing project class
     def removeCcpnReferences(self):
         """to slim down the memory footprint; should allow garbage collection. TODO: test"""
         attributeToRemove = "ccpn"
-        removeRecursivelyAttribute( self, attributeToRemove )
+        try:
+            removeRecursivelyAttribute( self, attributeToRemove )
+        except:
+            NTerror("Failed removeCcpnReferences")
 
     def export( self):
         """Call export routines from the plugins to export the project
@@ -2236,17 +2247,21 @@ class RDCRestraintList( NTlist ):
 
         NTdebug('RDCRestraintList.analyze: %s', self )
 
-        if (len( self ) == 0):
+        if len( self ) == 0:
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
         modelCount = 0
-        if (len(self[0].atoms) > 0):
-            modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
+        firstRestraint = self[0]
+        if not hasattr(firstRestraint, "atoms"):
+            NTerror("Failed to get the model count for no atoms are available.")
+        else:
+            if len(self[0].atoms):
+                modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
         #end if
 
-        if (modelCount == 0):
+        if (modelCount == 0): # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
             NTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
