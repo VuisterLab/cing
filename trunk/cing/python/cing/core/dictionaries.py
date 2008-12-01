@@ -1,9 +1,9 @@
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTwarning
-from cing.core.constants import INTERNAL
-from cing.core.constants import LOOSE
-from cing.core.database import NTdb
+#from cing.Libs.NTutils import NTdebug
+#from cing.Libs.NTutils import NTerror
+#from cing.Libs.NTutils import NTwarning
+#from cing.core.constants import INTERNAL
+#from cing.core.constants import LOOSE
+#from cing.core.database import NTdb
 
 #NTdebug("==> Creating translation dictionaries ... ")
 #

@@ -1,14 +1,6 @@
 """
 Implementation of the CING API
 """
-import cing
-__version__    = cing.__version__
-__date__       = cing.__date__
-__author__     = cing.__author__
-__copyright__  = cing.__copyright__
-__credits__    = cing.__credits__
-
-
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
@@ -32,19 +24,19 @@ from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import matchString
 from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.Libs.NTutils import matchString
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import LOOSE
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
-from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
@@ -56,11 +48,16 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
-from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
+import cing
 import math
 import os
 import sys
 import time
+__version__    = cing.__version__
+__date__       = cing.__date__
+__author__     = cing.__author__
+__copyright__  = cing.__copyright__
+__credits__    = cing.__credits__
 
 projects = NTlist()
 
@@ -739,7 +736,7 @@ Project: Top level Cing project class
 #        return NTdict.format( self )
         result =  self.header( dots ) + '\n' + \
                             'created:    %(created)s\n'
-        result = result%self
+        result = result%self 
         for firstString,item in [('molecules:  ', 'molecules'),
                                  ('peaks:      ', 'peaks'),
                                  ('distances:  ', 'distances'),

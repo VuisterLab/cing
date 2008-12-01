@@ -5,7 +5,6 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import limitToRange
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
@@ -63,7 +62,7 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from Numeric import arange
-
+ 
 #=======
 #try:
 #    from numpy.core.ma import arange #@UnusedImport
@@ -79,7 +78,6 @@ except ImportError:
 #end try
 
 import math
-import sys
 
 
 # NOTE WELL: use only 1 NTplot instance at a time.
@@ -417,7 +415,7 @@ class NTplot( NTdict ):
         self.move( startPoint )
         self.draw( endPoint=endPoint, attributes=attributes )
     #end def
-
+ 
     def lines( self, points, attributes=None ):
         if not attributes:
             attributes=defaultAttributes

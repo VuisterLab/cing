@@ -27,28 +27,26 @@ Methods:
 
 """
 from cing.Libs import PyMMLib
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
-from cing.core.constants import IUPAC
 from cing.core.constants import INTERNAL
+from cing.core.constants import IUPAC
+from cing.core.database import NTdb
+from cing.core.molecule import Chain
+from cing.core.molecule import Molecule
+from cing.core.molecule import ensureValidChainId
+import os
 #from cing.core.dictionaries import NTdbGetAtom
 #from cing.core.dictionaries import NTdbGetResidue
-from cing.core.molecule import Molecule
-from cing.core.molecule import Chain
-from cing.core.molecule import ensureValidChainId
-from cing.core.database import NTdb
-import os
 
 #==============================================================================
 # PDB stuff
@@ -679,7 +677,7 @@ def PDB2Molecule( pdbFile, moleculeName, convention=IUPAC, nmodels=None)   :
 Molecule.PDB2Molecule = staticmethod( PDB2Molecule )
 
 
-def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
+def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC, max_models=None):
     """
     Save a molecule instance to PDB file.
     Convention eq PDB, CYANA, CYANA2, XPLOR.
@@ -692,7 +690,7 @@ def moleculeToPDBfile( molecule, path, model=None, convention=IUPAC):
     """
     NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
              molecule, path, model, convention)
-    pdbFile = molecule.toPDB( model=model, convention = convention)
+    pdbFile = molecule.toPDB( model=model, convention = convention, max_models=None )
     if not pdbFile:
         return True
     pdbFile.save( path)
