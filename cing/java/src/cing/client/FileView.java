@@ -149,6 +149,7 @@ public class FileView extends iCingView {
 //        }
         flexTable.insertRow(currentRowIdx); // push the Add button down.
         /** Number the files in the table from 1 to n */
+        @SuppressWarnings("unused")
         int currentFileNumber = flexTable.getRowCount() - 2;
 //        GenClient.showDebug("Added file number [1,n]: " + currentFileNumber);
 

@@ -108,22 +108,14 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
-import cing
-__version__    = cing.__version__
-__date__       = cing.__date__
-__author__     = cing.__author__
-__copyright__  = cing.__copyright__
-__credits__    = cing.__credits__
-
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
-#from cing import header
+from cing import starttime
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.core.classes import Project
@@ -131,11 +123,17 @@ from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 from string import join
-from cing import starttime
-import time
+import cing
 import os
 import sys
+import time
 import unittest
+__version__    = cing.__version__
+__date__       = cing.__date__
+__author__     = cing.__author__
+__copyright__  = cing.__copyright__
+__credits__    = cing.__credits__
+
 
 #------------------------------------------------------------------------------------
 # Support routines
@@ -400,6 +398,15 @@ def getParser():
                       dest="ranges", default=None,
                       help="Ranges for superpose, procheck, validate etc; e.g. 503-547,550-598,800,801",
                       metavar="RANGES"
+                     )
+    parser.add_option("--ensemble",
+                      dest="ensemble", default=None,
+                      help="Models of the ensemble to use for superpose, procheck, validate etc; e.g. 1-8,10,20",
+                      metavar="ENSEMBLE"
+                     )
+    parser.add_option("--noImagery",
+                      dest="noImagery", default=None,
+                      help="Set this option to prevent the creation images. Greatly speeds validation up."
                      )
     parser.add_option("--superpose",
                       action="store_true", default=False,

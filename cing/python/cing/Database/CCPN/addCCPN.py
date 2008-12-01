@@ -2,7 +2,7 @@
 Script to import CCPN nomenclature (from file generate by TIM) into CING database
 """
 
-from cing import *
+from cing import * #@UnusedWildImport
 
 resdef = None
 for line in AwkLike('CcpnResAtomNomenclature.txt'):
