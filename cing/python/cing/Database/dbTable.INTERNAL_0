@@ -3290,7 +3290,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(-1, 'C'), (0, 'HN'), (0, 'CA')]
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNitrogen', 'nitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'N', 'CYANA': 'N', 'IUPAC': 'N', 'AQUA': 'N', 'BMRBd': None, 'INTERNAL_1': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'N', 'CYANA': 'N', 'IUPAC': 'N', 'AQUA': 'N', 'BMRBd': None, 'INTERNAL_1': 'N', 'CYANA2': 'N', 'PDB': None, 'XPLOR': 'N'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3304,7 +3304,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'N')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'HN', 'CYANA': 'HN', 'IUPAC': 'H', 'AQUA': 'HN', 'BMRBd': None, 'INTERNAL_1': 'H', 'CYANA2': 'H', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HN', 'CYANA': 'HN', 'IUPAC': 'H', 'AQUA': 'HN', 'BMRBd': None, 'INTERNAL_1': 'H', 'CYANA2': 'H', 'PDB': None, 'XPLOR': 'HN'}
 		aliases = ['HN', 'H']
 		pseudo = None
 		real = []
@@ -3318,7 +3318,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'CA', 'CYANA': 'CA', 'IUPAC': 'CA', 'AQUA': 'CA', 'BMRBd': None, 'INTERNAL_1': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'CA', 'CYANA': 'CA', 'IUPAC': 'CA', 'AQUA': 'CA', 'BMRBd': None, 'INTERNAL_1': 'CA', 'CYANA2': 'CA', 'PDB': None, 'XPLOR': 'CA'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3332,7 +3332,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CA')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'HA', 'CYANA': 'HA', 'IUPAC': 'HA', 'AQUA': 'HA', 'BMRBd': None, 'INTERNAL_1': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HA', 'CYANA': 'HA', 'IUPAC': 'HA', 'AQUA': 'HA', 'BMRBd': None, 'INTERNAL_1': 'HA', 'CYANA2': 'HA', 'PDB': None, 'XPLOR': 'HA'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3346,7 +3346,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CA'), (0, 'HB2'), (0, 'HB3'), (0, 'CG')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'CB', 'CYANA': 'CB', 'IUPAC': 'CB', 'AQUA': 'CB', 'BMRBd': None, 'INTERNAL_1': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'CB', 'CYANA': 'CB', 'IUPAC': 'CB', 'AQUA': 'CB', 'BMRBd': None, 'INTERNAL_1': 'CB', 'CYANA2': 'CB', 'PDB': None, 'XPLOR': 'CB'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3360,7 +3360,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CB')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
-		nameDict = {'INTERNAL_0': 'HB2', 'CYANA': 'HB2', 'IUPAC': 'HB2', 'AQUA': 'HB2', 'BMRBd': None, 'INTERNAL_1': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HB2', 'CYANA': 'HB2', 'IUPAC': 'HB2', 'AQUA': 'HB2', 'BMRBd': None, 'INTERNAL_1': 'HB2', 'CYANA2': 'HB2', 'PDB': None, 'XPLOR': 'HB2'}
 		aliases = []
 		pseudo = 'QB'
 		real = []
@@ -3374,7 +3374,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CB')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
-		nameDict = {'INTERNAL_0': 'HB3', 'CYANA': 'HB3', 'IUPAC': 'HB3', 'AQUA': 'HB3', 'BMRBd': None, 'INTERNAL_1': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HB3', 'CYANA': 'HB3', 'IUPAC': 'HB3', 'AQUA': 'HB3', 'BMRBd': None, 'INTERNAL_1': 'HB3', 'CYANA2': 'HB3', 'PDB': None, 'XPLOR': 'HB1'}
 		aliases = []
 		pseudo = 'QB'
 		real = []
@@ -3388,7 +3388,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CB')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'QB', 'CYANA': 'QB', 'IUPAC': 'QB', 'AQUA': 'QB', 'BMRBd': None, 'INTERNAL_1': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'QB', 'CYANA': 'QB', 'IUPAC': 'QB', 'AQUA': 'QB', 'BMRBd': None, 'INTERNAL_1': 'QB', 'CYANA2': 'QB', 'PDB': None, 'XPLOR': 'HB*,HB#,HB%,HB+'}
 		aliases = []
 		pseudo = None
 		real = ['HB2', 'HB3']
@@ -3402,7 +3402,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CB'), (0, 'ND1'), (0, 'CD2')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'CG', 'CYANA': 'CG', 'IUPAC': 'CG', 'AQUA': 'CG', 'BMRBd': None, 'INTERNAL_1': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'CG', 'CYANA': 'CG', 'IUPAC': 'CG', 'AQUA': 'CG', 'BMRBd': None, 'INTERNAL_1': 'CG', 'CYANA2': 'CG', 'PDB': None, 'XPLOR': 'CG'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3416,7 +3416,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CG'), (0, 'CE1')]
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNitrogen', 'nitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'ND1', 'CYANA': 'ND1', 'IUPAC': 'ND1', 'AQUA': 'ND1', 'BMRBd': None, 'INTERNAL_1': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'ND1', 'CYANA': 'ND1', 'IUPAC': 'ND1', 'AQUA': 'ND1', 'BMRBd': None, 'INTERNAL_1': 'ND1', 'CYANA2': 'ND1', 'PDB': None, 'XPLOR': 'ND1'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3430,7 +3430,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CG'), (0, 'HD2'), (0, 'NE2')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'CD2', 'CYANA': 'CD2', 'IUPAC': 'CD2', 'AQUA': 'CD2', 'BMRBd': None, 'INTERNAL_1': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'CD2', 'CYANA': 'CD2', 'IUPAC': 'CD2', 'AQUA': 'CD2', 'BMRBd': None, 'INTERNAL_1': 'CD2', 'CYANA2': 'CD2', 'PDB': None, 'XPLOR': 'CD2'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3444,7 +3444,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CD2')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'HD2', 'CYANA': 'HD2', 'IUPAC': 'HD2', 'AQUA': 'HD2', 'BMRBd': None, 'INTERNAL_1': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HD2', 'CYANA': 'HD2', 'IUPAC': 'HD2', 'AQUA': 'HD2', 'BMRBd': None, 'INTERNAL_1': 'HD2', 'CYANA2': 'HD2', 'PDB': None, 'XPLOR': 'HD2'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3458,7 +3458,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CD2'), (0, 'CE1'), (0, 'HE2')]
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNitrogen', 'nitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'NE2', 'CYANA': 'NE2', 'IUPAC': 'NE2', 'AQUA': 'NE2', 'BMRBd': None, 'INTERNAL_1': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'NE2', 'CYANA': 'NE2', 'IUPAC': 'NE2', 'AQUA': 'NE2', 'BMRBd': None, 'INTERNAL_1': 'NE2', 'CYANA2': 'NE2', 'PDB': None, 'XPLOR': 'NE2'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3472,7 +3472,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'ND1'), (0, 'NE2'), (0, 'HE1')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'CE1', 'CYANA': 'CE1', 'IUPAC': 'CE1', 'AQUA': 'CE1', 'BMRBd': None, 'INTERNAL_1': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'CE1', 'CYANA': 'CE1', 'IUPAC': 'CE1', 'AQUA': 'CE1', 'BMRBd': None, 'INTERNAL_1': 'CE1', 'CYANA2': 'CE1', 'PDB': None, 'XPLOR': 'CE1'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3486,7 +3486,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CE1')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'HE1', 'CYANA': 'HE1', 'IUPAC': 'HE1', 'AQUA': 'HE1', 'BMRBd': None, 'INTERNAL_1': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HE1', 'CYANA': 'HE1', 'IUPAC': 'HE1', 'AQUA': 'HE1', 'BMRBd': None, 'INTERNAL_1': 'HE1', 'CYANA2': 'HE1', 'PDB': None, 'XPLOR': 'HE1'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3500,7 +3500,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'NE2')]
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'HE2', 'CYANA': 'HE2', 'IUPAC': 'HE2', 'AQUA': 'HE2', 'BMRBd': None, 'INTERNAL_1': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'HE2', 'CYANA': 'HE2', 'IUPAC': 'HE2', 'AQUA': 'HE2', 'BMRBd': None, 'INTERNAL_1': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': 'HE2'}
 		aliases = []
 		pseudo = None
 		real = []
@@ -3514,7 +3514,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'CA'), (0, 'O'), (1, 'N')]
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'C', 'CYANA': 'C', 'IUPAC': 'C', 'AQUA': 'C', 'BMRBd': None, 'INTERNAL_1': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'C', 'CYANA': 'C', 'IUPAC': 'C', 'AQUA': 'C', 'BMRBd': None, 'INTERNAL_1': 'C', 'CYANA2': 'C', 'PDB': None, 'XPLOR': 'C'}
 		aliases = ['C', 'CO']
 		pseudo = None
 		real = []
@@ -3528,7 +3528,7 @@ RESIDUE	HISE     H
 	#---------------------------------------------------------------
 		topology = [(0, 'C')]
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isSidechain', 'sidechain']
-		nameDict = {'INTERNAL_0': 'O', 'CYANA': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'BMRBd': None, 'INTERNAL_1': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': None}
+		nameDict = {'INTERNAL_0': 'O', 'CYANA': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'BMRBd': None, 'INTERNAL_1': 'O', 'CYANA2': 'O', 'PDB': None, 'XPLOR': 'O'}
 		aliases = []
 		pseudo = None
 		real = []

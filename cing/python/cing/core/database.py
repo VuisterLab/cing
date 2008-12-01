@@ -1,4 +1,5 @@
 from cing.core.constants import INTERNAL
+from cing.core.constants import LOOSE
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
@@ -15,8 +16,47 @@ import sys
 patches = False
 
 """
-NTdb: database of topology, nomenclature and NMR properties
+__________________________________________________________________________________________________________
 
+NTdb: MolDef instance with database of topology, nomenclature and NMR properties
+
+    MolDef <-> ResDef <-> AtomDef
+                      <-> DihedralDef
+__________________________________________________________________________________________________________
+Methods:
+
+MolDef.getResidueDefByName( resName, convention )
+    return ResidueDef instance for resName if resName is a valid for convention
+    or None otherwise.
+
+MolDef.isValidResidueName( resName, convention )
+    return True if resName is a valid for convention or False otherwise.
+
+MolDef.getAtomDefByName( resName, atmName, convention )
+    return AtomDef instance for resName, atmName if resName, atmName are a valid for convention
+    or None otherwise.
+
+MolDef.isValidAtomName( resName, atmName, convention )
+    return True if resName, atmName is a valid for convention or False otherwise.
+
+ResDef.getAtomDefByName( atmName, convention )
+    return AtomDef instance for atmName if atmName is valid for convention
+    or None otherwise.
+
+ResDef.isValidAtomName( atmName, convention )
+    return True if atmName is a valid for convention or False otherwise.
+
+def translateResidueName( convention, resName, atmName, newConvention=INTERNAL ):
+    Translate resName from convention to newConvention
+    return None on error/no-translation
+
+def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
+    Translate resName,atomName from convention to newConvention
+    return None on error/no-translation
+
+__________________________________________________________________________________________________________
+History:
+__________________________________________________________________________________________________________
 20-25 Sep 2005
 Restructuring using NTtree and saving to different file format.
 1. Read residueDefs and converted to 'keyword format': dbTable.py
@@ -27,7 +67,7 @@ Restructuring using NTtree and saving to different file format.
    Yields NTdb as root of database
 4. Conversion dictionaries initialized from nameDict entries of NTdb
 
-Note that updating dict and list types requires first initialisation of the
+Note that updating dict and list types requires first initialization of the
 NTdb-tree and then updating it. Otherwise, the changes are discarded as parsing
 the dbTable involves blunt assignment of the corresponding attributes.
 
@@ -50,6 +90,10 @@ Removed \n from all __FORMAT__ defs
 29 Sep 2008:
 Removed XML saves; patch the properties for duplicates
 
+1-4 Nov 2008:
+Moved code from dictionaries.py to MolDef class
+Implemented new methods for MolDef class
+__________________________________________________________________________________________________________
 """
 
 
@@ -116,6 +160,109 @@ class MolDef( NTtree ):
             #end if
         #end for
         return result
+    #end def
+
+    def isValidResidueName( self, resName, convention = INTERNAL ):
+        """return True if resName is a valid for convention, False otherwise"""
+    #  print '>>', resName, atomName
+
+        if not self.residueDict.has_key(convention):
+            NTerror('MolDef.isValidResidueName: convention %s not defined within CING', convention)
+            return False
+        #end if
+        return (self.getResidueDefByName( resName, convention=convention) != None)
+    #end def
+
+    def getResidueDefByName( self, resName, convention = INTERNAL ):
+        """return ResidueDef instance for resName if resName is a valid for convention
+           or None otherwise
+        """
+        if not self.residueDict.has_key(convention):
+            NTerror('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
+            return None
+        #end if
+        rn = resName.strip()
+        if self.residueDict[convention].has_key(rn):
+            return self.residueDict[convention][rn]
+        #endif
+        return None
+    #end def
+
+    def isValidAtomName( self, resName, atmName, convention = INTERNAL ):
+        """return True if resName, atmName is a valid for convention, False otherwise"""
+    #  print '>>', resName, atomName
+
+        if not self.residueDict.has_key(convention):
+            NTerror('MolDef.isValidAtomName: convention %s not defined within CING', convention)
+            return False
+        #end if
+        return (self.getAtomDefByName( resName, atmName, convention=convention) != None)
+    #end def
+
+    def getAtomDefByName( self, resName, atmName, convention = INTERNAL ):
+        """return AtomDef instance for resName, atmName if resName, atmName is a valid for convention
+           or None otherwise
+        """
+        if not self.residueDict.has_key(convention):
+            NTerror('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
+            return None
+        #end if
+        resDef = self.getResidueDefByName( resName, convention=convention )
+        if not resDef:
+            return None
+        return resDef.getAtomDefByName( atmName, convention=convention )
+    #end def
+
+    def postProcess(self):
+        """
+         Create the residueDict and atomDict settings from the nameDict's
+
+         This allows checking and conversion of names
+         Note that it generates cycles in the referencing, so printing of
+         these dicts generates a recursion error.
+
+
+         NTdb.residueDict[INTERNAL] is a dictionary of all internal residue names. Each
+         entry points to the relevant residueDef instance.
+         Ex. NTdb.residueDict[INTERNAL]['GLU-'] points to the GLU- residueDef instance
+
+         NTdb.residueDict[CYANA2] is a dictionary of all CYANA2 residue names. Each
+         entry points to the relevant residueDef instance
+
+         idem for all other conventions
+
+         NTdb.residueDict[LOOSE] is a dictionary of all Loosely defined residue names. Each
+         entry points to the relevant residueDef instance
+
+         The atomDict dictionaries of each residue function analogously for the atom names
+        """
+        NTdebug("==> Creating translation dictionaries ... ")
+        for res in self:
+            # loose definitions
+            self.residueDict.setdefault( LOOSE, {} )
+            for n in [res.shortName, res.name, res.name.capitalize(), res.name.lower()]:
+                self.residueDict[LOOSE][n] = res
+            #end for
+            #different convention definitions
+            for convR, nameR in res.nameDict.iteritems():
+                self.residueDict.setdefault( convR, {} )
+                if (nameR != None):
+                    self.residueDict[convR][nameR] = res
+                #end if
+            # end for
+            for atm in res:
+                for convA, nameA in atm.nameDict.iteritems():
+                    res.atomDict.setdefault( convA, {} )
+                    if (nameA != None):
+                        # XPLOR definitions have possibly multiple entries
+                        # separated by ','
+                        for n in nameA.split(','):
+                            res.atomDict[convA][n] = atm
+                        #end for
+                    #end if
+                #end for
+            #end for
+        #end for
     #end def
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
@@ -224,6 +371,33 @@ class ResidueDef( NTtree ):
         if convention in self.nameDict:
             return self.nameDict[convention]
         #end if
+        return None
+    #end def
+
+    def isValidAtomName( self, atmName, convention = INTERNAL ):
+        """return True if resName, atmName is a valid for convention, False otherwise"""
+    #  print '>>', resName, atomName
+
+        if not self.residueDict.has_key(convention):
+            NTerror('ResidueDef.isValidAtomName: convention %s not defined within CING', convention)
+            return False
+        #end if
+        return (self.getAtomDefByName( atmName, convention=convention) != None)
+    #end def
+
+    def getAtomDefByName( self, atmName, convention = INTERNAL ):
+        """return AtomDef instance for atmName if atmName is a valid for convention
+           or None otherwise
+        """
+        if not self.atomDict.has_key(convention):
+            NTerror('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
+            return None
+        #end if
+
+        an = atmName.strip()
+        if self.atomDict[convention].has_key(an):
+            return self.atomDict[convention][an]
+        #endif
         return None
     #end def
 
@@ -392,6 +566,8 @@ class AtomDef( NTtree ):
                            nameDict    = {},
                            aliases     = [],       # list of aliases
 
+                           residueDef  = None,     # ResidueDef instance
+
                            topology    = [],       # List of bound atoms: (i, name) tuple
                                                    # i:  -1=previous residue; 0=current residue; 1=next residue
                            pseudo      = None,     # Corresponding pseudo atom (for real atoms)
@@ -421,7 +597,11 @@ class AtomDef( NTtree ):
 #                    )
 
     def __str__(self):
-        return '<AtomDef %s.%s>' % (self.residueDef.name, self.name)
+        if self.residueDef:
+            return '<AtomDef %s.%s>' % (self.residueDef.name, self.name)
+        else:
+            return '<AtomDef %s.%s>' % (self.residueDef, self.name)
+    #end def
 
     def translate( self, convention ):
 #        if convention in self.nameDict:
@@ -707,19 +887,43 @@ def importNameDefs( tableFile, name)   :
     mol.name=name
 
     if mol.convention != INTERNAL:
-        NTerror('Reading database: current convention setting (%s) does not match database file "%s" (%s)',
+        NTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
                 INTERNAL, tableFile, mol.convention
                )
-#        sys.exit(1)
-        return None # TODO: should signal error. 
+        sys.exit(1)
 
     #Post-processing
     for res in mol.allResidueDefs():
         res.postProcess()
     for atm in mol.allAtomDefs():
         atm.postProcess()
+    mol.postProcess()
 
     return mol
+#end def
+
+
+def translateResidueName( convention, resName, newConvention=INTERNAL ):
+    """ Translate resName from convention to newConvention
+        return None on error/no-translation
+    """
+    res =  NTdb.getResidueDefByName( resName, convention=convention )
+    if res != None:
+        return res.translate( newConvention )
+    #endif
+    return None
+#end def
+
+
+def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
+    """ Translate resName,atomName from convention to newConvention
+        return None on error/no-translation
+    """
+    atm =  NTdb.getAtomDefByName( resName, atmName, convention=convention )
+    if atm != None:
+        return atm.translate( newConvention )
+    #endif
+    return None
 #end def
 
 
@@ -728,7 +932,11 @@ def importNameDefs( tableFile, name)   :
 # import the database table and generate the db-tree
 NTdebug('importing NTdb')
 NTdebug( '>' + INTERNAL )
+
 NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
+
+
+
 
 
 

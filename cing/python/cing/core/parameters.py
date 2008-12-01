@@ -47,6 +47,7 @@ moleculeDirectories = NTdict(
     yasara     = 'Macros/Yasara'
 )
 moleculeDirectories.keysformat() #define a format string for 'pretty' output
+validationSubDirectories = moleculeDirectories # New name
 
 #These directories get generated below the HLML root of a molecule
 htmlDirectories = NTdict(

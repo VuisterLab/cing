@@ -222,9 +222,11 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
     #end if
-    molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR)
-    project.appendMolecule( molecule )
-
+#    molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR)
+#    project.appendMolecule( molecule )
+    molecule = project.initPDB( xplorFile, name=name, convention = XPLOR )
+    if not molecule:
+        return None
     # now the other models:
     for model in models[1:]:
 #        modelId = model - 1
@@ -235,7 +237,6 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end for
 
     project.molecule.updateAll()
-    project.dssp() # TODO: move these calls toproject.molecule.updateAll()
 
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()

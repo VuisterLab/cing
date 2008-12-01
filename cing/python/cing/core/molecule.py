@@ -1,3 +1,13 @@
+"""
+Implementation of the CING API
+"""
+import cing
+__version__    = cing.__version__
+__date__       = cing.__date__
+__author__     = cing.__author__
+__copyright__  = cing.__copyright__
+__credits__    = cing.__credits__
+
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTcodeerror
@@ -41,8 +51,8 @@ from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
-from cing.core.dictionaries import translateAtomName
-from cing.core.dictionaries import translateResidueName
+from cing.core.database import translateAtomName
+from cing.core.database import translateResidueName
 from database import NTdb
 from math import acos
 from math import pi
@@ -78,28 +88,8 @@ class Molecule( NTtree ):
 -------------------------------------------------------------------------------
 Molecule class: defines the holder for molecule items.
 
-Mapping between the CING data model and NMR-STAR:
+API layout in cing.core.classes
 
-CING     | NMR-STAR             CCPN
---------------------------------
-Molecule | Molecular system     MolSystem (from ccp.api.molecule.MolSystem)
-Chain    | Assembly entity      Chain
-Residue  | Chemical component   Residue
-
-There are things that will be difficult to map from one to the other.
-A Zinc ion will usually be part of the same chain in CING whereas it will be
-in a different assembly entity in NMR-STAR. This has consequences for numbering.
--------------------------------------------------------------------------------
-
-  Ensemble <-> [Model1, ..] -> [Coordinate_atom1, ..]
-    ^                             [Coordinate1, ..]
-    |                                  ^
-    |                                  |
-    v                                  v
-  Molecule <-> Chain <-> Residue <-> Atom <-> Resonance <- Peak
-                            |          |
-                            v          v
-              NTdb <-> ResidueDef <-> AtomDef
   _____________________________________________________________________________
 
     Molecule.chains     List of Chain instances; equivalent to Molecule._children
@@ -1072,6 +1062,7 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         """Calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
            Generate an ensemble from coordinates
+           Generate an atomList
            Calculate the rmsd's
         """
         if self.modelCount > 0:
@@ -1273,6 +1264,8 @@ Return an Molecule instance or None on error
             return None
         #end if
 
+        NTdebug("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
+
         selectedResidues = self.ranges2list( ranges )
         selectedModels   = self.models2list( models )
 
@@ -1299,8 +1292,6 @@ Return an Molecule instance or None on error
                 res.rmsd.included = False
             #end if
         #end for
-
-        NTdebug("Calculating rmsd's: %s", ranges)
 
         for res in self.allResidues():
             if res.rmsd.backboneCount > 0:
@@ -1353,7 +1344,7 @@ Return an Molecule instance or None on error
         return self.rmsd
     #end def
 
-    def toPDB( self, model = None, convention = IUPAC, max_models=None   ):
+    def toPDB( self, model = None, convention = IUPAC   ):
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
@@ -1377,11 +1368,6 @@ Return an Molecule instance or None on error
                 return None
             models = NTlist( model )
 
-        if max_models:
-            NTdebug("Limiting number of models exported from %d to %d" % (len( models ), max_models))
-            if len( models ) > max_models:
-                models = models[0:max_models]
-                
 #        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
 #                   convention, models[0], models.last()                 )
 
@@ -2542,38 +2528,13 @@ Atom class: Defines object for storing atom properties
         atomName                : Atom name according to the nomenclature list.
 
     Derived attributes:
-        atomIndex               : Unique atom index (several external programs need one).
+        atomIndex               : Unique (sequential) atom index (several external programs need one).
         resonances              : NTlist of Resonance instances.
+        coordinates             : NTlist of Coordinate instances.
         db                      : Reference to database AtomDef instance
         residue                 : Reference to Residue instance
-
-    Attributes inherited from NTtree:
-        _parent                 : Reference to parent NTtree instance (None for root)
-        _children               : NTlist of children NTtree instances.
-
-    Methods:
-        translate( convention ) : translate atomName according to convention.
-        topology()              : Return list of Atom instances defining topology
-        isAssigned()            : Return true if atoms has ta least one assignment
-        set()                   : Return a NTset instance containing Atom instances:
-                                     if   isPseudoAtom():  set contains self and the real atom instances
-                                     elif hasPseudoAtom(): set contains self and pseudoAtom instances
-                                     else:                 set contains self
-
-        allAtoms()              : Returns a list containing self.
-
-    Methods inherited from NTtree:
-        _Cname( depth )         : Returns name expanded to depth
-        addChild( child )       :
-        sibling( relativeIndex ) :
-        traverse()              :
-
-    Methods inherited from NTdict:
-        format()                : Return a formatted string of with values of selected fields.
-        printAttr()             : Print a list of all attributes and their values.
-
-    all dict methods
-
+        rogScore                : ROGscore instance
+-------------------------------------------------------------------------------
     """
 
     def __init__( self, resName, atomName, **kwds ):
@@ -2641,7 +2602,7 @@ Atom class: Defines object for storing atom properties
 
         return result
 
-    def addCoordinate( self, x, y, z, Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, **kwds ):
+    def addCoordinate( self, x, y, z, Bfac=Coordinate.DEFAULT_BFACTOR, occupancy=Coordinate.DEFAULT_OCCUPANCY, **kwds ):
         """Append coordinate to coordinates list
         Convenience method.
         """
@@ -3127,10 +3088,10 @@ Atom class: Defines object for storing atom properties
 
     def set( self ):
         """
-        set()                   : Return a NTset instance containing Atom instances:
-                                     if   isPseudoAtom():  set contains self and the real atom instances
-                                     elif hasPseudoAtom(): set contains self and pseudoAtom instances
-                                     else:                 set contains self
+        Return a NTset instance containing Atom instances:
+            if   isPseudoAtom():  set contains self and the real atom instances
+            elif hasPseudoAtom(): set contains self and pseudoAtom instances
+            else:                 set contains self
         """
         # generate the set
         result = NTset( self )
@@ -3463,15 +3424,16 @@ def NTdihedralOpt( c1, c2, c3, c4 ):
     """ To replace unoptimized routine. It's 7 times faster (20.554/2.965s)
     for 100,000 calculations. Since last the performance dropped with
     the coordinate based on CoordinateOld(list) to 3.0 s per 10,000.
+    gv 4 Nov 2008: Only equally fast when using c0.e, c1.e, ... etc directly
     Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
     Adapted from biopython-1.41
     """
 #    ab = c1() - c2() optimized
 #    cb = c3() - c2()
 #    db = c4() - c3()
-    ab = ( c1[0]-c2[0], c1[1]-c2[1], c1[2]-c2[2] )
-    cb = ( c3[0]-c2[0], c3[1]-c2[1], c3[2]-c2[2] )
-    db = ( c4[0]-c3[0], c4[1]-c3[1], c4[2]-c3[2] )
+    ab = ( c1.e[0]-c2.e[0], c1.e[1]-c2.e[1], c1.e[2]-c2.e[2] )
+    cb = ( c3.e[0]-c2.e[0], c3.e[1]-c2.e[1], c3.e[2]-c2.e[2] )
+    db = ( c4.e[0]-c3.e[0], c4.e[1]-c3.e[1], c4.e[2]-c3.e[2] )
 
     # Optimized out.
 #    u = ab.cross( cb )

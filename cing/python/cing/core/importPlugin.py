@@ -1,5 +1,5 @@
 from cing import cingPythonCingDir
-from cing.Libs.NTutils import NTdetail
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexception
@@ -16,10 +16,10 @@ import os
 #-----------------------------------------------------------------------------
 def importPlugin( pluginName ):
     """
-    Import a plugin
+    Import the plugin pluginName present in PluginCode directory.
     Returns None on error
     """
-#    NTdebug('==> Importing plugin ' + pluginName)
+
     pluginCodeModule = 'cing.' + cingPaths.plugins
 #    moduleName = cingPaths.plugins + '.' + pluginName
     if plugins.has_key(pluginName):
@@ -40,9 +40,9 @@ def importPlugin( pluginName ):
                          [pluginName]) #JFD changed from default to zero which means to only try absolute imports.
 
 #    NTdebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
-    NTdetail('==> Imported plugin: ' + pluginName )
+    NTdebug('importPlugin: ' + pluginName )
     if not hasattr(pluginCodeModulePackage, pluginName):
-        NTerror("Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
+        NTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
         return None
 #     set p to plugin module
     pluginModule = getattr( pluginCodeModulePackage, pluginName )
@@ -66,13 +66,7 @@ def importPlugin( pluginName ):
             #end for
         #end if
     #end for
-
-    # msg = plugin.printAttr()
-
-#    NTmessage('==> Staged plugin ' + plugin.module.__file__ )
-    #end if
     return plugin
-
 #end def
 
 # get all *.py files in plugin directory excluding __init__
@@ -81,18 +75,16 @@ pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
 #NTdebug("found plugin file list: " + `pluginFileList`)
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 
-try: 
+try:
     import ccpnmr #@UnusedImport
 except:
-    NTdetail('Running CING without CCPN support')
+    NTdebug('importPlugin: Running CING without CCPN support')
     pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
 
-#NTwarning("TODO: reintroduce the validate plugin code here once fixed")
-#pluginFileList.remove( os.path.join( pluginDir, 'validate.py') )
-for p in pluginFileList:
-    d,pname,e = NTpath(p)
-    if not importPlugin( pname ):
-        raise Exception("Failed to import plugin: " + pname)
+for _p in pluginFileList:
+    _d,_pname,_e = NTpath(_p)
+    if not importPlugin( _pname ):
+        raise Exception("Failed to import plugin: " + _pname)
 #end for
 del( pluginDir )
 del( pluginFileList)

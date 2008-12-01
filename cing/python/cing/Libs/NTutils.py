@@ -1,8 +1,4 @@
 from cing import NaNstring
-from cing import prefixDebug
-from cing import prefixDetail
-from cing import prefixError
-from cing import prefixWarning
 from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityError
@@ -27,6 +23,7 @@ import math
 import optparse
 import os
 import sys
+import pydoc
 
 CONSENSUS_STR = 'consensus'
 
@@ -102,6 +99,10 @@ class NTlist(list):
         return NTlist(*list.__add__(self, other))
     #end def
 
+    def doc(self):
+        pydoc.doc(self, title='%s')
+    #end def
+
     def getConsensus(self, minFraction=1.):
         if not hasattr(self, CONSENSUS_STR):
             self.setConsensus(minFraction=minFraction)
@@ -127,13 +128,14 @@ class NTlist(list):
                 setattr(self, CONSENSUS_STR, v)
                 return v
         return False
-
-
+    #end def
 
     def append(self, *items):
         for item in items:
             list.append(self, item)
             self.current = item
+        #end for
+    #end def
 
     def add(self, *items):
         '''Add a new item to a list only if not there before, like 'add' method
@@ -177,8 +179,6 @@ class NTlist(list):
         # JFD notes that this method is now twice as fast.
         # This was a very rate limiting piece of code when a chain
         # had many residues (E.g. an X-ray structure with many waters).
-
-
         try:
             return list.index(self, item)
         except ValueError:
@@ -187,6 +187,7 @@ class NTlist(list):
 #        if item in self:
 #            return list.index( self, item )
 #        return -1
+    #end def
 
     def last(self):
         l = len(self)
@@ -230,6 +231,8 @@ class NTlist(list):
                 self.pop(i)
             else:
                 i += 1
+        #end while
+    #end def
 
     def reorder(self, indices):
         """Return a new NTlist, ordered according to indices or None on error
@@ -777,7 +780,7 @@ class NTvector(list):
             result.append(self[i])
         #end for
         return result
-    #end def 
+    #end def
     #--------------------------------------------------------------
     # Formatting, str, XML etc
     #--------------------------------------------------------------
@@ -932,8 +935,7 @@ class NTdict(dict):
     """
         class NTdict: Base class for all mapping NT objects.
 
-        create a 'structure' from keywords to group things. Keys can be referenced as
-        in dictionary methods, or as an attribute; e.g.
+        Keys can be referenced as in dictionary methods, or as an attribute; e.g.
 
             aap = NTdict( noot=3, mies=4, kees='not awake' )
             print aap['noot']
@@ -944,14 +946,16 @@ class NTdict(dict):
         Hashing and compare implemented.
 
         Methods:
-            __call__( **kwds )                            Calling will update kwds and return self
+            __call__( **kwds )                            Calling will update kwds and return self.
 
             format( format=None )                         Format the object according to format or __FORMAT__ (when
                                                           format == None) attribute.
+            keysformat()                                  Set __FORMAT__ to include all keys.
             printAttr( hidden=0 )                         Print all attributes to stream (mainly for debugging purposes).
                                                           Also print 'hidden' attributes when hidden!=0.
 
-            getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise
+            getdefault( key, defaultKey )                 Return self[key] if key exists, self[defaultKey] otherwise.
+            uniqueKey( key )                              Return an unique key derived from key.
 
             saveXML( *attrs ):                            Add attrs to the list to save in XML format.
             toXML( stream=sys.stdout )                    Write XML code of object to stream; recursively decend; i.e.
@@ -972,10 +976,16 @@ class NTdict(dict):
             attribute '__FORMAT__'                        is reserved to store format for method format()
             attribute '__HIDDEN__'                        is reserved to store the hidden attributes
             attribute '__SAVEXML__'                       is reserved to store the name of attributes saved as XML
+            attribute '__SAVEALLXML__'                    is reserved to indicate saving all attributes as XML
 
         GV 12 Sep 2007:
           removed implementation with global storage in NTstructObjects since it was never used and
           will result in objects persisting even if they could be deleted (i.e. a memory leak).
+
+        GV 26 Nov 2008:
+          Changed implementation compare: removed __cmp__ and implemented __lt__, __le__, __gt__, __ge__;
+          adapted __eq__.
+          Changed implementation in __hash__ due to recursion error.
     """
     def __init__(self, *args, **kwds):
         global NTdictObjectId
@@ -988,57 +998,93 @@ class NTdict(dict):
         self.setdefault('__SAVEALLXML__', True)   # when True, save all attributes in toXML() methods
 #        self.__getstate__ =  self  # Trick for fooling shelve.
 
-        self.__OBJECTID__ = NTdictObjectId
-        NTdictObjectId += 1
-        self.__HIDDEN__  = ['__HIDDEN__', '__OBJECTID__', '__CLASS__', '__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
+        self['__OBJECTID__'] = NTdictObjectId
+        NTdictObjectId      += 1
+        self['__HIDDEN__']   = ['__HIDDEN__', '__OBJECTID__', '__CLASS__', '__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
     #end def
 
     #------------------------------------------------------------------
     # Basic functionality
     #------------------------------------------------------------------
     def __getattr__(self, attr):
-        """Need to override because otherwise attributes such as __SAVEXML__
-        aren't available"""
+        """Implement basic functionality:
+           Keys can be referenced as in dictionary methods, or as an attribute.
+        """
 #        if attr == '__getstate__':
 #        return
 #        if hasattr(self, attr):
+        if not self.has_key(attr):
+            raise AttributeError
         return self[attr]
-#        return None
+    #end def
 
 
     def __setattr__(self, attr, value):
+        """Implement basic functionality:
+           Keys can be referenced as in dictionary methods, or as an attribute.
+        """
         self[attr] = value
 
     def __delattr__(self, attr):
+        """Implement basic functionality:
+           Keys can be referenced as in dictionary methods, or as an attribute.
+        """
         del(self[attr])
 
+    def __lt__(self, other):
+        if other == None:
+            return False
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
+            return False
+        return self['__OBJECTID__'] < other['__OBJECTID__']
 
-    def __cmp__(self, other):
-        """Optimized for speed a bit"""
-        if not hasattr(other, '__OBJECTID__'): return -1
-        if self.__OBJECTID__ == other.__OBJECTID__:
-            return 0
-        if self.__OBJECTID__ < other.__OBJECTID__:
-            return -1
-        return 1
-
-    def __hash__(self):
-        return hash(self.__OBJECTID__)
-    #end def
+    def __le__(self, other):
+        if other == None:
+            return False
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
+            return False
+        return self['__OBJECTID__'] <= other['__OBJECTID__']
 
     def __eq__(self, other):
         if other == None:
             return False
         if not isinstance(other, NTdict): # eg when comparing with tuple.
             return False
-        return self.__OBJECTID__ == other.__OBJECTID__
+        return self['__OBJECTID__'] == other['__OBJECTID__']
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self.__eq__(other)
 
-    #------------------------------------------------------------------
-    # Print/repr/output routines
-    #------------------------------------------------------------------
+    def __gt__(self, other):
+        if other == None:
+            return False
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
+            return False
+        return self['__OBJECTID__'] > other['__OBJECTID__']
+
+    def __ge__(self, other):
+        if other == None:
+            return False
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
+            return False
+        return self['__OBJECTID__'] >= other['__OBJECTID__']
+
+#
+#    def __cmp__(self, other):
+#        """Optimized for speed a bit"""
+#        if not hasattr(other, '__OBJECTID__'): return -1
+#        if self.__OBJECTID__ == other.__OBJECTID__:
+#            return 0
+#        if self.__OBJECTID__ < other.__OBJECTID__:
+#            return -1
+#        return 1
+
+    def __hash__(self):
+        #print 'hash>', self, self['__OBJECTID__']
+        return int(self['__OBJECTID__'])
+        #return hash(self['__OBJECTID__'])
+    #end def
+
     def __str__(self):
 #        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
 #        return self.format()
@@ -1153,6 +1199,9 @@ class NTdict(dict):
     #------------------------------------------------------------------
     # Misc routines
     #------------------------------------------------------------------
+    def doc(self):
+        pydoc.doc(self, title='%s')
+    #end def
 
     def copy(self):
         """Generate a copy with 'shallow' references"""
@@ -1439,7 +1488,7 @@ class NoneObjectClass(NTdict):
         NTdict.__init__(self, __CLASS__ = 'NoneObjectClass')
     #end def
     def __getattr__(self, attr):
-        return self
+        return dict.__getattr__( self, attr )
     #end def
 
     def __setattr__(self, attr, value):
@@ -1448,6 +1497,9 @@ class NoneObjectClass(NTdict):
     def __delattr__(self, attr):
         pass
     #end def
+
+    def __nonzero__(self):
+        return False
 
     # To allow iteration
     def keys(self):
@@ -1468,6 +1520,7 @@ class NoneObjectClass(NTdict):
         return '<NoneObject>'
 #end def
 NoneObject = NoneObjectClass()
+#NoneObject = None
 noneobject = NoneObject
 
 
@@ -1514,9 +1567,9 @@ class NTtree(NTdict):
     def __str__(self):
         return '<%s %s>' % (self._className(), self.name)
 
-#    def __repr__( self ):
-#        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
-#    #end def
+    def __repr__( self ):
+        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
+    #end def
 
     def addChild(self, name, **kwds):
         child = NTtree(name=name, **kwds)
@@ -1995,7 +2048,7 @@ class NTvalue(NTdict):
         (value,error) tuple
         or None on error
         """
-        if len(theTuple)!=2: 
+        if len(theTuple)!=2:
             return None
         return NTvalue(value=theTuple[0], error=theTuple[1])
     #end def
@@ -2992,9 +3045,11 @@ def printf(format, *args):
 
 class PrintWrap:
     def __init__(self, stream = None,
-                  autoFlush = True,
-                  verbose=verbosityOutput,
-                  noEOL=False):
+                       autoFlush = True,
+                       verbose=verbosityOutput,
+                       noEOL=False,
+                       prefix = ''
+                ):
         self.autoFlush = autoFlush
         self.verbose   = verbose
         self.noEOL     = noEOL
@@ -3004,15 +3059,16 @@ class PrintWrap:
             self.stream = sys.stderr
         if stream: # Allow override.
             self.stream = stream
-        self.prefix = ""
-        if self.verbose == verbosityError:
-            self.prefix = prefixError
-        elif self.verbose == verbosityWarning:
-            self.prefix = prefixWarning
-        elif self.verbose == verbosityDetail:
-            self.prefix = prefixDetail
-        elif self.verbose == verbosityDebug:
-            self.prefix = prefixDebug
+        self.prefix = prefix
+#        if self.verbose == verbosityError:
+#            self.prefix = prefixError
+#        elif self.verbose == verbosityWarning:
+#            self.prefix = prefixWarning
+#        elif self.verbose == verbosityDetail:
+#            self.prefix = prefixDetail
+#        elif self.verbose == verbosityDebug:
+#            self.prefix = prefixDebug
+
     def __call__(self, format, *args):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
@@ -3034,17 +3090,17 @@ class PrintWrap:
         self.verbose=verbose
 
 NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
-NTerror   = PrintWrap(verbose=verbosityError)
-NTcodeerror=PrintWrap(verbose=verbosityError)
-NTexception=PrintWrap(verbose=verbosityError)
-NTwarning = PrintWrap(verbose=verbosityWarning)
+NTerror   = PrintWrap(verbose=verbosityError, prefix = 'ERROR: ')
+NTcodeerror=PrintWrap(verbose=verbosityError, prefix = 'ERROR IN CODE: ')
+NTexception=PrintWrap(verbose=verbosityError, prefix = 'EXCEPTION CAUGHT: ')
+NTwarning = PrintWrap(verbose=verbosityWarning, prefix = 'WARNING: ')
 NTmessage = PrintWrap(verbose=verbosityOutput)
 NTdetail  = PrintWrap(verbose=verbosityDetail)
-NTdebug   = PrintWrap(verbose=verbosityDebug)
+NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = 'DEBUG: ')
 
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
-NTcodeerror.prefix += " IN CODE"
-NTcodeerror.prefix += " EXCEPTION CAUGHT"
+#NTcodeerror.prefix += " IN CODE"
+#NTcodeerror.prefix += " EXCEPTION CAUGHT"
 
 def NTexit(msg, exitCode=1):
     NTerror(msg)
@@ -3071,7 +3127,7 @@ class NTfile(file):
     """File class with a binary read/write
            typecode as defined for array module:
 
- This module defines an object type which can efficiently represent an array of basic values: characters, integers,
+This module defines an object type which can efficiently represent an array of basic values: characters, integers,
 floating point numbers. Arrays are sequence types and behave very much like lists, except that the type of objects
 stored in them is constrained. The type is specified at object creation time by using a type code, which is a single
 character. The following type codes are defined:
@@ -3894,7 +3950,7 @@ class ROGscore(NTdict):
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
         self.reset()
-        
+
 
     def __str__(self):
         return str(self.colorLabel)
@@ -3952,7 +4008,7 @@ class ROGscore(NTdict):
                 dst('font' , comment, **kw)
                 dst('li' , openTag=False)
     #        dst('ul', openTag=False)
-            
+
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The so called ROG score.
@@ -3970,7 +4026,7 @@ class ROGscore(NTdict):
            colorLabel == COLOR_ORANGE and self.colorLabel == COLOR_RED):
             return
 
-        # certain to stay at or upgrade to given color. 
+        # certain to stay at or upgrade to given color.
         if colorLabel == COLOR_RED and self.colorLabel != COLOR_RED:
             self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
         self.colorLabel = colorLabel
@@ -4004,7 +4060,7 @@ def removeRecursivelyAttribute(x, attributeToRemove):
     _visitedHashes.clear()
     _removeRecursivelyAttribute(x, attributeToRemove)
     _visitedHashes.clear()
-    
+
 
 def _removeRecursivelyAttribute(x, attributeToRemove):
     """Watch out because this can remove any attribute; be carefull what argument you give.
@@ -4019,8 +4075,8 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
         return
     if _visitedHashes.has_key(h):
         return
-    _visitedHashes[h] = None        
-        
+    _visitedHashes[h] = None
+
     if isinstance(x, list) or isinstance(x, tuple):
         for e in x:
             if e == attributeToRemove:
@@ -4032,34 +4088,34 @@ def _removeRecursivelyAttribute(x, attributeToRemove):
                 del x[k]
             else:
                 _removeRecursivelyAttribute(x[k], attributeToRemove)
-            
+
 
 def bytesToFormattedString(size):
-    """1600 bytes will be rounded to 2K"""        
+    """1600 bytes will be rounded to 2K"""
     k = 1024
     M = k*k
     G = k*M
     T = M*M
     ck = 'K'
     cM = 'M'
-    cG = 'G' 
+    cG = 'G'
     cT = 'T'
     postFix = ck
-    
+
     divider = k
     if  size < M:
         divider = k
         postFix = ck
     elif size < G:
         divider = M
-        postFix = cM  
+        postFix = cM
     elif size < T:
         divider = G
         postFix = cG
     else:
         divider = T
         postFix = cT
-    
+
     r = size/float(divider)
     result = ("%.0f" % r) + postFix
     return result
@@ -4068,14 +4124,14 @@ def bytesToFormattedString(size):
 #    """Use single quotes on the outside if needed.
 #    Replace any internal single quotes with double quotes
 #    Strip any surrounding double quotes
-#    """ 
+#    """
 #    if not msg:
 #        if isValue:
 #            msg = "''"
 #        else:
 #            msg = ""
 #        return msg
-#    
+#
 #    msg = msg.replace("'", '"')
 #    if msg.find(" ") >= 0:
 #        if msg[0] == '"':
@@ -4104,12 +4160,14 @@ class Lister:
                 result = result + "\tname %s=<built-in>\n" % attr
             else:
                 result = result + "\tname %s=%s\n" % (attr, self.__dict__[attr])
-        return result        
+        return result
+    #end def
+#end class
 
 """
 This function checks to see if the string is a reasonable candidate for a
 pdb entry code
-"""
+    """
 def is_pdb_code( chk_string ):
     pattern = re.compile( '^\d\w\w\w$' )
     match = pattern.match( chk_string )

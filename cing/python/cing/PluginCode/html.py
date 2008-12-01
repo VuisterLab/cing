@@ -1,7 +1,7 @@
 """
 Adds html generation methods
 """
-from cing import CHARS_PER_LINE_OF_PROGRESS
+from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
 from cing import authorList
 from cing import cingPythonCingDir
@@ -1534,12 +1534,13 @@ class ResidueHTMLfile( HTMLfile ):
 
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
 
-        #@todo: Remove styling from below, should be in css
+ #@todo: Remove styling from below, should be in css
         self.header( 'br' )
         self.header( 'br' )
         for plot in plottedList:
             kw = {'href':'#'+plot}
             self.header('a' , plot, style="font-size: 10px", title=sprintf('goto %s plot on this page',plot), **kw)
+   #end def
 
     def generateHtml(self, htmlOnly=False):
         """
