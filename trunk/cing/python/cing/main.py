@@ -3,7 +3,62 @@
 main.py: command line interface to the cing utilities:
 --------------------------------------------------------------------------------
 
+Usage: cing [options]       use -h or --help for listing
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  --test                Run set of test routines to verify installations
+  --doc                 Print more documentation to stdout
+  --docdoc              Print full documentation to stdout
+  --pydoc               start pydoc server and browse documentation
+  -n PROJECTNAME, --name=PROJECTNAME, --project=PROJECTNAME
+                        NAME of the project (required)
+  --new                 Start new project PROJECTNAME (overwrite if already
+                        present)
+  --old                 Open a old project PROJECTNAME (error if not present)
+  --init=SEQUENCEFILE[,CONVENTION]
+                        Initialize new project PROJECTNAME and new molecule
+                        from SEQUENCEFILE[,CONVENTION]
+  --initPDB=PDBFILE[,CONVENTION]
+                        Initialize new project PROJECTNAME from
+                        PDBFILE[,CONVENTION]
+  --initBMRB=BMRBFILE   Initialize new project PROJECTNAME from edited BMRB
+                        file
+  --initCcpn=CCPNFOLDER
+                        Initialize new project PROJECTNAME from CCPNFOLDER
+  --loadCcpn=CCPNFOLDER
+                        Open project PROJECTNAME and load data from CCPNFOLDER
+  --xeasy=SEQFILE,PROTFILE,CONVENTION
+                        Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION
+  --xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION
+                        Import peaks from xeasy
+                        SEQFILE,PROTFILE,PEAKFILE,CONVENTION
+  --merge               Merge resonances
+  --generatePeaks=EXP_NAME,AXIS_ORDER
+                        Generate EXP_NAME peaks with AXIS_ORDER from the
+                        resonance data
+  --molecule=MOLECULENAME
+                        Restore Molecule MOLECULENAME as active molecule
+  --script=SCRIPTFILE   Run script from SCRIPTFILE
+  --ipython             Start ipython interpreter
+  --validate            Run doValidate.py script [in current or cing
+                        directory]
+  --shiftx              Predict with shiftx
+  --ranges=RANGES       Ranges for superpose, procheck, validate etc; e.g.
+                        503-547,550-598,800,801
+  --superpose           Do superposition; optionally uses RANGES
+  --nosave              Don't save on exit (default: save)
+  --export              Export before exit (default: noexport)
+  -v VERBOSITY, --verbosity=VERBOSITY
+                        verbosity: [0(nothing)-9(debug)] no/less messages to
+                        stdout/stderr (default: 3)
+  --server              Start a server at ports 8000 and 8001 by default
+
+
+--------------------------------------------------------------------------------
 Some examples; all assume a project named 'test':
+--------------------------------------------------------------------------------
 
 - To start a new Project using most verbose messaging:
 cing --name test --new --verbosity 9
@@ -53,14 +108,22 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+import cing
+__version__    = cing.__version__
+__date__       = cing.__date__
+__author__     = cing.__author__
+__copyright__  = cing.__copyright__
+__credits__    = cing.__credits__
+
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
-from cing import header
+#from cing import header
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.core.classes import Project
@@ -69,14 +132,10 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 from string import join
 from cing import starttime
-from cing import usage
 import time
-import cing
 import os
 import sys
 import unittest
-
-
 
 #------------------------------------------------------------------------------------
 # Support routines
@@ -91,12 +150,14 @@ def format( object ):
     #end if
 #end def
 
-"""Copy catted from xplor
-"""
+
 def getStartMessage():
-#    user = "jd"
-#    on   = "Stella.loc(darwin/x86    )"
-#    at   = "29-Oct-08 15:36:22"
+    """
+    Copy catted from xplor
+    user = "jd"
+    on   = "Stella.loc(darwin/x86    )
+    at   = "29-Oct-08 15:36:22
+    """
     user = os.getenv("USER", "Unknown user")
     machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
     ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
@@ -104,12 +165,12 @@ def getStartMessage():
     at = time.asctime()
     return "User: %-15s on: %-45s at: %s" % ( user, on, at )
 
-"""From Wattos
-"""
+
 def getStopMessage():
+    """From Wattos
 #    Wattos started at: October 29, 2008 4:04:44 PM CET
 #    Wattos stopped at: October 29, 2008 4:04:49 PM CET
-#    Wattos took (#ms): 4915
+#    Wattos took (#ms): 4915"""
     at = time.asctime( time.localtime(starttime) )
     now = time.asctime()
 
@@ -218,10 +279,12 @@ def testOverall():
         NTmessage('\n\n\n')
 
 
+
 def getParser():
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
+    usage          = "usage: cing [options]       use -h or --help for listing"
 
     parser = OptionParser(usage=usage, version=cingVersion)
     parser.add_option("--test",
@@ -238,6 +301,11 @@ def getParser():
                       action="store_true",
                       dest="docdoc",
                       help="Print full documentation to stdout"
+                     )
+    parser.add_option("--pydoc",
+                      action="store_true",
+                      dest="pydoc",
+                      help="start pydoc server and browse documentation"
                      )
     parser.add_option("-n", "--name", "--project",
                       dest="name", default=None,
@@ -370,7 +438,14 @@ def main():
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
+
     # From this point on code may be executed that will go through the appropriate verbosity filtering
+    header = """
+======================================================================================================
+| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
+======================================================================================================
+""" % (cingVersion)
+
     NTmessage(header)
     NTmessage(getStartMessage())
 
@@ -390,6 +465,16 @@ def main():
     if options.doc:
         parser.print_help(file=sys.stdout)
         print __doc__
+        sys.exit(0)
+    #end if
+
+    if options.pydoc:
+        import pydoc
+        import webbrowser
+        NTmessage( '==> Serving documentation at http://localhost:9999' )
+        NTmessage( '    Type <control-c> to quit' )
+        webbrowser.open('http://localhost:9999/cing.html')
+        pydoc.serve(port=9999)
         sys.exit(0)
     #end if
 
@@ -499,7 +584,7 @@ def main():
     mol = project.molecule #@UnusedVariable
     m   = project.molecule #@UnusedVariable
 
-#   pr = print
+ #   pr = print
     f  = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 
@@ -597,7 +682,6 @@ def main():
     if project:
         project.close(save=not options.nosave)
     #------------------------------------------------------------------------------------
-
 
 if __name__ == '__main__':
     try:

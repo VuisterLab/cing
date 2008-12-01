@@ -32,10 +32,11 @@ from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import NOSHIFT
 from cing.core.constants import X_AXIS
-from cing.core.dictionaries import isValidAtomName
-from cing.core.dictionaries import isValidResidueName
-from cing.core.dictionaries import translateAtomName
-from cing.core.molecule import allResidues #@UnusedImport
+from cing.core.database import NTdb
+#from cing.core.dictionaries import isValidAtomName
+#from cing.core.dictionaries import isValidResidueName
+from cing.core.database import translateAtomName
+#from cing.core.molecule import allResidues #@UnusedImport
 import os
 
 #==============================================================================
@@ -58,7 +59,7 @@ class Xeasy( NTdict ):
                    ):
                     pass
 
-                elif (not isValidResidueName( f.dollar[1], convention ) ):
+                elif (not NTdb.isValidResidueName( f.dollar[1], convention ) ):
                     NTerror( 'Xeasy: residue "%s" invalid for convention "%s" in "%s:%d"',
                              f.dollar[1], convention, seqFile, f.NR
                            )
@@ -96,7 +97,7 @@ class Xeasy( NTdict ):
                     self.error = 1
                 else:
                     resName   = self.seq[resNum]
-                    if not isValidAtomName( resName, atomName, convention):
+                    if not NTdb.isValidAtomName( resName, atomName, convention):
                         NTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d',
                                    protFile, f.NR,  atomName, resName, resNum
                                 )
@@ -255,7 +256,10 @@ class Xeasy( NTdict ):
                             break
                         else:
                             atom = self.prot[ aIndex].atom
-                            resonances.append( atom.resonances() )
+                            if atom != None:
+                                resonances.append( atom.resonances() )
+                            else:
+                                resonances.append( None )
                         #end if
                     #end if
                 #end for
@@ -311,19 +315,6 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
 
 #   export seq file
     exportSequence2Xeasy( molecule, seqFile, convention)
-#    fout = open( seqFile, 'w' )
-#    resCount = 0
-#    for res in allResidues( molecule ):
-#        resName = res.translate(convention)
-#        if (resName != None):
-#            fprintf( fout, '%3s %4d\n',
-#                     resName,
-#                     res.resNum
-#                   )
-#        #end if
-#        resCount += 1
-#    #end for
-#    fout.close()
 
 #   export prot file
     fout = open( protFile, 'w' )

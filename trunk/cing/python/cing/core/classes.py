@@ -1,3 +1,14 @@
+"""
+Implementation of the CING API
+"""
+import cing
+__version__    = cing.__version__
+__date__       = cing.__date__
+__author__     = cing.__author__
+__copyright__  = cing.__copyright__
+__credits__    = cing.__credits__
+
+
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
@@ -45,8 +56,7 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
-from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME 
-import cing
+from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
 import math
 import os
 import sys
@@ -64,29 +74,6 @@ class Project( NTdict ):
 -------------------------------------------------------------------------------
 Project: Top level Cing project class
 -------------------------------------------------------------------------------
-
-                                   ccpnResidue
-                                        ^
-                         ccpnChain      |     ccpnAtom
-                             ^          |        ^
-             ccpnMolecule    |          |        |  Coordinate
-                 ^           |          |        |  ^
-                 |           |          |        |  |
-                 v           v          v        v  v
-  Project ->  Molecule <-> Chain <-> Residue <-> Atom <-> Resonance <- Peak
-     ^                                  |          |
-     |                                  v          v
-     v                    NTdb <-> ResidueDef <-> AtomDef
-  ccpnProject
-
-  Project.ccpn     = ccpnProject    (Molecule.ccpn      =  ccpnMolecule and so on)
-  ccpnProject.cing = Project        (ccpnMolecule.cing  =  Molecule and so on)
-
-  ccpnProject :: (memops.Implementation.Project)
-  ccpnMolecule = ccpnProject.molSystems[0]   :: (ccp.molecule.MolSystem.MolSystem)
-  ccpnChain   in ccpnMolecule.sortedChains() :: (ccp.molecule.MolSystem.Chain)
-  ccpnResidue in ccpnChain.sortedResidues()  :: (ccp.molecule.MolSystem.Residue)
-  ccpnAtom    in ccpnResidue.sortedAtoms()   :: (ccp.molecule.MolSystem.Atom)
 
   Project <-> molecules[<Molecule-1>, <Molecule-2>, ...] #  Molecule instances list
            -> molecule <-> ... (See Molecule)            # 'Current' molecule
@@ -232,15 +219,9 @@ Project: Top level Cing project class
 
 
     def readValidationSettings(self, fn=None):
-        if fn:
-            validationConfigurationFile = fn
-            NTmessage( "Using validation configuration file: " + validationConfigurationFile)
-        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
-            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-            NTmessage( "Using local validation configuration file: " + validationConfigurationFile)
-        else:
-            validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-            NTdebug( "Using default validation configuration file: " + validationConfigurationFile)
+        validationConfigurationFile = fn
+        if not fn:
+            validationConfigurationFile = os.path.join(cingPythonCingDir, 'valSets.cfg')
         config = ConfigParser()
         config.readfp(open(validationConfigurationFile))
         for item in config.items('DEFAULT'):
@@ -311,6 +292,26 @@ Project: Top level Cing project class
             return self.path( self.molecule.name )
 
         return self.path( self.molecule.name, moleculeDirectories[subdir], *args )
+    #end def
+
+    def validationPath(self, *args ):
+        """Path relative to validation directory for molecule.
+        Create path if does not exist.
+
+        **** Highly redundant with moleculePath at present time, but should replace it eventually ***
+
+        Return path or None in case of error.
+        """
+        if not self.molecule:
+            return None
+        path = self.mkdir( self.molecule.name ) # should become self.mkdir( 'Validation', self.molecule.name )
+
+        if not path:
+            return None
+
+        return os.path.join( path, *args )
+    #end def
+
 
     def htmlPath(self, *args ):
         """ Path relative to molecule's html directory.
@@ -566,10 +567,7 @@ Project: Top level Cing project class
     def removeCcpnReferences(self):
         """to slim down the memory footprint; should allow garbage collection. TODO: test"""
         attributeToRemove = "ccpn"
-        try:
-            removeRecursivelyAttribute( self, attributeToRemove )
-        except:
-            NTerror("Failed removeCcpnReferences")
+        removeRecursivelyAttribute( self, attributeToRemove )
 
     def export( self):
         """Call export routines from the plugins to export the project
@@ -1288,58 +1286,112 @@ class DistanceRestraint( NTdict ):
         self.min        = None      # Minimum distance
         self.max        = None      # Max distance
         self.violations = NTlist() # list with violations for each model INCLUDING non violating models!
-        self.violCount1 = 0        # Number of violations over 0.1A
-        self.violCount3 = 0        # Number of violations over 0.3A
-        self.violCount5 = 0        # Number of violations over 0.5A
+        self.violCount1 = 0        # Number of violations > 0.1A
+        self.violCount3 = 0        # Number of violations > 0.3A
+        self.violCount5 = 0        # Number of violations > 0.5A
+        self.violCountLower = 0    # Number of lower-bound violations over 0.1A
         self.violMax    = 0.0      # Maximum violation
         self.violAv     = 0.0      # Average violation
         self.violSd     = None     # Sd of violations
         self.violSum    = 0.0      # Sum of violations
         self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
-        for i in range( modelCount):
-            d = 0.0
-            for atm1,atm2 in self.atomPairs:
-                # skip trivial cases
-                if atm1 == atm2:
-                    break
+#        for i in range( modelCount):
+#            d = 0.0;
+#            for atm1,atm2 in self.atomPairs:
+#                # skip trivial cases
+#                if atm1 == atm2:
+#                    continue
+#
+#                #expand pseudoatoms
+#                atms1 = atm1.realAtoms()
+#                atms2 = atm2.realAtoms()
+#                for a1 in atms1:
+#                    #print '>>>', a1.format()
+#                    if len( a1.coordinates ) > i:
+#                        for a2 in atms2:
+#                            #print '>>', atm1, a1, atm2, a2
+#                            if len(a2.coordinates) > i:
+##                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
+##                                e1 = a1.coordinates[i].e
+##                                e2 = a2.coordinates[i].e
+##                                v = NTcVector(e1[0]-e2[0],e1[1]-e2[1],e1[2]-e2[2]
+##                                tmp = v.length()
+##                                if tmp > 0.0:
+##                                    d += math.pow( tmp, -6.0 )
+#                                d += Rm6dist(a1.coordinates[i].e,a2.coordinates[i].e)
+#                            else:
+#                                self.error = True
+#                            #end if
+#                        #end for
+#                    else:
+#                        self.error = True
+#                    #end if
+#                #end for
+#            #end for
+#            try:
+#                self.distances.append( math.pow(d, -0.166666666666666667) )
+#            except:
+#                self.error = True
+#                msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
+#                NTdebug(msg)
+#                self.rogScore.setMaxColor( COLOR_RED, msg )
+#                return (None, None, None, None)
+#            #end try
+#        #end for loop over models
+#        self.av, self.sd, self.n = NTaverage( self.distances )
+#        self.min = min( self.distances )
+#        self.max = max( self.distances )
 
-                #expand pseudoatoms
-                atms1 = atm1.realAtoms()
-                atms2 = atm2.realAtoms()
-                for a1 in atms1:
-                    #print '>>>', a1.format()
-                    if len( a1.coordinates ) > i:
-                        for a2 in atms2:
-                            #print '>>', atm1, a1, atm2, a2
-                            if len(a2.coordinates) > i:
-#                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
-#                                e1 = a1.coordinates[i].e
-#                                e2 = a2.coordinates[i].e
-#                                v = NTcVector(e1[0]-e2[0],e1[1]-e2[1],e1[2]-e2[2]
-#                                tmp = v.length()
-#                                if tmp > 0.0:
-#                                    d += math.pow( tmp, -6.0 )
-                                d += Rm6dist(a1.coordinates[i].e,a2.coordinates[i].e)
-                            else:
-                                self.error = True
-                            #end if
-                        #end for
-                    else:
-                        self.error = True
-                    #end if
-                #end for
+        self.distances = NTfill( 0.0, modelCount)
+        models = range( modelCount )
+        i = 0
+        for atm1,atm2 in self.atomPairs:
+            # skip trivial cases
+            if atm1 == atm2:
+                continue
+
+            #expand pseudoatoms
+            atms1 = atm1.realAtoms()
+            atms2 = atm2.realAtoms()
+            for a1 in atms1:
+                #print '>>>', a1.format()
+                if len( a1.coordinates ) == modelCount:
+                    for a2 in atms2:
+                        #print '>>', atm1, a1, atm2, a2
+                        i = 0
+                        if len(a2.coordinates) == modelCount:
+                            for i in models:
+                                self.distances[i] += Rm6dist(a1.coordinates[i].e,a2.coordinates[i].e)
+                            #end for
+                        else:
+#                            self.distances[0] = 0.0
+                            i = 0
+                            self.error = True
+                            break
+                        #end if
+                    #end for
+                else:
+#                    self.distances[0] = 0.0
+                    i = 0
+                    self.error = True
+                    break
+                #end if
             #end for
-            try:
-                self.distances.append( math.pow(d, -0.166666666666666667) )
-            except:
-                self.error = True
-                msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
-                NTdebug(msg)
-                self.rogScore.setMaxColor( COLOR_RED, msg )
-                return (None, None, None, None)
-            #end try
-        #end for loop over models
+        #end for
+        if self.error:
+            msg = "AtomPair (%s,%s) model %d without coordinates" % (atm1.toString(), atm2.toString(), i)
+            NTdebug(msg)
+            self.rogScore.setMaxColor( COLOR_RED, msg )
+            return (None, None, None, None)
+        #end if
+
+        # Calculate R-6 distances
+        for i in models:
+            if self.distances[i] > 0.0:
+                self.distances[i] = math.pow(self.distances[i], -0.166666666666666667)
+            #end if
+        #end for
 
         self.av, self.sd, self.n = NTaverage( self.distances )
         self.min = min( self.distances )
@@ -1358,20 +1410,22 @@ class DistanceRestraint( NTdict ):
 
         # analyze violations
         for d in self.violations:
-            dabs = math.fabs(d)
+#            dabs = math.fabs(d)
 #           print '>>', d,dabs
-            if ( dabs > 0.5):
+            if ( d > 0.5):
                 self.violCount5 += 1
-            elif ( dabs > 0.3):
+            if ( d > 0.3):
                 self.violCount3 += 1
-            elif ( dabs > 0.1):
+            if ( d > 0.1):
                 self.violCount1 += 1
+            if ( d < -0.1):
+                self.violCountLower += 1
         #end for
         if self.violations:
-            # JFD doesn't understand why the values need to be mapped to floats.
-            self.violAv, self.violSd, _n = NTaverage( map(math.fabs,self.violations) )
-            self.violMax = max( map(math.fabs,self.violations) )
-            self.violSum = self.violations.sum()
+            vAbs = map(math.fabs,self.violations)
+            self.violAv, self.violSd, _n = NTaverage( vAbs )
+            self.violMax = max( vAbs )
+            self.violSum = sum( vAbs )
         #end if
 
         return (self.av,self.sd,self.min,self.max )
@@ -1414,7 +1468,7 @@ class DistanceRestraint( NTdict ):
     def format( self ):
         return  \
             sprintf('%-25s %-6s (Target: %s %s)  (Models: min %s  av %s+-%s  max %s) '+\
-                    '(Violations: av %4.2f max %4.2f counts %2d,%2d,%2d) %s',
+                    '(Violations: av %4.2f max %4.2f counts l,0.1,0.3,0.5:%2d,%2d,%2d,%2d) %s',
                      str(self), self.rogScore,
                      val2Str(self.lower, "%4.1f", 4),
                      val2Str(self.upper, "%4.1f", 4),
@@ -1422,7 +1476,8 @@ class DistanceRestraint( NTdict ):
                      val2Str(self.av,  "%4.2f", 4),
                      val2Str(self.sd,  "%4.1f", 4),
                      val2Str(self.max, "%4.1f", 4),
-                     self.violAv, self.violMax, self.violCount1, self.violCount3, self.violCount5,
+                     self.violAv, self.violMax,
+                     self.violCountLower, self.violCount1, self.violCount3, self.violCount5,
                      self._names()
                     )
 #            sprintf('%-25s %-6s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f) '+\
@@ -1458,6 +1513,7 @@ class DistanceRestraintList( NTlist ):
         self.violCount1 = 0       # Total violations over 0.1 A
         self.violCount3 = 0       # Total violations over 0.3 A
         self.violCount5 = 0       # Total violations over 0.5 A
+        self.violCountLower = 0   # Total lower-bound violations over 0.1 A
 
         # partitioning in intra, sequential, medium-range and long-range, ambigous
         self.intraResidual = NTlist()
@@ -1533,6 +1589,7 @@ class DistanceRestraintList( NTlist ):
             if dr.error:
                 self.errors.append( dr )
             else:
+                self.violCountLower += dr.violCountLower
                 self.violCount1 += dr.violCount1
                 self.violCount3 += dr.violCount3
                 self.violCount5 += dr.violCount5
@@ -1588,22 +1645,23 @@ class DistanceRestraintList( NTlist ):
     def format( self ):
         return sprintf(
 '''%s DistanceRestraintList "%s" (%s,%d) %s
-sequential:        %4d
-intra-residual:    %4d
-medium-range:      %4d
-long-range:        %4d
-ambigious:         %4d
+sequential:         %4d
+intra-residual:     %4d
+medium-range:       %4d
+long-range:         %4d
+ambigious:          %4d
 
 rmsd:               %7s +-%6s
-violations >0.1 A: %4d
-violations >0.3 A: %4d
-violations >0.5 A: %4d
+violations <-0.1 A: %4d (lower-bound violations)
+violations > 0.1 A: %4d
+violations > 0.3 A: %4d
+violations > 0.5 A: %4d
 
 ROG score:         %s''',
                         dots, self.name,self.status,len(self), dots,
                         len(self.intraResidual),len(self.sequential),len(self.mediumRange),len(self.longRange),len(self.ambigious),
                         val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
-                        self.violCount1, self.violCount3, self.violCount5,
+                        self.violCountLower, self.violCount1, self.violCount3, self.violCount5,
                         self.rogScore
                       )
 #       return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n' +\
@@ -1771,11 +1829,11 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-                                self.atoms[0].coordinates[i],
-                                self.atoms[1].coordinates[i],
-                                self.atoms[2].coordinates[i],
-                                self.atoms[3].coordinates[i]
-                            )
+        	                    self.atoms[0].coordinates[i],
+            	                self.atoms[1].coordinates[i],
+                	            self.atoms[2].coordinates[i],
+                    	        self.atoms[3].coordinates[i]
+                        	  )
                 self.dihedrals.append( d )
             #end for
         except:
@@ -2181,18 +2239,14 @@ class RDCRestraintList( NTlist ):
 
         NTdebug('RDCRestraintList.analyze: %s', self )
 
-        if len( self ) == 0:
+        if (len( self ) == 0):
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name )
             return (None, None, None, None, None)
         #end if
 
         modelCount = 0
-        firstRestraint = self[0]
-        if not hasattr(firstRestraint, "atoms"):
-            NTerror("Failed to get the model count for no atoms are available.")
-        else:
-            if len(self[0].atoms):
-                modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
+        if (len(self[0].atoms) > 0):
+            modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
         #end if
 
         if (modelCount == 0):

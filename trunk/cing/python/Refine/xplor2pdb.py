@@ -18,7 +18,8 @@ from cing.Libs.PyMMLib import PDBFile
 from cing.Libs.PyMMLib import REMARK
 from cing.Libs.PyMMLib import TER
 from cing.core.constants import XPLOR
-from cing.core.dictionaries import NTdbGetAtom
+from cing.core.database import NTdb
+#from cing.core.dictionaries import NTdbGetAtom
 import sys
 
 version = "%prog 1.1 alpha"
@@ -120,7 +121,7 @@ for fName in files:
         if record._name.strip() in ["ATOM","HETATM"]:
 
             # see if we can find a definition for this residue, atom name in the database
-            atm = NTdbGetAtom( record.resName, record.name, XPLOR )
+            atm = NTdb.getAtomDefByName( record.resName, record.name, XPLOR )
 
             # we found a match
             if (atm != None):

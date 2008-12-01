@@ -18,6 +18,7 @@ from cing.Libs.NTutils import XML2obj
 from cing.Libs.fpconst import NaN
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing.core.parameters import validationSubDirectories
 from cing.core.molecule import dots
 #from cing.Libs.NTutils import getDeepByKeys
 #from cing.Libs.fpconst import isNaN
@@ -29,6 +30,14 @@ import cing
 import os
 
 contentFile = 'content.xml'
+
+def shiftxPath(project, *args):
+    """
+    Return shiftx path from active molecule of project
+    Creates directory if does not exist
+    """
+    return project.validationPath(validationSubDirectories['shiftx'], *args)
+#end def
 
 def parseShiftxOutput( fileName, molecule, chainId ):
     """

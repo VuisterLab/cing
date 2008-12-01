@@ -1,7 +1,7 @@
 Directories:
 
 core                    CING API basics
-Database                Biochemistry nomenclature
+Database                Nomenclature database files
 Libs                    Library functionality including fast c code for cython.
 PluginCode              Application specific code for e.g. validation programs.
 Scripts                 Loose pieces of python CING code.

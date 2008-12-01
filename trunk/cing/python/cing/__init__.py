@@ -1,29 +1,51 @@
 """
 CING: Common Interface for NMR structure Generation
 
-(c) AW,JFD,GWV 2004-2008
+Directories:
+
+core                    CING API basics
+Database                Nomenclature database files
+Libs                    Library functionality including fast c code for cython.
+PluginCode              Application specific code for e.g. validation programs.
+Scripts                 Loose pieces of python CING code.
+STAR                    Python API to STAR.
+Talos                   Contains the Talos data.
+
+Files:
+
+CONTENTS.txt            File with directory and file description.
+localConstants.py       Settings that can be imported from python/cing/__init__.py
+                        NB this file is absent from svn. An example can be adapted
+                        from: scripts/cing/localSettingsExample.py
+main.py                 The CING program.
+setup.py                Run to set up environment variables and check installation.
+valSets.cfg             Validation settings. Might be moved around.
 
 """
-import time
 import os
 import sys
-# Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.82
+import time
+
 programName     = 'CING'
-header = """
-======================================================================================================
-| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
-======================================================================================================
-""" % (cingVersion)
-footer = """------------------------------------------------------------------------------------------------------
-"""
-usage          = "usage: cing [options]       use -h or --help for listing"
+# Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
+cingVersion     = 0.831
+__version__     = cingVersion # for pydoc
+__date__        = '27 November 2008'
 
-authorList = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
-                ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
-                ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
-                ]
+authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
+                     ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
+                     ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
+                  ]
+__author__      = '' # for pydoc
+for _a in authorList:
+    __author__ = __author__ + _a[0] + ' (' + _a[1] + ')    '
+__copyright__  = "Copyright (c) 2004-2008 Protein Biophysics, IMM, Radboud University Nijmegen, The Netherlands"
+__credits__    = """More info at http://proteins.dyndns.org/CING
 
+""" + __copyright__ # misusing credits for pydoc
+
+# Verbosity settings: How much text is printed to stdout/stderr streams
+# Reference to it as cing.verbosity if you want to see non-default behavior
 verbosityNothing  = 0 # Even errors will be suppressed
 verbosityError    = 1 # show only errors
 verbosityWarning  = 2 # show errors and warnings
@@ -32,14 +54,7 @@ verbosityDetail   = 4 # show more details
 verbosityDebug    = 9 # add debugging info (not recommended for casual user)
 
 verbosityDefault  = verbosityOutput
-"""How much text is printed to stdout/sstderr streams
-Reference to it as cing.verbosity if you want to see non-default behavior
-"""
-verbosity = verbosityDefault
-prefixError     = "ERROR: "
-prefixWarning   = "WARNING: "
-prefixDetail    = ""
-prefixDebug     = "DEBUG: "
+verbosity         = verbosityDefault
 
 #- configure local settings:
 #    Create a file localConstants parallel to the setup.py file and add definitions that
@@ -54,7 +69,6 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 #    criteriaDict = criteriaDict
 
 
-CHARS_PER_LINE_OF_PROGRESS = 100
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
 
@@ -65,7 +79,7 @@ cingPythonCingDir = os.path.split(__file__)[0]
 cingPythonDir = os.path.split(cingPythonCingDir)[0]
 # Now a very important variable used through out the code. Even though the
 # environment variable CINGROOT is defined the same this is the preferred
-# source for the info within the CING python code.
+# source for the info within the CING python code. GWV does not understand why
 cingRoot = os.path.split(cingPythonDir)[0]
 #NTdebug("cingRoot        : " + cingRoot)
 ######################################################################################################
@@ -94,21 +108,24 @@ starttime = time.time()
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, printf, fprintf, sprintf, NTdict, NTlist, NTvalue, NTpath
+from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, NTdebug, printf, fprintf, sprintf, NTdict, NTlist, NTvalue, NTpath
 from cing.Libs.AwkLike      import AwkLike
 from cing.Libs.fpconst      import NaN
 
-from cing.core.constants    import *
+#from cing.core.constants    import *
+from cing.core.constants    import AQUA, IUPAC, SPARKY, CYANA, XEASY, DYANA, CYANA2, XPLOR, PDB, INTERNAL, LOOSE, CCPN
+from cing.core.database     import NTdb        # This also initializes the database
+from cing.core.constants    import X_AXIS, Y_AXIS, Z_AXIS, A_AXIS
+
 from cing.core.classes      import Project
 from cing.core.classes      import Peak,              PeakList
 from cing.core.classes      import DistanceRestraint, DistanceRestraintList
 from cing.core.classes      import DihedralRestraint, DihedralRestraintList
-#from cing.core.parameters import *
-from cing.core.database     import NTdb
-#from cing.core.dictionaries import *
+from cing.core.classes      import RDCRestraint,      RDCRestraintList
+
 from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance, mapMolecules
 from cing.core.importPlugin import importPlugin # This imports all plugins
-from cing.core.sml          import obj2SML    # This also initializes the SMLhandler methods
-from cing.core.sml          import SML2obj    # This also initializes the SMLhandler methods
-#from cing.Libs.peirceTest import peirceTest
-#from cing.Libs.TypeChecking import *
+from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
+from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods
+
+
