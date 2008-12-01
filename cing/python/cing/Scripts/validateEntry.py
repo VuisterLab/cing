@@ -37,7 +37,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
     """
     
-    fastestTest = False
+    fastestTest = True
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -45,6 +45,7 @@ def main(entryId, *extraArgList):
         htmlOnly = True 
         doWhatif = False
         doProcheck = False
+    FORCE_REDO = False
     
     expectedNumberOfArguments = 4
     if len(extraArgList) != expectedNumberOfArguments:
@@ -65,8 +66,20 @@ def main(entryId, *extraArgList):
     NTdebug("restraintsConvention: " + restraintsConvention)
     # presume the directory still needs to be created.
     cingEntryDir = entryId+".cing"
+    
     if os.path.isdir(cingEntryDir):
-        rmtree(cingEntryDir)
+        if FORCE_REDO:
+            NTmessage("Enforcing a redo")
+            rmtree(cingEntryDir)
+        else:
+            mainIndexFile = os.path.join( cingEntryDir, "index.html")
+            isDone = os.path.isfile( mainIndexFile )
+            if isDone:
+                NTmessage("SKIPPING ENTRY ALREADY DONE")
+                return
+            NTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
+            rmtree(cingEntryDir)
+                
         
     os.chdir(outputDir)
     
