@@ -128,20 +128,20 @@ import os
 import sys
 import time
 import unittest
-__version__    = cing.__version__
-__date__       = cing.__date__
-__author__     = cing.__author__
-__copyright__  = cing.__copyright__
-__credits__    = cing.__credits__
+__version__ = cing.__version__
+__date__ = cing.__date__
+__author__ = cing.__author__
+__copyright__ = cing.__copyright__
+__credits__ = cing.__credits__
 
 
 #------------------------------------------------------------------------------------
 # Support routines
 #------------------------------------------------------------------------------------
 
-def format( object ):
+def format(object):
 #    print '>>', object
-    if hasattr(object,'format'):
+    if hasattr(object, 'format'):
         print object.format()
     else:
         print object
@@ -159,9 +159,11 @@ def getStartMessage():
     user = os.getenv("USER", "Unknown user")
     machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
     ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
-    on = "%s (%s)" % ( machine, ostype )
+    on = "%s (%s)" % (machine, ostype)
     at = time.asctime()
-    return "User: %-15s on: %-45s at: %s" % ( user, on, at )
+#    atForFileName = "%s" % at
+#    atForFileName = re.sub('[ :]', '_', atForFileName)
+    return "User: %-15s on: %-45s at: %s" % (user, on, at)
 
 
 def getStopMessage():
@@ -169,16 +171,16 @@ def getStopMessage():
 #    Wattos started at: October 29, 2008 4:04:44 PM CET
 #    Wattos stopped at: October 29, 2008 4:04:49 PM CET
 #    Wattos took (#ms): 4915"""
-    at = time.asctime( time.localtime(starttime) )
+    at = time.asctime(time.localtime(starttime))
     now = time.asctime()
 
 #    memory TODO print "in use and allocated"
-    msg =  "CING started at : %s\n" % at
+    msg = "CING started at : %s\n" % at
     msg += "CING stopped at : %s\n" % now
     msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
     return msg
 
-def verbosity( value ):
+def verbosity(value):
     """Set CING verbosity
     """
     try:
@@ -188,54 +190,54 @@ def verbosity( value ):
 #end def
 
 
-def formatall( object ):
-    if isinstance( object, list ):
+def formatall(object):
+    if isinstance(object, list):
         i = 0
         for obj in object:
             #printf(">>> [%d] >>> ", i)
-            format( obj )
+            format(obj)
             i += 1
         #end for
-    elif isinstance( object, dict ):
-        for key,value in object.items():
-            NTmessage("%-15s : ", key )
+    elif isinstance(object, dict):
+        for key, value in object.items():
+            NTmessage("%-15s : ", key)
             format(value)
         #end for
     else:
-        format( object )
+        format(object)
     #end try
 #end def
 
 args = []
 kwds = {}
 
-def scriptPath( scriptFile ):
+def scriptPath(scriptFile):
     # get path to scriptFile
 
-    if not os.path.exists( scriptFile ):
+    if not os.path.exists(scriptFile):
         NTdebug('Missed in current working directory the script file: %s' % scriptFile)
-        scriptsDir  = os.path.join( cingPythonCingDir, cingPaths.scripts)
-        scriptFileAbs = os.path.join( scriptsDir, scriptFile)
-        if not os.path.exists( scriptFileAbs ):
-            NTerror('Missed in current working directory and Scripts directory\n'+
-                    '[%s] the script file [%s]' % ( scriptsDir, scriptFile ))
+        scriptsDir = os.path.join(cingPythonCingDir, cingPaths.scripts)
+        scriptFileAbs = os.path.join(scriptsDir, scriptFile)
+        if not os.path.exists(scriptFileAbs):
+            NTerror('Missed in current working directory and Scripts directory\n' + 
+                    '[%s] the script file [%s]' % (scriptsDir, scriptFile))
             return None
         return scriptFileAbs
     #end if
     return scriptFile
 #end def
 
-def script( scriptFile, *a, **k ):
+def script(scriptFile, *a, **k):
     # Hack to get arguments to routine as global variables to use in script
     global args
     global kwds
     args = a
     kwds = k
 
-    path = scriptPath( scriptFile )
+    path = scriptPath(scriptFile)
     if path:
-        NTmessage('==> Executing script "%s"', path )
-        execfile( path, globals() )
+        NTmessage('==> Executing script "%s"', path)
+        execfile(path, globals())
     #end if
 #end def
 
@@ -265,13 +267,13 @@ def testOverall():
     lenCingPythonDirStr = len(cingPythonDir)
     for name in nameList:
 #        print name
-        tailPathStr = name[lenCingPythonDirStr+1:-3]
+        tailPathStr = name[lenCingPythonDirStr + 1: - 3]
         mod_name = join(tailPathStr.split('/'), '.')
         if mod_name in excludedModuleList:
             print "Skipping module:  " + mod_name
             continue
-        exec("import %s" % (mod_name)   )
-        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name)   )
+        exec("import %s" % (mod_name))
+        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
@@ -282,7 +284,7 @@ def getParser():
     #------------------------------------------------------------------------------------
     # Options
     #------------------------------------------------------------------------------------
-    usage          = "usage: cing [options]       use -h or --help for listing"
+    usage = "usage: cing [options]       use -h or --help for listing"
 
     parser = OptionParser(usage=usage, version=cingVersion)
     parser.add_option("--test",
@@ -366,7 +368,7 @@ def getParser():
                       help="Merge resonances"
                      )
     parser.add_option("--generatePeaks",
-                      dest="generatePeaks", default = None,
+                      dest="generatePeaks", default=None,
                       help="Generate EXP_NAME peaks with AXIS_ORDER from the resonance data",
                       metavar="EXP_NAME,AXIS_ORDER"
                      )
@@ -413,12 +415,12 @@ def getParser():
                       dest="superpose",
                       help="Do superposition; optionally uses RANGES"
                      )
-    parser.add_option( "--nosave",
+    parser.add_option("--nosave",
                       action="store_true",
                       dest="nosave",
                       help="Don't save on exit (default: save)"
                      )
-    parser.add_option( "--export", default=False,
+    parser.add_option("--export", default=False,
                       action="store_true",
                       dest="export",
                       help="Export before exit (default: noexport)"
@@ -435,7 +437,7 @@ def main():
 
     global project
 
-    _root,file,_ext  = NTpath( __file__ )
+    _root, file, _ext = NTpath(__file__)
 
     parser = getParser()
     (options, _args) = parser.parse_args()
@@ -478,8 +480,8 @@ def main():
     if options.pydoc:
         import pydoc
         import webbrowser
-        NTmessage( '==> Serving documentation at http://localhost:9999' )
-        NTmessage( '    Type <control-c> to quit' )
+        NTmessage('==> Serving documentation at http://localhost:9999')
+        NTmessage('    Type <control-c> to quit')
         webbrowser.open('http://localhost:9999/cing.html')
         pydoc.serve(port=9999)
         sys.exit(0)
@@ -495,8 +497,8 @@ def main():
 
         print Project.__doc__
         for p in plugins.values():
-            NTmessage(    '-------------------------------------------------------------------------------' +
-                       'Plugin %s\n' +
+            NTmessage('-------------------------------------------------------------------------------' + 
+                       'Plugin %s\n' + 
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
                      )
@@ -536,37 +538,37 @@ def main():
     # open project
     #------------------------------------------------------------------------------------
     if options.new:
-        project = Project.open( options.name, status='new' )
+        project = Project.open(options.name, status='new')
     elif options.old:
-        project = Project.open( options.name, status='old' )
+        project = Project.open(options.name, status='old')
     elif options.init:
         init = options.init.split(',')
         if (len(init) == 2):
-            project = Project.open( options.name, status='new' )
-            project.newMolecule( options.name, sequenceFile=init[0], convention = init[1] )
+            project = Project.open(options.name, status='new')
+            project.newMolecule(options.name, sequenceFile=init[0], convention=init[1])
         else:
-            project = Project.open( options.name, status='new' )
-            project.newMolecule( options.name, sequenceFile=init[0] )
+            project = Project.open(options.name, status='new')
+            project.newMolecule(options.name, sequenceFile=init[0])
         #end if
     elif options.initPDB:
         init = options.initPDB.split(',')
         if (len(init) == 2):
-            project = Project.open( options.name, status='new' )
-            project.initPDB( pdbFile=init[0], convention = init[1] )
+            project = Project.open(options.name, status='new')
+            project.initPDB(pdbFile=init[0], convention=init[1])
         else:
-            project = Project.open( options.name, status='new' )
-            project.initPDB( pdbFile=init[0] )
+            project = Project.open(options.name, status='new')
+            project.initPDB(pdbFile=init[0])
     elif options.initBMRB:
-        project = Project.open( options.name, status='new' )
-        project.initBMRB( bmrbFile = options.initBMRB, moleculeName = project.name )
+        project = Project.open(options.name, status='new')
+        project.initBMRB(bmrbFile=options.initBMRB, moleculeName=project.name)
     elif options.initCcpn:
-        project = Project.open( options.name, status='new' )
-        project.initCcpn( ccpnFolder = options.initCcpn )
+        project = Project.open(options.name, status='new')
+        project.initCcpn(ccpnFolder=options.initCcpn)
     elif options.loadCcpn:
-        project = Project.open( options.name, status='create', restore=False )
-        project.initCcpn( ccpnFolder = options.loadCcpn )
+        project = Project.open(options.name, status='create', restore=False)
+        project.initCcpn(ccpnFolder=options.loadCcpn)
     else:
-        project = Project.open( options.name, status='create' )
+        project = Project.open(options.name, status='create')
 
     if not project:
         NTdebug("Doing a hard system exit")
@@ -584,15 +586,15 @@ def main():
         #end if
     #end if
 
-    NTmessage( project.format() )
+    NTmessage(project.format())
 
     # shortcuts
-    p   = project
+    p = project
     mol = project.molecule #@UnusedVariable
-    m   = project.molecule #@UnusedVariable
+    m = project.molecule #@UnusedVariable
 
  #   pr = print
-    f  = format #@UnusedVariable
+    f = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 
     #------------------------------------------------------------------------------------
@@ -613,7 +615,7 @@ def main():
         if (len(xeasy) != 4):
             NTerror("--xeasyPeaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
         else:
-            project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2],convention=xeasy[3])
+            project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2], convention=xeasy[3])
 
     #------------------------------------------------------------------------------------
     # Merge resonances
@@ -630,7 +632,7 @@ def main():
         if len(gp) != 2:
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
         else:
-            peaks = project.generatePeaks( experimentName = gp[0], axisOrder = gp[1] ) #@UnusedVariable
+            peaks = project.generatePeaks(experimentName=gp[0], axisOrder=gp[1]) #@UnusedVariable
         #end if
     #end if
 
@@ -652,18 +654,18 @@ def main():
     if options.validate:
         path = scriptPath('doValidate.py')
         if path:
-            NTmessage('==> Executing script "%s"', path )
-            execfile( path )
+            NTmessage('==> Executing script "%s"', path)
+            execfile(path)
     #end if
 
     #------------------------------------------------------------------------------------
     # Script
     #------------------------------------------------------------------------------------
     if options.script:
-        scriptFile = scriptPath( options.script )
+        scriptFile = scriptPath(options.script)
         if scriptFile:
-            NTmessage('==> Executing script "%s"', scriptFile )
-            execfile( scriptFile ) # JFD removed: Used to have: , globals() because options weren't coming thru.
+            NTmessage('==> Executing script "%s"', scriptFile)
+            execfile(scriptFile) # JFD removed: Used to have: , globals() because options weren't coming thru.
         #end if
     #end if
 
@@ -672,8 +674,8 @@ def main():
     #------------------------------------------------------------------------------------
     if options.ipython:
         from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed('',  banner   = '--------Dropping to IPython--------',
-                                    exit_msg = '--------Leaving IPython--------')
+        ipshell = IPShellEmbed('', banner='--------Dropping to IPython--------',
+                                    exit_msg='--------Leaving IPython--------')
         ipshell()
     #end if
 
