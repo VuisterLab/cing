@@ -39,6 +39,7 @@ if( $variables['database'] == 'pdb' ) {
     $indexNum = GetPDBPage( $variables['id'] );
     $newURL = $url_base . "/index/index_{$indexNum}.html";
 }
+
 if( $indexNum > 0 ) {
     header( "Location:$newURL" );
     exit();

@@ -54,8 +54,9 @@ def main(entryId, *extraArgList):
             expectedNumberOfArguments, len(extraArgList)))
         return True
         
+    entryCodeChar2and3 = entryId[1:3]        
     inputDir = os.path.join(extraArgList[0], entryId)
-    outputDir = extraArgList[1]
+    outputDir = os.path.join( extraArgList[1], 'data', entryCodeChar2and3, entryId )
     pdbConvention = extraArgList[2] #@UnusedVariable
     restraintsConvention = extraArgList[3]
 
@@ -92,11 +93,16 @@ def main(entryId, *extraArgList):
                 
     isCcpnProject = False # TODO: refine
     if inputDir.startswith("http"):
-        fnametgz = entryId + '.tgz' 
-        if not os.path.exists(fnametgz):
-            NTerror("Tgz should already have been present skipping entry")
-            return        
-#        retrieveTgzFromUrl(entryId, inputDir)
+        fnametgz = entryId + '.tgz'
+        stillToRetrieve = True
+        if stillToRetrieve:
+            if not os.path.exists(fnametgz):
+                retrieveTgzFromUrl(entryId, inputDir)
+        else:             
+            if not os.path.exists(fnametgz):
+                NTerror("Tgz should already have been present skipping entry")
+                return        
+#            retrieveTgzFromUrl(entryId, inputDir)
         isCcpnProject = True
         
     if isCcpnProject:
