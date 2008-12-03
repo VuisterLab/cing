@@ -37,6 +37,7 @@ FAILED_TO_BE_CONVERTED_NRG = "Failed to be converted in NRG."
 TO_BE_VALIDATED_BY_CING = "To be validated by CING"
 FAILED_TO_BE_VALIDATED_CING = "Failed to be validated in CING."
 PRESENT_IN_CING = "Present in CING."
+PRESENT_IN_CING = ""
 
 class WhyNotEntry:
     def __init__(self, entryId, exists=True, comment=''):

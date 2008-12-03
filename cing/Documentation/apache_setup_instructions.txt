@@ -3,6 +3,8 @@
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
 
+    Php support:
+        
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
 

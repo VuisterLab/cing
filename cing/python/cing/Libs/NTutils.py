@@ -4210,7 +4210,7 @@ def symlink( file_1, file_2 ):
     os.system(cmd)
 
 def getDateTimeStampForFileName():
-    date_stamp = datetime.now().isoformat('_')
+    date_stamp = datetime.datetime.now().isoformat('_')
     date_stamp = re.sub( '[:]', '-', date_stamp )
     date_stamp = re.sub( '\.[0-9]+', '', date_stamp )
     return date_stamp
@@ -4218,7 +4218,7 @@ def getDateTimeStampForFileName():
 
 
 def writeTextToFile(fileName, txt):
-    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
+#    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
     fp = open(fileName, 'w')
     fprintf(fp, txt)
     fp.close()
@@ -4233,4 +4233,4 @@ if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug 
     input = ['1brv', '9pcy' ]
     NTdebug("csv: [" + toCsv(input) + "]")
-    
+    NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")

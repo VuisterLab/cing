@@ -47,6 +47,8 @@ from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
 from cing.Libs.NTutils import writeTextToFile
 from cing.NRG.WhyNot import PRESENT_IN_CING
 from cing.Libs.NTutils import toCsv
+from cing import cingRoot
+import shutil
 import cing
 import csv 
 import os
@@ -68,8 +70,13 @@ class nrgCing(Lister):
 
     def __init__(self,
                  max_entries_todo=1,
-                 max_time_to_wait=20
+                 max_time_to_wait=20,
+                 writeWhyNot=False,
+                 updateIndices=False
                 ):
+
+        self.writeWhyNot = writeWhyNot
+        self.updateIndices = updateIndices
 
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
@@ -190,7 +197,7 @@ class nrgCing(Lister):
     def is_complete_resource(self, entry_code):
         NTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
-        indexFileName = os.path.join (self.results_dir, 'data', sub_dir, entry_code, entry_code+".cing", 'index.html')
+        indexFileName = os.path.join (self.results_dir, 'data', sub_dir, entry_code, entry_code + ".cing", 'index.html')
         return os.path.isfile(indexFileName)
  
  
@@ -216,10 +223,10 @@ class nrgCing(Lister):
         for file_name in file_list:            
 #            NTdebug("Using file name: " + file_name )
             entry_code = file_name[10:14]
-            if not is_pdb_code( entry_code ):
+            if not is_pdb_code(entry_code):
                 tmpStr = "String doesn't look like a pdb code: ", entry_code
                 raise RuntimeError, tmpStr
-            result.append( entry_code )            
+            result.append(entry_code)            
         return result
 
     def getCingEntriesTried(self):
@@ -244,10 +251,10 @@ class nrgCing(Lister):
         for file_name in file_list:            
 #            NTdebug("Using file name: " + file_name )
             entry_code = file_name[10:14]
-            if not is_pdb_code( entry_code ):
+            if not is_pdb_code(entry_code):
                 tmpStr = "String doesn't look like a pdb code: ", entry_code
                 raise RuntimeError, tmpStr
-            result.append( entry_code )            
+            result.append(entry_code)            
         return result
 
     """
@@ -261,53 +268,57 @@ class nrgCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
         
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for all tgz files in NRG.")
+        NTdebug("Looking for PDB entries from different databases.")
 
-        self.entry_list_pdb = getPdbEntries()
-        if not self.entry_list_pdb:
-            NTerror("No PDB entries found")
-            return 0
-        NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
-
-        self.entry_list_nmr = getPdbEntries(onlyNmr=True)
-        if not self.entry_list_nmr:
-            NTerror("No NMR entries found")
-            return 0
-        NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
-
-        
-        self.entry_list_nrg = getBmrbNmrGridEntries()
-        if not self.entry_list_nrg:
-            NTerror("No NRG entries found")
-            return 0
-        NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
-        
-        ## The list of all entry_codes for which tgz files have been found
-        self.entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
-        if not self.entry_list_nrg_docr:
-            NTerror("No NRG DOCR entries found")
-            return 0
-        NTmessage("Found %s NRG DOCR entries." % len(self.entry_list_nrg_docr))                    
-        if len( self.entry_list_nrg_docr ) < 3000:
-            NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len( self.entry_list_nrg_docr ))
-            return 0
-
+        if self.writeWhyNot:
+            self.entry_list_pdb = getPdbEntries()
+            if not self.entry_list_pdb:
+                NTerror("No PDB entries found")
+                return 0
+            NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
+    
+            self.entry_list_nmr = getPdbEntries(onlyNmr=True)
+            if not self.entry_list_nmr:
+                NTerror("No NMR entries found")
+                return 0
+            NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
+    
+            
+            self.entry_list_nrg = getBmrbNmrGridEntries()
+            if not self.entry_list_nrg:
+                NTerror("No NRG entries found")
+                return 0
+            NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
+            
+            ## The list of all entry_codes for which tgz files have been found
+            self.entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+            if not self.entry_list_nrg_docr:
+                NTerror("No NRG DOCR entries found")
+                return 0
+            NTmessage("Found %s NRG DOCR entries." % len(self.entry_list_nrg_docr))                    
+            if len(self.entry_list_nrg_docr) < 3000:
+                NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
+                return 0
+    
+            self.entry_list_tried = self.getCingEntriesTried()
+            if not self.entry_list_tried:
+                NTerror("Failed to find entries that CING tried.")
+                return 0
+            NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
         self.entry_list_done = self.getCingEntriesDone()
         if not self.entry_list_done:
             NTerror("Failed to find entries that CING did.")
             return 0
         NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
-
-        self.entry_list_tried = self.getCingEntriesTried()
-        if not self.entry_list_tried:
-            NTerror("Failed to find entries that CING tried.")
-            return 0
-        NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
         
-        self.writeWhyNot()
-                
-        # premature return.
+        if self.writeWhyNot:
+            self.writeWhyNot()
+        
+        if self.updateIndices:
+            self.update_index_files()
+            
+        # premature return until coded completeley... TODO:
         return 0
     
         
@@ -433,7 +444,7 @@ class nrgCing(Lister):
             whyNotEntry.comment = PRESENT_IN_CING
         # end loop over entries
         whyNotStr = '%s' % whyNot
-        NTdebug("whyNotStr truncated to 1000 chars: ["+ whyNotStr[0:1000] +"]")
+        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
         writeTextToFile("NRG-CING.txt", whyNotStr)
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
@@ -471,41 +482,26 @@ class nrgCing(Lister):
 
                 
     def update_index_files(self):
-        """
-        Updating the index files disclosing the results for both ways:
-        PDB to BMRB and BMRB to PDB.
-        Using images of 190x133.
-        """
+        "Updating the index files"
 
+        indexDir = os.path.join(self.results_dir, "index")
+        shutil.rmtree(indexDir)
+        os.mkdir(indexDir)
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
-#        logo_text_bmrb = """
-#<A HREF="http://www.bmrb.wisc.edu"><img SRC="http://www.bmrb.wisc.edu/WebModule/wattos/MRGridServlet/images/bmrb_logo_brown_fg_cream_bg.gif" TITLE="BMRB home" border="0"></A>
-#"""
-        logo_text = """
-        <A HREF="http://nmr.cmbi.ru.nl/cing"><img SRC="http://nmr.cmbi.ru.nl/cing/Home_files/shapeimage_2.png" TITLE="CING home" border="0"></A>
-"""
-#        color_scheme_text_bmrb = """text="#660000" bgcolor="#FFFFCC" link="#666633" vlink="#999966" alink="#999966\""""
-        color_scheme_text = """text="#660000" bgcolor="#ede8e2" link="#a3c159" vlink="#a3c159" alink="#a3c159\""""
-#        color_scheme_text_White = ""
+        cssFile = os.path.join(cingRoot, "HTML", "cing.css")
+        shutil.copy(cssFile, indexDir)
 
-        keys = self.match.d.keys()
-        header_text = "CING validation reports of NMR entries with restraints in the PDB"
-        footer_text = """
-               The PDB entry link is to the RCSB PDB site. Below that, a link
-               to the BMRB entry is given for those PDB entries originating from NMR studies that 
-               have NMR experimental data deposited with BMRB."""
-        csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
-            
-        if not keys:
-            NTwarning("no entries in pickle, skipping creation of indexes")
+        csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))            
+        if not self.entry_list_done:
+            NTwarning("No entries done, skipping creation of indexes")
             return 1
-                
-        keys.sort()
+
+        self.entry_list_done.sort()
         
         number_of_entries_per_file = number_of_entries_per_row * number_of_files_per_column            
         ## Get the number of files required for building an index
-        number_of_entries_all_present = len(keys)
+        number_of_entries_all_present = len(self.entry_list_done)
         ## Number of files with indexes in google style
         number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
         if number_of_entries_all_present % number_of_entries_per_file:
@@ -514,24 +510,15 @@ class nrgCing(Lister):
                         
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR>
-            <a href=""" + self.bmrb_link_template + \
-        ">%b</a>"                
+            <a href=""" + self.bmrb_link_template + ">%b</a>"                
                 
         cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
-        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0></a></td>'
-        file_name = os.path.join (self.base_dir, "index.html")
+        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="100" ></a></td>'
+        file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
         new_string = time.asctime()
         file_content = string.replace(file_content, old_string, new_string)
-        old_string = r"<!-- INSERT NEW HEADER HERE -->"
-        file_content = string.replace(file_content, old_string, header_text)
-        old_string = r"<!-- INSERT NEW FOOTER HERE -->"
-        file_content = string.replace(file_content, old_string, footer_text)
-        old_string = r"<!-- INSERT NEW LOGO HERE -->"
-        file_content = string.replace(file_content, old_string, logo_text)
-        old_string = r"<!-- INSERT NEW COLOR SCHEME HERE -->"
-        file_content = string.replace(file_content, old_string, color_scheme_text)
 
         ## Count will track the number of entries done per index file
         entries_done_per_file = 0
@@ -546,7 +533,7 @@ class nrgCing(Lister):
         insert_text = ''
 
         ## Repeat for all entries plus a dummy pass for writing the last index file    
-        for x_entry_code in keys + [ None ]:
+        for x_entry_code in self.entry_list_done + [ None ]:
             if x_entry_code:
                 pdb_entry_code = x_entry_code
                 if self.matches_many2one.has_key(pdb_entry_code):
@@ -577,8 +564,8 @@ class nrgCing(Lister):
 <INPUT type="submit" name="button" value="go">"""                   
                 jump_form_end = "</FORM>"
 
-                begin_entry_code = string.upper(keys[ begin_entry_count - 1 ])
-                end_entry_code = string.upper(keys[ end_entry_count - 1 ])
+                begin_entry_code = string.upper(self.entry_list_done[ begin_entry_count - 1 ])
+                end_entry_code = string.upper(self.entry_list_done[ end_entry_count - 1 ])
                 new_row = [ file_id, begin_entry_code, end_entry_code ]
                 csvwriter.writerow(new_row)
                 
@@ -633,11 +620,9 @@ class nrgCing(Lister):
                 new_file_content = string.replace(new_file_content, old_string, new_string)
 
 
-                ## Make the first index file name still index.html
-                
-                if file_id:
-                    new_file_name = self.results_dir + '/index/index' + "_" + `file_id` + '.html'
-                else:
+                ## Make the first index file name still index.html                
+                new_file_name = self.results_dir + '/index/index' + "_" + `file_id` + '.html'
+                if not file_id:
                     new_file_name = self.results_dir + '/index/index' + '.html'
                 open(new_file_name, 'w').write(new_file_content)
 
@@ -672,20 +657,20 @@ class nrgCing(Lister):
 
         ## Make a sym link from the index_pdb_1.html file to the index_pdb.html file
         index_file_first = 'index_1.html'
-        index_file = os.path.join(self.results_dir + "/index", 'index.html')
+        index_file = os.path.join(self.results_dir, "index", 'index.html')
         ## Assume that a link that is already present is valid and will do the job
         NTmessage('Symlinking (A): %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
                  
-        ## Make a sym link from the index_bmrb.html file to the index.html file
-        index_file_first = 'index_pdb.html'
-        index_file_first = index_file_first
-        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
-        symlink(index_file_first, index_file)
+#        ## Make a sym link from the index_bmrb.html file to the index.html file
+#        index_file_first = 'index_pdb.html'
+#        index_file_first = index_file_first
+#        index_file = os.path.join(self.results_dir + "/index", 'index.html')
+#        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
+#        symlink(index_file_first, index_file)
          
         NTmessage("Copy the adjusted php script")
-        org_file = os.path.join(self.base_dir, 'redirect.php')
+        org_file = os.path.join(self.base_dir, 'data', 'redirect.php')
         new_file = os.path.join(self.results_dir, 'redirect.php')
         file_content = open(org_file, 'r').read()
         old_string = 'URL_BASE'
@@ -693,7 +678,7 @@ class nrgCing(Lister):
         open(new_file, 'w').write(file_content)
 
         NTmessage("Copy the adjusted html redirect")
-        org_file = os.path.join(self.base_dir, 'redirect.html')
+        org_file = os.path.join(self.base_dir, 'data', 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
         file_content = open(org_file, 'r').read()
         old_string = 'URL_BASE'
@@ -730,10 +715,12 @@ if __name__ == '__main__':
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 1    # was 1 may be set to a 100 when just running through to regenerate pickle                                       
     doUpdateAfterFileSystemReset = 0    # DEFAULT 0 use to update all the modification times to now in the pickle.
+    writeWhyNot = False
+    updateIndices = True
     new_hits_entry_list = [] # define empty for checking new ones.
     new_hits_entry_list = ['1brv']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
     
     ## Initialize the project 
-    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait) 
+    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices) 
     m.update(new_hits_entry_list)
