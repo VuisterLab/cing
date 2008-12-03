@@ -25,33 +25,33 @@ Execute like:
 python -u $CINGROOT/python/cing/NRG/nrgCing.py
 """
 from cing import cingPythonCingDir
+from cing import cingRoot
 from cing.Libs import forkoff
 from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import getOsResult
 from cing.Libs.NTutils import is_pdb_code
 from cing.Libs.NTutils import symlink
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
-from cing.Libs.NTutils import getOsResult
+from cing.Libs.NTutils import toCsv
+from cing.Libs.NTutils import writeTextToFile
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
+from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
 from cing.NRG.PDBEntryLists import getPdbEntries
-from cing.NRG.WhyNot import WhyNot
-from cing.NRG.WhyNot import WhyNotEntry
+from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
+from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
 from cing.NRG.WhyNot import NOT_NMR_ENTRY
 from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
-from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
-from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
-from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
-from cing.Libs.NTutils import writeTextToFile
 from cing.NRG.WhyNot import PRESENT_IN_CING
-from cing.Libs.NTutils import toCsv
-from cing import cingRoot
-import shutil
+from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
+from cing.NRG.WhyNot import WhyNot
+from cing.NRG.WhyNot import WhyNotEntry
 import cing
 import csv 
 import os
+import shutil
 import string
 import time
 import urllib
@@ -318,7 +318,7 @@ class nrgCing(Lister):
         NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
         
         if self.writeWhyNot:
-            self.writeWhyNot()
+            self.doWriteWhyNot()
         
         if self.updateIndices:
             self.update_index_files()
@@ -417,7 +417,7 @@ class nrgCing(Lister):
 #        return 1 # Success
 
 
-    def writeWhyNot(self):
+    def doWriteWhyNot(self):
         "Create WHY_NOT list"
         whyNot = WhyNot()
         # Loop for speeding up the checks. Most are not nmr.
@@ -724,7 +724,7 @@ if __name__ == '__main__':
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 1    # was 1 may be set to a 100 when just running through to regenerate pickle                                       
     doUpdateAfterFileSystemReset = 0    # DEFAULT 0 use to update all the modification times to now in the pickle.
-    writeWhyNot = False
+    writeWhyNot = True
     updateIndices = True
     isProduction = False
     new_hits_entry_list = [] # define empty for checking new ones.
