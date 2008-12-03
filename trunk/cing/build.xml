@@ -13,7 +13,7 @@
 
 	<target name="init" description="init">
 		<!-- Set the below to development 0 or production 1-->
-		<property name="isProduction" value="0" />
+		<property name="isProduction" value="1" />
 		<if>
 			<equals arg1="${isProduction}" arg2="1" />
 			<then>
