@@ -8,9 +8,17 @@ set subl = ( 1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e )
 cd /Library/WebServer/Documents/NRG-CING
 #cd /var/www/servlet_data/NRG_ccpn_tmp
 
+@ sublMin = 0
+
 echo "Doing" $#subl "pdb entries"
+@ count = 0
 foreach x ( $subl )
-   echo "Doing $x"
+   @ count = $count + 1
+   if ( $count < $sublMin ) then
+            continue
+   endif
+   echo "Doing $x $count"
+
    if ( -e $x.tgz ) then
         echo "DEBUG: $x.tgz already present."
         continue

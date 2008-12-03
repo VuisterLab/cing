@@ -1,0 +1,98 @@
+"""
+Author: Jurgen F. Doreleijers, BMRB, June 2006
+"""
+from cing.Libs.NTutils import NTdebug
+import cing
+import urllib
+
+#urlDB2 = "http://tang.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" Gets DoS
+#urlDB2 = "http://nmr.cmbi.ru.nl/servlet_data/viavia/mr_mysql_backup/"
+urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
+#ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids" 
+ocaUrl = "http://localhost/oca" # For fastest develop.
+
+def getEntryListFromCsvFile(urlLocation):
+  result = []
+##108d
+##149d
+  r1 = urllib.urlopen(urlLocation)
+  data = r1.read()
+  r1.close()  
+  dataLines = data.split("\n")   
+  for dataLine in dataLines:
+    if dataLine:
+        (pdbCode,) = dataLine.split()
+        result.append(pdbCode)     
+  return result
+
+
+def getBmrbNmrGridEntries():
+  result = [] 
+  urlLocation = urlDB2 + "/entry.txt" 
+##4583	\N	108d	\N	\N
+##4584	\N	149d	\N	\N
+  r1 = urllib.urlopen(urlLocation)
+  data = r1.read()
+  r1.close()  
+  dataLines = data.split("\n")   
+  for dataLine in dataLines:
+    if dataLine:
+        # b is for bogus/unused
+        (_entryId, _bmrbId, pdbCode, _in_recoord, _in_dress) = dataLine.split()
+        result.append(pdbCode)     
+  return result
+
+def getBmrbNmrGridEntriesDOCRfREDDone():
+  result = []
+  urlLocation = urlDB2 + "/mrfile.txt" 
+##61458    7567    4-filtered-FRED    2gov    2006-05-11
+##61459    7567    4-filtered-FRED    2gov    2006-05-11
+  r1 = urllib.urlopen(urlLocation)
+  data = r1.read()
+  r1.close()  
+  dataLines = data.split("\n")   
+  for dataLine in dataLines:
+    if dataLine:
+        # b is for bogus/unused
+        (_mrfile_id, _entry_id, stage, pdbCode, _date_modified) = dataLine.split()
+        if stage == "4-filtered-FRED":
+            if pdbCode not in result:
+                result.append(pdbCode) 
+  return result
+
+
+def getPdbEntries(onlyNmr=False):
+  result = []
+#  urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
+  urlLocation = ocaUrl + "/ocaidsPDB"
+  if onlyNmr:
+      urlLocation = ocaUrl + "/ocaidsPDB-NMR"
+      
+## OCA database search on: Wed Dec  3 10:18:07 2008
+## Query: ex=any&m=du
+## Hits: 55841 (search time 0 sec)
+#100D     Crystal The Highly Distorted Chimeric Deca... Ban                1.90   
+#101D     Refinement Of Netropsin Bound To DNA: Bias... Goodsell           2.25   
+  r1 = urllib.urlopen(urlLocation)
+  data = r1.read()
+  r1.close()  
+  
+  dataLines = data.split("\n")   
+  for dataLine in dataLines:
+    if dataLine:
+        if not dataLine[0].isdigit():
+             # skipping html and header.
+            continue
+        items = dataLine.split()
+        if items:
+            pdbCode = items[0]
+            pdbCode = pdbCode.lower()
+            result.append(pdbCode) 
+  return result
+
+if __name__ == '__main__':
+    cing.verbosity = cing.verbosityDebug    
+    entry_list_pdb = getPdbEntries() 
+    NTdebug( "entries pdb: %d %40s" % (len(entry_list_pdb), entry_list_pdb ))
+    entry_list_pdb_nmr = getPdbEntries(onlyNmr=True)
+    NTdebug( "entries nmr: %d %s" % (len(entry_list_pdb_nmr), entry_list_pdb_nmr ))

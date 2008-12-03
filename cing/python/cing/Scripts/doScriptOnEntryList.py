@@ -4,6 +4,7 @@ and a file with a list of their names.
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 
@@ -69,14 +70,17 @@ def doScriptOnEntryList(pythonScriptFileName,
         if extraArgList:
             extraArgListStr = ' '.join( extraArgList )
         chain_code = chainCodeList[i]
-        cmd = 'cd %s; python -u %s %s %s %s > %s%s.log 2>&1 ' % ( 
+        
+        date_stamp = getDateTimeStampForFileName()
+        cmd = 'cd %s; python -u %s %s %s %s > %s%s%s.log 2>&1 ' % ( 
             startDir,
             pythonScriptFileName, 
             entry_code, 
             chain_code, 
             extraArgListStr,
             entry_code,
-            chain_code
+            chain_code,
+            date_stamp
              )
         job = ( do_cmd, (cmd,) )
         job_list.append( job )

@@ -15,15 +15,16 @@ from gzip import GzipFile
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-import re
 import array
 import cing
+import datetime
 import inspect
 import math
 import optparse
 import os
-import sys
 import pydoc
+import re
+import sys
 
 CONSENSUS_STR = 'consensus'
 
@@ -3346,6 +3347,33 @@ class ExecuteProgram(NTdict):
         return code
 #end class
 
+def getOsResult( cmd ):
+    """
+    Returns tuple (status, msg) 
+    status 0 for success. > 0 for failure.
+    """
+#    NTdebug( "Doing command: %s" % cmd )
+
+    ##  Try command and check for non-zero exit status
+    pipe = os.popen( cmd )
+    output = pipe.read()
+
+    ##  The program exit status is available by the following construct
+    ##  The status will be the exit number unless the program executed
+    ##  successfully in which case it will be None.
+    status = pipe.close()
+
+#    if output:
+#        NTdebug( "Found os msg: %s" % output )
+        
+#    if status:
+#        NTdebug("Failed shell command:")
+#        NTdebug( cmd )
+#        NTdebug("Output: %s" % output)
+#        NTdebug("Status: %s" % status)
+        
+    return ( status, output )
+
 
 class OptionParser (optparse.OptionParser):
     """
@@ -4180,3 +4208,29 @@ def symlink( file_1, file_2 ):
     cmd = "ln -s %s %s" % (file_1, file_2 )
     NTdebug( "Running cmd: " + cmd )
     os.system(cmd)
+
+def getDateTimeStampForFileName():
+    date_stamp = datetime.now().isoformat('_')
+    date_stamp = re.sub( '[:]', '-', date_stamp )
+    date_stamp = re.sub( '\.[0-9]+', '', date_stamp )
+    return date_stamp
+
+
+
+def writeTextToFile(fileName, txt):
+    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
+    fp = open(fileName, 'w')
+    fprintf(fp, txt)
+    fp.close()
+    
+def toCsv(input):
+    result = ''
+    for item in input:        
+        result += "%s\n" % item
+    return result
+
+if __name__ == '__main__':
+    cing.verbosity = cing.verbosityDebug 
+    input = ['1brv', '9pcy' ]
+    NTdebug("csv: [" + toCsv(input) + "]")
+    
