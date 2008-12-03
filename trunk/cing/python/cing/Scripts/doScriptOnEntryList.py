@@ -7,6 +7,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
+import os
 
 """
 NB
@@ -16,6 +17,23 @@ for when using 3 processes.
 START_ENTRY_ID                 = 0 # default 0
 MAX_ENTRIES_TODO               = 999 # default a ridiculously large number like 999999
 
+def mkSubDirStructure(startDir, entryCodeList):
+    for entry_code in entryCodeList:
+        entryCodeChar2and3 = entry_code[1:3]
+        dataDir = os.path.join( startDir, 'data' )
+        if not os.path.exists(dataDir):
+            NTmessage("Creating dir: " + dataDir)
+            os.mkdir(dataDir)
+        subDir = os.path.join( dataDir, entryCodeChar2and3 )
+        if not os.path.exists(subDir):
+            NTmessage("Creating dir: " + subDir)
+            os.mkdir(subDir)
+        entryDir = os.path.join( subDir, entry_code )
+        if not os.path.exists(entryDir):
+            NTmessage("Creating dir: " + entryDir)
+            os.mkdir(entryDir)
+            
+    
 def doScriptOnEntryList(pythonScriptFileName, 
           entryListFileName, 
           startDir                       ='.', 
@@ -63,6 +81,8 @@ def doScriptOnEntryList(pythonScriptFileName,
     NTmessage('Selected  %04d entries    ' % entryCountSelected)  
     NTmessage('Sliced    %04d entries: %s' % (len(entryCodeList), entryCodeList ))  
     
+    mkSubDirStructure( startDir, entryCodeList )
+    
     job_list = []
     i = 0
     for entry_code in entryCodeList:  
@@ -71,9 +91,12 @@ def doScriptOnEntryList(pythonScriptFileName,
             extraArgListStr = ' '.join( extraArgList )
         chain_code = chainCodeList[i]
         
+        entryCodeChar2and3 = entry_code[1:3]
+        entryDir = os.path.join( startDir, 'data', entryCodeChar2and3, entry_code )
+        
         date_stamp = getDateTimeStampForFileName()
-        cmd = 'cd %s; python -u %s %s %s %s > %s%s%s.log 2>&1 ' % ( 
-            startDir,
+        cmd = 'cd %s; python -u %s %s %s %s > %s_%s%s.log 2>&1 ' % ( 
+            entryDir,
             pythonScriptFileName, 
             entry_code, 
             chain_code, 

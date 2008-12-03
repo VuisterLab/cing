@@ -22,7 +22,7 @@ or similar. The minus of -15 is necessary because it needs to signal it's childr
 
 Execute like:
 
-python -u $CINGROOT/python/NRG/nrgCing.py
+python -u $CINGROOT/python/cing/NRG/nrgCing.py
 """
 from cing import cingPythonCingDir
 from cing.Libs import forkoff
@@ -72,12 +72,14 @@ class nrgCing(Lister):
                  max_entries_todo=1,
                  max_time_to_wait=20,
                  writeWhyNot=False,
-                 updateIndices=False
+                 updateIndices=False,
+                 isProduction=False
                 ):
 
         self.writeWhyNot = writeWhyNot
         self.updateIndices = updateIndices
-
+        self.isProduction = isProduction
+        
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
         self.backcolor = 'cing_blue'
@@ -89,8 +91,11 @@ class nrgCing(Lister):
         self.data_dir = os.path.join(self.results_base_dir, 'data')        
 #        self.results_dir        = '/big/jurgen/molgrap/'        + run_id
         self.tmp_dir = self.results_dir + '/_tmp_'
-#        self.results_url        = 'http://www.bmrb.wisc.edu/servlet_data/' + run_id
-        self.results_url = 'http://localhost/' + self.results_base + '/'
+        self.results_host = 'localhost' 
+        if self.isProduction: 
+            # Needed for php script. 
+            self.results_host = 'nmr.cmbi.ru.nl'
+        self.results_url = 'http://'+self.results_host + '/'+self.results_base + '/'
         
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
@@ -134,7 +139,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = 'http://nmr.cmbi.ru.nl/NRG-CING/data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = self.results_url+'/data/%t/%s/%s.cing/%s/HTML/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -485,12 +490,16 @@ class nrgCing(Lister):
         "Updating the index files"
 
         indexDir = os.path.join(self.results_dir, "index")
-        shutil.rmtree(indexDir)
+        if os.path.exists(indexDir):
+            shutil.rmtree(indexDir)
         os.mkdir(indexDir)
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
-        cssFile = os.path.join(cingRoot, "HTML", "cing.css")
+        htmlDir = os.path.join(cingRoot, "HTML") 
+        cssFile = os.path.join(htmlDir, "cing.css")
+        headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
         shutil.copy(cssFile, indexDir)
+        shutil.copy(headerBgFile, indexDir)
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))            
         if not self.entry_list_done:
@@ -509,11 +518,10 @@ class nrgCing(Lister):
         NTmessage("Generating %s index html files" % (number_of_files))
                         
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
-        """>%S</a><BR>
-            <a href=""" + self.bmrb_link_template + ">%b</a>"                
+        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"                
                 
         cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
-        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="100" ></a></td>'
+        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
         file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
@@ -611,7 +619,7 @@ class nrgCing(Lister):
                     if link == file_id:
                         links_string += ' <B>%s</B>' % link
                     else:
-                        links_string += ' <a href="index%s.html">%s</a>' % (
+                        links_string += ' <a href="index_%s.html">%s</a>' % (
                              link, link)
                         
                 old_string = r"<!-- INSERT NEW LINKS HERE -->"
@@ -680,10 +688,11 @@ class nrgCing(Lister):
         NTmessage("Copy the adjusted html redirect")
         org_file = os.path.join(self.base_dir, 'data', 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
-        file_content = open(org_file, 'r').read()
-        old_string = 'URL_BASE'
-        file_content = string.replace(file_content, old_string, self.results_url)
-        open(new_file, 'w').write(file_content)
+#        file_content = open(org_file, 'r').read()
+#        old_string = 'URL_BASE'
+#        file_content = string.replace(file_content, old_string, self.results_url)
+#        open(new_file, 'w').write(file_content)
+        shutil.copy(org_file, new_file)
 
         return 1
     
@@ -717,10 +726,12 @@ if __name__ == '__main__':
     doUpdateAfterFileSystemReset = 0    # DEFAULT 0 use to update all the modification times to now in the pickle.
     writeWhyNot = False
     updateIndices = True
+    isProduction = False
     new_hits_entry_list = [] # define empty for checking new ones.
     new_hits_entry_list = ['1brv']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
     
     ## Initialize the project 
-    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices) 
+    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
+                isProduction=isProduction) 
     m.update(new_hits_entry_list)
