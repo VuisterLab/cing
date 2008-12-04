@@ -27,8 +27,6 @@ Options:
                         file
   --initCcpn=CCPNFOLDER
                         Initialize new project PROJECTNAME from CCPNFOLDER
-  --loadCcpn=CCPNFOLDER
-                        Open project PROJECTNAME and load data from CCPNFOLDER
   --xeasy=SEQFILE,PROTFILE,CONVENTION
                         Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION
   --xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION
@@ -53,7 +51,6 @@ Options:
   -v VERBOSITY, --verbosity=VERBOSITY
                         verbosity: [0(nothing)-9(debug)] no/less messages to
                         stdout/stderr (default: 3)
-  --server              Start a server at ports 8000 and 8001 by default
 
 
 --------------------------------------------------------------------------------
@@ -403,11 +400,12 @@ def getParser():
                      )
     parser.add_option("--ensemble",
                       dest="ensemble", default=None,
-                      help="Models of the ensemble to use for superpose, procheck, validate etc; e.g. 1-8,10,20",
+                      help="Models of the ensemble to use for superpose, procheck, validate etc; e.g. 0,3-8,10,20. Note that model numbers start at zero.",
                       metavar="ENSEMBLE"
                      )
     parser.add_option("--noImagery",
-                      dest="noImagery", default=None,
+                      action="store_true",
+                      dest="noImagery", 
                       help="Set this option to prevent the creation images. Greatly speeds validation up."
                      )
     parser.add_option("--superpose",
@@ -436,7 +434,8 @@ project = None # after running main it will be filled.
 def main():
 
     global project
-
+    global options
+    
     _root, file, _ext = NTpath(__file__)
 
     parser = getParser()
@@ -463,7 +462,7 @@ def main():
 
     # The weird location of this import is because we want it to be verbose.
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
-
+        
     if options.test:
         testOverall()
         sys.exit(0)
@@ -597,6 +596,12 @@ def main():
     f = format #@UnusedVariable
     fa = formatall #@UnusedVariable
 
+    if options.ensemble:
+#        NTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
+        mol.keepSelectedModels( options.ensemble )
+#    else:
+#        NTdebug( "ensemble option was not found." )
+
     #------------------------------------------------------------------------------------
     # Import xeasy protFile
     #------------------------------------------------------------------------------------
@@ -665,7 +670,7 @@ def main():
         scriptFile = scriptPath(options.script)
         if scriptFile:
             NTmessage('==> Executing script "%s"', scriptFile)
-            execfile(scriptFile) # JFD removed: Used to have: , globals() because options weren't coming thru.
+            execfile(scriptFile, globals() )
         #end if
     #end if
 

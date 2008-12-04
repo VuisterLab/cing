@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -33,8 +35,10 @@ import com.braju.format.Parameters;
 public class iCingServlet extends HttpServlet {
     private static final long serialVersionUID = 6098745782027999297L;
 
+    static final String PROJECT_NAME_regexp = ".+.pdb|.+.ent|.+.tgz";
+
     static {
-        if ( Settings.DO_DEBUG ) {
+        if (Settings.DO_DEBUG) {
             General.setVerbosityToDebug();
         }
     }
@@ -62,7 +66,8 @@ public class iCingServlet extends HttpServlet {
         FileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
         List<FileItem> items = null;
-
+        /** The parameters other than accessKey, UserId, Action. */
+        HashMap<String, String> parameterMap = new HashMap<String, String>();
         // Create a progress listener on server side; pretty useless, so far but
         // when pushed to client can be nice.
         ProgressListener progressListener = new ProgressListener() {
@@ -140,15 +145,16 @@ public class iCingServlet extends HttpServlet {
                     General.showDebug("retrieved action: " + currentAction);
                     continue;
                 }
+                parameterMap.put(name, value);
                 // When the routine falls thru to here the parameter was not recognized.
                 if (value == null) {
                     value = Settings.NONE;
                 }
                 int endIndex = Math.min(100, value.length());
-                value = value.substring(0, endIndex);
-                String msg = "Parameter [" + name + "] with value (first 100 bytes): [" + value + "] was unexpected.";
-                writeJsonError(response, result, msg);
-                return;
+                String valueTruncated = value.substring(0, endIndex);
+                String msg = "Retrieved extra arameter [" + name + "] with value (first 100 bytes): [" + valueTruncated
+                        + "].";
+                General.showDebug(msg);
             } else {
                 actualFileItem = item;
                 General.showDebug("retrieved actualFileItem: " + actualFileItem);
@@ -201,7 +207,9 @@ public class iCingServlet extends HttpServlet {
         } else if (currentAction.equals(Settings.FORM_ACTION_STATUS)) {
             processStatus(response, result, pathProject);
         } else if (currentAction.equals(Settings.FORM_ACTION_RUN)) {
-            processRun(response, result, pathProject);
+            processRun(response, result, pathProject, parameterMap);
+        } else if (currentAction.equals(Settings.FORM_ACTION_OPTIONS)) {
+            processOptions(response, result, pathProject, parameterMap);
         } else {
             // Would be a code bug as is checked before.
             writeJsonError(response, result, "Requested action unknown:  " + currentAction + " [CODE ERROR]");
@@ -211,21 +219,11 @@ public class iCingServlet extends HttpServlet {
 
     private void processPname(HttpServletResponse response, JSONObject result, File pathProject) {
 
-        String regexp = ".*.tgz";
-        // GenClient.showOutput("Reg exp files: " + regexp);
-        // GenClient.showOutput("Dir: " + pathProject);
-        InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
-        String[] list = pathProject.list(ff);
-
-        General.showOutput("Found files: " + Strings.toString(list));
-        General.showOutput("Found number of files: " + list.length);
-
-        if (list.length < 1) {
-            writeJsonError(response, result, "No project files found");
+        String projectName = getProjectName(pathProject);
+        if (projectName == null) {
+            writeJsonError(response, result, "Failed to get project name.");
             return;
         }
-        String projectName = list[0];
-        projectName = InOut.getFilenameBase(projectName);
         jsonResultPut(result, Settings.RESPONSE_RESULT, projectName);
         writeJson(response, result);
     }
@@ -233,22 +231,21 @@ public class iCingServlet extends HttpServlet {
     private void processPurgeProject(HttpServletResponse response, JSONObject result, File pathProject) {
 
         boolean status = false;
-        if ( pathProject.exists() ) {
+        if (pathProject.exists()) {
             General.showOutput("Removing project: " + pathProject);
             InOut.deleteDirectoryRecursively(pathProject);
-            if ( ! pathProject.exists() ) {
+            if (!pathProject.exists()) {
                 status = true;
             }
         }
 
-
-        if ( status ) {
+        if (status) {
             jsonResultPut(result, Settings.RESPONSE_RESULT, "Removed project: " + pathProject);
             writeJson(response, result);
             return;
         }
         writeJsonError(response, result, "Failed to remove project directory on server");
-        return;        
+        return;
     }
 
     private void jsonResultPut(JSONObject result, String key, String value) {
@@ -296,39 +293,66 @@ public class iCingServlet extends HttpServlet {
     }
 
     /**
-     * 
-     * @param response
-     * @param result
      * @param pathProject
      * @return null on error.
      */
-    private String getProjectFile(HttpServletResponse response, JSONObject result, File pathProject) {
-
-        String regexp = ".*.tgz";
-        // GenClient.showOutput("Reg exp files: " + regexp);
+    private String getProjectFilePath(File pathProject) {
+        General.showOutput("Reg exp files: " + PROJECT_NAME_regexp);
         General.showOutput("Dir: " + pathProject);
-        InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(regexp);
+        InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(PROJECT_NAME_regexp);
         String[] list = pathProject.list(ff);
 
         General.showOutput("Found files: " + Strings.toString(list));
         General.showOutput("Found number of files: " + list.length);
 
         if (list.length < 1) {
-            writeJsonError(response, result, "No project files found");
             return null;
         }
-        String projectName = list[0];
-        String projectFileName = InOut.getFileName(projectName);
-        return projectFileName;
+        return list[0];
+    }
+
+    /**
+     * @param pathProject
+     * @return null on error.
+     */
+    private String getProjectName(File pathProject) {
+        String projectFilePath = getProjectFilePath(pathProject);
+        String projectName = InOut.getFilenameBase(projectFilePath);
+        return projectName;
     }
 
     /**
      * Actually saves the file
      * 
+     * @param parameterMap
+     * 
      * @param item
      * @return a JSON string.
      */
-    private void processRun(HttpServletResponse response, JSONObject result, File pathProject) {
+    private void processRun(HttpServletResponse response, JSONObject result, File pathProject,
+            HashMap<String, String> parameterMap) {
+
+        /** Use default values if the following variables remain null */
+        String verbosity = null;
+        String imagery = null;
+        String residues = null;
+        String ensemble = null;
+
+        for (Iterator<String> it = parameterMap.keySet().iterator(); it.hasNext();) {
+            String key = it.next();
+            String value = parameterMap.get(key);
+            if (key.equals(Settings.FORM_PARM_VERBOSITY)) {
+                verbosity = value;
+            } else if (key.equals(Settings.FORM_PARM_IMAGERY)) {
+                imagery = value;
+            } else if (key.equals(Settings.FORM_PARM_RESIDUES)) {
+                residues = value;
+            } else if (key.equals(Settings.FORM_PARM_ENSEMBLE)) {
+                ensemble = value;
+            } else {
+                General.showError("Ignoring unexpected key/value: " + key + "/" + value);
+            }
+        }
 
         File doneFile = new File(pathProject, Settings.DONE_FILE);
         File cingRunLogFile = new File(pathProject, Settings.CING_RUN_LOG_FILE);
@@ -351,15 +375,16 @@ public class iCingServlet extends HttpServlet {
         // + " &";
         String cmdRunDone = "touch " + doneFile; // Using absolute path so no cd needed.
 
-        String projectFileName = getProjectFile(response, result, pathProject);
+        String projectFileName = getProjectFilePath(pathProject);
         if (projectFileName == null) {
-            // Will already have generated a Json error back.
+            writeJsonError(response, result, "Failed to getProjectFilePath");
             return;
         }
+        String possibleInit = getInitString(projectFileName);
 
-        String projectName = InOut.getFilenameBase(projectFileName);
+        String projectName = getProjectName(pathProject);
         if (projectFileName == null) {
-            writeJsonError(response, result, "Failed to find project name");
+            writeJsonError(response, result, "Failed to getProjectName");
             return;
         }
 
@@ -374,9 +399,24 @@ public class iCingServlet extends HttpServlet {
          */
         Parameters p = new Parameters(); // Printf parameters autoclearing after use.
         p.add(projectName);
-        p.add(projectFileName);
+        p.add(possibleInit);
         p.add(Settings.CING_VERBOSITY);
-        String cing_options = Format.sprintf("--name %s --initCcpn %s -v %s --script doValidateiCing.py", p);
+        String cing_options = Format.sprintf("--name %s %s -v %s --script doValidateiCing.py", p);
+
+        General.showDebug("verbosity at iCingServlet: " + verbosity);
+        if (verbosity != null && verbosity.length() > 0 && (!verbosity.equals("null"))) {
+            cing_options += " --verbosity " + verbosity;
+        }
+        General.showDebug("residues at iCingServlet: " + residues);
+        if (residues != null && residues.length() > 0 && (!residues.equals("null"))) {
+            cing_options += " --ranges " + residues;
+        }
+        if (ensemble != null) {
+            cing_options += " --ensemble " + ensemble;
+        }
+        if (imagery == null) {
+            cing_options += " --noImagery";
+        }
 
         p.add(cmdCdProjectDir);
         p.add(Settings.CING_WRAPPER_SCRIPT);
@@ -402,6 +442,19 @@ public class iCingServlet extends HttpServlet {
         }
         jsonResultPut(result, Settings.RESPONSE_RESULT, Settings.RESPONSE_STARTED);
         writeJson(response, result);
+    }
+
+    private String getInitString(String projectFileName) {
+        if (projectFileName.endsWith(".cing.tgz")) {
+            return "--old";
+        }
+        if (projectFileName.endsWith(".tgz")) {
+            return "--initCcpn " + projectFileName;
+        }
+        if (projectFileName.endsWith(".ent") || projectFileName.endsWith(".pdb")) {
+            return "--initPDB " + projectFileName;
+        }
+        return null;
     }
 
     /**
@@ -440,7 +493,7 @@ public class iCingServlet extends HttpServlet {
 
         File uploadedFile = new File(pathProject, fileName);
         if (uploadedFile.exists()) {
-            if (pathProject.delete()) {
+            if (uploadedFile.delete()) {
                 writeJsonError(response, result, "Failed to remove file with the same name: [" + uploadedFile + "]");
                 return;
             }
@@ -461,6 +514,51 @@ public class iCingServlet extends HttpServlet {
         General.showDebug("File written length: " + length);
         String sizeStr = Ut.bytesToFormattedString(length);
         jsonResultPut(result, Settings.RESPONSE_RESULT, sizeStr);
+        writeJson(response, result);
+    }
+
+    /**
+     * Saves the validation settings file: valSets.cfg
+     * 
+     * @param item
+     * @return a JSON string.
+     */
+    private void processOptions(HttpServletResponse response, JSONObject result, File pathProject,
+            HashMap<String, String> parameterMap) {
+
+        General.showDebug("Now in processOptions.");
+        if (parameterMap.size() == 0) {
+            jsonResultPut(result, Settings.RESPONSE_RESULT, "No parameters to save");
+            writeJson(response, result);
+            return;
+        }
+
+        /** Name without path part */
+        String fileName = Settings.VAL_SETS_CFG_DEFAULT_FILENAME;
+
+        File uploadedFile = new File(pathProject, fileName);
+        if (uploadedFile.exists()) {
+            writeJsonError(response, result,
+                    "Failed to write options to file as file already exists with the same name: [" + uploadedFile + "]");
+            return;
+        }
+        String parameterListString = Ut.mapToPythonRFC822ConfigurationSettings(parameterMap);
+        if (parameterListString == null) {
+            writeJsonError(response, result, "Failed to convert options to text.");
+            return;
+        }
+        boolean force = true;
+        boolean interactive = true;
+        if (!InOut.writeTextToFile(uploadedFile, parameterListString, force, interactive)) {
+            writeJsonError(response, result, "Failed to write options to file as InOut.writeTextToFile failed.");
+            return;
+        }
+        InOut.chmod(uploadedFile, "a+rw");
+ 
+        long length = uploadedFile.length();
+        General.showDebug("File written length: " + length);
+        String sizeStr = Ut.bytesToFormattedString(length);
+        jsonResultPut(result, Settings.RESPONSE_RESULT, "Saved options: " + sizeStr + " on server");
         writeJson(response, result);
     }
 

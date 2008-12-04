@@ -99,10 +99,10 @@ public class FileView extends iCingView {
 
         nextButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                icingShadow.onHistoryChanged(iCing.RUN_STATE);
+                icingShadow.onHistoryChanged(iCing.CRITERIA_STATE);
             }
         });
-        nextButton.setEnabled(false);
+//        nextButton.setEnabled(false);
         nextButton.setText(c.Next());
         nextButton.setTitle(c.Set_the_criteria());
     }

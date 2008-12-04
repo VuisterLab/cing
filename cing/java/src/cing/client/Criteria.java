@@ -1,5 +1,6 @@
 package cing.client;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -224,21 +225,33 @@ public class Criteria extends iCingView {
 		cingTable.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
 		cingTable.getFlexCellFormatter().setColSpan(0, 0, 5);
 		noneCingCheckBox.setHTML(c.none());
-
-		final Button nextButton = new Button();
-		nextButton.setText(c.Next());
-		nextButton.addClickListener(new ClickListener() {
-			public void onClick(final Widget sender) {
-				icingShadow.onHistoryChanged(iCing.OPTIONS_STATE);					
-			}
-		});	
-		verticalPanel.add(nextButton);
-		nextButton.setTitle("Goto CING run options.");
-		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-		
 		
 		// Return the content
 		tabPanel.ensureDebugId("criteriaTabPanel");
 		tabPanel.selectTab(0);
+		
+        final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+        horizontalPanelBackNext.setSpacing(iCing.margin);
+        verticalPanel.add(horizontalPanelBackNext);
+        final Button backButton = new Button();
+        final Button nextButton = new Button();
+        horizontalPanelBackNext.add(backButton);
+        backButton.addClickListener(new ClickListener() {
+            public void onClick(final Widget sender) {
+                History.back();
+            }
+        });
+        backButton.setText(c.Back());
+        horizontalPanelBackNext.add(backButton);
+        horizontalPanelBackNext.add(nextButton);
+
+        nextButton.addClickListener(new ClickListener() {
+            public void onClick(final Widget sender) {
+                icingShadow.onHistoryChanged(iCing.OPTIONS_STATE);
+            }
+        });
+        nextButton.setText(c.Next());
+        nextButton.setTitle(c.Set_the_options());
+		
 	}	
 }

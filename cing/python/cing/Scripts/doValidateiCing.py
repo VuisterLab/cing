@@ -1,7 +1,6 @@
-#==================================================
-# some variables
-#==================================================
-from cing.Libs.NTutils import NTerror, NTmessage
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 
 # Run and parse/Only parse the results
 parseOnly = False
@@ -18,6 +17,14 @@ if fastestTest:
 
 project = project #@UndefinedVariable for Pydev extensions.
 options = options #@UndefinedVariable
+
+
+if options.noImagery:
+    NTdebug( "Setting to htmlOnly because noImagery option was set." )
+    htmlOnly = True
+else:
+    NTdebug( "noImagery option was not found." )
+    
 #==================================================
 # Check for molecule
 #==================================================
@@ -25,6 +32,8 @@ if project.molecule == None:
     NTerror('script doValidate.py: no molecule defined')
     exit(1)
 #end if
+
+
 #==================================================
 # Run the tests
 #==================================================
