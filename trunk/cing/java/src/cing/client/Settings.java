@@ -6,7 +6,7 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = false;
+    public static final boolean DO_DEBUG = true;
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
@@ -42,7 +42,7 @@ public interface Settings {
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081203-2008";
+    public static final String VERSION = "20081204-0946";
 
     public static final String NONE = "NONE";
 
@@ -50,6 +50,10 @@ public interface Settings {
     public static final String FORM_PARM_USER_ID = "UserId";
     public static final String FORM_PARM_ACCESS_KEY = "AccessKey";
     public static final String FORM_PARM_UPLOAD_FILE_BASE = "UploadFile";
+    public static final String FORM_PARM_VERBOSITY = "Verbosity";
+    public static final String FORM_PARM_IMAGERY = "Imagery";
+    public static final String FORM_PARM_RESIDUES = "Residues";
+    public static final String FORM_PARM_ENSEMBLE = "Ensemble";
 
     public static final String FORM_PARM_USER_ID_ANONYMOUS = "anonymous";
     public static final String FORM_PARM_USER_ID_DEFAULT = FORM_PARM_USER_ID_ANONYMOUS;
@@ -60,6 +64,7 @@ public interface Settings {
     public static final String FORM_ACTION_SAVE = "Save";
     public static final String FORM_ACTION_RUN = "Run";
     public static final String FORM_ACTION_PURGE = "Purge";
+    public static final String FORM_ACTION_OPTIONS = "Options";
 
     public static final String ZIP_REPORT_FILENAME_POST_FIX = "_CING_report";
     /** No default response action really. */
@@ -83,7 +88,8 @@ public interface Settings {
     static final ArrayList<String> validResponseStatusValues = new ArrayList();
 
     public static final String[] FORM_ACTION_LIST = new String[] { FORM_ACTION_LOG, FORM_ACTION_PROJECT_NAME,
-            FORM_ACTION_PURGE, FORM_ACTION_STATUS, FORM_ACTION_SAVE, FORM_ACTION_RUN, FORM_ACTION_LOG };
+            FORM_ACTION_PURGE, FORM_ACTION_STATUS, FORM_ACTION_SAVE, FORM_ACTION_RUN, FORM_ACTION_LOG,
+            FORM_ACTION_OPTIONS };
     public static final String[] FORM_PARM_MINIMUM = new String[] { FORM_PARM_USER_ID, FORM_PARM_ACCESS_KEY,
             FORM_PARM_ACTION };
     public static final String[] RESPONSE_EXIT_CODE_LIST = new String[] { RESPONSE_EXIT_CODE_ERROR,
@@ -96,6 +102,33 @@ public interface Settings {
     public static final String VAL_SETS_CFG_DEFAULT_FILENAME = "valSets.cfg";
     public static final String FILE_PROGRAM_CING = "CING";
     public static final String FILE_PROGRAM_CCPN = "CCPN";
+    public static final String FILE_PROGRAM_PDB = "PDB";
     public static final String FILE_TYPE_PROJECT = "project";
     public static final String FILE_TYPE_VALIDATION_SETTINGS = "validation settings";
+
+    public static final String OMEGA_MAXALL_POOR = "15";
+    public static final String OMEGA_MAXALL_BAD = "20";
+    public static final String WI_POOR_RAMCHK = "-1.0";
+    public static final String WI_BAD_RAMCHK = "-1.3";
+    public static final String WI_POOR_BBCCHK = "10.0";
+    public static final String WI_BAD_BBCCHK = "3.0";
+    public static final String WI_POOR_C12CHK = "-0.9";
+    public static final String WI_BAD_C12CHK = "-1.2";
+    public static final String PC_POOR_GF = "-1.0";
+    public static final String PC_BAD_GF = "-1.3";
+    public static final String DR_MAXALL_POOR = "0.1";
+    public static final String DR_MAXALL_BAD = "0.3";
+    public static final String DR_THRESHOLD_OVER_POOR = "0.5";
+    public static final String DR_THRESHOLD_FRAC_POOR = "0.5";
+    public static final String DR_THRESHOLD_OVER_BAD = "1.0";
+    public static final String DR_THRESHOLD_FRAC_BAD = "0.5";
+    public static final String DR_RMSALL_BAD = "0.5";
+    public static final String AC_MAXALL_POOR = "3";
+    public static final String AC_MAXALL_BAD = "5";
+    public static final String AC_THRESHOLD_OVER_POOR = "3";
+    public static final String AC_THRESHOLD_FRAC_POOR = "0.5";
+    public static final String AC_THRESHOLD_OVER_BAD = "5";
+    public static final String AC_THRESHOLD_FRAC_BAD = "0.5";
+    public static final String AC_RMSALL_BAD = "3";
+
 }

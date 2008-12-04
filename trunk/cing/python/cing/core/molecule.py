@@ -47,6 +47,7 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
+from cing.Libs.NTutils import NTwarning
 import math
 import os
 import sys
@@ -244,6 +245,36 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
     def getChainIdForChainCount(self):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
 
+    def keepSelectedModels(self, modelListStr ):
+        selectedModels   = self.models2list( modelListStr )
+        selectedModelCount = len( selectedModels )
+        if selectedModelCount == self.modelCount:
+            NTwarning("No models to delete from ensemble sticking with: [" + modelListStr +"]")
+            return 
+             
+#        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
+#        NTdebug("verify this is the same as: [" + `selectedModels` +"]")
+        
+        modelToRemoveList = []
+        l = range( self.modelCount )
+        l.reverse()
+        for m in l:
+            if m not in selectedModels:
+                modelToRemoveList.append( m )
+        NTdebug("Removing models: [" + `modelToRemoveList` +"]")
+        
+        for atm in self.allAtoms():
+            atmCoordCount = len(atm.coordinates) # some atoms have no coordinates or just some
+            for i in modelToRemoveList:
+                if i >= atmCoordCount:
+                    continue 
+                del(atm.coordinates[i])
+                
+        self.modelCount = selectedModelCount
+        self.updateAll() # needed otherwise the dihedral.baddies get thru.
+        NTdebug('After keepSelectedModels: %s' % self)
+        
+        
     def addChain( self, name=None, **kwds ):
         """
         Add Chain instance name
@@ -2648,7 +2679,7 @@ Atom class: Defines object for storing atom properties
         c.model = len(self.coordinates)
         self.coordinates.append( c )
     #end def
-
+    
     def addResonance( self, value=NaN, error=NaN ):
         r = Resonance( atom=self, value=value, error = error )
         r.resonanceIndex = len(self.resonances)

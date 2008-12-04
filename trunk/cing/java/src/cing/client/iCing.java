@@ -50,7 +50,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
 	public static String CURRENT_THEME = "standard";
 
-	/** GUI settings */
+	/** GUI settings */ 
 	public static final int margin = 11;
 	public static final int yLocTopPanel = margin;
 	public static final int yLocMenu = 60;
@@ -422,8 +422,8 @@ public class iCing implements EntryPoint, HistoryListener {
         menuBar_file.addItem(c.PurgeProject(), commandPurgeProject);
 		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
-		menuBar_edit.setVisible(false);// doesn't 'help'
-		// menuBar.addItem(c.Edit(), menuBar_edit);
+//		menuBar_edit.setVisible(false);// doesn't 'help'
+		 menuBar.addItem(c.Edit(), menuBar_edit);
 		menuBar_edit.addItem(c.Criteria(), commandCriteria);
 		menuBar_edit.addItem(c.Options(), commandOptions);
 		menuBar.addItem(c.Run(), commandRun);
@@ -645,9 +645,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		for (int i = 1; i <= Settings.accessKeyLength; i++) {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
-			// TODO: generate on server with cross check on availability...
 		}
-//		result = "123456"; // TODO: disable for production.
+		result = "123456"; // TODO: disable for production.
 		
 		return result;
 	}

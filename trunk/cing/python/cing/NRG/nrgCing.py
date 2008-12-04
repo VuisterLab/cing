@@ -95,7 +95,7 @@ class nrgCing(Lister):
         if self.isProduction: 
             # Needed for php script. 
             self.results_host = 'nmr.cmbi.ru.nl'
-        self.results_url = 'http://'+self.results_host + '/'+self.results_base + '/'
+        self.results_url = 'http://' + self.results_host + '/' + self.results_base + '/'
         
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
@@ -139,7 +139,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url+'/data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -449,7 +449,7 @@ class nrgCing(Lister):
             whyNotEntry.comment = PRESENT_IN_CING
         # end loop over entries
         whyNotStr = '%s' % whyNot
-        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
+#        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
         writeTextToFile("NRG-CING.txt", whyNotStr)
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
@@ -489,17 +489,14 @@ class nrgCing(Lister):
     def update_index_files(self):
         "Updating the index files"
 
+        number_of_entries_per_row = 4
+        number_of_files_per_column = 4
+
         indexDir = os.path.join(self.results_dir, "index")
         if os.path.exists(indexDir):
             shutil.rmtree(indexDir)
         os.mkdir(indexDir)
-        number_of_entries_per_row = 4
-        number_of_files_per_column = 4
         htmlDir = os.path.join(cingRoot, "HTML") 
-        cssFile = os.path.join(htmlDir, "cing.css")
-        headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
-        shutil.copy(cssFile, indexDir)
-        shutil.copy(headerBgFile, indexDir)
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))            
         if not self.entry_list_done:
@@ -558,8 +555,7 @@ class nrgCing(Lister):
                 begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
                 end_entry_count = min(number_of_entries_per_file * file_id,
                                            number_of_entries_all_present)
-                NTdebug("%5d %5d %5d" % (
-                        begin_entry_count, end_entry_count, number_of_entries_all_present))
+#                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
@@ -629,9 +625,9 @@ class nrgCing(Lister):
 
 
                 ## Make the first index file name still index.html                
-                new_file_name = self.results_dir + '/index/index' + "_" + `file_id` + '.html'
+                new_file_name = indexDir + '/index_' + `file_id` + '.html'
                 if not file_id:
-                    new_file_name = self.results_dir + '/index/index' + '.html'
+                    new_file_name = indexDir + '/index.html'
                 open(new_file_name, 'w').write(new_file_content)
 
                 entries_done_per_file = 0
@@ -665,9 +661,9 @@ class nrgCing(Lister):
 
         ## Make a sym link from the index_pdb_1.html file to the index_pdb.html file
         index_file_first = 'index_1.html'
-        index_file = os.path.join(self.results_dir, "index", 'index.html')
+        index_file = os.path.join(indexDir, 'index.html')
         ## Assume that a link that is already present is valid and will do the job
-        NTmessage('Symlinking (A): %s %s' % (index_file_first, index_file))
+#        NTmessage('Symlinking: %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
                  
 #        ## Make a sym link from the index_bmrb.html file to the index.html file
@@ -693,6 +689,12 @@ class nrgCing(Lister):
 #        file_content = string.replace(file_content, old_string, self.results_url)
 #        open(new_file, 'w').write(file_content)
         shutil.copy(org_file, new_file)
+        
+        cssFile = os.path.join(htmlDir, "cing.css")
+        headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
+        shutil.copy(cssFile, indexDir)
+        shutil.copy(headerBgFile, indexDir)
+        
 
         return 1
     

@@ -1,11 +1,10 @@
 package cing.client;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -17,7 +16,7 @@ public class Options extends iCingView {
 
 //	static final private Random r = new Random();
 	private Label accessKeyLabelValue;
-	private TextBox textBoxModel;
+	private TextBox textBoxEnsemble;
 	private TextBox textBoxResidue;
 	
 	int i = 0;
@@ -25,12 +24,15 @@ public class Options extends iCingView {
 	final int optionImagerIdx = i++;
 	final int optionResidueIdx = i++;
 	final int optionModelIdx = i++;
-	final int optionAccessIdx = i++;
-	int cingVerbosity;
-    
+//	final int optionAccessIdx = i++;
+    final ListBox listBoxVerbosity = new ListBox();
+    final CheckBox createImageryCheckBox = new CheckBox();
+
+	
 	public Options() {
 		super();
 	}
+	
 	
 	public void setIcing(iCing icing) {
         super.setIcing(icing);
@@ -51,7 +53,6 @@ public class Options extends iCingView {
 		final Label verbosityLabel = new Label(c.Verbosity());
 		flexTable.setWidget(optionVerbosityIdx, 0, verbosityLabel);
 		
-		final ListBox listBoxVerbosity = new ListBox();
 		listBoxVerbosity.addItem(c.Nothing(),"0");
 		listBoxVerbosity.addItem(c.Error(),"1");
 		listBoxVerbosity.addItem(c.Warning(),"2");
@@ -60,20 +61,15 @@ public class Options extends iCingView {
 		listBoxVerbosity.addItem(c.Debug(),"9"); // refuse to give up extra space between 4 and 9 for coding convenience here.
 		listBoxVerbosity.setVisibleItemCount(1);
 		flexTable.setWidget(optionVerbosityIdx, 1, listBoxVerbosity);
-		listBoxVerbosity.addChangeListener(new ChangeListener() {
-			public void onChange(final Widget sender) {
-				int selectedValue = Integer.parseInt( listBoxVerbosity.getValue( listBoxVerbosity.getSelectedIndex()));
-				cingVerbosity = GenClient.map2CingVerbosity( selectedValue );
-			}
-		});
-		listBoxVerbosity.setSelectedIndex(GenClient.getVerbosity());
-		cingVerbosity = GenClient.map2CingVerbosity( GenClient.getVerbosity() );
+		listBoxVerbosity.setSelectedIndex(3);
+		if ( Settings.DO_DEBUG ) {
+		    listBoxVerbosity.setSelectedIndex(5);
+		}
 		
-		final CheckBox createImageryCheckBox = new CheckBox();
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
-		createImageryCheckBox.setChecked(false);
 		flexTable.getFlexCellFormatter().setColSpan(1, 0, 2);
 		createImageryCheckBox.setText(c.Imagery_repor());
+		createImageryCheckBox.setChecked(true);
 		
 		final Label residuesLabel = new Label(c.Residues());
 		flexTable.setWidget(optionResidueIdx, 0, residuesLabel);
@@ -89,20 +85,21 @@ public class Options extends iCingView {
 		final Label ensembleModelsLabel = new Label(c.Ensemble_mode() + ":");
 		flexTable.setWidget(optionModelIdx, 0, ensembleModelsLabel);
 
-		textBoxModel = new TextBox();
-		flexTable.setWidget(optionModelIdx, 1, textBoxModel);
-		textBoxModel.setWidth("100%");
-		textBoxModel.setEnabled(false);
+		textBoxEnsemble = new TextBox();
+		textBoxEnsemble.setEnabled(false);
+		flexTable.setWidget(optionModelIdx, 1, textBoxEnsemble);
+		textBoxEnsemble.setWidth("100%");
+//		textBoxEnsemble.setEnabled(false);
 
-		final Label egModel219Label = new Label(c.E_g_() + " 2-19");
+		final Label egModel219Label = new Label(c.E_g_() + " 0,3-8,10");
 		flexTable.setWidget(optionModelIdx, 2, egModel219Label);
 
-		final Label accessKeyLabel = new Label(c.Access_key());
-		flexTable.setWidget(optionAccessIdx, 0, accessKeyLabel);
+//		final Label accessKeyLabel = new Label(c.Access_key());
+//		flexTable.setWidget(optionAccessIdx, 0, accessKeyLabel);
 
 		// Added panel for getting better spacing?
 		final HorizontalPanel horizontalPanel = new HorizontalPanel();
-		flexTable.setWidget(optionAccessIdx, 1, horizontalPanel);
+//		flexTable.setWidget(optionAccessIdx, 1, horizontalPanel);
 		horizontalPanel.setSpacing(5);
 
 		accessKeyLabelValue = new Label();
@@ -115,7 +112,7 @@ public class Options extends iCingView {
 		final PushButton regeneratePushButton = new PushButton("Up text", "Down text");
 		regeneratePushButton.getDownFace().setHTML(c.Randomizing());
 		regeneratePushButton.getUpFace().setHTML(c.Regenerate());
-		flexTable.setWidget(optionAccessIdx, 2, regeneratePushButton);
+//		flexTable.setWidget(optionAccessIdx, 2, regeneratePushButton);
 		regeneratePushButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
 				generateAccessKey();
@@ -125,18 +122,29 @@ public class Options extends iCingView {
 		regeneratePushButton.setText(c.Regenerate());
 		regeneratePushButton.setEnabled(false);
 //		generateAccessKey(); 
-		
-		final Button nextButton = new Button();
-		nextButton.setText(c.Next());
-		nextButton.addClickListener(new ClickListener() {
-			public void onClick(final Widget sender) {
-				icingShadow.onHistoryChanged(iCing.RUN_STATE);					
-			}
-		});	
-		verticalPanel.add(nextButton);
-		nextButton.setTitle(c.Submit_to_CING_s());
-		verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-		
+				
+        final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
+        horizontalPanelBackNext.setSpacing(iCing.margin);
+        verticalPanel.add(horizontalPanelBackNext);
+        final Button backButton = new Button();
+        final Button nextButton = new Button();
+        horizontalPanelBackNext.add(backButton);
+        backButton.addClickListener(new ClickListener() {
+            public void onClick(final Widget sender) {
+                History.back();
+            }
+        });
+        backButton.setText(c.Back());
+        horizontalPanelBackNext.add(backButton);
+        horizontalPanelBackNext.add(nextButton);
+
+        nextButton.addClickListener(new ClickListener() {
+            public void onClick(final Widget sender) {
+                icingShadow.onHistoryChanged(iCing.RUN_STATE);
+            }
+        });
+        nextButton.setText(c.Next());
+        nextButton.setTitle(c.Submit_to_CING_s());
 	}
 	
 	
@@ -148,11 +156,19 @@ public class Options extends iCingView {
 		GenClient.showDebug("Set access key to: " + iCing.currentAccessKey);
 	}
 
-	public TextBox getTextBoxResidue() {
-		return textBoxResidue;
-	}
+    public String getVerbosity() {
+        return Utils.getListBoxItemText(listBoxVerbosity);
+    }
 
-	public TextBox getTextBoxModel() {
-		return textBoxModel;
-	}
+    public String getImagery() {
+        return Boolean.toString( createImageryCheckBox.isChecked() );
+    }
+
+    public String getResidue() {
+        return textBoxResidue.getSelectedText();
+    }
+
+	public String getEnsemble() {
+		return textBoxEnsemble.getSelectedText();
+	}	
 }

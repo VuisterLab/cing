@@ -366,6 +366,7 @@ def initCcpn( cingProject, ccpnFolder = None ):
                     ccpnRootDirectory = itar.name.replace("/", '')
                     if not ccpnRootDirectory:
                         NTerror("Skipping potential ccpnRootDirectory")
+        tar.close()
         if not ccpnRootDirectory:
             NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % ccpnFolder )
             return None

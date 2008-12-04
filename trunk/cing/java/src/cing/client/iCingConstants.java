@@ -904,6 +904,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Standard();
 
   /**
+   * Translated "Set the options.".
+   * 
+   * @return translated "Set the options."
+   * @gwt.key Set_the_options
+   */
+  String Set_the_options();
+
+  /**
    * Translated "Debug".
    * 
    * @return translated "Debug"
