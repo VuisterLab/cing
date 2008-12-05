@@ -11,7 +11,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
@@ -246,34 +245,38 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
 
     def keepSelectedModels(self, modelListStr ):
-        selectedModels   = self.models2list( modelListStr )
-        selectedModelCount = len( selectedModels )
-        if selectedModelCount == self.modelCount:
-            NTwarning("No models to delete from ensemble sticking with: [" + modelListStr +"]")
-            return 
-             
-#        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
-#        NTdebug("verify this is the same as: [" + `selectedModels` +"]")
         
-        modelToRemoveList = []
-        l = range( self.modelCount )
-        l.reverse()
-        for m in l:
-            if m not in selectedModels:
-                modelToRemoveList.append( m )
-        NTdebug("Removing models: [" + `modelToRemoveList` +"]")
-        
-        for atm in self.allAtoms():
-            atmCoordCount = len(atm.coordinates) # some atoms have no coordinates or just some
-            for i in modelToRemoveList:
-                if i >= atmCoordCount:
-                    continue 
-                del(atm.coordinates[i])
-                
-        self.modelCount = selectedModelCount
-        self.updateAll() # needed otherwise the dihedral.baddies get thru.
-        NTdebug('After keepSelectedModels: %s' % self)
-        
+        try:
+            selectedModels   = self.models2list( modelListStr )
+            selectedModelCount = len( selectedModels )
+            if selectedModelCount == self.modelCount:
+                NTwarning("No models to delete from ensemble sticking with: [" + modelListStr +"]")
+                return 
+                 
+    #        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
+    #        NTdebug("verify this is the same as: [" + `selectedModels` +"]")
+            
+            modelToRemoveList = []
+            l = range( self.modelCount )
+            l.reverse()
+            for m in l:
+                if m not in selectedModels:
+                    modelToRemoveList.append( m )
+            NTmessage("Keeping  "+`len(selectedModels)`+" models : [" + `modelListStr` +"]")
+            NTmessage("Removing "+`len(modelToRemoveList)`+" models : [" + `modelToRemoveList` +"]")
+            
+            for atm in self.allAtoms():
+                atmCoordCount = len(atm.coordinates) # some atoms have no coordinates or just some
+                for i in modelToRemoveList:
+                    if i >= atmCoordCount:
+                        continue 
+                    del(atm.coordinates[i])
+                    
+            self.modelCount = selectedModelCount
+            self.updateAll() # needed otherwise the dihedral.baddies get thru.
+            NTdebug('After keepSelectedModels: %s' % self)
+        except:
+            NTerror("Failed keepSelectedModels; please check the input string ["+modelListStr+"]")     
         
     def addChain( self, name=None, **kwds ):
         """

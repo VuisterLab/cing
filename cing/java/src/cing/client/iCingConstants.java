@@ -528,6 +528,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String E_g_();
 
   /**
+   * Translated "RMS violation".
+   * 
+   * @return translated "RMS violation"
+   * @gwt.key Rms_violatio
+   */
+  String Rms_violatio();
+
+  /**
    * Translated "here".
    * 
    * @return translated "here"
@@ -614,6 +622,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key No_Project_on_se
    */
   String No_Project_on_se();
+
+  /**
+   * Translated "Procheck G factor ".
+   * 
+   * @return translated "Procheck G factor "
+   * @gwt.key gFactor
+   */
+  String gFactor();
 
   /**
    * Translated "in which results are being created that may be consulted in the meanwhile. You may also switch to".
@@ -798,6 +814,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Flag_missing
    */
   String Flag_missing();
+
+  /**
+   * Translated "Maximum violation".
+   * 
+   * @return translated "Maximum violation"
+   * @gwt.key Maximum_violatio
+   */
+  String Maximum_violatio();
 
   /**
    * Translated "plot".

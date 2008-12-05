@@ -105,30 +105,4 @@ public interface Settings {
     public static final String FILE_PROGRAM_PDB = "PDB";
     public static final String FILE_TYPE_PROJECT = "project";
     public static final String FILE_TYPE_VALIDATION_SETTINGS = "validation settings";
-
-    public static final String OMEGA_MAXALL_POOR = "15";
-    public static final String OMEGA_MAXALL_BAD = "20";
-    public static final String WI_POOR_RAMCHK = "-1.0";
-    public static final String WI_BAD_RAMCHK = "-1.3";
-    public static final String WI_POOR_BBCCHK = "10.0";
-    public static final String WI_BAD_BBCCHK = "3.0";
-    public static final String WI_POOR_C12CHK = "-0.9";
-    public static final String WI_BAD_C12CHK = "-1.2";
-    public static final String PC_POOR_GF = "-1.0";
-    public static final String PC_BAD_GF = "-1.3";
-    public static final String DR_MAXALL_POOR = "0.1";
-    public static final String DR_MAXALL_BAD = "0.3";
-    public static final String DR_THRESHOLD_OVER_POOR = "0.5";
-    public static final String DR_THRESHOLD_FRAC_POOR = "0.5";
-    public static final String DR_THRESHOLD_OVER_BAD = "1.0";
-    public static final String DR_THRESHOLD_FRAC_BAD = "0.5";
-    public static final String DR_RMSALL_BAD = "0.5";
-    public static final String AC_MAXALL_POOR = "3";
-    public static final String AC_MAXALL_BAD = "5";
-    public static final String AC_THRESHOLD_OVER_POOR = "3";
-    public static final String AC_THRESHOLD_FRAC_POOR = "0.5";
-    public static final String AC_THRESHOLD_OVER_BAD = "5";
-    public static final String AC_THRESHOLD_FRAC_BAD = "0.5";
-    public static final String AC_RMSALL_BAD = "3";
-
 }
