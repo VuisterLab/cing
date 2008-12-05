@@ -6,7 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5 extras"/>
 	<classpathentry kind="lib" path="java/production/WEB-INF/lib/printf_hb15.jar"/>
 	<classpathentry kind="lib" path="java/production/WEB-INF/lib/jakarta-regexp.jar"/>
-	<classpathentry kind="lib" path="/Users/jd/workspace34/wattos/build" sourcepath="/wattos/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/wattos"/>
 	<classpathentry kind="output" path="java/bin"/>
 </classpath>

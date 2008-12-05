@@ -246,9 +246,39 @@ public class Utils {
     public static String getListBoxItemText(ListBox listBox) {
         String result = null;
         result = listBox.getItemText( listBox.getSelectedIndex());         
-//        GenClient.showDebug("Got text: " + result);
+        GenClient.showDebug("Got ListBox text: " + result);
         return result;
     }
-	
+    public static String getListBoxItemValue(ListBox listBox) {
+        String result = null;
+        result = listBox.getValue( listBox.getSelectedIndex());         
+        GenClient.showDebug("Got ListBox value: " + result);
+        return result;
+    }
 
+    /**
+     * 
+     * @param t
+     * @param row
+     * @param b
+     * @return true for error.
+     */
+    public static boolean setEnabledAllInColumnsButFirst(FlexTable t, int row, boolean b) {
+        if ( row >= t.getRowCount()) {
+            GenClient.showCodeBug("In setEnabledAllInColumnsButFirst row is: " + row + " but getRowCount is: " + t.getRowCount());
+            return true;
+        }
+        
+        int colMax = t.getCellCount(row);
+        for (int column = 1; column < colMax; column++) {
+            Widget w = t.getWidget(row, column);
+            setEnabled(w, b);
+        }
+        String msg = "Enabled";
+        if (!b) {
+            msg = "Disabled";
+        }
+        GenClient.showDebug(msg + " all input fields for table: " + t.getTitle()+" row: " + row);
+        return false; 
+    }
 }

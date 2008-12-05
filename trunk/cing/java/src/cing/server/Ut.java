@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Set;
 
+import Wattos.Utils.General;
 import Wattos.Utils.InOut;
 import Wattos.Utils.StringArrayList;
 
@@ -21,7 +22,7 @@ public class Ut {
     public static NumberFormat nf = NumberFormat.getInstance();
 
     public static String formatReal(double d, int precision) {
-        nf.setMaximumFractionDigits(precision); 
+        nf.setMaximumFractionDigits(precision);
         nf.setMinimumFractionDigits(precision);
         return nf.format(d);
     }
@@ -66,19 +67,26 @@ public class Ut {
         return result;
     }
 
-    /** Next might be implemented in i18n but is pretty fast here. */
+    /**
+     * 
+     * @param parameterMap
+     * @return Conforms to: Python RFC822 Configuration Settings
+     */
     public static String mapToPythonRFC822ConfigurationSettings(HashMap<String, String> parameterMap) {
         String FILE_LOCATION = "Data/valSetsHeader.cfg";
         InputStream file_is = Ut.class.getResourceAsStream(FILE_LOCATION); // was getClass()
         String header = InOut.readTextFromInputStream(file_is);
 
+        if (header == null) {
+            General.showError("Failed to read header from: " + FILE_LOCATION);
+            return null;
+        }
         StringBuffer result = new StringBuffer();
         result.append(header);
         /**
          * For the long command string it's real nice to have the overview layed out in a printf way
          */
         Parameters p = new Parameters(); // Printf parameters autoclearing after use.
-
         Set<String> keySet = parameterMap.keySet();
         StringArrayList sal = new StringArrayList(keySet);
         sal.sort();
@@ -86,7 +94,7 @@ public class Ut {
         for (int i = 0; i < n; i++) {
             String key = sal.getString(i);
             p.add(key);
-            p.add(parameterMap.get( key));
+            p.add(parameterMap.get(key));
             String item = Format.sprintf("%-30s = %-30s\n", p);
             result.append(item);
         }

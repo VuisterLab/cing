@@ -106,7 +106,7 @@ class ProcheckSummaryResult( NTdict ):
                         ranges     = ranges,
                         text       = text,
                         __FORMAT__ = \
-dots + " procheck summary " + dots + """
+dots + " Procheck Summary " + dots + """
 molecule:     %(molecule)s
 ranges:       %(ranges)s
 ramachandran

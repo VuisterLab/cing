@@ -152,7 +152,7 @@ public class iCingServlet extends HttpServlet {
                 }
                 int endIndex = Math.min(100, value.length());
                 String valueTruncated = value.substring(0, endIndex);
-                String msg = "Retrieved extra arameter [" + name + "] with value (first 100 bytes): [" + valueTruncated
+                String msg = "Retrieved extra parameter [" + name + "] with value (first 100 bytes): [" + valueTruncated
                         + "].";
                 General.showDebug(msg);
             } else {
@@ -297,13 +297,13 @@ public class iCingServlet extends HttpServlet {
      * @return null on error.
      */
     private String getProjectFilePath(File pathProject) {
-        General.showOutput("Reg exp files: " + PROJECT_NAME_regexp);
-        General.showOutput("Dir: " + pathProject);
+        // General.showOutput("Reg exp files: " + PROJECT_NAME_regexp);
+        // General.showOutput("Dir: " + pathProject);
         InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(PROJECT_NAME_regexp);
         String[] list = pathProject.list(ff);
 
         General.showOutput("Found files: " + Strings.toString(list));
-        General.showOutput("Found number of files: " + list.length);
+        // General.showOutput("Found number of files: " + list.length);
 
         if (list.length < 1) {
             return null;
@@ -394,14 +394,7 @@ public class iCingServlet extends HttpServlet {
         String cmdRunZipper = "zip -rq " + projectName + Settings.ZIP_REPORT_FILENAME_POST_FIX + ".zip cingRun.log "
                 + projectName + ".cing";
 
-        /**
-         * For the long command string it's real nice to have the overview layed out in a printf way
-         */
-        Parameters p = new Parameters(); // Printf parameters autoclearing after use.
-        p.add(projectName);
-        p.add(possibleInit);
-        p.add(Settings.CING_VERBOSITY);
-        String cing_options = Format.sprintf("--name %s %s -v %s --script doValidateiCing.py", p);
+        String cing_options = "--name " + projectName + " --script doValidateiCing.py " + possibleInit;
 
         General.showDebug("verbosity at iCingServlet: " + verbosity);
         if (verbosity != null && verbosity.length() > 0 && (!verbosity.equals("null"))) {
@@ -409,15 +402,21 @@ public class iCingServlet extends HttpServlet {
         }
         General.showDebug("residues at iCingServlet: " + residues);
         if (residues != null && residues.length() > 0 && (!residues.equals("null"))) {
+            residues = residues.replaceAll(" ", "");
             cing_options += " --ranges " + residues;
         }
-        if (ensemble != null) {
+        if (ensemble != null && ensemble.length() > 0 && (!ensemble.equals("null"))) {
+            ensemble = ensemble.replaceAll(" ", "");
             cing_options += " --ensemble " + ensemble;
         }
-        if (imagery == null) {
+        if (imagery != null && imagery.length() > 0 && imagery.equals("false")) {
             cing_options += " --noImagery";
         }
 
+        /**
+         * For the long command string it's real nice to have the overview layed out in a printf way
+         */
+        Parameters p = new Parameters(); // Printf parameters autoclearing after use.
         p.add(cmdCdProjectDir);
         p.add(Settings.CING_WRAPPER_SCRIPT);
         p.add(cing_options);
@@ -493,7 +492,7 @@ public class iCingServlet extends HttpServlet {
 
         File uploadedFile = new File(pathProject, fileName);
         if (uploadedFile.exists()) {
-            if (uploadedFile.delete()) {
+            if (!uploadedFile.delete()) {
                 writeJsonError(response, result, "Failed to remove file with the same name: [" + uploadedFile + "]");
                 return;
             }
@@ -554,7 +553,7 @@ public class iCingServlet extends HttpServlet {
             return;
         }
         InOut.chmod(uploadedFile, "a+rw");
- 
+
         long length = uploadedFile.length();
         General.showDebug("File written length: " + length);
         String sizeStr = Ut.bytesToFormattedString(length);

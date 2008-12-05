@@ -77,8 +77,9 @@ public class Options extends iCingView {
 		textBoxResidue = new TextBox();
 		flexTable.setWidget(optionResidueIdx, 1, textBoxResidue);
 		textBoxResidue.setWidth("100%");
-		textBoxResidue.setEnabled(false);
-
+//		textBoxResidue.setEnabled(false);
+		textBoxResidue.setText("175, 177-189"); // space will be stripped by servlet.
+		
 		final Label egResidue175177189Label = new Label(c.E_g_() + " 175,177-189");
 		flexTable.setWidget(optionResidueIdx, 2, egResidue175177189Label);
 
@@ -86,12 +87,13 @@ public class Options extends iCingView {
 		flexTable.setWidget(optionModelIdx, 0, ensembleModelsLabel);
 
 		textBoxEnsemble = new TextBox();
-		textBoxEnsemble.setEnabled(false);
+//		textBoxEnsemble.setEnabled(false);
 		flexTable.setWidget(optionModelIdx, 1, textBoxEnsemble);
 		textBoxEnsemble.setWidth("100%");
 //		textBoxEnsemble.setEnabled(false);
+		textBoxEnsemble.setText("0,3-8");
 
-		final Label egModel219Label = new Label(c.E_g_() + " 0,3-8,10");
+		final Label egModel219Label = new Label(c.E_g_() + " 0,3-8");
 		flexTable.setWidget(optionModelIdx, 2, egModel219Label);
 
 //		final Label accessKeyLabel = new Label(c.Access_key());
@@ -157,7 +159,7 @@ public class Options extends iCingView {
 	}
 
     public String getVerbosity() {
-        return Utils.getListBoxItemText(listBoxVerbosity);
+        return Utils.getListBoxItemValue(listBoxVerbosity);
     }
 
     public String getImagery() {
@@ -165,10 +167,10 @@ public class Options extends iCingView {
     }
 
     public String getResidue() {
-        return textBoxResidue.getSelectedText();
+        return textBoxResidue.getText();
     }
 
 	public String getEnsemble() {
-		return textBoxEnsemble.getSelectedText();
+		return textBoxEnsemble.getText();
 	}	
 }

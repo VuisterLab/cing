@@ -1,5 +1,7 @@
 package cing.client;
 
+import java.util.HashMap;
+
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -18,7 +20,7 @@ public class RunView extends iCingView {
     static final Button nextButton = new Button();
     iCingQuery cingQueryRun;
     iCingQuery cingQueryOptions = null;
-    static final Button saveOptionsButton = new Button();
+    static final Button saveCriteriaButton = new Button();
 
     public RunView() {
         super();
@@ -43,7 +45,6 @@ public class RunView extends iCingView {
         submitButton.setText(c.Submit());
         submitButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                // submitButton.setText("Running...");
                 run();
             }
         });
@@ -53,17 +54,17 @@ public class RunView extends iCingView {
         verticalPanelDec.add(submitButton);
 
         /** Options block */
-        saveOptionsButton.setTitle(c.Run_the_validati());
-        verticalPanelDec.setCellHorizontalAlignment(saveOptionsButton, HasHorizontalAlignment.ALIGN_LEFT);
+        saveCriteriaButton.setTitle(c.Run_the_validati());
+        verticalPanelDec.setCellHorizontalAlignment(saveCriteriaButton, HasHorizontalAlignment.ALIGN_LEFT);
 
-        saveOptionsButton.setText("saveOptionsButton");
-        saveOptionsButton.addClickListener(new ClickListener() {
+        saveCriteriaButton.setText("saveCriteriaButton");
+        saveCriteriaButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                getOptions();
+                run();
             }
         });
 
-        verticalPanel.add(saveOptionsButton);
+        verticalPanel.add(saveCriteriaButton);
         FormHandlerSpecific serverFormHandlerOptions = new FormHandlerSpecific(icing);
         cingQueryOptions = new iCingQuery(icing);
         cingQueryOptions.action.setValue(Settings.FORM_ACTION_OPTIONS);
@@ -80,7 +81,6 @@ public class RunView extends iCingView {
                 icingShadow.onHistoryChanged(iCing.CING_LOG_STATE);
             }
         });
-        // nextButton.setEnabled(false); //disable for testing it will be triggered by a run; or not...
 
         final HorizontalPanel horizontalPanelBackNext = new HorizontalPanel();
         horizontalPanelBackNext.setSpacing(iCing.margin);
@@ -97,8 +97,7 @@ public class RunView extends iCingView {
         horizontalPanelBackNext.add(nextButton);
 
         nextButton.setTitle(c.Goto_CING_log());
-        // verticalPanel.setCellHorizontalAlignment(nextButton, HasHorizontalAlignment.ALIGN_CENTER);
-        // nextButton.setVisible(false);
+
         cingQueryRun = new iCingQuery(icing);
         cingQueryRun.action.setValue(Settings.FORM_ACTION_RUN);
         verticalPanel.add(cingQueryRun.formPanel);
@@ -106,21 +105,44 @@ public class RunView extends iCingView {
     }
 
     /** Save the options; like a get to the server */
-    protected void getOptions() {
-        saveOptionsButton.setText("Saving options...");
+    protected void run() {
+        GenClient.showDebug("Now in run");
+        submitButton.setEnabled(false);
+        @SuppressWarnings("unused")
+        HashMap<String, String> parameterMap = icing.criteria.getCriteria();
+       
+//        String keySet = parameterMap.keySet();
+//        
+//        for (String key = 0; i < n; i++) {
+//            String key = sal.getString(i);
+//            p.add(key);
+//            p.add(parameterMap.get(key));
+//            String item = Format.sprintf("%-30s = %-30s\n", p);
+//            result.append(item);
+//        }
+        cingQueryOptions.formVerticalPanel.add(new Hidden("a", "b"));
+
+        saveCriteriaButton.setText("Saving criteria...");
         cingQueryOptions.formPanel.submit();
     }
 
     /** Call back method */
     protected void setOptions(String result) {
-        saveOptionsButton.setText("Options saved: " + result);
-    }
-
-    protected void run() {
-        submitButton.setEnabled(false);
-        nextButton.setEnabled(true);
-        icing.cingLogView.getProjectName();
+        saveCriteriaButton.setText("Criteria saved: " + result);
+        GenClient.showDebug("Now in setOptions");
+//        return;
         
+//        nextButton.setEnabled(true);
+        icing.cingLogView.getProjectName(); // should have been done already.
+
+        String verbosity = icing.options.getVerbosity();
+        String imagery = icing.options.getImagery();
+        String residue = icing.options.getResidue();
+        String ensemble = icing.options.getEnsemble();
+        GenClient.showDebug("verbosity: " + verbosity);
+        GenClient.showDebug("imagery: " + imagery);
+        GenClient.showDebug("residue: " + residue);
+        GenClient.showDebug("ensemble: " + ensemble);
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_VERBOSITY, icing.options.getVerbosity()));
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_IMAGERY, icing.options.getImagery()));
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_RESIDUES, icing.options.getResidue()));
