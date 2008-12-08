@@ -1,6 +1,5 @@
 package cing.client;
 
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -78,7 +77,7 @@ public class Options extends iCingView {
 		flexTable.setWidget(optionResidueIdx, 1, textBoxResidue);
 		textBoxResidue.setWidth("100%");
 //		textBoxResidue.setEnabled(false);
-		textBoxResidue.setText("175, 177-189"); // space will be stripped by servlet.
+		textBoxResidue.setText(""); // space will be stripped by servlet.
 		
 		final Label egResidue175177189Label = new Label(c.E_g_() + " 175,177-189");
 		flexTable.setWidget(optionResidueIdx, 2, egResidue175177189Label);
@@ -91,7 +90,7 @@ public class Options extends iCingView {
 		flexTable.setWidget(optionModelIdx, 1, textBoxEnsemble);
 		textBoxEnsemble.setWidth("100%");
 //		textBoxEnsemble.setEnabled(false);
-		textBoxEnsemble.setText("0,3-8");
+		textBoxEnsemble.setText("");
 
 		final Label egModel219Label = new Label(c.E_g_() + " 0,3-8");
 		flexTable.setWidget(optionModelIdx, 2, egModel219Label);
@@ -133,7 +132,8 @@ public class Options extends iCingView {
         horizontalPanelBackNext.add(backButton);
         backButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                History.back();
+                icingShadow.onHistoryChanged(iCing.CRITERIA_STATE);
+//                History.back();
             }
         });
         backButton.setText(c.Back());

@@ -1,7 +1,6 @@
 package cing.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -42,7 +41,8 @@ public class Report extends iCingView {
 		horizontalPanelBackNext.add(backButton);
 		backButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				History.back();
+                icingShadow.onHistoryChanged(iCing.CING_LOG_STATE);
+//				History.back();
 			}
 		});
 		backButton.setText(c.Back());
@@ -122,6 +122,7 @@ public class Report extends iCingView {
 	// }
 
 	public void showResults() {
+        GenClient.showDebug("Now in report#showResults");
 		String runUrl = getRunUrl();
 		if (runUrl == null) {
 			GenClient.showError("In showResults. Failed to getRunUrl; not changing the report url.");

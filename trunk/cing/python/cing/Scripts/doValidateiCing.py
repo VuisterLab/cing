@@ -23,7 +23,7 @@ if options.noImagery:
     NTmessage( "Setting to htmlOnly because noImagery option was set." )
     htmlOnly = True
 else:
-    NTdebug( "noImagery option was not found." )
+    NTdebug( "noImagery option was not set so doing all images." )
     
 #==================================================
 # Check for molecule
@@ -34,7 +34,7 @@ if project.molecule == None:
 #end if
 
 ## TODO: disable after done debugging.
-exit(0)
+#exit(0)
 #==================================================
 # Run the tests
 #==================================================

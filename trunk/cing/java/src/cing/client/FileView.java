@@ -3,7 +3,6 @@ package cing.client;
 import java.util.ArrayList;
 
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -90,7 +89,7 @@ public class FileView extends iCingView {
         horizontalPanelBackNext.add(backButton);
         backButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                History.back();
+                icingShadow.onHistoryChanged(iCing.WELCOME_STATE);
             }
         });
         backButton.setText(c.Back());
@@ -310,6 +309,7 @@ public class FileView extends iCingView {
                     listBox_Type.addItem(item);
                 }
                 listBox_Type.setItemSelected(0, true);
+                listBox_Type.setEnabled(typeList.size() > 1);
                 listBox_Type.onBrowserEvent(Event.getCurrentEvent());
             }
         });
@@ -338,6 +338,7 @@ public class FileView extends iCingView {
                     listBox_Subtype.addItem(item);
                 }
                 listBox_Subtype.setItemSelected(0, true);
+                listBox_Subtype.setEnabled(subTypeList.size() > 1);
                 listBox_Subtype.onBrowserEvent(Event.getCurrentEvent());
             }
         });
@@ -372,6 +373,7 @@ public class FileView extends iCingView {
                     listBox_Other.addItem(item);
                 }
                 listBox_Other.setItemSelected(0, true);
+                listBox_Other.setEnabled(otherList.size() > 1);
                 listBox_Other.onBrowserEvent(Event.getCurrentEvent()); // No need to propagate
             }
         });

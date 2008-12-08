@@ -11,22 +11,19 @@ public class Classification {
      */
     static final String[][] classi = new String[][] {
             { Settings.FILE_PROGRAM_CCPN, Settings.FILE_TYPE_PROJECT, iCing.STRING_NA, iCing.STRING_NA, "1brv.tgz" },
-            { Settings.FILE_PROGRAM_CING, Settings.FILE_TYPE_PROJECT, iCing.STRING_NA, iCing.STRING_NA,
-                "1brv.cing.tgz" },
-                { Settings.FILE_PROGRAM_CING, Settings.FILE_TYPE_VALIDATION_SETTINGS, iCing.STRING_NA, iCing.STRING_NA,
+            { Settings.FILE_PROGRAM_CING, Settings.FILE_TYPE_PROJECT, iCing.STRING_NA, iCing.STRING_NA, "1brv.cing.tgz" },
+            { Settings.FILE_PROGRAM_CING, Settings.FILE_TYPE_VALIDATION_SETTINGS, iCing.STRING_NA, iCing.STRING_NA,
                     Settings.VAL_SETS_CFG_DEFAULT_FILENAME },
-    // { "CING", "project", iCing.STRING_NA, iCing.STRING_NA },
-    // { "CCPN", "bogus", "blabla", iCing.STRING_NA },
-    // { "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
-    // { "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
-    // { "DYANA/DIANA", "distance", "NOE", "upper" },
-    // { "DYANA/DIANA", "distance", "NOE", "lower" },
-    // { "DYANA/DIANA", "dihedral angle", iCing.STRING_NA, iCing.STRING_NA },
-    // { "XPLOR/CNS", "distance", "hydrogen bond", iCing.STRING_NA },
-    // { "XPLOR/CNS", "distance", "NOE", iCing.STRING_NA },
-                    { Settings.FILE_PROGRAM_PDB, "coordinate", iCing.STRING_NA, iCing.STRING_NA, "pdb1brv.ent" },
-                    { Settings.FILE_PROGRAM_PDB, "coordinate", iCing.STRING_NA, iCing.STRING_NA, "pdb1brv.ent" },
-    };
+            // { "CING", "project", iCing.STRING_NA, iCing.STRING_NA },
+            // { "CCPN", "bogus", "blabla", iCing.STRING_NA },
+            // { "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
+            // { "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
+            // { "DYANA/DIANA", "distance", "NOE", "upper" },
+            // { "DYANA/DIANA", "distance", "NOE", "lower" },
+            // { "DYANA/DIANA", "dihedral angle", iCing.STRING_NA, iCing.STRING_NA },
+            // { "XPLOR/CNS", "distance", "hydrogen bond", iCing.STRING_NA },
+            // { "XPLOR/CNS", "distance", "NOE", iCing.STRING_NA },
+            { Settings.FILE_PROGRAM_PDB, "coordinate", iCing.STRING_NA, iCing.STRING_NA, "pdb1brv.ent" }, };
 
     public static ArrayList<String> getProgramList() {
         ArrayList<String> r = new ArrayList<String>();
@@ -86,7 +83,7 @@ public class Classification {
                 }
             }
         }
-//        GenClient.showDebug("getOtherList: " + Utils.toString(r, false, true, ","));
+        // GenClient.showDebug("getOtherList: " + Utils.toString(r, false, true, ","));
         return r;
     }
 

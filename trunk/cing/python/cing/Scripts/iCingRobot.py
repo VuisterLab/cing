@@ -86,6 +86,7 @@ def iCingRobot():
         %s """ % (credentialSettings, FORM_ACTION_PROJECT_NAME, rpcUrl)
     if doPname:
         NTmessage("Curling to: " + rpcUrl)
+                
         do_cmd(cmdPname)
     
 ##############################################################################################################
@@ -95,7 +96,10 @@ def iCingRobot():
     if doPurge:
         NTmessage("Curling to: " + rpcUrl)
         do_cmd(cmdPname)
-    
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     iCingRobot()
+    
+    
+    

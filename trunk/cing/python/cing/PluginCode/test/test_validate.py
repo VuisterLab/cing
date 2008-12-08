@@ -23,9 +23,9 @@ class AllChecks(TestCase):
     def testRun(self):
         fastestTest = False
         
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
         if fastestTest:
             htmlOnly = True 
             doWhatif = False

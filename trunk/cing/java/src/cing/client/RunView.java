@@ -2,11 +2,9 @@ package cing.client;
 
 import java.util.HashMap;
 
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -20,7 +18,7 @@ public class RunView extends iCingView {
     static final Button nextButton = new Button();
     iCingQuery cingQueryRun;
     iCingQuery cingQueryOptions = null;
-    static final Button saveCriteriaButton = new Button();
+//    static final Button saveCriteriaButton = new Button();
 
     public RunView() {
         super();
@@ -45,7 +43,7 @@ public class RunView extends iCingView {
         submitButton.setText(c.Submit());
         submitButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                run();
+                getCriteriaOnServer();
             }
         });
         submitButton.setEnabled(true);
@@ -54,26 +52,26 @@ public class RunView extends iCingView {
         verticalPanelDec.add(submitButton);
 
         /** Options block */
-        saveCriteriaButton.setTitle(c.Run_the_validati());
-        verticalPanelDec.setCellHorizontalAlignment(saveCriteriaButton, HasHorizontalAlignment.ALIGN_LEFT);
+//        saveCriteriaButton.setTitle(c.Run_the_validati());
+//        verticalPanelDec.setCellHorizontalAlignment(saveCriteriaButton, HasHorizontalAlignment.ALIGN_LEFT);
+//
+//        saveCriteriaButton.setText("saveCriteriaButton");
+//        saveCriteriaButton.addClickListener(new ClickListener() {
+//            public void onClick(final Widget sender) {
+//                run();
+//            }
+//        });
 
-        saveCriteriaButton.setText("saveCriteriaButton");
-        saveCriteriaButton.addClickListener(new ClickListener() {
-            public void onClick(final Widget sender) {
-                run();
-            }
-        });
-
-        verticalPanel.add(saveCriteriaButton);
+//        verticalPanel.add(saveCriteriaButton);
         FormHandlerSpecific serverFormHandlerOptions = new FormHandlerSpecific(icing);
         cingQueryOptions = new iCingQuery(icing);
-        cingQueryOptions.action.setValue(Settings.FORM_ACTION_OPTIONS);
+        cingQueryOptions.action.setValue(Settings.FORM_ACTION_CRITERIA);
         cingQueryOptions.setFormHandler(serverFormHandlerOptions);
         verticalPanel.add(cingQueryOptions.formPanel);
-        for (int i = 0; i < 2; i++) { // testing if protocol can handle many params.
-            String randomKey = iCing.getNewAccessKey();
-            cingQueryOptions.formVerticalPanel.add(new Hidden(randomKey, randomKey));
-        }
+//        for (int i = 0; i < 2; i++) { // testing if protocol can handle many params.
+//            String randomKey = iCing.getNewAccessKey();
+//            cingQueryOptions.formVerticalPanel.add(new Hidden(randomKey, randomKey));
+//        }
 
         nextButton.setText(c.Next());
         nextButton.addClickListener(new ClickListener() {
@@ -89,7 +87,8 @@ public class RunView extends iCingView {
         horizontalPanelBackNext.add(backButton);
         backButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                History.back();
+                icingShadow.onHistoryChanged(iCing.OPTIONS_STATE);
+//                History.back();
             }
         });
         backButton.setText(c.Back());
@@ -104,37 +103,32 @@ public class RunView extends iCingView {
 
     }
 
-    /** Save the options; like a get to the server */
-    protected void run() {
-        GenClient.showDebug("Now in run");
-        submitButton.setEnabled(false);
-        @SuppressWarnings("unused")
-        HashMap<String, String> parameterMap = icing.criteria.getCriteria();
-       
-//        String keySet = parameterMap.keySet();
-//        
-//        for (String key = 0; i < n; i++) {
-//            String key = sal.getString(i);
-//            p.add(key);
-//            p.add(parameterMap.get(key));
-//            String item = Format.sprintf("%-30s = %-30s\n", p);
-//            result.append(item);
-//        }
-        cingQueryOptions.formVerticalPanel.add(new Hidden("a", "b"));
-
-        saveCriteriaButton.setText("Saving criteria...");
+    /** Save the options; like a get to the server.
+     */
+    protected void getCriteriaOnServer() {
+        GenClient.showDebug("Now in saveCriteriaOnServer");
+        submitButton.setEnabled(false); // only allow once. TODO: set to disabled after done debugging.
+        HashMap<String, String> parameterMap = icing.criteria.getCriteria(cingQueryOptions.formVerticalPanel);
+        if ( parameterMap == null ) {
+            GenClient.showCodeBug("Failed to icing.criteria.getCriteria");
+            return;
+        }
         cingQueryOptions.formPanel.submit();
     }
 
     /** Call back method */
-    protected void setOptions(String result) {
-        saveCriteriaButton.setText("Criteria saved: " + result);
-        GenClient.showDebug("Now in setOptions");
-//        return;
-        
-//        nextButton.setEnabled(true);
-        icing.cingLogView.getProjectName(); // should have been done already.
+    protected void setCriteriaOnServer() {
+        GenClient.showDebug("setCriteriaOnServer");
+        icing.onHistoryChanged(iCing.CING_LOG_STATE);
+        getRunOnServer();
+    }
+    
+    /** Save the options; like a get to the server.
+     */
+    protected void getRunOnServer() {
+        GenClient.showDebug("Now in getRunOnServer");
 
+        
         String verbosity = icing.options.getVerbosity();
         String imagery = icing.options.getImagery();
         String residue = icing.options.getResidue();
@@ -148,6 +142,12 @@ public class RunView extends iCingView {
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_RESIDUES, icing.options.getResidue()));
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_ENSEMBLE, icing.options.getEnsemble()));
         cingQueryRun.formPanel.submit();
-        icing.onHistoryChanged(iCing.CING_LOG_STATE);
+    }
+    
+    /** Save the options; like a get to the server.
+     */
+    protected void setRunOnServer() {
+        GenClient.showDebug("Now in setRunOnServer");
+        icing.report.showResults();
     }
 }

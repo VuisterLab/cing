@@ -78,7 +78,7 @@ public class FormHandlerFile extends FormHandlerMain {
 
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
 		super.onSubmitComplete(event);
-//		GenClient.showDebug("Now in FormHandlerFile.onSubmitComplete");
+		GenClient.showDebug("Now in FormHandlerFile.onSubmitComplete");
 
 		statusMessage.removeStyleName("successBorder");
 		statusMessage.removeStyleName("failureBorder");
@@ -90,7 +90,8 @@ public class FormHandlerFile extends FormHandlerMain {
 		} else {
 			showUploadError(result);
 		}
-//        GenClient.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
+        icing.cingLogView.getProjectName(); // try after each file upload.
+        GenClient.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
 	}
 
 	private void showUploadError(String result) {

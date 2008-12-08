@@ -49,6 +49,7 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
+from cing.Libs.NTutils import NTcodeerror
 import tarfile
 import cing
 import math
@@ -62,6 +63,7 @@ __copyright__ = cing.__copyright__
 __credits__ = cing.__credits__
 
 projects = NTlist()
+
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
@@ -128,6 +130,8 @@ Project: Top level Cing project class
     def __init__(self, name):
 
         root, name = Project.rootPath(name)
+        "CRV stands for CRiteria Value CRS stands for CRiteria String"
+        self.CRV_NONE = "-999.9";              
 
         NTdict.__init__(self,
                            __CLASS__='Project',
@@ -218,24 +222,63 @@ Project: Top level Cing project class
 
 
     def readValidationSettings(self, fn=None):
+        """Reads the validation settings from installation first and then overwrite any if a filename is given.
+        This ensures that all settings needed are present but can be overwritten. It decouples development from
+        production.         
+        """
+
+        validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
+        NTdebug("Using system validation configuration file: " + validationConfigurationFile)
+        self._readValidationSettingsFromfile(validationConfigurationFile)
+        validationConfigurationFile = None
+        
         if fn:
             validationConfigurationFile = fn
-            NTmessage("Using validation configuration file: " + validationConfigurationFile)
+            NTdebug("Using validation configuration file: " + validationConfigurationFile)
         elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
             validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-            NTmessage("Using local validation configuration file: " + validationConfigurationFile)
-        else:
-            validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-#            NTdebug("Using default validation configuration file: " + validationConfigurationFile)
+            NTdebug("Using local validation configuration file: " + validationConfigurationFile)
+        if validationConfigurationFile:            
+            self._readValidationSettingsFromfile(validationConfigurationFile)
 
+    #end def
+
+    def _readValidationSettingsFromfile(self, fn):
+        """Return True on error.   """
+        if not fn:
+            NTcodeerror("No input filename given at: _readValidationSettingsFromfile")
+            return True
+        
+        if not os.path.exists(fn):
+            NTcodeerror("Input file does not exist at: " + fn)
+            return True
+
+        NTdebug("Reading validation file: " + fn)
         config = ConfigParser()
-        config.readfp(open(validationConfigurationFile))
+        config.readfp(open(fn))
         for item in config.items('DEFAULT'):
             key = item[0].upper()  # upper only.
-            value = float(item[1])
+            try:
+                if item[1] == self.CRV_NONE:
+                    value = None
+                else:
+                    value = float(item[1])
+            except ValueError:
+                try:
+                    value = bool(item[1])
+                except:
+                    value = item[1]
+            valueStr = `value`
+            if self.valSets.has_key(key):
+                valueFromStr = `self.valSets[key]`
+                if valueStr == valueFromStr:
+                    continue  # no print
+                NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
+            else:
+                NTdebug("Adding              key " + key + " with value: " + valueStr)
             self.valSets[key] = value # name value pairs.
         #end for
-        self.valSets.keysformat()
+        self.valSets.keysformat() 
     #end def
 
     #-------------------------------------------------------------------------
@@ -389,8 +432,8 @@ Project: Top level Cing project class
             #end if
 
         elif status == 'old':
-            possibleTgz = name+ ".cing.tgz"
-            possibleProjectDir = name+'.cing'
+            possibleTgz = name + ".cing.tgz"
+            possibleProjectDir = name + '.cing'
             if os.path.exists(possibleTgz) and not os.path.exists(possibleProjectDir):
                 NTdebug("Unpacking possibleTgz: " + possibleTgz)
                 tar = tarfile.open(possibleTgz, "r:gz")
@@ -1198,41 +1241,49 @@ class DistanceRestraint(NTdict):
 
         self.rogScore.reset()
 #        NTdebug( '%s' % self )
-        if self.violMax >= project.valSets.DR_MAXALL_BAD:
+        if (project.valSets.DR_MAXALL_BAD != None) and (self.violMax >= project.valSets.DR_MAXALL_BAD):
             comment = 'RED: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
-        elif self.violMax >= project.valSets.DR_MAXALL_POOR:
+        elif (project.valSets.DR_MAXALL_POOR != None) and (self.violMax >= project.valSets.DR_MAXALL_POOR):
             comment = 'ORANGE: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
-        fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_POOR)
-        if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
-            comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
+        if (project.valSets.DR_THRESHOLD_OVER_POOR != None) and (project.valSets.DR_THRESHOLD_FRAC_POOR != None):
+            fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_POOR)
+            if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
+                comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
+    #            NTdebug(comment)
+                self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+        if (project.valSets.DR_THRESHOLD_OVER_BAD != None) and (project.valSets.DR_THRESHOLD_FRAC_BAD != None):
+            fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_BAD)
+            if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
+                comment = 'RED: fractionAbove: %7.2f' % fractionAbove
+    #            NTdebug(comment)
+                self.rogScore.setMaxColor(COLOR_RED, comment)
+        if (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
+            comment = 'ORANGE: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
-        fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_BAD)
-        if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
-            comment = 'RED: fractionAbove: %7.2f' % fractionAbove
-#            NTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
-        if self.violSd >= project.valSets.DR_RMSALL_BAD:
+        if (project.valSets.DR_RMSALL_BAD != None) and (self.violSd >= project.valSets.DR_RMSALL_BAD):
             comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
 
-        modelCount = self.getModelCount()
-        for atm1, atm2 in self.atomPairs:
-            atms1 = atm1.realAtoms()
-            atms2 = atm2.realAtoms()
-            for a in atms1 + atms2:
-                if len(a.coordinates) < modelCount:
-                    msg = "Missing coordinates (%s)" % a.toString()
-                    NTdebug(msg)
-                    self.rogScore.setMaxColor(COLOR_RED, msg)
-                #end if
+        if project.valSets.FLAG_MISSING_COOR:
+            modelCount = self.getModelCount()
+            for atm1, atm2 in self.atomPairs:
+                atms1 = atm1.realAtoms()
+                atms2 = atm2.realAtoms()
+                for a in atms1 + atms2:
+                    if len(a.coordinates) < modelCount:
+                        msg = "Missing coordinates (%s)" % a.toString()
+                        NTdebug(msg)
+                        self.rogScore.setMaxColor(COLOR_RED, msg)
+                    #end if
+                #end for
             #end for
-        #end for
+        # end if
     #end def
 
     def getModelCount(self):
@@ -1782,39 +1833,47 @@ class DihedralRestraint(NTdict):
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
-        if self.violMax >= project.valSets.AC_MAXALL_BAD:
+        if (project.valSets.AC_MAXALL_BAD != None) and (self.violMax >= project.valSets.AC_MAXALL_BAD):
             comment = 'RED: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
-        elif self.violMax >= project.valSets.AC_MAXALL_POOR:
+        elif (project.valSets.AC_MAXALL_POOR != None) and (self.violMax >= project.valSets.AC_MAXALL_POOR):
             comment = 'ORANGE: violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
-        fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_POOR)
-        if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
-            comment = 'RED: fractionAbove: %7.2f' % fractionAbove
-#            NTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
-        elif fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
-            comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
-#            NTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
-        fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
-
-        if self.violSd >= project.valSets.AC_RMSALL_BAD:
+        if (project.valSets.AC_THRESHOLD_OVER_POOR != None) and (project.valSets.AC_THRESHOLD_FRAC_POOR != None):
+            fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_POOR)
+            if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
+                comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
+    #            NTdebug(comment)
+                self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+                
+        if (project.valSets.AC_THRESHOLD_OVER_BAD != None) and (project.valSets.AC_THRESHOLD_FRAC_BAD != None):
+            fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
+            if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
+                comment = 'RED: fractionAbove: %7.2f' % fractionAbove
+    #            NTdebug(comment)
+                self.rogScore.setMaxColor(COLOR_RED, comment) 
+                
+        if (project.valSets.AC_RMSALL_BAD != None) and (self.violSd >= project.valSets.AC_RMSALL_BAD):
             comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
-
-        modelCount = self.getModelCount()
-        for atm in self.atoms:
-            atms = atm.realAtoms()
-            for a in atms:
-                if len(a.coordinates) < modelCount:
-                    msg = "Missing coordinates (%s)" % a.toString()
-                    NTdebug(msg)
-                    self.rogScore.setMaxColor(COLOR_RED, msg)
+        if (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
+            comment = 'ORANGE: violSd: %7.2f' % self.violSd
+#            NTdebug(comment)
+            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+            
+        if project.valSets.FLAG_MISSING_COOR:
+            modelCount = self.getModelCount()
+            for atm in self.atoms:
+                atms = atm.realAtoms() 
+                for a in atms:
+                    if len(a.coordinates) < modelCount:
+                        msg = "Missing coordinates in dihedral (%s)" % a.toString()
+                        NTdebug(msg)
+                        self.rogScore.setMaxColor(COLOR_RED, msg)
     #end def
 
     def calculateAverage(self):
@@ -1859,7 +1918,7 @@ class DihedralRestraint(NTdict):
             	                self.atoms[1].coordinates[i],
                 	            self.atoms[2].coordinates[i],
                     	        self.atoms[3].coordinates[i]
-                        	                        	                        	                        	  )
+                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	                        	  )
                 self.dihedrals.append(d)
             #end for
         except:

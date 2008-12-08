@@ -246,13 +246,13 @@ public class Utils {
     public static String getListBoxItemText(ListBox listBox) {
         String result = null;
         result = listBox.getItemText( listBox.getSelectedIndex());         
-        GenClient.showDebug("Got ListBox text: " + result);
+//        GenClient.showDebug("Got ListBox text: " + result);
         return result;
     }
     public static String getListBoxItemValue(ListBox listBox) {
         String result = null;
         result = listBox.getValue( listBox.getSelectedIndex());         
-        GenClient.showDebug("Got ListBox value: " + result);
+//        GenClient.showDebug("Got ListBox value: " + result);
         return result;
     }
 

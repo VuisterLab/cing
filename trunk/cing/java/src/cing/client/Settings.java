@@ -6,7 +6,7 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = true;
+    public static final boolean DO_DEBUG = false;
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
@@ -42,7 +42,7 @@ public interface Settings {
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081204-0946";
+    public static final String VERSION = "20081208-1545";
 
     public static final String NONE = "NONE";
 
@@ -64,7 +64,7 @@ public interface Settings {
     public static final String FORM_ACTION_SAVE = "Save";
     public static final String FORM_ACTION_RUN = "Run";
     public static final String FORM_ACTION_PURGE = "Purge";
-    public static final String FORM_ACTION_OPTIONS = "Options";
+    public static final String FORM_ACTION_CRITERIA = "Criteria";
 
     public static final String ZIP_REPORT_FILENAME_POST_FIX = "_CING_report";
     /** No default response action really. */
@@ -89,7 +89,7 @@ public interface Settings {
 
     public static final String[] FORM_ACTION_LIST = new String[] { FORM_ACTION_LOG, FORM_ACTION_PROJECT_NAME,
             FORM_ACTION_PURGE, FORM_ACTION_STATUS, FORM_ACTION_SAVE, FORM_ACTION_RUN, FORM_ACTION_LOG,
-            FORM_ACTION_OPTIONS };
+            FORM_ACTION_CRITERIA };
     public static final String[] FORM_PARM_MINIMUM = new String[] { FORM_PARM_USER_ID, FORM_PARM_ACCESS_KEY,
             FORM_PARM_ACTION };
     public static final String[] RESPONSE_EXIT_CODE_LIST = new String[] { RESPONSE_EXIT_CODE_ERROR,

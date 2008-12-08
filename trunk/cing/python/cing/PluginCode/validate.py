@@ -69,24 +69,24 @@ import sys
 #from cing.core.classes import HTMLfile
 #from cing.core.classes import htmlObjects
 
-dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-dbase = shelve.open( dbaseFileName )
+dbaseFileName = os.path.join(cingPythonCingDir, 'PluginCode', 'data', 'phipsi_wi_db.dat')
+dbase = shelve.open(dbaseFileName)
 #        histCombined               = dbase[ 'histCombined' ]
 #histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 dbase.close()
 
-def runCingChecks( project, ranges=None ):
+def runCingChecks(project, ranges=None):
     project.partitionRestraints()
     project.analyzeRestraints()
-    project.validateRestraints( toFile=True)
+    project.validateRestraints(toFile=True)
     project.validateDihedrals()
     project.validateModels()
 #    project.validateAssignments(toFile=True) in criticize now
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
     if project.molecule:
-        project.molecule.calculateRMSDs( ranges=ranges)
+        project.molecule.calculateRMSDs(ranges=ranges)
     project.criticize(toFile=True)
     project.summary(toFile=True)
     project.mkMacros()
@@ -95,8 +95,8 @@ def runCingChecks( project, ranges=None ):
 """Stolen from doValidate.py in Script directory. Need this here so the
 code can be tested. I.e. returns a meaningful status if needed.
 """
-def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True ):
+def validate(project, ranges=None, parseOnly=False, htmlOnly=False,
+        doProcheck=True, doWhatif=True):
     project.runShiftx(parseOnly=parseOnly)
     project.runDssp(parseOnly=parseOnly)
     if doProcheck:
@@ -105,12 +105,12 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         project.runWhatif(parseOnly=parseOnly)
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
-    project.generateHtml(htmlOnly = htmlOnly)
+    project.generateHtml(htmlOnly=htmlOnly)
     project.renderHtml()
     NTmessage("Done with overall validation")
 
 
-def criticizePeaks( project, toFile=True ):
+def criticizePeaks(project, toFile=True):
     """
     Check's based upon peak's.
     Compare peak positions and assigned shifts
@@ -136,21 +136,21 @@ def criticizePeaks( project, toFile=True ):
                 if resonance and resonance.atom != None and resonance.value != NOSHIFT:
                     resonance.atom.peakPositions.append(peak.positions[i])
                     if not resonance.atom.isAssigned():
-                        peak.rogScore.setMaxColor( COLOR_ORANGE,
+                        peak.rogScore.setMaxColor(COLOR_ORANGE,
                                                     sprintf('ORANGE: dimension %d: Atom %s not assigned', i, resonance.atom)
                                                   )
                     else:
                         if resonance.atom.db.spinType in errorMargins:
                             shift = resonance.atom.shift()
                             errM = errorMargins[resonance.atom.db.spinType]
-                            if math.fabs(resonance.value-shift)> 2.0*errM:
-                                peak.rogScore.setMaxColor( COLOR_RED,
+                            if math.fabs(resonance.value - shift) > 2.0 * errM:
+                                peak.rogScore.setMaxColor(COLOR_RED,
                                     sprintf('RED: dimension %d: position (%.2f) - shift Atom %s (%.2f) > 2.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
 
-                            elif math.fabs(resonance.value-shift)> 1.0*errM:
-                                peak.rogScore.setMaxColor( COLOR_ORANGE,
+                            elif math.fabs(resonance.value - shift) > 1.0 * errM:
+                                peak.rogScore.setMaxColor(COLOR_ORANGE,
                                     sprintf('ORANGE: dimension %d: position (%.2f) - shift Atom %s (%.2f) > 1.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
@@ -159,7 +159,7 @@ def criticizePeaks( project, toFile=True ):
                     #end if
                 #end if
             #end for
-            pl.rogScore.setMaxColor( peak.rogScore.colorLabel, comment='Cascaded from peak %d' % peak.peakIndex )
+            pl.rogScore.setMaxColor(peak.rogScore.colorLabel, comment='Cascaded from peak %d' % peak.peakIndex)
         #end for
     #end for
 
@@ -171,7 +171,7 @@ def criticizePeaks( project, toFile=True ):
 
     if toFile:
         for pl in project.peaks:
-            path = project.moleculePath('analysis',pl.name+'.txt')
+            path = project.moleculePath('analysis', pl.name + '.txt')
             f = file(path, 'w')
             for peak in pl:
                 fprintf(f, '%s  %s\n', peak, peak.rogScore.format())
@@ -182,23 +182,23 @@ def criticizePeaks( project, toFile=True ):
     #end if
 #end def
 
-def _criticizeChain( chain, valSets ):
+def _criticizeChain(chain, valSets):
     """Convenience method
     """
-    for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+    for color in [COLOR_GREEN, COLOR_ORANGE, COLOR_RED]:
         chain[color] = NTlist()
 
     chain.rogScore.reset()
 
     for res in chain.allResidues():
-        _criticizeResidue( res, valSets )
+        _criticizeResidue(res, valSets)
         chain[res.rogScore.colorLabel].append(res)
         chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
     #end for
 #end def
 Chain.criticize = _criticizeChain
 
-def _criticizeResidue( residue, valSets ):
+def _criticizeResidue(residue, valSets):
     """
     Use whatif, procheck scores and CING for critique of residue; translate into ROG scores.
     """
@@ -212,10 +212,14 @@ def _criticizeResidue( residue, valSets ):
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
 #            NTdebug('Now criticizing %s, whatif key %s', residue, key )
 
-            thresholdValuePoor = valSets[ 'WI_POOR_'+key ]
-            thresholdValueBad  = valSets[ 'WI_BAD_'+key ]
+            thresholdValuePoor = valSets[ 'WI_' + key + '_POOR'  ]
+            thresholdValueBad = valSets[ 'WI_' + key + '_BAD' ]
 
-            actualValue        = getDeepByKeys(residue,'whatif', key, 'valueList') #TODO remove this valueList stuff
+            if (thresholdValuePoor == None) or (thresholdValueBad == None):
+                NTdebug("Skipping What If " + key + " critique")
+                continue
+            
+            actualValue = getDeepByKeys(residue, 'whatif', key, 'valueList') #TODO remove this valueList stuff
             if actualValue == None:
                 #print '>>', residue,key
                 continue
@@ -225,15 +229,15 @@ def _criticizeResidue( residue, valSets ):
 #            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
 #                    actualValue, thresholdValuePoor, thresholdValueBad)
 
-            actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
+            actualValueStr = val2Str(actualValue, fmt='%8.3f', count=8)
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'RED: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                NTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_RED, comment)
+                residue.rogScore.setMaxColor(COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'ORANGE: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                NTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
         #end for
@@ -244,10 +248,14 @@ def _criticizeResidue( residue, valSets ):
         for key in ['gf']:
 #            NTdebug('Now criticizing %s, procheck key %s', residue, key )
 
-            thresholdValuePoor = valSets[ 'PC_POOR_'+key.upper() ]
-            thresholdValueBad  = valSets[ 'PC_BAD_'+key.upper() ]
+            thresholdValuePoor = valSets[ 'PC_' + key.upper() +'_POOR']
+            thresholdValueBad = valSets[ 'PC_' + key.upper() +'_BAD']
 
-            actualValue        = getDeepByKeys(residue,'procheck', key )
+            if (thresholdValuePoor == None) or (thresholdValueBad == None):
+                NTdebug("Skipping procheck g factor critique")
+                continue
+
+            actualValue = getDeepByKeys(residue, 'procheck', key)
             if actualValue == None:
                 #print '>>', residue,key
                 continue
@@ -257,15 +265,15 @@ def _criticizeResidue( residue, valSets ):
 #            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
 #                    actualValue, thresholdValuePoor, thresholdValueBad)
 
-            actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
+            actualValueStr = val2Str(actualValue, fmt='%8.3f', count=8)
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                NTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_RED, comment)
+                residue.rogScore.setMaxColor(COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                NTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
         #end for
@@ -279,15 +287,15 @@ def _criticizeResidue( residue, valSets ):
         for value in d:
             v = violationAngle(value=value, lowerBound=180., upperBound=180)
             if v > 90.: # Never mind a cis
-                v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
+                v = violationAngle(value=value, lowerBound= - 180., upperBound= - 180)
 #                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
 #                            res, modelId, v) )
-            if v >= valSets.OMEGA_MAXALL_BAD:
-                residue.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
+            if (valSets.OMEGA_MAXALL_BAD != None) and (v >= valSets.OMEGA_MAXALL_BAD):
+                residue.rogScore.setMaxColor(COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA)
 #                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
 #                NTdebug('Set to red')
-            elif v >= valSets.OMEGA_MAXALL_POOR:
-                residue.rogScore.setMaxColor( COLOR_ORANGE, ROGscore.ROG_COMMENT_BAD_OMEGA )
+            elif (valSets.OMEGA_MAXALL_POOR != None) and (v >= valSets.OMEGA_MAXALL_POOR):
+                residue.rogScore.setMaxColor(COLOR_ORANGE, ROGscore.ROG_COMMENT_POOR_OMEGA)
 #                NTdebug('Set to orange (perhaps)')
             modelId += 1
         #end for
@@ -303,11 +311,11 @@ def criticize(project, toFile=True):
 
     if project.molecule:
         project.molecule.rogScore.reset()
-        for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+        for color in [COLOR_GREEN, COLOR_ORANGE, COLOR_RED]:
             project.molecule[color] = NTlist()
 
         for chain in project.molecule.allChains():
-            _criticizeChain( chain, project.valSets )
+            _criticizeChain(chain, project.valSets)
             # also list the residues in molecule color lists
             for res in chain.allResidues():
 #                _criticizeResidue( res, project.valSets ) # now done in _criticizeChain
@@ -316,24 +324,24 @@ def criticize(project, toFile=True):
         #end for
 
         if len(project.molecule[COLOR_RED]) > 0:
-            project.molecule.rogScore.setMaxColor(COLOR_RED,'Inferred from residue ROG scores')
+            project.molecule.rogScore.setMaxColor(COLOR_RED, 'Inferred from residue ROG scores')
         elif len(project.molecule[COLOR_ORANGE]) > 0:
-            project.molecule.rogScore.setMaxColor(COLOR_ORANGE,'Inferred from residue ROG scores')
+            project.molecule.rogScore.setMaxColor(COLOR_ORANGE, 'Inferred from residue ROG scores')
 
         if toFile:
             path = project.moleculePath('analysis', 'ROG.txt')
-            f = file(path,'w')
+            f = file(path, 'w')
             for residue in project.molecule.allResidues():
                 fprintf(f, '%-8s %4d %-6s  ', residue.name, residue.resNum, residue.rogScore.colorLabel)
                 keys = residue.rogScore.keys()
                 for key in ['BBCCHK', 'C12CHK', 'RAMCHK', 'gf', 'OMEGA']:
                     if key in keys:
-                        fprintf(f,'%-6s %-8s   ', key, val2Str( residue.rogScore[key], fmt='%8.3f', count=8 ))
+                        fprintf(f, '%-6s %-8s   ', key, val2Str(residue.rogScore[key], fmt='%8.3f', count=8))
                     else:
-                        fprintf(f,'%-6s %8s   ', key, '.   ')
+                        fprintf(f, '%-6s %8s   ', key, '.   ')
                     #end if
                 #end for
-                fprintf(f,'%s\n', residue.rogScore.colorCommentList)
+                fprintf(f, '%s\n', residue.rogScore.colorCommentList)
             #end for
             f.close()
             NTdetail('==> Criticizing project: output to "%s"', path)
@@ -347,17 +355,17 @@ def criticize(project, toFile=True):
         drl.criticize(project, toFile=toFile)
 
     #Peaks
-    criticizePeaks( project, toFile=toFile )
+    criticizePeaks(project, toFile=toFile)
 
     # Assignments
-    validateAssignments( project, toFile=toFile )
+    validateAssignments(project, toFile=toFile)
 
 #end def
 
-def _ROGsummary( residueList ):
+def _ROGsummary(residueList):
     """Return a ROG summary string for residues in residueList
     """
-    c = NTlist( 0, 0, 0 ) # Counts for green, orange and red.
+    c = NTlist(0, 0, 0) # Counts for green, orange and red.
     for residue in residueList:
         if residue.rogScore.isRed():
             c[2] += 1
@@ -366,24 +374,24 @@ def _ROGsummary( residueList ):
         else:
             c[0] += 1
     #end for
-    total = reduce(lambda x, y: x+y+0.0, c) # total expressed as a float because of 0.0
+    total = reduce(lambda x, y: x + y + 0.0, c) # total expressed as a float because of 0.0
     if total <= 0:
         msgTmp = '_ROGsummary: Funny, no residues encountered'
         NTwarning(msgTmp)
         return msgTmp
     else:
-        p = map( lambda x: 100*x/total, c)
+        p = map(lambda x: 100 * x / total, c)
         msg = """Red:     %3d  (%3.0f%%)
 Orange:  %3d  (%3.0f%%)
 Green:   %3d  (%3.0f%%)
          -----------
-Total    %3d  (%3.0f%%)""" % ( c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0 )
+Total    %3d  (%3.0f%%)""" % (c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0)
     #end if
     return msg
 #end def
 
 
-def summary( project, toFile = True ):
+def summary(project, toFile=True):
     """
     Generate a summary string and store to text file
     Return summary string or None on error.
@@ -392,15 +400,15 @@ def summary( project, toFile = True ):
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
 
-    msg = sprintf( '=================== CING SUMMARY project %s ===================\n', project.name )
+    msg = sprintf('=================== CING SUMMARY project %s ===================\n', project.name)
 
 #    msg += sprintf( '%s\n', project.molecule.format() )
 
-    if project.molecule.has_key('rmsd' ):
-        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
+    if project.molecule.has_key('rmsd'):
+        msg += sprintf('\n%s\n', project.molecule.rmsd.format())
 
     for drl in project.distances + project.dihedrals + project.rdcs:
-        msg += sprintf( '\n%s\n', drl.format() )
+        msg += sprintf('\n%s\n', drl.format())
 
     msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues()))
     if project.molecule.ranges:
@@ -420,17 +428,17 @@ def summary( project, toFile = True ):
             NTerror("Failed to find the procheck summary attribute")
 
     if toFile:
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
-        fp = open( fname, 'w' )
-        NTmessage( '==> summary, output to %s', fname)
-        fprintf( fp, msg )
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'summary.txt')
+        fp = open(fname, 'w')
+        NTmessage('==> summary, output to %s', fname)
+        fprintf(fp, msg)
         fp.close()
     #end if
 
     return msg
 #end def
 
-def partitionRestraints( project, tmp=None ):
+def partitionRestraints(project, tmp=None):
     """
     Partition the restraints and generate per-residue lists
     """
@@ -443,37 +451,37 @@ def partitionRestraints( project, tmp=None ):
     for res in project.molecule.allResidues():
         res.distanceRestraints = NTlist()
         res.dihedralRestraints = NTlist()
-        res.rdcRestraints      = NTlist()
+        res.rdcRestraints = NTlist()
     #end for
 
     for drl in project.distances:
         for restraint in drl:
-            for atm1,atm2 in restraint.atomPairs:
-                atm1.residue.distanceRestraints.add( restraint ) #AWSS
-                atm2.residue.distanceRestraints.add( restraint ) #AWSS
+            for atm1, atm2 in restraint.atomPairs:
+                atm1.residue.distanceRestraints.add(restraint) #AWSS
+                atm2.residue.distanceRestraints.add(restraint) #AWSS
             #end for
         #end for
     #end for
     # dihedrals
     for drl in project.dihedrals:
         for restraint in drl:
-            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
+            restraint.atoms[2].residue.dihedralRestraints.add(restraint) #AWSS
         #end for
     #end for
     #RDCs
     for drl in project.rdcs:
         for restraint in drl:
-            for atm1,atm2 in restraint.atomPairs:
-                atm1.residue.rdcRestraints.add( restraint ) #AWSS
+            for atm1, atm2 in restraint.atomPairs:
+                atm1.residue.rdcRestraints.add(restraint) #AWSS
                 if atm2.residue != atm1.residue:
-                    atm2.residue.rdcRestraints.add( restraint ) #AWSS
+                    atm2.residue.rdcRestraints.add(restraint) #AWSS
             #end for
         #end for
     #end for
 #end def
 
 
-def validateRestraints( project, toFile = True)   :
+def validateRestraints(project, toFile=True)   :
     """
     Calculate rmsd's and violation on restraints
     """
@@ -484,7 +492,7 @@ def validateRestraints( project, toFile = True)   :
     if not project.molecule: return
 
     msg = ""
-    msg += sprintf('%s\n', project.format() )
+    msg += sprintf('%s\n', project.format())
 
 #    # distances and dihedrals
 #    for res in project.molecule.allResidues():
@@ -495,17 +503,17 @@ def validateRestraints( project, toFile = True)   :
     # distances
     for drl in project.distances:
 #        drl.analyze()
-        msg += sprintf( '%s\n', drl.format())
+        msg += sprintf('%s\n', drl.format())
         drl.sort('violMax').reverse()
-        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf('%s Sorted on Maximum Violations %s\n', dots, dots)
+        msg += sprintf('%s\n', formatList(drl[0:min(len(drl), 30)]))
 
         drl.sort('violCount3').reverse()
         # omit restraints that have a violation less than cut off.  NEW FEATURE REQUEST
-        msg += sprintf( '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
-        theList = drl[0:min(len(drl),30)]
+        msg += sprintf('%s Sorted on Violations > 0.3 A %s\n', dots, dots)
+        theList = drl[0:min(len(drl), 30)]
 #        NTdebug("Found list: " + `theList`)
-        msg += sprintf( '%s\n', formatList( theList ) )
+        msg += sprintf('%s\n', formatList(theList))
 
         # Sort restraints on a per-residue basis # now in partitionRestrainst
 #        for restraint in drl:
@@ -519,14 +527,14 @@ def validateRestraints( project, toFile = True)   :
     # dihedrals
     for drl in project.dihedrals:
 #        drl.analyze()
-        msg += sprintf( '%s\n', drl.format())
+        msg += sprintf('%s\n', drl.format())
         drl.sort('violMax').reverse()
-        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf('%s Sorted on Maximum Violations %s\n', dots, dots)
+        msg += sprintf('%s\n', formatList(drl[0:min(len(drl), 30)]))
 
         drl.sort('violCount3').reverse()
-        msg += sprintf( '%s Sorted on Violations > 3 degree %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += sprintf('%s Sorted on Violations > 3 degree %s\n', dots, dots)
+        msg += sprintf('%s\n', formatList(drl[0:min(len(drl), 30)]))
 
         # sort the restraint on a per residue basis
 #        for restraint in drl:
@@ -535,38 +543,38 @@ def validateRestraints( project, toFile = True)   :
     #end for
 
     # Process the per residue restraints data
-    msg += sprintf( '%s Per residue scores %s\n', dots, dots )
+    msg += sprintf('%s Per residue scores %s\n', dots, dots)
     count = 0
     for res in project.molecule.allResidues():
 
         if len(res.distanceRestraints):
             # Sort on violation count
-            NTsort(res.distanceRestraints, 'violCount3', inplace=True )
+            NTsort(res.distanceRestraints, 'violCount3', inplace=True)
             res.distanceRestraints.reverse()
 
             # Calculate sum, rmsd and sum_of_average_deviation of restraints per residue
-            sum   = 0.0
+            sum = 0.0
             sumsq = 0.0
             n = 0
             for d in res.distanceRestraints:
-                sum   = d.violations.sum( sum )
-                sumsq = d.violations.sumsq( sumsq )
+                sum = d.violations.sum(sum)
+                sumsq = d.violations.sumsq(sumsq)
                 n += len(d.violations)
             #end for
             if n == 0:
                 NTwarning('No DRs so no rmsd')
             else:
-                res.distanceRestraints.rmsd = math.sqrt(sumsq/n)
+                res.distanceRestraints.rmsd = math.sqrt(sumsq / n)
                 res.distanceRestraints.sum = sum
 
-            res.distanceRestraints.violAv     = res.distanceRestraints.zap('violAv').sum()
+            res.distanceRestraints.violAv = res.distanceRestraints.zap('violAv').sum()
             res.distanceRestraints.violCount1 = res.distanceRestraints.zap('violCount1').sum()
             res.distanceRestraints.violCount3 = res.distanceRestraints.zap('violCount3').sum()
             res.distanceRestraints.violCount5 = res.distanceRestraints.zap('violCount5').sum()
         else:
-            res.distanceRestraints.rmsd       = 0.0
-            res.distanceRestraints.sum        = 0.0
-            res.distanceRestraints.violAv     = 0.0
+            res.distanceRestraints.rmsd = 0.0
+            res.distanceRestraints.sum = 0.0
+            res.distanceRestraints.violAv = 0.0
             res.distanceRestraints.violCount1 = 0
             res.distanceRestraints.violCount3 = 0
             res.distanceRestraints.violCount5 = 0
@@ -577,17 +585,17 @@ def validateRestraints( project, toFile = True)   :
             msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv --')
         #end if
         if res.has_key('PHI'):
-            phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
+            phi = NTvalue(res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f')
         else:
-            phi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
+            phi = NTvalue('-', '-', fmt='%7s %7s', fmt2='%7s')
         #end if
         if res.has_key('PSI'):
-            psi = NTvalue( res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
+            psi = NTvalue(res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f')
         else:
-            psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
+            psi = NTvalue('-', '-', fmt='%7s %7s', fmt2='%7s')
         #end if
         try:
-            msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f\n',
+            msg += sprintf('%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f\n',
                  res, phi, psi,
                  len(res.distanceRestraints),
                  res.distanceRestraints.violCount1,
@@ -604,9 +612,9 @@ def validateRestraints( project, toFile = True)   :
 #    NTdebug(msg)
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
-        fp = open( fname, 'w' )
-        NTmessage( '==> validateRestraints, output to %s', fname)
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'restraints.txt')
+        fp = open(fname, 'w')
+        NTmessage('==> validateRestraints, output to %s', fname)
         fprintf(fp, msg)
     #end if
 #end def
@@ -621,8 +629,8 @@ def checkForDisulfides(project, toFile=True):
         NTerror('checkForDisulfides: no molecule defined')
         return None
     #end if
-    cys=project.molecule.residuesWithProperties('CYS')
-    cyss=project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
+    cys = project.molecule.residuesWithProperties('CYS')
+    cyss = project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
     for c in cyss:
         if c not in cys:
             cys.append(c)
@@ -631,24 +639,24 @@ def checkForDisulfides(project, toFile=True):
     # all cys(i), cys(j) pairs with j>i
     for i in range(len(cys)):
         c1 = cys[i]
-        for j in range(i+1, len(cys)):
+        for j in range(i + 1, len(cys)):
             c2 = cys[j]
-            scoreList = disulfideScore( c1, c2)
-            disulfides.append( (c1, c2, scoreList) ) # keep track of data
+            scoreList = disulfideScore(c1, c2)
+            disulfides.append((c1, c2, scoreList)) # keep track of data
         #end for
     #end for
     if toFile:
-        path = project.moleculePath('analysis','disulfides.txt')
-        f = file(path,'w')
+        path = project.moleculePath('analysis', 'disulfides.txt')
+        f = file(path, 'w')
         fprintf(f, '========= Disulfide analysis %s =========\n\n', project.molecule)
-        for c1,c2,scoreList in disulfides:
-            fprintf(f, '%s %s: scores dCa, dCb, S-S dihedral: %s ', c1,c2,scoreList)
+        for c1, c2, scoreList in disulfides:
+            fprintf(f, '%s %s: scores dCa, dCb, S-S dihedral: %s ', c1, c2, scoreList)
             if scoreList[3] >= 0.9:
-                fprintf(f,' certain disulfide\n')
+                fprintf(f, ' certain disulfide\n')
             elif scoreList[3] >= 0.3:
-                fprintf(f,' potential disulfide\n')
+                fprintf(f, ' potential disulfide\n')
             else:
-                fprintf(f,'\n')
+                fprintf(f, '\n')
             #end if
         #end for
         NTmessage('==> Disulfide analysis, output to %s', path)
@@ -656,7 +664,7 @@ def checkForDisulfides(project, toFile=True):
 # end def
 
 
-def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
+def checkForSaltbridges(project, cutoff=5, toFile=False)   :
     """
     Routine to analyze all potential saltbridges involving E,D,R,K and H residues.
     Initiates an NTlist instances as saltbridges attribute for all residues.
@@ -672,15 +680,15 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
 
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')
-        fp = open( fname, 'w' )
-        NTmessage( '==> checkSaltbridges, output to %s', fname)
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'saltbridges.txt')
+        fp = open(fname, 'w')
+        NTmessage('==> checkSaltbridges, output to %s', fname)
     else:
         fp = None
     #end if
 
     if toFile:
-        fprintf( fp, '%s\n', project.molecule.format() )
+        fprintf(fp, '%s\n', project.molecule.format())
 #    NTmessage(     '%s', project.molecule.format() )
 
     residues1 = project.molecule.residuesWithProperties('E') + \
@@ -700,15 +708,15 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
     for res1 in residues1:
         for res2 in residues2:
             #print '>>', res1, res2
-            s = validateSaltbridge(res1,res2)
+            s = validateSaltbridge(res1, res2)
             if s:
                 if (s.types[4][1] <= cutoff):    # less then cutoff 'not observed'
                     if toFile:
-                        fprintf(fp, '%s\n', s.format() )
+                        fprintf(fp, '%s\n', s.format())
 #                    NTdebug(    '%s\n', s.format() )
-                    res1.saltbridges.append( s )
-                    res2.saltbridges.append( s )
-                    result.append( s )
+                    res1.saltbridges.append(s)
+                    res2.saltbridges.append(s)
+                    result.append(s)
                 #end if
             #end if
         #end for
@@ -716,8 +724,8 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
 
     if s:
         if toFile:
-            fprintf( fp, '%s\n', s.comment )
-        NTdebug(     '%s\n', s.comment )
+            fprintf(fp, '%s\n', s.comment)
+        NTdebug('%s\n', s.comment)
     #end if
 
     if toFile:
@@ -728,7 +736,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
     return result
 #end def
 
-def validateSaltbridge( residue1, residue2 ):
+def validateSaltbridge(residue1, residue2):
     """
     ValidateSaltbridge( residue1, residue2 )
 
@@ -745,18 +753,18 @@ def validateSaltbridge( residue1, residue2 ):
 
     # Definitions of the centroids according to the paper
     centroids = NTdict(
-        E = ['OE1','OE2'],
-        D = ['OD1','OD2'],
-        H = ['CG','ND1','CD2','CE1', 'NE2'],
-        K = ['NZ'],
-        R = ['NE','CZ','NH1','NH2']
+        E=['OE1', 'OE2'],
+        D=['OD1', 'OD2'],
+        H=['CG', 'ND1', 'CD2', 'CE1', 'NE2'],
+        K=['NZ'],
+        R=['NE', 'CZ', 'NH1', 'NH2']
     )
     donorAcceptor = NTdict(
-        E = ['OE1','OE2'],
-        D = ['OD1','OD2'],
-        H = ['ND1','NE2'],
-        K = ['NZ'],
-        R = ['NE','NH1','NH2']
+        E=['OE1', 'OE2'],
+        D=['OD1', 'OD2'],
+        H=['ND1', 'NE2'],
+        K=['NZ'],
+        R=['NE', 'NH1', 'NH2']
     )
 
     if residue1 == None:
@@ -774,13 +782,13 @@ def validateSaltbridge( residue1, residue2 ):
         return None
     #end if
 
-    if residue1.db.shortName not in ['E','D','H','K','R']:
+    if residue1.db.shortName not in ['E', 'D', 'H', 'K', 'R']:
         NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue1)
         return None
     #end if
 
 
-    if residue2.db.shortName not in ['E','D','H','K','R']:
+    if residue2.db.shortName not in ['E', 'D', 'H', 'K', 'R']:
         NTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue2)
         return None
     #end if
@@ -796,28 +804,28 @@ def validateSaltbridge( residue1, residue2 ):
     #end for
 
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
-    result  = NTlist()
+    result = NTlist()
     summary = NTdict(
-        residue1 = residue1,
-        residue2 = residue2,
-        comment  = """
+        residue1=residue1,
+        residue2=residue2,
+        comment="""
 Ref: Kumar, S. and Nussinov, R. Biophys. J. 83, 1595-1612 (2002)
 Arbitrarily set the criteria for ion-pair (r,theta) to be within
 2 sd ~ 2*(1.2A,39) of average (7.6A,118), else set type to 'not observed'.
 """,
-        __FORMAT__ = '------------------ Saltbridge ------------------\n' +\
-                     'residues:          %(residue1)s %(residue2)s\n' +\
-                     'r (av,sd,min,max): (%(rAv).1f, %(rSd).1f, %(min).1f, %(max).1f)\n' +\
-                     'theta (av,sd):     (%(thetaAv).1f, %(thetaSd).1f)\n' +\
+        __FORMAT__='------------------ Saltbridge ------------------\n' + \
+                     'residues:          %(residue1)s %(residue2)s\n' + \
+                     'r (av,sd,min,max): (%(rAv).1f, %(rSd).1f, %(min).1f, %(max).1f)\n' + \
+                     'theta (av,sd):     (%(thetaAv).1f, %(thetaSd).1f)\n' + \
                      'types:             %(types)s'
     )
-    types = ['saltbridge','C-C bridge','N-O bridge','ion pair','not observed']
-    counts = NTfill(0,5)
+    types = ['saltbridge', 'C-C bridge', 'N-O bridge', 'ion pair', 'not observed']
+    counts = NTfill(0, 5)
 
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
-    for model in range( modelCount ):
+    for model in range(modelCount):
         #c1 is geometric mean of centroid atms
-        c1 = NTcVector(0,0,0)
+        c1 = NTcVector(0, 0, 0)
         for atmName in centroids[residue1.db.shortName]:
             atm = residue1[atmName]
             c1 += atm.coordinates[model].e
@@ -832,7 +840,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             break
 
         #c2 is geometric mean of centroid atms
-        c2 = NTcVector(0,0,0)
+        c2 = NTcVector(0, 0, 0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
             c2 += atm.coordinates[model].e
@@ -844,9 +852,9 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         c2a = residue2['CA'].coordinates[model].e
 
         #print '>>', c1, c2
-        r = c2-c1
+        r = c2 - c1
         rl = r.length()
-        theta = 180.0 - (c1-c1a).angle(c2-c2a)
+        theta = 180.0 - (c1 - c1a).angle(c2 - c2a)
 
         # Check criteria
         criterium1 = (rl < 4.0)
@@ -855,19 +863,19 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             atm1 = residue1[atmName1]
             for atmName2 in donorAcceptor[residue2.db.shortName]:
                 atm2 = residue2[atmName2]
-                d = (atm1.coordinates[model].e-atm2.coordinates[model].e).length()
+                d = (atm1.coordinates[model].e - atm2.coordinates[model].e).length()
                 if d < 4.0:
                     count += 1
                 #print '>', atm1,atm2,d,count
 
-        criterium2 = count>0
+        criterium2 = count > 0
         if   criterium1 and criterium2:
             type = 0
         elif criterium1 and not criterium2:
             type = 1
         elif not criterium1 and criterium2:
             type = 2
-        elif not criterium1 and not criterium2 and rl < 7.6+2.1*2 and 118-39*2< theta and theta < 118+39*2:
+        elif not criterium1 and not criterium2 and rl < 7.6 + 2.1 * 2 and 11839 * 2 < theta and theta < 11839 * 2:
             type = 3
         else:
             type = 4
@@ -875,20 +883,20 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         counts[type] += 1
 
         data = NTdict(
-            residue1   = residue1,
-            residue2   = residue2,
-            model      = model,
-            r          = rl,
-            theta      = theta,
-            criterium1 = criterium1,
-            criterium2 = criterium2,
-            type       = types[type],
+            residue1=residue1,
+            residue2=residue2,
+            model=model,
+            r=rl,
+            theta=theta,
+            criterium1=criterium1,
+            criterium2=criterium2,
+            type=types[type],
 
-            __FORMAT__ = '--- saltbridge analysis %(residue1)s-%(residue2)s ---\n' +\
-                         'model: %(model)d\n' +\
-                         'type:  %(type)s\n' +\
-                         'r (A): %(r).1f\n' +\
-                         'theta: %(theta).1f\n' +\
+            __FORMAT__='--- saltbridge analysis %(residue1)s-%(residue2)s ---\n' + \
+                         'model: %(model)d\n' + \
+                         'type:  %(type)s\n' + \
+                         'r (A): %(r).1f\n' + \
+                         'theta: %(theta).1f\n' + \
                          'criteria: %(criterium1)s, %(criterium2)s\n'
         )
 
@@ -898,22 +906,22 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
 
     summary.result = result
     summary.rAv, summary.rSd, summary.modelCount = result.zap('r').average()
-    summary.min   = min( result.zap('r') )
-    summary.max   = max( result.zap('r') )
+    summary.min = min(result.zap('r'))
+    summary.max = max(result.zap('r'))
     summary.thetaAv, summary.thetaSd, _n = result.zap('theta').average()
-    summary.types = zip( types,counts)
+    summary.types = zip(types, counts)
     if not summary.rSd:
-        summary.rSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
+        summary.rSd = - 999.9 # wait until we have a standard approach for dealing with Nans. TODO:
     if not summary.thetaSd:
-        summary.thetaSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
+        summary.thetaSd = - 999.9 # wait until we have a standard approach for dealing with Nans. TODO:
     return summary
 #end def
 Residue.checkSaltbridge = validateSaltbridge
 
 #==============================================================================
-def checkHbond( donorH, acceptor,
-                minAngle = 100.0, maxAngle=225.0, maxDistance = 3.0,
-                fraction = 0.5
+def checkHbond(donorH, acceptor,
+                minAngle=100.0, maxAngle=225.0, maxDistance=3.0,
+                fraction=0.5
               ):
     """
     Check for presence of H-bond between donorH proton and acceptor.
@@ -927,63 +935,63 @@ def checkHbond( donorH, acceptor,
     """
 
     if not donorH or not donorH.isProton():
-        NTerror('checkHbond: non-proton donor %s\n', donorH )
+        NTerror('checkHbond: non-proton donor %s\n', donorH)
         return None
     #end if
 
     if not acceptor:
-        NTerror('checkHbond: undefined acceptor %s\n', donorH )
+        NTerror('checkHbond: undefined acceptor %s\n', donorH)
         return None
     #end if
 
-    result = NTdict( __FORMAT__ = '=== H-bond %(donor)s - %(donorH)s - %(acceptor)s ===\n' +\
-                                    'accepted: %(accepted)s (%(acceptedCount)d out of %(modelCount)d)\n' +\
-                                    'distance: %(distance).2f  +- %(distanceSD).2f\n' +\
+    result = NTdict(__FORMAT__='=== H-bond %(donor)s - %(donorH)s - %(acceptor)s ===\n' + \
+                                    'accepted: %(accepted)s (%(acceptedCount)d out of %(modelCount)d)\n' + \
+                                    'distance: %(distance).2f  +- %(distanceSD).2f\n' + \
                                     'angle:    %(angle).1f  cv: %(angleCV).2f\n'
                      )
-    result.donor         = donorH.topology()[0]
-    result.donorH        = donorH
-    result.acceptor      = acceptor
-    result.minAngle      = minAngle
-    result.maxAngle      = maxAngle
-    result.maxDistance   = maxDistance
-    result.fraction      = fraction
-    result.distance      = NaN
-    result.distanceSD    = 0.0
-    result.angle         = NaN
-    result.angleCV       = 0.0
-    result.accepted      = False
+    result.donor = donorH.topology()[0]
+    result.donorH = donorH
+    result.acceptor = acceptor
+    result.minAngle = minAngle
+    result.maxAngle = maxAngle
+    result.maxDistance = maxDistance
+    result.fraction = fraction
+    result.distance = NaN
+    result.distanceSD = 0.0
+    result.angle = NaN
+    result.angleCV = 0.0
+    result.accepted = False
 
-    result.av, result.sd, _mind, _maxd = donorH.distance( acceptor )
-    result.cav, result.cv = donorH.angle( result.donor, acceptor,
+    result.av, result.sd, _mind, _maxd = donorH.distance(acceptor)
+    result.cav, result.cv = donorH.angle(result.donor, acceptor,
                                           radians=False
                                         )
 
-    result.data           = map( None, donorH.distances, donorH.angles )
+    result.data = map(None, donorH.distances, donorH.angles)
     result.acceptedModels = NTlist()
-    result.acceptedCount  = 0
-    result.modelCount     = 0
-    distances             = NTlist()    # make copies to calculate averages of accepted
-    angles                = NTlist()    # make copies to calculate averages of accepted
-    for d,a in result.data:
+    result.acceptedCount = 0
+    result.modelCount = 0
+    distances = NTlist()    # make copies to calculate averages of accepted
+    angles = NTlist()    # make copies to calculate averages of accepted
+    for d, a in result.data:
         if d <= maxDistance and a >= minAngle and a <= maxAngle:
-            result.acceptedModels.append( (result.modelCount, d, a ) )
+            result.acceptedModels.append((result.modelCount, d, a))
             result.acceptedCount += 1
-            distances.append( d )
-            angles.append( a )
+            distances.append(d)
+            angles.append(a)
         #end if
         result.modelCount += 1
     #end for
     if len(distances) > 0: result.distance, result.distanceSD, _n = distances.average()
     if len(angles) > 0: result.angle, result.angleCV, _n = angles.cAverage()
-    result.accepted = ((float(len( result.acceptedModels)) / float(len( result.data ))) >= fraction)
+    result.accepted = ((float(len(result.acceptedModels)) / float(len(result.data))) >= fraction)
     del distances
     del angles
     return result
 #end def
 Atom.checkHbond = checkHbond
 
-def _fixStereoAssignments( project  ):
+def _fixStereoAssignments(project):
     """Action is implemented here; this routine needs to be called twice to propagate the adjustments
     """
     for atm in project.molecule.allAtoms():
@@ -1013,24 +1021,24 @@ def _fixStereoAssignments( project  ):
     #end for
 #end def
 
-def fixStereoAssignments( project  ):
+def fixStereoAssignments(project):
     """
     Fix the stereo assignments of the prochiral methyls; i.e. if either carbon or proton is stereo-specifically
     assigned, also assign the proton or carbon
     """
     # Since the changes may have to propagate I.e. methyls QD2->QD1->CD1, it is most easy done by doing it twice
-    _fixStereoAssignments( project )
-    _fixStereoAssignments( project )
+    _fixStereoAssignments(project)
+    _fixStereoAssignments(project)
 #end def
 
 
-MULTIPLE_ASSIGNMENT             = 'MULTIPLE_ASSIGNMENT'
-MISSING_ASSIGNMENT              = 'MISSING_ASSIGNMENT'
-EXPECTED_ASSIGNMENT             = 'EXPECTED_ASSIGNMENT'
-INVALID_STEREO_ASSIGNMENT       = 'STEREO_ASSIGNMENT'
-SHIFT                           = 'SHIFT'
+MULTIPLE_ASSIGNMENT = 'MULTIPLE_ASSIGNMENT'
+MISSING_ASSIGNMENT = 'MISSING_ASSIGNMENT'
+EXPECTED_ASSIGNMENT = 'EXPECTED_ASSIGNMENT'
+INVALID_STEREO_ASSIGNMENT = 'STEREO_ASSIGNMENT'
+SHIFT = 'SHIFT'
 
-def validateAssignments( project, toFile = True   ):
+def validateAssignments(project, toFile=True):
     """
     Validate the assignments; check for potential problems and inconsistencies
     Add's NTlist instance with strings of warning description to each atom as
@@ -1082,16 +1090,16 @@ def validateAssignments( project, toFile = True   ):
                     string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
                                      SHIFT, shift, delta, av, sd
                                     )
-                    result.append( atm )
+                    result.append(atm)
                     atm.validateAssignment.append(string)
                 #end if
             #end if
 
             # Check if not both realAtom and pseudoAtom are assigned
             if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
-                string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
+                string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom())
 #                NTmessage('%-20s %s', atm, string)
-                result.append( atm )
+                result.append(atm)
                 atm.validateAssignment.append(string)
             #end if
 
@@ -1099,9 +1107,9 @@ def validateAssignments( project, toFile = True   ):
             if atm.isPseudoAtom():
                 for a in atm.realAtoms():
                     if a.isAssigned():
-                        string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
+                        string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a)
 #                        NTmessage('%-20s %s', atm, string)
-                        result.append( atm )
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                 #end for
@@ -1111,9 +1119,9 @@ def validateAssignments( project, toFile = True   ):
             if atm.hasPseudoAtom():
                 for a in atm.pseudoAtom().realAtoms():
                     if not a.isAssigned():
-                        string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
+                        string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a)
 #                        NTmessage('%-20s %s', atm, string )
-                        result.append( atm )
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                 #end for
@@ -1123,9 +1131,9 @@ def validateAssignments( project, toFile = True   ):
             if atm.isProton():
                 heavyAtm = atm.topology()[0]
                 if not heavyAtm.isAssigned():
-                    string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
+                    string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm)
 #                    NTmessage('%-20s %s', atm, string )
-                    result.append( atm )
+                    result.append(atm)
                     atm.validateAssignment.append(string)
                 #end if
             #end if atm.isProton()
@@ -1133,21 +1141,21 @@ def validateAssignments( project, toFile = True   ):
             # stereo assignments checks
             if atm.isStereoAssigned():
                 if not atm.isProChiral():
-                    string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
-                    result.append( atm )
+                    string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm)
+                    result.append(atm)
                     atm.validateAssignment.append(string)
                 else:
                     # Check prochiral partner assignments
                     partner = atm.proChiralPartner()
                     if partner:
                         if not partner.isAssigned():
-                            string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
-                            result.append( atm )
+                            string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner)
+                            result.append(atm)
                             atm.validateAssignment.append(string)
                         else:
                             if not partner.isStereoAssigned():
-                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
-                                result.append( atm )
+                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner)
+                                result.append(atm)
                                 atm.validateAssignment.append(string)
                             #end if
                         #end if
@@ -1160,13 +1168,13 @@ def validateAssignments( project, toFile = True   ):
                 heavy = atm.heavyAtom()
                 if heavy and heavy.isAssigned():
                     if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                        result.append( atm )
+                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy)
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                     if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                        result.append( atm )
+                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy)
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                 #end if
@@ -1177,13 +1185,13 @@ def validateAssignments( project, toFile = True   ):
                 pseudo = atm.attachedProtons(includePseudo=True).last()
                 if pseudo and pseudo.isAssigned():
                     if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                        result.append( atm )
+                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo)
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                     if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                        result.append( atm )
+                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo)
+                        result.append(atm)
                         atm.validateAssignment.append(string)
                     #end if
                 #end if
@@ -1192,24 +1200,24 @@ def validateAssignments( project, toFile = True   ):
         else:
             # Atm is not assigned but stereo assignment is set
             if atm.isStereoAssigned():
-                string = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
-                result.append( atm )
+                string = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm)
+                result.append(atm)
                 atm.validateAssignment.append(string)
             #end if
 
             if atm.isProChiral():
                 partner = atm.proChiralPartner()
                 if partner and partner.isAssigned() and partner.isStereoAssigned():
-                    string = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
-                    result.append( atm )
+                    string = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner)
+                    result.append(atm)
                     atm.validateAssignment.append(string)
             #end if
 
         #end if atm.isAssigned():
 
         if atm.validateAssignment:
-            atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
-            project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
+            atm.rogScore.setMaxColor(COLOR_ORANGE, atm.validateAssignment)
+            project.molecule.atomList.rogScore.setMaxColor(COLOR_ORANGE, 'Inferred from atoms')
         #end if
     #end for
 
@@ -1217,7 +1225,7 @@ def validateAssignments( project, toFile = True   ):
     if toFile:
         #path = project.mkdir( project.directories.analysis, project.molecule.name )
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'validateAssignments.txt')
-        fp = open( fname,'w' )
+        fp = open(fname, 'w')
         if not fp:
             NTerror("Failed to open for writing: " + fname)
             return None
@@ -1225,18 +1233,18 @@ def validateAssignments( project, toFile = True   ):
 
         fmt = '%-18s   %8s %6s %6s   %8s %6s   %8s %8s  %8s %6s   %s\n'
         for res in project.molecule.allResidues():
-            fprintf(fp, fmt, '#',  'resonance', 'error', 'stereo', 'shiftx', 'error', 'delta', 'error', 'dbase', 'error', 'Critique')
+            fprintf(fp, fmt, '#', 'resonance', 'error', 'stereo', 'shiftx', 'error', 'delta', 'error', 'dbase', 'error', 'Critique')
 
             for atm in res.allAtoms():
                 #TODO: this code also appears in AtomsHTMLfile
-                sav     = None
-                ssd     = None
-                delta   = None
-                rdelta  = None
-                dav     = None
-                dsd     = None
-                value   = None
-                error   = None
+                sav = None
+                ssd = None
+                delta = None
+                rdelta = None
+                dav = None
+                dsd = None
+                value = None
+                error = None
 
                 if atm.has_key('shiftx') and len(atm.shiftx) > 0:
                     sav = atm.shiftx.av
@@ -1245,7 +1253,7 @@ def validateAssignments( project, toFile = True   ):
                     delta = atm.resonances().value - sav
                     rdelta = 1.0
                     if ssd > 0.0:
-                        rdelta = sav/ssd
+                        rdelta = sav / ssd
                 if atm.db.shift:
                     dav = atm.db.shift.average
                     dsd = atm.db.shift.sd
@@ -1253,24 +1261,24 @@ def validateAssignments( project, toFile = True   ):
                     value = atm.resonances().value
                     error = atm.resonances().error
 
-                savStr     = val2Str(sav,   '%6.2f', 6 )
-                ssdStr     = val2Str(ssd,   '%6.2f', 6 )
-                deltaStr   = val2Str(delta, '%6.2f', 6 )
-                rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
-                davStr     = val2Str(dav,   '%6.2f', 6 )
-                dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-                valueStr   = val2Str(value, '%6.2f', 6 ) # was sometimes set to a NOSHIFT
-                if valueStr==NaNstring:
-                    error=None
-                errorStr   = val2Str(error, '%6.2f', 6 )
+                savStr = val2Str(sav, '%6.2f', 6)
+                ssdStr = val2Str(ssd, '%6.2f', 6)
+                deltaStr = val2Str(delta, '%6.2f', 6)
+                rdeltaStr = val2Str(rdelta, '%6.2f', 6)
+                davStr = val2Str(dav, '%6.2f', 6)
+                dsdStr = val2Str(dsd, '%6.2f', 6)
+                valueStr = val2Str(value, '%6.2f', 6) # was sometimes set to a NOSHIFT
+                if valueStr == NaNstring:
+                    error = None
+                errorStr = val2Str(error, '%6.2f', 6)
 
                 if atm.isStereoAssigned():
                     stereo = 'S'
                 else:
                     stereo = '.'
 
-                fprintf(fp,fmt,
-                        atm._Cname(-1),
+                fprintf(fp, fmt,
+                        atm._Cname(- 1),
                         valueStr,
                         errorStr,
                         stereo,
@@ -1325,31 +1333,31 @@ def validateDihedrals(self):
                 continue
 #            print res, dihed, d
 
-            plotpars = self.plotParameters.getdefault(dihed,'dihedralDefault')
+            plotpars = self.plotParameters.getdefault(dihed, 'dihedralDefault')
 
             cav, _cv, _n = d.cAverage(min=plotpars.min, max=plotpars.max)
-            NTlimit( d, cav-180.0, cav+180.0 )
+            NTlimit(d, cav - 180.0, cav + 180.0)
 
-            goodAndOutliers = peirceTest( d )
+            goodAndOutliers = peirceTest(d)
             if not goodAndOutliers:
                 NTcodeerror("in validateDihedrals: error from peirceTest")
                 return True
             d.good, d.outliers = goodAndOutliers
 
-            d.limit(          plotpars.min, plotpars.max )
-            d.cAverage(       plotpars.min, plotpars.max )
-            d.good.limit(     plotpars.min, plotpars.max, byItem=1 )
-            d.good.cAverage(  plotpars.min, plotpars.max, byItem=1 )
-            d.outliers.limit( plotpars.min, plotpars.max, byItem=1 )
+            d.limit(plotpars.min, plotpars.max)
+            d.cAverage(plotpars.min, plotpars.max)
+            d.good.limit(plotpars.min, plotpars.max, byItem=1)
+            d.good.cAverage(plotpars.min, plotpars.max, byItem=1)
+            d.outliers.limit(plotpars.min, plotpars.max, byItem=1)
             if False:
-                NTmessage( '--- Residue %s, %s ---', res, dihed )
-                NTmessage( 'good:     %2d %6.1f %4.3f',
-                           d.good.n, d.good.cav, d.good.cv )
-                NTmessage( 'outliers: %2d models: %s',
-                           len(d.outliers), d.outliers.zap(0) )
+                NTmessage('--- Residue %s, %s ---', res, dihed)
+                NTmessage('good:     %2d %6.1f %4.3f',
+                           d.good.n, d.good.cav, d.good.cv)
+                NTmessage('outliers: %2d models: %s',
+                           len(d.outliers), d.outliers.zap(0))
 #end def
 
-def validateModels( self)   :
+def validateModels(self)   :
     """Validate the models on the basis of the dihedral outliers
     """
 
@@ -1360,7 +1368,7 @@ def validateModels( self)   :
         NTerror("validateModels: no model for molecule %s defined", self.molecule)
         return True
 
-    backbone = ['PHI','PSI','OMEGA']
+    backbone = ['PHI', 'PSI', 'OMEGA']
 
 #    self.validateDihedrals(    )
     # self.models keeps track of the number of outliers per model.
@@ -1380,28 +1388,28 @@ def validateModels( self)   :
                         continue
                 except:
                     continue
-                for m in d.outliers.zap( 0 ):    #get all modelId of outliers
+                for m in d.outliers.zap(0):    #get all modelId of outliers
                     self.models[m] += 1
             #end if
         #end for
     #end for
     for m, count in self.models.items():
-        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
+        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count)
 #end def
 
 
 # register the functions
-methods  = [(validateDihedrals, None),
-            (validateModels,None),
+methods = [(validateDihedrals, None),
+            (validateModels, None),
             (validateAssignments, None),
             (validateRestraints, None),
-            (partitionRestraints,None),
+            (partitionRestraints, None),
 #
             (runCingChecks, None),
-            (validate,None),
+            (validate, None),
             (criticizePeaks, None),
             (summary, None),
-            (criticize,None),
+            (criticize, None),
 
             (checkForSaltbridges, None),
             (checkForDisulfides, None),
