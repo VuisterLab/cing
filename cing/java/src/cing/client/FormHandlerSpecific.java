@@ -33,6 +33,10 @@ public class FormHandlerSpecific extends FormHandlerMain {
             icing.cingLogView.setProjectName(result);
         } else if (action.equals(Settings.FORM_ACTION_PURGE)) {
             icing.cingLogView.setPurgeProject(result);
+        } else if (action.equals(Settings.FORM_ACTION_CRITERIA)) { 
+            icing.runView.setCriteriaOnServer();
+        } else if (action.equals(Settings.FORM_ACTION_RUN)) {
+            icing.runView.setRunOnServer();
 		} else {
 			// shouldn't happen because checked before.
 			GenClient.showCodeBug("Weird, found invalid response key: [" + exitCode + "]");

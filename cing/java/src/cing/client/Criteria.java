@@ -1,20 +1,23 @@
 package cing.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Criteria extends iCingView {
@@ -27,8 +30,8 @@ public class Criteria extends iCingView {
 
     int j = 0;
     final int rowIdxCingNone = j++;
-    final int rowIdxCingOmega = j++;
     final int rowIdxCingMissingCoord = j++;
+    final int rowIdxCingOmega = j++;
     final int rowIdxCingDrMax = j++;
     final int rowIdxCingDrRms = j++;
     final int rowIdxCingAcMax = j++;
@@ -75,6 +78,122 @@ public class Criteria extends iCingView {
     private TextBox textBoxComplPoor;
     private ListBox listBoxObs;
     private CheckBox gFactorCheckBox;
+    /**
+     * CRV stands for CRiteria Value CRS stands for CRiteria String
+     */
+    static String CRV_NONE = "-999.9";
+    static String CRV_TRUE = "1";
+    static String CRV_FALSE = CRV_NONE;
+    // Might seem verbose but allows for excellent checking by Eclipse.
+    static String CRS_OMEGA_MAXALL_POOR = "OMEGA_MAXALL_POOR";
+    static String CRS_OMEGA_MAXALL_BAD = "OMEGA_MAXALL_BAD";
+    static String CRS_DR_MAXALL_POOR = "DR_MAXALL_POOR";
+    static String CRS_DR_MAXALL_BAD = "DR_MAXALL_BAD";
+    static String CRS_DR_THRESHOLD_OVER_POOR = "DR_THRESHOLD_OVER_POOR";
+    static String CRS_DR_THRESHOLD_FRAC_POOR = "DR_THRESHOLD_FRAC_POOR";
+    static String CRS_DR_THRESHOLD_OVER_BAD = "DR_THRESHOLD_OVER_BAD";
+    static String CRS_DR_THRESHOLD_FRAC_BAD = "DR_THRESHOLD_FRAC_BAD";
+    static String CRS_DR_RMSALL_BAD = "DR_RMSALL_BAD";
+    static String CRS_DR_RMSALL_POOR = "DR_RMSALL_POOR";
+    static String CRS_AC_MAXALL_POOR = "AC_MAXALL_POOR";
+    static String CRS_AC_MAXALL_BAD = "AC_MAXALL_BAD";
+    static String CRS_AC_THRESHOLD_OVER_POOR = "AC_THRESHOLD_OVER_POOR";
+    static String CRS_AC_THRESHOLD_FRAC_POOR = "AC_THRESHOLD_FRAC_POOR";
+    static String CRS_AC_THRESHOLD_OVER_BAD = "AC_THRESHOLD_OVER_BAD";
+    static String CRS_AC_THRESHOLD_FRAC_BAD = "AC_THRESHOLD_FRAC_BAD";
+    static String CRS_AC_RMSALL_BAD = "AC_RMSALL_BAD";
+    static String CRS_AC_RMSALL_POOR = "AC_RMSALL_POOR";
+    static String CRS_FLAG_MISSING_COOR = "FLAG_MISSING_COOR";
+    static String CRS_WI_RAMCHK_POOR = "WI_RAMCHK_POOR";
+    static String CRS_WI_RAMCHK_BAD = "WI_RAMCHK_BAD";
+    static String CRS_WI_BBCCHK_POOR = "WI_BBCCHK_POOR";
+    static String CRS_WI_BBCCHK_BAD = "WI_BBCCHK_BAD";
+    static String CRS_WI_C12CHK_POOR = "WI_C12CHK_POOR";
+    static String CRS_WI_C12CHK_BAD = "WI_C12CHK_BAD";
+    static String CRS_PC_GF_POOR = "PC_GF_POOR";
+    static String CRS_PC_GF_BAD = "PC_GF_BAD";
+    static String CRS_AQUA_COMPL_INC_INTRA = "AQUA_COMPL_INC_INTRA";
+    static String CRS_AQUA_COMPL_OBS = "AQUA_COMPL_OBS";
+    static String CRS_AQUA_COMPL_POOR = "AQUA_COMPL_POOR";
+    static String CRS_AQUA_COMPL_BAD = "AQUA_COMPL_BAD";
+
+    static ArrayList<String> cingCriteriaKeyList = new ArrayList<String>();
+    static ArrayList<String> wiCriteriaKeyList = new ArrayList<String>();
+    static ArrayList<String> pcCriteriaKeyList = new ArrayList<String>();
+    static ArrayList<String> criteriaKeyListAll = new ArrayList<String>();
+
+    // Interface defaults; sync with those in $CINGROOT/python/cing/valSets.cfg.
+    String CRV_AC_MAXALL_BAD = "10";
+    String CRV_AC_MAXALL_POOR = "3";
+    String CRV_AC_RMSALL_BAD = "5";
+    String CRV_AC_RMSALL_POOR = "3";
+    String CRV_AC_THRESHOLD_FRAC_BAD = CRV_NONE;
+    String CRV_AC_THRESHOLD_FRAC_POOR = CRV_NONE;
+    String CRV_AC_THRESHOLD_OVER_BAD = CRV_NONE;
+    String CRV_AC_THRESHOLD_OVER_POOR = CRV_NONE;
+    String CRV_AQUA_COMPL_BAD = "10";
+    String CRV_AQUA_COMPL_INC_INTRA = "1";
+    String CRV_AQUA_COMPL_OBS = "Standard";
+    String CRV_AQUA_COMPL_POOR = "20";
+    String CRV_DR_MAXALL_BAD = "0.5";
+    String CRV_DR_MAXALL_POOR = "0.3";
+    String CRV_DR_RMSALL_BAD = "0.3";
+    String CRV_DR_RMSALL_POOR = "0.15";
+    String CRV_DR_THRESHOLD_FRAC_BAD = CRV_NONE;
+    String CRV_DR_THRESHOLD_FRAC_POOR = CRV_NONE;
+    String CRV_DR_THRESHOLD_OVER_BAD = CRV_NONE;
+    String CRV_DR_THRESHOLD_OVER_POOR = CRV_NONE;
+    String CRV_FLAG_MISSING_COOR = "true";
+    String CRV_OMEGA_MAXALL_BAD = "20";
+    String CRV_OMEGA_MAXALL_POOR = "15";
+    String CRV_PC_BAD_GF = "-1.3";
+    String CRV_PC_POOR_GF = "-1.0";
+    String CRV_WI_BAD_BBCCHK = "3.0";
+    String CRV_WI_BAD_C12CHK = "-1.2";
+    String CRV_WI_BAD_RAMCHK = "-1.3";
+    String CRV_WI_POOR_BBCCHK = "10.0";
+    String CRV_WI_POOR_C12CHK = "-0.9";
+    String CRV_WI_POOR_RAMCHK = "-1.0";
+
+    static {
+        // Get all added to sub lists.
+        cingCriteriaKeyList.add(CRS_OMEGA_MAXALL_POOR);
+        cingCriteriaKeyList.add(CRS_OMEGA_MAXALL_BAD);
+        cingCriteriaKeyList.add(CRS_FLAG_MISSING_COOR);
+        cingCriteriaKeyList.add(CRS_DR_MAXALL_POOR);
+        cingCriteriaKeyList.add(CRS_DR_MAXALL_BAD);
+        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_OVER_POOR);
+        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_FRAC_POOR);
+        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_OVER_BAD);
+        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_FRAC_BAD);
+        cingCriteriaKeyList.add(CRS_DR_RMSALL_BAD);
+        cingCriteriaKeyList.add(CRS_AC_MAXALL_POOR);
+        cingCriteriaKeyList.add(CRS_AC_MAXALL_BAD);
+        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_OVER_POOR);
+        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_FRAC_POOR);
+        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_OVER_BAD);
+        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_FRAC_BAD);
+        cingCriteriaKeyList.add(CRS_AC_RMSALL_BAD);
+
+        wiCriteriaKeyList.add(CRS_WI_RAMCHK_POOR);
+        wiCriteriaKeyList.add(CRS_WI_RAMCHK_BAD);
+        wiCriteriaKeyList.add(CRS_WI_BBCCHK_POOR);
+        wiCriteriaKeyList.add(CRS_WI_BBCCHK_BAD);
+        wiCriteriaKeyList.add(CRS_WI_C12CHK_POOR);
+        wiCriteriaKeyList.add(CRS_WI_C12CHK_BAD);
+        wiCriteriaKeyList.add(CRS_PC_GF_POOR);
+        wiCriteriaKeyList.add(CRS_PC_GF_BAD);
+
+        pcCriteriaKeyList.add(CRS_AQUA_COMPL_INC_INTRA);
+        pcCriteriaKeyList.add(CRS_AQUA_COMPL_OBS);
+        pcCriteriaKeyList.add(CRS_AQUA_COMPL_POOR);
+        pcCriteriaKeyList.add(CRS_AQUA_COMPL_BAD);
+
+        // Get all added to overall list.
+        criteriaKeyListAll.addAll(cingCriteriaKeyList);
+        criteriaKeyListAll.addAll(wiCriteriaKeyList);
+        criteriaKeyListAll.addAll(pcCriteriaKeyList);
+    }
 
     public Criteria() {
         super();
@@ -126,26 +245,26 @@ public class Criteria extends iCingView {
         wiTable.setWidget(rowIdxWiRama, 2, ramaTextBoxBad);
         wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiRama, 2, HasHorizontalAlignment.ALIGN_CENTER);
         ramaTextBoxBad.setStyleName("red");
-        ramaTextBoxBad.setText("-1.3");
+        ramaTextBoxBad.setText(CRV_WI_BAD_RAMCHK);
         ramaTextBoxBad.setWidth("3em");
         ramaTextBoxPoor = new TextBox();
         wiTable.setWidget(rowIdxWiRama, 3, ramaTextBoxPoor);
         wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiRama, 3, HasHorizontalAlignment.ALIGN_CENTER);
         ramaTextBoxPoor.setStyleName("orange");
-        ramaTextBoxPoor.setText("-1.0");
+        ramaTextBoxPoor.setText(CRV_WI_POOR_RAMCHK);
         ramaTextBoxPoor.setWidth("3em");
 
         bbTextBoxBad = new TextBox();
         wiTable.setWidget(rowIdxWiBb, 2, bbTextBoxBad);
         wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiBb, 2, HasHorizontalAlignment.ALIGN_RIGHT);
-        bbTextBoxBad.setText("3.0");
+        bbTextBoxBad.setText(CRV_WI_BAD_BBCCHK);
         bbTextBoxBad.setStyleName("red");
         bbTextBoxBad.setWidth("3em");
 
         bbTextBoxPoor = new TextBox();
         wiTable.setWidget(rowIdxWiBb, 3, bbTextBoxPoor);
         wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiBb, 3, HasHorizontalAlignment.ALIGN_CENTER);
-        bbTextBoxPoor.setText("10.0");
+        bbTextBoxPoor.setText(CRV_WI_POOR_BBCCHK);
         bbTextBoxPoor.setStyleName("orange");
         bbTextBoxPoor.setWidth("3em");
 
@@ -172,7 +291,7 @@ public class Criteria extends iCingView {
         janinTextBoxBad = new TextBox();
         wiTable.setWidget(rowIdxWiJanin, 2, janinTextBoxBad);
         wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiBb, 2, HasHorizontalAlignment.ALIGN_CENTER);
-        janinTextBoxBad.setText("-1.2");
+        janinTextBoxBad.setText(CRV_WI_BAD_C12CHK);
         janinTextBoxBad.setStyleName("red");
         janinTextBoxBad.setWidth("3em");
 
@@ -196,7 +315,7 @@ public class Criteria extends iCingView {
         wiTable.setWidget(rowIdxWiJanin, 3, janinTextBoxPoor);
         wiTable.getCellFormatter().setHorizontalAlignment(3, 3, HasHorizontalAlignment.ALIGN_CENTER);
         janinTextBoxPoor.setStyleName("orange");
-        janinTextBoxPoor.setText("-0.9");
+        janinTextBoxPoor.setText(CRV_WI_POOR_C12CHK);
         janinTextBoxPoor.setWidth("3em");
 
         final Label residueSigmas22Label_1 = new Label(c.residue_sigma() + " [-2,2]");
@@ -215,17 +334,17 @@ public class Criteria extends iCingView {
         textBoxGfactorPoor = new TextBox();
         pcTable.setWidget(rowIdxPcGfactor, 2, textBoxGfactorPoor);
         textBoxGfactorPoor.setStyleName("orange");
-        textBoxGfactorPoor.setText("-1.0");
+        textBoxGfactorPoor.setText(CRV_PC_POOR_GF);
         textBoxGfactorPoor.setWidth("3em");
         textBoxGfactorBad = new TextBox();
         pcTable.setWidget(rowIdxPcGfactor, 1, textBoxGfactorBad);
         pcTable.getCellFormatter().setHorizontalAlignment(rowIdxPcGfactor, 3, HasHorizontalAlignment.ALIGN_LEFT);
         textBoxGfactorBad.setStylePrimaryName("red");
-        textBoxGfactorBad.setText("-1.3");
+        textBoxGfactorBad.setText(CRV_PC_BAD_GF);
         textBoxGfactorBad.setWidth("3em");
         @SuppressWarnings("unused")
         final Label gFactorLimitsLabel = new Label("[-99,99]");
-//        pcTable.setWidget(rowIdxPcGfactor, 3, gFactorLimitsLabel);
+        // pcTable.setWidget(rowIdxPcGfactor, 3, gFactorLimitsLabel);
         includeIntraresidualContactsCheckBox = new CheckBox();
         pcTable.setWidget(rowIdxPcIntra, 0, includeIntraresidualContactsCheckBox);
         includeIntraresidualContactsCheckBox.setChecked(true);
@@ -255,14 +374,14 @@ public class Criteria extends iCingView {
         textBoxComplBad.setVisibleLength(3);
         textBoxComplBad.setMaxLength(3);
         textBoxComplBad.setStyleName("red");
-        textBoxComplBad.setText("10");
+        textBoxComplBad.setText(CRV_AQUA_COMPL_BAD);
         textBoxComplBad.setWidth("3em");
 
         textBoxComplPoor = new TextBox();
         pcTable.setWidget(rowIdxPcComple, 2, textBoxComplPoor);
         textBoxComplPoor.setVisibleLength(3);
         textBoxComplPoor.setStyleName("orange");
-        textBoxComplPoor.setText("20");
+        textBoxComplPoor.setText(CRV_AQUA_COMPL_POOR);
         textBoxComplPoor.setWidth("3em");
         final Label per0100Label = new Label("[0,100%]");
         pcTable.setWidget(rowIdxPcComple, 3, per0100Label);
@@ -282,6 +401,9 @@ public class Criteria extends iCingView {
         final Label observableAtomSetLabel = new Label(c.Observable_at());
         pcTable.setWidget(rowIdxPcObserv, 0, observableAtomSetLabel);
         nonePcCheckBox.setText(c.none());
+        pcTable.removeRow(rowIdxPcComple); // deleting bottom up.
+        pcTable.removeRow(rowIdxPcObserv); // TODO: enable when Wattos is run.
+        pcTable.removeRow(rowIdxPcIntra);
 
         checkBoxOmega = new CheckBox();
         cingTable.setWidget(rowIdxCingOmega, 0, checkBoxOmega);
@@ -296,7 +418,7 @@ public class Criteria extends iCingView {
         textBoxOmegaPoor = new TextBox();
         cingTable.setWidget(rowIdxCingOmega, 1, textBoxOmegaPoor);
         textBoxOmegaPoor.setStyleName("orange");
-        textBoxOmegaPoor.setText("15");
+        textBoxOmegaPoor.setText(CRV_OMEGA_MAXALL_POOR);
         textBoxOmegaPoor.setWidth("3em");
         final Label andLabelOmega = new Label(c.and());
         cingTable.setWidget(rowIdxCingOmega, 2, andLabelOmega);
@@ -304,7 +426,7 @@ public class Criteria extends iCingView {
         cingTable.setWidget(rowIdxCingOmega, 3, textBoxOmegaBad);
         cingTable.getCellFormatter().setHorizontalAlignment(rowIdxCingOmega, 3, HasHorizontalAlignment.ALIGN_CENTER);
         textBoxOmegaBad.setStylePrimaryName("red");
-        textBoxOmegaBad.setText("20");
+        textBoxOmegaBad.setText(CRV_OMEGA_MAXALL_BAD);
         textBoxOmegaBad.setWidth("3em");
         final Label labelDegreeOmega = new Label("\u00B0");
         cingTable.setWidget(rowIdxCingOmega, 4, labelDegreeOmega);
@@ -312,7 +434,7 @@ public class Criteria extends iCingView {
         textBoxDrMaxPoor = new TextBox();
         cingTable.setWidget(rowIdxCingDrMax, 1, textBoxDrMaxPoor);
         textBoxDrMaxPoor.setStyleName("orange");
-        textBoxDrMaxPoor.setText("0.1");
+        textBoxDrMaxPoor.setText(CRV_DR_MAXALL_POOR);
         textBoxDrMaxPoor.setWidth("3em");
         textBoxDrMaxBad = new TextBox();
         final Label andLabelDr = new Label(c.and());
@@ -320,7 +442,7 @@ public class Criteria extends iCingView {
         cingTable.setWidget(rowIdxCingDrMax, 3, textBoxDrMaxBad);
         cingTable.getCellFormatter().setHorizontalAlignment(rowIdxCingDrMax, 3, HasHorizontalAlignment.ALIGN_CENTER);
         textBoxDrMaxBad.setStylePrimaryName("red");
-        textBoxDrMaxBad.setText("0.3");
+        textBoxDrMaxBad.setText(CRV_DR_MAXALL_BAD);
         textBoxDrMaxBad.setWidth("3em");
         final Label labelAng = new Label("\u00C5");
         cingTable.setWidget(rowIdxCingDrMax, 4, labelAng);
@@ -331,7 +453,7 @@ public class Criteria extends iCingView {
         textBoxDrRmsPoor = new TextBox();
         cingTable.setWidget(rowIdxCingDrRms, 1, textBoxDrRmsPoor);
         textBoxDrRmsPoor.setStyleName("orange");
-        textBoxDrRmsPoor.setText("0.1");
+        textBoxDrRmsPoor.setText(CRV_DR_RMSALL_POOR);
         textBoxDrRmsPoor.setWidth("3em");
         textBoxDrRmsBad = new TextBox();
         final Label andLabelDrRms = new Label(c.and());
@@ -339,7 +461,7 @@ public class Criteria extends iCingView {
         cingTable.setWidget(rowIdxCingDrRms, 3, textBoxDrRmsBad);
         cingTable.getCellFormatter().setHorizontalAlignment(rowIdxCingDrRms, 3, HasHorizontalAlignment.ALIGN_CENTER);
         textBoxDrRmsBad.setStylePrimaryName("red");
-        textBoxDrRmsBad.setText("0.3");
+        textBoxDrRmsBad.setText(CRV_DR_RMSALL_BAD);
         textBoxDrRmsBad.setWidth("3em");
         final Label labelAngDrRms = new Label("\u00C5");
         cingTable.setWidget(rowIdxCingDrRms, 4, labelAngDrRms);
@@ -350,7 +472,7 @@ public class Criteria extends iCingView {
         textBoxAcMaxPoor = new TextBox();
         cingTable.setWidget(rowIdxCingAcMax, 1, textBoxAcMaxPoor);
         textBoxAcMaxPoor.setStyleName("orange");
-        textBoxAcMaxPoor.setText("3");
+        textBoxAcMaxPoor.setText(CRV_AC_MAXALL_POOR);
         textBoxAcMaxPoor.setWidth("3em");
         textBoxAcMaxBad = new TextBox();
         final Label andLabelAc = new Label(c.and());
@@ -358,7 +480,7 @@ public class Criteria extends iCingView {
         cingTable.setWidget(rowIdxCingAcMax, 3, textBoxAcMaxBad);
         cingTable.getCellFormatter().setHorizontalAlignment(rowIdxCingAcMax, 3, HasHorizontalAlignment.ALIGN_CENTER);
         textBoxAcMaxBad.setStylePrimaryName("red");
-        textBoxAcMaxBad.setText("5");
+        textBoxAcMaxBad.setText(CRV_AC_MAXALL_BAD);
         textBoxAcMaxBad.setWidth("3em");
         final Label labelDegreeAc = new Label("\u00B0");
         cingTable.setWidget(rowIdxCingAcMax, 4, labelDegreeAc);
@@ -369,14 +491,14 @@ public class Criteria extends iCingView {
         textBoxAcRmsPoor = new TextBox();
         cingTable.setWidget(rowIdxCingAcRms, 1, textBoxAcRmsPoor);
         textBoxAcRmsPoor.setStyleName("orange");
-        textBoxAcRmsPoor.setText("3");
+        textBoxAcRmsPoor.setText(CRV_AC_RMSALL_POOR);
         textBoxAcRmsPoor.setWidth("3em");
         textBoxAcRmsBad = new TextBox();
         cingTable.setWidget(rowIdxCingAcRms, 2, new Label(c.and()));
         cingTable.setWidget(rowIdxCingAcRms, 3, textBoxAcRmsBad);
         cingTable.getCellFormatter().setHorizontalAlignment(rowIdxCingAcRms, 3, HasHorizontalAlignment.ALIGN_CENTER);
         textBoxAcRmsBad.setStylePrimaryName("red");
-        textBoxAcRmsBad.setText("5");
+        textBoxAcRmsBad.setText(CRV_AC_RMSALL_BAD);
         textBoxAcRmsBad.setWidth("3em");
         final Label labelDegreeAcRms = new Label("\u00B0");
         cingTable.setWidget(rowIdxCingAcRms, 4, labelDegreeAcRms);
@@ -424,7 +546,8 @@ public class Criteria extends iCingView {
         horizontalPanelBackNext.add(backButton);
         backButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                History.back();
+                icingShadow.onHistoryChanged(iCing.FILE_STATE);
+                // History.back();
             }
         });
         backButton.setText(c.Back());
@@ -442,163 +565,85 @@ public class Criteria extends iCingView {
     }
 
     /**
-     * Per table the criteria will be read out into a settings map
+     * Per table the criteria will be read out into a settings map that is returned if all's well. The criteria will
+     * also be added to the panel argument as hidden parameters.
      * 
      * The values do need to be presented. An absent value might become supplemented within CING.
      * 
      * CRV stands for CRiteria Value CRS stands for CRiteria String
      * 
+     * @param verticalPanel
+     * 
      * @return null on error.
      */
-    public HashMap<String, String> getCriteria() {
+    public HashMap<String, String> getCriteria(VerticalPanel verticalPanel) {
         HashMap<String, String> result = new HashMap<String, String>();
 
-        String CR_NONE = "-999.9";
-        String CR_TRUE = "1";
-        String CR_FALSE = CR_NONE;
-
-        String CRS_OMEGA_MAXALL_POOR = "OMEGA_MAXALL_POOR";
-        String CRS_OMEGA_MAXALL_BAD = "OMEGA_MAXALL_BAD";
-        String CRS_DR_MAXALL_POOR = "DR_MAXALL_POOR";
-        String CRS_DR_MAXALL_BAD = "DR_MAXALL_BAD";
-        String CRS_DR_THRESHOLD_OVER_POOR = "DR_THRESHOLD_OVER_POOR";
-        String CRS_DR_THRESHOLD_FRAC_POOR = "DR_THRESHOLD_FRAC_POOR";
-        String CRS_DR_THRESHOLD_OVER_BAD = "DR_THRESHOLD_OVER_BAD";
-        String CRS_DR_THRESHOLD_FRAC_BAD = "DR_THRESHOLD_FRAC_BAD";
-        String CRS_DR_RMSALL_BAD = "DR_RMSALL_BAD";
-        String CRS_AC_MAXALL_POOR = "AC_MAXALL_POOR";
-        String CRS_AC_MAXALL_BAD = "AC_MAXALL_BAD";
-        String CRS_AC_THRESHOLD_OVER_POOR = "AC_THRESHOLD_OVER_POOR";
-        String CRS_AC_THRESHOLD_FRAC_POOR = "AC_THRESHOLD_FRAC_POOR";
-        String CRS_AC_THRESHOLD_OVER_BAD = "AC_THRESHOLD_OVER_BAD";
-        String CRS_AC_THRESHOLD_FRAC_BAD = "AC_THRESHOLD_FRAC_BAD";
-        String CRS_AC_RMSALL_BAD = "AC_RMSALL_BAD";
-        String CRS_FLAG_MISSING_COOR = "FLAG_MISSING_COOR";
-        String CRS_WI_POOR_RAMCHK = "WI_POOR_RAMCHK";
-        String CRS_WI_BAD_RAMCHK = "WI_BAD_RAMCHK";
-        String CRS_WI_POOR_BBCCHK = "WI_POOR_BBCCHK";
-        String CRS_WI_BAD_BBCCHK = "WI_BAD_BBCCHK";
-        String CRS_WI_POOR_C12CHK = "WI_POOR_C12CHK";
-        String CRS_WI_BAD_C12CHK = "WI_BAD_C12CHK";
-        String CRS_PC_POOR_GF = "PC_POOR_GF";
-        String CRS_PC_BAD_GF = "PC_BAD_GF";
-        String CRS_AQUA_COMPL_INC_INTRA = "AQUA_COMPL_INC_INTRA";
-        String CRS_AQUA_COMPL_OBS = "AQUA_COMPL_OBS";
-        String CRS_AQUA_COMPL_POOR = "AQUA_COMPL_POOR";
-        String CRS_AQUA_COMPL_BAD = "AQUA_COMPL_BAD";
         // CING
         if (!checkBoxOmega.isChecked()) {
-            textBoxOmegaBad.setText(CR_NONE);
-            textBoxOmegaPoor.setText(CR_NONE);
+            textBoxOmegaBad.setText(CRV_NONE);
+            textBoxOmegaPoor.setText(CRV_NONE);
         }
         if (!checkBoxDrMax.isChecked()) {
-            textBoxDrMaxBad.setText(CR_NONE);
-            textBoxDrMaxPoor.setText(CR_NONE);
+            textBoxDrMaxBad.setText(CRV_NONE);
+            textBoxDrMaxPoor.setText(CRV_NONE);
         }
         if (!checkBoxDrRms.isChecked()) {
-            textBoxDrRmsBad.setText(CR_NONE);
-            textBoxDrRmsPoor.setText(CR_NONE);
+            textBoxDrRmsBad.setText(CRV_NONE);
+            textBoxDrRmsPoor.setText(CRV_NONE);
         }
         if (!checkBoxAcMax.isChecked()) {
-            textBoxAcMaxBad.setText(CR_NONE);
-            textBoxAcMaxPoor.setText(CR_NONE);
+            textBoxAcMaxBad.setText(CRV_NONE);
+            textBoxAcMaxPoor.setText(CRV_NONE);
         }
         if (!checkBoxAcRms.isChecked()) {
-            textBoxAcRmsPoor.setText(CR_NONE);
-            textBoxAcRmsBad.setText(CR_NONE);
+            textBoxAcRmsPoor.setText(CRV_NONE);
+            textBoxAcRmsBad.setText(CRV_NONE);
         }
-        String CRV_OMEGA_MAXALL_POOR = textBoxOmegaPoor.getText();
-        String CRV_OMEGA_MAXALL_BAD = textBoxOmegaBad.getText();
-        String CRV_FLAG_MISSING_COOR = (checkBoxMissingCoordinates.isChecked() ? CR_TRUE : CR_FALSE);
-        String CRV_DR_MAXALL_POOR = textBoxDrMaxPoor.getText();
-        String CRV_DR_MAXALL_BAD = textBoxDrMaxBad.getText();
-        String CRV_DR_THRESHOLD_OVER_POOR = "0.5"; // not implemented all threshold parameters. TODO: if too much time.
-        String CRV_DR_THRESHOLD_FRAC_POOR = "0.5";
-        String CRV_DR_THRESHOLD_OVER_BAD = "1.0";
-        String CRV_DR_THRESHOLD_FRAC_BAD = "0.5";
-        String CRV_DR_RMSALL_BAD = textBoxDrRmsBad.getText();
-        String CRV_AC_MAXALL_POOR = textBoxAcMaxPoor.getText();
-        String CRV_AC_MAXALL_BAD = textBoxAcMaxBad.getText();
-        String CRV_AC_THRESHOLD_OVER_POOR = "3";
-        String CRV_AC_THRESHOLD_FRAC_POOR = "0.5";
-        String CRV_AC_THRESHOLD_OVER_BAD = "5";
-        String CRV_AC_THRESHOLD_FRAC_BAD = "0.5";
-        String CRV_AC_RMSALL_BAD = textBoxAcRmsBad.getText();
+        CRV_OMEGA_MAXALL_POOR = textBoxOmegaPoor.getText();
+        CRV_OMEGA_MAXALL_BAD = textBoxOmegaBad.getText();
+        CRV_FLAG_MISSING_COOR = (checkBoxMissingCoordinates.isChecked() ? CRV_TRUE : CRV_FALSE);
+        CRV_DR_MAXALL_POOR = textBoxDrMaxPoor.getText();
+        CRV_DR_MAXALL_BAD = textBoxDrMaxBad.getText();
+        CRV_DR_RMSALL_BAD = textBoxDrRmsBad.getText();
+        CRV_AC_MAXALL_POOR = textBoxAcMaxPoor.getText();
+        CRV_AC_MAXALL_BAD = textBoxAcMaxBad.getText();
+        CRV_AC_RMSALL_BAD = textBoxAcRmsBad.getText();
         // WI
         if (!ramachandranPlotCheckBox.isChecked()) {
-            ramaTextBoxBad.setText(CR_NONE);
-            ramaTextBoxPoor.setText(CR_NONE);
+            ramaTextBoxBad.setText(CRV_NONE);
+            ramaTextBoxPoor.setText(CRV_NONE);
         }
         if (!janinPlotCheckBox.isChecked()) {
-            janinTextBoxBad.setText(CR_NONE);
-            janinTextBoxPoor.setText(CR_NONE);
+            janinTextBoxBad.setText(CRV_NONE);
+            janinTextBoxPoor.setText(CRV_NONE);
         }
         if (!backboneNormalityCheckBox.isChecked()) {
-            bbTextBoxBad.setText(CR_NONE);
-            bbTextBoxPoor.setText(CR_NONE);
+            bbTextBoxBad.setText(CRV_NONE);
+            bbTextBoxPoor.setText(CRV_NONE);
         }
-        
-//        just finished typing here to continue maandag TODO:
-        
-        String CRV_WI_POOR_RAMCHK = ramaTextBoxPoor.getText();
-        String CRV_WI_BAD_RAMCHK = ramaTextBoxBad.getText();
-        String CRV_WI_POOR_BBCCHK = bbTextBoxPoor.getText();
-        String CRV_WI_BAD_BBCCHK = bbTextBoxBad.getText();
-        String CRV_WI_POOR_C12CHK = janinTextBoxPoor.getText();
-        String CRV_WI_BAD_C12CHK = janinTextBoxBad.getText();
+
+        CRV_WI_POOR_RAMCHK = ramaTextBoxPoor.getText();
+        CRV_WI_BAD_RAMCHK = ramaTextBoxBad.getText();
+        CRV_WI_POOR_BBCCHK = bbTextBoxPoor.getText();
+        CRV_WI_BAD_BBCCHK = bbTextBoxBad.getText();
+        CRV_WI_POOR_C12CHK = janinTextBoxPoor.getText();
+        CRV_WI_BAD_C12CHK = janinTextBoxBad.getText();
         // PC
         if (!gFactorCheckBox.isChecked()) {
-            textBoxGfactorBad.setText(CR_NONE);
-            textBoxGfactorBad.setText(CR_NONE);
+            textBoxGfactorBad.setText(CRV_NONE);
+            textBoxGfactorBad.setText(CRV_NONE);
         }
         if (!noeCompletenessCheckBox.isChecked()) {
-            textBoxComplBad.setText(CR_NONE);
-            textBoxComplPoor.setText(CR_NONE);
-        }        
-        String CRV_PC_POOR_GF = textBoxGfactorPoor.getText();
-        String CRV_PC_BAD_GF = textBoxGfactorBad.getText();
-        String CRV_AQUA_COMPL_INC_INTRA = (includeIntraresidualContactsCheckBox.isChecked() ? CR_TRUE : CR_FALSE);
-        String CRV_AQUA_COMPL_OBS = Utils.getListBoxItemText(listBoxObs);
-        String CRV_AQUA_COMPL_POOR =textBoxComplPoor.getText();
-        String CRV_AQUA_COMPL_BAD = textBoxComplBad.getText();
-
-        ArrayList<String> cingCriteriaKeyList = new ArrayList<String>();
-        cingCriteriaKeyList.add(CRS_OMEGA_MAXALL_POOR);
-        cingCriteriaKeyList.add(CRS_OMEGA_MAXALL_BAD);
-        cingCriteriaKeyList.add(CRS_FLAG_MISSING_COOR);
-        cingCriteriaKeyList.add(CRS_DR_MAXALL_POOR);
-        cingCriteriaKeyList.add(CRS_DR_MAXALL_BAD);
-        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_OVER_POOR);
-        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_FRAC_POOR);
-        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_OVER_BAD);
-        cingCriteriaKeyList.add(CRS_DR_THRESHOLD_FRAC_BAD);
-        cingCriteriaKeyList.add(CRS_DR_RMSALL_BAD);
-        cingCriteriaKeyList.add(CRS_AC_MAXALL_POOR);
-        cingCriteriaKeyList.add(CRS_AC_MAXALL_BAD);
-        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_OVER_POOR);
-        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_FRAC_POOR);
-        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_OVER_BAD);
-        cingCriteriaKeyList.add(CRS_AC_THRESHOLD_FRAC_BAD);
-        cingCriteriaKeyList.add(CRS_AC_RMSALL_BAD);
-
-        ArrayList<String> wiCriteriaKeyList = new ArrayList<String>();
-        cingCriteriaKeyList.add(CRS_WI_POOR_RAMCHK);
-        cingCriteriaKeyList.add(CRS_WI_BAD_RAMCHK);
-        cingCriteriaKeyList.add(CRS_WI_POOR_BBCCHK);
-        cingCriteriaKeyList.add(CRS_WI_BAD_BBCCHK);
-        cingCriteriaKeyList.add(CRS_WI_POOR_C12CHK);
-        cingCriteriaKeyList.add(CRS_WI_BAD_C12CHK);
-
-        ArrayList<String> pcCriteriaKeyList = new ArrayList<String>();
-        cingCriteriaKeyList.add(CRS_PC_POOR_GF);
-        cingCriteriaKeyList.add(CRS_PC_BAD_GF);
-        cingCriteriaKeyList.add(CRS_AQUA_COMPL_INC_INTRA);
-        cingCriteriaKeyList.add(CRS_AQUA_COMPL_OBS);
-        cingCriteriaKeyList.add(CRS_AQUA_COMPL_POOR);
-        cingCriteriaKeyList.add(CRS_AQUA_COMPL_BAD);
-
-        ArrayList<String> criteriaKeyListAll = new ArrayList<String>();
-        criteriaKeyListAll.addAll(cingCriteriaKeyList);
+            textBoxComplBad.setText(CRV_NONE);
+            textBoxComplPoor.setText(CRV_NONE);
+        }
+        CRV_PC_POOR_GF = textBoxGfactorPoor.getText();
+        CRV_PC_BAD_GF = textBoxGfactorBad.getText();
+        CRV_AQUA_COMPL_INC_INTRA = (includeIntraresidualContactsCheckBox.isChecked() ? CRV_TRUE : CRV_FALSE);
+        CRV_AQUA_COMPL_OBS = Utils.getListBoxItemText(listBoxObs);
+        CRV_AQUA_COMPL_POOR = textBoxComplPoor.getText();
+        CRV_AQUA_COMPL_BAD = textBoxComplBad.getText();
 
         result.put(CRS_OMEGA_MAXALL_POOR, CRV_OMEGA_MAXALL_POOR);
         result.put(CRS_OMEGA_MAXALL_BAD, CRV_OMEGA_MAXALL_BAD);
@@ -610,6 +655,7 @@ public class Criteria extends iCingView {
         result.put(CRS_DR_THRESHOLD_OVER_BAD, CRV_DR_THRESHOLD_OVER_BAD);
         result.put(CRS_DR_THRESHOLD_FRAC_BAD, CRV_DR_THRESHOLD_FRAC_BAD);
         result.put(CRS_DR_RMSALL_BAD, CRV_DR_RMSALL_BAD);
+        result.put(CRS_DR_RMSALL_POOR, CRV_DR_RMSALL_POOR);
         result.put(CRS_AC_MAXALL_POOR, CRV_AC_MAXALL_POOR);
         result.put(CRS_AC_MAXALL_BAD, CRV_AC_MAXALL_BAD);
         result.put(CRS_AC_THRESHOLD_OVER_POOR, CRV_AC_THRESHOLD_OVER_POOR);
@@ -617,16 +663,17 @@ public class Criteria extends iCingView {
         result.put(CRS_AC_THRESHOLD_OVER_BAD, CRV_AC_THRESHOLD_OVER_BAD);
         result.put(CRS_AC_THRESHOLD_FRAC_BAD, CRV_AC_THRESHOLD_FRAC_BAD);
         result.put(CRS_AC_RMSALL_BAD, CRV_AC_RMSALL_BAD);
+        result.put(CRS_AC_RMSALL_POOR, CRV_AC_RMSALL_POOR);
         //
-        result.put(CRS_WI_POOR_RAMCHK, CRV_WI_POOR_RAMCHK);
-        result.put(CRS_WI_BAD_RAMCHK, CRV_WI_BAD_RAMCHK);
-        result.put(CRS_WI_POOR_BBCCHK, CRV_WI_POOR_BBCCHK);
-        result.put(CRS_WI_BAD_BBCCHK, CRV_WI_BAD_BBCCHK);
-        result.put(CRS_WI_POOR_C12CHK, CRV_WI_POOR_C12CHK);
-        result.put(CRS_WI_BAD_C12CHK, CRV_WI_BAD_C12CHK);
+        result.put(CRS_WI_RAMCHK_POOR, CRV_WI_POOR_RAMCHK);
+        result.put(CRS_WI_RAMCHK_BAD, CRV_WI_BAD_RAMCHK);
+        result.put(CRS_WI_BBCCHK_POOR, CRV_WI_POOR_BBCCHK);
+        result.put(CRS_WI_BBCCHK_BAD, CRV_WI_BAD_BBCCHK);
+        result.put(CRS_WI_C12CHK_POOR, CRV_WI_POOR_C12CHK);
+        result.put(CRS_WI_C12CHK_BAD, CRV_WI_BAD_C12CHK);
         //
-        result.put(CRS_PC_POOR_GF, CRV_PC_POOR_GF);
-        result.put(CRS_PC_BAD_GF, CRV_PC_BAD_GF);
+        result.put(CRS_PC_GF_POOR, CRV_PC_POOR_GF);
+        result.put(CRS_PC_GF_BAD, CRV_PC_BAD_GF);
         result.put(CRS_AQUA_COMPL_INC_INTRA, CRV_AQUA_COMPL_INC_INTRA);
         result.put(CRS_AQUA_COMPL_OBS, CRV_AQUA_COMPL_OBS);
         result.put(CRS_AQUA_COMPL_POOR, CRV_AQUA_COMPL_POOR);
@@ -642,12 +689,26 @@ public class Criteria extends iCingView {
         if (nonePcCheckBox.isChecked()) {
             keyListToNull.addAll(pcCriteriaKeyList);
         }
-
+        Collections.sort(keyListToNull);
         for (Iterator i = keyListToNull.iterator(); i.hasNext();) {
             String key = (String) i.next();
-            result.put(key, CR_NONE);
+            if (!result.containsKey(key)) {
+                GenClient.showError("Nulling value to key that does not exist yet: [" + key);
+                return null;
+            }
+            GenClient.showDebug("Nulling value to key: [" + key);
+            result.put(key, CRV_NONE);
         }
 
+        Set<String> keySet = result.keySet();
+        ArrayList keyList = new ArrayList(keySet);
+        Collections.sort(keyList);
+        for (Iterator i = keyList.iterator(); i.hasNext();) {
+            String key = (String) i.next();
+            String value = result.get(key);
+            // GenClient.showDebug("Adding to form: key, value: [" + key + "] ["+value+"]");
+            verticalPanel.add(new Hidden(key, value));
+        }
         return result;
     }
 }

@@ -33,9 +33,9 @@ public class Welcome extends iCingView {
         final Hyperlink hyperlink = new Hyperlink(c.Start(), iCing.FILE_STATE);
         verticalPanelDec.add(hyperlink);
         hyperlink.setTitle(c.Begin_with_file());
-        final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);
-        verticalPanelDec.add(hyperlink_1);
-        hyperlink_1.setTitle(c.Start_new_sessi());
+//        final Hyperlink hyperlink_1 = new Hyperlink(c.Logout(), iCing.LOGIN_STATE);
+//        verticalPanelDec.add(hyperlink_1);
+//        hyperlink_1.setTitle(c.Start_new_sessi());
     }
 
 }

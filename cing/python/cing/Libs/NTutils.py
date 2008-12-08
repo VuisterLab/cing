@@ -444,7 +444,7 @@ class NTlist(list):
             NTerror('NTlist.toSML: no SMLhandler defined')
         #end if
     #end def
-#end class
+#end class 
 
 def NTfill(value, n):
     """Return a NTlist instance with n elements of value
@@ -3968,6 +3968,7 @@ class ROGscore(NTdict):
     """
     ROG_COMMENT_NO_COOR = 'No coordinates'
     ROG_COMMENT_BAD_OMEGA = 'Bad omega'
+    ROG_COMMENT_POOR_OMEGA = 'Poor omega'
     ROG_COMMENT_POOR_ASSIGNMENT = 'Poor assignment'
 
     MAX_TO_REPORT_IN_POPUP = 5

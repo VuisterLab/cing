@@ -3,7 +3,6 @@ package cing.client;
 import java.util.Date;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -106,7 +105,8 @@ public class CingLogView extends iCingView {
         horizontalPanelBackNext.add(backButton);
         backButton.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                History.back();
+                icingShadow.onHistoryChanged(iCing.RUN_STATE);
+//                History.back();
             }
         });
         backButton.setText(c.Back());

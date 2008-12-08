@@ -26,7 +26,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -362,11 +361,11 @@ public class iCing implements EntryPoint, HistoryListener {
 				loadCingLogView();
 			}
 		};
-		Command commandExit = new Command() {
-			public void execute() {
-				loadLoginView();
-			}
-		};
+//		Command commandExit = new Command() {
+//			public void execute() {
+//				loadLoginView();
+//			}
+//		};
 		Command commandPref = new Command() {
 			public void execute() {
 				loadPrefView();
@@ -420,7 +419,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar.addItem(c.File(), menuBar_file);
         menuBar_file.addItem(c.Upload(), commandFile);
         menuBar_file.addItem(c.PurgeProject(), commandPurgeProject);
-		menuBar_file.addItem(c.Exit(), commandExit);
+//		menuBar_file.addItem(c.Exit(), commandExit);
 		final MenuBar menuBar_edit = new MenuBar(true);
 //		menuBar_edit.setVisible(false);// doesn't 'help'
 		 menuBar.addItem(c.Edit(), menuBar_edit);
@@ -435,8 +434,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		menuBar_view.addItem(c.Log() + " CING", commandCingLog);
 		// menuItemLogCing.addStyleDependentName("disabled");
 		menuBar_view.addItem(c.Log() + " iCing", commandLog);
-		MenuItem menuItem3D = menuBar.addItem(c.threeD(), (Command) null);
-		menuItem3D.addStyleDependentName("disabled"); // try to improve styling.
+//		MenuItem menuItem3D = menuBar.addItem(c.threeD(), (Command) null);
+//		menuItem3D.addStyleDependentName("disabled"); // try to improve styling.
 		menuBar.setWidth(widthMenuStr);
 		final MenuBar menuBar_help = new MenuBar(true);
 		menuBar.addItem(c.Help(), menuBar_help);
@@ -646,7 +645,7 @@ public class iCing implements EntryPoint, HistoryListener {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
 		}
-//		result = "123456"; // TODO: disable for production.
+		result = "123456"; // TODO: disable for production.
 		
 		return result;
 	}

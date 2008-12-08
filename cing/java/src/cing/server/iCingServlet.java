@@ -152,8 +152,11 @@ public class iCingServlet extends HttpServlet {
                 }
                 int endIndex = Math.min(100, value.length());
                 String valueTruncated = value.substring(0, endIndex);
-                String msg = "Retrieved extra parameter [" + name + "] with value (first 100 bytes): [" + valueTruncated
-                        + "].";
+                Parameters p = new Parameters();
+                p.add(name);
+                p.add(valueTruncated);
+                String msg = Format.sprintf("Retrieved extra parameter [%-30s] with value (first 100 bytes): [%-100s]",
+                        p);
                 General.showDebug(msg);
             } else {
                 actualFileItem = item;
@@ -208,7 +211,7 @@ public class iCingServlet extends HttpServlet {
             processStatus(response, result, pathProject);
         } else if (currentAction.equals(Settings.FORM_ACTION_RUN)) {
             processRun(response, result, pathProject, parameterMap);
-        } else if (currentAction.equals(Settings.FORM_ACTION_OPTIONS)) {
+        } else if (currentAction.equals(Settings.FORM_ACTION_CRITERIA)) {
             processOptions(response, result, pathProject, parameterMap);
         } else {
             // Would be a code bug as is checked before.
@@ -297,6 +300,10 @@ public class iCingServlet extends HttpServlet {
      * @return null on error.
      */
     private String getProjectFilePath(File pathProject) {
+        if ( pathProject == null ) {
+            General.showCodeBug("Got null for pathProject in iCingServlet#getProjectFilePath");
+            return null;
+        }
         // General.showOutput("Reg exp files: " + PROJECT_NAME_regexp);
         // General.showOutput("Dir: " + pathProject);
         InOut.RegExpFilenameFilter ff = new InOut.RegExpFilenameFilter(PROJECT_NAME_regexp);
@@ -317,6 +324,10 @@ public class iCingServlet extends HttpServlet {
      */
     private String getProjectName(File pathProject) {
         String projectFilePath = getProjectFilePath(pathProject);
+        if ( projectFilePath == null ) {
+            General.showCodeBug("Got null for projectFilePath in iCingServlet#getProjectName");
+            return null;
+        }
         String projectName = InOut.getFilenameBase(projectFilePath);
         return projectName;
     }
@@ -537,9 +548,11 @@ public class iCingServlet extends HttpServlet {
 
         File uploadedFile = new File(pathProject, fileName);
         if (uploadedFile.exists()) {
-            writeJsonError(response, result,
-                    "Failed to write options to file as file already exists with the same name: [" + uploadedFile + "]");
-            return;
+            General.showWarning("Removing existing criteria file");
+            if (! uploadedFile.delete()) {
+                writeJsonError(response, result, "Failed to delete existing criteria file");
+                return;
+            }
         }
         String parameterListString = Ut.mapToPythonRFC822ConfigurationSettings(parameterMap);
         if (parameterListString == null) {

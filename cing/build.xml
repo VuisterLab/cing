@@ -13,7 +13,7 @@
 
 	<target name="init" description="init">
 		<!-- Set the below to development 0 or production 1-->
-		<property name="isProduction" value="1" />
+		<property name="isProduction" value="0" />
 		<if>
 			<equals arg1="${isProduction}" arg2="1" />
 			<then>
@@ -49,6 +49,9 @@
 		
 		<replaceregexp file="java/src/cing/client/Settings.java" match="String VERSION = (.*)" replace='String VERSION = "${cing_version}";' byline="true" />
       <echo message="Changed Settings.java to reflect new version." />
+        
+        <copy verbose="true" file="python/cing/valSets.cfg" todir="java/src/cing/public/example"/>
+	      <echo message="Synced configuration file to iCing examples." />
 
 	</target>
 

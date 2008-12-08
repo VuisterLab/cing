@@ -249,9 +249,16 @@ in a different assembly entity in NMR-STAR. This has consequences for numbering.
         try:
             selectedModels   = self.models2list( modelListStr )
             selectedModelCount = len( selectedModels )
+            if not selectedModelCount: 
+                NTerror("No models selected to keep which must be a bug; please check input string: ["+modelListStr+"]")     
+                return 
             if selectedModelCount == self.modelCount:
                 NTwarning("No models to delete from ensemble sticking with: [" + modelListStr +"]")
-                return 
+                return
+            lastModelIdx = selectedModels[-1] 
+            if lastModelIdx >= self.modelCount:
+                NTwarning("Last selected model index ("+`lastModelIdx`+") is not in ensemble; please check input string: [" + modelListStr +"]")
+                return
                  
     #        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
     #        NTdebug("verify this is the same as: [" + `selectedModels` +"]")
