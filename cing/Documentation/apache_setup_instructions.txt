@@ -65,3 +65,7 @@ The tomcat server in eclipse works together with the apache configured here.
 ProxyPass         / http://localhost:8080/NRG/MRGridServlet
 ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
             
+ProxyPass         /fcweb http://localhost:8000/
+ProxyPassReverse  /fcweb http://localhost:8000/
+
+            

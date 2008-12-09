@@ -645,7 +645,7 @@ public class iCing implements EntryPoint, HistoryListener {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
 		}
-		result = "123456"; // TODO: disable for production.
+//		result = "123456"; // TODO: disable for production.
 		
 		return result;
 	}
