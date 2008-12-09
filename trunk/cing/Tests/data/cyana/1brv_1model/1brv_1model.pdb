@@ -2,7 +2,6 @@ HEADER    GLYCOPROTEIN                            29-MAR-96   1BRV
 TITLE     SOLUTION NMR STRUCTURE OF THE IMMUNODOMINANT REGION OF                
 TITLE    2 PROTEIN G OF BOVINE RESPIRATORY SYNCYTIAL VIRUS, 48                  
 TITLE    3 STRUCTURES                                                           
-MODEL        1                                                                  
 ATOM      1  N   VAL A 171       3.148   2.384   5.854  1.00  0.00           N  
 ATOM      2  CA  VAL A 171       3.495   2.127   4.420  1.00  0.00           C  
 ATOM      3  C   VAL A 171       2.427   1.356   3.559  1.00  0.00           C  
@@ -18,7 +17,7 @@ ATOM     12 HG13 VAL A 171       6.365   1.423   2.473  1.00  0.00           H
 ATOM     13 HG21 VAL A 171       6.175   2.933   5.352  1.00  0.00           H  
 ATOM     14 HG22 VAL A 171       5.744   1.435   6.215  1.00  0.00           H  
 ATOM     15 HG23 VAL A 171       6.997   1.396   4.958  1.00  0.00           H  
-REMARK     16  N   PRO A 172       1.878   0.162   3.927  1.00  0.00           N  
+ATOM     16  N   PRO A 172       1.878   0.162   3.927  1.00  0.00           N  
 ATOM     17  CA  PRO A 172       0.906  -0.611   3.099  1.00  0.00           C  
 ATOM     18  C   PRO A 172      -0.287   0.182   2.484  1.00  0.00           C  
 ATOM     19  O   PRO A 172      -0.898   1.022   3.151  1.00  0.00           O  

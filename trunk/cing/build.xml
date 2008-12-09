@@ -13,7 +13,7 @@
 
 	<target name="init" description="init">
 		<!-- Set the below to development 0 or production 1-->
-		<property name="isProduction" value="0" />
+		<property name="isProduction" value="1" />
 		<if>
 			<equals arg1="${isProduction}" arg2="1" />
 			<then>
@@ -68,6 +68,11 @@
 		-->
 	</target>
 
+    <target name="iCing--install" depends="init, iCing-servlet-install, iCing-static-install">
+        <echo message="Ensure that the iCing dir already exists remotely." />
+    </target>
+
+	
 	<target name="iCing-static-install" depends="init">
 		<echo message="Ensure that the iCing dir already exists remotely." />
 
