@@ -3,6 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
 from cing import verbosityDebug
+from cing import verbosityDefault
 from cing.PluginCode.ccpn import RESTRAINT_IDX_DIHEDRAL
 from cing.PluginCode.ccpn import RESTRAINT_IDX_DISTANCE
 from cing.PluginCode.ccpn import SMALL_FLOAT_FOR_DIHEDRAL_ANGLES
@@ -76,4 +77,5 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityDefault
     unittest.main()

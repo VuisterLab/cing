@@ -1,3 +1,9 @@
+# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+import sys
+_bitBucket = open('/dev/null', 'aw')
+_returnMyTerminal = sys.stdout
+sys.stdout = _bitBucket
+
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.util.Molecule import makeMolecule
 from cing.Libs.NTutils import NTdebug
@@ -22,13 +28,8 @@ from string import digits
 import os
 import tarfile
 
-# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
-#from cing.Libs.NTutils import NTdebug
-#_bitBucket = open('/dev/null', 'aw')
-#_returnMyTerminal = sys.stdout
-#sys.stdout = _bitBucket
-#sys.stdout = _returnMyTerminal
-#del(_bitBucket)
+sys.stdout = _returnMyTerminal
+del(_bitBucket)
 
 RESTRAINT_IDX_DISTANCE = 0
 RESTRAINT_IDX_DIHEDRAL = 1
@@ -1183,11 +1184,11 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
         NTwarning("Restraint in CCPN was None")
         return None
     
-    NTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
-    NTdebug(" CCPN: constraint.lowerLimit     %8s" % constraint.lowerLimit)
-    NTdebug(" CCPN: constraint.upperLimit     %8s" % constraint.upperLimit)
-    NTdebug(" CCPN: constraint.error          %8s" % constraint.error)
-    NTdebug(" CCPN: restraintTypeIdx          %8s" % restraintTypeIdx)
+#    NTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
+#    NTdebug(" CCPN: constraint.lowerLimit     %8s" % constraint.lowerLimit)
+#    NTdebug(" CCPN: constraint.upperLimit     %8s" % constraint.upperLimit)
+#    NTdebug(" CCPN: constraint.error          %8s" % constraint.error)
+#    NTdebug(" CCPN: restraintTypeIdx          %8s" % restraintTypeIdx)
 # wrong lowerbound in the following valid case.    
 #constraint.targetValue         5.5
 #constraint.lowerLimit          0.0
@@ -1227,10 +1228,11 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
     upper = constraint.upperLimit
 
     if (lower != None) and (upper != None):
-        NTdebug("Simplest case first for speed reasons.")
+        pass
+#        NTdebug("Simplest case first for speed reasons.")
     else:    
         if constraint.targetValue == None:
-            NTdebug("One or both of the two bounds are None but no target available to derive them")
+            NTdebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper) )
         else:    
             # When there is a targetvalue and no lower or upper we will use a error of zero by default which makes
             # the range of ther error zero in case the error was not defined. This is a reesonable assumption according
@@ -1241,7 +1243,7 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
                 error = - error
             if restraintTypeIdx==RESTRAINT_IDX_DIHEDRAL:
                 if error > 180.:                 
-                    NTwarning("Found error above half circle; which means all's possible; translated well to CING: " + `error`)
+                    NTwarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: " + `error`)
                     return (0.0, -SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
                 
             
