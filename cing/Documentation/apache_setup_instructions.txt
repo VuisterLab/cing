@@ -1,4 +1,5 @@
-* apache on mac
+
+* Mac's apache 
     There's one in eclipse but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
@@ -40,6 +41,7 @@ Info:
             Turn on "Web Sharing" and check server in browser.
 
 
+SetEnv PYTHONPATH 
 Add settings to /private/etc/apache2/httpd.conf  like:
 SetEnv  xplorPath /usr/local/bin/xplor
 SetEnv  procheckPath /Users/jd/progs/procheck/procheck_nmr.scr
@@ -65,7 +67,4 @@ The tomcat server in eclipse works together with the apache configured here.
 ProxyPass         / http://localhost:8080/NRG/MRGridServlet
 ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
             
-ProxyPass         /fcweb http://localhost:8000/
-ProxyPassReverse  /fcweb http://localhost:8000/
-
             

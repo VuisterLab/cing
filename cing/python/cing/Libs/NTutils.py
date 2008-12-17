@@ -2093,6 +2093,25 @@ def NTlimit(theList, min, max, byItem=None):
     #end for
 #end def
 
+def NTlimitSingleValue(value, min, max):
+    """
+    Limit the the values of theList between min and max, assuming periodicity
+    i.e, like for angles.
+    Assumes numeric value, None element is ignored.
+    
+    Could easily be optimized. If the value is far away from the allowed range
+    then round off errors also become important with this algorithm.
+    """
+    listRange = max-min
+    if value == None:
+        return value
+    
+    while value < min:
+        value += listRange
+    while value > max:
+        value -= listRange
+    return value
+
 
 def NTaverage(theList, byIndex=None):
     """returns (av, sd, n) tuple of theList or
@@ -3207,7 +3226,7 @@ def removedir(path):
 
 def NTpath(path):
 
-    """Return a triple (directory, basename, extension) form path"
+    """Return a triple (directory, basename, extension) from path"
     """
     d = os.path.split(path)
     dirname = d[0]
