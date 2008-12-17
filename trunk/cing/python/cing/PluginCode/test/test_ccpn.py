@@ -20,6 +20,7 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
         entryList = "1brv".split()
+#        entryList = "2cka".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #        entryList =            "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
@@ -29,7 +30,7 @@ class AllChecks(TestCase):
 
         fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
+        doWhatif = True # disables whatif actual run
         doProcheck = True
         if fastestTest:
             htmlOnly = True 

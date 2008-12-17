@@ -23,3 +23,4 @@ On the restraint side:
 1iv6 EMBOSS
 1kr8 Amber with RDCs
 2hgh CYANA with RDCs.
+2cka XPLOR with bounds 0, 5.5, 5.5, None for lower, upper, target, and error.

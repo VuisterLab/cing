@@ -55,7 +55,7 @@
 
 	</target>
 
-	<target name="home-web-install" depends="init">
+	<target name="iweb-CING-install" depends="init">
 		<echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
 		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
 		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" 

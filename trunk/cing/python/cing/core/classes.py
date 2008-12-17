@@ -275,7 +275,8 @@ Project: Top level Cing project class
                     continue  # no print
                 NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
             else:
-                NTdebug("Adding              key " + key + " with value: " + valueStr)
+#                NTdebug("Adding              key " + key + " with value: " + valueStr)
+                pass
             self.valSets[key] = value # name value pairs.
         #end for
         self.valSets.keysformat() 
