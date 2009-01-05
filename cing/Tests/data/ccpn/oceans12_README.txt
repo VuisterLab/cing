@@ -6,8 +6,9 @@ Molecular system:
 1a4d small dsRNA one to start off with
 1a24 well known
 1afp beta barrel.
-1ai0 complex with H2O and
+1ai0 complex with H2O and ligand
 1brv small
+1bus has ligand PCA.
 1cjg nucleic acid/protein complex.
 1hue well known dimer to me
 1ieh well known
