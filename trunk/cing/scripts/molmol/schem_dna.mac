@@ -17,7 +17,7 @@ DefPropRes 'new_ribbon' 'mol.selected & selected'
 # selected primitives + new ribbons at the end
 SelectPrim '0'
 
-# set the helix property on the resdiues that the ribbon is
+# set the helix property on the residues that the ribbon is
 # added to, we always want the DNA to be displayed as helix
 DefPropRes 'helix' 'helix | new_ribbon'
 
@@ -48,57 +48,57 @@ ColorPrim 1 0.0 0.5
 
 # add orange red rings for A bases
 SelectPrim '0'
-SelectAtom 'res.new_ribbon & (res.name = "[DR]ADE*" | res.name = "[DR]A") & base'
+SelectAtom 'res.new_ribbon & (res.name = "[DR]ADE*" | res.name = "[DR]A"| res.name = "A") & base'
 AddPlates
 DefPropPrim 'new_ribbon' 'new_ribbon | selected'
 ColorPrim 1 0.2 0
 
 # make A bonds orange red
-SelectBond 'res.new_ribbon & (res.name = "[DR]ADE*" | res.name = "[DR]A")'
+SelectBond 'res.new_ribbon & (res.name = "[DR]ADE*" | res.name = "[DR]A" | res.name = "A")'
 ColorBond 1 0.2 0
 
 # add yellow rings for T bases
 SelectPrim '0'
-SelectAtom 'res.new_ribbon & (res.name = "[DR]THY*" | res.name = "[DR]T") & base'
+SelectAtom 'res.new_ribbon & (res.name = "[DR]THY*" | res.name = "[DR]T" | res.name = "T") & base'
 AddPlates
 DefPropPrim 'new_ribbon' 'new_ribbon | selected'
 ColorPrim 1 1 0
 
 # make T bonds yellow
-SelectBond 'res.new_ribbon & (res.name = "[DR]THY*" | res.name = "[DR]T")'
+SelectBond 'res.new_ribbon & (res.name = "[DR]THY*" | res.name = "[DR]T" | res.name = "T")'
 ColorBond 1 1 0
 
 # add green rings for G bases
 SelectPrim '0'
-SelectAtom 'res.new_ribbon & (res.name = "[DR]GUA*" | res.name = "[DR]G") & base'
+SelectAtom 'res.new_ribbon & (res.name = "[DR]GUA*" | res.name = "[DR]G" | res.name = "G") & base'
 AddPlates
 DefPropPrim 'new_ribbon' 'new_ribbon | selected'
 ColorPrim 0 0 1
 
 # make G bonds green
-SelectBond 'res.new_ribbon & (res.name = "[DR]GUA*" | res.name = "[DR]G")'
+SelectBond 'res.new_ribbon & (res.name = "[DR]GUA*" | res.name = "[DR]G" | res.name = "G")'
 ColorBond 0 0 1
 
 # add cyan rings for C bases
 SelectPrim '0'
-SelectAtom 'res.new_ribbon & (res.name = "[DR]CYT*" | res.name = "[DR]C") & base'
+SelectAtom 'res.new_ribbon & (res.name = "[DR]CYT*" | res.name = "[DR]C" | res.name = "C") & base'
 AddPlates
 DefPropPrim 'new_ribbon' 'new_ribbon | selected'
 ColorPrim 0 1 1
 
 # make C bonds cyan
-SelectBond 'res.new_ribbon & (res.name = "[DR]CYT*" | res.name = "[DR]C")'
+SelectBond 'res.new_ribbon & (res.name = "[DR]CYT*" | res.name = "[DR]C" | res.name = "C")'
 ColorBond 0 1 1
 
 # add magenta rings for U bases
 SelectPrim '0'
-SelectAtom 'res.new_ribbon & (res.name = "[DR]URA*" | res.name = "[DR]U") & base'
+SelectAtom 'res.new_ribbon & (res.name = "[DR]URA*" | res.name = "[DR]U" | res.name = "U") & base'
 AddPlates
 DefPropPrim 'new_ribbon' 'new_ribbon | selected'
 ColorPrim 1 0 1
 
 # make U bonds magenta
-SelectBond 'res.new_ribbon & (res.name = "[DR]URA*" | res.name = "[DR]U")'
+SelectBond 'res.new_ribbon & (res.name = "[DR]URA*" | res.name = "[DR]U" | res.name = "U")'
 ColorBond 1 0 1
 
 # display bond connecting backbone and rings

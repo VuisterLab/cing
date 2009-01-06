@@ -2,12 +2,19 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 
 * Note  http://www.malisphoto.com/tips/tomcatonosx.html
     Has most up to date instructions.
+    Do what it says but add a -m32 flag to CFLAGS before doing your make to the file Makedefs
+    Thanks to http://crashingdaily.wordpress.com/2008/11/12/compiling-a-32-bit-jsvc-on-a-64-bit-machine/
+    - Made many changes to Tomcat5.sh as suggested by tomcatonosx.html
+    
     
 * On Stella/mini (mac):
 -Using mac installed version (Apache Tomcat/5.5.23):
     as root
     export CATALINA_HOME=/Library/Tomcat
-	$CATALINA_HOME/bin/shutdown.sh
+    $CATALINA_HOME/bin/Tomcat5.sh start
+    $CATALINA_HOME/bin/Tomcat5.sh stop
+    
+	$CATALINA_HOME/bin/shutdown.sh (RETIRED)
 	$CATALINA_HOME/bin/startup.sh
 	
 - Logs:
@@ -25,7 +32,7 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
     Add the proxyPort setting to the Connector tag in your server.xml.
 	And to the apache setup with proxies?	
 	
-# Fink specific	
+# Fink specific	(not using fink's with cing servlet)
     setenv CATALINA_HOME /sw/var/tomcat5
 - Status:
 	ps -a | grep TOMCAT5LAUNCH | grep -v grep 

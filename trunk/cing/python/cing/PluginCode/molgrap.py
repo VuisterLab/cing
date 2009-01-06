@@ -10,10 +10,9 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.TypeChecking import check_string
 from cing.Libs.TypeChecking import check_type
-from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
@@ -64,25 +63,26 @@ class Molgrap(NTdict):
         if export:
             NTdebug("First looking for atoms that should not be fed to molmol")
             NTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
-            skippedAtoms = [] # Keep a list of skipped atoms for later
-            skippedResidues = []
-            for res in molecule.allResidues():
-#                TODO: why do the ions from the example xeasy project need to be removed here?
-#                they cause molmol to write an invalid povray file.
-#                consider switching to PyMol.
-                if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-                    skippedResidues.append(res)
-                    for atm in res.allAtoms():
-                        atm.pdbSkipRecord = True
-                        skippedAtoms.append( atm )
-            if skippedResidues:
-                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
+            
+#            skippedAtoms = [] # Keep a list of skipped atoms for later
+#            skippedResidues = []
+#            for res in molecule.allResidues():
+##                TODO: why do the ions from the example xeasy project need to be removed here?
+##                they cause molmol to write an invalid povray file.
+##                consider switching to PyMol.
+#                if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
+#                    skippedResidues.append(res)
+#                    for atm in res.allAtoms():
+#                        atm.pdbSkipRecord = True
+#                        skippedAtoms.append( atm )
+#            if skippedResidues:
+#                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
-            #
-            molecule.toPDBfile(pdb_first_file_name, convention=CYANA, model=0)
+            # was CYANA            
+            molecule.toPDBfile(pdb_first_file_name, convention=IUPAC, model=0)
             # Restore the 'default' state
-            for atm in skippedAtoms:
-                atm.pdbSkipRecord = False
+#            for atm in skippedAtoms:
+#                atm.pdbSkipRecord = False
 
         if not os.path.exists(pdb_first_file_name):
             NTerror("Molgrap.run: Failed to materialize first model PDB file")

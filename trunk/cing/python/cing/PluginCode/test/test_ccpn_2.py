@@ -16,7 +16,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testRestraintsValuesRegular(self):
-        """See http://code.google.com/p/cing/issues/detail?id=121"""
+        _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
 #        lower, upper, targetValue, error     
         rList = [     
                  (0.0, 3.0, 4.0, 1.0), # Should give a warning and just use lower/upper as is. 

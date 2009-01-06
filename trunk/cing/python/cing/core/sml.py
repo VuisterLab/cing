@@ -437,7 +437,7 @@ class SMLMoleculeHandler( SMLhandler ):
         mol._sequence = NTlist()
         for res in mol.allResidues():
             mol._sequence.append( ( res.chain.name,
-                                    res.db.translate(SMLsaveFormat),
+                                    res.translate(SMLsaveFormat) ,
                                     res.resNum,
                                     SMLsaveFormat
                                    )

@@ -1,5 +1,6 @@
 Directories:
 
+ccpn                    Example data using CCPN format.
 cyana                   Example data using cyana formats.
 tmp                     Empty directory for temporary data created by CING test cases.
 

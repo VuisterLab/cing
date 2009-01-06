@@ -693,7 +693,8 @@ def exportShifts2Talos( molecule, fileName=None)   :
 #   generate a oneletter sequence string
     seqString = ''
     for res in allResidues( molecule ):
-        seqString = seqString + res.db.shortName
+#        seqString = seqString + res.db.shortName JFD mod.
+        seqString = seqString + res.shortName
     #end for
 
 #   header
@@ -710,7 +711,8 @@ def exportShifts2Talos( molecule, fileName=None)   :
         if (ac.isAssigned() and (atomName in talosUsed)):
             fprintf( f, '%4d    %1s     %4s      %8.3f\n',
                         ac._parent.resNum,
-                        ac._parent.db.shortName,
+#                        ac._parent.db.shortName, JFD mod.
+                        ac._parent.shortName,
                         atomName,
                         ac.shift()
                    )

@@ -55,9 +55,18 @@ class lostInTranslation():
         f = codecs.open( propBaseFile, "r", "utf-8" )
         # now the reads will result in unicode being returned.        
         r={}
+        lineNo = 0
         for line in f:
+            lineNo += 1
+            if line == "":
+                continue
 #            NTdebug("line: " + line)
-            (key,value) = line.split('=')
+            try:
+                (key,value) = line.split('=')
+            except :
+                NTerror("In file [%s] on line [%d]: [%s]" % (propBaseFile, lineNo, line))
+                raise # re-raise the current exception (new in 1.5)
+            
             key = key.strip()
             value = value.strip()
             r[key]=value
