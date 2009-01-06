@@ -9,6 +9,7 @@
         LoadModule php5_module        libexec/apache2/libphp5.so
         
         
+* Mac's apache        
 'HOME', '/Users/jd/Sites/tmp/cing'
 ErrorLog /private/var/log/apache2/error_log
 
@@ -18,8 +19,6 @@ monitor with:
 - processing is done as _www:admin account.
     So don't use the suEXEC way.
     
-apache_setup_instructions.txt
-Info:
     httpd -V
 
     Restart by:

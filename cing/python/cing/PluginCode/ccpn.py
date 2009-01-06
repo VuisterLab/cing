@@ -1,4 +1,5 @@
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
+from cing.Libs.NTutils import NTcodeerror
 import sys
 _bitBucket = open('/dev/null', 'aw')
 _returnMyTerminal = sys.stdout
@@ -36,6 +37,9 @@ RESTRAINT_IDX_DIHEDRAL = 1
 RESTRAINT_IDX_RDC = 2
 
 SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1.0E-9
+
+"Unknown to JFD why these atoms sometimes exist in CCPN. E.g. 1a4d."
+atomNamesToIgnore = [ "HOP2", "HOP3" ]
 
 """
 Adds initialize from CCPN project files
@@ -277,8 +281,8 @@ def _checkCcpnNmrProject(ccpnProject, funcName):
        Output: ccp.nmr.Nmr.NmrProject, None or error.
     '''
 
-    # TODO: this needs to be better! Taking only one NmrProject for the moment
-    if (ccpnProject.currentNmrProject):
+    # Taking only one NmrProject for the moment
+    if ccpnProject.currentNmrProject:
         ccpnNmrProject = ccpnProject.currentNmrProject
     elif (ccpnProject.nmrProjects):
         ccpnNmrProject = ccpnProject.findFirstNmrProject()
@@ -603,22 +607,27 @@ def _getCcpnChainsResiduesAtomsCoords(molecule, coords=True):
             # end if
 
             if not chemCompSysName:
-                NTwarning("Residue '%s' not identified", ccpnResidue.ccpCode)
-                continue
-            # end if
-            # residue Name according namingSystem
-            resNameInSysName = chemCompSysName.sysName
-            NTdebug("Res %s name '%s' (CCPN) ==> '%s' ('%s')",
-                      ccpnResidue.seqCode, ccpnResidue.ccpCode, resNameInSysName, namingSystem)
+                NTwarning("Residue '%s' not identified; creating a freestyle residue.", ccpnResidue.ccpCode)
 
+            
+            
+            # residue Name according namingSystem            
+            if chemCompSysName:
+                resNameInSysName = chemCompSysName.sysName
+            else:
+                NTdebug("Using ccpn residue name as cing residue name")
+                resNameInSysName = ccpnResidue.ccpCode
+                
+#            NTdebug("Res %s name '%s' (CCPN) ==> '%s' ('%s')",
+#                      ccpnResidue.seqCode, ccpnResidue.ccpCode, resNameInSysName, namingSystem)
             if resNameInSysName in dictCif2Cing.keys():
                 oldName = resNameInSysName
                 resNameInSysName = dictCif2Cing[resNameInSysName]
                 NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, newNamingSystem, resNameInSysName)
             # end if
             if not NTdb.getResidueDefByName(resNameInSysName):
-                NTwarning("Residue '%s' not identified in CING DB", resNameInSysName)
-                continue
+                NTwarning("Residue '%s' not identified in CING DB. Again, CING will create a freestyle residue", resNameInSysName)
+#                continue
             # end if
 
             residue = chain.addResidue(resNameInSysName, ccpnResidue.seqCode)
@@ -694,39 +703,48 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
         atom = molecule.decodeNameTuple(cingNameTuple)
 
         if not atom:
-            NTwarning('Atom %s not found in CING %s', cingNameTuple, molecule)
-#            NTwarning( 'Atom %s not found in CING molecule %s; CCPN: %s, %s, %s, %s, %s, %s',
-#                        cingNameTuple, molecule,
-#                        namingSystem, ccpnChainLetter,
-#                        ccpnResidue.ccpCode, ccpnResidue.seqCode, atomName, resNameInSysName
-#                     )
-        else:
-            # Make mutual linkages between Ccpn and Cing objects
-            atom.ccpn = ccpnAtom
-            ccpnAtom.cing = atom
+            if not (atomName in atomNamesToIgnore):
+                NTwarning('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
+            else:
+                NTdebug('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
+            cingResNameTuple = ('INTERNAL_0', ccpnChainLetter, ccpnResSeq, None)
+            res = molecule.decodeNameTuple(cingResNameTuple)
+            if not res:
+                NTcodeerror('No residue found in CING for tuple %s. Creating freestyle atom' % cingResNameTuple)
+                continue
+            atom = res.addAtom(atomName)
+            if not atom:
+                NTcodeerror('Failed to add atom to residue for tuple %s' % cingNameTuple)
+                continue
 
-            if coords:
-            # Get coords for atoms
-                for ccpnCoordResidue in ccpnCoordResidues:
-                    ccpnCoordAtom = ccpnCoordResidue.findFirstAtom(atom=ccpnAtom)
+#        else:
+        # Make mutual linkages between Ccpn and Cing objects
+        atom.ccpn = ccpnAtom
+        ccpnAtom.cing = atom
 
-                    if not ccpnCoordAtom:
-                        #gv says: do not know why we would have this error, as we have matched the atom objects
-                        #TODO: it usully happens for H in N-term, which CING is not mapping yet.
-                        NTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
-                        continue
-                    # end if
+        if coords:
+        # Get coords for atoms
+            for ccpnCoordResidue in ccpnCoordResidues:
+                ccpnCoordAtom = ccpnCoordResidue.findFirstAtom(atom=ccpnAtom)
 
-                    if ccpnCoordAtom.coords:
-                        for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
-                            ccpnCoord = ccpnCoordAtom.findFirstCoord(model=ccpnModel)
-                            atom.addCoordinate(ccpnCoord.x, ccpnCoord.y,
-                                               ccpnCoord.z, ccpnCoord.bFactor,
-                                               ocuppancy=ccpnCoord.occupancy)
-                        # end for
-                    # end if
-                # end for
-            # end if
+                if not ccpnCoordAtom:
+                    #gv says: do not know why we would have this error, as we have matched the atom objects
+                    # JFD: I don't understand either.
+                    #TODO: it usually happens for H in N-term, which CING is not mapping yet.
+                    NTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
+                    continue
+                # end if
+
+                if ccpnCoordAtom.coords:
+                    for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
+                        ccpnCoord = ccpnCoordAtom.findFirstCoord(model=ccpnModel)
+                        atom.addCoordinate(ccpnCoord.x, ccpnCoord.y,
+                                           ccpnCoord.z, ccpnCoord.bFactor,
+                                           ocuppancy=ccpnCoord.occupancy)
+                    # end for
+                # end if
+            # end for
+        # end if
         # end if
     # end for
 # end def _ccpnAtom2CingAndCoords
@@ -1204,7 +1222,7 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
     
     # Generate some warnings which might be helpfull to a user because it should not be out of wack like this.
     # Perhaps this gets checked in ccpn api already?
-    if restraintTypeIdx==RESTRAINT_IDX_DISTANCE:
+    if restraintTypeIdx == RESTRAINT_IDX_DISTANCE:
         if constraint.targetValue != None:
             if constraint.lowerLimit != None:
                 if constraint.targetValue < constraint.lowerLimit:                 
@@ -1232,7 +1250,7 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
 #        NTdebug("Simplest case first for speed reasons.")
     else:    
         if constraint.targetValue == None:
-            NTdebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper) )
+            NTdebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
         else:    
             # When there is a targetvalue and no lower or upper we will use a error of zero by default which makes
             # the range of ther error zero in case the error was not defined. This is a reesonable assumption according
@@ -1241,10 +1259,10 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
             if error < 0:                 
                 NTerror("Found error below zero; taking absolute value of error: " + `error`)
                 error = - error
-            if restraintTypeIdx==RESTRAINT_IDX_DIHEDRAL:
+            if restraintTypeIdx == RESTRAINT_IDX_DIHEDRAL:
                 if error > 180.:                 
                     NTwarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: " + `error`)
-                    return (0.0, -SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
+                    return (0.0, - SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
                 
             
             if lower == None:
@@ -1256,7 +1274,7 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
                 upper = constraint.targetValue + error
                 
             
-    if restraintTypeIdx==RESTRAINT_IDX_DISTANCE:
+    if restraintTypeIdx == RESTRAINT_IDX_DISTANCE:
         if (lower != None) and (upper != None):
             if lower > upper:                 
                 NTerror("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
@@ -1270,9 +1288,9 @@ def restraintsValues(constraint, restraintTypeIdx=RESTRAINT_IDX_DISTANCE):
             upper = None
             
     # Unfortunately, sometimes it would be nice to preserve the info on the range but can't be here.
-    if restraintTypeIdx==RESTRAINT_IDX_DIHEDRAL:
-        lower = NTlimitSingleValue( lower, -180., 180.) # routine is ok with None input.
-        upper = NTlimitSingleValue( upper, -180., 180.)
+    if restraintTypeIdx == RESTRAINT_IDX_DIHEDRAL:
+        lower = NTlimitSingleValue(lower, - 180., 180.) # routine is ok with None input.
+        upper = NTlimitSingleValue(upper, - 180., 180.)
 
     return (lower, upper)
 

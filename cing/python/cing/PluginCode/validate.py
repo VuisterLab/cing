@@ -1322,6 +1322,8 @@ def validateDihedrals(self):
     restoreDihRestraintInfo(self)
 
     for res in self.molecule.allResidues():
+        if not res.db:            
+            continue
         for dihed in res.db.dihedrals.zap('name'):
             if not dihed in res:
                 continue

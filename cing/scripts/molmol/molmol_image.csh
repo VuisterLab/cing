@@ -20,6 +20,7 @@ set mul            = 1
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
 
+date
 echo "DEBUG: 1"
 
 # check if we got the right amount of parameters
@@ -51,6 +52,7 @@ if ( 1 ) then
     echo "molmol_image.csh found pdb_file   :" $pdb_file >  $log_file
     echo "molmol_image.csh found tmp_dir    :" $tmp_dir  >> $log_file
     echo "molmol_image.csh found id         :" $id       >> $log_file
+    date                                                 >> $log_file
 endif
 echo "DEBUG: 2"
 
@@ -98,8 +100,13 @@ echo "DEBUG: 4"
 
 # Notes for the macro file:
 # -1- No empty lines allowed.
+# InitAll for getting rid of any potential old molecules. Will be issued again.
 echo "InitAll yes" > $mac_file
-echo "PathNames '' '' '' '' '/Users/jd/progs/molmolM/setup/PdbAtoms' '/Users/jd/progs/molmolM/setup/PropDef' '/Users/jd/progs/molmolM/setup/pdb.lib' '' ''" >> $mac_file
+
+echo "PathNames '' '' '' '' '$mac_dir/PdbAtoms' '$mac_dir/PropDef' '$mac_dir/pdb.lib' '' ''" >> $mac_file
+#echo "ReadLib '$mac_dir/pdb.lib'" >> $mac_file
+# InitAll uses the pathnames above to initialize the definitions
+echo "InitAll yes" >> $mac_file
 if ( $backcolor == "bmrb_yellow" ) then
     echo "BackColor 1 1 0.79688" >> $mac_file
 else

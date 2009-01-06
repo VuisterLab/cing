@@ -370,8 +370,8 @@ class ResidueDef( NTtree ):
     def translate( self, convention ):
         if convention in self.nameDict:
             return self.nameDict[convention]
-        #end if
-        return None
+        NTwarning("Failed to find convention for residue: %s using CING name." % self )
+        return self.name
     #end def
 
     def isValidAtomName( self, atmName, convention = INTERNAL ):
@@ -604,8 +604,13 @@ class AtomDef( NTtree ):
     #end def
 
     def translate( self, convention ):
-#        if convention in self.nameDict:
-# speed
+        if not hasattr(self,'nameDict'):
+            return self.name        
+        if not self.nameDict:
+            return self.name        
+#        if not hasattr(self.nameDict,convention):
+#            return self.name        
+
         if self.nameDict.has_key(convention):
             # XPLOR definitions potentially have multiple
             # entries, separated by ','. Take the first.
@@ -613,7 +618,8 @@ class AtomDef( NTtree ):
                 return self.nameDict[convention].split(',')[0]
             #end if
         #end if
-        return None
+        NTwarning("Failed to find convention for atom: %s using CING name." % self )
+        return self.name
     #end def
 
     def allAtomDefs(self):
@@ -662,7 +668,7 @@ class AtomDef( NTtree ):
         if isCarbon(self):
             props.append('isCarbon','carbon')
         else:
-            props.append('isNotCarbon','notcarbon')
+            props.append('isNotCarbon','notcarbon') 
         #end if
         if isNitrogen(self):
             props.append('isNitrogen','nitrogen')

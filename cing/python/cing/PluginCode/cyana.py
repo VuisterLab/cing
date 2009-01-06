@@ -65,7 +65,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
     res, angleName, _db = dr.retrieveDefinition()
     if res:
         return sprintf( '%4d %-4s %-6s %6.1f %6.1f',
-                        res.resNum, res.db.translate( convention ),
+                        res.resNum, res.translate(convention),
                         angleName, dr.lower, dr.upper
                       )
     else:

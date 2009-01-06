@@ -5,3 +5,6 @@ schem_dna.mac       Attempted to include deviating residue names but fails to
 CONTENTS.txt        This file.
 molmol_image.csh    For image generation with Molmol.
 render_convert.csh  Ray trace scenes to image files.
+pdb.lib             Atom defs from amber94.lib. Added DA, DG, DT, DC etc.
+PdbAtoms            Mapping between PDB (1/2 nomenclature) and MOLMOL.
+PropDef             Atom and bond definitions such as what composes a sugar.
