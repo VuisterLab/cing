@@ -10,7 +10,8 @@ cing.verbosity = cing.verbosityDebug
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName = os.path.join('/Users/jd', 'entry_list_nrg_docr.csv')
+entryListFileName = os.path.join(startDir, 'entry_list_1a3p.csv')
+#entryListFileName = os.path.join(startDir, 'entry_list_nrg_docr.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
@@ -26,7 +27,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     startDir,
                     processes_max=2,
                     delay_between_submitting_jobs=15,
-                    max_time_to_wait=120, # 1y4o took more than 600. This is one of the optional arguments.
-                    START_ENTRY_ID=3,
+                    max_time_to_wait=1200, # 1y4o took more than 600. This is one of the optional arguments.
+                    START_ENTRY_ID=0,
                     MAX_ENTRIES_TODO=200,
                     extraArgList=extraArgList)

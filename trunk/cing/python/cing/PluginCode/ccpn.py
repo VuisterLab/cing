@@ -703,10 +703,10 @@ def _ccpnAtom2CingAndCoords(molecule, ccpnResidue, ccpnChainLetter,
         atom = molecule.decodeNameTuple(cingNameTuple)
 
         if not atom:
-            if not (atomName in atomNamesToIgnore):
-                NTwarning('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
-            else:
-                NTdebug('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
+#            if not (atomName in atomNamesToIgnore):
+#                NTwarning('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
+#            else:
+            NTdebug('Atom %s in CCPN not found in CING %s. Creating freestyle atom' % ( cingNameTuple, molecule))
             cingResNameTuple = ('INTERNAL_0', ccpnChainLetter, ccpnResSeq, None)
             res = molecule.decodeNameTuple(cingResNameTuple)
             if not res:
@@ -1694,7 +1694,7 @@ def _getConstraintAtoms(ccpnConstraint):
                 try:
                     atoms = [ x[0].cing for x in atomList ]
                 except:
-                    NTdebug("No Cing atom obj equivalent for Ccpn atom list", atomList)
+                    NTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
                 # end try
             elif className in ['DistanceConstraint', 'RdcConstraint']:
                 for ccpnAtom1 in atomList[0]:
