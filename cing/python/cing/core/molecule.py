@@ -2660,8 +2660,8 @@ Atom class: Defines object for storing atom properties
             if resDb.has_key( atomName ):
                 self.db = NTdb[resName][atomName]
         if not self.db:            
-            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-            NTwarning("Creating empty atom definition for this atom.")
+#            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
+#            NTwarning("Creating empty atom definition for this atom.")
             self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.
         #end if
     #end def
