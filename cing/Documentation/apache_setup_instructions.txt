@@ -1,18 +1,12 @@
-
 * Mac's apache 
-    There's one in eclipse but heck why not shrew up the one in mac os integrated.
+    There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
 
-    Php support:
+    Php support, needed for NRG-CING pdb code lookup:
         enable in config the line:
         LoadModule php5_module        libexec/apache2/libphp5.so
         
-        
-* Mac's apache        
-'HOME', '/Users/jd/Sites/tmp/cing'
-ErrorLog /private/var/log/apache2/error_log
-
 monitor with:
 	tail -f /private/var/log/apache2/*_log &
 
@@ -38,23 +32,6 @@ monitor with:
     In the System Preference of the Mac
         Sharing
             Turn on "Web Sharing" and check server in browser.
-
-
-SetEnv PYTHONPATH 
-Add settings to /private/etc/apache2/httpd.conf  like:
-SetEnv  xplorPath /usr/local/bin/xplor
-SetEnv  procheckPath /Users/jd/progs/procheck/procheck_nmr.scr
-SetEnv  aqpcPath /Users/jd/progs/aquad/scripts/aqpc
-SetEnv  whatifPath /home/vriend/whatif/DO_WHATIF.COM
-SetEnv  dsspPath /home/vriend/whatif/dssp/DSSP.EXE
-SetEnv  convertPath /sw/bin/convert
-SetEnv  ghostscriptPath /sw/bin/gs
-SetEnv  ps2pdfPath /sw/bin/ps2pdf14
-SetEnv  molmolPath /Users/jd/progs/molmolM/molmol
-SetEnv  povrayPath /sw/bin/povray
-# To home a .matplotlibrc directory with settings will be added.
-SetEnv  HOME /Library/WebServer/Documents/servlet-cing-home
-SetEnv  CINGROOT /Users/jd/workspace34/cing
 
 # For the gwt tomcat server
 ProxyPass         /iCing/serv http://localhost:8080/iCing
