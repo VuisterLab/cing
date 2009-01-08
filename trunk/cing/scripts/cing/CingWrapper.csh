@@ -23,6 +23,8 @@ setenv MOLMOLHOME         $UJ/progs/molmolM
 setenv HOME               /Library/WebServer/Documents/servlet-cing-home
 #setenv HOME               $UJ
 
+# Possible improvement could be to have the debug flag below here be defined from 
+# the iCing interface.
 set verbosityDebug = 0
 
 
@@ -39,7 +41,20 @@ limit datasize  1000m   # Maximum size of data (including stack)
 limit coredumpsize 0    # Maximum size of core dump file
 umask 2                 # The files created will be having special permissions.
 
+# PYTHONPATH  will be completely set by cing.csh.
 unsetenv PYTHONPATH
+# fink
+source /sw/bin/init.csh
+
+if ( $verbosityDebug) then
+    echo "DEBUG: Wrap for HOME / user           $HOME / $user"
+endif
+
+if ( $verbosityDebug) then
+    echo    "DEBUG: Path:                          $PATH"
+    echo -n "DEBUG: python:                        "
+    which python
+endif
 
 if ( $verbosityDebug) then
     echo "DEBUG: Wrap for HOME / user           $HOME / $user"

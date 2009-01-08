@@ -62,8 +62,8 @@ public class FormHandlerFile extends FormHandlerMain {
 
         if ( program.equals(Settings.FILE_PROGRAM_CCPN) &&
                 type.equals(Settings.FILE_TYPE_PROJECT) ) {
-            if ( ! fnNoPath.endsWith(".tgz")) {
-                Window.alert(c.ERROR()+"\n\n"+c.Please_end_filen() + " .tgz");
+            if ( ! (fnNoPath.endsWith(".tgz") || fnNoPath.endsWith(".tar.gz"))) {
+                Window.alert(c.ERROR()+"\n\n"+c.Please_end_filen() + " .tar.gz | .tgz");
                 event.setCancelled(true);
                 return;
             }

@@ -1,0 +1,23 @@
+After a reboot make sure the following services run on the server:
+
+Jurgen's setup
+- CING website:     http://nmr.cmbi.ru.nl/cing (checked from Madison every 12"). 
+- iCing javascript https://nmr.cmbi.ru.nl/iCing (checked from Madison).
+- iCing servlet    https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet (checked from Madison).
+- mysql (needed by fcweb and by NRG)
+    TODO: fails the automatic startup even though the System Preferences Gui says it should. The console shows a message
+            saying mysql should be upgraded to create a required file. Probably to do with change from case-sensitive 
+            FS to case aware FS. Since it is not yet essential skipped for now.
+    Workaround: start by hand from System Preferences.        
+- fcweb (checked from Madison).
+   TODO: fails the automatic startup after reboot. Solution by hand:
+   launchctl unload /System/Library/LaunchAgents/fcweb.plist
+   launchctl   load /System/Library/LaunchAgents/fcweb.plist
+
+Geerten's setup
+- proteins website: http://nmr.cmbi.ru.nl (checked from Madison).
+- mac fusion (check by hand by doing Finder->Connect to server-> https://proteins.dyndns.org/gDisk
+    Unable to check from a remote site yet. Can't do a scp or a ssh to https://proteins.dyndns.org/gDisk
+    TODO:
+
+

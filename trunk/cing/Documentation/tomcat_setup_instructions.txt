@@ -7,9 +7,9 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
     - Made many changes to Tomcat5.sh as suggested by tomcatonosx.html
     
     
-* On Stella/mini (mac):
--Using mac installed version (Apache Tomcat/5.5.23):
-    as root
+* On mac:
+    -Using mac installed version (Apache Tomcat/5.5.23):
+    # runs under as root (TODO: run under tomcat user as this poses a security risk)
     export CATALINA_HOME=/Library/Tomcat
     $CATALINA_HOME/bin/Tomcat5.sh start
     $CATALINA_HOME/bin/Tomcat5.sh stop
