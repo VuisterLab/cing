@@ -42,9 +42,9 @@ PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc unde
 SECSTRUCT_STR      = 'secStruct'
 CONSENSUS_SEC_STRUCT_FRACTION = 0.6
 
-#Trying to accommodate at least 
+#Trying to accommodate at least
 #2k0e with 160 models of with each 148 residues, 2611 atoms
-#1ai0  
+#1ai0
 ## Adjusted to reflect original procheck_nmr settings:
 #
 #C MXATOM - Maximum number of atoms allowed for the structure (1 model)
@@ -75,7 +75,7 @@ CONSENSUS_SEC_STRUCT_FRACTION = 0.6
 #left at 60 in   viol2pdb because the same as MXFILE
 MAX_PROCHECK_NMR_MODELS = 60
 #MAX_PROCHECK_NMR_MODELS = 2
- 
+
 def procheckString2float(string):
     """Convert a string to float, return None in case of value of 999.90"""
     result = float(string)
@@ -386,6 +386,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
             self.molecule.toPDBfile(path, convention=AQUA, max_models = MAX_PROCHECK_NMR_MODELS)
+#            self.molecule.toPDBfile(path, convention=AQUA) #GV removed because not implemented in toPDBfile; 12 Jan 09 Try-again
             # Can't use IUPAC here because aqua doesn't understand difference between
             # G and DG.(oxy/deoxy).
 
@@ -489,7 +490,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if modelCount > MAX_PROCHECK_NMR_MODELS:
             NTwarning("Limiting number of models analyzed from %d to %d" % (modelCount, MAX_PROCHECK_NMR_MODELS))
             modelCount = MAX_PROCHECK_NMR_MODELS
-            
+
         # reset the procheck dictionary of each residue
         for res in self.molecule.allResidues():
             if res.has_key('procheck'):

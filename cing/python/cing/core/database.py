@@ -163,11 +163,16 @@ class MolDef( NTtree ):
     #end def
 
     def isValidResidueName( self, resName, convention = INTERNAL ):
-        """return True if resName is a valid for convention, False otherwise"""
+        """return True if resName is a valid for convention, False otherwise
+        """
     #  print '>>', resName, atomName
 
+        if not resName:
+            NTdebug('MolDef.isValidResidueName: undefined residue name')
+            return None
+        #end if
         if not self.residueDict.has_key(convention):
-            NTerror('MolDef.isValidResidueName: convention %s not defined within CING', convention)
+            NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getResidueDefByName( resName, convention=convention) != None)
@@ -177,8 +182,13 @@ class MolDef( NTtree ):
         """return ResidueDef instance for resName if resName is a valid for convention
            or None otherwise
         """
+
+        if not resName:
+            NTdebug('MolDef.getResidueDefByName: undefined residue name')
+            return None
+        #end if
         if not self.residueDict.has_key(convention):
-            NTerror('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
+            NTdebug('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         rn = resName.strip()
@@ -192,8 +202,16 @@ class MolDef( NTtree ):
         """return True if resName, atmName is a valid for convention, False otherwise"""
     #  print '>>', resName, atomName
 
+        if not resName:
+            NTdebug('MolDef.isValidAtomName: undefined residue name')
+            return None
+        #end if
+        if not atmName:
+            NTdebug('MolDef.isValidAtomName: undefined atom name')
+            return None
+        #end if
         if not self.residueDict.has_key(convention):
-            NTerror('MolDef.isValidAtomName: convention %s not defined within CING', convention)
+            NTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getAtomDefByName( resName, atmName, convention=convention) != None)
@@ -203,8 +221,16 @@ class MolDef( NTtree ):
         """return AtomDef instance for resName, atmName if resName, atmName is a valid for convention
            or None otherwise
         """
+        if not resName:
+            NTdebug('MolDef.getAtomDefByName: undefined residue name')
+            return None
+        #end if
+        if not atmName:
+            NTdebug('MolDef.getAtomDefByName: undefined atom name')
+            return None
+        #end if
         if not self.residueDict.has_key(convention):
-            NTerror('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
+            NTdebug('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         resDef = self.getResidueDefByName( resName, convention=convention )
@@ -604,13 +630,8 @@ class AtomDef( NTtree ):
     #end def
 
     def translate( self, convention ):
-        if not hasattr(self,'nameDict'):
-            return self.name        
-        if not self.nameDict:
-            return self.name        
-#        if not hasattr(self.nameDict,convention):
-#            return self.name        
-
+#        if convention in self.nameDict:
+# speed
         if self.nameDict.has_key(convention):
             # XPLOR definitions potentially have multiple
             # entries, separated by ','. Take the first.
@@ -668,7 +689,7 @@ class AtomDef( NTtree ):
         if isCarbon(self):
             props.append('isCarbon','carbon')
         else:
-            props.append('isNotCarbon','notcarbon') 
+            props.append('isNotCarbon','notcarbon')
         #end if
         if isNitrogen(self):
             props.append('isNitrogen','nitrogen')
