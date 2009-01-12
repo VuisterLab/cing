@@ -45,8 +45,6 @@ from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
 import os
-#from cing.core.dictionaries import NTdbGetAtom
-#from cing.core.dictionaries import NTdbGetResidue
 
 #==============================================================================
 # PDB stuff
@@ -165,7 +163,7 @@ class pdbParser:
                ResidueDef<->AtomDef
 
     """
-    def __init__(self, pdbFile, convention=IUPAC, patchAtomNames = False):
+    def __init__(self, pdbFile, convention=IUPAC, patchAtomNames = False, skipWaters=False ):
         if not os.path.exists(pdbFile):
             NTerror('pdbParser: missing PDB-file "%s"', pdbFile)
             return None
@@ -180,6 +178,7 @@ class pdbParser:
         self.pdbFile = pdbFile
         self.convention = convention
         self.patchAtomNames = patchAtomNames
+        self.skipWaters = skipWaters
 
         # parsing storage
         self._records2tree()
@@ -287,13 +286,13 @@ class pdbParser:
 
         # Residue names that are ambigiously defined by different PDB file formats
         if res.resName[0:3] == 'ARG':
-            if ('HH11' in res and 'HH12' in res) or ('1HH1' in res and '2HH1' in res): # Second set for CYANA 1.x, AMBER
-                #print 'ARG'
-                res.db = NTdb.getResidueDefByName( 'ARG+', convention = CYANA )
-            else:
-                # Default deprot
-                #print 'ARGx'
+            if 'HH1' in res:
                 res.db = NTdb.getResidueDefByName( 'ARG', convention = CYANA )
+            elif '1HH' in res: # Second set for CYANA 1.x, AMBER
+                res.db = NTdb.getResidueDefByName( 'ARG', convention = CYANA )
+            else:
+                # Default protonated; this also assures most common for X-ray without protons
+                res.db = NTdb.getResidueDefByName( 'ARG+', convention = CYANA )
             #end if
         #end if
         elif res.resName[0:3] == 'ASP':
@@ -301,7 +300,7 @@ class pdbParser:
                 #print 'ASPH'
                 res.db = NTdb.getResidueDefByName( 'ASP', convention = CYANA )
             else:
-                # Default deprot
+                # Default deprot; this also assures most common for X-ray without protons
                 #print 'ASP'
                 res.db = NTdb.getResidueDefByName( 'ASP-', convention = CYANA )
             #end if
@@ -310,7 +309,7 @@ class pdbParser:
                 #print 'GLUH'
                 res.db = NTdb.getResidueDefByName( 'GLU', convention = CYANA )
             else:
-                # Default deprot
+                # Default deprot; this also assures most common for X-ray without protons
                 #print 'GLU'
                 res.db = NTdb.getResidueDefByName( 'GLU-', convention = CYANA )
             #end if
@@ -327,13 +326,13 @@ class pdbParser:
                 res.db = NTdb.getResidueDefByName( 'HIS', convention = CYANA )
             #end if
         elif res.resName[0:3] == 'LYS':
-            if ('HZ3' in res) or ('3HZ' in res): # Second set for CYANA 1.x
-                #print 'LYS'
-                res.db = NTdb.getResidueDefByName( 'LYS+', convention = CYANA )
-            else:
-                # Default deprot
-                #print 'LYSx'
+            if ('HZ1' in res and not 'HZ3' in res):
                 res.db = NTdb.getResidueDefByName( 'LYS', convention = CYANA )
+            elif ('1HZ' in res and not '3HZ' in res): # Second set for CYANA 1.x
+                res.db = NTdb.getResidueDefByName( 'LYS', convention = CYANA )
+            else:
+                # Default prot; this also assures most common for X-ray without protons
+                res.db = NTdb.getResidueDefByName( 'LYS+', convention = CYANA )
             #end if
         elif res.resName in CYANA_NON_RESIDUES:
             res.skip = True

@@ -389,11 +389,16 @@ class SMLMoleculeHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, _tmp=None):
-        # The handle restores the attributes of Molecule
+        """ The handle restores the attributes of Molecule
+        """
         # Explicitly encode it because we want on the fly action for _sequence
 
         nameTuple = eval(' '.join(line[2:]))
         mol = Molecule( nameTuple[0] )
+        if not mol:
+            NTerror('SMLMoleculeHandler.handle: invalid line "%s"', line[0])
+            return None
+        #end if
 
         line = SMLhandler.readline( fp )
         while (line):

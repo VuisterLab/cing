@@ -28,7 +28,7 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.831
+cingVersion     = 0.84
 __version__     = cingVersion # for pydoc
 __date__        = '27 November 2008'
 

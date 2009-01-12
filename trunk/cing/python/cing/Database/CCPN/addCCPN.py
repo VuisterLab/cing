@@ -1,11 +1,17 @@
 """
 Script to import CCPN nomenclature (from file generate by TIM) into CING database
+
+python -u addCCPN.py
+
+Adjust sourceFile where needed
 """
 
 from cing import * #@UnusedWildImport
 
+sourceFile = 'CcpnResAtomNomenclature_081103.txt'
+
 resdef = None
-for line in AwkLike('CcpnResAtomNomenclature.txt'):
+for line in AwkLike(sourceFile, commentString = '#'):
     d = line.dollar
     #print d[1]
     if d[1] == 'RESIDUE':
@@ -53,7 +59,9 @@ for line in AwkLike('CcpnResAtomNomenclature.txt'):
         else:
             cyanaName = d[5]
 
-        if not dianaName in resdef:
+        if dianaName in ['next_1','prev_1','prev_2']: # skip these lines as they are ccpn specific
+            pass
+        elif not dianaName in resdef:
             NTerror('line %d: %s undefined atom DIANA: "%s" IUPAC: "%s" CCPN "%s"', line.NR, resdef, dianaName, iupacName, ccpnName)
         else:
             atomdef = resdef[dianaName]
@@ -66,6 +74,6 @@ for line in AwkLike('CcpnResAtomNomenclature.txt'):
                 NTwarning('line %d %s: IUPAC nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, atomdef,
                           atomdef.translate(IUPAC), iupacName)
             #end if
-
+        #end if
     #end fi
 #end for
