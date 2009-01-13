@@ -212,8 +212,11 @@ def _criticizeResidue( residue, valSets ):
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
 #            NTdebug('Now criticizing %s, whatif key %s', residue, key )
 
-            thresholdValuePoor = valSets[ 'WI_POOR_'+key ]
-            thresholdValueBad  = valSets[ 'WI_BAD_'+key ]
+            thresholdValuePoor = valSets[ 'WI_' + key + '_POOR'  ]
+            thresholdValueBad = valSets[ 'WI_' + key + '_BAD' ]
+            if (thresholdValuePoor == None) or (thresholdValueBad == None):
+                NTdebug("Skipping What If " + key + " critique")
+                continue
 
             actualValue        = getDeepByKeys(residue,'whatif', key, 'valueList') #TODO remove this valueList stuff
             if actualValue == None:
