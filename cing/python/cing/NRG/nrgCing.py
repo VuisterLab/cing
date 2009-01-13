@@ -9,8 +9,6 @@ If the pickle is polluted do the following steps:
   -2- run (takes less than an hour)
   -3- reset all the default options again and run again
 
-When the modification times of the NRG files were reset
-set doUpdateAfterFileSystemReset = 1
 
 When you need to stop a batch processing, send a signal
 to it for interuption. E.g. when 22059 is the PID of "python nrgCing.py 1"
@@ -100,16 +98,19 @@ class nrgCing(Lister):
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
 
+        self.why_not_db_mount_point = '/Volumes/cmbi8'
+        # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done        
+        self.why_not_db_comments_dir = self.why_not_db_mount_point + "/usr/scratch/whynot/comments"
+        self.why_not_db_comments_file = '20090106_NRG-CING.txt_done'
+        # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
+        self.why_not_db_raw_dir = self.why_not_db_mount_point + "/usr/data/data/raw/nrg-cing"
+        
         ## Maximum number of pictures to create before ending
         ## and writting the pickle and web page overview again.
         ## Restart the process to do any remaining entries.
         ## Don't overlap processes!!!
         self.max_entries_todo = max_entries_todo
         self.max_time_to_wait = max_time_to_wait 
-        ## Set this variable to 0 for usual operations. Set to 1 for
-        ## not generating new images if all are present all ready
-        ## without regard to the up to dateness of the pdb file.
-        self.skip_newer_entries_if_images_exist = 0
 
         ## When set to non-zero the algorithm will update the modification
         ## time for an updated pdb file in the pickle but will not
@@ -457,6 +458,23 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
+             
+        
+        why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
+        NTdebug("Copying to: " + why_not_db_comments_file)
+        shutil.copy("NRG-CING.txt", why_not_db_comments_file)
+        for entryId in self.entry_list_done[0:10]:
+            # For many files like: /usr/data/raw/nmr-cing/           d3/1d3z/1d3z.exist
+            char23 = entryId[1:3]
+            subDir = os.path.join(self.why_not_db_raw_dir, char23, entryId)
+            os.makedirs(subDir)
+            fileName = os.path.join(subDir, entryId + ".exist")
+            NTdebug("Creating: " + fileName)
+            fp = open(fileName, 'w')
+#            fprintf(fp, ' ')
+            fp.close()
+            
+        
 
     def make_individual_pages(self, entry_code):
         """
@@ -694,8 +712,6 @@ class nrgCing(Lister):
         headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
         shutil.copy(cssFile, indexDir)
         shutil.copy(headerBgFile, indexDir)
-        
-
         return 1
     
     def update(self, new_hits_entry_list=None):
@@ -725,7 +741,6 @@ if __name__ == '__main__':
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 1    # was 1 may be set to a 100 when just running through to regenerate pickle                                       
-    doUpdateAfterFileSystemReset = 0    # DEFAULT 0 use to update all the modification times to now in the pickle.
     writeWhyNot = True
     updateIndices = True
     isProduction = False
