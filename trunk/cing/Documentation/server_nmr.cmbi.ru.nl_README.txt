@@ -19,5 +19,5 @@ Geerten's setup
 - mac fusion (check by hand by doing Finder->Connect to server-> https://proteins.dyndns.org/gDisk
     Unable to check from a remote site yet. Can't do a scp or a ssh to https://proteins.dyndns.org/gDisk
     TODO:
-
+- svn TODO: JFD hasn't checked yet.
 
