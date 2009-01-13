@@ -30,7 +30,6 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import getOsResult
 from cing.Libs.NTutils import is_pdb_code
 from cing.Libs.NTutils import symlink
 from cing.Libs.NTutils import toCsv
@@ -76,6 +75,7 @@ class nrgCing(Lister):
 
         self.writeWhyNot = writeWhyNot
         self.updateIndices = updateIndices
+        "Only during production we do a write to WHY_NOT"
         self.isProduction = isProduction
         
         # Dir as base in which all info and scripts like this one resides
@@ -98,12 +98,16 @@ class nrgCing(Lister):
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
 
-        self.why_not_db_mount_point = '/Volumes/cmbi8'
-        # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done        
-        self.why_not_db_comments_dir = self.why_not_db_mount_point + "/usr/scratch/whynot/comments"
-        self.why_not_db_comments_file = '20090106_NRG-CING.txt_done'
-        # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
-        self.why_not_db_raw_dir = self.why_not_db_mount_point + "/usr/data/data/raw/nrg-cing"
+        if self.isProduction: 
+            # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done        
+            self.why_not_db_comments_dir = "/Volumes/cmbi8/usr/scratch/whynot/comments"
+            # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
+            self.why_not_db_raw_dir = "/Volumes/cmbi8/usr/data/data/raw/nrg-cing"
+        else:
+            self.why_not_db_comments_dir = os.path.join(self.results_base_dir,"cmbi8","comments")
+            self.why_not_db_raw_dir = os.path.join(self.results_base_dir,"cmbi8","raw")
+
+        self.why_not_db_comments_file = 'NRG-CING.txt_done'
         
         ## Maximum number of pictures to create before ending
         ## and writting the pickle and web page overview again.
@@ -207,61 +211,38 @@ class nrgCing(Lister):
         return os.path.isfile(indexFileName)
  
  
-    def getCingEntriesDone(self):
+    def getCingEntriesTriedAndDone(self):
         "Returns list or None for error"
         NTdebug("From disk get the entries done in NRG-CING")
         
-        result = []
-        ## Which files shall be selected.
-        ## Give a Unix style file pattern, not a regular expression
-#        file_match_pattern = r'data/*/*/*.cing/index.html'                                        
-        cmd = 'find . -name "index.html" -depth 5'
-        (status, msg) = getOsResult(cmd) # very fast and that's important.
-        if status:
-            NTerror("Failed cmd: " + cmd)
-            return None
+        entry_list_tried = []
+        entry_list_done = []
         
-        file_list = msg.split()                
-        ## Strip the leading part from e.g.:
-#        ['./data/br/1brv/1brv.cing/index.html',
-#         './data/pc/9pcy/9pcy.cing/index.html']
         
-        for file_name in file_list:            
-#            NTdebug("Using file name: " + file_name )
-            entry_code = file_name[10:14]
-            if not is_pdb_code(entry_code):
-                tmpStr = "String doesn't look like a pdb code: ", entry_code
-                raise RuntimeError, tmpStr
-            result.append(entry_code)            
-        return result
+        subDirList = os.listdir('data')
+        for subDir in subDirList:
+            if len(subDir) != 2:
+                NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                continue 
+            entryList = os.listdir(os.path.join('data',subDir))
+            for entryDir in entryList:
+                entry_code = entryDir
+                if not is_pdb_code(entry_code):
+                    NTerror("String doesn't look like a pdb code: " + entry_code)
+                    continue
 
-    def getCingEntriesTried(self):
-        "Returns list or None for error"
-        NTdebug("From disk get the entries tried in NRG-CING")
+                cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
+                if not os.path.exists(cingDirEntry):
+                    continue
+                
+                entry_list_tried.append(entry_code)
+                indexFileEntry = os.path.join(cingDirEntry, "index.html")
+                if os.path.exists(indexFileEntry):
+                    entry_list_done.append(entry_code)
+                     
         
-        result = []
-        ## Which files shall be selected.
-        ## Give a Unix style file pattern, not a regular expression
-#        file_match_pattern = r'data/*/*/*.cing/index.html'                                        
-        cmd = 'find . -name "*.cing" -depth 4'
-        (status, msg) = getOsResult(cmd) # very fast and that's important.
-        if status:
-            NTerror("Failed cmd: " + cmd)
-            return None
-        
-        file_list = msg.split()                
-        ## Strip the leading part from e.g.:
-#        ./data/br/1brv/1brv.cing
-#        ./data/br/1brz/1brz.cing
-        
-        for file_name in file_list:            
-#            NTdebug("Using file name: " + file_name )
-            entry_code = file_name[10:14]
-            if not is_pdb_code(entry_code):
-                tmpStr = "String doesn't look like a pdb code: ", entry_code
-                raise RuntimeError, tmpStr
-            result.append(entry_code)            
-        return result
+        return (entry_list_tried, entry_list_done)
+
 
     """
     Set the list of matched entries and the dictionary holding the 
@@ -306,13 +287,12 @@ class nrgCing(Lister):
                 NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
                 return 0
     
-            self.entry_list_tried = self.getCingEntriesTried()
+            (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
             if not self.entry_list_tried:
                 NTerror("Failed to find entries that CING tried.")
                 return 0
             NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
-        self.entry_list_done = self.getCingEntriesDone()
         if not self.entry_list_done:
             NTerror("Failed to find entries that CING did.")
             return 0
@@ -458,21 +438,22 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
-             
-        
+                     
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
         NTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy("NRG-CING.txt", why_not_db_comments_file)
-        for entryId in self.entry_list_done[0:10]:
+        for entryId in self.entry_list_done:
             # For many files like: /usr/data/raw/nmr-cing/           d3/1d3z/1d3z.exist
             char23 = entryId[1:3]
             subDir = os.path.join(self.why_not_db_raw_dir, char23, entryId)
-            os.makedirs(subDir)
+            if not os.path.exists(subDir):
+                os.makedirs(subDir)
             fileName = os.path.join(subDir, entryId + ".exist")
-            NTdebug("Creating: " + fileName)
-            fp = open(fileName, 'w')
-#            fprintf(fp, ' ')
-            fp.close()
+            if not os.path.exists(fileName):
+                NTdebug("Creating: " + fileName)
+                fp = open(fileName, 'w')
+    #            fprintf(fp, ' ')
+                fp.close()
             
         
 
@@ -750,5 +731,6 @@ if __name__ == '__main__':
     
     ## Initialize the project 
     m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
-                isProduction=isProduction) 
+                isProduction=isProduction)
+#    m.getCingEntriesTriedAndDone() 
     m.update(new_hits_entry_list)
