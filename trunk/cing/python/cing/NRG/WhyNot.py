@@ -36,8 +36,9 @@ NO_EXPERIMENTAL_DATA = "No experimental data."
 FAILED_TO_BE_CONVERTED_NRG = "Failed to be converted in NRG."
 TO_BE_VALIDATED_BY_CING = "To be validated by CING"
 FAILED_TO_BE_VALIDATED_CING = "Failed to be validated in CING."
+# entries simply present in CING don't need to be written out in the comments file.
 PRESENT_IN_CING = "Present in CING."
-PRESENT_IN_CING = ""
+#PRESENT_IN_CING = ""
 
 class WhyNotEntry:
     def __init__(self, entryId, exists=True, comment=''):
@@ -79,7 +80,7 @@ if __name__ == '__main__':
             whyNotEntry.comment = NOT_NMR_ENTRY
             whyNotEntry.exists = False
             continue
-        whyNotEntry.comment = PRESENT_IN_CING
+        whyNotEntry.comment = FAILED_TO_BE_VALIDATED_CING
     whyNotStr = '%s' % whyNot
     NTdebug("whyNotStr: ["+ whyNotStr +"]")
     writeTextToFile("NRG-CING.txt", whyNotStr)
