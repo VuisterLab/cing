@@ -41,7 +41,6 @@ from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
 from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
 from cing.NRG.WhyNot import NOT_NMR_ENTRY
 from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
-from cing.NRG.WhyNot import PRESENT_IN_CING
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
@@ -222,13 +221,15 @@ class nrgCing(Lister):
         subDirList = os.listdir('data')
         for subDir in subDirList:
             if len(subDir) != 2:
-                NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                if subDir != ".DS_Store":
+                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue 
             entryList = os.listdir(os.path.join('data',subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
-                    NTerror("String doesn't look like a pdb code: " + entry_code)
+                    if entry_code != ".DS_Store":
+                        NTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
 
                 cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
@@ -427,7 +428,10 @@ class nrgCing(Lister):
                 whyNotEntry.comment = FAILED_TO_BE_VALIDATED_CING
                 whyNotEntry.exists = False
                 continue
-            whyNotEntry.comment = PRESENT_IN_CING
+            
+#            whyNotEntry.comment = PRESENT_IN_CING
+            # Entries that are present in the database do not need a comment
+            del( whyNot[entryId] )
         # end loop over entries
         whyNotStr = '%s' % whyNot
 #        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
