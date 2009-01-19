@@ -2,6 +2,15 @@
 # Model validity check skipped
 # WARNING, no previous map found for <MetaAttribute: ccp.nmr.Nmr.DataDimRef.localValuePerPoint> (www.ccpn.ac.uk_Fogh_2008-10-15-12:22:42_00001)
 # WARNING, no previous map found for <MetaAttribute: ccp.nmr.Nmr.DataDimRef.localValuePerPoint> (www.ccpn.ac.uk_Fogh_2008-10-15-12:22:42_00001)
+# Modified CCPN DNA A prot:H1: no CING, DYANA, CYANA
+# Modified CCPN DNA C prot:H3: no CING, DYANA, CYANA
+# Modified CCPN DNA G prot:H7,H1
+# Modified CCPN RNA A prot:H1
+# Modified CCPN RNA C prot:H3
+# Modified CCPN RNA G prot:H7,H1
+# Modified CCPN protein Tyr deprot:HH: no CING, CYANA, DYANA
+# Modified HOH: CING collumn contains H1, H2, O, QH
+#
 RESIDUE  CING -    CYANA2.1 -    DIANA -    IUPAC PLM  PDB_REMED PLM   CCPN other Plm neutral
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED C1       CCPN C1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED C2       CCPN C2
@@ -399,7 +408,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING ADE  CYANA2.1 ADE  DIANA ADE  IUPAC DA   PDB_REMED DA    CCPN DNA A prot:H1
+RESIDUE  CING -  CYANA2.1 -  DIANA -  IUPAC DA   PDB_REMED DA    CCPN DNA A prot:H1
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -1023,7 +1032,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING CYT  CYANA2.1 CYT  DIANA CYT  IUPAC DC   PDB_REMED DC    CCPN DNA C prot:H3
+RESIDUE  CING -  CYANA2.1 -  DIANA -  IUPAC DC   PDB_REMED DC    CCPN DNA C prot:H3
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -1601,7 +1610,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING GUA  CYANA2.1 GUA  DIANA GUA  IUPAC DG   PDB_REMED DG    CCPN DNA G prot:H7,H1
+RESIDUE  CING -  CYANA2.1 -  DIANA -  IUPAC DG   PDB_REMED DG    CCPN DNA G prot:H7,H1
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -1714,10 +1723,10 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
 RESIDUE  CING HOH  CYANA2.1 -    DIANA -    IUPAC HOH  PDB_REMED HOH   CCPN other Hoh neutral
-ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN H*
-ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED H1       CCPN H1
-ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED H2       CCPN H2
-ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED O        CCPN O
+ATOM   CING QH       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN H*
+ATOM   CING H1       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED H1       CCPN H1
+ATOM   CING H2       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED H2       CCPN H2
+ATOM   CING O       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED O        CCPN O
 ENDRES
 RESIDUE  CING HYP  CYANA2.1 HYP  DIANA HYP  IUPAC HYP  PDB_REMED HYP   CCPN protein Hyp neutral
 ATOM   CING -       CYANA2.1 C       DIANA C       IUPAC C       PDB_REMED C        CCPN C
@@ -2686,7 +2695,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING RADE CYANA2.1 RADE DIANA RADE IUPAC A    PDB_REMED A     CCPN RNA A prot:H1
+RESIDUE  CING - CYANA2.1 - DIANA - IUPAC A    PDB_REMED A     CCPN RNA A prot:H1
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -2767,7 +2776,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING RCYT CYANA2.1 RCYT DIANA RCYT IUPAC C    PDB_REMED C     CCPN RNA C prot:H3
+RESIDUE  CING - CYANA2.1 - DIANA - IUPAC C    PDB_REMED C     CCPN RNA C prot:H3
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -2890,7 +2899,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING RGUA CYANA2.1 RGUA DIANA RGUA IUPAC G    PDB_REMED G     CCPN RNA G prot:H7,H1
+RESIDUE  CING - CYANA2.1 - DIANA - IUPAC G    PDB_REMED G     CCPN RNA G prot:H7,H1
 ATOM   CING -       CYANA2.1 C1'     DIANA C1'     IUPAC C1'     PDB_REMED C1'      CCPN C1'
 ATOM   CING -       CYANA2.1 C2      DIANA C2      IUPAC C2      PDB_REMED C2       CCPN C2
 ATOM   CING -       CYANA2.1 C2'     DIANA C2'     IUPAC C2'     PDB_REMED C2'      CCPN C2'
@@ -3204,7 +3213,7 @@ ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -    
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_1
 ATOM   CING -       CYANA2.1 -       DIANA -       IUPAC -       PDB_REMED -        CCPN prev_2
 ENDRES
-RESIDUE  CING TYR  CYANA2.1 TYR  DIANA TYR  IUPAC TYR  PDB_REMED TYR   CCPN protein Tyr deprot:HH
+RESIDUE  CING -  CYANA2.1 -  DIANA -  IUPAC TYR  PDB_REMED TYR   CCPN protein Tyr deprot:HH
 ATOM   CING -       CYANA2.1 C       DIANA C       IUPAC C       PDB_REMED C        CCPN C
 ATOM   CING -       CYANA2.1 CA      DIANA CA      IUPAC CA      PDB_REMED CA       CCPN CA
 ATOM   CING -       CYANA2.1 CB      DIANA CB      IUPAC CB      PDB_REMED CB       CCPN CB

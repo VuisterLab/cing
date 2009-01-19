@@ -13913,8 +13913,8 @@ END_RESIDUE
 RESIDUE	LGLY     LGLY
 #=======================================================================
 	nameDict = {'INTERNAL_0': 'LGLY', 'CYANA': 'LGLY', 'IUPAC': None, 'AQUA': None, 'BMRBd': None, 'INTERNAL_1': 'LGLY', 'CYANA2': 'LGLY', 'PDB': None, 'XPLOR': None}
-	comment = None
-	properties = []
+	comment = 'L-glycine'
+	properties = ['protein']
 	#---------------------------------------------------------------
 	DIHEDRAL PHI
 	#---------------------------------------------------------------
@@ -14053,8 +14053,8 @@ END_RESIDUE
 RESIDUE	SS       s
 #=======================================================================
 	nameDict = {'INTERNAL_0': 'SS', 'CYANA': 'SS', 'IUPAC': None, 'AQUA': None, 'BMRBd': None, 'INTERNAL_1': 'SS', 'CYANA2': 'SS', 'PDB': None, 'XPLOR': None}
-	comment = None
-	properties = []
+	comment = 'generic residue used by xeasy'
+	properties = ['protein']
 	#---------------------------------------------------------------
 	DIHEDRAL PHI
 	#---------------------------------------------------------------
@@ -14222,7 +14222,7 @@ RESIDUE	CA2P     CA2P
 #=======================================================================
 	nameDict = {'INTERNAL_0': 'CA2P', 'CYANA': 'ION', 'IUPAC': 'CA', 'AQUA': 'CA', 'BMRBd': None, 'INTERNAL_1': 'CA2P', 'CYANA2': 'ION', 'PDB': 'CA', 'XPLOR': 'CA2'}
 	comment = 'Calcium 2plus ion'
-	properties = ['ion', 'charged']
+	properties = ['ion', 'metal','charged']
 	#---------------------------------------------------------------
 	DIHEDRAL LB
 	#---------------------------------------------------------------
@@ -14336,7 +14336,7 @@ RESIDUE	ZN2P     ZN2P
 #=======================================================================
 	nameDict = {'INTERNAL_0': 'ZN2P', 'CYANA': 'ZN', 'IUPAC': 'ZN', 'AQUA': 'ZN', 'BMRBd': None, 'INTERNAL_1': 'ZN2P', 'CYANA2': 'ZN', 'PDB': 'ZN', 'XPLOR': 'ZN2'}
 	comment = 'Zinc 2plus ion'
-	properties = ['ion', 'charged']
+	properties = ['ion', 'metal','charged']
 	#---------------------------------------------------------------
 	DIHEDRAL LB
 	#---------------------------------------------------------------
@@ -14458,7 +14458,7 @@ RESIDUE	HOH      O
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 		nameDict = {'INTERNAL_0': 'O', 'CYANA': None, 'IUPAC': 'O', 'AQUA': 'O', 'BMRBd': 'O', 'INTERNAL_1': 'O', 'CYANA2': None, 'PDB': 'O', 'XPLOR': 'O'}
 		aliases = []
-		pseudo = None
+		pseudo = 'QH'
 		real = []
 		type = 'O_HYD'
 		spinType = '16O'
@@ -14472,26 +14472,40 @@ RESIDUE	HOH      O
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 		nameDict = {'INTERNAL_0': 'H1', 'CYANA': None, 'IUPAC': 'H1', 'AQUA': 'H1', 'BMRBd': 'H1', 'INTERNAL_1': 'H1', 'CYANA2': None, 'PDB': 'H1', 'XPLOR': 'H1'}
 		aliases = []
-		pseudo = None
+		pseudo = 'QH'
 		real = []
 		type = 'H_OXY'
 		spinType = '1H'
 		shift = None
 		hetatm = False
 	END_ATOM
-	#---------------------------------------------------------------
-	ATOM H2
-	#---------------------------------------------------------------
-		topology = [(0, 'O')]
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-		nameDict = {'INTERNAL_0': 'H2', 'CYANA': None, 'IUPAC': 'H2', 'AQUA': 'H2', 'BMRBd': 'H2', 'INTERNAL_1': 'H2', 'CYANA2': None, 'PDB': 'H2', 'XPLOR': 'H2'}
-		aliases = []
-		pseudo = None
-		real = []
-		type = 'H_OXY'
-		spinType = '1H'
-		shift = None
-		hetatm = False
-	END_ATOM
+    #---------------------------------------------------------------
+    ATOM H2
+    #---------------------------------------------------------------
+        topology = [(0, 'O')]
+        properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+        nameDict = {'INTERNAL_0': 'H2', 'CYANA': None, 'IUPAC': 'H2', 'AQUA': 'H2', 'BMRBd': 'H2', 'INTERNAL_1': 'H2', 'CYANA2': None, 'PDB': 'H2', 'XPLOR': 'H2'}
+        aliases = []
+        pseudo = 'QH'
+        real = []
+        type = 'H_OXY'
+        spinType = '1H'
+        shift = None
+        hetatm = False
+    END_ATOM
+    #---------------------------------------------------------------
+    ATOM QH
+    #---------------------------------------------------------------
+        topology = [(0, 'O')]
+        properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+        nameDict = {'INTERNAL_0': 'QH', 'CYANA': None, 'IUPAC': None, 'AQUA': None, 'BMRBd': None, 'INTERNAL_1': 'QH', 'CYANA2': None, 'PDB': None, 'XPLOR': None}
+        aliases = []
+        pseudo = None
+        real = ['H1','H2']
+        type = 'PSEUD'
+        spinType = '1H'
+        shift = None
+        hetatm = False
+    END_ATOM
 END_RESIDUE
 #=======================================================================
