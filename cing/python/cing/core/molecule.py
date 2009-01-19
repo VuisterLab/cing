@@ -1880,14 +1880,13 @@ Chain class: defines chain properties and methods
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
 
-    def addResidue( self, resName, resNum, **kwds ):
-#       We have to make sure that whatever goes on here is also done in the XML handler
+    def addResidue( self, resName, resNum, convention=INTERNAL, **kwds ):
         name = resName + str(resNum)
         if name in self:
             NTerror( 'ERROR Chain.addResidue: residue "%s" already present\n', name )
             return None
         #end if
-        res = Residue( resName=resName, resNum=resNum, **kwds )
+        res = Residue( resName=resName, resNum=resNum, convention=convention, **kwds )
         self._addChild( res )
         res.chain = self
         self[resNum] = res
@@ -2020,8 +2019,9 @@ class Residue( NTtree ):
 Residue class: Defines residue properties
 -------------------------------------------------------------------------------
     Initiating attributes:
-        resName                 : Residue name according to the nomenclature list.
+        resName                 : Residue name according to the nomenclature convention.
         resNum                  : Unique residue number within this chain.
+        convention              : Convention descriptor; eg. INTERNAL, CYANA2, IUPAC
 
     Derived attributes:
         atoms                   : NTlist of Atom instances.
@@ -2055,7 +2055,7 @@ Residue class: Defines residue properties
     all dict methods
 
     """
-    def __init__( self, resName, resNum, **kwds ):
+    def __init__( self, resName, resNum, convention=INTERNAL, **kwds ):
         #print '>',resName, resNum
         NTtree.__init__(self, name=resName + str(resNum),
                               __CLASS__='Residue', **kwds
@@ -2064,7 +2064,7 @@ Residue class: Defines residue properties
         self.atomCount = 0
         self.chain     = self._parent
 
-        self._nameResidue( resName, resNum ) # sets all naming and links correctly
+        self._nameResidue( resName, resNum, convention=convention ) # sets all naming and links correctly
         self.saveXML('resName','resNum')
         self.rogScore = ROGscore()
 
@@ -2087,21 +2087,22 @@ Residue class: Defines residue properties
             result += self.number
         return result
 
-    def _nameResidue( self, resName, resNum ):
+    def _nameResidue( self, resName, resNum, convention = INTERNAL ):
         """Internal routine to set all the naming right and database refs right
         """
         self.resName  = resName
         self.resNum   = resNum
         self.name     = resName + str(resNum)
         # find the database entry in NTdb (which is of type MolDef)
-        if resName in NTdb:
-            self.db        = NTdb[self.resName]
+        db = NTdb.getResidueDefByName( resName, convention )
+        if db:
+            self.db        = db
             # add the two names to the dictionary
             self.shortName = self.db.shortName + str(resNum)
             self.names     = [self.shortName, self.name]
         else:
             NTwarning('Residue._nameResidue: residue "%s" not defined in database. Adding freestyle one now.', resName)
-            self.db = NTdb.appendResidue( name=resName, shortName = resName ) # JFD adds
+            self.db = NTdb.appendResidueDef( name=resName, shortName = resName ) # JFD adds
 #            self.db = None
             self.shortName = '_' + str(resNum)
             self.names     = [self.shortName, self.name]
@@ -2210,12 +2211,12 @@ Residue class: Defines residue properties
         return self,newRes
     #end def
 
-    def addAtom( self, name, **kwds ):
+    def addAtom( self, name, convention=INTERNAL, **kwds ):
         """add atomName to self as well as potential alias references
            return Atom instance
         """
 #       We have to make sure that whatever goes on here is also done in the XML handler
-        ac = Atom( resName=self.resName, atomName=name, **kwds )
+        ac = Atom( resName=self.resName, atomName=name, convention=convention, **kwds )
         self._addChild( ac )
         ac.residue = self
         self._parent._parent.atomCount += 1
@@ -2287,8 +2288,13 @@ Residue class: Defines residue properties
     #end def
 
     def translate( self, convention ):
-        """return translated name according to convention"""
+        """return translated name according to convention or None if not defined"""
         return self.db.translate(convention)
+    #end def
+
+    def translateWithDefault( self, convention ):
+        """return translated name according to convention or internal CING name if not defined"""
+        return self.db.translateWithDefault(convention)
     #end def
 
     def allResidues( self ):
@@ -2562,8 +2568,9 @@ class Atom( NTtree ):
 Atom class: Defines object for storing atom properties
 -------------------------------------------------------------------------------
     Initiating attributes:
-        resName                 : Residue name according to the nomenclature list.
-        atomName                : Atom name according to the nomenclature list.
+        resName                 : Residue name according to convention.
+        atomName                : Atom name according to the convention.
+        convention              : Naming convention; e.g. INTERNAL, CYANA2, IUPAC
 
     Derived attributes:
         atomIndex               : Unique (sequential) atom index (several external programs need one).
@@ -2575,9 +2582,9 @@ Atom class: Defines object for storing atom properties
 -------------------------------------------------------------------------------
     """
 
-    def __init__( self, resName, atomName, **kwds ):
+    def __init__( self, resName, atomName, convention=INTERNAL, **kwds ):
 
-        NTtree.__init__(self, name=atomName, __CLASS__='Atom',**kwds )
+        NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
 
         self.__FORMAT__ = self.header( dots ) + '\n' +\
                           'residue:     %(residue)s\n' +\
@@ -2598,16 +2605,15 @@ Atom class: Defines object for storing atom properties
         self.atomIndex = AtomIndex
         AtomIndex += 1
 
-        # find the database entry. JFD notes that speed up can be easy if 'in' is replaced by has_key()
-#        if ((resName in NTdb) and (atomName in NTdb[resName])):
-        self.db = None
-        if NTdb.has_key(resName):
-            resDb = NTdb[resName]
-            if resDb.has_key( atomName ):
-                self.db = NTdb[resName][atomName]
-        if not self.db:
+        db = NTdb.getAtomDefByName( resName, atomName, convention = convention )
+        if db:
+            self.name = db.translate(INTERNAL)
+            self.db = db
+        else:
 #            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-#            NTwarning("Creating empty atom definition for this atom.")
+            NTwarning('Atom.__init__: (%s,%s) not valid for convention "%s". Creating freestyle definition.',
+                       resName, atomName, convention
+                      )
             self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.
         #end if
     #end def
@@ -2771,8 +2777,13 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def translate( self, convention ):
-        """return translates name according to convention"""
+        """return translated name according to convention or None if not defined"""
         return self.db.translate(convention)
+    #end def
+
+    def translateWithDefault( self, convention ):
+        """return translated name according to convention or internal CING name if not defined"""
+        return self.db.translateWithDefault(convention)
     #end def
 
     def topology( self ):

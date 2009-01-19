@@ -674,3 +674,7 @@ WARNING: DihedralDef.exportDef: <DihedralDef ZN2P.LB> topology (-1,Q2) skipped t
 
 - Ran mkDbTable to generate dbTable.INTERNAL_1
 
+
+- 15 Jan 2009:
+Added QH pseudo-atom to HOH residue
+

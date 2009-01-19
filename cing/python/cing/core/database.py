@@ -117,7 +117,11 @@ class MolDef( NTtree ):
 #        self.saveXML('name')
     #end def
 
-    def appendResidue( self, name, shortName, **kwds ):
+    def appendResidueDef( self, name, shortName, **kwds ):
+        if self.has_key(name):
+            NTerror('MolDef.appendResidueDef: residueDef "%s" already exists', name)
+            return None
+        #end if
         res = ResidueDef( name, shortName, **kwds )
         self._addChild( res )
         res.molDef = self
@@ -323,10 +327,14 @@ class ResidueDef( NTtree ):
                           'dihedrals:  %(dihedrals)s\n' +\
                           'properties: %(properties)s'
 
-#        self.saveXML('name', 'shortName', 'comment', 'nameDict','dihedrals', 'properties')
         #NB atoms is a derived attribute (from _children), no need to save it explicitly
+    #end def
 
-    def appendAtom( self, name, **kwds ):
+    def appendAtomDef( self, name, **kwds ):
+        if self.has_key(name):
+            NTerror('ResidueDef.appendAtomDef: atomDef "%s" already exists', name)
+            return None
+        #end if
         atm = AtomDef( name, **kwds )
         self._addChild( atm )
         atm.residueDef = self
@@ -394,9 +402,23 @@ class ResidueDef( NTtree ):
     #end def
 
     def translate( self, convention ):
+        """Translate residueDef.name to nomenclature of convention.
+           Return None if not defined for convention
+        """
         if convention in self.nameDict:
             return self.nameDict[convention]
-        NTwarning("Failed to find convention for residue: %s using CING name." % self )
+        return None
+    #end def
+
+    def translateWithDefault( self, convention ):
+        """Translate residueDef.name to nomenclature of convention.
+           Return residueDef.name if not defined for convention
+        """
+        newName = self.translate(convention)
+        if newName:
+            return newName
+
+        NTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', convention, self, self.name )
         return self.name
     #end def
 
@@ -415,6 +437,11 @@ class ResidueDef( NTtree ):
         """return AtomDef instance for atmName if atmName is a valid for convention
            or None otherwise
         """
+        if not atmName:
+            NTdebug('ResidueDef.getAtomDefByName: atmName not defined')
+            return None
+        #end if
+
         if not self.atomDict.has_key(convention):
             NTerror('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
@@ -515,9 +542,16 @@ def isBackbone( atmDef ):
 def isSidechain( atmDef ):
     """
     Return True if it is a sidechain atom,
-    i.e. not isBackbone
+    i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
-    return not isBackbone( atmDef )
+    if atmDef.residueDef.hasProperties('protein') and \
+       not backBoneProteinAtomDict.has_key( atmDef.name ):
+            return True
+    if atmDef.residueDef.hasProperties('nucleic') and \
+       not backBoneNucleicAtomDict.has_key( atmDef.name ):
+            return True
+    return False
+#    return not isBackbone( atmDef )
 
 def isMethyl( atmDef ):
     """
@@ -630,8 +664,9 @@ class AtomDef( NTtree ):
     #end def
 
     def translate( self, convention ):
-#        if convention in self.nameDict:
-# speed
+        """Translate atomDef.name to nomenclature of convention.
+           Return None if not defined for convention
+        """
         if self.nameDict.has_key(convention):
             # XPLOR definitions potentially have multiple
             # entries, separated by ','. Take the first.
@@ -639,7 +674,17 @@ class AtomDef( NTtree ):
                 return self.nameDict[convention].split(',')[0]
             #end if
         #end if
-        NTwarning("Failed to find convention for atom: %s using CING name." % self )
+        return None
+    #end def
+
+    def translateWithDefault( self, convention ):
+        """Translate atomDef.name to nomenclature of convention.
+           Return atomDef.name if not defined for convention
+        """
+        newName = self.translate( convention )
+        if newName:
+            return newName
+        NTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', convention, self, self.name )
         return self.name
     #end def
 
@@ -870,7 +915,7 @@ def importNameDefs( tableFile, name)   :
         if r.isComment() or r.isEmpty():
             pass
         elif r.dollar[1] == 'RESIDUE':
-            res = mol.appendResidue( name=r.dollar[2], shortName =r.dollar[3] )
+            res = mol.appendResidueDef( name=r.dollar[2], shortName =r.dollar[3] )
             obj = res
         elif r.dollar[1] == 'END_RESIDUE':
             obj = mol
@@ -880,7 +925,7 @@ def importNameDefs( tableFile, name)   :
         elif r.dollar[1] == 'END_DIHEDRAL':
             obj = res
         elif r.dollar[1] == 'ATOM':
-            atm = res.appendAtom( name=r.dollar[2] )
+            atm = res.appendAtomDef( name=r.dollar[2] )
             obj = atm
         elif r.dollar[1] == 'END_ATOM':
             obj = res

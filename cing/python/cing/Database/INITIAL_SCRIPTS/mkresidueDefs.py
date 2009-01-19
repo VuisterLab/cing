@@ -1326,7 +1326,7 @@ for r in AwkLike( 'atomTable.def' ):
     if (r.isComment() or r.isEmpty()):
         pass
     elif (r.dollar[1] == 'RESIDUE'):
-        res = residueDefs.appendResidue( r.dollar[2], r.dollar[3] )
+        res = residueDefs.appendResidueDef( r.dollar[2], r.dollar[3] )
     elif (r.dollar[1] == 'END_RESIDUE'):
         pass
     else:
