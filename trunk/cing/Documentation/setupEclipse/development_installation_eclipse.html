@@ -5,7 +5,7 @@
 <title>How to install CING for development on Eclipse</title>
 </head>
 <body>
-Install the requirements: Last ran on 11/11/2008<br><br>
+Install the requirements: Last updated on 11/11/2008<br><br>
 <ol>
 <li><b>Install Fink</b>
 <br>Make sure you have the unstable trees in your /sw/etc/fink.conf too. I had to add:
@@ -55,12 +55,10 @@ Finally create a symlink for python in order to override macs:
  <pre>http://code.google.com/p/wattos/</pre>
  <li><b>(Optionally) install What If</b>
  <pre>From http://swift.cmbi.kun.nl/whatif/</pre>
- Because the program insists on residing in /home/vriend you need to adjust /etc/auto_master
- <PRE>/home autohome -nobrowse</PRE>
- to e.g.:
- <pre>/ahome autohome -nobrowse</pre>
- So that you can create a regular /home dir.
- <br>Note that compilation with macports gcc42 gfortran:
+ Edit the Whati If installation dir in the 2 files  (3 lines) below <br><br>./DO_WHATIF.COM:DIR=/Users/jd/workspace34/whatif
+<br>./WHATIF.FIG:/Users/jd/workspace34/whatif/dbdata/
+<br>./WHATIF.FIG:/Users/jd/workspace34/whatif/qualty/
+<br><br>Note that compilation with macports gcc42 gfortran:
 /opt/local/bin/gfortran-mp-4.2
 works for compiling what if.<br>This is of course redundant with the fink setup but macports didn't have all required packages last time JFD checked (winter '07).<br>
 Found the dep by:
