@@ -1884,12 +1884,11 @@ Chain class: defines chain properties and methods
     isNullValue = staticmethod( isNullValue )
 
     def addResidue( self, resName, resNum, convention=INTERNAL, **kwds ):
-        name = resName + str(resNum)
-        if name in self:
+        res = Residue( resName=resName, resNum=resNum, convention=convention, **kwds )
+        if res.name in self:
             NTerror( 'ERROR Chain.addResidue: residue "%s" already present\n', name )
             return None
         #end if
-        res = Residue( resName=resName, resNum=resNum, convention=convention, **kwds )
         self._addChild( res )
         res.chain = self
         self[resNum] = res
@@ -2093,23 +2092,27 @@ Residue class: Defines residue properties
     def _nameResidue( self, resName, resNum, convention = INTERNAL ):
         """Internal routine to set all the naming right and database refs right
         """
-        self.resName  = resName
-        self.resNum   = resNum
-        self.name     = resName + str(resNum)
         # find the database entry in NTdb (which is of type MolDef)
         db = NTdb.getResidueDefByName( resName, convention )
-        if db:
-            self.db        = db
-            # add the two names to the dictionary
-            self.shortName = self.db.shortName + str(resNum)
-            self.names     = [self.shortName, self.name]
-        else:
+        if not db:
             NTwarning('Residue._nameResidue: residue "%s" not defined in database. Adding freestyle one now.', resName)
-            self.db = NTdb.appendResidueDef( name=resName, shortName = resName ) # JFD adds
-#            self.db = None
-            self.shortName = '_' + str(resNum)
-            self.names     = [self.shortName, self.name]
+            self.db = NTdb.appendResidueDef( name=resName, shortName = '_' ) # JFD adds
         #end if
+        self.resNum   = resNum
+        if not db:
+            self.name      = resName + str(resNum)
+            self.resName   = resName
+            self.shortName = '_' + str(resNum)
+            self.db        = None
+        else:
+            self.db        = db
+            self.name      = db.translate(INTERNAL) + str(resNum)
+            self.resName   = db.translate(INTERNAL)
+            self.shortName = db.shortName + str(resNum)
+        #end if
+        # add the two names to the dictionary
+        self.names     = [self.shortName, self.name]
+
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'shortName:  %(shortName)s\n' +\
                           'chain:      %(chain)s\n' +\
