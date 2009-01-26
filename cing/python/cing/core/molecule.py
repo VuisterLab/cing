@@ -1886,7 +1886,7 @@ Chain class: defines chain properties and methods
     def addResidue( self, resName, resNum, convention=INTERNAL, **kwds ):
         res = Residue( resName=resName, resNum=resNum, convention=convention, **kwds )
         if res.name in self:
-            NTerror( 'ERROR Chain.addResidue: residue "%s" already present\n', name )
+            NTerror( 'ERROR Chain.addResidue: residue "%s" already present\n', res.name )
             return None
         #end if
         self._addChild( res )
