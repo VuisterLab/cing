@@ -2,7 +2,7 @@
 Adds methods to generate peaks
 
 Methods:
-    generatePeaks( project, experimentName, axisOrder=None, onlyAssigned = True, skipResidues = [] )         
+    generatePeaks( project, experimentName, axisOrder=None, onlyAssigned = True, skipResidues = [] )
 
     listPredefinedExperiments()
 
@@ -85,29 +85,29 @@ expDict = NTdict()
 class ExperimentDef( dict ):
     """Base class for experiments"""
     global expdict
-    
+
     name      = 'NoName'
     dimension = 0
     peaks     = []
     nuclei    = []
-    
+
     def __init__( self, residue, axisOrder=None ):
         dict.__init__( self )
         self.residue = residue
-         
+
         #define the nuclei
         for dim in range(self.dimension):
             for n in self.nuclei[dim]:
                 self[n] = dim
             #end for
         #end for
-        
+
         if (axisOrder):
             axis = axisOrder.strip().split(':')
             self.axisOrder = []
             for a in axis:
                 if (a not in self):
-                    NTerror('ERROR: axis "%s" not defined for experiment "%s"\n%s, using default\n', 
+                    NTerror('ERROR: axis "%s" not defined for experiment "%s"\n%s, using default\n',
                              a, self.name, str(self)
                            )
                     self.axisOrder = range( self.dimension )
@@ -121,14 +121,14 @@ class ExperimentDef( dict ):
 
         self.definePeaks()
     #end def
-    
+
     def definePeaks( self ):
         """Method to be subclassed for different exps (if needed)
            It should define the peaks list
         """
         pass
     #end def
-    
+
     def __next__( self ):
         return self
     #end def
@@ -138,15 +138,15 @@ class ExperimentDef( dict ):
             atoms = translateTopology( self.residue, peak ).reorder( self.axisOrder )
             yield atoms
     #end def
-    
+
     def __str__( self ):
         return sprintf('<Experiment: %s (%dD)>',self.name, self.dimension )
     #end def
-    
+
     def describe( exp ):
         """Static method: ExperimentDef.describe( experiment )
         """
-        s = sprintf('%s Experiment: %s %s\ndimensions: %d', 
+        s = sprintf('%s Experiment: %s %s\ndimensions: %d',
                        dots, exp.name, dots, exp.dimension
                       )
         for dim in range(exp.dimension):
@@ -163,9 +163,9 @@ class ExperimentDef( dict ):
 class N15_HSQC( ExperimentDef ):
     name      = 'N15_HSQC'
     dimension = 2
-    peaks     = [            
-                 [(0,'HN'),(0,'N')] 
-                ]  
+    peaks     = [
+                 [(0,'HN'),(0,'N')]
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -178,10 +178,10 @@ expDict['N15_HSQC'] = N15_HSQC
 class HNCA( ExperimentDef ):
     name      = 'HNCA'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),( 0,'CA')],  # Intra-residual CA peak
                  [(0,'HN'),(0,'N'),(-1,'CA')],  # Sequential CA peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -195,9 +195,9 @@ expDict['HNCA'] = HNCA
 class HNCOCA( ExperimentDef ):
     name      = 'HNCOCA'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),(-1,'CA')],  # Sequential CA peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -211,7 +211,7 @@ expDict['HNCOCA'] = HNCOCA
 class HNCAHA( ExperimentDef ):
     name      = 'HNCAHA'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),( 0,'HA')],   # Intra-residual HA peak
                  [(0,'HN'),(0,'N'),(-1,'HA')],   # Sequential HA peak
                  [(0,'HN'),(0,'N'),( 0,'HA1')],  # Intra-residual gly HA1 peak
@@ -220,7 +220,7 @@ class HNCAHA( ExperimentDef ):
                  [(0,'HN'),(0,'N'),(-1,'HA2')],  # Sequential gly HA2 peak
                  [(0,'HN'),(0,'N'),( 0,'QA')],   # Intra-residual gly QA peak
                  [(0,'HN'),(0,'N'),(-1,'QA')],   # Sequential gly QA peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -234,12 +234,12 @@ expDict['HNCAHA'] = HNCAHA
 class HNCACB( ExperimentDef ):
     name      = 'HNCACB'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),( 0,'CA')],  # Intra-residual CA peak
                  [(0,'HN'),(0,'N'),(-1,'CA')],  # Sequential CA peak
                  [(0,'HN'),(0,'N'),( 0,'CB')],  # Intra-residual CB peak
                  [(0,'HN'),(0,'N'),(-1,'CB')],  # Sequential CB peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -253,10 +253,10 @@ expDict['HNCACB'] = HNCACB
 class CBCACONH( ExperimentDef ):
     name      = 'CBCACONH'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),(-1,'CA')],  # Sequential CA peak
                  [(0,'HN'),(0,'N'),(-1,'CB')],  # Sequential CB peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -271,7 +271,7 @@ expDict['HNCOCACB'] = CBCACONH
 class HAHBCONH( ExperimentDef ):
     name      = 'HAHBCONH'
     dimension = 3
-    peaks     = [            
+    peaks     = [
                  [(0,'HN'),(0,'N'),(-1,'HA')],   # Sequential HA peak
                  [(0,'HN'),(0,'N'),(-1,'HA1')],  # Sequential gly HA1 peak
                  [(0,'HN'),(0,'N'),(-1,'HA2')],  # Sequential gly HA2 peak
@@ -280,7 +280,7 @@ class HAHBCONH( ExperimentDef ):
                  [(0,'HN'),(0,'N'),(-1,'HB2')],  # Sequential HB2 peak
                  [(0,'HN'),(0,'N'),(-1,'HB3')],  # Sequential HB3 peak
                  [(0,'HN'),(0,'N'),(-1,'QB')],   # Sequential QB peak
-                ]  
+                ]
     nuclei    = [
                  ['HN','H'],
                  ['N'],
@@ -301,11 +301,11 @@ class CCONH( ExperimentDef ):
                  ['N'],
                  ['C']
                 ]
-                
+
     def definePeaks( self ):
         previous = self.residue.sibling( -1 )
         if not previous: return
-        
+
         # I don't have in the database yet what are aliphatic and aromatic atoms
         carbons = NTlist()
         for atm in previous.atoms:
@@ -315,7 +315,7 @@ class CCONH( ExperimentDef ):
                 carbons.append( atm )
         #end for
 #        print '>>',carbons
-        
+
         self.peaks = NTlist()
         #Generate all CCONH peaks of carbons
         for C in carbons:
@@ -337,7 +337,7 @@ class CCH( ExperimentDef ):
                  ['C2','CH'],
                  ['H']
                 ]
-                
+
     def definePeaks( self ):
         # I don't have in the database yet what are aliphatic and aromatic atoms
         carbons = NTlist()
@@ -348,7 +348,7 @@ class CCH( ExperimentDef ):
                 carbons.append( atm )
         #end for
 #        print '>>',carbons
-        
+
         self.peaks = NTlist()
         #Generate all CCH peaks of carbons
         for C2 in carbons:
@@ -387,7 +387,7 @@ def listPredefinedExperiments( project, *expNames ):
 def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True, skipResidues = [] ):
     """Generation of peaks
             experimentName: string identifying the experiment
-            axisOrder:      string of colon-separated nuclei defining the order of 
+            axisOrder:      string of colon-separated nuclei defining the order of
                             the axis; e.g. 'H:CA:N'
     """
     expName = experimentName.strip().upper()
@@ -399,7 +399,7 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
     exp = expDict[expName]
 
     # new peak list
-    peakList = project.newPeakList( experimentName, status='keep' )
+    peakList = project.peaks.new( experimentName, status='keep' )
 
     # Generate peaks for all residues
     for residue in project.molecule.allResidues():
@@ -412,12 +412,12 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
         #end if
     #end for
     NTmessage('... Appended %d peaks', len( peakList ) )
-    
+
     return peakList
 #end def
 
 
- 
+
 # register the functions
 methods  = [(generatePeaks, None), (listPredefinedExperiments, None) ]
 #saves    = []

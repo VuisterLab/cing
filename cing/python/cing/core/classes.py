@@ -75,12 +75,13 @@ class Project( NTdict ):
 Project: Top level Cing project class
 -------------------------------------------------------------------------------
 
-  Project <-> molecules[<Molecule-1>, <Molecule-2>, ...] #  Molecule instances list
-           -> molecule <-> ... (See Molecule)            # 'Current' molecule
+  Project <-> molecules[<Molecule-1>, <Molecule-2>, ...]   #  Molecule instances list
+           -> molecule                                     # 'Current' molecule
 
-          <-> peaks[<Peaklist [<Peak>, ...]>]
-          <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]
-          <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]
+          <-> peaks[<Peaklist [<Peak>, ...]>]                                # Project peak lists
+          <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]   # Project DistanceRestraint lists
+          <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]   # Project DihedralRestraint lists
+          <-> rdcs[<RDCRestraintList[<RDCRestraint>, ...]>]                  # Project RDCRestraint lists
 
            -> directories
            -> cingPaths
@@ -97,10 +98,6 @@ Project: Top level Cing project class
                                                           if it exists or new project
                                                           otherwise
 
-    to initialize a Molecule:
-        project.newMolecule( name, sequenceFile, convention )
-                                    convention = CYANA, CYANA2, INTERNAL, LOOSE
-
     to save a project:
         project.save()
 
@@ -109,6 +106,10 @@ Project: Top level Cing project class
 
     to export and save:
         project.close()
+
+    to initialize a Molecule:
+        project.newMolecule( name, sequenceFile, convention )
+                                    convention = CYANA, CYANA2, INTERNAL, LOOSE
 
     to initialize the resonance lists:
         project.initResonances()
@@ -123,6 +124,7 @@ Project: Top level Cing project class
 
     to define and add a new DistanceRestraintList to project:
         distanceRestraintList = project.distances.new( name, status='keep' ):
+    Likewise for list of other restraint types (dihedrals, RDCs).
 
     """
 
@@ -369,13 +371,13 @@ Project: Top level Cing project class
     #end def
 
     def decodeNameTuple(self, nameTuple):
-        """
-        Decode the 7-element nameTuple:
-        (objectName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+        """Decode the 7-element nameTuple:
 
-        Return Object or None on error.
+    (objectName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
 
-@TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
+    Return Object or None on error.
+
+    @TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
         """
         if nameTuple == None or not self.has_key(nameTuple[0]):
             return None
@@ -661,6 +663,9 @@ Project: Top level Cing project class
     # actions Molecule
     #-------------------------------------------------------------------------
     def appendMolecule( self, molecule ):
+        """Append molecule to project.molecules; generate required internal directories.
+        Return molecule or None on error.
+        """
         if not molecule: return None
 
         # Store names and references and append
@@ -741,18 +746,18 @@ Project: Top level Cing project class
         self.history( line, timeStamp )
     #end def
 
-    def newPeakList( self, name, status='keep'):
-        """Dummy for compatibility
-        """
-        return self.peaks.new( name = name, status=status)
-    #end def
+#    def newPeakList( self, name, status='keep'):
+#        """Dummy for compatibility
+#        """
+#        return self.peaks.new( name = name, status=status)
+#    #end def
 
-    def appendPeakList( self, peaklist):
-        """Append peaklist; dummy for compatibility
-        """
-        self.peaks.append( peaklist )
-        return peaklist
-    #end def
+#    def appendPeakList( self, peaklist):
+#        """Append peaklist; dummy for compatibility
+#        """
+#        self.peaks.append( peaklist )
+#        return peaklist
+#    #end def
 
     def analyzeRestraints(self):
         """Call analyze method for all restraint lists
@@ -1856,14 +1861,14 @@ class DihedralRestraint( NTdict ):
                 comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_ORANGE, comment)
-                
+
         if (project.valSets.AC_THRESHOLD_OVER_BAD != None) and (project.valSets.AC_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
                 comment = 'RED: fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
-                self.rogScore.setMaxColor(COLOR_RED, comment) 
-                
+                self.rogScore.setMaxColor(COLOR_RED, comment)
+
         if (project.valSets.AC_RMSALL_BAD != None) and (self.violSd >= project.valSets.AC_RMSALL_BAD):
             comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
@@ -1872,11 +1877,11 @@ class DihedralRestraint( NTdict ):
             comment = 'ORANGE: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
-            
+
         if project.valSets.FLAG_MISSING_COOR:
             modelCount = self.getModelCount()
             for atm in self.atoms:
-                atms = atm.realAtoms() 
+                atms = atm.realAtoms()
                 for a in atms:
                     if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates in dihedral (%s)" % a.toString()

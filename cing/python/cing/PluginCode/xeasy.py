@@ -500,7 +500,7 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
 #       Extract the peaks
         peaks = project.xeasy.importPeaks( project.molecule, peakFile   )
 #       Append to project
-        project.appendPeakList( peaks   )
+        project.peaks.append( peaks )
 
         project.addHistory( sprintf('Imported Xeasy peaks from "%s"', peakFile ) )
 
