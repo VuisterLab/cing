@@ -32,10 +32,6 @@
 		<property name="home.web.url" value="${home.web.machine}/${ant.project.name}" />
 		<property name="home.web.usermachine" value="${home.web.user}@${home.web.machine}" />
 
-		<tstamp>
-			<format property="cing_version" pattern="yyyyMMdd-HHmm" />
-		</tstamp>
-		<echo message="Initiating cing version: ${cing_version}" />
 
 		<if>
 			<not>
@@ -46,20 +42,28 @@
 				<mkdir dir="${build.classes.dir}" />
 			</then>
 		</if>
-		
-		<replaceregexp file="java/src/cing/client/Settings.java" match="String VERSION = (.*)" replace='String VERSION = "${cing_version}";' byline="true" />
-      <echo message="Changed Settings.java to reflect new version." />
-        
-        <copy verbose="true" file="python/cing/valSets.cfg" todir="java/src/cing/public/example"/>
-	      <echo message="Synced configuration file to iCing examples." />
+
+
+		<copy verbose="true" file="python/cing/valSets.cfg" todir="java/src/cing/public/example" />
+		<echo message="Synced configuration file to iCing examples." />
 
 	</target>
 
+    <target name="set-version" depends="init">
+    	
+        <tstamp>
+            <format property="cing_version" pattern="yyyyMMdd-HHmm" />
+        </tstamp>
+        <echo message="Initiating cing version: ${cing_version}" />
+    	
+        <replaceregexp file="java/src/cing/client/Settings.java" match="String VERSION = (.*)" replace='String VERSION = "${cing_version}";' byline="true" />
+        <echo message="Changed Settings.java to reflect new version." /> 
+    </target>
+	
 	<target name="iweb-CING-install" depends="init">
 		<echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
 		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
-		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" 
-			passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
+		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
 			<fileset dir="${home.web.local.dir}" />
 		</scp>
 		<!--
@@ -68,11 +72,11 @@
 		-->
 	</target>
 
-    <target name="iCing--install" depends="init, iCing-servlet-install, iCing-static-install">
-        <echo message="Ensure that the iCing dir already exists remotely." />
-    </target>
+	<target name="iCing--install" depends="init, iCing-servlet-install, iCing-static-install">
+		<echo message="Ensure that the iCing dir already exists remotely." />
+	</target>
 
-	
+
 	<target name="iCing-static-install" depends="init">
 		<echo message="Ensure that the iCing dir already exists remotely." />
 
@@ -90,17 +94,16 @@
 		</copy>
 		<!-- The Wattos code changes every now and then so it needs to be included live. Every now and then.-->
 		<copy todir="${icing.production.local.dir}/WEB-INF/classes">
-	        <fileset dir="${WS}/wattos/build"/>                     
+			<fileset dir="${WS}/wattos/build" />
 		</copy>
 
 		<zip destfile="java/${icing.war.file}">
 			<fileset dir="${icing.production.local.dir}" />
 		</zip>
 
-        <echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}"/>
-        <echo message="with port = ${home.web.port} and knownhosts=${home.web.knownhosts} passphrase=${home.web.passphrase} keyfile=${home.web.keyfile} "/>
-		<scp todir="${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" 
-			knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
+		<echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" />
+		<echo message="with port = ${home.web.port} and knownhosts=${home.web.knownhosts} passphrase=${home.web.passphrase} keyfile=${home.web.keyfile} " />
+		<scp todir="${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
 			<fileset file="java/${icing.war.file}" />
 		</scp>
 	</target>

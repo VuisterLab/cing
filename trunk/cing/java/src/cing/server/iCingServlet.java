@@ -28,6 +28,7 @@ import Wattos.Utils.OSExec;
 import Wattos.Utils.StringArrayList;
 import Wattos.Utils.Strings;
 import cing.client.Settings;
+import cing.client.Utils;
 
 import com.braju.format.Format;
 import com.braju.format.Parameters;
@@ -53,7 +54,7 @@ public class iCingServlet extends HttpServlet {
      * */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             java.io.IOException {
-        General.showDebug("processing doPost");
+        General.showDebug("processing doPost by iCingServlet version: [" + Settings.VERSION + "]");
         JSONObject result = new JSONObject();
 
         File pathUser = null;
@@ -480,7 +481,7 @@ public class iCingServlet extends HttpServlet {
             return;
         }
 
-        // String fieldName = item.getFieldName();
+//         String fieldName = item.getFieldName();
         // String contentType = item.getContentType();
         // boolean isInMemory = item.isInMemory();
 
@@ -493,6 +494,10 @@ public class iCingServlet extends HttpServlet {
 
         /** Name without path part */
         String fileName = item.getName();
+        General.showDebug("fn   : " + fileName);
+        fileName = Utils.getFileNameWithoutPath(fileName);
+        General.showDebug("fn(b): " + fileName);
+                
         /**
          * TODO: read up on safety issues here. No .. or forward slash allowed.
          */
