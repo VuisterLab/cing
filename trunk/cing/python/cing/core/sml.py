@@ -525,7 +525,7 @@ class SMLResidueHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, molecule=None):
-        # The handle restores the attributes of atom
+        # The handle restores the attributes of residue
         # Needs a valid molecule
         if molecule == None: return None
 
