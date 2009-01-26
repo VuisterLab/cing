@@ -31,17 +31,21 @@ public class FormHandlerFile extends FormHandlerMain {
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
 		super.onSubmit(event);
-//		GenClient.showDebug("Starting submit which will be dealt with from FormHandlerFile.");
+		GenClient.showDebug("Starting submit from FormHandlerFile.");
 
-		/** Extra checks here for this class */
+        String fn = fileUpload.getFilename();
+
+        GenClient.showDebug("Using fileName in FormHandlerFile: [" + fn + "]");
+        /** Extra checks here for this class */
 		if (fileUpload.getFilename().length() == 0) {
 			Window.alert(c.ERROR()+"\n\n"+c.You_must_sele());
 			event.setCancelled(true);
 			return;
 		}
 
-		String fn = fileUpload.getFilename();
+		
 		String fnNoPath = Utils.getFileNameWithoutPath(fn);
+        GenClient.showDebug("Using fileNameWithoutPath in FormHandlerFile: [" + fnNoPath + "]");
 
 		/** Keep block together */
         String program = Utils.getListBoxItemText( listBox_Program );
@@ -88,9 +92,13 @@ public class FormHandlerFile extends FormHandlerMain {
 			// Try to get the project name from it if not set already.
 			icing.cingLogView.getProjectName();
 		} else {
+		    if ( result == null ) {
+		        result = "Failed to get a result string from parent: FormHandlerMain#onSubmitComplete()";
+		    }
 			showUploadError(result);
 		}
-        icing.cingLogView.getProjectName(); // try after each file upload.
+//        icing.cingLogView.getProjectName(); // try after each file upload. But commented out here because only 
+//		expected to have a chance of success when the results was a success.
         GenClient.showDebug("Exiting FormHandlerFile.onSubmitComplete");		
 	}
 

@@ -30,7 +30,7 @@ public class FormHandlerMain implements FormHandler {
 
 	// When the submit starts, make sure the user selected a file to upload
 	public void onSubmit(FormSubmitEvent event) {
-//		GenClient.showDebug("Starting submit which will be dealt with from FormHandlerMain and sub class.");
+		GenClient.showDebug("Starting submit which will be dealt with from FormHandlerMain and sub class.");
 		if (icing == null) {
 			GenClient.showCodeBug("In FormHandlerMain.onSubmit Found null for icing.");
 			event.setCancelled(true);
@@ -40,7 +40,7 @@ public class FormHandlerMain implements FormHandler {
 
 	// After the submit, get the JSON result and parse it.
 	public void onSubmitComplete(FormSubmitCompleteEvent event) {
-//		GenClient.showDebug("Now in FormHandlerMain.onSubmitComplete");
+		GenClient.showDebug("Now in FormHandlerMain.onSubmitComplete");
 
 		String response = event.getResults();
 		if (response == null) {
@@ -120,7 +120,7 @@ public class FormHandlerMain implements FormHandler {
             "result: " + result;
 		    Window.alert(msg);		    
 		}
-//		GenClient.showDebug("Exiting FormHandlerMain.onSubmitComplete");
+		GenClient.showDebug("Exiting FormHandlerMain.onSubmitComplete");
 	}
 
 	public void setiCing(iCing icing) {

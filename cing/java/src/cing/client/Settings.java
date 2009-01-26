@@ -6,7 +6,7 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = false;
+    public static final boolean DO_DEBUG = true;
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
@@ -18,7 +18,7 @@ public interface Settings {
     /** Directory with the CING run results. */
     public static final String SERVER_TMP_DIR = SERVER_ROOT_DIR + "/" + RESULT_URL;
     /** 10 Mb ought to do it for now. 100 in the future? */
-    public static final long FILE_UPLOAD_MAX_SIZE = 10 * 1024 * 1024;
+    public static final long FILE_UPLOAD_MAX_SIZE = 50 * 1024 * 1024;
     /** Name of file that indicates the CING run is done */
     public static final String DONE_FILE = "DONE";
     /** Name of file that holds a single long number with the last send log byte position */
@@ -38,11 +38,11 @@ public interface Settings {
     public static final String ERROR_WRITE_FAILED = "File write failed.";
     public static final String ERROR_NOT_MULTI_PART = "Not multipart message.";
 
-    /** Url of servlet. Is hard coded in several places in GWT setup. Match! */
+    /** Url of servlet. */
     public static final String SERVLET_URL = "serv/iCingServlet";
     public static final String NOT_AVAILABLE = "not available";
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20081212-1204";
+    public static final String VERSION = "20090126-1332";
 
     public static final String NONE = "NONE";
 
