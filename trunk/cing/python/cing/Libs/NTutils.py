@@ -101,6 +101,9 @@ class NTlist(list):
     #end def
 
     def doc(self):
+        """
+        Generate pydoc output of self
+        """
         pydoc.doc(self, title='%s')
     #end def
 
@@ -425,6 +428,9 @@ class NTlist(list):
 #    #end def
 
     def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        """
+        Write XML-representation of elements of self to stream
+        """
         NTindent(depth, stream, indent)
         fprintf(stream, "<NTlist>")
         fprintf(stream, lineEnd)
@@ -444,7 +450,7 @@ class NTlist(list):
             NTerror('NTlist.toSML: no SMLhandler defined')
         #end if
     #end def
-#end class 
+#end class
 
 def NTfill(value, n):
     """Return a NTlist instance with n elements of value
@@ -835,6 +841,9 @@ class NTset(NTlist):
     #end def
 
     def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        """
+        Write XML-representation of elements of self to stream
+        """
         NTindent(depth, stream, indent)
         fprintf(stream, "<NTset>")
         fprintf(stream, lineEnd)
@@ -1201,6 +1210,9 @@ class NTdict(dict):
     # Misc routines
     #------------------------------------------------------------------
     def doc(self):
+        """
+        Generate pydoc output of self
+        """
         pydoc.doc(self, title='%s')
     #end def
 
@@ -1395,6 +1407,10 @@ class NTdict(dict):
     # XML routines
     #------------------------------------------------------------------
     def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
+        """
+        Write XML-representation of keys/attributes of self (defined by the
+        saveXML or saveAllXML methods) to stream
+        """
         NTindent(depth, stream, indent)
         fprintf(stream, "<%s>", self.__CLASS__)
         fprintf(stream, lineEnd)
@@ -2098,14 +2114,14 @@ def NTlimitSingleValue(value, min, max):
     Limit the the values of theList between min and max, assuming periodicity
     i.e, like for angles.
     Assumes numeric value, None element is ignored.
-    
+
     Could easily be optimized. If the value is far away from the allowed range
     then round off errors also become important with this algorithm.
     """
     listRange = max-min
     if value == None:
         return value
-    
+
     while value < min:
         value += listRange
     while value > max:
@@ -3368,7 +3384,7 @@ class ExecuteProgram(NTdict):
 
 def getOsResult( cmd ):
     """
-    Returns tuple (status, msg) 
+    Returns tuple (status, msg)
     status 0 for success. > 0 for failure.
     """
 #    NTdebug( "Doing command: %s" % cmd )
@@ -3384,13 +3400,13 @@ def getOsResult( cmd ):
 
 #    if output:
 #        NTdebug( "Found os msg: %s" % output )
-        
+
 #    if status:
 #        NTdebug("Failed shell command:")
 #        NTdebug( cmd )
 #        NTdebug("Output: %s" % output)
 #        NTdebug("Status: %s" % status)
-        
+
     return ( status, output )
 
 
@@ -4242,15 +4258,15 @@ def writeTextToFile(fileName, txt):
     fp = open(fileName, 'w')
     fprintf(fp, txt)
     fp.close()
-    
+
 def toCsv(input):
     result = ''
-    for item in input:        
+    for item in input:
         result += "%s\n" % item
     return result
 
 if __name__ == '__main__':
-    cing.verbosity = cing.verbosityDebug 
+    cing.verbosity = cing.verbosityDebug
     input = ['1brv', '9pcy' ]
     NTdebug("csv: [" + toCsv(input) + "]")
     NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")

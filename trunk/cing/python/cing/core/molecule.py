@@ -76,12 +76,11 @@ dots = '-----------'
 #==============================================================================
 class Molecule( NTtree ):
     """
--------------------------------------------------------------------------------
-Molecule class: defines the holder for molecule items.
+    Molecule class: defines the holder for molecule items.
 
-API layout in cing.core.classes
-
-  _____________________________________________________________________________
+    _____________________________________________________________________________
+    API layout in cing.core.classes
+    _____________________________________________________________________________
 
     Molecule.chains     List of Chain instances; equivalent to Molecule._children
 
@@ -103,39 +102,19 @@ API layout in cing.core.classes
 
     Peak.resonances     List of Resonance instances
                         corresponding with dimensions of peak
-  _____________________________________________________________________________
+    _____________________________________________________________________________
 
     Initiating attributes:
         name                    : Molecule name
 
     Derived attributes:
         chains                  : NTlist of Chain instances (identical to _children)
-        residueCount            : Number of Residue instances
         chainCount              : Number of Chain instances
-
-    Attributes inherited from NTtree:
-        _parent                 : None
-        _children               : NTlist of children NTtree instances.
-
-    Methods:
-        allChains()             : Returns a list of all chains objects of molecule.
-        allResidues()           : Returns a list of all residue objects of molecule.
-        allAtoms()              : Returns a list of all atom objects of molecule.
-
-    Methods inherited from NTtree:
-        _Cname( depth )         : Returns name expanded to depth
-        addChild( child )       :
-        sibling( relativeIndex ) :
-        traverse()              :
-        ...
-
-    Methods inherited from NTdict:
-        printAttr()             : Print a list of all attributes and their values.
-        ....
-
-    all dict methods
-
- """
+        residueCount            : Number of Residue instances
+        atomCount               : Number of Atom instances
+        resonanceCount          : Number of Resonance Instances per atom
+        modelCount              : Number of Coordinate instances per atom
+  """
 
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
@@ -2221,8 +2200,7 @@ Residue class: Defines residue properties
         """add atomName to self as well as potential alias references
            return Atom instance
         """
-#       We have to make sure that whatever goes on here is also done in the XML handler
-        ac = Atom( resName=self.resName, atomName=name, convention=convention, **kwds )
+        ac = Atom( resName=self.db.translate(convention), atomName=name, convention=convention, **kwds )
         self._addChild( ac )
         ac.residue = self
         self._parent._parent.atomCount += 1

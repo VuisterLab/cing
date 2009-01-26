@@ -1,0 +1,508 @@
+==> line 12, Skipping residue IUPAC: "PLM", CCPN: "other Plm neutral"
+
+
+==> line 79, Skipping residue IUPAC: "3CO", CCPN: "other 3co neutral"
+
+
+==> line 82, Skipping residue IUPAC: "5MU", CCPN: "RNA T deprot:H3"
+
+
+==> line 122, Skipping residue IUPAC: "5MU", CCPN: "RNA T prot:H3"
+
+
+==> line 163, Skipping residue IUPAC: "6HC", CCPN: "other 6hc neutral"
+
+
+==> line 206, Skipping residue IUPAC: "6HG", CCPN: "other 6hg neutral"
+
+
+==> line 252, Skipping residue IUPAC: "6HT", CCPN: "other 6ht neutral"
+
+
+==> line 297, Skipping residue IUPAC: "8OG", CCPN: "other 8og neutral"
+
+
+==> line 340, Skipping residue IUPAC: "ABA", CCPN: "protein Aba neutral"
+
+
+==> line 360, Skipping residue IUPAC: "ACE", CCPN: "other Ace neutral"
+
+
+==> line 369, Found CING: <ResidueDef ADE>  IUPAC: "DA"  CCPN: "DNA A deprot:H1"
+
+WARNING: line 384 <AtomDef ADE.Q2'>: IUPAC nomenclature CING database "Q2'" vrs CCPN database "H2'*"
+WARNING: line 389 <AtomDef ADE.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+WARNING: line 390 <AtomDef ADE.Q6>: IUPAC nomenclature CING database "Q6" vrs CCPN database "H6*"
+
+
+==> line 409, Skipping residue IUPAC: "DA", CCPN: "DNA A prot:H1"
+
+
+==> line 450, Skipping residue IUPAC: "AG", CCPN: "other Ag neutral"
+
+
+==> line 453, Skipping residue IUPAC: "AIB", CCPN: "protein Aib neutral"
+
+
+==> line 473, Found CING: <ResidueDef ALA>  IUPAC: "ALA"  CCPN: "protein Ala neutral"
+
+WARNING: line 479 <AtomDef ALA.QB>: IUPAC nomenclature CING database "MB" vrs CCPN database "HB*"
+
+
+==> line 489, Found CING: <ResidueDef ARG>  IUPAC: "ARG"  CCPN: "protein Arg prot:HH12"
+
+WARNING: line 498 <AtomDef ARG.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 501 <AtomDef ARG.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 505 <AtomDef ARG.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+WARNING: line 509 <AtomDef ARG.QH1>: IUPAC nomenclature CING database "QH1" vrs CCPN database "HH1*"
+WARNING: line 512 <AtomDef ARG.QH2>: IUPAC nomenclature CING database "QH2" vrs CCPN database "HH2*"
+
+
+==> line 524, Found CING: <ResidueDef ARGx>  IUPAC: "ARG"  CCPN: "protein Arg deprot:HH12"
+WARNING: line 524 <ResidueDef ARGx>: CYANA2 nomenclature CING database "None" vrs CCPN database "ARG"
+
+WARNING: line 533 <AtomDef ARGx.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 536 <AtomDef ARGx.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 540 <AtomDef ARGx.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+WARNING: line 543 <AtomDef ARGx.HH1>: IUPAC nomenclature CING database "HH1" vrs CCPN database "HH11"
+WARNING: line 544 <AtomDef ARGx.QH2>: IUPAC nomenclature CING database "QH2" vrs CCPN database "HH2*"
+
+
+==> line 556, Found CING: <ResidueDef ASN>  IUPAC: "ASN"  CCPN: "protein Asn link:ND2"
+
+WARNING: line 563 <AtomDef ASN.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 576, Found CING: <ResidueDef ASN>  IUPAC: "ASN"  CCPN: "protein Asn neutral"
+
+WARNING: line 583 <AtomDef ASN.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 586 <AtomDef ASN.QD2>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD2*"
+
+
+==> line 597, Found CING: <ResidueDef ASP>  IUPAC: "ASP"  CCPN: "protein Asp deprot:HD2"
+
+WARNING: line 604 <AtomDef ASP.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 615, Found CING: <ResidueDef ASPH>  IUPAC: "ASP"  CCPN: "protein Asp prot:HD2"
+WARNING: line 615 <ResidueDef ASPH>: CYANA2 nomenclature CING database "None" vrs CCPN database "ASP"
+
+WARNING: line 622 <AtomDef ASPH.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 634, Skipping residue IUPAC: "ATL", CCPN: "other Atl neutral"
+
+
+==> line 677, Skipping residue IUPAC: "ATP", CCPN: "other Atp neutral"
+
+
+==> line 728, Skipping residue IUPAC: "BMT", CCPN: "protein Bmt neutral"
+
+
+==> line 767, Skipping residue IUPAC: "C2S", CCPN: "other C2s neutral"
+
+
+==> line 806, Skipping residue IUPAC: "CA", CCPN: "other Ca neutral"
+
+
+==> line 809, Skipping residue IUPAC: "CDR", CCPN: "other Cdr neutral"
+
+
+==> line 835, Skipping residue IUPAC: "CGU", CCPN: "protein Cgu neutral"
+
+
+==> line 860, Skipping residue IUPAC: "CMO", CCPN: "other Cmo neutral"
+
+
+==> line 864, Skipping residue IUPAC: "CMR", CCPN: "other Cmr neutral"
+
+
+==> line 906, Skipping residue IUPAC: "CSO", CCPN: "protein Cso neutral"
+
+
+==> line 924, Skipping residue IUPAC: "CSS", CCPN: "protein Css neutral"
+
+
+==> line 942, Skipping residue IUPAC: "CU", CCPN: "other Cu neutral"
+
+
+==> line 945, Found CING: <ResidueDef CYS>  IUPAC: "CYS"  CCPN: "protein Cys deprot:HG"
+
+WARNING: line 951 <AtomDef CYS.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 961, Found CING: <ResidueDef CYS>  IUPAC: "CYS"  CCPN: "protein Cys prot:HG"
+
+WARNING: line 967 <AtomDef CYS.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 978, Found CING: <ResidueDef CYSS>  IUPAC: "CYS"  CCPN: "protein Cys link:SG"
+
+WARNING: line 984 <AtomDef CYSS.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 995, Found CING: <ResidueDef CYT>  IUPAC: "DC"  CCPN: "DNA C deprot:H3"
+
+WARNING: line 1008 <AtomDef CYT.Q2'>: IUPAC nomenclature CING database "Q2" vrs CCPN database "H2'*"
+WARNING: line 1011 <AtomDef CYT.Q4>: IUPAC nomenclature CING database "Q4" vrs CCPN database "H4*"
+WARNING: line 1017 <AtomDef CYT.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 1033, Skipping residue IUPAC: "DC", CCPN: "DNA C prot:H3"
+
+
+==> line 1072, Skipping residue IUPAC: "DAL", CCPN: "protein D-Ala neutral"
+
+
+==> line 1088, Skipping residue IUPAC: "DHA", CCPN: "protein Dha neutral"
+
+
+==> line 1102, Skipping residue IUPAC: "DI", CCPN: "DNA I deprot:H1,H7"
+
+
+==> line 1139, Skipping residue IUPAC: "DI", CCPN: "DNA I prot:H1;deprot:H7"
+
+
+==> line 1177, Skipping residue IUPAC: "DI", CCPN: "DNA I prot:H7,H1"
+
+
+==> line 1216, Skipping residue IUPAC: "DPR", CCPN: "protein D-Pro neutral"
+
+
+==> line 1238, Skipping residue IUPAC: "DTH", CCPN: "protein D-Thr neutral"
+
+
+==> line 1258, Skipping residue IUPAC: "DTR", CCPN: "protein D-Trp neutral"
+
+
+==> line 1288, Skipping residue IUPAC: "DU", CCPN: "DNA U deprot:H3"
+
+
+==> line 1323, Skipping residue IUPAC: "DU", CCPN: "DNA U prot:H3"
+
+
+==> line 1359, Skipping residue IUPAC: "EDC", CCPN: "other Edc neutral"
+
+
+==> line 1400, Skipping residue IUPAC: "GDP", CCPN: "other Gdp neutral"
+
+
+==> line 1447, Found CING: <ResidueDef GLN>  IUPAC: "GLN"  CCPN: "protein Gln neutral"
+
+WARNING: line 1455 <AtomDef GLN.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 1458 <AtomDef GLN.QE2>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE2*"
+WARNING: line 1461 <AtomDef GLN.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+
+
+==> line 1472, Found CING: <ResidueDef GLU>  IUPAC: "GLU"  CCPN: "protein Glu deprot:HE2"
+
+WARNING: line 1480 <AtomDef GLU.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 1483 <AtomDef GLU.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+
+
+==> line 1494, Found CING: <ResidueDef GLUH>  IUPAC: "GLU"  CCPN: "protein Glu prot:HE2"
+WARNING: line 1494 <ResidueDef GLUH>: CYANA2 nomenclature CING database "None" vrs CCPN database "GLU"
+
+WARNING: line 1502 <AtomDef GLUH.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 1506 <AtomDef GLUH.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+
+
+==> line 1517, Found CING: <ResidueDef GLY>  IUPAC: "GLY"  CCPN: "protein Gly neutral"
+
+WARNING: line 1521 <AtomDef GLY.QA>: IUPAC nomenclature CING database "QA" vrs CCPN database "HA*"
+
+
+==> line 1530, Found CING: <ResidueDef GUA>  IUPAC: "DG"  CCPN: "DNA G deprot:H1,H7"
+
+WARNING: line 1544 <AtomDef GUA.Q2'>: IUPAC nomenclature CING database "Q2'" vrs CCPN database "H2'*"
+WARNING: line 1545 <AtomDef GUA.Q2>: IUPAC nomenclature CING database "Q2" vrs CCPN database "H2*"
+WARNING: line 1552 <AtomDef GUA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 1570, Found CING: <ResidueDef GUA>  IUPAC: "DG"  CCPN: "DNA G prot:H1;deprot:H7"
+
+WARNING: line 1585 <AtomDef GUA.Q2'>: IUPAC nomenclature CING database "Q2'" vrs CCPN database "H2'*"
+WARNING: line 1586 <AtomDef GUA.Q2>: IUPAC nomenclature CING database "Q2" vrs CCPN database "H2*"
+WARNING: line 1593 <AtomDef GUA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 1611, Skipping residue IUPAC: "DG", CCPN: "DNA G prot:H7,H1"
+
+
+==> line 1653, Found CING: <ResidueDef HIS>  IUPAC: "HIS"  CCPN: "protein His prot:HD1;deprot:HE2"
+
+WARNING: line 1662 <AtomDef HIS.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 1676, Found CING: <ResidueDef HISE>  IUPAC: "HIS"  CCPN: "protein His prot:HE2;deprot:HD1"
+WARNING: line 1676 <ResidueDef HISE>: CYANA2 nomenclature CING database "HIST" vrs CCPN database "HIS"
+
+WARNING: line 1685 <AtomDef HISE.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 1699, Found CING: <ResidueDef HISH>  IUPAC: "HIS"  CCPN: "protein His prot:HD1,HE2"
+
+WARNING: line 1708 <AtomDef HISH.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 1723, Found CING: <ResidueDef HOH>  IUPAC: "HOH"  CCPN: "other Hoh neutral"
+
+
+
+==> line 1729, Skipping residue IUPAC: "HYP", CCPN: "protein Hyp neutral"
+
+
+==> line 1751, Skipping residue IUPAC: "I", CCPN: "RNA I deprot:H1,H7"
+
+
+==> line 1788, Skipping residue IUPAC: "I", CCPN: "RNA I prot:H1;deprot:H7"
+
+
+==> line 1826, Skipping residue IUPAC: "I", CCPN: "RNA I prot:H7,H1"
+
+
+==> line 1865, Skipping residue IUPAC: "IGU", CCPN: "other Igu neutral"
+
+
+==> line 1907, Found CING: <ResidueDef ILE>  IUPAC: "ILE"  CCPN: "protein Ile neutral"
+
+WARNING: line 1917 <AtomDef ILE.QD1>: IUPAC nomenclature CING database "MD" vrs CCPN database "HD1*"
+WARNING: line 1921 <AtomDef ILE.QG1>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG1*"
+WARNING: line 1924 <AtomDef ILE.QG2>: IUPAC nomenclature CING database "MG" vrs CCPN database "HG2*"
+
+
+==> line 1934, Skipping residue IUPAC: "K", CCPN: "other K neutral"
+
+
+==> line 1937, Skipping residue IUPAC: "KCX", CCPN: "protein Kcx neutral"
+
+
+==> line 1970, Skipping residue IUPAC: "LA", CCPN: "other La neutral"
+
+
+==> line 1973, Found CING: <ResidueDef LEU>  IUPAC: "LEU"  CCPN: "protein Leu neutral"
+
+WARNING: line 1983 <AtomDef LEU.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 1986 <AtomDef LEU.QQD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 1987 <AtomDef LEU.QD1>: IUPAC nomenclature CING database "MD1" vrs CCPN database "HD1*"
+WARNING: line 1991 <AtomDef LEU.QD2>: IUPAC nomenclature CING database "MD2" vrs CCPN database "HD2*"
+
+
+==> line 2002, Skipping residue IUPAC: "LLP", CCPN: "protein Llp neutral"
+
+
+==> line 2060, Found CING: <ResidueDef LYS>  IUPAC: "LYS"  CCPN: "protein Lys prot:HZ3"
+
+WARNING: line 2069 <AtomDef LYS.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 2072 <AtomDef LYS.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 2075 <AtomDef LYS.QE>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE*"
+WARNING: line 2078 <AtomDef LYS.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+WARNING: line 2081 <AtomDef LYS.QZ>: IUPAC nomenclature CING database "QZ" vrs CCPN database "HZ*"
+
+
+==> line 2092, Found CING: <ResidueDef LYSx>  IUPAC: "LYS"  CCPN: "protein Lys deprot:HZ3"
+WARNING: line 2092 <ResidueDef LYSx>: CYANA2 nomenclature CING database "None" vrs CCPN database "LYS"
+
+WARNING: line 2101 <AtomDef LYSx.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 2104 <AtomDef LYSx.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 2107 <AtomDef LYSx.QE>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE*"
+WARNING: line 2110 <AtomDef LYSx.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+WARNING: line 2113 <AtomDef LYSx.QZ>: IUPAC nomenclature CING database "QZ" vrs CCPN database "HZ*"
+
+
+==> line 2123, Skipping residue IUPAC: "MA6", CCPN: "other Ma6 neutral"
+
+
+==> line 2171, Skipping residue IUPAC: "MCY", CCPN: "other Mcy neutral"
+
+
+==> line 2209, Found CING: <ResidueDef MET>  IUPAC: "MET"  CCPN: "protein Met neutral"
+
+WARNING: line 2217 <AtomDef MET.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 2220 <AtomDef MET.QE>: IUPAC nomenclature CING database "ME" vrs CCPN database "HE*"
+WARNING: line 2224 <AtomDef MET.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+
+
+==> line 2234, Skipping residue IUPAC: "MG", CCPN: "other Mg neutral"
+
+
+==> line 2237, Skipping residue IUPAC: "MLE", CCPN: "protein Mle neutral"
+
+
+==> line 2270, Skipping residue IUPAC: "MN", CCPN: "other Mn neutral"
+
+
+==> line 2273, Skipping residue IUPAC: "MSE", CCPN: "protein Mse neutral"
+
+
+==> line 2298, Skipping residue IUPAC: "MVA", CCPN: "protein Mva neutral"
+
+
+==> line 2327, Skipping residue IUPAC: "NA", CCPN: "other Na neutral"
+
+
+==> line 2330, Skipping residue IUPAC: "NH2", CCPN: "other Nh2 neutral"
+
+
+==> line 2336, Skipping residue IUPAC: "NLE", CCPN: "protein Nle neutral"
+
+
+==> line 2364, Skipping residue IUPAC: "OCS", CCPN: "protein Ocs neutral"
+
+
+==> line 2384, Skipping residue IUPAC: "ORN", CCPN: "protein Orn neutral"
+
+
+==> line 2412, Skipping residue IUPAC: "P", CCPN: "other P neutral"
+
+
+==> line 2463, Skipping residue IUPAC: "PDU", CCPN: "other Pdu neutral"
+
+
+==> line 2512, Found CING: <ResidueDef PHE>  IUPAC: "PHE"  CCPN: "protein Phe neutral"
+
+WARNING: line 2526 <AtomDef PHE.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 2529 <AtomDef PHE.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 2530 <AtomDef PHE.QR>: IUPAC nomenclature CING database "QR" vrs CCPN database "HD*|HE*"
+WARNING: line 2533 <AtomDef PHE.QE>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE*"
+
+
+==> line 2543, Found CING: <ResidueDef PRO>  IUPAC: "PRO"  CCPN: "protein Pro neutral"
+
+WARNING: line 2550 <AtomDef PRO.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 2553 <AtomDef PRO.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 2556 <AtomDef PRO.QG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+
+
+==> line 2565, Skipping residue IUPAC: "PSU", CCPN: "other Psu neutral"
+
+
+==> line 2602, Skipping residue IUPAC: "PTR", CCPN: "protein Ptr neutral"
+
+
+==> line 2634, Skipping residue IUPAC: "QUI", CCPN: "other Qui neutral"
+
+
+==> line 2655, Found CING: <ResidueDef RADE>  IUPAC: "A"  CCPN: "RNA A deprot:H1"
+WARNING: line 2655 <ResidueDef RADE>: CYANA2 nomenclature CING database "None" vrs CCPN database "RADE"
+
+WARNING: line 2673 <AtomDef RADE.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+WARNING: line 2674 <AtomDef RADE.Q6>: IUPAC nomenclature CING database "Q6" vrs CCPN database "H6*"
+
+
+==> line 2696, Skipping residue IUPAC: "A", CCPN: "RNA A prot:H1"
+
+
+==> line 2738, Found CING: <ResidueDef RCYT>  IUPAC: "C"  CCPN: "RNA C deprot:H3"
+
+WARNING: line 2752 <AtomDef RCYT.Q4>: IUPAC nomenclature CING database "Q4" vrs CCPN database "H4*"
+WARNING: line 2758 <AtomDef RCYT.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 2777, Skipping residue IUPAC: "C", CCPN: "RNA C prot:H3"
+
+
+==> line 2817, Found CING: <ResidueDef RGUA>  IUPAC: "G"  CCPN: "RNA G deprot:H1,H7"
+
+WARNING: line 2830 <AtomDef RGUA.Q2>: IUPAC nomenclature CING database "Q2" vrs CCPN database "H2*"
+WARNING: line 2837 <AtomDef RGUA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 2858, Found CING: <ResidueDef RGUA>  IUPAC: "G"  CCPN: "RNA G prot:H1;deprot:H7"
+
+WARNING: line 2872 <AtomDef RGUA.Q2>: IUPAC nomenclature CING database "Q2" vrs CCPN database "H2*"
+WARNING: line 2879 <AtomDef RGUA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 2900, Skipping residue IUPAC: "G", CCPN: "RNA G prot:H7,H1"
+
+
+==> line 2943, Skipping residue IUPAC: "RMP", CCPN: "other Rmp neutral"
+
+
+==> line 2987, Skipping residue IUPAC: "SAR", CCPN: "protein Sar neutral"
+
+
+==> line 3004, Found CING: <ResidueDef SER>  IUPAC: "SER"  CCPN: "protein Ser deprot:HG"
+
+WARNING: line 3010 <AtomDef SER.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 3020, Found CING: <ResidueDef SER>  IUPAC: "SER"  CCPN: "protein Ser prot:HG"
+
+WARNING: line 3026 <AtomDef SER.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 3037, Found CING: <ResidueDef THR>  IUPAC: "THR"  CCPN: "protein Thr deprot:HG1"
+
+WARNING: line 3045 <AtomDef THR.QG2>: IUPAC nomenclature CING database "MG" vrs CCPN database "HG2*"
+
+
+==> line 3056, Found CING: <ResidueDef THR>  IUPAC: "THR"  CCPN: "protein Thr prot:HG1"
+
+WARNING: line 3065 <AtomDef THR.QG2>: IUPAC nomenclature CING database "MG" vrs CCPN database "HG2*"
+
+
+==> line 3076, Found CING: <ResidueDef THY>  IUPAC: "DT"  CCPN: "DNA T deprot:H3"
+
+WARNING: line 3090 <AtomDef THY.Q2'>: IUPAC nomenclature CING database "Q2'" vrs CCPN database "H2'*"
+WARNING: line 3095 <AtomDef THY.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+WARNING: line 3097 <AtomDef THY.Q7>: IUPAC nomenclature CING database "M7" vrs CCPN database "H7*"
+
+
+==> line 3115, Found CING: <ResidueDef THY>  IUPAC: "DT"  CCPN: "DNA T prot:H3"
+
+WARNING: line 3129 <AtomDef THY.Q2'>: IUPAC nomenclature CING database "Q2'" vrs CCPN database "H2'*"
+WARNING: line 3135 <AtomDef THY.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+WARNING: line 3137 <AtomDef THY.Q7>: IUPAC nomenclature CING database "M7" vrs CCPN database "H7*"
+
+
+==> line 3155, Found CING: <ResidueDef TRP>  IUPAC: "TRP"  CCPN: "protein Trp deprot:HE1"
+
+WARNING: line 3169 <AtomDef TRP.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 3184, Found CING: <ResidueDef TRP>  IUPAC: "TRP"  CCPN: "protein Trp prot:HE1"
+
+WARNING: line 3198 <AtomDef TRP.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+
+
+==> line 3214, Found CING: <ResidueDef TYR>  IUPAC: "TYR"  CCPN: "protein Tyr deprot:HH"
+
+WARNING: line 3228 <AtomDef TYR.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 3231 <AtomDef TYR.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 3232 <AtomDef TYR.QR>: IUPAC nomenclature CING database "QR" vrs CCPN database "HD*|HE*"
+WARNING: line 3235 <AtomDef TYR.QE>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE*"
+
+
+==> line 3245, Found CING: <ResidueDef TYR>  IUPAC: "TYR"  CCPN: "protein Tyr prot:HH"
+
+WARNING: line 3259 <AtomDef TYR.QB>: IUPAC nomenclature CING database "QB" vrs CCPN database "HB*"
+WARNING: line 3262 <AtomDef TYR.QD>: IUPAC nomenclature CING database "QD" vrs CCPN database "HD*"
+WARNING: line 3263 <AtomDef TYR.QR>: IUPAC nomenclature CING database "QR" vrs CCPN database "HD*|HE*"
+WARNING: line 3266 <AtomDef TYR.QE>: IUPAC nomenclature CING database "QE" vrs CCPN database "HE*"
+
+
+==> line 3277, Skipping residue IUPAC: "TYS", CCPN: "protein Tys neutral"
+
+
+==> line 3308, Found CING: <ResidueDef URA>  IUPAC: "U"  CCPN: "RNA U deprot:H3"
+
+WARNING: line 3325 <AtomDef URA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 3344, Found CING: <ResidueDef URA>  IUPAC: "U"  CCPN: "RNA U prot:H3"
+
+WARNING: line 3362 <AtomDef URA.Q5'>: IUPAC nomenclature CING database "Q5'" vrs CCPN database "H5'*"
+
+
+==> line 3381, Found CING: <ResidueDef VAL>  IUPAC: "VAL"  CCPN: "protein Val neutral"
+
+WARNING: line 3391 <AtomDef VAL.QQG>: IUPAC nomenclature CING database "QG" vrs CCPN database "HG*"
+WARNING: line 3392 <AtomDef VAL.QG1>: IUPAC nomenclature CING database "MG1" vrs CCPN database "HG1*"
+WARNING: line 3396 <AtomDef VAL.QG2>: IUPAC nomenclature CING database "MG2" vrs CCPN database "HG2*"
+
+
+==> line 3406, Skipping residue IUPAC: "ZN", CCPN: "other Zn neutral"
+
+
