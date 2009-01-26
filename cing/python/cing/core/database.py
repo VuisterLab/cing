@@ -98,6 +98,30 @@ ________________________________________________________________________________
 
 
 class MolDef( NTtree ):
+    """
+    Root class for the NTdb database
+
+
+    NTdb.residueDict and ResidueDef.atomDict settings from the nameDict's
+
+    This allows checking and conversion of names
+    Note that it generates cycles in the referencing, so printing of
+    these dicts generates a recursion error.
+
+    NTdb.residueDict[INTERNAL] is a dictionary of all internal residue names. Each
+    entry points to the relevant residueDef instance.
+    Ex. NTdb.residueDict[INTERNAL]['GLU-'] points to the GLU- residueDef instance
+
+    NTdb.residueDict[CYANA2] is a dictionary of all CYANA2 residue names. Each
+    entry points to the relevant residueDef instance
+
+    idem for all other conventions
+
+    NTdb.residueDict[LOOSE] is a dictionary of all Loosely defined residue names. Each
+    entry points to the relevant residueDef instance
+
+    The atomDict dictionaries of each residue function analogously for the atom names
+    """
     def __init__( self, name, *args, **kwds ):
         NTtree.__init__( self,
                          __CLASS__   = 'MolDef',
@@ -245,54 +269,42 @@ class MolDef( NTtree ):
 
     def postProcess(self):
         """
-         Create the residueDict and atomDict settings from the nameDict's
-
-         This allows checking and conversion of names
-         Note that it generates cycles in the referencing, so printing of
-         these dicts generates a recursion error.
-
-
-         NTdb.residueDict[INTERNAL] is a dictionary of all internal residue names. Each
-         entry points to the relevant residueDef instance.
-         Ex. NTdb.residueDict[INTERNAL]['GLU-'] points to the GLU- residueDef instance
-
-         NTdb.residueDict[CYANA2] is a dictionary of all CYANA2 residue names. Each
-         entry points to the relevant residueDef instance
-
-         idem for all other conventions
-
-         NTdb.residueDict[LOOSE] is a dictionary of all Loosely defined residue names. Each
-         entry points to the relevant residueDef instance
-
-         The atomDict dictionaries of each residue function analogously for the atom names
+        Call postProcessing routines of all ResidueDefs and atomDefs
         """
         NTdebug("==> Creating translation dictionaries ... ")
         for res in self:
-            # loose definitions
-            self.residueDict.setdefault( LOOSE, {} )
-            for n in [res.shortName, res.name, res.name.capitalize(), res.name.lower()]:
-                self.residueDict[LOOSE][n] = res
-            #end for
-            #different convention definitions
-            for convR, nameR in res.nameDict.iteritems():
-                self.residueDict.setdefault( convR, {} )
-                if (nameR != None):
-                    self.residueDict[convR][nameR] = res
-                #end if
-            # end for
+            res.postProcess()
             for atm in res:
-                for convA, nameA in atm.nameDict.iteritems():
-                    res.atomDict.setdefault( convA, {} )
-                    if (nameA != None):
-                        # XPLOR definitions have possibly multiple entries
-                        # separated by ','
-                        for n in nameA.split(','):
-                            res.atomDict[convA][n] = atm
-                        #end for
-                    #end if
-                #end for
+                atm.postProcess()
             #end for
         #end for
+
+#        for res in self:
+#            # loose definitions
+#            self.residueDict.setdefault( LOOSE, {} )
+#            for n in [res.shortName, res.name, res.name.capitalize(), res.name.lower()]:
+#                self.residueDict[LOOSE][n] = res
+#            #end for
+#            #different convention definitions
+#            for convR, nameR in res.nameDict.iteritems():
+#                self.residueDict.setdefault( convR, {} )
+#                if (nameR != None):
+#                    self.residueDict[convR][nameR] = res
+#                #end if
+#            # end for
+#            for atm in res:
+#                for convA, nameA in atm.nameDict.iteritems():
+#                    res.atomDict.setdefault( convA, {} )
+#                    if (nameA != None):
+#                        # XPLOR definitions have possibly multiple entries
+#                        # separated by ','
+#                        for n in nameA.split(','):
+#                            res.atomDict[convA][n] = atm
+#                        #end for
+#                    #end if
+#                #end for
+#            #end for
+#        #end for
     #end def
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
@@ -466,6 +478,20 @@ class ResidueDef( NTtree ):
             #end if
         #end for
         self.properties = props2
+
+        # Set the entry residueDict of molDef to self
+        residueDict = self.molDef.residueDict
+        residueDict.setdefault( LOOSE, {} )
+        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower()]:
+            residueDict[LOOSE][n] = self
+        #end for
+        #different convention definitions
+        for convR, nameR in self.nameDict.iteritems():
+            residueDict.setdefault( convR, {} )
+            if (nameR != None):
+                residueDict[convR][nameR] = self
+            #end if
+        # end for
     #end def
 
     def exportDef( self, stream = sys.stdout, convention = INTERNAL ):
@@ -789,6 +815,21 @@ class AtomDef( NTtree ):
         #Add aliases
         for aname in self.aliases:
             self.residueDef[aname] = self
+        #end for
+
+        # set entry of atomDict of residueDef to self
+        atomDict = self.residueDef.atomDict
+        for convA, nameA in self.nameDict.iteritems():
+            atomDict.setdefault( convA, {} )
+            if (nameA != None):
+                # XPLOR definitions have possibly multiple entries
+                # separated by ','
+                for n in nameA.split(','):
+                    atomDict[convA][n] = self
+                #end for
+            #end if
+        #end for
+
     #end def
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
@@ -965,10 +1006,10 @@ def importNameDefs( tableFile, name)   :
         sys.exit(1)
 
     #Post-processing
-    for res in mol.allResidueDefs():
-        res.postProcess()
-    for atm in mol.allAtomDefs():
-        atm.postProcess()
+#    for res in mol.allResidueDefs():
+#        res.postProcess()
+#    for atm in mol.allAtomDefs():
+#        atm.postProcess()
     mol.postProcess()
 
     return mol

@@ -8514,7 +8514,7 @@ RESIDUE ADE      da
 #=======================================================================
     nameDict = {'CCPN': 'DNA A deprot:H1', 'BMRBd': 'ADE', 'IUPAC': 'DA', 'AQUA': 'A', 'INTERNAL_0': 'ADE', 'INTERNAL_1': 'DA', 'CYANA': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE'}
     comment = 'deoxy-adenine'
-    properties = ['nucleic', 'deoxy']
+    properties = ['nucleic', 'deoxy', 'DNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -9066,9 +9066,9 @@ END_RESIDUE
 #   internal short
 RESIDUE RADE     a
 #=======================================================================
-    nameDict = {'A': 'RADE', 'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
+    nameDict = {'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
     comment = 'adenine'
-    properties = ['nucleic']
+    properties = ['nucleic','RNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -9628,7 +9628,7 @@ RESIDUE CYT      dc
 #=======================================================================
     nameDict = {'CCPN': 'DNA C deprot:H3', 'BMRBd': 'CYT', 'IUPAC': 'DC', 'AQUA': 'C', 'INTERNAL_0': 'CYT', 'INTERNAL_1': 'DC', 'CYANA': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT'}
     comment = 'deoxy cytosine'
-    properties = ['nucleic', 'deoxy']
+    properties = ['nucleic', 'deoxy', 'DNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -10154,7 +10154,7 @@ RESIDUE RCYT     c
 #=======================================================================
     nameDict = {'CCPN': 'RNA C deprot:H3', 'BMRBd': 'RCYT', 'IUPAC': 'C', 'AQUA': 'C', 'INTERNAL_0': 'RCYT', 'INTERNAL_1': 'C', 'CYANA': 'RCYT', 'CYANA2': 'RCYT', 'PDB': 'RCYT', 'XPLOR': 'RCYT'}
     comment = 'cytosine'
-    properties = ['nucleic']
+    properties = ['nucleic','RNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -10686,7 +10686,7 @@ RESIDUE GUA      dg
 #=======================================================================
     nameDict = {'CCPN': 'DNA G prot:H1;deprot:H7', 'BMRBd': 'GUA', 'IUPAC': 'DG', 'AQUA': 'G', 'INTERNAL_0': 'GUA', 'INTERNAL_1': 'DG', 'CYANA': 'GUA', 'CYANA2': 'GUA', 'PDB': 'GUA', 'XPLOR': 'GUA'}
     comment = 'deoxy-guanine'
-    properties = ['nucleic', 'deoxy']
+    properties = ['nucleic', 'deoxy', 'DNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -11254,7 +11254,7 @@ RESIDUE RGUA     g
 #=======================================================================
     nameDict = {'CCPN': 'RNA G prot:H1;deprot:H7', 'BMRBd': 'RGUA', 'IUPAC': 'G', 'AQUA': 'G', 'INTERNAL_0': 'RGUA', 'INTERNAL_1': 'G', 'CYANA': 'RGUA', 'CYANA2': 'RGUA', 'PDB': 'RGUA', 'XPLOR': 'RGUA'}
     comment = 'guanine'
-    properties = ['nucleic']
+    properties = ['nucleic','RNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -11828,7 +11828,7 @@ RESIDUE THY      t
 #=======================================================================
     nameDict = {'CCPN': 'DNA T prot:H3', 'BMRBd': 'THY', 'IUPAC': 'DT', 'AQUA': 'T', 'INTERNAL_0': 'THY', 'INTERNAL_1': 'DT', 'CYANA': 'THY', 'CYANA2': 'THY', 'PDB': 'THY', 'XPLOR': 'THY'}
     comment = 'deoxy-thymine'
-    properties = ['nucleic', 'thymine']
+    properties = ['nucleic', 'deoxy','DNA',]
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -12388,7 +12388,7 @@ RESIDUE URA      u
 #=======================================================================
     nameDict = {'CCPN': 'RNA U prot:H3', 'BMRBd': 'URA', 'IUPAC': 'U', 'AQUA': 'U', 'INTERNAL_0': 'URA', 'INTERNAL_1': 'U', 'CYANA': 'URA', 'CYANA2': 'URA', 'PDB': 'U', 'XPLOR': 'URA'}
     comment = 'uracil'
-    properties = ['nucleic']
+    properties = ['nucleic','RNA']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
