@@ -6,7 +6,9 @@
     Php support, needed for NRG-CING pdb code lookup:
         enable in config the line:
         LoadModule php5_module        libexec/apache2/libphp5.so
-        
+    Redirect old cased icing url in apache's settings (Thanks to: http://www.yolinux.com/TUTORIALS/ApacheRedirect.html)
+        Redirect permanent /iCing /icing
+    
 monitor with:
 	tail -f /private/var/log/apache2/*_log &
 
@@ -34,8 +36,8 @@ monitor with:
             Turn on "Web Sharing" and check server in browser.
 
 # For the gwt tomcat server
-ProxyPass         /iCing/serv http://localhost:8080/iCing
-ProxyPassReverse  /iCing/serv http://localhost:8080/iCing
+ProxyPass         /icing/serv http://localhost:8080/icing
+ProxyPassReverse  /icing/serv http://localhost:8080/icing
 
 The tomcat server in eclipse works together with the apache configured here.
 

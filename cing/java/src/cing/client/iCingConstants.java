@@ -368,9 +368,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Load_state();
 
   /**
-   * Translated "iCing does not work on this browser ".
+   * Translated "Unfortunately, iCing does not work on this browser ".
    * 
-   * @return translated "iCing does not work on this browser "
+   * @return translated "Unfortunately, iCing does not work on this browser "
    * @gwt.key warningBrowser
    */
   String warningBrowser();
@@ -624,9 +624,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Expect_to_see();
 
   /**
-   * Translated "Please use Firefox or the Safari browser on any OS. ".
+   * Translated "Please use a recent version of e.g. Firefox, Chrome or Safari. ".
    * 
-   * @return translated "Please use Firefox or the Safari browser on any OS. "
+   * @return translated "Please use a recent version of e.g. Firefox, Chrome or Safari. "
    * @gwt.key PleaseUse
    */
   String PleaseUse();

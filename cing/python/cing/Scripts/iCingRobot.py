@@ -28,7 +28,7 @@ def iCingRobot():
     doStatus= 0
     doLog   = 0
     doPname = 0
-    doPurge = 1
+    doPurge = 0
     ## credentials.
     user_id = "jd3"
     access_key = "123456"
@@ -40,9 +40,9 @@ def iCingRobot():
     entryId = '1a4d' # 388K
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
 #    rpcUrl = "localhost/iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
-    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
+#    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
 #/    rpcUrl = "dodos.dyndns.org/icing/serv/iCingServlet" # testing production-like 
-#    rpcUrl = "https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet" # testing production
+    rpcUrl = "https://nmr.cmbi.ru.nl/icing/serv/iCingServlet" # testing production
                                 
 ##############################################################################################################
     credentialSettings = "-F UserId=%s -F AccessKey=%s" % ( user_id, access_key)

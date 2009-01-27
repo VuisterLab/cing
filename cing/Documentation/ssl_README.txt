@@ -33,9 +33,9 @@ An optional company name []:
 		
 Setup a secure iCing server at:
 
-https://mini.cmbi.umcn.nl/iCing
+https://nmr.cmbi.umcn.nl/icing
 equals:
-/Library/WebServer/Documents/iCing
+/Library/WebServer/Documents/icing
 
 Network layout:
 
@@ -75,7 +75,7 @@ SSLCertificateKeyFile "/private/etc/apache2/mini.key"
       ServerName nmr.cmbi.ru.nl
       Loglevel warn
       RewriteEngine On
-      RewriteRule ^/iCing(.*) https://nmr.cmbi.ru.nl/iCing/$1 [L,R]
+      RewriteRule ^/icing(.*) https://nmr.cmbi.ru.nl/icing/$1 [L,R]
 #       RewriteLog /var/log/httpd/nmr.cmbi.ru.nl-rewrite_log
      <Location />
           ProxyPass http://mini.cmbi.umcn.nl/

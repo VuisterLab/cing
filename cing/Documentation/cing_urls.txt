@@ -2,9 +2,9 @@ On poster for Cagliari
 proteins.dyndns.org/CING 
 
 iCing
-http://nmr.cmbi.ru.nl/iCing
-http://nmr.cmbi.ru.nl/iCing/iCing.html
-https://nmr.cmbi.ru.nl/iCing/iCing.html
+http://nmr.cmbi.ru.nl/icing
+http://nmr.cmbi.ru.nl/icing/iCing.html
+https://nmr.cmbi.ru.nl/icing/iCing.html
 
 According to Google on Nov 20, 2008 nobody links to anything on the above domains.
 

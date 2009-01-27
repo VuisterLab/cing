@@ -2,8 +2,8 @@ After a reboot make sure the following services run on the server:
 
 Jurgen's setup
 - CING website:     http://nmr.cmbi.ru.nl/cing (checked from Madison every 12"). 
-- iCing javascript https://nmr.cmbi.ru.nl/iCing (checked from Madison).
-- iCing servlet    https://nmr.cmbi.ru.nl/iCing/serv/iCingServlet (checked from Madison).
+- iCing javascript https://nmr.cmbi.ru.nl/icing (checked from Madison).
+- iCing servlet    https://nmr.cmbi.ru.nl/icing/serv/iCingServlet (checked from Madison).
 - mysql (needed by fcweb and by NRG)
     TODO: fails the automatic startup even though the System Preferences Gui says it should. The console shows a message
             saying mysql should be upgraded to create a required file. Probably to do with change from case-sensitive 

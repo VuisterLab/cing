@@ -305,7 +305,7 @@ class nrgCing(Lister):
         if self.updateIndices:
             self.update_index_files()
             
-        # premature return until coded completeley... TODO:
+        # premature return until coded completely... TODO:
         return 0
     
         
@@ -730,7 +730,7 @@ if __name__ == '__main__':
     updateIndices = True
     isProduction = False
     new_hits_entry_list = [] # define empty for checking new ones.
-    new_hits_entry_list = ['1brv']
+    new_hits_entry_list = ['1d3z']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
     
     ## Initialize the project 

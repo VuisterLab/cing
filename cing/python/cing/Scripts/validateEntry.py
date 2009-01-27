@@ -46,6 +46,7 @@ def main(entryId, *extraArgList):
         doWhatif = False
         doProcheck = False
     FORCE_REDO = True
+    FORCE_RETRIEVE_INPUT = True
     
     expectedNumberOfArguments = 4
     if len(extraArgList) != expectedNumberOfArguments:
@@ -94,14 +95,20 @@ def main(entryId, *extraArgList):
     isCcpnProject = False # TODO: refine
     if inputDir.startswith("http"):
         fnametgz = entryId + '.tgz'
-        stillToRetrieve = True
+        stillToRetrieve = False
+        if os.path.exists(fnametgz):
+            if FORCE_RETRIEVE_INPUT:
+                os.unlink(fnametgz)
+                stillToRetrieve = True
+        else:
+            stillToRetrieve = True           
+            
         if stillToRetrieve:
-            if not os.path.exists(fnametgz):
-                retrieveTgzFromUrl(entryId, inputDir)
-        else:             
-            if not os.path.exists(fnametgz):
-                NTerror("Tgz should already have been present skipping entry")
-                return        
+             retrieveTgzFromUrl(entryId, inputDir)
+             
+        if not os.path.exists(fnametgz):
+            NTerror("Tgz should already have been present skipping entry")
+            return        
 #            retrieveTgzFromUrl(entryId, inputDir)
         isCcpnProject = True
         
