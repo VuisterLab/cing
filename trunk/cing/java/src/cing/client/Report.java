@@ -92,11 +92,11 @@ public class Report extends iCingView {
 		moduleBaseUrl = moduleBaseUrl.replace("/cing.iCing", Settings.RESULT_URL);
 //		GenClient.showDebug("moduleBaseUrl 2: " + moduleBaseUrl);
 		// When production this will do something.
-		moduleBaseUrl = moduleBaseUrl.replace("/iCing", Settings.RESULT_URL);
+		moduleBaseUrl = moduleBaseUrl.replace("/icing", Settings.RESULT_URL);
 //		GenClient.showDebug("moduleBaseUrl 3: " + moduleBaseUrl);
 
 		String runUrl = moduleBaseUrl + iCing.currentUserId + "/" + iCing.currentAccessKey;
-		GenClient.showDebug("runUrl: [" + runUrl + "].");
+//		GenClient.showDebug("runUrl: [" + runUrl + "].");
 		return runUrl;
 	}
 

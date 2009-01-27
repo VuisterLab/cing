@@ -163,16 +163,19 @@ public class iCing implements EntryPoint, HistoryListener {
             // initToken = iCing.LOG_STATE;
         }
         onHistoryChanged(initToken);
-        String userAgent = getUserAgent().toLowerCase();
-        if ( userAgent.startsWith("msie") || userAgent.startsWith("msie") ) {
-                showBrowserWarning();                
+
+        String userAgent = UtilsJS.getUserAgent().toLowerCase();
+        /** Considering http://msdn.microsoft.com/en-us/library/ms537503.aspx
+         * E.g. Windows-RSS-Platform/1.0 (MSIE 7.0; Windows NT 5.1) 
+         */
+        String msg = "userAgent: [" + userAgent + "]";
+        GenClient.showDebug(msg);        
+        if (userAgent.contains("msie") ) {
+            showBrowserWarning();
         }
+
     }
 
-    public static native String getUserAgent() /*-{
-    return navigator.userAgent.toLowerCase();
-    }-*/;
-    
     private void showFooter() {
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
                 + "CING  " + c.version() + " 0.8 (iCing v." + Settings.VERSION + ")\t" + GenClient.eol
@@ -250,13 +253,14 @@ public class iCing implements EntryPoint, HistoryListener {
 
     public void showBrowserWarning() {
         About h = new About();
-        String browserId = "BrowserWithCompatibilityIssues";
-        String msg = c.warningBrowser() + "[" + browserId + "]" + "<BR>" + c.PleaseUse();
-        h.setHTML(msg); // TODO: seems without effect.
+        String userAgent = UtilsJS.getUserAgent().toLowerCase();        
+        String msg = c.warningBrowser() + "[" + userAgent + "]" + "<BR>" + c.PleaseUse();
+        GenClient.showError(msg);
+        h.setHTML(msg);
         h.details.setHTML(h.details.getHTML() + "<BR>" + c.for_help());
         h.show();
     }
-    
+
     public void clearAllViews() {
         // GenClient.showDebug("Now in clearAllViews");
         for (iCingView v : views) {
