@@ -229,16 +229,16 @@ Project: Top level Cing project class
         """
 
         validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-        NTdebug("Using system validation configuration file: " + validationConfigurationFile)
+#        NTdebug("Using system validation configuration file: " + validationConfigurationFile)
         self._readValidationSettingsFromfile(validationConfigurationFile)
         validationConfigurationFile = None
 
         if fn:
             validationConfigurationFile = fn
-            NTdebug("Using validation configuration file: " + validationConfigurationFile)
+#            NTdebug("Using validation configuration file: " + validationConfigurationFile)
         elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
             validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-            NTdebug("Using local validation configuration file: " + validationConfigurationFile)
+#            NTdebug("Using local validation configuration file: " + validationConfigurationFile)
         if validationConfigurationFile:
             self._readValidationSettingsFromfile(validationConfigurationFile)
 
@@ -254,7 +254,7 @@ Project: Top level Cing project class
             NTcodeerror("Input file does not exist at: " + fn)
             return True
 
-        NTdebug("Reading validation file: " + fn)
+#        NTdebug("Reading validation file: " + fn)
         config = ConfigParser()
         config.readfp(open(fn))
         for item in config.items('DEFAULT'):

@@ -1,13 +1,17 @@
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityError
+from cing.Libs.NTutils import NTdebug
+from cing.core.classes import Project
 from cing.core.molecule import Chain
 from cing.core.molecule import Coordinate
+from cing.core.molecule import Molecule
 from cing.core.molecule import NTangleOpt
 from cing.core.molecule import NTdihedralOpt
 from cing.core.molecule import NTdistanceOpt
-from unittest import TestCase
 from cing.core.molecule import ensureValidChainId
-from cing import verbosityDebug
+from cing.main import format
+from unittest import TestCase
 import cing
 import os
 import unittest #@UnusedImport Too difficult for code analyzer.
@@ -32,14 +36,31 @@ class AllChecks(TestCase):
 
     def test_EnsureValidChainId(self):
         self.assertEquals( ensureValidChainId('A'), 'A')
+        self.assertEquals( ensureValidChainId('a'), 'a')
         self.assertEquals( ensureValidChainId('ABCD'), 'A')
         self.assertEquals( ensureValidChainId('BCDE'), 'B')
-        self.assertEquals( ensureValidChainId('1'), Chain.defaultChainId)
+        self.assertEquals( ensureValidChainId('1'), '1')
         self.assertEquals( ensureValidChainId('$'), Chain.defaultChainId)
         self.assertEquals( ensureValidChainId('-'), Chain.defaultChainId)
         self.assertEquals( ensureValidChainId('A'), Chain.defaultChainId) # They are the same.
         self.assertEquals( ensureValidChainId(None), Chain.defaultChainId)
 
+    def test_GetNextAvailableChainId(self):
+        entryId = 'test'
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status='new')
+        molecule = Molecule(name='moleculeName')
+        project.appendMolecule(molecule) # Needed for html.
+        chainId = molecule.getNextAvailableChainId()
+        self.assertEquals( chainId, Chain.defaultChainId)
+        n = 26 * 2 + 10 + 1 # alpha numeric including an extra and lower cased.
+        for _c in range(n):
+            chainId = molecule.getNextAvailableChainId()
+            self.assertTrue( molecule.addChain(chainId))
+        NTdebug("Added %d chains to: %s" % (n, format(molecule)))
+        self.assertEqual( len(molecule.allChains()), n)
+        
 if __name__ == "__main__":
     fn = 'fooprof'
     os.chdir(cingDirTmp)

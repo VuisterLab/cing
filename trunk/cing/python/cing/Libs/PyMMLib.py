@@ -1,9 +1,10 @@
 ## Copyright 2002 by PyMMLib Development Group (see AUTHORS file)
-## This code is part of the PyMMLib distrobution and governed by
+## This code is part of the PyMMLib distribution and governed by
 ## its license.  Please see the LICENSE file that should have been
 ## included as part of this package.
+
 ## Adjusted by gv for specific purpose of NTmol
-#from cing.Libs.NTutils import NTdebug
+
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTmessage
@@ -21,11 +22,10 @@ and written back out as PDB files.
 """
 #from __future__ import generators
 
-
-try:
-    from mmTypes import *
-except ImportError:
-    OpenFile = open
+#try:
+#    from mmTypes import *
+#except ImportError:
+OpenFile = open
 
 
 class PDBError(Exception):
@@ -1553,6 +1553,8 @@ class PDBFile(list):
             try:
                 pdb_record_class = PDBRecordMap[rname]
             except KeyError:
+                if rname == 'FTNOTE':
+                    continue
                 NTmessage("PDB parser: unknown record type: %s"%(rname))
                 continue
 

@@ -21,6 +21,7 @@ or similar. The minus of -15 is necessary because it needs to signal it's childr
 Execute like:
 
 python -u $CINGROOT/python/cing/NRG/nrgCing.py
+
 """
 from cing import cingPythonCingDir
 from cing import cingRoot
@@ -715,7 +716,7 @@ class nrgCing(Lister):
                     
         ## Make the individual and overall web pages including
         ## new versions of the scripts used.    
-#        m.do_analyses_loop(processes_max=processors)
+        m.do_analyses_loop(processes_max=processors)
     
         if not m.update_index_files():
             NTerror("can't update index files")    
@@ -725,7 +726,7 @@ if __name__ == '__main__':
 
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
-    processors = 1    # was 1 may be set to a 100 when just running through to regenerate pickle                                       
+    processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle                                       
     writeWhyNot = True
     updateIndices = True
     isProduction = False

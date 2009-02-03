@@ -26,8 +26,8 @@ doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
                     processes_max=2,
-                    delay_between_submitting_jobs=15,
+                    delay_between_submitting_jobs=15, # why is this so long? because of time outs at tang?
                     max_time_to_wait=1200, # 1y4o took more than 600. This is one of the optional arguments.
                     START_ENTRY_ID=0,
-                    MAX_ENTRIES_TODO=200,
+                    MAX_ENTRIES_TODO=1,
                     extraArgList=extraArgList)

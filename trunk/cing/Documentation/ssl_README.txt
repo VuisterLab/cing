@@ -92,8 +92,8 @@ SSLCertificateKeyFile "/private/etc/apache2/mini.key"
  SSLEngine on
 #       SSLProxyEngine on
   <Location />
-         ProxyPass http://mini.cmbi.umcn.nl/
-         ProxyPassReverse http://mini.cmbi.umcn.nl/
+         ProxyPass http://nmr.cmbi.umcn.nl/
+         ProxyPassReverse http://nmr.cmbi.umcn.nl/
   </Location>
 
   ErrorLog /var/log/httpd/nmr.cmbi.ru.nl_sec-error_log

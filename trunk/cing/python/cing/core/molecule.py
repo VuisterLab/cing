@@ -1,3 +1,4 @@
+from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTcodeerror
@@ -11,6 +12,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
@@ -40,18 +42,16 @@ from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
 from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
+from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from cing.core.database import translateResidueName
 from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
-from cing.Libs.NTutils import NTwarning
-from cing.core.database import AtomDef
 import math
 import os
 import sys
-#from cing.core.sml import SMLhandler
 
 
 
@@ -73,6 +73,7 @@ NTmolParameters = NTdict(
 )
 
 dots = '-----------'
+
 #==============================================================================
 class Molecule( NTtree ):
     """
@@ -115,6 +116,7 @@ class Molecule( NTtree ):
         resonanceCount          : Number of Resonance Instances per atom
         modelCount              : Number of Coordinate instances per atom
   """
+
 
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
@@ -204,6 +206,55 @@ class Molecule( NTtree ):
 
     def getChainIdForChainCount(self):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
+
+    
+    def ensureValidChainIdForThisMolecule(self, chainId ):
+        """
+        In CING all chains must have one non-space character (chain id) because:
+    
+        - More than 1 characters would not fit in PDB column 22. Note that
+        some programs read the chain id from PDB columns [73-76> but others
+        programs (e.g. SHIFTX, ???) used by CING do not.
+        In the future, the CING code could be extended to interface
+        to these programs but for now CING uses the lowest common denominator.
+        - No space allowed because it does not materialize to a nice file name,
+        one that can be used without quotes. If the value is a space it is hard to
+        pass this to some programs; such as SHIFTX. A space would also be
+        making it impossible to CING to use e.g.:
+        print project.molecule.A.GLU77.procheck.CHI1[0]
+        where A stands for chain id A.
+        - The letters A-Z are often used already which will cause name space
+        collisions. It is important to choose an id that will most likely not be
+        used in the above formats.
+    
+        The chain id is ALWAYS given in PDB and XPLOR coordinate files.
+        It might be a space character but it's always implicitly present. If it's a
+        space character, CING will translate it to the next still available chain id 
+        value. It's up to the caller to remember the mapping then!
+    
+        Bottom line: use a chain id character on input!
+        """
+        if isValidChainId( chainId ):
+            return chainId
+
+        if len(chainId) > 1:
+            chainId = chainId[0]
+
+        if isValidChainId( chainId ):
+            return chainId
+
+        return self.getNextAvailableChainId()
+    
+    
+    def getNextAvailableChainId(self ):
+        for chainId in Chain.DEFAULT_ChainNamesByAlphabet:
+            if not( self.has_key(chainId)):
+                return chainId
+        issueId = 130
+        msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
+            len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
+        msg += issueListUrl+`issueId`
+        NTcodeerror(msg)
 
     def keepSelectedModels(self, modelListStr):
 
@@ -347,24 +398,25 @@ class Molecule( NTtree ):
         an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 #        if (not an or (an not in res)): return None
         if not an:
-#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
             return None
 
         if not res.has_key(an):
-#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
             return None
 
         atm = res[an]
-        if resonanceIndex == None and model == None:
+        # JFD modifies to include brackets. Otherwise the 'and' operator has a higher precedence than '==' etc, 
+        if (resonanceIndex == None) and (model == None):
             self._nameTupleDict[nameTuple] = atm
             return atm
 
-        if model != None and resonanceIndex == None and model<len(atm.coordinates):
+        if (model != None) and (resonanceIndex == None) and (model<len(atm.coordinates)):
             c = atm.coordinates[model]
             self._nameTupleDict[nameTuple] = c
             return c
 
-        if model == None and resonanceIndex != None and resonanceIndex<len(atm.resonances):
+        if (model == None) and (resonanceIndex != None) and (resonanceIndex<len(atm.resonances)):
             r = atm.resonances[resonanceIndex]
             self._nameTupleDict[nameTuple] = r
             return r
@@ -1063,13 +1115,53 @@ class Molecule( NTtree ):
                         cyssDict2Pair[c1] = pair
                         cyssDict2Pair[c2] = pair
         if pairList:
-            NTmessage( '==> Molecule %s: Potential disulfide bridged residues:' , self.name)
+            NTmessage( '==> Molecule %s: Potential disulfide bridges: %d' %( self.name, len(pairList)))
             for pair in pairList:
-                NTmessage( '%s %s' % (pair[0], pair[1] ))
+                NTdebug( '%s %s' % (pair[0], pair[1] ))
         else:
             NTdetail( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
     # end def
 
+    def syncModels(self ):
+        """E.g. entry 1brv has more atoms in the second than in the first model. CING will not include those extra 
+        atoms
+        """
+        atomListToSyncToSink = []
+        n = self.modelCount
+        for atom in self.allAtoms():
+            if atom.isPseudoAtom():
+                continue
+            actualCoordinateListLength = len(atom.coordinates)
+            # The pseudos above handled and the atoms for which normally there are no coordinates
+            # will be saved. 
+            if (actualCoordinateListLength == 0) or (actualCoordinateListLength == n):
+                continue
+            atomListToSyncToSink.append(atom)
+                
+        if not atomListToSyncToSink:
+            return
+        
+        unmatchedAtomByResDict = {}
+        for atom in atomListToSyncToSink:
+            res = atom._parent
+            if not res.deleteAtom(atom.name):
+                NTcodeerror("Failed to delete atom %s from residue %s" % ( atom, res ))
+            # JFD: Report all together now.
+            if not unmatchedAtomByResDict.has_key(res.resName):
+                unmatchedAtomByResDict[ res.resName ] = ([],[])
+            atmList = unmatchedAtomByResDict[res.resName][0]
+            resNumList = unmatchedAtomByResDict[res.resName][1]
+            if atom.name not in atmList:
+                atmList.append(atom.name)
+            if res.resNum not in resNumList:
+                resNumList.append(res.resNum)
+                                            
+        if unmatchedAtomByResDict:
+            msg = "Molecule#syncModels Removed atoms that differ over the different models:\n"
+            msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
+            NTwarning(msg)             
+            
+                
     def updateAll( self)   :
         """Calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
@@ -1078,6 +1170,7 @@ class Molecule( NTtree ):
            Calculate the rmsd's
         """
         if self.modelCount > 0:
+            self.syncModels()
             self.updateDihedrals()
             self.updateMean()
             self.ensemble = Ensemble( self )
@@ -1132,7 +1225,7 @@ Return an Molecule instance or None on error
                 chainId = Chain.defaultChainId # recommended to use your own instead of CING making one up.
                 if f.NF >= 3:
                     chainId = f.dollar[3]
-                chainId = ensureValidChainId( chainId )
+                chainId = molecule.ensureValidChainId( chainId )
 
                 molecule._addResidue( chainId, resName, resNum, convention )
         NTmessage("%s", molecule.format())
@@ -1267,7 +1360,7 @@ Return an Molecule instance or None on error
     def calculateRMSDs( self, ranges=None, models = None   ):
         """
         Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
-        Optionally  select for rnages and models.
+        Optionally  select for ranges and models.
         return rmsd result of molecule, or None on error
         """
 
@@ -1315,7 +1408,13 @@ Return an Molecule instance or None on error
                                                             # since we may supply an external list
                     Vbb = []
                     for atm in res.rmsd.bbtemp:
-                        Vbb.append(atm.coordinates[model].e)
+                        # JFD: when there are 2 models of 1brv and VAL H1 is only present in the second model
+                        # the len is 1 and model will become 1.
+                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#deleteAtom.
+                            Vbb.append(atm.coordinates[model].e)
+                        else:
+                            Vbb.append(atm.coordinates[0].e)
+                            NTcodeerror("TODO: fix Residue#deleteAtom.")
                     #end for
                     res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
 
@@ -1333,7 +1432,11 @@ Return an Molecule instance or None on error
                                                             # since we may supply an external list
                     Vhv = []
                     for atm in res.rmsd.hvtemp:
-                        Vhv.append(atm.coordinates[model].e)
+                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#deleteAtom.
+                            Vhv.append(atm.coordinates[model].e)
+                        else:
+                            Vhv.append(atm.coordinates[0].e)
+                            NTcodeerror("TODO: fix Residue#deleteAtom.")
                     #end for
                     res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
 
@@ -1746,60 +1849,9 @@ class RmsdResult( NTdict ):
 #
 
 
-def isValidChainId( chainId ):
-    """TODO: test routine; See doc for next method: ensureValidChainId.
-    For use by ccpn importer; call this routine to see if chain id is valid
-    otherwise call ensureValidChainId to make it a valid one.
-    """
-    if chainId==None:
-        return False
-    if len(chainId) != 1:
-        return False
-    if chainId.islower():
-        return False
-    if not (chainId in Chain.validChainIdListBesidesTheAlphabet):
-        return False
-    return True
+    
 
-
-def ensureValidChainId( chainId ):
-    """
-    In CING all chains must have one non-space character (chain id) because:
-
-    - More than 1 characters would not fit in PDB column 22. Note that
-    some programs read the chain id from PDB columns [73-76> but others
-    programs (e.g. SHIFTX, ???) used by CING do not.
-    In the future, the CING code could be extended to interface
-    to these programs but for now CING uses the lowest common denominator.
-    - No space allowed because it does not materialize to a nice file name,
-    one that can be used without quotes. If the value is a space it is hard to
-    pass this to some programs; such as SHIFTX. A space would also be
-    making it impossible to CING to use e.g.:
-    print project.molecule.A.GLU77.procheck.CHI1[0]
-    where A stands for chain id A.
-    - The letters A-Z are often used already which will cause name space
-    collisions. It is important to choose an id that will most likely not be
-    used in the above formats.
-
-    The chain id is ALWAYS given in PDB and XPLOR coordinate files.
-    It might be a space character but it's always implicitly present. If it's a
-    space character, CING will translate it to the defaultChainId value.
-
-    Bottom line: use a chain id character on input!
-    """
-    if chainId==None:
-        return Chain.defaultChainId
-    if chainId=='':
-        return Chain.defaultChainId
-    if len(chainId) > 1:
-        chainId = chainId[0]
-    chainId = chainId.upper()
-    charOrd = ord(chainId)
-    if charOrd >= ord('A') and charOrd <= ord('Z'):
-        return chainId
-    if chainId in Chain.validChainIdListBesidesTheAlphabet:
-        return chainId
-    return Chain.defaultChainId
+    
 
 class Chain( NTtree ):
     """
@@ -1835,8 +1887,8 @@ Chain class: defines chain properties and methods
     all dict methods
     """
 
-    DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#^_'
-    validChainIdListBesidesTheAlphabet = '^_' # last 3 chars of above.; JFD removed pound because has a special meaning in STAR files.
+    DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ^01234567890abcdefghijklmnopqrstuvwxyz'
+#    validChainIdListBesidesTheAlphabet = '^' # last 1 chars of above.; JFD removed pound and underscore because they have a special meaning in STAR files.
     'Nothing that is a special character in Python, or tcsh.'
     defaultChainId = 'A'
     'See documentation: molecule#ensureValidChainId'
@@ -2069,20 +2121,23 @@ Residue class: Defines residue properties
         return result
 
     def _nameResidue( self, resName, resNum, convention = INTERNAL ):
-        """Internal routine to set all the naming right and database refs right
+        """Internal routine to set all the naming right and database references right
         """
         # find the database entry in NTdb (which is of type MolDef)
         db = NTdb.getResidueDefByName( resName, convention )
         if not db:
-            NTwarning('Residue._nameResidue: residue "%s" not defined in database. Adding freestyle one now.', resName)
-            self.db = NTdb.appendResidueDef( name=resName, shortName = '_' ) # JFD adds
+            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding freestyle one now.' %( resName, convention))
+            self.db = NTdb.appendResidueDef( name=resName, shortName = '_' )
+            x = NTdb.getResidueDefByName( resName, convention )
+            if not x:
+                NTcodeerror("Added residue but failed to find it again")
         #end if
         self.resNum   = resNum
         if not db:
             self.name      = resName + str(resNum)
             self.resName   = resName
             self.shortName = '_' + str(resNum)
-            self.db        = None
+#            self.db        = None # JFD adds: It's erased again? Must be a bug. 
         else:
             self.db        = db
             self.name      = db.translate(INTERNAL) + str(resNum)
@@ -2175,7 +2230,8 @@ Residue class: Defines residue properties
             if (atmDef.name in self):
                 atm = self.removeChild( self[atmDef.name] )
                 for alias in atm.db.aliases:
-                    if alias in self: del(self[alias])
+                    if alias in self: 
+                        del(self[alias])
                 #end for
                 self.atomCount -= 1
                 atm.residue = newRes
@@ -2196,6 +2252,19 @@ Residue class: Defines residue properties
         return self,newRes
     #end def
 
+    def deleteAtom(self, name ):
+        """JFD adds: GV please check 
+        Return True on success.
+        """
+        atm = self.getAtom(name)
+        if atm.db:
+            for alias in atm.db.aliases:
+                if alias in self: 
+                    del(self[alias])
+        self.removeChild( name )
+        self.atomCount -= 1             
+        return True
+        
     def addAtom( self, name, convention=INTERNAL, **kwds ):
         """add atomName to self as well as potential alias references
            return Atom instance
@@ -2595,7 +2664,7 @@ Atom class: Defines object for storing atom properties
             self.db = db
         else:
 #            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-            NTwarning('Atom.__init__: (%s,%s) not valid for convention "%s". Creating freestyle definition.',
+            NTwarning('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating freestyle definition.',
                        resName, atomName, convention
                       )
             self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.
@@ -3795,3 +3864,68 @@ def disulfideScore( cys1, cys2 ):
 
     score[3] = score.sum() / (3. * mc)
     return score
+
+
+def isValidChainId( chainId ):
+    """For use by ccpn importer; call this routine to see if chain id is valid
+    otherwise call ensureValidChainId to make it a valid one.
+    """
+    if chainId==None:
+        return False
+    if len(chainId) != 1:
+        return False
+#    if chainId.islower(): # given up as per issue 130.
+#        return False
+    return chainId in Chain.DEFAULT_ChainNamesByAlphabet
+#        return False
+#    return True
+
+def ensureValidChainId(chainId ):
+    """See doc Molecule#ensureValidChainIdForThisMolecule
+    In absence of an existing molecule this routine can only return the default chain id
+    if the presented id is not valid.
+    """
+    
+    if isValidChainId( chainId ):
+        return chainId
+    if chainId and len(chainId) > 1:
+        chainId = chainId[0]
+    if isValidChainId( chainId ):
+        return chainId
+    return Chain.defaultChainId
+
+
+
+def getNextAvailableChainId(chainIdListAlreadyUsed = []):
+#    NTdebug("chainIdListAlreadyUsed: %s" % chainIdListAlreadyUsed)
+    for chainId in Chain.DEFAULT_ChainNamesByAlphabet:
+        if not( chainId in chainIdListAlreadyUsed ):
+            return chainId
+    issueId = 130
+    msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
+        len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
+    msg += issueListUrl+`issueId`
+    NTcodeerror(msg)
+
+
+def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
+    msg = ''
+    resNameList = unmatchedAtomByResDict.keys()
+    resNameList.sort()
+    for resName in resNameList:
+        atmNameList = unmatchedAtomByResDict[ resName ][0]
+        resNumbList = unmatchedAtomByResDict[ resName ][1]
+        atmNameList.sort()
+        resNumbList.sort()
+        msg += "%-4s: " % resName
+        for atmName in atmNameList:
+            msg += "%-4s " % atmName
+        msg += '['
+        for resNumb in resNumbList:
+            msg += " %d" % resNumb
+        msg += ']'
+        if resName != resNameList[-1]:
+            msg += '\n'
+    return msg
+
+
