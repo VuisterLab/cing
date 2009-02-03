@@ -9,6 +9,7 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTcodeerror
 
 import os
 import sys
@@ -149,6 +150,7 @@ class MolDef( NTtree ):
         res = ResidueDef( name, shortName, **kwds )
         self._addChild( res )
         res.molDef = self
+        res.postProcess()
         return res
     #end def
 
@@ -250,7 +252,7 @@ class MolDef( NTtree ):
            or None otherwise
         """
         if not resName:
-            NTdebug('MolDef.getAtomDefByName: undefined residue name')
+#            NTdebug('MolDef.getAtomDefByName: undefined residue name')
             return None
         #end if
         if not atmName:
@@ -324,8 +326,8 @@ class ResidueDef( NTtree ):
                            name        = name,
                            shortName   = shortName,
                            comment     = None,
-                           nameDict    = {},
-                           atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialisation
+                           nameDict    = {INTERNAL:name},
+                           atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = [] # list of properties for residue
                        )
@@ -338,6 +340,7 @@ class ResidueDef( NTtree ):
                           'atoms:      %(atoms)s\n' +\
                           'dihedrals:  %(dihedrals)s\n' +\
                           'properties: %(properties)s'
+#        NTdebug("XXXXXXXX Adding %r" % self)
 
         #NB atoms is a derived attribute (from _children), no need to save it explicitly
     #end def
@@ -350,7 +353,15 @@ class ResidueDef( NTtree ):
         atm = AtomDef( name, **kwds )
         self._addChild( atm )
         atm.residueDef = self
+        atm.postProcess()        
         return atm
+    #end def
+
+    def appendAtomListDef( self, nameList=[], **kwds ):
+        """Not used yet; to be used in CCPN reader..."""
+        for atomName in nameList:
+            atm = self.appendAtomDef(atomName,**kwds)
+            NTdebug("Added to residue: %s atom %s" % (self, atm))
     #end def
 
     def appendDihedral( self, name, **kwds ):
@@ -447,15 +458,19 @@ class ResidueDef( NTtree ):
 
     def getAtomDefByName( self, atmName, convention = INTERNAL ):
         """return AtomDef instance for atmName if atmName is a valid for convention
-           or None otherwise
+           or None otherwise.
+           
+           Do NOT print an error here because for optimal use the code is called
+           many times in cases where no defs are available; e.g.
+           pdbParser#_matchAtom2Cing
         """
         if not atmName:
-            NTdebug('ResidueDef.getAtomDefByName: atmName not defined')
+            NTcodeerror('ResidueDef.getAtomDefByName: atmName not defined')
             return None
         #end if
 
         if not self.atomDict.has_key(convention):
-            NTerror('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
+#            NTdebug('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
         #end if
 
@@ -649,7 +664,7 @@ class AtomDef( NTtree ):
                            __CLASS__   = 'AtomDef' ,
                            convention  = INTERNAL,
                            name        = name,     # Internal name
-                           nameDict    = {},
+                           nameDict    = {INTERNAL:name},
                            aliases     = [],       # list of aliases
 
                            residueDef  = None,     # ResidueDef instance
@@ -681,6 +696,7 @@ class AtomDef( NTtree ):
 #                     'topology','pseudo','real',
 #                     'type','spinType','shift', 'hetatm','properties'
 #                    )
+#        NTdebug("XXXXXXXX Adding %r" % self)
 
     def __str__(self):
         if self.residueDef:

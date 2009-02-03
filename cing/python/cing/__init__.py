@@ -44,6 +44,8 @@ __credits__    = """More info at http://proteins.dyndns.org/CING
 
 """ + __copyright__ # misusing credits for pydoc
 
+issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
+
 # Verbosity settings: How much text is printed to stdout/stderr streams
 # Reference to it as cing.verbosity if you want to see non-default behavior
 verbosityNothing  = 0 # Even errors will be suppressed

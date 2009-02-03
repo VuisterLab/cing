@@ -25,114 +25,40 @@ Methods:
     Project.export2PDB( pdbFile ):
         export to pdbFile
 
+Speed check: 103.609s for pdbParser.importCoordinates: <Molecule "pdb2k0e" (C:1,R:152,A:2647,M:160)>
 """
 from cing.Libs import PyMMLib
+from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
-from cing.core.constants import CYANA2
 from cing.core.constants import CYANA_NON_RESIDUES
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
 from cing.core.database import NTdb
-from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
-from cing.core.molecule import ensureValidChainId
+from cing.core.molecule import getNextAvailableChainId
+from cing.core.molecule import isValidChainId
+from cing.core.molecule import unmatchedAtomByResDictToString
 import os
 
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None)   :
+def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None, allowNonStandardResidue=True)   :
     """Import coordinates from pdbFile (optionally: first nmodels)
-       convention eq PDB, CYANA, CYANA2, XPLOR, IUPAC
+       convention e.g. PDB, CYANA, CYANA2, XPLOR, IUPAC
 
        return molecule or None on error
     """
-    if not molecule: return None
+    if not molecule: 
+        return None
 
-#    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
-#    if not os.path.exists(pdbFile):
-#        NTerror('importFromPDB: missing PDB-file "%s"', pdbFile)
-#
-#    pdb = PyMMLib.PDBFile( pdbFile)
-#
-##    atomDict = molecule._getAtomDict(convention)
-#
-#    foundModel = False
-#    modelCount = 0
-#    for record in pdb:
-#        recordName = record._name.strip()
-#        if  recordName == 'REMARK':
-#            continue
-#        if recordName == "MODEL":
-#            foundModel = True
-#            continue
-#        if recordName == "ENDMDL":
-#            modelCount += 1
-#            if nmodels and modelCount >= nmodels:
-#                break
-#            continue
-#        if recordName == "ATOM" or recordName == "HETATM":
-#            # see if we can find a definition for this residue, atom name in the database
-#            if convention == CYANA:
-#                # the residue names are in Cyana1.x convention (i.e. for GLU-)
-#                # atm names of the Cyana1.x PDB files are in messed-up Cyana format
-#                atmName = record.name[1:4] + record.name[0:1]
-#            elif convention == CYANA2:
-#                # the residue names are in Cyana2.x convention (i.e. for GLU)
-#                # atm names of the Cyana2.x PDB files are in messed-up Cyana format
-#                atmName = record.name[1:4] + record.name[0:1]
-#            else:
-#                atmName = record.name
-#            # Not all PDB files have chainID's !@%^&*
-#            # Actually, they do. It might be an space character though.
-#            # It's important to save it as is otherwise the residue number
-#            # is no longer a unique key within the chain. E.g. HOH in 1n62
-#            # has a space character for the chain id and similar residue
-#            # numbering as the protein sequence in chain A.
-#            chainId = Chain.defaultChainId
-#            if record.has_key('chainID'):
-#                chainId = record.chainID.strip()
-#                chainId = ensureValidChainId(chainId)
-##                print '>chain>', '>'+chainId+'<', len(chainId)
-#            #end if
-#            resID = record.resSeq
-##            if chainId == Chain.defaultChainId:
-##                # use the atomDict
-##                t = (resID, atmName)
-##                if atomDict.has_key(t):
-##                    atom = atomDict[t]
-##                else:
-##                    atom = None
-##            else:
-#            atom  = molecule.decodeNameTuple( (convention, chainId, resID, atmName) )
-#
-#            if not atom:
-#                NTerror('cing.PluginCode.pdb#importFromPDB: %s, model %d incompatible record (%s)',
-#                         convention, modelCount, record )
-#                #print '>>', convention, cname, resID, atmName
-#                continue
-#            atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
-#        #end if
-#    #end for
-#
-#    # Patch to get modelCount right for X-ray or XPLOR structures with only one model
-#    if not foundModel:
-#        modelCount += 1
-#
-#    molecule.modelCount += modelCount
-#
-#    NTdetail( 'importFromPDB: read %d records; added %d structure models', len(pdb), modelCount )
-#    #end if
-#
-#    del( pdb )
     parser = pdbParser( pdbFile, convention=convention )
     if not parser:
         return None
@@ -143,19 +69,26 @@ def importFromPDB( molecule, pdbFile, convention=IUPAC, nmodels=None)   :
 # Add as a method to Molecule class
 Molecule.importFromPDB = importFromPDB
 
+
+
 class pdbParser:
     """
     Class to parse the pdb file and import into molecule instance
-    Should handle all nitty/gritty details such as HIS/ARG/LYS/GLU/ASP/(R)Ade/(R)Cyt/(R)Gua and Cyana1.x related issues
+    Should handle all nitty gritty (sorry for the discriminatory derogative) details such as 
+    HIS/ARG/LYS/GLU/ASP/(R)Ade/(R)Cyt/(R)Gua and Cyana1.x related issues
 
     Steps:
     - Parse the pdbFile into records using PyMMlib.
     - Assemble a tree from chn's,res's,atm's, map records back to atm entries (_records2tree).
-    - Map res's and atm's to CING db. Convert the idiocraties in the process. (_matchResidue2Cing and _matchAtom2Cing)
+    - Map res's and atm's to CING db. Convert the idiocracies in the process. (_matchResidue2Cing and _matchAtom2Cing)
     - Optionally: generate a molecule from chn,res's
     - Map atm's to atoms of molecule.
     - Import the coordinates.
 
+    The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
+    a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
+    See the image at: http://code.google.com/p/cing/issues/detail?id=126#c4
+    
                              atom<->residue->chain<->molecule<-self
                               |
     self->tree<->chn<->res<->atm<-record<-self
@@ -163,7 +96,14 @@ class pdbParser:
                ResidueDef<->AtomDef
 
     """
-    def __init__(self, pdbFile, convention=IUPAC, patchAtomNames = False, skipWaters=False ):
+    def __init__(self, pdbFile, convention=IUPAC, patchAtomNames = True, skipWaters=False, allowNonStandardResidue=True ):
+
+        self.pdbFile = pdbFile
+        self.convention = convention
+        self.patchAtomNames = patchAtomNames
+        self.skipWaters = skipWaters
+        self.allowNonStandardResidue = allowNonStandardResidue
+        
         if not os.path.exists(pdbFile):
             NTerror('pdbParser: missing PDB-file "%s"', pdbFile)
             return None
@@ -175,10 +115,6 @@ class pdbParser:
             NTerror('pdbParser: parsing PDB-file "%s"', pdbFile)
             return None
         #end if
-        self.pdbFile = pdbFile
-        self.convention = convention
-        self.patchAtomNames = patchAtomNames
-        self.skipWaters = skipWaters
 
         # parsing storage
         self._records2tree()
@@ -187,8 +123,9 @@ class pdbParser:
     #end def
 
     def _records2tree(self):
-        """Convert the pdbRecords in a tree-structure.
+        """Convert the pdbRecords in a tree-structure. Really a HoHoH; Hash of...
         """
+#        NTdebug("Now in _records2tree")
         self.tree = NTtree('tree') # Tree like structure of pdbFile
         chn  = None
         res  = None
@@ -196,6 +133,9 @@ class pdbParser:
         self.modelCount = 0
         atomDict  = {}
 
+        mapChainId = {} # Keep track of mappings between input and CING when they're not the same.
+        chainIdListAlreadyUsed = [] # simpler list.
+        
         atmCount = 0
         foundModel = False
         for record in self.pdbRecords:
@@ -210,12 +150,20 @@ class pdbParser:
 
                 # Not all PDB files have chainID's !@%^&*
                 # They do; if none returned then take the space that is always present!
-                chainId = Chain.defaultChainId
+                # JFD adds: take a look at 1ai0 
+                #    It features chain ids A thru F but also several residues with a ' ' for the chain id.
+                #    Luckily the residues all have non-overlapping numbers. So let's program against 
+                #    this study case. Might have to be optimized.
+                chainId = ' '
                 if record.has_key('chainID'):
-                    chainId = record.chainID.strip()
-                    chainId = ensureValidChainId(chainId)
-                #end if
-
+                    chainId = record.chainID
+                if mapChainId.has_key(chainId):
+                    chainId = mapChainId[chainId]
+                if not isValidChainId( chainId ):                    
+                    chainIdNew = getNextAvailableChainId( chainIdListAlreadyUsed = chainIdListAlreadyUsed )
+                    mapChainId[chainId] = chainIdNew
+                    chainId = chainIdNew
+                    
                 resName  = record.resName.strip()
                 resNum   = record.resSeq
                 fullResName = resName+str(resNum)
@@ -230,6 +178,10 @@ class pdbParser:
 
                     if not self.tree.has_key(chainId):
                         chn = self.tree.addChild(name=chainId)
+                        if chainId in chainIdListAlreadyUsed:
+                            NTcodeerror("list out of sync in _records2tree")
+                        else:
+                            chainIdListAlreadyUsed.append( chainId ) # simpler object for getNextAvailableChainId
                     else:
                         chn = self.tree[chainId]
                     #end if
@@ -258,7 +210,7 @@ class pdbParser:
                         continue
                     #end if
                     atomDict[t] = atm
-                    #print chn, res,atm
+#                    print chn, res,atm
                 #end if
 
                 # Make a reference to the tree
@@ -281,6 +233,9 @@ class pdbParser:
         Return NTdb resDef object None on Error
 
         """
+        
+#        NTdebug("Now in _matchResidue2Cing: %s" % res)
+        
         res.db = None
         res.skip = False
 
@@ -341,6 +296,30 @@ class pdbParser:
         else:
             res.db = NTdb.getResidueDefByName( res.resName, convention = self.convention )
         #end if
+        
+        # Only continue the search if not found and non-standard residues are allowed.
+        if res.db:
+            return res.db
+        
+        if not self.allowNonStandardResidue:
+            res.skip = True         
+            return res.db            
+
+        # Try to match the residue using INTERNAL convention.
+        res.db = NTdb.getResidueDefByName( res.resName )
+        if res.db:
+            return res.db
+                       
+#        insert new residue.
+        res.db = NTdb.appendResidueDef( name=res.resName, shortName = '_' )
+        if not res.db:
+            NTcodeerror("Adding a non-standard residue should have been possible.")
+            return None
+        # Just a check, disable for speed.
+        _x = NTdb.getResidueDefByName( res.resName )
+        if not _x:
+            NTcodeerror("Added residue but failed to find it again in pdbParser#_matchResidue2Cing")
+            
         return res.db
     #end def
 
@@ -349,11 +328,15 @@ class pdbParser:
         Match atm.name to CING database using previously defined convention;
         Account for 'ill-defined' atoms, such as CYANA definitions in PDB file
 
-        If self.patchAtomNames=True (defined on __init__), several patches are tried (NOT advised to use).
+        If self.patchAtomNames=True (defined on __init__), several patches are tried (NOT advised to use by GV but
+        recommended by JD).
 
         Return NTdb AtomDef object or None on Error
 
         """
+        
+#        NTdebug("Now in _matchAtom2Cing: %s" % atm)
+        
         if not atm:
             NTerror('pdbParser._matchAtom: undefined atom')
             return None
@@ -365,73 +348,113 @@ class pdbParser:
 
         if not res:
             NTerror('pdbParser._matchAtom: undefined parent residue, atom %s, convention %s, not matched',
-                    atm.name, self.convention
-                   )
+                    atm.name, self.convention)
             return None
         #end if
         #print '>',atm,res
 
         if res.skip:
             atm.skip = True
-            return atm
+            return None # JFD: this is not an error but contract of method signature requests an AtomDef object
+        # which can not be created here.
         #end if
 
         if not res.db:
+            NTerror('_matchAtom2Cing: undefined parent residue DB'),
             return None
         #end if
 
         # Now try to match the name of the atom
-        if self.convention == CYANA or self.convention == CYANA2:
+#        if self.convention == CYANA or self.convention == CYANA2:
             # the residue names are in Cyana1.x convention (i.e. for GLU-)
             # atm names of the Cyana1.x PDB files are in messed-up Cyana format
             # So: 1HD2 becomes HD21 where needed:
-            aName = moveFirstDigitToEnd(atm.name)
-        else:
-            aName = atm.name
+            # JFD adds: Not just in CYANA
+        # JFD adds: new rule; CING always reworks atom names that start with a digit.
+        aName = moveFirstDigitToEnd(atm.name)
+#        else:
+#            aName = atm.name
         #end if
 
         # For the atom name conversion step, we use the res.db object. This points to the proper ResidueDef that we just
         # mapped in the _matchResidue2Cing routine.
         atm.db = res.db.getAtomDefByName( aName, convention = self.convention )
+        if atm.db:
+            return atm.db
 
         # JFD adds hacks these debilitating simple variations if nothing is found so far
         # GWV does not like this at all and therefore hides it behind an option
-        if self.patchAtomNames and not atm.db:
-            NTdebug('pdbParser._matchAtom: patching atom %s, residue %s %s, convention %s',
-                       atm.name, res.resName, res.resNum, self.convention
-                     )
-            if not atm.db: # some besides CYANA have this too; just too easy to hack here
-                aName = moveFirstDigitToEnd(atm.name)
-                atm.db = res.db.getAtomDefByName( aName, convention = self.convention )
+        if self.patchAtomNames:        
+#            if not atm.db: # some besides CYANA have this too; just too easy to hack here
+#                aName = moveFirstDigitToEnd(atm.name)
+#                atm.db = res.db.getAtomDefByName( aName, convention = self.convention )
             #end if
-
-            if not atm.db:
-                if atm.name == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
-                    aName = 'HN'
-                elif atm.name == 'HN': # for future examples.
-                    aName = 'H'
-                atm.db = res.db.getAtomDefByName( aName, convention = self.convention )
+#            if not atm.db:
+            bName = None # Don't save the variable name beyond patch attempt.
+            if atm.name == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
+                bName = 'HN' 
+            elif atm.name == 'HN': # for future examples.
+                bName = 'H'
+            if bName:
+                atm.db = res.db.getAtomDefByName( bName, convention = self.convention )
             #end if
+#            if atm.db:
+#                NTdebug('pdbParser._matchAtom: patched atom %s, residue %s %s, convention %s',
+#                           atm.name, res.resName, res.resNum, self.convention                     )                
         #end if
+        if atm.db:
+            return atm.db
 
+        # Try internal one for those just added to non-standard residues/atoms.
+        atm.db = res.db.getAtomDefByName( aName )                
+#        if atm.db:
+#            return atm.db        
         return atm.db
     #end def
 
+        
     def _matchResiduesAndAtoms(self):
         """
         Match residues and Atoms in the tree to CING db using self.convention
         """
+#        NTdebug("Now in _matchResiduesAndAtoms")
+        unmatchedAtomByResDict = {}
+#        unmatchedResDict = {}
         for res in self.tree.subNodes(depth=2):
             self._matchResidue2Cing( res )
             for atm in res:
-                self._matchAtom2Cing( atm )
-                if not atm.skip and atm.db == None:
-                    NTwarning('pdbParser._matchResiduesAndAtoms: atom %s, residue %s %s, convention %s, not matched to CING',
-                               atm.name, res.resName, res.resNum, self.convention
-                             )
-                    atm.skip = True
-            #end for
-        #end for
+                if not self._matchAtom2Cing( atm ):                    
+                    if not unmatchedAtomByResDict.has_key(res.resName):
+                        unmatchedAtomByResDict[ res.resName ] = ([],[])
+                    atmList = unmatchedAtomByResDict[res.resName][0] 
+                    resNumList = unmatchedAtomByResDict[res.resName][1] 
+                    if atm.name not in atmList:
+                        atmList.append(atm.name)
+                    if res.resNum not in resNumList:
+                        resNumList.append(res.resNum)
+        
+                    if not self.allowNonStandardResidue:
+                        atm.skip = True
+                        continue                        
+
+#                   aName = moveFirstDigitToEnd(atm.name) # worry about this?
+                    atm.db = res.db.appendAtomDef( atm.name )
+                    if not atm.db:
+                        NTcodeerror("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
+                        continue        
+                                            
+        msg = "Non-standard (residues and their) atoms"
+        if self.allowNonStandardResidue:
+            msg += " to add:\n"
+        else:
+            msg += " to skip:\n"
+        
+        if unmatchedAtomByResDict:
+            msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
+            if self.allowNonStandardResidue:
+                NTmessage(msg)
+            else:
+                NTerror(msg)             
     #end def
 
     def initMolecule(self, moleculeName):
@@ -444,39 +467,61 @@ class pdbParser:
         for ch in self.tree:
             chain = mol.addChain( name = ch.name )
             for res in ch:
-                #print '>', ch, res, res.skip, res.db
+#                print '>', ch, res, res.skip, res.db
                 if not res.skip and res.db!=None:
                     residue = chain.addResidue( res.db.name, res.resNum )
                     residue.addAllAtoms()
                 #end if
             #end for
         #end for
-        NTdebug('pdbParser.initMolecule: %s', mol)
+#        NTdebug('pdbParser.initMolecule: %s', mol)
         self.map2molecule( mol )
         return mol
     #end for
 
     def map2molecule(self, molecule):
         """
-        Map the pdb records of self to molecule instance.
+        Map the tree to CING molecule instance.
         """
+        
+        unmatchedAtomByResDict = {}
+                        
         for chn in self.tree:
             for res in chn:
+#                NTdebug("map2molecule res: %s" % res)
+                if res.skip or (not res.db):
+                    continue
                 for atm in res:
                     atm.atom = None
-                    if not atm.skip and atm.db != None:
+                    if atm.skip or (not atm.db):
+#                        NTerror("pdbParser#map2molecule was flagged before right?")
+                        continue
+                    t = (IUPAC, chn.name, res.resNum, atm.db.name)
+                    atm.atom = molecule.decodeNameTuple(t)                      
+                    if not atm.atom: # for the non-standard residues and atoms.
                         t = (INTERNAL, chn.name, res.resNum, atm.db.name)
-                        atm.atom = molecule.decodeNameTuple(t)
-                        if not atm.atom:
-                            NTerror('pdbParser.map2molecule: Strange! error mapping atom (%s, %s, %s, %s) to %s; This should not happen!',
-                                     chn.name, res.db.name, res.resNum, atm.name, molecule
-                                   )
+                        atm.atom = molecule.decodeNameTuple(t)                      
+                    if not atm.atom:
+                        # JFD: Report all together now.
+                        if not unmatchedAtomByResDict.has_key(res.resName):
+                            unmatchedAtomByResDict[ res.resName ] = ([],[])
+                        atmList = unmatchedAtomByResDict[res.resName][0]
+                        resNumList = unmatchedAtomByResDict[res.resName][1]
+                        if atm.name not in atmList:
+                            atmList.append(atm.name)
+                        if res.resNum not in resNumList:
+                            resNumList.append(res.resNum)                            
                         #end if
                     #end if
                 #end for
             #end for
         #end for
         self.molecule = molecule
+        
+        if unmatchedAtomByResDict:
+            msg = "pdbParser.map2molecule: Strange! ERROR mapping atom for:\n"
+            msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
+            NTcodeerror(msg)             
     #end def
 
     def importCoordinates( self, nmodels=None, update=True ):
@@ -509,7 +554,7 @@ class pdbParser:
             recordName = record._name.strip()
             if recordName == "MODEL":
                 foundModel = True
-                NTdebug('pdbParser.importCoordinates: importing as MODEL %d', model)
+#                NTdebug('pdbParser.importCoordinates: importing as MODEL %d', model)
                 continue
 
             elif recordName == "ENDMDL":
@@ -518,15 +563,22 @@ class pdbParser:
                     break
 
             elif recordName == "ATOM" or recordName == "HETATM":
-                if not record.atm.skip and record.atm.atom != None:
-                    atom = record.atm.atom
-                    # Check if the coordinate already exists for this model
-                    # This might happen when alternate locations are being
-                    # specified. Simplify to one coordinate per model.
-                    if len(atom.coordinates) <= model:
-                        atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor, occupancy=record.occupancy )
-                    else:
-                        NTdebug('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
+#                if (not record.atm.skip) and (record.atm.atom != None):
+                if not record.atm:
+                    continue   
+#                NTdebug("record.atm: %s" % record.atm)             
+                if record.atm.skip:
+                    continue                
+                if not record.atm.atom:
+                    continue                
+                atom = record.atm.atom
+                # Check if the coordinate already exists for this model
+                # This might happen when alternate locations are being
+                # specified. Simplify to one coordinate per model.
+                if len(atom.coordinates) <= model:
+                    atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor, occupancy=record.occupancy )
+                else:
+                    NTdebug('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
                 #end if
             #end if
         #end for
@@ -702,7 +754,7 @@ def moveFirstDigitToEnd(a):
         a = a[1:] + a[0:1]
     return a
 
-def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None, update=True ):
+def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None, update=True, allowNonStandardResidue=True ):
     """Initialize Molecule from pdbFile.
        convention eq. CYANA, CYANA2, XPLOR, IUPAC
 
@@ -715,12 +767,12 @@ def initPDB( project, pdbFile, convention = IUPAC, name=None, nmodels=None, upda
     if not os.path.exists(pdbFile):
         NTerror('Project.initPDB: missing PDB-file "%s"', pdbFile)
 
-    NTmessage('==> initializing from PDB file "%s"', pdbFile)
+#    NTmessage('==> initializing from PDB file "%s"', pdbFile) # repeated in the parser.
 
     if not name:
         _path,name,_ext  = NTpath( pdbFile )
 #    molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
-    parser = pdbParser( pdbFile, convention=convention )
+    parser = pdbParser( pdbFile, convention=convention, allowNonStandardResidue=allowNonStandardResidue )
     if not parser:
         return None
     molecule = parser.initMolecule( name )

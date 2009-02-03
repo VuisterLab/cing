@@ -8,7 +8,9 @@ Usage: cing [options]       use -h or --help for listing
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
-  --test                Run set of test routines to verify installations
+  --test                Run set of test routines to verify installation.
+  --test2               Run extensive tests on large data sets checking code
+                        after fundamental changes.
   --doc                 Print more documentation to stdout
   --docdoc              Print full documentation to stdout
   --pydoc               start pydoc server and browse documentation
@@ -84,6 +86,9 @@ cing --name test --script MYSCRIPT.py
 - To test CING without any messages (not even errors):
 cing --test --verbose 0
 
+- To test CING on many data sets including CCPN, PDB, etc.
+cing --test2 --verbose 0
+
 --------------------------------------------------------------------------------
 Some simple script examples:
 --------------------------------------------------------------------------------
@@ -137,12 +142,11 @@ __credits__ = cing.__credits__
 #------------------------------------------------------------------------------------
 
 def format(object):
+    """Returns the formatted object representation"""    
 #    print '>>', object
     if hasattr(object, 'format'):
-        print object.format()
-    else:
-        print object
-    #end if
+        return object.format()
+    return  "%s" % object
 #end def
 
 
@@ -188,21 +192,21 @@ def verbosity(value):
 
 
 def formatall(object):
+    """Returns the formatted object representation"""    
+    result = ""
     if isinstance(object, list):
         i = 0
         for obj in object:
             #printf(">>> [%d] >>> ", i)
-            format(obj)
+            result += format(obj)
             i += 1
-        #end for
-    elif isinstance(object, dict):
+        return result    
+    if isinstance(object, dict):
         for key, value in object.items():
-            NTmessage("%-15s : ", key)
-            format(value)
-        #end for
-    else:
-        format(object)
-    #end try
+            result += "%-15s : " % key
+            result += format(value)
+        return result
+    return format(object)
 #end def
 
 args = []
@@ -239,7 +243,7 @@ def script(scriptFile, *a, **k):
 #end def
 
 
-def testOverall():
+def testOverall(namepattern):
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
@@ -250,7 +254,7 @@ def testOverall():
 #                           cingPythonDir + "/cing.Scripts.test.test_cyana2cing",
 #                           cingPythonDir + "/cing.STAR.FileTest",
                           ]
-    namepattern, startdir = "test_*.py", cingPythonDir
+    startdir = cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/iCing/test/test_Json.py']
     NTdebug('will unit check: ' + `nameList`)
@@ -277,6 +281,7 @@ def testOverall():
 
 
 
+
 def getParser():
     #------------------------------------------------------------------------------------
     # Options
@@ -288,6 +293,11 @@ def getParser():
                       action="store_true",
                       dest="test",
                       help="Run set of test routines to verify installations"
+                     )
+    parser.add_option("--test2",
+                      action="store_true",
+                      dest="test2",
+                      help="Run extensive set of test routines to check code (Those matching test2_*.py)."
                      )
     parser.add_option("--doc",
                       action="store_true",
@@ -464,7 +474,10 @@ def main():
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
         
     if options.test:
-        testOverall()
+        testOverall(namepattern="test_*.py")
+        sys.exit(0)
+    if options.test2:
+        testOverall(namepattern="test2_*.py")
         sys.exit(0)
 
     #------------------------------------------------------------------------------------
