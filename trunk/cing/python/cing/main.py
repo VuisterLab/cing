@@ -110,6 +110,12 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+from cing import __author__ #@UnusedImport
+from cing import __copyright__ #@UnusedImport
+from cing import __copyright_years__
+from cing import __credits__ #@UnusedImport
+from cing import __date__ #@UnusedImport
+from cing import __version__ #@UnusedImport
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
@@ -130,11 +136,6 @@ import os
 import sys
 import time
 import unittest
-__version__ = cing.__version__
-__date__ = cing.__date__
-__author__ = cing.__author__
-__copyright__ = cing.__copyright__
-__credits__ = cing.__credits__
 
 
 #------------------------------------------------------------------------------------
@@ -460,9 +461,9 @@ def main():
     # From this point on code may be executed that will go through the appropriate verbosity filtering
     header = """
 ======================================================================================================
-| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV 2004-2008 |
+| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |
 ======================================================================================================
-""" % (cingVersion)
+""" % (cingVersion, __copyright_years__)
 
     NTmessage(header)
     NTmessage(getStartMessage())
@@ -576,9 +577,9 @@ def main():
     elif options.initCcpn:
         project = Project.open(options.name, status='new')
         project.initCcpn(ccpnFolder=options.initCcpn)
-    elif options.loadCcpn:
-        project = Project.open(options.name, status='create', restore=False)
-        project.initCcpn(ccpnFolder=options.loadCcpn)
+#    elif options.loadCcpn:
+#        project = Project.open(options.name, status='create', restore=False)
+#        project.initCcpn(ccpnFolder=options.loadCcpn)
     else:
         project = Project.open(options.name, status='create')
 
