@@ -1,0 +1,48 @@
+* Mac's apache 
+    There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
+    On leopard which has apache 2:
+        vi /private/etc/apache2/httpd.conf
+
+    Php support, needed for NRG-CING pdb code lookup:
+        enable in config the line:
+        LoadModule php5_module        libexec/apache2/libphp5.so
+    Redirect old cased icing url in apache's settings (Thanks to: http://www.yolinux.com/TUTORIALS/ApacheRedirect.html)
+        Redirect permanent /iCing /icing
+    
+monitor with:
+	tail -f /private/var/log/apache2/*_log &
+
+- processing is done as _www:admin account.
+    So don't use the suEXEC way.
+    
+    httpd -V
+
+    Restart by:
+    /usr/sbin/httpd -k restart
+    Accept the following warnings:
+    [Tue Jun 17 15:20:45 2008] [warn] PassEnv variable procheckPath was undefined
+    [Tue Jun 17 15:20:45 2008] [warn] PassEnv variable aqpcPath was undefined
+    Processing config directory: /private/etc/httpd/users/*.conf
+    Processing config file: /private/etc/httpd/users/ca.conf
+    Processing config file: /private/etc/httpd/users/jd.conf
+
+    Install /Library/WebServer/Documents/favicon.ico
+    	Create it with gimp; square it and reduce size to 16x16 and save as pnm. Then use:
+    	http://netpbm.sourceforge.net/doc//ppmtowinicon.html to 
+    	ppmtowinicon -output favicon.ico favicon.pnm
+    	 
+    In the System Preference of the Mac
+        Sharing
+            Turn on "Web Sharing" and check server in browser.
+
+# For the gwt tomcat server
+ProxyPass         /icing/serv http://localhost:8080/icing
+ProxyPassReverse  /icing/serv http://localhost:8080/icing
+
+The tomcat server in eclipse works together with the apache configured here.
+
+# For the NRG tomcat web app.
+ProxyPass         / http://localhost:8080/NRG/MRGridServlet
+ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
+            
+            

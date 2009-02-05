@@ -1,0 +1,4 @@
+#!/bin/sh
+APPDIR=`dirname $0`/..;
+java -cp "$APPDIR/src:$APPDIR/../bin:/Users/jd/progs/gwt-mac-1.5.1/gwt-user.jar:/Users/jd/progs/gwt-mac-1.5.1/gwt-dev-mac.jar" com.google.gwt.i18n.tools.I18NSync -out $APPDIR/src cing.client.iCingConstants  ;
+

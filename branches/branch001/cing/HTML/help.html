@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Help</title>
+    <link media="screen" href="cing.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<div id="container">
+<div id="header">
+    <h1>Help</h1>
+    <a href="index.html">Home</a>
+    <a href="javascript:history.back()">Back</a>
+</div>
+<!-- end header -->
+<div id="main">
+<table>
+<tr>
+<td>
+    <h5>Explanations of external program features</h5>
+    <h3>* WHATIF</h3>
+        See <a href="http://proteins.dyndns.org/Education/Validation/HTML/CheckHelp/index.html">Protein
+        structure verification</a>
+        and <a href="http://proteins.dyndns.org/Education/Validation/HTML/USF/whatif.html"> A crystallographer's
+        guide to interpreting WHATIF output</a>.
+    <h3>* Procheck_NMR</h3>
+        See <a href="http://www.biochem.ucl.ac.uk/~roman/procheck_nmr/manual/index.html">
+        AQUA and PROCHECK-NMR - Operating manual</a>.
+    <br><h5>CING Plots</h5>
+    <h3>Ramachandran and Janin plots</h3>
+    <ul><li>The background shading is for the probability derived from What If’s
+     internal database of high-resolution structures on a 10 by 10 degree grid.
+     The color coding refers to one of three states the secondary structure (by
+     DSSP) was assigned to be in. Blue, green, and yellow are respectively for
+     helix, sheet, and other. The coloring changes linearly from white to e.g.
+     yellow for densities 2 to 20%. They are consequently put on top of each
+     other (blue on top) with some alpha blending. More details in code at
+     <a href="http://code.google.com/p/cing/source/browse/trunk/cing/python/cing/Libs/NTplot.py">dihedralComboPlot</a>.</li>
+     <li>The CHI 1 and 2 combination plot is named after <a href="http://en.wikipedia.org/wiki/Janin_Plot">Janin</a></li>
+    <li>For angles PHI, PSI, CHI 1 and 2, if a dihedral restraint
+    involves one or more of these angles, a transluced orange rectangle or square
+    will be drawn evidencing the limits of this particular dihedral</li>
+</ul>
+    <h3>Symbols</h3>
+    <dl><dd><span style="color: rgb(0, 0, 153);">o</span> (blue)
+    circular averaged value</dd>
+    <dd><span style="color: rgb(0, 153, 0);">+</span>
+    (green) non-proline/glycine
+    </dd>
+    <dd><span style="color: rgb(0, 153, 0);">▴</span>
+    (green) non-cacheable-glycine
+    </dd>
+    <dd><span style="color: rgb(0, 153, 0);">■</span>
+    (green) non-cacheable-proline
+    </dd>
+    <dd><span style="color: rgb(0, 0, 153);">|</span>
+    (blue) a line indicates the circular averaged value for a given angle </dd></dl>
+</td></tr></table>
+</div>
+<!-- end main --> <br style="clear: both;" />
+</div>
+<!-- end container -->
+<div id="footer">
+CING <a href="mailto:vuister@science.ru.nl"> Geerten Vuister</a>,
+<a href="mailto:jurgend@cmbi.ru.nl"> Jurgen F. Doreleijers</a>
+, and<a href="mailto:alanwilter@gmail.com"> Alan Wilter Sousa da Silva</a>
+</div>
+<!-- end footer -->
+</body>
+</html>
