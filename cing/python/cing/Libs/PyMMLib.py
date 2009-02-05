@@ -1535,6 +1535,7 @@ class PDBFile(list):
         else:
             fil_size_bytes = 1304189
 
+        atomCount = 0
         for ln in fil.readlines():
             line_number    += 1
             fil_read_bytes += len(ln)
@@ -1561,9 +1562,11 @@ class PDBFile(list):
             ## create/add/parse the record
             pdb_record = pdb_record_class()
             pdb_record.read(ln)
+            if (rname == 'HETATM') or (rname == 'HETATM'):
+                atomCount += 1
             self.append(pdb_record)
 
-        NTdebug("PDBFile: read %d records from %s", len(self), fileName )
+        NTdebug("PDBFile: read %d records (%d atoms) from %s", len(self), atomCount, fileName )
 
     def save_file(self, fil):
         """Saves the PDBFile object in PDB file format to File object fil.

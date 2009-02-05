@@ -58,7 +58,7 @@ class AllChecks(TestCase):
 
         ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
         self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile))
-        self.failIf(project.save())
+        self.assertTrue(project.save())
 
         gifFileName = entryId+".gif"
         pathGif = os.path.join( cingDirTmp, gifFileName)

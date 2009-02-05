@@ -4265,6 +4265,28 @@ def toCsv(input):
         result += "%s\n" % item
     return result
 
+"""To dump some output to never see again"""
+_bitBucket = open('/dev/null', 'aw')
+"Regular utput at the start of the program"
+_returnMyStdOut = sys.stdout
+"Error output at the start of the program"
+_returnMyStdErr = sys.stderr
+
+"""Switch away from output; might be usefull to silence verbose part of code or external program"""
+def switchOutput( showOutput, doStdOut=True, doStdErr=False):
+    if showOutput:
+        if doStdOut:
+            sys.stdout = _returnMyStdOut
+        if doStdErr:
+            sys.stderr = _returnMyStdErr
+        return
+
+    if doStdOut:
+        sys.stdout = _bitBucket
+    if doStdErr:
+        sys.stderr = _bitBucket
+    
+    
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     input = ['1brv', '9pcy' ]

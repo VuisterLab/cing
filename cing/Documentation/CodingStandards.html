@@ -16,17 +16,22 @@ Caps are allowed. Few underscores used.
 <li><b>Function Names</b>
 Again, Caps are used instead of underscores.
 <li><b>Line width</b>
-JFD sometimes prefers exceeding 80 characters per line.
+JFD prefers exceeding 80 characters per line and uses 120.
 </ol>
 
 And the additions:
 
 <ol>
 <li>
-No brackets for simple if block.
+No brackets for simple if block.<br>Brackets are a bit silly sometimes because JFD realized the following a bit late:<br>In [11]: 1 or 0 != 0
+Out[11]: 1
+
+In [12]: False or 0 == 0
+Out[12]: True
+<br>Showing that indeed the operator precedence rules favor or over ==. The funny thing though is that this doesn't matter for simple expressions where you're only interested in knowing the result being True or False. As long as you don't care they might be expressed as 1 or 0 instead. For clarity and if I missed a case, usually more brackets are used. 
 <li>
 Extra #end if comments for -long- sections but not for single line ifs or fors.
-</ol>
+<br></ol>
 
 Special care:
 No "import string" because always using string methods directly for speed.

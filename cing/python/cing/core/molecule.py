@@ -2126,7 +2126,7 @@ Residue class: Defines residue properties
         # find the database entry in NTdb (which is of type MolDef)
         db = NTdb.getResidueDefByName( resName, convention )
         if not db:
-            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding freestyle one now.' %( resName, convention))
+            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
             self.db = NTdb.appendResidueDef( name=resName, shortName = '_' )
             x = NTdb.getResidueDefByName( resName, convention )
             if not x:
@@ -2664,7 +2664,7 @@ Atom class: Defines object for storing atom properties
             self.db = db
         else:
 #            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-            NTwarning('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating freestyle definition.',
+            NTwarning('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating non-standard definition.',
                        resName, atomName, convention
                       )
             self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.

@@ -561,7 +561,9 @@ Project: Top level Cing project class
 
     def save( self):
         """
-        Save project data
+        Save project data;
+        
+        Return True on success.
         """
         NTmessage('' + dots*5 +'' )
         NTmessage(   '==> Saving %s', self )
@@ -594,6 +596,7 @@ Project: Top level Cing project class
         #end if
 
         self.addHistory( 'Saved project' )
+        return True
     #end def
 
     def restore(self ):
@@ -633,7 +636,7 @@ Project: Top level Cing project class
     #end def
 
     def removeCcpnReferences(self):
-        """to slim down the memory footprint; should allow garbage collection. TODO: test"""
+        """To slim down the memory footprint; should allow garbage collection."""
         attributeToRemove = "ccpn"
         try:
         	removeRecursivelyAttribute( self, attributeToRemove )
@@ -656,7 +659,8 @@ Project: Top level Cing project class
     def updateProject( self ):
         """Do all administrative things after actions
         """
-        if self.molecule: self[self.molecule.name] = self.molecule
+        if self.molecule: 
+            self[self.molecule.name] = self.molecule
     #end def
 
     #-------------------------------------------------------------------------
@@ -1522,7 +1526,6 @@ class DistanceRestraint( NTdict ):
             return None
 
         violatingModels = NTlist()
-        #TODO: check if the below self.violations was meant when JFD changed from just 'violations'
         for i in range( len(self.violations) ):
             if (math.fabs( self.violations[i]) > cutoff):
                 violatingModels.append( i )

@@ -14,6 +14,7 @@ Molecular system:
 1hue well known dimer to me
 1ieh well known
 1iv6 complex
+1otz large number of chains (60)
 2k0e Largest in total (35 Mb cif file; 160 models with each 148 residues.
 2jzn Entry with wildly different models in the ensemble.
 

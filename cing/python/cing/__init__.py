@@ -28,9 +28,10 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.84
+cingVersion     = 0.85
 __version__     = cingVersion # for pydoc
-__date__        = '27 November 2008'
+__date__        = '5 February 2009'
+__copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
 authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
                      ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
@@ -39,10 +40,10 @@ authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
 __author__      = '' # for pydoc
 for _a in authorList:
     __author__ = __author__ + _a[0] + ' (' + _a[1] + ')    '
-__copyright__  = "Copyright (c) 2004-2008 Protein Biophysics, IMM, Radboud University Nijmegen, The Netherlands"
-__credits__    = """More info at http://proteins.dyndns.org/CING
+__copyright__  = "Copyright (c) %s Protein Biophysics (IMM)/CMBI, Radboud University Nijmegen, The Netherlands"
+__credits__    = """More info at http://nmr.cmbi.ru.nl/CING
 
-""" + __copyright__ # misusing credits for pydoc
+""" + __copyright__ # TODO: misusing credits for pydoc 
 
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 
