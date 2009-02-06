@@ -73,7 +73,6 @@ NTmolParameters = NTdict(
 )
 
 dots = '-----------'
-
 #==============================================================================
 class Molecule( NTtree ):
     """
@@ -116,7 +115,6 @@ class Molecule( NTtree ):
         resonanceCount          : Number of Resonance Instances per atom
         modelCount              : Number of Coordinate instances per atom
   """
-
 
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
@@ -207,11 +205,11 @@ class Molecule( NTtree ):
     def getChainIdForChainCount(self):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
 
-    
+
     def ensureValidChainIdForThisMolecule(self, chainId ):
         """
         In CING all chains must have one non-space character (chain id) because:
-    
+
         - More than 1 characters would not fit in PDB column 22. Note that
         some programs read the chain id from PDB columns [73-76> but others
         programs (e.g. SHIFTX, ???) used by CING do not.
@@ -226,12 +224,12 @@ class Molecule( NTtree ):
         - The letters A-Z are often used already which will cause name space
         collisions. It is important to choose an id that will most likely not be
         used in the above formats.
-    
+
         The chain id is ALWAYS given in PDB and XPLOR coordinate files.
         It might be a space character but it's always implicitly present. If it's a
-        space character, CING will translate it to the next still available chain id 
+        space character, CING will translate it to the next still available chain id
         value. It's up to the caller to remember the mapping then!
-    
+
         Bottom line: use a chain id character on input!
         """
         if isValidChainId( chainId ):
@@ -244,8 +242,8 @@ class Molecule( NTtree ):
             return chainId
 
         return self.getNextAvailableChainId()
-    
-    
+
+
     def getNextAvailableChainId(self ):
         for chainId in Chain.DEFAULT_ChainNamesByAlphabet:
             if not( self.has_key(chainId)):
@@ -406,7 +404,7 @@ class Molecule( NTtree ):
             return None
 
         atm = res[an]
-        # JFD modifies to include brackets. Otherwise the 'and' operator has a higher precedence than '==' etc, 
+        # JFD modifies to include brackets. Otherwise the 'and' operator has a higher precedence than '==' etc,
         if (resonanceIndex == None) and (model == None):
             self._nameTupleDict[nameTuple] = atm
             return atm
@@ -783,8 +781,8 @@ class Molecule( NTtree ):
             #end for
             l = len(atm.resonances)
             if l < self.resonanceCount:
-                NTerror('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
-                        atm, l, self.resonanceCount
+                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
+                          atm, l, self.resonanceCount
                         )
                 for _i in range(l,self.resonanceCount):
                     atm.addResonance()
@@ -1050,13 +1048,52 @@ class Molecule( NTtree ):
             atm.coordinates = NTlist()
         self.modelCount = 0
 
+    def updateTopology( self)   :
+        """Define the _topology key for all atoms.
+        """
+        NTdebug('Defining topology')
+        for residue in self.allResidues():
+            for atm in residue:
+                atm._topology = NTlist()
+                if atm.db:
+                    topDef = atm.db.topology
+                    # manage N- and C-terminal exceptions
+                    if residue.Nterminal and len(atm.db.NterminalTopology) > 0:
+                        topDef = atm.db.NterminalTopology
+                    if residue.Cterminal and len(atm.db.CterminalTopology) > 0:
+                        topDef = atm.db.CterminalTopology
+
+                    for i,atomName in topDef:
+                        try:
+                            idx = int(i)
+                            res = residue.sibling( idx )
+                            if res == None or not res.has_key( atomName ):
+                                result.append( None )
+                                continue
+                            atm._topology.append( res[atomName] )
+
+                        except:
+                            pass # exceptional cases here
+                        #end try
+                    #end for
+                else:
+                    NTdebug('Molecule.updateTopolgy: atm %s: odd db==None', atm)
+                #end if
+            #end for
+        #end for
+    #end def
+
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
         NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
-            for dihedral in res.db.dihedrals:
-                res.dihedral( dihedral.name )
+#            res.addAllDihedrals()
+            for d in res.dihedrals:
+                d.calculateValues()
+            #end for
+        #end for
+    #end def
 
     def updateMean( self):
         """Calculate mean coordinates for all atoms
@@ -1123,7 +1160,7 @@ class Molecule( NTtree ):
     # end def
 
     def syncModels(self ):
-        """E.g. entry 1brv has more atoms in the second than in the first model. CING will not include those extra 
+        """E.g. entry 1brv has more atoms in the second than in the first model. CING will not include those extra
         atoms
         """
         atomListToSyncToSink = []
@@ -1133,14 +1170,14 @@ class Molecule( NTtree ):
                 continue
             actualCoordinateListLength = len(atom.coordinates)
             # The pseudos above handled and the atoms for which normally there are no coordinates
-            # will be saved. 
+            # will be saved.
             if (actualCoordinateListLength == 0) or (actualCoordinateListLength == n):
                 continue
             atomListToSyncToSink.append(atom)
-                
+
         if not atomListToSyncToSink:
             return
-        
+
         unmatchedAtomByResDict = {}
         for atom in atomListToSyncToSink:
             res = atom._parent
@@ -1155,31 +1192,36 @@ class Molecule( NTtree ):
                 atmList.append(atom.name)
             if res.resNum not in resNumList:
                 resNumList.append(res.resNum)
-                                            
+
         if unmatchedAtomByResDict:
             msg = "Molecule#syncModels Removed atoms that differ over the different models:\n"
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
-            NTwarning(msg)             
-            
-                
+            NTwarning(msg)
+
+
     def updateAll( self)   :
-        """Calculate the dihedral angles for all residues
+        """Define and calculate the dihedral angles for all residues
            Calculate mean coordinates for all atoms
            Generate an ensemble from coordinates
            Generate an atomList
+           Define the topological connections
            Calculate the rmsd's
         """
+        for res in self.allResidues():
+            res.addAllDihedrals()
         if self.modelCount > 0:
             self.syncModels()
             self.updateDihedrals()
             self.updateMean()
             self.ensemble = Ensemble( self )
             self.atomList = AtomList( self )
+            self.idDisulfides()
             if not self.has_key('ranges'):
                 self.ranges = None
             self.calculateRMSDs(ranges=self.ranges)
-            self.idDisulfides()
         #end if
+
+        self.updateTopology()
     #end def
 
 
@@ -1233,38 +1275,61 @@ Return an Molecule instance or None on error
     #end def
     initialize = staticmethod( initialize )
 
-    def _addResidue( self, chainId, resName, resNum, convention ):
+    def _addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False ):
         """
         Internal routine to add a residue to molecule
-           return Residue or None or error
+        Add chain if not yet present
+
+        return Residue instance or None or error
         """
-        rn = translateResidueName( convention, resName, INTERNAL )
-        if (rn == None):
-            NTerror('Molecule._addResidue: chain %s, residue "%s" not valid for convention "%s"',
-                     chainId, resName, convention
-                   )
-            return None
+#        rn = translateResidueName( convention, resName, INTERNAL )
+#        if (rn == None):
+#            NTerror('Molecule._addResidue: chain %s, residue "%s" not valid for convention "%s"',
+#                     chainId, resName, convention
+#                   )
+#            return None
+#        else:
+#            if chainId == None:
+#                chainId = Chain.defaultChainId
+#
+#            if chainId not in self:
+#                chain = self.addChain(chainId)
+#            else:
+#                chain = self[chainId]
+#            #end if
+#            if not chain: return None
+#
+#            # Add the residue if not present
+#            if resNum in chain:
+#                return chain[resNum]
+#            #end if
+#            residue = chain.addResidue( rn, resNum, Nterminal=Nterminal, Cterminal=Cterminal )
+#            if not residue: return None
+#
+#            # Use database to add atoms
+#            residue.addAllAtoms()
+#        #end if
+
+        if chainId == None:
+            chainId = Chain.defaultChainId
+
+        if chainId not in self:
+            chain = self.addChain(chainId)
         else:
-            if chainId == None:
-                chainId = Chain.defaultChainId
-
-            if chainId not in self:
-                chain = self.addChain(chainId)
-            else:
-                chain = self[chainId]
-            #end if
-            if not chain: return None
-
-            # Add the residue
-            if resNum in chain:
-                return chain[resNum]
-            #end if
-            residue = chain.addResidue( rn, resNum )
-            if not residue: return None
-
-            # Use database to add atoms
-            residue.addAllAtoms()
+            chain = self[chainId]
         #end if
+        if not chain: return None
+
+        # Add the residue if not present
+        if resNum in chain:
+            return chain[resNum]
+        #end if
+        residue = chain.addResidue( resName, resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal )
+        if not residue: return None
+
+        # Use database to add atoms
+        residue.addAllAtoms()
+
         return residue
     #end def
 
@@ -1849,9 +1914,9 @@ class RmsdResult( NTdict ):
 #
 
 
-    
 
-    
+
+
 
 class Chain( NTtree ):
     """
@@ -1914,10 +1979,14 @@ Chain class: defines chain properties and methods
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
 
-    def addResidue( self, resName, resNum, convention=INTERNAL, **kwds ):
-        res = Residue( resName=resName, resNum=resNum, convention=convention, **kwds )
+    def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ):
+        if self.has_key(resNum):
+            NTerror( 'Chain.addResidue: residue number "%s" already present in %s', resNum, self )
+            return None
+        #end if
+        res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
         if res.name in self:
-            NTerror( 'ERROR Chain.addResidue: residue "%s" already present\n', res.name )
+            NTerror( 'Chain.addResidue: residue "%s" already present in %s', res.name, chain )
             return None
         #end if
         self._addChild( res )
@@ -1931,7 +2000,7 @@ Chain class: defines chain properties and methods
 
     def removeResidue( self, residue)   :
         if (not residue in self._children):
-            NTerror( 'ERROR Chain.removeResidue: residue "%s" not present in chain %s\n',
+            NTerror( 'Chain.removeResidue: residue "%s" not present in chain %s',
                      residue, self
                    )
             return None
@@ -1947,7 +2016,7 @@ Chain class: defines chain properties and methods
 
         res = self.removeChild( residue )
         if (res == None):
-            NTerror('Error Chain.removeResidue: error removing %s from %s\n', residue, self)
+            NTerror('Chain.removeResidue: error removing %s from %s', residue, self)
             return None
         else:
             res.chain = None
@@ -2060,47 +2129,33 @@ Residue class: Defines residue properties
         atoms                   : NTlist of Atom instances.
         db                      : Reference to database residueDef instance
         chain                   : Reference to Chain instance
-
-    Attributes inherited from NTtree:
-        _parent                 : Reference to parent NTtree instance (None for root)
-        _children               : NTlist of children NTtree instances.
-
-    Methods:
-        translate( convention ) : translate resName according to convention.
-        addAtom()
-        addAllAtoms()
-
-        allResidues()           : Returns a list containing self.
-        allAtoms()              : Returns a list of all atom objects of residue.
-
-        ...
-
-    Methods inherited from NTtree:
-        _Cname( depth )         : Returns name expanded to depth
-        addChild( child )       :
-        sibling( relativeIndex ) :
-        traverse()              :
-
-    Methods inherited from NTdict:
-        format()                : Return a formatted string of with values of selected fields.
-        printAttr()            : Print a list of all attributes and their values.
-
-    all dict methods
+        dihedrals               : NTlist of Dihedral instances
 
     """
-    def __init__( self, resName, resNum, convention=INTERNAL, **kwds ):
+    def __init__( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ):
         #print '>',resName, resNum
-        NTtree.__init__(self, name=resName + str(resNum),
-                              __CLASS__='Residue', **kwds
+        NTtree.__init__(self, __CLASS__ = 'Residue',
+                              name=resName + str(resNum),    # Only a temporarily name, will be formalised after
+                                                             # this init
+                              Nterminal = Nterminal,         # defines the residue to be N-terminus
+                              Cterminal = Cterminal,         # defines the residue to be C-terminus
+                              **kwds
                        )
+        self._nameResidue( resName, resNum, convention=convention ) # sets all naming and links correctly
+
         self.atoms     = self._children
         self.atomCount = 0
         self.chain     = self._parent
 
-        self._nameResidue( resName, resNum, convention=convention ) # sets all naming and links correctly
-        self.saveXML('resName','resNum')
+        self.dihedrals = NTlist()
+
         self.rogScore = ROGscore()
 
+        self.__FORMAT__ =  self.header( dots ) + '\n' +\
+                          'shortName:  %(shortName)s\n' +\
+                          'chain:      %(chain)s\n' +\
+                          'atoms (%(atomCount)2d): %(atoms)s\n' +\
+                           self.footer( dots )
     #end def
 
     def __repr__(self):
@@ -2137,7 +2192,7 @@ Residue class: Defines residue properties
             self.name      = resName + str(resNum)
             self.resName   = resName
             self.shortName = '_' + str(resNum)
-#            self.db        = None # JFD adds: It's erased again? Must be a bug. 
+#            self.db        = None # JFD adds: It's erased again? Must be a bug.
         else:
             self.db        = db
             self.name      = db.translate(INTERNAL) + str(resNum)
@@ -2146,13 +2201,6 @@ Residue class: Defines residue properties
         #end if
         # add the two names to the dictionary
         self.names     = [self.shortName, self.name]
-
-        self.__FORMAT__ =  self.header( dots ) + '\n' +\
-                          'shortName:  %(shortName)s\n' +\
-                          'chain:      %(chain)s\n' +\
-                          'atoms (%(atomCount)2d): %(atoms)s\n' +\
-                           self.footer( dots )
-
     #end def
 
     def renumber( self, newResNum ):
@@ -2160,6 +2208,10 @@ Residue class: Defines residue properties
         Renumber residue
            Return self or None on error
         """
+        if newResNum in self._parent:
+            NTerror( 'ERROR Residue.renumber: residue  number "%s" already present\n', newResNum )
+            return None
+        #end if
         newName = self.resName + str(newResNum)
         if newName in self._parent:
             NTerror( 'ERROR Residue.renumber: residue "%s" already present\n', newName )
@@ -2230,7 +2282,7 @@ Residue class: Defines residue properties
             if (atmDef.name in self):
                 atm = self.removeChild( self[atmDef.name] )
                 for alias in atm.db.aliases:
-                    if alias in self: 
+                    if alias in self:
                         del(self[alias])
                 #end for
                 self.atomCount -= 1
@@ -2252,93 +2304,115 @@ Residue class: Defines residue properties
         return self,newRes
     #end def
 
-    def deleteAtom(self, name ):
-        """JFD adds: GV please check 
+    def deleteAtom(self, name, convention=INTERNAL ):
+        """JFD adds: GV please check
         Return True on success.
         """
-        atm = self.getAtom(name)
+        atm = self.getAtom(name, convention=convention)
+        if not atm:
+            return False
         if atm.db:
             for alias in atm.db.aliases:
-                if alias in self: 
+                if alias in self:
                     del(self[alias])
-        self.removeChild( name )
-        self.atomCount -= 1             
+        self.removeChild( atm )
+        self.atomCount -= 1
+        self._parent._parent.atomCount -= 1
         return True
-        
+
     def addAtom( self, name, convention=INTERNAL, **kwds ):
         """add atomName to self as well as potential alias references
            return Atom instance
         """
-        ac = Atom( resName=self.db.translate(convention), atomName=name, convention=convention, **kwds )
-        self._addChild( ac )
-        ac.residue = self
+        atm = Atom( resName=self.db.translate(convention), atomName=name, convention=convention, **kwds )
+        self._addChild( atm )
+        atm.residue = self
         self._parent._parent.atomCount += 1
         self.atomCount += 1
-        for alias in ac.db.aliases:
-            self[alias] = ac
-        return ac
+        for alias in atm.db.aliases:
+            self[alias] = atm
+        return atm
     #end def
 
     def addAllAtoms( self ):
-        """Add all atoms according to the definition database
+        """Add all atoms according to the definition database.
         """
         # Use database to add atoms
         if self.db:
             for atm in self.db:
                 self.addAtom( atm.name )
-
-    def dihedral( self, dihedralName ):
-        """Return cmean,cv tuple for dihedralName,
-        or None on error
-
-        set self[dihedralName] to NTlist of results
-        """
-        # optimized out.
-#        if dihedralName not in self.db:
-        if not self.db.has_key(dihedralName):
-            return None
-
-        self[dihedralName] = NTlist()
-        self[dihedralName].cAverage()
-#        self[dihedralName].cav = NAN_FLOAT Now redundant because cAverage will already have set them
-#        self[dihedralName].cv  = NAN_FLOAT To be set at the end of this routine by calling cAverage() again.
-        self[dihedralName].db  = self.db[dihedralName] # linkage to the database
-        self[dihedralName].residue  = self             # linkage to self
-
-        # Get/Check the topology
-        self[dihedralName].atoms  = None
-        atoms = translateTopology( self, self.db[dihedralName].atoms )
-        if atoms == None or len(atoms) != 4 or None in atoms:
-            return None
-        self[dihedralName].atoms  = atoms
-
-        #add dihedral to dict for lookup later
-        self.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
-            (self, dihedralName, self.db[dihedralName])
-        self.chain.molecule._dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
-            (self, dihedralName, self.db[dihedralName])
-
-        # Check if all atoms have the same number of coordinates
-        l = len( atoms[0].coordinates)
-        for a in atoms[1:]:
-            if len(a.coordinates) != l:
-                return None
-            #end if
-        #end for
-
-        for i in range(0,l):
-            self[dihedralName].append( NTdihedralOpt(
-               atoms[0].coordinates[i],
-               atoms[1].coordinates[i],
-               atoms[2].coordinates[i],
-               atoms[3].coordinates[i]))
-
-        plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
-        self[dihedralName].limit( plotpars.min, plotpars.max )
-        cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
-
-        return cav,cv
+            #end for
+        #end if
     #end def
+
+    def addAllDihedrals(self):
+        """Add all dihedrals according to definition database.
+        """
+        self.dihedrals = NTlist()
+        if self.db:
+            for d in self.db.dihedrals:
+                dihed = Dihedral( self, d.name )
+                if dihed.atoms:
+                    self.dihedrals.append(dihed)
+                    self[dihed.name] = dihed
+                #end if
+            #end for
+        #end if
+    #end def
+
+
+#    def dihedral( self, dihedralName ):
+#        """Return cmean,cv tuple for dihedralName,
+#        or None on error
+#
+#        set self[dihedralName] to NTlist of results
+#        """
+#        # optimized out.
+##        if dihedralName not in self.db:
+#        if not self.db.has_key(dihedralName):
+#            return None
+#
+#        self[dihedralName] = NTlist()
+#        self[dihedralName].cAverage()
+##        self[dihedralName].cav = NAN_FLOAT Now redundant because cAverage will already have set them
+##        self[dihedralName].cv  = NAN_FLOAT To be set at the end of this routine by calling cAverage() again.
+#        self[dihedralName].db  = self.db[dihedralName] # linkage to the database
+#        self[dihedralName].residue  = self             # linkage to self
+#
+#        # Get/Check the topology
+#        self[dihedralName].atoms  = None
+#        atoms = translateTopology( self, self.db[dihedralName].atoms )
+#        if atoms == None or len(atoms) != 4 or None in atoms:
+#            return None
+#        self[dihedralName].atoms  = atoms
+#
+#        #add dihedral to dict for lookup later
+#        self.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
+#            (self, dihedralName, self.db[dihedralName])
+#        self.chain.molecule._dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
+#            (self, dihedralName, self.db[dihedralName])
+#
+#        # Check if all atoms have the same number of coordinates
+#        l = len( atoms[0].coordinates)
+#        for a in atoms[1:]:
+#            if len(a.coordinates) != l:
+#                return None
+#            #end if
+#        #end for
+#
+#        for i in range(0,l):
+#            self[dihedralName].append( NTdihedralOpt(
+#               atoms[0].coordinates[i],
+#               atoms[1].coordinates[i],
+#               atoms[2].coordinates[i],
+#               atoms[3].coordinates[i]))
+#
+#        plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
+#        self[dihedralName].limit( plotpars.min, plotpars.max )
+#        cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
+#
+#        return cav,cv
+#    #end def
 
     def translate( self, convention ):
         """return translated name according to convention or None if not defined"""
@@ -2377,9 +2451,9 @@ Residue class: Defines residue properties
         #end if
 
         if (convention != INTERNAL):
-            atomName = translateAtomName( convention, self.resName, atomName, INTERNAL )
+            atomName = translateAtomName( convention, self.translate(convention), atomName, INTERNAL )
         #end if
-        if (atomName in self):
+        if self.has_key(atomName):
             return self[atomName]
         #end if
         return None
@@ -2460,30 +2534,98 @@ Residue class: Defines residue properties
     #end def
 #end class
 
-#class XMLResidueHandler( XMLhandler ):
-#    """Residue handler class"""
-#    def __init__( self ):
-#        XMLhandler.__init__( self, name='Residue')
-#    #end def
-#
-#    def handle( self, node ):
-#        attrs = self.handleDictElements( node )
-#        if attrs == None: return None
-#        result = Residue( resName = attrs['resName'], resNum = attrs['resNum'] )
-#
-#        # update the attrs values
-#        result.update( attrs )
-#
-#        # restore the tree structure
-#        for atm in result._children:
-#            result[atm.name] = atm
-#            atm._parent = result
-#        return result
-#    #end def
-##end class
-#
-##register this handler
-#Residue.XMLhandler = XMLResidueHandler()
+class Dihedral( NTlist ):
+    """
+    Class to represent a dihedral angle
+    """
+
+    def __init__(self, residue, dihedralName, range=None ):
+        NTlist.__init__(self)
+
+        self.residue = residue
+        self.name = dihedralName
+        if not range:
+            plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
+            self.range = ( plotpars.min, plotpars.max )
+        else:
+            self.range = range
+        #end if
+
+
+        if not dihedralName or not residue or not residue.db or not residue.db.has_key(dihedralName):
+            self.db = None
+            self.atoms = None
+        else:
+            self.db = residue.db[dihedralName]
+            atoms = translateTopology( self.residue, self.db.atoms )
+            if atoms == None or len(atoms) != 4 or None in atoms:
+                self.atoms = None
+            else:
+                self.atoms  = atoms
+                #add dihedral to dict for lookup later
+                self.residue.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
+                    (self.residue, dihedralName, self.db)
+                self.residue.chain.molecule._dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
+                    (self.residue, dihedralName, self.db)
+            #end if
+        #end if
+        self.cav = NaN
+        self.cv  = NaN
+    #end def
+
+    def __str__(self):
+        if self.residue:
+            dname = self.residue.name + '.' + self.name
+        else:
+            dname = self.name
+        #end if
+        return sprintf('<Dihedral %s: %.1f, %.2f>', dname, self.cav, self.cv)
+    #end def
+
+    def format(self):
+        if self.residue:
+            dname = self.residue.name + '.' + self.name
+        else:
+            dname = self.name
+        #end if
+        return sprintf('%s Dihedral %s %s\n' +\
+                       'values:   %s\n' +\
+                       'average:  %.1f\n' +\
+                       'variance: %.2f\n' +\
+                       'range:    %s\n' +\
+                       'atoms:    %s',
+                        dots, dname, dots,
+                        NTlist.__str__(self),
+                        self.cav, self.cv, self.range,
+                        self.atoms
+                       )
+
+
+    def calculateValues(self):
+        """Calculate the dihedral values: return cav, cv tuple or NaN,NaN on error
+        """
+        # Check if all atoms have the same number of coordinates
+        l = len( self.atoms[0].coordinates)
+        for a in self.atoms[1:]:
+            if len(a.coordinates) != l:
+                return NaN,NaN
+            #end if
+        #end for
+
+        for i in range(0,l):
+            self.append( NTdihedralOpt(
+                                       self.atoms[0].coordinates[i],
+                                       self.atoms[1].coordinates[i],
+                                       self.atoms[2].coordinates[i],
+                                       self.atoms[3].coordinates[i]
+                                      )
+                       )
+
+        cav,cv,_n = self.cAverage(min=self.range[0],max=self.range[1])
+
+        return cav,cv
+    #end def
+#end class
 
 
 class Coordinate:
@@ -2651,7 +2793,7 @@ Atom class: Defines object for storing atom properties
         self.coordinates = NTlist()
         self.rogScore    = ROGscore()
 
-        self.saveXML('resName', 'resonances','coordinates')
+        self._topology = None #intially None; defined by the updateTopolgy call of the Molecule class
 
         # several external programs need an index
         global AtomIndex
@@ -2841,7 +2983,10 @@ Atom class: Defines object for storing atom properties
 
     def topology( self ):
         """return list of Atom instances defining the topology"""
-        return translateTopology( self._parent, self.db.topology )
+        if self._topology != None:
+            return self._topology
+        else: #old style#
+            return translateTopology( self._parent, self.db.topology )
     #end def
 
     def isAssigned( self ):
@@ -2944,69 +3089,6 @@ Atom class: Defines object for storing atom properties
         return self.topology()[0]
     #end def
 
-
-
-
-#    def isAromatic( self ):
-#        """Return true if it is an atom belonging to an aromatic ring
-#           Patched for now, have to store it in database
-#        """
-#        if not self.residue.db.hasProperties('aromatic'): return False
-#
-#        if (self.isCarbon() and self.db.shift.average > 100.0):
-#            return True
-#        if (self.isNitrogen() and self.db.shift.average > 130.0):
-#            return True
-#        elif (self.isProton()):
-#            topo = self.topology()
-#            if len(topo) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
-#            heavy = self.topology()[0]
-#            return heavy.isAromatic()
-#        #end if
-#        return False
-#    #end def
-#
-#    def isBackbone( self ):
-#        """
-#        Return True if it is a backbone atom.
-#        Patch for now, based upon explicit enumeration
-#        """
-#        if self.name in ['C','O','N','H','HN','H1','H2','H3','CA','HA','HA1','HA2']:
-#            return True
-#        else:
-#            return False
-#    #end def
-#
-#    def isSidechain( self ):
-#        """
-#        Return True if it is a sidechain atom,
-#        i.e. not isBackbone
-#        """
-#        return not self.isBackbone()
-#    #end def
-#
-#    def isMethyl( self ):
-#        """
-#        Return True atm is a methyl (either carbon or proton)
-#        """
-#        if self.isCarbon() and len(self.attachedProtons(includePseudo = False)) == 3:
-#            return True
-#        elif self.isProton():
-#            # should be attched to a heavy atomo
-#            topo = self.topology()
-#            if len(topo) == 0 or topo[0] == None: return False
-#            return topo[0].isMethyl()
-#        else:
-#            return False
-#        #end if
-#    #end def
-#
-#    def isMethylProton( self ):
-#        """
-#        Return True if atm is a methyl proton
-#        """
-#        return self.isProton() and self.isMethyl()
-#    #end def
     def isAromatic( self ):
         """Return true if it is an atom belonging to an aromatic ring
         """
@@ -3091,30 +3173,6 @@ Atom class: Defines object for storing atom properties
         else:
             props.append('isNotStereoAssigned','notstereoassigned')
         #end if
-
-# in database now
-#        if self.isBackbone():
-#            props.append('isBackbone','backbone')
-#        else:
-#            props.append('isSidechain','sidechain')
-#        #endif
-#        if self.isAromatic():
-#            props.append('isAromatic','aromatic')
-#        else:
-#            props.append('isNotAromatic','notaromatic')
-#        #end if
-#        if self.isMethyl():
-#            props.append('isMethyl','methyl')
-#        else:
-#            props.append('isNotMethyl','notmethyl')
-#        #end if
-#        if self.isMethylProton():
-#            props.append('isMethylProton','methylproton')
-#        else:
-#            props.append('isNotMethylProton','notmethylproton')
-#        #end if
-
-#        print '>>', props
 
         for p in properties:
             if not p in props:
@@ -3885,7 +3943,7 @@ def ensureValidChainId(chainId ):
     In absence of an existing molecule this routine can only return the default chain id
     if the presented id is not valid.
     """
-    
+
     if isValidChainId( chainId ):
         return chainId
     if chainId and len(chainId) > 1:

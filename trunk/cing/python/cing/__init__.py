@@ -28,7 +28,7 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.85
+cingVersion     = 0.86
 __version__     = cingVersion # for pydoc
 __date__        = '5 February 2009'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
@@ -43,7 +43,7 @@ for _a in authorList:
 __copyright__  = "Copyright (c) %s Protein Biophysics (IMM)/CMBI, Radboud University Nijmegen, The Netherlands"
 __credits__    = """More info at http://nmr.cmbi.ru.nl/CING
 
-""" + __copyright__ # TODO: misusing credits for pydoc 
+""" + __copyright__ # TODO: misusing credits for pydoc
 
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 
@@ -126,7 +126,7 @@ from cing.core.classes      import DistanceRestraint, DistanceRestraintList
 from cing.core.classes      import DihedralRestraint, DihedralRestraintList
 from cing.core.classes      import RDCRestraint,      RDCRestraintList
 
-from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance, mapMolecules
+from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance, Dihedral, mapMolecules
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
 from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods

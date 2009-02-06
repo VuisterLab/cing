@@ -30,7 +30,7 @@ from cing.core.classes import DihedralRestraintList
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
 
-from cing.core.constants import CYANA
+#from cing.core.constants import CYANA
 
 #The following imports we need for restoring the project
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
@@ -40,15 +40,16 @@ import sys
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
-SMLversion       = 0.221
+SMLversion       = 0.23
 # version history:
 #  0.1: initial version
 #  0.2: NTlist and NTdict SML handlers; recursion in dict-like handlers
 #  0.21: Explicitly require endHandler to return obj or None on error.
 #  0.22: SML Molecule, Chain, Residue, Atom handlers
 #  0.221: Atom saves shiftx
+#  0.23: Molecule saves Nterminal, Cterminal in _sequence list
 
-SMLsaveFormat  = CYANA
+SMLsaveFormat  = 'INTERNAL_0'
 SMLfileVersion = None
 
 class SMLhandler:
@@ -87,8 +88,13 @@ Example file:
         SMLstarthandlers[self.startTag] = self
         SMLendhandlers[self.endTag]     = self
 
+#        print self._className()
+
     def __str__(self):
         return sprintf('<SMLhandler %s>', self.name )
+
+#    def _className(self):
+#        return str(self.__class__)[7:-2].split('.')[-1:][0]
 
     def listHandler(self, listObj, fp, obj=None):
         """
@@ -116,16 +122,19 @@ Example file:
 #            line = SMLhandler.readline( fp )
 #            if self.debug: NTmessage('%s> %s', self, line)
 
-            if len(line) > 0 and line[1] == self.endTag:
+            l = len(line)
+            if l > 0 and line[1] == self.endTag:
                 return self.endHandler( listObj, obj )
-            elif len(line) > 0 and SMLstarthandlers.has_key(line[1]):
+            elif l > 0 and SMLstarthandlers.has_key(line[1]):
                 listObj.append( SMLstarthandlers[line[1]].handle( line, fp, obj ) )
+            elif l > 0 and SMLendhandlers.has_key(line[1]):
+                NTerror('SMLhandler.listHandler: skipping invalid closing tag "%s"', line[1])
             else:
                 listObj.append( eval(line[0]) )
             #end if
             line = SMLhandler.readline( fp )
-
         #end while
+
         # we should not be here
         NTerror('SMLhandler.listHandler: unterminated list')
         return None
@@ -162,20 +171,22 @@ Example file:
 #            #end if
 #            line = SMLhandler.readline( fp )
 #            if self.debug: printf('%s> %s\n', self, line)
-
-            if len(line) > 0 and line[1]==self.endTag:
+            l = len(line)
+            if l > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )
             # version 0.2: implement recursion
-            elif len(line) > 3 and SMLstarthandlers.has_key(line[3]):
+            elif l > 3 and SMLstarthandlers.has_key(line[3]):
                 dictObj[line[1]] = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, obj )
-            elif len(line) > 3:
+            elif l > 0 and SMLendhandlers.has_key(line[1]):
+                NTerror('SMLhandler.dictHandler: skipping invalid closing tag "%s"', line[1])
+            elif l > 3:
                 dictObj[line[1]] = eval(''.join(line[3:]))
             else:
-                NTerror('SMLhandler.dictHandler: incomplete line "%s"', line[0])
+                NTerror('SMLhandler.dictHandler: skipped incomplete line "%s"', line[0])
             #end if
             line = SMLhandler.readline( fp )
-
         #end while
+
         # we should not be here
         NTerror('SMLhandler.dictHandler: unterminated dict')
         return None
@@ -409,9 +420,17 @@ class SMLMoleculeHandler( SMLhandler ):
                 _sequence = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, mol )
                 # Restore the sequence
                 #print '>>', _sequence
-                for chain, resName, resNum, convention in _sequence:
-                    mol._addResidue( chain, resName, resNum, convention )
-                #end for
+                if SMLfileVersion < 0.23:
+                # older _sequence format without N-, C-terminal defs <= 0.23
+                    for chain, resName, resNum, convention in _sequence:
+                        mol._addResidue( chain, resName, resNum, convention )
+                    #end for
+                else:
+                # Newer _sequence format with N-, C-terminal defs >= 0.23
+                    for chain, resName, resNum, Nterminal, Cterminal, convention in _sequence:
+                        mol._addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
+                    #end for
+                #end if
             elif len(line) > 3 and SMLstarthandlers.has_key(line[3]):
                 mol[line[1]] = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, mol )
             elif len(line) > 3:
@@ -444,6 +463,8 @@ class SMLMoleculeHandler( SMLhandler ):
             mol._sequence.append( ( res.chain.name,
                                     res.translate(SMLsaveFormat) ,
                                     res.resNum,
+                                    res.Nterminal,
+                                    res.Cterminal,
                                     SMLsaveFormat
                                    )
                                 )

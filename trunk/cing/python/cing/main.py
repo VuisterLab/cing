@@ -142,8 +142,22 @@ import unittest
 # Support routines
 #------------------------------------------------------------------------------------
 
+def pformat( object ):
+#$%^%^&&*(()
+#
+# JURGEN: do NOT touch this routine!
+#
+#%%^$&*$($()
+#    print '>>', object
+    if hasattr(object,'format'):
+        print object.format()
+    else:
+        print object
+    #end if
+#end def
+
 def format(object):
-    """Returns the formatted object representation"""    
+    """Returns the formatted object representation"""
 #    print '>>', object
     if hasattr(object, 'format'):
         return object.format()
@@ -193,7 +207,7 @@ def verbosity(value):
 
 
 def formatall(object):
-    """Returns the formatted object representation"""    
+    """Returns the formatted object representation"""
     result = ""
     if isinstance(object, list):
         i = 0
@@ -201,7 +215,7 @@ def formatall(object):
             #printf(">>> [%d] >>> ", i)
             result += format(obj)
             i += 1
-        return result    
+        return result
     if isinstance(object, dict):
         for key, value in object.items():
             result += "%-15s : " % key
@@ -221,7 +235,7 @@ def scriptPath(scriptFile):
         scriptsDir = os.path.join(cingPythonCingDir, cingPaths.scripts)
         scriptFileAbs = os.path.join(scriptsDir, scriptFile)
         if not os.path.exists(scriptFileAbs):
-            NTerror('Missed in current working directory and Scripts directory\n' + 
+            NTerror('Missed in current working directory and Scripts directory\n' +
                     '[%s] the script file [%s]' % (scriptsDir, scriptFile))
             return None
         return scriptFileAbs
@@ -416,7 +430,7 @@ def getParser():
                      )
     parser.add_option("--noImagery",
                       action="store_true",
-                      dest="noImagery", 
+                      dest="noImagery",
                       help="Set this option to prevent the creation images. Greatly speeds validation up."
                      )
     parser.add_option("--superpose",
@@ -446,7 +460,7 @@ def main():
 
     global project
     global options
-    
+
     _root, file, _ext = NTpath(__file__)
 
     parser = getParser()
@@ -473,7 +487,7 @@ def main():
 
     # The weird location of this import is because we want it to be verbose.
     from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
-        
+
     if options.test:
         testOverall(namepattern="test_*.py")
         sys.exit(0)
@@ -510,8 +524,8 @@ def main():
 
         print Project.__doc__
         for p in plugins.values():
-            NTmessage('-------------------------------------------------------------------------------' + 
-                       'Plugin %s\n' + 
+            NTmessage('-------------------------------------------------------------------------------' +
+                       'Plugin %s\n' +
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
                      )
@@ -607,7 +621,7 @@ def main():
     m = project.molecule #@UnusedVariable
 
  #   pr = print
-    f = format #@UnusedVariable
+    f = pformat #@UnusedVariable
     fa = formatall #@UnusedVariable
 
     if options.ensemble:
