@@ -1067,7 +1067,6 @@ class Molecule( NTtree ):
                             idx = int(i)
                             res = residue.sibling( idx )
                             if res == None or not res.has_key( atomName ):
-#                                result.append( None ) # JFD thinks this is a bug.
                                 continue
                             atm._topology.append( res[atomName] )
 
@@ -1978,7 +1977,7 @@ Chain class: defines chain properties and methods
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
 
-    def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ):
+    def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, FiveTerminal=False, ThreeTerminal=False, **kwds ):
         if self.has_key(resNum):
             NTerror( 'Chain.addResidue: residue number "%s" already present in %s', resNum, self )
             return None
@@ -2761,9 +2760,8 @@ Atom class: Defines object for storing atom properties
             self.db = db
         else:
 #            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-            NTwarning('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating non-standard definition.',
-                       resName, atomName, convention
-                      )
+#            NTdebug('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating non-standard definition.',
+#                       resName, atomName, convention   )
             self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.
         #end if
     #end def

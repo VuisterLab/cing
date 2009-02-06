@@ -171,6 +171,20 @@ class NTlist(list):
         #end if
     #end def
 
+    def removeIfPresent(self, item):
+        if self.index(item)>=0:
+            self.remove(item)
+        #end if
+    #end def
+    
+    def replaceIfPresent(self, item, itemNew):
+        idx = self.index(item)
+        if idx >= 0:
+            self.remove(item)
+            self.insert(idx,itemNew)
+        #end if
+    #end def
+        
     def replace(self, item, newItem):
         index = self.index(item)
         if (index < 0):
