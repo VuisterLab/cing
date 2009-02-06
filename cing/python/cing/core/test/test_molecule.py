@@ -2,6 +2,7 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTmessage
 from cing.core.classes import Project
 from cing.core.molecule import Chain
 from cing.core.molecule import Coordinate
@@ -60,6 +61,29 @@ class AllChecks(TestCase):
             self.assertTrue( molecule.addChain(chainId))
         NTdebug("Added %d chains to: %s" % (n, format(molecule)))
         self.assertEqual( len(molecule.allChains()), n)
+        
+    def test_AddResidue_Standard(self):
+        entryId = 'test'
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status='new')
+
+        mol = Molecule('test')
+        project.appendMolecule(mol)
+        c = mol.addChain('A')
+        r1 = c.addResidue('ALA', 1, Nterminal = True)
+        if r1:
+            r1.addAllAtoms()
+        r2 = c.addResidue('VAL', 2)
+        if r2:
+            r2.addAllAtoms()
+        r3 = c.addResidue('GLU', 3, Cterminal = True)
+        if r3:
+            r3.addAllAtoms()
+        
+        mol.updateAll()
+        
+        NTmessage( mol.format() )        
         
 if __name__ == "__main__":
     fn = 'fooprof'

@@ -4,10 +4,8 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
 from cing import verbosityDebug
 from cing import verbosityDefault
-from cing.PluginCode.ccpn import RESTRAINT_IDX_DIHEDRAL
-from cing.PluginCode.ccpn import RESTRAINT_IDX_DISTANCE
-from cing.PluginCode.ccpn import SMALL_FLOAT_FOR_DIHEDRAL_ANGLES
-from cing.PluginCode.ccpn import restraintsValues
+from cing.PluginCode.Ccpn import Ccpn
+from cing.PluginCode.Ccpn import getRestraintBoundList
 from cing.core.sml import NTdict
 from unittest import TestCase
 import cing
@@ -29,11 +27,11 @@ class AllChecks(TestCase):
                  (2.0, None, None, None), # lower only
                  (-2.0, 5.0, None, None), # should give reasonable error and unset distance lower bound
                   
-                 (-5.0, 5.0, None, None, RESTRAINT_IDX_DIHEDRAL), # Is a range of 10 degrees. 
-                 (5.0, -5.0, None, None, RESTRAINT_IDX_DIHEDRAL), # Is a range of 350 degrees. 
-                 (None, None, -10.0, 20.0, RESTRAINT_IDX_DIHEDRAL), # Is a range of 20 degrees. 
-                 (None, None, 350.0, 20.0, RESTRAINT_IDX_DIHEDRAL), # Same. 
-                 (None, None, 123.0, 200.0, RESTRAINT_IDX_DIHEDRAL), # Give a reasonable error and sets to full circle by setting to (0,-SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
+                 (-5.0, 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 10 degrees. 
+                 (5.0, -5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 350 degrees. 
+                 (None, None, -10.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 20 degrees. 
+                 (None, None, 350.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Same. 
+                 (None, None, 123.0, 200.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Give a reasonable warning and sets to full circle by setting to (0,-SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
                    ]
         cingRlist = [ 
                      (0.0, 3.0),
@@ -50,7 +48,7 @@ class AllChecks(TestCase):
                      (5.0, -5.0),
                      (-30.0, 10.0),                     
                      (-30.0, 10.0),                     
-                     (0.0, -SMALL_FLOAT_FOR_DIHEDRAL_ANGLES),                     
+                     (0.0, -Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES),                     
                    ]
 
         for i in range(len(rList)):
@@ -60,13 +58,13 @@ class AllChecks(TestCase):
             ccpnConstraint.upperLimit = cc[1] 
             ccpnConstraint.targetValue = cc[2] 
             ccpnConstraint.error = cc[3]
-            restraintTypeIdx = RESTRAINT_IDX_DISTANCE
+            restraintTypeIdx = Ccpn.RESTRAINT_IDX_DISTANCE
             if len(cc) >= 5:
                 restraintTypeIdx = cc[4]
 
             cie = cingRlist[i]
 #               Output: floats (lower, upper)
-            ci = restraintsValues(ccpnConstraint,restraintTypeIdx)
+            ci = getRestraintBoundList(ccpnConstraint,restraintTypeIdx)
 
             if not ci:
                 self.assertFalse(cie)
