@@ -44,7 +44,6 @@ from cing.core.constants import NOSHIFT
 from cing.core.constants import XPLOR
 from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
-from cing.core.database import translateResidueName
 from database import NTdb
 from math import acos
 from math import pi
@@ -1068,7 +1067,7 @@ class Molecule( NTtree ):
                             idx = int(i)
                             res = residue.sibling( idx )
                             if res == None or not res.has_key( atomName ):
-                                result.append( None )
+#                                result.append( None ) # JFD thinks this is a bug.
                                 continue
                             atm._topology.append( res[atomName] )
 
@@ -1986,7 +1985,7 @@ Chain class: defines chain properties and methods
         #end if
         res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
         if res.name in self:
-            NTerror( 'Chain.addResidue: residue "%s" already present in %s', res.name, chain )
+            NTerror( 'Chain.addResidue: residue "%s" already present in %s', res.name, self.name )
             return None
         #end if
         self._addChild( res )

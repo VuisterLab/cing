@@ -10,7 +10,7 @@ from cing.core.classes import Project
 from unittest import TestCase
 from shutil import move #@UnusedImport
 from cing import verbosityDebug
-from cing.PluginCode.ccpn import _isRootDirectory
+from cing.PluginCode.Ccpn import isRootDirectory
 import cing
 import os
 import unittest
@@ -19,8 +19,8 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-#        entryList = "1a".split()
-        entryList = "1brv".split()
+        entryList = "1a4d".split()
+#        entryList = "1brv".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #        entryList =            "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
@@ -45,17 +45,17 @@ class AllChecks(TestCase):
 
             ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile))
-            self.failIf(project.save())
+            self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif ))
-            self.assertFalse(project.removeCcpnReferences())
+            self.assertFalse(project.removeCcpnReferences()) 
 
-    def testIsRootDirectory(self):
-        self.assertTrue( _isRootDirectory("linkNmrStarData/"))
-        self.assertTrue( _isRootDirectory("linkNmrStarData//"))
-        self.assertFalse( _isRootDirectory("linkNmrStarData/ccp/"))
-        self.assertFalse( _isRootDirectory("linkNmrStarData/ccp//"))
+    def tttestIsRootDirectory(self):
+        self.assertTrue( isRootDirectory("linkNmrStarData/"))
+        self.assertTrue( isRootDirectory("linkNmrStarData//"))
+        self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
+        self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
