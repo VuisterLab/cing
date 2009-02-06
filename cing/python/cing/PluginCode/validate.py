@@ -1128,7 +1128,7 @@ def validateAssignments( project, toFile = True   ):
 
             # Check for protons with unassigned heavy atoms
             if atm.isProton():
-                heavyAtm = atm.topology()[0]
+                heavyAtm = atm.heavyAtom()
                 if not heavyAtm.isAssigned():
                     string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
 #                    NTmessage('%-20s %s', atm, string )
@@ -1297,6 +1297,7 @@ def validateAssignments( project, toFile = True   ):
 
 def restoreDihRestraintInfo(project):
     """To restore restraint.residue and restraint.angle"""
+    #GV does not understand why this routine would be needed
     for dihRestraintList in project.dihedrals:
         for dihRestraint in dihRestraintList:
             residue, angle, _val3 = dihRestraint.retrieveDefinition()

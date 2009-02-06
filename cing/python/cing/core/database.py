@@ -671,6 +671,9 @@ class AtomDef( NTtree ):
 
                            topology    = [],       # List of bound atoms: (i, name) tuple
                                                    # i:  -1=previous residue; 0=current residue; 1=next residue
+                           NterminalTopology = [], # special case for N-terminal atoms
+                           CterminalTopology = [], # special case for C-terminal atoms
+
                            pseudo      = None,     # Corresponding pseudo atom (for real atoms)
                            real        = [],       # List of corresponding real atoms (for pseudo atoms)
 
@@ -828,11 +831,6 @@ class AtomDef( NTtree ):
         #end for
         self.properties = props2
 
-        #Add aliases
-        for aname in self.aliases:
-            self.residueDef[aname] = self
-        #end for
-
         # set entry of atomDict of residueDef to self
         atomDict = self.residueDef.atomDict
         for convA, nameA in self.nameDict.iteritems():
@@ -844,6 +842,12 @@ class AtomDef( NTtree ):
                     atomDict[convA][n] = self
                 #end for
             #end if
+        #end for
+
+        #Add aliases
+        for aname in self.aliases:
+            self.residueDef[aname] = self
+            atomDict[INTERNAL][aname] = self
         #end for
 
     #end def
@@ -1064,6 +1068,82 @@ NTdebug( '>' + INTERNAL )
 
 NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
 
+
+# Patch N- and C-termini
+from cing import IUPAC,CCPN,XPLOR
+protein = NTdb.residuesWithProperties('protein')
+for res in protein[:-1]:
+
+    N = res.N
+    N.NterminalTopology = [(0,'CA')]
+
+    if 'HN' in res: #non-proline
+        hn = res.HN
+        #print hn
+
+        for hName in ['H1','H2','H3']:
+            ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
+                                                     'INTERNAL_1':hName,
+                                                      IUPAC:hName,
+                                                      CCPN:hName,
+                                                      XPLOR:hName,
+                                                    },
+                                         aliases=[],
+                                         pseudo = None,
+                                         real   = [],
+                                         shift  = hn.shift,
+                                         spinType = '1H',
+                                         topology = [(0,'N')],
+                                         type = 'H_AMI'
+                                 )
+            ad.postProcess()
+            N.NterminalTopology.append( (0,hName) )
+        #end for
+
+    else: # proline (cis and trans)
+
+        for hName in ['H2','H3']:
+            ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
+                                                     'INTERNAL_1':hName,
+                                                      IUPAC:hName,
+                                                      CCPN:hName,
+                                                      XPLOR:hName,
+                                                    },
+                                         aliases=[],
+                                         pseudo = None,
+                                         real   = [],
+                                         shift  = NTdict(average=8.3,sd=0.5), #just some numbers
+                                         spinType = '1H',
+                                         topology = [(0,'N')],
+                                         type = 'H_AMI'
+                                 )
+            ad.postProcess()
+            N.NterminalTopology.append( (0,hName) )
+        #end for
+    #end if
+
+    # Add O' alias for terminal oxygen
+    res.O.aliases=['O',"O'"]
+    res.O.postProcess()
+
+    # add C-terminal OXT
+    ad = res.appendAtomDef( 'OXT', nameDict={'INTERNAL_0':'OXT',
+                                             'INTERNAL_1':'OXT',
+                                               IUPAC:"OXT,O''",
+                                               CCPN:"O''",
+                                               XPLOR:'OXT',
+                                             },
+                                     aliases=["OXT","O''"],
+                                     pseudo = None,
+                                     real   = [],
+                                     spinType = '16O',
+                                     topology = [(0,'C')],
+                                     type = 'O_BYL'
+                             )
+    ad.postProcess()
+    res.C.CterminalTopology = [(0,'CA'),(0,'O'),(0,'OXT')]
+
+#end for
 
 
 

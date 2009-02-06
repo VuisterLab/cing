@@ -869,7 +869,8 @@ projecthandler = XMLProjectHandler()
 
 
 class _ProjectList( NTlist ):
-    """Generic Project list class; only to be used internally
+    """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
+       only to be used internally
        Creates classDef instance when calling the new() method
     """
     def __init__( self, project, classDef, nameListKey, basePath ):
