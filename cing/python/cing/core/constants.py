@@ -32,7 +32,7 @@ CYANA2     = 'CYANA2'
 XPLOR      = 'XPLOR'
 CNS        =  XPLOR
 PDB        = 'PDB'
-INTERNAL_0 = 'INTERNAL_1'   # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention
+INTERNAL_0 = 'INTERNAL_0'   # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention
 INTERNAL_1 = 'INTERNAL_1'   # INTERNAL_1 is the second convention used: IUPAC for IUPAC defined atoms, CYANA2 for non-IUPAC atoms
 INTERNAL   = INTERNAL_0
 
@@ -40,7 +40,6 @@ LOOSE      = 'LOOSE'
 
 CCPN       = 'CCPN' # Wim added
 CING       = 'CING' # For CCPN
-CIF        = 'CIF'  # Internal to CCPN the name for the CING atom names
 
 # No shift value for Xeasy.
 NOSHIFT         =  999.000

@@ -195,16 +195,12 @@ class MolDef( NTtree ):
     def isValidResidueName( self, resName, convention = INTERNAL ):
         """return True if resName is a valid for convention, False otherwise
         """
-    #  print '>>', resName, atomName
-
         if not resName:
             NTdebug('MolDef.isValidResidueName: undefined residue name')
             return None
-        #end if
         if not self.residueDict.has_key(convention):
             NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
-        #end if
         return (self.getResidueDefByName( resName, convention=convention) != None)
     #end def
 
