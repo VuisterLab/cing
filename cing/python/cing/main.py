@@ -145,7 +145,7 @@ import unittest
 def pformat( object ):
 #$%^%^&&*(()
 #
-# JURGEN: do NOT touch this routine!
+# JURGEN: do NOT touch this routine! Only for interactive usage
 #
 #%%^$&*$($()
 #    print '>>', object
