@@ -2360,60 +2360,6 @@ Residue class: Defines residue properties
         #end if
     #end def
 
-
-#    def dihedral( self, dihedralName ):
-#        """Return cmean,cv tuple for dihedralName,
-#        or None on error
-#
-#        set self[dihedralName] to NTlist of results
-#        """
-#        # optimized out.
-##        if dihedralName not in self.db:
-#        if not self.db.has_key(dihedralName):
-#            return None
-#
-#        self[dihedralName] = NTlist()
-#        self[dihedralName].cAverage()
-##        self[dihedralName].cav = NAN_FLOAT Now redundant because cAverage will already have set them
-##        self[dihedralName].cv  = NAN_FLOAT To be set at the end of this routine by calling cAverage() again.
-#        self[dihedralName].db  = self.db[dihedralName] # linkage to the database
-#        self[dihedralName].residue  = self             # linkage to self
-#
-#        # Get/Check the topology
-#        self[dihedralName].atoms  = None
-#        atoms = translateTopology( self, self.db[dihedralName].atoms )
-#        if atoms == None or len(atoms) != 4 or None in atoms:
-#            return None
-#        self[dihedralName].atoms  = atoms
-#
-#        #add dihedral to dict for lookup later
-#        self.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
-#            (self, dihedralName, self.db[dihedralName])
-#        self.chain.molecule._dihedralDict[(atoms[3],atoms[2],atoms[1],atoms[0])] = \
-#            (self, dihedralName, self.db[dihedralName])
-#
-#        # Check if all atoms have the same number of coordinates
-#        l = len( atoms[0].coordinates)
-#        for a in atoms[1:]:
-#            if len(a.coordinates) != l:
-#                return None
-#            #end if
-#        #end for
-#
-#        for i in range(0,l):
-#            self[dihedralName].append( NTdihedralOpt(
-#               atoms[0].coordinates[i],
-#               atoms[1].coordinates[i],
-#               atoms[2].coordinates[i],
-#               atoms[3].coordinates[i]))
-#
-#        plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
-#        self[dihedralName].limit( plotpars.min, plotpars.max )
-#        cav,cv,_n = self[dihedralName].cAverage(min=plotpars.min,max=plotpars.max)
-#
-#        return cav,cv
-#    #end def
-
     def translate( self, convention ):
         """return translated name according to convention or None if not defined"""
         return self.db.translate(convention)
@@ -2477,6 +2423,16 @@ Residue class: Defines residue properties
         #end for
         return result
     #end def
+
+    def isNterminal(self):
+        """Return True for N-terminal residue; ie. a residue with H1, H2, H3 atoms.
+        """
+        return self.Nterminal
+
+    def isCterminal(self):
+        """Return True for C-terminal residue; ie. a residue with OXT (O'') atom.
+        """
+        return self.Cterminal
 
     def hasProperties(self, *properties):
         """
