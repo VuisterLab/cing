@@ -2306,11 +2306,11 @@ Residue class: Defines residue properties
 
     def deleteAtom(self, name, convention=INTERNAL ):
         """JFD adds: GV please check
-        Return True on success.
+        Return Atom on success or None on error
         """
         atm = self.getAtom(name, convention=convention)
         if not atm:
-            return False
+            return None
         if atm.db:
             for alias in atm.db.aliases:
                 if alias in self:
@@ -2318,7 +2318,7 @@ Residue class: Defines residue properties
         self.removeChild( atm )
         self.atomCount -= 1
         self._parent._parent.atomCount -= 1
-        return True
+        return atm
 
     def addAtom( self, name, convention=INTERNAL, **kwds ):
         """add atomName to self as well as potential alias references
