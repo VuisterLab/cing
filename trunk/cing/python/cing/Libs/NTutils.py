@@ -3139,6 +3139,11 @@ class PrintWrap:
     def setVerbosity(self, verbose):
         self.verbose=verbose
 
+ERROR_ID = "ERROR"
+WARNING_ID = "WARNING"
+MESSAGE_ID = "MESSAGE"
+DEBUG_ID = "DEBUG"
+
 NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
 NTerror   = PrintWrap(verbose=verbosityError, prefix = 'ERROR: ')
 NTcodeerror=PrintWrap(verbose=verbosityError, prefix = 'ERROR IN CODE: ')
@@ -3390,7 +3395,7 @@ class ExecuteProgram(NTdict):
         elif self.redirectOutputToFile:
             cmd = sprintf('%s > %s 2>&1', cmd, self.redirectOutputToFile)
             self.jobcount += 1
-        NTdebug('==> Executing ('+cmd+') ... ')
+#        NTdebug('==> Executing ('+cmd+') ... ')
         code = os.system(cmd)
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
@@ -4300,7 +4305,47 @@ def switchOutput( showOutput, doStdOut=True, doStdErr=False):
     if doStdErr:
         sys.stderr = _bitBucket
     
+class MsgHoL(NTdict):
+    def __init__(self):
+        NTdict.__init__(self)
+        self[ ERROR_ID ] =  NTlist()
+        self[ WARNING_ID ] =  NTlist()
+        self[ MESSAGE_ID ] =  NTlist()
+        self[ DEBUG_ID ] =  NTlist()
+        
+    def appendError(self, msg):
+        self[ ERROR_ID ].append(msg)
+    def appendWarning(self, msg):
+        self[ WARNING_ID ].append(msg)
+    def appendMessage(self, msg):
+        self[ MESSAGE_ID ].append(msg)
+    def appendDebug(self, msg):
+        self[ DEBUG_ID ].append(msg)
+        
+    def showMessage( self, MAX_ERRORS = 5, MAX_WARNINGS = 5, MAX_MESSAGES = 5, MAX_DEBUGS = 100 ):
+        "Limited printing of errors and the like; might have moved the arguments to the init but let's not waste time."
     
+        typeCountList = { ERROR_ID: MAX_ERRORS, WARNING_ID: MAX_WARNINGS, MESSAGE_ID: MAX_MESSAGES, DEBUG_ID: MAX_DEBUGS }
+        typeReportFunctionList = { ERROR_ID: NTerror, WARNING_ID: NTwarning, MESSAGE_ID: NTmessage,  DEBUG_ID: NTdebug }
+    
+        for type in typeCountList:            
+            if not self.has_key(type):
+                continue
+    
+            typeCount = typeCountList[ type ]
+            msgList = self[type]
+            typeReportFunction = typeReportFunctionList[ type ]
+            msgListLength = len(msgList)
+#            NTdebug("now for typeCount: %d found %d" % (typeCount, msgListLength))
+            for i in range(msgListLength):
+                if i >= typeCount:
+                    typeReportFunction("and so on for a total of %d messages" % len(msgList))
+                    break
+                typeReportFunction(msgList[i])
+    #end def            
+# end classs 
+            
+
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     input = ['1brv', '9pcy' ]

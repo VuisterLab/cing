@@ -319,7 +319,7 @@ Example file:
         object.SMLhandler.toSML( object, fp )
         fprintf( fp, '%s\n', smlhandler.endTag )
 
-        NTdebug('saved %s to "%s"', object, fileName )
+#        NTdebug('saved %s to "%s"', object, fileName ) # JFD adds; it's a duplicate of the NTdetail message.
         #end if
         return object
     #end def

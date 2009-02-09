@@ -796,7 +796,8 @@ def validateSaltbridge( residue1, residue2 ):
         for atmName in centroids[residue.db.shortName]:
             atm = residue[atmName]
             if len(atm.coordinates) == 0:
-                NTerror('validateSaltbridge: no coordinates for atom %s', atm)
+                # Happens for all residues without coordinates. E.g. 1brv 159-170
+#                NTerror('validateSaltbridge: no coordinates for atom %s', atm)
                 return None
             #end if
         #end for

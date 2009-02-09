@@ -58,7 +58,8 @@ import sys
 # Global variables
 #==============================================================================
 AtomIndex = 1
-
+_DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
+ 
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
 # Superseeded by SML routines
@@ -497,7 +498,7 @@ class Molecule( NTtree ):
         return resNumDict
     #end def
 
-    def _getAtomDict(self, convention=INTERNAL, ChainId = 'A'):
+    def _getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
@@ -516,9 +517,10 @@ class Molecule( NTtree ):
                     if atomDict.has_key( t ):
                         # GV needs to check if this still needs to be an error or as is, down graded to warning level.
                         # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
-                        # GV, Yes maintain, but  test for aname should reduce warnings
-                        NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
-                                    atm, atomDict[t])
+                        # GV, Yes maintain, but test for aname should reduce warnings
+#                        NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+#                                    atm, atomDict[t])
+                        pass
                     else:
                         atomDict[t] = atm
                     #end if
@@ -1142,7 +1144,7 @@ class Molecule( NTtree ):
                             c_partner_found = c1
                             if c_partner_found == c:
                                 c_partner_found = c2
-                            NTwarning('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
+                            NTdebug('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
                                   c, c_partner_found_before, c_partner_found ))
                     if toAdd:
                         pair = (c1, c2)
@@ -1151,8 +1153,8 @@ class Molecule( NTtree ):
                         cyssDict2Pair[c2] = pair
         if pairList:
             NTmessage( '==> Molecule %s: Potential disulfide bridges: %d' %( self.name, len(pairList)))
-            for pair in pairList:
-                NTdebug( '%s %s' % (pair[0], pair[1] ))
+#            for pair in pairList:
+#                NTdebug( '%s %s' % (pair[0], pair[1] ))
         else:
             NTdetail( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
     # end def
@@ -1586,7 +1588,7 @@ Return an Molecule instance or None on error
                 if lastAtm and convention != XPLOR:
                     record = lastAtm.toPDBTER( pdbIndex=atmCount, convention=convention )
                     if not record:
-                        NTwarning("Failed to create a PDB file terminating record; ignoring for now.")
+                        NTdebug("Failed to create a PDB file terminating record; ignoring for now.")
                         continue
                     pdbFile.append( record )
                     atmCount += 1
@@ -1953,7 +1955,7 @@ Chain class: defines chain properties and methods
     DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ^01234567890abcdefghijklmnopqrstuvwxyz'
 #    validChainIdListBesidesTheAlphabet = '^' # last 1 chars of above.; JFD removed pound and underscore because they have a special meaning in STAR files.
     'Nothing that is a special character in Python, or tcsh.'
-    defaultChainId = 'A'
+    defaultChainId = _DEFAULT_CHAIN_ID
     'See documentation: molecule#ensureValidChainId'
 
     NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valied chain code but needs to be able to be passed on commandline
@@ -3294,13 +3296,14 @@ Atom class: Defines object for storing atom properties
         if not pdbAtmName:
             if self.name.startswith('Q'):
                 return None
-            NTwarning("Failed to translate from CING to convention: %s atom: %-20s returning CING atom name" % (convention, self))
+#            NTdebug("Failed to translate from CING to convention: %s atom: %-20s returning CING atom name" % (convention, self))
             pdbAtmName = self.name
 
         pdbResName = self.residue.translate( convention )
         if not pdbResName:
-            NTwarning("Failed to translate from CING to convention: %s residue: %-20s" % ( convention, self.residue ))
-            return None
+#            NTdebug("Failed to translate from CING to convention: %s residue: %-20s returning CING residue name" % ( convention, self.residue ))
+            pdbResName = self.residue.name
+#            return None
 
         coor = self.coordinates[model]
 

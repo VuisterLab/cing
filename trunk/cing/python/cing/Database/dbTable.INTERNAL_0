@@ -1802,7 +1802,7 @@ END_RESIDUE
 #   internal short
 RESIDUE CYSS     C
 #=======================================================================
-    nameDict = {'CCPN': 'protein Cys link:SG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYSS', 'INTERNAL_1': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
+    nameDict = {'CCPN': 'protein Cys deprot:HG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYSS', 'INTERNAL_1': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
     comment = 'disulphide linked Cys'
     properties = ['protein', 'aliphatic', 'polar', 'isCystine']
     #---------------------------------------------------------------
