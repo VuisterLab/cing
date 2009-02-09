@@ -1,0 +1,15 @@
+#summary Setting up CING
+
+= Setup script =
+{{{
+python $CINGROOT/python/cing/setup.py
+}}}
+Will look for installed software and puts the settings into a .csh/.sh to be sourced from your setup.
+
+It will also generate an alias to run cing:
+
+= Test setup =
+{{{
+cing --test -v 0
+}}}
+If all is fine it should only list ok at the end of each test.
