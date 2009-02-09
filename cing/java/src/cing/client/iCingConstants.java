@@ -48,20 +48,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Sound_is_turn();
 
   /**
-   * Translated "is part of the".
-   * 
-   * @return translated "is part of the"
-   * @gwt.key is_part
-   */
-  String is_part();
-
-  /**
    * Translated "Ensemble models".
    * 
    * @return translated "Ensemble models"
    * @gwt.key Ensemble_mode
    */
   String Ensemble_mode();
+
+  /**
+   * Translated "is part of the".
+   * 
+   * @return translated "is part of the"
+   * @gwt.key is_part
+   */
+  String is_part();
 
   /**
    * Translated "Options".
@@ -88,20 +88,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String PurgedProject();
 
   /**
-   * Translated "Residues".
-   * 
-   * @return translated "Residues"
-   * @gwt.key Residues
-   */
-  String Residues();
-
-  /**
    * Translated "Submit to CING server.".
    * 
    * @return translated "Submit to CING server."
    * @gwt.key Submit_to_CING_s
    */
   String Submit_to_CING_s();
+
+  /**
+   * Translated "Residues".
+   * 
+   * @return translated "Residues"
+   * @gwt.key Residues
+   */
+  String Residues();
 
   /**
    * Translated "Welcome to".
@@ -136,9 +136,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Save();
 
   /**
-   * Translated "Goto CING log.".
+   * Translated "Go to CING log.".
    * 
-   * @return translated "Goto CING log."
+   * @return translated "Go to CING log."
    * @gwt.key Goto_CING_log
    */
   String Goto_CING_log();
@@ -176,14 +176,6 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Advance_to_file();
 
   /**
-   * Translated "none".
-   * 
-   * @return translated "none"
-   * @gwt.key none
-   */
-  String none();
-
-  /**
    * Translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far.".
    * 
    * @return translated "CING might have crashed as the server status could not be retrieved. It might also still be running. Please check the results so far."
@@ -192,9 +184,17 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String CING_might_have();
 
   /**
-   * Translated "Purge the project data on the iCing server. ".
+   * Translated "none".
    * 
-   * @return translated "Purge the project data on the iCing server. "
+   * @return translated "none"
+   * @gwt.key none
+   */
+  String none();
+
+  /**
+   * Translated "Purge the project data on the iCing server.".
+   * 
+   * @return translated "Purge the project data on the iCing server."
    * @gwt.key PurgeProjectTitl
    */
   String PurgeProjectTitl();
@@ -272,20 +272,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Short_name_like();
 
   /**
-   * Translated "residue sigmas".
-   * 
-   * @return translated "residue sigmas"
-   * @gwt.key residue_sigma
-   */
-  String residue_sigma();
-
-  /**
    * Translated "Other".
    * 
    * @return translated "Other"
    * @gwt.key Other
    */
   String Other();
+
+  /**
+   * Translated "residue sigmas".
+   * 
+   * @return translated "residue sigmas"
+   * @gwt.key residue_sigma
+   */
+  String residue_sigma();
 
   /**
    * Translated "Only amides".
@@ -368,20 +368,12 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Load_state();
 
   /**
-   * Translated "Unfortunately, iCing does not work on this browser ".
+   * Translated "Unfortunately, iCing does not work on this browser".
    * 
-   * @return translated "Unfortunately, iCing does not work on this browser "
+   * @return translated "Unfortunately, iCing does not work on this browser"
    * @gwt.key warningBrowser
    */
   String warningBrowser();
-
-  /**
-   * Translated "Include intra-residual contacts".
-   * 
-   * @return translated "Include intra-residual contacts"
-   * @gwt.key Include_intra
-   */
-  String Include_intra();
 
   /**
    * Translated "Select file(s) to upload.".
@@ -390,6 +382,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key Select_file_s_
    */
   String Select_file_s_();
+
+  /**
+   * Translated "Include intra-residual contacts".
+   * 
+   * @return translated "Include intra-residual contacts"
+   * @gwt.key Include_intra
+   */
+  String Include_intra();
 
   /**
    * Translated "Sound".
@@ -440,20 +440,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String After_a_while_it();
 
   /**
-   * Translated "per residue".
-   * 
-   * @return translated "per residue"
-   * @gwt.key per_residue
-   */
-  String per_residue();
-
-  /**
    * Translated "Omega".
    * 
    * @return translated "Omega"
    * @gwt.key Omega
    */
   String Omega();
+
+  /**
+   * Translated "per residue".
+   * 
+   * @return translated "per residue"
+   * @gwt.key per_residue
+   */
+  String per_residue();
 
   /**
    * Translated "Name".
@@ -504,28 +504,12 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Short_secret_wo();
 
   /**
-   * Translated "occurrences in db".
-   * 
-   * @return translated "occurrences in db"
-   * @gwt.key occurances_in
-   */
-  String occurances_in();
-
-  /**
    * Translated "Upload file".
    * 
    * @return translated "Upload file"
    * @gwt.key Upload_file
    */
   String Upload_file();
-
-  /**
-   * Translated "Log".
-   * 
-   * @return translated "Log"
-   * @gwt.key Log
-   */
-  String Log();
 
   /**
    * Translated "E.g.".
@@ -536,12 +520,12 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String E_g_();
 
   /**
-   * Translated "RMS violation".
+   * Translated "Log".
    * 
-   * @return translated "RMS violation"
-   * @gwt.key Rms_violatio
+   * @return translated "Log"
+   * @gwt.key Log
    */
-  String Rms_violatio();
+  String Log();
 
   /**
    * Translated "here".
@@ -558,6 +542,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key File
    */
   String File();
+
+  /**
+   * Translated "RMS violation".
+   * 
+   * @return translated "RMS violation"
+   * @gwt.key Rms_violatio
+   */
+  String Rms_violatio();
 
   /**
    * Translated "View".
@@ -624,9 +616,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Expect_to_see();
 
   /**
-   * Translated "Please use a recent version of e.g. Firefox, Chrome or Safari. ".
+   * Translated "Please use a recent version of e.g. Firefox, Chrome or Safari.".
    * 
-   * @return translated "Please use a recent version of e.g. Firefox, Chrome or Safari. "
+   * @return translated "Please use a recent version of e.g. Firefox, Chrome or Safari."
    * @gwt.key PleaseUse
    */
   String PleaseUse();
@@ -640,9 +632,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String No_Project_on_se();
 
   /**
-   * Translated "Procheck G factor ".
+   * Translated "Procheck G factor".
    * 
-   * @return translated "Procheck G factor "
+   * @return translated "Procheck G factor"
    * @gwt.key gFactor
    */
   String gFactor();
@@ -680,20 +672,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Once_CING_is_run();
 
   /**
-   * Translated "Logout".
-   * 
-   * @return translated "Logout"
-   * @gwt.key Logout
-   */
-  String Logout();
-
-  /**
    * Translated "Edit".
    * 
    * @return translated "Edit"
    * @gwt.key Edit
    */
   String Edit();
+
+  /**
+   * Translated "Logout".
+   * 
+   * @return translated "Logout"
+   * @gwt.key Logout
+   */
+  String Logout();
 
   /**
    * Translated "ERROR".
@@ -718,6 +710,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
    * @gwt.key All_non-hydro
    */
   String All_non_hydro();
+
+  /**
+   * Translated "occurrences in db".
+   * 
+   * @return translated "occurrences in db"
+   * @gwt.key occurrences_in
+   */
+  String occurrences_in();
 
   /**
    * Translated "Detail".
@@ -888,9 +888,9 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Debug_mode();
 
   /**
-   * Translated "Goto CING report.".
+   * Translated "Go to CING report.".
    * 
-   * @return translated "Goto CING report."
+   * @return translated "Go to CING report."
    * @gwt.key Goto_CING_report
    */
   String Goto_CING_report();
@@ -928,20 +928,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Standard_no();
 
   /**
-   * Translated "About".
-   * 
-   * @return translated "About"
-   * @gwt.key About
-   */
-  String About();
-
-  /**
    * Translated "Standard".
    * 
    * @return translated "Standard"
    * @gwt.key Standard
    */
   String Standard();
+
+  /**
+   * Translated "About".
+   * 
+   * @return translated "About"
+   * @gwt.key About
+   */
+  String About();
 
   /**
    * Translated "Set the options.".
@@ -1000,20 +1000,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String threeD();
 
   /**
-   * Translated "release".
-   * 
-   * @return translated "release"
-   * @gwt.key release
-   */
-  String release();
-
-  /**
    * Translated "Start new session.".
    * 
    * @return translated "Start new session."
    * @gwt.key Start_new_sessi
    */
   String Start_new_sessi();
+
+  /**
+   * Translated "release".
+   * 
+   * @return translated "release"
+   * @gwt.key release
+   */
+  String release();
 
   /**
    * Translated "A zip file with the full report is available as well".
@@ -1080,20 +1080,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String DEBUG();
 
   /**
-   * Translated "iCing".
-   * 
-   * @return translated "iCing"
-   * @gwt.key iCing
-   */
-  String iCing();
-
-  /**
    * Translated "Run".
    * 
    * @return translated "Run"
    * @gwt.key Run
    */
   String Run();
+
+  /**
+   * Translated "iCing".
+   * 
+   * @return translated "iCing"
+   * @gwt.key iCing
+   */
+  String iCing();
 
   /**
    * Translated "Criteria for".
@@ -1104,20 +1104,20 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String Criteria_for();
 
   /**
-   * Translated "response is".
-   * 
-   * @return translated "response is"
-   * @gwt.key response_is
-   */
-  String response_is();
-
-  /**
    * Translated "Run the validation.".
    * 
    * @return translated "Run the validation."
    * @gwt.key Run_the_validati
    */
   String Run_the_validati();
+
+  /**
+   * Translated "response is".
+   * 
+   * @return translated "response is"
+   * @gwt.key response_is
+   */
+  String response_is();
 
   /**
    * Translated "Reverse the order of lines in the log.".
