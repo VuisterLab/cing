@@ -1,15 +1,15 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
+python $CINGROOT/python/cing/PluginCode/test/test2_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.core.classes import Project
-from unittest import TestCase
 from shutil import move #@UnusedImport
-from cing import verbosityDebug
+from unittest import TestCase
 import cing
 import os
 import unittest
@@ -19,11 +19,10 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1ai0".split()
-        entryList = "1brv".split()
-#        entryList = "1kr8".split()
+#        entryList = "1brv".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
-#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
+        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #        entryList =            "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #1iv6 needs better ccpn file from FC
 #        entryList = ["Parvulustat"]

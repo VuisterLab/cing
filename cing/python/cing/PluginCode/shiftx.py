@@ -56,6 +56,9 @@ format file:
   or in 1y4o:
   1     G  N      109.7404
   1     G  CA      45.2787
+  or in 1afp
+  10    K  HZ3      3.7795 # A HZ3 that might not be present.
+  
 
 
     """
@@ -74,7 +77,9 @@ format file:
 #                atm = molecule.decodeNameTuple( (IUPAC, None, lineCol1, line.dollar[3]), fromCYANA2CING=True )
 
             if not atm:
-                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
+                pass
+#                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
+                # happens for all LYS without HZ3.
             else:
                 atm.shiftx.append( line.float(4) )
             #end if
@@ -177,9 +182,10 @@ def runShiftx( project, parseOnly=False, model=None   ):
         for chain in project.molecule.allChains():
 
             if chain in skippedChains:
-                NTdebug('Skipping chain code [%s]: no protein residues' % (chain.name))
+#                NTdebug('Skipping chain code [%s]: no protein residues' % (chain.name))
+                pass
             else:
-                NTdebug('Doing chain code [%s]' % (chain.name))
+#                NTdebug('Doing chain code [%s]' % (chain.name))
                 # quotes needed because by default the chain id is a space now.
     #            chainId =  "'" + chain.name + "'"
                 # According to the readme in shiftx with the source this is the way to call it.
@@ -190,7 +196,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
                 shiftx(chainId, rootname + '.pdb', outputFile )
                 outputFile = os.path.join(root,outputFile)
     #            outputFile = os.path.abspath(outputFile)
-                NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+#                NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
                 parseShiftxOutput( outputFile, project.molecule, chain.name )
             #end if
         #end for

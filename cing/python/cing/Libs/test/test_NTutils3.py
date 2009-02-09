@@ -8,6 +8,7 @@ from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
 from unittest import TestCase
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import MsgHoL
 import cing
 import os 
 import unittest
@@ -72,6 +73,13 @@ class AllChecks(TestCase):
             self.assertEquals(directory, expectedDirectory[i])
             self.assertEquals(basename, expectedBasename[i])
             self.assertEquals(extension, expectedExtension[i])
+            
+    def testMsgHoL(self):
+        msgHol = MsgHoL()
+        for i in range(5):
+            msgHol.appendMessage("Message %d" % i)
+            msgHol.appendDebug("Debug %d" % i)
+        msgHol.showMessage(MAX_MESSAGES=2)
             
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing

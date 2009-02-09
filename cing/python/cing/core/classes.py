@@ -26,7 +26,6 @@ from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import matchString
 from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import removedir
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
@@ -50,6 +49,7 @@ from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
 from cing.Libs.NTutils import NTcodeerror
+from cing import issueListUrl
 import tarfile
 import cing
 import math
@@ -635,13 +635,6 @@ Project: Top level Cing project class
         self.updateProject()
     #end def
 
-    def removeCcpnReferences(self):
-        """To slim down the memory footprint; should allow garbage collection."""
-        attributeToRemove = "ccpn"
-        try:
-        	removeRecursivelyAttribute( self, attributeToRemove )
-        except:
-            NTerror("Failed removeCcpnReferences")
 
     def export( self):
         """Call export routines from the plugins to export the project
@@ -2349,13 +2342,14 @@ class RDCRestraintList( NTlist ):
         modelCount = 0
         firstRestraint = self[0]
         if not hasattr(firstRestraint, "atoms"):
-            NTerror("Failed to get the model count for no atoms are available.")
+            NTwarning("Failed to get the model count for no atoms are available in the first RDC restraint.")
+            NTwarning("See also issue: %s%d"%(issueListUrl,133))
         else:
-            if len(self[0].atoms):
-            	modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
+            if len(self[0].atomPairs):
+            	modelCount = self[0].atomPairs[0].residue.chain.molecule.modelCount
         #end if
 
-        if (modelCount == 0): # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
+        if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
             NTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
@@ -2365,7 +2359,8 @@ class RDCRestraintList( NTlist ):
         self.violCount3 =  0
         self.violCount5 =  0
         for dr in self:
-            if calculateFirst: dr.calculateAverage()
+            if calculateFirst: 
+                dr.calculateAverage()
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5

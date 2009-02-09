@@ -2,6 +2,7 @@ from cing.Libs.NTutils import switchOutput
 switchOutput(False)
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 from ccp.general.Util import createMoleculeTorsionDict
+from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
@@ -10,6 +11,7 @@ from cing.Libs.NTutils import NTlimitSingleValue
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
@@ -23,10 +25,10 @@ from cing.core.constants import IUPAC
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
+from cing.core.molecule import unmatchedAtomByResDictToString
 from memops.general.Io import loadProject
 from shutil import move
 from shutil import rmtree
-from cing.core.molecule import unmatchedAtomByResDictToString
 import os
 import string
 import tarfile
@@ -76,6 +78,10 @@ class Ccpn:
     CCPN_DEPROT_H_DOUBLE_PRIME = "deprot:H''"
     CCPN_LINK_SG = 'link:SG'
     CCPN_DEPROT_HG = 'deprot:HG'
+    "Don't report on the next atoms; not interested"
+    
+    # Add these to CING lib later. For now, it's just clobbering the output to report on them.
+    CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
     
     def __init__(self, project, ccpnFolder, convention = IUPAC, patchAtomNames = True,
                  skipWaters = False, allowNonStandardResidue = True):
@@ -398,7 +404,8 @@ class Ccpn:
 #                    NTdebug("Residue '%s' not identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
                     matchingConvention = INTERNAL
                     if NTdb.isValidResidueName(ccpnResName3Letter):
-                        NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResName3Letter, matchingConvention))
+#                        NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResName3Letter, matchingConvention))
+                        pass
                     else:
                         if self.allowNonStandardResidue:
                             NTdebug("Residue '%s' will be a new residue in convention %s." % (ccpnResName3Letter, matchingConvention))
@@ -406,8 +413,8 @@ class Ccpn:
                             NTdebug("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, matchingConvention))
                             addResidue = False
                             addingNonStandardResidue = True
-                        if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
-                            unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
+#                        if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
+#                            unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
                         
                 if not addResidue:
                     continue
@@ -464,8 +471,9 @@ class Ccpn:
                         if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
                             unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
                         atmList = unmatchedAtomByResDict[ccpnResName3Letter][0] 
-                        resNumList = unmatchedAtomByResDict[ccpnResName3Letter][1] 
-                        if atomName not in atmList:
+                        resNumList = unmatchedAtomByResDict[ccpnResName3Letter][1]
+                         
+                        if (atomName not in atmList) and ( atomName not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING):
                             atmList.append(atomName)
                         if res.resNum not in resNumList:
                             resNumList.append(res.resNum)
@@ -868,7 +876,9 @@ class Ccpn:
         funcName = self.importFromCcpnDistanceRestraint.func_name
         
         listOfDistRestList = []
-    
+        msgHoL = MsgHoL()
+#        msgHoL.appendDebug("Let's start off with one")
+        
         # loop over all constraint stores
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
             ccpnDistanceListOfList = ccpnConstraintStore.findAllConstraintLists(className = 'DistanceConstraintList')
@@ -882,7 +892,7 @@ class Ccpn:
                 distanceRestraintList.ccpn = ccpnDistanceList
     
                 for ccpnDistanceConstraint in ccpnDistanceList.constraints:
-                    result = getRestraintBoundList(ccpnDistanceConstraint)
+                    result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
                     if not result:
                         NTdetail("%s: Ccpn distance restraint '%s' with bad distances imported.", funcName, ccpnDistanceConstraint)
                         result = (None, None)
@@ -906,6 +916,7 @@ class Ccpn:
                 listOfDistRestList.append(distanceRestraintList)
             # end for
         # end for
+        msgHoL.showMessage()
         return listOfDistRestList
     # end def importFromCcpnDistanceRestraint
     
@@ -927,7 +938,7 @@ class Ccpn:
         # end for
     
         listOfDihRestList = []
-    
+        msgHoL = MsgHoL()
         # loop over all constraint stores
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
     
@@ -943,7 +954,7 @@ class Ccpn:
                     # TODO merge (dilute) ambig dihedrals
                     dihConsItem = ccpnDihedralConstraint.findFirstItem()
     
-                    result = getRestraintBoundList(dihConsItem, self.RESTRAINT_IDX_DIHEDRAL)
+                    result = getRestraintBoundList(dihConsItem, self.RESTRAINT_IDX_DIHEDRAL, msgHoL)
     #                [None, None] evaluates to True
                     if not result:
                         NTdetail("Ccpn dihedral restraint '%s' with bad values imported." % ccpnDihedralConstraint)
@@ -964,6 +975,7 @@ class Ccpn:
                 listOfDihRestList.append(dihedralRestraintList)
             # end for
         # end for
+        msgHoL.showMessage()
         return listOfDihRestList
     # end def importFromCcpnDihedralRestraint
     
@@ -972,11 +984,13 @@ class Ccpn:
                    As input either Cing.Project instance or Ccpn.Project instance,
                    or both, since it'll check if instances has attribute .ccpn or
                    .cing, respectively.
-                   Molecules and Coordinates should be imported previouly.
+                   Molecules and Coordinates should be imported previously.
            Inputs: Ccpn Implementation.Project, Cing.Project instance.
            Output: Cing.RdcRestraintList or None on error.
         '''
         listOfRdcRestList = []    
+        
+        msgHoL = MsgHoL()
         # loop over all constraint stores
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
     
@@ -989,7 +1003,7 @@ class Ccpn:
                 rdcRestraintList.ccpn = ccpnRdcList
     
                 for ccpnRdcConstraint in ccpnRdcList.constraints:
-                    result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC)
+                    result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC, msgHoL)
                     if not result:
                         NTdetail("Ccpn RDC restraint '%s' with bad values imported." % 
                                   ccpnRdcConstraint)
@@ -1014,6 +1028,7 @@ class Ccpn:
                 listOfRdcRestList.append(rdcRestraintList)
             # end for
         # end for
+        msgHoL.showMessage()
         return listOfRdcRestList
     # end def importFromCcpnRdcRestraint
     
@@ -1124,7 +1139,7 @@ class Ccpn:
     # end def _ensureValidName
 # end class
 
-def getRestraintBoundList(constraint, restraintTypeIdx = Ccpn.RESTRAINT_IDX_DISTANCE):
+def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     '''Descrn: Return upper and lower values for a Ccpn constraint.
        Inputs: Ccpn constraint.
        Output: floats (lower, upper) or None
@@ -1141,9 +1156,12 @@ def getRestraintBoundList(constraint, restraintTypeIdx = Ccpn.RESTRAINT_IDX_DIST
        
        For full circle dihedral angle restraints derived from a error larger than 180. degrees:
        return: (0.0, -1.0E-9) which should be ok.
+       
+       Should report to msgHoL (a class MsgHoL)
     '''
+    
     if not constraint:
-        NTwarning("Restraint in CCPN was None")
+        msgHoL.appendWarning( "Restraint in CCPN was None" ) 
         return None
     
 #    NTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
@@ -1161,22 +1179,22 @@ def getRestraintBoundList(constraint, restraintTypeIdx = Ccpn.RESTRAINT_IDX_DIST
 
     # only if all 3 items (except error value) are absent it is a bug.
     if (constraint.targetValue == None) and (constraint.lowerLimit == None) and (constraint.upperLimit == None):
-        NTwarning("Restraint with all None for lower, upper and target")
+        msgHoL.appendWarning("Restraint with all None for lower, upper and target")
         return None
     
-    # Generate some warnings which might be helpful to a user because it should not be out of wack like this.
+    # Generate some warnings which might be helpful to a user because it should not be out of whack like this.
     # Perhaps this gets checked in ccpn api already?
     if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE:
         if constraint.targetValue != None:
             if constraint.lowerLimit != None:
                 if constraint.targetValue < constraint.lowerLimit:                 
-                    NTwarning("Target value is below lower bound: [%s,%s]" % (constraint.targetValue, constraint.lowerLimit))
+                    msgHoL.appendWarning("Target value is below lower bound: [%s,%s]" % (constraint.targetValue, constraint.lowerLimit))
             if constraint.upperLimit != None:
                 if constraint.targetValue > constraint.upperLimit:                 
-                    NTwarning("Target value is above upper bound: [%s,%s]" % (constraint.targetValue, constraint.upperLimit))
+                    msgHoL.appendWarning("Target value is above upper bound: [%s,%s]" % (constraint.targetValue, constraint.upperLimit))
         if (constraint.lowerLimit != None) and (constraint.upperLimit != None):
             if constraint.lowerLimit > constraint.upperLimit:                 
-                NTwarning("Lower bound is above upper bound: [%s,%s]" % (constraint.lowerLimit, constraint.upperLimit))
+                msgHoL.appendWarning("Lower bound is above upper bound: [%s,%s]" % (constraint.lowerLimit, constraint.upperLimit))
 
 
 
@@ -1194,40 +1212,40 @@ def getRestraintBoundList(constraint, restraintTypeIdx = Ccpn.RESTRAINT_IDX_DIST
 #        NTdebug("Simplest case first for speed reasons.")
     else:    
         if constraint.targetValue == None:
-            NTdebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
+            msgHoL.appendDebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
         else:    
             # When there is a target value and no lower or upper we will use a error of zero by default which makes
             # the range of their error zero in case the error was not defined. This is a reasonable assumption according
             # to JFD.
             error = constraint.error or 0
             if error < 0:                 
-                NTerror("Found error below zero; taking absolute value of error: " + `error`)
+                msgHoL.appendError("Found error below zero; taking absolute value of error: " + `error`)
                 error = - error
             if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DIHEDRAL:
                 if error > 180.:                 
-                    NTwarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: " + `error`)
+                    msgHoL.appendWarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: " + `error`)
                     return (0.0, - Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)                
             
             if lower == None:
-                NTdebug("Setting lower bound from target and (perhaps assumed error).")
+                msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed error).")
                 lower = constraint.targetValue - error
                 
             if upper == None:
-                NTdebug("Setting upper bound from target and (perhaps assumed error).")
+                msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed error).")
                 upper = constraint.targetValue + error
                 
             
     if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE:
         if (lower != None) and (upper != None):
             if lower > upper:                 
-                NTerror("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
-                NTerror("Assuming CING prefers upper bound and thus unsetting lower bound as if unexisting; please check your data.")
+                msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
+                msgHoL.appendError("Assuming CING prefers upper bound and thus unsetting lower bound as if unexisting; please check your data.")
                 lower = None
         if (lower != None) and (lower < 0):
-            NTwarning("Lower distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
+            msgHoL.appendWarning("Lower distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
             lower = None
         if (upper != None) and (upper < 0):
-            NTwarning("Upper distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
+            msgHoL.appendWarning("Upper distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
             upper = None
             
     # Unfortunately, sometimes it would be nice to preserve the info on the range but can't be here.
@@ -1253,6 +1271,14 @@ def isRootDirectory(f):
         return True
     return False
 
+def removeCcpnReferences(self):
+    """To slim down the memory footprint; should allow garbage collection."""
+    attributeToRemove = "ccpn"
+    try:
+        removeRecursivelyAttribute( self, attributeToRemove )
+    except:
+        NTerror("Failed removeCcpnReferences")
+
 def initCcpn(project, ccpnFolder):
     '''Descrn: Adds to the Cing Project instance from a Ccpn folder project.
        Inputs: Cing.Project instance, Ccpn project XML file or a gzipped tar file such as .tgz or .tar.gz
@@ -1268,6 +1294,7 @@ def initCcpn(project, ccpnFolder):
 
 # register the function
 methods = [ (initCcpn, None),
+           (removeCcpnReferences, None),
            ]
 
 #    nameDict = {'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
@@ -1320,9 +1347,10 @@ def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
             ccpnResDescriptorList.removeIfPresent(Ccpn.CCPN_DEPROT_H_DOUBLE_PRIME)
     # Didn't find anything specific for RNA/DNA in Analysis windows on examples 1ai0, 1cjg, and 1a4d.
 
-    # Note that in 1brv's CCPN this Cys is listed as 'deprot:HG' whereas CING has: 'link:SG'  
-    if ccpnMolType == Ccpn.CCPN_PROTEIN:
-        ccpnResDescriptorList.replaceIfPresent(Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_LINK_SG )
+    # Note that in 1brv's CCPN this Cys is listed as 'deprot:HG' whereas CING has: 'link:SG'
+    # Fixed in lib now.  
+#    if ccpnMolType == Ccpn.CCPN_PROTEIN:
+#        ccpnResDescriptorList.replaceIfPresent(Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_LINK_SG )
     
     if not len(ccpnResDescriptorList):
         ccpnResDescriptorList.add(Ccpn.CCPN_NEUTRAL)

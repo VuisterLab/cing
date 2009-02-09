@@ -4,9 +4,11 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
 from cing import verbosityDebug
 from cing import verbosityDefault
+from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.Ccpn import getRestraintBoundList
+from cing.PluginCode.Ccpn import isRootDirectory
 from cing.PluginCode.Ccpn import patchCcpnResDescriptor
 from cing.core.sml import NTdict
 from unittest import TestCase
@@ -15,8 +17,17 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def ttttestRestraintsValuesRegular(self):
+    def testIsRootDirectory(self):
+        self.assertTrue( isRootDirectory("linkNmrStarData/"))
+        self.assertTrue( isRootDirectory("linkNmrStarData//"))
+        self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
+        self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
+
+
+    def testRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
+        
+        msgHoL = MsgHoL()
 #        lower, upper, targetValue, error     
         rList = [     
                  (0.0, 3.0, 4.0, 1.0), # Should give a warning and just use lower/upper as is. 
@@ -66,21 +77,21 @@ class AllChecks(TestCase):
 
             cie = cingRlist[i]
 #               Output: floats (lower, upper)
-            ci = getRestraintBoundList(ccpnConstraint, restraintTypeIdx)
+            ci = getRestraintBoundList(ccpnConstraint, restraintTypeIdx, msgHoL)
 
             if not ci:
                 self.assertFalse(cie)
             else:
                 self.assertEquals(ci[0], cie[0])
                 self.assertEquals(ci[1], cie[1])
-
+            msgHoL.showMessage(999, 999, 999, 999)
     def testPatchCcpnResDescriptor(self):
         rList = [ # result, description, ccpnMolType, linking,     
                  ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_START],
                  ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!  
                  ['prot:HG1', "prot:HG1;deprot:H''", Ccpn.CCPN_PROTEIN, Ccpn.CCPN_END],
                  ['prot:HD1;prot:HE2', 'prot:HD1;prot:HE2', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_MIDDLE],
-                 [Ccpn.CCPN_LINK_SG, Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_PROTEIN, Ccpn.CCPN_MIDDLE],
+                 [Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_PROTEIN, Ccpn.CCPN_MIDDLE], # not an issue anymore.
                    ]
 
         for i in range(len(rList)):

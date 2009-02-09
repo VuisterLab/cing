@@ -9,7 +9,6 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.constants import IUPAC
@@ -62,7 +61,8 @@ class Dssp:
                 
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
-                    NTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
+                    pass
+#                    NTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
 
             models = NTlist(*range( self.project.molecule.modelCount ))
             # Can't use IUPAC here because aqua doesn't understand difference between
