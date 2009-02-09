@@ -298,7 +298,7 @@ public class Criteria extends iCingView {
         final Label residueSigmas22Label = new Label(c.residue_sigma() + " [-2,2]");
         wiTable.setWidget(rowIdxWiRama, 4, residueSigmas22Label);
 
-        final Label occurancesInDbLabel = new Label(c.occurances_in() + " [0-80]");
+        final Label occurancesInDbLabel = new Label(c.occurrences_in() + " [0-80]");
         wiTable.setWidget(rowIdxWiBb, 4, occurancesInDbLabel);
 
         backboneNormalityCheckBox = new CheckBox();
