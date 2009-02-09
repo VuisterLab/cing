@@ -1,6 +1,7 @@
 #summary Setting up CING
 
 = Setup script =
+Replace $CINGROOT with your CING installation directory.
 {{{
 python $CINGROOT/python/cing/setup.py
 }}}
