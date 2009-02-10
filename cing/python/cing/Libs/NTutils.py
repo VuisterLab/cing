@@ -4345,7 +4345,15 @@ class MsgHoL(NTdict):
     #end def            
 # end classs 
             
+def isAlmostEqual( ntList, epsilon):
+    e = ntList[0] - ntList[1]
+    e = math.fabs(e)
+    if e < epsilon:
+        return True
+    return False
+# end def
 
+ 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     input = ['1brv', '9pcy' ]

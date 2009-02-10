@@ -1,16 +1,17 @@
 Why these (originally) 12 test entries were special to JFD, CP, WV
 
-Current count: 13
-Current list:  1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e
+Current count: 14
+Current list:  1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1d3z 1hue 1ieh 1iv6 1kr8 2hgh 2k0e
 
 Molecular system:
 **********************
 1a4d small dsRNA one to start off with
-1a24 well known
+1a24 well known 
 1afp beta barrel.
 1ai0 complex with H2O and
 1brv small VAL H1 is only present in the second model and on.
 1cjg nucleic acid/protein complex.
+1d3x interest of Vincent B.
 1hue well known dimer to me
 1ieh well known
 1iv6 complex
@@ -20,6 +21,7 @@ Molecular system:
 
 On the restraint side:
 **********************
+1a24 Hydrogen bonds
 1brv Discover
 1bus no parsed
 1cjg XPLOR

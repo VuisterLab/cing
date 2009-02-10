@@ -42,6 +42,6 @@ class AllChecks(TestCase):
 if __name__ == "__main__":
     cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
-    NTdebug("This should not show up")
-    NTmessage("And this also not")
+#    NTdebug("This should not show up")
+#    NTmessage("And this also not")
     unittest.main()

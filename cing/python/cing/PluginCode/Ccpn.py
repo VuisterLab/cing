@@ -143,7 +143,7 @@ class Ccpn:
             return None
         # end if
     
-        switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
+#        switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
         self.ccpnProject = loadProject(ccpnFolder)
         switchOutput(True)
         if not self.ccpnProject:
@@ -300,6 +300,7 @@ class Ccpn:
     
         # Set all the chains for this molSystem
         for ccpnChain in ccpnMolSys.sortedChains():
+            
             ccpnChainLetter = ensureValidChainId(ccpnChain.pdbOneLetterCode)
     #        NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChainLetter, ccpnChain.pdbOneLetterCode))
             if ccpnChainLetter != ccpnChain.pdbOneLetterCode:
@@ -365,8 +366,8 @@ class Ccpn:
                     ccpnCoordChainList.append(ccpnCoordChain)
                 # end if
             # end for
-            for ccpnResidue in ccpnChain.sortedResidues():
-                ccpnMolType = ccpnResidue.molType # TODO: take outside loop.
+            for ccpnResidue in ccpnChain.sortedResidues():                
+                ccpnMolType = ccpnResidue.molType # Can not be taken outside loop because within a chain multiple molTypes might occur in CCPN.
                 resNumber = ccpnResidue.seqCode
                 chemCompVar = ccpnResidue.chemCompVar
                 chemComp = chemCompVar.chemComp
@@ -379,22 +380,14 @@ class Ccpn:
                                 
 #    nameDict = {'CCPN': 'DNA A deprot:H1'..
                 ccpnResNameInCingDb = "%s %s %s" % (ccpnResidue.molType, ccpnResCode, ccpnResDescriptorPatched)
-                NTdebug("ccpnResName3Letter, ccpnResCode, ccpnResDescriptor, ccpnResDescriptorPatched ccpnResNameInCingDb %s, %s, %s, %s, %s" % (
+                NTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
                           ccpnResName3Letter, ccpnResCode, ccpnResDescriptor, ccpnResDescriptorPatched, ccpnResNameInCingDb))
                 
-#DEBUG: ccpnResName3Letter, ccpnResCode, ccpnResDescriptor GLY, Gly, prot:H3
-                
-# TODO: add ions CCPN mappings.
-
 #See bottom of this file for CCPN residue name mappings in CING db.
 # Note that this will be ok except for the terminii which will always deviate in the descriptor/stereochemistry info.
 # The terminii will be dealt with in separate code below but JFD thinks it is acceptable to map in those cases to the
 # simple 4 letter residue code.
                 
-#                if resNameInSysName in dictCif2Cing.keys():
-#                    oldName = resNameInSysName
-#                    resNameInSysName = dictCif2Cing[resNameInSysName]
-#                    NTmessage("    Reconverted '%s' ('%s') ==> '%s' ('CING')", oldName, CIF, resNameInSysName)
 
                 addResidue = True
                 addingNonStandardResidue = False
@@ -469,7 +462,7 @@ class Ccpn:
                             continue
                         atom = res.addAtom(atomName)
                         if not atom:
-                            NTdebug('Failed to add atom to residue for tuple %s' % `cingNameTuple`) # TODO: update db.
+                            NTdebug('Failed to add atom to residue for tuple %s' % `cingNameTuple`)
                             continue
                         if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
                             unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
@@ -490,7 +483,7 @@ class Ccpn:
             
                         if not ccpnCoordAtom:
                             # GV says: do not know why we would have this error, as we have matched the atom objects
-                            #TODO: JFD: It usually happens for H in N-term, which CING is not mapping yet. GV will fix.
+                            #TODO: issue 128 JFD: It usually happens for H in N-term, which CING is not mapping yet. GV will fix.
 #                            NTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
                             continue
                         # end if
@@ -697,7 +690,8 @@ class Ccpn:
                     for ccpnAtom in ccpnAtomSet.atoms:
     #                    # Now create list, with CING
     #                    # (could be set to other one)
-    #                    # TODO: use cing object link made earlier.
+    #                    # JFD: fails to see why this is a TO DO: 
+                            #    use cing object link made earlier.
     #                    chemAtom = ccpnAtom.chemAtom
     #                    chemAtomSysName = namingSystemObject.findFirstAtomSysName(atomName = chemAtom, atomSubType=chemAtom.subType)
     #                    if chemAtomSysName:
@@ -720,7 +714,7 @@ class Ccpn:
            Inputs: Cing.Molecule instance (obj), ccp.molecule.MolSystem.MolSystem.
            Output: Cing.Project or None on error.
         '''
-        # TODO: shiftMapping should pass cing objects
+        # TO DO: shiftMapping should pass cing objects
         self.molecule.newResonances()
     
         ccpnShifts = shiftMapping.keys()
@@ -736,8 +730,7 @@ class Ccpn:
                     atom.resonances().value = shiftValue
                     atom.resonances().error = shiftError
                     index = len(atom.resonances) - 1
-                    # TODO: set setStereoAssigned
-    
+                    atom.setStereoAssigned() # untested for JFD has no test data.
                     # Make mutual linkages between Ccpn and Cing objects
                     # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
                     atom.resonances[index].ccpn = ccpnShift
@@ -877,48 +870,49 @@ class Ccpn:
         '''
     
         funcName = self.importFromCcpnDistanceRestraint.func_name
-        
         listOfDistRestList = []
+        mapDistListType = { 'DistanceConstraintList': 'DistRestraint',  'HBondConstraintList': 'HbondRestraint'}
         msgHoL = MsgHoL()
 #        msgHoL.appendDebug("Let's start off with one")
+        for distListType in mapDistListType.keys(): # loop over regular distance and hydrogen bond restraints.
+            distType =  mapDistListType[distListType]
+            # loop over all constraint stores
+            for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
+                ccpnDistanceListOfList = ccpnConstraintStore.findAllConstraintLists(className = distListType)
+                
+                for ccpnDistanceList in ccpnDistanceListOfList:
+                    ccpnDistanceListName = self._ensureValidName(ccpnDistanceList.name, distType)
+                    distanceRestraintList = self.project.distances.new(ccpnDistanceListName, status = 'keep')
         
-        # loop over all constraint stores
-        for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
-            ccpnDistanceListOfList = ccpnConstraintStore.findAllConstraintLists(className = 'DistanceConstraintList')
-#            ccpnDistanceListOfList += ccpnConstraintStore.findAllConstraintLists(className = 'HBondConstraintList') # TODO:
-            
-            for ccpnDistanceList in ccpnDistanceListOfList:
-                ccpnDistanceListName = self._ensureValidName(ccpnDistanceList.name, 'DistRestraint')
-                distanceRestraintList = self.project.distances.new(ccpnDistanceListName, status = 'keep')
-    
-                ccpnDistanceList.cing = distanceRestraintList
-                distanceRestraintList.ccpn = ccpnDistanceList
-    
-                for ccpnDistanceConstraint in ccpnDistanceList.constraints:
-                    result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
-                    if not result:
-                        msgHoL.appendMessage("%s: Ccpn distance restraint '%s' with bad distances imported."% (funcName, ccpnDistanceConstraint))
-                        result = (None, None)
-                    lower, upper = result
-    
-                    atomPairs = self._getConstraintAtom(ccpnDistanceConstraint)
-    
-                    if not atomPairs:
-                        # restraints that will not be imported
-                        msgHoL.appendMessage("%s: skipped Ccpn distance restraint '%s' without atom pairs"%( funcName, ccpnDistanceConstraint))
-                        continue
-                    # end if
-    
-                    distanceRestraint = DistanceRestraint(atomPairs, lower, upper)
-    
-                    distanceRestraint.ccpn = ccpnDistanceConstraint
-                    ccpnDistanceConstraint.cing = distanceRestraint
-    
-                    distanceRestraintList.append(distanceRestraint)
+                    ccpnDistanceList.cing = distanceRestraintList
+                    distanceRestraintList.ccpn = ccpnDistanceList
+        
+                    for ccpnDistanceConstraint in ccpnDistanceList.constraints:
+                        result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
+                        if not result:
+                            msgHoL.appendMessage("%s: Ccpn %s restraint '%s' with bad distances imported."% (funcName, distType, ccpnDistanceConstraint))
+                            result = (None, None)
+                        lower, upper = result
+        
+                        atomPairs = self._getConstraintAtom(ccpnDistanceConstraint)
+        
+                        if not atomPairs:
+                            # restraints that will not be imported
+                            msgHoL.appendMessage("%s: skipped Ccpn %s restraint '%s' without atom pairs"%( funcName, distType, ccpnDistanceConstraint))
+                            continue
+                        # end if
+        
+                        distanceRestraint = DistanceRestraint(atomPairs, lower, upper)
+        
+                        distanceRestraint.ccpn = ccpnDistanceConstraint
+                        ccpnDistanceConstraint.cing = distanceRestraint
+        
+                        distanceRestraintList.append(distanceRestraint)
+                    # end for
+                    listOfDistRestList.append(distanceRestraintList)
                 # end for
-                listOfDistRestList.append(distanceRestraintList)
             # end for
-        # end for
+        # end for dist types.
         msgHoL.showMessage()
         return listOfDistRestList
     # end def importFromCcpnDistanceRestraint
@@ -1299,7 +1293,7 @@ def initCcpn(project, ccpnFolder):
 methods = [ (initCcpn, None),
            (removeCcpnReferences, None),
            ]
-
+# Obtained by a grep on INTERNAL_0 file.
 #    nameDict = {'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
 #    nameDict = {'CCPN': 'DNA A deprot:H1', 'BMRBd': 'ADE', 'IUPAC': 'DA', 'AQUA': 'A', 'INTERNAL_0': 'ADE', 'INTERNAL_1': 'DA', 'CYANA': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE'}
 #    nameDict = {'CCPN': 'DNA C deprot:H3', 'BMRBd': 'CYT', 'IUPAC': 'DC', 'AQUA': 'C', 'INTERNAL_0': 'CYT', 'INTERNAL_1': 'DC', 'CYANA': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT'}
@@ -1315,7 +1309,7 @@ methods = [ (initCcpn, None),
 #    nameDict = {'CCPN': 'protein Asn neutral', 'BMRBd': 'ASN', 'IUPAC': 'ASN', 'AQUA': 'ASN', 'INTERNAL_0': 'ASN', 'INTERNAL_1': 'ASN', 'CYANA': 'ASN', 'CYANA2': 'ASN', 'PDB': 'ASN', 'XPLOR': 'ASN'}
 #    nameDict = {'CCPN': 'protein Asp deprot:HD2', 'BMRBd': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'INTERNAL_0': 'ASP', 'INTERNAL_1': 'ASP', 'CYANA': 'ASP-', 'CYANA2': 'ASP', 'PDB': 'ASP', 'XPLOR': 'ASP'}
 #    nameDict = {'CCPN': 'protein Asp prot:HD2', 'BMRBd': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'INTERNAL_0': 'ASPH', 'INTERNAL_1': 'ASPH', 'CYANA': 'ASP', 'CYANA2': None, 'PDB': 'ASP', 'XPLOR': None}
-#    nameDict = {'CCPN': 'protein Cys link:SG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYSS', 'INTERNAL_1': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
+#    nameDict = {'CCPN': 'protein Cys deprot:HG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYSS', 'INTERNAL_1': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
 #    nameDict = {'CCPN': 'protein Cys prot:HG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYS', 'INTERNAL_1': 'CYS', 'CYANA': 'CYS', 'CYANA2': 'CYS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
 #    nameDict = {'CCPN': 'protein Gln neutral', 'BMRBd': 'GLN', 'IUPAC': 'GLN', 'AQUA': 'GLN', 'INTERNAL_0': 'GLN', 'INTERNAL_1': 'GLN', 'CYANA': 'GLN', 'CYANA2': 'GLN', 'PDB': 'GLN', 'XPLOR': 'GLN'}
 #    nameDict = {'CCPN': 'protein Glu deprot:HE2', 'BMRBd': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'INTERNAL_0': 'GLU', 'INTERNAL_1': 'GLU', 'CYANA': 'GLU-', 'CYANA2': 'GLU', 'PDB': 'GLU', 'XPLOR': 'GLU'}
