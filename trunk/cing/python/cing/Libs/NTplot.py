@@ -23,6 +23,7 @@ from copy import deepcopy
 from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib import use
+from cing.Libs.NTutils import isAlmostEqual
 # Use a backend that allows headless (without GUI) printing in addition to GUI.
 # It has to be called before matplotlib.pylab. Defined here and one not need to
 # defined in matoplotlibrc, and if defined there, it'll be overridden
@@ -1024,6 +1025,7 @@ class NTplot( NTdict ):
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
 
         alpha = 0.3
+        SMALL_ANGLE_DIFF_FOR_PLOT = 0.1
 
         plotparamsXmin, plotparamsXmax = (self.xRange)
         plotparamsYmin, plotparamsYmax = (self.yRange)
@@ -1036,6 +1038,13 @@ class NTplot( NTdict ):
         bounds1.limit(plotparamsXmin, plotparamsXmax)
         bounds2.limit(plotparamsYmin, plotparamsYmax)
 
+        # When the bounds are almost the same then make the range a very thinny one instead of full circle.
+        if isAlmostEqual( bounds1, SMALL_ANGLE_DIFF_FOR_PLOT ):
+            bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT 
+        if isAlmostEqual( bounds2, SMALL_ANGLE_DIFF_FOR_PLOT ):
+            bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
+        NTdebug("bounds1 : %s" % bounds1)
+        NTdebug("bounds2 : %s" % bounds2)
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
                 point = (bounds1[0], bounds2[0]) # lower left corner of only box.

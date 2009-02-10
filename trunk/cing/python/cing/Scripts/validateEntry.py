@@ -16,9 +16,7 @@ import sys
 import urllib
 
 def usage():
-    NTmessage("Use like eg:")
-    NTmessage("python -u $CINGROOT/python/cing/Scripts/validateEntry.py entryId inputDir outputDir pdbConvention restraintsConvention")
-    NTmessage("python -u $CINGROOT/python/cing/Scripts/validateEntry.py 1brv http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp 1brv . .")
+    NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
 
 def retrieveTgzFromUrl(entryId, url):
     """Retrieves tgz file from url to current working dir assuming the
@@ -92,8 +90,8 @@ def main(entryId, *extraArgList):
         
     project = Project.open(entryId, status='new')
                 
-    isCcpnProject = False # TODO: refine
-    if inputDir.startswith("http"):
+    isCcpnProject = False 
+    if inputDir.startswith("http") or inputDir.startswith("file") :
         fnametgz = entryId + '.tgz'
         stillToRetrieve = False
         if os.path.exists(fnametgz):

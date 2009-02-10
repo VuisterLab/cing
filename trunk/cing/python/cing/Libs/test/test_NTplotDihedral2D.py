@@ -27,7 +27,7 @@ class AllChecks(TestCase):
 
         
 
-    def tttestPlotDihedral2DRama(self):  
+    def testPlotDihedral2DRama(self):  
         showRestraints = True
         showDataPoints = True  
         dihedralName1= "PHI"
@@ -59,9 +59,12 @@ class AllChecks(TestCase):
 #                residueName = resType + ""
             x = NTlist(-45, -80,  125) # outside the range.
             y = NTlist(-65, -63, -125)
+            # 1 SMALL boxe
+            lower1, upper1 = -120.00, -120.05 # if within 0.1 they're considered the same and order shouldn't matter.
+            lower2, upper2 = 0,  100
             # 4 boxes:
-            lower1, upper1 = 120,   0
-            lower2, upper2 = 130,  20
+#            lower1, upper1 = 120,   0
+#            lower2, upper2 = 130,  20
             # left/right boxes:
     #        lower1, upper1 =  90, 270
     #        lower2, upper2 =   0,  70        
@@ -119,7 +122,7 @@ class AllChecks(TestCase):
 #        plot.show() 
     
 
-    def testPlotDihedral2DJanin(self):  
+    def tttestPlotDihedral2DJanin(self):  
         showRestraints = True
         showDataPoints = True  
         dihedralName1= "CHI1"
