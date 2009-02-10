@@ -1,7 +1,6 @@
 """
 Adds html generation methods
 """
-from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing import NaNstring
 from cing import authorList
 from cing import cingPythonCingDir
@@ -26,6 +25,7 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
@@ -42,7 +42,7 @@ from cing.PluginCode.Whatif import histJaninBySsAndResType
 from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import wiPlotList
-#from cing.core.classes import AtomList
+from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
@@ -50,6 +50,7 @@ from cing.core.parameters import moleculeDirectories
 import os
 import shelve
 import shutil
+#from cing.core.classes import AtomList
 #from cing.PluginCode.Whatif import criticizeByWhatif
 #from cing.core.classes import HTMLfile
 #from cing.core.classes import htmlObjects
@@ -1047,11 +1048,13 @@ class HTMLfile:
             return None
 
         if not source:
-            NTerror("No Cing object source defined here")
+            # Happens for 2k0e
+            NTwarning("No Cing object source defined here")
             return None
 
         if not destination:
-            NTerror("No Cing object destination defined here")
+            # Happens for 2k0e
+            NTwarning("No Cing object destination defined here")
             return None
 
         link = self.findHtmlLocation( source, destination, id )

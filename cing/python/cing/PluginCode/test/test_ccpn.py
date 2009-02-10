@@ -19,7 +19,7 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1ai0".split()
-        entryList = "1brv".split()
+        entryList = "2k0e".split()
 #        entryList = "1kr8".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()

@@ -81,7 +81,10 @@ class Ccpn:
     "Don't report on the next atoms; not interested"
     
     # Add these to CING lib later. For now, it's just clobbering the output to report on them.
-    CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
+    CCPN_ATOM_LIST_TO_IGNORE_REPORTING = []
+    hideMissingAtomsJfdKnowsAbout = False # default should be False
+    if hideMissingAtomsJfdKnowsAbout:
+        CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
     
     def __init__(self, project, ccpnFolder, convention = IUPAC, patchAtomNames = True,
                  skipWaters = False, allowNonStandardResidue = True):
@@ -894,7 +897,7 @@ class Ccpn:
                 for ccpnDistanceConstraint in ccpnDistanceList.constraints:
                     result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
                     if not result:
-                        NTdetail("%s: Ccpn distance restraint '%s' with bad distances imported.", funcName, ccpnDistanceConstraint)
+                        msgHoL.appendMessage("%s: Ccpn distance restraint '%s' with bad distances imported."% (funcName, ccpnDistanceConstraint))
                         result = (None, None)
                     lower, upper = result
     
@@ -902,7 +905,7 @@ class Ccpn:
     
                     if not atomPairs:
                         # restraints that will not be imported
-                        NTdetail("%s: skipped Ccpn distance restraint '%s' without atom pairs", funcName, ccpnDistanceConstraint)
+                        msgHoL.appendMessage("%s: skipped Ccpn distance restraint '%s' without atom pairs"%( funcName, ccpnDistanceConstraint))
                         continue
                     # end if
     

@@ -627,7 +627,10 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
         NTerror('runProcheck: no molecule defined')
         return None
     #end if
-
+    if not project.molecule.hasAminoAcid():    
+#    if len(project.molecule.residuesWithProperties('protein')) == 0:
+           NTdebug("Skipping procheck as there is no protein in the current molecule")
+           return
     if project.molecule.has_key('procheck'):
         del(project.molecule.procheck)
     #end if
