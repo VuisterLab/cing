@@ -1643,7 +1643,8 @@ class DistanceRestraintList( NTlist ):
         NTdebug('DistanceRestraintList.analyze: %s', self )
 
         if (len( self ) == 0):
-            NTerror('ERROR DistanceRestraintList.analyze: "%s" empty list', self.name )
+            # happens for entry 2k0e imported from CCPN. Has unlinked restraints.
+            NTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
             return (None, None, None, None, None)
         #end if
 
