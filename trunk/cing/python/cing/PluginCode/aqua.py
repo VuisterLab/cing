@@ -33,6 +33,10 @@ def exportAtom2aqua( atom ):
 # add as a method to Atom Class
 Atom.export2aqua = exportAtom2aqua
 #-----------------------------------------------------------------------------
+
+MIN_DISTANCE_ANY_ATOM_PAIR = 1.8
+MAX_DISTANCE_ANY_ATOM_PAIR = 999.9
+
 def export2aqua( project, tmp=None ):
     """
         export distanceRestraintLists to aqua
@@ -71,11 +75,17 @@ def export2aqua( project, tmp=None ):
             for dr in drl:
                 if typeId == 0:
 #                   Distance
+                    upper = dr.upper
+                    if not upper:
+                        lower = MAX_DISTANCE_ANY_ATOM_PAIR
+                    lower = dr.lower
+                    if not lower:
+                        lower = MIN_DISTANCE_ANY_ATOM_PAIR
                     result = 'NOEUPLO %s %s  %8.3f  %8.3f' % (
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
-                                 dr.upper,
-                                 dr.lower )
+                                 upper,
+                                 lower )
 
                     if len(dr.atomPairs) > 1:
                         if warningCount == warningCountMax+1:
