@@ -45,6 +45,12 @@ __credits__    = """More info at http://nmr.cmbi.ru.nl/CING
 
 """ + __copyright__ # TODO: misusing credits for pydoc
 
+header = """
+======================================================================================================
+| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |
+======================================================================================================
+""" % (cingVersion, __copyright_years__)
+
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 
 # Verbosity settings: How much text is printed to stdout/stderr streams

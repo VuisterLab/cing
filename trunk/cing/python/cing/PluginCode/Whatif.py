@@ -8,6 +8,7 @@
 # Fix these strings so we can get some automated code checking by pydev extensions.
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
+from cing import issueListUrl
 CHECK_ID_STR     = "checkID"
 LOC_ID_STR       = "locID"
 LEVEL_STR        = "level"
@@ -430,6 +431,10 @@ fullstop y
         # sorting on mols, residues, and atoms
 #        NTmessage("  for self.checks: " + `self.checks`)
         NTdebug("  for self.checks count: " + `len(self.checks)`)
+        
+        msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
+        msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
+        
         for check in self.checks:
             if LEVEL_STR not in check:
                 NTerror("Whatif._processCheckdb: no level attribute in check dictionary: "+check[CHECK_ID_STR])
@@ -467,11 +472,11 @@ fullstop y
 
                     nameTuple = self.translateResAtmString( curLocId )
                     if not nameTuple:
-                        NTerror('Whatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
                         continue
                     entity = self.molecule.decodeNameTuple( nameTuple ) # can be a chain, residue or atom level object
                     if not entity:
-                        NTerror('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
+                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
                         continue
                     #NTdebug("adding to entity: " + `entity`)
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())

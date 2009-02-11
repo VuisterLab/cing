@@ -1,3 +1,4 @@
+from cing import header
 from cing import verbosityDebug
 from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
@@ -9,6 +10,8 @@ from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from shutil import rmtree
 import cing
 import os
@@ -22,7 +25,7 @@ def usage():
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
     """
-    
+        
     fastestTest = True
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
@@ -33,6 +36,10 @@ def main(entryId, *extraArgList):
         doProcheck = False
     FORCE_REDO = True
     FORCE_RETRIEVE_INPUT = True
+    
+    
+    NTmessage(header)
+    NTmessage(getStartMessage())
     
     expectedNumberOfArguments = 5
     if len(extraArgList) != expectedNumberOfArguments:
@@ -92,7 +99,7 @@ def main(entryId, *extraArgList):
             stillToRetrieve = True           
             
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir,archiveType = archiveType)
+             retrieveTgzFromUrl(entryId, inputDir, archiveType = archiveType)
              
         if not os.path.exists(fileNameTgz):
             NTerror("Tgz should already have been present skipping entry")
@@ -203,6 +210,9 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
-    status = main(*sys.argv[1:])
-#    return status
+    
 #        sys.exit(1) # can't be used in forkoff api
+    try:
+        status = main(*sys.argv[1:])
+    finally:
+        NTmessage(getStopMessage())

@@ -1,16 +1,18 @@
 """
 Author: Jurgen F. Doreleijers, BMRB, June 2006
+
+python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
-from cing.Libs.NTutils import NTerror
 import cing
 import urllib
 
-#urlDB2 = "http://tang.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" Gets DoS
+urlDB2 = "http://tang.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" # Gets Denial of Service sometimes.
 #urlDB2 = "http://nmr.cmbi.ru.nl/servlet_data/viavia/mr_mysql_backup/"
-urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
+#urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
 #ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids" 
 ocaUrl = "http://localhost/oca" # For fastest develop.
 
@@ -43,6 +45,7 @@ def getBmrbNmrGridEntries():
         # b is for bogus/unused
         (_entryId, _bmrbId, pdbCode, _in_recoord, _in_dress) = dataLine.split()
         result.append(pdbCode)     
+  result.sort()
   return result
 
 def getBmrbNmrGridEntriesDOCRfREDDone():
@@ -56,11 +59,11 @@ def getBmrbNmrGridEntriesDOCRfREDDone():
   dataLines = data.split("\n")   
   for dataLine in dataLines:
     if dataLine:
-        # b is for bogus/unused
         (_mrfile_id, _entry_id, stage, pdbCode, _date_modified) = dataLine.split()
         if stage == "4-filtered-FRED":
             if pdbCode not in result:
-                result.append(pdbCode) 
+                result.append(pdbCode)
+  result.sort()
   return result
 
 def writeEntryListToFile(fileName, entryList):
@@ -99,6 +102,7 @@ def getPdbEntries(onlyNmr = False):
             pdbCode = items[0]
             pdbCode = pdbCode.lower()
             result.append(pdbCode) 
+  result.sort()
   return result
 
 if __name__ == '__main__':

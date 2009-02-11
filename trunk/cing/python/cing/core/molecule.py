@@ -1588,7 +1588,7 @@ Return an Molecule instance or None on error
                 if lastAtm and convention != XPLOR:
                     record = lastAtm.toPDBTER( pdbIndex=atmCount, convention=convention )
                     if not record:
-                        NTdebug("Failed to create a PDB file terminating record; ignoring for now.")
+#                        NTdebug("Failed to create a PDB file terminating record; ignoring for now.") # TODO check if this matters.
                         continue
                     pdbFile.append( record )
                     atmCount += 1

@@ -28,7 +28,7 @@ outputDir = startDir
 
 extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`)
 
-retrieveEntryListFromNRG = True
+retrieveEntryListFromNRG = False
 
 if retrieveEntryListFromNRG:
     ## The list of all entry_codes for which tgz files have been found
@@ -47,6 +47,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
-                    START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 1,
+                    START_ENTRY_ID = 2,
+                    MAX_ENTRIES_TODO = 4,
                     extraArgList = extraArgList)
