@@ -1043,8 +1043,8 @@ class NTplot( NTdict ):
             bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT 
         if isAlmostEqual( bounds2, SMALL_ANGLE_DIFF_FOR_PLOT ):
             bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
-        NTdebug("bounds1 : %s" % bounds1)
-        NTdebug("bounds2 : %s" % bounds2)
+#        NTdebug("bounds1 : %s" % bounds1)
+#        NTdebug("bounds2 : %s" % bounds2)
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
                 point = (bounds1[0], bounds2[0]) # lower left corner of only box.

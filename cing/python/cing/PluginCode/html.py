@@ -1568,8 +1568,8 @@ class ResidueHTMLfile( HTMLfile ):
         graphicsFormatExtension = 'png'
         plottedList = []
 #        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)
-        if not htmlOnly:
-            NTdebug("Residue %s: generating dihedral plots", self.residue )
+#        if not htmlOnly:
+#            NTdebug("Residue %s: generating dihedral plots", self.residue )
 
         for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
 #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)

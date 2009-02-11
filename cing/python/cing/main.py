@@ -112,13 +112,13 @@ format(peaks)
 #==============================================================================
 from cing import __author__ #@UnusedImport
 from cing import __copyright__ #@UnusedImport
-from cing import __copyright_years__
 from cing import __credits__ #@UnusedImport
 from cing import __date__ #@UnusedImport
 from cing import __version__ #@UnusedImport
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
+from cing import header
 from cing import starttime
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
@@ -471,13 +471,7 @@ def main():
     else:
         NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
         NTerror("Ignoring setting")
-
     # From this point on code may be executed that will go through the appropriate verbosity filtering
-    header = """
-======================================================================================================
-| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |
-======================================================================================================
-""" % (cingVersion, __copyright_years__)
 
     NTmessage(header)
     NTmessage(getStartMessage())
