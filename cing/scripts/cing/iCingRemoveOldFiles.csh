@@ -26,7 +26,7 @@ set mailto = jurgenfd@gmail.com
 
 # Find options.
 set dirToClean = /Library/WebServer/Documents/tmp/cing
-@ maxMinutes = 24 * 60
+@ maxMinutes = 24 * 60 * 7
 #set maxMinutes = 1
 # Where to put the report for a bit before it gets mailed:
 set tmpdir = /tmp

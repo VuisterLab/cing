@@ -6,5 +6,10 @@ Directories:
 
 Files:
 
-CONTENTS.txt            This file.
-iCingRestartServer.csh  Unused.
+CONTENTS.txt                    This file.
+CingWrapper.csh*                Script called by iCing that encapsulates the setting of environment variables.
+Tomcat5.sh*                     Copy of /Library/Tomcat/bin/Tomcat5.sh to show deps on CING servlets.
+getNRG_ccpn.csh*                Sync with NRG CCPN files at BMRB; to be called from cron.
+iCingRemoveOldFiles.csh*        Removes older files in /Library/WebServer/Documents/tmp/cing but not used yet (<5G after 2 months)
+org.apache.commons.jsvc.plist   Property list for starting tomcat see doc.
+
