@@ -1,9 +1,13 @@
 # python -u $CINGROOT/python/cing/Scripts/validateNRG.py
 from cing import cingDirScripts
+from cing.Libs.NTutils import NTerror
+from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
+from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 import cing
 import os
+import sys
 
 cing.verbosity = cing.verbosityDebug
 #cing.verbosity = cing.verbosityDefault
@@ -11,8 +15,8 @@ cing.verbosity = cing.verbosityDebug
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
-#entryListFileName = os.path.join(startDir, 'entry_list_nrg_docr.csv')
+#entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
+entryListFileName = os.path.join(startDir, 'entry_list_nrg_docr.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
@@ -23,7 +27,19 @@ inputDir = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
 outputDir = startDir
 
 extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`)
-    
+
+retrieveEntryListFromNRG = True
+
+if retrieveEntryListFromNRG:
+    ## The list of all entry_codes for which tgz files have been found
+    entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+    if not entry_list_nrg_docr:
+        NTerror("No NRG DOCR entries found")
+        sys.exit(1)
+    if writeEntryListToFile(entryListFileName, entry_list_nrg_docr):
+        NTerror("Failed to write entry list")
+        sys.exit(1)
+
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
