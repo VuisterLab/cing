@@ -18,18 +18,6 @@ import urllib
 def usage():
     NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
 
-def retrieveTgzFromUrl(entryId, url):
-    """Retrieves tgz file from url to current working dir assuming the
-    source is named:      
-    Will skip the download if it's already present.
-    """
-    fnametgz = entryId + '.tgz' 
-    if os.path.exists(fnametgz):
-        NTmessage("Tgz already present skip downloading")
-        return
-    unametgz = url + '/' + fnametgz 
-    NTdebug("downloading url: " + unametgz)
-    urllib.urlretrieve(unametgz, fnametgz) # consistently fails.
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
@@ -46,7 +34,7 @@ def main(entryId, *extraArgList):
     FORCE_REDO = True
     FORCE_RETRIEVE_INPUT = True
     
-    expectedNumberOfArguments = 4
+    expectedNumberOfArguments = 5
     if len(extraArgList) != expectedNumberOfArguments:
         NTerror("Got arguments: " + `extraArgList`)
         NTerror("Failed to get expected number of arguments: %d got %d" % (
@@ -55,9 +43,10 @@ def main(entryId, *extraArgList):
         
     entryCodeChar2and3 = entryId[1:3]        
     inputDir = os.path.join(extraArgList[0], entryId)
-    outputDir = os.path.join( extraArgList[1], 'data', entryCodeChar2and3, entryId )
+    outputDir = os.path.join(extraArgList[1], 'data', entryCodeChar2and3, entryId)
     pdbConvention = extraArgList[2] #@UnusedVariable
     restraintsConvention = extraArgList[3]
+    archiveType = extraArgList[4]
 
     NTdebug("Using:")
     NTdebug("inputDir:             " + inputDir)
@@ -65,15 +54,15 @@ def main(entryId, *extraArgList):
     NTdebug("pdbConvention:        " + pdbConvention)
     NTdebug("restraintsConvention: " + restraintsConvention)
     # presume the directory still needs to be created.
-    cingEntryDir = entryId+".cing"
+    cingEntryDir = entryId + ".cing"
     
     if os.path.isdir(cingEntryDir):
         if FORCE_REDO:
             NTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
-            mainIndexFile = os.path.join( cingEntryDir, "index.html")
-            isDone = os.path.isfile( mainIndexFile )
+            mainIndexFile = os.path.join(cingEntryDir, "index.html")
+            isDone = os.path.isfile(mainIndexFile)
             if isDone:
                 NTmessage("SKIPPING ENTRY ALREADY DONE")
                 return
@@ -88,31 +77,32 @@ def main(entryId, *extraArgList):
         NTerror("Failed to remove existing project (if present)")
         return True
         
-    project = Project.open(entryId, status='new')
+    project = Project.open(entryId, status = 'new')
                 
     isCcpnProject = False 
-    if inputDir.startswith("http") or inputDir.startswith("file") :
-        fnametgz = entryId + '.tgz'
+    # if true will do retrieveTgzFromUrl.
+    if inputDir.startswith("http") or inputDir.startswith("file"):
+        fileNameTgz = entryId + '.tgz'
         stillToRetrieve = False
-        if os.path.exists(fnametgz):
+        if os.path.exists(fileNameTgz):
             if FORCE_RETRIEVE_INPUT:
-                os.unlink(fnametgz)
+                os.unlink(fileNameTgz)
                 stillToRetrieve = True
         else:
             stillToRetrieve = True           
             
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir)
+             retrieveTgzFromUrl(entryId, inputDir,archiveType = archiveType)
              
-        if not os.path.exists(fnametgz):
+        if not os.path.exists(fileNameTgz):
             NTerror("Tgz should already have been present skipping entry")
             return        
 #            retrieveTgzFromUrl(entryId, inputDir)
         isCcpnProject = True
         
     if isCcpnProject:
-        fnametgz = entryId + '.tgz'         
-        if not project.initCcpn(ccpnFolder=fnametgz):
+        fileNameTgz = entryId + '.tgz'         
+        if not project.initCcpn(ccpnFolder = fileNameTgz):
             NTerror("Failed to init project from ccpn")
             return True     
     else:
@@ -128,7 +118,7 @@ def main(entryId, *extraArgList):
                 pdbConvention = CYANA
             if entryId.startswith("1tgq"):
                 pdbConvention = PDB
-        project.initPDB(pdbFile=pdbFilePath, convention=pdbConvention)
+        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
         NTdebug("Reading files from directory: " + inputDir)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]              
@@ -146,21 +136,69 @@ def main(entryId, *extraArgList):
     
         # Skip restraints if absent.
         if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
-            project.cyana2cing(cyanaDirectory=inputDir,
-                               convention=restraintsConvention,
-                               copy2sources=True,
+            project.cyana2cing(cyanaDirectory = inputDir,
+                               convention = restraintsConvention,
+                               copy2sources = True,
                                **kwds)
     project.save()
-    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif):
+    if project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif):
         NTerror("Failed to validate project read")
         return True
     project.save()
     if isCcpnProject:
-#        fnametgz = entryId + '.tgz'         
-#        os.unlink(fnametgz) # temporary ccpn tgz
+#        fileNameTgz = entryId + '.tgz'         
+#        os.unlink(fileNameTgz) # temporary ccpn tgz
         rmdir(entryId) # temporary ccpn dir        
     
         
+ARCHIVE_TYPE_FLAT = 0
+ARCHIVE_TYPE_BY_ENTRY = 1
+ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 2
+
+def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
+    """Retrieves tgz file from url to current working dir assuming the
+    source is named:      $url/$x/$x.tgz
+    Will skip the download if it's already present.
+    
+    Returns True on failure or None on success.
+    """
+    fileNameTgz = entryId + '.tgz' 
+    if os.path.exists(fileNameTgz):
+        NTmessage("Tgz already present skip downloading")
+        return
+    
+    pathInsert = ''
+    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
+        pathInsert = '/%s' % entryId
+    if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
+        entryCodeChar2and3 = entryId[1:3]
+        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
+        
+    if url.startswith('file:/'):
+        pathSource = url.replace('file:/', '')
+        fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz) 
+        NTdebug("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
+        if not os.path.exists(fullPathSource):
+            NTerror("%s does not exist." % (fullPathSource))
+            return True            
+        if not os.path.isfile(fullPathSource):
+            NTerror("%s is not a file" % (fullPathSource))
+            return True            
+        os.link(fullPathSource, fileNameTgz)
+    elif url.startswith('http:/'):
+        urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz) 
+        NTdebug("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))        
+        urllib.urlretrieve(urlNameTgz, fileNameTgz)        
+    else:
+        NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
+        return True
+        
+    if os.path.exists(fileNameTgz):
+        return
+    
+    NTerror("Failed to download: " + urlNameTgz)
+    return True
+    
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
