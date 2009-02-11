@@ -4273,7 +4273,7 @@ def getDateTimeStampForFileName():
 
 
 def writeTextToFile(fileName, txt):
-#    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
+    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
     fp = open(fileName, 'w')
     fprintf(fp, txt)
     fp.close()

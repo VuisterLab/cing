@@ -2,6 +2,9 @@
 Author: Jurgen F. Doreleijers, BMRB, June 2006
 """
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import toCsv
+from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import NTerror
 import cing
 import urllib
 
@@ -60,8 +63,16 @@ def getBmrbNmrGridEntriesDOCRfREDDone():
                 result.append(pdbCode) 
   return result
 
+def writeEntryListToFile(fileName, entryList):
+    "Returns True on failure"
+    csvText = toCsv(entryList)
+    if not csvText:
+        NTerror("Failed to get CSV for %s" % entryList)
+        return True
+    writeTextToFile(fileName, csvText)
+    
 
-def getPdbEntries(onlyNmr=False):
+def getPdbEntries(onlyNmr = False):
   result = []
 #  urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
   urlLocation = ocaUrl + "/ocaidsPDB"
@@ -92,7 +103,9 @@ def getPdbEntries(onlyNmr=False):
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug    
-    entry_list_pdb = getPdbEntries() 
-    NTdebug( "entries pdb: %d %40s" % (len(entry_list_pdb), entry_list_pdb ))
-    entry_list_pdb_nmr = getPdbEntries(onlyNmr=True)
-    NTdebug( "entries nmr: %d %s" % (len(entry_list_pdb_nmr), entry_list_pdb_nmr ))
+#    entry_list_pdb = getPdbEntries() 
+#    NTdebug( "entries pdb: %d %40s" % (len(entry_list_pdb), entry_list_pdb ))
+#    entry_list_pdb_nmr = getPdbEntries(onlyNmr=True)
+#    NTdebug( "entries nmr: %d %s" % (len(entry_list_pdb_nmr), entry_list_pdb_nmr ))
+    entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+    NTdebug("entries nrg docr: %d %s" % (len(entry_list_nrg_docr), entry_list_nrg_docr))
