@@ -22,8 +22,8 @@ class AllChecks(TestCase):
 #        entryList = "1brv".split()
 #        entryList = "1a24".split()
 #        entryList = "1kr8".split()
-#        entryList = "1a4d".split()
-        entryList = "1d3z".split()
+        entryList = "1a4d".split()
+#        entryList = "1ai0".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #        entryList =            "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
@@ -31,7 +31,10 @@ class AllChecks(TestCase):
 #        entryList = ["Parvulustat"]
 #        entryList = ["1a4d"]
 
-        fastestTest = False
+#        if you have a local copy you can use it; make sure to adjust the path setting below.
+        useNrgArchive = False # Default is False
+        
+        fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
@@ -46,12 +49,18 @@ class AllChecks(TestCase):
             project = Project.open( entryId, status='new' )
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
-            ccpnFile = os.path.join(cingDirTestsData,"ccpn", entryId+".tgz")
+            if useNrgArchive: # default is True
+                inputArchiveDir = os.path.join(cingDirTestsData,"ccpn")
+            else:
+                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+
+            ccpnFile = os.path.join(inputArchiveDir, entryId+".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile))
             self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif ))
+#            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences()) 
 
 if __name__ == "__main__":

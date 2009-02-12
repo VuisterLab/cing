@@ -821,6 +821,9 @@ def runWhatif( project, parseOnly=False ):
         return True
 
     path = os.path.join(path, 'pdbout.txt' )
+    if os.path.exists(path): # Happened for 1ao2 on production machine; not on development...
+        NTerror("Path does not exist: %s" % (path))
+        return True
     NTdebug( '> parsing '+ path)
     fullText = open(path, 'r').read()
     if fullText:

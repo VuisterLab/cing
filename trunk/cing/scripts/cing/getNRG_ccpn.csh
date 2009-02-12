@@ -20,8 +20,7 @@ if ( ! $status ) then
 endif
 
 # Watch out for not changing the azvv option below without changing it above.
-rsync -azvv \
-    -f '+ */*.tgz' -f '- */*' \
+rsync -azvv -f '+ */*.tgz' -f '- */*' \
     --delete --stats --progress  \
     -e 'ssh -l jurgen' $SERVER $MIRRORDIR
 

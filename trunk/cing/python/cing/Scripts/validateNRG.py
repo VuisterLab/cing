@@ -39,6 +39,9 @@ if retrieveEntryListFromNRG:
     if writeEntryListToFile(entryListFileName, entry_list_nrg_docr):
         NTerror("Failed to write entry list")
         sys.exit(1)
+        
+# disable next line for regular run.
+writeEntryListToFile(entryListFileName, ['1abt'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
@@ -47,6 +50,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
-                    START_ENTRY_ID = 2,
-                    MAX_ENTRIES_TODO = 4,
+                    START_ENTRY_ID = 0,
+                    MAX_ENTRIES_TODO = 1,
                     extraArgList = extraArgList)

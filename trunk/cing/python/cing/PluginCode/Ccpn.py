@@ -143,7 +143,7 @@ class Ccpn:
             return None
         # end if
     
-#        switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
+        switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
         self.ccpnProject = loadProject(ccpnFolder)
         switchOutput(True)
         if not self.ccpnProject:
@@ -489,8 +489,13 @@ class Ccpn:
                         # end if
             
                         if ccpnCoordAtom.coords:
+                            i = -1
                             for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
+                                i += 1
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
+                                if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
+                                    NTwarning("Skippng coordinate for CING failed to find coordinate for model %d for atom %s" % ( i, atom))
+                                    continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
                             # end for
                         # end if
@@ -1063,7 +1068,7 @@ class Ccpn:
                         for atom in fixedAtomSet.atoms:
                             equivAtoms[atom] = True
                             if not hasattr(atom, 'cing'):
-                                NTdebug("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
+                                NTwarning("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
                             # end if
                         # end for
                     # end for
@@ -1089,15 +1094,14 @@ class Ccpn:
                             # end try
                             atom1 = atom1.pseudoAtom() or atom1
                             atom2 = atom2.pseudoAtom() or atom2
-                            if atom1 != atom2:
-                                aset, arset = set(), set()
-                                atomPair = (atom1, atom2)
-                                aset.add(atomPair)
-                                atomPairRev = (atom2, atom1)
-                                arset.add(atomPairRev)
-                                if not atoms.issuperset(aset) and not atoms.issuperset(arset):
-                                    atoms.add(atomPair)
-                                # end if
+#                            if atom1 != atom2: # JFD were diagonal restraints excluded? No need.
+                            aset, arset = set(), set()
+                            atomPair = (atom1, atom2)
+                            aset.add(atomPair)
+                            atomPairRev = (atom2, atom1)
+                            arset.add(atomPairRev)
+                            if not atoms.issuperset(aset) and not atoms.issuperset(arset):
+                                atoms.add(atomPair)
                             # end if
                         # end for
                     # end for
