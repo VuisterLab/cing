@@ -1,3 +1,5 @@
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTwarning
 import math
 TWO_PI = 2. * math.pi
 
@@ -22,6 +24,13 @@ def violationAngle(value, lowerBound, upperBound):
 ###############################################################
         # operate in float space (not integer)
 #        value      -= .0
+        "Return None on error"
+        if lowerBound == None: # See entry 1bn0
+            NTwarning("Lower bound is None; skipping this angle for this model.")
+            return
+        if upperBound == None: # See entry 1bn0
+            NTwarning("Upper bound is None; skipping this angle for this model.")
+            return
         lowerBound -= .0 # only one needed because see below.
 #        upperBound -= .0
         

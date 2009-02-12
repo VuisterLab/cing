@@ -829,7 +829,7 @@ Project: Top level Cing project class
         before exiting."""
         pathString, _name = self.rootPath(self.name)
         if not os.path.exists(pathString):
-            NTwarning("No cing project is found at: " + pathString)
+            NTdebug("No cing project is found at: " + pathString)
             return None
         NTmessage('Removing existing cing project "%s"', self)
         if rmtree( pathString ):
@@ -841,7 +841,7 @@ Project: Top level Cing project class
 
 class XMLProjectHandler( XMLhandler ):
     """Project handler class"""
-    def __init__( self ):
+    def __init__( self ):   
         XMLhandler.__init__( self, name='Project')
     #end def
 
@@ -1478,11 +1478,14 @@ class DistanceRestraint( NTdict ):
         self.max = max( self.distances )
 
         # calculate violations
-        for d in self.distances:
+        for d in self.distances:            
             if (d < self.lower):
                 self.violations.append( d-self.lower )
             elif (d > self.upper):
-                self.violations.append( d-self.upper )
+                if self.upper == None: # Happens for entry 1but
+                    self.violations.append( 0.0 )
+                else:
+                    self.violations.append( d-self.upper )
             else:
                 self.violations.append( 0.0 )
             #end if
@@ -1948,6 +1951,8 @@ class DihedralRestraint( NTdict ):
         # Analyze violations, account for periodicity
         for d in self.dihedrals:
             v = violationAngle(value=d, lowerBound=self.lower, upperBound=self.upper)
+            if v == None: # already send a message
+                continue 
             fv = math.fabs(v)
             self.violations.append( v )
             if fv > 1.0: self.violCount1 += 1
@@ -2095,11 +2100,11 @@ class DihedralRestraintList( NTlist ):
         #end if
 
         modelCount = 0
-        if (len(self[0].atoms) > 0):
+        if len(self[0].atoms):
             modelCount = self[0].atoms[0].residue.chain.molecule.modelCount
         #end if
 
-        if (modelCount == 0):
+        if not modelCount:
             NTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name )
             return (None, None, None, None, None)
         #end if
@@ -2117,8 +2122,10 @@ class DihedralRestraintList( NTlist ):
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5
-            for i in range(0, modelCount):
-                self.rmsd[i] += dr.violations[i]*dr.violations[i]
+            for i in range(len(dr.violations)): # happened in entry 1bn0 that violations were not defined.
+#            for i in range(0, modelCount):
+                v = dr.violations[i]
+                self.rmsd[i] += v*v
             #end for
         #end for
 

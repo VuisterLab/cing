@@ -634,6 +634,15 @@ def checkForDisulfides(project, toFile=True):
         if c not in cys:
             cys.append(c)
 
+    iList = range(len(cys))
+    iList.reverse()
+    # delete from the end as not to mess up the in operator below.
+    for i in iList:
+        c = cys[i]
+        if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
+            NTwarning("No coordinates for CA, skipping residue: %s" % c)
+            del( cys[i] )            
+
     disulfides = NTlist()
     # all cys(i), cys(j) pairs with j>i
     for i in range(len(cys)):

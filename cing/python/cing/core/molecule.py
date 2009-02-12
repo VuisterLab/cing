@@ -48,6 +48,7 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
+import cing
 import math
 import os
 import sys
@@ -1103,15 +1104,27 @@ class Molecule( NTtree ):
             atm.calculateMeanCoordinate()
 
     def idDisulfides(self):
-        """Just identify the disulfide bonds.
+        """Just identify the disulfide bonds. 
+        Takes into account residues with missing coordinates as long as they are all missing.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
-        NTdebug('Identify the disulfide bonds.')
+#        NTdebug('Identify the disulfide bonds.')
         cys=self.residuesWithProperties('CYS')
         cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
+                
         for c in cyss:
             if c not in cys:
                 cys.append(c)
+                
+        iList = range(len(cys))
+        iList.reverse()
+        # delete from the end as not to mess up the in operator below.
+        for i in iList:
+            c = cys[i]
+            if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
+                NTdebug("No coordinates for CA, skipping residue: %s" % c)
+                del( cys[i] )            
+#                needs testing.
         pairList = []
         cyssDict2Pair = {}
         # all cys(i), cys(j) pairs with j>i
@@ -1120,7 +1133,10 @@ class Molecule( NTtree ):
             for j in range(i+1, len(cys)):
                 c2 = cys[j]
                 scoreList = disulfideScore( c1, c2)
-#                if cing.verbosity > cing.verbosityDebug: # impossible of course
+                if not scoreList:
+                    continue
+                    
+#                if cing.verbosity >= cing.verbosityDebug:
                 if False:
                     da = c1.CA.distance( c2.CA )
                     db = c1.CB.distance( c2.CB )
@@ -3856,9 +3872,12 @@ def disulfideScore( cys1, cys2 ):
     cys1, cys2: Residue instances
     returns a NTlist with four numbers:
         [d(Ca-Ca) count, d(Cb-Cb) count, S-S count, final score]
-
+        or None on error (eg when there were no coordinates.
     """
     mc = len(cys1.CA.coordinates) # model count
+    if not mc: # see entry 1abt
+        NTwarning("No coordinates for CA of residue: %s" % cys1)
+        return None
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
