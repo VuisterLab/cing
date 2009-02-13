@@ -2,16 +2,20 @@
 
 = Explanations of external program features =
 
-  What If
-See [http://proteins.dyndns.org/Education/Validation/HTML/USF/whatif.html Protein structure] verification and A crystallographer's guide to interpreting WHATIF output.
+  ==What If==
+See [http://proteins.dyndns.org/Education/Validation/HTML/CheckHelp/index.html Protein structure verification] and "A crystallographer's [http://proteins.dyndns.org/Education/Validation/HTML/USF/whatif.html guide] to interpreting WHATIF output".
  
 
-  Procheck_NMR
-See AQUA and PROCHECK-NMR - Operating manual.
+  ==Procheck_NMR==
+See AQUA and PROCHECK-NMR - [http://www.biochem.ucl.ac.uk/~roman/procheck_nmr/manual/index.html Operating manual].
 
-= Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Ramachandran and Janin plots =
+  * The background shading is for the probability derived from What If’s internal database of high-resolution structures on a 10 by 10 degree grid. The color coding refers to one of three states the secondary structure (by DSSP) was assigned to be in. Blue, green, and yellow are respectively for helix, sheet, and other. The coloring changes linearly from white to e.g. yellow for densities 2 to 20%. They are consequently put on top of each other (blue on top) with some alpha blending. More details in code at [http://code.google.com/p/cing/source/browse/trunk/cing/python/cing/Libs/NTplot.py dihedralComboPlot].
+  * The chi 1 and 2 combination plot is named after [http://en.wikipedia.org/wiki/Janin_Plot Janin].
+
+
+= Symbols =
+  *  <font color="blue"> ◦ <font color="black"> (blue) circular averaged value
+  *  <font color="green">+ <font color="black">(green) non-proline/glycine
+  *  <font color="green"> ▴ <font color="black">(green) non-cacheable-proline/glycine
