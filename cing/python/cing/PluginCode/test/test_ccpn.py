@@ -22,7 +22,7 @@ class AllChecks(TestCase):
 #        entryList = "1brv".split()
 #        entryList = "1a24".split()
 #        entryList = "1kr8".split()
-        entryList = "1a4d".split()
+        entryList = "1brv".split()
 #        entryList = "1ai0".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()

@@ -2,6 +2,7 @@ from cing.Libs.NTutils import switchOutput
 switchOutput(False)
 # Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 from ccp.general.Util import createMoleculeTorsionDict
+from ccp.general.Util import getResonancesFromPairwiseConstraintItem
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -29,6 +30,10 @@ from cing.core.molecule import unmatchedAtomByResDictToString
 from memops.general.Io import loadProject
 from shutil import move
 from shutil import rmtree
+from cing.core.constants import DR_LEVEL
+from cing.core.constants import HBR_LEVEL
+from cing.core.constants import AC_LEVEL
+from cing.core.constants import RDC_LEVEL
 import os
 import string
 import tarfile
@@ -61,8 +66,11 @@ class Ccpn:
     # Reported: https://sourceforge.net/tracker2/index.php?func=detail&aid=2049228&group_id=85796&atid=577329
     
     RESTRAINT_IDX_DISTANCE = 0
-    RESTRAINT_IDX_DIHEDRAL = 1
-    RESTRAINT_IDX_RDC = 2
+    RESTRAINT_IDX_HBOND = 1
+    RESTRAINT_IDX_DIHEDRAL = 2
+    RESTRAINT_IDX_RDC = 3
+    RESTRAINT_IDX_CS = 4
+    
     
     CCPN_PROTEIN = 'protein'
     CCPN_DNA = 'DNA'
@@ -78,8 +86,34 @@ class Ccpn:
     CCPN_DEPROT_H_DOUBLE_PRIME = "deprot:H''"
     CCPN_LINK_SG = 'link:SG'
     CCPN_DEPROT_HG = 'deprot:HG'
-    "Don't report on the next atoms; not interested"
     
+    CCPN_DISTANCE_CONSTRAINT = 'DistanceConstraint'
+    CCPN_HBOND_CONSTRAINT = 'HBondConstraint'
+    CCPN_DIHEDRAL_CONSTRAINT = 'DihedralConstraint'
+    CCPN_RDC_CONSTRAINT = 'RdcConstraint'
+    CCPN_CS_CONSTRAINT = 'ChemShiftConstraint'
+
+    CCPN_DISTANCE_CONSTRAINT_LIST = 'DistanceConstraintList'
+    CCPN_HBOND_CONSTRAINT_LIST = 'HBondConstraintList'
+    CCPN_DIHEDRAL_CONSTRAINT_LIST = 'DihedralConstraintList'
+    CCPN_RDC_CONSTRAINT_LIST = 'RdcConstraintList'
+    CCPN_CS_CONSTRAINT_LIST = 'ChemShiftConstraintList'
+    
+    CCPN_CLASS_RESTRAINT = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT,
+                            RESTRAINT_IDX_HBOND: CCPN_HBOND_CONSTRAINT,
+                            RESTRAINT_IDX_DIHEDRAL: CCPN_DIHEDRAL_CONSTRAINT,
+                            RESTRAINT_IDX_RDC: CCPN_RDC_CONSTRAINT,
+                            RESTRAINT_IDX_CS: CCPN_CS_CONSTRAINT,
+                            }
+
+    CCPN_CLASS_RESTRAINT_LIST = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT_LIST,
+                            RESTRAINT_IDX_HBOND: CCPN_HBOND_CONSTRAINT_LIST,
+                            RESTRAINT_IDX_DIHEDRAL: CCPN_DIHEDRAL_CONSTRAINT_LIST,
+                            RESTRAINT_IDX_RDC: CCPN_RDC_CONSTRAINT_LIST, 
+                            RESTRAINT_IDX_CS: CCPN_CS_CONSTRAINT_LIST,
+                            }
+    
+    "Don't report on the next atoms"
     # Add these to CING lib later. For now, it's just clobbering the output to report on them.
     CCPN_ATOM_LIST_TO_IGNORE_REPORTING = []
     hideMissingAtomsJfdKnowsAbout = False # default should be False
@@ -380,8 +414,8 @@ class Ccpn:
                                 
 #    nameDict = {'CCPN': 'DNA A deprot:H1'..
                 ccpnResNameInCingDb = "%s %s %s" % (ccpnResidue.molType, ccpnResCode, ccpnResDescriptorPatched)
-                NTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
-                          ccpnResName3Letter, ccpnResCode, ccpnResDescriptor, ccpnResDescriptorPatched, ccpnResNameInCingDb))
+#                NTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
+#                          ccpnResName3Letter, ccpnResCode, ccpnResDescriptor, ccpnResDescriptorPatched, ccpnResNameInCingDb))
                 
 #See bottom of this file for CCPN residue name mappings in CING db.
 # Note that this will be ok except for the terminii which will always deviate in the descriptor/stereochemistry info.
@@ -469,7 +503,7 @@ class Ccpn:
                         atmList = unmatchedAtomByResDict[ccpnResName3Letter][0] 
                         resNumList = unmatchedAtomByResDict[ccpnResName3Letter][1]
                          
-                        if (atomName not in atmList) and ( atomName not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING):
+                        if (atomName not in atmList) and (atomName not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING):
                             atmList.append(atomName)
                         if res.resNum not in resNumList:
                             resNumList.append(res.resNum)
@@ -489,12 +523,12 @@ class Ccpn:
                         # end if
             
                         if ccpnCoordAtom.coords:
-                            i = -1
+                            i = - 1
                             for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
                                 i += 1
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-                                    NTwarning("Skippng coordinate for CING failed to find coordinate for model %d for atom %s" % ( i, atom))
+                                    NTwarning("Skippng coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom))
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
                             # end for
@@ -876,11 +910,15 @@ class Ccpn:
     
         funcName = self.importFromCcpnDistanceRestraint.func_name
         listOfDistRestList = []
-        mapDistListType = { 'DistanceConstraintList': 'DistRestraint',  'HBondConstraintList': 'HbondRestraint'}
+#        mapDistListType = { self.CC: 'DistRestraint', 'HBondConstraintList': 'HbondRestraint'}
+        
+        # map to CING names were possible note the presence of DistanceRestraintList.Hbond
+        mapDistListType = { self.CCPN_DISTANCE_CONSTRAINT_LIST: DR_LEVEL, self.CCPN_HBOND_CONSTRAINT_LIST: HBR_LEVEL}
+        
         msgHoL = MsgHoL()
 #        msgHoL.appendDebug("Let's start off with one")
         for distListType in mapDistListType.keys(): # loop over regular distance and hydrogen bond restraints.
-            distType =  mapDistListType[distListType]
+            distType = mapDistListType[distListType]
             # loop over all constraint stores
             for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
                 ccpnDistanceListOfList = ccpnConstraintStore.findAllConstraintLists(className = distListType)
@@ -892,10 +930,10 @@ class Ccpn:
                     ccpnDistanceList.cing = distanceRestraintList
                     distanceRestraintList.ccpn = ccpnDistanceList
         
-                    for ccpnDistanceConstraint in ccpnDistanceList.constraints:
+                    for ccpnDistanceConstraint in ccpnDistanceList.sortedConstraints():
                         result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
                         if not result:
-                            msgHoL.appendMessage("%s: Ccpn %s restraint '%s' with bad distances imported."% (funcName, distType, ccpnDistanceConstraint))
+                            msgHoL.appendMessage("%s: Ccpn %s restraint '%s' with bad distances imported." % (funcName, distType, ccpnDistanceConstraint))
                             result = (None, None)
                         lower, upper = result
         
@@ -903,7 +941,7 @@ class Ccpn:
         
                         if not atomPairs:
                             # restraints that will not be imported
-                            msgHoL.appendMessage("%s: skipped Ccpn %s restraint '%s' without atom pairs"%( funcName, distType, ccpnDistanceConstraint))
+                            msgHoL.appendMessage("%s: skipped Ccpn %s restraint '%s' without atom pairs" % (funcName, distType, ccpnDistanceConstraint))
                             continue
                         # end if
         
@@ -915,6 +953,8 @@ class Ccpn:
                         distanceRestraintList.append(distanceRestraint)
                     # end for
                     listOfDistRestList.append(distanceRestraintList)
+                    if distanceRestraintList.simplify():
+                         NTerror("Failed to simplify the distanceRestraintList")
                 # end for
             # end for
         # end for dist types.
@@ -944,15 +984,15 @@ class Ccpn:
         # loop over all constraint stores
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
     
-            for ccpnDihedralList in ccpnConstraintStore.findAllConstraintLists(className = 'DihedralConstraintList'):
-                ccpnDihedralListName = self._ensureValidName(ccpnDihedralList.name, 'DihRestraint')
+            for ccpnDihedralList in ccpnConstraintStore.findAllConstraintLists(className = self.CCPN_DIHEDRAL_CONSTRAINT_LIST):
+                ccpnDihedralListName = self._ensureValidName(ccpnDihedralList.name, AC_LEVEL )
     
                 dihedralRestraintList = self.project.dihedrals.new(ccpnDihedralListName, status = 'keep')
     
                 ccpnDihedralList.cing = dihedralRestraintList
                 dihedralRestraintList.ccpn = ccpnDihedralList
     
-                for ccpnDihedralConstraint in ccpnDihedralList.constraints:
+                for ccpnDihedralConstraint in ccpnDihedralList.sortedConstraints():
                     # TODO merge (dilute) ambig dihedrals
                     dihConsItem = ccpnDihedralConstraint.findFirstItem()
     
@@ -996,15 +1036,15 @@ class Ccpn:
         # loop over all constraint stores
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
     
-            for ccpnRdcList in ccpnConstraintStore.findAllConstraintLists(className = 'RdcConstraintList'):
-                ccpnRdcListName = self._ensureValidName(ccpnRdcList.name, 'RdcRestraint')
+            for ccpnRdcList in ccpnConstraintStore.findAllConstraintLists(className = self.CCPN_RDC_CONSTRAINT_LIST):
+                ccpnRdcListName = self._ensureValidName(ccpnRdcList.name, RDC_LEVEL)
     
                 rdcRestraintList = self.project.rdcs.new(ccpnRdcListName, status = 'keep')
     
                 ccpnRdcList.cing = rdcRestraintList
                 rdcRestraintList.ccpn = ccpnRdcList
     
-                for ccpnRdcConstraint in ccpnRdcList.constraints:
+                for ccpnRdcConstraint in ccpnRdcList.sortedConstraints():
                     result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC, msgHoL)
                     if not result:
                         NTdetail("Ccpn RDC restraint '%s' with bad values imported." % 
@@ -1037,23 +1077,39 @@ class Ccpn:
     def _getConstraintAtom(self, ccpnConstraint):
         """Descrn: Get the atoms that may be assigned to the constrained resonances.
            Inputs: NmrConstraint.AbstractConstraint.
-           Output: List of Cing.Atoms, tupled Cing.Atoms pairs or [].
+           Output: List of Cing.Atoms, tupled Cing.Atoms pairs or []
+           or None on error.
+           
+           Note that pseudo atoms are collapsed from CCPN to CING for those and only those
+           cases were the FC has expanded them. I.e. Issue 1 in the nmrrestrntsgrid project.
+           
+Original data: HG* is nicest to be written QG instead of writing it as a
+ambi.
+
+1 2 1 1 1 14 VAL MG1 1 171 VALn HG* 1 1
+1 2 2 1 1 14 VAL HA 1 171 VALn HA 1 1
+1 3 1 1 1 14 VAL MG2 1 171 VALn HG* 1 1
+1 3 2 1 1 14 VAL HA 1 171 VALn HA 1 1      
+
+Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the pseudo?                 
         """
     
-        atoms = set()
+#        atoms = set()
+        atomListOfList = NTlist() # Can use the routine: issuperset
         fixedResonances = []
         className = ccpnConstraint.className
     
-        if className == 'DihedralConstraint':
+        if className == self.CCPN_DIHEDRAL_CONSTRAINT:
             fixedResonances.append(ccpnConstraint.resonances)
-    
-        elif className == 'ChemShiftConstraint':
-            fixedResonances.append([ccpnConstraint.resonance, ])
-    
-        else:
+#        elif className == 'ChemShiftConstraint': # can't model these in CING yet anyway. They're not chemical shifts are they?
+#            fixedResonances.append([ccpnConstraint.resonance, ])
+        elif className in [self.CCPN_DISTANCE_CONSTRAINT, self.CCPN_HBOND_CONSTRAINT, self.CCPN_RDC_CONSTRAINT]:
             for item in ccpnConstraint.items:
-                fixedResonances.append(item.resonances)
-            # end for
+#                fixedResonances.append(item.resonances) # this used to use unsorted items.
+                fixedResonances.append(getResonancesFromPairwiseConstraintItem(item)) # JFD from WV. Tries to use sorted items where available.
+        else:
+            NTerror("Type of constraint '%s' not recognized", className)
+            return None
         # end if
     
         for fixedResonanceList in fixedResonances:
@@ -1062,55 +1118,59 @@ class Ccpn:
                 fixedResonanceSet = fixedResonance.resonanceSet
     
                 if fixedResonanceSet:
-                    equivAtoms = {}
-    
+                    equivAtoms = {} # why use a dictionary here?
+                    equivAtoms = []
                     for fixedAtomSet in fixedResonanceSet.atomSets:
                         for atom in fixedAtomSet.atoms:
-                            equivAtoms[atom] = True
                             if not hasattr(atom, 'cing'):
                                 NTwarning("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
-                            # end if
-                        # end for
-                    # end for
-                    atomList.append(equivAtoms.keys())
+                                return None
+                            else:
+                                equivAtoms.append(atom)
+                    atomList.append(equivAtoms)
                 # end if
             # end for
     
-            if len(atomList) == len(fixedResonanceList):
-                if className == 'DihedralConstraint':
-                    try:
-                        atoms = [ x[0].cing for x in atomList ]
-                    except:
-                        NTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
-                    # end try
-                elif className in ['DistanceConstraint', 'HBondConstraint', 'RdcConstraint']:
-                    for ccpnAtom1 in atomList[0]:
-                        for ccpnAtom2 in atomList[1]:
-                            try:
-                                atom1, atom2 = ccpnAtom1.cing, ccpnAtom2.cing
-                            except:
-                                NTdebug("No Cing atom obj equivalent for Ccpn atoms %s and %s", ccpnAtom1.name, ccpnAtom2.name)
-                                continue
-                            # end try
-                            atom1 = atom1.pseudoAtom() or atom1
-                            atom2 = atom2.pseudoAtom() or atom2
+            if len(atomList) != len(fixedResonanceList):
+                NTdebug("why aren't the atoms found for this restraint: %s" % (ccpnConstraint))
+                return None
+            
+            if className == self.CCPN_DIHEDRAL_CONSTRAINT:
+                try:                    
+                    for x in atomList:
+                        atomListOfList.append(x[0].cing)
+                except:
+                    NTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
+                    return None
+            else:
+                for ccpnAtom1 in atomList[0]:
+                    for ccpnAtom2 in atomList[1]:
+                        try:
+                            atom1, atom2 = ccpnAtom1.cing, ccpnAtom2.cing
+                        except:
+                            NTdebug("No Cing atom obj equivalent for Ccpn atoms %s and %s", ccpnAtom1.name, ccpnAtom2.name)
+                            return None
+                        # end try
+                        atom1 = atom1.pseudoAtom() or atom1
+                        atom2 = atom2.pseudoAtom() or atom2
 #                            if atom1 != atom2: # JFD were diagonal restraints excluded? No need.
-                            aset, arset = set(), set()
-                            atomPair = (atom1, atom2)
-                            aset.add(atomPair)
-                            atomPairRev = (atom2, atom1)
-                            arset.add(atomPairRev)
-                            if not atoms.issuperset(aset) and not atoms.issuperset(arset):
-                                atoms.add(atomPair)
-                            # end if
-                        # end for
-                    # end for
-                else:
-                    NTmessage("Type of constraint '%s' not recognized", className)
-                # end if
+#                        aset = set()
+#                        arset = set()
+                        atomPair = (atom1, atom2) # a tuple of 2 elements always.
+#                        aset.add(atomPair)
+#                        atomPairRev = (atom2, atom1)
+#                        arset.add(atomPairRev)
+#                        TODO implement issuperset??
+#                        but why would there be duplicates at this point?
+#                        if not atomListOfList.issuperset(aset) and not atomListOfList.issuperset(arset):
+                        atomListOfList.add(atomPair)
             # end if
         # end for
-        return list(atoms)
+#        atoms = list(atoms)
+
+        atomListOfList
+        NTdebug("_getConstraintAtom: %s" % atomListOfList)
+        return atomListOfList
     # end def _getConstraintAtom
     
     def _ensureValidName(self, name, prefix = CING):
@@ -1140,6 +1200,9 @@ class Ccpn:
     # end def _ensureValidName
 # end class
 
+def isDistanceOrHBondType(restraintTypeIdx):
+    return restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE or restraintTypeIdx == Ccpn.RESTRAINT_IDX_HBOND
+ 
 def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     '''Descrn: Return upper and lower values for a Ccpn constraint.
        Inputs: Ccpn constraint.
@@ -1162,7 +1225,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     '''
     
     if not constraint:
-        msgHoL.appendWarning( "Restraint in CCPN was None" ) 
+        msgHoL.appendWarning("Restraint in CCPN was None") 
         return None
     
 #    NTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
@@ -1185,7 +1248,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     
     # Generate some warnings which might be helpful to a user because it should not be out of whack like this.
     # Perhaps this gets checked in ccpn api already?
-    if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE:
+    if isDistanceOrHBondType(restraintTypeIdx):
         if constraint.targetValue != None:
             if constraint.lowerLimit != None:
                 if constraint.targetValue < constraint.lowerLimit:                 
@@ -1236,7 +1299,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
                 upper = constraint.targetValue + error
                 
             
-    if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE:
+    if isDistanceOrHBondType(restraintTypeIdx):
         if (lower != None) and (upper != None):
             if lower > upper:                 
                 msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
@@ -1276,7 +1339,7 @@ def removeCcpnReferences(self):
     """To slim down the memory footprint; should allow garbage collection."""
     attributeToRemove = "ccpn"
     try:
-        removeRecursivelyAttribute( self, attributeToRemove )
+        removeRecursivelyAttribute(self, attributeToRemove)
     except:
         NTerror("Failed removeCcpnReferences")
 

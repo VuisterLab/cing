@@ -5,8 +5,10 @@ from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
+from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTaverage
+from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
@@ -35,6 +37,8 @@ from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
+from cing.core.constants import DRL_LEVEL
+from cing.core.constants import DR_LEVEL
 from cing.core.constants import LOOSE
 from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
 from cing.core.molecule import Atom
@@ -48,13 +52,13 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
-from cing.Libs.NTutils import NTcodeerror
-from cing import issueListUrl
-import tarfile
+from cing.core.constants import AC_LEVEL
+from cing.core.constants import RDC_LEVEL
 import cing
 import math
 import os
 import sys
+import tarfile
 import time
 __version__ = cing.__version__
 __date__ = cing.__date__
@@ -1207,11 +1211,13 @@ class DistanceRestraint( NTdict ):
        atomPairs: list of (atom_1,atom_2) tuples,
        lower and upper bounds
     """
-
+    STATUS_SIMPLIFIED = 'simplified'
+    STATUS_NOT_SIMPLIFIED = 'not simplified'    
+    
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
-    def __init__( self, atomPairs=[], lower=None, upper=None, **kwds ):
+    def __init__( self, atomPairs=NTlist(), lower=None, upper=None, **kwds ):
 
-        NTdict.__init__(self,__CLASS__  = 'DistanceRestraint',
+        NTdict.__init__(self,__CLASS__  = DR_LEVEL,
                                atomPairs  = NTlist(),
                                lower      = lower,
                                upper      = upper,
@@ -1289,6 +1295,118 @@ class DistanceRestraint( NTdict ):
         # end if
     #end def
 
+    def simplify(self):
+        """Return True on error"""
+        status = self.STATUS_SIMPLIFIED
+        while status == self.STATUS_SIMPLIFIED:
+            status = self.simplifySpecificallyForFcFeature()
+            if status == self.STATUS_SIMPLIFIED:
+                pass
+#                NTdebug("simplified restraint %s" % self)
+            elif status == self.STATUS_NOT_SIMPLIFIED:
+                pass
+#                NTdebug("not simplified restraint %s" % self)
+            else:
+                NTerror("Encountered an error simplifying restraint %s" % self)
+                return True            
+                
+
+    def simplifySpecificallyForFcFeature(self):
+        """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint 
+        were it is not really one. Undone here.
+        Return None on error. 
+        STATUS_NOT_SIMPLIFIED for no simplifications done
+        STATUS_SIMPLIFIED for simplifications done        
+        """
+#        atomPairIdxList = range( len(self.atomPairs) )
+#        atomPairIdxList.reverse()
+        # JFD: Delete exact sames just to learn this code
+        lenAtomPairList =len(self.atomPairs)
+        if lenAtomPairList <= 1:
+#            NTdebug('returned because just a single pair of atoms')
+            return self.STATUS_NOT_SIMPLIFIED
+                
+#        atomPairIdxJ = len(self.atomPairs) 
+#        while atomPairIdxJ > 1:
+#            atomPairIdxJ -= 1
+#            atomPairJ = self.atomPairs[atomPairIdxJ]
+#            atom0J = atomPairJ[0]
+#            atom1J = atomPairJ[1]
+#            for atomPairIdxI in range( atomPairIdxJ ):
+#                atomPairI = self.atomPairs[atomPairIdxI]
+#                atom0I = atomPairI[0]
+#                atom1I = atomPairI[1]
+#                if (atom0I == atom0J and atom1I == atom1J) or   \
+#                   (atom0I == atom1J and atom1I == atom0J):
+#                    NTerror("Found the same pairs in restraint %s" % self)
+#                    del self.atomPairs[atomPairIdxJ]
+                    
+        atomPairIdxJ = len(self.atomPairs) 
+        while atomPairIdxJ > 1:
+            atomPairIdxJ -= 1
+            atomPairJ = self.atomPairs[atomPairIdxJ]
+            atomPairJset = set( atomPairJ )
+            atom0J = atomPairJ[0]
+            atom1J = atomPairJ[1]
+            
+#            NTdebug('Using atoms J %s and %s' % ( atom0J, atom1J) )
+            # speed up check on J.
+            if not (atom0J.isProChiral() or atom1J.isProChiral()):
+#                NTdebug('Skipping restraint without prochiral J atoms')
+                continue
+            
+            for atomPairIdxI in range( atomPairIdxJ ): # Compare only with the previous atom pairs
+                atomPairI = self.atomPairs[atomPairIdxI]
+                atom0I = atomPairI[0]
+                atom1I = atomPairI[1]
+#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+                atomPairIset = set( atomPairI )
+                atomPairIntersection = atomPairIset.intersection(atomPairJset)
+                if not atomPairIntersection:
+#                    NTdebug('    No intersection')
+                    continue
+                if len( atomPairIntersection ) != 1:
+                    NTcodeerror('Unexpected more than one atom in atom set intersection')
+                    return None
+                
+                atomPairInCommon = atomPairIntersection.pop()
+                atomIinCommonIdx = 0
+                atomJinCommonIdx = 0
+                atomItoMergeIdx = 1
+                atomJtoMergeIdx = 1
+                if atomPairI[atomIinCommonIdx] != atomPairInCommon:
+                      atomIinCommonIdx = 1                                
+                      atomItoMergeIdx = 0
+                if atomPairJ[atomJinCommonIdx] != atomPairInCommon:
+                      atomJinCommonIdx = 1                                
+                      atomJtoMergeIdx = 0
+#                NTdebug('    atominCommonIdx I %d and J %d' % ( atomIinCommonIdx, atomJinCommonIdx) )
+                
+                atomItoMerge = atomPairI[atomItoMergeIdx]
+                atomJtoMerge = atomPairJ[atomJtoMergeIdx]
+                
+                #
+                if atomItoMerge.proChiralPartner() != atomJtoMerge:                     
+#                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all' % ( atomItoMerge, atomJtoMerge) )
+                    continue
+                    
+                pseudoOfPseudoAtom = atomItoMerge.getPseudoOfPseudoAtom()
+                if not pseudoOfPseudoAtom:
+#                    NTdebug('    no pseudo of pseudo atom for this atom %s' % atomItoMerge)
+                    continue
+                
+                NTdebug( "    New pop atom: %s" % pseudoOfPseudoAtom)
+                # Change I maintaining order
+                atomPairINewList = list( atomPairI ) 
+                atomPairINewList[atomItoMergeIdx] = pseudoOfPseudoAtom
+                self.atomPairs[atomPairIdxI] = tuple( atomPairINewList )
+                # Remove J 
+                del self.atomPairs[atomPairIdxJ]
+                # Return qucikly to keep code to the left (keep it simple).      
+                return self.STATUS_SIMPLIFIED                        
+#        NTdebug('Not simplified.')
+        return self.STATUS_NOT_SIMPLIFIED
+            
     def getModelCount(self):
         modelCount = 0
         if len(self.atomPairs) :
@@ -1581,9 +1699,10 @@ class DistanceRestraintList( NTlist ):
     Also manages the "id's".
     Sort  by item of DistanceRestraint Class
     """
+    # use the same spelling through out.
     def __init__( self, name, status='keep' ):
         NTlist.__init__( self )
-        self.__CLASS__ = 'DistanceRestraintList'
+        self.__CLASS__ = DRL_LEVEL
         self.name   = name        # Name of the list
         self.status = status      # Status of the list; 'keep' indicates storage required
         self.Hbond  = False       # Hbond: fix to keep information about Hbond restraints from CCPN
@@ -1629,6 +1748,12 @@ class DistanceRestraintList( NTlist ):
             NTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
     #end def
+    
+    def simplify(self):
+        """Look at Wattos code for a full set of code that does any simplification"""
+        for dr in self:
+            dr.simplify()
+        
 
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
@@ -1813,7 +1938,7 @@ class DihedralRestraint( NTdict ):
 
         if upper<lower:
             upper+=360.0
-        NTdict.__init__(self, __CLASS__  = 'DihedralRestraint',
+        NTdict.__init__(self, __CLASS__  = AC_LEVEL,
                               atoms      = NTlist( *atoms ),
                               lower      = lower,
                               upper      = upper,
@@ -2203,7 +2328,7 @@ class RDCRestraint( NTdict ):
     """
     def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
 
-        NTdict.__init__(self, __CLASS__  = 'RDCRestraint',
+        NTdict.__init__(self, __CLASS__  = RDC_LEVEL,
                               atomPairs  = NTlist(),
                               lower      = lower,
                               upper      = upper,
