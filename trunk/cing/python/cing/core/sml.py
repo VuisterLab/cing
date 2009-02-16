@@ -1,42 +1,45 @@
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTfill
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import sprintf
-
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTdebug
-
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTdict
-# do not remove these two: they are needed during parsing of the sml files
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTvalue
-from cing.core.molecule import Coordinate #@UnusedImport
-
-from cing.core.molecule import Molecule
-from cing.core.molecule import Chain
-from cing.core.molecule import Residue
-from cing.core.molecule import Atom
-from cing.core.molecule import Resonance
-
-from cing.core.classes import Peak
-from cing.core.classes import PeakList
-
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
-
+from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
-
+from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
+from cing.core.classes import Peak
+from cing.core.classes import PeakList
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
+from cing.core.constants import AC_LEVEL
+from cing.core.constants import DR_LEVEL
+from cing.core.molecule import Atom
+from cing.core.molecule import Chain
+from cing.core.molecule import Coordinate #@UnusedImport
+from cing.core.molecule import Molecule
+from cing.core.molecule import Residue
+from cing.core.molecule import Resonance
+from cing.core.constants import RDC_LEVEL
+import os
+import sys
+
+
+# do not remove these two: they are needed during parsing of the sml files
+
+
+
+
+
 
 #from cing.core.constants import CYANA
 
 #The following imports we need for restoring the project
-from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
 
-import os
-import sys
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
@@ -818,7 +821,7 @@ PeakList.SMLhandler = SMLPeakListHandler()
 class SMLDistanceRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = 'DistanceRestraint' )
+        SMLhandler.__init__( self, name = DR_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -880,7 +883,7 @@ DistanceRestraintList.SMLhandler = SMLDistanceRestraintListHandler()
 class SMLDihedralRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = 'DihedralRestraint' )
+        SMLhandler.__init__( self, name = AC_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -931,7 +934,7 @@ DihedralRestraintList.SMLhandler = SMLDihedralRestraintListHandler()
 class SMLRDCRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = 'RDCRestraint' )
+        SMLhandler.__init__( self, name = RDC_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):

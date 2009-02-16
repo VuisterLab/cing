@@ -2749,6 +2749,10 @@ Atom class: Defines object for storing atom properties
 -------------------------------------------------------------------------------
     """
 
+    LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1', MD1 = 'MD2', MD2 = 'MD1',
+                   CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1', MG1 = 'MG2', MG2 = 'MG1'
+                 )
+
     def __init__( self, resName, atomName, convention=INTERNAL, **kwds ):
 
         NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
@@ -3013,13 +3017,10 @@ Atom class: Defines object for storing atom properties
         Return True if atm is pro-chiral and thus can have stereo assignment
         Should be in in database
         """
-        LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1', MD1 = 'MD2', MD2 = 'MD1',
-                       CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1', MG1 = 'MG2', MG2 = 'MG1'
-                     )
         self.db.proChiralPartnerAtom = None
-        if self.residue.db.name in ['LEU', 'VAL'] and self.db.name in LVdict:
+        if self.residue.db.name in ['LEU', 'VAL'] and self.db.name in self.LVdict:
             # patch database
-            self.db.proChiralPartnerAtom = LVdict[ self.db.name ]
+            self.db.proChiralPartnerAtom = self.LVdict[ self.db.name ]
             return True
         #end if
         if self.isProton():
@@ -3050,6 +3051,28 @@ Atom class: Defines object for storing atom properties
         return None
     #end def
 
+    def getPseudoOfPseudoAtom(self):
+        """Return pseudo atom containing self or None"""
+        
+        res = self._parent
+        resName = res.resName # use shorthand.
+        NTdebug(" my name %s, parent residue: %s" % ( self.name, res))
+        
+        if resName == 'LEU' and self.name.startswith('QD'):
+            return res.QQD
+        
+        if resName == 'VAL' and self.name.startswith('QG'):
+            return res.QQG
+
+#        if resName == 'ARG' and self.name.startswith('QH'):
+#            return res.QQH # Not present yet.
+
+        if resName == 'PHE' or resName == 'TYR':
+            if self.name == 'QD' or self.name == 'QE' :
+                return res.QR
+
+        return None
+        
     def heavyAtom( self ):
         """
         For protons return heavyAtom of self,
@@ -3191,7 +3214,7 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def isPseudoAtom( self ):
-        """Return 1 if atom is pseudoAtom"""
+        """Return True if atom is pseudoAtom"""
         return ( len(self.db.real) > 0 )
     #end def
 

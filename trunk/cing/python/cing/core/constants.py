@@ -77,6 +77,12 @@ ANY_ENTITY_LEVEL = 'ANY_ENTITY'
 
 DR_LEVEL       = 'DistanceRestraint'
 DRL_LEVEL      = 'DistanceRestraintList'
+HBR_LEVEL = 'HBondRestraint' # Alternative for hydrogen bond restraints where in CCPN another name is used.
+HBRL_LEVEL = 'HBondRestraintList'
+AC_LEVEL = 'DihedralRestraint'
+ACL_LEVEL = 'DihedralRestraintList'
+RDC_LEVEL = 'RDCRestraint'
+RDCL_LEVEL = 'RDCRestraintList'
 
 POOR_PROP = 'POOR'
 BAD_PROP  = 'BAD'
