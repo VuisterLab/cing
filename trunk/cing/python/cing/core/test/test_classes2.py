@@ -8,6 +8,8 @@ from cing.core.molecule import Molecule
 from cing.core.sml import NTlist
 from cing.main import formatall
 from unittest import TestCase
+from cing import cingDirTmp
+import os
 import cing
 import unittest
 
@@ -15,7 +17,12 @@ class AllChecks(TestCase):
 
     def creatSimpleFastProject(self):
         entryId = 'test'
-        self.project = Project(entryId)
+        
+        os.chdir(cingDirTmp)
+        self.project = Project( entryId )
+        self.project.removeFromDisk()
+        self.project = Project.open( entryId, status='new' )
+        
 
         mol = Molecule('test')
         self.project.appendMolecule(mol)

@@ -820,12 +820,12 @@ def runWhatif( project, parseOnly=False ):
         NTerror("runWhatif: Failed to process check db")
         return True
 
-    path = os.path.join(path, 'pdbout.txt' )
-    if os.path.exists(path): # Happened for 1ao2 on production machine; not on development...
-        NTerror("Path does not exist: %s" % (path))
+    pathPdbOut = os.path.join(path, 'pdbout.txt' )
+    if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
+        NTerror("Path does not exist: %s" % (pathPdbOut))
         return True
-    NTdebug( '> parsing '+ path)
-    fullText = open(path, 'r').read()
+    NTdebug( '> parsing '+ pathPdbOut)
+    fullText = open(pathPdbOut, 'r').read()
     if fullText:
         start       = 'This report was created by WHAT IF'
         end         ='INTRODUCTION'
