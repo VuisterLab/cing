@@ -48,7 +48,6 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
-import cing
 import math
 import os
 import sys
@@ -3051,12 +3050,40 @@ Atom class: Defines object for storing atom properties
         return None
     #end def
 
+    def getSterospecificallyRelatedlPartner( self ):
+        """
+        Return proChiral partner Atom instance of self or
+        another Atom instance that is related by another stereospecific relation.
+        E.g. Phe HD1 will return HD2,
+             Asn HD1 too
+             Arg QH1 will return QH2.
+        should be in database; of course.
+        """
+        proChiralPartner = self.proChiralPartner()
+        if proChiralPartner:
+            return proChiralPartner
+        
+        pseudoAtom = self.pseudoAtom()
+        if not pseudoAtom:
+            NTdebug("There is no pseudo defined for %s" % self)
+            return None
+        
+        realAtomList = pseudoAtom.realAtoms()
+        if len(realAtomList) > 2:
+            NTcodeerror("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
+            return None 
+        
+        if self == realAtomList[0]:
+            return  realAtomList[1]
+        return realAtomList[0]
+    #end def
+
     def getPseudoOfPseudoAtom(self):
         """Return pseudo atom containing self or None"""
         
         res = self._parent
         resName = res.resName # use shorthand.
-        NTdebug(" my name %s, parent residue: %s" % ( self.name, res))
+#        NTdebug(" my name %s, parent residue: %s" % ( self.name, res))
         
         if resName == 'LEU' and self.name.startswith('QD'):
             return res.QQD
@@ -3219,7 +3246,7 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def hasPseudoAtom( self ):
-        """Return 1 if atom has a correponding pseudoAtom"""
+        """Return True if atom has a correponding pseudoAtom"""
         return ( self.db.pseudo != None )
     #end def
 
@@ -3239,10 +3266,37 @@ Atom class: Defines object for storing atom properties
         """
         if self.isPseudoAtom():
             return self.residue.getAtoms( self.db.real )
-        else:
-            return NTlist( self )
-        #end if
+        return NTlist( self )
     #end def
+
+    def getRepresentativePseudoAtom( self, atomList ):
+        """Return pseudo atom that represents all the atoms in the list and no more
+        or None. Input sorting is unimportant.
+        """
+        inputLength = len(atomList)
+        if inputLength <= 1:
+#            NTwarning("Trying to getRepresentativePseudoAtom for atomList: %s" % atomList )
+            return None
+        
+        pseudoAtom = self.pseudoAtom()
+        if not pseudoAtom:
+            return None
+        realAtomList = pseudoAtom.realAtoms()
+        realAtomListLength = len(realAtomList)
+        if inputLength == 1:
+            NTwarning("Found pseudo with single real atom [%s] (itself?) for atomList: %s" % (realAtomList[0], atomList ))
+            return None
+        
+        # efficiency in my mind
+        if inputLength != realAtomListLength:
+            NTdebug("Found unrepresentative pseudo [%s] for atomList: %s" % (pseudoAtom, atomList ))
+            return None
+            
+        for atom in atomList:
+            if atom not in realAtomList:
+                NTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))
+                return None
+        return pseudoAtom
 
     def set( self ):
         """

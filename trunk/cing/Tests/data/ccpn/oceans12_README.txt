@@ -22,6 +22,6 @@ On the restraint side:
 1bus no parsed
 1cjg XPLOR
 1iv6 EMBOSS
-1kr8 Amber with RDCs
+1kr8 Amber with RDCs. Has missing atoms.
 2hgh CYANA with RDCs.
 2cka XPLOR with bounds 0, 5.5, 5.5, None for lower, upper, target, and error.

@@ -3304,7 +3304,8 @@ RESIDUE HISE     H
     #---------------------------------------------------------------
         topology = [(0, 'N')]
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-        nameDict = {'CCPN': 'H', 'BMRBd': None, 'IUPAC': 'H', 'AQUA': 'HN', 'INTERNAL_0': 'HN', 'INTERNAL_1': 'H', 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': None, 'XPLOR': 'HN'}
+        nameDict = {'CCPN': 'H', 'BMRBd': 'H', 'IUPAC': 'H', 'AQUA': 'H', 'INTERNAL_0': 'HN', 'INTERNAL_1': 'H', 'CYANA': 'HN', 'CYANA2': 'H', 'PDB': 'H', 'XPLOR': 'HN'}
+        aliases = ['HN', 'H']
         aliases = ['HN', 'H']
         pseudo = None
         real = []

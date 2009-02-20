@@ -80,6 +80,8 @@ class AllChecks(TestCase):
             msgHol.appendMessage("Message %d" % i)
             msgHol.appendDebug("Debug %d" % i)
         msgHol.showMessage(MAX_MESSAGES=2)
+        
+
             
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing

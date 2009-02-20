@@ -1314,57 +1314,39 @@ class DistanceRestraint( NTdict ):
     def simplifySpecificallyForFcFeature(self):
         """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint 
         were it is not really one. Undone here.
-        Return None on error. 
+        Return None on error.
         STATUS_NOT_SIMPLIFIED for no simplifications done
         STATUS_SIMPLIFIED for simplifications done        
         """
-#        atomPairIdxList = range( len(self.atomPairs) )
-#        atomPairIdxList.reverse()
-        # JFD: Delete exact sames just to learn this code
-        lenAtomPairList =len(self.atomPairs)
-        if lenAtomPairList <= 1:
-#            NTdebug('returned because just a single pair of atoms')
-            return self.STATUS_NOT_SIMPLIFIED
                 
-#        atomPairIdxJ = len(self.atomPairs) 
-#        while atomPairIdxJ > 1:
-#            atomPairIdxJ -= 1
-#            atomPairJ = self.atomPairs[atomPairIdxJ]
-#            atom0J = atomPairJ[0]
-#            atom1J = atomPairJ[1]
-#            for atomPairIdxI in range( atomPairIdxJ ):
-#                atomPairI = self.atomPairs[atomPairIdxI]
-#                atom0I = atomPairI[0]
-#                atom1I = atomPairI[1]
-#                if (atom0I == atom0J and atom1I == atom1J) or   \
-#                   (atom0I == atom1J and atom1I == atom0J):
-#                    NTerror("Found the same pairs in restraint %s" % self)
-#                    del self.atomPairs[atomPairIdxJ]
-                    
+#        NTdebug('Starting simplifySpecificallyForFcFeature for %s' % ( self ) )
         atomPairIdxJ = len(self.atomPairs) 
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
             atomPairJ = self.atomPairs[atomPairIdxJ]
-            atomPairJset = set( atomPairJ )
+            atomPairJset = set( atomPairJ ) # Important to use api of unsorted atoms in pair (left right will not matter)
             atom0J = atomPairJ[0]
             atom1J = atomPairJ[1]
             
 #            NTdebug('Using atoms J %s and %s' % ( atom0J, atom1J) )
             # speed up check on J.
-            if not (atom0J.isProChiral() or atom1J.isProChiral()):
-#                NTdebug('Skipping restraint without prochiral J atoms')
-                continue
+            if not (atom0J.hasPseudoAtom() or atom1J.hasPseudoAtom()):
+                if not (atom0J.getPseudoOfPseudoAtom() or atom1J.getPseudoOfPseudoAtom()):
+#                    NTdebug('Skipping restraint without pseudo representing J atoms')
+                    continue
             
             for atomPairIdxI in range( atomPairIdxJ ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
-                atom0I = atomPairI[0]
-                atom1I = atomPairI[1]
+#                atom0I = atomPairI[0]
+#                atom1I = atomPairI[1]
 #                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set( atomPairI )
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
                 if not atomPairIntersection:
 #                    NTdebug('    No intersection')
                     continue
+                
+                # At this point it is certain that there is an intersection of an atom between the two pairs.
                 if len( atomPairIntersection ) != 1:
                     NTcodeerror('Unexpected more than one atom in atom set intersection')
                     return None
@@ -1380,29 +1362,35 @@ class DistanceRestraint( NTdict ):
                 if atomPairJ[atomJinCommonIdx] != atomPairInCommon:
                       atomJinCommonIdx = 1                                
                       atomJtoMergeIdx = 0
+                      
+                # Now we know which atoms are in common and consequently the others should be tried to merge.
 #                NTdebug('    atominCommonIdx I %d and J %d' % ( atomIinCommonIdx, atomJinCommonIdx) )
                 
                 atomItoMerge = atomPairI[atomItoMergeIdx]
                 atomJtoMerge = atomPairJ[atomJtoMergeIdx]
-                
-                #
-                if atomItoMerge.proChiralPartner() != atomJtoMerge:                     
+     
+                if atomItoMerge.getSterospecificallyRelatedlPartner() != atomJtoMerge:                     
 #                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all' % ( atomItoMerge, atomJtoMerge) )
                     continue
-                    
-                pseudoOfPseudoAtom = atomItoMerge.getPseudoOfPseudoAtom()
-                if not pseudoOfPseudoAtom:
-#                    NTdebug('    no pseudo of pseudo atom for this atom %s' % atomItoMerge)
-                    continue
                 
-                NTdebug( "    New pop atom: %s" % pseudoOfPseudoAtom)
+                # 
+                pseudoOfAtom = atomItoMerge.pseudoAtom()
+                if not pseudoOfAtom:
+#                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
+                    pseudoOfAtom = atomItoMerge.getPseudoOfPseudoAtom()
+                    if not pseudoOfAtom:
+                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge)
+                        continue
+                
+#                NTdebug( "    New pop atom: %s" % pseudoOfAtom)
                 # Change I maintaining order
                 atomPairINewList = list( atomPairI ) 
-                atomPairINewList[atomItoMergeIdx] = pseudoOfPseudoAtom
+                atomPairINewList[atomItoMergeIdx] = pseudoOfAtom
                 self.atomPairs[atomPairIdxI] = tuple( atomPairINewList )
                 # Remove J 
                 del self.atomPairs[atomPairIdxJ]
                 # Return qucikly to keep code to the left (keep it simple).      
+#                NTdebug('Simplified.')
                 return self.STATUS_SIMPLIFIED                        
 #        NTdebug('Not simplified.')
         return self.STATUS_NOT_SIMPLIFIED
@@ -1416,19 +1404,27 @@ class DistanceRestraint( NTdict ):
 
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
+        
+        JFD disables this functionality because no checking
+        nor reordering is necessary on initialization of the class needed for CCPN import.
+        
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
         """
-        a0 = self.atomPairs.zap(0)
-        a1 = self.atomPairs.zap(1)
-        if (pair[0] in a0 or pair[1] in a1):
+        if True: # TODO GV please check and explain to JFD.
             self.atomPairs.append( pair )
-        elif (pair[0] in a1 or pair[1] in a0):
-            self.atomPairs.append( (pair[1],pair[0]) )
-        elif (pair[0].residue.resNum > pair[1].residue.resNum):
-            self.atomPairs.append( (pair[1],pair[0]) )
         else:
-            self.atomPairs.append( pair )
+            a0 = self.atomPairs.zap(0)
+            a1 = self.atomPairs.zap(1)
+            
+            if (pair[0] in a0 or pair[1] in a1):
+                self.atomPairs.append( pair )
+            elif (pair[0] in a1 or pair[1] in a0):
+                self.atomPairs.append( (pair[1],pair[0]) )
+            elif (pair[0].residue.resNum > pair[1].residue.resNum):
+                self.atomPairs.append( (pair[1],pair[0]) )
+            else:
+                self.atomPairs.append( pair )
     #end def
 
     def classify(self):

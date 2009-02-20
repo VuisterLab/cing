@@ -1403,8 +1403,8 @@ def validateModels( self)   :
             #end if
         #end for
     #end for
-    for m, count in self.models.items():
-        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
+#    for m, count in self.models.items():
+#        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
 #end def
 
 
