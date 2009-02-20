@@ -7,7 +7,6 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessage
 from cing.PluginCode.Wattos import runWattos
 from cing.core.classes import Project
 from cing.core.constants import IUPAC

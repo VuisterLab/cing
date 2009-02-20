@@ -14,6 +14,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import val2Str
 from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
@@ -109,7 +110,7 @@ class Ccpn:
     CCPN_CLASS_RESTRAINT_LIST = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT_LIST,
                             RESTRAINT_IDX_HBOND: CCPN_HBOND_CONSTRAINT_LIST,
                             RESTRAINT_IDX_DIHEDRAL: CCPN_DIHEDRAL_CONSTRAINT_LIST,
-                            RESTRAINT_IDX_RDC: CCPN_RDC_CONSTRAINT_LIST, 
+                            RESTRAINT_IDX_RDC: CCPN_RDC_CONSTRAINT_LIST,
                             RESTRAINT_IDX_CS: CCPN_CS_CONSTRAINT_LIST,
                             }
     
@@ -304,6 +305,7 @@ class Ccpn:
     
         return True
     # end def importFromCcpnMolecule
+    
     
     def _match2Cing(self):
         '''Descrn: Imports chains, residues, atoms and coords
@@ -552,7 +554,52 @@ class Ccpn:
         
         return self.molecule
     # end def _match2Cing
+    
+    def _getCingAtom(self, ccpnAtomSet):
+        """Matches to CING atoms or a pseudoAtom
+        Return list or None on Error.
+        """
+        
+        NTdebug("    ccpnAtomSet = %s" % ccpnAtomSet)
+        
+        ccpnAtomList = ccpnAtomSet.sortedAtoms()
+        if not ccpnAtomList:
+            NTerror("No ccpnAtomList: %s", ccpnAtomList)
+            return None
+                
+        
+        # Quicky for efficiency.
+        if len(ccpnAtomList) == 1:
+            ccpnAtom = ccpnAtomList[0]
+            if not hasattr(ccpnAtom, 'cing'):
+                NTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
+                return None
+            return ccpnAtom.cing
             
+        cingAtomList = []
+        atomSeenLast = None
+        for ccpnAtom in ccpnAtomList:
+            NTdebug("      ccpn atom: %s" % ccpnAtom)
+            if not hasattr(ccpnAtom, 'cing'):
+                NTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
+                return None
+            atomSeenLast = ccpnAtom.cing
+            cingAtomList.append(ccpnAtom.cing)
+
+        if len(cingAtomList) < 2:
+            return atomSeenLast
+        
+        if not atomSeenLast:
+            NTerror("Failed to find single CING atom for ccpnAtomList %s" % ccpnAtomList)
+            return None
+        
+        cingPseudoAtom = atomSeenLast.getRepresentativePseudoAtom(cingAtomList)
+        if not cingPseudoAtom:
+            
+            return atomSeenLast
+        return cingPseudoAtom
+        
+    
     def _getCcpnCoordinate(self):
         '''Descrn: Core that'll import coordinates from Ccpn.MolSystem
                    into a Cing.Project.Molecule instance.
@@ -930,6 +977,7 @@ class Ccpn:
                     ccpnDistanceList.cing = distanceRestraintList
                     distanceRestraintList.ccpn = ccpnDistanceList
         
+#                    for ccpnDistanceConstraint in ccpnDistanceList.sortedConstraints():
                     for ccpnDistanceConstraint in ccpnDistanceList.sortedConstraints():
                         result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
                         if not result:
@@ -937,15 +985,15 @@ class Ccpn:
                             result = (None, None)
                         lower, upper = result
         
-                        atomPairs = self._getConstraintAtom(ccpnDistanceConstraint)
+                        atomPairList = self._getConstraintAtomPairList(ccpnDistanceConstraint)
         
-                        if not atomPairs:
+                        if not atomPairList:
                             # restraints that will not be imported
                             msgHoL.appendMessage("%s: skipped Ccpn %s restraint '%s' without atom pairs" % (funcName, distType, ccpnDistanceConstraint))
                             continue
                         # end if
         
-                        distanceRestraint = DistanceRestraint(atomPairs, lower, upper)
+                        distanceRestraint = DistanceRestraint(atomPairList, lower, upper)
         
                         distanceRestraint.ccpn = ccpnDistanceConstraint
                         ccpnDistanceConstraint.cing = distanceRestraint
@@ -985,7 +1033,7 @@ class Ccpn:
         for ccpnConstraintStore in self.ccpnNmrProject.nmrConstraintStores:
     
             for ccpnDihedralList in ccpnConstraintStore.findAllConstraintLists(className = self.CCPN_DIHEDRAL_CONSTRAINT_LIST):
-                ccpnDihedralListName = self._ensureValidName(ccpnDihedralList.name, AC_LEVEL )
+                ccpnDihedralListName = self._ensureValidName(ccpnDihedralList.name, AC_LEVEL)
     
                 dihedralRestraintList = self.project.dihedrals.new(ccpnDihedralListName, status = 'keep')
     
@@ -1003,7 +1051,7 @@ class Ccpn:
                         result = (None, None)
     
                     lower, upper = result
-                    atoms = self._getConstraintAtom(ccpnDihedralConstraint)
+                    atoms = self._getConstraintAtomList(ccpnDihedralConstraint)
                     if not atoms:
                         NTdetail("Ccpn dihedral restraint '%s' without atoms will be skipped" % ccpnDihedralConstraint)
                         continue
@@ -1052,15 +1100,15 @@ class Ccpn:
                         result = (None, None)
                     lower, upper = result
                     
-                    atomPairs = self._getConstraintAtom(ccpnRdcConstraint)
+                    atomPairList = self._getConstraintAtomPairList(ccpnRdcConstraint)
     
-                    if not atomPairs:
+                    if not atomPairList:
                         # restraints that will not be imported
                         NTdetail("Ccpn RDC restraint '%s' without atom pairs will be skipped" % ccpnRdcConstraint)
                         continue
                     # end if
     
-                    rdcRestraint = RDCRestraint(atomPairs, lower, upper)
+                    rdcRestraint = RDCRestraint(atomPairList, lower, upper)
     
                     rdcRestraint.ccpn = ccpnRdcConstraint
                     ccpnRdcConstraint.cing = rdcRestraint
@@ -1074,12 +1122,27 @@ class Ccpn:
         return listOfRdcRestList
     # end def importFromCcpnRdcRestraint
     
-    def _getConstraintAtom(self, ccpnConstraint):
+    
+    
+    def _getConstraintAtomPairList(self, ccpnConstraint):
         """Descrn: Get the atoms that may be assigned to the constrained resonances.
            Inputs: NmrConstraint.AbstractConstraint.
-           Output: List of Cing.Atoms, tupled Cing.Atoms pairs or []
+           Output: List of Cing.Atoms, tupled Cing.Atoms pairs or [] for dihedrals and
            or None on error.
-           
+           JFD adds just to be clear the output is an atomPairList structured:
+           [ ( a1, a2 ), 
+             ( a3, a4), .. ] where a1 is an atom which may be a pseudo atom. a1 may not be
+           a set of atoms such as is the case in the CCPN data model.: E.g.
+           [ [ [a0, a1], [ a2 ] ], 
+             [ [a3],[a4]]] will first be translated below to CING:
+           [ ( a0, a2 ), 
+             ( a1, a2 ), 
+             ( a3, a4), .. ]
+            Later the code in the standard CING api will be tried to compress the structure if
+            a0 and a1 can be represented by a pseudo of some sort.
+            
+            Basically, this is because a resonance in CCPN can represent several atoms.
+             
            Note that pseudo atoms are collapsed from CCPN to CING for those and only those
            cases were the FC has expanded them. I.e. Issue 1 in the nmrrestrntsgrid project.
            
@@ -1091,87 +1154,163 @@ ambi.
 1 3 1 1 1 14 VAL MG2 1 171 VALn HG* 1 1
 1 3 2 1 1 14 VAL HA 1 171 VALn HA 1 1      
 
-Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the pseudo?                 
+Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the pseudo?    
         """
     
-#        atoms = set()
-        atomListOfList = NTlist() # Can use the routine: issuperset
+        # for speed reasons put this debug info in block.
+#        if cing.verbosity >= cing.verbosityDebug:
+        if False:
+            #        # Example code from Wim is a nice demonstration.
+            lowerLimit = None
+            upperLimit = None
+            if hasattr(ccpnConstraint, 'lowerLimit'):
+                lowerLimit = ccpnConstraint.lowerLimit
+                upperLimit = ccpnConstraint.upperLimit
+            NTdebug( 'Constraint [%d]: [%s] - [%s]' % (
+                ccpnConstraint.serial, 
+                val2Str(lowerLimit, '%.1f'), 
+                val2Str(upperLimit, '%.1f'))) # Deals with None.
+            for constItem in ccpnConstraint.sortedItems():
+                atomList = []
+                # Sometimes there may also be an ordered<Class> method.
+                resonanceList = None
+                if hasattr(constItem, 'orderedResonances'): # dihedrals don't have this.
+                    resonanceList = constItem.orderedResonances    
+                # Otherwise, use the usual sorted<Class> method.
+                if not resonanceList:
+                    resonanceList = constItem.sortedResonances()
+                # Here, resonanceList should always have 2 resonances.
+                assert(len(resonanceList) == 2)
+                for resonance in resonanceList:
+                    resAtomList = []
+                    resonanceSet = resonance.resonanceSet
+                    if resonanceSet:                                        
+                        for atomSet in resonanceSet.sortedAtomSets():
+                            for atom in atomSet.sortedAtoms():
+                                resAtomList.append('%d.%s' % (
+                                    atom.residue.seqCode, atom.name))
+                    else:
+                        NTwarning("No resonanceSet (means unassigned) for ccpnConstraint %s" % ccpnConstraint)
+                    resAtomList.sort()
+                    resAtomString = ','.join(resAtomList)
+                    atomList.append(resAtomString)
+                NTdebug('  [%s] - [%s]' % (atomList[0], atomList[1]))
+            NTdebug('')
+
+        # Now the real code.
+        atomPairList = []
+        atomPairSet = set()
+        fixedResonanceListOfList = []
+
+        for constItem in ccpnConstraint.sortedItems():
+            # JFD from WV. Tries to use sorted items where available.
+            fixedResonanceListOfList.append(getResonancesFromPairwiseConstraintItem(constItem)) 
+
+#        NTdebug("fixedResonanceListOfList: %s" % fixedResonanceListOfList)
+        for fixedResonanceList in fixedResonanceListOfList:
+#            NTdebug("  fixedResonanceList: %s" % fixedResonanceList)
+            # JFD Normally would use less levels of loops here but just to figure out how it's done it's nicer to spell it out.
+            fixedResonanceSetLeft = fixedResonanceList[0].resonanceSet 
+            fixedResonanceSetRight = fixedResonanceList[1].resonanceSet 
+            if not fixedResonanceSetLeft:
+                NTdebug("Failed to find fixedResonanceSet Left for ccpnConstraint %s" % ccpnConstraint)
+                return None
+            if not fixedResonanceSetRight:
+                NTdebug("Failed to find fixedResonanceSet Right for ccpnConstraint %s" % ccpnConstraint)
+                return None
+            fixedAtomSetListLeft = fixedResonanceSetLeft.sortedAtomSets()
+            fixedAtomSetListRight = fixedResonanceSetRight.sortedAtomSets()
+#            NTdebug("    fixedAtomSetListLeft  = %s" % fixedAtomSetListLeft)
+#            NTdebug("    fixedAtomSetListRight = %s" % fixedAtomSetListRight)
+            for fixedAtomSetLeft in fixedAtomSetListLeft:
+#                NTdebug("      fixedAtomSetLeft: %s" % fixedAtomSetLeft)
+                atomListLeft = []
+                for ccpnAtomLeft in fixedAtomSetLeft.sortedAtoms():
+#                    NTdebug("        ccpnAtom Left: %s" % ccpnAtomLeft)
+                    if not hasattr(ccpnAtomLeft, 'cing'):
+                        NTerror("No Cing ccpnAtomLeft obj equivalent for Ccpn atom: %s", ccpnAtomLeft)
+                        return None
+                    atomLeft = ccpnAtomLeft.cing
+                    atomListLeft.append(atomLeft)
+                if not atomLeft:
+                    NTerror("Failed to find at least one atomLeft for ccpnConstraint %s" % ccpnConstraint)
+                    return None
+                pseudoAtomLeft = atomLeft.getRepresentativePseudoAtom(atomListLeft)
+                if pseudoAtomLeft: # use just the pseudo representative.
+                    atomListLeft = [ pseudoAtomLeft ]
+#                NTdebug("      atomListLeft: %s" % atomListLeft)
+                for atomLeft in atomListLeft: 
+#                    NTdebug("        atomLeft: %s" % atomLeft)
+                    for fixedAtomSetRight in fixedAtomSetListRight:
+#                        NTdebug("          fixedAtomSetRight: %s" % fixedAtomSetRight)
+                        atomListRight = []
+                        for ccpnAtomRight in fixedAtomSetRight.sortedAtoms():
+#                            NTdebug("                ccpnAtom Right: %s" % ccpnAtomRight)
+                            if not hasattr(ccpnAtomRight, 'cing'):
+                                NTerror("No Cing ccpnAtomRight obj equivalent for Ccpn atom: %s", ccpnAtomRight)
+                                return None
+                            atomRight = ccpnAtomRight.cing
+                            atomListRight.append(atomRight)
+                        if not atomRight:
+                            NTerror("Failed to find at least one atomRight for ccpnConstraint %s" % ccpnConstraint)
+                            return None
+                        pseudoAtomRight = atomRight.getRepresentativePseudoAtom(atomListRight)
+                        if pseudoAtomRight: # use just the pseudo representative.
+                            atomListRight = [ pseudoAtomRight ]
+#                        NTdebug("          atomListRight: %s" % atomListRight)
+                        for atomRight in atomListRight:
+                            atomPair = (atomLeft, atomRight) 
+#                            NTdebug("            atomPair: %s %s" % atomPair)
+                            if atomPair in atomPairSet:
+#                                NTdebug("Skipping pair already represented.")
+                                continue 
+                            atomPairSet.add(atomPair)
+                            atomPairList.append(atomPair)
+#        NTdebug("_getConstraintAtomPairList: %s" % atomPairList)
+        return atomPairList
+
+    def _getConstraintAtomList(self, ccpnConstraint):
+        """ Use this routine instead of the above for dihedrals and chem shifts.
+        Descrn: Get the atoms that may be assigned to the constrained resonances.
+       Inputs: NmrConstraint.AbstractConstraint.
+       Output: List of Cing.Atoms, tupled Cing.Atoms pairs or []."""
+
+        atoms = set()
         fixedResonances = []
         className = ccpnConstraint.className
     
         if className == self.CCPN_DIHEDRAL_CONSTRAINT:
             fixedResonances.append(ccpnConstraint.resonances)
-#        elif className == 'ChemShiftConstraint': # can't model these in CING yet anyway. They're not chemical shifts are they?
-#            fixedResonances.append([ccpnConstraint.resonance, ])
-        elif className in [self.CCPN_DISTANCE_CONSTRAINT, self.CCPN_HBOND_CONSTRAINT, self.CCPN_RDC_CONSTRAINT]:
-            for item in ccpnConstraint.items:
-#                fixedResonances.append(item.resonances) # this used to use unsorted items.
-                fixedResonances.append(getResonancesFromPairwiseConstraintItem(item)) # JFD from WV. Tries to use sorted items where available.
+        elif className == self.CCPN_CS_CONSTRAINT:
+            fixedResonances.append([ccpnConstraint.resonance, ])
         else:
-            NTerror("Type of constraint '%s' not recognized", className)
+            NTcodeerror("Routine _getConstraintAtomList should only be called for %s and %s" %(
+               self.CCPN_DIHEDRAL_CONSTRAINT, self.CCPN_CS_CONSTRAINT))
             return None
-        # end if
-    
+        
         for fixedResonanceList in fixedResonances:
             atomList = []
             for fixedResonance in fixedResonanceList:
                 fixedResonanceSet = fixedResonance.resonanceSet
     
                 if fixedResonanceSet:
-                    equivAtoms = {} # why use a dictionary here?
-                    equivAtoms = []
+                    equivAtoms = {}
+    
                     for fixedAtomSet in fixedResonanceSet.atomSets:
                         for atom in fixedAtomSet.atoms:
+                            equivAtoms[atom] = True
                             if not hasattr(atom, 'cing'):
-                                NTwarning("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
-                                return None
-                            else:
-                                equivAtoms.append(atom)
-                    atomList.append(equivAtoms)
-                # end if
-            # end for
-    
-            if len(atomList) != len(fixedResonanceList):
-                NTdebug("why aren't the atoms found for this restraint: %s" % (ccpnConstraint))
-                return None
-            
-            if className == self.CCPN_DIHEDRAL_CONSTRAINT:
-                try:                    
-                    for x in atomList:
-                        atomListOfList.append(x[0].cing)
+                                NTdebug("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
+                    atomList.append(equivAtoms.keys())
+
+            if len(atomList) == len(fixedResonanceList):
+                try:
+                    atoms = [ x[0].cing for x in atomList ]
                 except:
                     NTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
-                    return None
-            else:
-                for ccpnAtom1 in atomList[0]:
-                    for ccpnAtom2 in atomList[1]:
-                        try:
-                            atom1, atom2 = ccpnAtom1.cing, ccpnAtom2.cing
-                        except:
-                            NTdebug("No Cing atom obj equivalent for Ccpn atoms %s and %s", ccpnAtom1.name, ccpnAtom2.name)
-                            return None
-                        # end try
-                        atom1 = atom1.pseudoAtom() or atom1
-                        atom2 = atom2.pseudoAtom() or atom2
-#                            if atom1 != atom2: # JFD were diagonal restraints excluded? No need.
-#                        aset = set()
-#                        arset = set()
-                        atomPair = (atom1, atom2) # a tuple of 2 elements always.
-#                        aset.add(atomPair)
-#                        atomPairRev = (atom2, atom1)
-#                        arset.add(atomPairRev)
-#                        TODO implement issuperset??
-#                        but why would there be duplicates at this point?
-#                        if not atomListOfList.issuperset(aset) and not atomListOfList.issuperset(arset):
-                        atomListOfList.add(atomPair)
-            # end if
-        # end for
-#        atoms = list(atoms)
-
-        atomListOfList
-        NTdebug("_getConstraintAtom: %s" % atomListOfList)
-        return atomListOfList
-    # end def _getConstraintAtom
+        return list(atoms)
+    # end def 
+    
     
     def _ensureValidName(self, name, prefix = CING):
         '''Descrn: For checking string names from Ccpn.Project for objects like molecule, peak list, restraint list, etc.

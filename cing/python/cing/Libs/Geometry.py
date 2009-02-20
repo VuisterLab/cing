@@ -1,4 +1,3 @@
-from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTwarning
 import math
 TWO_PI = 2. * math.pi
