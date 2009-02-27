@@ -25,10 +25,10 @@ def iCingRobot():
     ## queries possible
     doSave  = 1
     doRun   = 0
-    doStatus= 1
-    doLog   = 1
-    doPname = 1
-    doPurge = 1
+    doStatus= 0
+    doLog   = 0
+    doPname = 0
+    doPurge = 0
     ## credentials.
     user_id = "jd3"
     access_key = "123456"
