@@ -60,7 +60,7 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif ))
-#            self.assertTrue(project.exportValidation2ccpn())
+            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences()) 
 
 if __name__ == "__main__":

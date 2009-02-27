@@ -1,8 +1,7 @@
-from cing.Libs.NTutils import switchOutput
-switchOutput(False)
-# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.general.Util import getResonancesFromPairwiseConstraintItem
+from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
+from ccp.util.Validation import getResidueValidation #@UnresolvedImport
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -14,16 +13,21 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import switchOutput
 from cing.Libs.NTutils import val2Str
 from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
 from cing.core.classes import RDCRestraint
+from cing.core.constants import AC_LEVEL
 from cing.core.constants import CCPN
 from cing.core.constants import CING
+from cing.core.constants import DR_LEVEL
+from cing.core.constants import HBR_LEVEL
 from cing.core.constants import INTERNAL
 from cing.core.constants import IUPAC
+from cing.core.constants import RDC_LEVEL
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
@@ -31,13 +35,12 @@ from cing.core.molecule import unmatchedAtomByResDictToString
 from memops.general.Io import loadProject
 from shutil import move
 from shutil import rmtree
-from cing.core.constants import DR_LEVEL
-from cing.core.constants import HBR_LEVEL
-from cing.core.constants import AC_LEVEL
-from cing.core.constants import RDC_LEVEL
 import os
 import string
 import tarfile
+
+switchOutput(False)
+# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 
 switchOutput(True)
 
@@ -1159,8 +1162,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
     
         # for speed reasons put this debug info in block.
 #        if cing.verbosity >= cing.verbosityDebug:
-        if False:
-            #        # Example code from Wim is a nice demonstration.
+#        # Example code from Wim is a nice demonstration.
+        if True:
             lowerLimit = None
             upperLimit = None
             if hasattr(ccpnConstraint, 'lowerLimit'):
@@ -1180,12 +1183,18 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 if not resonanceList:
                     resonanceList = constItem.sortedResonances()
                 # Here, resonanceList should always have 2 resonances.
-                assert(len(resonanceList) == 2)
+                
+                resonanceListLength = len(resonanceList)
+                assert(resonanceListLength == 2) # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
+                if resonanceListLength != 2:
+                    NTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
+                    return None
                 for resonance in resonanceList:
                     resAtomList = []
                     resonanceSet = resonance.resonanceSet
                     if resonanceSet:                                        
                         for atomSet in resonanceSet.sortedAtomSets():
+                            # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually (e.g. methyl group).
                             for atom in atomSet.sortedAtoms():
                                 resAtomList.append('%d.%s' % (
                                     atom.residue.seqCode, atom.name))
@@ -1495,10 +1504,116 @@ def initCcpn(project, ccpnFolder):
     return project
     
 
-# register the function
-methods = [ (initCcpn, None),
-           (removeCcpnReferences, None),
-           ]
+def exportValidation2ccpn( project ):
+    """
+    Proof of principle: export validation scores to ccpn project
+
+    Return Project or None on error.
+    """
+    if not project.has_key('ccpn'):
+        NTerror('exportValidation2ccpn: No open CCPN project present')
+        return None
+    NTmessage('==> Exporting to Ccpn')
+    for residue in project.molecule.allResidues():
+        valObj = storeResidueValidationInCcpn( project, residue)
+        if not valObj:
+            NTerror('exportValidation2ccpn: exporting validation for residue %s', residue)
+        else:
+            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
+    #end for
+    project.ccpn.saveModified()
+    return project
+#end def
+
+def storeResidueValidations(validStore, context, keyword, residues, scores):
+  """Descrn: Store the per-residue scores for a an ensemble within
+             CCPN validation objects.
+             *NOTE* This function may be quicker than using the generic
+             replaceValidationObjects() because it is class specifc
+     Inputs: Validation.ValidationStore,
+             List of MolStructure.Residues, List if Floats
+     Output: List of Validation.ResidueValidations
+  """
+
+  validObjs = []
+
+  # Define data model call for new result
+  newValidation = validStore.newResidueValidation
+
+  for i, residue in enumerate(residues):
+
+    score = scores[i]
+
+    # Find any existing residue validation objects
+    validObj = getResidueValidation(validStore, residue, context, keyword)
+
+    # Validated object(s) must be in a list
+    residueObjs = [residue, ]
+
+    # Make a new validation object if none was found
+    if not validObj:
+      validObj = newValidation(context=context, keyword=keyword,
+                               residues=residueObjs)
+
+    # Set value of the score
+    validObj.floatValue = score
+
+    validObjs.append(validObj)
+
+  return validObjs
+
+
+def storeResidueValidationInCcpn( project, residue, context='CING'):
+    """
+    Store residue ROG result in ccpn
+    Return ccpn StructureValidation.ResidueValidation obj on success or None on error
+    """
+
+    keyword = 'ROGscore'
+
+    ccpnMolSystem = project.molecule.ccpn
+    ccpnEnsemble  = ccpnMolSystem.findFirstStructureEnsemble()
+
+    if not project.has_key('ccpnValidationStore'):
+
+        project.ccpnValidationStore = getEnsembleValidationStore(ensemble = ccpnEnsemble,
+                                                                 context  = context,
+                                                                 keywords = [keyword]
+                                                                )
+    #end if
+
+    # Need to convert the CCPN MolSystem.Residue to MolStructure.Residue
+    ccpnStrucResidue = None
+    for ccpnChain in ccpnEnsemble.coordChains:
+      ccpnStrucResidue = ccpnChain.findFirstResidue(residue=residue.ccpn)
+      if ccpnStrucResidue:
+        break
+
+    if not ccpnStrucResidue:
+      return
+
+    # Find any existing residue validation objects
+    validObj = getResidueValidation(project.ccpnValidationStore, ccpnStrucResidue,
+                                    context=context, keyword=keyword)
+
+    # Validated object(s) must be in a list
+    residueObjs = [ccpnStrucResidue, ]
+
+    # Make a new validation object if none was found
+    if not validObj:
+      newValidation = project.ccpnValidationStore.newResidueValidation
+      validObj = newValidation(context=context, keyword=keyword,
+                               residues=residueObjs)
+
+    # Set value of the score
+    validObj.textValue = residue.rogScore.colorLabel or None
+    validObj.details   = '\n'.join(residue.rogScore.colorCommentList) or None
+
+    return validObj
+
+#end def
+
+
 # Obtained by a grep on INTERNAL_0 file.
 #    nameDict = {'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
 #    nameDict = {'CCPN': 'DNA A deprot:H1', 'BMRBd': 'ADE', 'IUPAC': 'DA', 'AQUA': 'A', 'INTERNAL_0': 'ADE', 'INTERNAL_1': 'DA', 'CYANA': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE'}
@@ -1560,3 +1675,10 @@ def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
 #    NTdebug("ccpnResDescriptorList: %s " % ccpnResDescriptorList)
     ccpnResDescriptorPatched = string.join(ccpnResDescriptorList, ';')
     return ccpnResDescriptorPatched
+
+
+# register the function
+methods = [ (initCcpn, None),
+           (removeCcpnReferences, None),
+            (exportValidation2ccpn, None)
+           ]
