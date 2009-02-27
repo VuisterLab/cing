@@ -79,7 +79,7 @@ try:
     import ccpnmr #@UnusedImport
 except:
     NTdebug('importPlugin: Running CING without CCPN support')
-    pluginFileList.remove( os.path.join( pluginDir, 'ccpn.py') )
+    pluginFileList.remove( os.path.join( pluginDir, 'Ccpn.py') )
 
 for _p in pluginFileList:
     _d,_pname,_e = NTpath(_p)
