@@ -581,8 +581,6 @@ VALID_VALUE_TYPE_ATTRS = {type(0.0): 'floatValue',
                           type(True): 'booleanValue'}
 
 
-#from ccpnmr.analysis.core.Util import getSoftware JFD disabled because it builds a dep I don't have.
-
 # # # # # # #  C I N G  E X A M P L E  # # # # # # #
 
 def storeRogScores(ccpnEnsemble, scores, context='CING'):
@@ -717,7 +715,7 @@ def getResidueValidation(validStore, residue, context, keyword):
      Output: Validation.ResidueValidation
   """
 
-  # Define data model call to find exting result
+  # Define data model call to find exiting result
   findValidation = residue.findFirstResidueValidation
 
   validObj = findValidation(validationStore=validStore,
@@ -726,114 +724,6 @@ def getResidueValidation(validStore, residue, context, keyword):
   return validObj
 
 
-def storeResidueValidations(validStore, context, keyword, residues, scores):
-  """Descrn: Store the per-residue scores for a an ensemble within
-             CCPN validation objects.
-             *NOTE* This function may be quicker than using the generic
-             replaceValidationObjects() because it is class specifc
-     Inputs: Validation.ValidationStore,
-             List of MolStructure.Residues, List if Floats
-     Output: List of Validation.ResidueValidations
-  """
-
-  validObjs = []
-
-  # Define data model call for new result
-  newValidation = validStore.newResidueValidation
-
-  for i, residue in enumerate(residues):
-
-    score = scores[i]
-
-    # Find any existing residue validation objects
-    validObj = getResidueValidation(validStore, residue, context, keyword)
-
-    # Validated object(s) must be in a list
-    residueObjs = [residue, ]
-
-    # Make a new validation object if none was found
-    if not validObj:
-      validObj = newValidation(context=context, keyword=keyword,
-                               residues=residueObjs)
-
-    # Set value of the score
-    validObj.floatValue = score
-
-    validObjs.append(validObj)
-
-  return validObjs
-
-
-def storeResidueValidationInCcpn( project, residue, context='CING'):
-    """
-    Store residue ROG result in ccpn
-    Return ccpn StructureValidation.ResidueValidation obj on success or None on error
-    """
-
-    keyword = 'ROGscore'
-
-    ccpnMolSystem = project.molecule.ccpn
-    ccpnEnsemble  = ccpnMolSystem.findFirstStructureEnsemble()
-
-    if not project.has_key('ccpnValidationStore'):
-
-        project.ccpnValidationStore = getEnsembleValidationStore(ensemble = ccpnEnsemble,
-                                                                 context  = context,
-                                                                 keywords = [keyword]
-                                                                )
-    #end if
-
-    # Need to convert the CCPN MolSystem.Residue to MolStructure.Residue
-    ccpnStrucResidue = None
-    for ccpnChain in ccpnEnsemble.coordChains:
-      ccpnStrucResidue = ccpnChain.findFirstResidue(residue=residue.ccpn)
-      if ccpnStrucResidue:
-        break
-
-    if not ccpnStrucResidue:
-      return
-
-    # Find any existing residue validation objects
-    validObj = getResidueValidation(project.ccpnValidationStore, ccpnStrucResidue,
-                                    context=context, keyword=keyword)
-
-    # Validated object(s) must be in a list
-    residueObjs = [ccpnStrucResidue, ]
-
-    # Make a new validation object if none was found
-    if not validObj:
-      newValidation = project.ccpnValidationStore.newResidueValidation
-      validObj = newValidation(context=context, keyword=keyword,
-                               residues=residueObjs)
-
-    # Set value of the score
-    validObj.textValue = residue.rogScore.colorLabel or None
-    validObj.details   = '\n'.join(residue.rogScore.colorCommentList) or None
-
-    return validObj
-
-#end def
-
-def exportValidation2ccpn( project ):
-    """
-    Proof of principle: export validation scores to ccpn project
-
-    Return Project or None on error.
-    """
-    if not project.has_key('ccpn'):
-        NTerror('exportValidation2ccpn: No open CCPN project present')
-        return None
-    NTmessage('==> Exporting to Ccpn')
-    for residue in project.molecule.allResidues():
-        valObj = storeResidueValidationInCcpn( project, residue)
-        if not valObj:
-            NTerror('exportValidation2ccpn: exporting validation for residue %s', residue)
-        else:
-            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
-    #end for
-    project.ccpn.saveModified()
-    return project
-#end def
 
 
 # register the functions
@@ -842,7 +732,6 @@ methods  = [(procheck_old, None),
             (mkYasaraByResidueMacro,None),
             (mkYasaraMacros,None),
             (mkMacros,None),
-            (exportValidation2ccpn, None)
 
            ]
 #saves    = []
