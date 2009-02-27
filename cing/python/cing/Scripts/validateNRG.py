@@ -16,7 +16,7 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
-entryListFileName = os.path.join(startDir, 'entry_list_nrg_docr.csv')
+entryListFileName = os.path.join(startDir, 'list', 'entry_list_nrg_docr.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
@@ -41,7 +41,7 @@ if retrieveEntryListFromNRG:
         sys.exit(1)
         
 # disable next line for regular run.
-writeEntryListToFile(entryListFileName, ['1abt'])
+writeEntryListToFile(entryListFileName, ['1brv'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,

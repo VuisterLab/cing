@@ -144,7 +144,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/CING_%s/HTML/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -306,99 +306,9 @@ class nrgCing(Lister):
         if self.updateIndices:
             self.update_index_files()
             
-        # premature return until coded completely... TODO:
-        return 0
+        NTdebug("premature return until coded completely... TODO:")
+        return True
     
-        
-#        ## Look in dictionary for entries that are no longer on file and
-#        ## remove them from the dictionary and
-#        ## if present remove the files from the result directory
-#        NTmessage("Checking if any entries in NRG-CING are no longer in the NRG")
-#        for entry_code in self.match.d.keys():
-#            if not entry_code in entry_list_all:
-#                NTwarning("removing old entry no longer on file: " + entry_code)
-#                NTmessage("Sleeping a second as to give a user a chance to interrupt these removes")
-#                time.sleep(1)
-#                del self.match.d[ entry_code ]
-#                ## Delete old data if it is there.                
-#                if not self.remove_resource(entry_code):
-#                    NTerror("failed to remove resource for entry: " + entry_code)
-#                    return 0
-#
-#
-#        ## Look on file system for dictionary entries that are no longer current
-#        ## remove it from the dictionary and
-#        ## if present remove it from the directory
-#        NTmessage("Checking if any entries in the pickle are no longer (completely) in the image archive.")
-#            
-#        for entry_code in self.match.d.keys():
-#            if not self.is_complete_resource(entry_code):
-#                NTwarning("entry in pickle and PDB is no longer complete as a resource on file: " + entry_code)
-#                NTwarning("entry will be deleted from pickle until it's present again.")
-#                del self.match.d[ entry_code ]
-#                self.pickle_changed += 1
-#                ## Delete old data if it is there.                
-#                if not self.remove_resource(entry_code):
-#                    NTerror("failed to remove giffies for entry: " + entry_code)
-#                    return 0
-#
-#        NTmessage("Compiling a list of new entries todo")
-#        ## Entry_list will contain entries that will be searched
-#        entry_list = []
-#        for entry_code in entry_list_all:
-#            ## Check if we're not overworking
-#            if len(entry_list) >= self.max_entries_todo:
-#                NTwarning("Using truncated list of entries todo;            length                  : " + `self.max_entries_todo`)
-#                NTwarning("Actual length of list of entries that should be done COULD be as large as: " + `len(entry_list_all)`)
-#                break
-#            
-#            chars2and3 = entry_code[1:3]
-#            file_name = self.data_dir + os.sep + chars2and3 + os.sep + "pdb" + entry_code + ".ent.gz"            
-#            if os.path.isfile(file_name):
-#                modification_time = os.path.getmtime(file_name)
-#            else:
-#                NTerror("file doesn't exist: " + file_name)
-#                NTerror("assuming modification time is current time")
-#                modification_time = time.time()
-#            
-#            ## Entry completely new?            
-#            if not entry_code in keys_org:
-#                NTmessage("New entry in pdb with code: %s" % entry_code)
-#                entry_list.append(entry_code)
-#                self.match.d[ entry_code ] = EntryInfo(time=modification_time)
-#                self.pickle_changed += 1
-#            else:
-#                ## Include files that have been modified
-#                if modification_time > self.match.d[ entry_code ].time:
-#                    NTmessage("Found entry %s with newer modification times:\n\t%s and\n\t%s" % (
-#                          entry_code,
-#                            time.ctime(modification_time),
-#                            time.ctime(self.match.d[ entry_code ].time)
-#                          ))
-#                    self.match.d[ entry_code ] = EntryInfo(time=modification_time)
-#                    self.pickle_changed += 1
-#                    if self.skip_updated_pdb_files:
-#                        NTwarning("Skipping regeneration of PDB file because option set for skip_updated_pdb_files")
-#                        NTmessage("Modification time for this entry updated though.")
-#                    else:
-#                        entry_list.append(entry_code)
-#                    
-#                    
-#        if len(entry_list):
-#            NTmessage("Scanning %s 'new' entries: %s" % \
-#                  (len(entry_list), entry_list))
-#        else:
-#            NTmessage("No new entries to be scanned")
-#            return 1 # Success
-#
-#
-#        for entry_code in entry_list:
-#            ## Add info to dictionary
-#            self.new_hits_entry_list.append(entry_code)
-#
-#        NTmessage("Total of %d new entries" % len(self.new_hits_entry_list))
-#        return 1 # Success
-
 
     def doWriteWhyNot(self):
         "Create WHY_NOT list"
@@ -521,7 +431,7 @@ class nrgCing(Lister):
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"                
                 
-        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
+        cingImage = '../data/%t/%s/%s.cing/CING_%s/HTML/mol.gif'
         example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
         file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()
@@ -739,3 +649,4 @@ if __name__ == '__main__':
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone() 
     m.update(new_hits_entry_list)
+    NTmessage("Finished creating the NRG-CING indices")
