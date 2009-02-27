@@ -13,8 +13,9 @@ import urllib
 #urlDB2 = "http://tang.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" # Gets Denial of Service sometimes.
 #urlDB2 = "http://nmr.cmbi.ru.nl/servlet_data/viavia/mr_mysql_backup/"
 urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
-#ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids" 
-ocaUrl = "http://localhost/oca" # For fastest develop.
+#ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids"
+ocaUrl = "http://www.ebi.ac.uk/msd-srv/oca/oca-bin/ocaids" 
+#ocaUrl = "http://localhost/oca" # For fastest develop.
 
 def getEntryListFromCsvFile(urlLocation):
   result = []
@@ -77,10 +78,11 @@ def writeEntryListToFile(fileName, entryList):
 
 def getPdbEntries(onlyNmr = False):
   result = []
-#  urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
-  urlLocation = ocaUrl + "/ocaidsPDB"
+  urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
+#  urlLocation = ocaUrl + "/ocaidsPDB"
   if onlyNmr:
-      urlLocation = ocaUrl + "/ocaidsPDB-NMR"
+#      urlLocation = ocaUrl + "/ocaidsPDB-NMR"
+      urlLocation = ocaUrl + "?dat=dep&ex=nmr&m=du"
       
 ## OCA database search on: Wed Dec  3 10:18:07 2008
 ## Query: ex=any&m=du
