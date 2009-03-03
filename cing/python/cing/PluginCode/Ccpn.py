@@ -1,3 +1,6 @@
+from cing.Libs.NTutils import switchOutput
+switchOutput(False)
+# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.general.Util import getResonancesFromPairwiseConstraintItem
 from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
@@ -13,7 +16,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import switchOutput
 from cing.Libs.NTutils import val2Str
 from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
@@ -39,8 +41,6 @@ import os
 import string
 import tarfile
 
-switchOutput(False)
-# Leave this at the top of ccp imports as to prevent non-errors from non-cing being printed.
 
 switchOutput(True)
 
@@ -1163,7 +1163,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # for speed reasons put this debug info in block.
 #        if cing.verbosity >= cing.verbosityDebug:
 #        # Example code from Wim is a nice demonstration.
-        if True:
+        if False:
             lowerLimit = None
             upperLimit = None
             if hasattr(ccpnConstraint, 'lowerLimit'):
@@ -1517,11 +1517,15 @@ def exportValidation2ccpn( project ):
     for residue in project.molecule.allResidues():
         valObj = storeResidueValidationInCcpn( project, residue)
         if not valObj:
-            NTerror('exportValidation2ccpn: exporting validation for residue %s', residue)
+            # Happens for all residues without coordinates.
+            NTdebug('exportValidation2ccpn: no export of validation done for residue %s', residue)
         else:
-            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
+            pass
+#            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
     #end for
+    switchOutput(False) # disable standard out.
     project.ccpn.saveModified()
+    switchOutput(True)
     return project
 #end def
 

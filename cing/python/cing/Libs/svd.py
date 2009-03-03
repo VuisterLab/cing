@@ -52,10 +52,13 @@
 # to facilitate the solution of linear systems.
 #
 # Version 1.0 2005 May 01
-
-
+from cing.Libs.NTutils import NTwarning
+from numpy import zeros #@UnresolvedImport
+from numpy.linalg import svd
 import copy
 import math
+
+
 
 def svd(a, *args):
     '''Compute the singular value decomposition of array.'''
@@ -316,16 +319,13 @@ def matrixmultiply(a,b):
 # http://www.physics.drexel.edu/students/courses/physics-501/hw2_python/hw2.3.py
 #
 
-import sys
-
+# JFD wonders what the routine below does? It just returns None and has no side effects; to remove?
 def zeros(dims):
-    result = []
-    for d in dims:
+    _result = []
+    for _d in dims:
         pass
 #end def
 
-from numpy import zeros
-from numpy.linalg import svd
 
 
 class SVDfit:

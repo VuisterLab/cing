@@ -10,9 +10,9 @@ from cing.Libs.NTutils import writeTextToFile
 import cing
 import urllib
 
-#urlDB2 = "http://tang.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" # Gets Denial of Service sometimes.
+urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/" # Gets Denial of Service sometimes.
 #urlDB2 = "http://nmr.cmbi.ru.nl/servlet_data/viavia/mr_mysql_backup/"
-urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
+#urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
 #ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids"
 ocaUrl = "http://www.ebi.ac.uk/msd-srv/oca/oca-bin/ocaids" 
 #ocaUrl = "http://localhost/oca" # For fastest develop.
