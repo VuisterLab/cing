@@ -3274,7 +3274,7 @@ Atom class: Defines object for storing atom properties
         """
         if self.isPseudoAtom():
             return self.residue.getAtoms( self.db.real )
-            return NTlist( self )
+        return NTlist( self )
     #end def
 
     def getRepresentativePseudoAtom( self, atomList ):

@@ -643,7 +643,7 @@ Project: Top level Cing project class
         """To slim down the memory footprint; should allow garbage collection."""
         attributeToRemove = "ccpn"
         try:
-        	removeRecursivelyAttribute( self, attributeToRemove )
+        	self.removeRecursivelyAttribute( attributeToRemove )
         except:
             NTerror("Failed removeCcpnReferences")
 
@@ -1411,23 +1411,27 @@ class DistanceRestraint( NTdict ):
 
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
+        
+        JFD disables this functionality because no checking
+        nor reordering is necessary on initialization of the class needed for CCPN import.
+        
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
         """
-        if pair[0] == None or pair[1] == None:
-            NTerror('DistanceRestraint.appendPair: invalid pair %s', pair)
-            return
-        #end if
-        a0 = self.atomPairs.zap(0) # first atoms
-        a1 = self.atomPairs.zap(1) # second atoms
-        if (pair[0] in a0 or pair[1] in a1):
+        if True: # TODO GV please check and explain to JFD.
             self.atomPairs.append( pair )
-        elif (pair[0] in a1 or pair[1] in a0):
-            self.atomPairs.append( (pair[1],pair[0]) )
-        elif (pair[0].residue.resNum > pair[1].residue.resNum):
-            self.atomPairs.append( (pair[1],pair[0]) )
         else:
-            self.atomPairs.append( pair )
+            a0 = self.atomPairs.zap(0)
+            a1 = self.atomPairs.zap(1)
+            
+            if (pair[0] in a0 or pair[1] in a1):
+                self.atomPairs.append( pair )
+            elif (pair[0] in a1 or pair[1] in a0):
+                self.atomPairs.append( (pair[1],pair[0]) )
+            elif (pair[0].residue.resNum > pair[1].residue.resNum):
+                self.atomPairs.append( (pair[1],pair[0]) )
+            else:
+                self.atomPairs.append( pair )
     #end def
 
     def classify(self):
@@ -1467,13 +1471,14 @@ class DistanceRestraint( NTdict ):
         In that case the s.d. may remain None to indicate undefined.
         """
 
+#        NTdebug('calculateAverage: %s' % self)
         modelCount = 0
         if len(self.atomPairs) :
             modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
         if modelCount == 0:
-            NTerror('Error DistanceRestraint.calculateAverage: No structure models (%s)\n', self)
+            NTerror('DistanceRestraint.calculateAverage: No structure models (%s)\n', self)
             return (None, None, None, None)
         #end if
 
@@ -1551,6 +1556,11 @@ class DistanceRestraint( NTdict ):
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
             atms2 = atm2.realAtoms()
+            
+#            NTdebug('atm1: %s' % atm1)
+#            NTdebug('atm2: %s' % atm2)
+#            NTdebug('atms1: %s' % atms1)
+#            NTdebug('atms2: %s' % atms2)
             for a1 in atms1:
                 #print '>>>', a1.format()
                 if len( a1.coordinates ) == modelCount:
@@ -1775,7 +1785,9 @@ class DistanceRestraintList( NTlist ):
         #end if
 
         modelCount = 0
-        if len(self[0].atomPairs and self[0].atomPairs[0][0]):
+        # JFD disabled bug in below statement
+#        if len(self[0].atomPairs and self[0].atomPairs[0][0]):
+        if len(self[0].atomPairs):
             modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 

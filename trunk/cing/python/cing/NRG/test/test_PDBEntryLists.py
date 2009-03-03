@@ -23,9 +23,10 @@ class AllChecks(TestCase):
             NTdebug("getPdbEntries NMR: %d %s" % (len(nmrList), nmrList))
             self.assertTrue( nmrList )
 
-        pdbList = getPdbEntries(onlyNmr = False)
-        NTdebug("getPdbEntries ALL: %d %s" % (len(pdbList), pdbList))
-        self.assertTrue( pdbList )
+        if False:
+            pdbList = getPdbEntries(onlyNmr = False)
+            NTdebug("getPdbEntries ALL: %d %s" % (len(pdbList), pdbList))
+            self.assertTrue( pdbList )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

@@ -923,7 +923,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project.molecule )
-        if None in atoms:
+        if None in dr.atoms:
             NTerror('SMLDihedralRestraintHandler.endHandler: invalid atom(s) %s', dr.atoms)
         return dr
     #end def
