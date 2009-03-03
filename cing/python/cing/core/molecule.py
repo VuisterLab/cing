@@ -59,7 +59,7 @@ import sys
 #==============================================================================
 AtomIndex = 1
 _DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
- 
+
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
 # Superseeded by SML routines
@@ -517,7 +517,7 @@ class Molecule( NTtree ):
                     if atomDict.has_key( t ):
                         # GV needs to check if this still needs to be an error or as is, down graded to warning level.
                         # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
-                        # GV, Yes maintain, but test for aname should reduce warnings
+                        # GV, Yes maintain, but  test for aname should reduce warnings
 #                        NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
 #                                    atm, atomDict[t])
                         pass
@@ -1103,14 +1103,13 @@ class Molecule( NTtree ):
             atm.calculateMeanCoordinate()
 
     def idDisulfides(self):
-        """Just identify the disulfide bonds. 
+        """Just identify the disulfide bonds.
         Takes into account residues with missing coordinates as long as they are all missing.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
 #        NTdebug('Identify the disulfide bonds.')
         cys=self.residuesWithProperties('CYS')
         cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
-                
         for c in cyss:
             if c not in cys:
                 cys.append(c)
@@ -2197,10 +2196,12 @@ Residue class: Defines residue properties
         db = NTdb.getResidueDefByName( resName, convention )
         if not db:
             NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
-            self.db = NTdb.appendResidueDef( name=resName, shortName = '_' )
+            self.db = NTdb.appendResidueDef( name=resName, shortName = '_',
+                                             nameDict = {INTERNAL:resName, convention:resName}
+                                           )
             x = NTdb.getResidueDefByName( resName, convention )
             if not x:
-                NTcodeerror("Added residue but failed to find it again")
+                NTcodeerror("Residue._nameResidue: Added residue but failed to find it again")
         #end if
         self.resNum   = resNum
         if not db:
@@ -2370,6 +2371,10 @@ Residue class: Defines residue properties
                 if dihed.atoms:
                     self.dihedrals.append(dihed)
                     self[dihed.name] = dihed
+                    # if db and aliases, add them; e.g. DNA/RNA DELTA==NU3
+                    if dihed.db:
+                        for aname in dihed.db.aliases:
+                            self[aname] = dihed
                 #end if
             #end for
         #end if
@@ -2552,6 +2557,9 @@ class Dihedral( NTlist ):
         #end if
         return sprintf('<Dihedral %s: %.1f, %.2f>', dname, self.cav, self.cv)
     #end def
+
+    def __repr__(self):
+        return self.__str__()
 
     def format(self):
         if self.residue:
@@ -3266,7 +3274,7 @@ Atom class: Defines object for storing atom properties
         """
         if self.isPseudoAtom():
             return self.residue.getAtoms( self.db.real )
-        return NTlist( self )
+            return NTlist( self )
     #end def
 
     def getRepresentativePseudoAtom( self, atomList ):

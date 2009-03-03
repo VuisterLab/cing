@@ -1,4 +1,6 @@
 from cing.core.constants import INTERNAL
+from cing.core.constants import INTERNAL_0
+from cing.core.constants import INTERNAL_1
 from cing.core.constants import LOOSE
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTlist
@@ -143,16 +145,25 @@ class MolDef( NTtree ):
     #end def
 
     def appendResidueDef( self, name, shortName, **kwds ):
+        resDef = ResidueDef( name, shortName, **kwds )
         if self.has_key(name):
-            NTerror('MolDef.appendResidueDef: residueDef "%s" already exists', name)
-            return None
+            oldResDef = self[name]
+            NTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
+            self.replaceChild( oldResDef, resDef )
+        else:
+            self._addChild( resDef )
         #end if
-        res = ResidueDef( name, shortName, **kwds )
-        self._addChild( res )
-        res.molDef = self
-        res.postProcess()
-        return res
+        resDef.molDef = self
+        resDef.postProcess()
+        return resDef
     #end def
+
+    def appendResidueDefFromSMLfile(self, SMLfile):
+        """Read and append ResidueDef from SMLfile
+        Return ResidueDef of None on error.
+        """
+        # cannot use SML2obj because that would require a circular import
+        return ResidueDef.SMLhandler.fromFile( SMLfile, self )
 
     def allResidueDefs(self):
         return self.subNodes( depth = 1 )
@@ -198,9 +209,11 @@ class MolDef( NTtree ):
         if not resName:
             NTdebug('MolDef.isValidResidueName: undefined residue name')
             return None
+        #end if
         if not self.residueDict.has_key(convention):
             NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
+        #end if
         return (self.getResidueDefByName( resName, convention=convention) != None)
     #end def
 
@@ -275,6 +288,9 @@ class MolDef( NTtree ):
             for atm in res:
                 atm.postProcess()
             #end for
+            for d in res.dihedrals:
+                d.postProcess()
+            #end for
         #end for
 
 #        for res in self:
@@ -322,7 +338,7 @@ class ResidueDef( NTtree ):
                            name        = name,
                            shortName   = shortName,
                            comment     = None,
-                           nameDict    = {INTERNAL:name},
+                           nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
                            atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = [] # list of properties for residue
@@ -349,7 +365,7 @@ class ResidueDef( NTtree ):
         atm = AtomDef( name, **kwds )
         self._addChild( atm )
         atm.residueDef = self
-        atm.postProcess()        
+        atm.postProcess()
         return atm
     #end def
 
@@ -366,6 +382,7 @@ class ResidueDef( NTtree ):
         self.dihedrals.append( dh )
         dh._parent = self
         dh.residueDef = self
+        dh.postProcess()
         return dh
     #end def
 
@@ -455,7 +472,7 @@ class ResidueDef( NTtree ):
     def getAtomDefByName( self, atmName, convention = INTERNAL ):
         """return AtomDef instance for atmName if atmName is a valid for convention
            or None otherwise.
-           
+
            Do NOT print an error here because for optimal use the code is called
            many times in cases where no defs are available; e.g.
            pdbParser#_matchAtom2Cing
@@ -502,7 +519,11 @@ class ResidueDef( NTtree ):
             if (nameR != None):
                 residueDict[convR][nameR] = self
             #end if
-        # end for
+        #end for
+
+        for atmDef in self:
+            atmDef.patchProperties() #Properties can only be patch after all atoms are present
+        #end for
     #end def
 
     def exportDef( self, stream = sys.stdout, convention = INTERNAL ):
@@ -660,7 +681,8 @@ class AtomDef( NTtree ):
                            __CLASS__   = 'AtomDef' ,
                            convention  = INTERNAL,
                            name        = name,     # Internal name
-                           nameDict    = {INTERNAL:name},
+                           nameDict    = {INTERNAL_0:name, INTERNAL_1:name}, # default initialization, to be
+                                                                             # updated later.
                            aliases     = [],       # list of aliases
 
                            residueDef  = None,     # ResidueDef instance
@@ -675,7 +697,7 @@ class AtomDef( NTtree ):
 
                            type        = None,     # Cyana type of atom
                            spinType    = None,     # NMR spin type; i.e. 1H, 13C ...
-                           shift       = None,      # NTdict with average and sd
+                           shift       = None,     # NTdict with average and sd
 
                            hetatm      = False,    # PDB HETATM type
 
@@ -760,9 +782,8 @@ class AtomDef( NTtree ):
         return True
     #end def
 
-    def postProcess(self):
-        """
-        Any post-reading actions
+    def patchProperties(self):
+        """Patch the properties list
         """
         props = NTlist( self.name, self.residueDef.name, self.residueDef.shortName, self.spinType, *self.properties)
 
@@ -826,7 +847,12 @@ class AtomDef( NTtree ):
             #end if
         #end for
         self.properties = props2
+    #end def
 
+    def postProcess(self):
+        """
+        Any post-reading actions
+        """
         # set entry of atomDict of residueDef to self
         atomDict = self.residueDef.atomDict
         for convA, nameA in self.nameDict.iteritems():
@@ -904,6 +930,7 @@ class DihedralDef( NTtree ):
                            __CLASS__   = 'DihedralDef',
                            convention  = INTERNAL,
                            name        = name,
+                           aliases     = [],
                            residueDef  = None,
                            atoms       = [],    # List of atoms: (i, name) tuple
                                                 # i:  -1=previous residue
@@ -957,6 +984,15 @@ class DihedralDef( NTtree ):
         fprintf( stream, '\tEND_DIHEDRAL\n')
 #        fprintf( stream, '\t#---------------------------------------------------------------\n')
     #end for
+
+    def postProcess(self):
+        """Any post-processing actions
+        """
+        if self.residueDef:
+            for aname in self.aliases:
+                self.residueDef[aname] = self
+            #end for
+    #end def
 #end class
 
 
@@ -1061,6 +1097,8 @@ def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
 # import the database table and generate the db-tree
 NTdebug('importing NTdb')
 NTdebug( '>' + INTERNAL )
+
+#print '>',os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL)
 
 NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
 
