@@ -566,7 +566,7 @@ Project: Top level Cing project class
     def save( self):
         """
         Save project data;
-        
+
         Return True on success.
         """
         NTmessage('' + dots*5 +'' )
@@ -639,6 +639,13 @@ Project: Top level Cing project class
         self.updateProject()
     #end def
 
+    def removeCcpnReferences(self):
+        """To slim down the memory footprint; should allow garbage collection."""
+        attributeToRemove = "ccpn"
+        try:
+        	removeRecursivelyAttribute( self, attributeToRemove )
+        except:
+            NTerror("Failed removeCcpnReferences")
 
     def export( self):
         """Call export routines from the plugins to export the project
@@ -656,7 +663,7 @@ Project: Top level Cing project class
     def updateProject( self ):
         """Do all administrative things after actions
         """
-        if self.molecule: 
+        if self.molecule:
             self[self.molecule.name] = self.molecule
     #end def
 
@@ -845,7 +852,7 @@ Project: Top level Cing project class
 
 class XMLProjectHandler( XMLhandler ):
     """Project handler class"""
-    def __init__( self ):   
+    def __init__( self ):
         XMLhandler.__init__( self, name='Project')
     #end def
 
@@ -1212,8 +1219,8 @@ class DistanceRestraint( NTdict ):
        lower and upper bounds
     """
     STATUS_SIMPLIFIED = 'simplified'
-    STATUS_NOT_SIMPLIFIED = 'not simplified'    
-    
+    STATUS_NOT_SIMPLIFIED = 'not simplified'
+
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__( self, atomPairs=NTlist(), lower=None, upper=None, **kwds ):
 
@@ -1308,33 +1315,33 @@ class DistanceRestraint( NTdict ):
 #                NTdebug("not simplified restraint %s" % self)
             else:
                 NTerror("Encountered an error simplifying restraint %s" % self)
-                return True            
-                
+                return True
+
 
     def simplifySpecificallyForFcFeature(self):
-        """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint 
+        """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint
         were it is not really one. Undone here.
         Return None on error.
         STATUS_NOT_SIMPLIFIED for no simplifications done
-        STATUS_SIMPLIFIED for simplifications done        
+        STATUS_SIMPLIFIED for simplifications done
         """
-                
+
 #        NTdebug('Starting simplifySpecificallyForFcFeature for %s' % ( self ) )
-        atomPairIdxJ = len(self.atomPairs) 
+        atomPairIdxJ = len(self.atomPairs)
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
             atomPairJ = self.atomPairs[atomPairIdxJ]
             atomPairJset = set( atomPairJ ) # Important to use api of unsorted atoms in pair (left right will not matter)
             atom0J = atomPairJ[0]
             atom1J = atomPairJ[1]
-            
+
 #            NTdebug('Using atoms J %s and %s' % ( atom0J, atom1J) )
             # speed up check on J.
             if not (atom0J.hasPseudoAtom() or atom1J.hasPseudoAtom()):
                 if not (atom0J.getPseudoOfPseudoAtom() or atom1J.getPseudoOfPseudoAtom()):
 #                    NTdebug('Skipping restraint without pseudo representing J atoms')
                     continue
-            
+
             for atomPairIdxI in range( atomPairIdxJ ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
 #                atom0I = atomPairI[0]
@@ -1345,35 +1352,35 @@ class DistanceRestraint( NTdict ):
                 if not atomPairIntersection:
 #                    NTdebug('    No intersection')
                     continue
-                
+
                 # At this point it is certain that there is an intersection of an atom between the two pairs.
                 if len( atomPairIntersection ) != 1:
                     NTcodeerror('Unexpected more than one atom in atom set intersection')
                     return None
-                
+
                 atomPairInCommon = atomPairIntersection.pop()
                 atomIinCommonIdx = 0
                 atomJinCommonIdx = 0
                 atomItoMergeIdx = 1
                 atomJtoMergeIdx = 1
                 if atomPairI[atomIinCommonIdx] != atomPairInCommon:
-                      atomIinCommonIdx = 1                                
+                      atomIinCommonIdx = 1
                       atomItoMergeIdx = 0
                 if atomPairJ[atomJinCommonIdx] != atomPairInCommon:
-                      atomJinCommonIdx = 1                                
+                      atomJinCommonIdx = 1
                       atomJtoMergeIdx = 0
-                      
+
                 # Now we know which atoms are in common and consequently the others should be tried to merge.
 #                NTdebug('    atominCommonIdx I %d and J %d' % ( atomIinCommonIdx, atomJinCommonIdx) )
-                
+
                 atomItoMerge = atomPairI[atomItoMergeIdx]
                 atomJtoMerge = atomPairJ[atomJtoMergeIdx]
-     
-                if atomItoMerge.getSterospecificallyRelatedlPartner() != atomJtoMerge:                     
+
+                if atomItoMerge.getSterospecificallyRelatedlPartner() != atomJtoMerge:
 #                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all' % ( atomItoMerge, atomJtoMerge) )
                     continue
-                
-                # 
+
+                #
                 pseudoOfAtom = atomItoMerge.pseudoAtom()
                 if not pseudoOfAtom:
 #                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
@@ -1381,20 +1388,20 @@ class DistanceRestraint( NTdict ):
                     if not pseudoOfAtom:
                         NTerror('    no pseudo of pseudoatom %s' % atomItoMerge)
                         continue
-                
+
 #                NTdebug( "    New pop atom: %s" % pseudoOfAtom)
                 # Change I maintaining order
-                atomPairINewList = list( atomPairI ) 
+                atomPairINewList = list( atomPairI )
                 atomPairINewList[atomItoMergeIdx] = pseudoOfAtom
                 self.atomPairs[atomPairIdxI] = tuple( atomPairINewList )
-                # Remove J 
+                # Remove J
                 del self.atomPairs[atomPairIdxJ]
-                # Return qucikly to keep code to the left (keep it simple).      
+                # Return qucikly to keep code to the left (keep it simple).
 #                NTdebug('Simplified.')
-                return self.STATUS_SIMPLIFIED                        
+                return self.STATUS_SIMPLIFIED
 #        NTdebug('Not simplified.')
         return self.STATUS_NOT_SIMPLIFIED
-            
+
     def getModelCount(self):
         modelCount = 0
         if len(self.atomPairs) :
@@ -1404,27 +1411,23 @@ class DistanceRestraint( NTdict ):
 
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
-        
-        JFD disables this functionality because no checking
-        nor reordering is necessary on initialization of the class needed for CCPN import.
-        
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
         """
-        if True: # TODO GV please check and explain to JFD.
+        if pair[0] == None or pair[1] == None:
+            NTerror('DistanceRestraint.appendPair: invalid pair %s', pair)
+            return
+        #end if
+        a0 = self.atomPairs.zap(0) # first atoms
+        a1 = self.atomPairs.zap(1) # second atoms
+        if (pair[0] in a0 or pair[1] in a1):
             self.atomPairs.append( pair )
+        elif (pair[0] in a1 or pair[1] in a0):
+            self.atomPairs.append( (pair[1],pair[0]) )
+        elif (pair[0].residue.resNum > pair[1].residue.resNum):
+            self.atomPairs.append( (pair[1],pair[0]) )
         else:
-            a0 = self.atomPairs.zap(0)
-            a1 = self.atomPairs.zap(1)
-            
-            if (pair[0] in a0 or pair[1] in a1):
-                self.atomPairs.append( pair )
-            elif (pair[0] in a1 or pair[1] in a0):
-                self.atomPairs.append( (pair[1],pair[0]) )
-            elif (pair[0].residue.resNum > pair[1].residue.resNum):
-                self.atomPairs.append( (pair[1],pair[0]) )
-            else:
-                self.atomPairs.append( pair )
+            self.atomPairs.append( pair )
     #end def
 
     def classify(self):
@@ -1592,7 +1595,7 @@ class DistanceRestraint( NTdict ):
         self.max = max( self.distances )
 
         # calculate violations
-        for d in self.distances:            
+        for d in self.distances:
             if (d < self.lower):
                 self.violations.append( d-self.lower )
             elif (d > self.upper):
@@ -1744,12 +1747,11 @@ class DistanceRestraintList( NTlist ):
             NTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
     #end def
-    
+
     def simplify(self):
         """Look at Wattos code for a full set of code that does any simplification"""
         for dr in self:
             dr.simplify()
-        
 
     def append( self, distanceRestraint ):
         distanceRestraint.id = self.currentId
@@ -1773,7 +1775,7 @@ class DistanceRestraintList( NTlist ):
         #end if
 
         modelCount = 0
-        if len(self[0].atomPairs):
+        if len(self[0].atomPairs and self[0].atomPairs[0][0]):
             modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
@@ -2073,7 +2075,7 @@ class DihedralRestraint( NTdict ):
         for d in self.dihedrals:
             v = violationAngle(value=d, lowerBound=self.lower, upperBound=self.upper)
             if v == None: # already send a message
-                continue 
+                continue
             fv = math.fabs(v)
             self.violations.append( v )
             if fv > 1.0: self.violCount1 += 1
@@ -2488,7 +2490,7 @@ class RDCRestraintList( NTlist ):
         self.violCount3 =  0
         self.violCount5 =  0
         for dr in self:
-            if calculateFirst: 
+            if calculateFirst:
                 dr.calculateAverage()
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3

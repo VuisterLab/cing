@@ -1,45 +1,52 @@
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import sprintf
-from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
-from cing.core.classes import DihedralRestraint
-from cing.core.classes import DihedralRestraintList
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
+
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTwarning
+
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTdict
+# do not remove these two: they are needed during parsing of the sml files
+from cing.Libs.NTutils import NTfill
+from cing.Libs.NTutils import NTvalue
+from cing.core.molecule import Coordinate #@UnusedImport
+
+from cing.core.molecule import Molecule
+from cing.core.molecule import Chain
+from cing.core.molecule import Residue
+from cing.core.molecule import Atom
+from cing.core.molecule import Resonance
+
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
-from cing.core.classes import RDCRestraint
-from cing.core.classes import RDCRestraintList
+
+from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
+
+from cing.core.classes import DihedralRestraint
+from cing.core.classes import DihedralRestraintList
+
 from cing.core.constants import AC_LEVEL
 from cing.core.constants import DR_LEVEL
-from cing.core.molecule import Atom
-from cing.core.molecule import Chain
-from cing.core.molecule import Coordinate #@UnusedImport
-from cing.core.molecule import Molecule
-from cing.core.molecule import Residue
-from cing.core.molecule import Resonance
 from cing.core.constants import RDC_LEVEL
-import os
-import sys
 
 
-# do not remove these two: they are needed during parsing of the sml files
+from cing.core.classes import RDCRestraint
+from cing.core.classes import RDCRestraintList
 
+from cing.core.database import AtomDef
+from cing.core.database import DihedralDef
+from cing.core.database import ResidueDef
 
-
-
-
-
-#from cing.core.constants import CYANA
+from cing.core.constants import INTERNAL
 
 #The following imports we need for restoring the project
+from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
 
+import os
+import sys
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
@@ -54,6 +61,29 @@ SMLversion       = 0.23
 
 SMLsaveFormat  = 'INTERNAL_0'
 SMLfileVersion = None
+
+class smlFile(file):
+    def __init__(self, *args, **kwds):
+        file.__init__(self, *args, **kwds)
+        self.NR = 0
+    #end def
+
+    def readline(self):
+        # Skip empty lines and lines the start with #
+        line = file.readline(self)
+        self.NR += 1
+        while line and (len(line)<=1 or line.lstrip().startswith('#')):
+            line = file.readline(self)
+            self.NR += 1
+        return line
+    #end def
+
+    def readlines(self):
+        lines = self.readlines(self)
+        self.NR += len(lines)
+        return lines
+    #end def
+#end def
 
 class SMLhandler:
     """
@@ -102,36 +132,21 @@ Example file:
     def listHandler(self, listObj, fp, obj=None):
         """
         General list handling routine. Parses items and append to
-        listObj.
+        listObj. Obj is carried along for convenience to pass external info if needed.
 
         Returns listObj or None on error.
         """
         line = SMLhandler.readline( fp )
         while (line):
-#            if len(line) > 0 and SMLendhandlers.has_key(line[1]):
-#                handler = SMLendhandlers[line[1]]
-#                if (handler != self):
-#                    NTerror('Error SMLhandler.listHandler: badly formed SML list (%s)', line[1] )
-#                    return None
-#                #end if
-#                handler.endHandler( listObj, obj )
-#                return listObj
-#            elif len(line) > 0 and SMLstarthandlers.has_key(line[1]):
-#                handler = SMLstarthandlers[line[1]]
-#                listObj.append( handler.handle( line, fp, obj ) )
-#            else:
-#                listObj.append( eval(line[0]) )
-#            #end if
-#            line = SMLhandler.readline( fp )
-#            if self.debug: NTmessage('%s> %s', self, line)
-
             l = len(line)
             if l > 0 and line[1] == self.endTag:
                 return self.endHandler( listObj, obj )
             elif l > 0 and SMLstarthandlers.has_key(line[1]):
                 listObj.append( SMLstarthandlers[line[1]].handle( line, fp, obj ) )
             elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLhandler.listHandler: skipping invalid closing tag "%s"', line[1])
+                NTerror('SMLhandler.listHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+                self.jumpToEndTag( fp )
+                return self.endHandler( listObj, obj )
             else:
                 listObj.append( eval(line[0]) )
             #end if
@@ -146,46 +161,26 @@ Example file:
     def dictHandler(self, dictObj, fp, obj=None):
         """
         General dict handling routine. Parses key = value pairs and inserts into
-        dictObj.
+        dictObj. Obj is carried along for convenience to pass external info if needed.
 
         Returns dictObj or None on error.
         """
         line = SMLhandler.readline( fp )
         while (line):
-
-
-#            if len(line) > 0 and SMLendhandlers.has_key(line[1]):
-#                handler = SMLendhandlers[line[1]]
-#                if (handler != self):
-#                    NTerror('Error SMLhandler.dictHandler: badly formed SML list (%s)', line[0] )
-#                    return None
-#                #end if
-#                handler.endHandler( dictObj, obj )
-#                return dictObj
-#            # version 0.2: implement recursion
-#            elif len(line) > 3 and SMLstarthandlers.has_key(line[3]):
-##                handler = SMLstarthandlers[line[3]]
-##                obj     = SMLstarthandlers[line[3]].handle( line[3:], fp, obj )
-#                dictObj[line[1]] = SMLstarthandlers[line[3]].handle( line[3:], fp, obj )
-#            elif len(line) > 3:
-#                dictObj[line[1]] = eval(''.join(line[3:]))
-#            else:
-#                NTerror('Error SMLhandler.dictHandler: incomplete line "%s"', line[0])
-#            #end if
-#            line = SMLhandler.readline( fp )
-#            if self.debug: printf('%s> %s\n', self, line)
             l = len(line)
             if l > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )
             # version 0.2: implement recursion
             elif l > 3 and SMLstarthandlers.has_key(line[3]):
-                dictObj[line[1]] = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, obj )
+                dictObj[line[1]] = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, obj )
             elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLhandler.dictHandler: skipping invalid closing tag "%s"', line[1])
+                NTerror('SMLhandler.dictHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+                self.jumpToEndTag( fp )
+                return self.endHandler( dictObj, obj )
             elif l > 3:
-                dictObj[line[1]] = eval(''.join(line[3:]))
+                dictObj[line[1]] = eval(' '.join(line[3:]))
             else:
-                NTerror('SMLhandler.dictHandler: skipped incomplete line "%s"', line[0])
+                NTerror('SMLhandler.dictHandler: line %d, incomplete "%s"', fp.NR, line[0])
             #end if
             line = SMLhandler.readline( fp )
         #end while
@@ -215,14 +210,19 @@ Example file:
 
         newObj  = None
         line = SMLhandler.readline( fp )
+        l = len(line)
         while (line):
-            if len(line) > 0 and line[1]==self.endTag:
+            if l > 0 and line[1]==self.endTag:
                 return self.endHandler( newObj, obj )
-            elif len(line) > 0 and SMLstarthandlers.has_key(line[1]):
+            elif l > 0 and SMLstarthandlers.has_key(line[1]):
                 handler = SMLstarthandlers[line[1]]
                 newObj  = handler.handle( line, fp, obj )
+            elif l > 0 and SMLendhandlers.has_key(line[1]):
+                NTerror('SMLhandler.handle: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+                self.jumpToEndTag( fp )
+                return self.endHandler( newObj, obj )
             else:
-                NTerror('SMLhandler.handle: incomplete line "%s"', line[0])
+                NTerror('SMLhandler.handle: line %d incomplete: "%s"', fp.NR, line[0])
             #end if
             line = SMLhandler.readline( fp )
         #end while
@@ -237,6 +237,20 @@ Example file:
         Should return newObj or None on error
        """
         return newObj
+    #end def
+
+    def jumpToEndTag(self, fp):
+        """
+        Progress to end tag of handler
+        """
+        line = self.readline(fp)
+        while line:
+            if len(line) > 0 and line[1] == self.endTag:
+                return
+            line = self.readline(fp)
+        #end while
+        NTerror('SMLhandler.jumpToEndTag: line %d, endTag "%s" not found', fp.NR, self.endTag)
+        return
     #end def
 
     def toSML(self, obj, fp):
@@ -274,27 +288,29 @@ Example file:
 #        result = NTlist(line, *line.split())
         #print '>', result, '<'
         # Much quicker then previous NTlist stuff!
-        if SMLhandler.debug: printf('%s> %s\n', SMLfileVersion, [line]+line.split())
+        if SMLhandler.debug: printf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
         return [line]+line.split()
     #end def
     readline = staticmethod( readline )
 
     def fromFile( fileName, obj=None)   :
         """
-        Static method to restore object from SML file.
-        Returns obj or None on error.
+        Static method to restore new object from SML file.
+        obj is carried along for convenience to pass an external info if needed.
+
+        Returns newObj or None on error.
         """
         if not os.path.exists( fileName ):
             NTerror('Error SMLhandler.fromFile: file "%s" does not exist\n', fileName )
             return None
         #end if
-        fp   = open( fileName, 'r' )
+        fp   = smlFile( fileName, 'r' )
         line = SMLhandler.readline( fp )
         if len(line) > 0 and SMLstarthandlers.has_key(line[1]):
             handler = SMLstarthandlers[line[1]]
             newObj  = handler.handle( line, fp, obj )
         else:
-            NTerror('SMLhandler.fromFile: invalid SML file line "%s"', line[0])
+            NTerror('SMLhandler.fromFile: invalid SML file line %d "%s"', fp.NR, line[0])
 #        newObj  = smlhandler.handle( None, fp, obj )
         fp.close()
         NTdebug('Restored %s from "%s"', newObj, fileName )
@@ -315,7 +331,7 @@ Example file:
         fprintf( fp, '%s %s\n', smlhandler.startTag, SMLversion )
 
         if not hasattr(object,'SMLhandler'):
-            NTerror('SMLHandle.toFile: object "%s" without SMLhandler method', object)
+            NTerror('SMLHandler.toFile: object "%s" without SMLhandler method', object)
             fp.close()
             return None
 
@@ -344,7 +360,7 @@ class SMLNTlistHandler( SMLhandler ):
         return self.listHandler(listObj, fp, obj)
     #end def
 
-    def toSML(self, theList, stream=sys.stdout):
+    def toSML(self, theList, stream=sys.stdout, *args, **kwds):
         """
         Write element of theList to stream for restoring later with fromFile method
         Returns theList or None on error.
@@ -352,7 +368,7 @@ class SMLNTlistHandler( SMLhandler ):
         fprintf( stream, '%s\n', self.startTag )
         for item in theList:
             if hasattr(item,'SMLhandler') and item.SMLhandler != None:
-                item.SMLhandler.toSML( item, stream )
+                item.SMLhandler.toSML( item, stream, *args, **kwds )
             else:
                 fprintf( stream, '%r\n', item )
             #end if
@@ -375,7 +391,7 @@ class SMLNTdictHandler( SMLhandler ):
         return self.dictHandler(dictObj, fp, obj)
     #end def
 
-    def toSML(self, theDict, stream=sys.stdout):
+    def toSML(self, theDict, stream=sys.stdout, *args, **kwds):
         """
         Write key value pairs of theDict to stream for restoring later with fromFile method
         Returns theDict or None on error.
@@ -384,7 +400,7 @@ class SMLNTdictHandler( SMLhandler ):
         for key,value in theDict.iteritems():
             fprintf( stream, '%s = ', key )
             if hasattr(value,'SMLhandler') and value.SMLhandler != None:
-                value.SMLhandler.toSML( value, stream )
+                value.SMLhandler.toSML( value, stream, *args, **kwds )
             else:
                 fprintf( stream, '%r\n', value )
             #end if
@@ -415,12 +431,13 @@ class SMLMoleculeHandler( SMLhandler ):
         #end if
 
         line = SMLhandler.readline( fp )
+        l = len(line)
         while (line):
-            if len(line) > 0 and line[1]==self.endTag:
+            if l > 0 and line[1]==self.endTag:
                 return self.endHandler( mol, None )
             # version 0.2: implement recursion
-            elif len(line) > 3 and line[1]=='_sequence'  and SMLstarthandlers.has_key(line[3]):
-                _sequence = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, mol )
+            elif l > 3 and line[1]=='_sequence'  and SMLstarthandlers.has_key(line[3]):
+                _sequence = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, mol )
                 # Restore the sequence
                 #print '>>', _sequence
                 if SMLfileVersion < 0.23:
@@ -434,10 +451,12 @@ class SMLMoleculeHandler( SMLhandler ):
                         mol._addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
                     #end for
                 #end if
-            elif len(line) > 3 and SMLstarthandlers.has_key(line[3]):
-                mol[line[1]] = SMLstarthandlers[line[3]].handle( [''.join(line[3:])] + line[3:], fp, mol )
-            elif len(line) > 3:
-                mol[line[1]] = eval(''.join(line[3:]))
+            elif l > 3 and SMLstarthandlers.has_key(line[3]):
+                mol[line[1]] = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, mol )
+            elif l > 0 and SMLendhandlers.has_key(line[1]):
+                NTerror('SMLMoleculeHandler.handle: skipping invalid closing tag "%s"', line[1])
+            elif l > 3:
+                mol[line[1]] = eval(' '.join(line[3:]))
             else:
                 NTerror('SMLMoleculeHandler.handle: incomplete line "%s"', line[0])
             #end if
@@ -509,7 +528,8 @@ class SMLChainHandler( SMLhandler ):
 
         chain = molecule.decodeNameTuple(nameTuple)
         if chain == None:
-            NTerror('SMLChainHandler.handle: invalid nameTuple %s', nameTuple)
+            NTerror('SMLChainHandler.handle: invalid nameTuple %s, ==> Skipped chain', nameTuple)
+            self.jumpToEndTag(fp)
             return None
         #end if
         return self.dictHandler(chain, fp, molecule)
@@ -556,7 +576,8 @@ class SMLResidueHandler( SMLhandler ):
         nameTuple = eval(' '.join(line[2:]))
         res = molecule.decodeNameTuple(nameTuple)
         if res == None:
-            NTerror('SMLResidueHandler.handle: invalid nameTuple %s', nameTuple)
+            NTerror('SMLResidueHandler.handle: invalid nameTuple %s, ==> skipped Residue', nameTuple)
+            self.jumpToEndTag(fp)
             return None
         #end if
         return self.dictHandler(res, fp, molecule)
@@ -602,7 +623,8 @@ class SMLAtomHandler( SMLhandler ):
         nameTuple = eval(' '.join(line[2:]))
         atm = molecule.decodeNameTuple(nameTuple)
         if atm == None:
-            NTerror('SMLAtomHandler.handle: invalid nameTuple %s', nameTuple)
+            NTerror('SMLAtomHandler.handle: line %d, invalid nameTuple %s, ==> atom skipped', fp.NR, nameTuple)
+            self.jumpToEndTag(fp)
             return None
         #end if
         return self.dictHandler(atm, fp, molecule)
@@ -835,7 +857,14 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
-            dr.appendPair( (project.molecule.decodeNameTuple(ap[0]), project.molecule.decodeNameTuple(ap[1])) )
+            p0 = project.molecule.decodeNameTuple(ap[0])
+            p1 = project.molecule.decodeNameTuple(ap[1])
+            if p0 and p1:
+                dr.appendPair( (p0, p1) )
+            else:
+                if not p0: NTerror('SMLDistanceRestraintHandler.endHandler: error decoding %s', ap[0])
+                if not p1: NTerror('SMLDistanceRestraintHandler.endHandler: error decoding %s', ap[1])
+            #end if
         #end for
         return dr
     #end def
@@ -894,6 +923,8 @@ class SMLDihedralRestraintHandler( SMLhandler ):
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project.molecule )
+        if None in atoms:
+            NTerror('SMLDihedralRestraintHandler.endHandler: invalid atom(s) %s', dr.atoms)
         return dr
     #end def
 
@@ -948,7 +979,14 @@ class SMLRDCRestraintHandler( SMLhandler ):
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
-            dr.appendPair( (project.molecule.decodeNameTuple(ap[0]), project.molecule.decodeNameTuple(ap[1])) )
+            p0 = project.molecule.decodeNameTuple(ap[0])
+            p1 = project.molecule.decodeNameTuple(ap[1])
+            if p0 and p1:
+                dr.appendPair( (p0, p1) )
+            else:
+                if not p0: NTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[0])
+                if not p1: NTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[1])
+            #end if
         #end for
         return dr
     #end def
@@ -992,6 +1030,216 @@ class SMLRDCRestraintListHandler( SMLhandler ):
 #end class
 RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
 
+class SMLResidueDefHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'ResidueDef' )
+    #end def
+
+    def handle(self, line, fp, molDef=None):
+        if molDef == None:
+            NTerror('SMLResidueDefHandler.handle: line %d, undefined molDef', fp.NR)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        if len(line) < 4:
+            NTerror('SMLResidueDefHandler.handle: line %d, incomplete ResidueDef syntax "%s"', fp.NR, line)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        resDef = molDef.appendResidueDef(line[2], line[3])
+        if not resDef:
+            NTerror('SMLResidueDefHandler.handle: line %d, error initiating ResidueDef instance "%s"', fp.NR, line[2])
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        return self.dictHandler(resDef, fp, resDef)
+    #end def
+
+    def endHandler(self, resDef, obj=None):
+        resDef.postProcess()
+        return resDef
+    #end def
+
+    def toSML(self, resDef, stream = sys.stdout, convention = INTERNAL  ):
+        """Store resDef in SML format
+        """
+        fprintf( stream, '\n#=======================================================================\n')
+        fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'internal', 'short')
+        fprintf( stream,   '%s  \t%-8s %-8s\n', self.startTag, resDef.translate(convention), resDef.shortName )
+        fprintf( stream,   '#=======================================================================\n')
+
+        # saving different residue attributes
+        for attr in ['comment','nameDict']:
+            fprintf( stream, "\t%-10s = %r\n", attr, resDef[attr] )
+        #end for
+
+        # clean the properties list
+        props = []
+        for prop in resDef.properties:
+            # Do not store name and residueDef.name as property. Add those dynamically upon reading
+            if not prop in [resDef.name, resDef.shortName] and not prop in props:
+                props.append(prop)
+            #end if
+        #end for
+        fprintf( stream, "\t%-10s = %r\n", 'properties', props )
+
+        fprintf( stream, "\n\t%-10s = %s\n", 'dihedrals', '<NTlist>') # for readability (tabs), write it explicitly
+        for d in resDef.dihedrals:
+            d.SMLhandler.toSML( d, stream, convention=convention )
+        fprintf( stream, "\t%s\n", '</NTlist>')
+
+        fprintf( stream, "\n\t%-10s = %s\n", 'atoms', '<NTlist>') # for readability (tabs), write it explicitly
+        for a in resDef.atoms:
+            a.SMLhandler.toSML( a, stream, convention=convention )
+        fprintf( stream, "\t%s\n", '</NTlist>')
+
+        fprintf( stream,   '%s\n', self.endTag)
+        fprintf( stream,   '#=======================================================================\n')
+    #end def
+#end class
+ResidueDef.SMLhandler = SMLResidueDefHandler()
+
+class SMLDihedralDefHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'DihedralDef' )
+    #end def
+
+    def handle(self, line, fp, resDef=None):
+        if resDef == None:
+            NTerror('DihedralDef.handle: line %d, undefined resDef', fp.NR)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        if len(line) < 3:
+            NTerror('DihedralDef.handle: line %d, incomplete DihedralDef syntax "%s"', fp.NR, line)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        dihedDef = resDef.appendDihedral(line[2])
+        return self.dictHandler(dihedDef, fp, None)
+    #end def
+
+    def endHandler(self, dihedDef, obj=None):
+        dihedDef.postProcess()
+        return dihedDef
+    #end def
+
+    def toSML(self, dihedDef, stream = sys.stdout, convention = INTERNAL  ):
+        """Store dihedDef in SML format
+        """
+        #print '>', convention
+        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        fprintf( stream, '\t%s %-8s\n', self.startTag, dihedDef.name)
+        fprintf( stream, '\t#---------------------------------------------------------------\n')
+
+        if convention == INTERNAL:
+            atms = dihedDef.atoms
+        else:
+            # convert atoms
+            atms = []
+            for resId,atmName in dihedDef.atoms:
+                if resId != 0:
+                    NTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', dihedDef, resId, atmName)
+                    atms.append( (resId,atmName) )
+                elif not atmName in dihedDef.residueDef:
+                    NTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', dihedDef, resId, atmName)
+                    atms.append( (resId,atmName) )
+                else:
+                    atm = dihedDef.residueDef[atmName]
+                    atms.append( (resId,atm.translate(convention)) )
+                #end if
+            #end for
+            #print 'atms', atms
+        #end if
+        fprintf( stream, "\t\t%-8s = %r\n", 'atoms', atms )
+
+        for attr in ['karplus']:
+            fprintf( stream, "\t\t%-8s = %r\n", attr, dihedDef[attr] )
+        #end for
+
+        fprintf( stream, '\t%s\n', self.endTag)
+    #end def
+#end class
+DihedralDef.SMLhandler = SMLDihedralDefHandler()
+
+class SMLAtomDefHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'AtomDef' )
+    #end def
+
+    def handle(self, line, fp, resDef=None):
+        if resDef == None:
+            NTerror('AtomDef.handle: line %d, undefined resDef', fp.NR)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        if len(line) < 3:
+            NTerror('AtomDef.handle: line %d, incomplete AtomDef syntax "%s"', fp.NR, line)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+        atmDef = resDef.appendAtomDef(line[2])
+        return self.dictHandler(atmDef, fp, None)
+    #end def
+
+    def endHandler(self, atmDef, obj=None):
+        atmDef.postProcess()
+        return atmDef
+    #end def
+
+    def toSML(self, atmDef, stream = sys.stdout, convention = INTERNAL  ):
+        """Store dihedDef in SML format
+        """
+        #print '>', convention
+        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        fprintf( stream, '\t%s %-8s\n', self.startTag, atmDef.translate(convention) )
+        fprintf( stream, '\t#---------------------------------------------------------------\n')
+
+        # Topology; optionally convert
+        if convention == INTERNAL:
+            top2 = atmDef.topology
+        else:
+            # convert topology
+            top2 = []
+            for resId,atmName in atmDef.topology:
+                if resId != 0:
+                    NTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', atmDef, resId, atmName)
+                    top2.append( (resId,atmName) )
+                elif not atmName in atmDef.residueDef:
+                    NTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', atmDef, resId, atmName)
+                    top2.append( (resId,atmName) )
+                else:
+                    atm = atmDef.residueDef[atmName]
+                    top2.append( (resId,atm.translate(convention)) )
+                #end if
+            #end for
+            #print 'top2', top2
+        #end if
+        fprintf( stream, "\t\t%-10s = %r\n", 'topology', top2 )
+
+        # Others
+        for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm']:
+            if atmDef.has_key(attr):
+                fprintf( stream, "\t\t%-10s = %r\n", attr, atmDef[attr] )
+        #end for
+
+        # clean the properties list
+        props = []
+        for prop in atmDef.properties:
+            # Do not store name and residueDef.name as property. Add those dynamically upon reading
+            if not prop in [atmDef.name, atmDef.residueDef.name, atmDef.residueDef.shortName, atmDef.spinType] and not prop in props:
+                props.append(prop)
+            #end if
+        #end for
+        fprintf( stream, "\t\t%-10s = %r\n", 'properties', props )
+
+        fprintf( stream, '\t%s\n', self.endTag)
+    #end def
+#end class
+AtomDef.SMLhandler = SMLAtomDefHandler()
 
 
 def obj2SML( obj, smlFile ):

@@ -17,6 +17,189 @@ from cing.core.molecule import dots
 import cing #@Reimport
 
 import os #@Reimport
+from math import cos, sin, pi
+from cing.Libs.svd import SVDfit
+
+
+class PseudoRotation( SVDfit ):
+    """
+    Class to calculate PseudoRotation and pucker amplitudes of sugars in oligonucleotides
+    (Altona and Sundaraligam, JACS, 94, 8205 1972).
+
+    Definition:
+
+        tauJ = tauM * cos( P + 0.8*pi*J )           (eq. 1 Altona and Sundaraligam)
+
+        J = 0,1,2,3,4
+        P = phaseangle
+        tauM = pucker amplitude
+
+    rewrite:
+
+        tauJ = tauM * cos(P) * cos(tetaJ)  - tauM * sin(P) * sin(tetaJ)
+
+        tetaJ = 0.8*pi*J
+
+    rewrite:
+
+        tauJ = c0 * cos(tetaJ) + c1 * sin(tetaJ)
+
+        c0 = tauM*cos(P)
+        c1 = -tauM*sin(P)
+
+    solve c0,c1 by svd, with tetaJ as running variable, calculate
+
+        P = atan(-c1/c0)
+        tauM = c0/cos(P)
+
+    # map of tauJ onto IUPAC dihedral angle defs
+    angleMap = [
+                    (0, 'NU2'),
+                    (1, 'NU3'),
+                    (2, 'NU4'),
+                    (3, 'NU0'),
+                    (4, 'NU1')
+                ]
+    """
+
+    # map of tauJ onto IUPAC dihedral angle defs
+    angleMap = [
+                 (0, 'NU2'),
+                 (1, 'NU3'),
+                 (2, 'NU4'),
+                 (3, 'NU0'),
+                 (4, 'NU1')
+               ]
+
+    def __init__(self):
+        tetas = []
+        for J,dihed in self.angleMap:
+            tetaJ = 0.8*pi*(J)
+            tetas.append( tetaJ )
+        #end for
+
+        SVDfit.__init__(self, tetas, None, self.cos_sin, 2)
+    #end def
+
+    def calculate( self, residue ):
+        """Calculate the PseudoRotation angles and pucker amplitudes
+           for all models of residue.
+
+           return a (Ntlist,NTlist,ETclassification) tuple with the PseudoRotation angles
+           and pucker amplitudes, or (None,None,None) on error.
+
+        """
+        from cing import printf, NTerror, NTlist
+        from math import atan2
+
+        if not residue.hasProperties('nucleic'):
+            NTerror('PseudoRotation.calculate: residue %s is not nucleic acid', residue)
+            return (None,None,None)
+        #end if
+
+        diheds = []
+        for J,dihed in self.angleMap:
+            if dihed not in residue:
+                NTerror('PseudoRotation.calculate: dihedral "%s" not defined for residue %s', dihed, residue)
+                return (None,None,None)
+            #end if
+            diheds.append( residue[dihed] )
+        #end for
+        #print diheds
+
+        nmodels = len(diheds[0])
+        Plist = NTlist()
+        tauMlist = NTlist()
+        for i in range(nmodels):
+            taus = []
+            for d in diheds:
+                taus.append(d[i])
+            #end for
+
+            # Do fit and calculate P and pucker
+            c = self.fit(taus)
+            P = atan2(-c[1],c[0])
+            tauM = c[0]/cos(P)
+            P = P/pi*180.0 # convert to degrees
+
+            Plist.append(P)
+            tauMlist.append(tauM)
+
+            #printf( '%1d %8.2f %8.2f\n',i, P, tauM )
+        #end for
+
+        Plist.cAverage()
+        Plist.limit(Plist.cav-180.0,Plist.cav+180.0) # Center around circular average,
+        Plist.average()                              # to calculate sd in this step
+        Plist.limit(0.0,360.0)                       # and rescale to 0,360 range
+        tauMlist.average()
+
+        ETname = self.getETnomenclature(Plist.cav,Plist.sd)
+        return Plist,tauMlist,ETname
+    #end def
+
+    # ET definitions from: http://www.chem.qmul.ac.uk/iupac/misc/pnuc2.html#200
+    # encoding superscript-lowerscript-E/T; underscore denotes 'absence'
+    angleDefs = [( -9,   9, '32T'),
+                 (  9,  27, '3_E'), # C3'-endo
+                 ( 27,  45, '34T'),
+                 ( 45,  63, '_4E'), # C4'-exo
+                 ( 63,  81, 'O4T'),
+                 ( 81,  99, 'O_E'), # O4'-endo
+                 ( 99, 117, 'O1T'),
+                 (117, 135, '_1E'), # C1'-exo
+                 (135, 153, '21T'),
+                 (153, 171, '2_E'), # C2'-endo
+                 (171, 189, '23T'),
+                 (189, 207, '_3E'), # C3'-exo
+                 (207, 225, '43T'),
+                 (225, 243, '4_E'), # C4'-endo
+                 (243, 261, '4OT'),
+                 (261, 279, '_OE'), # O4'-exo
+                 (279, 297, '1OT'),
+                 (297, 315, '1_E'), # C1'-endo
+                 (315, 333, '12T'),
+                 (333, 351, '_2E')  # C2'-exo
+                 ]
+
+    def getETnomenclature(self, pseudoAngle, error=0.0 ):
+        """
+        Return the E/T nomenclature corresponding to pseudoAngle+-error
+        """
+        #transform the pseudoAngle to [-9,351] range
+        while pseudoAngle > 351.0:
+            pseudoAngle -= 360.0
+        while pseudoAngle < -9.0:
+            pseudoAngle += 360.0
+
+        if error == 0.0:
+            for lower,upper,ETname in self.angleDefs:
+                if pseudoAngle > lower and pseudoAngle <= upper:
+                    return ETname
+            #end for
+        else:
+            low = self.getETnomenclature( pseudoAngle - error, 0.0 )
+            high = self.getETnomenclature( pseudoAngle + error, 0.0 )
+            if low==high:
+                return low
+            else:
+                return low + '/' + high
+            #endif
+        #end if
+
+        return None
+    #end def
+
+    def cos_sin( teta, na ):
+        """Return cos and sin for teta; NB na==2
+        """
+        from math import cos, sin, pi
+        return [cos(teta),sin(teta)]
+    #end def
+    cos_sin = staticmethod(cos_sin)
+
+#end class
+
 
 def procheckString2float( string ):
     """Convert a string to float, return None in case of value of 999.90
