@@ -4,12 +4,17 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
+from cing.Libs.NTutils import NTdebug
 from cing.core.classes import Project
-from unittest import TestCase
+from cing.core.constants import CYANA
+from cing.core.constants import IUPAC
+from cing.core.constants import PDB
+from cing.core.constants import XPLOR
 from shutil import move #@UnusedImport
-from cing import verbosityDebug
+from unittest import TestCase
 import cing
 import os
 import unittest
@@ -18,11 +23,11 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-        entryList = "1brv".split()
+#        entryList = "1brv".split()
 #        entryList = "1brv".split()
 #        entryList = "1a24".split()
 #        entryList = "1kr8".split()
-#        entryList = "1brv".split()
+        entryList = "1brv".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
@@ -33,38 +38,84 @@ class AllChecks(TestCase):
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         useNrgArchive = False # Default is False
-        
+
         fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         if fastestTest:
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+        self.failIf(os.chdir(cingDirTmp), msg =
+            "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
-            project = Project.open( entryId, status='new' )
+            project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
             if useNrgArchive: # default is False
                 inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
             else:
-                inputArchiveDir = os.path.join(cingDirTestsData,"ccpn")
+                inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
-            ccpnFile = os.path.join(inputArchiveDir, entryId+".tgz")
-            self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile))
+            ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
+            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
             self.assertTrue(project.save())
-            self.assertFalse(project.validate(htmlOnly=htmlOnly,
+            self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,
-                                              doWhatif=doWhatif ))
+                                              doWhatif = doWhatif))
             self.assertTrue(project.exportValidation2ccpn())
-#            self.assertFalse(project.removeCcpnReferences()) 
+#            self.assertFalse(project.removeCcpnReferences())
+
+    def ttttestCreateCcpn(self):
+        pdbConvention = IUPAC
+        restraintsConvention = CYANA
+        entryId = "1brv_1model" # Small much studied PDB NMR entry
+        if entryId.startswith("1YWUcdGMP"):
+            pdbConvention = XPLOR
+        if entryId.startswith("2hgh"):
+            pdbConvention = CYANA
+        if entryId.startswith("1tgq"):
+            pdbConvention = PDB
+        if entryId.startswith("1brv"):
+            pdbConvention = IUPAC
+
+        self.failIf(os.chdir(cingDirTmp), msg =
+            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status = 'new')
+        cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
+        pdbFileName = entryId + ".pdb"
+        pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
+        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
+
+        NTdebug("Reading files from directory: " + cyanaDirectory)
+        kwds = {'uplFiles': [ entryId ],
+                'acoFiles': [ entryId ]
+                  }
+        if entryId.startswith("1YWUcdGMP"):
+            del(kwds['acoFiles'])
+
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
+            self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
+                "Converter for cyana also needs a seq file before a prot file can be imported")
+            kwds['protFile'] = entryId
+            kwds['seqFile'] = entryId
+
+        # Skip restraints if absent.
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
+            project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
+                        copy2sources = True,
+                        **kwds)
+        project.save()
+        ccpnFolder = entryId
+        self.assertTrue(project.createCcpn(ccpnFolder))
+        self.assertTrue(project.saveCcpn())
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityDebug
     unittest.main()

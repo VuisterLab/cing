@@ -176,7 +176,7 @@ class NTlist(list):
             self.remove(item)
         #end if
     #end def
-    
+
     def replaceIfPresent(self, item, itemNew):
         idx = self.index(item)
         if idx >= 0:
@@ -184,7 +184,7 @@ class NTlist(list):
             self.insert(idx,itemNew)
         #end if
     #end def
-        
+
     def replace(self, item, newItem):
         index = self.index(item)
         if (index < 0):
@@ -4273,7 +4273,7 @@ def getDateTimeStampForFileName():
 
 
 def writeTextToFile(fileName, txt):
-    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
+#    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
     fp = open(fileName, 'w')
     fprintf(fp, txt)
     fp.close()
@@ -4304,7 +4304,7 @@ def switchOutput( showOutput, doStdOut=True, doStdErr=False):
         sys.stdout = _bitBucket
     if doStdErr:
         sys.stderr = _bitBucket
-    
+
 class MsgHoL(NTdict):
     def __init__(self):
         NTdict.__init__(self)
@@ -4312,7 +4312,7 @@ class MsgHoL(NTdict):
         self[ WARNING_ID ] =  NTlist()
         self[ MESSAGE_ID ] =  NTlist()
         self[ DEBUG_ID ] =  NTlist()
-        
+
     def appendError(self, msg):
         self[ ERROR_ID ].append(msg)
     def appendWarning(self, msg):
@@ -4321,17 +4321,17 @@ class MsgHoL(NTdict):
         self[ MESSAGE_ID ].append(msg)
     def appendDebug(self, msg):
         self[ DEBUG_ID ].append(msg)
-        
+
     def showMessage( self, MAX_ERRORS = 5, MAX_WARNINGS = 5, MAX_MESSAGES = 5, MAX_DEBUGS = 100 ):
         "Limited printing of errors and the like; might have moved the arguments to the init but let's not waste time."
-    
+
         typeCountList = { ERROR_ID: MAX_ERRORS, WARNING_ID: MAX_WARNINGS, MESSAGE_ID: MAX_MESSAGES, DEBUG_ID: MAX_DEBUGS }
         typeReportFunctionList = { ERROR_ID: NTerror, WARNING_ID: NTwarning, MESSAGE_ID: NTmessage,  DEBUG_ID: NTdebug }
-    
-        for type in typeCountList:            
+
+        for type in typeCountList:
             if not self.has_key(type):
                 continue
-    
+
             typeCount = typeCountList[ type ]
             msgList = self[type]
             typeReportFunction = typeReportFunctionList[ type ]
@@ -4342,9 +4342,9 @@ class MsgHoL(NTdict):
                     typeReportFunction("and so on for a total of %d messages" % len(msgList))
                     break
                 typeReportFunction(msgList[i])
-    #end def            
-# end classs 
-            
+    #end def
+# end classs
+
 def isAlmostEqual( ntList, epsilon):
     e = ntList[0] - ntList[1]
     e = math.fabs(e)
@@ -4353,7 +4353,7 @@ def isAlmostEqual( ntList, epsilon):
     return False
 # end def
 
- 
+
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     input = ['1brv', '9pcy' ]
