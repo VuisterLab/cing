@@ -818,7 +818,7 @@ class Ccpn:
             # Setup peak list name
             plName = '%s_%s_%i' % (ccpnExperiment.name, ccpnDataSource.name,
                                                          ccpnPeakList.serial)
-            peakListName = self._checkName(plName, 'Peak')
+            peakListName = self._ensureValidName(plName, 'Peak')
             peakListName = self.project.uniqueKey(peakListName)
 
 
@@ -847,12 +847,13 @@ class Ccpn:
 
                 ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType =
                                                              'height')
-                if (ccpnHeight):
-                    hValue = ccpnVolume.value or 0.00
-                    hError = ccpnVolume.error or 0.00
-                else:
-                    hValue = 0.00
-                    hError = 0.00
+                hValue = 0.00
+                hError = 0.00
+                if ccpnHeight:
+                    if hasattr( ccpnVolume, 'value'):
+                        hValue = ccpnVolume.value
+                    if hasattr( ccpnVolume, 'error'):
+                        hError = ccpnVolume.error
 
                 if str(hValue) == 'inf':
                     hValue = NaN

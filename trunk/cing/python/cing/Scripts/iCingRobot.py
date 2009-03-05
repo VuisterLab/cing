@@ -23,14 +23,15 @@ def iCingRobot():
 #    NTwarning("Expect errors without a server up and running.")
     NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
     ## queries possible
-    doSave  = 1
+    doSave  = 0
     doRun   = 0
     doStatus= 0
     doLog   = 0
     doPname = 0
     doPurge = 0
     ## credentials.
-    user_id = "jd3"
+    user_id = os.getenv("USER", "UnknownUser")
+#    user_id = "jd3"
     access_key = "123456"
 
 #    user_id = "Tim"
