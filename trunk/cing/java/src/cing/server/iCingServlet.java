@@ -315,7 +315,7 @@ public class iCingServlet extends HttpServlet {
 
         if (list.length < 1) {
             return null;
-        }
+        }        
         return list[0];
     }
 
@@ -329,9 +329,24 @@ public class iCingServlet extends HttpServlet {
             General.showCodeBug("Got null for projectFilePath in iCingServlet#getProjectName");
             return null;
         }
-        String projectName = InOut.getFilenameBase(projectFilePath);
+        String projectName = null;
+        // Do something nice for CCPN and later for CING as well.
+        if ( projectFilePath.endsWith("tgz") || projectFilePath.endsWith("tar.gz") ) {
+            if ( projectFilePath.contains(".cing.")) {
+                ;
+                // Add later.
+            } else {
+//                projectName = Ut.getProjectNameFromCcpnProjectFile( pathProject );
+            }
+        }
+        
+        // covers the case of not ccpn and failure of getting ccpn's.
+        if ( projectName == null ) {
+            projectName = InOut.getFilenameBase(projectFilePath);
+        }
         return projectName;
     }
+
 
     /**
      * Actually saves the file

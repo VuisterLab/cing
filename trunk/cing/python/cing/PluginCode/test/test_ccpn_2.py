@@ -7,6 +7,7 @@ from cing import verbosityDefault
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.Ccpn import Ccpn
+from cing.PluginCode.Ccpn import getProjectNameInFileName
 from cing.PluginCode.Ccpn import getRestraintBoundList
 from cing.PluginCode.Ccpn import isRootDirectory
 from cing.PluginCode.Ccpn import patchCcpnResDescriptor
@@ -22,9 +23,9 @@ class AllChecks(TestCase):
         self.assertTrue( isRootDirectory("linkNmrStarData//"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
-
-
-    def testRestraintsValuesRegular(self):
+        
+        
+    def tttestRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
         
         msgHoL = MsgHoL()
@@ -85,7 +86,7 @@ class AllChecks(TestCase):
                 self.assertEquals(ci[0], cie[0])
                 self.assertEquals(ci[1], cie[1])
             msgHoL.showMessage(999, 999, 999, 999)
-    def testPatchCcpnResDescriptor(self):
+    def tttestPatchCcpnResDescriptor(self):
         rList = [ # result, description, ccpnMolType, linking,     
                  ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_START],
                  ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!  
@@ -99,6 +100,23 @@ class AllChecks(TestCase):
             NTdebug("d: %s" % d)
             self.assertEquals(d[0], patchCcpnResDescriptor(d[1], d[2], d[3]))
     # end def
+    
+    def testCcpnProjectNameFromFileName(self):
+        inputList = ["BASP/memops/Implementation/BASP.xml",
+                     "/X/Y/memops/Implementation/BASP.xml", # base not important.
+                     "bla.xml",
+                     "/X/Y/memops/Implementation/BA SP.xml"
+                     ]
+        expectedList = ['BASP',
+                        'BASP', 
+                        None,
+                        'BA SP' 
+                        ]
+        for i, input in enumerate(inputList):
+            result = getProjectNameInFileName(input)
+            NTdebug( "i, input, result, expected: [%s] [%s] [%s] [%s]" % ( i, input, result, expectedList[i]))
+            self.assertEquals(expectedList[i], result)
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDefault

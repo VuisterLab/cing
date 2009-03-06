@@ -26,6 +26,7 @@ class AllChecks(TestCase):
 #        entryList = "1a24".split()
 #        entryList = "1kr8".split()
         entryList = "1brv".split()
+#        entryList = "basp2".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
@@ -38,10 +39,10 @@ class AllChecks(TestCase):
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         useNrgArchive = False # Default is False
 
-        fastestTest = True
+        fastestTest = False
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
         if fastestTest:
             htmlOnly = True
             doWhatif = False

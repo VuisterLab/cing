@@ -338,9 +338,15 @@ def setupHtml(project):
 #    atomList = AtomList(project) # instantiated only for this purpose locally; TODO: should be in molecule section updateAll
 #    project.molecule.atoms = atomList
 #    atomList.molecule = project.molecule
-    AtomsHTMLfile( project, project.molecule.atomList )
+    if hasattr(molecule, 'atomList'):
+        AtomsHTMLfile( project, molecule.atomList )
+    else:
+        NTcodeerror("Failed to create AtomsHTMLfile because no molecule.atomList")
 
-    EnsembleHTMLfile( project, project.molecule.ensemble )
+    if hasattr(molecule, 'ensemble'):
+        EnsembleHTMLfile( project, molecule.ensemble )
+    else:
+        NTdebug("Not creating EnsembleHTMLfile because no ensemble")
 
     for restraintList in project.allRestraintLists():
         RestraintListHTMLfile( project, restraintList )
@@ -375,8 +381,10 @@ def generateHtml( project, htmlOnly=False ):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
     NTmessage("Html for atoms and models")
-    project.molecule.atomList.html.generateHtml(htmlOnly=htmlOnly)
-    project.molecule.ensemble.html.generateHtml(htmlOnly=htmlOnly)
+    if hasattr(project.molecule, 'atomList'):
+        project.molecule.atomList.html.generateHtml(htmlOnly=htmlOnly)
+    if hasattr(project.molecule, 'ensemble'):
+        project.molecule.ensemble.html.generateHtml(htmlOnly=htmlOnly)
 
     NTmessage('Html for peaks and restraints')
     for l in NTprogressIndicator(project.peaks+project.allRestraintLists(), CHARS_PER_LINE_OF_PROGRESS):
@@ -1232,7 +1240,9 @@ Redirecting to %s
         self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule,
                                         text=self.project.molecule.name
                                 )
-        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
+        
+        if hasattr(self.project.molecule, 'atomList'):
+            self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
         htmlMain('ul', openTag=False)
 
         # peaks
@@ -1456,8 +1466,9 @@ class MoleculeHTMLfile( HTMLfile ):
             _makeResidueTableHtml( self.molecule, chain.allResidues(), None )
         #end for
 
-        self.main('h1', 'Model-based analysis')
-        self.insertHtmlLink(self.main, self.molecule, self.molecule.ensemble, text='Models page')
+        if hasattr(self.molecule, 'ensemble'):
+            self.main('h1', 'Model-based analysis')
+            self.insertHtmlLink(self.main, self.molecule, self.molecule.ensemble, text='Models page')
 
         self.main('h1', 'Structure-based analysis')
         #Use a dummy object for referencing the salt-bridges text-file for now

@@ -28,7 +28,8 @@ def iCingRobot():
     doStatus= 0
     doLog   = 0
     doPname = 0
-    doPurge = 0
+    doPurge = 1
+
     ## credentials.
     user_id = os.getenv("USER", "UnknownUser")
 #    user_id = "jd3"

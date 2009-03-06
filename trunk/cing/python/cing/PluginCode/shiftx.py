@@ -109,7 +109,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         return None
     #end if
     if project.molecule.modelCount == 0:
-        NTerror('runShiftx: no models for "%s"', project.molecule)
+        NTwarning('runShiftx: no models for "%s"', project.molecule)
         return None
     #end if
     if model != None and model >= project.molecule.modelCount:
