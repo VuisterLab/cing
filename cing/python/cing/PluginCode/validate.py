@@ -628,6 +628,12 @@ def checkForDisulfides(project, toFile=True):
         NTerror('checkForDisulfides: no molecule defined')
         return None
     #end if
+    
+    if project.molecule.modelCount == 0:
+        NTwarning('checkForDisulfides: no models for "%s"', project.molecule)
+        return
+    #end if
+    
     cys=project.molecule.residuesWithProperties('CYS')
     cyss=project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
     for c in cyss:
@@ -685,6 +691,13 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
         NTerror('checkForSaltbridges: no molecule defined')
         return None
     #end if
+    
+    result = NTlist()
+    
+    if project.molecule.modelCount == 0:
+        NTwarning('checkForSaltbridges: no models for "%s"', project.molecule)
+        return result
+    #end if
 
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
@@ -712,7 +725,6 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
     #end for
 
     s = None
-    result = NTlist()
     for res1 in residues1:
         for res2 in residues2:
             #print '>>', res1, res2
@@ -748,7 +760,7 @@ def validateSaltbridge( residue1, residue2 ):
     """
     ValidateSaltbridge( residue1, residue2 )
 
-    Validate presence of saltbridge, CC-Bridge, NO-bridge, or ion-pair beteween residue1 and residue2
+    Validate presence of saltbridge, CC-Bridge, NO-bridge, or ion-pair between residue1 and residue2
     Ref: Kumar, S. and Nussinov, R. Biophys. J. 83, 1595-1612 (2002)
 
     residue1, residue2: Residue instances of type E,D,H,K,R
@@ -1226,7 +1238,8 @@ def validateAssignments( project, toFile = True   ):
 
         if atm.validateAssignment:
             atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
-            project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
+            if hasattr(project.molecule, 'atomList'):
+                project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
         #end if
     #end for
 
@@ -1375,8 +1388,8 @@ def validateModels( self)   :
         NTerror("validateModels: no molecule defined")
         return True
     if not self.molecule.modelCount:
-        NTerror("validateModels: no model for molecule %s defined", self.molecule)
-        return True
+        NTwarning("validateModels: no model for molecule %s defined", self.molecule)
+        return None
 
     backbone = ['PHI','PSI','OMEGA']
 

@@ -1,6 +1,5 @@
 from cing.Libs.NTutils import switchOutput
 switchOutput(False)
-
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.general.Util import getResonancesFromPairwiseConstraintItem
 from ccp.util.Molecule import makeMolecule
@@ -42,6 +41,7 @@ from memops.general.Io import loadProject
 from shutil import move
 from shutil import rmtree
 import os
+import re
 import string
 import tarfile
 
@@ -192,9 +192,10 @@ class Ccpn:
             tar = tarfile.open(self.ccpnFolder, "r:gz")
             for itar in tar:
                 tar.extract(itar.name, '.') # itar is a TarInfo object
-    #            NTdebug("extracted: " + itar.name)
-                if isRootDirectory(itar.name):
-                    if not ccpnRootDirectory: # pick only the first one.
+#                NTdebug("extracted: " + itar.name)
+                # Try to match: BASP/memops/Implementation/BASP.xml
+                if not ccpnRootDirectory: # pick only the first one.
+                    if isRootDirectory(itar.name):
                         ccpnRootDirectory = itar.name.replace("/", '')
                         if not ccpnRootDirectory:
                             NTerror("Skipping potential ccpnRootDirectory")
@@ -204,6 +205,7 @@ class Ccpn:
                 return None
 
             if ccpnRootDirectory != self.project.name:
+                NTwarning("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
                 move(ccpnRootDirectory, self.project.name)
             ccpnFolder = self.project.name # Now it is a folder.
 
@@ -375,7 +377,7 @@ class Ccpn:
 
 
             if not len(ccpnMolSys.structureEnsembles):
-                NTerror("There are no coordinates for molecule %s", self.molecule.name)
+                NTdebug("There are no coordinates for molecule %s", self.molecule.name)
 
             # stuff molecule with chains, residues and atoms and coords
             if not self._match2Cing():
@@ -383,7 +385,7 @@ class Ccpn:
                 return None
 
             self.project.molecule.updateAll()
-            NTmessage("==> Ccpn molecule '%s' imported with coordinates", moleculeName)
+            NTmessage("==> Ccpn molecule '%s' imported", moleculeName)
         # end for
         self.project.updateProject()
 
@@ -404,7 +406,9 @@ class Ccpn:
 
         # we are taking just the current Ensemble now
         ccpnStructureEnsemble = ccpnMolSys.parent.currentStructureEnsemble
-        if ccpnStructureEnsemble.molSystem is not ccpnMolSys:
+        if ((not hasattr(ccpnStructureEnsemble, 'molSystem')) or 
+            (ccpnStructureEnsemble.molSystem == None) or 
+            (ccpnStructureEnsemble.molSystem is not ccpnMolSys)):
             ccpnStructureEnsemble = ccpnMolSys.findFirstStructureEnsemble(molSystem = ccpnMolSys)
 
         try:
@@ -414,9 +418,11 @@ class Ccpn:
 
         NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
-        self.molecule.modelCount += len(ccpnStructureEnsemble.models)
+        ccpnMolCoordList = []
+        if hasattr(ccpnStructureEnsemble, 'models'):
+            self.molecule.modelCount += len(ccpnStructureEnsemble.models)
+            ccpnMolCoordList = [ccpnStructureEnsemble]
 
-        ccpnMolCoordList = [ccpnStructureEnsemble]
 
         # Set all the chains for this molSystem
         for ccpnChain in ccpnMolSys.sortedChains():
@@ -424,8 +430,9 @@ class Ccpn:
             ccpnChainLetter = ensureValidChainId(ccpnChain.pdbOneLetterCode)
     #        NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChainLetter, ccpnChain.pdbOneLetterCode))
             if ccpnChainLetter != ccpnChain.pdbOneLetterCode:
-                NTcodeerror("Changed chain id from CCPN %s to CING %s" % (ccpnChainLetter, ccpnChain.pdbOneLetterCode))
-                NTerror("This will most likely lead to inconsistencies in CING")
+                NTdebug("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, ccpnChainLetter))
+                NTdebug("TODO: find out if this leads to inconsistencies in CING")
+                # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
                 # From CCPN doc:
     #            One letter chain identifier. Will be used by PDB (and programs that use similar conventions). WARNING: having same oneLetterCode for different chains is legal but may cause serious confusion.
@@ -779,6 +786,9 @@ class Ccpn:
 
             for ccpnMolSystem in self.ccpnMolSystemList:
                 for ccpnShiftList in ccpnShiftLists:
+                    if not ccpnShiftList:
+                        NTwarning("JFD observed this happens in Wims example data but doesn't know why")
+                        continue
                     doneSetShifts = self._getCcpnShifts(ccpnMolSystem, ccpnShiftList)
                     if not doneSetShifts:
                         NTerror("Import of CCPN chemical shifts failed")
@@ -798,12 +808,11 @@ class Ccpn:
                    Cing this will be used to specify the peak lists
                    for analysis. Otherwise all peak lists will be
                    considered.
+                   Will still report success if nothing was imported.
+                   I.e. no peaks present.
            Inputs: Cing Project, CCPN Implementation.MemopsRoot
            Output: True or None for error.
         """
-
-        done = False
-
         for ccpnPeakList in self._getCcpnPeakListOfList():
             ccpnDataSource = ccpnPeakList.dataSource
             ccpnExperiment = ccpnDataSource.experiment
@@ -811,8 +820,7 @@ class Ccpn:
 
             shiftList = ccpnExperiment.shiftList
             if not shiftList:
-                NTwarning("No shift list found for CCPN Experiment '%s'",
-                                    ccpnExperiment.name)
+                NTwarning("No shift list found for CCPN Experiment '%s'", ccpnExperiment.name)
                 continue
 
             # Setup peak list name
@@ -845,14 +853,14 @@ class Ccpn:
                 if str(vValue) == 'inf':
                     vValue = NaN
 
-                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType =
+                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType = 
                                                              'height')
                 hValue = 0.00
                 hError = 0.00
                 if ccpnHeight:
-                    if hasattr( ccpnVolume, 'value'):
+                    if hasattr(ccpnVolume, 'value'):
                         hValue = ccpnVolume.value
-                    if hasattr( ccpnVolume, 'error'):
+                    if hasattr(ccpnVolume, 'error'):
                         hError = ccpnVolume.error
 
                 if str(hValue) == 'inf':
@@ -893,14 +901,8 @@ class Ccpn:
                 ccpnPeak.cing = peak
 
                 peakList.append(peak)
-
-            msg = "==> PeakList '%s' imported from CCPN Nmr project '%s'"
-            NTdetail(msg, peakListName, self.ccpnNmrProject.name)
-            done = True
-
-        if done:
-            return True
-        return None
+            NTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
+        return True
 
     def _getCcpnPeakListOfList(self):
 
@@ -1257,7 +1259,7 @@ class Ccpn:
             for ccpnRdcConstraint in ccpnRdcList.sortedConstraints():
                 result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC, msgHoL)
                 if not result:
-                    NTdetail("Ccpn RDC restraint '%s' with bad values imported." %
+                    NTdetail("Ccpn RDC restraint '%s' with bad values imported." % 
                               ccpnRdcConstraint)
                     result = (None, None)
                 lower, upper = result
@@ -1826,7 +1828,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         ccpnConstraintStore = self.ccpnProject.newNmrConstraintStore(nmrProject = self.ccpnNmrProject)
 
         for distanceRestraintList in self.project.distances:
-            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name =
+            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name = 
                                                         distanceRestraintList.name)
             for distanceRestraint in distanceRestraintList:
                 upper = distanceRestraint.lower
@@ -1855,7 +1857,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # end for
 
         for dihedralRestraintList in self.project.dihedrals:
-            ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList(name =
+            ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList(name = 
                                                         dihedralRestraintList.name)
             for dihedralRestraint in dihedralRestraintList: #@UnusedVariable
                 upper = distanceRestraint.lower
@@ -1995,21 +1997,6 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 
     return (lower, upper)
 
-def isRootDirectory(f):
-    """ Algorithm for finding just the root dir.
-    See unit test for examples.
-    """
-#    NTdebug("Checking _isRootDirectory on : ["+f+"]")
-    idxSlash = f.find("/")
-    if idxSlash < 0:
-        NTerror("Found no forward slash in entry in tar file.")
-        return None
-
-    idxLastChar = len(f) - 1
-    if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
-#        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
-        return True
-    return False
 
 def removeCcpnReferences(self):
     """To slim down the memory footprint; should allow garbage collection."""
@@ -2066,6 +2053,14 @@ def exportValidation2ccpn(project):
     if not project.has_key('ccpn'):
         NTerror('exportValidation2ccpn: No open CCPN project present')
         return None
+    
+    ccpnMolSystem = project.molecule.ccpn
+    ccpnEnsemble = ccpnMolSystem.findFirstStructureEnsemble()
+
+    if not ccpnEnsemble:
+        NTdebug("Failing to exportValidation2ccpn, perhaps because there is no ensemble")
+        return project
+    
     NTmessage('==> Exporting to Ccpn')
     for residue in project.molecule.allResidues():
         valObj = storeResidueValidationInCcpn(project, residue)
@@ -2124,6 +2119,7 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
     """
     Store residue ROG result in ccpn
     Return ccpn StructureValidation.ResidueValidation obj on success or None on error
+    Return NaN when there is no ensemble.
     """
 
     keyword = 'ROGscore'
@@ -2131,8 +2127,10 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
     ccpnMolSystem = project.molecule.ccpn
     ccpnEnsemble = ccpnMolSystem.findFirstStructureEnsemble()
 
+    if not ccpnEnsemble:
+        NTerror("Failing to storeResidueValidationInCcpn, perhaps because there is no ensemble")
+        return None
     if not project.has_key('ccpnValidationStore'):
-
         project.ccpnValidationStore = getEnsembleValidationStore(ensemble = ccpnEnsemble,
                                                                  context = context,
                                                                  keywords = [keyword]
@@ -2241,10 +2239,42 @@ def upperCaseFirstCharOnly(inputStr):
         return string.upper(inputStr)
     return string.upper(inputStr[0]) + string.lower(inputStr[1:])
 
+
+def getProjectNameInFileName(fileName):
+    regExpProjectNameInFileName = re.compile(".*/memops/Implementation/(.*).xml")
+#    NTdebug("Matching fileName [%s]"%fileName)
+    m = regExpProjectNameInFileName.match(fileName, 1)
+    if not m:
+#        NTdebug("No match")
+        return None
+    g = m.groups()
+    if not g:                    
+#        NTdebug("No groups")
+        return None
+    projectName = g[0]
+#    NTdebug("projectName: [%s]" % projectName)
+    return projectName
+
+def isRootDirectory(f):
+    """ Algorithm for finding just the root dir.
+    See unit test for examples.
+    """
+#    NTdebug("Checking _isRootDirectory on : ["+f+"]")
+    idxSlash = f.find("/")
+    if idxSlash < 0:
+        NTerror("Found no forward slash in entry in tar file.")
+        return None
+
+    idxLastChar = len(f) - 1
+    if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
+#        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
+        return True
+    return False    
+
 # register the function
 methods = [ (initCcpn, None),
            (removeCcpnReferences, None),
-            (exportValidation2ccpn, None),
+           (exportValidation2ccpn, None),
            (createCcpn, None),
            (saveCcpn, None),
            ]

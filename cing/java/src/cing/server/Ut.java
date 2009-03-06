@@ -1,5 +1,6 @@
 package cing.server;
 
+import java.io.File;
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -101,4 +102,14 @@ public class Ut {
         return result.toString();
     }
 
+    public String getProjectNameFromCcpnProjectFile(File pathProject) {
+        /** See discussion http://code.google.com/p/cing/issues/detail?id=143
+         * Looking for \<directory\>/memops/Implementation/\<projectName\>.xml
+         */
+        
+        
+        
+        
+        return null;
+    }
 }

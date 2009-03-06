@@ -1107,6 +1107,12 @@ class Molecule( NTtree ):
         Takes into account residues with missing coordinates as long as they are all missing.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
+        
+        if self.modelCount == 0:
+            NTwarning('idDisulfides: no models for "%s"', self)
+            return
+        #end if
+        
 #        NTdebug('Identify the disulfide bonds.')
         cys=self.residuesWithProperties('CYS')
         cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
@@ -1229,6 +1235,8 @@ class Molecule( NTtree ):
             self.updateMean()
             self.ensemble = Ensemble( self )
             self.atomList = AtomList( self )
+            if not self.atomList:
+                NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
             self.idDisulfides()
             if not self.has_key('ranges'):
                 self.ranges = None
@@ -1441,11 +1449,12 @@ Return an Molecule instance or None on error
         Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
         Optionally  select for ranges and models.
         return rmsd result of molecule, or None on error
+        When no models are present return NaN.
         """
 
         if self.modelCount == 0:
-            NTerror('Molecule.calculateRMSDs: no coordinates for %s', self)
-            return None
+            NTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
+            return NaN
         #end if
 
         NTdebug("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)

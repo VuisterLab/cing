@@ -9,12 +9,13 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
-from cing.setup import time
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
+from cing.setup import time
 import os
 
 # don't change:
@@ -54,6 +55,9 @@ class Dssp:
                                     redirectOutput= self.redirectOutput)
     # Return True on error ( None on success; Python default)
     def run(self, export = True):
+        if self.project.molecule.modelCount == 0:
+            NTwarning('dssp: no models for "%s"', self.project.molecule)
+            return None
         if export:
             if not self.project.molecule.hasAminoAcid():
                 NTmessage('Dssp.run: skipping because no amino acid in this molecule')
