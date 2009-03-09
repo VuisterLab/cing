@@ -17,7 +17,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def ttttestMolgrapRunFromPdbFile(self):
+    def testMolgrapRunFromPdbFile(self):
         pdbConvention = CYANA
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
@@ -50,8 +50,9 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif, project=None))
         self.assertTrue(os.path.exists(pathGif))
         
-    def testMolgrapRunFromCcpnFile(self):
+    def ttttestMolgrapRunFromCcpnFile(self):
 #        entryId = "1cjg" # Nucleic acid entry.
+
         entryId = "1brv" # Nucleic acid entry.
         project = Project.open( entryId, status='new' )
         self.assertTrue(project, 'Failed opening project: ' + entryId)

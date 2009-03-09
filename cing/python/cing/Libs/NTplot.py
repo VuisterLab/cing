@@ -1,3 +1,4 @@
+from Numeric import arange
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -5,29 +6,25 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NThistogram
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import isAlmostEqual
 from cing.Libs.NTutils import limitToRange
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
 from cing.Libs.matplotlibExt import yellow_inv
-from cing.PluginCode.Whatif import INOCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.dssp import DSSP_STR
-from cing.PluginCode.dssp import getDsspSecStructConsensus
-from cing.PluginCode.procheck import CONSENSUS_SEC_STRUCT_FRACTION
-from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.PluginCode.procheck import to3StateUpper
+from cing.PluginCode.required.reqDssp import DSSP_STR
+from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
+from cing.PluginCode.required.reqDssp import to3StateUpper
+from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
+from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
+from cing.PluginCode.required.reqWhatif import INOCHK_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
 from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib import use
-from cing.Libs.NTutils import isAlmostEqual
-# Use a backend that allows headless (without GUI) printing in addition to GUI.
-# It has to be called before matplotlib.pylab. Defined here and one not need to
-# defined in matoplotlibrc, and if defined there, it'll be overridden
-use('Agg')
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
 from matplotlib.lines import Line2D
@@ -62,7 +59,11 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-from Numeric import arange
+import math
+# Use a backend that allows headless (without GUI) printing in addition to GUI.
+# It has to be called before matplotlib.pylab. Defined here and one not need to
+# defined in matoplotlibrc, and if defined there, it'll be overridden
+use('Agg')
  
 #=======
 #try:
@@ -78,7 +79,6 @@ except ImportError:
     haveImage = False
 #end try
 
-import math
 
 
 # NOTE WELL: use only 1 NTplot instance at a time.

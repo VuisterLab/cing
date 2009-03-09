@@ -9,11 +9,11 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDeepByKeys
-from cing.PluginCode.Whatif import histJaninBySsAndResType
-from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.core.classes import Project
 from matplotlib.pylab import plot
 from unittest import TestCase
+from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
+from cing.PluginCode.required.reqWhatif import histJaninBySsAndResType
 import cing
 import os #@Reimport
 import unittest

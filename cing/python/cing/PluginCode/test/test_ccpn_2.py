@@ -14,7 +14,7 @@ from cing.PluginCode.Ccpn import patchCcpnResDescriptor
 from cing.core.sml import NTdict
 from unittest import TestCase
 import cing
-import unittest
+import unittest    
 
 class AllChecks(TestCase):
 
@@ -25,7 +25,7 @@ class AllChecks(TestCase):
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
         
         
-    def tttestRestraintsValuesRegular(self):
+    def testRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
         
         msgHoL = MsgHoL()
@@ -86,7 +86,7 @@ class AllChecks(TestCase):
                 self.assertEquals(ci[0], cie[0])
                 self.assertEquals(ci[1], cie[1])
             msgHoL.showMessage(999, 999, 999, 999)
-    def tttestPatchCcpnResDescriptor(self):
+    def testPatchCcpnResDescriptor(self):
         rList = [ # result, description, ccpnMolType, linking,     
                  ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_START],
                  ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!  

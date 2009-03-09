@@ -1,3 +1,7 @@
+* Apache relay server on www.cmbi.ru.nl:/var/log/httpd
+    nmr.cmbi.ru.nl-error_log    
+    nmr.cmbi.ru.nl-access_log
+
 * Mac's apache 
     There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:

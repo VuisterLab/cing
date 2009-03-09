@@ -1,5 +1,16 @@
-from cing.Libs.NTutils import switchOutput
-switchOutput(False)
+if True:
+    from cing.Libs.NTutils import ImportWarning
+    from cing.Libs.NTutils import NTmessage
+    from cing.Libs.NTutils import switchOutput
+    switchOutput(False)        
+    try:
+        import ccpnmr #@UnusedImport @UnresolvedImport 
+    except:
+        raise ImportWarning('Ccpn')
+    finally:
+        switchOutput(False)
+    NTmessage('Using CCPN')
+
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.general.Util import getResonancesFromPairwiseConstraintItem
 from ccp.util.Molecule import makeMolecule
@@ -11,13 +22,10 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlimitSingleValue
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
@@ -35,6 +43,7 @@ from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
 from cing.core.molecule import unmatchedAtomByResDictToString
+from cing.core.sml import NTlist
 from memops.api.Implementation import MemopsRoot
 from memops.general.Constants import currentModelVersion
 from memops.general.Io import loadProject
@@ -44,6 +53,7 @@ import os
 import re
 import string
 import tarfile
+
 
 switchOutput(True)
 

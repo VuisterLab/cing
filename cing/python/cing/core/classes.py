@@ -587,8 +587,12 @@ Project: Top level Cing project class
 
         # Call Plugin registered functions
         for p in self.plugins.values():
-            for f,o in p.saves:
-                f( self, o )
+            if (not p) or (not hasattr(p, 'saves')) or (not p.saves):
+                pass
+#                NTdebug("Skipping save for disabled plugin: %s" % p)
+            else:
+                for f,o in p.saves:
+                    f( self, o )
             #end for
         #end for
 

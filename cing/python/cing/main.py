@@ -124,6 +124,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.core.classes import Project
@@ -271,7 +272,11 @@ def testOverall(namepattern):
                           ]
     startdir = cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
+    # enable next line to do a single check only.
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/iCing/test/test_Json.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_ccpn.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Molgrap.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Procheck.py']
     NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
@@ -288,13 +293,14 @@ def testOverall(namepattern):
         if mod_name in excludedModuleList:
             print "Skipping module:  " + mod_name
             continue
-        exec("import %s" % (mod_name))
-        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
-        testVerbosity = 2
-        unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
-        NTmessage('\n\n\n')
-
-
+        try:
+            exec("import %s" % (mod_name))
+            exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
+            testVerbosity = 2
+            unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
+            NTmessage('\n\n\n')
+        except ImportWarning, extraInfo:
+            NTdebug("Skipping test report of an optional compound: %s" % extraInfo)
 
 
 def getParser():

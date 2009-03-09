@@ -105,8 +105,8 @@ def _NTmessage(msg):
 
 def check_python():
     version = float(sys.version[:3])
-    if version < 2.4:
-        _NTgetoutput('Failed to find Python version 2.4 or higher.')
+    if version < 2.5:
+        _NTgetoutput('Failed to find Python version 2.5 or higher.')
 #        print 'Current version is', sys.version[:5]
     else:
         _NTmessage("........ Found 'Python'")
