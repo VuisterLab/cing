@@ -8,12 +8,12 @@ from cing import verbosityDebug
 from cing import verbosityDetail
 from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
+from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
-from shutil import move #@UnusedImport
 from unittest import TestCase
 import cing
 import os
@@ -39,10 +39,10 @@ class AllChecks(TestCase):
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         useNrgArchive = False # Default is False
 
-        fastestTest = False
+        fastestTest = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
-        doProcheck = True
+        doWhatif = False # disables whatif actual run
+        doProcheck = False
         if fastestTest:
             htmlOnly = True
             doWhatif = False

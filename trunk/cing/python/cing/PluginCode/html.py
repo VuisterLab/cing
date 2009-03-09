@@ -33,15 +33,15 @@ from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import list2asci #@UnusedImport
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.PluginCode.Whatif import C12CHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.Whatif import histJaninBySsAndCombinedResType
-from cing.PluginCode.Whatif import histJaninBySsAndResType
-from cing.PluginCode.Whatif import histRamaBySsAndCombinedResType
-from cing.PluginCode.Whatif import histRamaBySsAndResType
-from cing.PluginCode.Whatif import wiPlotList
+from cing.PluginCode.required.reqWhatif import C12CHK_STR
+from cing.PluginCode.required.reqWhatif import RAMCHK_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import histJaninBySsAndCombinedResType
+from cing.PluginCode.required.reqWhatif import histJaninBySsAndResType
+from cing.PluginCode.required.reqWhatif import histRamaBySsAndCombinedResType
+from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
+from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
@@ -50,10 +50,6 @@ from cing.core.parameters import moleculeDirectories
 import os
 import shelve
 import shutil
-#from cing.core.classes import AtomList
-#from cing.PluginCode.Whatif import criticizeByWhatif
-#from cing.core.classes import HTMLfile
-#from cing.core.classes import htmlObjects
 
 
 dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )

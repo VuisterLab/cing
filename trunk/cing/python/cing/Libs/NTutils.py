@@ -3177,6 +3177,9 @@ class SetupError(Exception):
 class CodeError(Exception):
     "Program code error"
 
+class ImportWarning(Exception):
+    "Optional code warning"
+
 
 class NTfile(file):
     """File class with a binary read/write

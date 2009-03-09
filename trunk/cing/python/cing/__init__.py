@@ -28,9 +28,9 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.86
+cingVersion     = 0.87
 __version__     = cingVersion # for pydoc
-__date__        = '5 February 2009'
+__date__        = '9 March 2009'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
 authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
@@ -117,14 +117,11 @@ starttime = time.time()
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
 #from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils      import NTmessage, NTwarning, NTerror, NTdebug, printf, fprintf, sprintf, NTdict, NTlist, NTvalue, NTpath
+from cing.Libs.NTutils      import *
 from cing.Libs.AwkLike      import AwkLike
-from cing.Libs.fpconst      import NaN
 
-#from cing.core.constants    import *
-from cing.core.constants    import AQUA, IUPAC, SPARKY, CYANA, XEASY, DYANA, CYANA2, XPLOR, PDB, INTERNAL, LOOSE, CCPN
+from cing.core.constants    import *
 from cing.core.database     import NTdb        # This also initializes the database
-from cing.core.constants    import X_AXIS, Y_AXIS, Z_AXIS, A_AXIS
 
 from cing.core.classes      import Project
 from cing.core.classes      import Peak,              PeakList
@@ -132,7 +129,7 @@ from cing.core.classes      import DistanceRestraint, DistanceRestraintList
 from cing.core.classes      import DihedralRestraint, DihedralRestraintList
 from cing.core.classes      import RDCRestraint,      RDCRestraintList
 
-from cing.core.molecule     import Molecule, Chain, Residue, Atom, Coordinate, Resonance, Dihedral, mapMolecules
+from cing.core.molecule     import *
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
 from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods

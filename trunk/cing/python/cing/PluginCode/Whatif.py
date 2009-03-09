@@ -9,36 +9,6 @@
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
 from cing import issueListUrl
-CHECK_ID_STR     = "checkID"
-LOC_ID_STR       = "locID"
-LEVEL_STR        = "level"
-TEXT_STR         = "text"
-TYPE_STR         = "type"
-VALUE_LIST_STR   = "valueList"
-QUAL_LIST_STR    = "qualList"
-WHATIF_STR       = "whatif" # key to the entities (atoms, residues, etc under which the results will be stored
-
-INOCHK_STR       = 'INOCHK'
-BNDCHK_STR       = 'BNDCHK'
-ANGCHK_STR       = 'ANGCHK'
-
-QUACHK_STR       = 'QUACHK'
-RAMCHK_STR       = 'RAMCHK'
-C12CHK_STR       = 'C12CHK'
-BBCCHK_STR       = 'BBCCHK'
-ROTCHK_STR       = 'ROTCHK'
-
-NQACHK_STR       = 'NQACHK'
-PLNCHK_STR       = 'PLNCHK'
-PL2CHK_STR       = 'PL2CHK'
-PL3CHK_STR       = 'PL3CHK'
-
-CHICHK_STR       = 'CHICHK'
-FLPCHK_STR       = 'FLPCHK'
-ACCLST_STR       = 'ACCLST'
-BMPCHK_STR       = 'BMPCHK'
-
-from cing import cingDirData
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
@@ -50,11 +20,35 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-#from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import getTextBetween
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
+from cing.PluginCode.required.reqWhatif import ACCLST_STR
+from cing.PluginCode.required.reqWhatif import ANGCHK_STR
+from cing.PluginCode.required.reqWhatif import BBCCHK_STR
+from cing.PluginCode.required.reqWhatif import BMPCHK_STR
+from cing.PluginCode.required.reqWhatif import BNDCHK_STR
+from cing.PluginCode.required.reqWhatif import C12CHK_STR
+from cing.PluginCode.required.reqWhatif import CHECK_ID_STR
+from cing.PluginCode.required.reqWhatif import CHICHK_STR
+from cing.PluginCode.required.reqWhatif import FLPCHK_STR
+from cing.PluginCode.required.reqWhatif import INOCHK_STR
+from cing.PluginCode.required.reqWhatif import LEVEL_STR
+from cing.PluginCode.required.reqWhatif import LOC_ID_STR
+from cing.PluginCode.required.reqWhatif import NQACHK_STR
+from cing.PluginCode.required.reqWhatif import PL2CHK_STR
+from cing.PluginCode.required.reqWhatif import PL3CHK_STR
+from cing.PluginCode.required.reqWhatif import PLNCHK_STR
+from cing.PluginCode.required.reqWhatif import QUACHK_STR
+from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
+from cing.PluginCode.required.reqWhatif import RAMCHK_STR
+from cing.PluginCode.required.reqWhatif import ROTCHK_STR
+from cing.PluginCode.required.reqWhatif import TEXT_STR
+from cing.PluginCode.required.reqWhatif import TYPE_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
@@ -62,31 +56,7 @@ from glob import glob
 from shutil import copy
 from string import upper
 import os
-import shelve
 import time
-
-
-
-
-
-#            QUACHK   Poor   : <   -3.00   Bad    : <   -5.00
-#            RAMCHK   Poor   : <   -3.00   Bad    : <   -4.00
-#            C12CHK   Poor   : <   -3.00   Bad    : <   -4.00
-#            BBCCHK
-# jackknifed av,sd,n over set of entries.
-#DB_RAMCHK = (-1.36040035673, 0.033537074106736189, 555)
-
-_dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
-_dbase = shelve.open( _dbase_file_abs_name )
-histRamaCombined                = _dbase[ 'histRamaCombined' ]
-histRamaBySsAndResType          = _dbase[ 'histRamaBySsAndResType' ]
-histRamaBySsAndCombinedResType  = _dbase[ 'histRamaBySsAndCombinedResType' ]
-_dbase.close()
-_dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
-_dbase = shelve.open( _dbase_file_abs_name )
-histJaninBySsAndResType         = _dbase[ 'histJaninBySsAndResType' ]
-histJaninBySsAndCombinedResType = _dbase[ 'histJaninBySsAndCombinedResType' ]
-_dbase.close()
 
 class Whatif( NTdict ):
     """
@@ -524,11 +494,6 @@ fullstop y
 
 #end Class
 
-wiPlotList = []
-# GV: moved to outer level to not always call createHtmlWhatif
-wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
-wiPlotList.append( ('_02_bond_angle','BND/ANG/NQA/PLNCHK') )
-wiPlotList.append( ('_03_steric_acc_flip','BMP/ACC/FLP/CHI') )
 
 def createHtmlWhatif(project, ranges=None):
     """ Read out wiPlotList to see what get's created. """
@@ -869,3 +834,4 @@ methods  = [
 #saves    = []
 restores = [(restoreWhatif, None)]
 #exports  = []
+

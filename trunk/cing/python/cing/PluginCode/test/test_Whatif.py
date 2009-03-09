@@ -7,11 +7,11 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
-from cing.PluginCode.Whatif import QUAL_LIST_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.Whatif import histRamaBySsAndResType
 from cing.PluginCode.Whatif import runWhatif
+from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
 from cing.core.classes import Project
 from cing.core.constants import IUPAC
 from matplotlib.numerix.mlab import amax
