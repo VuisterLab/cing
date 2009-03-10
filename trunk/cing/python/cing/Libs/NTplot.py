@@ -59,6 +59,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
+from cing.Libs.NTutils import NTwarning
 import math
 # Use a backend that allows headless (without GUI) printing in addition to GUI.
 # It has to be called before matplotlib.pylab. Defined here and one not need to
@@ -1747,6 +1748,8 @@ class RangeIcon(Rectangle):
 #        NTdebug(' self.height  : %s',  self.height)
 #        NTdebug('verts: %s', verts)
         return verts
+    
+    
 
 class RangeIconPoly(Polygon):
     def __init__(self, seq=None, axis=None, *args, **kwargs ):

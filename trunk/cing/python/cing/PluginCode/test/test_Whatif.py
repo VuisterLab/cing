@@ -37,10 +37,10 @@ class AllChecks(TestCase):
             set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
             try:
                 strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
+                NTdebug( '\n%s' % strHist )
             except:
                 # Fails for some reason on Linux 64 bit. Perhaps some inconsistency. 
                 pass
-            NTdebug( '\n%s' % strHist )
 
     def testRunWhatif(self):        
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 

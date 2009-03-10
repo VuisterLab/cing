@@ -106,12 +106,39 @@ def _NTmessage(msg):
     print msg
 
 def check_python():
+    hasDep = True
     version = float(sys.version[:3])
     if version < 2.4:
         _NTerror('Failed to find Python version 2.4 or higher.')
         _NTerror('Current version is %s' % sys.version[:5])
-    else:
+        hasDep = False
+    if hasDep:
         _NTmessage("........ Found 'Python'")
+    else:
+        _NTwarning('Failed to find good python.')
+        
+def check_matplotlib():
+    hasDep = True
+    try:
+        from matplotlib.axis import XAxis
+    except:
+        hasDep = False
+        _NTerror('Failed to find matplotlib. Absolutely required for CING')
+
+    if hasDep:
+        try:
+            from matplotlib.pylab import axes
+            xaxis = XAxis(axes([.1, .1, .8, .8 ]))
+            if not hasattr(xaxis, 'convert_units'):
+                hasDep = False
+                _NTerror('Failed to find good matplotlib. Absolutely required for CING. Look for version 0.98.3-1 or higher. Developed with 0.98.5-1')
+        except:
+            hasDep = False
+                
+    if hasDep:
+        _NTmessage("........ Found 'matplotlib'")
+        
+
 
 def check_pylab():
 #    print 'Matplotlib module  ',
@@ -281,6 +308,7 @@ if __name__ == '__main__':
 #    cing.verbosity = verbosityOutput # Default is no output of anything.
 
     check_python()
+    check_matplotlib()
     check_ccpn()
     check_pylab()
 #    check_numpy()
