@@ -1,0 +1,49 @@
+#summary Step by step instruction on Linux
+
+Please see [http://code.google.com/p/cing/source/browse/trunk/cing/Documentation/setupEclipse/development_installation_eclipse.html here] for complete instructions for installing using Eclipse.
+
+= Linux version =
+{{{
+Linux version 2.6.22.14-72.fc6 (brewbuilder@ls20-bc1-14.build.redhat.com) (gcc version 4.1.2 20070626 (Red Hat 4.1.2-13)) #1 SMP Wed Nov 21 14:10:25 EST 2007
+tcsh 6.14.00 (Astron) 2005-03-25 (x86_64-unknown-linux) options wide,nls,dl,al,kan,rh,color,filec
+}}}
+
+
+
+= Install Yum = 
+
+= Install matplotlib =
+{{{
+yum install python-matplotlib.x86_64
+}}}
+This installs python2.4 versions of everything on my test os; tang.bmrb.wisc.edu. This is the minimum python version: 2.4.
+
+Configure matplotlib by putting the configuration file in the download section here:
+{{{
+http://cing.googlecode.com/files/matplotlibrc
+}}}
+in a directory that might already be created:
+{{{
+~/..matplotlib/matplotlibrc
+}}}
+
+= Install other deps =
+{{{
+ImageMagick.x86_64
+wings-povray.x86_64 # or something like povray UNTESTED.
+}}}
+
+= Configure CING =
+
+First setup CING proper as described in $CINGROOT/README.txt using a Makefile.
+
+If you don't have access to '/tmp/cing' then configure a local tmp path by doing something like:
+{{{
+echo "cingDirTmp             = '/home/jurgen/tmp/cingTmp/'" > $CINGROOT/python/cing/localConstants.py
+}}}
+
+= Test installation =
+{{{
+cing --test -v 0
+}}}
+or when you need the highest debug verbosity use 9 instead of 0. Normal is 3. 
