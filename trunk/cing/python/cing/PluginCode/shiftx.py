@@ -1,33 +1,41 @@
 """
-Adds shiftx method to predict chemical shifts
-Methods:
+Adds shiftx method to predict chemical shifts. The shiftx program is included as binaries for Mac OSX and 32 bit
+Linux in the bin directory. 
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import obj2XML
 from cing.Libs.NTutils import XML2obj
+from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
 from cing.core.constants import IUPAC
+from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
-from cing.core.molecule import dots
-#from cing.Libs.NTutils import getDeepByKeys
-#from cing.Libs.fpconst import isNaN
-
 from math import sqrt
-from cing.Libs.NTutils import NTerror
-
 import cing
 import os
+
+
+if True: # block
+    useModule = True
+    # TODO: test if the binary is actually applicable to the system os.
+    if not os.path.exists( cingPaths.shiftx ):
+        NTdebug("Missing shiftx which is a dep for shiftx")
+        useModule = False
+    if not useModule:
+        raise ImportWarning('shiftx')    
+#    NTmessage('Using shiftx')
 
 contentFile = 'content.xml'
 
@@ -157,7 +165,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
 
     root = project.mkdir( project.molecule.name, project.moleculeDirectories.shiftx)
     baseName = 'model_%03d'
-    shiftx = ExecuteProgram( pathToProgram=os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx'),
+    shiftx = ExecuteProgram( pathToProgram=cingPaths.shiftx,
                              rootPath = root, redirectOutput = False)
 
     # Storage of results for later

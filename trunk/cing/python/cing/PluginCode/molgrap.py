@@ -37,7 +37,7 @@ if True: # block
 
     if not useModule:
         raise ImportWarning('Molgrap')
-    NTmessage('Using Molgrap')
+#    NTmessage('Using Molgrap')
     
 class Molgrap(NTdict):
     def __init__(self, backcolor = 'cing_turqoise', project = None):

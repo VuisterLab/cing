@@ -8,10 +8,10 @@ from cing.Libs.NTutils import floatParse
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
-from cing.PluginCode.dssp import to3StateUpper
 from cing.core.classes import Project
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
+from cing.PluginCode.required.reqDssp import to3StateUpper
 import cing
 import csv
 import os

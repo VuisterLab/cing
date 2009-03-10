@@ -6,6 +6,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
+from cing.PluginCode.procheck import Procheck #@UnusedImport Keep to indicate dep and proper handeling.
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC

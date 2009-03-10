@@ -2,16 +2,29 @@
     Wattos Module
     First version: jfd Dec 11, 2007
 """
-from cing.core.constants import IUPAC
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
+from cing.core.constants import IUPAC
+from cing.core.parameters import cingPaths
 import os
 import time
+
+if True: # block
+    # TODO: use more advanced tests.
+    if not cingPaths.classpath:
+        NTdebug("Missing java classpath which is a dep for Wattos")
+        raise ImportWarning('Wattos')    
+    if not (('Wattos.jar' in cingPaths.classpath) or ( # development classes.
+             '/Users/jd/workspace34/wattos/build' in cingPaths.classpath)):        
+        NTdebug("Missing Wattos jar in classpath which is a dep for Wattos")
+        raise ImportWarning('Wattos')    
+#    NTmessage('Using Wattos')
 
 
 class Wattos( NTdict ):
