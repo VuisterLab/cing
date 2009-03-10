@@ -1402,9 +1402,11 @@ class MoleculeHTMLfile( HTMLfile ):
 
         NTmessage("Creating Whatif html")
         if not htmlOnly:
-            if project.createHtmlWhatif():
-                NTerror('Failed to createHtmlWhatif')
-                return True
+            if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
+                if project.createHtmlWhatif():
+                    NTerror('Failed to createHtmlWhatif')
+                    return True
+                #end if
             #end if
         #end if
 
