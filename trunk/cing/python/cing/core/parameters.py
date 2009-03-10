@@ -82,6 +82,14 @@ cingPaths = NTdict(
     povray       = os.getenv('povrayPath'),
     classpath    = os.getenv('CLASSPATH'),
 )
+
+# Keep the below in sync with the one in setup.py
+PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE"
+
+for key in cingPaths.keys():
+    if cingPaths[ key ] == PLEASE_ADD_EXECUTABLE_HERE:
+        cingPaths[ key ] = None
+
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
 cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx')
