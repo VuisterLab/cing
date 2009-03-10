@@ -33,6 +33,7 @@ from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import list2asci #@UnusedImport
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import RAMCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
@@ -47,6 +48,7 @@ from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
+from cing.core.parameters import plugins
 import os
 import shelve
 import shutil
@@ -428,7 +430,7 @@ def _navigateHtml( obj ):
                                )
 #end def
 
-class MakeHtmlTable():
+class MakeHtmlTable:
     """Iterative class that generates rows of html Table
         columnFormats:     a list of (header, dict()) tuples describing the column
                              header can be None for no header above column
@@ -1272,8 +1274,12 @@ Redirecting to %s
         molGifFileName = "mol.gif"
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
-            NTdebug("ProjectHtmlFile.generateHtml: Trying to create : " + pathMolGif)
-            self.project.molecule.export2gif(pathMolGif, project=self.project)
+            if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
+                NTdebug("ProjectHtmlFile.generateHtml: Trying to create : " + pathMolGif)
+                self.project.molecule.export2gif(pathMolGif, project=self.project)
+            else:
+                NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
+                
         #end if
         if os.path.exists( pathMolGif ):
             htmlMain('td', openTag=False)

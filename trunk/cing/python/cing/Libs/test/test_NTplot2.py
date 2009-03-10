@@ -1,12 +1,13 @@
+from Numeric import arange
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
+from cing.Libs.NTmoleculePlot import selectPointsFromRange
 from cing.Libs.NTplot import HelixIconList
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTmoleculePlot import selectPointsFromRange
 from cing.Libs.NTplot import triangularList
 from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
@@ -18,11 +19,11 @@ from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
 from unittest import TestCase
-#from numpy.core.ma import arange
-from Numeric import arange
 import cing
 import os #@Reimport
+import sys
 import unittest
+#from numpy.core.ma import arange
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):
@@ -152,6 +153,10 @@ class AllChecks(TestCase):
 
     def testHelix(self):
         # Bug reported and fixed on sf.net project for matlibplot
+        version = float(sys.version[:3])
+        if version < 2.5:
+            NTdebug('Not checking for a bug does exist in previous python versions below 2.5 and the related matplotlib.')
+            return
         figure().add_subplot(111)
         ax = gca()
         x = 0         # in data coordinate system
@@ -166,7 +171,7 @@ class AllChecks(TestCase):
         ax.set_xlim(xmax=10)
         ax.set_ylim(ymax=10)
 #        show()
-
+            
     def testZaagtand(self):
         t = arange( 0.,360.,1.)
         s = triangularList( t )

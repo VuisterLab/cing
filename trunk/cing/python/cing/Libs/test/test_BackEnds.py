@@ -12,10 +12,11 @@ import unittest
 
 class AllChecks(TestCase):
 
-    # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
-
     def testBackEnd(self):
+
+        # important to switch to temp space before starting to generate files for the project.
+        self.failIf(os.chdir(cingDirTmp), msg =
+            "Failed to change to directory for temporary test files: " + cingDirTmp)
 
         # Trying to plot without GUI backend.
 #        use('Agg') Already present in NTplot.py

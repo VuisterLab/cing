@@ -407,7 +407,7 @@ class pdbParser:
     #end def
 #end class
 
-class MatchGame():
+class MatchGame:
     def __init__(self, convention = IUPAC, patchAtomNames = True, skipWaters = False, allowNonStandardResidue = True):
         self.convention = convention
         self.patchAtomNames = patchAtomNames
