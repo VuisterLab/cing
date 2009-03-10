@@ -6,9 +6,10 @@ if True:
     try:
         import ccpnmr #@UnusedImport @UnresolvedImport 
     except:
-        raise ImportWarning('Ccpn')
-    finally:
         switchOutput(False)
+        raise ImportWarning('Ccpn')
+#    finally: # finally fails in python below 2.5
+    switchOutput(False)
 #    NTmessage('Using Ccpn')
 
 from ccp.general.Util import createMoleculeTorsionDict

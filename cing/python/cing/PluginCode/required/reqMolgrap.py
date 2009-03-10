@@ -1,0 +1,1 @@
+MOLGRAP_STR = "Molgrap"

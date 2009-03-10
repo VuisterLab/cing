@@ -98,6 +98,8 @@ def _NTgetoutput( cmd ):
     out.close()
     err.close()
     return (output,errors)
+def _NTerror(msg):
+    print "ERROR:",msg
 def _NTwarning(msg):
     print "WARNING:",msg
 def _NTmessage(msg):
@@ -105,9 +107,9 @@ def _NTmessage(msg):
 
 def check_python():
     version = float(sys.version[:3])
-    if version < 2.5:
-        _NTgetoutput('Failed to find Python version 2.5 or higher.')
-#        print 'Current version is', sys.version[:5]
+    if version < 2.4:
+        _NTerror('Failed to find Python version 2.4 or higher.')
+        _NTerror('Current version is %s' % sys.version[:5])
     else:
         _NTmessage("........ Found 'Python'")
 
