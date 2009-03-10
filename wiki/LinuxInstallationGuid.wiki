@@ -2,17 +2,19 @@
 
 Please see [http://code.google.com/p/cing/source/browse/trunk/cing/Documentation/setupEclipse/development_installation_eclipse.html here] for complete instructions for installing using Eclipse.
 
-= Linux version =
+Also, you are likely finding new exceptions due to your specific setup. Please report them back to me at jurgenfd@gmail.com so I can improve the compatibility of the code.
+
+== Linux version ==
 {{{
 Linux version 2.6.22.14-72.fc6 (brewbuilder@ls20-bc1-14.build.redhat.com) (gcc version 4.1.2 20070626 (Red Hat 4.1.2-13)) #1 SMP Wed Nov 21 14:10:25 EST 2007
 tcsh 6.14.00 (Astron) 2005-03-25 (x86_64-unknown-linux) options wide,nls,dl,al,kan,rh,color,filec
 }}}
 
+== Install Yum ==
 
+== Install matplotlib ==
 
-= Install Yum = 
-
-= Install matplotlib =
+Look for version 0.98.3-1 or higher. Developed with 0.98.5-1
 {{{
 yum install python-matplotlib.x86_64
 }}}
@@ -27,13 +29,13 @@ in a directory that might already be created:
 ~/..matplotlib/matplotlibrc
 }}}
 
-= Install other deps =
+== Install other deps ==
 {{{
 ImageMagick.x86_64
 wings-povray.x86_64 # or something like povray UNTESTED.
 }}}
 
-= Configure CING =
+== Configure CING ==
 
 First setup CING proper as described in $CINGROOT/README.txt using a Makefile.
 
@@ -42,8 +44,30 @@ If you don't have access to '/tmp/cing' then configure a local tmp path by doing
 echo "cingDirTmp             = '/home/jurgen/tmp/cingTmp/'" > $CINGROOT/python/cing/localConstants.py
 }}}
 
-= Test installation =
+== Test installation ==
 {{{
 cing --test -v 0
 }}}
 or when you need the highest debug verbosity use 9 instead of 0. Normal is 3. 
+
+== Problems with dependencies ==
+If you have these it might be nice to check the installation without them. If you want to temporarily disable them then do something like:
+{{{
+unsetenv  xplorPath
+unsetenv  procheckPath
+unsetenv  aqpcPath   
+unsetenv  whatifPath 
+unsetenv  dsspPath   
+unsetenv  molmolPath
+unsetenv  povrayPath
+
+unsetenv  convertPath
+unsetenv  ghostscriptPath 
+unsetenv  ps2pdfPath
+
+setenv PYTHONPATH $CINGROOT/python:${CYTHON}                 
+                  
+unsetenv CLASSPATH
+}}}
+
+For more permanent changes adjust the generated $CINGROOT/cing.csh
