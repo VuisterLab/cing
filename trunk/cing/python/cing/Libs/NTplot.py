@@ -59,7 +59,6 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-from cing.Libs.NTutils import NTwarning
 import math
 # Use a backend that allows headless (without GUI) printing in addition to GUI.
 # It has to be called before matplotlib.pylab. Defined here and one not need to
