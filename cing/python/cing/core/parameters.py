@@ -1,4 +1,5 @@
 from cing.Libs.NTutils import NTdict
+import cing
 import os
 
 #-----------------------------------------------------------------------------
@@ -79,9 +80,13 @@ cingPaths = NTdict(
     ps2pdf       = os.getenv('ps2pdfPath'),
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
+    classpath    = os.getenv('CLASSPATH'),
 )
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
+cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx')
+if cingPaths.classpath:
+    cingPaths.classpath = cingPaths.classpath.split(':')
 
 cingPaths.keysformat() #define a format string for 'pretty' output
 

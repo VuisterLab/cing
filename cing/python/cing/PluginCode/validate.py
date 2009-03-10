@@ -52,15 +52,20 @@ from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.peirceTest import peirceTest
+from cing.PluginCode.required.reqDssp import DSSP_STR
+from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
+from cing.core.constants import NOSHIFT
+from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Residue
 from cing.core.molecule import disulfideScore
 from cing.core.molecule import dots
-from cing.core.constants import NOSHIFT
-from cing.core.molecule import Atom
+from cing.core.parameters import plugins
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
 import math
 import os
 import shelve
@@ -97,12 +102,16 @@ code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True ):
-    project.runShiftx(parseOnly=parseOnly)
-    project.runDssp(parseOnly=parseOnly)
-    if doProcheck:
-        project.runProcheck(ranges=ranges, parseOnly=parseOnly)
-    if doWhatif:
-        project.runWhatif(parseOnly=parseOnly)
+    if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
+        project.runShiftx(parseOnly=parseOnly)
+    if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
+        project.runDssp(parseOnly=parseOnly)
+    if hasattr(plugins, PROCHECK_STR) and plugins[ PROCHECK_STR ].isInstalled:
+        if doProcheck:
+            project.runProcheck(ranges=ranges, parseOnly=parseOnly)
+    if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
+        if doWhatif:
+            project.runWhatif(parseOnly=parseOnly)
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)

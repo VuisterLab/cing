@@ -9,7 +9,7 @@ if True:
         raise ImportWarning('Ccpn')
     finally:
         switchOutput(False)
-    NTmessage('Using CCPN')
+#    NTmessage('Using Ccpn')
 
 from ccp.general.Util import createMoleculeTorsionDict
 from ccp.general.Util import getResonancesFromPairwiseConstraintItem

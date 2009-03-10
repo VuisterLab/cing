@@ -1,0 +1,1 @@
+SHIFTX_STR       = "shiftx"

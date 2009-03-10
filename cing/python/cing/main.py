@@ -277,6 +277,9 @@ def testOverall(namepattern):
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_ccpn.py']
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Molgrap.py']
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Procheck.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_validate.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Wattos.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/Libs/test/test_Imagery.py']
     NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
@@ -300,7 +303,7 @@ def testOverall(namepattern):
             unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
             NTmessage('\n\n\n')
         except ImportWarning, extraInfo:
-            NTdebug("Skipping test report of an optional compound: %s" % extraInfo)
+            NTmessage("Skipping test report of an optional compound: %s" % extraInfo)
 
 
 def getParser():

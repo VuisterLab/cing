@@ -48,14 +48,14 @@ import os
 if True: # block
     useModule = True
     if not cingPaths.aqpc:
-        NTdebug("Missing aqpc which is a dep for procheck_nmr")
+        NTdebug("Missing aqpc which is a dep for procheck")
         useModule = False
     elif not cingPaths.procheck_nmr:
-        NTdebug("Missing procheck_nmr which is a dep for procheck_nmr")
+        NTdebug("Missing procheck_nmr which is a dep for procheck")
         useModule = False
     if not useModule:
-        raise ImportWarning('Procheck')    
-    NTmessage('Using Procheck')
+        raise ImportWarning('procheck')    
+#    NTmessage('Using procheck')
 
 #Trying to accommodate at least
 #2k0e with 160 models of with each 148 residues, 2611 atoms

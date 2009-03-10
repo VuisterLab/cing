@@ -11,7 +11,7 @@ from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.numpyInterpolation import interpn_linear
-from cing.PluginCode.dssp import to3StateUpper
+from cing.PluginCode.required.reqDssp import to3StateUpper
 from cing.core.classes import Project
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d

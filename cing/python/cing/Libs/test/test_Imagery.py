@@ -1,3 +1,7 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/Libs/test/test_Imagery.py
+"""
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
@@ -6,11 +10,16 @@ from cing.Libs.Imagery import convert2Web
 from cing.Libs.Imagery import joinPdfPagesByGhostScript
 from cing.Libs.Imagery import montage
 from cing.Libs.NTplot import useMatPlotLib
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
+from cing.core.parameters import cingPaths
 from unittest import TestCase
 import cing
 import os
 import unittest
+
+if not cingPaths.convert: # Requirement for test.
+    raise ImportWarning('convert')
 
 class AllChecks(TestCase):
 
@@ -19,6 +28,7 @@ class AllChecks(TestCase):
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testConvert2Web(self):
+            
         fn = "pc_nmr_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)

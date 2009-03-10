@@ -6,6 +6,9 @@ import re
 import os
 
 def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
+    if not cingPaths.convert:
+        NTerror("No cingPaths.convert in convertImageMagick")
+        return True
     convert = ExecuteProgram(cingPaths.convert, redirectOutput=False) # No output expected
     cmd = options
     if extraOptions:
@@ -16,6 +19,9 @@ def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
         return True
 
 def montageImageMagick(inputPath,outputPath,options,extraOptions=None):
+    if not cingPaths.montage:
+        NTerror("No cingPaths.montage in montageImageMagick")
+        return True
     if not cingPaths.montage:
         return True
     convert = ExecuteProgram(cingPaths.montage, redirectOutput=False) # No output expected
@@ -31,6 +37,9 @@ def montageImageMagick(inputPath,outputPath,options,extraOptions=None):
 def convertGhostScript(inputPath,options,extraOptions=None):
     # GS has rather verbose output
     # just to make sure we report back on on error let's have caller check results.
+    if not cingPaths.ghostscript:
+        NTerror("No cingPaths.ghostscript in montageImageMagick")
+        return True
     gs = ExecuteProgram(cingPaths.ghostscript, redirectOutputToFile='/dev/null')
     cmd = options
     if extraOptions:
@@ -41,6 +50,9 @@ def convertGhostScript(inputPath,options,extraOptions=None):
         return True
 
 def convertPs2Pdf(inputPath,outputPath,options,extraOptions=None):
+    if not cingPaths.ps2pdf:
+        NTerror("No cingPaths.ps2pdf in convertPs2Pdf")
+        return True
     convert = ExecuteProgram(cingPaths.ps2pdf, redirectOutput=False) # No output expected
     cmd = options
     if extraOptions:
@@ -95,6 +107,17 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
        E.g. residuePlotSetAll001.gif as the first filename will give a:
             residuePlotSetAll.gif and residuePlotSetAll_pin.gif output.
     """
+    if not cingPaths.montage:
+        NTerror("No cingPaths.montage in convert2Web")
+        return True
+    if not cingPaths.convert:
+        NTerror("No cingPaths.convert in convert2Web")
+        return True
+    if not cingPaths.ghostscript:
+        NTerror("No cingPaths.ghostscript in convert2Web")
+        return True
+    
+    
     optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width
     optionsFull  = "-delay 200 -geometry 1024"
     optionsPrint = ""
@@ -193,6 +216,9 @@ def montage(pathList, outputFileName, extraOptions = None ):
        Input can be anything ImageMagick reads, e.g. Postscript produced by Procheck_NMR.
        The input pathList may also be a single file such as a multiple page .ps.
     """
+    if not cingPaths.montage:
+        NTerror("No cingPaths.montage in montageImageMagick")
+        return True
 #    backgroundColor = '#ede8e2' # default in cing.css
 #    optionsPinUp = "-label %f -frame 15 -background %s -geometry +10+10 -geometry 102" % ( backgroundColor )
 #    optionsFull  = "-frame 15 -geometry +10+10 -background '#ede8e2'"
