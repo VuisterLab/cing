@@ -2313,8 +2313,12 @@ class PeakListHTMLfile( HTMLfile ):
 
             peakMain('ul', closeTag=False)
             peakMain('li', 'Positions: %s' % peak.positions.__str__())
-            peakMain('li', 'Height: %.3e (%.3e)' % ( peak.height.value, peak.height.error))
-            peakMain('li', 'Volume: %.3e (%.3e)' % ( peak.volume.value, peak.volume.error))
+
+            fmt = '%.3e'        
+            if peak.hasHeight():    
+                peakMain('li', 'Height: %s (%s)' % ( val2Str(peak.height.value, fmt), val2Str(peak.height.error, fmt)))
+            if peak.hasVolume():    
+                peakMain('li', 'Volume: %s (%s)' % ( val2Str(peak.volume.value, fmt), val2Str(peak.volume.error, fmt)))
             peakMain('li', 'Atoms:', closeTag=False)
             for resonance in peak.resonances:
                 if resonance:

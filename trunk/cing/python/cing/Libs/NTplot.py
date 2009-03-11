@@ -24,7 +24,6 @@ from colorsys import hsv_to_rgb
 from copy import deepcopy
 from matplotlib import colors
 from matplotlib import rcParams
-from matplotlib import use
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
 from matplotlib.lines import Line2D
@@ -60,17 +59,7 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 import math
-# Use a backend that allows headless (without GUI) printing in addition to GUI.
-# It has to be called before matplotlib.pylab. Defined here and one not need to
-# defined in matoplotlibrc, and if defined there, it'll be overridden
-use('Agg')
- 
-#=======
-#try:
-#    from numpy.core.ma import arange #@UnusedImport
-#except:
-#    from numpy.core import arange # for numpy 1.1.0 and matplotlib 0.91.x @Reimport
-#>>>>>>> .r250
+
 try:
     import Image
     haveImage = True
