@@ -1,1 +1,1 @@
-MOLGRAP_STR = "Molgrap"
+MOLGRAP_STR = "molgrap"
