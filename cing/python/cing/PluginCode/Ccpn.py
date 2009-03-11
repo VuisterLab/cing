@@ -216,7 +216,7 @@ class Ccpn:
                 return None
 
             if ccpnRootDirectory != self.project.name:
-                NTwarning("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
+                NTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
                 move(ccpnRootDirectory, self.project.name)
             ccpnFolder = self.project.name # Now it is a folder.
 
@@ -792,7 +792,7 @@ class Ccpn:
                 ccpnShiftLists = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
 
             if not ccpnShiftLists:
-                NTwarning('CCPN project contains no shift lists')
+                NTdebug('CCPN project contains no shift lists')
                 return True
 
             for ccpnMolSystem in self.ccpnMolSystemList:
@@ -887,13 +887,10 @@ class Ccpn:
                     resonancesDim = []
                     for contrib in peakDim.peakDimContribs:
                         try:
-                            cingResonance = contrib.resonance.findFirstShift \
-                                                 (parentList = shiftList).cing
-
+                            cingResonance = contrib.resonance.findFirstShift(parentList = shiftList).cing
                             resonancesDim.append(cingResonance)
                         except:
                             NTdebug('==== contrib out %s', contrib)
-
 
                     if resonancesDim:
                         resonances.append(resonancesDim[0])
@@ -1135,7 +1132,6 @@ class Ccpn:
            Output: True or None on error.
         '''
 
-        funcName = self.importFromCcpnDistanceRestraint.func_name
 #        mapDistListType = { self.CC: 'DistRestraint', 'HBondConstraintList': 'HbondRestraint'}
 
         # map to CING names were possible note the presence of DistanceRestraintList.Hbond
@@ -1161,7 +1157,7 @@ class Ccpn:
             for ccpnDistanceConstraint in ccpnDistanceList.sortedConstraints():
                 result = getRestraintBoundList(ccpnDistanceConstraint, Ccpn.RESTRAINT_IDX_DISTANCE, msgHoL)
                 if not result:
-                    msgHoL.appendMessage("%s: Ccpn %s restraint '%s' with bad distances imported." % (funcName, distType, ccpnDistanceConstraint))
+                    msgHoL.appendMessage("%s with bad distances imported." % (ccpnDistanceConstraint))
                     result = (None, None)
                 lower, upper = result
 
@@ -1169,7 +1165,7 @@ class Ccpn:
 
                 if not atomPairList:
                     # restraints that will not be imported
-                    msgHoL.appendMessage("%s: skipped Ccpn %s restraint '%s' without atom pairs" % (funcName, distType, ccpnDistanceConstraint))
+                    msgHoL.appendMessage("%s without atom pairs" % (ccpnDistanceConstraint))
                     continue
                 # end if
 
@@ -2273,7 +2269,8 @@ def isRootDirectory(f):
 #    NTdebug("Checking _isRootDirectory on : ["+f+"]")
     idxSlash = f.find("/")
     if idxSlash < 0:
-        NTerror("Found no forward slash in entry in tar file.")
+        # Happens for every toplevel file. E.g. 1brv_aria.xml in issue 146 for 1brv_ccpngrid.tgz
+#        NTdebug("Found no forward slash in entry in tar file.")
         return None
 
     idxLastChar = len(f) - 1

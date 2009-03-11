@@ -23,7 +23,6 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-#        entryList = "1a24".split()
 #        entryList = "1kr8".split()
         entryList = "1brv".split()
 #        entryList = "basp2".split()
@@ -34,13 +33,13 @@ class AllChecks(TestCase):
 #        entryList = "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #1iv6 needs better ccpn file from FC
 #        entryList = ["Parvulustat"]
-#        entryList = ["1a4d"]
+#        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         useNrgArchive = False # Default is False
 
         fastestTest = True
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         if fastestTest:
@@ -65,7 +64,7 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif))
-            self.assertTrue(project.exportValidation2ccpn())
+#            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
 
     def ttttestCreateCcpn(self):
@@ -116,6 +115,6 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityOutput
     unittest.main()

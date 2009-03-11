@@ -570,7 +570,7 @@ def validateRestraints( project, toFile = True)   :
                 n += len(d.violations)
             #end for
             if n == 0:
-                NTwarning('No DRs so no rmsd')
+                NTmessage('Only DRs without values so no rmsd for residue: %s' % res)
             else:
                 res.distanceRestraints.rmsd = math.sqrt(sumsq/n)
                 res.distanceRestraints.sum = sum
