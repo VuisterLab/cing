@@ -2,9 +2,9 @@ if True:
     from cing.Libs.NTutils import ImportWarning
     from cing.Libs.NTutils import NTmessage
     from cing.Libs.NTutils import switchOutput
-    switchOutput(False)        
+    switchOutput(False)
     try:
-        import ccpnmr #@UnusedImport @UnresolvedImport 
+        import ccpnmr #@UnusedImport @UnresolvedImport
     except:
         switchOutput(False)
         raise ImportWarning('Ccpn')
@@ -175,7 +175,7 @@ class Ccpn:
         for ccpnConstraintStore in ccpnConstraintStores:
             for ccpnRestraintList in ccpnConstraintStore.sortedConstraintLists():
                 if ccpnRestraintList.className in classNames:
-                     ccpnRestraintLists.append(ccpnRestraintList)
+                    ccpnRestraintLists.append(ccpnRestraintList)
 
         return ccpnRestraintLists
 
@@ -219,6 +219,8 @@ class Ccpn:
                 NTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
                 move(ccpnRootDirectory, self.project.name)
             ccpnFolder = self.project.name # Now it is a folder.
+        else:
+            ccpnFolder = self.ccpnFolder
 
         if (not ccpnFolder) or (not os.path.exists(ccpnFolder)):
             NTerror("ccpnFolder '%s' not found", ccpnFolder)
@@ -278,8 +280,8 @@ class Ccpn:
 
 
         if not ccpnMolSystemList:
-             NTerror("No molecular systems found in CCPN project")
-             return None
+            NTerror("No molecular systems found in CCPN project")
+            return None
 
         self.ccpnMolSystemList = ccpnMolSystemList
         self.ccpnCingRun = ccpnCalc
@@ -417,8 +419,8 @@ class Ccpn:
 
         # we are taking just the current Ensemble now
         ccpnStructureEnsemble = ccpnMolSys.parent.currentStructureEnsemble
-        if ((not hasattr(ccpnStructureEnsemble, 'molSystem')) or 
-            (ccpnStructureEnsemble.molSystem == None) or 
+        if ((not hasattr(ccpnStructureEnsemble, 'molSystem')) or
+            (ccpnStructureEnsemble.molSystem == None) or
             (ccpnStructureEnsemble.molSystem is not ccpnMolSys)):
             ccpnStructureEnsemble = ccpnMolSys.findFirstStructureEnsemble(molSystem = ccpnMolSys)
 
@@ -864,7 +866,7 @@ class Ccpn:
                 if str(vValue) == 'inf':
                     vValue = NaN
 
-                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType = 
+                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType =
                                                              'height')
                 hValue = 0.00
                 hError = 0.00
@@ -1176,7 +1178,7 @@ class Ccpn:
 
                 distanceRestraintList.append(distanceRestraint)
             if distanceRestraintList.simplify():
-                 NTerror("Failed to simplify the distanceRestraintList")
+                NTerror("Failed to simplify the distanceRestraintList")
         msgHoL.showMessage()
         return True
     # end def importFromCcpnDistanceRestraint
@@ -1266,7 +1268,7 @@ class Ccpn:
             for ccpnRdcConstraint in ccpnRdcList.sortedConstraints():
                 result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC, msgHoL)
                 if not result:
-                    NTdetail("Ccpn RDC restraint '%s' with bad values imported." % 
+                    NTdetail("Ccpn RDC restraint '%s' with bad values imported." %
                               ccpnRdcConstraint)
                     result = (None, None)
                 lower, upper = result
@@ -1558,10 +1560,10 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # JFD: how about when there is no cingRun? It's created below then...
         ccpnNmrSimStore = self.ccpnProject.findFirstNmrSimStore(name = CING)
         if ccpnNmrSimStore and ccpnNmrSimStore.runs:
-             # Always use the most recently setup run if ther is one.
-             self.ccpnProject.cingRun = ccpnNmrSimStore.sortedRuns()[ - 1]
+            # Always use the most recently setup run if ther is one.
+            self.ccpnProject.cingRun = ccpnNmrSimStore.sortedRuns()[ - 1]
         else:
-             self.ccpnProject.cingRun = None
+            self.ccpnProject.cingRun = None
 
         return True
 
@@ -1688,12 +1690,12 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
                 firstResidue = residues[0]
                 if firstResidue.getAtoms(['CA', 'N'], convention = CCPN):
-                  molType = 'protein'
+                    molType = 'protein'
                 elif firstResidue.getAtoms(["C1'", "C5'", "C2", "C6"], convention = CCPN):
-                      if firstResidue.getAtoms(["HO2'", "H2'"], convention = CCPN):
-                          molType = 'RNA'
-                      else:
-                          molType = 'DNA'
+                    if firstResidue.getAtoms(["HO2'", "H2'"], convention = CCPN):
+                        molType = 'RNA'
+                    else:
+                        molType = 'DNA'
                 elif firstResidue.getAtoms(['H1', 'H2'], convention = CCPN):
                     molType = 'water'
                 else:
@@ -1835,7 +1837,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         ccpnConstraintStore = self.ccpnProject.newNmrConstraintStore(nmrProject = self.ccpnNmrProject)
 
         for distanceRestraintList in self.project.distances:
-            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name = 
+            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name =
                                                         distanceRestraintList.name)
             for distanceRestraint in distanceRestraintList:
                 upper = distanceRestraint.lower
@@ -1864,7 +1866,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # end for
 
         for dihedralRestraintList in self.project.dihedrals:
-            ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList(name = 
+            ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList(name =
                                                         dihedralRestraintList.name)
             for dihedralRestraint in dihedralRestraintList: #@UnusedVariable
                 upper = distanceRestraint.lower
@@ -2060,14 +2062,14 @@ def exportValidation2ccpn(project):
     if not project.has_key('ccpn'):
         NTerror('exportValidation2ccpn: No open CCPN project present')
         return None
-    
+
     ccpnMolSystem = project.molecule.ccpn
     ccpnEnsemble = ccpnMolSystem.findFirstStructureEnsemble()
 
     if not ccpnEnsemble:
         NTdebug("Failing to exportValidation2ccpn, perhaps because there is no ensemble")
         return project
-    
+
     NTmessage('==> Exporting to Ccpn')
     for residue in project.molecule.allResidues():
         valObj = storeResidueValidationInCcpn(project, residue)
@@ -2085,41 +2087,41 @@ def exportValidation2ccpn(project):
 #end def
 
 def storeResidueValidations(validStore, context, keyword, residues, scores):
-  """Descrn: Store the per-residue scores for a an ensemble within
-             CCPN validation objects.
-             *NOTE* This function may be quicker than using the generic
-             replaceValidationObjects() because it is class specifc
-     Inputs: Validation.ValidationStore,
-             List of MolStructure.Residues, List if Floats
-     Output: List of Validation.ResidueValidations
-  """
+    """Descrn: Store the per-residue scores for a an ensemble within
+               CCPN validation objects.
+               *NOTE* This function may be quicker than using the generic
+               replaceValidationObjects() because it is class specifc
+       Inputs: Validation.ValidationStore,
+               List of MolStructure.Residues, List if Floats
+       Output: List of Validation.ResidueValidations
+    """
 
-  validObjs = []
+    validObjs = []
 
-  # Define data model call for new result
-  newValidation = validStore.newResidueValidation
+    # Define data model call for new result
+    newValidation = validStore.newResidueValidation
 
-  for i, residue in enumerate(residues):
+    for i, residue in enumerate(residues):
 
-    score = scores[i]
+        score = scores[i]
 
-    # Find any existing residue validation objects
-    validObj = getResidueValidation(validStore, residue, context, keyword)
+        # Find any existing residue validation objects
+        validObj = getResidueValidation(validStore, residue, context, keyword)
 
-    # Validated object(s) must be in a list
-    residueObjs = [residue, ]
+        # Validated object(s) must be in a list
+        residueObjs = [residue, ]
 
-    # Make a new validation object if none was found
-    if not validObj:
-      validObj = newValidation(context = context, keyword = keyword,
-                               residues = residueObjs)
+        # Make a new validation object if none was found
+        if not validObj:
+            validObj = newValidation(context = context, keyword = keyword,
+                                     residues = residueObjs)
 
-    # Set value of the score
-    validObj.floatValue = score
+        # Set value of the score
+        validObj.floatValue = score
 
-    validObjs.append(validObj)
+        validObjs.append(validObj)
 
-  return validObjs
+    return validObjs
 
 
 def storeResidueValidationInCcpn(project, residue, context = 'CING'):
@@ -2147,12 +2149,12 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
     # Need to convert the CCPN MolSystem.Residue to MolStructure.Residue
     ccpnStrucResidue = None
     for ccpnChain in ccpnEnsemble.coordChains:
-      ccpnStrucResidue = ccpnChain.findFirstResidue(residue = residue.ccpn)
-      if ccpnStrucResidue:
-        break
+        ccpnStrucResidue = ccpnChain.findFirstResidue(residue = residue.ccpn)
+        if ccpnStrucResidue:
+            break
 
     if not ccpnStrucResidue:
-      return
+        return
 
     # Find any existing residue validation objects
     validObj = getResidueValidation(project.ccpnValidationStore, ccpnStrucResidue,
@@ -2163,9 +2165,9 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
 
     # Make a new validation object if none was found
     if not validObj:
-      newValidation = project.ccpnValidationStore.newResidueValidation
-      validObj = newValidation(context = context, keyword = keyword,
-                               residues = residueObjs)
+        newValidation = project.ccpnValidationStore.newResidueValidation
+        validObj = newValidation(context = context, keyword = keyword,
+                                 residues = residueObjs)
 
     # Set value of the score
     validObj.textValue = residue.rogScore.colorLabel or None
@@ -2255,7 +2257,7 @@ def getProjectNameInFileName(fileName):
 #        NTdebug("No match")
         return None
     g = m.groups()
-    if not g:                    
+    if not g:
 #        NTdebug("No groups")
         return None
     projectName = g[0]
@@ -2277,7 +2279,7 @@ def isRootDirectory(f):
     if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
 #        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
         return True
-    return False    
+    return False
 
 # register the function
 methods = [ (initCcpn, None),

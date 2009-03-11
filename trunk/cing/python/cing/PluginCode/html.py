@@ -1238,7 +1238,7 @@ Redirecting to %s
         self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule,
                                         text=self.project.molecule.name
                                 )
-        
+
         if hasattr(self.project.molecule, 'atomList'):
             self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
         htmlMain('ul', openTag=False)
@@ -1279,7 +1279,7 @@ Redirecting to %s
                 self.project.molecule.export2gif(pathMolGif, project=self.project)
             else:
                 NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
-                
+
         #end if
         if os.path.exists( pathMolGif ):
             htmlMain('td', openTag=False)
@@ -1552,13 +1552,13 @@ class ResidueHTMLfile( HTMLfile ):
 
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
 
- #@todo: Remove styling from below, should be in css
+        #TODO: Remove styling from below, should be in css
         self.header( 'br' )
         self.header( 'br' )
         for plot in plottedList:
             kw = {'href':'#'+plot}
             self.header('a' , plot, style="font-size: 10px", title=sprintf('goto %s plot on this page',plot), **kw)
-   #end def
+    #end def
 
     def generateHtml(self, htmlOnly=False):
         """
@@ -2314,10 +2314,10 @@ class PeakListHTMLfile( HTMLfile ):
             peakMain('ul', closeTag=False)
             peakMain('li', 'Positions: %s' % peak.positions.__str__())
 
-            fmt = '%.3e'        
-            if peak.hasHeight():    
+            fmt = '%.3e'
+            if peak.hasHeight():
                 peakMain('li', 'Height: %s (%s)' % ( val2Str(peak.height.value, fmt), val2Str(peak.height.error, fmt)))
-            if peak.hasVolume():    
+            if peak.hasVolume():
                 peakMain('li', 'Volume: %s (%s)' % ( val2Str(peak.volume.value, fmt), val2Str(peak.volume.error, fmt)))
             peakMain('li', 'Atoms:', closeTag=False)
             for resonance in peak.resonances:
