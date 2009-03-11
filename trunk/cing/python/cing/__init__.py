@@ -22,6 +22,7 @@ setup.py                Run to set up environment variables and check installati
 valSets.cfg             Validation settings. Might be moved around.
 
 """
+from cing.Libs.helper import getSvnRevision
 import os
 import sys
 import time
@@ -29,6 +30,10 @@ import time
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
 cingVersion     = 0.87
+cingRevision    = getSvnRevision()
+
+
+        
 __version__     = cingVersion # for pydoc
 __date__        = '9 March 2009'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
@@ -45,11 +50,15 @@ __credits__    = """More info at http://nmr.cmbi.ru.nl/CING
 
 """ + __copyright__ # TODO: misusing credits for pydoc
 
+versionStr = "%s" % cingVersion
+if cingRevision:
+    versionStr += " (r%d)" % cingRevision
+    
 header = """
 ======================================================================================================
 | CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |
 ======================================================================================================
-""" % (cingVersion, __copyright_years__)
+""" % (versionStr, __copyright_years__)
 
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 
