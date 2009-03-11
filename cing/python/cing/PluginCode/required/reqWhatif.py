@@ -2,6 +2,8 @@ from cing import cingDirData
 import os
 import shelve
 
+WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
+
 CHECK_ID_STR     = "checkID"
 LOC_ID_STR       = "locID"
 LEVEL_STR        = "level"
@@ -9,7 +11,6 @@ TEXT_STR         = "text"
 TYPE_STR         = "type"
 VALUE_LIST_STR   = "valueList"
 QUAL_LIST_STR    = "qualList"
-WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
 
 INOCHK_STR       = 'INOCHK'
 BNDCHK_STR       = 'BNDCHK'

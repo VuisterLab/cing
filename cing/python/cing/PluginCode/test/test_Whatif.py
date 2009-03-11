@@ -39,7 +39,7 @@ class AllChecks(TestCase):
                 strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
                 NTdebug( '\n%s' % strHist )
             except:
-                # Fails for some reason on Linux 64 bit. Perhaps some inconsistency. 
+                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib 
                 pass
 
     def testRunWhatif(self):        

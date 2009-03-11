@@ -93,9 +93,10 @@ cingRoot = os.path.split(cingPythonDir)[0]
 def check_python():
     hasDep = True
     version = float(sys.version[:3])
-    if version < 2.4:
-        _NTerror('Failed to find Python version 2.4 or higher.')
+    if version < 2.5:
+        _NTerror('Failed to find Python version 2.5 or higher.')
         _NTerror('Current version is %s' % sys.version[:5])
+        _NTerror("Python 2.4 in the package managers such as yum, fink, and apt come with a matplotlib version that doesn't work with CING.")
         hasDep = False
     if hasDep:
         _NTmessage("........ Found 'Python'")
