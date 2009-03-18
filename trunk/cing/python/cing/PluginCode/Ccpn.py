@@ -2,21 +2,24 @@ if True:
     from cing.Libs.NTutils import ImportWarning
     from cing.Libs.NTutils import NTmessage
     from cing.Libs.NTutils import switchOutput
+    from cing.PluginCode.required.reqCcpn import CCPN_STR
     switchOutput(False)
     try:
-        import ccpnmr #@UnusedImport @UnresolvedImport
+        import ccpnmr #@UnusedImport
+        from ccp.general.Util import createMoleculeTorsionDict
+        from ccp.general.Util import getResonancesFromPairwiseConstraintItem
+        from ccp.util.Molecule import makeMolecule
+        from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
+        from ccp.util.Validation import getResidueValidation #@UnresolvedImport
+        from memops.api.Implementation import MemopsRoot
+        from memops.general.Constants import currentModelVersion
+        from memops.general.Io import loadProject
     except:
-        switchOutput(False)
-        raise ImportWarning('Ccpn')
-#    finally: # finally fails in python below 2.5
-    switchOutput(False)
+        switchOutput(True)
+        raise ImportWarning(CCPN_STR)
+    finally: # finally fails in python below 2.5
+        switchOutput(True)
 #    NTmessage('Using Ccpn')
-
-from ccp.general.Util import createMoleculeTorsionDict
-from ccp.general.Util import getResonancesFromPairwiseConstraintItem
-from ccp.util.Molecule import makeMolecule
-from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
-from ccp.util.Validation import getResidueValidation #@UnresolvedImport
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -45,9 +48,6 @@ from cing.core.molecule import Molecule
 from cing.core.molecule import ensureValidChainId
 from cing.core.molecule import unmatchedAtomByResDictToString
 from cing.core.sml import NTlist
-from memops.api.Implementation import MemopsRoot
-from memops.general.Constants import currentModelVersion
-from memops.general.Io import loadProject
 from shutil import move
 from shutil import rmtree
 import os
@@ -56,7 +56,8 @@ import string
 import tarfile
 
 
-switchOutput(True)
+
+#switchOutput(True)
 
 """
     Adds initialize from CCPN project files
@@ -2080,9 +2081,9 @@ def exportValidation2ccpn(project):
             pass
 #            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
     #end for
-    switchOutput(False) # disable standard out.
+#    switchOutput(False) # disable standard out.
     project.ccpn.saveModified()
-    switchOutput(True)
+#    switchOutput(True)
     return project
 #end def
 

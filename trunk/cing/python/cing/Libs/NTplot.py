@@ -184,9 +184,19 @@ def pointAttributes( type='circle', size=4.0, pointEdgeWidth=2.0, color='black',
 # Some default attributes
 defaultAttributes  = NTplotAttributes()
 
-solidLine          = lineAttributes( type='solid',      width=1.0, color='black' )
-dottedLine         = lineAttributes( type='dotted',     width=1.0, color='black' )
-dashedline         = lineAttributes( type='longdashed', width=1.0, color='black' )
+SOLID_LINE_TYPE = 'solid'
+DOTTED_LINE_TYPE = 'dotted'
+LONGDASHED_LINE_TYPE = 'longdashed'
+DASHDOT_LINE_TYPE = 'dash-dot'
+NONE_LINE_TYPE = 'None'
+
+cingLineTypeList = [ SOLID_LINE_TYPE, DOTTED_LINE_TYPE, LONGDASHED_LINE_TYPE, DASHDOT_LINE_TYPE, NONE_LINE_TYPE]
+
+solidLine          = lineAttributes( type=SOLID_LINE_TYPE,      width=1.0, color='black' )
+dottedLine         = lineAttributes( type=DOTTED_LINE_TYPE,     width=1.0, color='black' )
+dashedline         = lineAttributes( type=LONGDASHED_LINE_TYPE, width=1.0, color='black' )
+dashdotline        = lineAttributes( type=DASHDOT_LINE_TYPE,    width=1.0, color='black' )
+noneline           = lineAttributes( type=NONE_LINE_TYPE,       width=1.0, color='black' )
 redLine            = lineAttributes( type='solid',      width=1.0, color='red' )
 blueLine           = lineAttributes( type='solid',      width=1.0, color='blue' )
 greenLine          = lineAttributes( type='solid',      width=1.0, color='green' )
@@ -270,7 +280,15 @@ mappingPointType2MatLibPlot = {
     'triangle':         '^',
      }
 """          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ] """
-mappingLineType2MatLibPlot = { 'solid': None, 'dotted': ':', 'longdashed': '--'}
+
+
+mappingLineType2MatLibPlot = { 
+    SOLID_LINE_TYPE:        '-', 
+    DOTTED_LINE_TYPE:       ':', 
+    LONGDASHED_LINE_TYPE:   '--',
+    DASHDOT_LINE_TYPE:      '-.',
+    NONE_LINE_TYPE:         ' '
+    }
 
 
 #-----------------------------------------------------------------------------
@@ -520,6 +538,13 @@ class NTplot( NTdict ):
         if 'lineColor' in keys:
 #            print "doing lineColor"
             result['color']           =  attributes.lineColor
+        if 'lineType' in keys:
+#            print "doing lineType (linestyle)"
+            if not mappingLineType2MatLibPlot.has_key( attributes.lineType ):
+                NTcodeerror("Failed to set line style [%s] because it is absent in mappingLineType2MatLibPlot %s" % 
+                            (attributes.lineType, mappingLineType2MatLibPlot))
+            else:
+                result['linestyle']       =  mappingLineType2MatLibPlot[attributes.lineType]
         if 'color' in keys:
 #            print "doing color"
             result['color']           =  attributes.color

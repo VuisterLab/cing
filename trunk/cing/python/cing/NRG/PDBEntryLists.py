@@ -14,7 +14,7 @@ urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backu
 #ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids"
 ocaUrl = "http://www.ebi.ac.uk/msd-srv/oca/oca-bin/ocaids" 
 
-testingLocally = True
+testingLocally = False
 if testingLocally:
     urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
     ocaUrl = "http://localhost/oca" # For fastest develop.
@@ -117,5 +117,8 @@ if __name__ == '__main__':
 #    NTdebug( "entries pdb: %d %40s" % (len(entry_list_pdb), entry_list_pdb ))
 #    entry_list_pdb_nmr = getPdbEntries(onlyNmr=True)
 #    NTdebug( "entries nmr: %d %s" % (len(entry_list_pdb_nmr), entry_list_pdb_nmr ))
-    entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
-    NTdebug("entries nrg docr: %d %s" % (len(entry_list_nrg_docr), entry_list_nrg_docr))
+    entry_list_nrg = getBmrbNmrGridEntries()
+    NTdebug("entries nrg: %d %s" % (len(entry_list_nrg), entry_list_nrg))
+#    entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+#    NTdebug("entries nrg docr: %d %s" % (len(entry_list_nrg_docr), entry_list_nrg_docr))
+    for entry in entry_list_nrg: print entry

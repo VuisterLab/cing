@@ -24,8 +24,8 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
+#        entryList = "1ai0".split()
         entryList = "1brv".split()
-#        entryList = "basp2".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
@@ -36,17 +36,19 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        useNrgArchive = False # Default is False
-
-        fastestTest = True
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        fastestTest = False
+        
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
+        doWattos = True
+        useNrgArchive = False
         if fastestTest:
-            htmlOnly = True
+            htmlOnly = True 
             doWhatif = False
             doProcheck = False
-
+            doWattos = False
+            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
@@ -63,7 +65,8 @@ class AllChecks(TestCase):
             self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,
-                                              doWhatif = doWhatif))
+                                              doWhatif = doWhatif,
+                                          doWattos=doWattos ))
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
 
@@ -115,6 +118,6 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityDebug
     cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityDebug
     unittest.main()

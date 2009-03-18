@@ -2,6 +2,9 @@
 Classes for dealing with STAR syntax
 """
 from cing.Libs.NTutils import Lister
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.STAR.Text import isStarNan
 from cing.STAR.Text import pattern_quoted
 from cing.STAR.Text import pattern_quotes_needed
 from cing.STAR.Text import pattern_quotes_needed_2
@@ -64,7 +67,7 @@ class TagTable (Lister):
         elif flavor == 'mmCIF':
             loop_ident_size     = 0
         else:
-            print 'ERROR: Unknown flavor of STAR given', flavor
+            NTerror('Unknown flavor of STAR given %s' % flavor)
             return 1
 
         free_ident_size         = loop_ident_size
@@ -116,7 +119,8 @@ class TagTable (Lister):
 
         for row_id in row_range:
 
-            str_tmp = tagvalues_tr[row_id].join( ',' )
+            str_tmp = ','.join(tagvalues_tr[row_id])
+#            str_tmp = tagvalues_tr[row_id].join( ',' )
 
             ## Are quotes needed? Do it per row first to get some speed perhaps
             match_quotes_needed_2 = pattern_quotes_needed_2.search( str_tmp )
@@ -129,7 +133,8 @@ class TagTable (Lister):
                     else:
                         str_tmp = str_tmp + '%s ' % self.tagvalues[col_id][row_id]
             else:
-                str_tmp = tagvalues_tr[row_id].join(  )
+                str_tmp = ''.join(tagvalues_tr[row_id])
+#                str_tmp = tagvalues_tr[row_id].join(  )
 
             str_row.append( str_tmp )
 
@@ -144,21 +149,59 @@ class TagTable (Lister):
         if show_stop_tag:
             str_row.append( '\n' + loop_ident_size * ' ' + 'stop_\n' )
 
-        str += str_row.join( '\n')
+        str += '\n'.join(str_row)
+#        str += str_row.join( '\n')
 
         # Save some space
         del tagvalues_tr
 
         return str
 
+    def getStringListByColumnName(self, columnName):
+        """Return a list of values or None for Error"""
+        if columnName not in self.tagnames:
+            NTdebug("columnName %s not in self.tagnames: %s" % (columnName, self.tagnames))
+            return None
+        idx = self.tagnames.index(columnName)
+        if idx < 0:
+            return None
+        return self.tagvalues[idx]
+
+    def getIntListByColumnName(self, columnName):
+        """Convenience function."""
+        return self.getSpecificListByColumnName( columnName, int, "int")
+    def getFloatListByColumnName(self, columnName):
+        """Convenience function."""
+        return self.getSpecificListByColumnName( columnName, float, "float")
+            
+    def getSpecificListByColumnName(self, columnName, function, dataType):
+        """Return a list of values or None for Error"""
+        resultNative = self.getStringListByColumnName(columnName)
+        if not resultNative:
+            return None
+        
+        result = []
+        for i,row in enumerate(resultNative):
+            if isStarNan(row):
+                result.append( None )
+            else:
+                try:
+                    result.append( function(row) )                    
+                except:
+                    NTerror("Value on row %d: [%s] is not an %s" % ( i, row, dataType))
+                    return None
+        return result
+            
     """
-    A title identifing a tagtable by its tagnames
+    A title identifying a tagtable by its tagnames
     simply the space separated concatenation of the tag names
     """
-    def set_title ( self ):
+    def set_title ( self, defaultName = "Bla" ):
         if self.verbosity >= 9:
             print 'Setting title of tagtable'
-        self.title = self.tagnames.join( )
+        self.title = defaultName
+        if self.tagnames:
+            self.title = ''.join(self.tagnames)
 
 
     """
@@ -383,7 +426,7 @@ class TagTable (Lister):
         while pos < pos_end:
             if self.verbosity > 2:
                 if pos - count > count_hash:
-                    print 'DEBUG: ##### %s chars processed ######' % count_hash
+                    NTdebug('##### %s chars processed ######' % count_hash)
                     count = pos
             ## 1 char search; ', ", or ; at beginning of line
             match_quoted = pattern_quoted.search( text, pos, pos_end )
@@ -392,10 +435,10 @@ class TagTable (Lister):
                     ## Quoted at pos
                     value, pos = tag_value_quoted_parse( text, pos )
                     if pos ==  None:
-                        print 'ERROR: got error in parse (1)'
+                        NTerror('got error in parse (1)')
                         return 1
                     if pos > pos_end:
-                        print 'ERROR: found a quoted value that was not wholly within boundaries (1)'
+                        NTerror('found a quoted value that was not wholly within boundaries (1)')
                         return 1
                     self.tagvalues[ tag_id ].append( value )
                     tag_id += 1
@@ -429,10 +472,10 @@ class TagTable (Lister):
                         pos = tempendpos
                         value, pos = tag_value_quoted_parse( text, pos )
                         if pos ==  None:
-                            print 'ERROR: got error in parse (2)'
+                            NTerror('got error in parse (2)')
                             return 1
                         if pos > pos_end:
-                            print 'ERROR: found a quoted value that was not wholly within boundaries (2)'
+                            NTerror('found a quoted value that was not wholly within boundaries (2)')
                             return 1
                         self.tagvalues[ tag_id ].append( value )
                         tag_id += 1

@@ -55,6 +55,10 @@ from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
+from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import WI_SUMMARY_STR
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
@@ -65,7 +69,6 @@ from cing.core.molecule import Residue
 from cing.core.molecule import disulfideScore
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
 import math
 import os
 import shelve
@@ -101,17 +104,20 @@ def runCingChecks( project, ranges=None ):
 code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True ):
+        doProcheck = True, doWhatif=True, doWattos=True ):
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
         project.runDssp(parseOnly=parseOnly)
-    if hasattr(plugins, PROCHECK_STR) and plugins[ PROCHECK_STR ].isInstalled:
-        if doProcheck:
-            project.runProcheck(ranges=ranges, parseOnly=parseOnly)
     if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
         if doWhatif:
             project.runWhatif(parseOnly=parseOnly)
+    if hasattr(plugins, PROCHECK_STR) and plugins[ PROCHECK_STR ].isInstalled:
+        if doProcheck:
+            project.runProcheck(ranges=ranges, parseOnly=parseOnly)
+    if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
+        if doWattos:
+            project.runWattos()
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
@@ -424,16 +430,20 @@ def summary( project, toFile = True ):
         msg += "\n%s CING ROG analysis (residues %s) %s\n%s\n" % \
                (dots, r, dots, _ROGsummary(project.molecule.ranges2list(r)))
 
-    wiSummary = getDeepByKeys(project.molecule, 'wiSummary') # Hacked bexause should be another procheck level inbetween.
+    wiSummary = getDeepByKeys(project.molecule, WI_SUMMARY_STR) # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
         msg += wiSummary
 
-    pc = getDeepByKeys(project.molecule, 'procheck')
+    pc = getDeepByKeys(project.molecule, PROCHECK_STR)
     if pc:
         if hasattr(pc, "summary"):
             msg += '\n' + pc.summary.format()
         else:
             NTerror("Failed to find the procheck summary attribute")
+
+    wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR) 
+    if wattosSummary:
+        msg += wattosSummary
 
     if toFile:
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')

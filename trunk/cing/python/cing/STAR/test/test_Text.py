@@ -1,9 +1,13 @@
+from cing import cingDirTmp
 from cing.STAR.Text import comments_strip
 from unittest import TestCase
+import os
 import unittest
 
 
 class AllChecks(TestCase):
+    os.chdir(cingDirTmp)
+
     def test(self):
 #        textExpectedAfterCollapse = ';<eol-string>mmy xie<eol-string>;\n_Test'
 #        text = """;

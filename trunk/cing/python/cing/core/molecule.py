@@ -498,6 +498,20 @@ class Molecule( NTtree ):
         return resNumDict
     #end def
 
+    def _getResidueLoL(self):
+        """
+        Return list of list instance with chain number and residue number in order.
+        For decoding usage with Wattos routines
+        """
+        result = NTlist()
+        for ch in self.allChains():
+            chList = NTlist()
+            result.append(chList)
+            for res in ch.allResidues():
+                chList.append(res)
+        return result
+    #end def
+
     def _getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
         """
         Return a dict instance with (resNum, atomName), Atom mappings.

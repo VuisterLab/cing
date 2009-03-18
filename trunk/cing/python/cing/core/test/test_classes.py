@@ -1,26 +1,27 @@
+from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import removedir
 from cing.PluginCode.html import HTMLfile
 from cing.core.classes import Project
+from cing.core.constants import IUPAC
+from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from unittest import TestCase
-from cing.core.molecule import Ensemble
-from cing.core.constants import IUPAC
-from cing.Libs.NTutils import NTerror
-from cing import cingDirTestsData
+from cing.Libs.NTutils import NTmessage
 import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
 
+    os.chdir(cingDirTmp)
+    
     def tttest_HTMLfile_simple(self):
-        self.failIf(os.chdir(cingDirTmp), msg=
-             "Failed to change to directory for temporary test files: "+cingDirTmp)
         entryId = 'test'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -57,13 +58,14 @@ class AllChecks(TestCase):
         myhtml.render()
         #project = openProject('im2', 'old' )
 
-    def ttttest_rootPath(self):
+    def testRootPath(self):
         p = Project('1brv')
         self.assertEquals('./1brv.cing', p.rootPath('1brv')[0])
         self.assertEquals('1brv', p.rootPath('1brv')[1])
+        NTmessage("hello")
+        NTdebug(p.root)
 
-
-    def testRun(self):
+    def tttestRun(self):
         htmlOnly = True
         pdbConvention = IUPAC
         entryId = "1brv_1model"        # Small much studied PDB NMR entry

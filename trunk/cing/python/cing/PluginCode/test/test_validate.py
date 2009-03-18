@@ -23,13 +23,15 @@ class AllChecks(TestCase):
     def testRun(self):
         fastestTest = True
         
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
+        doWattos = True
         if fastestTest:
             htmlOnly = True 
             doWhatif = False
             doProcheck = False
+            doWattos = False
         pdbConvention = CYANA
         restraintsConvention = CYANA
 
@@ -102,7 +104,8 @@ class AllChecks(TestCase):
         project.save()
         self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                           doProcheck = doProcheck,
-                                          doWhatif=doWhatif ))
+                                          doWhatif=doWhatif,
+                                          doWattos=doWattos ))
         
 
 if __name__ == "__main__":

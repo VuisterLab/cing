@@ -3027,7 +3027,7 @@ class EventSkip:
 def NTinspect(something):
     m = inspect.getmembers(something)
     for item in m:
-        print str(item)
+        NTmessage( str(item) )
 
 class NTprogressIndicator:
     """
@@ -3091,6 +3091,7 @@ def sprintf(format, *args):
 
 def printf(format, *args):
     """print string according to C's printf routine"""
+    # JFD: need to take out the sys.stdout dep?
     fprintf(sys.stdout, format, *args)
 
 class PrintWrap:
@@ -3132,7 +3133,7 @@ class PrintWrap:
 #            fprintf( self.stream, "Exception below:\n" )
 #            traceback.print_exc() # Just prints None on my Mac. Strange.
         if self.autoFlush:
-            self.stream.flush()
+#            self.stream.flush() # JFD seems double.
             self.flush()
     def flush(self):
         self.stream.flush()
@@ -3143,33 +3144,10 @@ ERROR_ID = "ERROR"
 WARNING_ID = "WARNING"
 MESSAGE_ID = "MESSAGE"
 DEBUG_ID = "DEBUG"
-
-NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
-NTerror   = PrintWrap(verbose=verbosityError, prefix = 'ERROR: ')
-NTcodeerror=PrintWrap(verbose=verbosityError, prefix = 'ERROR IN CODE: ')
-NTexception=PrintWrap(verbose=verbosityError, prefix = 'EXCEPTION CAUGHT: ')
-NTwarning = PrintWrap(verbose=verbosityWarning, prefix = 'WARNING: ')
-NTmessage = PrintWrap(verbose=verbosityOutput)
-NTdetail  = PrintWrap(verbose=verbosityDetail)
-NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = 'DEBUG: ')
-
-NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
-#NTcodeerror.prefix += " IN CODE"
-#NTcodeerror.prefix += " EXCEPTION CAUGHT"
-
+ 
 def NTexit(msg, exitCode=1):
     NTerror(msg)
     sys.exit(exitCode)
-
-#def setVerbosity(verbosity):
-#    cing.verbosity = verbosity
-#    # Notify instances.
-#    NTnothing.setVerbosity(verbosity):
-#    NTerror.setVerbosity(verbosity):
-#    NTwarning.setVerbosity(verbosity):
-#    NTmessage.setVerbosity(verbosity):
-#    NTdetail.setVerbosity(verbosity):
-#    NTdebug.setVerbosity(verbosity):
 
 class SetupError(Exception):
     "Setup check error"
@@ -3363,7 +3341,7 @@ class ExecuteProgram(NTdict):
     def __call__(self, *args):
         """
         Execute the program.
-        Return exit code
+        Return exit code. An exit code of zero means success.
         """
         if not self.pathToProgram:
             raise SetupError("No program given for arguments: "+`args`)
@@ -3509,8 +3487,22 @@ def val2Str(value, fmt, count=None):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is
     None the count determines how long the return string will be.
-    Regular formatting is used otherwise."""
-    if value==None or isNaN(value):
+    Regular formatting is used otherwise.
+    If the input is not a None or of type float it will return None.
+    """
+    
+    if value==None:
+        value = None
+    elif not isinstance(value, float):
+#        try to parse it as a float and see
+        try:
+            # reduce the next message to debug or lower when happy.
+#            NTdebug("In val2Str the input [%s] was not a None and also not of type float; trying to parse as float now" % value)
+            value = float(value)
+        except:            
+            NTwarning("In val2Str the input was not a None and also not of type float; failed to parse as float as well.")
+            return None    
+    elif isNaN(value):
         value = None
     if value == None:
         if not count:
@@ -4287,26 +4279,62 @@ def toCsv(input):
         result += "%s\n" % item
     return result
 
+
+NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
+NTerror   = PrintWrap(verbose=verbosityError, prefix = 'ERROR: ')
+NTcodeerror=PrintWrap(verbose=verbosityError, prefix = 'ERROR IN CODE: ')
+NTexception=PrintWrap(verbose=verbosityError, prefix = 'EXCEPTION CAUGHT: ')
+NTwarning = PrintWrap(verbose=verbosityWarning, prefix = 'WARNING: ')
+NTmessage = PrintWrap(verbose=verbosityOutput)
+NTdetail  = PrintWrap(verbose=verbosityDetail)
+NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = 'DEBUG: ')
+
+NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
+
+_outOutputStreamContainerList = [ NTmessageNoEOL, NTdebug, NTdetail, NTmessage, NTwarning ]
+_errOutputStreamContainerList = [ NTerror, NTcodeerror, NTexception ]
+
 """To dump some output to never see again"""
 _bitBucket = open('/dev/null', 'aw')
-"Regular utput at the start of the program"
+"Regular output at the start of the program"
 _returnMyStdOut = sys.stdout
 "Error output at the start of the program"
 _returnMyStdErr = sys.stderr
 
+def _setStdOutStreamsTo(stream):
+    return _setOutStreamList(stream, _outOutputStreamContainerList)
+        
+def _setStdErrStreamsTo(stream):
+    return _setOutStreamList(stream, _errOutputStreamContainerList)
+
+def _setOutStreamList(stream, outputStreamContainerList):
+    for outputStreamContainer in outputStreamContainerList:
+#        print "Setting the outputStreamContainer [%s] stream to: %s" % (outputStreamContainer, stream) 
+        outputStreamContainer.flush() 
+        outputStreamContainer.stream = stream
+    
+
+        
 """Switch away from output; might be usefull to silence verbose part of code or external program"""
 def switchOutput( showOutput, doStdOut=True, doStdErr=False):
     if showOutput:
         if doStdOut:
             sys.stdout = _returnMyStdOut
+            _setStdOutStreamsTo( _returnMyStdOut )
+#            print "1DEBUG: enabled stdout"
         if doStdErr:
             sys.stderr = _returnMyStdErr
+            _setStdErrStreamsTo( _returnMyStdErr )
+#            print "1DEBUG: enabled stderr"
         return
-
     if doStdOut:
+#        print "1DEBUG: disabling stdout"
         sys.stdout = _bitBucket
+        _setStdOutStreamsTo( _bitBucket )
     if doStdErr:
+#        print "1DEBUG: disabling stderr"
         sys.stderr = _bitBucket
+        _setStdErrStreamsTo( _bitBucket )
 
 class MsgHoL(NTdict):
     def __init__(self):
@@ -4355,10 +4383,3 @@ def isAlmostEqual( ntList, epsilon):
         return True
     return False
 # end def
-
-
-if __name__ == '__main__':
-    cing.verbosity = cing.verbosityDebug
-    input = ['1brv', '9pcy' ]
-    NTdebug("csv: [" + toCsv(input) + "]")
-    NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")

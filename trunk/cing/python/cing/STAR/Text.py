@@ -484,7 +484,9 @@ def comments_strip( text ):
 
     if verbosity >= 9:
         print 'Done [%s] comment subs' % count
-    text = lines.join("\n")
+    if lines:
+        text = "\n".join(lines)
+#    text = lines.join("\n")
     return text
 
 """
@@ -522,6 +524,15 @@ def _comments_strip_line( line ):
                     state = FREE
         c += 1
     return line
+
+def isStarNan(starValue):
+    if '.' == starValue:
+        return True
+#    if '?' == starValue:
+#        return True
+    if None == starValue:
+        return True
+    return False
 
 #def comments_stripOld( text ):
 #    # split for profiling

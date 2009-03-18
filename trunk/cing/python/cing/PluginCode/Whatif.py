@@ -791,25 +791,31 @@ def runWhatif( project, parseOnly=False ):
         return True
     NTdebug( '> parsing '+ pathPdbOut)
     fullText = open(pathPdbOut, 'r').read()
-    if fullText:
-        start       = 'This report was created by WHAT IF'
-        end         ='INTRODUCTION'
-        intro = getTextBetween( fullText, start, end, endIncl=False )
-        intro = '----------- ' + intro.strip() + ' -----------'
-        NTdebug( 'got intro: \n'+ intro)
-
-        start       = 'Summary report for users of a structure'
-        end         ='=============='
-        summary = getTextBetween( fullText, start, end, endIncl=False )
-        summary = summary.strip() + '\n---------------------------------------------'
-        NTdebug( 'got summary: \n'+ summary)
-
-        summary = '\n\n'.join([intro,summary])
-        if setDeepByKeys(project.molecule, summary, 'wiSummary'):# Hacked bexause should be another wi level inbetween.
-            NTerror( 'Failed to set WI summary' )
-            return True
-    else:
+    if not fullText:
         NTerror('runWhatif: Failed to parse WI summary file')
+        return True
+        
+    start       = 'This report was created by WHAT IF'
+    end         ='INTRODUCTION'
+    intro = getTextBetween( fullText, start, end, endIncl=False )
+    if not intro:
+        NTerror('runWhatif: Failed to parse intro WI summary file')
+        return True
+    intro = '----------- ' + intro.strip() + ' -----------'
+    NTdebug( 'got intro: \n'+ intro)
+
+    start       = 'Summary report for users of a structure'
+    end         ='=============='
+    summary = getTextBetween( fullText, start, end, endIncl=False )
+    if not summary:
+        NTerror('runWhatif: Failed to parse summary WI summary file')
+        return True
+    summary = summary.strip() + '\n---------------------------------------------'
+    NTdebug( 'got summary: \n'+ summary)
+
+    summary = '\n\n'.join([intro,summary])
+    if setDeepByKeys(project.molecule, summary, 'wiSummary'):# Hacked bexause should be another wi level inbetween.
+        NTerror( 'Failed to set WI summary' )
         return True
 
     project.whatifStatus.parsed = True

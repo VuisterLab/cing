@@ -2,6 +2,7 @@
 Classes for dealing with STAR syntax
 """
 from cing.Libs.NTutils import Lister
+from cing.Libs.NTutils import NTwarning
 
 
 """
@@ -58,19 +59,19 @@ class SaveFrame (Lister):
         possibleTagNamesSFCategory = [ '_Saveframe_category',  # 2.1
                                        '.Sf_category' ]        # 3
         if not self.tagtables:
-            print "WARNING: no tagtable found in Saveframe"
+            NTwarning('no tagtable found in Saveframe')
             return None
 
         tT = self.tagtables[0] # assumed 0
         if not tT.tagvalues[0]: # assumed 0
-            print "WARNING: empty tagtable found in Saveframe"
+            NTwarning('empty tagtable found in Saveframe')
             return None
         found = 0
         for possi in possibleTagNamesSFCategory:
             if tT.tagnames[0].endswith(possi):
                 found = 1
         if not found:
-            print "WARNING: first tag doesn't look like a Sf_category; taking value anyway"
+            NTwarning("first tag doesn't look like a Sf_category; taking value anyway")
 
         return tT.tagvalues[0][0]
 

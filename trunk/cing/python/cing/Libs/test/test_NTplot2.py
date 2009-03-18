@@ -7,7 +7,6 @@ from cing.Libs.NTplot import HelixIconList
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
-from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import triangularList
 from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
@@ -19,6 +18,7 @@ from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
 from unittest import TestCase
+from cing.Libs.NTplot import lineAttributes
 import cing
 import os #@Reimport
 import sys
@@ -125,14 +125,15 @@ class AllChecks(TestCase):
 #                   lineAttributes(color=plotparams.upper, width=width) )
 #
         # Always plot the cav line
-        plot.line( (aAv, 0), (aAv, ylimMax),
+        plot.line( (aAv, 0), (aAv, ylimMax), 
                    lineAttributes(color=plotparams.average, width=width) )
+#                   dashdotline() )
         ps.hardcopy("testPlotHistoDihedral."+graphicsFormat, graphicsFormat)
 #        plot.show()
 
 
 
-    def testSelectPointsFromRange( self ):
+    def tttestSelectPointsFromRange( self ):
         pointList = [ (-1,9), (0,9), (1,9) ]
         self.assertTrue( len(selectPointsFromRange( pointList, start=-1, length=3))==3)
         self.assertTrue( len(selectPointsFromRange( pointList, start=0, length=1))==1)

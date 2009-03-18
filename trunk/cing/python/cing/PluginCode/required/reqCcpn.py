@@ -1,0 +1,2 @@
+CCPN_STR = "Ccpn"
+CCPN_LOWERCASE_STR = 'ccpn'
