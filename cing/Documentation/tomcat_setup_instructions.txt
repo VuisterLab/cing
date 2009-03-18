@@ -17,6 +17,9 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 	$CATALINA_HOME/bin/shutdown.sh (RETIRED)
 	$CATALINA_HOME/bin/startup.sh
 	
+	Test by url like: https://nmr.cmbi.ru.nl/icing/serv/iCingServlet should give:
+	{"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
+	
 - Logs:
 	tail -f $CATALINA_HOME/logs/catalina.out  &
 - Webapps:x

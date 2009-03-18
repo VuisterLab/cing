@@ -1,14 +1,18 @@
 """
-Unit test for SaveFrameTest.py
-Setup taken from "Dive Into Python"
+Unit test execute as:
+python $CINGROOT/python/cing/STAR/test/test_SaveFrame.py
 """
+from cing import cingDirTmp
 from cing.STAR.SaveFrame import SaveFrame
 from cing.STAR.TagTable import TagTable
 from unittest import TestCase
+import os
 import unittest
 
 
 class AllChecks(TestCase):
+    os.chdir(cingDirTmp)
+
     sf = SaveFrame()
     tT = TagTable()
     tT.tagnames=['_File_characteristics.Sf_category']

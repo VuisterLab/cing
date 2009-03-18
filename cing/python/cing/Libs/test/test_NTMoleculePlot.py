@@ -6,6 +6,10 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
+from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST5_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import YLABEL_STR
@@ -32,6 +36,8 @@ from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from random import random
 from unittest import TestCase
+from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
 import cing
 import os #@Reimport
 import unittest
@@ -46,8 +52,8 @@ class AllChecks(TestCase):
 
     def testMoleculePlot(self):
 
-        actuallyRunWhatif   = True
-        showValues          = True
+        actuallyRunWhatif   = False
+        showValues          = False
 
         modelNum            = 2 # Only used when simulating data
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
@@ -153,6 +159,10 @@ class AllChecks(TestCase):
         keyLoLoL = []
         plotAttributesRowMain = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowMain[ KEY_LIST2_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowMain[ KEY_LIST3_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowMain[ KEY_LIST4_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowMain[ KEY_LIST5_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  QUACHK_STR ]
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
@@ -170,9 +180,12 @@ class AllChecks(TestCase):
         plotAttributesRowAlte = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
+        plotAttributesRowAlte[ KEY_LIST2_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  C12CHK_STR ]
         plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  ROTCHK_STR ]
-#        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
+        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
+        plotAttributesRowMain[ USE_MAX_VALUE_STR]   = 10.0
+        
         keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
 
 

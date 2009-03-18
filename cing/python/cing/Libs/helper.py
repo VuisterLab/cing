@@ -3,6 +3,7 @@ import os
 """Very simple functions only here that can be instantiated without the general CING setup.
 Called from cing's main __init__.py and setup.py.
 """
+
 def _NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
     inp,out,err = os.popen3( cmd )
@@ -40,3 +41,4 @@ def getSvnRevision():
     except:
         pass
     return None
+

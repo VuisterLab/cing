@@ -1,0 +1,1 @@
+NMRSTAR_STR       = "NmrStar"

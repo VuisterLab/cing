@@ -1,14 +1,17 @@
 from cing import cingDirTmp
 from cing import verbosityDebug
+from cing.Libs.NTutils import MsgHoL
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import bytesToFormattedString
+from cing.Libs.NTutils import getDateTimeStampForFileName
+from cing.Libs.NTutils import toCsv
 from cing.PluginCode.html import HTMLfile
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
 from unittest import TestCase
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import MsgHoL
 import cing
 import os 
 import unittest
@@ -81,6 +84,11 @@ class AllChecks(TestCase):
             msgHol.appendDebug("Debug %d" % i)
         msgHol.showMessage(MAX_MESSAGES=2)
         
+    def testCSV(self):
+        input = ['1brv', '9pcy' ]
+        NTdebug("csv: [" + toCsv(input) + "]")
+    def testGetDateTimeStampForFileName(self):
+        NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
 
             
 if __name__ == "__main__":

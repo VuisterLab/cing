@@ -2,16 +2,40 @@
     Wattos Module
     First version: jfd Dec 11, 2007
 """
+from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST_STR
+from cing.Libs.NTmoleculePlot import MoleculePlotSet
+from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
+from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getTextBetween
+from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
-from cing.core.constants import IUPAC
+from cing.PluginCode.NmrStar import NmrStar
+from cing.PluginCode.required.reqWattos import COMPLCHK_STR
+from cing.PluginCode.required.reqWattos import EXP_COUNT_STR
+from cing.PluginCode.required.reqWattos import MAT_COUNT_STR
+from cing.PluginCode.required.reqWattos import OBS_ATOM_COUNT_STR
+from cing.PluginCode.required.reqWattos import OBS_COUNT_STR
+from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
+from cing.PluginCode.required.reqWattos import wattosPlotList
+from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.STAR.File import File
 from cing.core.parameters import cingPaths
+from cing.Libs.NTutils import val2Str
+from cing import NaNstring
+import cing
 import os
 import time
 
@@ -20,35 +44,102 @@ if True: # block
     if not cingPaths.classpath:
         NTdebug("Missing java classpath which is a dep for Wattos")
         raise ImportWarning('Wattos')    
-    if not (('Wattos.jar' in cingPaths.classpath) or ( # development classes.
+    if not (('Wattos.jar' in cingPaths.classpath) or (# development classes.
              '/Users/jd/workspace34/wattos/build' in cingPaths.classpath)):        
         NTdebug("Missing Wattos jar in classpath which is a dep for Wattos")
         raise ImportWarning('Wattos')    
 #    NTmessage('Using Wattos')
 
 
-class Wattos( NTdict ):
+class Wattos(NTdict):
     """
     Class to use Wattos checks.
-    First adding completeness check.
+    Adding completeness and all other checks.
     """
-
-    scriptTemplate = """
+    
+    nameDefs = [               
+                (COMPLCHK_STR, 'NOE Completeness 4Ang.', 'NOE Completeness 4A'),
+                (OBS_COUNT_STR, 'Restraint count', 'Restrainnt Observed/Expected/Matched'),
+                (OBS_ATOM_COUNT_STR, 'Atom count', 'Atom count'),
+    ]
+    
+    shortNameDict = NTdict()
+    for row in nameDefs:
+        n1 = row[0]
+#        nameDict[n1] = row[1]
+        if len(row) >= 3:
+            shortNameDict[n1] = row[2]
+        
+    def __init__(self, rootPath = '.', molecule = None, **kwds):
+        NTdict.__init__(self, __CLASS__ = 'Wattos', **kwds)
+        self.checks = None
+        self.molecule = molecule
+        self.rootPath = rootPath
+        self.SURPLUS_CHECK_FILE_NAME_BASE = "wattos_surplus_chk"
+        self.COMPLETENESS_CHECK_FILE_NAME = "wattos_completeness_chk.str"
+    
+        self.scriptTemplate = """
 InitAll
 
 SetProp
 interactiveSession
 false
+
 SetProp
 verbosity
-3
+VERBOSITY
+
 SetProp
 writeSessionOnExit
 false
 
+ListProp
+
 #Input file
-ReadEntryPDB
-INPUT_PDB_FILE
+#Read molecular system and coordinates (y suggested)
+#Read restraints (y suggested)
+#Match restraints to soup by regular STAR tags. (y suggested)
+#Match restraints to soup by author atom and residue names etc. (n suggested; only previous or this can and must be set)
+#Remove unlinked restraints (y suggested)
+#Sync over models; removing inconsistent atoms (true suggested)
+ReadEntryNMRSTAR
+INPUT_STR_FILE
+y
+y
+y
+n
+y
+y
+
+# Redundancy tolerance (5% suggested)
+# Should impossible target distance be reset to null (y suggested)
+# Should only fixed distances be considered surplus (n suggested)
+# Averaging method id. Center,Sum,R6 are 0,1, and 2 respectively and -1 to let it be determined per list but that's not completely implemented yet: (1 suggested)
+# Number of monomers but only relevant when Sum averaging is selected: (1 suggested)"));
+# Enter file name base (with path) for output of surplus check summary and constraint lists.
+# Should non-redundant constraints be written (y suggested)
+# Should redundant constraints be written (n suggested)
+# Should redundant constraints be removed (y suggested)
+CheckSurplus
+5.0
+y
+n
+1
+1
+""" + \
+self.SURPLUS_CHECK_FILE_NAME_BASE + \
+"""
+y
+y
+y
+
+CalcDistConstraintViolation
+0.5
+wattos_dist_viol.str
+
+CalcDihConstraintViolation
+5.0
+wattos_dihed_viol.str
 
 # Using same defaults as for FRED (NMR Restraints Grid) analysis.
 CheckCompleteness
@@ -64,27 +155,139 @@ CheckCompleteness
 1
 n
 ob_standard.str
-wattos_completeness_chk.str
+""" + \
+self.COMPLETENESS_CHECK_FILE_NAME + \
+"""
 n
 wattos_completeness_chk
 
+# Tolerance (0.1 Angstrom suggested)
+CalcBond
+0.1
+
+# Hydrogen bond distance between proton and acceptor cutoff (2.7 Angstroms suggested)
+# Hydrogen bond distance between donor and acceptor cutoff (3.35 Angstroms suggested)
+# Hydrogen bond angle (D-H-A) cutoff (90 degrees suggested)
+# Enter star file name (with path) for output: (e.g. C:\1brv_hb.txt)
+CalcHydrogenBond
+2.7
+3.35
+90.0
+wattos_hb.txt
+
+# Angle cutoff (40.0 degrees suggested)
+# Use only Watson Crick basepairing (false suggested)
+# Enter csv file name (with path) for output of CalcCoPlanarBasesSet.
+CalcCoPlanarBasesSet
+45.0
+n
+coPlanarBasesSet.csv
+
 Quit
 """
+        self.residueLoL = self.molecule._getResidueLoL()
+        if not self.residueLoL:
+            NTerror("Failed to get residue LoL")
+            
+    def locateWattosResidue(self, entityAssemblyId, compIndexId, compId):
+        residue = getDeepByKeys(self.residueLoL, int(entityAssemblyId) - 1, int(compIndexId) - 1)
+        strTuple = "entityAssemblyId, compIndexId, compId %s %s %s" % (entityAssemblyId, compIndexId, compId)
+        if not residue:
+            NTerror("Failed to get residue in locateWattosResidue for " + strTuple)
+            return None
+        NTdebug("Retrieved %s for Wattos %s" % (residue, strTuple))
+        return residue
+    
+    def _processComplCheck(self, fullName):
+        """
+        Put parsed data of all models into CING data model
+        Return None for success or True for error.
 
-    def __init__( self, rootPath = '.', molecule = None, **kwds ):
-        NTdict.__init__( self, __CLASS__ = 'Wattos', **kwds )
-        self.checks                = None
-        self.molSpecificChecks     = None
-        self.residueSpecificChecks = None
-        self.atomSpecificChecks    = None
-        self.residues              = None
-        self.atoms                 = None
-        self.molecule              = molecule
-        self.rootPath              = rootPath
+        Example of processed data structure attached to say a residue:
+            "wattos": {
+                "COMPCHK": {
+                    "valeList": [ 0.009, 0.100 ],
+                    "qualList": ["POOR", "GOOD" ]},
+                "BLABLACHK": {
+                    "valeList": [ 0.009, 0.100 ],
+                    }}
+                    """
+        NTdetail("==> Processing the Wattos results into CING data model")
+        # Assemble the atom, residue and molecule specific checks
+        # set the formats of each check easy printing
+#        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
+        self.molecule.wattos = self # is self and that's asking for luggage
+        
+        
+        # sorting on mols, residues, and atoms
+#        NTmessage("  for self.checks: " + `self.checks`)
+#        NTdebug("  for self.checks count: %s" % len(self.checks))
+        
+        starFile = File()
+        starFile.filename = fullName    
+        if starFile.read():
+           NTerror("Failed to read star file: %s" % fullName)
+           return True
+        
+        sfList = starFile.getSaveFrames(category = "NOE_completeness_statistics")
+        if not sfList or len(sfList) != 1:
+            NTerror("Failed to get single saveframe but got list of: [%s]" % sfList)
+            return True
+        
+        saveFrameCompl = sfList[0]
+        tagTableComplHeader = saveFrameCompl.tagtables[0]
+        completenessMol = tagTableComplHeader.getStringListByColumnName("_NOE_completeness_stats.Completeness_cumulative_pct")
+        if completenessMol:
+            completenessMol = completenessMol[0]
+
+        tagTableComplBody = saveFrameCompl.tagtables[3]
+
+        entityAssemblyIdList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Entity_assembly_ID")
+        compIndexIdList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Comp_index_ID")
+        compIdList = tagTableComplBody.getStringListByColumnName("_NOE_completeness_comp.Comp_ID")
+        
+        obsAtomCountList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Obs_atom_count")
+        obsCountList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Constraint_observed_count")
+        expCountList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Constraint_expected_count")
+        matCountList = tagTableComplBody.getIntListByColumnName("_NOE_completeness_comp.Constraint_matched_count")
+        
+        completenessResidueList = tagTableComplBody.getFloatListByColumnName("_NOE_completeness_comp.Completeness_cumulative_pct")
+        detailsList = tagTableComplBody.getStringListByColumnName("_NOE_completeness_comp.Details")
+        
+        for i, completenessResidue in enumerate(completenessResidueList):
+            entityAssemblyId = entityAssemblyIdList[i]
+            compIndexId = compIndexIdList[i]
+            compId = compIdList[i]
+            
+            obsAtomCount = obsAtomCountList[i]
+            obsCount = obsCountList   [i] 
+            expCount = expCountList   [i] 
+            matCount = matCountList   [i] 
+            
+            details = detailsList[i]
+            wattosTuple = (entityAssemblyId, compIndexId, compId)
+            residue = self.locateWattosResidue(*wattosTuple)
+            if not residue:
+                NTerror("Failed to find Wattos residue in CING: %s" % (wattosTuple))
+                return True
+            
+            residueWattosDic = residue.setdefault(WATTOS_STR, NTdict())
+            complDic = residueWattosDic.setdefault(COMPLCHK_STR, NTdict())
+#                    "valeList": [ 0.009] 
+#                    "qualList": [">sigma" ]
+            complDic[VALUE_LIST_STR] = completenessResidue
+            complDic[QUAL_LIST_STR] = details
+            
+            residueWattosDic.setDeepByKeys(obsAtomCount, OBS_ATOM_COUNT_STR, VALUE_LIST_STR) 
+            residueWattosDic.setDeepByKeys(obsCount, OBS_COUNT_STR, VALUE_LIST_STR) 
+            residueWattosDic.setDeepByKeys(expCount, EXP_COUNT_STR, VALUE_LIST_STR) 
+            residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR) 
+
+        self.molecule.setDeepByKeys([completenessMol], WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR) 
+        NTdebug('done with _processCheckdb')
     #end def
-
-
-def runWattos( project, tmp=None ):
+    
+def runWattos(project, tmp = None):
     """
         Run and import the wattos results per model.
         All models in the ensemble of the molecule will be checked.
@@ -92,84 +295,183 @@ def runWattos( project, tmp=None ):
         or None if no wattos results exist
         returns 1 on success or None on any failure.
     """
-    if not project.molecule:
+    molecule = project.molecule
+    if not molecule:
         NTerror("No project molecule in runWattos")
         return None
 
-    path = project.path( project.molecule.name, project.moleculeDirectories.wattos )
-    if not os.path.exists( path ):
-        project.molecule.wattos = None
-        for chain in project.molecule.allChains():
+    
+    path = project.path(molecule.name, project.moleculeDirectories.wattos)
+    if not os.path.exists(path):
+        molecule.wattos = None
+        for chain in molecule.allChains():
             chain.wattos = None
-        for res in project.molecule.allResidues():
+        for res in molecule.allResidues():
             res.wattos = None
-        for atm in project.molecule.allAtoms():
+        for atm in molecule.allAtoms():
             atm.wattos = None
         return None
 
-    wattos = Wattos( rootPath = path, molecule = project.molecule )
-    if project.molecule == None:
+    wattos = Wattos(rootPath = path, molecule = molecule)
+    if molecule == None:
         NTerror('in runWattos: no molecule defined')
         return None
 
-    if project.molecule.modelCount == 0:
-        NTerror('in runWattos: no models for "%s"', project.molecule)
+    if molecule.modelCount == 0:
+        NTerror('in runWattos: no models for "%s"', molecule)
         return None
 
-    wattosDir = project.mkdir( project.molecule.name, project.moleculeDirectories.wattos  )
-    pdbFileName = 'project.pdb'
-    fullname =  os.path.join( wattosDir, pdbFileName )
-    pdbFile = project.molecule.toPDB( convention = IUPAC )
-    if not pdbFile:
-        NTerror("Failed to write a temporary PDB formatted coordinate file for ensemble.")
-        return None
-    pdbFile.save( fullname   )
+    wattosDir = project.mkdir(molecule.name, project.moleculeDirectories.wattos)
+    fileName = 'project.str'
+    fullname = os.path.join(wattosDir, fileName)
 
-    scriptComplete = Wattos.scriptTemplate
-    scriptComplete = scriptComplete.replace("INPUT_PDB_FILE", pdbFileName)
+    if os.path.exists(fullname):
+        if os.unlink(fullname):
+            NTmessage("Removing existing file: %s" % fullname)
+        else:
+            NTerror("Failed to remove existing file: %s" % fullname)
+            return None
+
+    nmrStar = NmrStar(project)
+    if not nmrStar:
+        NTerror("Failed to create NmrStar(project)")
+        return None
+    
+    if not nmrStar.toNmrStarFile(fullname):
+        NTdebug("Failed to nmrStar.toNmrStarFile") # change to error when cing to ccpn is functional.
+        return None
+    
+    if not os.path.exists(fullname):
+        NTerror("Failed to create file in nmrStar.toNmrStarFile")
+        return None
+        
+    scriptComplete = wattos.scriptTemplate
+    scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
+    scriptComplete = scriptComplete.replace("VERBOSITY", `cing.verbosity`)
 
     # Let's ask the user to be nice and not kill us
     # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
-    timeRunEstimated = 0.0025 *project.molecule.modelCount * len(project.molecule.allResidues())
-    timeRunEstimatedInSecondsStr = sprintf("%4.0f",timeRunEstimated*60)
-    NTmessage('==> Running Wattos read for an estimated (50,000 atoms/s): '+timeRunEstimatedInSecondsStr+" seconds; please wait")
+    timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
+    timeRunEstimatedInSecondsStr = sprintf("%4.0f", timeRunEstimated * 60)
+    NTmessage('==> Running Wattos read for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
     scriptFileName = "wattos.script"
-    scriptFullFileName =  os.path.join( wattosDir, scriptFileName )
-    open(scriptFullFileName,"w").write(scriptComplete)
+    scriptFullFileName = os.path.join(wattosDir, scriptFileName)
+    open(scriptFullFileName, "w").write(scriptComplete)
 #    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
     wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
     logFileName = "wattos_compl.log"
-    wattosProgram = ExecuteProgram( wattosPath, rootPath = wattosDir,
-                             redirectOutputToFile  = logFileName,
-                             redirectInputFromFile = scriptFileName )
+    wattosProgram = ExecuteProgram(wattosPath, rootPath = wattosDir,
+                             redirectOutputToFile = logFileName,
+                             redirectInputFromFile = scriptFileName)
     # The last argument becomes a necessary redirection into fouling Wattos into
     # thinking it's running interactively.
     now = time.time()
-    if True:
-        wattosExitCode = wattosProgram()
-    else:
-        NTdebug("Skipping actual wattos execution for testing")
-        wattosExitCode = 0
+    wattosExitCode = wattosProgram()
 
     NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if wattosExitCode:
         NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
         return None
-
-    NTmessage('==> Parsing checks')
-#    modelCheckDbFullFileName =  os.path.join( wattosDir, modelCheckDbFileName )
-#    wattos._parseCheckdb( modelCheckDbFullFileName, 999 )
-
-    NTwarning("Processing is to be continued from here on.")
-    return 1
-    if not wattos._processCheckdb():
-        NTerror("Failed to process check db")
+    
+    fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
+    if not os.path.exists(fullname):
+        NTerror("Failed to find wattos completeness check result file: %s" % fullname)
         return None
-    # TODO: finish this code.
-#    wattos.map2molecule()
+    NTmessage('==> Parsing checks')
 
+    if wattos._processComplCheck(fullname):
+        NTerror("\nrunWattos Failed to parse check %s", fullname)
+        return None
+
+
+    pathOutSurplus = os.path.join(path, 'wattos_surplus_chk_summary.txt')
+    if not os.path.exists(pathOutSurplus): # Happened for 1ao2 on production machine; not on development...
+        NTerror("Path does not exist: %s" % (pathOutSurplus))
+        return True
+    NTdebug('> parsing ' + pathOutSurplus)
+    fullTextSurplus = open(pathOutSurplus, 'r').read()
+    if not fullTextSurplus:
+        NTerror('Failed to parse Wattos surplus summary file')
+        return True
+    
+
+    startString = 'SUMMARY:'
+    surplusSummary = getTextBetween(fullTextSurplus, startString, endString = None, startIncl = False, endIncl = False)
+    if not surplusSummary:
+        NTerror("Failed to find surplusSummary in surplusSummary[:80]: [%s]" % surplusSummary[:80])
+        return True
+    surplusSummary = surplusSummary.strip() + '\n---------------------------------------------'
+    NTdebug('got surplusSummary: \n' + surplusSummary)
+
+    pathOutCompleteness = os.path.join(path, 'wattos_completeness_chk.str')
+    if not os.path.exists(pathOutCompleteness): # Happened for 1ao2 on production machine; not on development...
+        NTerror("Path does not exist: %s" % (pathOutCompleteness))
+        return True
+    NTdebug('> parsing ' + pathOutCompleteness)
+    fullTextCompleteness = open(pathOutCompleteness, 'r').read()
+    if not fullTextCompleteness:
+        NTerror('Failed to parse Wattos completeness summary file')
+        return True
+
+    startString = '_NOE_completeness_shell.Type'
+    endString = 'stop_'
+    completenessSummary = getTextBetween(fullTextCompleteness, startString, endString, endIncl = False)
+    if not completenessSummary:
+        NTerror("Failed to find completenessSummary in fullText[:80]: [%s]" % fullTextCompleteness[:80])
+        return True
+    completenessSummary = completenessSummary.strip() + '\n---------------------------------------------'
+    NTdebug('got completenessSummary: \n' + completenessSummary)
+
+    intro = '----------- Wattos summary -----------'
+    completenessMolStr = NaNstring
+    completenessMol = molecule.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+    if completenessMol:
+        completenessMolStr = val2Str(completenessMol[0], "%.2f")
+    complStatement = 'Overall NOE completeness is %s percent\n---------------------------------------------' % completenessMolStr
+
+    summary = '\n'.join([intro, surplusSummary, complStatement, completenessSummary])
+    if setDeepByKeys(molecule, summary, WATTOS_SUMMARY_STR):
+        NTerror('Failed to set Wattos summary')
+        return True
+    
     return wattos # Success
 #end def
 
+def createHtmlWattos(project, ranges = None):
+    """ Read out wiPlotList to see what get's created. """
+
+#    wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
+    # The following object will be responsible for creating a (png/pdf) file with
+    # possibly multiple pages
+    # Level 1: row
+    # Level 2: against main or alternative y-axis
+    # Level 3: plot parameters dictionary (extendable).
+    keyLoLoL = []
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR] = Wattos.shortNameDict[  COMPLCHK_STR ]
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 100.0
+    keyLoLoL.append([ [plotAttributesRowMain] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ WATTOS_STR, OBS_COUNT_STR, VALUE_LIST_STR ]
+    plotAttributesRowMain[ KEY_LIST2_STR] = [ WATTOS_STR, EXP_COUNT_STR, VALUE_LIST_STR ]
+    plotAttributesRowMain[ KEY_LIST3_STR] = [ WATTOS_STR, MAT_COUNT_STR, VALUE_LIST_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ WATTOS_STR, OBS_ATOM_COUNT_STR, VALUE_LIST_STR ]
+    plotAttributesRowMain[ YLABEL_STR] = Wattos.shortNameDict[  OBS_COUNT_STR ]
+    plotAttributesRowAlte[ YLABEL_STR] = Wattos.shortNameDict[  OBS_ATOM_COUNT_STR ]
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+
+    printLink = project.moleculePath('wattos', project.molecule.name + wattosPlotList[0][0] + ".pdf")
+    moleculePlotSet = MoleculePlotSet(project = project, ranges = ranges, keyLoLoL = keyLoLoL)
+    moleculePlotSet.renderMoleculePlotSet(printLink, createPngCopyToo = True)
+#end def
+
+
 # register the functions
-methods  = [(runWattos, None)]
+methods = [(runWattos, None),
+           (createHtmlWattos, None)           
+           ]

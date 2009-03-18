@@ -49,6 +49,8 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
+from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqWattos import wattosPlotList
 import os
 import shelve
 import shutil
@@ -1400,8 +1402,8 @@ class MoleculeHTMLfile( HTMLfile ):
         project = self.project
         molecule = self.molecule
 
-        NTmessage("Creating Whatif html")
         if not htmlOnly:
+            NTmessage("Creating Whatif html")
             if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
                 if project.createHtmlWhatif():
                     NTerror('Failed to createHtmlWhatif')
@@ -1449,7 +1451,67 @@ class MoleculeHTMLfile( HTMLfile ):
             main('tr',  openTag=False)
         main('table',  openTag=False) # close table
         if not anyWIPlotsGenerated:
-            main('h2', "No what if plots found at all")
+            main('h2', "No What If plots found at all")
+        #end for doWhatif check.
+    #end def
+
+    def _generateWattosHtml(self, htmlOnly=False):
+        """Generate the Wattos html code
+        """
+        main = self.main
+        project = self.project
+        molecule = self.molecule
+
+        NTmessage("Creating Wattos html")
+        if not htmlOnly:
+            if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
+                if project.createHtmlWattos():
+                    NTerror('Failed to createHtmlWattos')
+                    return True
+                #end if
+            #end if
+        #end if
+
+        anyWattosPlotsGenerated = False
+
+        main('h1','Wattos')
+        ncols = 6
+        main('table',  closeTag=False)
+        plotCount = -1
+        for p,d in NTprogressIndicator(wattosPlotList):
+            plotCount += 1
+            wattosLink = os.path.join('../..',
+                        project.moleculeDirectories.wattos, molecule.name + p + ".pdf")
+            wattosLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
+                        project.moleculeDirectories.wattos, molecule.name + p + ".pdf")
+#            NTdebug('wiLinkReal: ' + wiLinkReal)
+            if not os.path.exists( wattosLinkReal ):
+#                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
+                continue # Skip their inclusion.
+
+            pinupLink = os.path.join('../..',
+                        project.moleculeDirectories.wattos, molecule.name + p + "_pin.gif" )
+            fullLink = os.path.join('../..',
+                        project.moleculeDirectories.wattos, molecule.name + p + ".png" )
+            anyWattosPlotsGenerated = True
+            if plotCount % ncols == 0:
+                if plotCount:
+                    main('tr',  openTag=False)
+                main('tr',  closeTag=False)
+            main('td',  closeTag=False)
+            main('a',   "",         href = fullLink, closeTag=False )
+            main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+            main('a',   "",         openTag=False )
+            main('br')
+            main('a',   d,          href = wattosLink )
+            main('td',  openTag=False)
+        #end for plot
+
+        if plotCount: # close any started rows.
+            main('tr',  openTag=False)
+        main('table',  openTag=False) # close table
+        if not anyWattosPlotsGenerated:
+            main('h2', "No Wattos plots found at all")
         #end for doWhatif check.
     #end def
 
@@ -1482,6 +1544,7 @@ class MoleculeHTMLfile( HTMLfile ):
 
         self._generateWhatifHtml(htmlOnly=htmlOnly)
         self._generateProcheckHtml(htmlOnly=htmlOnly)
+        self._generateWattosHtml(htmlOnly=htmlOnly)
 
         #footer code is inserted upon rendering
         # render

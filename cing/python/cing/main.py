@@ -279,6 +279,7 @@ def testOverall(namepattern):
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Procheck.py']
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_validate.py']
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Wattos.py']
+#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_NmrStar.py']
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/Libs/test/test_Imagery.py']
     NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
@@ -380,11 +381,11 @@ def getParser():
                       help="Initialize new project PROJECTNAME from CCPNFOLDER",
                       metavar="CCPNFOLDER"
                      )
-    parser.add_option("--loadCcpn",
-                      dest="loadCcpn", default=None,
-                      help="Open project PROJECTNAME and load data from CCPNFOLDER",
-                      metavar="CCPNFOLDER"
-                     )
+#    parser.add_option("--loadCcpn",
+#                      dest="loadCcpn", default=None,
+#                      help="Open project PROJECTNAME and load data from CCPNFOLDER",
+#                      metavar="CCPNFOLDER"
+#                     )
     parser.add_option("--xeasy",
                       dest="xeasy", default=None,
                       help="Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION",
@@ -438,11 +439,6 @@ def getParser():
                       dest="ensemble", default=None,
                       help="Models of the ensemble to use for superpose, procheck, validate etc; e.g. 0,3-8,10,20. Note that model numbers start at zero.",
                       metavar="ENSEMBLE"
-                     )
-    parser.add_option("--noImagery",
-                      action="store_true",
-                      dest="noImagery",
-                      help="Set this option to prevent the creation images. Greatly speeds validation up."
                      )
     parser.add_option("--superpose",
                       action="store_true", default=False,

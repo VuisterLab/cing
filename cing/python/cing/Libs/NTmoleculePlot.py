@@ -7,6 +7,7 @@ from cing.Libs.Imagery import joinPdfPages
 from cing.Libs.Imagery import montage
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import ResPlot
+from cing.Libs.NTplot import cingLineTypeList
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import pointAttributes
 from cing.Libs.NTutils import NTerror
@@ -15,8 +16,14 @@ from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
 import os
 
 KEY_LIST_STR = 'keyList'
+KEY_LIST2_STR = 'keyList2'
+KEY_LIST3_STR = 'keyList3'
+KEY_LIST4_STR = 'keyList4'
+KEY_LIST5_STR = 'keyList5'
+
 YLABEL_STR = 'yLabel'
 USE_ZERO_FOR_MIN_VALUE_STR = 'useZeroForMinValue'
+USE_MAX_VALUE_STR = 'useMaxValue'
 
 class MoleculePlotSet:
     """A set of ResPlotSet (pages)."""
@@ -53,6 +60,13 @@ class MoleculePlotSet:
                 for item in mainOrAlt:
                     points = []
                     pointsL.append(points)
+                    itemDictKeyList = item.keys()
+                    itemDictKeyList.sort()
+                    for keyList in itemDictKeyList:
+                        if not (keyList in [ KEY_LIST_STR, KEY_LIST2_STR, KEY_LIST3_STR, KEY_LIST4_STR, KEY_LIST5_STR]):
+                            continue
+                        serie = []
+                        points.append(serie)
 #        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
 #        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
         rangeList = self.project.molecule.getFixedRangeList(
@@ -60,25 +74,40 @@ class MoleculePlotSet:
             ranges=self.ranges )
         resNumb = 0
         
-        # start a new plot for each resList
+        # start a new plot page for each resList
         for resList in rangeList:
-            for res in resList:
+            for res in resList: 
                 resNumb += 1
 #                NTdebug(`res`)
                 r = 0 # r for row
                 for row in self.keyLoLoL:
                     pointsLoL = pointsLoLoL[r]
-                    i = 0
+                    i = 0 # for each serie; main or alternative.
                     for mainOrAlt in row:
+#                        NTdebug("mainOrAlt: %s" % mainOrAlt)
                         pointsL = pointsLoL[i]
-                        j = 0
+                        j = 0 # for each 
                         for item in mainOrAlt:
+#                            NTdebug("item: %s" % item)
                             points = pointsL[j]
-                            keys = item[KEY_LIST_STR]
-                            point = getDeepByKeys(res,*keys)
-                            if isinstance(point, NTlist):
-                                point = point.average()[0]
-                            points.append((resNumb-.5, point))
+                            itemDictKeyList = item.keys()
+                            itemDictKeyList.sort()
+#                            NTdebug("itemDictKeyList: %s" % itemDictKeyList)
+                            k = 0
+                            for keyList in itemDictKeyList:
+                                if not (keyList in [ KEY_LIST_STR, KEY_LIST2_STR, KEY_LIST3_STR, KEY_LIST4_STR, KEY_LIST5_STR]):
+                                    continue
+                                serie = points[k]
+                                keys = item[keyList]
+                                point = getDeepByKeys(res,*keys)
+    #                            NTdebug("Found point %s" % point )
+                                if isinstance(point, NTlist):
+                                    av, _sd, _n = point.average()
+    #                                NTdebug("Found av, sd, n %s %s %s" % (val2Str(av, "%.3f", 8),val2Str(sd, "%.3f", 8),val2Str(n, "%.3f", 8)))
+                                    point = av
+    #                                point = point.average()[0]
+                                serie.append((resNumb-.5, point))
+                                k += 1
                             j += 1
                         i += 1
                     r += 1
@@ -138,6 +167,7 @@ class MoleculePlotSet:
             length = ntPlotList[0].MAX_WIDTH_IN_RESIDUES
             start = (r-1)*length
 
+            
             for i in range(nrows):
                 pointsLoL = pointsLoLoL[i]
                 pointsForAutoscaling = [] # might be done differently in future when alternative axis doesn't have same scale as main axis.
@@ -145,19 +175,28 @@ class MoleculePlotSet:
                     pointsL = pointsLoL[j]
                     for k in range(len(pointsL)): # k usually just 0
                         points = pointsL[k]
-                        pointsOffset = convertPointsToPlotRange(points, xOffset=-start, yOffset=0, start=0, length=length)
-                        pointAttr = plusPoint
-                        if j:      # alternative y-axis
-                            pointAttr = circlePoint
-#                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
-                        ntPlotList[i].lines(pointsOffset,  pointAttr)
-                        pointsForAutoscaling += pointsOffset
+                        for lineTypeIdx,serie in enumerate(points): # extra loop for potentially multiple series                            
+                            pointsOffset = convertPointsToPlotRange(serie, xOffset=-start, yOffset=0, start=0, length=length)
+                            pointAttr = plusPoint
+                            if j:      # alternative y-axis
+                                pointAttr = circlePoint
+#                            NTdebug("Using lineTypeIdx %d %s"%(lineTypeIdx, cingLineTypeList[lineTypeIdx]))                            
+                            pointAttr.lineType = cingLineTypeList[lineTypeIdx]
+    #                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
+                            ntPlotList[i].lines(pointsOffset,  pointAttr)
+                            pointsForAutoscaling += pointsOffset
                         
 #                NTdebug( 'autoScaleY row %d' % (i))
                 ntPlotList[i].autoScaleY( pointsForAutoscaling )
                 if getDeepByKeys( self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR ):
 #                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
                     ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
+
+                maxValue = getDeepByKeys( self.keyLoLoL, i, 0, 0, USE_MAX_VALUE_STR )
+                if maxValue != None:
+#                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
+                    ntPlotList[i].setYrange((ntPlotList[i].yRange[0], maxValue))
+
 
             ySpaceAxisResTypes = .02 + (nrows-1) * .01
             ntPlotList[0].drawResTypes(ySpaceAxis=ySpaceAxisResTypes) # Weirdly can only be called after yRange is set.

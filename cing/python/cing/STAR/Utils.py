@@ -1,6 +1,7 @@
 """
 Just a few utilities that can be of more general use.
 """
+from cing.Libs.NTutils import NTerror
 import re
 
 __author__    = "$Author$"
@@ -14,12 +15,12 @@ Used in TagTable.
 """
 def transpose ( matrix ):
     if len( matrix ) < 1:
-        print 'ERROR: trying to transpose an empty matrix'
+        NTerror(' trying to transpose an empty matrix')
         return 1
     elif len( matrix ) == 1:
         if len(matrix[0]) == 0:
-            print 'ERROR: trying to transpose an empty matrix, shape would be lost'
-            print 'ERROR: [[]] would become []'
+            NTerror(' trying to transpose an empty matrix, shape would be lost')
+            NTerror(' [[]] would become []')
             return 1
         else:
             return map( lambda y : (y)   , matrix[0] )
