@@ -35,6 +35,7 @@ from cing.STAR.File import File
 from cing.core.parameters import cingPaths
 from cing.Libs.NTutils import val2Str
 from cing import NaNstring
+from cing.Libs.NTutils import NTwarning
 import cing
 import os
 import time
@@ -42,11 +43,11 @@ import time
 if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
-        NTdebug("Missing java classpath which is a dep for Wattos")
+        NTmessage("Missing java classpath which is a dep for Wattos")
         raise ImportWarning('Wattos')    
-    if not (('Wattos.jar' in cingPaths.classpath) or (# development classes.
+    if not (('/Users/jd/workspace34/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
              '/Users/jd/workspace34/wattos/build' in cingPaths.classpath)):        
-        NTdebug("Missing Wattos jar in classpath which is a dep for Wattos")
+        NTmessage("Missing Wattos jar in classpath [%s] which is a dep for Wattos" % cingPaths.classpath)
         raise ImportWarning('Wattos')    
 #    NTmessage('Using Wattos')
 
@@ -375,9 +376,9 @@ def runWattos(project, tmp = None):
     
     fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
     if not os.path.exists(fullname):
-        NTerror("Failed to find wattos completeness check result file: %s" % fullname)
+        NTwarning("Failed to find wattos completeness check result file: %s" % fullname)
         return None
-    NTmessage('==> Parsing checks')
+#    NTmessage('==> Parsing checks')
 
     if wattos._processComplCheck(fullname):
         NTerror("\nrunWattos Failed to parse check %s", fullname)
@@ -388,7 +389,7 @@ def runWattos(project, tmp = None):
     if not os.path.exists(pathOutSurplus): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathOutSurplus))
         return True
-    NTdebug('> parsing ' + pathOutSurplus)
+#    NTdebug('> parsing ' + pathOutSurplus)
     fullTextSurplus = open(pathOutSurplus, 'r').read()
     if not fullTextSurplus:
         NTerror('Failed to parse Wattos surplus summary file')
@@ -399,37 +400,42 @@ def runWattos(project, tmp = None):
     surplusSummary = getTextBetween(fullTextSurplus, startString, endString = None, startIncl = False, endIncl = False)
     if not surplusSummary:
         NTerror("Failed to find surplusSummary in surplusSummary[:80]: [%s]" % surplusSummary[:80])
-        return True
-    surplusSummary = surplusSummary.strip() + '\n---------------------------------------------'
-    NTdebug('got surplusSummary: \n' + surplusSummary)
+        return True 
+    surplusSummary = "Wattos Surplus Analysis Summary\n\n" + surplusSummary.strip()
+    
+#    NTdebug('got surplusSummary: \n' + surplusSummary)
 
-    pathOutCompleteness = os.path.join(path, 'wattos_completeness_chk.str')
-    if not os.path.exists(pathOutCompleteness): # Happened for 1ao2 on production machine; not on development...
-        NTerror("Path does not exist: %s" % (pathOutCompleteness))
-        return True
-    NTdebug('> parsing ' + pathOutCompleteness)
-    fullTextCompleteness = open(pathOutCompleteness, 'r').read()
-    if not fullTextCompleteness:
-        NTerror('Failed to parse Wattos completeness summary file')
-        return True
+#    pathOutCompleteness = os.path.join(path, 'wattos_completeness_chk.str')
+#    if not os.path.exists(pathOutCompleteness): # Happened for 1ao2 on production machine; not on development...
+#        NTerror("Path does not exist: %s" % (pathOutCompleteness))
+#        return True
+#    NTdebug('> parsing ' + pathOutCompleteness)
+#    fullTextCompleteness = open(pathOutCompleteness, 'r').read()
+#    if not fullTextCompleteness:
+#        NTerror('Failed to parse Wattos completeness summary file')
+#        return True
+#
+#    startString = '_NOE_completeness_shell.Type'
+#    endString = 'stop_'
+#    completenessSummary = getTextBetween(fullTextCompleteness, startString, endString, endIncl = False)
+#    if not completenessSummary:
+#        NTerror("Failed to find completenessSummary in fullText[:80]: [%s]" % fullTextCompleteness[:80])
+#        return True
+#    completenessSummary = '\n'.join([HTML_TAG_PRE, 
+#                                completenessSummary.strip(), 
+#                                '---------------------------------------------', 
+#                                HTML_TAG_PRE2])
+#    
+#    NTdebug('got completenessSummary: \n' + completenessSummary)
 
-    startString = '_NOE_completeness_shell.Type'
-    endString = 'stop_'
-    completenessSummary = getTextBetween(fullTextCompleteness, startString, endString, endIncl = False)
-    if not completenessSummary:
-        NTerror("Failed to find completenessSummary in fullText[:80]: [%s]" % fullTextCompleteness[:80])
-        return True
-    completenessSummary = completenessSummary.strip() + '\n---------------------------------------------'
-    NTdebug('got completenessSummary: \n' + completenessSummary)
-
-    intro = '----------- Wattos summary -----------'
+#    intro = '----------- Wattos summary -----------'
     completenessMolStr = NaNstring
     completenessMol = molecule.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
     if completenessMol:
         completenessMolStr = val2Str(completenessMol[0], "%.2f")
-    complStatement = 'Overall NOE completeness is %s percent\n---------------------------------------------' % completenessMolStr
+    complStatement = 'Overall NOE completeness is %s percent\n' % completenessMolStr
 
-    summary = '\n'.join([intro, surplusSummary, complStatement, completenessSummary])
+    summary = '\n\n'.join([surplusSummary, complStatement])
     if setDeepByKeys(molecule, summary, WATTOS_SUMMARY_STR):
         NTerror('Failed to set Wattos summary')
         return True

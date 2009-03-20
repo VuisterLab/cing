@@ -45,13 +45,13 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
-from cing.Libs.NTutils import list2asci #@UnusedImport
+from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.peirceTest import peirceTest
+from cing.PluginCode.html import removePreTagLines
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
@@ -69,6 +69,7 @@ from cing.core.molecule import Residue
 from cing.core.molecule import disulfideScore
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
+from cing.PluginCode.html import addPreTagLines
 import math
 import os
 import shelve
@@ -376,7 +377,7 @@ def criticize(project, toFile=True):
 
 #end def
 
-def _ROGsummary( residueList ):
+def _ROGsummary( residueList, allowHtml=False ):
     """Return a ROG summary string for residues in residueList
     """
     c = NTlist( 0, 0, 0 ) # Counts for green, orange and red.
@@ -401,6 +402,8 @@ Green:   %3d  (%3.0f%%)
          -----------
 Total    %3d  (%3.0f%%)""" % ( c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0 )
     #end if
+    if allowHtml:
+        msg = addPreTagLines(msg)
     return msg
 #end def
 
@@ -414,42 +417,51 @@ def summary( project, toFile = True ):
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
 
-    msg = sprintf( '=================== CING SUMMARY project %s ===================\n', project.name )
+    msg = sprintf( '%s CING SUMMARY project %s %s\n', dots, project.name, dots )
 
 #    msg += sprintf( '%s\n', project.molecule.format() )
 
     if project.molecule.has_key('rmsd' ):
-        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
+        msg += project.molecule.rmsd.format(allowHtml=True)
+#        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
 
     for drl in project.distances + project.dihedrals + project.rdcs:
-        msg += sprintf( '\n%s\n', drl.format() )
+        msg += drl.format(allowHtml=True) + '\n'
+#        msg += sprintf( '\n%s\n', drl.format() )
 
-    msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues()))
+    msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues(),allowHtml=True))
     if project.molecule.ranges:
         r = project.molecule.ranges
         msg += "\n%s CING ROG analysis (residues %s) %s\n%s\n" % \
-               (dots, r, dots, _ROGsummary(project.molecule.ranges2list(r)))
+               (dots, r, dots, _ROGsummary(project.molecule.ranges2list(r), allowHtml=True))
 
     wiSummary = getDeepByKeys(project.molecule, WI_SUMMARY_STR) # Hacked bexause should be another procheck level inbetween.
     if wiSummary:
-        msg += wiSummary
+        msg += "\n%s WHAT IF Summary %s\n" % (dots, dots )
+        msg += addPreTagLines(wiSummary)
 
     pc = getDeepByKeys(project.molecule, PROCHECK_STR)
     if pc:
         if hasattr(pc, "summary"):
-            msg += '\n' + pc.summary.format()
+            msg += "\n%s Procheck Summary %s\n" % (dots, dots )
+            msg += '\n' + addPreTagLines(pc.summary.format())
         else:
             NTerror("Failed to find the procheck summary attribute")
 
     wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR) 
     if wattosSummary:
-        msg += wattosSummary
+        msg += "\n%s Wattos Summary %s\n" % (dots, dots )
+        msg += '\n' + addPreTagLines(wattosSummary)
 
+    
     if toFile:
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         NTmessage( '==> summary, output to %s', fname)
-        fprintf( fp, msg )
+#        NTdebug(" msg: " + msg)
+        msgClean = removePreTagLines( msg )
+#        NTdebug(" msgClean: " + msgClean)
+        fprintf( fp, msgClean )
         fp.close()
     #end if
 

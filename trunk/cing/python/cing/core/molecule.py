@@ -48,6 +48,7 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
+from cing.PluginCode.html import addPreTagLines
 import math
 import os
 import sys
@@ -1895,16 +1896,14 @@ class RmsdResult( NTdict ):
     def header(self, dots='-'*20):
         return sprintf('%s %s %s', dots, self, dots)
 
-    def format(self):
-        return sprintf('%s\n' +\
+    def format(self, allowHtml=False):
+        msg = sprintf(
                        'backboneAverage:      %s\n'  +\
                        'heavyAtomsAverage:    %s\n'  +\
                        'models:               %s\n' +\
                        'backbone   (n=%4d): [%s]\n' +\
                        'heavyAtoms (n=%4d): [%s]\n' +\
-                       'closestToMean:        model %d\n' +\
-                       '%s',
-                       self.header(),
+                       'closestToMean:        model %d\n',
                        str(self.backboneAverage),
                        str(self.heavyAtomsAverage),
                        self.models.format('%4d '),
@@ -1912,9 +1911,11 @@ class RmsdResult( NTdict ):
                        self.backbone.format(fmt='%4.2f '),
                        self.heavyAtomsCount,
                        self.heavyAtoms.format(fmt='%4.2f '),
-                       self.closestToMean,
-                       self.footer()
+                       self.closestToMean
                       )
+        if allowHtml:
+            msg = addPreTagLines(msg)
+        return '\n'.join( [self.header(), msg, '' ])
     #end def
 #end class
 

@@ -54,6 +54,7 @@ from cing.core.parameters import plugins
 from shutil import rmtree
 from cing.core.constants import AC_LEVEL
 from cing.core.constants import RDC_LEVEL
+from cing.PluginCode.html import addPreTagLines
 import cing
 import math
 import os
@@ -1678,9 +1679,8 @@ class DistanceRestraint( NTdict ):
         return sprintf('<DistanceRestraint %d>', self.id )
     #end def
 
-    def format( self ):
-        return  \
-            sprintf('%-25s %-6s (Target: %s %s)  (Models: min %s  av %s+-%s  max %s) '+\
+    def format( self, allowHtml=False ):
+        msg = sprintf('%-25s %-6s (Target: %s %s)  (Models: min %s  av %s+-%s  max %s) '+\
                     '(Violations: av %4.2f max %4.2f counts l,0.1,0.3,0.5:%2d,%2d,%2d,%2d) %s',
                      str(self), self.rogScore,
                      val2Str(self.lower, "%4.1f", 4),
@@ -1693,15 +1693,9 @@ class DistanceRestraint( NTdict ):
                      self.violCountLower, self.violCount1, self.violCount3, self.violCount5,
                      self._names()
                     )
-#            sprintf('%-25s %-6s (Target: %4.1f %4.1f)  (Models: av %4s sd %4s min %4.1f max %4.1f) '+\
-#                    '(Violations: av %6s max %6.1f counts %2d,%2d,%2d) %s',
-#                     str(self), self.rogScore,
-#                     self.lower, self.upper,
-#                     val2Str(self.av,"%6.1f", 6), val2Str(self.sd,"%7.3f", 7), self.min, self.max,
-#                     val2Str(self.violAv,"%4.1f", 4),self.violMax, self.violCount1, self.violCount3, self.violCount5,
-#                     self._names()
-#                    )
-
+        if allowHtml:
+            msg = addPreTagLines(msg)
+        return msg
     #end def
 #end class
 
@@ -1872,9 +1866,9 @@ class DistanceRestraintList( NTlist ):
         return self.__str__()
     #end def
 
-    def format( self ):
-        return sprintf(
-'''%s DistanceRestraintList "%s" (%s,%d) %s
+    def format( self, allowHtml=False ):
+        msg = sprintf(
+'''
 sequential:         %4d
 intra-residual:     %4d
 medium-range:       %4d
@@ -1887,27 +1881,19 @@ violations > 0.1 A: %4d
 violations > 0.3 A: %4d
 violations > 0.5 A: %4d
 
-ROG score:         %s''',
-                        dots, self.name,self.status,len(self), dots,
+ROG score:         %s
+''',
                         len(self.intraResidual),len(self.sequential),len(self.mediumRange),len(self.longRange),len(self.ambigious),
                         val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
                         self.violCountLower, self.violCount1, self.violCount3, self.violCount5,
                         self.rogScore
                       )
-#       return sprintf( '%s DistanceRestraintList "%s" (%s,%d) %s\n' +\
-#                        'Violations\n' +\
-#                        '  > 0.1 A:%7d\n' +\
-#                        '  > 0.3 A:%7d\n' +\
-#                        '  > 0.5 A:%7d\n' +\
-#                        'rmsd:     %7s +-%6s',
-#                        dots, self.name,self.status,len(self), dots,
-#                        self.violCount1,
-#                        self.violCount3,
-#                        self.violCount5,
-#                        val2Str(self.rmsdAv, "%7.3f", 7),
-#                        val2Str(self.rmsdSd, "%6.3f", 6)
-#                       )
-
+        if allowHtml:
+            msg = addPreTagLines(msg)
+        header = '%s DistanceRestraintList "%s" (%s,%d) %s\n' % (
+            dots, self.name,self.status,len(self), dots)
+        msg = header + msg 
+        return msg
     #end def
 
     def save(self,path=None):
@@ -2292,28 +2278,28 @@ class DihedralRestraintList( NTlist ):
         return self.__str__()
     #end def
 
-    def format( self ):
-        return sprintf(
-'''%s DihedralRestraintList "%s" (%s,%d) %s
+    def format( self, allowHtml=False ):
+        msg = sprintf(
+'''
 rmsd:                 %7s +-%6s
 violations >1 degree: %4d
 violations >3 degree: %4d
 violations >5 degree: %4d
-ROG score:            %s''',
-                        dots, self.name,self.status,len(self), dots,
-                        val2Str(self.rmsdAv, "%7.3f", 7),
+
+ROG score:            %s
+''',                    val2Str(self.rmsdAv, "%7.3f", 7),
                         val2Str(self.rmsdSd, "%6.3f", 6),
                         self.violCount1,
                         self.violCount3,
                         self.violCount5,
                         self.rogScore
                       )
-#        return sprintf( '%s DihedralRestraintList "%s" (%s,%d) %s\n'+\
-#                        'rmsd: %7s %6s        Violations > 1,3,5 degree: %d, %d, %d',
-#                      dots, self.name,self.status,len(self), dots,
-#                      val2Str(self.rmsdAv,         "%7.3f", 7),
-#                      val2Str(self.rmsdSd,         "%6.3f", 6),
-#                      self.violCount1, self.violCount3, self.violCount5)
+        if allowHtml:
+            msg = addPreTagLines(msg)
+        header = '%s DihedralRestraintList "%s" (%s,%d) %s\n' % (
+            dots, self.name,self.status,len(self), dots)
+        msg = header + msg 
+        return msg
     #end def
 
     def save(self,path=None):
@@ -2566,13 +2552,15 @@ class RDCRestraintList( NTlist ):
         return self.__str__()
     #end def
 
-    def format( self ):
-        s = sprintf( '%s RDCRestraintList "%s" (%s,%d) %s\n' +\
-                     'rmsd: %7.3f %6.3f',
-                      dots, self.name,self.status,len(self), dots,
-                      self.rmsdAv, self.rmsdSd
-                   )
-        return s
+    def format( self, allowHtml=False ):
+        msg = sprintf( 'rmsd: %7.3f %6.3f',
+                      self.rmsdAv, self.rmsdSd)
+        if allowHtml:
+            msg = addPreTagLines(msg)
+        header = '%s RDCRestraintList "%s" (%s,%d) %s\n' % (
+            dots, self.name,self.status,len(self), dots)
+        msg = header + msg 
+        return msg
     #end def
 
     def save(self,path=None):

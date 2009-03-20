@@ -36,11 +36,11 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
         
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
         doWattos = True
         useNrgArchive = False
         if fastestTest:
@@ -66,7 +66,7 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,
-                                          doWattos=doWattos ))
+                                              doWattos=doWattos ))
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
 

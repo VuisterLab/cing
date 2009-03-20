@@ -18,24 +18,26 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-#        entryList = "1ai0".split()
+        entryList = "1iv6".split()
 #        entryList = "1brv".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
-        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
+#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
 #        entryList =            "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #1iv6 needs better ccpn file from FC
 #        entryList = ["Parvulustat"]
 #        entryList = ["1a4d"]
 
         fastestTest = True
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
+        doWattos = True
         if fastestTest:
             htmlOnly = True 
             doWhatif = False
             doProcheck = False
+            doWattos = False
 
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
@@ -48,7 +50,8 @@ class AllChecks(TestCase):
             self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
-                                              doWhatif=doWhatif ))
+                                              doWhatif=doWhatif,
+                                              doWattos=doWattos ))
 #            self.assertFalse(project.removeCcpnReferences()) 
 
 if __name__ == "__main__":

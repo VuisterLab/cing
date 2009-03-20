@@ -103,6 +103,8 @@ class Whatif( NTdict ):
                 ('DUNCHK', 'Duplicate atom names in ligands', 'Duplicate atom names in ligands'),
                 ('EXTO2',  'Test for extra OXTs', 'Test for extra OXTs'),
                 ('FLPCHK', 'Peptide flip',                                              'Peptide flip'),
+                ('H2OCHK',  'Water check', 'Water check'),
+                ('H2OHBO',  'Water Hydrogen bond', 'Water Hydrogen bond'),
                 ('HNDCHK', 'Chirality', 'Chirality'),
                 ('HNQCHK', 'Flip HIS GLN ASN hydrogen-bonds', 'Flip HIS GLN ASN hydrogen-bonds'),
                 ('INOCHK', 'Accessibility',                                             'Accessibility Z.'),
@@ -789,31 +791,31 @@ def runWhatif( project, parseOnly=False ):
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathPdbOut))
         return True
-    NTdebug( '> parsing '+ pathPdbOut)
+#    NTdebug( '> parsing '+ pathPdbOut)
     fullText = open(pathPdbOut, 'r').read()
     if not fullText:
         NTerror('runWhatif: Failed to parse WI summary file')
         return True
         
-    start       = 'This report was created by WHAT IF'
-    end         ='INTRODUCTION'
-    intro = getTextBetween( fullText, start, end, endIncl=False )
-    if not intro:
-        NTerror('runWhatif: Failed to parse intro WI summary file')
-        return True
-    intro = '----------- ' + intro.strip() + ' -----------'
-    NTdebug( 'got intro: \n'+ intro)
+#    start       = 'This report was created by WHAT IF'
+#    end         ='INTRODUCTION'
+#    intro = getTextBetween( fullText, start, end, endIncl=False )
+#    if not intro:
+#        NTerror('runWhatif: Failed to parse intro WI summary file')
+#        return True
+#    intro = '----------- ' + intro.strip() + ' -----------'
+#    NTdebug( 'got intro: \n'+ intro)
 
     start       = 'Summary report for users of a structure'
     end         ='=============='
-    summary = getTextBetween( fullText, start, end, endIncl=False )
+    summary = getTextBetween( fullText, start, end, startIncl=False, endIncl=False )
     if not summary:
         NTerror('runWhatif: Failed to parse summary WI summary file')
         return True
-    summary = summary.strip() + '\n---------------------------------------------'
-    NTdebug( 'got summary: \n'+ summary)
+    summary = summary.strip() + '\n'
+#    NTdebug( 'got summary: \n'+ summary)
 
-    summary = '\n\n'.join([intro,summary])
+#    summary = '\n\n'.join([intro,summary])
     if setDeepByKeys(project.molecule, summary, 'wiSummary'):# Hacked bexause should be another wi level inbetween.
         NTerror( 'Failed to set WI summary' )
         return True

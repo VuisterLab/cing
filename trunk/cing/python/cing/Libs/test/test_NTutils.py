@@ -14,9 +14,9 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import findFiles
 from cing.Libs.NTutils import removeRecursivelyAttribute
+from cing.Libs.NTutils import switchOutput
 from cing.Libs.NTutils import val2Str
 from cing.Libs.fpconst import isNaN
-from cing.Libs.helper import switchOutput
 from unittest import TestCase
 import cing
 import os

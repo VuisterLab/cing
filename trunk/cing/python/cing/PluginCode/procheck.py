@@ -116,8 +116,7 @@ class ProcheckSummaryResult( NTdict ):
                         molecule   = molecule,
                         ranges     = ranges,
                         text       = text,
-                        __FORMAT__ = \
-dots + " Procheck Summary " + dots + """
+                        __FORMAT__ = """
 molecule:     %(molecule)s
 ranges:       %(ranges)s
 ramachandran
@@ -586,9 +585,9 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if not os.path.exists(path):
             NTerror('Procheck.parseResult: file "%s" not found', path)
             return True
-        NTdebug( '> parsing sum >'+ path)
+#        NTdebug( '> parsing sum >'+ path)
         text = open(path, 'r').read()
-        NTdebug( 'got: \n'+ text)
+#        NTdebug( 'got: \n'+ text)
         if text:
             self.summary = ProcheckSummaryResult( text, self.molecule, self.ranges )
         else:

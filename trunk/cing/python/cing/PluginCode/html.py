@@ -5,8 +5,8 @@ from cing import NaNstring
 from cing import authorList
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing import cingVersion
 from cing import programName
+from cing import versionStr
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
@@ -34,6 +34,8 @@ from cing.Libs.NTutils import list2asci #@UnusedImport
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
+from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqWattos import wattosPlotList
 from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import RAMCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
@@ -49,8 +51,6 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
-from cing.PluginCode.required.reqWattos import WATTOS_STR
-from cing.PluginCode.required.reqWattos import wattosPlotList
 import os
 import shelve
 import shutil
@@ -62,6 +62,9 @@ dbase = shelve.open( dbaseFileName )
 #histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 dbase.close()
+
+HTML_TAG_PRE = "<PRE>"
+HTML_TAG_PRE2 = "</PRE>"
 
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
@@ -891,7 +894,7 @@ class HTMLfile:
         # Append a default footer
         defaultFooter = NTlist()
         self._appendTag( defaultFooter, 'p', closeTag=False)
-        self._appendTag( defaultFooter, None, sprintf( ' %s  version %s ', programName, cingVersion) )
+        self._appendTag( defaultFooter, None, sprintf( ' %s  version %s ', programName, versionStr) )
         n = len(authorList)-1
         for i,author in enumerate(authorList):
             self._appendTag( defaultFooter, 'a', author[0], href=sprintf("mailto:%s", author[1]))
@@ -1172,12 +1175,31 @@ Redirecting to %s
 #        htmlsum.header('a', 'Home', href='../../index.html' )    #TODO: fix explicitly coded path
 
         s = self.project.summary(toFile = False).split('\n')
-        for l in s[1:]:
+
+        # Create a two-state machinery.
+        summaryLineCount = len(s)
+        i = 0
+        while i < summaryLineCount:
+            l = s[i]
             if l[0:5] == '-----':
                 html.main('h3', l )
+            elif l.startswith('<PRE>'): # should occur alone on line!
+                preLineList = []
+                while True:
+                    i += 1
+                    if i >= summaryLineCount:
+                        NTcodeerror("Failed to find </PRE> all the way to the end")
+                        break
+                    l = s[i]
+                    if l.startswith('</PRE>'): # should occur alone on line!
+                        break
+                    preLineList.append( l )
+                subStr = '\n'.join(preLineList)
+                html.main('pre', subStr)
             else:
                 html.main('br', l )
-        #end for
+            i += 1            
+        #end while
         html.render()
         return html
     #end def
@@ -2455,6 +2477,23 @@ class EnsembleHTMLfile( HTMLfile ):
         self.render()
     #end def
 #end class
+
+
+def removePreTagLines(msg):
+    """Removes lines that start with a pre tag"""
+    resultList = []
+    msgList = msg.split('\n')
+    for l in msgList:
+        
+        if l.startswith(HTML_TAG_PRE) or l.startswith(HTML_TAG_PRE2):
+            continue 
+        resultList.append(l)
+    result = '\n'.join(resultList)
+    return result
+
+def addPreTagLines(msg):
+    """Add pre tag lines."""
+    return '\n'.join( [HTML_TAG_PRE, msg, HTML_TAG_PRE2 ])
 
 def sortListByRogAndKey(theList, sortKey=None, descending=True):
     if sortKey!=None:
