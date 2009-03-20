@@ -196,7 +196,7 @@ Quit
         if not residue:
             NTerror("Failed to get residue in locateWattosResidue for " + strTuple)
             return None
-        NTdebug("Retrieved %s for Wattos %s" % (residue, strTuple))
+#        NTdebug("Retrieved %s for Wattos %s" % (residue, strTuple))
         return residue
     
     def _processComplCheck(self, fullName):

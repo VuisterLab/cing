@@ -161,13 +161,14 @@ class AllChecks(TestCase):
         Is this because it gets called upon importing the CCPN module already. Nop.?
         """
         NTdebug("Message to debug")
-        NTerror("Message to error")
+        NTerror("Intended message to error")
         switchOutput( showOutput=False, doStdOut=True, doStdErr=True)
+        print "Message to regular sys.stdout should not be printed"
         NTdebug("Message to debug 2 should not be printed")
         NTerror("Message to error 2 should not be printed")
         switchOutput( showOutput=True, doStdOut=True, doStdErr=True)
         NTdebug("Message to debug 3")
-        NTerror("Message to error 3")
+        NTerror("Intended message to error 3")
 
 
 if __name__ == "__main__":
