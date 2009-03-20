@@ -45,7 +45,6 @@ from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
-from cing.core.constants import CING
 import cing
 import csv
 import os
@@ -145,7 +144,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/'+CING+'_%s/HTML/index.html'
+        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -432,7 +431,7 @@ class nrgCing(Lister):
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
-        cingImage = '../data/%t/%s/%s.cing/CING_%s/HTML/mol.gif'
+        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
         example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
         file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()

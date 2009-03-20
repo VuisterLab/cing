@@ -1,25 +1,3 @@
-if True:
-    from cing.Libs.NTutils import ImportWarning
-    from cing.Libs.NTutils import NTmessage
-    from cing.Libs.NTutils import switchOutput
-    from cing.PluginCode.required.reqCcpn import CCPN_STR
-    switchOutput(False)
-    try:
-        import ccpnmr #@UnusedImport
-        from ccp.general.Util import createMoleculeTorsionDict
-        from ccp.general.Util import getResonancesFromPairwiseConstraintItem
-        from ccp.util.Molecule import makeMolecule
-        from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
-        from ccp.util.Validation import getResidueValidation #@UnresolvedImport
-        from memops.api.Implementation import MemopsRoot
-        from memops.general.Constants import currentModelVersion
-        from memops.general.Io import loadProject
-    except:
-        switchOutput(True)
-        raise ImportWarning(CCPN_STR)
-    finally: # finally fails in python below 2.5
-        switchOutput(True)
-#    NTmessage('Using Ccpn')
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -54,6 +32,28 @@ import os
 import re
 import string
 import tarfile
+if True:
+    from cing.Libs.NTutils import ImportWarning
+    from cing.Libs.NTutils import NTmessage
+    from cing.Libs.NTutils import switchOutput
+    from cing.PluginCode.required.reqCcpn import CCPN_STR
+    switchOutput(False)
+    try:
+        import ccpnmr #@UnusedImport
+        from ccp.general.Util import createMoleculeTorsionDict
+        from ccp.general.Util import getResonancesFromPairwiseConstraintItem
+        from ccp.util.Molecule import makeMolecule
+        from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
+        from ccp.util.Validation import getResidueValidation #@UnresolvedImport
+        from memops.api.Implementation import MemopsRoot
+        from memops.general.Constants import currentModelVersion
+        from memops.general.Io import loadProject
+    except:
+        switchOutput(True)
+        raise ImportWarning(CCPN_STR)
+    finally: # finally fails in python below 2.5
+        switchOutput(True)
+#    NTmessage('Using Ccpn')
 
 
 
@@ -1490,10 +1490,10 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
     # end def
 
 
-    def _ensureValidName(self, name, prefix = CING):
+    def _ensureValidName(self, name, prefix = "_"):
         '''Descrn: For checking string names from Ccpn.Project for objects like molecule, peak list, restraint list, etc.
-                   If 'name' start with a digit, 'CING_' will prefix 'name'.
-                   Cing doesn't like names starting with digits, spaces neither '|'.
+                   Objects may start with a digit now in CING.
+                   Cing doesn't like names starting with spaces neither '|', '.', or '+'.
            Inputs: a string 'name'.
            Output: same string 'name', 'prefix' + string 'name' or
                    just 'prefix' if 'name' = None'''
@@ -1502,10 +1502,10 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         if not name:
             name = prefix
 
-        if name[0].isdigit():
-            name = prefix + '_' + name
-        else:
-            name = prefix
+#        if name[0].isdigit():
+#            name = prefix + '_' + name
+#        else:
+#            name = prefix
         # end if
 
         name = name.replace('|', '_')
@@ -1979,11 +1979,11 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
                     return (0.0, - Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
 
             if lower == None:
-                msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed error).")
+                msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed dev).")
                 lower = constraint.targetValue - error
 
             if upper == None:
-                msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed error).")
+                msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed dev).")
                 upper = constraint.targetValue + error
 
 

@@ -39,7 +39,7 @@ INTERNAL   = INTERNAL_0
 LOOSE      = 'LOOSE'
 
 CCPN       = 'CCPN' # Wim added
-CING       = 'CING' # For CCPN
+CING       = 'CING' # For CCPN etc.
 
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
