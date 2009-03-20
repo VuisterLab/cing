@@ -4,6 +4,8 @@ import os
 Called from cing's main __init__.py and setup.py.
 """
 
+#Block to keep in sync with the one in helper.py
+#===============================================================================
 def _NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
     inp,out,err = os.popen3( cmd )
@@ -23,6 +25,7 @@ def _NTwarning(msg):
     print "WARNING:",msg
 def _NTmessage(msg):
     print msg
+#===============================================================================
 
 def getSvnRevision():
     """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""

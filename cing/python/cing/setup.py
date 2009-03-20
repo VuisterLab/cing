@@ -1,9 +1,5 @@
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
-from cing.Libs.helper import _NTerror
-from cing.Libs.helper import _NTgetoutput
-from cing.Libs.helper import _NTmessage
-from cing.Libs.helper import _NTwarning
 from string import atoi
 from string import strip
 import os
@@ -30,6 +26,29 @@ xplor/procheck/what if executables; make sure they are in your
 path when you run setup. If they are not; you may continue without their
 respective functionalities.
 """
+
+#Block to keep in sync with the one in helper.py
+#===============================================================================
+def _NTgetoutput( cmd ):
+    """Return output from command as (stdout,sterr) tuple"""
+    inp,out,err = os.popen3( cmd )
+    output = ''
+    for line in out.readlines():
+        output += line
+    errors = ''
+    for line in err.readlines():
+        errors += line
+    inp.close()
+    out.close()
+    err.close()
+    return (output,errors)
+def _NTerror(msg):
+    print "ERROR:",msg
+def _NTwarning(msg):
+    print "WARNING:",msg
+def _NTmessage(msg):
+    print msg
+#===============================================================================
 
 #------------------------------------------------------------------------------------
 # generate setup csh or bash script
