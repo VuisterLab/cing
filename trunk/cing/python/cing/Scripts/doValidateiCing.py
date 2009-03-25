@@ -1,4 +1,3 @@
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 
@@ -19,11 +18,11 @@ project = project #@UndefinedVariable for Pydev extensions.
 options = options #@UndefinedVariable
 
 
-if options.noImagery:
-    NTmessage( "Setting to htmlOnly because noImagery option was set." )
-    htmlOnly = True
-else:
-    NTdebug( "noImagery option was not set so doing all images." )
+#if options.noImagery:
+#    NTmessage( "Setting to htmlOnly because noImagery option was set." )
+#    htmlOnly = True
+#else:
+#    NTdebug( "noImagery option was not set so doing all images." )
     
 #==================================================
 # Check for molecule

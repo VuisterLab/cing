@@ -6,7 +6,6 @@ main.py: command line interface to the cing utilities:
 Usage: cing [options]       use -h or --help for listing
 
 Options:
-  --version             show program's version number and exit
   -h, --help            show this help message and exit
   --test                Run set of test routines to verify installation.
   --test2               Run extensive tests on large data sets checking code
