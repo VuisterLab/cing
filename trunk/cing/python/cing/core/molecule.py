@@ -1407,6 +1407,18 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
+    def hasNucleicAcid(self):
+        for res in self.allResidues():
+            if res.hasProperties('nucleic'):
+                return True
+        return None # is actually the default of course.   
+
+    def hasDNA(self):
+        for res in self.allResidues():
+            if res.hasProperties('DNA'):
+                return True
+        return None # is actually the default of course.   
+
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
         """
         Superpose the coordinates of molecule
