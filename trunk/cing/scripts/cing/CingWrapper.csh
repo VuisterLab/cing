@@ -34,8 +34,8 @@ set script = CingWrapper.csh
 ###############################################################################
     
 # Requirements below:
-limit cputime    6000   # Maximum number of seconds the CPU can spend
-                        # on any single process spawned. 100 minutes seems to be top.
+limit cputime   12000   # Maximum number of seconds the CPU can spend
+                        # on any single process spawned. 100 minutes seems to be top. Nop, Entry 2vda was only halfway.
 limit filesize   500m   # Maximum size of any one file
 limit datasize  1000m   # Maximum size of data (including stack)
 limit coredumpsize 0    # Maximum size of core dump file
