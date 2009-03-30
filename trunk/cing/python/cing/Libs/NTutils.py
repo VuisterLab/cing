@@ -1556,7 +1556,7 @@ noneobject = NoneObject
 
 
 class NTtree(NTdict):
-    """NTTree class
+    """NTtree class
        Linked tree-like structure class
     """
 
