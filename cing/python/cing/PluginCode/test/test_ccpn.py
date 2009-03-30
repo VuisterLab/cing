@@ -26,6 +26,7 @@ class AllChecks(TestCase):
 #        entryList = "1kr8".split()
 #        entryList = "1ai0".split()
         entryList = "1brv".split()
+#        entryList = "H1GI".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
@@ -36,7 +37,7 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
         
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
@@ -70,7 +71,7 @@ class AllChecks(TestCase):
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
 
-    def ttttestCreateCcpn(self):
+    def tttestCreateCcpn(self):
         pdbConvention = IUPAC
         restraintsConvention = CYANA
         entryId = "1brv_1model" # Small much studied PDB NMR entry
@@ -111,7 +112,7 @@ class AllChecks(TestCase):
             project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
                         copy2sources = True,
                         **kwds)
-        project.save()
+#        project.save()
         ccpnFolder = entryId
         self.assertTrue(project.createCcpn(ccpnFolder))
         self.assertTrue(project.saveCcpn())

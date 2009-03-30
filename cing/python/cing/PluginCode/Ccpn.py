@@ -147,7 +147,7 @@ class Ccpn:
     CCPN_ATOM_LIST_TO_IGNORE_REPORTING = []
     hideMissingAtomsJfdKnowsAbout = False # default should be False
     if hideMissingAtomsJfdKnowsAbout:
-        CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
+        CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "H1 H2 H3 OXT ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
 
     def __init__(self, project, ccpnFolder, convention = IUPAC, patchAtomNames = True,
                  skipWaters = False, allowNonStandardResidue = True):
@@ -659,6 +659,27 @@ class Ccpn:
 
         return self.molecule
     # end def _match2Cing
+
+
+    def _match2Ccpn(self, residue):
+        '''Descrn: Match the atoms in a residue between CING and CCPN.
+           Output: None on error.
+        '''
+        
+        ccpnResidue = residue.ccpn
+        matchingConvention = INTERNAL
+        
+        for ccpnAtom in ccpnResidue.sortedAtoms():
+            nameTuple = (matchingConvention, residue.chain.name, residue.resNum, ccpnAtom.chemAtom.name)
+            atom = self.molecule.decodeNameTuple(nameTuple)
+            if not atom:
+                NTerror('No atom found in CING for tuple %s. Skipping creating non-standard atoms' %str( nameTuple))
+                continue
+            atom.ccpn = ccpnAtom
+            ccpnAtom.cing = atom
+        return True
+    # end def  
+
 
     def _getCingAtom(self, ccpnAtomSet):
         """Matches to CING atoms or a pseudoAtom
@@ -1536,26 +1557,21 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         return True
 
 
-    def _checkCcpnProject(self, makeNewCcpn = False):
-        """Descrn: Function to check that an object really is a CCPN project.
-                   Optional argument to make a new CCPN project if none is input.
-           Inputs: Cing Project, CCPN Implementation.MemopsRoot or None,
-                   String, Boolean
-           Output: True or None
+    def _createCcpnProject(self):
+        """Descrn: Function to add a CCPN project to self.
+           Inputs: Cing Project
+           Output: None for error.
         """
 
-        if not self.ccpnProject:
-            if makeNewCcpn:
-                name = self.project.name
-                NTmessage("==> Making new CCPN project '%s' ", name)
-                self.ccpnProject = MemopsRoot(name = name)
-            else:
-                NTerror("No CCPN project specified")
-                return None
+        if self.ccpnProject:
+            # TODO: actually remove the project from the memops etc.
+            self.ccpnProject = None
+        name = self.project.name
+        NTmessage("==> Making new CCPN project '%s' ", name)
+        self.ccpnProject = MemopsRoot(name = name)
 
-        elif not isinstance(self.ccpnProject, MemopsRoot):
-            NTerror("Input object is not a CCPN project")
-            return None
+        self.project.ccpn = self.ccpnProject
+        self.ccpnProject.cing = self.project
 
         # JFD: are we sure that this is capital CING?
         # JFD: how about when there is no cingRun? It's created below then...
@@ -1568,51 +1584,21 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
         return True
 
-
-
-    def _checkProjects(self, makeNewCcpn = False):
-        """Descrn: Function to check Cing and CPPN projects are what they
-                   ought to be. Optional argument to make a new CCPN project
-                   if None is input
-           Inputs: Cing Project, CCPN Implementation.MemopsRoot or None,
-                   String, Boolean
-           Output: True or None for error.
-        """
-        if not self._checkCingProject():
-            NTerror(" Failed _checkCingProject")
-            return None
-
-        if not self._checkCcpnProject(makeNewCcpn):
-            NTerror(" Failed _checkCingProject")
-            return None
-
-        if hasattr(self.ccpnProject, self.CCPN_CING_ATR):
-            if self.ccpnProject.cing is not self.project:
-                NTerror("Attempt to switch CCPN project")
-                return None
-            self.ccpnProject.cing = self.project
-            self.project.ccpn = self.ccpnProject
-        return True
-
-
     def createCcpn(self, ccpnFolder = None):
         """Descrn: Create a new CCPN project and associates it to a Cing.Project.
            Inputs: Cing.Project instance.
            Output: True or None for error.
         """
-
-        NTcodeerror("This code is a first setup but is NOT functional yet; see the TODOs below.")
-
         self.ccpnProject = None # removing it.
-        if not self._checkProjects(makeNewCcpn = True):
-            NTerror("Failed _checkProjects")
+        if not self._createCcpnProject(makeNewCcpn=True):
+            NTerror(" Failed _checkCingProject")
             return None
 
-        if not self.ccpnNmrProject:
-            self.ccpnNmrProject = self.ccpnProject.newNmrProject(name = self.ccpnProject.name)
-            if not self.ccpnNmrProject:
-                NTerror("Failed ccpnProject.newNmrProject")
-                return None
+#        if not self.ccpnNmrProject:
+#            self.ccpnNmrProject = self.ccpnProject.newNmrProject(name = self.ccpnProject.name)
+#            if not self.ccpnNmrProject:
+#                NTerror("Failed ccpnProject.newNmrProject")
+#                return None
 
         if not self.createCcpnMolecules():
             NTerror("Failed to createCcpnMolecules")
@@ -1620,9 +1606,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         if not self.createCcpnStructures():
             NTerror("Failed to createCcpnStructures")
             return None
-        if not self.createCcpnRestraints():
-            NTerror("Failed to createCcpnRestraints")
-            return None
+#        if not self.createCcpnRestraints():
+#            NTerror("Failed to createCcpnRestraints")
+#            return None
 
         # TODO: Peak Lists
         #ccpnPeakLists = createCcpnPeakLists(cingProject, ccpnProject)
@@ -1656,7 +1642,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         """Descrn: Create from Cing.Molecule a molSystem into a existing
                    CCPN project instance.
            Inputs: CCPN Implementation.Project, Cing Project, String
-           Output: CCPN MolSystem.MolSystem or None
+           Output: Return None on error
         """
 
         moleculeList = [] #@UnusedVariable
@@ -1672,15 +1658,20 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # end if
 
         for molecule in moleculeList:
+            NTdebug("Doing create CCPN molecule (%s)", molecule.name)
             if hasattr(molecule, self.CING_CCPN_ATR):
                 NTwarning("CCPN export attempt for molecule (%s) with existing link", molecule.name)
                 continue
 
             moleculeName = molecule.name
 
-            molSystem = self.ccpnProject.newMolSystem(code = moleculeName, name = moleculeName)
+            print self.ccpnProject.molSystems
+#            molSystem = self.ccpnProject.newMolSystem(code = moleculeName, name = moleculeName)
+            molSystem = self.ccpnProject.findFirstMolSystem()
             molSystem.cing = molecule
             molecule.ccpn = molSystem
+            
+            self.molecule = molecule # Needed in this class even if it's temp.
 
             for chain in molecule.chains:
                 residues = chain.residues
@@ -1688,7 +1679,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
                 # TODO: What about protonation states?
                 # TODO: Check names in sequence OK
-
+                # JFD: CING also stores the molType as a residue attribute just like CCPN.
                 firstResidue = residues[0]
                 if firstResidue.getAtoms(['CA', 'N'], convention = CCPN):
                     molType = 'protein'
@@ -1707,12 +1698,12 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 resSkippedList = []
                 for res in chain:
                     resNameCcpnFull = res.db.translate(CCPN)
-                    NTdebug("resNameCcpnFull " + resNameCcpnFull)
+#                    NTdebug("resNameCcpnFull " + resNameCcpnFull)
                     # Actually gives: 'DNA G prot:H1;deprot:H7' or 'protein Val neutral'
 #                    resNameCcpn = upperCaseFirstCharOnly(res.resName)
                     # Fails for Gluh etc.
                     resNameCcpnList = resNameCcpnFull.split(' ')
-                    NTdebug("resNameCcpnList %s" % resNameCcpnList)
+#                    NTdebug("resNameCcpnList %s" % resNameCcpnList)
                     if len(resNameCcpnList) < 2:
                         NTerror("Failed to find normal ccpn residue name; perhaps missing mol type?")
                         resSkippedList.append(res)
@@ -1727,10 +1718,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     continue
                 NTdebug("sequence for CCPN: %s" % sequence)
 
-                ccpnMolecule = makeMolecule(self.ccpnProject, molType,
-                                            isCyclic = False, startNum = firstResidue.resNum,
-                                            molName = moleculeChainName,
-                                            sequence = sequence)
+                ccpnMolecule = makeMolecule(self.ccpnProject, molType, isCyclic = False, startNum = firstResidue.resNum,
+                                            molName = moleculeChainName, sequence = sequence)
 
                 ccpnChain = molSystem.newChain(code = chain.name,
                                                molecule = ccpnMolecule)
@@ -1742,13 +1731,13 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     residue = residues[i]
                     ccpnResidue.cing = residue
                     residue.ccpn = ccpnResidue
-                    #_ccpnAtom2CingAndCoords(molecule, ccpnResidue, chain.name)
+                    self._match2Ccpn(residue)
                 # end for
                 NTmessage("Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName)
             # end for
         # end for
 
-        return molSystem
+        return True
 
     # end def createCcpnMolecules
 
@@ -1756,7 +1745,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         """Descrn: create Ccpn.molStructures from Cing.Coordinates into a existing
                    CCPN project instance.
            Inputs: CCPN Implementation.Project, Cing.Project, String (Molecule.name)
-           Output: CCPN MolStructure.StructureEnsemble or None
+           Output: True or None for error.
         """
 
         listMolecules = []
@@ -1799,7 +1788,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                                                           seqId = ccpnResidue.seqId)
                     for atom in residue.allAtoms():
                         if not atom.coordinates:
-                            NTwarning("Skipping %s because no coordinates were found", atom)
+                            if not atom.isPseudoAtom():
+                                if atom.name not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING:
+                                    NTwarning("Skipping %s because no coordinates were found", atom)
     #                        NTwarning('atom: '+atom.format())
                             continue
                         # end if
@@ -1823,7 +1814,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             # end for
         # end for
 
-        return structureEnsemble
+        return True
 
 
 
@@ -1834,6 +1825,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
            Inputs: CCPN Implementation.Project, Cing.Project instance.
            Output: CCPN NmrConstraint.NmrConstraintStore or None
         """
+
+        NTcodeerror("This code is a first setup but is NOT functional yet; see the TODOs below.")
 
         ccpnConstraintStore = self.ccpnProject.newNmrConstraintStore(nmrProject = self.ccpnNmrProject)
 
@@ -1889,6 +1882,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 # end class
 
 def isDistanceOrHBondType(restraintTypeIdx):
+    """Returns True if the restraint is either a distance or a HB"""
     return restraintTypeIdx == Ccpn.RESTRAINT_IDX_DISTANCE or restraintTypeIdx == Ccpn.RESTRAINT_IDX_HBOND
 
 def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
@@ -2042,11 +2036,12 @@ def createCcpn(project, ccpnFolder):
     return ccpn.ccpnProject
 
 def saveCcpn(project):
+    """Return None for error"""
     if not hasattr(project, Ccpn.CING_CCPN_ATR):
         NTerror("Failed saveCcpn because there is not ccpn project yet.")
         return None
 
-    if project.ccpn.saveModified():
+    if not project.ccpn.saveModified():
         NTmessage("Saved ccpn project.")
         return True
 

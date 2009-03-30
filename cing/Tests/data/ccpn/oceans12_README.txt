@@ -7,6 +7,7 @@ Molecular system:
 1a24 well known
 1afp beta barrel.
 1ai0 complex with H2O and ligand
+1b4y DNA triple helix for testing x3dna code
 1brv small
 1bus has ligand PCA.
 1cjg nucleic acid/protein complex.
