@@ -38,8 +38,8 @@ to generate thumbnails.
        - Select and trim sections from the event library clips and
 drag and drop them to the new project.
        - Add a music track from say iTunes and set the volume to like 1 %.
-- Publish to YouTube from iMovie.
-       - Right click the project and select "Publish to YouTube"
+- Export from iMovie because it doesn't do the highest resolution.
+- At YouTube
        - Enter your account info and set the category to "Science &
 Technology".
        - Title like: Analysis iCing interface Screencast
@@ -48,7 +48,7 @@ screencast I will show you how to use Analysis to validate your NMR
 project with in iCing."
        - Add Tags like: CING, Analysis, NMR, Structure Validation,
 Proteins, Nucleic Acids, CCPN, PDB
-       - Size has to be at least Medium which is still very small at 640 x 480.
+       - Size has to be at least 1280 x 720 (16:9 HD).
 - Link to it from as many web pages as you see fit.
 - I like to add a high resolution version to the CING web site since
 it really is hard to read the font on YouTube.
