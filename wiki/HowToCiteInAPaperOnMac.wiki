@@ -1,0 +1,16 @@
+#summary How to write a paper with Word/Endnote/Papers on Mac OSX
+
+= Versions =
+
+  * Word 2004 for Mac, v 11.3.8 (070817)
+  * Endnote X1
+  * Papers 1.9.1
+
+= Procedure =
+
+  * In Papers select (File -> Export -> 
+  * In Endnote 
+    * select all and delete.
+    * select (File -> Import) using EndNote Generated XML/Import All/ANSEL settings.
+  * In Word
+    * Use the style: xxx
