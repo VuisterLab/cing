@@ -19,7 +19,7 @@ public interface Settings {
     public static final String SERVER_ROOT_DIR = "/Library/WebServer/Documents";
     /** Directory with the CING run results. */
     public static final String SERVER_TMP_DIR = SERVER_ROOT_DIR + "/" + RESULT_URL;
-    /** 10 Mb ought to do it for now. 100 in the future? */
+    /** 50 Mb ought to do it for now. The PDB file for 2k0e is 28 Mb. Which crashed the Servlet on Java out of memory. */
     public static final long FILE_UPLOAD_MAX_SIZE = 50 * 1024 * 1024;
     /** Name of file that indicates the CING run is done */
     public static final String DONE_FILE = "DONE";
