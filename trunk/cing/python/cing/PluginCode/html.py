@@ -1247,8 +1247,12 @@ Redirecting to %s
         #Use a dummy object for referencing the text-files for now
         flatFiles = NTdict()
         flatFiles.htmlLocation = (self.project.moleculePath('analysis'), HTMLfile.top )
-#        self.main('p')
         self.insertHtmlLinkInTag('li',self.main, self.project, flatFiles, text="Details (flat)")
+
+        #Use a dummy object for referencing the text-files for now
+        progFiles = NTdict()
+        progFiles.htmlLocation = (self.project.moleculePath(), HTMLfile.top )
+        self.insertHtmlLinkInTag('li',self.main, self.project, progFiles, text="Programs (flat)")
 
         if hasattr(self, 'history'):
             del(self.history)
