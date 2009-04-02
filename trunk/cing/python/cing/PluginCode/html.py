@@ -1789,7 +1789,7 @@ class ResidueHTMLfile( HTMLfile ):
 
                                                         ('violations',dict(width= "55px", align="right",  valign="top", style="font-size: 10px") ),
                                                         ('Max',       dict(width= "25px", align="right",  valign="top", style="font-size: 10px") ),
-                                                        ('>0.3A',     dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
+                                                        ('>threshold',     dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
 
                                                         ('Critique',  dict(align="left",  valign="top", style="font-size: 10px") )
                                                        ],
@@ -1846,7 +1846,7 @@ class ResidueHTMLfile( HTMLfile ):
 
                                                         ('violations',dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
                                                         ('Max',       dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
-                                                        ('>0.3A',     dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
+                                                        ('>threshold',dict(width= "25px", align="center",    valign="top", style="font-size: 10px") ),
 
                                                         ('Critique',  dict(align="left",  valign="top", style="font-size: 10px") )
                                                        ],
