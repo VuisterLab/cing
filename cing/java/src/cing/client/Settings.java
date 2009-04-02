@@ -8,7 +8,7 @@ public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
     public static final boolean DO_DEBUG = false;
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20090213-1320";
+    public static final String VERSION = "20090330-1139";
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
@@ -51,7 +51,7 @@ public interface Settings {
     public static final String FORM_PARM_ACCESS_KEY = "AccessKey";
     public static final String FORM_PARM_UPLOAD_FILE_BASE = "UploadFile";
     public static final String FORM_PARM_VERBOSITY = "Verbosity";
-    public static final String FORM_PARM_IMAGERY = "Imagery";
+//    public static final String FORM_PARM_IMAGERY = "Imagery";
     public static final String FORM_PARM_RESIDUES = "Residues";
     public static final String FORM_PARM_ENSEMBLE = "Ensemble";
 

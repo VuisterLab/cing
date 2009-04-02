@@ -68,7 +68,8 @@ public class Options extends iCingView {
 		flexTable.setWidget(optionImagerIdx, 0, createImageryCheckBox);
 		flexTable.getFlexCellFormatter().setColSpan(1, 0, 2);
 		createImageryCheckBox.setText(c.Imagery_repor());
-		createImageryCheckBox.setChecked(true);
+        createImageryCheckBox.setChecked(true);
+        createImageryCheckBox.setVisible(false);
 		
 		final Label residuesLabel = new Label(c.Residues());
 		flexTable.setWidget(optionResidueIdx, 0, residuesLabel);
@@ -162,9 +163,9 @@ public class Options extends iCingView {
         return Utils.getListBoxItemValue(listBoxVerbosity);
     }
 
-    public String getImagery() {
-        return Boolean.toString( createImageryCheckBox.isChecked() );
-    }
+//    public String getImagery() {
+//        return Boolean.toString( createImageryCheckBox.isChecked() );
+//    }
 
     public String getResidue() {
         return textBoxResidue.getText();

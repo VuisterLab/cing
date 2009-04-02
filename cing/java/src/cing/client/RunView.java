@@ -130,15 +130,15 @@ public class RunView extends iCingView {
 
         
         String verbosity = icing.options.getVerbosity();
-        String imagery = icing.options.getImagery();
+//        String imagery = icing.options.getImagery();
         String residue = icing.options.getResidue();
         String ensemble = icing.options.getEnsemble();
         GenClient.showDebug("verbosity: " + verbosity);
-        GenClient.showDebug("imagery: " + imagery);
+//        GenClient.showDebug("imagery: " + imagery);
         GenClient.showDebug("residue: " + residue);
         GenClient.showDebug("ensemble: " + ensemble);
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_VERBOSITY, icing.options.getVerbosity()));
-        cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_IMAGERY, icing.options.getImagery()));
+//        cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_IMAGERY, icing.options.getImagery()));
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_RESIDUES, icing.options.getResidue()));
         cingQueryRun.formVerticalPanel.add(new Hidden(Settings.FORM_PARM_ENSEMBLE, icing.options.getEnsemble()));
         cingQueryRun.formPanel.submit();

@@ -88,6 +88,7 @@ def testEntry(entry):
     "&program=STAR&request_type=archive&subtype=full&type=entry") % (stage, stage, entry)
     fnamezip = entry + ".zip"
 #    print "DEBUG: downloading url:", urlLocation
+    # TODO: wrap this in a try so the test is less invulnerable to network outages.
     try:
         urllib.urlretrieve(urlLocation, fnamezip)
     except:

@@ -361,7 +361,7 @@ public class iCingServlet extends HttpServlet {
 
         /** Use default values if the following variables remain null */
         String verbosity = null;
-        String imagery = null;
+//        String imagery = null;
         String residues = null;
         String ensemble = null;
 
@@ -370,8 +370,8 @@ public class iCingServlet extends HttpServlet {
             String value = parameterMap.get(key);
             if (key.equals(Settings.FORM_PARM_VERBOSITY)) {
                 verbosity = value;
-            } else if (key.equals(Settings.FORM_PARM_IMAGERY)) {
-                imagery = value;
+//            } else if (key.equals(Settings.FORM_PARM_IMAGERY)) {
+//                imagery = value;
             } else if (key.equals(Settings.FORM_PARM_RESIDUES)) {
                 residues = value;
             } else if (key.equals(Settings.FORM_PARM_ENSEMBLE)) {
@@ -436,9 +436,9 @@ public class iCingServlet extends HttpServlet {
             ensemble = ensemble.replaceAll(" ", "");
             cing_options += " --ensemble " + ensemble;
         }
-        if (imagery != null && imagery.length() > 0 && imagery.equals("false")) {
-            cing_options += " --noImagery";
-        }
+//        if (imagery != null && imagery.length() > 0 && imagery.equals("false")) {
+//            cing_options += " --noImagery";
+//        }
 
         /**
          * For the long command string it's real nice to have the overview layed out in a printf way
