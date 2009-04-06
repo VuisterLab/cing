@@ -1,0 +1,18 @@
+#summary Checking out and updating What If for the Mac
+
+== Check out ==
+
+Add username to service by asking Maarten H.
+{{{
+svn co https://svn.cmbi.ru.nl/repos/whatif/trunk/ whatif
+}}}
+
+== Dependencies ==
+
+Install gfortran using Fink (Originally I used macports).
+
+{{{
+fink selfupdate
+fink install gfortran-shlibs (untested)
+}}}
+
