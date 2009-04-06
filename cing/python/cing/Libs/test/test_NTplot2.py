@@ -1,4 +1,3 @@
-from Numeric import arange
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
@@ -7,6 +6,7 @@ from cing.Libs.NTplot import HelixIconList
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
+from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import triangularList
 from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
@@ -17,13 +17,12 @@ from matplotlib.pylab import figure
 from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
+from numpy.core.ma import arange
 from unittest import TestCase
-from cing.Libs.NTplot import lineAttributes
 import cing
 import os #@Reimport
 import sys
 import unittest
-#from numpy.core.ma import arange
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):
