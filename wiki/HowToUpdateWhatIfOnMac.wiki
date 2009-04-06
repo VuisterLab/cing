@@ -15,6 +15,14 @@ svn update .
 }}}
 Note all conflicts and remove the conflicting files and iterate.... There must be a svn command line option for overriding this like there is in the GUI version in my Eclipse.
 
+TODO doc:
+Make sure the dummy-2.f is still present Add it to Makefile
+{{{
+rm MESSA*
+rm ./dbdata/PARAMS.FIG.r6084 ./dbdata/PARAMS.FIG.r6684 ./dbdata/RAMA.LIN.r6084 ./dbdata/RAMA.LIN.r6684
+}}}
+etc...
+
 == Dependencies ==
 
 ===Install gfortran using MacPorts===
