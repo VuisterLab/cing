@@ -1,4 +1,3 @@
-from Numeric import arange
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
@@ -29,6 +28,7 @@ from matplotlib.cbook import silent_list
 from matplotlib.lines import Line2D
 from matplotlib.mlab import frange
 from matplotlib.numerix.mlab import amax
+from matplotlib.patches import Ellipse
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
 from matplotlib.pylab import annotate
@@ -58,6 +58,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
+from numpy.core.ma import arange
 import math
 
 try:
@@ -433,6 +434,45 @@ class NTplot( NTdict ):
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
 
+            
+    def scatter(self, x,y,s,c,marker=None,verts =None):
+        """Return true on error UNTESTED.
+
+        Make a scatter plot of x versus y, where x, y are 1-D sequences
+        of the same length, N.
+
+        s is a size in points^2.  It is a scalar
+          or an array of the same length as x and y.
+
+        c is a color and can be a single color format string,
+
+        If marker is None and verts is not None, verts is a sequence
+        of (x,y) vertices for a custom scatter symbol.
+
+        s is a size argument in points squared.                
+        """
+        if not useMatPlotLib:
+            NTerror("Failed to scatter because not useMatPlotLib")
+            return True
+        # Expose matplot lib routine.
+        self.axis.scatter(x,y,s,c,marker=marker,verts =verts)
+    
+    def ellipse(self, point, width=3.0, height=1.0, color=None, alpha=None):
+        """Return true on error UNTESTED."""
+        if not useMatPlotLib:
+            NTerror("Failed to ellipse because not useMatPlotLib")
+            return True
+        # Expose matplot lib routine.
+#        e = Ellipse(xy=point, width=0.2*rand(), height=0.2*rand())
+        e = Ellipse(xy=point, width=width, height=height)
+        e.set_clip_box(self.axis.bbox)
+        if color:
+            e.set_facecolor(color)
+            e.set_edgecolor(color)
+        if alpha:
+            e.set_alpha(alpha)
+        self.axis.add_artist(e)
+        
     def drawVerticalLines( self, xlocList ):
         if self.yRange == None:
             self.autoScaleY(None) # sets the yRange needed below.
@@ -753,6 +793,57 @@ class NTplot( NTdict ):
             pointList.append(item)
         return self.autoScaleY( pointList, startAtZero )
 
+    def autoScaleX( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
+        """Using the list of points autoscale the y axis.
+        If no list is given then the routine simply returns now.
+        If the list only contains nulls the min and max will be assumed 0 and 1.
+        If the min equals the max then the max is simply taken as min increased by one.
+        If the min is None then the min is assumed to be zero and max will become one.
+        This guarantees a y range.
+        """
+        min = None
+        max = None
+        if not pointList:
+            return
+
+        for point in pointList:
+            v = point[1]
+            if v == None:
+                continue
+            if min == None:
+                min = v
+                max = v
+                continue
+            if  v < min:
+                min = v
+            if  v > max:
+                max = v
+
+        if min == None or max == None:
+#            NTdebug('Only None values in autoScaleY pointList found')
+            min = 0.0
+            max = 1.0
+
+        if min == max: # Zero range is impossible.
+            if min == None:
+                min = 0.
+            max = min + 1.
+
+        if startAtZero and min >= 0.:
+            min = 0.
+
+#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+        if useMatPlotLib:
+            xlocator = self.axis.xaxis.get_major_locator()
+            xlocator.set_bounds( min, max )
+            self.axis.autoscale_view( scalex=True, scaley=False)
+            self.xRange = self.axis.get_xlim()
+            if useIntegerTickLabels:
+                formatter = FuncFormatter(integerNumberOnly)
+                xaxis = self.axis.xaxis
+                xaxis.set_major_formatter( formatter )
+
+
     def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
         """Using the list of points autoscale the y axis.
         If no list is given then the routine simply returns now.
@@ -761,6 +852,9 @@ class NTplot( NTdict ):
         If the min is None then the min is assumed to be zero and max will become one.
         This guarantees a y range.
         """
+        
+#        NTdebug( 'autoScaleY for list: %s' % (pointList) )
+        
         min = None
         max = None
         if not pointList:
