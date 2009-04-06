@@ -7,12 +7,126 @@ Add username to service by asking Maarten H.
 svn co https://svn.cmbi.ru.nl/repos/whatif/trunk/ whatif
 }}}
 
+== Update ==
+
+Cd to whatif dir and issue repeatedly:
+{{{
+svn update .
+}}}
+Note all conflicts and remove the conflicting files and iterate.... There must be a svn command line option for overriding this like there is in the GUI version in my Eclipse.
+
 == Dependencies ==
 
-Install gfortran using Fink (Originally I used macports).
+===Install gfortran using MacPorts===
+ * Run .dmg installer from MacPorts web site.
+{{{
+port selfupdate
+port install gcc42
+}}}
+After the last command you need to take a several hour break!
 
+ * Use the below Makefile in the whatif/src directory. It's specific to Mac in that different compiler options have been set. It might be included in the distribution as Makefile.mac.
+
+{{{
+SYSOBJ=
+ARROWOBJ= getline/getline.o getline/wifconn.o
+DEFINES=-DUNIX -DCTEXT -DARROW -DGLX11 -DX11 -DDX4 -DGL -Dunix -DPOSIX
+PROCESSOR=
+XFLAGS=
+#OPTFLAGS=-O3
+OPTFLAGS=-O0 -Wall -g
+#OPTFLAGS=-O0 -pg
+XTCLIB= -L../xtc -lxdrf
+LIBS= -lm -L/usr/X11R6/lib -lX11
+ANSICC=cc
+KRCC=cc
+INCLUDES= -I/usr/X11R6/include -I.
+#F77=g77 -xf77-cpp-input -Wsurprising
+F77=/opt/local/bin/gfortran-mp-4.2 -xf77-cpp-input -Wsurprising
+FDAAN=
+LD=/opt/local/bin/gfortran-mp-4.2
+
+# End-Of-Configuration: Do not delete this line!!!
+
+FC=$(F77)
+CC=$(KRCC)
+
+OBJECTS =  newqua.o 3ssp.o   aamain.o ahead.o  access.o altatm.o \
+  anaold.o tramov.o tragen.o digit.o  proton.o pdbcheck.o \
+  sect01.o sect02.o sect03.o sect04.o sect05.o sect06.o \
+  sect07.o sect08.o sect09.o sudoku.o phytre.o secprd.o \
+  build.o  pdbout.o cdbfil.o histog.o import.o chess.o  chesstls.o \
+  cell.o   chiang.o chr.o    clufam.o colour.o contac.o cystein.o \
+  debump.o dgloop.o dgmut.o  drug.o   debugs.o secstr.o geom.o \
+  anisou.o ions.o   ourele.o fbond.o  datbas.o enviro.o \
+  savsou.o mol8.o   mol9.o   cms.o    jmol.o   essdyn.o \
+  usedna.o eaa.o    espace.o extra.o  mcxalg.o elemnt.o \
+  infpck.o inftls.o marcin.o msippl.o concrd.o electr.o electr2.o \
+  grafic.o gratls.o gratwo.o graext.o gradb.o  graone.o \
+  modopt.o gpcphy.o drawat.o strand.o grasol.o \
+  grids.o  group.o  hbonds.o hbond2.o hydro.o  hssp.o   \
+  ini.o    items.o  junior.o klonk.o  label.o  wiftxt.o support.o \
+  flygif.o map.o    mapp.o   makpln.o surmap.o \
+  masmap.o mdf.o    wifgen.o genmen.o menus.o  planar.o dgeom.o   \
+  mol.o    mol1.o   mol2.o   mol3.o   mol4.o   mol5.o   mol6.o mol7.o \
+  nmr.o    neibrs.o notes.o  neural.o neutls.o other.o  ostools.o \
+  prompt.o plotit.o params.o pirpsq.o pstnew.o pstplt.o porno.o \
+  oldqua.o pucker.o refine.o rjread.o readonly.o pka.o  pka2.o pka3.o \
+  scan3d.o scan3s.o scan3e.o scnsdb.o select.o pkahyd.o \
+  stereo.o setvdw.o search.o server.o sugars.o showiets.o \
+  shaget.o modify.o gromacs.o \
+  suppos.o supps2.o sym.o    symrep.o symtls.o symrea.o symcon.o \
+  loops.o  spcial.o spcian.o spcold.o doself.o getiets.o \
+  tools.o  tlsarr.o tlsio.o  tlsbyt.o tlsfil.o tlsmvc.o tlsn77.o \
+  tlslog.o tlsort.o tlssts.o tlssup.o tlstxt.o tlsmio.o \
+  tables.o teach.o  wifsup.o wifsp2.o wifsp3.o wifsp4.o \
+  water.o  xray.o   ccp4.o   xbfact.o refmac.o \
+  irigra.o irisup.o iriobj.o irimov.o iridial.o xragmx.o \
+  iriini.o iripick.o \
+  rolando.o robmenu.o elmar.o jens.o   \
+  makdb.o  maklog.o difout.o \
+  walhid.o walsad.o walphy.o walign.o waltls.o \
+  walcor.o walgra.o walprf.o walseq.o walvar.o \
+  walsrt.o walser.o masmp2.o whatis.o dummy-2.o
+
+VERSOBJ=version.o
+
+ALLOBJ=$(OBJECTS) $(SYSOBJ)  $(ARROWOBJ)  $(VERSOBJ)
+
+FFLAGS= $(XFLAGS) $(DEFINES) $(PROCESSOR) $(OPTFLAGS) -I.
+CFLAGS=           $(DEFINES) $(OPTFLAGS)
+
+whatif: depends $(ALLOBJ)
+        /bin/rm -f whatifGLUT
+        $(LD) $(FFLAGS) -o whatif $(ALLOBJ) $(LIBS)
+
+full:   depends $(ALLOBJ)
+        /bin/rm -f whatif
+        cd ./ccodeglut/freeglut; make -f Makefile.linux clean; make -f Makefile.linux
+        cd ./ccodeglut; make -f Makefile.linux clean; make -f Makefile.linux
+        cd ../dssp; make -f Makefile.linux clean; make -f Makefile.linux
+        $(LD) $(FFLAGS) -o whatif $(ALLOBJ) $(LIBS)
+
+version.f: $(OBJECTS)
+        ./mkversion
+
+depends: *.INC
+        egrep '^      INCLUDE' *.[Ff] | sed "s/ *INCLUDE */ /;s/\.[Ff]/\.o/;s/'//g" | sort | uniq > depends
+        @echo Dependencies rebuilt
+        @echo please ignore error message and re-execute make
+        exit 3
+
+include depends
+}}}
+
+  * Change working directory to src and ype:
+{{{
+make
+}}}
+
+= Alternatively =
+Perhaps the following also works but I haven't been able to wait for the long time it takes to compile:
 {{{
 fink selfupdate
 fink install gfortran-shlibs (untested)
 }}}
-
