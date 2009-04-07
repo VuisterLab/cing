@@ -25,7 +25,9 @@ class AllChecks(TestCase):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
 #        entryList = "1ai0".split()
+#        entryList = "1ti3".split()
         entryList = "1brv".split()
+#        entryList = "1hue".split()
 #        entryList = "H1GI".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
@@ -37,19 +39,19 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
         
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
+        doWhatif = False # disables whatif actual run
         doProcheck = True
-        doWattos = True
+        doWattos = False
         useNrgArchive = False
         if fastestTest:
             htmlOnly = True 
             doWhatif = False
             doProcheck = False
             doWattos = False
-            useNrgArchive = False
+#            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
@@ -57,7 +59,9 @@ class AllChecks(TestCase):
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
             if useNrgArchive: # default is False
-                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+#                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                # Mounted from nmr.cmbi.ru.nl
+                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)                
             else:
                 inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
