@@ -21,7 +21,7 @@ class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
     
-    def tttest_HTMLfile_simple(self):
+    def test_HTMLfile_simple(self):
         entryId = 'test'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -29,7 +29,7 @@ class AllChecks(TestCase):
         molecule = Molecule(name='moleculeName')
         molecule.ensemble = Ensemble(molecule) # Needed for html.
         project.appendMolecule(molecule) # Needed for html.
-        
+        molecule.updateAll()
         project.setupHtml() # Needed for creating the sub dirs.
         
         myhtml = HTMLfile('myTest.html', project, 'A Test')

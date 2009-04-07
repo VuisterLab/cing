@@ -186,6 +186,8 @@ SETWIF 1503 0
 SETWIF 142 1
 # Cutoff for reporting in the INP* routines (*100)
 SETWIF 143 400
+# Skip generation of EPS files in order to speed up this ordeal.
+SETWIF 473 1
 # General debug flag
 # Should prevent problems such as:
 # > 1b9q and many others: broken backbone/ERROR reading DSSP file
@@ -743,23 +745,25 @@ def runWhatif( project, parseOnly=False ):
             NTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
             return True
 
-        try:
-            removeListLocal = ["DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "pdbout.tex"]
-            removeList = []
-            for fn in removeListLocal:
-                removeList.append( os.path.join(whatifDir, fn) )
-
-            for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
-                for fn in glob(os.path.join(whatifDir,extension)):
-                    removeList.append(fn)
-            for fn in removeList:
-                if not os.path.exists(fn):
-                    NTdebug("runWhatif: Expected to find a file to be removed but it doesn't exist: " + fn )
-                    continue
-    #            NTdebug("Removing: " + fn)
-                os.unlink(fn)
-        except:
-            NTwarning("runWhatif: Failed to remove all temporary what if files that were expected")
+        removeTempFiles = False # Useful optional block for debugging. Default: True
+        if removeTempFiles:
+            try:
+                removeListLocal = ["DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "pdbout.tex"]
+                removeList = []
+                for fn in removeListLocal:
+                    removeList.append( os.path.join(whatifDir, fn) )
+    
+                for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
+                    for fn in glob(os.path.join(whatifDir,extension)):
+                        removeList.append(fn)
+                for fn in removeList:
+                    if not os.path.exists(fn):
+                        NTdebug("runWhatif: Expected to find a file to be removed but it doesn't exist: " + fn )
+                        continue
+        #            NTdebug("Removing: " + fn)
+                    os.unlink(fn)
+            except:
+                NTwarning("runWhatif: Failed to remove all temporary what if files that were expected")
 
         project.whatifStatus.completed = True
     else:

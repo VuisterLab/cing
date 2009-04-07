@@ -4027,7 +4027,11 @@ class ROGscore(NTdict):
                          __CLASS__  = 'ROGscore',
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
-        self.reset()
+        # Explicitely showing instance attributes here in init.
+        self.colorLabel = COLOR_GREEN
+        """Elements in this list are tuples of (color, comment).
+        """
+        self.colorCommentList = NTlist()
 
 
     def __str__(self):
@@ -4069,19 +4073,18 @@ class ROGscore(NTdict):
     def createHtmlForComments(self, dst):
         if not self.isCritiqued():
             return
-#        dst('ul', 'Critiques:', closeTag=False )
         refExists = False
         if refExists:
-            kw = {'href':''}
-            kw['class'] = self.colorLabel
-            for comment in self.colorCommentList:
+            for color,comment in self.colorCommentList:
+                kw = {'href':''}
+                kw['class'] = color
                 dst('li' , closeTag=False)
                 dst('a' , comment, **kw)
                 dst('li' , openTag=False)
     #        dst('ul', openTag=False)
         else:
-            kw = {'color':self.colorLabel}
-            for comment in self.colorCommentList:
+            for color,comment in self.colorCommentList:
+                kw = {'color':color}
                 dst('li' , closeTag=False)
                 dst('font' , comment, **kw)
                 dst('li' , openTag=False)
@@ -4092,34 +4095,34 @@ class ROGscore(NTdict):
         """priority: red, orange, green. The so called ROG score.
         The comment is optional and will only be appended when the color lable is
         at least as severe as the current one. The less severe levels of comments
-        will also be wiped out.
-        Only orange and RED levels can add comments.
+        used to be wiped out but not any more; see issue 153.
+        Only ORANGE and RED levels can add comments.
         Parameter comment may also be a list of comments.
         """
     #    if not o.has_key( 'colorLabel' ):# NTlist doesn't have 'has_key'.
     #    if not hasattr(o,'colorLabel'):
     #        o.colorLabel = COLOR_GREEN
 
-        if colorLabel == COLOR_GREEN or (
-           colorLabel == COLOR_ORANGE and self.colorLabel == COLOR_RED):
+        if colorLabel == COLOR_GREEN:
             return
 
         # certain to stay at or upgrade to given color.
-        if colorLabel == COLOR_RED and self.colorLabel != COLOR_RED:
-            self.colorCommentList = NTlist() # JFD enabled again because was showing less severe comments.
-        self.colorLabel = colorLabel
+        if colorLabel == COLOR_RED or (colorLabel == COLOR_ORANGE and self.colorLabel != COLOR_RED):
+            self.colorLabel = colorLabel
 
-        if comment:
-            if isinstance(comment, list):
-                self.colorCommentList += comment # grow list with potentially multiple comments.
-                self.colorCommentList.removeDuplicates()
-            #end if
-            else:
-                if comment not in self.colorCommentList:
-                    self.colorCommentList.append(comment)
-                #end if
-            #end else
-        #end if
+        if not comment:     
+            return       
+
+        if isinstance(comment, list):
+            for commentSingle in comment:
+               commentTuple = (colorLabel, commentSingle ) 
+               self.colorCommentList.append( commentTuple )# grow list with potentially multiple comments.
+        else:
+            commentTuple = (colorLabel, comment )
+            self.colorCommentList.append(commentTuple)
+        self.colorCommentList.removeDuplicates()
+        # Keep comments for red and orange together.
+        NTsort( self.colorCommentList, 0, inplace=True)
     #end def
 #end class
 

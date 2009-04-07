@@ -8,9 +8,12 @@ from cing.Libs.NTutils import bytesToFormattedString
 from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.NTutils import toCsv
 from cing.PluginCode.html import HTMLfile
+from cing.core.classes import Project
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
+from cing.core.molecule import Ensemble
+from cing.core.molecule import Molecule
 from unittest import TestCase
 import cing
 import os 
@@ -20,34 +23,46 @@ class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
 
-    def testROGscore(self):
+    def testROGscore(self):       
+        entryId = 'test'
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status='new')
+        molecule = Molecule(name='moleculeName')
+        molecule.ensemble = Ensemble(molecule) # Needed for html.
+        project.appendMolecule(molecule) # Needed for html.
+        molecule.updateAll()
+        project.setupHtml() # Needed for creating the sub dirs.
+         
         a = Atom(resName='ALA', atomName='HN')
         a.criticize()
         self.assertTrue(a)
         self.assertEquals(a.rogScore.colorLabel, COLOR_ORANGE)
-        self.assertEquals(a.rogScore.colorCommentList[0], ROGscore.ROG_COMMENT_NO_COOR)
+        self.assertEquals(a.rogScore.colorCommentList[0][0], COLOR_ORANGE)
+        self.assertEquals(a.rogScore.colorCommentList[0][1], ROGscore.ROG_COMMENT_NO_COOR)
         LOTR_remark = 'One ring to rule them all'
         Preserved_remark = 'Preserved'
+        NowHasEffect_remark = 'Now has effect'
+        NowHasEffectToo_remark = 'Now has effect too'
         # Next line will have to wipe out the orange comments.
         a.rogScore.setMaxColor(COLOR_RED, LOTR_remark)
-        a.rogScore.setMaxColor(COLOR_ORANGE, 'No effect')
+        a.rogScore.setMaxColor(COLOR_ORANGE, NowHasEffect_remark )
         a.rogScore.setMaxColor(COLOR_RED, Preserved_remark)
-        a.rogScore.setMaxColor(COLOR_ORANGE, 'No effect either')
-        self.assertEquals(len(a.rogScore.colorCommentList), 2)
-        self.assertEquals(a.rogScore.colorCommentList[0], LOTR_remark)
-        self.assertEquals(a.rogScore.colorCommentList[1], Preserved_remark)
+        a.rogScore.setMaxColor(COLOR_ORANGE, NowHasEffectToo_remark)
+        self.assertEquals(len(a.rogScore.colorCommentList), 5)
+        self.assertEquals(a.rogScore.colorCommentList[0][1], ROGscore.ROG_COMMENT_NO_COOR)
+        self.assertEquals(a.rogScore.colorCommentList[1][1], NowHasEffect_remark)
 
-        # Note that this inserts some multi line popups by use of a alternative tag
-        # which gets rendered by java script.
-        myhtml = HTMLfile('testROGscore.html', 'A Test')
+        myhtml = HTMLfile('testROGscore.html', project, 'A Test')
         myhtml.main("a main")
         a.rogScore.createHtmlForComments(myhtml.main)
 
         kw = {}
         a.rogScore.addHTMLkeywords(kw)
         myhtml.main("a", 'or by popup', **kw)
-
-    def testBytesToFormattedString(self):
+        myhtml.render()
+        
+    def tttestBytesToFormattedString(self):
         byteList = [ 1, 1000, 1300, 1600, 13000 * 1024, 130 * 1000 * 1024 * 1024  ]
         expectedResults = [ '0K', '1K', '1K', '2K', '13M', '127G' ]
         for i in range(len(byteList)):
@@ -65,7 +80,7 @@ class AllChecks(TestCase):
 #            i += 1
 
 
-    def testNTpath(self):
+    def tttestNTpath(self):
         pathList = [ "/Users/jd/.cshrc", "/Users/jd/workspace34", "/Users/jd/workspace34/" ]
         expectedDirectory = [ '/Users/jd' , "/Users/jd" , "/Users/jd/workspace34"]
         expectedBasename = [ '','workspace34', '' ]
@@ -77,17 +92,17 @@ class AllChecks(TestCase):
             self.assertEquals(basename, expectedBasename[i])
             self.assertEquals(extension, expectedExtension[i])
             
-    def testMsgHoL(self):
+    def tttestMsgHoL(self):
         msgHol = MsgHoL()
         for i in range(5):
             msgHol.appendMessage("Message %d" % i)
             msgHol.appendDebug("Debug %d" % i)
         msgHol.showMessage(MAX_MESSAGES=2)
         
-    def testCSV(self):
+    def tttestCSV(self):
         input = ['1brv', '9pcy' ]
         NTdebug("csv: [" + toCsv(input) + "]")
-    def testGetDateTimeStampForFileName(self):
+    def tttestGetDateTimeStampForFileName(self):
         NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
 
             

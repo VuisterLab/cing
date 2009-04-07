@@ -344,7 +344,8 @@ def setupHtml(project):
     if hasattr(molecule, 'atomList'):
         AtomsHTMLfile( project, molecule.atomList )
     else:
-        NTcodeerror("Failed to create AtomsHTMLfile because no molecule.atomList")
+        # reduced verbosity here because gets tested in test_NTutils3.py.
+        NTwarning("Failed to create AtomsHTMLfile because no molecule.atomList")
 
     if hasattr(molecule, 'ensemble'):
         EnsembleHTMLfile( project, molecule.ensemble )
