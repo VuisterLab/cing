@@ -1,5 +1,7 @@
 #summary Checking out and updating What If for the Mac
 
+*Never do 'make all' it will screw up good files.
+
 == Check out ==
 
 Add username to service by asking Maarten H.
@@ -28,7 +30,8 @@ rm ./dbdata/PARAMS.FIG.r6084 ./dbdata/PARAMS.FIG.r6684 ./dbdata/RAMA.LIN.r6084 .
 }}}
 etc... Or use 'find'.
 
-  * At first DSSP failed to compile after doing a make all.
+  * DSSP failed to compile after doing a make all. Solution, get copy from CMBI. And remove it from Makefile#all target.
+  * The getline compiles but gives a lot of noises so it must be bad. Get one from CMBI.
 
 == Dependencies ==
 
