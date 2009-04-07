@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
+python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlotCorrelation.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -49,7 +49,7 @@ class AllChecks(TestCase):
         fastestTest = False
         
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
+        doWhatif = False # disables whatif actual run
         doProcheck = False
         doWattos = False
         useNrgArchive = False

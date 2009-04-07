@@ -25,7 +25,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testHistogram(self):
+    def tttestHistogram(self):
         resType = 'GLY'     
         for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
             hist = histRamaBySsAndResType[ssType][resType]

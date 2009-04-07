@@ -37,9 +37,9 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = True
+        fastestTest = False
         
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
