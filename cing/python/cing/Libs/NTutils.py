@@ -367,6 +367,17 @@ class NTlist(list):
         return sum(map(NTsq, self), start)
     #end def
 
+    """ Return the rms average value """
+    def rms(self):
+#        NTdebug("NTlist serie: %r" % self)
+        self.n = len(self)
+        if not self.n:
+            return NaN
+        sumsq = float(self.sumsq(0)) # continue with float arithmetics.
+        result = math.sqrt(sumsq/self.n)
+#        NTdebug("result: %s" % result)
+        return result
+    #end def
     def limit(self, min, max, byItem=None):
         """Use NTlimit on self, return self
         """
@@ -4016,8 +4027,6 @@ class ROGscore(NTdict):
     Red orange green with comments.
     """
     ROG_COMMENT_NO_COOR = 'No coordinates'
-    ROG_COMMENT_BAD_OMEGA = 'Bad omega'
-    ROG_COMMENT_POOR_OMEGA = 'Poor omega'
     ROG_COMMENT_POOR_ASSIGNMENT = 'Poor assignment'
 
     MAX_TO_REPORT_IN_POPUP = 5

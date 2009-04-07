@@ -294,28 +294,40 @@ def _criticizeResidue( residue, valSets ):
         #end for
     #end if
 
-    #OMEGA
-    dihed = 'OMEGA'
-    if residue.hasProperties('protein') and dihed in residue and residue[dihed]:
-        d = residue[dihed] # NTlist object
-        modelId = 0
-        for value in d:
-            v = violationAngle(value=value, lowerBound=180., upperBound=180)
-            if v > 90.: # Never mind a cis
-                v = violationAngle(value=value, lowerBound=-180., upperBound=-180)
-#                    NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f' % (
-#                            res, modelId, v) )
-            if (valSets.OMEGA_MAXALL_BAD != None) and (v >= valSets.OMEGA_MAXALL_BAD):
-                residue.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA )
-#                        res.rogScore.setMaxColor( COLOR_RED, ROGscore.ROG_COMMENT_BAD_OMEGA + ' double on purpose; TODO: REMOVE')
+    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. J Mol Biol (1998) vol. 276 pp. 417-436 
+    TRANS_OMEGA_VALUE = 179.6 # cis is assumed -180.0
+    TRANS_OMEGA_SD = 4.7    
+    for key in ['OMEGA']:
+        if residue.hasProperties('protein') and key in residue and residue[key]:
+            d = residue[key] # NTlist object
+            modelId = -1 # needs to be set even if enumerate doesn't assign it.
+            vList = NTlist()
+            for modelId,value in enumerate(d):
+                v = violationAngle(value=value, lowerBound=TRANS_OMEGA_VALUE, upperBound=TRANS_OMEGA_VALUE)
+                if v > 90.: # Check a cis
+                    v = violationAngle(value=value, lowerBound=-180., upperBound=-180.)
+#                NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( residue, modelId, v, value) )
+                vList.append(v)
+            #end for
+            rmsViol = 0.0
+            if modelId >= 0:
+                rmsViol = vList.rms()
+                        
+#            NTdebug('found rmsViol: %8.3f' % rmsViol )
+            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )            
+            timesKnownSd = rmsViol / TRANS_OMEGA_SD
+            postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), TRANS_OMEGA_SD)
+            if (valSets.OMEGA_MAXALL_BAD != None) and (rmsViol >= valSets.OMEGA_MAXALL_BAD):
+                comment = 'RED: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
+                residue.rogScore.setMaxColor( COLOR_RED, comment )
 #                NTdebug('Set to red')
-            elif (valSets.OMEGA_MAXALL_POOR != None) and (v >= valSets.OMEGA_MAXALL_POOR):
-                residue.rogScore.setMaxColor(COLOR_ORANGE, ROGscore.ROG_COMMENT_POOR_OMEGA)
+            elif (valSets.OMEGA_MAXALL_POOR != None) and (rmsViol >= valSets.OMEGA_MAXALL_POOR):
+                comment = 'ORANGE: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_POOR, postFixStr)
+                residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
 #                NTdebug('Set to orange (perhaps)')
-            modelId += 1
-        #end for
-        residue.rogScore['OMEGA'] = v
-    #end if
+            residue.rogScore[key] = rmsViol
+        #end if
+    # end for
     return residue.rogScore
 #end def
 #Convenience method

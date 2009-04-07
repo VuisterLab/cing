@@ -6,6 +6,7 @@ python -u $CINGROOT/python/cing/Libs/test/test_NTutils4.py
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import switchOutput
 from unittest import TestCase
+from cing.Libs.NTutils import NTlist
 import cing
 import unittest
 
@@ -34,6 +35,17 @@ class AllChecks(TestCase):
 #            traceBackString = format_exc()
 #            NTerror(traceBackString)
     
+    def testRmsNTlist(self):
+        serie = NTlist()
+        serie.append( 0.0 )
+        rms = serie.rms()
+        self.assertEquals(rms, 0.0)
+        serie.append( 1.0 )
+        rms = serie.rms()
+        self.assertAlmostEquals(rms, 0.707, 3)
+        serie.append( 2.0 )
+        rms = serie.rms()
+        self.assertAlmostEquals(rms, 1.291, 3)
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

@@ -187,7 +187,7 @@ SETWIF 142 1
 # Cutoff for reporting in the INP* routines (*100)
 SETWIF 143 400
 # Skip generation of EPS files in order to speed up this ordeal.
-SETWIF 473 1
+#SETWIF 473 1
 # General debug flag
 # Should prevent problems such as:
 # > 1b9q and many others: broken backbone/ERROR reading DSSP file
