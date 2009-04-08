@@ -42,7 +42,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys

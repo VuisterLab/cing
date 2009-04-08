@@ -11,6 +11,7 @@ from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWar
 from cing.core.classes import Project
 from unittest import TestCase
 from cing.PluginCode.NmrStar import NmrStar
+from cing import verbosityNothing
 import cing
 import os
 import unittest
@@ -57,5 +58,6 @@ class AllChecks(TestCase):
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
     cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
     unittest.main()

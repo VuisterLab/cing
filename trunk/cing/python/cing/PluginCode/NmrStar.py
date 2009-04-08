@@ -1,13 +1,16 @@
 from cing import __author__
+from cing import verbosityDebug
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import removedir
-from cing.Libs.NTutils import ImportWarning
+from cing.Libs.NTutils import switchOutput
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 from cing.PluginCode.required.reqNmrStar import NMRSTAR_STR
 from traceback import format_exc
+import cing
 import os
-#from cing.Libs.NTutils import switchOutput
 
 try:
     # ? need to set sys.stdout here because it is cached?
@@ -43,7 +46,10 @@ class NmrStar():
         
         try:
             LinkNmrStarData.projectDirectory = self.linkNmrStarDataProjectDirectory
-#            switchOutput(False, doStdOut=True, doStdErr=True) # disable verbose stdout but keep stderr
+            NTdebug( "test A" )
+            if cing.verbosity < verbosityDebug:
+                switchOutput(False, doStdOut=True)
+            NTdebug( "test B" )
             linkNmrStarData = LinkNmrStarData(" %s -raise -force  -noGui" % self.project.name )
             linkNmrStarData.idCode = self.project.name
             
@@ -64,6 +70,10 @@ class NmrStar():
                     for pl in ds.sortedPeakLists():
                         nmrEntry.addPeakList(pl)
     
+            NTdebug(  "test C" )
+            if cing.verbosity < verbosityDebug:
+                switchOutput(False, doStdOut=True) # For some reason python grabbed sys.stdout again. 
+            NTdebug(  "test C2" )
             nmrStarExport = NmrStarExport(nmrEntry, nmrStarVersion = '3.1', forceEntryId = self.project.name)
             ccpnCodeVerbose = False
             
@@ -71,8 +81,15 @@ class NmrStar():
               
             # Set the header comment - only set this if you need a standard header!
             topComment = "# File written for CING by NmrStarExport.py code"
-              
+            NTdebug(  "test D")
+            if cing.verbosity < verbosityDebug:
+                switchOutput(False, doStdOut=True) # disable verbose stdout but keep stderr            
+            NTdebug(  "test E" )
             nmrStarExport.writeFile(title = "CING", topComment=topComment, verbose = ccpnCodeVerbose)
+            if cing.verbosity < verbosityDebug:
+                switchOutput(True, doStdOut=True) # disable verbose stdout but keep stderr            
+            NTdebug(  "test F" )
+            NTmessage("Finished toNmrStarFile for file: %s" % fileName)
             return True
         except:
 #            switchOutput(True, doStdOut=True, doStdErr=True)
@@ -81,4 +98,5 @@ class NmrStar():
         finally:
 #            switchOutput(True, doStdOut=True, doStdErr=True)
             pass
+        
         return None # Just to be explicit.            
