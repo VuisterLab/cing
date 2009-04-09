@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore
 
 
 # ADD QUEEN SOURCE TO SYSTEM PATH

@@ -15,7 +15,7 @@ import os
 try:
     # ? need to set sys.stdout here because it is cached?
 #    switchOutput(False, doStdOut=True, doStdErr=True) # disable verbose stdout but keep stderr
-    from msd.nmrStar.IO.NmrStarExport import NmrStarExport
+    from msd.nmrStar.IO.NmrStarExport import NmrStarExport #@UnresolvedImport
     from recoord2.msd.linkNmrStarData import LinkNmrStarData
 #    switchOutput(True, doStdOut=True, doStdErr=True) # disable verbose stdout but keep stderr
 except:
