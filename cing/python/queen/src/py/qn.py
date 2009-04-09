@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore
 import string,os,sys,math,socket,time,shutil,copy,types,random,glob,fnmatch,nmv,pdb_file
 
 #  ======================================================================
