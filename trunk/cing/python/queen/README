@@ -1,0 +1,391 @@
+## Contents ##
+##############
+
+- QUEEN
+
+- Installation
+ - Python
+ - X-PLOR
+ - Configuration
+ - Testsuite
+
+- Running QUEEN
+ - Project setup
+ - Data conversion
+ - Running QUEEN
+ - Iave calculations
+
+- Example
+
+- Miscellaneous
+ - Running QUEEN in parallel
+ - QUEEN performance
+ - Restraint formats
+ - Problems, questions of suggestions?
+
+## QUEEN ##
+###########
+
+QUEEN   :
+  QUantitative Evaluation of Experimental Nmr restraints
+
+Author  :
+  Sander Nabuurs
+
+E-mail  :
+  s.nabuurs@cmbi.kun.nl
+
+Homepage and servers:
+  http://www.cmbi.kun.nl/software/queen/
+
+Version :
+  1.2
+
+Date    :
+  April 2009
+
+When using QUEEN please cite:
+
+  Sander B. Nabuurs, Chris A.E.M. Spronk, Elmar Krieger, Hans Maassen,
+  Gert Vriend and Geerten W. Vuister (2003). Quantitative evaluation of
+  experimental NMR restraints. J. Am. Chem. Soc. 125 (39), 12026-12034.
+
+No warranty implied or expressed.
+All rights reserved.
+
+## Installation ##
+##################
+
+QUEEN currently only runs on the Linux and Mac OSX intel platforms.
+
+Untar the QUEEN package using the following command:
+
+  tar zxvf queen.tar.gz
+
+This creates a new directory ./queen
+The distribution structure is as follows:
+
+  ./example/
+  ./example/data/
+  ./example/data/restraints/
+  ./example/data/sequence/
+  ./example/data/datasets/
+  ./example/log/
+  ./example/output/
+  ./parameters/
+  ./src/
+  ./src/py
+  ./src/c
+  ./src/c/nmv_22
+  ./src/c/nmv_23
+  ./src/c/nmv_source
+  ./src/3rd-party
+  ./src/3rd-party/optik
+  ./src/3rd-party/pdb_file
+  ./src/3rd-party/pypar_22
+  ./src/3rd-party/pypar_23
+
+# Python #
+
+QUEEN is mostly written in Python and requires:
+
+  - Python 2.2 or later.
+
+The latest version of Python can be obtained from http://www.python.org.
+
+# X-PLOR #
+
+QUEEN requires X-PLOR for bound matrix calculations.
+The program is tested to work with:
+
+  - X-PLOR (online) 3.851
+  - XPLOR-NIH
+
+X-PLOR (online) 3.851 can be obtained from http://atb.csb.yale.edu/xplor/.
+XPLOR-NIH is available at http://nmr.cit.nih.gov/xplor-nih/.
+
+# Configuration #
+
+QUEEN is configured by the configuration file 'queen.conf' in the
+installation directory. There are three paths that have to be defined
+in this file:
+
+  - Q_PATH   : the full system path of the directory where QUEEN resides.
+  - Q_PROJECT: the full system path of the directory where you want to
+               store your QUEEN projects
+  - XPLOR:     the full system path to the XPLOR executable
+
+If you own a copy of YASARA (which can help you in visualizing your
+distance restraints) place the full path to the program following
+the YASARA entry in 'queen.conf'. If you don't have YASARA: no problem,
+QUEEN runs fine without it, but have a look at http://www.yasara.org for
+a free copy of YASARA View!
+
+# Testsuite #
+
+QUEEN comes with a testsuite to check your installation. Before proceeding
+any further we suggest you run it to make your sure your basic installation
+is correct. The script is located in the main installation directory.
+
+  ./testsuite.py
+
+## Running QUEEN ##
+###################
+
+QUEEN consists of four programs:
+
+  ./ccpndatamodel.py - for importing data from the CPPN datamodel.
+  ./generate.py      - for generating projects and input files
+  ./restraints.py    - for checking restraint files
+  ./queen.py         - running QUEEN
+
+For each program help is availabe by running it with the -h option.
+
+QUEEN stores all the data it uses for one project in a project
+directory tree. Using the default configuration file this tree
+lookes like this:
+
+  ./projectname/data
+  ./projectname/data/sequence    - sequence, psf and template files
+  ./projectname/data/restraints  - experimental restraint files
+  ./projectname/data/datasets    - dataset description files
+  ./projectname/log              - logfiles of the calculations
+  ./projectname/output           - QUEEN output
+
+# Project setup #
+
+Setting a QUEEN project consists of several steps:
+ 1. Creating the project directory tree.
+ 2. Creating a sequence, protein structure and template file.
+ 3. Copying the experimental restraints.
+ 4. Creating the dataset description file.
+
+1. A new project is created by the following command:
+
+  ./generate.py --project projectname
+
+This creates a new directory 'projectname' in the QUEEN project directory,
+which was defined as Q_PROJECT in 'queen.conf'.
+
+# Data conversion #
+
+All of the data conversion steps described here can also be ran on
+our QUEEN web servers for your convenience. The QUEEN webservers can
+be found at http://www.cmbi.kun.nl/software/queen/.
+
+2. If you have a PDB file available of your structure, you can take
+the easy route:
+
+  ./generate.py --pdb2all projectname yourprotein.pdb
+
+This will generate a sequence file, a PSF file and a template PDB file at
+the following locations:
+
+  /theprojectdir/data/sequence/protein.seq
+  /theprojectdir/data/sequence/protein.psf
+  /theprojectdir/data/sequence/protein.pdb
+
+If you do not have a PDB file availabe, you first have to generate
+a sequence file. The format for the sequence file is as follows:
+
+  > A
+  GLY
+  ALA
+  GLN
+  THR
+  > B
+  CYS
+  THR
+  ALA
+  GLU
+  etc.
+
+Where 'A' and 'B' are chain names, which should be replaced by a space if no
+chain name is present. The sequence should be given in three-letter
+aminoacid codes, with one amino-acid per line. With the sequence file, you
+can generate a PSF file.
+
+  ./generate.py --seq2psf projectname yoursequencefile.seq
+
+This PSF (which can be found at /theprojectdir/data/sequence/protein.psf
+can then be converted to a template PDB file.
+
+  ./generate.py --psf2tem projectname /theprojectdir/data/sequence/protein.psf
+
+The template PDB file can then be found at: /theprojectdir/data/sequence/protein.pdb.
+
+3. As QUEEN uses XPLOR, experimental restraints have to be in XPLOR
+(or CNS) format. If your restraints are currently in a different format you
+can convert them to XPLOR format using the CCPN FormatConverter, which is
+available at http://www.ccpn.ac.uk (currently in beta-testing).
+
+It is crucial to first check your restraints files for invalid or double
+restraints!
+
+  ./restraints.py --check yourrestraints.tbl
+
+If you receive no more error messages, you can output the clean restraints
+to a new restraintfile. In our case:
+
+  ./restraints.py --check yourrestraints.tbl -o yourcheckedrestraints.tbl
+
+The checked restraints can then be copied into the restraint directory:
+
+  cp yourcheckedrestraints.tbl /theprojectdir/projectname/data/restraints/
+
+Dihedral restraints can be checked by providing the -d flag:
+
+  ./restraints.py --check -d yourdihedrals.tbl -o yourcheckeddihedrals.tbl
+
+4. The last thing to do is to make the dataset description file. With
+different dataset description files you can define datasets composed of
+different combinations of your restraint tables. In this case, the dataset
+file (/theprojectdir/projectname/data/datasets/yourdataset.list) would look
+like this:
+
+  NAME = NOE restraints
+  TYPE = DIST
+  FILE = yourcheckedrestraints
+  //
+  NAME = Dihedral angle restraints
+  TYPE = DIHE
+  FILE = yourcheckeddihedrals
+  //
+
+Note that the filename has the '.tbl' extensions removed, and it is assumed
+to be located in the /yourprojectdir/projectname/data/restraints/ directory.
+The TYPE field can be either DIST or DIHE for distance and dihedral restraints,
+respectively. Every block has to be ended with a '//' delimiter!
+
+A new feature in QUEEN 1.1 is the possiblity to include restraints as
+back ground information. This done by adding the 'INFO' statement to the
+dataset description file. For example:
+
+  NAME = NOE restraints
+  TYPE = DIST
+  FILE = yourcheckedrestraints
+  //
+  NAME = Dihedral angle restraints
+  TYPE = DIHE
+  FILE = yourcheckeddihedrals
+  INFO = no
+  //
+
+The dihedral angle restraints will now be included in all calculations
+(as part of Hstructure|0), but will not be evaluated in the per restraint
+evaluations such as the unique and average information content. This can be
+useful if you for instance only want to evaluate your long-range restraints,
+but don't want to loose the information in the intra-residual, sequential and
+medium-range restraints.
+
+# Running QUEEN #
+
+With everything in place you should now be able to run QUEEN, using queen.py.
+To quickly test your data, run the check option:
+
+  ./queen.py --check projectname yourdataset
+
+If this runs without QUEEN reporting errors, it's likely that all others options
+will also run without any further problems. If you receive warnings or errors when
+checking your dataset, the iterative check option (--icheck) can help you to
+identify problematic restraints. For information on the other things QUEEN can do
+for you, run queen.py -h.
+
+# Iave calculations #
+
+A short note on calculating the average restraint information (the --Iave and --Iavef
+options). As these computations are computationally very intensive we strongly
+suggest running them on a Linux cluster. The difference between Iave and Iavef is that
+Iave will continue calculations until convergence has been reached, Iavef will stop
+after a fixed number of cycles. In practice Iavef provides a reasonable
+approximation of the values obtained with Iave, in a much shorter period of time.
+If you do not have the computational resources available for the Iave calculations,
+just stick to Iuni for the time being. In our experience it are these values which are
+the most informative, so you'll probably be fine without Iave.
+
+
+## Example ##
+#############
+
+The QUEEN distribution comes with an example dataset. The restraints in this
+dataset belong to PDB entry 1BUS, which is the oldest NMR structure to be found
+in the Protein Data Bank.
+
+To use this dataset you must set Q_PROJECT in queen.conf to the example/ directoy
+in the QUEEN installation directory (Q_PATH). You can then run all the QUEEN
+options using 'example' as the projectname and 'noe' or 'all' as the dataset.
+For example, to check the 'all' dataset:
+
+  ./queen.py --check example all
+
+Or, to calculate the unique restraint information of the restraints in the
+'noe' dataset:
+
+  ./queen.py --Iuni example noe
+
+
+## Miscellaneous ##
+###################
+
+# Running QUEEN in parallel #
+
+The main program (queen.py) can also be run in parallel for the 'Iset', 'Iave' and
+'Iuni' options. As especially the 'Iave' option can be rather time consuming, it
+is recommendable to run this option in parallel on a Linux cluster.
+This done by providing the '-m' flag, for using the MPI protocol.
+
+NOTE: For parallellization QUEEN comes with the pypar module, which requires
+Numerical Python to be installed. Numerical Python can be obtained from:
+http://sourceforge.net/projects/numpy.
+
+For example, to calculate the unique restraint information on a dual processor
+machine:
+
+  mpirun -np 2 ./queen.py -m --Iuni projectname yourdataset
+
+To run QUEEN parallel on 10 CPUs on a Linux cluster in order to calculate the
+average restraint information, submit to following command to your queueing system:
+
+  mpirun -np 10 /pathtoqueen/queen.py -m --Iave projectname yourdataset
+
+NOTE: only the 'Iset', 'Iave' and 'Iuni' options will run in parallel, for all
+others options, it will just execute the same code many times!
+
+# QUEEN performance #
+
+As QUEEN produces a large number of intermediate output files, it is critical that
+the speed at which files can be written to the path defined by Q_LOG in queen.conf
+is as high as possible. Therefore, it is recommended that Q_LOG is always local to
+the machine where the work is being done, especially on Linux clusters where disks
+are often shared over NFS. Setting Q_LOG to a local path such as /tmp/ can give a
+dramatic increase in speed in these cases. Files stored there are all temporary and
+are deleted by QUEEN automatically if there are no errors reported by the program.
+
+# Restraint formats #
+
+As mentioned before, all restraint files have to be in the XPLOR format.
+Unfortunately, we currently cannot support all the options XPLOR supports in
+it's restraint formats. For example this restraint, just to show that the
+following selection mechanism is not allowed:
+
+  ASSI  (RESI   4:6 AND NAME   HA)
+        (RESI    33 AND NAME   HN)      2.500 0.700 0.400
+
+Separate the 4:6 terms into their separate contributions in these cases.
+
+Also for restraints like this one:
+
+  ASSI  (RESI  1 AND NAME HB1 OR RESI 1 AND NAME HB2)
+        (RESI 10 AND NAME HA)           2.500 0.700 0.400
+
+Again separate the different terms into separate brackets:
+
+  ASSI  ((RESI  1 AND NAME HB1) OR (RESI 1 AND NAME HB2))
+        (RESI 10 AND NAME HA)           2.500 0.700 0.400
+
+or just use HB# of course...
+
+# Problems, questions of suggestions? #
+
+They can be sent to queen@cmbi.kun.nl, we will try to answer them as soon
+as possible!
