@@ -19,7 +19,7 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 #        entryList = "apoTTHAcis".split()
 #        entryList = "CuTTHAcis CuTTHAtrans Parvulustat TTSco apoTTHAcis apoTTHAtrans BASP mia40 taf3 wln34".split()
-        entryList = "BASP mia40 taf3 wln34".split()
+        entryList = "taf3 wln34".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
@@ -44,7 +44,7 @@ class AllChecks(TestCase):
 
             inputArchiveDir = os.path.join(cingDirTestsData, "eNMRworkshop")
 
-            ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
+            ccpnFile = os.path.join(inputArchiveDir, entryId, entryId + ".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
             self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
