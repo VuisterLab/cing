@@ -38,10 +38,10 @@ class AllChecks(TestCase):
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
         
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
         doProcheck = True
-        doWattos = False
+        doWattos = True
         useNrgArchive = False
         modelCount=None
         if fastestTest:

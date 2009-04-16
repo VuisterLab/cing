@@ -325,10 +325,15 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         Ranges: GWV 25 Sep 2008: does work ok, using modified script to only implement for tplot call
 
-        Return True on error ( None on success; Python default)
+        Return True on error (None on success; Python default)
         """
         #
-        # It's actually important not to write any to Proceck then because
+        
+        if self.molecule.modelCount == 0:
+            NTwarning('Procheck run: no models for "%s"', self.molecule)
+            return
+        
+        # It's actually important not to write any to Procheck then because
         # there might be more than 200 stretches which upsets PC.
         NTmessage('==> Running procheck_nmr')
 
@@ -627,7 +632,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
 def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly = False)   :
     """
-    Adds <Procheck> instance to molecule. Run procheck and parse result
+    Adds <Procheck> instance to molecule. Run procheck and parse result.
+    Return True on error.
     """
     if cingPaths.procheck_nmr == None or cingPaths.procheck_nmr == PLEASE_ADD_EXECUTABLE_HERE:
         NTmessage("No procheck_nmr installed so skipping this step")
@@ -635,8 +641,12 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
 
     if not project.molecule:
         NTerror('runProcheck: no molecule defined')
-        return None
+        return True
     #end if
+    if project.molecule.modelCount == 0:
+        NTwarning('runProcheck: no models for "%s"', project.molecule)
+        return
+    
     if not project.molecule.hasAminoAcid():    
 #    if len(project.molecule.residuesWithProperties('protein')) == 0:
            NTdebug("Skipping procheck as there is no protein in the current molecule")
@@ -648,12 +658,12 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     pcheck = Procheck(project)
     if not pcheck:
         NTerror("runProcheck: Failed to get procheck instance of project")
-        return None
+        return True
 
     if not parseOnly:
         if not pcheck.run(ranges=ranges,createPlots=createPlots, runAqua=runAqua):
             NTerror("runProcheck: Failed to run procheck_nmr")
-            return None
+            return True
     else:
         pcheck.ranges = ranges
         pcheck.parseResult()
