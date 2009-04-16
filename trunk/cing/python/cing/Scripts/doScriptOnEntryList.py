@@ -42,7 +42,8 @@ def doScriptOnEntryList(pythonScriptFileName,
           delay_between_submitting_jobs  = 1,
           extraArgList                   = None,
           START_ENTRY_ID                 = START_ENTRY_ID,
-          MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO
+          MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO,
+          expectPdbEntryList             = True
           ):
 #    if os.chdir(cingDirTmp):
 #        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
@@ -58,15 +59,19 @@ def doScriptOnEntryList(pythonScriptFileName,
     for line in entryListFile.readlines():
         line = line.strip()
         entryCountTotal += 1
-        entryCode = line[0:4].lower()
+        if expectPdbEntryList:
+            entryCode = line[0:4].lower()
+        else:
+            entryCode = line
         if entryCode in entryCodeListFilter:
             continue
         entryCodeList.append( entryCode )
         # get it only when present or ignore it. Watch for number of arguments changes.
         # the python script will only see entry_code and extraArgListStr
         chainCode = ''
-        if len(line) > 4:            
-            chainCode = line[4].upper()
+        if expectPdbEntryList:
+            if len(line) > 4:            
+                chainCode = line[4].upper()
 #        NTdebug('Using chainCode: [%s]' % chainCode )
         chainCodeList.append(chainCode)
     entryListFile.close()
