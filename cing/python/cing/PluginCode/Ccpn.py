@@ -303,11 +303,12 @@ class Ccpn:
         return True
 
 
-    def importFromCcpn(self):
+    def importFromCcpn(self, modelCount=None):
         '''Descrn: Import data from Ccpn into a Cing instance.
                    Check if either instance has attribute .cing or .ccpn,
                    respectively.
            Inputs: Ccpn Implementation.Project, Cing.Project instance.
+           When modelCount is not None it will limit the number of models imported.
            Output: None on error.
         '''
 
@@ -317,7 +318,7 @@ class Ccpn:
 
         NTmessage('==> Importing data from Ccpn project "%s"', self.ccpnProject.name)
 
-        if not self.importFromCcpnMolecule():
+        if not self.importFromCcpnMolecule(modelCount=modelCount):
             NTerror("Failed to importFromCcpnMolecule")
             return None
 
@@ -355,13 +356,14 @@ class Ccpn:
         return True # To distinguish success from failure.
     # end def importFromCcpn
 
-    def importFromCcpnMolecule(self):
+    def importFromCcpnMolecule(self, modelCount=None):
         '''Descrn: Import MolSystems (Molecules) from Ccpn.Project instance and
                    append it to Cing.Project instance, including chains, residues
                    and atoms.
                    As input either Cing.Project instance or Ccpn.Project instance,
                    or both, since it'll check if instances has attribute .ccpn or
                    .cing, respectively.
+           When modelCount is not None it will limit the number of models imported.
            Output: True or None on error.
         '''
 
@@ -394,7 +396,7 @@ class Ccpn:
                 NTdebug("There are no coordinates for molecule %s", self.molecule.name)
 
             # stuff molecule with chains, residues and atoms and coords
-            if not self._match2Cing():
+            if not self._match2Cing(modelCount = modelCount):
                 NTerror("Failed to _match2Cing")
                 return None
 
@@ -407,11 +409,12 @@ class Ccpn:
     # end def importFromCcpnMolecule
 
 
-    def _match2Cing(self):
+    def _match2Cing(self, modelCount=None):
         '''Descrn: Imports chains, residues, atoms and coords
                    from Ccpn.MolSystem into a Cing.Project.Molecule instance.
                    (fastest way to import since it loops only once over
                    chains, residues, atoms and coordinates.)
+           When modelCount is not None it will limit the number of models imported.
            Output: Cing.Molecule or None on error.
         '''
         unmatchedAtomByResDict = {}
@@ -433,8 +436,14 @@ class Ccpn:
         NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
         ccpnMolCoordList = []
+        maxModelCount = 0
         if hasattr(ccpnStructureEnsemble, 'models'):
-            self.molecule.modelCount += len(ccpnStructureEnsemble.models)
+            maxModelCount = len(ccpnStructureEnsemble.models)
+            if modelCount:
+                if maxModelCount > modelCount:
+                     maxModelCount = modelCount
+                     NTmessage("Limiting the number of imported models to: %d" % maxModelCount)
+            self.molecule.modelCount += maxModelCount
             ccpnMolCoordList = [ccpnStructureEnsemble]
 
 
@@ -633,6 +642,10 @@ class Ccpn:
                             i = - 1
                             for ccpnModel in ccpnCoordResidue.parent.parent.sortedModels():
                                 i += 1
+                                # at this point i will be zero for the first model.
+                                if i >= maxModelCount:
+#                                    NTdebug("Not adding model idx %d and more." % i)
+                                    break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
                                     NTwarning("Skippng coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom))
@@ -822,7 +835,7 @@ class Ccpn:
             for ccpnMolSystem in self.ccpnMolSystemList:
                 for ccpnShiftList in ccpnShiftLists:
                     if not ccpnShiftList:
-                        NTwarning("JFD observed this happens in Wims example data but doesn't know why")
+                        NTwarning("JFD observed this (no ccpnShiftList in non-empty ccpnShiftLists) happens in Wim's example data but doesn't know why")
                         continue
                     doneSetShifts = self._getCcpnShifts(ccpnMolSystem, ccpnShiftList)
                     if not doneSetShifts:
@@ -1412,10 +1425,10 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             fixedResonanceSetLeft = fixedResonanceList[0].resonanceSet
             fixedResonanceSetRight = fixedResonanceList[1].resonanceSet
             if not fixedResonanceSetLeft:
-                NTdebug("Failed to find fixedResonanceSet Left for ccpnConstraint %s" % ccpnConstraint)
+#                NTdebug("Failed to find fixedResonanceSet Left for ccpnConstraint %s" % ccpnConstraint)
                 return None
             if not fixedResonanceSetRight:
-                NTdebug("Failed to find fixedResonanceSet Right for ccpnConstraint %s" % ccpnConstraint)
+#                NTdebug("Failed to find fixedResonanceSet Right for ccpnConstraint %s" % ccpnConstraint)
                 return None
             fixedAtomSetListLeft = fixedResonanceSetLeft.sortedAtomSets()
             fixedAtomSetListRight = fixedResonanceSetRight.sortedAtomSets()
@@ -2010,14 +2023,15 @@ def removeCcpnReferences(self):
     except:
         NTerror("Failed removeCcpnReferences")
 
-def initCcpn(project, ccpnFolder):
+def initCcpn(project, ccpnFolder, modelCount=None):
     '''Descrn: Adds to the Cing Project instance from a Ccpn folder project.
        Inputs: Cing.Project instance, Ccpn project XML file or a gzipped tar file such as .tgz or .tar.gz
+       When modelCount is not None it will limit the number of models imported.
        Output: Cing.Project or None on error.
     '''
     # work horse class.
     ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
-    if not ccpn.importFromCcpn():
+    if not ccpn.importFromCcpn(modelCount=modelCount):
         NTerror("Failed importFromCcpn")
         return None
     return project

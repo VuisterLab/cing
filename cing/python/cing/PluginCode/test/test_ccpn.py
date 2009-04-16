@@ -22,21 +22,18 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-        # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
-        entryList = "1brv".split()
+#        entryList = "Cu_CopK".split()
 #        entryList = "1hue".split()
 #        entryList = "H1GI".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
+        
+        entryList = "1brv".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
-#        entryList = "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()
-#1iv6 needs better ccpn file from FC
-#        entryList = ["Parvulustat"]
-#        entryList = ["SRYBDNA"]
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
@@ -46,7 +43,9 @@ class AllChecks(TestCase):
         doProcheck = True
         doWattos = False
         useNrgArchive = False
+        modelCount=None
         if fastestTest:
+            modelCount=1
             htmlOnly = True 
             doWhatif = False
             doProcheck = False
@@ -66,7 +65,7 @@ class AllChecks(TestCase):
                 inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
-            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
+            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
             self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,

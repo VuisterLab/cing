@@ -170,7 +170,7 @@ class Whatif( NTdict ):
 
 
     scriptBegin = """
-# Generate WI script
+# CING generated What If (WI) script
 # Set WI options
 # Truncating errors in a PDBOUT table
 SETWIF 593 100
