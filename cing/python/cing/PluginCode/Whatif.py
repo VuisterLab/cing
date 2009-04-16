@@ -127,7 +127,11 @@ class Whatif( NTdict ):
                 ('TO2CHK', 'Missing C-terminal groups', 'Missing C-terminal groups'),
                 ('TOPPOS', 'Ligand without know topology', 'Ligand without know topology'),
                 ('WGTCHK', 'Atomic occupancy check', 'Atomic occupancy check'),
-                ('Hand',   '(Pro-)chirality or handness check',                         '(Pro-)chirality'),
+                ('Hand',   '(Pro-)chirality or handness check'),                                        
+                ('AAINLI',   'Unknown check', 'Unknown check'),
+                ('ATHYBO',   'Unknown check', 'Unknown check'),
+                ('BBAMIS',   'Unknown check', 'Unknown check'),
+                ('TORCHK',   'Unknown check', 'Unknown check')
                  ]
 
 #              'Bond max Z',
@@ -297,7 +301,7 @@ fullstop y
                 checkID = value # local var within this 'if' statement.
 #                NTdebug("found check ID: " + checkID)
                 if not self.nameDict.has_key( checkID ):
-                    NTerror("Whatif._parseCheckdb: Skipping an unknown CheckID: "+checkID)
+                    NTwarning("Whatif._parseCheckdb: Skipping an unknown CheckID: "+checkID)
                     continue
 #                if self.debugCheck != checkID:
 ##                    NTdebug("Skipping a check not to be debugged: "+checkID)
@@ -648,8 +652,8 @@ def runWhatif( project, parseOnly=False ):
         return True
 
     if project.molecule.modelCount == 0:
-        NTerror('runWhatif: no models for "%s"', project.molecule)
-        return True
+        NTwarning('runWhatif: no models for "%s"', project.molecule)
+        return
 
     path = project.moleculePath( 'whatif' )
     if not os.path.exists( path ):

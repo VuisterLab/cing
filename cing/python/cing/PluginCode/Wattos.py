@@ -319,7 +319,7 @@ def runWattos(project, tmp = None):
         return None
 
     if molecule.modelCount == 0:
-        NTerror('in runWattos: no models for "%s"', molecule)
+        NTwarning('in runWattos: no models for "%s"', molecule)
         return None
 
     wattosDir = project.mkdir(molecule.name, project.moleculeDirectories.wattos)

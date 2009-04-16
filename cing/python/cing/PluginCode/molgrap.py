@@ -11,6 +11,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.TypeChecking import check_string
 from cing.Libs.TypeChecking import check_type
 from cing.core.constants import IUPAC
@@ -54,6 +55,10 @@ class Molgrap(NTdict):
     Return True on error and False on success.
     """
     def run(self, molecule, path, export = True):
+
+        if molecule.modelCount == 0:
+            NTwarning('runMolgrap: no models for "%s"', molecule)
+            return
 
         if not os.environ.has_key('MOLMOLHOME'):
             NTdebug('MOLMOLHOME not defined by user, using a temporary one')

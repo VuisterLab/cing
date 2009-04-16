@@ -21,7 +21,7 @@ try:
 except:
     raise ImportWarning(NMRSTAR_STR)    
 
-__author__ = 'Wim Vranken ' + __author__
+__author__ += 'Wim Vranken '
 
 class NmrStar():
     def __init__(self, project):
@@ -46,10 +46,10 @@ class NmrStar():
         
         try:
             LinkNmrStarData.projectDirectory = self.linkNmrStarDataProjectDirectory
-            NTdebug( "test A" )
+#            NTdebug( "test A" )
             if cing.verbosity < verbosityDebug:
                 switchOutput(False, doStdOut=True)
-            NTdebug( "test B" )
+#            NTdebug( "test B" )
             linkNmrStarData = LinkNmrStarData(" %s -raise -force  -noGui" % self.project.name )
             linkNmrStarData.idCode = self.project.name
             
@@ -70,10 +70,10 @@ class NmrStar():
                     for pl in ds.sortedPeakLists():
                         nmrEntry.addPeakList(pl)
     
-            NTdebug(  "test C" )
+#            NTdebug(  "test C" )
             if cing.verbosity < verbosityDebug:
                 switchOutput(False, doStdOut=True) # For some reason python grabbed sys.stdout again. 
-            NTdebug(  "test C2" )
+#            NTdebug(  "test C2" )
             nmrStarExport = NmrStarExport(nmrEntry, nmrStarVersion = '3.1', forceEntryId = self.project.name)
             ccpnCodeVerbose = False
             
@@ -81,14 +81,14 @@ class NmrStar():
               
             # Set the header comment - only set this if you need a standard header!
             topComment = "# File written for CING by NmrStarExport.py code"
-            NTdebug(  "test D")
+#            NTdebug(  "test D")
             if cing.verbosity < verbosityDebug:
                 switchOutput(False, doStdOut=True) # disable verbose stdout but keep stderr            
-            NTdebug(  "test E" )
+#            NTdebug(  "test E" )
             nmrStarExport.writeFile(title = "CING", topComment=topComment, verbose = ccpnCodeVerbose)
             if cing.verbosity < verbosityDebug:
                 switchOutput(True, doStdOut=True) # disable verbose stdout but keep stderr            
-            NTdebug(  "test F" )
+#            NTdebug(  "test F" )
             NTmessage("Finished toNmrStarFile for file: %s" % fileName)
             return True
         except:
