@@ -2047,8 +2047,10 @@ class AtomsHTMLfile( HTMLfile ):
         if atom.has_key('shiftx') and len(atom.shiftx) > 0:
             sav = atom.shiftx.av
             ssd = atom.shiftx.sd
+        atomResonanceCollapsed = atom.resonances()
+#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
         if atom.isAssigned() and sav:
-            delta = atom.resonances().value - sav
+            delta = atomResonanceCollapsed.value - sav
             rdelta = 1.0
             if ssd > 0.0:
                 rdelta = sav/ssd
@@ -2056,8 +2058,8 @@ class AtomsHTMLfile( HTMLfile ):
             dav = atom.db.shift.average
             dsd = atom.db.shift.sd
         if atom.resonances():
-            value = atom.resonances().value
-            error = atom.resonances().error
+            value = atomResonanceCollapsed.value
+            error = atomResonanceCollapsed.error
 
         savStr     = val2Str(sav,   '%6.2f', 6 )
         ssdStr     = val2Str(ssd,   '%6.2f', 6 )
@@ -2065,7 +2067,7 @@ class AtomsHTMLfile( HTMLfile ):
         rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
         davStr     = val2Str(dav,   '%6.2f', 6 )
         dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-        valueStr   = val2Str(value, '%6.2f', 6 ) # was sometimes set to a NOSHIFT
+        valueStr   = val2Str(value, '%6.2f', 6 )
         if valueStr==NaNstring:
             error=None
         errorStr   = val2Str(error, '%6.2f', 6 )
