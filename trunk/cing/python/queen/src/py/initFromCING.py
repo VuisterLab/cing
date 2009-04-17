@@ -2,11 +2,11 @@
 import sys,os
 
 sys.path += [os.path.join(sys.path[0])]
-from qn import *
+from qn import * #@UnusedWildImport
 
 # CING IMPORTS
 try:
-  from cing import *
+  from cing import * #@UnusedWildImport
   from cing.core.parameters import directories
   from cing.Libs.NTutils import removedir
 except ImportError:
@@ -27,7 +27,7 @@ def initFromCING( queenProject, cingProject ):
     if not cingProject.contentIsRestored:
         cingProject.restore()
 
-    nmvconf = queenProject.nmvconf
+    nmvconf = queenProject.nmvconf #@UnusedVariable
 
     # Create the queen directory structure
     removedir( queenProject.projectpath )
