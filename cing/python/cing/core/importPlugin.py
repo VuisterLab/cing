@@ -41,7 +41,7 @@ def importPlugin( pluginName ):
     pluginCodeModulePackage = None
     try:
         #JFD changed from default to zero which means to only try absolute imports.
-        pluginCodeModulePackage = __import__( pluginCodeModule, globals(), locals(), [pluginName]) 
+        pluginCodeModulePackage = __import__( pluginCodeModule, globals(), locals(), [pluginName])
         isInstalled = True
     except ImportWarning:
         NTdebug("Skipping import of an optional compound.")
@@ -50,9 +50,9 @@ def importPlugin( pluginName ):
 #        traceBackObject = sys.exc_info()[2]
         traceBackString = format_exc()
         NTerror(traceBackString)
-        NTerror('Failed to import pluginCodeModule: [%s]' % pluginName)        
+        NTerror('Failed to import pluginCodeModule: [%s]' % pluginName)
         return None
-        
+
 
     pluginModule = None
     if isInstalled:
@@ -65,7 +65,7 @@ def importPlugin( pluginName ):
         pluginModule = getattr( pluginCodeModulePackage, pluginName )
     #    NTdebug("pluginModule looks like: " + `pluginModule`)
 
-    plugin = NTdict( module = pluginModule, name = pluginName, isInstalled = isInstalled)
+    plugin = NTdict( module = pluginModule, name = pluginName, isInstalled = isInstalled )
     #end try
 #    NTdebug('==> Staging plugin ' + pluginName)
     plugins[pluginName] = plugin

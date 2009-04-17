@@ -1,3 +1,4 @@
+
 ## Contents ##
 ##############
 
@@ -26,23 +27,14 @@
 ## QUEEN ##
 ###########
 
-QUEEN   :
-  QUantitative Evaluation of Experimental Nmr restraints
+QUEEN   : QUantitative Evaluation of Experimental Nmr restraints
 
-Author  :
-  Sander Nabuurs
+Author  : Sander Nabuurs & Geerten Vuister
 
-E-mail  :
-  s.nabuurs@cmbi.kun.nl
+E-mail  : s.nabuurs@cmbi.ru.nl or g.vuister@science.ru.nl
 
-Homepage and servers:
-  http://www.cmbi.kun.nl/software/queen/
+Homepage and servers: http://nmr.cmbi.ru.nl/QUEEN
 
-Version :
-  1.2
-
-Date    :
-  April 2009
 
 When using QUEEN please cite:
 
@@ -50,13 +42,13 @@ When using QUEEN please cite:
   Gert Vriend and Geerten W. Vuister (2003). Quantitative evaluation of
   experimental NMR restraints. J. Am. Chem. Soc. 125 (39), 12026-12034.
 
-No warranty implied or expressed.
-All rights reserved.
+No warranty implied or expressed. All rights reserved.
+
 
 ## Installation ##
 ##################
 
-QUEEN currently only runs on the Linux and Mac OSX intel platforms.
+QUEEN currently only runs on the Linux and Mac OSX platforms.
 
 Untar the QUEEN package using the following command:
 
@@ -127,7 +119,7 @@ QUEEN comes with a testsuite to check your installation. Before proceeding
 any further we suggest you run it to make your sure your basic installation
 is correct. The script is located in the main installation directory.
 
-  ./testsuite.py
+  ./cing.py --test    (NB changed in 1.2 version)
 
 ## Running QUEEN ##
 ###################
@@ -154,6 +146,23 @@ lookes like this:
 
 # Project setup #
 
+The program can be run as stand-alone or using the CING API. Please refer to
+the appropriate sections.
+
+####### Using CING API #########
+Setting a QUEEN project consists of one step:
+ 1. Creating the project directory tree from a existing CING project.
+    A new QUEEN run is initialized by the following command:
+
+    ./queen.py --project projectname --initCing  (NB new in 1.2 version)
+
+The restraints are taken from the CING project and automatically converted
+suitable for the QUEEN run. They are grouped in the dataset 'all'.
+A a sequence, protein structure and template file are created.
+
+
+####### Stand-alone version #########
+
 Setting a QUEEN project consists of several steps:
  1. Creating the project directory tree.
  2. Creating a sequence, protein structure and template file.
@@ -162,7 +171,7 @@ Setting a QUEEN project consists of several steps:
 
 1. A new project is created by the following command:
 
-  ./generate.py --project projectname
+  ./queen.py --project projectname --init  (NB new in 1.2 version)
 
 This creates a new directory 'projectname' in the QUEEN project directory,
 which was defined as Q_PROJECT in 'queen.conf'.
@@ -176,7 +185,7 @@ be found at http://www.cmbi.kun.nl/software/queen/.
 2. If you have a PDB file available of your structure, you can take
 the easy route:
 
-  ./generate.py --pdb2all projectname yourprotein.pdb
+  ./queen.py --project projectname --pdb2all yourprotein.pdb (NB changed in version 1.2)
 
 This will generate a sequence file, a PSF file and a template PDB file at
 the following locations:
@@ -205,12 +214,14 @@ chain name is present. The sequence should be given in three-letter
 aminoacid codes, with one amino-acid per line. With the sequence file, you
 can generate a PSF file.
 
-  ./generate.py --seq2psf projectname yoursequencefile.seq
+  ./queen.py --project projectname --seq2psf yoursequencefile.seq
+  (NB changed in version 1.2)
 
 This PSF (which can be found at /theprojectdir/data/sequence/protein.psf
 can then be converted to a template PDB file.
 
-  ./generate.py --psf2tem projectname /theprojectdir/data/sequence/protein.psf
+  ./queen.py --project projectname --psf2tem /theprojectdir/data/sequence/protein.psf
+  (NB changed in version 1.2)
 
 The template PDB file can then be found at: /theprojectdir/data/sequence/protein.pdb.
 
@@ -257,7 +268,7 @@ to be located in the /yourprojectdir/projectname/data/restraints/ directory.
 The TYPE field can be either DIST or DIHE for distance and dihedral restraints,
 respectively. Every block has to be ended with a '//' delimiter!
 
-A new feature in QUEEN 1.1 is the possiblity to include restraints as
+A new feature since QUEEN 1.1 is the possiblity to include restraints as
 back ground information. This done by adding the 'INFO' statement to the
 dataset description file. For example:
 
@@ -283,7 +294,7 @@ medium-range restraints.
 With everything in place you should now be able to run QUEEN, using queen.py.
 To quickly test your data, run the check option:
 
-  ./queen.py --check projectname yourdataset
+  ./queen.py --project projectname --dataset yourdataset --check
 
 If this runs without QUEEN reporting errors, it's likely that all others options
 will also run without any further problems. If you receive warnings or errors when
@@ -311,17 +322,16 @@ The QUEEN distribution comes with an example dataset. The restraints in this
 dataset belong to PDB entry 1BUS, which is the oldest NMR structure to be found
 in the Protein Data Bank.
 
-To use this dataset you must set Q_PROJECT in queen.conf to the example/ directoy
-in the QUEEN installation directory (Q_PATH). You can then run all the QUEEN
-options using 'example' as the projectname and 'noe' or 'all' as the dataset.
+To use this dataset you must use the --example flag in stead of the --project option.
+You can then run all the QUEEN options with 'noe' or 'all' as the dataset.
 For example, to check the 'all' dataset:
 
-  ./queen.py --check example all
+  ./queen.py --example --check --dataset all  (NB changed in version 1.2)
 
 Or, to calculate the unique restraint information of the restraints in the
 'noe' dataset:
 
-  ./queen.py --Iuni example noe
+  ./queen.py --example --Iuni --dataset noe  (NB changed in version 1.2)
 
 
 ## Miscellaneous ##

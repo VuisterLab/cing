@@ -47,14 +47,14 @@ class AllChecks(TestCase):
 
         showValues = False
         fastestTest = False
-        
+
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         doWattos = False
         useNrgArchive = False
         if fastestTest:
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
@@ -67,7 +67,7 @@ class AllChecks(TestCase):
 #        entryId = "2hgh_1model"
         entryId = "1hue"
 
-        self.failIf(os.chdir(cingDirTmp), msg = 
+        self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to temp test directory for data: " + cingDirTmp)
         project = Project.open(entryId, status = 'new')
         self.assertTrue(project, 'Failed opening project: ' + entryId)
@@ -84,7 +84,7 @@ class AllChecks(TestCase):
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif,
                                               doWattos=doWattos ))
-            
+
         else:
             rangeList = project.molecule.getFixedRangeList(
                 max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges = None)
@@ -152,7 +152,7 @@ class AllChecks(TestCase):
         # Level 3: plot parameters dictionary (extendable).
         keyLoLoL = []
         plotAttributesRowMain = NTdict()
-        # Now for a correlation specify the x, y series as consequetive 
+        # Now for a correlation specify the x, y series as consequetive
         # KEY_LIST_STR, KEY_LIST2_STR and subsequent correlations as:
         # KEY_LIST_STR3, KEY_LIST4_STR etc.
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR, QUACHK_STR, VALUE_LIST_STR ]

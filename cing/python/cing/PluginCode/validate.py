@@ -459,12 +459,12 @@ def summary( project, toFile = True ):
         else:
             NTerror("Failed to find the procheck summary attribute")
 
-    wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR) 
+    wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR)
     if wattosSummary:
         msg += "\n%s Wattos Summary %s\n" % (dots, dots )
         msg += '\n' + addPreTagLines(wattosSummary)
 
-    
+
     if toFile:
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
@@ -670,12 +670,11 @@ def checkForDisulfides(project, toFile=True):
         NTerror('checkForDisulfides: no molecule defined')
         return None
     #end if
-    
+
     if project.molecule.modelCount == 0:
         NTwarning('checkForDisulfides: no models for "%s"', project.molecule)
         return
     #end if
-    
     cys=project.molecule.residuesWithProperties('CYS')
     cyss=project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
     for c in cyss:
@@ -689,7 +688,7 @@ def checkForDisulfides(project, toFile=True):
         c = cys[i]
         if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
             NTwarning("No coordinates for CA, skipping residue: %s" % c)
-            del( cys[i] )            
+            del( cys[i] )
 
     disulfides = NTlist()
     # all cys(i), cys(j) pairs with j>i
@@ -720,10 +719,12 @@ def checkForDisulfides(project, toFile=True):
 # end def
 
 
-def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
+def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
     """
     Routine to analyze all potential saltbridges involving E,D,R,K and H residues.
     Initiates an NTlist instances as saltbridges attribute for all residues.
+
+    Only list/store for a particular pair if fraction 'not-observed' <= cutoff)
 
     Returns a NTlist with saltbridge summaries.
 
@@ -733,9 +734,9 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
         NTerror('checkForSaltbridges: no molecule defined')
         return None
     #end if
-    
+
     result = NTlist()
-    
+
     if project.molecule.modelCount == 0:
         NTwarning('checkForSaltbridges: no models for "%s"', project.molecule)
         return result
@@ -772,7 +773,9 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
             #print '>>', res1, res2
             s = validateSaltbridge(res1,res2)
             if s:
-                if (s.types[4][1] <= cutoff):    # less then cutoff 'not observed'
+                if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
+                    pass
+                else:
                     if toFile:
                         fprintf(fp, '%s\n', s.format() )
 #                    NTdebug(    '%s\n', s.format() )
@@ -787,7 +790,7 @@ def checkForSaltbridges( project, cutoff = 5, toFile=False)   :
     if s:
         if toFile:
             fprintf( fp, '%s\n', s.comment )
-        NTdebug(     '%s\n', s.comment )
+        #NTdebug(     '%s\n', s.comment )
     #end if
 
     if toFile:
@@ -812,6 +815,7 @@ def validateSaltbridge( residue1, residue2 ):
 
     Returns summary NTdict or None on error
     """
+    NTdebug('validateSaltBridge: %s %s', residue1, residue2)
 
     # Definitions of the centroids according to the paper
     centroids = NTdict(

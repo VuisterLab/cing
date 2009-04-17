@@ -939,7 +939,7 @@ def qn_createproject(nmvconf,projectname=None,projectpath=None):
     if os.path.exists(qpath):
       error("Project already exists")
     else:
-      NTmessage( "==> Creating QUEEN project directory tree at %s", qpath )
+      print( "==> Creating QUEEN project directory tree at %s", qpath )
       # CREATE THE PROJECT DIR
       os.makedirs(qpath)
       # CREATE THE NECESSARY SUBDIRS
@@ -1121,24 +1121,151 @@ def qn_setupxplor(nmvconf,projectname,projectpath=None):
   # RETURN THE XPLOR INSTANCE
   return xplr
 
+
+def qn_seq2psf( queenProject, seqfile):
+    """
+    Generate psf file from seqfile.
+
+    Return True on error, False on succes.
+    """
+    if not queenProject.exists():
+        error("qn_seq2psf: Project directory does not exist. Please setup project first")
+        return True
+    #end if
+
+    nmvconf     = queenProject.nmvconf
+    projectpath = queenProject.projectpath
+    psffile     = queenProject.psffile
+
+    top = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_TOP"])
+    pep = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PEP"])
+    par = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
+    xpl = nmvconf["XPLOR"]
+
+    patches = {}
+    # CHECK FOR DISULFIDES
+    disulfidefile = os.path.join(projectpath,nmvconf["Q_DISULFIDES"])
+    if os.path.exists(disulfidefile):
+        patches.update(qn_readdisulfides(disulfidefile))
+    # CHECK FOR OTHER PATCHES
+    patchesfile = os.path.join(projectpath,nmvconf["Q_PATCHES"])
+    if os.path.exists(patchesfile):
+        patches.update(qn_readpatches(patchesfile))
+    xplor_buildstructure(psffile,seqfile,'sequence',top,pep,xpl,patches=patches)
+    return False
+#end def
+
+def qn_psf2tem( queenProject, psffile ):
+    """
+    Generate psf file from psffile.
+
+    Return True on error, False on succes.
+    """
+    if not queenProject.exists():
+        error("qn_psf2tem: Project directory does not exist. Please setup project first")
+        return True
+    #end if
+
+    nmvconf     = queenProject.nmvconf
+    top = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_TOP"])
+    pep = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PEP"])
+    par = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
+    xpl = nmvconf["XPLOR"]
+
+    xplor_generatetemplate(queenProject.temfile, psffile, par, xpl)
+    return False
+#end def
+
+def qn_pdb2all( queenProject, pdbfile, xplorflag=0 ):
+    """
+    Generate all required template files in queen project from pdbfile.
+
+    Return True on error, False on succes.
+    """
+    if not queenProject.exists():
+        error("qn_pdb2all: QUEEN project directory does not exist. Please setup project first")
+        return True
+    #end if
+
+    # Generate seq file
+    qn_pdb2seq(pdbfile, queenProject.seqfile, xplorflag)
+
+    # Generate psf file
+    qn_seq2psf( queenProject, queenProject.seqfile)
+
+    # RENUMBER PSF FILE
+    psffile = queenProject.psffile
+    inpsf = "%s.prenum"%psffile
+    shutil.copy(psffile,inpsf)
+    xplor_renumberpsf(inpsf,psffile,pdbfile,xplorflag)
+
+    # BUILD TEMPLATE
+    qn_psf2tem( queenProject, psffile )
+
+    return False
+#end def
+
+def qn_test(nmvconf):
+    """
+    QUEEN testing routine
+    """
+    # CHECK PYTHON
+    print "Checking your Python version."
+    print "  Found Python version %s."%sys.version.split()[0]
+    nmv_checkpython()
+    print
+
+    # CHECK THE QUEEN CONFIGURATION FILE
+    print "Checking your configuration:"
+
+    print "Checking if XPLOR path is correct...",
+    if not os.path.exists(nmvconf["XPLOR"]):
+      print "No."
+      error("  Please set the correct path for XPLOR")
+    else:
+      print "Yes."
+    print
+
+    print "Testing QUEEN ..."
+    # TEST WITH THE EXAMPLE
+    print "  Temporarily switching Q_PROJECT to the example/ directory..."
+    nmvconf["Q_PROJECT"]=nmvconf["Q_PATH"]
+    project,dataset = 'example','all'
+    # SETUP QUEEN
+    print "  Initializing QUEEN...",
+    queen = qn_setup(nmvconf,project,0,1)
+    xplr  = qn_setupxplor(nmvconf,project)
+    print "Ok."
+    print "  Reading test set of restraints...",
+    table = nmv_adjust(queen.table,'test')
+    r = restraint_file(table,'r')
+    r.read()
+    print "Ok."
+    print "  Calculating and validating output...",
+    sys.stdout.flush()
+    score = queen.uncertainty(xplr,{"DIST":r.restraintlist})
+    print score
+    if "%13.11f"%score=="4.55017471313":
+      print "Installation ok."
+    else:
+      print "Problem."
+      print "  Outcome of procedure not as expected."
+      print
+      print "Please don't change the restraint file 'test.tbl' in the example directory!"
+      print "If you did so, please restore the directory to it's original state"
+      print "and run the testsuite again."
+    print
+#end def
+
 # SETUP QUEEN
 # ===========
 # SETUP QUEEN
-def qn_setup(nmvconf,project,myid=0,numproc=1,projectpath=None):
-  # SETUP QUEEN
-  if not projectpath:
-    path = os.path.join(nmvconf["Q_PROJECT"],project)
-  else:
-    path = os.path.join(projectpath,project)
-  if not os.path.exists(path):
-    error("Project directory does not exist. Please setup project first")
-  queen = queenbase(path,project)
-  queen.sequence   = os.path.join(queen.path,nmvconf["Q_SEQ"])
-  queen.table      = os.path.join(queen.path,nmvconf["Q_DATATBL"])
-  queen.dataset    = os.path.join(queen.path,nmvconf["Q_DATASET"])
-  queen.logpath    = os.path.join(queen.path,nmvconf["Q_LOG"])
-  queen.pdb        = os.path.join(queen.path,nmvconf["Q_PDB"])
-  queen.outputpath = os.path.join(queen.path,nmvconf["Q_OUTPUT"])
+def qn_setup(nmvconf,project,myid=0,numproc=1):
+  """
+  Setup QUEEN:
+  GWV made this mostly into a dummy by moving it to the initialization of the queenbase instance
+  """
+  queen = queenbase(nmvconf,project)
   queen.numproc    = numproc
   queen.myid       = myid
   if numproc>1:
@@ -3930,17 +4057,70 @@ class restraint_file:
 class queenbase:
   """
   A base class for a QUEEN project.
-  Create a class instance by giving a path and a projectname.
+  Create a class instance by giving an optional path and a name of a project.
   """
-  def __init__(self,path,project):
-    self.path = path
-    self.project = project
-    self.projectpath = os.path.join(path,project)
-    self.logpath = self.path
-    self.display_error = 1
+  def __init__(self, nmvconf, project, path=None, numproc=1, myid=0 ):
+
+    if not path:
+        self.path        = nmvconf["Q_PROJECT"]
+    else:
+        self.path        = path
+    #end if
+    self.project         = project
+    self.nmvconf         = nmvconf
+
+    self.projectpath     = os.path.join(self.path,self.project)
+    self.logpath         = os.path.join(self.projectpath,nmvconf["Q_LOG"])
+    self.sequence        = os.path.join(self.projectpath,nmvconf["Q_SEQ"])
+    self.seqfile         = os.path.join(self.projectpath,nmvconf["Q_SEQ"])
+    self.psffile         = os.path.join(self.projectpath,nmvconf["Q_PSF"])
+    self.temfile         = os.path.join(self.projectpath,nmvconf["Q_TEMPLATE"])
+    self.table           = os.path.join(self.projectpath,nmvconf["Q_DATATBL"])
+    self.dataset         = os.path.join(self.projectpath,nmvconf["Q_DATASET"])
+    self.pdb             = os.path.join(self.projectpath,nmvconf["Q_PDB"])
+    self.outputpath      = os.path.join(self.projectpath,nmvconf["Q_OUTPUT"])
+
+    self.display_error   = 1
     self.display_warning = 1
-    self.display_debug = 1
-    self.errorflag = 0
+    self.display_debug   = 1
+    self.errorflag       = 0
+
+    self.numproc         = numproc
+    self.myid            = myid
+  #end def
+
+  def exists(self):
+      """
+       Return True if projectpath exists.
+      """
+      return os.path.exists(self.projectpath)
+  #end def
+
+  def createproject(self, overwrite=False):
+      """
+      Create project tree.
+      Optionally overwrite existing data
+
+      """
+
+      if self.exists() and not overwrite:
+          error('queenbase.createproject: project directory already exists; use overwrite flag')
+      #end if
+
+      print "==> Creating QUEEN project directory tree at %s" % (self.projectpath)
+      # CREATE THE PROJECT DIR
+      if not os.path.exists(self.projectpath):
+          os.makedirs(self.projectpath)
+
+      # CREATE THE NECESSARY SUBDIRS
+      for key in ["Q_SEQUENCE","Q_RESTRAINTS","Q_DATASETS","Q_OUTPUT","Q_LOG","Q_PDB"]:
+          subpath = os.path.join(self.projectpath, os.path.dirname(self.nmvconf[key]))
+          #print '>', key, subpath
+          if not os.path.exists(subpath):
+              os.makedirs(subpath)
+          #end if
+      #end for
+  #end def
 
   def error(self):
     pass
@@ -4042,4 +4222,22 @@ class queenbase:
     shutil.copy(self.dmtx,matrix)
     # CLEAR MEMORY
     self.clear()
+  #end def
+#end class
+
+
+class ExampleQueen( queenbase ):
+
+    def __init__(self, nmvconf ):
+        nmvconf["Q_PROJECT"]=nmvconf["Q_PATH"]
+        queenbase.__init__( self, nmvconf, project='example')
+    #end def
+
+    def createproject(self, overwrite=False):
+        """
+        Subclass to prevent creation of the Example directories
+        """
+        error('ExampleQueen.createproject: not allowed for example project')
+    #end def
+#end class
 
