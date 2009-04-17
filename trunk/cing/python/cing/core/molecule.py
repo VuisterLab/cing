@@ -931,27 +931,33 @@ class Molecule( NTtree ):
             and take the first one which has a assigned value,
             append or collapse the resonances list to single entry depending on append.
         """
+        
+        if not self.resonanceCount:
+            NTmessage("Skipping project.mergeResonances because there are no resonances")
+            return
+        
         for atom in self.allAtoms():
             if len(atom.resonances) != self.resonanceCount:
                 NTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
                          atom, len(atom.resonances), self.resonanceCount)
                 return
             #end if
-            rm = None
+            matchedResonance = None
             if selection == None or atom.name in selection:
-                for res in atom.resonances:
-                    if not isNaN(res.value):
-                        rm=res
+                for resonance in atom.resonances:
+                    if not isNaN(resonance.value):
+                        matchedResonance=resonance
                         break
                     #end if
                 #end for
             #end if
 
-            if rm:
-                atom.resonances.append(rm)
+            if matchedResonance:
+                atom.resonances.append(matchedResonance)
             else:
-                rm = atom.resonances[0]
-                atom.resonances.append(rm)
+#                NTdebug("For atom no matched resonance yet so let's take the first")
+                matchedResonance = atom.resonances[0]
+                atom.resonances.append(matchedResonance)
             #end if
 
             # Optionally reduce the list

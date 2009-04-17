@@ -19,7 +19,8 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 #        entryList = "CuTTHAcis CuTTHAtrans Parvulustat TTSco apoTTHAcis apoTTHAtrans BASP mia40 taf3 wln34".split()
 #        entryList = "taf3".split()
-        entryList = "mia40".split()
+#        entryList = "mia40".split()
+        entryList = "apoTTHAcis".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
