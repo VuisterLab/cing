@@ -20,9 +20,9 @@ p = svd.fit(ys)
 print p
 """
 from cing.Libs.NTutils import NTwarning
-from numpy import zeros
+from numpy import zeros #@UnresolvedImport
 from numpy.linalg import svd
-import copy
+import copy #@UnusedImport
 import math
 
 class SVDfit:
