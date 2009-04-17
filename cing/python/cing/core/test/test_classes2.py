@@ -95,7 +95,7 @@ class AllChecks(TestCase):
         r1 = self.r1        
 #        r2 = self.r2        
         r3 = self.r3       
-        atomListOfList = [[r1.HN],
+        atomLoL = [[r1.HN],
                           [r3.HB2, r3.HB3],
                           [r3.HB2],
                           [r1.HG11, r1.HG12, r1.HG13],
@@ -111,7 +111,7 @@ class AllChecks(TestCase):
                                      ]
         
         i = -1
-        for atomList in atomListOfList:
+        for atomList in atomLoL:
             i += 1
             firstAtom = atomList[0]
             self.assertEqual( firstAtom.getRepresentativePseudoAtom(atomList), pseudoListResultExpected[i])

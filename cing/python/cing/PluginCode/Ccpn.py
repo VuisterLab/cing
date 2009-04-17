@@ -162,7 +162,7 @@ class Ccpn:
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
 
-    def _getCcpnRestraintListOfList(self, ccpnConstraintStores, classNames):
+    def _getCcpnRestraintLoL(self, ccpnConstraintStores, classNames):
         """Descrn: Function to get a list of CCPN restraint lists given an
                    input list of CCPN Nmr Constraint Stores (containers for
                    the lists) and a list of class namee to specify which
@@ -739,7 +739,7 @@ class Ccpn:
         return cingPseudoAtom
 
 
-    def _getCcpnShifts(self, ccpnMolSystem, ccpnShiftList):
+    def _getCcpnShiftList(self, ccpnMolSystem, ccpnShiftList):
         """Descrn: Intenal function to transfer CCPN assignments in the
                    input shift list, which match to a given molSystem,
                    to the relevant Cing objects. This function assumes
@@ -748,7 +748,7 @@ class Ccpn:
            Output: True or None for Error.
         """
 
-        NTdebug("Now in _getCcpnShifts")
+        NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         molecule = ccpnMolSystem.cing
         molecule.newResonances()
@@ -765,7 +765,7 @@ class Ccpn:
                 continue
 
             if not hasattr(ccpnResidue, 'cing'):
-                msg = "_getCcpnShifts:CCPN residue %d %s skipped - no Cing link"
+                msg = "_getCcpnShiftList:CCPN residue %d %s skipped - no Cing link"
                 NTwarning(msg, ccpnResidue.seqCode, ccpnResidue.ccpCode)
                 knownTroubleResidues[ccpnResidue] = True
                 continue
@@ -783,7 +783,7 @@ class Ccpn:
                     atom.resonances[index].ccpn = ccpnShift
                     ccpnShift.cing = atom.resonances[index]
                 except:
-                    msg = "_getCcpnShifts: %s, shift CCPN atom %s skipped"
+                    msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
                     NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
 
         NTdetail("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
@@ -796,6 +796,7 @@ class Ccpn:
                    to a Cing Project. Checks are made to ensure all the
                    relevant molecular descriptions are present or also
                    transferred.
+                   As the name suggests, this also transfers the chemical shift lists.
            Inputs: Cing Project, CCPN Implementation.MemopsRoot
            Output: True or None
         """
@@ -803,43 +804,56 @@ class Ccpn:
         doneSetShifts = False
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
+            NTdebug("Using ccpnCalc object")
             molSystem = ccpnCalc.molSystem
             for mList in ccpnCalc.inputMeasurementLists:
                 if mList.className == 'ShiftList':
-                    doneSetShifts = self._getCcpnShifts(molSystem, mList)
+                    doneSetShifts = self._getCcpnShiftList(molSystem, mList)
         else:
-            ccpnShiftLists = []
-            ccpnPeakLists = self._getCcpnPeakListOfList()
+            NTdebug("Not using ccpnCalc object")
+            ccpnShiftLoL = []
+            ccpnPeakLoL = self._getCcpnPeakLoL()
 
-            for ccpnPeakList in ccpnPeakLists:
+            for ccpnPeakList in ccpnPeakLoL:
                 ccpnExperiment = ccpnPeakList.dataSource.experiment
 
-                if ccpnExperiment.shiftList not in ccpnShiftLists:
-                    ccpnShiftLists.append(ccpnExperiment.shiftList)
+                if ccpnExperiment.shiftList not in ccpnShiftLoL:
+                    if ccpnExperiment.shiftList:
+                        NTdebug("Adding CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+                        ccpnShiftLoL.append(ccpnExperiment.shiftList)
+                    else:
+                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))                            
+                else:
+                    NTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+                    
 
-            if ccpnPeakLists and not ccpnShiftLists:
-                msg = 'CCPN project has no shift lists linked to experiments. '
-                msg += 'Using any/all available shift lists'
-                NTwarning(msg)
+            if ccpnPeakLoL and (not ccpnShiftLoL):
+                NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
-            if not ccpnShiftLists:
-                # If there are no shift lists to this point
-                # we will most likely only find one in the project
-                ccpnShiftLists = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
+            if not ccpnShiftLoL:
+                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
+                ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
 
-            if not ccpnShiftLists:
+            NTdebug("Shift lists %r" % ccpnShiftLoL)
+                
+            if not ccpnShiftLoL:
                 NTdebug('CCPN project contains no shift lists')
                 return True
 
             for ccpnMolSystem in self.ccpnMolSystemList:
-                for ccpnShiftList in ccpnShiftLists:
+                for ccpnShiftList in ccpnShiftLoL:
                     if not ccpnShiftList:
-                        NTdebug("JFD observed this (no ccpnShiftList in non-empty ccpnShiftLists) happens in Wim's example data but doesn't know why")
+                        NTerror("Observed ccpnShiftList (%s) in non-empty ccpnShiftLoL; happens in example data but JFD doesn't know why"
+                                % ccpnShiftList )
                         continue
-                    doneSetShifts = self._getCcpnShifts(ccpnMolSystem, ccpnShiftList)
+                    doneSetShifts = self._getCcpnShiftList(ccpnMolSystem, ccpnShiftList)
                     if not doneSetShifts:
                         NTerror("Import of CCPN chemical shifts failed")
                         return False
+                    # end if
+                # end for
+            # end for
+        # end if
 
         if not self._getCcpnPeakList():
             NTerror("Failed _getCcpnPeakList")
@@ -860,7 +874,7 @@ class Ccpn:
            Inputs: Cing Project, CCPN Implementation.MemopsRoot
            Output: True or None for error.
         """
-        for ccpnPeakList in self._getCcpnPeakListOfList():
+        for ccpnPeakList in self._getCcpnPeakLoL():
             ccpnDataSource = ccpnPeakList.dataSource
             ccpnExperiment = ccpnDataSource.experiment
             ccpnNumDim = ccpnDataSource.numDim
@@ -900,8 +914,7 @@ class Ccpn:
                 if str(vValue) == 'inf':
                     vValue = NaN
 
-                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType =
-                                                             'height')
+                ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType = 'height')
                 hValue = 0.00
                 hError = 0.00
                 if ccpnHeight:
@@ -949,7 +962,7 @@ class Ccpn:
             NTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
         return True
 
-    def _getCcpnPeakListOfList(self):
+    def _getCcpnPeakLoL(self):
 
         """Descrn: Get the CCPN peak lists to import from a CCPN NMR project.
                    Uses a previously setup CCPN calculation object for Cing
@@ -992,7 +1005,7 @@ class Ccpn:
         ccpnShiftMapping = {}
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
-                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+#                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
                 continue
             ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
             ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
@@ -1181,12 +1194,12 @@ class Ccpn:
         msgHoL = MsgHoL()
 
         classNameList = (self.CCPN_DISTANCE_CONSTRAINT_LIST, self.CCPN_HBOND_CONSTRAINT_LIST)
-        ccpnConstraintListOfList = self._getCcpnRestraintListOfList(self.ccpnConstraintStoreList, classNameList)
-        if not ccpnConstraintListOfList:
-            NTdebug("No ccpnDistanceListOfList which can be normal.")
+        ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintStoreList, classNameList)
+        if not ccpnConstraintLoL:
+            NTdebug("No ccpnDistanceLoL which can be normal.")
             return True
 
-        for ccpnDistanceList in ccpnConstraintListOfList:
+        for ccpnDistanceList in ccpnConstraintLoL:
             distType = mapDistListType[ccpnDistanceList.className]
             ccpnDistanceListName = self._ensureValidName(ccpnDistanceList.name, distType)
             distanceRestraintList = self.project.distances.new(ccpnDistanceListName, status = 'keep')
@@ -1241,12 +1254,12 @@ class Ccpn:
 
         msgHoL = MsgHoL()
         classNameList = (self.CCPN_DIHEDRAL_CONSTRAINT_LIST)
-        ccpnConstraintListOfList = self._getCcpnRestraintListOfList(self.ccpnConstraintStoreList, classNameList)
-        if not ccpnConstraintListOfList:
-            NTdebug("No ccpnDihedralListOfList which can be normal.")
+        ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintStoreList, classNameList)
+        if not ccpnConstraintLoL:
+            NTdebug("No ccpnDihedralLoL which can be normal.")
             return True
 
-        for ccpnDihedralList in ccpnConstraintListOfList:
+        for ccpnDihedralList in ccpnConstraintLoL:
             ccpnDihedralListName = self._ensureValidName(ccpnDihedralList.name, AC_LEVEL)
 
             dihedralRestraintList = self.project.dihedrals.new(ccpnDihedralListName, status = 'keep')
@@ -1292,11 +1305,11 @@ class Ccpn:
         '''
         msgHoL = MsgHoL()
         classNameList = (self.CCPN_RDC_CONSTRAINT_LIST)
-        ccpnConstraintListOfList = self._getCcpnRestraintListOfList(self.ccpnConstraintStoreList, classNameList)
-        if not ccpnConstraintListOfList:
-            NTdebug("No ccpnRDCListOfList which can be normal.")
+        ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintStoreList, classNameList)
+        if not ccpnConstraintLoL:
+            NTdebug("No ccpnRDCLoL which can be normal.")
             return True
-        for ccpnRdcList in ccpnConstraintListOfList:
+        for ccpnRdcList in ccpnConstraintLoL:
             ccpnRdcListName = self._ensureValidName(ccpnRdcList.name, RDC_LEVEL)
 
             rdcRestraintList = self.project.rdcs.new(ccpnRdcListName, status = 'keep')
@@ -1416,14 +1429,14 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # Now the real code.
         atomPairList = []
         atomPairSet = set()
-        fixedResonanceListOfList = []
+        fixedResonanceLoL = []
 
         for constItem in ccpnConstraint.sortedItems():
             # JFD from WV. Tries to use sorted items where available.
-            fixedResonanceListOfList.append(getResonancesFromPairwiseConstraintItem(constItem))
+            fixedResonanceLoL.append(getResonancesFromPairwiseConstraintItem(constItem))
 
-#        NTdebug("fixedResonanceListOfList: %s" % fixedResonanceListOfList)
-        for fixedResonanceList in fixedResonanceListOfList:
+#        NTdebug("fixedResonanceLoL: %s" % fixedResonanceLoL)
+        for fixedResonanceList in fixedResonanceLoL:
 #            NTdebug("  fixedResonanceList: %s" % fixedResonanceList)
             # JFD Normally would use less levels of loops here but just to figure out how it's done it's nicer to spell it out.
             fixedResonanceSetLeft = fixedResonanceList[0].resonanceSet
