@@ -47,6 +47,7 @@ from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
 from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing.core.constants import PDB
+#from cing.core.molecule import AtomList # Fails to be imported here because of cyclic deps.
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
@@ -337,7 +338,10 @@ def setupHtml(project):
         ChainHTMLfile( project, chain )
     for res in molecule.allResidues():
         ResidueHTMLfile( project, res )
-
+        
+#    from cing.core.molecule import AtomList # Fails to be imported above.
+        
+    # JFD re-enables these inits because we need it fast now.
 #    atomList = AtomList(project) # instantiated only for this purpose locally; TODO: should be in molecule section updateAll
 #    project.molecule.atoms = atomList
 #    atomList.molecule = project.molecule

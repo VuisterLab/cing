@@ -17,18 +17,18 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-#        entryList = "apoTTHAcis".split()
 #        entryList = "CuTTHAcis CuTTHAtrans Parvulustat TTSco apoTTHAcis apoTTHAtrans BASP mia40 taf3 wln34".split()
-        entryList = "taf3".split()
+#        entryList = "taf3".split()
+        entryList = "mia40".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
         
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
-        doProcheck = True
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        doWhatif = False # disables whatif actual run
+        doProcheck = False
         doWattos = True
-        modelCount=None
+        modelCount=1
         if fastestTest:
             modelCount=1
             htmlOnly = True 

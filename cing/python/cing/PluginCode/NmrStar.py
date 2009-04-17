@@ -46,7 +46,8 @@ class NmrStar():
         
         try:
             LinkNmrStarData.projectDirectory = self.linkNmrStarDataProjectDirectory
-#            NTdebug( "test A" )
+            NTdebug( "LinkNmrStarData.projectDirectory: %s" % LinkNmrStarData.projectDirectory)
+            NTdebug( "test A" )
             if cing.verbosity < verbosityDebug:
                 switchOutput(False, doStdOut=True)
 #            NTdebug( "test B" )

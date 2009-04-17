@@ -748,6 +748,7 @@ class Ccpn:
            Output: True or None for Error.
         """
 
+        NTdebug("Now in _getCcpnShifts")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         molecule = ccpnMolSystem.cing
         molecule.newResonances()
@@ -755,7 +756,6 @@ class Ccpn:
         knownTroubleResidues = {} # To avoid repeating the same messages over
 
         ccpnShifts = shiftMapping.keys()
-
         for ccpnShift in ccpnShifts:
             shiftValue = ccpnShift.value
             shiftError = ccpnShift.error
@@ -782,7 +782,6 @@ class Ccpn:
                     # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
                     atom.resonances[index].ccpn = ccpnShift
                     ccpnShift.cing = atom.resonances[index]
-
                 except:
                     msg = "_getCcpnShifts: %s, shift CCPN atom %s skipped"
                     NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
@@ -835,7 +834,7 @@ class Ccpn:
             for ccpnMolSystem in self.ccpnMolSystemList:
                 for ccpnShiftList in ccpnShiftLists:
                     if not ccpnShiftList:
-                        NTwarning("JFD observed this (no ccpnShiftList in non-empty ccpnShiftLists) happens in Wim's example data but doesn't know why")
+                        NTdebug("JFD observed this (no ccpnShiftList in non-empty ccpnShiftLists) happens in Wim's example data but doesn't know why")
                         continue
                     doneSetShifts = self._getCcpnShifts(ccpnMolSystem, ccpnShiftList)
                     if not doneSetShifts:
@@ -927,7 +926,8 @@ class Ccpn:
                             cingResonance = contrib.resonance.findFirstShift(parentList = shiftList).cing
                             resonancesDim.append(cingResonance)
                         except:
-                            NTdebug('==== contrib out %s', contrib)
+#                            NTdebug('==== contrib out %s', contrib)
+                            pass
 
                     if resonancesDim:
                         resonances.append(resonancesDim[0])
@@ -980,32 +980,35 @@ class Ccpn:
                              Tuple of CCPN MolSystem.Atoms]
         """
 
-        ccpnResonances = []
+        NTdebug("Now in _getShiftAtomNameMapping")
+        ccpnResonanceList = []
         ccpnResonanceToShift = {}
 
         for ccpnShift in ccpnShiftList.measurements:
             ccpnResonance = ccpnShift.resonance
-            ccpnResonances.append(ccpnResonance)
+            ccpnResonanceList.append(ccpnResonance)
             ccpnResonanceToShift[ccpnResonance] = ccpnShift
 
         ccpnShiftMapping = {}
-        for ccpnResonance in ccpnResonances:
-            if ccpnResonance.resonanceSet: # i.e atom assigned
-                ccpnAtomSets = list(ccpnResonance.resonanceSet.atomSets)
-                ccpnResidue = ccpnAtomSets[0].findFirstAtom().residue
-
-                if ccpnResidue.chain.molSystem is not molSystem:
-                    continue
-
-                atomList = []
-
-                for ccpnAtomSet in ccpnAtomSets:
-                    for ccpnAtom in ccpnAtomSet.atoms:
-                        atomList.append(ccpnAtom)
-
-                ccpnShift = ccpnResonanceToShift[ccpnResonance]
-                ccpnShiftMapping[ccpnShift] = [ccpnResidue, tuple(atomList) ]
-
+        for ccpnResonance in ccpnResonanceList:
+            if not ccpnResonance.resonanceSet: # i.e atom assigned
+                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+                continue
+            ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
+            ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
+            if ccpnResidue.chain.molSystem is not molSystem:
+                NTdebug("Skipping resonance %s because CCPN residue falls outside the expected CCPN molSystem" % ccpnResonance)
+                continue
+            atomList = []
+            if not ccpnAtomSetList:
+                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)                
+            for ccpnAtomSet in ccpnAtomSetList:
+                for ccpnAtom in ccpnAtomSet.atoms:
+                    atomList.append(ccpnAtom)
+            ccpnShift = ccpnResonanceToShift[ccpnResonance]
+            ccpnShiftMapping[ccpnShift] = [ccpnResidue, tuple(atomList) ]
+        size = len(ccpnShiftMapping)
+        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % size)
         return ccpnShiftMapping
 
 
@@ -1116,7 +1119,8 @@ class Ccpn:
                                     #resonances.append(cingResonance)
                                     resonancesDim.append(cingResonance)
                                 except:
-                                    NTdebug('==== contrib out %s', contrib)
+                                    pass
+#                                    NTdebug('==== contrib out %s', contrib)
                                 # end try
                             # end for
                             if resonancesDim:
