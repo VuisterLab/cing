@@ -932,24 +932,22 @@ class Molecule( NTtree ):
             append or collapse the resonances list to single entry depending on append.
         """
         for atom in self.allAtoms():
-            if ( len(atom.resonances) != self.resonanceCount ):
+            if len(atom.resonances) != self.resonanceCount:
                 NTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
-                         atom, len(atom.resonances), self.resonanceCount
-                       )
+                         atom, len(atom.resonances), self.resonanceCount)
                 return
-            else:
-                rm = None
-                if (selection == None or atom.name in selection):
-                    for res in atom.resonances:
-                        if not isNaN(res.value):
-                            rm=res
-                            break
-                        #end if
-                    #end for
-                #end if
+            #end if
+            rm = None
+            if selection == None or atom.name in selection:
+                for res in atom.resonances:
+                    if not isNaN(res.value):
+                        rm=res
+                        break
+                    #end if
+                #end for
             #end if
 
-            if (rm):
+            if rm:
                 atom.resonances.append(rm)
             else:
                 rm = atom.resonances[0]

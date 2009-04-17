@@ -91,6 +91,8 @@ def runCingChecks( project, ranges=None ):
     project.validateDihedrals()
     project.validateModels()
 #    project.validateAssignments(toFile=True) in criticize now
+    project.mergeResonances()
+    
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
     if project.molecule:
