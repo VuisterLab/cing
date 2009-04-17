@@ -1249,14 +1249,19 @@ class Molecule( NTtree ):
             self.updateDihedrals()
             self.updateMean()
             self.ensemble = Ensemble( self )
-            self.atomList = AtomList( self )
-            if not self.atomList:
-                NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
+#            self.atomList = AtomList( self )
+#            if not self.atomList:
+#                NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
             self.idDisulfides()
             if not self.has_key('ranges'):
                 self.ranges = None
             self.calculateRMSDs(ranges=self.ranges)
         #end if
+        # Atom list is needed even when no coordinates are present.
+        self.atomList = AtomList( self )
+        if not self.atomList:
+            NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
+        
 
         self.updateTopology()
     #end def
@@ -3530,6 +3535,8 @@ class AtomList( NTlist ):
 
     NB this list is only instantiated for the validate plugin. It has very little
     functionality. Most functionality should be in Residue, Chains, etc.
+    
+    JFD: why not skip this intermediate object and hang functionality straight off Atom and AtomsHTMLfile classes?
     """
     def __init__( self, molecule ):
         NTlist.__init__( self )
