@@ -298,8 +298,8 @@ Project: Top level Cing project class
         return os.path.normpath( os.path.join( self.root, *args ) )
     #end def
 
-    def rootPath( name ):
-        """Static method returning Root,name of project from name
+    def rootPath( pathName ):
+        """Static method returning Root,name of project from pathName
 
         name can be:
             simple_name_string
@@ -310,14 +310,14 @@ Project: Top level Cing project class
         GWV  6 Dec 2007: to allow for relative paths.
         JFD 17 Apr 2008: fixed bugs caused by returning 2 values.
         """
-        root,name,ext = NTpath(name)
+        root,name,ext = NTpath(pathName)
         if name == '' or name == 'project': # indicate we had a full path
             root,name,ext = NTpath( root )
         #end if
         if (len(ext)>0 and ext != '.cing'):
-            NTerror('FATAL ERROR: unable to parse "%s"\n', name )
+            NTerror('FATAL: unable to parse "%s"; invalid extention "%s"\n', pathName, ext )
 #            exit(1) # no more hard exits for we might call this from GUI or so wrappers
-            return None
+            return None,None
 
         rootp = os.path.join(root, name + '.cing')
 #        NTdebug("rootp, name: [%s] [%s]" % (rootp, name))
@@ -420,6 +420,8 @@ Project: Top level Cing project class
 
         if (status == 'new'):
             root,dummy = Project.rootPath( name )
+            if not root:
+                return None
             if os.path.exists( root ):
                 removedir( root )
             #end if
@@ -432,6 +434,8 @@ Project: Top level Cing project class
 
         elif (status == 'create'):
             root,dummy = Project.rootPath( name )
+            if not root:
+                return None
             if os.path.exists( root ):
                 return Project.open( name, 'old', restore=restore )
             else:
@@ -458,6 +462,8 @@ Project: Top level Cing project class
                     NTdebug("No " + possibleTgz + " found.")
 
             root,newName = Project.rootPath( name )
+            if not root:
+                return None
             if not os.path.exists( root ):
                 NTerror('Project.open: unable to open Project "%s"\n', name )
                 return None
@@ -634,9 +640,11 @@ Project: Top level Cing project class
 
         # Plugin registered functions
         for p in self.plugins.values():
-            for f,o in p.restores:
-                f( self, o )
-            #end for
+            if p.isInstalled:
+                for f,o in p.restores:
+                    f( self, o )
+                #end for
+            #end if
         #end for
 
         self.contentIsRestored = True
@@ -1243,6 +1251,7 @@ class DistanceRestraint( NTdict ):
         self.min        = None      # Minimum distance
         self.max        = None      # Max distance
         self.violations = None     # list with violations for each model; None: not yet defined
+        self.violCountLower = 0    # Lower-bound violations
         self.violCount1 = 0        # Number of violations over 0.1A
         self.violCount3 = 0        # Number of violations over 0.3A
         self.violCount5 = 0        # Number of violations over 0.5A
@@ -1292,12 +1301,15 @@ class DistanceRestraint( NTdict ):
             self.rogScore.setMaxColor(COLOR_RED, comment)
 
         if project.valSets.FLAG_MISSING_COOR:
-            modelCount = self.getModelCount()
+            #modelCount = self.getModelCount()
             for atm1, atm2 in self.atomPairs:
                 atms1 = atm1.realAtoms()
                 atms2 = atm2.realAtoms()
                 for a in atms1 + atms2:
-                    if len(a.coordinates) < modelCount:
+                    if a and a.hasMissingCoordinates(): # gv has mase this into a method because the getModelCount()
+                                                 # can crash when reading back NRG dataset because of their
+                                                 # incompleteness
+                    #if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates (%s)" % a.toString()
                         NTdebug(msg)
                         self.rogScore.setMaxColor(COLOR_RED, msg)
@@ -1409,42 +1421,52 @@ class DistanceRestraint( NTdict ):
 
     def getModelCount(self):
         modelCount = 0
-        if len(self.atomPairs) :
+        if len(self.atomPairs) and self.atomPairs[0][0] != None:
             modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
         return modelCount
     #end def
 
     def appendPair( self, pair ):
         """ pair is a (atom1,atom2) tuple
-        
-        JFD disables this functionality because no checking
-        nor reordering is necessary on initialization of the class needed for CCPN import.
-        
+
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
         """
-        if True: # TODO GV please check and explain to JFD.
+
+		# GV says; order needs to stay: is beeing used for easier
+		# (manual) analysis.
+
+
+        if pair[0] == None or pair[1] == None:
+            NTerror('DistanceRestraint.appendPair: invalid pair %s', pair)
+            return
+        #end if
+        a0 = self.atomPairs.zap(0) # first atoms
+        a1 = self.atomPairs.zap(1) # second atoms
+        if (pair[0] in a0 or pair[1] in a1):
             self.atomPairs.append( pair )
+        elif (pair[0] in a1 or pair[1] in a0):
+            self.atomPairs.append( (pair[1],pair[0]) )
+        elif (pair[0].residue.resNum > pair[1].residue.resNum):
+            self.atomPairs.append( (pair[1],pair[0]) )
         else:
-            a0 = self.atomPairs.zap(0)
-            a1 = self.atomPairs.zap(1)
-            
-            if (pair[0] in a0 or pair[1] in a1):
-                self.atomPairs.append( pair )
-            elif (pair[0] in a1 or pair[1] in a0):
-                self.atomPairs.append( (pair[1],pair[0]) )
-            elif (pair[0].residue.resNum > pair[1].residue.resNum):
-                self.atomPairs.append( (pair[1],pair[0]) )
-            else:
-                self.atomPairs.append( pair )
+            self.atomPairs.append( pair )
     #end def
 
     def classify(self):
         """
         Return 0,1,2,3 depending on sequential, intra-residual, medium-range or long-range
         Simply ignore ambigious assigned NOEs for now and take it as the first atom pair
+
+        return -1 on error
         """
+        if not self.atomPairs or len(self.atomPairs) < 1:
+            return -1
+
         atm1, atm2 = self.atomPairs[0]
+        if atm1 == None or atm2 == None:
+            return -1
+
         if atm1.residue.chain != atm2.residue.chain:
             return 3
         elif atm1.residue == atm2.residue:
@@ -1477,13 +1499,12 @@ class DistanceRestraint( NTdict ):
         """
 
 #        NTdebug('calculateAverage: %s' % self)
-        modelCount = 0
-        if len(self.atomPairs) :
-            modelCount = self.atomPairs[0][0].residue.chain.molecule.modelCount
-        #end if
+        self.error = False    # Indicates if an error was encountered when analyzing restraint
 
+        modelCount = self.getModelCount()
         if modelCount == 0:
-            NTerror('DistanceRestraint.calculateAverage: No structure models (%s)\n', self)
+            NTerror('DistanceRestraint.calculateAverage: No structure models (%s)', self)
+            self.error = True
             return (None, None, None, None)
         #end if
 
@@ -1501,7 +1522,6 @@ class DistanceRestraint( NTdict ):
         self.violAv     = 0.0      # Average violation
         self.violSd     = None     # Sd of violations
         self.violSum    = 0.0      # Sum of violations
-        self.error      = False    # Indicates if an error was encountered when analyzing restraint
 
 #        for i in range( modelCount):
 #            d = 0.0;
@@ -1554,18 +1574,24 @@ class DistanceRestraint( NTdict ):
         models = range( modelCount )
         i = 0
         for atm1,atm2 in self.atomPairs:
+
+        	# GV says: Check are done to prevent crashes upon rereading
+        	# datasets with floating/adhoc residues/atoms
+
             # skip trivial cases
             if atm1 == atm2:
                 continue
-
+            if atm1 == None or atm2 == None:
+                continue
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
+            if atms1 == None:
+                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
+                continue
             atms2 = atm2.realAtoms()
-            
-#            NTdebug('atm1: %s' % atm1)
-#            NTdebug('atm2: %s' % atm2)
-#            NTdebug('atms1: %s' % atms1)
-#            NTdebug('atms2: %s' % atms2)
+            if atms2 == None:
+                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
+                continue
             for a1 in atms1:
                 #print '>>>', a1.format()
                 if len( a1.coordinates ) == modelCount:
@@ -1892,7 +1918,7 @@ ROG score:         %s
             msg = addPreTagLines(msg)
         header = '%s DistanceRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name,self.status,len(self), dots)
-        msg = header + msg 
+        msg = header + msg
         return msg
     #end def
 
@@ -2005,14 +2031,19 @@ class DihedralRestraint( NTdict ):
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if project.valSets.FLAG_MISSING_COOR:
-            modelCount = self.getModelCount()
-            for atm in self.atoms:
-                atms = atm.realAtoms()
-                for a in atms:
-                    if len(a.coordinates) < modelCount:
-                        msg = "Missing coordinates in dihedral (%s)" % a.toString()
-                        NTdebug(msg)
-                        self.rogScore.setMaxColor(COLOR_RED, msg)
+            #modelCount = self.getModelCount()
+                #atms = atm.realAtoms()
+                #for a in atms:
+            for a in self.atoms:                # GV says: no realAtoms should be called; these are dihedrals
+                                                # and should be properly defined by their actual atoms.
+
+                #if len(a.coordinates) < modelCount:
+                if a and a.hasMissingCoordinates(): # gv has mase this into a method because the getModelCount()
+                                             # can crash when reading back NRG dataset because of their
+                                             # incompleteness
+                    msg = "Missing coordinates in dihedral (%s)" % a.toString()
+                    NTdebug(msg)
+                    self.rogScore.setMaxColor(COLOR_RED, msg)
     #end def
 
     def calculateAverage(self):
@@ -2020,21 +2051,22 @@ class DihedralRestraint( NTdict ):
         return cav and cv tuple or (None, None) tuple on error
         """
 
-        modelCount = self.getModelCount()
-        if modelCount == 0:
-            NTerror('Error DihedralRestraint: no structure models\n' )
-            return (None,None)
-        #end if
-
         if len(self.atoms) != 4 or (None in self.atoms):
-            NTerror('Error DihedralRestraint: invalid dihedral definition %s\n', self.atoms )
+            NTerror('DihedralRestraint: invalid dihedral definition %s', self.atoms )
             return (None,None)
         #end if
 
         if None in self.atoms.zap('meanCoordinate'):
-            NTerror('Error DihedralRestraint: atom without coordinates %s\n', self.atoms )
+            NTerror('DihedralRestraint: atom without coordinates %s', self.atoms )
             return (None,None)
         #end if
+
+        modelCount = self.getModelCount()
+        if modelCount == 0:
+            NTerror('DihedralRestraint: no structure models' )
+            return (None,None)
+        #end if
+
 
         #set the default values
         self.dihedrals  = NTlist() # list with dihedral values for each model
@@ -2298,7 +2330,7 @@ ROG score:            %s
             msg = addPreTagLines(msg)
         header = '%s DihedralRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name,self.status,len(self), dots)
-        msg = header + msg 
+        msg = header + msg
         return msg
     #end def
 
@@ -2559,7 +2591,7 @@ class RDCRestraintList( NTlist ):
             msg = addPreTagLines(msg)
         header = '%s RDCRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name,self.status,len(self), dots)
-        msg = header + msg 
+        msg = header + msg
         return msg
     #end def
 

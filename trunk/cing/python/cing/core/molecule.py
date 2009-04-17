@@ -1122,19 +1122,19 @@ class Molecule( NTtree ):
         Takes into account residues with missing coordinates as long as they are all missing.
         """
         CUTOFF_SCORE = 0.9 # Default is 0.9
-        
+
         if self.modelCount == 0:
             NTwarning('idDisulfides: no models for "%s"', self)
             return
         #end if
-        
+
 #        NTdebug('Identify the disulfide bonds.')
         cys=self.residuesWithProperties('CYS')
         cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
         for c in cyss:
             if c not in cys:
                 cys.append(c)
-                
+
         iList = range(len(cys))
         iList.reverse()
         # delete from the end as not to mess up the in operator below.
@@ -1142,7 +1142,7 @@ class Molecule( NTtree ):
             c = cys[i]
             if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
                 NTdebug("No coordinates for CA, skipping residue: %s" % c)
-                del( cys[i] )            
+                del( cys[i] )
 #                needs testing.
         pairList = []
         cyssDict2Pair = {}
@@ -1154,7 +1154,7 @@ class Molecule( NTtree ):
                 scoreList = disulfideScore( c1, c2)
                 if not scoreList:
                     continue
-                    
+
 #                if cing.verbosity >= cing.verbosityDebug:
                 if False:
                     da = c1.CA.distance( c2.CA )
@@ -1416,13 +1416,13 @@ Return an Molecule instance or None on error
         for res in self.allResidues():
             if res.hasProperties('nucleic'):
                 return True
-        return None # is actually the default of course.   
+        return None # is actually the default of course.
 
     def hasDNA(self):
         for res in self.allResidues():
             if res.hasProperties('DNA'):
                 return True
-        return None # is actually the default of course.   
+        return None # is actually the default of course.
 
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
         """
@@ -2877,6 +2877,23 @@ Atom class: Defines object for storing atom properties
         self.coordinates.append( c )
     #end def
 
+    def hasCoordinates(self):
+        """
+        Returns True if atom has coordinates
+        """
+        return len(self.coordinates) > 0
+    #end def
+
+    def hasMissingCoordinates(self):
+        """
+        Returns True if atom has less coordinates instances than would be expected from modelCount
+        """
+        if len(self.coordinates) < self.residue.chain.molecule.modelCount:
+            return True
+        else:
+            return False
+    #end def
+
     def addResonance( self, value=NaN, error=NaN ):
         r = Resonance( atom=self, value=value, error = error )
         r.resonanceIndex = len(self.resonances)
@@ -3111,17 +3128,17 @@ Atom class: Defines object for storing atom properties
         proChiralPartner = self.proChiralPartner()
         if proChiralPartner:
             return proChiralPartner
-        
+
         pseudoAtom = self.pseudoAtom()
         if not pseudoAtom:
             NTdebug("There is no pseudo defined for %s" % self)
             return None
-        
+
         realAtomList = pseudoAtom.realAtoms()
         if len(realAtomList) > 2:
             NTcodeerror("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
-            return None 
-        
+            return None
+
         if self == realAtomList[0]:
             return  realAtomList[1]
         return realAtomList[0]
@@ -3129,14 +3146,14 @@ Atom class: Defines object for storing atom properties
 
     def getPseudoOfPseudoAtom(self):
         """Return pseudo atom containing self or None"""
-        
+
         res = self._parent
         resName = res.resName # use shorthand.
 #        NTdebug(" my name %s, parent residue: %s" % ( self.name, res))
-        
+
         if resName == 'LEU' and self.name.startswith('QD'):
             return res.QQD
-        
+
         if resName == 'VAL' and self.name.startswith('QG'):
             return res.QQG
 
@@ -3148,7 +3165,7 @@ Atom class: Defines object for storing atom properties
                 return res.QR
 
         return None
-        
+
     def heavyAtom( self ):
         """
         For protons return heavyAtom of self,
@@ -3315,7 +3332,8 @@ Atom class: Defines object for storing atom properties
         """
         if self.isPseudoAtom():
             return self.residue.getAtoms( self.db.real )
-        return NTlist( self )
+        else:
+            return NTlist( self )
     #end def
 
     def getRepresentativePseudoAtom( self, atomList ):
@@ -3326,7 +3344,7 @@ Atom class: Defines object for storing atom properties
         if inputLength <= 1:
 #            NTwarning("Trying to getRepresentativePseudoAtom for atomList: %s" % atomList )
             return None
-        
+
         pseudoAtom = self.pseudoAtom()
         if not pseudoAtom:
             return None
@@ -3335,12 +3353,12 @@ Atom class: Defines object for storing atom properties
         if inputLength == 1:
             NTwarning("Found pseudo with single real atom [%s] (itself?) for atomList: %s" % (realAtomList[0], atomList ))
             return None
-        
+
         # efficiency in my mind
         if inputLength != realAtomListLength:
             NTdebug("Found unrepresentative pseudo [%s] for atomList: %s" % (pseudoAtom, atomList ))
             return None
-            
+
         for atom in atomList:
             if atom not in realAtomList:
                 NTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))

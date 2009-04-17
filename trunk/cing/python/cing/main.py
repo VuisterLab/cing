@@ -304,7 +304,7 @@ def testOverall(namepattern):
             NTmessage('\n\n\n')
         except ImportWarning, extraInfo:
             NTmessage("Skipping test report of an optional compound: %s" % extraInfo)
-        except ImportError, extraInfo:            
+        except ImportError, extraInfo:
             NTmessage("Skipping test report of an optional module: %s" % mod_name)
 
 
@@ -314,7 +314,7 @@ def getParser():
     #------------------------------------------------------------------------------------
     usage = "usage: cing [options]       use -h or --help for listing"
 
-    parser = OptionParser(usage=usage, version=cingVersion)
+    parser = OptionParser(usage=usage, version=str(cingVersion))
     parser.add_option("--test",
                       action="store_true",
                       dest="test",

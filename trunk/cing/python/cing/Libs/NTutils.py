@@ -3155,7 +3155,7 @@ ERROR_ID = "ERROR"
 WARNING_ID = "WARNING"
 MESSAGE_ID = "MESSAGE"
 DEBUG_ID = "DEBUG"
- 
+
 def NTexit(msg, exitCode=1):
     NTerror(msg)
     sys.exit(exitCode)
@@ -3227,12 +3227,12 @@ NTopen = NTfile
 
 
 def removedir(path):
-    """Recursive remove"""
+    """Recursive remove path"""
     while (1):
         try:
             filelist=os.listdir(path)
         except:
-            NTerror("ERROR: Subdirectory %s could not be entered", path)
+            NTerror('Subdirectory "%s" could not be entered', path)
         # DELETE ALL THE FILES
         for file in filelist:
             file=os.path.join(path, file)
@@ -3244,7 +3244,7 @@ def removedir(path):
         try:
             os.rmdir(path)
         except:
-            NTerror("ERROR: Directory could not be removed, most likely an NFS problem. Try again later.")
+            NTerror('Directory "%s" could not be removed, most likely an NFS problem. Try again later.', path)
 #            continue # disabled because was leading to a infinite loop
         break
     #end while
@@ -3501,7 +3501,7 @@ def val2Str(value, fmt, count=None):
     Regular formatting is used otherwise.
     If the input is not a None or of type float it will return None.
     """
-    
+
     if value==None:
         value = None
     elif not isinstance(value, float):
@@ -3510,9 +3510,9 @@ def val2Str(value, fmt, count=None):
             # reduce the next message to debug or lower when happy.
 #            NTdebug("In val2Str the input [%s] was not a None and also not of type float; trying to parse as float now" % value)
             value = float(value)
-        except:            
+        except:
             NTwarning("In val2Str the input was not a None and also not of type float; failed to parse as float as well.")
-            return None    
+            return None
     elif isNaN(value):
         value = None
     if value == None:
@@ -4315,18 +4315,18 @@ _returnMyStdErr = sys.stderr
 
 def _setStdOutStreamsTo(stream):
     return _setOutStreamList(stream, _outOutputStreamContainerList)
-        
+
 def _setStdErrStreamsTo(stream):
     return _setOutStreamList(stream, _errOutputStreamContainerList)
 
 def _setOutStreamList(stream, outputStreamContainerList):
     for outputStreamContainer in outputStreamContainerList:
-#        print "Setting the outputStreamContainer [%s] stream to: %s" % (outputStreamContainer, stream) 
-        outputStreamContainer.flush() 
+#        print "Setting the outputStreamContainer [%s] stream to: %s" % (outputStreamContainer, stream)
+        outputStreamContainer.flush()
         outputStreamContainer.stream = stream
-    
 
-        
+
+
 """Switch away from output; might be usefull to silence verbose part of code or external program"""
 def switchOutput( showOutput, doStdOut=True, doStdErr=False):
     if showOutput:
