@@ -285,7 +285,7 @@ Quit
             residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR) 
 
         self.molecule.setDeepByKeys([completenessMol], WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR) 
-        NTdebug('done with _processCheckdb')
+        NTdebug('done with _processComplCheck')
     #end def
     
 def runWattos(project, tmp = None):

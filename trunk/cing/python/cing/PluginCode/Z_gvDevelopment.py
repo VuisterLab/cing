@@ -465,7 +465,7 @@ def mkYasaraByResidueMacro( project, keys,
                             path=None
                            ):
 
-    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
+#    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
 
     if path:
         stream = open( path, 'w')

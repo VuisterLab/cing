@@ -232,7 +232,7 @@ def _averageMethylAndMethylene( project, models ):
     """
     Routine to average the methyl proton shifts and b-methylene, before calculating average per atom
     """
-    NTdebug('shiftx: doing _averageMethylAndMethylene')
+#    NTdebug('shiftx: doing _averageMethylAndMethylene')
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():
 
@@ -267,7 +267,7 @@ def averageShiftx( project, tmp=None ):
     """Average shiftx array for each atom
     """
 
-    NTdebug('shiftx: doing averageShiftx')
+#    NTdebug('shiftx: doing averageShiftx')
     if project.molecule == None:
         return
     #end if

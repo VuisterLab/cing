@@ -16,7 +16,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testInitCcpn(self):
+    # can only be done with eNMRworkshop data so disabled for now.
+    def tttestInitCcpn(self):
 #        entryList = "CuTTHAcis CuTTHAtrans Parvulustat TTSco apoTTHAcis apoTTHAtrans BASP mia40 taf3 wln34".split()
 #        entryList = "taf3".split()
 #        entryList = "mia40".split()

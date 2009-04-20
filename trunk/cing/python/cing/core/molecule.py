@@ -150,7 +150,7 @@ class Molecule( NTtree ):
         self.content.saveAllXML()
         self.content.keysformat()
 
-        NTdebug('Molecule.__init__: %s', self )
+#        NTdebug('Molecule.__init__: %s', self )
         #end if
     #end def
 
@@ -1071,7 +1071,7 @@ class Molecule( NTtree ):
     def updateTopology( self)   :
         """Define the _topology key for all atoms.
         """
-        NTdebug('Defining topology')
+#        NTdebug('Defining topology')
         for residue in self.allResidues():
             for atm in residue:
                 atm._topology = NTlist()
@@ -1105,7 +1105,7 @@ class Molecule( NTtree ):
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
-        NTdebug('Calculating dihedral angles')
+#        NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
 #            res.addAllDihedrals()
             for d in res.dihedrals:
@@ -1117,7 +1117,7 @@ class Molecule( NTtree ):
     def updateMean( self):
         """Calculate mean coordinates for all atoms
         """
-        NTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
+#        NTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
         for atm in self.allAtoms():
             atm.calculateMeanCoordinate()
 
@@ -1493,7 +1493,7 @@ Return an Molecule instance or None on error
             return NaN
         #end if
 
-        NTdebug("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
+        NTmessage("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
         selectedResidues = self.ranges2list( ranges )
         selectedModels   = self.models2list( models )
