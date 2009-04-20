@@ -806,9 +806,9 @@ class Ccpn:
         if ccpnCalc:
             NTdebug("Using ccpnCalc object")
             molSystem = ccpnCalc.molSystem
-            for mList in ccpnCalc.inputMeasurementLists:
-                if mList.className == 'ShiftList':
-                    doneSetShifts = self._getCcpnShiftList(molSystem, mList)
+            for measurementList in ccpnCalc.inputMeasurementLists:
+                if measurementList.className == 'ShiftList':
+                    doneSetShifts = self._getCcpnShiftList(molSystem, measurementList)
         else:
             NTdebug("Not using ccpnCalc object")
             ccpnShiftLoL = []
@@ -984,25 +984,22 @@ class Ccpn:
         return peakLists
 
     def _getShiftAtomNameMapping(self, ccpnShiftList, molSystem):
-        """Descrn: Internal function to create a dictionary that maps
-                   between CCPN Shift objects (which in turn link to CCPN
-                   Resonances) and a list of the CCPN Residues and Atoms
-                   to which they may be assigned.
+        """Descrn: Internal function to create a dictionary that maps between CCPN Shift objects (which in turn link to CCPN
+                   Resonances) and a list of the CCPN Residues and Atoms to which they may be assigned.
            Inputs: CCPN Nmr.ShiftList, CCPN MoleSystem.MolSystem
-           Output: Dict of CCPN Nmr.Shift:[CCPN MolSystem.Residue,
-                             Tuple of CCPN MolSystem.Atoms]
+           Output: Dict of CCPN Nmr.Shift:[CCPN MolSystem.Residue, Tuple of CCPN MolSystem.Atoms]
         """
 
-        NTdebug("Now in _getShiftAtomNameMapping")
+        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
-        ccpnResonanceToShift = {}
+        ccpnResonanceToShiftMap = {}
 
         for ccpnShift in ccpnShiftList.measurements:
             ccpnResonance = ccpnShift.resonance
             ccpnResonanceList.append(ccpnResonance)
-            ccpnResonanceToShift[ccpnResonance] = ccpnShift
+            ccpnResonanceToShiftMap[ccpnResonance] = ccpnShift
 
-        ccpnShiftMapping = {}
+        ccpnShiftMappingResult = {}
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
 #                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
@@ -1018,11 +1015,13 @@ class Ccpn:
             for ccpnAtomSet in ccpnAtomSetList:
                 for ccpnAtom in ccpnAtomSet.atoms:
                     atomList.append(ccpnAtom)
-            ccpnShift = ccpnResonanceToShift[ccpnResonance]
-            ccpnShiftMapping[ccpnShift] = [ccpnResidue, tuple(atomList) ]
-        size = len(ccpnShiftMapping)
-        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % size)
-        return ccpnShiftMapping
+            ccpnShift = ccpnResonanceToShiftMap[ccpnResonance]
+            ccpnShiftMappingResult[ccpnShift] = [ccpnResidue, tuple(atomList) ]
+        matchCount = len(ccpnShiftMappingResult)
+        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
+        if matchCount == 0:
+            NTwarning("All resonances in this list are unassigned")
+        return ccpnShiftMappingResult
 
 
     def _setShift(self, shiftMapping, ccpnShiftList):

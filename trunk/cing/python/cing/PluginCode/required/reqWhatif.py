@@ -15,6 +15,9 @@ QUAL_LIST_STR    = "qualList"
 INOCHK_STR       = 'INOCHK'
 BNDCHK_STR       = 'BNDCHK'
 ANGCHK_STR       = 'ANGCHK'
+OMECHK_STR       = 'OMECHK'
+HNDCHK_STR       = 'HNDCHK'
+INOCHK_STR       = 'INOCHK'
 
 QUACHK_STR       = 'QUACHK'
 RAMCHK_STR       = 'RAMCHK'

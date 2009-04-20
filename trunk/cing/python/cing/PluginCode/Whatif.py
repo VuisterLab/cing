@@ -21,9 +21,10 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import getTextBetween
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import val2Str
 from cing.PluginCode.required.reqWhatif import ACCLST_STR
 from cing.PluginCode.required.reqWhatif import ANGCHK_STR
 from cing.PluginCode.required.reqWhatif import BBCCHK_STR
@@ -37,6 +38,7 @@ from cing.PluginCode.required.reqWhatif import INOCHK_STR
 from cing.PluginCode.required.reqWhatif import LEVEL_STR
 from cing.PluginCode.required.reqWhatif import LOC_ID_STR
 from cing.PluginCode.required.reqWhatif import NQACHK_STR
+from cing.PluginCode.required.reqWhatif import OMECHK_STR
 from cing.PluginCode.required.reqWhatif import PL2CHK_STR
 from cing.PluginCode.required.reqWhatif import PL3CHK_STR
 from cing.PluginCode.required.reqWhatif import PLNCHK_STR
@@ -55,6 +57,7 @@ from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
+from cing.PluginCode.required.reqWhatif import HNDCHK_STR
 import os
 import time
 
@@ -113,6 +116,7 @@ class Whatif( NTdict ):
                 ('NAMCHK', 'Atom names', 'Atom names'),
                 ('NQACHK', 'Qualities',                                                 'New quality'),
                 ('NTCHK',  'Acid group conformation check',                             'COOH check'),
+                ('OMECHK', 'Omega angle restraints',                                   'Omega check'),                
                 ('PC2CHK', 'Proline puckers', 'Proline puckers'),
                 ('PDBLST', 'List of residues', 'List of residues'),
                 ('PL2CHK', 'Connections to aromatic rings',                             'Plan. to aromatic'),
@@ -244,6 +248,206 @@ fullstop y
 #        d = theDict.setdefault( name, NTdict() )
 #        d[self.nameDict[key]] = d.setdefault( key, NTlist() )
 
+    def _processSummary( self, project, fileName='pdbout.txt' ):
+        """Parse fileName. Storing the check data according to each model.
+           Return None on success or True on error.
+           """
+        if not os.path.exists(fileName):
+            NTerror('Whatif._processSummary: file "%s" not found.', fileName)
+            return True
+
+        modelIdx = -1
+        for line in AwkLike( fileName, minNF = 2, separator=':' ):
+            l = line.dollar[0]
+            NTdebug("Read line: "+l)
+#            NTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
+#            NTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
+            
+            if l.find( 'Summary report for users of a structure') > 0:
+                NTdebug('Found summary report and increasing model idx: %d' % modelIdx) 
+                modelIdx += 1
+                continue
+            
+            checkId = None
+            if l.startswith( '  1st generation packing quality'):
+                checkId = QUACHK_STR
+            if l.startswith( '  2nd generation packing quality'):
+                checkId = QUACHK_STR
+            if l.startswith( '  Ramachandran plot appearance'):
+                checkId = RAMCHK_STR
+            if l.startswith( '  chi-1/chi-2 rotamer normality'):
+                checkId = ROTCHK_STR
+            if l.startswith( '  Backbone conformation'):
+                checkId = BBCCHK_STR
+# Second part.                
+            if l.startswith( '  Bond lengths'):
+                checkId = BNDCHK_STR
+            if l.startswith( '  Bond angles'):
+                checkId = ANGCHK_STR
+            if l.startswith( '  Omega angle restraints'):
+                checkId = OMECHK_STR 
+            if l.startswith( '  Side chain planarity'):
+                checkId = PLNCHK_STR
+            if l.startswith( '  Improper dihedral distribution'):
+                checkId = HNDCHK_STR
+            if l.startswith( '  Inside/Outside distribution'):
+                checkId = INOCHK_STR
+            
+            if not checkId:
+#                NTdebug("Failed to find any specific check, continueing to look")
+                continue
+                        
+            valueStringList  = line.dollar[2].strip().split()
+            NTdebug("valueStringList: %s" % valueStringList)
+            if not valueStringList:
+                NTerror("Failed to get valueStringList from line: [%s]"%line)
+                return True                    
+            value = float(valueStringList[0])
+                       
+            NTdebug('modelIdx: %d' % modelIdx) 
+            if modelIdx < 0:
+                NTerror('Failed to have increased model idx at least once')
+                return True 
+            if modelIdx == 0:
+                NTdebug('Setting empty NTlist for first time for check: %s' % checkId) 
+                setDeepByKeys( self.molecule, NTlist(), WHATIF_STR, checkId)
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId)
+            if ensembleValueList == None:
+                NTerror("Failed to get ensembleValueList for checkId: %s" % checkId)
+                return True            
+            ensembleValueList.append(value)
+            NTdebug('ensembleValueList now: %s' % ensembleValueList)
+        # end for line
+        
+        
+        summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
+                               BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  ] # second part.
+        summaryCheckIdMandatoryList = [ BNDCHK_STR, ANGCHK_STR ]
+        valueList = [ ]
+        qualList = [ ]
+        for checkId in summaryCheckIdList:
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId)
+            if not ensembleValueList:
+                msg = "empty ensembleValueList for checkId %s" % checkId 
+                if checkId in summaryCheckIdMandatoryList:
+                    NTwarning(msg)
+                else:
+                    NTdebug(msg)
+                ensembleValueList = NTlist()
+            # end if
+            ensembleValueList.average()
+            valueList.append(ensembleValueList)
+            NTdebug('ensembleValueList found: %s' % valueList[-1])
+            qualList.append( '' )
+            # Add comments like done in What If's pdbout.f:
+
+            if checkId == QUACHK_STR:
+                if ensembleValueList.av < -3.0:
+                    qualList[-1] = '(bad)'
+                elif ensembleValueList.av < -2.0:
+                    qualList[-1] = '(poor)'
+            if checkId == NQACHK_STR:
+                if ensembleValueList.av < -4.0:
+                    qualList[-1] = '(bad)'
+                elif ensembleValueList.av < -3.0:
+                    qualList[-1] = '(poor)'
+            if checkId == RAMCHK_STR:
+                if ensembleValueList.av < -4.0:
+                    qualList[-1] = '(bad)'
+                elif ensembleValueList.av < -3.0:
+                    qualList[-1] = '(poor)'            
+            if checkId == ROTCHK_STR:
+                if ensembleValueList.av < -4.0:
+                    qualList[-1] = '(bad)'
+                elif ensembleValueList.av < -3.0:
+                    qualList[-1] = '(poor)'
+            if checkId == BBCCHK_STR:
+                if ensembleValueList.av < -4.0:
+                    qualList[-1] = '(bad)'
+                elif ensembleValueList.av < -3.0:
+                    qualList[-1] = '(poor)'
+            # 2nd part
+            if checkId == BNDCHK_STR:
+                if ensembleValueList.av < 0.666:
+                    qualList[-1] = '(tight)'
+                elif ensembleValueList.av > 1.5:
+                    qualList[-1] = '(loose)'
+            elif checkId == ANGCHK_STR:
+                if ensembleValueList.av < 0.666:
+                    qualList[-1] = '(tight)'
+                elif ensembleValueList.av > 1.5:
+                    qualList[-1] = '(loose)'
+            elif checkId == OMECHK_STR:
+                if ensembleValueList.av > 7.0:
+                    qualList[-1] = '(loose)'
+                elif ensembleValueList.av < 4.0:
+                    qualList[-1] = '(tight)'
+            if checkId == PLNCHK_STR:
+                if ensembleValueList.av < 0.666:
+                    qualList[-1] = '(tight)'
+                elif ensembleValueList.av > 2.0:
+                    qualList[-1] = '(loose)'
+            if checkId == HNDCHK_STR:
+                if ensembleValueList.av > 0.0 and ensembleValueList.av > 1.5:
+                    qualList[-1] = '(loose)'
+            if checkId == INOCHK_STR:
+                if ensembleValueList.av > 1.16:
+                    qualList[-1] = '(unusual)'
+        # end for
+        fmt = "%.3f"
+        spaceCount = 7
+        summary = """
+    Summary report for users of a structure
+    This is an overall summary of the quality of the structure as
+    compared with current reliable structures. This summary is most
+    useful for biologists seeking a good structure to use for modelling
+    calculations.
+    
+    The second part of the table mostly gives an impression of how well
+    the model conforms to common refinement constraint values. The
+    first part of the table shows a number of constraint-independent
+    quality indicators.
+    
+    The standard deviation shows the variation over models in the ensemble
+    where appropriate.
+     
+     Structure Z-scores, positive is better than average:
+      1st generation packing quality :  %s +/- %s %s
+      2nd generation packing quality :  %s +/- %s %s
+      Ramachandran plot appearance   :  %s +/- %s %s
+      chi-1/chi-2 rotamer normality  :  %s +/- %s %s
+      Backbone conformation          :  %s +/- %s %s
+
+     RMS Z-scores, should be close to 1.0:
+      Bond lengths                   :   %s +/- %s %s
+      Bond angles                    :   %s +/- %s %s
+      Omega angle restraints         :   %s +/- %s %s
+      Side chain planarity           :   %s +/- %s %s
+      Improper dihedral distribution :   %s +/- %s %s
+      Inside/Outside distribution    :   %s +/- %s %s
+      
+        """ % (val2Str(valueList[0].av,fmt, spaceCount),val2Str(valueList[0].sd,fmt, spaceCount), qualList[0],
+               val2Str(valueList[1].av,fmt, spaceCount),val2Str(valueList[1].sd,fmt, spaceCount), qualList[1],
+               val2Str(valueList[2].av,fmt, spaceCount),val2Str(valueList[2].sd,fmt, spaceCount), qualList[2],
+               val2Str(valueList[3].av,fmt, spaceCount),val2Str(valueList[3].sd,fmt, spaceCount), qualList[3],
+               val2Str(valueList[4].av,fmt, spaceCount),val2Str(valueList[4].sd,fmt, spaceCount), qualList[4],
+               val2Str(valueList[5].av,fmt, spaceCount),val2Str(valueList[5].sd,fmt, spaceCount), qualList[5],
+               val2Str(valueList[6].av,fmt, spaceCount),val2Str(valueList[6].sd,fmt, spaceCount), qualList[6],
+               val2Str(valueList[7].av,fmt, spaceCount),val2Str(valueList[7].sd,fmt, spaceCount), qualList[7],
+               val2Str(valueList[8].av,fmt, spaceCount),val2Str(valueList[8].sd,fmt, spaceCount), qualList[8],
+               val2Str(valueList[9].av,fmt, spaceCount),val2Str(valueList[9].sd,fmt, spaceCount), qualList[9],
+               val2Str(valueList[10].av,fmt, spaceCount),val2Str(valueList[10].sd,fmt, spaceCount), qualList[10]
+               )
+                    
+        if setDeepByKeys(self.molecule, summary, 'wiSummary'):# Hacked because should be another wi level in between.
+            NTerror( 'Failed to set WI summary' )
+            return True
+        
+        project.whatifStatus.parsed = True
+        project.whatifStatus.keysformat()
+            
+                            
+        
     def _parseCheckdb( self, modelCheckDbFileName, model ):
         """Parse check_001.db etc. Generate references to
            all checks. Storing the check data according to residue and atom.
@@ -793,43 +997,16 @@ def runWhatif( project, parseOnly=False ):
 
     if whatif._processCheckdb():
         NTerror("runWhatif: Failed to process check db")
-        return True
+        return True            
 
     pathPdbOut = os.path.join(path, 'pdbout.txt' )
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathPdbOut))
         return True
-#    NTdebug( '> parsing '+ pathPdbOut)
-    fullText = open(pathPdbOut, 'r').read()
-    if not fullText:
-        NTerror('runWhatif: Failed to parse WI summary file')
+    
+    if whatif._processSummary(project, pathPdbOut):
+        NTerror("runWhatif: Failed to process WI summary file")
         return True
-        
-#    start       = 'This report was created by WHAT IF'
-#    end         ='INTRODUCTION'
-#    intro = getTextBetween( fullText, start, end, endIncl=False )
-#    if not intro:
-#        NTerror('runWhatif: Failed to parse intro WI summary file')
-#        return True
-#    intro = '----------- ' + intro.strip() + ' -----------'
-#    NTdebug( 'got intro: \n'+ intro)
-
-    start       = 'Summary report for users of a structure'
-    end         ='=============='
-    summary = getTextBetween( fullText, start, end, startIncl=False, endIncl=False )
-    if not summary:
-        NTerror('runWhatif: Failed to parse summary WI summary file')
-        return True
-    summary = summary.strip() + '\n'
-#    NTdebug( 'got summary: \n'+ summary)
-
-#    summary = '\n\n'.join([intro,summary])
-    if setDeepByKeys(project.molecule, summary, 'wiSummary'):# Hacked bexause should be another wi level inbetween.
-        NTerror( 'Failed to set WI summary' )
-        return True
-
-    project.whatifStatus.parsed = True
-    project.whatifStatus.keysformat()
 #end def
 
 def restoreWhatif( project, tmp=None ):
