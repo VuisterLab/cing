@@ -272,7 +272,7 @@ fullstop y
             if l.startswith( '  1st generation packing quality'):
                 checkId = QUACHK_STR
             if l.startswith( '  2nd generation packing quality'):
-                checkId = QUACHK_STR
+                checkId = NQACHK_STR
             if l.startswith( '  Ramachandran plot appearance'):
                 checkId = RAMCHK_STR
             if l.startswith( '  chi-1/chi-2 rotamer normality'):
