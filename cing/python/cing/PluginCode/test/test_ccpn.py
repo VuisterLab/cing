@@ -42,10 +42,10 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
-        useNrgArchive = False
+        useNrgArchive = True
         modelCount=None
         if fastestTest:
-            modelCount=1
+            modelCount=2
             htmlOnly = True 
             doWhatif = True
             doProcheck = False

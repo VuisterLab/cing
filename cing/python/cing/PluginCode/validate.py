@@ -485,7 +485,7 @@ def partitionRestraints( project, tmp=None ):
     """
     Partition the restraints and generate per-residue lists
     """
-    NTdebug('partionRestraints of project %s', project)
+#    NTdebug('partionRestraints of project %s', project)
 
     if not project.molecule:
         return
@@ -666,7 +666,7 @@ def checkForDisulfides(project, toFile=True):
     """Just check for potential disulfide bonds.
     TODO: merge this code with identical one in molecules.py#idDisulfides
     """
-    NTdebug('Identify the disulfide bonds.')
+#    NTdebug('Identify the disulfide bonds.')
 
     if not project.molecule:
         NTerror('checkForDisulfides: no molecule defined')
@@ -817,7 +817,7 @@ def validateSaltbridge( residue1, residue2 ):
 
     Returns summary NTdict or None on error
     """
-    NTdebug('validateSaltBridge: %s %s', residue1, residue2)
+#    NTdebug('validateSaltBridge: %s %s', residue1, residue2)
 
     # Definitions of the centroids according to the paper
     centroids = NTdict(
@@ -1120,7 +1120,7 @@ def validateAssignments( project, toFile = True   ):
 
     @todo: Also correlate assignment with peak values (if present)
     """
-    NTdebug("Starting validateAssignments")
+#    NTdebug("Starting validateAssignments")
     if not project.molecule:
         NTdebug('validateAssignments: no molecule defined')
         return None
@@ -1129,7 +1129,8 @@ def validateAssignments( project, toFile = True   ):
     funcName = validateAssignments.func_name
     result = NTlist()
     if project.molecule.resonanceCount == 0:
-        NTdebug("No resonance assignments read so no real validation on it can be done. Let's try anyway.")
+        pass
+#        NTdebug("No resonance assignments read so no real validation on it can be done. Let's try anyway.")
 #        return result
 
     for atm in project.molecule.allAtoms():
@@ -1299,7 +1300,7 @@ def validateAssignments( project, toFile = True   ):
         if not fp:
             NTerror("Failed to open for writing: " + fname)
             return None
-        NTdebug("Writing assignment validation to: " + fname)
+#        NTdebug("Writing assignment validation to: " + fname)
 
         fmt = '%-18s   %8s %6s %6s   %8s %6s   %8s %8s  %8s %6s   %s\n'
         for res in project.molecule.allResidues():

@@ -430,7 +430,7 @@ Project: Top level Cing project class
             pr.addHistory( 'New project'  )
             # Save the project data
             obj2XML( pr, path = pr.objectPath )
-            NTdebug('New project %s', pr)
+#            NTdebug('New project %s', pr)
 
         elif (status == 'create'):
             root,dummy = Project.rootPath( name )
@@ -931,7 +931,7 @@ class _ProjectList( NTlist ):
         self.append ( instance )
         s = sprintf('New "%s" instance named "%s"', self.className(), uname )
         self.project.history( s )
-        NTdebug( s )
+#        NTdebug( s )
         #end if
         return instance
     #end def
@@ -1763,7 +1763,7 @@ class DistanceRestraintList( NTlist ):
         """
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
-        NTdebug('DistanceRestraintList.criticize %s', self)
+#        NTdebug('DistanceRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 
@@ -1800,11 +1800,11 @@ class DistanceRestraintList( NTlist ):
         or (None, None, None, None, None) on error
         """
 
-        NTdebug('DistanceRestraintList.analyze: %s', self )
+#        NTdebug('DistanceRestraintList.analyze: %s', self )
 
         if (len( self ) == 0):
             # happens for entry 2k0e imported from CCPN. Has unlinked restraints.
-            NTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
+#            NTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -2217,7 +2217,7 @@ class DihedralRestraintList( NTlist ):
         """
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
-        NTdebug('DihedralRestraintList.criticize %s', self)
+#        NTdebug('DihedralRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 
@@ -2249,7 +2249,7 @@ class DihedralRestraintList( NTlist ):
         or (None, None, None, None, None) on error
         """
 
-        NTdebug('DihedralRestraintList.analyze: %s', self )
+#        NTdebug('DihedralRestraintList.analyze: %s', self )
 
         if not len( self ):
             NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name )

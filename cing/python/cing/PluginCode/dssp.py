@@ -103,7 +103,7 @@ class Dssp:
             #end if
         #end for
         taken = time.time() - now
-        NTdebug("Finished dssp successfully in %8.1f seconds", taken)
+#        NTdebug("Finished dssp successfully in %8.1f seconds", taken)
 
         self.parseResult()
 
@@ -136,7 +136,7 @@ class Dssp:
         Return True on error.
         """
         modelCount = self.molecule.modelCount
-        NTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
+#        NTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
 
         for model in range(modelCount):
             fullnameOut = 'model_%03d.dssp' % model

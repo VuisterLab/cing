@@ -259,12 +259,12 @@ fullstop y
         modelIdx = -1
         for line in AwkLike( fileName, minNF = 2, separator=':' ):
             l = line.dollar[0]
-            NTdebug("Read line: "+l)
+#            NTdebug("Read line: "+l)
 #            NTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
 #            NTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
             
             if l.find( 'Summary report for users of a structure') > 0:
-                NTdebug('Found summary report and increasing model idx: %d' % modelIdx) 
+#                NTdebug('Found summary report and increasing model idx: %d' % modelIdx) 
                 modelIdx += 1
                 continue
             
@@ -298,25 +298,25 @@ fullstop y
                 continue
                         
             valueStringList  = line.dollar[2].strip().split()
-            NTdebug("valueStringList: %s" % valueStringList)
+#            NTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
                 NTerror("Failed to get valueStringList from line: [%s]"%line)
                 return True                    
             value = float(valueStringList[0])
                        
-            NTdebug('modelIdx: %d' % modelIdx) 
+#            NTdebug('modelIdx: %d' % modelIdx) 
             if modelIdx < 0:
                 NTerror('Failed to have increased model idx at least once')
                 return True 
             if modelIdx == 0:
-                NTdebug('Setting empty NTlist for first time for check: %s' % checkId) 
+#                NTdebug('Setting empty NTlist for first time for check: %s' % checkId) 
                 setDeepByKeys( self.molecule, NTlist(), WHATIF_STR, checkId)
             ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId)
             if ensembleValueList == None:
                 NTerror("Failed to get ensembleValueList for checkId: %s" % checkId)
                 return True            
             ensembleValueList.append(value)
-            NTdebug('ensembleValueList now: %s' % ensembleValueList)
+#            NTdebug('ensembleValueList now: %s' % ensembleValueList)
         # end for line
         
         
@@ -331,13 +331,13 @@ fullstop y
                 msg = "empty ensembleValueList for checkId %s" % checkId 
                 if checkId in summaryCheckIdMandatoryList:
                     NTwarning(msg)
-                else:
-                    NTdebug(msg)
+#                else:
+#                    NTdebug(msg)
                 ensembleValueList = NTlist()
             # end if
             ensembleValueList.average()
             valueList.append(ensembleValueList)
-            NTdebug('ensembleValueList found: %s' % valueList[-1])
+#            NTdebug('ensembleValueList found: %s' % valueList[-1])
             qualList.append( '' )
             # Add comments like done in What If's pdbout.f:
 
@@ -394,7 +394,7 @@ fullstop y
                 if ensembleValueList.av > 1.16:
                     qualList[-1] = '(unusual)'
         # end for
-        fmt = "%.3f"
+        fmt = "%7.3f"
         spaceCount = 7
         summary = """
     Summary report for users of a structure
@@ -412,19 +412,19 @@ fullstop y
     where appropriate.
      
      Structure Z-scores, positive is better than average:
-      1st generation packing quality :  %s +/- %s %s
-      2nd generation packing quality :  %s +/- %s %s
-      Ramachandran plot appearance   :  %s +/- %s %s
-      chi-1/chi-2 rotamer normality  :  %s +/- %s %s
-      Backbone conformation          :  %s +/- %s %s
+      1st generation packing quality : %s +/- %s %s
+      2nd generation packing quality : %s +/- %s %s
+      Ramachandran plot appearance   : %s +/- %s %s
+      chi-1/chi-2 rotamer normality  : %s +/- %s %s
+      Backbone conformation          : %s +/- %s %s
 
      RMS Z-scores, should be close to 1.0:
-      Bond lengths                   :   %s +/- %s %s
-      Bond angles                    :   %s +/- %s %s
-      Omega angle restraints         :   %s +/- %s %s
-      Side chain planarity           :   %s +/- %s %s
-      Improper dihedral distribution :   %s +/- %s %s
-      Inside/Outside distribution    :   %s +/- %s %s
+      Bond lengths                   : %s +/- %s %s
+      Bond angles                    : %s +/- %s %s
+      Omega angle restraints         : %s +/- %s %s
+      Side chain planarity           : %s +/- %s %s
+      Improper dihedral distribution : %s +/- %s %s
+      Inside/Outside distribution    : %s +/- %s %s
       
         """ % (val2Str(valueList[0].av,fmt, spaceCount),val2Str(valueList[0].sd,fmt, spaceCount), qualList[0],
                val2Str(valueList[1].av,fmt, spaceCount),val2Str(valueList[1].sd,fmt, spaceCount), qualList[1],
@@ -612,7 +612,7 @@ fullstop y
         selfLevelChecks = [ self.residueSpecificChecks, self.atomSpecificChecks ]
         # sorting on mols, residues, and atoms
 #        NTmessage("  for self.checks: " + `self.checks`)
-        NTdebug("  for self.checks count: " + `len(self.checks)`)
+#        NTdebug("  for self.checks count: " + `len(self.checks)`)
         
         msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
         msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
@@ -678,7 +678,7 @@ fullstop y
                         entityWhatifCheckDic = entityWhatifDic.setdefault(checkId, NTdict())
                         entityWhatifCheckDic[keyWord]=curList
 #                    NTdebug("now entityWhatifDic: " + `entityWhatifDic`)
-        NTdebug('done with _processCheckdb')
+#        NTdebug('done with _processCheckdb')
     #end def
 
     def translateResAtmString( self, string ):
@@ -946,7 +946,7 @@ def runWhatif( project, parseOnly=False ):
         whatifExitCode = whatifProgram("script", scriptFileName )
         project.whatifStatus.exitCode  = whatifExitCode
         project.whatifStatus.time      = sprintf("%.1f", time.time() - now)
-        NTdebug('runWhatif: exitCode %s,  time: %s', project.whatifStatus.exitCode, project.whatifStatus.time)
+#        NTdebug('runWhatif: exitCode %s,  time: %s', project.whatifStatus.exitCode, project.whatifStatus.time)
         project.whatifStatus.keysformat()
 
         if whatifExitCode:

@@ -348,7 +348,7 @@ class Ccpn:
             NTerror("Failed to importFromCcpnRdcRestraint")
             return None
 
-        NTdebug('==> Ccpn project imported')
+        NTmessage('==> Ccpn project imported')
 
         self.project.addHistory(sprintf('Imported CCPN project'))
         self.project.updateProject()
@@ -433,7 +433,7 @@ class Ccpn:
         except AttributeError:
             ensembleName = 'ensemble_name'
 
-        NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
+#        NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
         ccpnMolCoordList = []
         maxModelCount = 0
@@ -804,13 +804,13 @@ class Ccpn:
         doneSetShifts = False
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-            NTdebug("Using ccpnCalc object")
+#            NTdebug("Using ccpnCalc object")
             molSystem = ccpnCalc.molSystem
             for measurementList in ccpnCalc.inputMeasurementLists:
                 if measurementList.className == 'ShiftList':
                     doneSetShifts = self._getCcpnShiftList(molSystem, measurementList)
         else:
-            NTdebug("Not using ccpnCalc object")
+#            NTdebug("Not using ccpnCalc object")
             ccpnShiftLoL = []
             ccpnPeakLoL = self._getCcpnPeakLoL()
 
@@ -819,10 +819,11 @@ class Ccpn:
 
                 if ccpnExperiment.shiftList not in ccpnShiftLoL:
                     if ccpnExperiment.shiftList:
-                        NTdebug("Adding CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+#                        NTdebug("Adding CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
                         ccpnShiftLoL.append(ccpnExperiment.shiftList)
                     else:
-                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))                            
+                        pass
+#                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))                            
                 else:
                     NTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
                     
@@ -831,13 +832,13 @@ class Ccpn:
                 NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
             if not ccpnShiftLoL:
-                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
+#                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
                 ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
 
-            NTdebug("Shift lists %r" % ccpnShiftLoL)
+#            NTdebug("Shift lists %r" % ccpnShiftLoL)
                 
             if not ccpnShiftLoL:
-                NTdebug('CCPN project contains no shift lists')
+#                NTdebug('CCPN project contains no shift lists')
                 return True
 
             for ccpnMolSystem in self.ccpnMolSystemList:
@@ -1306,7 +1307,7 @@ class Ccpn:
         classNameList = (self.CCPN_RDC_CONSTRAINT_LIST)
         ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintStoreList, classNameList)
         if not ccpnConstraintLoL:
-            NTdebug("No ccpnRDCLoL which can be normal.")
+#            NTdebug("No ccpnRDCLoL which can be normal.")
             return True
         for ccpnRdcList in ccpnConstraintLoL:
             ccpnRdcListName = self._ensureValidName(ccpnRdcList.name, RDC_LEVEL)
