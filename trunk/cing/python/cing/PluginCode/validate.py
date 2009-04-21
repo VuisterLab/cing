@@ -310,23 +310,29 @@ def _criticizeResidue( residue, valSets ):
 #                NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( residue, modelId, v, value) )
                 vList.append(v)
             #end for
-            rmsViol = 0.0
+#            rmsViol = 0.0
+            avViol = 0.0
             if modelId >= 0:
-                rmsViol = vList.rms()
+#                rmsViol = vList.rms()
+                vList.average()
+                avViol = vList.av
                         
 #            NTdebug('found rmsViol: %8.3f' % rmsViol )
-            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )            
-            timesKnownSd = rmsViol / TRANS_OMEGA_SD
+#            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )            
+            actualValueStr = val2Str( avViol, fmt='%8.3f', count=8 )
+            # Calculate the Z-score (the number of times of the known sd.)            
+#            timesKnownSd = rmsViol / TRANS_OMEGA_SD
+            timesKnownSd = avViol / TRANS_OMEGA_SD
             postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), TRANS_OMEGA_SD)
-            if (valSets.OMEGA_MAXALL_BAD != None) and (rmsViol >= valSets.OMEGA_MAXALL_BAD):
+            if (valSets.OMEGA_MAXALL_BAD != None) and (avViol >= valSets.OMEGA_MAXALL_BAD):
                 comment = 'RED: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
                 residue.rogScore.setMaxColor( COLOR_RED, comment )
 #                NTdebug('Set to red')
-            elif (valSets.OMEGA_MAXALL_POOR != None) and (rmsViol >= valSets.OMEGA_MAXALL_POOR):
+            elif (valSets.OMEGA_MAXALL_POOR != None) and (avViol >= valSets.OMEGA_MAXALL_POOR):
                 comment = 'ORANGE: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_POOR, postFixStr)
                 residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
 #                NTdebug('Set to orange (perhaps)')
-            residue.rogScore[key] = rmsViol
+            residue.rogScore[key] = avViol
         #end if
     # end for
     return residue.rogScore

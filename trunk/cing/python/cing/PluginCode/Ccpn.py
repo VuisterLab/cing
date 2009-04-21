@@ -428,12 +428,12 @@ class Ccpn:
             (ccpnStructureEnsemble.molSystem is not ccpnMolSys)):
             ccpnStructureEnsemble = ccpnMolSys.findFirstStructureEnsemble(molSystem = ccpnMolSys)
 
-        try:
-            ensembleName = ccpnStructureEnsemble.structureGeneration.name
-        except AttributeError:
-            ensembleName = 'ensemble_name'
-
-#        NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
+        if False: # Block for debug.
+            try:
+                ensembleName = ccpnStructureEnsemble.structureGeneration.name
+            except AttributeError:
+                ensembleName = 'ensemble_name'    
+            NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
         ccpnMolCoordList = []
         maxModelCount = 0

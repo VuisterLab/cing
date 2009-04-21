@@ -102,8 +102,8 @@ class Dssp:
                 return True
             #end if
         #end for
-        taken = time.time() - now
-#        NTdebug("Finished dssp successfully in %8.1f seconds", taken)
+        _taken = time.time() - now
+#        NTdebug("Finished dssp successfully in %8.1f seconds", _taken)
 
         self.parseResult()
 
