@@ -22,7 +22,6 @@ from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import XMLhandler
 from cing.Libs.NTutils import fprintf
@@ -35,11 +34,15 @@ from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImpor
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.PluginCode.html import addPreTagLines
+from cing.core.ROGscore import ROGscore
+from cing.core.constants import AC_LEVEL
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import DRL_LEVEL
 from cing.core.constants import DR_LEVEL
 from cing.core.constants import LOOSE
+from cing.core.constants import RDC_LEVEL
 from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
@@ -52,9 +55,6 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
-from cing.core.constants import AC_LEVEL
-from cing.core.constants import RDC_LEVEL
-from cing.PluginCode.html import addPreTagLines
 import cing
 import math
 import os
@@ -68,6 +68,7 @@ __copyright__ = cing.__copyright__
 __credits__ = cing.__credits__
 
 projects = NTlist()
+
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
@@ -2676,7 +2677,6 @@ class XMLHistoryHandler( XMLhandler ):
 #register this handler
 historyhandler = XMLHistoryHandler()
 
-# JFD removes section as it's still avail in svn.
 
 def path( *args ):
     """

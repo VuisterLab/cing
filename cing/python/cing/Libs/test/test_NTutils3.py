@@ -3,12 +3,12 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import bytesToFormattedString
 from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.NTutils import toCsv
 from cing.PluginCode.html import HTMLfile
 from cing.core.classes import Project
+from cing.core.classes import ROGscore
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.molecule import Atom
