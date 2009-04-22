@@ -14,7 +14,6 @@ from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NoneObject
-from cing.Libs.NTutils import ROGscore
 from cing.Libs.NTutils import XML2obj
 from cing.Libs.NTutils import angle3Dopt
 from cing.Libs.NTutils import asci2list
@@ -33,6 +32,8 @@ from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.PluginCode.html import addPreTagLines
+from cing.core.ROGscore import ROGscore
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -48,7 +49,6 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
-from cing.PluginCode.html import addPreTagLines
 import math
 import os
 import sys
