@@ -69,7 +69,6 @@ __credits__ = cing.__credits__
 
 projects = NTlist()
 
-
 #-----------------------------------------------------------------------------
 # Cing classes and routines
 #-----------------------------------------------------------------------------
@@ -619,6 +618,10 @@ Project: Top level Cing project class
         """
         Restore the project: molecules and lists
         """
+        if self.contentIsRestored:
+            NTerror("Project.restore: content was already restored")
+            return
+
         NTmessage('==> Restoring %s ... ', self )
 
         # Molecules

@@ -1,6 +1,7 @@
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import XMLhandler
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
@@ -19,7 +20,7 @@ class ROGscore(NTdict):
                          __CLASS__  = 'ROGscore',
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
-        # Explicitely showing instance attributes here in init.
+        # Explicitly showing instance attributes here in init.
         self.colorLabel = COLOR_GREEN
         """Elements in this list are tuples of (color, comment).
         """
@@ -102,12 +103,12 @@ class ROGscore(NTdict):
         if colorLabel == COLOR_RED or (colorLabel == COLOR_ORANGE and self.colorLabel != COLOR_RED):
             self.colorLabel = colorLabel
 
-        if not comment:     
-            return       
+        if not comment:
+            return
 
         if isinstance(comment, list):
             for commentSingle in comment:
-               commentTuple = (colorLabel, commentSingle ) 
+               commentTuple = (colorLabel, commentSingle )
                self.colorCommentList.append( commentTuple )# grow list with potentially multiple comments.
         else:
             commentTuple = (colorLabel, comment )
@@ -117,3 +118,20 @@ class ROGscore(NTdict):
         NTsort( self.colorCommentList, 0, inplace=True)
     #end def
 #end class
+
+class XMLROGscoreHandler( XMLhandler ):
+    """ROCscore XML handler class"""
+    def __init__(self):
+        XMLhandler.__init__(self, name='ROGscore')
+    #end def
+
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
+        if attrs == None: return None
+        result = ROGscore()
+        result.update(attrs)
+        return result
+    #end def
+#end class
+# Initiate an instance
+xmlrogscorehandler = XMLROGscoreHandler()

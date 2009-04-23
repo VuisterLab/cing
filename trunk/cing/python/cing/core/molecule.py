@@ -640,11 +640,12 @@ class Molecule( NTtree ):
             result = NTlist()
             for model in models:
                 if model < 0:
-                    NTerror('Error Molecule.models2list: invalid model number %d (below zero)\n', model )
+                    NTerror('Molecule.models2list: invalid model number %d ( < 0 )', model )
                     return None
                 if model >= self.modelCount:
-                    NTerror('Error Molecule.models2list: invalid model number %d (larger than modelCount: %d)\n',
-                            (model, self.modelCount ))
+                    NTerror('Molecule.models2list: invalid model number %d ( >=  modelCount: %d)',
+                             model, self.modelCount
+                           )
                     return None
                 result.append(model)
             #end for
@@ -931,11 +932,11 @@ class Molecule( NTtree ):
             and take the first one which has a assigned value,
             append or collapse the resonances list to single entry depending on append.
         """
-        
+
         if not self.resonanceCount:
             NTmessage("Skipping project.mergeResonances because there are no resonances")
             return
-        
+
         for atom in self.allAtoms():
             if len(atom.resonances) != self.resonanceCount:
                 NTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
@@ -1255,7 +1256,7 @@ class Molecule( NTtree ):
             self.ensemble = Ensemble( self )
 #            self.atomList = AtomList( self )
 #            if not self.atomList:
-#                NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
+#                NTcodeerror("Failed to generate AtomList in molecule#updateAll")
             self.idDisulfides()
             if not self.has_key('ranges'):
                 self.ranges = None
@@ -1264,8 +1265,8 @@ class Molecule( NTtree ):
         # Atom list is needed even when no coordinates are present.
         self.atomList = AtomList( self )
         if not self.atomList:
-            NTcodeerror("Failed to generate AtomList in molecule#updateAll") 
-        
+            NTcodeerror("Failed to generate AtomList in molecule#updateAll")
+
 
         self.updateTopology()
     #end def
@@ -1492,6 +1493,9 @@ Return an Molecule instance or None on error
             NTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
             return NaN
         #end if
+
+        if models == None:
+            models = sprintf('%s-%s', 0, self.modelCount-1)
 
         NTmessage("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
@@ -2207,6 +2211,12 @@ Residue class: Defines residue properties
         self.chain     = self._parent
 
         self.dihedrals = NTlist()
+
+        # restraints associated with this residue; filled in partion restraints
+        self.distanceRestraints = NTlist()
+        self.dihedralRestraints = NTlist()
+        self.rdcRestraints      = NTlist()
+
 
         self.rogScore = ROGscore()
 
@@ -3557,7 +3567,7 @@ class AtomList( NTlist ):
 
     NB this list is only instantiated for the validate plugin. It has very little
     functionality. Most functionality should be in Residue, Chains, etc.
-    
+
     JFD: why not skip this intermediate object and hang functionality straight off Atom and AtomsHTMLfile classes?
     """
     def __init__( self, molecule ):
