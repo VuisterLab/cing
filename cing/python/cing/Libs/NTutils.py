@@ -317,6 +317,19 @@ class NTlist(list):
         return (self.av, self.sd, self.n)
     #end def
 
+    def average2(self, byItem=None, fmt='%f +- %f' ):
+        """Return average as NTvalue object.
+           Store av,sd,n as attributes of self
+           Assumes numeric list, None elements ignored.
+           See also NTaverage2 routine
+       """
+        result = NTaverage2( self, byItem, fmt=fmt )
+        self.av = result.av
+        self.sd = result.sd
+        self.n  = self.n
+        return result
+    #end def
+
     def cAverage(self, min=0.0, max=360.0, radians = 0, byItem=None):
         """ Circular average.
            return (cav,cv,cn) tuple of a list
@@ -1894,7 +1907,11 @@ class NTvalue(NTdict):
     def __init__(self, value, error=0.0, fmt='%s (+- %s)', fmt2='%s', **kwds):
         kwds.setdefault('__CLASS__', 'NTvalue')
         NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
-        self.saveXML('value', 'error', 'fmt', 'fmt2')
+        # always map av and sd as alternatives for value and error, set default n
+        self.av = self.value
+        self.sd = self.error
+        self.setdefault('n',1)
+        self.saveXML('value', 'error', 'n','fmt', 'fmt2')
     #end def
 
     def __call__(self):
@@ -1914,9 +1931,12 @@ class NTvalue(NTdict):
         return  self.fmt % (self.value, self.error)
     #end def
 
+    def format(self):
+        return str(self)
+
     def __repr__(self):
-        return sprintf('NTvalue( value = %s, error = %s, fmt = %s, fmt2 = %s )',
-                       repr(self.value), repr(self.error), self.fmt, self.fmt2)
+        return sprintf('NTvalue( value = %s, error = %s, n = %r, fmt = %r, fmt2 = %r )',
+                       repr(self.value), repr(self.error), self.n, self.fmt, self.fmt2)
     #end def
 
     def __add__(self, other):
@@ -2150,13 +2170,30 @@ def NTlimitSingleValue(value, min, max):
         value -= listRange
     return value
 
-
-def NTaverage(theList, byIndex=None):
-    """returns (av, sd, n) tuple of theList or
-       (None, None, 0) in case of zero elements in theList
+def NTaverage2(theList, byIndex=None, fmt='%f +- %f' ):
+    """Calculate average of theList
        Assumes numeric list, None elements are ignored
        byIndex allows for list of tuples r other elements
+
+       returns
+           NTvalue object with attr. av, sd and n
+           or None on Error
     """
+    av,sd,n = NTaverage(theList, byIndex)
+    result = NTvalue( av, sd, n=n, fmt=fmt )
+    return result
+#end def
+
+def NTaverage(theList, byIndex=None ):
+    """Calculate average of theList
+       Assumes numeric list, None elements are ignored
+       byIndex allows for list of tuples r other elements
+
+       returns
+
+           (av, sd, n) tuple of theList or
+           (None, None, 0) in case of zero elements in theList
+     """
     sum = 0.0
     sumsqd = 0.0
     n = 0.0
@@ -4016,9 +4053,6 @@ def getTextBetween(s, startString, endString, startIncl=True, endIncl=True):
             endIdx = len(s)
 
     return s[startIdx:endIdx]
-
-
-
 
 def stripExtension(path):
     directory, basename, _extension = NTpath(path)

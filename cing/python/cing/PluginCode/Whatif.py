@@ -9,18 +9,24 @@
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
 from cing import issueListUrl
+from cing.core.molecule import dots
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTaverage2
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
@@ -61,6 +67,48 @@ from cing.PluginCode.required.reqWhatif import HNDCHK_STR
 import os
 import time
 
+class WhatifResult( NTdict ):
+    """
+    Class to store valueList, qualList Whatif results per model
+    """
+    def __init__(self, checkID, level, modelCount ):
+        NTdict.__init__( self, __CLASS__ = 'WhatifResult',
+                         checkID = checkID,
+                         alternate = None,
+                         level   = level,
+                         comment = Whatif.explain(checkID),
+                       )
+#        # Initialize the lists
+        if Whatif.cingNameDict.has_key(checkID):
+            self.alternate = Whatif.cingNameDict[checkID]
+        for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
+            self[c] = NTfill( None, modelCount)
+
+        #self.keysformat()
+    #end def
+
+    def average(self, fmt='%5.2f +/- %4.2f'):
+        """Return average of valueList as NTvalue object
+        """
+        theList = self[VALUE_LIST_STR]
+        return NTaverage2(theList, fmt=fmt)
+
+    def __str__(self):
+        return '<WhatifResult %(checkID)s>' % self
+    #end def
+
+    def format(self):
+        return sprintf(
+"""%s WhatifResult %s (%s) %s
+comment   = %s
+alternate = %s
+valueList = %s
+qualList  = %s
+""",                   dots, self.checkID, self.level, dots,
+                       self.comment, self.alternate, self.valueList, self.qualList
+                      )
+#end class
+
 class Whatif( NTdict ):
     """
     Class to use WHAT IF checks.
@@ -82,60 +130,65 @@ class Whatif( NTdict ):
 
     All file references relative to rootPath ('.' by default) using the .path()
     method.
+
+    Instantiated only from runWhatif
     """
     #define some more user friendly names
     # List of defs at:
     # http://www.yasara.org/pdbfinder_file.py.txt
     # http://swift.cmbi.ru.nl/whatif/html/chap23.html
     # All are in text record of file to be parsed so they're kind of redundant.
-    # Third element is optional short name suitable for labeling a y-axis.
+    # Second element is an alternative CING id
+    # Fourth element is optional short name suitable for labeling a y-axis.
+
+    #            WHATIF     CING
     nameDefs =[
-                ('ACCLST', 'Relative accessibility',                                    'Rel. accessibility'),
-                ('ALTATM', 'Amino acids inside ligands check/Attached group check',     'Amino acids inside ligands check/Attached group check'),
-                ('ANGCHK', 'Angles',                                                    'Bond angle'),
-                ('BA2CHK', 'Hydrogen bond acceptors', 'Hydrogen bond acceptors'),
-                ('BBCCHK', 'Backbone normality',                                        'Backbone normality' ),
-                ('BH2CHK', 'Hydrogen bond donors', 'Hydrogen bond donors'),
-                ('BMPCHK', 'Bumps',                                                     'Summed bumps'),
-                ('BNDCHK', 'Bond lengths',                                              'Bond lengths'),
-                ('BVALST', 'B-Factors', 'B-Factors'),
-                ('C12CHK', 'Chi-1 chi-2',                                               'Chi 1/2. Z'),
-                ('CHICHK', 'Torsions',                                                  'Aver. torsions Z.'),
-                ('CCOCHK', 'Inter-chain connection check', 'Inter-chain connection check'),
-                ('CHICHK', 'Torsion angle check', 'Torsion angle check'),
-                ('DUNCHK', 'Duplicate atom names in ligands', 'Duplicate atom names in ligands'),
-                ('EXTO2',  'Test for extra OXTs', 'Test for extra OXTs'),
-                ('FLPCHK', 'Peptide flip',                                              'Peptide flip'),
-                ('H2OCHK',  'Water check', 'Water check'),
-                ('H2OHBO',  'Water Hydrogen bond', 'Water Hydrogen bond'),
-                ('HNDCHK', 'Chirality', 'Chirality'),
-                ('HNQCHK', 'Flip HIS GLN ASN hydrogen-bonds', 'Flip HIS GLN ASN hydrogen-bonds'),
-                ('INOCHK', 'Accessibility',                                             'Accessibility Z.'),
-                ('MISCHK', 'Missing atoms', 'Missing atoms'),
-                ('MO2CHK', 'Missing C-terminal oxygen atoms', 'Missing C-terminal oxygen atoms'),
-                ('NAMCHK', 'Atom names', 'Atom names'),
-                ('NQACHK', 'Qualities',                                                 'New quality'),
-                ('NTCHK',  'Acid group conformation check',                             'COOH check'),
-                ('OMECHK', 'Omega angle restraints',                                   'Omega check'),                
-                ('PC2CHK', 'Proline puckers', 'Proline puckers'),
-                ('PDBLST', 'List of residues', 'List of residues'),
-                ('PL2CHK', 'Connections to aromatic rings',                             'Plan. to aromatic'),
-                ('PL3CHK', 'Side chain planarity with hydrogens attached',              'NA planarity'),
-                ('PLNCHK', 'Protein side chain planarities',                            'Protein SC planarity'),
-                ('PRECHK', 'Missing backbone atoms.', 'Missing backbone atoms.'),
-                ('PUCCHK', 'Ring puckering in Prolines', 'Ring puckering in Prolines'),
-                ('QUACHK', 'Directional Atomic Contact Analysis',                       'Packing quality'),
-                ('RAMCHK', 'Ramachandran',                                              'Ramachandr.' ),
-                ('ROTCHK', 'Rotamers',                                                  'Rotamer normality'),
-                ('SCOLST', 'List of symmetry contacts', 'List of symmetry contacts'),
-                ('TO2CHK', 'Missing C-terminal groups', 'Missing C-terminal groups'),
-                ('TOPPOS', 'Ligand without know topology', 'Ligand without know topology'),
-                ('WGTCHK', 'Atomic occupancy check', 'Atomic occupancy check'),
-                ('Hand',   '(Pro-)chirality or handness check'),                                        
-                ('AAINLI',   'Unknown check', 'Unknown check'),
-                ('ATHYBO',   'Unknown check', 'Unknown check'),
-                ('BBAMIS',   'Unknown check', 'Unknown check'),
-                ('TORCHK',   'Unknown check', 'Unknown check')
+                ('ACCLST',  None,          'Relative accessibility',                                    'Rel. accessibility'),
+                ('ALTATM',  None,          'Amino acids inside ligands check/Attached group check',     'Amino acids inside ligands check/Attached group check'),
+                ('ANGCHK', 'angles',       'Angles',                                                    'Bond angle'),
+                ('BA2CHK',  None,          'Hydrogen bond acceptors',                                   'Hydrogen bond acceptors'),
+                ('BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
+                ('BH2CHK',  None,          'Hydrogen bond donors',                                      'Hydrogen bond donors'),
+                ('BMPCHK', 'bumps',        'Bumps',                                                     'Summed bumps'),
+                ('BNDCHK', 'bondLengths',  'Bond lengths',                                              'Bond lengths'),
+                ('BVALST',  None,          'B-Factors',                                                 'B-Factors'),
+                ('C12CHK', 'janin',        'Janin',                                                     'Janin Z'),
+#duplicate                ('CHICHK',  None,          'Torsions',                                                  'Aver. torsions Z.'),
+                ('CCOCHK',  None,          'Inter-chain connection check',                              'Inter-chain connection check'),
+                ('CHICHK', 'torsion',      'Torsion angle check',                                       'Torsion angle check'),
+                ('DUNCHK',  None,          'Duplicate atom names in ligands',                           'Duplicate atom names in ligands'),
+                ('EXTO2',   None,          'Test for extra OXTs',                                       'Test for extra OXTs'),
+                ('FLPCHK',  None,          'Peptide flip',                                              'Peptide flip'),
+                ('H2OCHK',  None,          'Water check',                                               'Water check'),
+                ('H2OHBO',  None,          'Water Hydrogen bond',                                       'Water Hydrogen bond'),
+                ('HNDCHK', 'chiralities',  'Chirality',                                                 'Chirality'),
+                ('HNQCHK',  None,          'Flip HIS GLN ASN hydrogen-bonds',                           'Flip HIS GLN ASN hydrogen-bonds'),
+                ('INOCHK', 'accessibilities','Accessibility',                                             'Accessibility Z.'),
+                ('MISCHK',  None,          'Missing atoms',                                             'Missing atoms'),
+                ('MO2CHK',  None,          'Missing C-terminal oxygen atoms',                           'Missing C-terminal oxygen atoms'),
+                ('NAMCHK',  None,          'Atom names',                                                'Atom names'),
+                ('NQACHK', 'packingQuality2','2nd generation packing quality',                          'New quality'),
+                ('NTCHK',   None,          'Acid group conformation check',                             'COOH check'),
+                ('OMECHK', 'omegas',       'Omega angle restraints',                                    'Omega check'),
+                ('PC2CHK',  None,          'Proline puckers',                                           'Proline puckers'),
+                ('PDBLST',  None,          'List of residues',                                          'List of residues'),
+                ('PL2CHK',  None,          'Connections to aromatic rings',                             'Plan. to aromatic'),
+                ('PL3CHK',  None,          'Side chain planarity with hydrogens attached',              'NA planarity'),
+                ('PLNCHK', 'planarities',  'Protein side chain planarities',                            'Protein SC planarity'),
+                ('PRECHK',  None,          'Missing backbone atoms.',                                   'Missing backbone atoms.'),
+                ('PUCCHK',  None,          'Ring puckering in Prolines',                                'Ring puckering in Prolines'),
+                ('QUACHK', 'packingQuality1','Directional Atomic Contact Analysis, aka 1st generation packing quality', 'Packing quality'),
+                ('RAMCHK', 'ramachandran', 'Ramachandran Z-score',                                      'Ramachandr.' ),
+                ('ROTCHK', 'rotamer',      'Rotamers',                                                  'Rotamer normality'),
+                ('SCOLST',  None,          'List of symmetry contacts',                                 'List of symmetry contacts'),
+                ('TO2CHK',  None,          'Missing C-terminal groups',                                 'Missing C-terminal groups'),
+                ('TOPPOS',  None,          'Ligand without know topology',                              'Ligand without know topology'),
+                ('WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
+                ('Hand',    None,          '(Pro-)chirality or handness check',                         'Handness'),
+                ('AAINLI',  None,          'Unknown check',                                             'Unknown check'),
+                ('ATHYBO',  None,          'Unknown check',                                             'Unknown check'),
+                ('BBAMIS',  None,          'Unknown check',                                             'Unknown check'),
+                ('TORCHK',  None,          'Unknown check',                                             'Unknown check')
                  ]
 
 #              'Bond max Z',
@@ -155,14 +208,27 @@ class Whatif( NTdict ):
 
     debugCheck = 'BNDCHK'
     # Create a dictionary for fast lookup.
-    nameDict = NTdict()
-    shortNameDict = NTdict()
-    for row in nameDefs:
-        n1 = row[0]
-        nameDict[n1] = row[1]
-        if len(row) >= 3:
-            shortNameDict[n1] = row[2]
+#    nameDict = NTdict()
+#    shortNameDict = NTdict()
+#    for row in nameDefs:
+#        n1 = row[0]
+#        nameDict[n1] = row[1]
+#        if len(row) >= 3:
+#            shortNameDict[n1] = row[2]
+    # GV shorter
+    cingNameDict  = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,1)) )
+    nameDict      = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,2)) )
+    shortNameDict = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,3)) )
+    cingNameDict.keysformat()
     nameDict.keysformat()
+    shortNameDict.keysformat()
+
+    # Whatif id's for summary; will be keys in molecule[WHATIF_STR] dict
+    # Make them available to 'outside world through the Whatif class
+    summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
+                           BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  # second part.
+                         ]
+
     recordKeyWordsToIgnore = { # Using a dictionary for fast key checks below.
                               "Bad":None,
                               "Date":None,
@@ -223,14 +289,16 @@ fullstop y
 
 
 
-    def __init__( self, rootPath = '.', molecule = None, **kwds ):
-        NTdict.__init__( self, __CLASS__ = WHATIF_STR, **kwds )
+    def __init__( self, rootPath = '.', molecule=None, **kwds ):
+        NTdict.__init__( self, __CLASS__ = 'Whatif', **kwds )
         self.checks                = None
         self.molSpecificChecks     = None
         self.residueSpecificChecks = None
         self.atomSpecificChecks    = None
         self.residues              = None
         self.atoms                 = None
+        if not molecule:
+            NTerror('Whatif.__init__: no molecule defined')
         self.molecule              = molecule
         self.rootPath              = rootPath
     #end def
@@ -248,13 +316,111 @@ fullstop y
 #        d = theDict.setdefault( name, NTdict() )
 #        d[self.nameDict[key]] = d.setdefault( key, NTlist() )
 
-    def _processSummary( self, project, fileName='pdbout.txt' ):
-        """Parse fileName. Storing the check data according to each model.
+    def _characterizeEnsembleScore(self, checkId, value, default=None):
+        """Return characterization of Whatif value for ensemble checkId
+        """
+
+        if checkId == QUACHK_STR:
+            if value < -3.0:
+                return 'bad'
+            elif value < -2.0:
+                return 'poor'
+            else:
+                return default
+
+        if checkId == NQACHK_STR:
+            if value < -4.0:
+                return 'bad'
+            elif value < -3.0:
+                return 'poor'
+            else:
+                return default
+
+        if checkId == RAMCHK_STR:
+            if value < -4.0:
+                return 'bad'
+            elif value < -3.0:
+                return 'poor'
+            else:
+                return default
+
+        if checkId == ROTCHK_STR:
+            if value < -4.0:
+                return 'bad'
+            elif value < -3.0:
+                return 'poor'
+            else:
+                return default
+
+        if checkId == BBCCHK_STR:
+            if value < -4.0:
+                return 'bad'
+            elif value < -3.0:
+                return 'poor'
+            else:
+                return default
+
+        # 2nd part
+        if checkId == BNDCHK_STR:
+            if value < 0.666:
+                return 'tight'
+            elif value > 1.5:
+                return 'loose'
+            else:
+                return default
+
+        if checkId == ANGCHK_STR:
+            if value < 0.666:
+                return 'tight'
+            elif value > 1.5:
+                return 'loose'
+            else:
+                return default
+
+        if checkId == OMECHK_STR:
+            if value > 7.0:
+                return 'loose'
+            elif value < 4.0:
+                return 'tight'
+            else:
+                return default
+
+        if checkId == PLNCHK_STR:
+            if value < 0.666:
+                return 'tight'
+            elif value > 2.0:
+                return 'loose'
+            else:
+                return default
+
+        if checkId == HNDCHK_STR:
+            if value > 0.0 and value > 1.5: #GV strange clause!
+                return 'loose'
+            else:
+                return default
+
+        if checkId == INOCHK_STR:
+            if value > 1.16:
+                return 'unusual'
+            else:
+                return default
+
+        return default
+    #end def
+
+    def _processWhatifSummary( self, fileName='pdbout.txt' ):
+        """Parse the Whatif summary indicated by fileName.
+
+           Store the overall check data according to each model as WhatifResult instances
+           in molecule[WHATIF_STR] NTdict instance.
+
            Return None on success or True on error.
            """
         if not os.path.exists(fileName):
-            NTerror('Whatif._processSummary: file "%s" not found.', fileName)
+            NTerror('Whatif._processWhatifSummary: file "%s" not found.', fileName)
             return True
+
+        self.molecule[WHATIF_STR] = NTdict()
 
         modelIdx = -1
         for line in AwkLike( fileName, minNF = 2, separator=':' ):
@@ -262,12 +428,12 @@ fullstop y
 #            NTdebug("Read line: "+l)
 #            NTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
 #            NTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
-            
+
             if l.find( 'Summary report for users of a structure') > 0:
-#                NTdebug('Found summary report and increasing model idx: %d' % modelIdx) 
+#                NTdebug('Found summary report and increasing model idx: %d' % modelIdx)
                 modelIdx += 1
                 continue
-            
+
             checkId = None
             if l.startswith( '  1st generation packing quality'):
                 checkId = QUACHK_STR
@@ -279,56 +445,66 @@ fullstop y
                 checkId = ROTCHK_STR
             if l.startswith( '  Backbone conformation'):
                 checkId = BBCCHK_STR
-# Second part.                
+# Second part.
             if l.startswith( '  Bond lengths'):
                 checkId = BNDCHK_STR
             if l.startswith( '  Bond angles'):
                 checkId = ANGCHK_STR
             if l.startswith( '  Omega angle restraints'):
-                checkId = OMECHK_STR 
+                checkId = OMECHK_STR
             if l.startswith( '  Side chain planarity'):
                 checkId = PLNCHK_STR
             if l.startswith( '  Improper dihedral distribution'):
                 checkId = HNDCHK_STR
             if l.startswith( '  Inside/Outside distribution'):
                 checkId = INOCHK_STR
-            
+
             if not checkId:
 #                NTdebug("Failed to find any specific check, continueing to look")
                 continue
-                        
+
+            # if needed add WhatifResult instance
+            # Do not use setdefault() as it generate too much overhead this way
+            if not self.molecule[WHATIF_STR].has_key(checkId):
+                self.molecule[WHATIF_STR][checkId] = WhatifResult( checkId, level='MOLECULE', modelCount = self.molecule.modelCount)
+                # optionally add reference to alternate Cing name
+                cingId = Whatif.cingCheckId( checkId )
+                if cingId != checkId:
+                    self.molecule[WHATIF_STR][cingId] = self.molecule[WHATIF_STR][checkId]
+
             valueStringList  = line.dollar[2].strip().split()
 #            NTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
                 NTerror("Failed to get valueStringList from line: [%s]"%line)
-                return True                    
+                return True
             value = float(valueStringList[0])
-                       
-#            NTdebug('modelIdx: %d' % modelIdx) 
+
+#            NTdebug('modelIdx: %d' % modelIdx)
             if modelIdx < 0:
                 NTerror('Failed to have increased model idx at least once')
-                return True 
-            if modelIdx == 0:
-#                NTdebug('Setting empty NTlist for first time for check: %s' % checkId) 
-                setDeepByKeys( self.molecule, NTlist(), WHATIF_STR, checkId)
-            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId)
-            if ensembleValueList == None:
-                NTerror("Failed to get ensembleValueList for checkId: %s" % checkId)
-                return True            
-            ensembleValueList.append(value)
-#            NTdebug('ensembleValueList now: %s' % ensembleValueList)
+                return True
+
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )
+            ensembleValueList[modelIdx] = value
+
+            ensembleQualList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, QUAL_LIST_STR )
+            ensembleQualList[modelIdx] = self._characterizeEnsembleScore(checkId, value)
         # end for line
-        
-        
-        summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
-                               BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  ] # second part.
+        self.molecule[WHATIF_STR].keysformat()
+    #end def
+
+    def _makeSummary(self):
+        """
+        Return a Whatif summary from overall Molecule scores
+        """
+        # GV summaryCheckIdList moved to Class
         summaryCheckIdMandatoryList = [ BNDCHK_STR, ANGCHK_STR ]
         valueList = [ ]
-        qualList = [ ]
-        for checkId in summaryCheckIdList:
-            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId)
+        qualList  = [ ]
+        for checkId in Whatif.summaryCheckIdList:
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR)
             if not ensembleValueList:
-                msg = "empty ensembleValueList for checkId %s" % checkId 
+                msg = "empty ensembleValueList for checkId %s" % checkId
                 if checkId in summaryCheckIdMandatoryList:
                     NTwarning(msg)
 #                else:
@@ -338,95 +514,43 @@ fullstop y
             ensembleValueList.average()
             valueList.append(ensembleValueList)
 #            NTdebug('ensembleValueList found: %s' % valueList[-1])
-            qualList.append( '' )
-            # Add comments like done in What If's pdbout.f:
 
-            if checkId == QUACHK_STR:
-                if ensembleValueList.av < -3.0:
-                    qualList[-1] = '(bad)'
-                elif ensembleValueList.av < -2.0:
-                    qualList[-1] = '(poor)'
-            if checkId == NQACHK_STR:
-                if ensembleValueList.av < -4.0:
-                    qualList[-1] = '(bad)'
-                elif ensembleValueList.av < -3.0:
-                    qualList[-1] = '(poor)'
-            if checkId == RAMCHK_STR:
-                if ensembleValueList.av < -4.0:
-                    qualList[-1] = '(bad)'
-                elif ensembleValueList.av < -3.0:
-                    qualList[-1] = '(poor)'            
-            if checkId == ROTCHK_STR:
-                if ensembleValueList.av < -4.0:
-                    qualList[-1] = '(bad)'
-                elif ensembleValueList.av < -3.0:
-                    qualList[-1] = '(poor)'
-            if checkId == BBCCHK_STR:
-                if ensembleValueList.av < -4.0:
-                    qualList[-1] = '(bad)'
-                elif ensembleValueList.av < -3.0:
-                    qualList[-1] = '(poor)'
-            # 2nd part
-            if checkId == BNDCHK_STR:
-                if ensembleValueList.av < 0.666:
-                    qualList[-1] = '(tight)'
-                elif ensembleValueList.av > 1.5:
-                    qualList[-1] = '(loose)'
-            elif checkId == ANGCHK_STR:
-                if ensembleValueList.av < 0.666:
-                    qualList[-1] = '(tight)'
-                elif ensembleValueList.av > 1.5:
-                    qualList[-1] = '(loose)'
-            elif checkId == OMECHK_STR:
-                if ensembleValueList.av > 7.0:
-                    qualList[-1] = '(loose)'
-                elif ensembleValueList.av < 4.0:
-                    qualList[-1] = '(tight)'
-            if checkId == PLNCHK_STR:
-                if ensembleValueList.av < 0.666:
-                    qualList[-1] = '(tight)'
-                elif ensembleValueList.av > 2.0:
-                    qualList[-1] = '(loose)'
-            if checkId == HNDCHK_STR:
-                if ensembleValueList.av > 0.0 and ensembleValueList.av > 1.5:
-                    qualList[-1] = '(loose)'
-            if checkId == INOCHK_STR:
-                if ensembleValueList.av > 1.16:
-                    qualList[-1] = '(unusual)'
-        # end for
+            q = self._characterizeEnsembleScore(checkId, ensembleValueList.av, None)
+            if q != None:
+                qualList.append( '('+q+')' )
+            else:
+                qualList.append( '' )
+       # end for
         fmt = "%7.3f"
         spaceCount = 7
         summary = """
-    Summary report for users of a structure
-    This is an overall summary of the quality of the structure as
-    compared with current reliable structures. This summary is most
-    useful for biologists seeking a good structure to use for modelling
-    calculations.
-    
-    The second part of the table mostly gives an impression of how well
-    the model conforms to common refinement constraint values. The
-    first part of the table shows a number of constraint-independent
-    quality indicators.
-    
-    The standard deviation shows the variation over models in the ensemble
-    where appropriate.
-     
-     Structure Z-scores, positive is better than average:
-      1st generation packing quality : %s +/- %s %s
-      2nd generation packing quality : %s +/- %s %s
-      Ramachandran plot appearance   : %s +/- %s %s
-      chi-1/chi-2 rotamer normality  : %s +/- %s %s
-      Backbone conformation          : %s +/- %s %s
+WHATIF summary report of molecule "%s"
 
-     RMS Z-scores, should be close to 1.0:
-      Bond lengths                   : %s +/- %s %s
-      Bond angles                    : %s +/- %s %s
-      Omega angle restraints         : %s +/- %s %s
-      Side chain planarity           : %s +/- %s %s
-      Improper dihedral distribution : %s +/- %s %s
-      Inside/Outside distribution    : %s +/- %s %s
-      
-        """ % (val2Str(valueList[0].av,fmt, spaceCount),val2Str(valueList[0].sd,fmt, spaceCount), qualList[0],
+- This is an overall summary of the quality of the structure as
+  compared with current reliable structures.
+- The first part of the table shows a number of constraint-independent
+  quality indicators.
+- The second part of the table mostly gives an impression of how well
+  the model conforms to common refinement constraint values.
+- The standard deviation shows the variation over models in the ensemble
+  where appropriate.
+
+Structure Z-scores, positive is better than average:
+    1st generation packing quality : %s +/- %s %s
+    2nd generation packing quality : %s +/- %s %s
+    Ramachandran plot appearance   : %s +/- %s %s
+    chi-1/chi-2 rotamer normality  : %s +/- %s %s
+    Backbone conformation          : %s +/- %s %s
+
+RMS Z-scores, should be close to 1.0:
+    Bond lengths                   : %s +/- %s %s
+    Bond angles                    : %s +/- %s %s
+    Omega angle restraints         : %s +/- %s %s
+    Side chain planarity           : %s +/- %s %s
+    Improper dihedral distribution : %s +/- %s %s
+    Inside/Outside distribution    : %s +/- %s %s
+"""         % (self.molecule.name,
+               val2Str(valueList[0].av,fmt, spaceCount),val2Str(valueList[0].sd,fmt, spaceCount), qualList[0],
                val2Str(valueList[1].av,fmt, spaceCount),val2Str(valueList[1].sd,fmt, spaceCount), qualList[1],
                val2Str(valueList[2].av,fmt, spaceCount),val2Str(valueList[2].sd,fmt, spaceCount), qualList[2],
                val2Str(valueList[3].av,fmt, spaceCount),val2Str(valueList[3].sd,fmt, spaceCount), qualList[3],
@@ -438,16 +562,14 @@ fullstop y
                val2Str(valueList[9].av,fmt, spaceCount),val2Str(valueList[9].sd,fmt, spaceCount), qualList[9],
                val2Str(valueList[10].av,fmt, spaceCount),val2Str(valueList[10].sd,fmt, spaceCount), qualList[10]
                )
-                    
-        if setDeepByKeys(self.molecule, summary, 'wiSummary'):# Hacked because should be another wi level in between.
-            NTerror( 'Failed to set WI summary' )
-            return True
-        
-        project.whatifStatus.parsed = True
-        project.whatifStatus.keysformat()
-            
-                            
-        
+
+        self.molecule[WHATIF_STR].summary = summary
+
+        self.molecule[WHATIF_STR].keysformat()
+        return summary
+    #end def
+
+
     def _parseCheckdb( self, modelCheckDbFileName, model ):
         """Parse check_001.db etc. Generate references to
            all checks. Storing the check data according to residue and atom.
@@ -486,11 +608,14 @@ fullstop y
         if not os.path.exists(modelCheckDbFileName):
             NTdebug('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
             return True
+
         for line in AwkLike( modelCheckDbFileName, minNF = 3 ):
 #            NTdebug("DEBUG: read: "+line.dollar[0])
             if line.dollar[2] != ':':
-                NTwarning("The line below was unexpectedly not parsed, expected second field to be a semicolon.")
-                NTwarning(line.dollar[0])
+                NTwarning('Whatif._parseCheckdb: The line:\n   "%s"\nwas unexpectedly not parsed, expected second field to be a semicolon.',
+                          line.dollar[0]
+                         )
+                continue
 
 #            Split a line of the check.db file
             a      = line.dollar[0].split(':')
@@ -540,8 +665,13 @@ fullstop y
                 continue
             if key == "Name":
                 curLocId = value
-#                NTdebug("curLocId: "+curLocId )
-                curListDic = curLocDic.setdefault(curLocId, NTdict())
+
+                # do NOT!! use setdefault(0 routine because it will generate many times
+                # an expensive WhatifResult dummy first
+                if not curLocDic.has_key( curLocId ):
+                    curLocDic[curLocId] = WhatifResult(checkID, curCheck[LEVEL_STR], self.molecule.modelCount)
+
+                curListDic = curLocDic[curLocId]
                 continue
 
 #           Only allow values so lines like:
@@ -555,12 +685,9 @@ fullstop y
                 NTerror( "Whatif._parseCheckdb: Expected key to be Value or Qual but found key, value pair: [%s] [%s]" % ( key, value ))
                 return None
 
-            if not curListDic.has_key( keyWord ):
-                itemNTlist = NTlist()
-                curListDic[ keyWord ] = itemNTlist
-                for _dummy in range(self.molecule.modelCount): # Shorter code for these 2 lines please JFD.
-                    itemNTlist.append(None)
-#                NTdebug("b initialized with Nones: itemNTlist: %r", itemNTlist )
+            if curListDic==None or not curListDic.has_key( keyWord ):
+                NTerror( "Whatif._parseCheckdb, line %d: Expected key %s for WhatifResult dict %s", line.NR, keyWord, curListDic)
+
             else:
                 itemNTlist = curListDic[ keyWord ]
 #            NTdebug("a itemNTlist: "+`itemNTlist` )
@@ -580,23 +707,26 @@ fullstop y
 
     def _processCheckdb( self   ):
         """
-        Put parsed data of all models into CING data model
+        Put parsed data of all models into CING data model as
+        WhatifResult instances
+
         Return None for success
 
         Example of processed data structure attached to say a residue:
-            "whatif": {
-                "ANGCHK": {
-                    "valeList": [ 0.009, 0.100 ],
-                    "qualList": ["POOR", "GOOD" ]},
-                "BNDCHK": {
-                    "valeList": [ 0.009, 0.100 ],
-                    }}"""
+
+            whatif.ANGCHK.valueList : [ 0.009, 0.100 ]
+            whatif.ANGCHK.qualList  : ["POOR", "GOOD" ]
+
+            whatif.BNDCHK.valueList : [ 0.009, 0.100 ]
+            whatif.BNDCHK.qualList  : [ None, None ]
+
+        """
 
         NTdetail("==> Processing the WHATIF results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
-        self.molecule.whatif = self # is self and that's asking for luggage
+#        self.molecule.whatif = self # is self and that's asking for luggage
         # Later
 
 #        self.molSpecificChecks     = NTlist()
@@ -613,10 +743,10 @@ fullstop y
         # sorting on mols, residues, and atoms
 #        NTmessage("  for self.checks: " + `self.checks`)
 #        NTdebug("  for self.checks count: " + `len(self.checks)`)
-        
+
         msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
         msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
-        
+
         for check in self.checks:
             if LEVEL_STR not in check:
                 NTerror("Whatif._processCheckdb: no level attribute in check dictionary: "+check[CHECK_ID_STR])
@@ -629,6 +759,7 @@ fullstop y
                 return True
             selfLevelChecks[idx].append( check )
             check.keysformat()
+        #end for
 
         checkIter = iter(selfLevelChecks)
         for _levelEntity in selfLevels:
@@ -664,21 +795,11 @@ fullstop y
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
                     #NTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
 
-                    keyWordList = [ VALUE_LIST_STR, QUAL_LIST_STR]
-#            "locId": {                             # curLocDic
-#                "'A- 189-GLU'"                     # curLocId
-#                    : {                            # curListDic
-#                    "valeList": [ 0.009, 0.100 ]   # curList
-#                    "qualList": ["POOR", "GOOD" ]
-
-                    for keyWord in keyWordList:
-                        curList = curListDic.getDeepByKeys(keyWord) # just 1 level deep but never set as setdefaults would do.
-                        if not curList:
-                            continue
-                        entityWhatifCheckDic = entityWhatifDic.setdefault(checkId, NTdict())
-                        entityWhatifCheckDic[keyWord]=curList
-#                    NTdebug("now entityWhatifDic: " + `entityWhatifDic`)
-#        NTdebug('done with _processCheckdb')
+                    # GV direct linking using the WhatifResult object
+                    entityWhatifDic[curListDic.checkID] = curListDic
+                #end for
+            #end for
+        #end for
     #end def
 
     def translateResAtmString( self, string ):
@@ -704,6 +825,30 @@ fullstop y
     def report( self ):
         return ''.join( file( self.path( Whatif.reportFile ), 'r').readlines())
 
+    def explain( checkID=None ):
+        """
+        Static method to return a textual explanation of whatif checkID or all checkID's if None
+
+        Returns None if no such explanation exists
+        """
+        if checkID == None:
+            return Whatif.nameDict.format()
+        elif checkID!=None and Whatif.nameDict.has_key(checkID):
+            return Whatif.nameDict[checkID]
+        else:
+            return None
+    #end def
+    explain = staticmethod(explain)
+
+
+    def cingCheckId( checkId ):
+        """Static method to return a cingId if exists. Returns checkId otherwise.
+        """
+        if Whatif.cingNameDict.has_key(checkId) and Whatif.cingNameDict[checkId] != None:
+            return Whatif.cingNameDict[checkId]
+        return checkId
+    #end def
+    cingCheckId = staticmethod( cingCheckId )
 #end Class
 
 
@@ -870,22 +1015,13 @@ def runWhatif( project, parseOnly=False ):
         NTerror('runWhatif: absolute path "%s" contains spaces. This will crash Whatif.', absPath)
         return True
 
-    if project.molecule.has_key('whatif'):
-        del(project.molecule['whatif'])
-    for chain in project.molecule.allChains():
-        if chain.has_key('whatif'):
-            del(chain['whatif'])
-    for res in project.molecule.allResidues():
-        if res.has_key('whatif'):
-            del(res['whatif'])
-    for atm in project.molecule.allAtoms():
-        if atm.has_key('whatif'):
-            del(atm['whatif'])
-
+    # core Whatif object, allows running and parsing of whatif
     whatif = Whatif( rootPath = path, molecule = project.molecule )
+    project.molecule.runWhatif = whatif
+
     models = NTlist(*range( project.molecule.modelCount ))
 
-    whatifDir = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
+    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
     whatifPath       = os.path.dirname(cingPaths.whatif)
     whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
     whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
@@ -960,7 +1096,7 @@ def runWhatif( project, parseOnly=False ):
                 removeList = []
                 for fn in removeListLocal:
                     removeList.append( os.path.join(whatifDir, fn) )
-    
+
                 for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG"]:
                     for fn in glob(os.path.join(whatifDir,extension)):
                         removeList.append(fn)
@@ -980,8 +1116,23 @@ def runWhatif( project, parseOnly=False ):
     #end if
 
 
-#    NTmessageNoEOL('Parsing whatif checks ')
-    for model in models:
+    NTdebug('Parsing whatif checks ')
+
+    # clear the whatif data structure
+    if project.molecule.has_key(WHATIF_STR):
+        del(project.molecule[WHATIF_STR])
+    for chain in project.molecule.allChains():
+        if chain.has_key(WHATIF_STR):
+            del(chain[WHATIF_STR])
+    for res in project.molecule.allResidues():
+        if res.has_key(WHATIF_STR):
+            del(res[WHATIF_STR])
+    for atm in project.molecule.allAtoms():
+        if atm.has_key(WHATIF_STR):
+            del(atm[WHATIF_STR])
+
+    project.whatifStatus.parsed = False
+    for model in NTprogressIndicator(models):
         modelNumberString = sprintf('%03d', model)
 #        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
 #        os.unlink( fullname )
@@ -993,25 +1144,69 @@ def runWhatif( project, parseOnly=False ):
             NTerror("\nrunWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
     #end if
-#    NTmessage(' done')
 
     if whatif._processCheckdb():
         NTerror("runWhatif: Failed to process check db")
-        return True            
+        return True
 
     pathPdbOut = os.path.join(path, 'pdbout.txt' )
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathPdbOut))
         return True
-    
-    if whatif._processSummary(project, pathPdbOut):
-        NTerror("runWhatif: Failed to process WI summary file")
+
+    if whatif._processWhatifSummary(pathPdbOut):
+        NTerror("runWhatif: Failed to process WHATIF summary file")
         return True
+
+    whatif._makeSummary()
+
+    # complete the whatif data structure with NoneObjects
+    if not project.molecule.has_key(WHATIF_STR):
+        project.molecule[WHATIF_STR] = NoneObject
+    for chain in project.molecule.allChains():
+        if not chain.has_key(WHATIF_STR):
+            chain[WHATIF_STR] = NoneObject
+        else:
+            chain[WHATIF_STR].keysformat()
+    for res in project.molecule.allResidues():
+        if not res.has_key(WHATIF_STR):
+            res[WHATIF_STR] = NoneObject
+        else:
+            # check and initiate altenative cingId names
+            for checkId, item in res[WHATIF_STR].items():
+                cingId = Whatif.cingCheckId( checkId )
+                if cingId != checkId:
+                    res[WHATIF_STR][cingId] = item
+#            for key1, key2 in [('RAMCHK', 'ramanchandran'),
+#                               ('BBCCHK', 'backbone'),
+#                               ('CHICHK', 'chi1'),
+#                               ('C12CHK', 'janin')
+#                              ]:
+#                if res[WHATIF_STR].has_key(key1):
+#                    res[WHATIF_STR][key2] = res[WHATIF_STR][key1]
+#                else:
+#                    res[WHATIF_STR][key2] = NoneObject
+            #end for
+            res[WHATIF_STR].keysformat()
+        #end if
+
+    for atm in project.molecule.allAtoms():
+        if not atm.has_key(WHATIF_STR):
+            atm[WHATIF_STR] = NoneObject
+        else:
+            atm[WHATIF_STR].keysformat()
+
+    # set formats on the whatif data structure
+    whatif.keysformat()
+
+    project.whatifStatus.parsed = True
+    project.whatifStatus.keysformat()
+
 #end def
 
 def restoreWhatif( project, tmp=None ):
     """
-    Optionally restore dssp results
+    Optionally restore whatif results
     """
     if project.whatifStatus.completed:
         NTmessage('==> restoring whatif results')

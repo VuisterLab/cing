@@ -54,10 +54,11 @@ from cing.PluginCode.html import removePreTagLines
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.PluginCode.required.reqWhatif import WI_SUMMARY_STR
+#from cing.PluginCode.required.reqWhatif import WI_SUMMARY_STR
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
@@ -92,7 +93,7 @@ def runCingChecks( project, ranges=None ):
     project.validateModels()
 #    project.validateAssignments(toFile=True) in criticize now
     project.mergeResonances()
-    
+
     project.checkForSaltbridges(toFile=True)
     project.checkForDisulfides(toFile=True)
     if project.molecule:
@@ -224,7 +225,8 @@ def _criticizeResidue( residue, valSets ):
 
 #    result = NTdict()
     # WHATIF
-    if residue.has_key('whatif') and residue.hasProperties('protein'):
+    #print residue, residue.has_key(WHATIF_STR), residue.hasProperties('protein')
+    if residue.has_key(WHATIF_STR) and residue.hasProperties('protein'):
         #print '>', residue, residue.rogScore
         for key in ['BBCCHK', 'C12CHK', 'RAMCHK']:
 #            NTdebug('Now criticizing %s, whatif key %s', residue, key )
@@ -235,15 +237,15 @@ def _criticizeResidue( residue, valSets ):
                 NTdebug("Skipping What If " + key + " critique")
                 continue
 
-            actualValue        = getDeepByKeys(residue,'whatif', key, 'valueList') #TODO remove this valueList stuff
+            actualValue        = getDeepByKeys(residue, WHATIF_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
             if actualValue == None:
                 #print '>>', residue,key
                 continue
             if isinstance(actualValue, NTlist):
                 actualValue = actualValue.average()[0]
 
-#            NTdebug('actual %s, thresholdPoor %s, thresholdBad %s',
-#                    actualValue, thresholdValuePoor, thresholdValueBad)
+ #           NTdebug('%s key %s: actual %s, thresholdPoor %s, thresholdBad %s', residue, key,
+ #                   actualValue, thresholdValuePoor, thresholdValueBad)
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
@@ -295,9 +297,9 @@ def _criticizeResidue( residue, valSets ):
         #end for
     #end if
 
-    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. J Mol Biol (1998) vol. 276 pp. 417-436 
+    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. J Mol Biol (1998) vol. 276 pp. 417-436
     TRANS_OMEGA_VALUE = 179.6 # cis is assumed -180.0
-    TRANS_OMEGA_SD = 4.7    
+    TRANS_OMEGA_SD = 4.7
     for key in ['OMEGA']:
         if residue.hasProperties('protein') and key in residue and residue[key]:
             d = residue[key] # NTlist object
@@ -316,11 +318,11 @@ def _criticizeResidue( residue, valSets ):
 #                rmsViol = vList.rms()
                 vList.average()
                 avViol = vList.av
-                        
+
 #            NTdebug('found rmsViol: %8.3f' % rmsViol )
-#            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )            
+#            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )
             actualValueStr = val2Str( avViol, fmt='%8.3f', count=8 )
-            # Calculate the Z-score (the number of times of the known sd.)            
+            # Calculate the Z-score (the number of times of the known sd.)
 #            timesKnownSd = rmsViol / TRANS_OMEGA_SD
             timesKnownSd = avViol / TRANS_OMEGA_SD
             postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), TRANS_OMEGA_SD)
@@ -335,6 +337,13 @@ def _criticizeResidue( residue, valSets ):
             residue.rogScore[key] = avViol
         #end if
     # end for
+
+    # Check for restraint violations
+    for restraint in residue.distanceRestraints + residue.dihedralRestraints + residue.rdcRestraints:
+        if restraint.rogScore.isRed():
+            residue.rogScore.setMaxColor(COLOR_ORANGE, 'ORANGE: restraint violation(s)')
+            break
+    #end for
     return residue.rogScore
 #end def
 #Convenience method
@@ -342,6 +351,19 @@ Residue.criticize = _criticizeResidue
 
 def criticize(project, toFile=True):
     # initialize
+
+    # GV: Criticize restraints, peaks etc first
+    # Restraint red ROGs get carried as orange to residue ROGs
+
+    # Restraints lists
+    for drl in project.allRestraintLists():
+        drl.criticize(project, toFile=toFile)
+
+    #Peaks
+    criticizePeaks( project, toFile=toFile )
+
+    # Assignments
+    validateAssignments( project, toFile=toFile )
 
     if project.molecule:
         project.molecule.rogScore.reset()
@@ -366,7 +388,7 @@ def criticize(project, toFile=True):
             path = project.moleculePath('analysis', 'ROG.txt')
             f = file(path,'w')
             for residue in project.molecule.allResidues():
-                fprintf(f, '%-8s %4d %-6s  ', residue.name, residue.resNum, residue.rogScore.colorLabel)
+                fprintf(f, '%-15s %4d %-6s  ', residue._Cname(-1), residue.resNum, residue.rogScore.colorLabel)
                 keys = residue.rogScore.keys()
                 for key in ['BBCCHK', 'C12CHK', 'RAMCHK', 'gf', 'OMEGA']:
                     if key in keys:
@@ -375,24 +397,21 @@ def criticize(project, toFile=True):
                         fprintf(f,'%-6s %8s   ', key, '.   ')
                     #end if
                 #end for
-                fprintf(f,'%s\n', residue.rogScore.colorCommentList)
+                fprintf(f,'%s\n', residue.rogScore.colorCommentList.zap(1))
             #end for
             f.close()
             NTdetail('==> Criticizing project: output to "%s"', path)
+
+            # Generate an xml summary file
+            path = project.moleculePath('analysis', 'cingSummaryDict.xml')
+            s = project.getCingSummaryDict()
+            s.save( path )
         else:
             NTdetail('==> Criticizing project')
         #end if
     #end if
 
-    # Restraints lists
-    for drl in project.allRestraintLists():
-        drl.criticize(project, toFile=toFile)
-
-    #Peaks
-    criticizePeaks( project, toFile=toFile )
-
-    # Assignments
-    validateAssignments( project, toFile=toFile )
+    # store an
 
 #end def
 
@@ -454,7 +473,7 @@ def summary( project, toFile = True ):
         msg += "\n%s CING ROG analysis (residues %s) %s\n%s\n" % \
                (dots, r, dots, _ROGsummary(project.molecule.ranges2list(r), allowHtml=True))
 
-    wiSummary = getDeepByKeys(project.molecule, WI_SUMMARY_STR) # Hacked bexause should be another procheck level inbetween.
+    wiSummary = getDeepByKeys(project.molecule, WHATIF_STR, 'summary')
     if wiSummary:
         msg += "\n%s WHAT IF Summary %s\n" % (dots, dots )
         msg += addPreTagLines(wiSummary)
@@ -1481,7 +1500,6 @@ methods  = [(validateDihedrals, None),
             (validateModels,None),
             (validateAssignments, None),
             (validateRestraints, None),
-            (partitionRestraints,None),
 #
             (runCingChecks, None),
             (validate,None),
@@ -1493,6 +1511,8 @@ methods  = [(validateDihedrals, None),
             (fixStereoAssignments, None),
            ]
 #saves    = []
-restores = [(criticize,None),
+restores = [
+            (partitionRestraints,None),
+            (criticize,None),
            ]
 #exports  = []

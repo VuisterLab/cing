@@ -53,4 +53,4 @@ wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
 wiPlotList.append( ('_02_bond_angle','BND/ANG/NQA/PLNCHK') )
 wiPlotList.append( ('_03_steric_acc_flip','BMP/ACC/FLP/CHI') )
 
-WI_SUMMARY_STR = 'wiSummary'
+#WI_SUMMARY_STR = 'wiSummary'
