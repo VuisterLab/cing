@@ -122,7 +122,7 @@ public class Criteria extends iCingView {
     static ArrayList<String> pcCriteriaKeyList = new ArrayList<String>();
     static ArrayList<String> criteriaKeyListAll = new ArrayList<String>();
 
-    // Interface defaults; sync with those in $CINGROOT/python/cing/valSets.cfg.
+    // Interface defaults; sync with those in $CINGROOT/python/cing/valSets.cfg.    
     String CRV_AC_MAXALL_BAD = "10";
     String CRV_AC_MAXALL_POOR = "3";
     String CRV_AC_RMSALL_BAD = "5";
@@ -143,9 +143,11 @@ public class Criteria extends iCingView {
     String CRV_DR_THRESHOLD_FRAC_POOR = CRV_NONE;
     String CRV_DR_THRESHOLD_OVER_BAD = CRV_NONE;
     String CRV_DR_THRESHOLD_OVER_POOR = CRV_NONE;
-    String CRV_FLAG_MISSING_COOR = "true";
-    String CRV_OMEGA_MAXALL_BAD = "20";
-    String CRV_OMEGA_MAXALL_POOR = "15";
+    String CRV_FLAG_MISSING_COOR = "true";    
+//    String CRV_OMEGA_MAXALL_BAD = "20";
+//    String CRV_OMEGA_MAXALL_POOR = "15";
+    String CRV_OMEGA_MAXALL_BAD = "14.1";
+    String CRV_OMEGA_MAXALL_POOR = "9.4";
     String CRV_PC_BAD_GF = "-1.3";
     String CRV_PC_POOR_GF = "-1.0";
     String CRV_WI_BAD_BBCCHK = "3.0";
