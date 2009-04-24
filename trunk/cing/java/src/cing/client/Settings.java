@@ -6,9 +6,9 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = false;
+    public static final boolean DO_DEBUG = true;
     /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20090330-1139";
+    public static final String VERSION = "20090424-1010";
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */

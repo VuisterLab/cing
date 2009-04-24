@@ -36,7 +36,7 @@ import com.braju.format.Parameters;
 public class iCingServlet extends HttpServlet {
     private static final long serialVersionUID = 6098745782027999297L;
 
-    static final String PROJECT_NAME_regexp = ".+.pdb|.+.ent|.+.tgz";
+    static final String PROJECT_NAME_regexp = ".+.pdb|.+.ent|.+.tgz|.+.tar.gz";
 
     static {
         if (Settings.DO_DEBUG) {
@@ -471,10 +471,10 @@ public class iCingServlet extends HttpServlet {
     }
 
     private String getInitString(String projectFileName) {
-        if (projectFileName.endsWith(".cing.tgz")) {
+        if (projectFileName.endsWith(".cing.tgz") || projectFileName.endsWith(".cing.tar.gz")) {
             return "--old";
         }
-        if (projectFileName.endsWith(".tgz")) {
+        if (projectFileName.endsWith(".tgz") || projectFileName.endsWith(".tar.gz")) {
             return "--initCcpn " + projectFileName;
         }
         if (projectFileName.endsWith(".ent") || projectFileName.endsWith(".pdb")) {
