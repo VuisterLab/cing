@@ -17,7 +17,7 @@ from matplotlib.pylab import figure
 from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
-from numpy.core.ma import arange
+from numpy.ma.core import arange
 from unittest import TestCase
 import cing
 import os #@Reimport
@@ -124,7 +124,7 @@ class AllChecks(TestCase):
 #                   lineAttributes(color=plotparams.upper, width=width) )
 #
         # Always plot the cav line
-        plot.line( (aAv, 0), (aAv, ylimMax), 
+        plot.line( (aAv, 0), (aAv, ylimMax),
                    lineAttributes(color=plotparams.average, width=width) )
 #                   dashdotline() )
         ps.hardcopy("testPlotHistoDihedral."+graphicsFormat, graphicsFormat)
@@ -171,7 +171,7 @@ class AllChecks(TestCase):
         ax.set_xlim(xmax=10)
         ax.set_ylim(ymax=10)
 #        show()
-            
+
     def testZaagtand(self):
         t = arange( 0.,360.,1.)
         s = triangularList( t )

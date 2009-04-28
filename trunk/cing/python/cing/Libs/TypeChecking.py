@@ -27,7 +27,8 @@ $Date$
 """
 
 #from Numeric import zeros as _zeros
-from numpy.core.ma import zeros as _zeros
+#from numpy.core.ma import zeros as _zeros
+from numpy.ma.core import zeros as _zeros
 
 FLOAT = 'FLOAT'
 INT = 'INT'
@@ -58,7 +59,7 @@ for python_type, my_type in TYPES.items():
 class TypeChecker:
 
     def __init__(self, active = 1):
-        
+
         self.check_type(active, INT)
         self.active = active
 
@@ -78,7 +79,7 @@ class TypeChecker:
 
         try:
             return TYPES[t] == name
-        
+
         except:
 
             try:
@@ -86,7 +87,7 @@ class TypeChecker:
                 return self.is_subclass(token.__class__, name)
             except:
                 pass
-            
+
             if t == type(self.__class__):
                 s = 'type-checking is not supported for classes. ' + \
                     'Argument is an instance of class "%s"'
@@ -126,9 +127,9 @@ class TypeChecker:
                     '<%s> expected, <%s> given.'
 
             msg = descr % (filename, lineno, func_name, types, token_name)
-            
+
             raise TypeError, msg
-        
+
     def check_elements(self, seq, t):
 
         try:

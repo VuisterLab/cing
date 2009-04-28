@@ -22,7 +22,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-#        entryList = "1kr8".split()
+        entryList = "1kr8".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
 #        entryList = "Cu_CopK".split()
@@ -31,13 +31,13 @@ class AllChecks(TestCase):
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
-        
-        entryList = "a18v_xeasy".split()
+
+#        entryList = "a18v_xeasy".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
-        
+
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -46,7 +46,7 @@ class AllChecks(TestCase):
         modelCount=None
         if fastestTest:
             modelCount=2
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
@@ -60,8 +60,8 @@ class AllChecks(TestCase):
             if useNrgArchive: # default is False
 #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                 # Mounted from nmr.cmbi.ru.nl
-#                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)                
-                inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)                
+#                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
             else:
                 inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
