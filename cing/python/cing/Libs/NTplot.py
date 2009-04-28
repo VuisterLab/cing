@@ -58,7 +58,8 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-from numpy.core.ma import arange
+from numpy.ma.core import arange
+#from numpy.core.ma import arange
 import math
 
 try:
@@ -283,9 +284,9 @@ mappingPointType2MatLibPlot = {
 """          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ] """
 
 
-mappingLineType2MatLibPlot = { 
-    SOLID_LINE_TYPE:        '-', 
-    DOTTED_LINE_TYPE:       ':', 
+mappingLineType2MatLibPlot = {
+    SOLID_LINE_TYPE:        '-',
+    DOTTED_LINE_TYPE:       ':',
     LONGDASHED_LINE_TYPE:   '--',
     DASHDOT_LINE_TYPE:      '-.',
     NONE_LINE_TYPE:         ' '
@@ -424,7 +425,7 @@ class NTplot( NTdict ):
         self.move( startPoint )
         self.draw( endPoint=endPoint, attributes=attributes )
     #end def
- 
+
     def lines( self, points, attributes=None ):
         if not attributes:
             attributes=defaultAttributes
@@ -434,7 +435,7 @@ class NTplot( NTdict ):
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
 
-            
+
     def scatter(self, x,y,s,c,marker=None,verts =None):
         """Return true on error UNTESTED.
 
@@ -449,14 +450,14 @@ class NTplot( NTdict ):
         If marker is None and verts is not None, verts is a sequence
         of (x,y) vertices for a custom scatter symbol.
 
-        s is a size argument in points squared.                
+        s is a size argument in points squared.
         """
         if not useMatPlotLib:
             NTerror("Failed to scatter because not useMatPlotLib")
             return True
         # Expose matplot lib routine.
         self.axis.scatter(x,y,s,c,marker=marker,verts =verts)
-    
+
     def ellipse(self, point, width=3.0, height=1.0, color=None, alpha=None):
         """Return true on error UNTESTED."""
         if not useMatPlotLib:
@@ -472,7 +473,7 @@ class NTplot( NTdict ):
         if alpha:
             e.set_alpha(alpha)
         self.axis.add_artist(e)
-        
+
     def drawVerticalLines( self, xlocList ):
         if self.yRange == None:
             self.autoScaleY(None) # sets the yRange needed below.
@@ -581,7 +582,7 @@ class NTplot( NTdict ):
         if 'lineType' in keys:
 #            print "doing lineType (linestyle)"
             if not mappingLineType2MatLibPlot.has_key( attributes.lineType ):
-                NTcodeerror("Failed to set line style [%s] because it is absent in mappingLineType2MatLibPlot %s" % 
+                NTcodeerror("Failed to set line style [%s] because it is absent in mappingLineType2MatLibPlot %s" %
                             (attributes.lineType, mappingLineType2MatLibPlot))
             else:
                 result['linestyle']       =  mappingLineType2MatLibPlot[attributes.lineType]
@@ -852,9 +853,9 @@ class NTplot( NTdict ):
         If the min is None then the min is assumed to be zero and max will become one.
         This guarantees a y range.
         """
-        
+
 #        NTdebug( 'autoScaleY for list: %s' % (pointList) )
-        
+
         min = None
         max = None
         if not pointList:
@@ -1148,7 +1149,7 @@ class NTplot( NTdict ):
 
         # When the bounds are almost the same then make the range a very thinny one instead of full circle.
         if isAlmostEqual( bounds1, SMALL_ANGLE_DIFF_FOR_PLOT ):
-            bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT 
+            bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT
         if isAlmostEqual( bounds2, SMALL_ANGLE_DIFF_FOR_PLOT ):
             bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
 #        NTdebug("bounds1 : %s" % bounds1)
@@ -1855,8 +1856,8 @@ class RangeIcon(Rectangle):
 #        NTdebug(' self.height  : %s',  self.height)
 #        NTdebug('verts: %s', verts)
         return verts
-    
-    
+
+
 
 class RangeIconPoly(Polygon):
     def __init__(self, seq=None, axis=None, *args, **kwargs ):

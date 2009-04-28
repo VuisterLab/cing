@@ -4,16 +4,19 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.numpyInterpolation import interp2_linear
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.numpyInterpolation import interpn_nearest
-from numpy import * #@UnusedWildImport
+#from numpy import * #@UnusedWildImport
 from numpy.lib.index_tricks import ogrid
-from pylab import * #@UnusedWildImport
+#from pylab import * #@UnusedWildImport
 from unittest import TestCase
-import os #@Reimport
+from numpy.ma.core import sin
+from matplotlib.pyplot import subplot, title, imshow
+from numpy.__config__ import show
+import os
 import cing
 import unittest
 
 class AllChecks(TestCase):
-        
+
     os.chdir(cingDirTmp)
 
     def testNumpyInterpolation(self):
@@ -39,7 +42,7 @@ class AllChecks(TestCase):
 
     def test_jfd(self):
         r,c = ogrid[ 0:10:5j, 0:1:5j ]
-        # x is the row and 
+        # x is the row and
         # y is the column but when printed the matrix is printed differently.
         z = r + c
 #        z = sin( x - y )
@@ -57,7 +60,7 @@ class AllChecks(TestCase):
         NTdebug(" tx: \n%s" % tx)
         NTdebug(" interpolatedValueSection: \n%s" % interpolatedValueSection)
         NTdebug(" interpolatedValue: %s" % interpolatedValue)
-                    
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()
