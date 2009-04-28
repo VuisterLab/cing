@@ -17,12 +17,13 @@ from matplotlib.pylab import figure
 from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
-from numpy.ma.core import arange
+from numpy.core.ma import arange
 from unittest import TestCase
 import cing
 import os #@Reimport
 import sys
 import unittest
+#from numpy.ma.core import arange
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):

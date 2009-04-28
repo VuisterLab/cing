@@ -4,16 +4,20 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.numpyInterpolation import interp2_linear
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.numpyInterpolation import interpn_nearest
-#from numpy import * #@UnusedWildImport
-from numpy.lib.index_tricks import ogrid
-#from pylab import * #@UnusedWildImport
-from unittest import TestCase
-from numpy.ma.core import sin
-from matplotlib.pyplot import subplot, title, imshow
+from matplotlib.pylab import imshow
+from matplotlib.pylab import subplot
+from matplotlib.pylab import title
 from numpy.__config__ import show
-import os
+from numpy.core.ma import sin
+from numpy.lib.index_tricks import ogrid
+from unittest import TestCase
 import cing
+import os
 import unittest
+#from numpy import * #@UnusedWildImport
+#from pylab import * #@UnusedWildImport
+#from numpy.ma.core import sin
+#from matplotlib.pyplot import subplot, title, imshow
 
 class AllChecks(TestCase):
 

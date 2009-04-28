@@ -1,12 +1,10 @@
-#from numpy import * #@UnusedWildImport
-#from pylab import * #@UnusedWildImport
+from numpy import * #@UnusedWildImport
+from numpy.lib.index_tricks import ndindex
+from numpy.lib.index_tricks import ogrid
+from pylab import * #@UnusedWildImport
 
 """ Absorbed from: http://www.scipy.org/PauGargallo/Interpolation
 """
-from numpy.lib.index_tricks import ogrid
-from numpy.lib.index_tricks import ndindex
-from numpy.ma.core import asarray, clip, empty
-from numpy.core.fromnumeric import searchsorted, prod
 
 def interpn_nearest( z, targetcoords, bincoords=None ):
         '''Interpolate some data, z, located at bincoords in the target locations targetcoords

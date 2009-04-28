@@ -28,7 +28,6 @@ from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.PluginCode.required.reqWhatif import ACCLST_STR
@@ -766,7 +765,7 @@ RMS Z-scores, should be close to 1.0:
             levelCheck = checkIter.next()
 #            NTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
             for check in levelCheck:
-                checkId = check[CHECK_ID_STR]
+#                checkId = check[CHECK_ID_STR]
 #                NTdebug( 'check        : ' + `check`)
 #                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
                 if not check.has_key(LOC_ID_STR):

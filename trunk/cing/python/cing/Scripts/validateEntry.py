@@ -1,3 +1,4 @@
+# python -u $CINGROOT/python/cing/Scripts/validateEntry.py
 from cing import header
 from cing import verbosityDebug
 from cing import verbosityNothing
@@ -26,7 +27,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.     
     """
         
-    fastestTest = False
+    fastestTest = True
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = False # disables whatif actual run
     doProcheck = False

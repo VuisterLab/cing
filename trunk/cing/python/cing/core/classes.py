@@ -1641,7 +1641,7 @@ class DistanceRestraint( NTdict ):
 
         # calculate violations
         for d in self.distances:
-            if (d < self.lower):
+            if d < self.lower:
                 self.violations.append( d-self.lower )
             elif (d > self.upper):
                 if self.upper == None: # Happens for entry 1but
