@@ -22,7 +22,7 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-        entryList = "1kr8".split()
+        entryList = "1brv".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
 #        entryList = "Cu_CopK".split()
@@ -36,7 +36,7 @@ class AllChecks(TestCase):
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = True
+        fastestTest = False
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run

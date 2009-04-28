@@ -19,7 +19,7 @@ entryListFileName = os.path.join(startDir, 'list', 'entry_list.csv')
 # parameters for validateEntry
 #inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
 #inputDir = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
-inputDir = 'file:///Users/jd/workspace34/cing/Tests/data/eNMRworkshop'
+inputDir = 'file:///Users/jd/workspace34/cing/Tests/data/eNMR'
 #inputDir = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
 outputDir = startDir
 
@@ -36,6 +36,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 2,
+                    MAX_ENTRIES_TODO = 200,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)

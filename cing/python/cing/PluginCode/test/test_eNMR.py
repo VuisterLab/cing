@@ -17,20 +17,24 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def tttestInitCcpn(self):
-#        entryList = "CuTTHAcis CuTTHAtrans Parvulustat TTSco apoTTHAcis apoTTHAtrans BASP mia40 taf3 wln34".split()
+    def tttestEnmr(self):
+        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
+                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
+        entryList = entryList.split()
 #        entryList = "taf3".split()
 #        entryList = "mia40".split()
-        entryList = "apoTTHAcis".split()
+
+#        entryList = "VpR247Org".split()
+#        entryList = "VpR247Paris".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
         
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
         doWattos = True
-        modelCount=1
+        modelCount=None
         if fastestTest:
             modelCount=1
             htmlOnly = True 
@@ -41,10 +45,11 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
+            print "Doing "+entryId
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
-            inputArchiveDir = os.path.join(cingDirTestsData, "eNMRworkshop")
+            inputArchiveDir = os.path.join(cingDirTestsData, "eNMR")
 
             ccpnFile = os.path.join(inputArchiveDir, entryId, entryId + ".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
