@@ -58,8 +58,10 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-#from numpy.ma.core import arange
-from numpy.core.ma import arange
+try:
+    from numpy.core.ma import arange
+except:
+    from numpy.ma.core import arange
 import math
 
 try:

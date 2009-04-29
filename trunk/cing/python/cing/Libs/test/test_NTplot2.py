@@ -17,7 +17,10 @@ from matplotlib.pylab import figure
 from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
-from numpy.core.ma import arange
+try:
+    from numpy.core.ma import arange
+except:
+    from numpy.ma.core import arange
 from unittest import TestCase
 import cing
 import os #@Reimport
