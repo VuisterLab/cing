@@ -3285,7 +3285,7 @@ Atom class: Defines object for storing atom properties
 
     def atomsWithProperties(self, *properties ):
         """
-        Return a NTlist instance with self if it has propeties.
+        Return a NTlist instance with self if it has properties.
         NB. Code could be shorter but is copied from Molecule,Chain,Residue
         """
         result = NTlist()
@@ -3337,6 +3337,24 @@ Atom class: Defines object for storing atom properties
         else:
             return None
         #end if
+    #end def
+
+    def pseudoAtomList( self ):
+        """Return list of pseudoAtom instance (if exist, or empty list otherwise)"""
+        result = []
+
+        if self.hasPseudoAtom():
+            pseudoAtom = self.residue.getAtom( self.db.pseudo )
+            result.append( pseudoAtom )
+        # Add the complex pseudos:
+#    DEFAULT_PSEUDO_ATOM_ID_TWO_NH2_OR_CH2        = 3
+#    DEFAULT_PSEUDO_ATOM_ID_TWO_METHYL            = 4
+#    DEFAULT_PSEUDO_ATOM_ID_AROMAT_2H             = 5
+#    DEFAULT_PSEUDO_ATOM_ID_AROMAT_4H             = 6
+            if pseudoAtom.hasPseudoAtom():
+                pseudoAtom2 = self.residue.getAtom( pseudoAtom.db.pseudo )
+                result.append( pseudoAtom2 )
+        return result
     #end def
 
     def realAtoms( self ):

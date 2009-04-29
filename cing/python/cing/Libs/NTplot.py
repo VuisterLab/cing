@@ -58,11 +58,11 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
-try:
-    from numpy.core.ma import arange
-except:
-    from numpy.ma.core import arange
 import math
+try:
+    from numpy.core.ma import arange #@UnresolvedImport @Reimport #@UnusedImport
+except:
+    from numpy.ma.core import arange #@UnresolvedImport @Reimport #@UnusedImport
 
 try:
     import Image
