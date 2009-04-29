@@ -8,7 +8,10 @@ from matplotlib.pylab import imshow
 from matplotlib.pylab import subplot
 from matplotlib.pylab import title
 from numpy.__config__ import show
-from numpy.core.ma import sin
+try:
+    from numpy.core.ma import sin
+except:
+    from numpy.ma.core import sin
 from numpy.lib.index_tricks import ogrid
 from unittest import TestCase
 import cing
