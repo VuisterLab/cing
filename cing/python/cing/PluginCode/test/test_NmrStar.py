@@ -50,7 +50,7 @@ class AllChecks(TestCase):
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
             self.assertTrue(project.save())
-            fileName = entryId + ".str"
+            fileName = os.path.join( cingDirTmp, entryId + ".str")
             nmrStar = NmrStar(project)
             self.assertTrue( nmrStar )
             self.assertTrue( nmrStar.toNmrStarFile( fileName ))

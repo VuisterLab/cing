@@ -107,7 +107,7 @@ def runCingChecks( project, ranges=None ):
 code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=True ):
+        doProcheck = True, doWhatif=True, doWattos=False ):
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
@@ -627,6 +627,8 @@ def validateRestraints( project, toFile = True)   :
             sumsq = 0.0
             n = 0
             for d in res.distanceRestraints:
+                if d.violations == None: # Happens for ParvulustatParis
+                    continue
                 sum   = d.violations.sum( sum )
                 sumsq = d.violations.sumsq( sumsq )
                 n += len(d.violations)
