@@ -18,18 +18,26 @@ class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
     def tttestEnmr(self):
-        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
-                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
-        entryList = entryList.split()
+#        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
+#                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
+#        entryList = entryList.split()
 #        entryList = "taf3".split()
-#        entryList = "mia40".split()
+#        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
+#TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
 
 #        entryList = "VpR247Org".split()
-#        entryList = "VpR247Paris".split()
+        entryList = """AR3436Lyon AR3436Org AR3436Piscataway AR3436Utrecht BASPLyon BASPOrg CuTTHAcisFrankfurt
+        CuTTHAcisLyon CuTTHAcisOrg CuTTHAcisPiscataway CuTTHAtransFrankfurt CuTTHAtransLyon CuTTHAtransOrg
+        CuTTHAtransPiscataway ParvulustatFrankfurt ParvulustatLyon ParvulustatOrg ParvulustatParis
+        ParvulustatPiscataway TTScoFrankfurt TTScoLyon TTScoOrg TTScoParis TTScoPiscataway VpR247Lyon
+        VpR247Org VpR247Paris VpR247Piscataway apoTTHAcisFrankfurt apoTTHAcisLyon apoTTHAcisOrg
+        apoTTHAtransFrankfurt apoTTHAtransLyon apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
+        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway
+""".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
-        
+
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -37,7 +45,7 @@ class AllChecks(TestCase):
         modelCount=None
         if fastestTest:
             modelCount=1
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False

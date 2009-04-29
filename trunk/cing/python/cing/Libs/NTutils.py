@@ -4307,6 +4307,17 @@ class MsgHoL(NTdict):
     #end def
 # end classs
 
+class BitSet(NTlist):
+    """From Java for Stereo"""
+    def __init__(self):
+        NTlist.__init__(self)
+
+    def get(self, idx):
+        if idx >= self.n:
+            return False
+        return self[idx]
+
+
 def isAlmostEqual( ntList, epsilon):
     e = ntList[0] - ntList[1]
     e = math.fabs(e)

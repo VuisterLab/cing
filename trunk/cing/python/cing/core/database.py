@@ -98,6 +98,27 @@ Moved code from dictionaries.py to MolDef class
 Implemented new methods for MolDef class
 __________________________________________________________________________________________________________
 """
+DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
+DEFAULT_PSEUDO_ATOM_ID_CH2_OR_NH2            = 1
+DEFAULT_PSEUDO_ATOM_ID_METHYL                = 2
+DEFAULT_PSEUDO_ATOM_ID_TWO_NH2_OR_CH2        = 3
+DEFAULT_PSEUDO_ATOM_ID_TWO_METHYL            = 4
+DEFAULT_PSEUDO_ATOM_ID_AROMAT_2H             = 5
+DEFAULT_PSEUDO_ATOM_ID_AROMAT_4H             = 6
+
+#Store how many atoms the pseudo atom represents
+PSEUDO_ATOM_ATOM_COUNT = [ 0, 2, 3, 4, 6, 2, 4 ]
+
+#Needs to correspond to above definitions.
+PSEUDO_ATOM_TYPES = [
+    "undefined",
+    "CH2 or NH2",
+    "methyl",
+    "two NH2 or CH2",
+    "two methyl",
+    "aromat 2H",
+    "atomat 4H"
+]
 
 
 class MolDef( NTtree ):
@@ -693,6 +714,7 @@ class AtomDef( NTtree ):
                            CterminalTopology = [], # special case for C-terminal atoms
 
                            pseudo      = None,     # Corresponding pseudo atom (for real atoms)
+                           pseudoId    = DEFAULT_PSEUDO_ATOM_ID_UNDEFINED,
                            real        = [],       # List of corresponding real atoms (for pseudo atoms)
 
                            type        = None,     # Cyana type of atom

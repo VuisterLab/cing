@@ -61,7 +61,7 @@ class AllChecks(TestCase):
             self.assertTrue( molecule.addChain(chainId))
         NTdebug("Added %d chains to: %s" % (n, format(molecule)))
         self.assertEqual( len(molecule.allChains()), n)
-        
+
     def test_AddResidue_Standard(self):
         entryId = 'test'
         project = Project(entryId)
@@ -77,14 +77,21 @@ class AllChecks(TestCase):
         r2 = c.addResidue('VAL', 2)
         if r2:
             r2.addAllAtoms()
-        r3 = c.addResidue('GLU', 3, Cterminal = True)
+        r2 = c.addResidue('PHE', 3)
+        if r2:
+            r2.addAllAtoms()
+        r2 = c.addResidue('ARG', 4)
+        if r2:
+            r2.addAllAtoms()
+        r3 = c.addResidue('GLU', 5, Cterminal = True)
         if r3:
             r3.addAllAtoms()
-        
+
         mol.updateAll()
-        
-        NTmessage( mol.format() )        
-        
+
+        NTmessage( mol.format() )
+
+
 if __name__ == "__main__":
     fn = 'fooprof'
     os.chdir(cingDirTmp)

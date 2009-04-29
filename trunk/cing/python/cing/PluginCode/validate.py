@@ -298,8 +298,9 @@ def _criticizeResidue( residue, valSets ):
     #end if
 
     #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. J Mol Biol (1998) vol. 276 pp. 417-436
-    TRANS_OMEGA_VALUE = 179.6 # cis is assumed -180.0
-    TRANS_OMEGA_SD = 4.7
+    TRANS_OMEGA_VALUE = 179.6
+    CIS_OMEGA_VALUE = 0.0
+    OMEGA_SD = 4.7
     for key in ['OMEGA']:
         if residue.hasProperties('protein') and key in residue and residue[key]:
             d = residue[key] # NTlist object
@@ -308,7 +309,7 @@ def _criticizeResidue( residue, valSets ):
             for modelId,value in enumerate(d):
                 v = violationAngle(value=value, lowerBound=TRANS_OMEGA_VALUE, upperBound=TRANS_OMEGA_VALUE)
                 if v > 90.: # Check a cis
-                    v = violationAngle(value=value, lowerBound=-180., upperBound=-180.)
+                    v = violationAngle(value=value, lowerBound=CIS_OMEGA_VALUE, upperBound=CIS_OMEGA_VALUE)
 #                NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( residue, modelId, v, value) )
                 vList.append(v)
             #end for
@@ -323,9 +324,9 @@ def _criticizeResidue( residue, valSets ):
 #            actualValueStr = val2Str( rmsViol, fmt='%8.3f', count=8 )
             actualValueStr = val2Str( avViol, fmt='%8.3f', count=8 )
             # Calculate the Z-score (the number of times of the known sd.)
-#            timesKnownSd = rmsViol / TRANS_OMEGA_SD
-            timesKnownSd = avViol / TRANS_OMEGA_SD
-            postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), TRANS_OMEGA_SD)
+#            timesKnownSd = rmsViol / OMEGA_SD
+            timesKnownSd = avViol / OMEGA_SD
+            postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), OMEGA_SD)
             if (valSets.OMEGA_MAXALL_BAD != None) and (avViol >= valSets.OMEGA_MAXALL_BAD):
                 comment = 'RED: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
                 residue.rogScore.setMaxColor( COLOR_RED, comment )
@@ -338,12 +339,13 @@ def _criticizeResidue( residue, valSets ):
         #end if
     # end for
 
-    # Check for restraint violations
-    for restraint in residue.distanceRestraints + residue.dihedralRestraints + residue.rdcRestraints:
-        if restraint.rogScore.isRed():
-            residue.rogScore.setMaxColor(COLOR_ORANGE, 'ORANGE: restraint violation(s)')
-            break
-    #end for
+#    # Check for restraint violations
+#Geerten prefers to disable that for now.
+#    for restraint in residue.distanceRestraints + residue.dihedralRestraints + residue.rdcRestraints:
+#        if restraint.rogScore.isRed():
+#            residue.rogScore.setMaxColor(COLOR_ORANGE, 'ORANGE: restraint violation(s)')
+#            break
+#    #end for
     return residue.rogScore
 #end def
 #Convenience method

@@ -4671,7 +4671,8 @@ RESIDUE LEU      L
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isMethyl', 'methyl', 'isMethylProton', 'methylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HD1*', 'BMRBd': 'HD1', 'IUPAC': 'MD1', 'AQUA': 'MD1', 'INTERNAL_0': 'QD1', 'INTERNAL_1': 'MD1', 'CYANA': 'QD1', 'CYANA2': 'QD1', 'PDB': None, 'XPLOR': 'HD1*,HD1#,HD1%,HD1+'}
         aliases = ['MD1', 'QD1']
-        pseudo = None
+        pseudo = 'QQD'
+        pseudoId = 4
         real = ['HD11', 'HD12', 'HD13']
         type = 'PSEUD'
         spinType = '1H'
@@ -4685,7 +4686,8 @@ RESIDUE LEU      L
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isMethyl', 'methyl', 'isMethylProton', 'methylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HD2*', 'BMRBd': 'HD2', 'IUPAC': 'MD2', 'AQUA': 'MD2', 'INTERNAL_0': 'QD2', 'INTERNAL_1': 'MD2', 'CYANA': 'QD2', 'CYANA2': 'QD2', 'PDB': None, 'XPLOR': 'HD2*,HD2#,HD2%,HD2+'}
         aliases = ['MD2', 'QD2']
-        pseudo = None
+        pseudo = 'QQD'
+        pseudoId = 4
         real = ['HD21', 'HD22', 'HD23']
         type = 'PSEUD'
         spinType = '1H'
@@ -6189,7 +6191,8 @@ RESIDUE PHE      F
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isAromatic', 'aromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HD*', 'BMRBd': None, 'IUPAC': 'QD', 'AQUA': 'QD', 'INTERNAL_0': 'QD', 'INTERNAL_1': 'QD', 'CYANA': 'QD', 'CYANA2': 'QD', 'PDB': None, 'XPLOR': 'HD*,HD#,HD%,HD+'}
         aliases = []
-        pseudo = None
+        pseudo = 'QR'
+        pseudoId = 5
         real = ['HD1', 'HD2']
         type = 'PSEUD'
         spinType = '1H'
@@ -6203,7 +6206,8 @@ RESIDUE PHE      F
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isAromatic', 'aromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HE*', 'BMRBd': None, 'IUPAC': 'QE', 'AQUA': 'QE', 'INTERNAL_0': 'QE', 'INTERNAL_1': 'QE', 'CYANA': 'QE', 'CYANA2': 'QE', 'PDB': None, 'XPLOR': 'HE*,HE#,HE%,HE+'}
         aliases = []
-        pseudo = None
+        pseudo = 'QR'
+        pseudoId = 5
         real = ['HE1', 'HE2']
         type = 'PSEUD'
         spinType = '1H'
@@ -6218,6 +6222,7 @@ RESIDUE PHE      F
         nameDict = {'CCPN': 'HD*|HE*', 'BMRBd': None, 'IUPAC': 'QR', 'AQUA': 'QR', 'INTERNAL_0': 'QR', 'INTERNAL_1': 'QR', 'CYANA': 'QR', 'CYANA2': 'QR', 'PDB': None, 'XPLOR': None}
         aliases = []
         pseudo = None
+        pseudoId = 6
         real = ['HD1', 'HD2', 'HE1', 'HE2', 'HZ']
         type = 'PSEUD'
         spinType = '1H'
@@ -8331,7 +8336,8 @@ RESIDUE VAL      V
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isMethyl', 'methyl', 'isMethylProton', 'methylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HG1*', 'BMRBd': 'HG1', 'IUPAC': 'MG1', 'AQUA': 'MG1', 'INTERNAL_0': 'QG1', 'INTERNAL_1': 'MG1', 'CYANA': 'QG1', 'CYANA2': 'QG1', 'PDB': None, 'XPLOR': 'HG1*,HG1#,HG1%,HG1+'}
         aliases = ['MG1', 'QG1']
-        pseudo = None
+        pseudo = 'QQG'
+        pseudoId = 4
         real = ['HG11', 'HG12', 'HG13']
         type = 'PSEUD'
         spinType = '1H'
@@ -8345,7 +8351,8 @@ RESIDUE VAL      V
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isMethyl', 'methyl', 'isMethylProton', 'methylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
         nameDict = {'CCPN': 'HG2*', 'BMRBd': 'HG2', 'IUPAC': 'MG2', 'AQUA': 'MG2', 'INTERNAL_0': 'QG2', 'INTERNAL_1': 'MG2', 'CYANA': 'QG2', 'CYANA2': 'QG2', 'PDB': None, 'XPLOR': 'HG2*,HG2#,HG2%,HG2+'}
         aliases = ['MG2', 'QG2']
-        pseudo = None
+        pseudo = 'QQG'
+        pseudoId = 4
         real = ['HG21', 'HG22', 'HG23']
         type = 'PSEUD'
         spinType = '1H'

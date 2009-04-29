@@ -24,7 +24,7 @@ inputDir = 'file:///Users/jd/workspace34/cing/Tests/data/eNMR'
 outputDir = startDir
 
 extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`)
-        
+
 # disable next line for regular run.
 #writeEntryListToFile(entryListFileName, ['1brv'])
 
@@ -36,6 +36,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 200,
+                    MAX_ENTRIES_TODO = 1,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
