@@ -156,7 +156,7 @@ class Ccpn:
         self.ccpnMolSystemList = None # set in importFromCcpnMolecule
         self.ccpnNmrProject = None # set in importFromCcpnMolecule
         self.molecule = None # set in importFromCcpn ( importFromCcpnMolecule )
-        self.ccpnFolder = ccpnFolder
+        project.ccpnFolder = ccpnFolder # Needed to store for conversion from ccpn to star.
         self.convention = convention
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
@@ -182,12 +182,12 @@ class Ccpn:
 
     def readCcpnFolder(self):
         """Return ccpnProject on success or None on failure"""
-        if not self.ccpnFolder:
+        if not self.project.ccpnFolder:
             NTerror("No ccpnFolder")
             return None
 
-        if os.path.exists(self.ccpnFolder) and os.path.isfile(self.ccpnFolder) and (\
-            self.ccpnFolder.endswith(".tgz") or self.ccpnFolder.endswith(".tar.gz")):
+        if os.path.exists(self.project.ccpnFolder) and os.path.isfile(self.project.ccpnFolder) and (\
+            self.project.ccpnFolder.endswith(".tgz") or self.project.ccpnFolder.endswith(".tar.gz")):
             try:
                 rmtree(self.project.name)
             except:
@@ -201,7 +201,7 @@ class Ccpn:
 
             # Get a TarFile class.
             ccpnRootDirectory = None # Will become linkNmrStarData at first.
-            tar = tarfile.open(self.ccpnFolder, "r:gz")
+            tar = tarfile.open(self.project.ccpnFolder, "r:gz")
             for itar in tar:
                 tar.extract(itar.name, '.') # itar is a TarInfo object
 #                NTdebug("extracted: " + itar.name)
@@ -213,7 +213,7 @@ class Ccpn:
                             NTerror("Skipping potential ccpnRootDirectory")
             tar.close()
             if not ccpnRootDirectory:
-                NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.ccpnFolder)
+                NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
                 return None
 
             if ccpnRootDirectory != self.project.name:
@@ -221,12 +221,14 @@ class Ccpn:
                 move(ccpnRootDirectory, self.project.name)
             ccpnFolder = self.project.name # Now it is a folder.
         else:
-            ccpnFolder = self.ccpnFolder
+            ccpnFolder = self.project.ccpnFolder
 
         if (not ccpnFolder) or (not os.path.exists(ccpnFolder)):
             NTerror("ccpnFolder '%s' not found", ccpnFolder)
             return None
         # end if
+
+        self.project.ccpnFolder = os.path.abspath(ccpnFolder)
 
         switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
         self.ccpnProject = loadProject(ccpnFolder)
@@ -432,7 +434,7 @@ class Ccpn:
             try:
                 ensembleName = ccpnStructureEnsemble.structureGeneration.name
             except AttributeError:
-                ensembleName = 'ensemble_name'    
+                ensembleName = 'ensemble_name'
             NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
         ccpnMolCoordList = []
@@ -678,10 +680,10 @@ class Ccpn:
         '''Descrn: Match the atoms in a residue between CING and CCPN.
            Output: None on error.
         '''
-        
+
         ccpnResidue = residue.ccpn
         matchingConvention = INTERNAL
-        
+
         for ccpnAtom in ccpnResidue.sortedAtoms():
             nameTuple = (matchingConvention, residue.chain.name, residue.resNum, ccpnAtom.chemAtom.name)
             atom = self.molecule.decodeNameTuple(nameTuple)
@@ -691,7 +693,7 @@ class Ccpn:
             atom.ccpn = ccpnAtom
             ccpnAtom.cing = atom
         return True
-    # end def  
+    # end def
 
 
     def _getCingAtom(self, ccpnAtomSet):
@@ -823,10 +825,10 @@ class Ccpn:
                         ccpnShiftLoL.append(ccpnExperiment.shiftList)
                     else:
                         pass
-#                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))                            
+#                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
                 else:
                     NTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
-                    
+
 
             if ccpnPeakLoL and (not ccpnShiftLoL):
                 NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
@@ -836,7 +838,7 @@ class Ccpn:
                 ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
 
 #            NTdebug("Shift lists %r" % ccpnShiftLoL)
-                
+
             if not ccpnShiftLoL:
 #                NTdebug('CCPN project contains no shift lists')
                 return True
@@ -1012,7 +1014,7 @@ class Ccpn:
                 continue
             atomList = []
             if not ccpnAtomSetList:
-                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)                
+                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
             for ccpnAtomSet in ccpnAtomSetList:
                 for ccpnAtom in ccpnAtomSet.atoms:
                     atomList.append(ccpnAtom)
@@ -1700,7 +1702,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             molSystem = self.ccpnProject.findFirstMolSystem()
             molSystem.cing = molecule
             molecule.ccpn = molSystem
-            
+
             self.molecule = molecule # Needed in this class even if it's temp.
 
             for chain in molecule.chains:

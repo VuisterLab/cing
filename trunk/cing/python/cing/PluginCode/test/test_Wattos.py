@@ -1,6 +1,6 @@
 """
 Unit test
-python $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
+python -u $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
