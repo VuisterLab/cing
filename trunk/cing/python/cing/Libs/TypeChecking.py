@@ -25,12 +25,7 @@ $Author$
 $Revision$
 $Date$
 """
-
-#from Numeric import zeros as _zeros
-try:
-    from numpy.core.ma import zeros as _zeros #@Reimport @UnresolvedImport #@UnusedImport
-except:
-    from numpy.ma.core import zeros as _zeros #@Reimport @UnresolvedImport #@UnusedImport
+from numpy.core.numeric import zeros as _zeros
 
 FLOAT = 'FLOAT'
 INT = 'INT'
