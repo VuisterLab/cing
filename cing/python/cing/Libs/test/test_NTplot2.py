@@ -17,13 +17,10 @@ from matplotlib.pylab import figure
 from matplotlib.pylab import gca
 from matplotlib.pylab import plot
 from matplotlib.pylab import text
-try:
-    from numpy.core.ma import arange #@Reimport @UnresolvedImport  #@UnusedImport
-except:
-    from numpy.ma.core import arange #@Reimport @UnresolvedImport  #@UnusedImport
 from unittest import TestCase
+from numpy.core.numeric import arange
 import cing
-import os #@Reimport
+import os
 import sys
 import unittest
 #from numpy.ma.core import arange

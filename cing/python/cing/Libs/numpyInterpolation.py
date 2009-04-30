@@ -1,11 +1,5 @@
 from numpy.lib.index_tricks import ndindex
 from numpy.lib.index_tricks import ogrid
-
-# Original
-#from numpy import *
-#from pylab import *
-
-# Alan # should work with any version of numpy
 from numpy.core.numeric import asarray, empty
 from numpy.core.fromnumeric import clip, searchsorted, prod
 

@@ -1,34 +1,18 @@
+#import matplotlib # to pop-up a xwindow with command 'show()'
+#matplotlib.use('GTKAgg') # enable this line and above.
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.numpyInterpolation import interp2_linear
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.numpyInterpolation import interpn_nearest
-from matplotlib.pylab import imshow
-from matplotlib.pylab import subplot
-from matplotlib.pylab import title
-from numpy.__config__ import show
 from numpy.lib.index_tricks import ogrid
 from unittest import TestCase
+from matplotlib.pyplot import subplot, title, imshow, show
+from numpy import sin #@UnresolvedImport
 import cing
 import os
 import unittest
-# throws unwanted ugly message on JFD's setup. Which I can't even get rid off with switcher..
-#lapack_opt_info:
-#    extra_link_args = ['-Wl,-framework', '-Wl,Accelerate']
-#    extra_compile_args = ['-msse3']
-#    define_macros = [('NO_ATLAS_INFO', 3)]
-#
-#blas_opt_info:
-#    extra_link_args = ['-Wl,-framework', '-Wl,Accelerate']
-#    extra_compile_args = ['-msse3', '-I/System/Library/Frameworks/vecLib.framework/Headers']
-#    define_macros = [('NO_ATLAS_INFO', 3)]
-
-try:
-    from numpy.core.ma import sin #@UnresolvedImport @Reimport #@UnusedImport
-except:
-    from numpy.ma.core import sin #@UnresolvedImport @Reimport #@UnusedImport
 
 class AllChecks(TestCase):
 
@@ -78,5 +62,4 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    cing.verbosity = verbosityNothing
     unittest.main()
