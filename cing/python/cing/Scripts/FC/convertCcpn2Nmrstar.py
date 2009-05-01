@@ -1,3 +1,5 @@
+#python $CINGROOT/python/cing/Scripts/FC/convertCcpn2Nmrstar.py
+
 """
 Original from Wim Vranken.
 """
@@ -30,6 +32,19 @@ def convert(projectName, inputDir, outputFile):
     nmrEntry.structureGenerations = nmrProject.sortedStructureGenerations()
     nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalysiss() # watch out for misspelling.
     nmrEntry.measurementLists = nmrProject.sortedMeasurementLists()
+
+    # Hack to hook up coordinates, hopefully correctly (Wim 30/04/2009)
+    if nmrEntry.structureGenerations:
+      hasStructureEnsemble = False
+      for strucGen in nmrEntry.structureGenerations:
+        if strucGen.structureEnsemble:
+          hasStructureEnsemble = True
+          break
+
+      # This will only work dependably if there is one structureGeneration, one structureEnsemble...
+      # Take the one that was created last in any case, fingers crossed that they match up!
+      if not hasStructureEnsemble and ccpnProject.structureEnsembles:
+        nmrEntry.sortedStructureGenerations()[-1].structureEnsemble = ccpnProject.sortedStructureEnsembles()[-1]
 
     for ne in nmrProject.sortedExperiments(): # will be sortedNmrExperiments
         for ds in ne.sortedDataSources():

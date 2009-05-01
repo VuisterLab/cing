@@ -17,7 +17,7 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def testEnmr(self):
+    def tttestEnmr(self):
 #        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
 #                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
 #        entryList = entryList.split()
@@ -37,7 +37,7 @@ class AllChecks(TestCase):
 #        apoTTHAtransFrankfurt apoTTHAtransLyon apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway
 #""".split()
-        entryList = "ParvulustatParis".split()
+        entryList = "taf3Piscataway".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True

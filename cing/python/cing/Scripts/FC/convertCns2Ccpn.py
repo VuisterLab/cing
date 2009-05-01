@@ -93,7 +93,7 @@ if __name__ == '__main__':
 #    done: BASPLyon CuTTHAcisLyon
 #    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
 #    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
-    projectList = """   mia40Piscataway""".split()
+    projectList = """   taf3Piscataway""".split()
 #    projectList = [ "BASPLyon" ]
     # failed for
     # BASPLyon

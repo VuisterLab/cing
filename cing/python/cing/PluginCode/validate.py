@@ -107,7 +107,7 @@ def runCingChecks( project, ranges=None ):
 code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=False ):
+        doProcheck = True, doWhatif=True, doWattos=True ):
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
