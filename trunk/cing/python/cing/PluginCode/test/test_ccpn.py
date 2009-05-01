@@ -49,7 +49,7 @@ class AllChecks(TestCase):
             htmlOnly = True
             doWhatif = False
             doProcheck = False
-            doWattos = False
+            doWattos = True
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)

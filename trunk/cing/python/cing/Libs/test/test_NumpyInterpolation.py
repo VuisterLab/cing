@@ -8,7 +8,7 @@ from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.numpyInterpolation import interpn_nearest
 from numpy.lib.index_tricks import ogrid
 from unittest import TestCase
-from matplotlib.pyplot import subplot, title, imshow, show
+from matplotlib.pylab import subplot, title, imshow, show
 from numpy import sin #@UnresolvedImport
 import cing
 import os
