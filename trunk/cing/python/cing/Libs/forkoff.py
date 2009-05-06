@@ -38,13 +38,33 @@ def do_cmd( cmd ):
 
     if output:
         print output
-        
-    ## Success    
+
+    ## Success
     if ( status != None ):
         NTerror("Failed shell command:")
         NTerror( cmd )
         NTerror("Output: %s" % output)
         NTerror("Status: %s" % status)
+
+def get_cmd_output( cmd ):
+    NTdebug( "Doing command: %s" % cmd )
+
+    ##  Try command and check for non-zero exit status
+    pipe = os.popen( cmd )
+    output = pipe.read()
+
+    ##  The program exit status is available by the following construct
+    ##  The status will be the exit number unless the program executed
+    ##  successfully in which case it will be None.
+    status = pipe.close()
+
+    ## Success
+    if ( status != None ):
+        NTerror("Failed shell command:")
+        NTerror( cmd )
+        NTerror("Output: %s" % output)
+        NTerror("Status: %s" % status)
+    return output
 
 class ForkOff:
 
@@ -63,7 +83,7 @@ class ForkOff:
             ## Verbosity of output
             verbosity                   = 2
             ):
-        
+
         ## Parallel processing options:
         ## Maximum number of simultanuous subprocesses
         self.processes_max          = processes_max
@@ -111,7 +131,7 @@ class ForkOff:
     Empty lists will be returned if nothing gets done successfully
     """
     def forkoff_start( self, job_list, delay_between_submitting_jobs ):
-        
+
         ## Check job list for variable type errors
         for job in job_list:
             func = job[0]
@@ -127,14 +147,14 @@ class ForkOff:
                 print job
                 NTmessage("In stead type is : %s", type(func))
                 return []
-                
+
         ## Maximum number of processes to do
         self.processes_todo = len( job_list )
         if self.processes_todo == 0:
             if self.verbosity:
                 NTwarning("No new processes to do so none to start")
             return []
-            
+
         if self.verbosity > 1:
             NTmessage("Doing %s new processes" % self.processes_todo)
 
@@ -164,7 +184,7 @@ class ForkOff:
                 NTwarning("Again caught interrupt in parent.")
                 NTwarning("Can't finish if you don't let me.")
             raise KeyboardInterrupt
-            
+
         ## Any subprocesses left
         if self.process_d:
             key_list = self.process_d.keys()
@@ -320,7 +340,7 @@ class Process:
 
         os.setpgid(0,0)
         if self.verbosity > 8:
-            NTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % ( 
+            NTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % (
                 os.getpgrp(), os.getpid() ))
 
         try:
@@ -372,7 +392,7 @@ class Process:
             if self.verbosity:
                 NTwarning("given pid is for current process, giving up")
             return 1
-        
+
         try:
             os.kill( pid, sig )
         except OSError, info:
@@ -392,7 +412,7 @@ class Process:
         if self.verbosity > 2:
             NTmessage("Process and subprocesses will be signaled by a TERM signal")
         ## On my linux box urchin:
-        ## HUP  1    TERM 15  
+        ## HUP  1    TERM 15
         ## INT  2    KILL  9
         ## Please note that the minus sign in front of the pid which tells kill to
         ## kill all processes with that pid for its **group process id**
@@ -419,8 +439,8 @@ class Process:
                 NTerror("  Process could NOT be killed by HUP or KILL signal")
                 NTerror("  Process has turned into zombie")
         if self.verbosity >= 9:
-            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status)) 
-        
+            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status))
+
         return exit_pid, exit_status
 
 

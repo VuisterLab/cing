@@ -32,6 +32,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import symlink
+from cing.Libs.forkoff import get_cmd_output
 import cing
 import csv
 import os
@@ -121,7 +122,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -284,8 +285,8 @@ class nrgCing(Lister):
     def update_index_files(self):
         "Updating the index files"
 
-        number_of_entries_per_row = 4
-        number_of_files_per_column = 4
+        number_of_entries_per_row = 5
+        number_of_files_per_column = 5
 
         indexDir = os.path.join(self.results_dir, "index")
         if os.path.exists(indexDir):
@@ -309,11 +310,11 @@ class nrgCing(Lister):
             number_of_files += 1
         NTmessage("Generating %s index html files" % (number_of_files))
 
-        example_str_template = """ <td><a href=""" + self.pdb_link_template + \
-        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
+#        example_str_template = """ <td><a href=""" + self.pdb_link_template + \
+#        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
-        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
-        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
+        cingImage = '../data/%t/%s/%s.cing/%x/HTML/mol.gif'
+        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a><BR>%S</td>'
         file_name = os.path.join (self.base_dir, self.data_dir_local, "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
@@ -353,31 +354,20 @@ class nrgCing(Lister):
 #                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
-                jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
-                result_string = jump_form_start + "eNMR data sets"
-                db_id = "PDB"
-
-                jump_form = '<INPUT type="hidden" name="database" value="%s">' % string.lower(db_id)
-                jump_form = jump_form + \
-"""<INPUT type="text" size="4" name="id" value="" >
-<INPUT type="submit" name="button" value="go">"""
-                jump_form_end = "</FORM>"
+                result_string = "eNMR data sets"
 
                 begin_entry_code = string.upper(self.entry_list_done[ begin_entry_count - 1 ])
                 end_entry_code = string.upper(self.entry_list_done[ end_entry_count - 1 ])
                 new_row = [ file_id, begin_entry_code, end_entry_code ]
                 csvwriter.writerow(new_row)
 
-                new_string = '%s: <B>%s-%s</B> &nbsp;&nbsp; (%s-%s of %s). &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Jump to index with id &nbsp; %s\n%s\n' % (
+                new_string = '%s: <B>%s-%s</B> &nbsp;&nbsp; (%s-%s of %s).\n' % (
                         result_string,
                         begin_entry_code,
                         end_entry_code,
                         begin_entry_count,
                         end_entry_count,
-                        number_of_entries_all_present,
-#                        db_id,
-                        jump_form,
-                        jump_form_end
+                        number_of_entries_all_present
                         )
                 new_file_content = string.replace(file_content, old_string, new_string)
 
@@ -436,9 +426,27 @@ class nrgCing(Lister):
                 entries_done_per_file += 1
                 ## Get the html code right by abusing the formatting chars.
                 ## as in sprintf etc.
+
+                t = pdb_entry_code[1:3]
+                startDir = '%s/%s/%s/%s.cing' % ( self.data_dir, t, pdb_entry_code, pdb_entry_code )
+                cmd = 'cd %s; find . -name "mol.gif"' % startDir
+#                NTdebug("Attempting cmd: [%s]" % cmd)
+                output = get_cmd_output( cmd )
+                if output == None:
+                    NTerror("Failed to find mol.gif")
+                    x = 'Molecularsystem' # but not always.
+                else:
+                    try:
+                        x = output.split('/')[1] # ./Molecularsystem/HTML/mol.gif
+                    except:
+                        NTerror("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
+                        x = 'Molecularsystem' # but not always.
+#                NTdebug("found molecular system name: %s" % x)
+
                 tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code))
                 tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
-                tmp_string = string.replace(tmp_string, r"%t", pdb_entry_code[1:3])
+                tmp_string = string.replace(tmp_string, r"%t", t)
+                tmp_string = string.replace(tmp_string, r"%x", x)
                 tmp_string = string.replace(tmp_string, r"%b", bmrb_entry_code)
 
                 num_in_row = entries_done_per_file % number_of_entries_per_row

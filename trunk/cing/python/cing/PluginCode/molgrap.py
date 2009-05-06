@@ -18,6 +18,7 @@ from cing.core.constants import IUPAC
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
+from cing import cingPythonCingDir
 import os
 
 if True: # block
@@ -38,7 +39,7 @@ if True: # block
     if not useModule:
         raise ImportWarning('Molgrap')
 #    NTmessage('Using Molgrap')
-    
+
 class Molgrap(NTdict):
     def __init__(self, backcolor = 'cing_turqoise', project = None):
         self.csh_script_dir = cingDirMolmolScripts
@@ -88,7 +89,7 @@ class Molgrap(NTdict):
         if export:
             NTdebug("First looking for atoms that should not be fed to molmol")
             NTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
-            
+
 #            skippedAtoms = [] # Keep a list of skipped atoms for later
 #            skippedResidues = []
 #            for res in molecule.allResidues():
@@ -103,7 +104,7 @@ class Molgrap(NTdict):
 #            if skippedResidues:
 #                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
-            # was CYANA            
+            # was CYANA
             molecule.toPDBfile(pdb_first_file_name, convention = IUPAC, model = 0)
             # Restore the 'default' state
 #            for atm in skippedAtoms:
@@ -256,6 +257,7 @@ class Molgrap(NTdict):
         open(file_name_out, 'w').write(output_text)
 
 def export2gif(molecule, path, project = None):
+    """Return True on error but will still put a default image in."""
     check_type(molecule, 'Molecule')
     check_string(path)
     if project:
@@ -263,6 +265,16 @@ def export2gif(molecule, path, project = None):
 #    NTdebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap(project = project)
     m.run(molecule, path)
+#    if os.path.exists(path):
+    if not os.path.exists(path):
+        src =  os.path.join( cingPythonCingDir, 'PluginCode', 'data', 'UnknownImage.gif' )
+#        if os.path.exists(path): # disable when done testing.
+#            os.unlink(path)
+        NTdebug("copying default image from %s to %s" % (src, path))
+        os.link(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
+        return True
+    return None
+
 
 Molecule.export2gif = export2gif
 
