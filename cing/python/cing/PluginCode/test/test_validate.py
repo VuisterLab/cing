@@ -21,14 +21,14 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        fastestTest = False
-        
+        fastestTest = True
+
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         doWattos = True
         if fastestTest:
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
@@ -36,8 +36,8 @@ class AllChecks(TestCase):
         restraintsConvention = CYANA
 
 #        entryId = "1ai0"
-#        entryId = "1brv"        # Small much studied PDB NMR entry
-        entryId = "1brv_1model"        # Small much studied PDB NMR entry
+        entryId = "1brv"        # Small much studied PDB NMR entry
+#        entryId = "1brv_1model"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB
@@ -95,7 +95,7 @@ class AllChecks(TestCase):
             kwds['protFile'] = entryId
             kwds['seqFile']  = entryId
 
-        project.cyana2cing(cyanaDirectory=cyanaDirectory, 
+        project.cyana2cing(cyanaDirectory=cyanaDirectory,
                            convention=restraintsConvention,
                            coordinateConvention=pdbConvention,
                            copy2sources = True,
@@ -106,7 +106,7 @@ class AllChecks(TestCase):
                                           doProcheck = doProcheck,
                                           doWhatif=doWhatif,
                                           doWattos=doWattos ))
-        
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

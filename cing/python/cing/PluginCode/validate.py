@@ -108,6 +108,10 @@ code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True, doWattos=True ):
+# KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
+# python/cing/Scripts/doValidate.py
+# python/cing/Scripts/doValidateiCing.py
+# python/cing/PluginCod/validate.py#validate
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:

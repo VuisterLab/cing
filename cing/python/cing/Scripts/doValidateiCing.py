@@ -10,7 +10,7 @@ htmlOnly = False # default is False but enable it for faster runs without some a
 doWhatif = True # disables whatif actual run
 doProcheck = True
 if fastestTest:
-    htmlOnly = True 
+    htmlOnly = True
     doWhatif = False
     doProcheck = False
 
@@ -23,11 +23,11 @@ options = options #@UndefinedVariable
 #    htmlOnly = True
 #else:
 #    NTdebug( "noImagery option was not set so doing all images." )
-    
+
 #==================================================
 # Check for molecule
 #==================================================
-if project.molecule == None: 
+if project.molecule == None:
     NTerror('script doValidate.py: no molecule defined')
     exit(1)
 #end if
@@ -37,6 +37,10 @@ if project.molecule == None:
 #==================================================
 # Run the tests
 #==================================================
+# KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
+# python/cing/Scripts/doValidate.py
+# python/cing/Scripts/doValidateiCing.py
+# python/cing/PluginCod/validate.py#validate
 project.runShiftx()
 project.runDssp(parseOnly=parseOnly)
 if doProcheck:

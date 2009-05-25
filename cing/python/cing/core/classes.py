@@ -660,7 +660,7 @@ Project: Top level Cing project class
         """To slim down the memory footprint; should allow garbage collection."""
         attributeToRemove = "ccpn"
         try:
-        	self.removeRecursivelyAttribute( attributeToRemove )
+            self.removeRecursivelyAttribute( attributeToRemove )
         except:
             NTerror("Failed removeCcpnReferences")
 
@@ -1437,8 +1437,8 @@ class DistanceRestraint( NTdict ):
         otherwise: keep atom with lower residue index first
         """
 
-		# GV says; order needs to stay: is beeing used for easier
-		# (manual) analysis.
+        # GV says; order needs to stay: is beeing used for easier
+        # (manual) analysis.
 
 
         if pair[0] == None or pair[1] == None:
@@ -1579,8 +1579,8 @@ class DistanceRestraint( NTdict ):
         i = 0
         for atm1,atm2 in self.atomPairs:
 
-        	# GV says: Check are done to prevent crashes upon rereading
-        	# datasets with floating/adhoc residues/atoms
+            # GV says: Check are done to prevent crashes upon rereading
+            # datasets with floating/adhoc residues/atoms
 
             # skip trivial cases
             if atm1 == atm2:
@@ -2039,7 +2039,7 @@ class DihedralRestraint( NTdict ):
                 #atms = atm.realAtoms()
                 #for a in atms:
             for a in self.atoms:                # GV says: no realAtoms should be called; these are dihedrals
-                                                # and should be properly defined by their actual atoms.
+                                                # and should be properly defined by their \atoms.
 
                 #if len(a.coordinates) < modelCount:
                 if a and a.hasMissingCoordinates(): # gv has mase this into a method because the getModelCount()
@@ -2089,11 +2089,11 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-        	                    self.atoms[0].coordinates[i],
-            	                self.atoms[1].coordinates[i],
-                	            self.atoms[2].coordinates[i],
-                    	        self.atoms[3].coordinates[i]
-                        	  )
+                                self.atoms[0].coordinates[i],
+                                self.atoms[1].coordinates[i],
+                                self.atoms[2].coordinates[i],
+                                self.atoms[3].coordinates[i]
+                              )
                 self.dihedrals.append( d )
             #end for
         except:
@@ -2184,13 +2184,13 @@ class DihedralRestraint( NTdict ):
 
     def format( self ):
         return  \
-            sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %4s)  '+\
+            sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %7s)  '+\
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
                      self, self.rogScore,
                      val2Str(self.lower, "%4.1f", 4),
                      val2Str(self.upper, "%4.1f", 4),
                      val2Str(self.cav,"%6.1f", 6),
-                     val2Str(self.cv,"%4.1f", 4),
+                     val2Str(self.cv,"%7.4f", 7),
                      val2Str(self.violAv,"%4.1f", 4),
                      self.violMax, self.violCount1, self.violCount3, self.violCount5,
                      self.atoms.format('%-11s ')
@@ -2515,7 +2515,7 @@ class RDCRestraintList( NTlist ):
             NTwarning("See also issue: %s%d"%(issueListUrl,133))
         else:
             if len(self[0].atomPairs):
-            	modelCount = self[0].atomPairs[0].residue.chain.molecule.modelCount
+                modelCount = self[0].atomPairs[0].residue.chain.molecule.modelCount
         #end if
 
         if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
