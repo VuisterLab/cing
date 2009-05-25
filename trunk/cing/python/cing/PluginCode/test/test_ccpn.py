@@ -23,6 +23,7 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         entryList = "1brv".split()
+#        entryList = "1brv_ccpngrid".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
 #        entryList = "Cu_CopK".split()
@@ -39,8 +40,8 @@ class AllChecks(TestCase):
         fastestTest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
-        doProcheck = True
+        doWhatif = False # disables whatif actual run
+        doProcheck = False
         doWattos = True
         useNrgArchive = False
         modelCount=None

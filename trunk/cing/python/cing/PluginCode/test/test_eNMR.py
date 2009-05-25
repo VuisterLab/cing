@@ -17,7 +17,7 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def ttttestEnmr(self):
+    def testEnmr(self):
 #        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
 #                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
 #        entryList = entryList.split()
@@ -25,7 +25,7 @@ class AllChecks(TestCase):
 #        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
 #TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
 
-        entryList = "VpR247Org".split()
+        entryList = "CuTTHAcisFrankfurt".split()
 #        entryList = """
 #        apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway""".split()
@@ -48,7 +48,7 @@ class AllChecks(TestCase):
         doWattos = True
         modelCount=None
         if fastestTest:
-            modelCount=1
+            modelCount=2
             htmlOnly = True
             doWhatif = False
             doProcheck = False

@@ -338,9 +338,9 @@ def setupHtml(project):
         ChainHTMLfile( project, chain )
     for res in molecule.allResidues():
         ResidueHTMLfile( project, res )
-        
+
 #    from cing.core.molecule import AtomList # Fails to be imported above.
-        
+
     # JFD re-enables these inits because we need it fast now.
 #    atomList = AtomList(project) # instantiated only for this purpose locally; TODO: should be in molecule section updateAll
 #    project.molecule.atoms = atomList
@@ -1203,7 +1203,7 @@ Redirecting to %s
                 html.main('pre', subStr)
             else:
                 html.main('br', l )
-            i += 1            
+            i += 1
         #end while
         html.render()
         return html
@@ -1851,7 +1851,7 @@ class ResidueHTMLfile( HTMLfile ):
                                                         #nb align="char", char="." does not work
                                                         ('lower',     dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
                                                         ('upper',     dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
-                                                        ('actual',    dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
+                                                        ('actual (sd/cv)',    dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
 
                                                         ('violations',dict(width= "80px", align="right",  valign="top", style="font-size: 10px") ),
                                                         ('Max',       dict(width= "40px", align="right",  valign="top", style="font-size: 10px") ),
@@ -1873,7 +1873,7 @@ class ResidueHTMLfile( HTMLfile ):
 
             t.nextColumn(val2Str(dr.lower,'%.1f'))
             t.nextColumn(val2Str(dr.upper,'%.1f'))
-            t.nextColumn(sprintf('%s+-%s', val2Str(dr.cav,'%.1f'), val2Str(dr.cv,'%.1f')) )
+            t.nextColumn(sprintf('%s %s', val2Str(dr.cav,'%.1f'), val2Str(dr.cv,'%.4f')) )
 
             t.nextColumn(sprintf('%s+-%s', val2Str(dr.violAv,'%.1f'), val2Str(dr.violSd,'%.1f')) )
             t.nextColumn(val2Str(dr.violMax,'%.1f'))
@@ -2327,7 +2327,7 @@ class RestraintListHTMLfile( HTMLfile ):
                                 val2Str(restraint.upper, '%.2f')))
             restrMain('li', 'Average (CV):  %s (%s)'
                              % (val2Str(restraint.cav, '%.2f'),
-                                val2Str(restraint.cv, '%.2f')))
+                                val2Str(restraint.cv, '%.4f')))
             restrMain('li', 'ViolCount3: %i' % restraint.violCount3)
             restrMain('li', 'Viol Average | SD | Max: %s | %s | %s' % (
                              val2Str(restraint.violAv,  "%.2f"),
@@ -2495,9 +2495,9 @@ def removePreTagLines(msg):
     resultList = []
     msgList = msg.split('\n')
     for l in msgList:
-        
+
         if l.startswith(HTML_TAG_PRE) or l.startswith(HTML_TAG_PRE2):
-            continue 
+            continue
         resultList.append(l)
     result = '\n'.join(resultList)
     return result
