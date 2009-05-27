@@ -29,7 +29,7 @@ class AllChecks(TestCase):
         doWattos = False
         if fastestTest:
             htmlOnly = True
-            doWhatif = True
+            doWhatif = False
             doProcheck = False
             doWattos = False
         pdbConvention = CYANA
