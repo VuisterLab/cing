@@ -20,6 +20,7 @@ Adjust if needed.
 GV:  16 Sep 2007: added cingBinPath and profitPath
 JFD: 27 Nov 2007: removed again.
 GV:  13 Jun 2008: Added CYTHON path and refine, cyana2cing and cython aliases
+JFD: 26 May 2009: Added pyMol path
 
 Uses 'which xplor/$prodir/procheck_nmr.scr/DO_WHATIF.COM' to determine initial
 xplor/procheck/what if executables; make sure they are in your
@@ -76,11 +77,12 @@ CING_SHELL_TEMPLATE = \
 #############################################
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
 %(export)s  CYTHON%(equals)s%(cingRoot)s/dist/Cython
+%(export)s  PYMOL_PATH%(equals)s%(pyMolPath)s
 
 if %(conditional)s then
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYTHONPATH}
+    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYMOL_PATH}/modules:${PYTHONPATH}
 else
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}
+    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYMOL_PATH}/modules
 %(close_if)s
 
 # Use -u to ensure messaging streams for stdout/stderr
@@ -121,7 +123,7 @@ def check_python():
         _NTmessage("........ Found 'Python'")
     else:
         _NTwarning('Failed to find good python.')
-        
+
 def check_matplotlib():
     hasDep = True
     try:
@@ -139,10 +141,10 @@ def check_matplotlib():
                 _NTerror('Failed to find good matplotlib. Absolutely required for CING. Look for version 0.98.3-1 or higher. Developed with 0.98.5-1')
         except:
             hasDep = False
-                
+
     if hasDep:
         _NTmessage("........ Found 'matplotlib'")
-        
+
 
 
 def check_pylab():
@@ -449,6 +451,25 @@ if __name__ == '__main__':
     else:
         _NTmessage("........ Found 'povray'")
         parametersDict['povrayPath'] = strip(povrayPath)
+
+    # TODO: enable real location finder. This just works for JFD but shouldn't bother
+    # others.
+    pyMolPath,err  = ('/sw/lib/pymol-py25', None)
+    if not pyMolPath:
+        _NTwarning("Could not find 'pymol' code (optional)")
+        parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _NTmessage("........ Found 'pymol' code")
+        parametersDict['pyMolPath'] = strip(pyMolPath)
+
+    # Just to get a message to user; not important.
+    pyMolBinPath,err  = _NTgetoutput('which pymol')
+    if not pyMolBinPath:
+        _NTwarning("Could not find 'pymol' binary (optional)")
+#        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _NTmessage("........ Found 'pymol' binary")
+#        parametersDict['pyMolBinPath'] = strip(pyMolPath)
 
 
 #    userShell = os.environ.get('SHELL')

@@ -15,12 +15,12 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.molecule import dots
 from cing.PluginCode.Whatif import Whatif
+from random import random
 import cing #@Reimport
 
 import os #@Reimport
 from math import cos, sin, pi
 from cing.Libs.svd import SVDfit
-
 
 class PseudoRotation( SVDfit ):
     """
@@ -426,109 +426,6 @@ from cing.Libs.fpconst import NaN, isNaN
 
 #import yasaramodule as yasara
 
-def mkYasaraMacros( project ):
-    """
-    Generate the Yasara macros in the moleculeDirectories.yasara dir.
-    """
-    if not project.molecule:
-        NTerror('mkYasaraMacros: no molecule defined')
-        return
-    #end if
-    mkYasaraByResidueMacro(project, ['procheck','gf'],
-                           minValue=-3.0,maxValue=1.0,
-                           reverseColorScheme=True,
-                           path=project.moleculePath('yasara','gf.mcr')
-                          )
-
-    mkYasaraByResidueMacro(project, ['Qshift','backbone'],
-                           minValue=0.0,maxValue=0.05,
-                           reverseColorScheme=False,
-                           path=project.moleculePath('yasara','Qshift.mcr')
-                          )
-
-    mkYasaraByResidueROGMacro(project,path=project.moleculePath('yasara','rog.mcr'))
-#end def
-
-
-def mkMacros( project ):
-    """
-    Generate the macros in the moleculeDirectories.macros dir.
-    """
-    # Only one kind thus far
-    NTmessage('==> Generating Macros')
-    mkYasaraMacros(project)
-#end def
-
-
-
-def mkYasaraByResidueMacro( project, keys,
-                            minValue=0.0, maxValue=1.0, reverseColorScheme=False,
-                            path=None
-                           ):
-
-#    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
-
-    if path:
-        stream = open( path, 'w')
-    else:
-        stream = sys.stdout
-    #end if
-
-    fprintf( stream, 'Console off\n' )
-    fprintf( stream, 'ColorRes All, Gray\n' )
-    fprintf( stream, 'PropRes All, -999\n' )
-    if reverseColorScheme:
-        fprintf( stream, 'ColorPar Property Min,red,%f\n', minValue )
-        fprintf( stream, 'ColorPar Property Max,blue,%f\n', maxValue )
-    else:
-        fprintf( stream, 'ColorPar Property Min,blue,%f\n', minValue )
-        fprintf( stream, 'ColorPar Property Max,red,%f\n', maxValue )
-
-    for res in project.molecule.allResidues():
-        value = getDeepByKeysOrAttributes( res, *keys )
-#        if res.has_key(property) and res[property] != None and not isNaN(res[property]):
-        if value != None and not isNaN(value):
-            fprintf( stream,'PropRes Residue %d,%.4f\n', res.resNum, value)
-    #end for
-
-    fprintf( stream, 'ColorAll Property\n' )
-    fprintf( stream, 'Console on\n' )
-
-    if path:
-        stream.close()
-#end def
-
-def mkYasaraByResidueROGMacro( project, path=None ):
-    if path:
-        stream = open( path, 'w')
-#     else:
-#         stream = sys.stdout
-#     #end if
-
-    if path:
-        fprintf( stream, 'Console off\n' )
-        fprintf( stream, 'ColorRes  All, Gray\n')
-    else:
-        yasara.Console('off')
-        yasara.ColorRes( 'All, Gray' )
-
-
-    YasaraColorDict = dict( green=240, orange=150, red=120)
-
-    for res in project.molecule.allResidues():
-        cmd = sprintf('residue %d,%s', res.resNum, YasaraColorDict[res.rogScore.colorLabel] )
-        if path:
-            fprintf( stream, 'ColorRes %s\n', cmd )
-        else:
-            yasara.ColorRes( cmd )
-    #end for
-
-    if path:
-        fprintf( stream, 'Console on\n' )
-        stream.close()
-    else:
-        yasara.Console('on')
-#end def
 
 
 
@@ -1123,12 +1020,7 @@ def getCingSummaryDict( project ):
 
 # register the functions
 methods  = [(procheck_old, None),
-            (mkYasaraByResidueROGMacro,None),
-            (mkYasaraByResidueMacro,None),
-            (mkYasaraMacros,None),
-            (mkMacros,None),
             (getCingSummaryDict, None )
-
            ]
 #saves    = []
 #restores = []
