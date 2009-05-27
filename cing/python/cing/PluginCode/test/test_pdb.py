@@ -15,10 +15,8 @@ import unittest
 class AllChecks(TestCase):
 
     def testPdbFile(self):
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-        entryId = "1a4d" # Small much studied PDB NMR entry
-#        entryId = "1brv_1model" # Small much studied PDB NMR entry
-#        entryId = "2hgh_1model"
+        entryId = "1brv" # Small much studied PDB NMR entry
+#        entryId = "1hy8" # small, single model, very low scoring entry
 
         pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)
         pdbFileName = "pdb"+entryId+".ent"
@@ -31,8 +29,9 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
-                
-        
+        self.assertFalse(project.mkMacros())
+
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()

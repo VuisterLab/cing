@@ -45,7 +45,9 @@ moleculeDirectories = NTdict(
     analysis   = 'Cing',
     shiftx     = 'Shiftx',
     html       = 'HTML',
-    yasara     = 'Macros/Yasara'
+    pymol      = 'Macros/pyMol',
+    yasara     = 'Macros/Yasara',
+    molmol     = 'Macros/Molmol'
 )
 moleculeDirectories.keysformat() #define a format string for 'pretty' output
 validationSubDirectories = moleculeDirectories # New name
