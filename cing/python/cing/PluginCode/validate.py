@@ -1146,6 +1146,8 @@ def validateAssignments( project, toFile = True   ):
     Add's NTlist instance with strings of warning description to each atom as
     validateAssignment attribute
 
+    New: skipping issuing a warning MISSING_ASSIGNMENT when no chemical shifts are present of that nucleii.
+
     return a NTlist of atoms with errors.
     Generate output in moleculeName/Cing/validateAssignments.txt if toFile is True.
 
@@ -1165,6 +1167,21 @@ def validateAssignments( project, toFile = True   ):
         pass
 #        NTdebug("No resonance assignments read so no real validation on it can be done. Let's try anyway.")
 #        return result
+
+    # Keep track of what assignments are done and don't complain about specific ones missing
+    # if there are none at all assigned of that type.
+    # Just initialize the ones that are checked below; not 1H or P etc.
+    hasAssignment = {'13C': False, '15N': False}
+    for atm in project.molecule.allAtoms():
+#        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
+        if atm.isAssigned():
+            # spintype is not available for pseudos etc. perhaps
+            spinType = getDeepByKeys(atm, 'db', 'spinType')
+#            NTdebug("spinType: %s" % spinType)
+            if spinType:
+                hasAssignment[spinType] = True
+#    hasAssignment = {'13C': True, '15N': True}
+    NTmessage("Found assignments for the following spin types: %s" % hasAssignment)
 
     for atm in project.molecule.allAtoms():
         atm.rogScore.reset()
@@ -1191,8 +1208,7 @@ def validateAssignments( project, toFile = True   ):
                 delta = math.fabs(shift - av) / sd
                 if delta > 3.0:
                     string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
-                                     SHIFT, shift, delta, av, sd
-                                    )
+                                     SHIFT, shift, delta, av, sd )
                     result.append( atm )
                     atm.validateAssignment.append(string)
                 #end if
@@ -1234,10 +1250,14 @@ def validateAssignments( project, toFile = True   ):
             if atm.isProton():
                 heavyAtm = atm.heavyAtom()
                 if not heavyAtm.isAssigned():
-                    string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
-#                    NTmessage('%-20s %s', atm, string )
-                    result.append( atm )
-                    atm.validateAssignment.append(string)
+                    spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
+                    if spinType:
+                        # Only complain if type has at least one assignment.
+                        if getDeepByKeys( hasAssignment, spinType):
+                            string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
+        #                    NTmessage('%-20s %s', atm, string )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
                 #end if
             #end if atm.isProton()
 
