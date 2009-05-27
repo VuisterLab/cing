@@ -1,7 +1,5 @@
-#==================================================
-# some variables
-#==================================================
-from cing.Libs.NTutils import NTerror, NTmessage
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 
 # Run and parse/Only parse the results
 parseOnly = False
@@ -17,34 +15,23 @@ if project.molecule == None:
     NTerror('script doValidate.py: no molecule defined')
     exit(1)
 #end if
-#==================================================
-# Run the tests
-#==================================================
+
+
 # KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
 # python/cing/Scripts/doValidate.py
 # python/cing/Scripts/doValidateiCing.py
 # python/cing/PluginCod/validate.py#validate
-project.runShiftx(parseOnly=parseOnly)
-project.runDssp(parseOnly=parseOnly)
-project.runWhatif(parseOnly=parseOnly)
-project.runProcheck(ranges=options.ranges, parseOnly=parseOnly)
-project.runWattos()
-project.runCingChecks(ranges=options.ranges)
-#==================================================
-# Initialize the HTML
-#==================================================
-project.setupHtml()
+#project.runShiftx(parseOnly=parseOnly)
+#project.runDssp(parseOnly=parseOnly)
+#project.runWhatif(parseOnly=parseOnly)
+#project.runProcheck(ranges=options.ranges, parseOnly=parseOnly)
+#project.runWattos()
+#project.runCingChecks(ranges=options.ranges)
+#project.setupHtml()
+#project.generateHtml(htmlOnly = htmlOnly)
 
-#==================================================
-# Use code can go here
-#==================================================
-
-
-
-#==================================================
-# Generate CING html code
-#==================================================
-project.generateHtml(htmlOnly = htmlOnly)
+# Moved to:
+project.validate( parseOnly=parseOnly, htmlOnly=htmlOnly)
 
 NTmessage("Done with overall validation")
 

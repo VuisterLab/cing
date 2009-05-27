@@ -1,3 +1,5 @@
+# Executed from iCingServlet.java#processRun:
+# String cing_options = "--name " + projectName + " --script doValidateiCing.py " + possibleInit;
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 
@@ -9,10 +11,12 @@ fastestTest = False
 htmlOnly = False # default is False but enable it for faster runs without some actual data.
 doWhatif = True # disables whatif actual run
 doProcheck = True
+doWattos = True
 if fastestTest:
     htmlOnly = True
     doWhatif = False
     doProcheck = False
+    doWattos = False
 
 project = project #@UndefinedVariable for Pydev extensions.
 options = options #@UndefinedVariable
@@ -34,36 +38,25 @@ if project.molecule == None:
 
 ## TODO: disable after done debugging.
 #exit(0)
-#==================================================
-# Run the tests
-#==================================================
+
 # KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
 # python/cing/Scripts/doValidate.py
 # python/cing/Scripts/doValidateiCing.py
 # python/cing/PluginCod/validate.py#validate
-project.runShiftx()
-project.runDssp(parseOnly=parseOnly)
-if doProcheck:
-    project.runProcheck(ranges=options.ranges, parseOnly=parseOnly)
+#project.runShiftx()
+#project.runDssp(parseOnly=parseOnly)
+#if doProcheck:
+#    project.runProcheck(ranges=options.ranges, parseOnly=parseOnly)
+#if doWhatif:
+#    project.runWhatif(parseOnly=parseOnly)
+#project.runWattos()
+#project.runCingChecks(ranges=options.ranges)
+#project.setupHtml()
+#project.generateHtml(htmlOnly = htmlOnly)
 
-if doWhatif:
-    project.runWhatif(parseOnly=parseOnly)
-project.runCingChecks(ranges=options.ranges)
-#==================================================
-# Initialize the HTML
-#==================================================
-project.setupHtml()
-
-#==================================================
-# Use code can go here
-#==================================================
-
-
-
-#==================================================
-# Generate CING html code
-#==================================================
-project.generateHtml(htmlOnly = htmlOnly)
+# Moved to:
+project.validate( ranges=options.ranges, parseOnly=parseOnly,  htmlOnly=htmlOnly,
+                  doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos)
 
 NTmessage("Done with overall validation")
 
