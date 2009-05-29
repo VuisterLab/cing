@@ -12,6 +12,7 @@ from gzip import GzipFile
 from string  import find
 from xml.dom import minidom, Node
 from xml.sax import saxutils
+from string import join
 import array
 import cing
 import datetime
@@ -4325,3 +4326,12 @@ def isAlmostEqual( ntList, epsilon):
         return True
     return False
 # end def
+
+def toPoundedComment(str):
+    result = []
+    for line in str.split('\n'):
+        NTdebug("Processing line: [%s]" % line)
+        result.append( '# %s' % line )
+    resultStr = join(result, '\n')
+    return resultStr
+

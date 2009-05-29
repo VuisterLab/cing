@@ -25,7 +25,7 @@ class AllChecks(TestCase):
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
-        doProcheck = False
+        doProcheck = True
         doWattos = False
         if fastestTest:
             htmlOnly = True
@@ -36,8 +36,8 @@ class AllChecks(TestCase):
         restraintsConvention = CYANA
 
 #        entryId = "1ai0"
-#        entryId = "1brv"        # Small much studied PDB NMR entry
-        entryId = "1brv_1model"        # Small much studied PDB NMR entry
+        entryId = "1brv"        # Small much studied PDB NMR entry
+#        entryId = "1brv_1model"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB

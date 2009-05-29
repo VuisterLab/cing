@@ -54,11 +54,10 @@ versionStr = "%s" % cingVersion
 if cingRevision:
     versionStr += " (r%d)" % cingRevision
 
-header = """
-======================================================================================================
-| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |
-======================================================================================================
-""" % (versionStr, __copyright_years__)
+header = \
+"======================================================================================================\n" +\
+"| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |\n" % (versionStr, __copyright_years__) +\
+"======================================================================================================"
 
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 

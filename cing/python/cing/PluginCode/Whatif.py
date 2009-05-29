@@ -665,7 +665,7 @@ RMS Z-scores, should be close to 1.0:
             if key == "Name":
                 curLocId = value
 
-                # do NOT!! use setdefault(0 routine because it will generate many times
+                # do NOT!! use setdefault routine because it will generate many times
                 # an expensive WhatifResult dummy first
                 if not curLocDic.has_key( curLocId ):
                     curLocDic[curLocId] = WhatifResult(checkID, curCheck[LEVEL_STR], self.molecule.modelCount)
@@ -779,7 +779,7 @@ RMS Z-scores, should be close to 1.0:
 
                 for curLocId in curLocDic.keys():
                     curListDic = curLocDic[curLocId]
-#                    NTdebug("Working on curLocId:   " + `curLocId`)
+                    NTdebug("Working on curLocId:   " + `curLocId`)
 #                    NTdebug("Working on curListDic: " + `curListDic`)
 
                     nameTuple = self.translateResAtmString( curLocId )
@@ -807,18 +807,45 @@ RMS Z-scores, should be close to 1.0:
             A- 187-HIS- CB
             A- 177-GLU
             return None for error
+
+            New version of whatif uses formats like:
+Name   :    0 ; A    ;  171 ; VAL  ; _
+Name   :    0 ; A    ;  171 ; VAL  ; _    ;  CA  ; _
+                ^ Chain Id
+                        ^ Res Id
+                                             ^ Atom Id
             """
-        try:
-            a = string.split('-')
-            t = ['PDB',a[0].strip(),int(a[1]), None]
-            if len(a) == 4: # Is there an atom name too?#                print '>', a
-                try:
-                    i = int(a[3])    # @TODO this is a whatif bug and should not be possible @UnusedVariable
-                except:
-                    t[3] = a[3].strip()
-            return tuple( t )
-        except:
-            return None
+
+        # New or old format.
+        if string.find(';'):
+            try:
+                a = string.split(';')
+                a = [el.strip() for el in a]
+#In [5]: [el.strip() for el in a.split(';')]
+#Out[5]: ['Name   :    0', 'A', '171', 'VAL', '_', 'CA', '_']
+#                for i,_s in enumerate(a): # stupid construction; jfd needs to look up list comprehension.
+#                    a[i] = a[i].strip()
+
+                chId = a[1]
+                resId = int(a[2])
+                atomId = None
+                if len(a) == 7: # Is there an atom name too?
+                    atomId = a[5]
+                return tuple( ['PDB',chId,resId,atomId] )
+            except:
+                return None
+        else:
+            try:
+                a = string.split('-')
+                t = ['PDB',a[0].strip(),int(a[1]), None]
+                if len(a) == 4: # Is there an atom name too?#                print '>', a
+                    try:
+                        _i = int(a[3])    # @TODO this is a whatif bug and should not be possible
+                    except:
+                        t[3] = a[3].strip()
+                return tuple( t )
+            except:
+                return None
     #end def
 
     def report( self ):

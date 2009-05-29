@@ -1054,7 +1054,7 @@ class Peak( NTdict ):
        by GV 2007 07 23: added hasHeight, hasVolume attributes to the class
           GV 2007 28 09: Moved from molecule.py to project.py
           GV 19 Jun 08: PeakIndex starts at 0
-          GV 19 Jun 08: change height, volume to NTvalue clasess
+          GV 19 Jun 08: change height, volume to NTvalue classes
           GV 19 Jun 08: changed hasHeight and hasVolume to methods
     """
 

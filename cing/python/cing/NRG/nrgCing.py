@@ -98,14 +98,14 @@ class nrgCing(Lister):
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
 
-        if self.isProduction:
-            # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done
-            self.why_not_db_comments_dir = "/Volumes/cmbi8/usr/scratch/whynot/comments"
-            # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
-            self.why_not_db_raw_dir = "/Volumes/cmbi8/usr/data/data/raw/nrg-cing"
-        else:
-            self.why_not_db_comments_dir = os.path.join(self.results_base_dir,"cmbi8","comments")
-            self.why_not_db_raw_dir = os.path.join(self.results_base_dir,"cmbi8","raw")
+#        if self.isProduction:
+#            # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done
+#            self.why_not_db_comments_dir = "/Volumes/cmbi8/usr/scratch/whynot/comments"
+#            # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
+#            self.why_not_db_raw_dir = "/Volumes/cmbi8/usr/data/data/raw/nrg-cing"
+#        else:
+        self.why_not_db_comments_dir = os.path.join(self.results_base_dir,"cmbi8","comments")
+        self.why_not_db_raw_dir = os.path.join(self.results_base_dir,"cmbi8","raw")
 
         self.why_not_db_comments_file = 'NRG-CING.txt_done'
 
@@ -650,3 +650,5 @@ if __name__ == '__main__':
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
     NTmessage("Finished creating the NRG-CING indices")
+    # TODO: remove all but .csv files for updating whynot. Keep api because in future we might be able to say exactly
+    # why an entry fails at a certain stage.
