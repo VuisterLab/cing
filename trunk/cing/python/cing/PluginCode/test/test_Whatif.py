@@ -26,7 +26,7 @@ import unittest
 class AllChecks(TestCase):
 
     def tttestHistogram(self):
-        resType = 'GLY'     
+        resType = 'GLY'
         for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
             hist = histRamaBySsAndResType[ssType][resType]
             sumHist =  sum(sum(hist))
@@ -39,41 +39,45 @@ class AllChecks(TestCase):
                 strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
                 NTdebug( '\n%s' % strHist )
             except:
-                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib 
+                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib
                 pass
 
-    def testRunWhatif(self):        
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models 
+    def testRunWhatif(self):
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+#        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-        entryId = "1brv_1model" 
-#        entryId = "1tgq_1model" 
+        entryId = "1brv_1model"
+#        entryId = "1tgq_1model"
         pdbConvention = IUPAC
-        
+        parseOnly = False # normal is False
+        showValues = True
+
         os.chdir(cingDirTmp)
         project = Project( entryId )
-        project.removeFromDisk()
-        project = Project.open( entryId, status='new' )
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        NTdebug("Reading files from directory: " + cyanaDirectory)
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        if not parseOnly:
+            project.removeFromDisk()
+            project = Project.open( entryId, status='new' )
+            cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+            pdbFileName = entryId+".pdb"
+            pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+            NTdebug("Reading files from directory: " + cyanaDirectory)
+            project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 
 #        print project.cingPaths.format()
-        self.assertFalse(runWhatif(project))    
-        
+        self.assertFalse(runWhatif(project, parseOnly=parseOnly))
+
         project.save()
-        for res in project.molecule.allResidues():
-            NTdebug(`res`)
-            whatifResDict = res.getDeepByKeys(WHATIF_STR)
-            if not whatifResDict:
-                continue
-            checkIDList = whatifResDict.keys()
-            for checkID in checkIDList:
-                valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
-                qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
-                NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
+        if showValues:
+            for res in project.molecule.allResidues():
+                NTdebug(`res`)
+                whatifResDict = res.getDeepByKeys(WHATIF_STR)
+                if not whatifResDict:
+                    continue
+                checkIDList = whatifResDict.keys()
+                for checkID in checkIDList:
+                    valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
+                    qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
+                    NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

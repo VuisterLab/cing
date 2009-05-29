@@ -2,6 +2,7 @@
 Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
+from cing import header
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -9,41 +10,76 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import toPoundedComment
 from cing.Libs.NTutils import writeTextToFile
 from cing.Libs.fpconst import isNaN
+from cing.main import getStartMessage
 from random import random
 import sys
 
 try:
     import yasaramodule as yasara #@UnresolvedImport
 except:
-    NTdebug( "Yasara is not available for interactive work in CING; no problem have a homebrew" )
+    NTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
 
-MolmolColorDict = dict( green='0 1 0', orange='1 0.647 0', red='1 0 0')
+MolmolColorDict = dict(green = '0 1 0', orange = '1 0.647 0', red = '1 0 0')
 
 QshiftMinValue = 0.0
 QshiftMaxValue = 0.05
 QshiftReverseColorScheme = False
 
-PCgFactorMinValue = -3.0
+PCgFactorMinValue = - 3.0
 PCgFactorMaxValue = 1.0
 PCgFactorReverseColorScheme = True
 
 
-#testing = True
+loadTestingFile = True
 
-def mkMacros( project ):
+
+originatingProgramDeclaration = """Created by:
+%s
+%s""" % (header, getStartMessage())
+originatingProgramDeclaration = toPoundedComment(originatingProgramDeclaration)
+
+molmolMacroFileHeader = """# Execute by issuing command (without pound sign):
+# molmol -f THIS_FILE_NAME
+""" + originatingProgramDeclaration
+
+pyMolMacroFileHeader = """# Execute by issuing command  (without pound sign):
+# pymol THIS_FILE_NAME
+""" + originatingProgramDeclaration
+
+yasaraMacroFileHeader = """# Execute by issuing command  (without pound sign):
+# ???? THIS_FILE_NAME
+""" + originatingProgramDeclaration
+
+def mkMacros(project):
     """
     Generate the macros in the moleculeDirectories.macros dir.
     """
-    # Only one kind thus far
+    makePdbForMacros(project)
+
     NTmessage('==> Generating Macros')
     makePyMolMacros(project)
-#    makeMolmolMacros(project)
-#    mkYasaraMacros(project)
+    makeMolmolMacros(project)
+    mkYasaraMacros(project)
 #end def
 
-def makePyMolMacros( project ):
+def makePdbForMacros(project):
+    """
+    Other todos
+    Link naar macros vanaf de project page.
+    """
+    NTmessage('==> Exporting pdb files with one and all models for macros. TODO: finish coding.')
+#    pathPdb = project.path( project.directories.PDB )
+#    path = os.path.join( pathPdb, project.molecule.name + '.pdb')
+#
+#    project.molecule.toPDBfile(path, convention=IUPAC, max_models = MAX_PROCHECK_NMR_MODELS)
+#    path = os.path.join( pathPdb, project.molecule.name + '_000.pdb')
+#    project.molecule.toPDBfile(path, convention=IUPAC, max_models = MAX_PROCHECK_NMR_MODELS)
+
+
+def makePyMolMacros(project):
     """
     Generate the pyMol macros in the moleculeDirectories.pyMol dir.
     """
@@ -51,22 +87,23 @@ def makePyMolMacros( project ):
         NTerror('makeMolmolMacros: no molecule defined')
         return
     #end if
-#    makePyMolByResidueMacro(project, ['procheck','gf'],
-#                               minValue=PCgFactorMinValue,maxValue=PCgFactorMaxValue,
-#                               reverseColorScheme=PCgFactorReverseColorScheme,
-#                               path=project.moleculePath('pymol','gf.pml')
-#                              )
+    makePyMolByResidueMacro(project, ['procheck', 'gf'],
+                               minValue = PCgFactorMinValue, maxValue = PCgFactorMaxValue,
+                               reverseColorScheme = PCgFactorReverseColorScheme,
+                               path = project.moleculePath('pymol', 'gf.pml')
+                              )
 
-    makePyMolByResidueMacro(project, ['Qshift','backbone'],
-                           minValue=QshiftMinValue,maxValue=QshiftMaxValue,
-                           reverseColorScheme=QshiftReverseColorScheme,
-                           path=project.moleculePath('pymol','Qshift.pml')
+    makePyMolByResidueMacro(project, ['Qshift', 'backbone'],
+                           minValue = QshiftMinValue, maxValue = QshiftMaxValue,
+                           reverseColorScheme = QshiftReverseColorScheme,
+                           path = project.moleculePath('pymol', 'Qshift.pml')
                           )
 #
-    makePyMolByResidueROGMacro(project,path=project.moleculePath('pymol','rog.pml'))
+    makePyMolByResidueROGMacro(project, path = project.moleculePath('pymol', 'rog.pml'))
+    makePyMolReadPdbMacro(project, path = project.moleculePath('pymol', 'read.pml'))
 #end def
 
-def makeMolmolMacros( project ):
+def makeMolmolMacros(project):
     """
     Generate the Molmol macros in the moleculeDirectories.molmol dir.
     """
@@ -74,22 +111,22 @@ def makeMolmolMacros( project ):
         NTerror('makeMolmolMacros: no molecule defined')
         return
     #end if
-    makeMolmolByResidueMacro(project, ['procheck','gf'],
-                               minValue=PCgFactorMinValue,maxValue=PCgFactorMaxValue,
-                               reverseColorScheme=PCgFactorReverseColorScheme,
-                               path=project.moleculePath('molmol','gf.mac')
+    makeMolmolByResidueMacro(project, ['procheck', 'gf'],
+                               minValue = PCgFactorMinValue, maxValue = PCgFactorMaxValue,
+                               reverseColorScheme = PCgFactorReverseColorScheme,
+                               path = project.moleculePath('molmol', 'gf.mac')
                               )
 
-    makeMolmolByResidueMacro(project, ['Qshift','backbone'],
-                           minValue=QshiftMinValue,maxValue=QshiftMaxValue,
-                           reverseColorScheme=QshiftReverseColorScheme,
-                           path=project.moleculePath('molmol','Qshift.mac')
+    makeMolmolByResidueMacro(project, ['Qshift', 'backbone'],
+                           minValue = QshiftMinValue, maxValue = QshiftMaxValue,
+                           reverseColorScheme = QshiftReverseColorScheme,
+                           path = project.moleculePath('molmol', 'Qshift.mac')
                           )
 
-    makeMolmolByResidueROGMacro(project,path=project.moleculePath('molmol','rog.mac'))
+    makeMolmolByResidueROGMacro(project, path = project.moleculePath('molmol', 'rog.mac'))
 #end def
 
-def mkYasaraMacros( project ):
+def mkYasaraMacros(project):
     """
     Generate the Yasara macros in the moleculeDirectories.yasara dir.
     """
@@ -97,22 +134,22 @@ def mkYasaraMacros( project ):
         NTerror('mkYasaraMacros: no molecule defined')
         return
     #end if
-    mkYasaraByResidueMacro(project, ['procheck','gf'],
-                               minValue=PCgFactorMinValue,maxValue=PCgFactorMaxValue,
-                               reverseColorScheme=PCgFactorReverseColorScheme,
-                           path=project.moleculePath('yasara','gf.mcr')
+    mkYasaraByResidueMacro(project, ['procheck', 'gf'],
+                               minValue = PCgFactorMinValue, maxValue = PCgFactorMaxValue,
+                               reverseColorScheme = PCgFactorReverseColorScheme,
+                           path = project.moleculePath('yasara', 'gf.mcr')
                           )
 
-    mkYasaraByResidueMacro(project, ['Qshift','backbone'],
-                           minValue=QshiftMinValue,maxValue=QshiftMaxValue,
-                           reverseColorScheme=QshiftReverseColorScheme,
-                           path=project.moleculePath('yasara','Qshift.mcr')
+    mkYasaraByResidueMacro(project, ['Qshift', 'backbone'],
+                           minValue = QshiftMinValue, maxValue = QshiftMaxValue,
+                           reverseColorScheme = QshiftReverseColorScheme,
+                           path = project.moleculePath('yasara', 'Qshift.mcr')
                           )
 
-    mkYasaraByResidueROGMacro(project,path=project.moleculePath('yasara','rog.mcr'))
+    mkYasaraByResidueROGMacro(project, path = project.moleculePath('yasara', 'rog.mcr'))
 #end def
 
-def makePyMolByResidueROGMacro( project, path=None ):
+def makePyMolByResidueROGMacro(project, path = None):
     """See doc at:
 http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
 """
@@ -138,13 +175,17 @@ pymol.finish_launching()
 """
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "# cmd.load('/Users/jd/workspace34/cing/Tests/data/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode )
+    scriptPdbLoad = "cmd.load('/Users/jd/workspace34/cing/Tests/data/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
+
+%s
+
 # Coloring residues by CING ROG scores.
 
-"""
+""" % pyMolMacroFileHeader
+
     # Macro can be much shortened by combining categories ROG.
     # JFD has not found the command to actually set the values to e.g. the b-factor to use that to color/store.
     for res in project.molecule.allResidues():
@@ -155,7 +196,7 @@ pymol.finish_launching()
             if random() > 0.7:
                 pyMolColor = 'orange'
         pyMolColorQuoted = "'" + pyMolColor + "'"
-        macroTxt += "cmd.color( %-8s, 'chain %2s and resi %4d')\n" % ( pyMolColorQuoted, res.chain.name, res.resNum )
+        macroTxt += "cmd.color( %-8s, 'chain %2s and resi %4d')\n" % (pyMolColorQuoted, res.chain.name, res.resNum)
     #end for
 
     # Make it into a selfcontained script for testing.
@@ -165,14 +206,27 @@ pymol.finish_launching()
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage( macroTxt )
+        NTmessage(macroTxt)
     #end if
 #end def
 
 
-def makePyMolByResidueMacro( project, keys,
-                            minValue=0.0, maxValue=1.0, reverseColorScheme=False,
-                            path=None ):
+def makePyMolReadPdbMacro(project, path = None):
+    # Just for testing:
+    pdbCode = '1brv'
+    scriptPdbLoad = "load /Users/jd/workspace34/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
+    macroTxt = pyMolMacroFileHeader + '\n' + scriptPdbLoad +'\n'
+
+    if path:
+        writeTextToFile(path, macroTxt)
+    else:
+        NTmessage(macroTxt)
+
+
+
+def makePyMolByResidueMacro(project, keys,
+                            minValue = 0.0, maxValue = 1.0, reverseColorScheme = False,
+                            path = None):
 
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
@@ -181,10 +235,14 @@ def makePyMolByResidueMacro( project, keys,
 
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "# load /Users/jd/workspace34/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode )
+    if loadTestingFile:
+        scriptPdbLoad = "load /Users/jd/workspace34/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
+
+%s
+
 # Scaling colors to MinValue, MaxValue, ReverseColorScheme: minValue, maxValue, reverseColorScheme
 
 # clear out the old B Factors
@@ -192,19 +250,20 @@ def makePyMolByResidueMacro( project, keys,
 alter all, b=0.0
 
 # update the B Factors with new properties
-"""
+""" % pyMolMacroFileHeader
+
     spectrumName = 'green_yellow_red'
     if reverseColorScheme:
         spectrumName = 'red_yellow_green'
     for res in project.molecule.allResidues():
-        value = getDeepByKeysOrAttributes( res, *keys )
+        value = getDeepByKeysOrAttributes(res, *keys)
         if False: # Used for testing.
             value = random() * 0.05
         if value != None and not isNaN(value):
-            pyMolSelection = 'chain %2s and resi %4d' % ( res.chain.name, res.resNum )
+            pyMolSelection = 'chain %2s and resi %4d' % (res.chain.name, res.resNum)
 #            pyMolSelectionQuoted = "'%s'" % pyMolSelection
 #            macroTxt += "cmd.alter( %-30s, 'b = %10f')\n" % ( pyMolSelectionQuoted, value )
-            macroTxt += "alter ( %-30s ), b = %10f\n" % ( pyMolSelection, value )
+            macroTxt += "alter ( %-30s ), b = %10f\n" % (pyMolSelection, value)
         # end if
     # end for
 
@@ -212,7 +271,7 @@ alter all, b=0.0
 #cmd.spectrum(expression='b', palette='%s', selection='all', minimum=minValue, maximum=maxValue)
     macroTxt += """
 # color the molecule based on the new B Factors of the atoms
-spectrum b, %s, selection='all', minimum=minValue, maximum=maxValue
+spectrum b, %s, selection=all, minimum=minValue, maximum=maxValue
 
 """ % spectrumName
     macroTxt = macroTxt.replace('minValue', `minValue`)
@@ -220,30 +279,31 @@ spectrum b, %s, selection='all', minimum=minValue, maximum=maxValue
     macroTxt = macroTxt.replace('reverseColorScheme', `reverseColorScheme`)
 
     # Make it into a self-contained script for testing.
-    if True:
-        macroTxt = scriptPdbLoad + macroTxt
+    macroTxt = scriptPdbLoad + macroTxt
 
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage( macroTxt )
+        NTmessage(macroTxt)
     #end if
 #end def
 
 
-def makeMolmolByResidueROGMacro( project, path=None ):
+def makeMolmolByResidueROGMacro(project, path = None):
 
     NTdebug('makeMolmolByResidueROGMacro')
 
-#ReadPdb /Users/jd/workspace34/cing/Tests/data/pdb/1brv/pdb1brv.ent
-    macroTxt = \
-"""
+    macroTxt = """%s
+
 # Coloring residues by CING ROG scores.
+
+ReadPdb /Users/jd/workspace34/cing/Tests/data/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'
 
-"""
+""" % molmolMacroFileHeader
+
     # Macro can be much shortened by combining categories ROG.
     # JFD has not found the command to actually set the values to e.g. the b-factor to use that to color/store.
     for res in project.molecule.allResidues():
@@ -262,7 +322,7 @@ SelectAtom ':%d'
 SelectBond 'atom2.selected'
 ColorAtom %s
 ColorBond %s
-""" % ( res.resNum, molmolColor, molmolColor )
+""" % (res.resNum, molmolColor, molmolColor)
     #end for
 
 
@@ -275,12 +335,12 @@ SelectBond 'prev_sel'
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage( macroTxt )
+        NTmessage(macroTxt)
     #end if
 
 #end def
 
-def mapValueToMolmolColor( value, minValue, maxValue, reverseColorScheme):
+def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme):
     """Map from min to middle; blue to red and
            from middle to max; red to yellow
            TODO: implement reverseColorScheme
@@ -301,7 +361,7 @@ def mapValueToMolmolColor( value, minValue, maxValue, reverseColorScheme):
     # rangeValue is always positive
 #    rangeValue = maxValue - minValue
 #    middleValue = rangeValue / 2.
-    fractionOnZeroToOne = abs(value-minValue) / ( maxValue - minValue )
+    fractionOnZeroToOne = abs(value - minValue) / (maxValue - minValue)
     if reverseColorScheme:
         fractionOnZeroToOne = 1. - fractionOnZeroToOne
 
@@ -313,41 +373,44 @@ def mapValueToMolmolColor( value, minValue, maxValue, reverseColorScheme):
     else:
     # red to yellow; in rgb: 1 0 0 to 1 1 0
         colorRed = 1.
-        colorGreen = 2. * ( fractionOnZeroToOne -0.5 )
+        colorGreen = 2. * (fractionOnZeroToOne - 0.5)
         colorBlue = 0.
-    molmolColor = "%s %s %s" % ( colorRed, colorGreen, colorBlue )
+    molmolColor = "%s %s %s" % (colorRed, colorGreen, colorBlue)
 #    NTdebug( "mapValueToMolmolColor fraction %s red, green, blue: %s" %(fractionOnZeroToOne, molmolColor) )
     return molmolColor
 
-def makeMolmolByResidueMacro( project, keys,
-                            minValue=0.0, maxValue=1.0, reverseColorScheme=False,
-                            path=None
+def makeMolmolByResidueMacro(project, keys,
+                            minValue = 0.0, maxValue = 1.0, reverseColorScheme = False,
+                            path = None
                            ):
 
     NTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
-#ReadPdb /Users/jd/workspace34/cing/Tests/data/pdb/1brv/pdb1brv.ent
     macroTxt = \
-"""
+"""%s
+
 # Scaling colors to MinValue, MaxValue, ReverseColorScheme: minValue, maxValue, reverseColorScheme
+
+ReadPdb /Users/jd/workspace34/cing/Tests/data/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'
 
-"""
+""" % molmolMacroFileHeader
+
     for res in project.molecule.allResidues():
-        value = getDeepByKeysOrAttributes( res, *keys )
+        value = getDeepByKeysOrAttributes(res, *keys)
 #            value = random() * 4. - 3
 #        if testing:
 #        if res.has_key(property) and res[property] != None and not isNaN(res[property]):
         if value != None and not isNaN(value):
-            molmolColor = mapValueToMolmolColor( value, minValue, maxValue, reverseColorScheme)
+            molmolColor = mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme)
             macroTxt += \
     """
 SelectAtom ':%d'
 SelectBond 'atom2.selected'
 ColorAtom %s
 ColorBond %s
-""" % ( res.resNum, molmolColor, molmolColor )
+""" % (res.resNum, molmolColor, molmolColor)
         #end for
 
     macroTxt += """
@@ -361,88 +424,90 @@ SelectBond 'prev_sel'
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage( macroTxt )
+        NTmessage(macroTxt)
     #end if
 #end def
 
-def mkYasaraByResidueMacro( project, keys,
-                            minValue=0.0, maxValue=1.0, reverseColorScheme=False,
-                            path=None
+def mkYasaraByResidueMacro(project, keys,
+                            minValue = 0.0, maxValue = 1.0, reverseColorScheme = False,
+                            path = None
                            ):
 
 #    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
 
     if path:
-        stream = open( path, 'w')
+        stream = open(path, 'w')
     else:
         stream = sys.stdout
     #end if
 
-    fprintf( stream, 'Console off\n' )
-    fprintf( stream, 'ColorRes All, Gray\n' )
-    fprintf( stream, 'PropRes All, -999\n' )
+    fprintf(stream, 'Console off\n')
+    fprintf(stream, yasaraMacroFileHeader + '\n')
+    fprintf(stream, 'ColorRes All, Gray\n')
+    fprintf(stream, 'PropRes All, -999\n')
     if reverseColorScheme:
-        fprintf( stream, 'ColorPar Property Min,red,%f\n', minValue )
-        fprintf( stream, 'ColorPar Property Max,blue,%f\n', maxValue )
+        fprintf(stream, 'ColorPar Property Min,red,%f\n', minValue)
+        fprintf(stream, 'ColorPar Property Max,blue,%f\n', maxValue)
     else:
-        fprintf( stream, 'ColorPar Property Min,blue,%f\n', minValue )
-        fprintf( stream, 'ColorPar Property Max,red,%f\n', maxValue )
+        fprintf(stream, 'ColorPar Property Min,blue,%f\n', minValue)
+        fprintf(stream, 'ColorPar Property Max,red,%f\n', maxValue)
 
     for res in project.molecule.allResidues():
-        value = getDeepByKeysOrAttributes( res, *keys )
+        value = getDeepByKeysOrAttributes(res, *keys)
 #        if res.has_key(property) and res[property] != None and not isNaN(res[property]):
         if value != None and not isNaN(value):
-            fprintf( stream,'PropRes Residue %d,%.4f\n', res.resNum, value)
+            fprintf(stream, 'PropRes Residue %d,%.4f\n', res.resNum, value)
     #end for
 
-    fprintf( stream, 'ColorAll Property\n' )
-    fprintf( stream, 'Console on\n' )
+    fprintf(stream, 'ColorAll Property\n')
+    fprintf(stream, 'Console on\n')
 
     if path:
         stream.close()
 #end def
 
-def mkYasaraByResidueROGMacro( project, path=None ):
+def mkYasaraByResidueROGMacro(project, path = None):
     if path:
-        stream = open( path, 'w')
+        stream = open(path, 'w')
 #     else:
 #         stream = sys.stdout
 #     #end if
 
     if path:
-        fprintf( stream, 'Console off\n' )
-        fprintf( stream, 'ColorRes  All, Gray\n')
+        fprintf(stream, 'Console off\n')
+        fprintf(stream, yasaraMacroFileHeader + '\n')
+        fprintf(stream, 'ColorRes  All, Gray\n')
     else:
         yasara.Console('off')
-        yasara.ColorRes( 'All, Gray' )
+        yasara.ColorRes('All, Gray')
 
 
-    YasaraColorDict = dict( green=240, orange=150, red=120)
+    YasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
     for res in project.molecule.allResidues():
-        cmd = sprintf('residue %d,%s', res.resNum, YasaraColorDict[res.rogScore.colorLabel] )
+        cmd = sprintf('residue %d,%s', res.resNum, YasaraColorDict[res.rogScore.colorLabel])
         if path:
-            fprintf( stream, 'ColorRes %s\n', cmd )
+            fprintf(stream, 'ColorRes %s\n', cmd)
         else:
-            yasara.ColorRes( cmd )
+            yasara.ColorRes(cmd)
     #end for
 
     if path:
-        fprintf( stream, 'Console on\n' )
+        fprintf(stream, 'Console on\n')
         stream.close()
     else:
         yasara.Console('on')
 #end def
 
 # register the functions
-methods  = [
-            (mkYasaraByResidueROGMacro,None),
-            (mkYasaraByResidueMacro,None),
-            (mkYasaraMacros,None),
-            (makeMolmolByResidueROGMacro,None),
-            (makeMolmolByResidueMacro,None),
-            (makeMolmolMacros,None),
-            (mkMacros,None)
+methods = [
+            (mkYasaraByResidueROGMacro, None),
+            (mkYasaraByResidueMacro, None),
+            (mkYasaraMacros, None),
+            (makeMolmolByResidueROGMacro, None),
+            (makeMolmolByResidueMacro, None),
+            (makeMolmolMacros, None),
+            (mkMacros, None)
            ]
 #saves    = []
 #restores = []

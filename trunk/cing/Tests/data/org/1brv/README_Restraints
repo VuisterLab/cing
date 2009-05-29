@@ -1,0 +1,117 @@
+jfd@29/6/96                                                SORRY IT'S IN DUTCH
+
+DE TOTALE PROCEDURE VOOR HET VERKRIJGEN VAN DE RESTRAINTS UIT DE NOESY DATA:
+
+OPMEKING: de volgende variabelen worden gebruikt:
+$B voor /usr/ruuci2/people/jurgen/B_course
+$R voor /usr/ruuci2/people/jurgen/B_course/Restraints
+                                                         
+
+
+PIEK VOLUMINA FROM REGINE_4
+	- uit buildup spectra nb3 (noesie 750mhz van 100ms)
+	- gechecked op assignement met peak check
+	- sommeren van de data punten zonder offset
+	- gebruik de patronen/cluster files: brsvg.clu brsvg.pat
+		en spectrum nb3
+	- 546 pieks
+ 	- file: $B/regine/brsvg.pkr
+ 	- schrijven files: $B/regine/brsvg.asn en $B/regine/brsvg.pks
+	- 542 pieks
+
+CONVERSIE INTENSITEIT NAAR AFSTAND
+	- samenvoegen van .asn en .pks file zie uitleg in volgende script
+ 	- file: $R/brsvg.tot
+	- gebruik nawk script: $B/scripts/nawk/MakeRestraints
+ 		- calibratie op sequentiele d(an) voor helix 2
+			(3.5 A voor 6.4e6
+		- krachtconstante op 40 kcal mol^-1 A^-2 en geen lower bound
+		- verwijdert de restraints van residuen 1-13 (185 restraints)
+		- hernummert de restraints van 14-32 naar 1-19 
+	- 357 restraints
+ 	- file: $R/b_1.rstrnt
+
+TOEVOEGEN EXTRA NOE RESTRAINTS
+	- 13 NOE restraints uit D2O spectrum vanuit file brsvg_d2o.rstrnt
+ 	- file: $R/b_2.rstrnt 
+
+CONVERSIE ATOM NAMES NAAR ATOM LABELS
+	- gebruik vi script: $B/scripts/vi/Regine_2_NMRchitect
+		Op deze manier is de stereospecifieke toekenning ook
+		uit geprint. Dus in de atom labels. Ook sommige protonen
+		die spectroscopisch niet te onderscheiden waren komen nu
+		voor onder de juiste noemer. BV L28 HD*
+	- 370 restraints
+ 	- file: $R/b_3.rstrnt
+
+CORRECTIE MEERDERE PROTONEN IN PSEUDO-ATOOM EN EXP FOUT
+	- hernoem VALn weer VAL
+	- gebruik script: $B/scripts/nawk/Reg_noe_adjust/Reg_noe_adj
+		- sorteert de lijst
+		- vermeldt eventuele dubbele entrees
+		- +10 % voor iedere afstand (Experimentele fout)
+    		- methyls vermenigvuldig met 1.2
+			- Ala HB*
+    			- Val HG1* HG2*
+			- Leu28 HD*  (*1.4) 
+			- Thr's HG2* 
+			- Leu's HD1* HD2*
+			- Ile HG2* & HD1*
+    		- aromaten en beta's behoeven niet
+		- NB alle onderdelen van deze super script goed zetten bv de addscr op 10%
+	- hernoem VAL weer VALn
+	- verwijder de dubbele restraints (2 stuks van CYS_16:HA met zijn HB's)
+	- 370 restraints
+ 	- file: $R/b_4.rstrnt
+
+GENEREREN VAN PSEUDOATOMEN VOOR NIET STEREOSPECIFIEK TOEGEKENDE PROTONEN EN AFSTAND CORRIGEREN
+	- gebruik file $B/insight/brsvg.car $B/insight/brsvg.mdf
+	- Binnen insight:
+			- many HB1/HB2 -> HB* , 
+			- L's  HD1*/HD2* -> HD* 
+			- V    HG1*/HG2* -> HG*
+			- niet Asn HD1*/HD2* 
+		Dit wordt op basis van geometrie gedaan
+	- Binnnen insight:
+	    - corrigeren voor de mogelijk grotere afstand tot het pseudoatoom
+		* CH2 0.9 (vanwege afstand tot pseudo-atom)
+		* CH3 0.3 (zie Thea Koning artikel)
+		* 2CH3 1.8 (combinatie; alleen ongeveer)
+		* NH2 0.9 zie CH2
+	- 320 restraints
+ 	- file: $R/b_5.rstrnt 
+
+CORRECTIE REDUNDANT ONES
+	- DGII starten en verwijderen van 39 'redundant' intra-residual pieks met de hand.
+		zie file: $R/NotImportant.readme 
+	- 281 restraints
+	- file: $R/b_6.rstrnt 
+
+TOEVOEGEN EXTRA DIHEDRAL RESTRAINTS / PROCHIRAL CENTRA
+	- DIHEDRAL restraints uit DQF-COSY spectrum vanuit brsvg_dihedral.rstrnt
+	- 20 prochiral centra
+	- 9 chi1, 2 phi, 18 omega 
+	- 281 NOEs
+ 	- file: $R/b_7.rstrnt 
+
+VERWIJDEREN 11 DOOR SPINDIFFUSIE STERK GEVIOLEERDE RESTRAINTS
+	- Als "patch" om de structuur niet overdreven scheef te trekken.
+	- Zie file: $R/Readme_Spindiffusion
+	- 270 NOEs
+	- file: $R/b_8.rstrnt 
+
+MAAK EEN PSEUDO ATOOM VOOR ZIJKETEN ASN 9 HD2*
+	- om tot dezelfde restraints als in $R/brsvg_org.rstrnt welke
+		gebruikt zijn voor de laatste berekening (jfd@5/12/95).
+	- Verwijder de grootste afstand en tel 1 Ang bij de kleinste op.
+	- Verwijder restraint:
+		dubbel: 1:ASN_9:HD22  1:ASN_9:HN  -1.000  4.246  4.246
+	- Het verschil met brsvg_org.rstrnt zit in de 10% die nu voor de
+		pseudoatoom correctie bij opgeteld is en vroeger pas erna.
+	- 264 NOEs
+	- file: $R/b_9.rstrnt
+
+VERSCHILLEN MET DE ORGINELE DATA
+	- Meeste verschillen zitten in de 10% die nu voor de pseudoatoom 
+		correctie bij opgeteld is en vroeger pas erna.
+	- Asn zijketen 9 HD2* is iets anders behandeld.
