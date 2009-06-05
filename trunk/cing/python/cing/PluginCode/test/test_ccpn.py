@@ -23,6 +23,7 @@ class AllChecks(TestCase):
 
     def testInitCcpn(self):
         entryList = "1brv".split()
+#        entryList = "1brv_cs_peaks".split()
 #        entryList = "1brv_ccpngrid".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
@@ -42,7 +43,7 @@ class AllChecks(TestCase):
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
-        doWattos = True
+        doWattos = False
         useNrgArchive = False
         modelCount=None
         if fastestTest:
@@ -50,7 +51,7 @@ class AllChecks(TestCase):
             htmlOnly = True
             doWhatif = False
             doProcheck = False
-            doWattos = True
+            doWattos = False
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)

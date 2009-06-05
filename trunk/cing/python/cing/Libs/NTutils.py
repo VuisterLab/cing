@@ -4199,6 +4199,12 @@ def getDateTimeStampForFileName():
 
 
 
+def readTextFromFile(fileName):
+    NTdebug("Reading from file %s" % ( fileName))
+    fp = open(fileName, 'r')
+    content = fp.read()
+    return content
+
 def writeTextToFile(fileName, txt):
 #    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
     fp = open(fileName, 'w')

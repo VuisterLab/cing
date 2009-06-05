@@ -399,6 +399,9 @@ class Molecule( NTtree ):
         if not an:
 #            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
             return None
+            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
+            # and look up the atom translation. This can of course be fixed in the db too.
+
 
         if not res.has_key(an):
             NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)

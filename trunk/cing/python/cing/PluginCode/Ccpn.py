@@ -40,8 +40,8 @@ if True:
     switchOutput(False)
     try:
         import ccpnmr #@UnusedImport
-        from ccp.general.Util import createMoleculeTorsionDict
-        from ccp.general.Util import getResonancesFromPairwiseConstraintItem
+        from ccp.general.Util import createMoleculeTorsionDict #@UnresolvedImport
+        from ccp.general.Util import getResonancesFromPairwiseConstraintItem #@UnresolvedImport
         from ccp.util.Molecule import makeMolecule
         from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
         from ccp.util.Validation import getResidueValidation #@UnresolvedImport

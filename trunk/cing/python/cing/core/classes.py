@@ -55,6 +55,7 @@ from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from shutil import rmtree
+from cing.Libs.NTutils import Lister
 import cing
 import math
 import os
@@ -1047,7 +1048,7 @@ class _ProjectList( NTlist ):
 #
 #
 PeakIndex = 0
-class Peak( NTdict ):
+class Peak( NTdict, Lister ):
     """Peak class:
        Peaks point to resonances
        Resonances point to atoms
@@ -1087,7 +1088,7 @@ class Peak( NTdict ):
 
         self.dimension=dimension
 
-        # Copy the poistions and resonances argumnet to assure they become
+        # Copy the positions and resonances argument to assure they become
         # NTlist objects
         if resonances:
             self.resonances = NTlist( *resonances )

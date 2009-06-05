@@ -183,6 +183,16 @@ class Xeasy( NTdict ):
     def importPeaks( self, molecule, peakFile, status='keep')   :
         """Read Xeasy peak file
            returns a PeaksList instance or None on error
+
+           JFD: description of XEASY peak list format:
+  43   1.760   3.143 1 T          0.000e+00  0.00e+00 -   0 2260 2587 0
+  46   1.649   4.432 1 T          1.035e+05  0.00e+00 r   0 2583 2257 0
+   ^ peak id                      ^ height
+       ^ chemical shifts                     ^ height dev   ^ resonance ids
+                     ^ ?                              ^ ?             ^ ?
+                       ^ ?                                ^ ?
+
+        resonance id is zero for unassigned.
         """
         #print '>>', molecule, peakFile
 
@@ -193,6 +203,7 @@ class Xeasy( NTdict ):
 
 
         dimension = 0
+        # f stands for field.
         for f in  AwkLike( peakFile ):
             if (f.NR == 1 and f.NF == 5):
                 dimension = f.int(5)
