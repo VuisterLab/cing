@@ -1,3 +1,22 @@
+!BIOSYM nmr_peak_intensities 1
+!
+! Produced by REGINE
+! at 29-May-96 20:19:15      
+!
+! File will need further editing
+!
+! NB For communication with FELIX
+ peak IDs must be in ascending order.
+! This is YOUR responsibility !
+!
+#mixing_times
+!
+     1.0000E-01
+!
+#peak_intensities
+!
+! Peak W2_ppm W1_ppm Intensities
+!
      1    9.048    2.339 8.0715E+06
      2    9.048    2.246 1.3748E+07
      3    9.048    2.080 6.2732E+06

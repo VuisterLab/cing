@@ -2524,7 +2524,7 @@ END_RESIDUE
 #   internal short
 RESIDUE GLUH     E
 #=======================================================================
-    nameDict = {'CCPN': 'protein Glu prot:HE2', 'BMRBd': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'INTERNAL_0': 'GLUH', 'INTERNAL_1': 'GLUH', 'CYANA': 'GLU', 'CYANA2': None, 'PDB': 'GLU', 'XPLOR': None}
+    nameDict = {'CCPN': 'protein Glu prot:HE2', 'BMRBd': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'INTERNAL_0': 'GLUH', 'INTERNAL_1': 'GLUH', 'CYANA': 'GLU', 'CYANA2': None, 'PDB': 'GLU', 'XPLOR': 'GLU'}
     comment = 'Protonated (neutral) GLU (uncommon)'
     properties = ['protein', 'aliphatic', 'large', 'charged']
     #---------------------------------------------------------------

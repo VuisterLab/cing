@@ -24,9 +24,9 @@ class AllChecks(TestCase):
         fastestTest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
+        doWhatif = True # disables whatif actual run
         doProcheck = True
-        doWattos = False
+        doWattos = True
         if fastestTest:
             htmlOnly = True
             doWhatif = False
@@ -34,10 +34,11 @@ class AllChecks(TestCase):
             doWattos = False
         pdbConvention = CYANA
         restraintsConvention = CYANA
-
+        doValidate = True
+        writeXeasy = True
 #        entryId = "1ai0"
-        entryId = "1brv"        # Small much studied PDB NMR entry
-#        entryId = "1brv_1model"        # Small much studied PDB NMR entry
+#        entryId = "1brv"        # Small much studied PDB NMR entry
+        entryId = "1brv_1model"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
 #        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB
@@ -52,15 +53,15 @@ class AllChecks(TestCase):
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
 
 
-        self.failIf( os.chdir(cingDirTmp),
-                     msg="Failed to change to directory for temporary test files: "+cingDirTmp
+        self.failIf(os.chdir(cingDirTmp),
+                     msg = "Failed to change to directory for temporary test files: " + cingDirTmp
                    )
-        project = Project.open( entryId, status='new' )
+        project = Project.open(entryId, status = 'new')
         if not project:
             NTerror('Failed opening project %s', entryId)
             exit(1)
 
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+        cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
         NTdebug("Reading files from directory: " + cyanaDirectory)
 
         # Import of the raw data; different formats for each entry. Sometimes
@@ -81,32 +82,37 @@ class AllChecks(TestCase):
         kwds['pdbFile'] = entryId
 
         # Skip restraints if absent.
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".upl")):
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
             kwds['uplFiles'] = [entryId]
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".aco")) and not entryId.startswith("1YWUcdGMP"):
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".aco")) and not entryId.startswith("1YWUcdGMP"):
             kwds['acoFiles'] = [ entryId ]
 
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")):
-            kwds['seqFile']  = entryId
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")):
+            kwds['seqFile'] = entryId
 
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".prot")):
-            self.assertTrue( os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")),
-                "Converter for cyana also needs a seq file before a prot file can be imported" )
+        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
+            self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
+                "Converter for cyana also needs a seq file before a prot file can be imported")
             kwds['protFile'] = entryId
-            kwds['seqFile']  = entryId
+            kwds['seqFile'] = entryId
 
-        project.cyana2cing(cyanaDirectory=cyanaDirectory,
-                           convention=restraintsConvention,
-                           coordinateConvention=pdbConvention,
+        project.cyana2cing(cyanaDirectory = cyanaDirectory,
+                           convention = restraintsConvention,
+                           coordinateConvention = pdbConvention,
                            copy2sources = True,
                            **kwds)
 
         project.save()
-        self.assertFalse(project.validate(htmlOnly=htmlOnly,
-                                          doProcheck = doProcheck,
-                                          doWhatif=doWhatif,
-                                          doWattos=doWattos ))
 
+        peaksFile = os.path.join(cyanaDirectory, entryId + ".pkr")
+        if os.path.exists(peaksFile):
+            self.assertFalse(project.importReginePeakList(peaksFile, XPLOR))
+
+        if doValidate:
+            self.assertFalse(project.validate(htmlOnly = htmlOnly,
+                                          doProcheck = doProcheck, doWhatif = doWhatif, doWattos = doWattos))
+        if writeXeasy:
+            self.assertFalse(project.export2Xeasy())
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

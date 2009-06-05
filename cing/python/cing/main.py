@@ -636,7 +636,7 @@ def main():
     if options.xeasy:
         xeasy = options.xeasy.split(',')
         if (len(xeasy) != 3):
-            NTerror("--xeasy: SEQFILE,PROTFILE,CONVENTION arguments required")
+            NTerror("--xeasy=SEQFILE,PROTFILE,CONVENTION arguments required")
         else:
             project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
 
@@ -644,9 +644,9 @@ def main():
     # Import xeasy peakFile
     #------------------------------------------------------------------------------------
     if options.xeasyPeaks:
-        xeasy = options.xeasy.split(',')
-        if (len(xeasy) != 4):
-            NTerror("--xeasyPeaks: SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
+        xeasy = options.xeasyPeaks.split(',')
+        if len(xeasy) != 4:
+            NTerror("--xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
         else:
             project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2], convention=xeasy[3])
 
