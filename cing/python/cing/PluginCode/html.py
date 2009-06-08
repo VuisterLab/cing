@@ -52,6 +52,8 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
+from cing.core.constants import DR_LEVEL
+from cing.core.constants import AC_LEVEL
 import os
 import shelve
 import shutil
@@ -844,11 +846,19 @@ class HTMLfile:
 
         relativePath = self.relativePath()
         cssLink = os.path.join(relativePath, cingPaths.css)
-        jsMultiLineLink = os.path.join(relativePath, cingPaths.jsMultiLine)
+
         self.stream.write(self._generateTag( 'link',
             rel="stylesheet", type="text/css", media="screen", href=cssLink))
+
+        # multiline popups by JavaScript
+        jsMultiLineLink = os.path.join(relativePath, cingPaths.jsMultiLine)
         self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
             type="text/javascript", src=jsMultiLineLink))
+
+        # other JS utilities
+        jsUtilLink = os.path.join(relativePath, cingPaths.jsUtil)
+        self.stream.write(self._generateTag( 'script', # Not needed for all but always nice.
+            type="text/javascript", src=jsUtilLink))
 
         self.stream.write(self.closeTag('head'))
         self.stream.write(self.openTag('body'))
@@ -1102,7 +1112,6 @@ class HTMLfile:
                     project.html.insertHtmlLinkInTag( 'li', main, project, item, text=item.name )
 
         '''
-
         section(tag, closeTag=False)
         self.insertHtmlLink(section, source, destination, text=text, id=id, **kwds)
         section(tag, openTag=False)
@@ -1805,10 +1814,15 @@ class ResidueHTMLfile( HTMLfile ):
                               )
     #end def
 
-    def _generateDistanceRestraintCode(self, drl):
+    def _generateDistanceRestraintCode(self, drl, toShow, k):
 
         t = self.distanceTable
+        i = -1
         for dr in t.rows(drl):
+            i += 1
+            # Start a section that will initially not be shown.
+            if i == toShow:
+                t('tbody', closeTag=False, id=k, style='display:none')
             t.nextColumn()
             self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto distance restraint %d', dr.id))
 
@@ -1841,6 +1855,9 @@ class ResidueHTMLfile( HTMLfile ):
             t.nextColumn()
             dr.rogScore.createHtmlForComments(self.right)
         #end for
+
+        if i >= toShow:
+            t('tbody', openTag=False)
     #end def
 
     def _mkDihedralTableTemplate(self):
@@ -1862,10 +1879,15 @@ class ResidueHTMLfile( HTMLfile ):
                               )
     #end def
 
-    def _generateDihedralRestraintCode(self, drl):
+    def _generateDihedralRestraintCode(self, drl, toShow,k):
 
         t = self.dihedralTable
+        i = -1
         for dr in t.rows(drl):
+            i += 1
+            # Start a section that will initially not be shown.
+            if i == toShow:
+                t('tbody', closeTag=False, id=k, style='display:none')
             t.nextColumn()
             self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto dihedral restraint %d', dr.id))
 
@@ -1881,6 +1903,8 @@ class ResidueHTMLfile( HTMLfile ):
 
             t.nextColumn()
             dr.rogScore.createHtmlForComments(self.right)
+        if i >= toShow:
+            t('tbody', openTag=False)
         #end for
     #end def
 
@@ -1891,6 +1915,13 @@ class ResidueHTMLfile( HTMLfile ):
                    'RDC' (?).
            Output:
         '''
+        toShow = 5 # number of restraints to show on the right side of Residue page
+
+        # Just provide the:
+#            form name,  (DR_LEVEL)
+#            checkbox name, and (DR_LEVEL)
+#            id of the tag to work on (DR_LEVEL).
+
         residue = self.residue
         project = self.project
 
@@ -1923,10 +1954,17 @@ class ResidueHTMLfile( HTMLfile ):
             RLobj = project[k]
             resRight('h3', closeTag=False)
             residue.html.insertHtmlLink(resRight, residue, RLobj, text=k)
+
+            resRL = tmpDict[k]
+            n = len(resRL)
+            if n > toShow:
+                nameStr = "'%s'" % k
+                onclickStr = "javascript:showHideByCheckBox('%s', this)" % k
+                resRight("input", "all", type="checkbox", name=nameStr, onclick=onclickStr)
+
             resRight('h3', openTag=False)
             resRight('p', closeTag=False)
             #resRight('br')
-            resRL = tmpDict[k]
             # sort list by 'violCount3' reverse order (higher to lower values)
             resRL = sortListByRogAndKey(resRL, 'violCount3' )
 
@@ -1935,12 +1973,11 @@ class ResidueHTMLfile( HTMLfile ):
             #    residue.html.insertHtmlLink(resRight, residue, dr, text=str(dr.id))
             #end for
             # display restraint by line
-            toShow = 5 # number of restraints to show on the right side of Residue page
 
             if type == 'Distance':
-                self._generateDistanceRestraintCode(resRL[0:toShow])
+                self._generateDistanceRestraintCode(resRL,toShow,k)
             elif type == 'Dihedral':
-                self._generateDihedralRestraintCode(resRL[0:toShow])
+                self._generateDihedralRestraintCode(resRL,toShow,k)
 #                for dr in resRL:
 #                    text = '%s:' % (str(dr.id))
 #                    residue.html.insertHtmlLink(resRight, residue, dr, text=text)
