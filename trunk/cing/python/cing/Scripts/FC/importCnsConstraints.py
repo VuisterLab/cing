@@ -24,7 +24,7 @@ from ccp.api.nmr import Nmr
 # if this information was specified.
 #
 
-from ccp.general.Util import getResonancesFromPairwiseConstraintItem
+from ccp.general.Util import getResonancesFromPairwiseConstraintItem #@UnresolvedImport
 
 #
 # Import the CNS format class
@@ -49,34 +49,34 @@ if __name__ == '__main__':
   #
   # Variables
   #
-  
+
   dataDir = 'data/'
   coordinateFileName = 'cns_1.pdb' # Is used for getting the sequence only!
-  distanceConstraintFileName = 'n15noesy.tbl'  
+  distanceConstraintFileName = 'n15noesy.tbl'
 
   currentDir = os.path.abspath('.')
   projectDir = os.path.join(currentDir,'local')
   projectName = 'testImportCnsConstraints'
-  
+
   #
   # Make sure the projectDir exists and delete existing data
   #
-  
+
   if not os.path.exists(projectDir):
     os.mkdir(projectDir)
 
   projectPath = os.path.join(projectDir,projectName)
   if os.path.exists(projectPath):
     shutil.rmtree(projectPath)
-  
+
   #
   # Create a CCPN Data Model Project (this is the root object within the
   # Data Model)
   #
-  
+
   ccpnProject = Implementation.MemopsRoot(name = projectName)
   nmrProject = Nmr.NmrProject(ccpnProject, name = ccpnProject.name)
-  
+
   #
   # Make sure it saves the information in the projectDir
   # To do this on the Python level you have to reset the path
@@ -86,28 +86,28 @@ if __name__ == '__main__':
   # Alternatively create the project in the right directory to
   # start with - see convertCns2Pdb
   #
-  
+
   for repository in ccpnProject.repositories:
-    
+
     if repository.name in ('userData','backup'):
-      
+
       (oldUrlPath,baseName) = uniIo.splitPath(repository.url.path)
       newUrlPath = uniIo.joinPath(projectDir,baseName)
-      
+
       repository.url = Implementation.Url(path = newUrlPath)
-  
+
   #
   # Open a Tk window for handling the popups...
   #
 
   root = Tkinter.Tk()
-  
+
   #
   # Create the FormatConverter CnsFormat object
   #
 
   cnsFormat = CnsFormat(ccpnProject,root)
-  
+
   #
   # Read in a sequence - this will create the molecular system with
   # all the atom information.
@@ -119,14 +119,14 @@ if __name__ == '__main__':
 
   coordinateFile = os.path.join(dataDir,coordinateFileName)
   ccpnChains = cnsFormat.readSequence(coordinateFile)
-  
+
   #
   # Read in a distance constraint list
   #
 
   distanceConstraintFile = os.path.join(dataDir,distanceConstraintFileName)
   ccpnConstraintList = cnsFormat.readDistanceConstraints(distanceConstraintFile)
-  
+
   #
   # Do some preliminary Data Model navigation to get input parameters for
   # linkResonances
@@ -134,10 +134,10 @@ if __name__ == '__main__':
   # An nmrConstraintStore links a group of constraint files
   # A structureGeneration links an nmrConstraintStore with a set of structures
   #
-  
+
   nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
   structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
-  
+
   #
   # Run linkResonances (this will generate a lot of output to the shell)
   #
@@ -150,56 +150,56 @@ if __name__ == '__main__':
   # Set forceDefaultChainMapping to 0 if you want to interactively link the
   # chains in the CCPN data model to the information from the constraint file
   #
- 
+
   cnsFormat.linkResonances(
-                      
+
                       forceDefaultChainMapping = 1,
                       globalStereoAssign = 1,
                       setSingleProchiral = 1,
                       setSinglePossEquiv = 1,
                       strucGen = structureGeneration
-                      
+
                       )
-  
+
   #
   # Save the CCPN project as XML files
   #
 
   ccpnProject.saveModified()
-  
+
   #
   # Navigate the Data Model, get a list of atoms per constraint item
   #
-    
+
   for distConstr in ccpnConstraintList.sortedConstraints():
 
     print "Constraint %d: %.1f-%.1f" % (distConstr.serial, distConstr.lowerLimit, distConstr.upperLimit)
 
     for constrItem in distConstr.sortedItems():
-      
+
       #
       # Now list the atoms linked to each of the two resonances associated with
       # this item.
       #
-      
+
       atomList = []
-      
+
       resonanceList = getResonancesFromPairwiseConstraintItem(constrItem)
-            
+
       for resonance in resonanceList:
         atomList.append([])
         if resonance.resonanceSet:
           for atomSet in resonance.resonanceSet.atomSets:
             for atom in atomSet.atoms:
               atomList[-1].append("%d.%s" % (atom.residue.seqCode,atom.name))
-              
+
         atomList[-1].sort()
         atomList[-1] = ','.join(atomList[-1])
-        
+
       print "   (%s) - (%s)" % (atomList[0],atomList[1])
-  
+
     print
-    
+
   #
   # Finally, note that you can read a CCPN project back in as well... use
   # the following as an example:

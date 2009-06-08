@@ -72,6 +72,7 @@ cingPaths = NTdict(
     html         = 'HTML',
     css          = 'cing.css',
     jsMultiLine  = 'multilineTitles.js',
+    jsUtil       = 'util.js',
     xplor        = os.getenv('xplorPath'),
     procheck_nmr = os.getenv('procheckPath'),
     aqpc         = os.getenv('aqpcPath'),
