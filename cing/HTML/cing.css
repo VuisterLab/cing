@@ -1,91 +1,120 @@
 /*<group=General Styles>*/
 
+/*org base: 11 px
+
+px    em  styles using them
+=========
+180 16.36
+111 10.09   header height
+80  7.27
+75  6.82
+55  5.00
+45  4.09    (header a padding-left)
+40  3.64
+30  2.73
+31  2.82    foot height
+25  2.27
+24  2.18
+20  1.82    h1
+18  1.64    h2
+16  1.45    h3
+14  1.27
+13  1.18    standout
+11  1.01    base
+10  0.91    remark padding
+ 5  0.45    table padding
+ 3  0.27
+ 1  0.09    line thickness
+
+Note that many sites quote a default of 16 px as the standard.
+*/
+
 body {
-	background: #ede8e2;
-	margin: 0px 0px 0px 0px;
+    background: #ede8e2;
+    margin: 0.0em 0.0em 0.0em 0.0em;
     text-align: left;
     /*text-align: center; changed to make popup html code align left*/
     color: #000000;
-	font: 11px Verdana, Arial, Helvetica, sans-serif;
+    font: 100.1% Verdana, Arial, Helvetica, sans-serif; /** Trick from http://www.astahost.com/info.php/Sizes-Webdesign-Em-Px_t8926.html */
 }
 
-p { 
+p {
 }
 
 b, strong {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 a:link {
-	color: #a3c159;
-	text-decoration: none;
+    color: #a3c159;
+    text-decoration: none;
 }
 
 a:visited {
-	color: #a3c159;
-	text-decoration: none;
+    color: #a3c159;
+    text-decoration: none;
 }
 
 a:hover, a:active {
-	color: #000000;
+    color: #000000;
 }
 
 .image-left {
-	margin: 3px;
-	padding: 3px;
-	float: left;
+    margin: 0.27em;
+    padding: 0.27em;
+    float: left;
 }
 
 .image-right {
-	margin: 3px;
-	padding: 3px;
-	float: right;
+    margin: 0.27em;
+    padding: 0.27em;
+    float: right;
 }
 
 a.red:link {
-	color: #ff0f00;
-/*	font-weight: bold;
-	text-decoration: none; */
+    color: #ff0f00;
+/*  font-weight: bold;
+    text-decoration: none; */
 }
 
 a.red:visited {
-	color: #ff0f00;
-	font-style: italic;
-/*	text-decoration: none; */
+    color: #ff0f00;
+    font-style: italic;
+/*  text-decoration: none; */
 }
 
 a.red:hover, a.red:active {
-	color: #000000;
+    color: #000000;
 }
 
 a.orange:link {
-	color: #ff8100;
-/*	text-decoration: none; */
+    color: #ff8100;
+/*  text-decoration: none; */
 }
 
 a.orange:visited {
-	color: #ff8100;
-	font-style: italic;
-	/*	text-decoration: none; */
+    color: #ff8100;
+    font-style: italic;
+    /*  text-decoration: none; */
 }
 
 a.orange:hover, a.orange:active {
-	color: #000000;
+    color: #000000;
 }
 
 a.green:link {
-	color: #a3c159;
-/*	text-decoration: none; */
+    color: #a3c159;
+/*  text-decoration: none; */
 }
 
 a.green:visited {
-	color: #a3c159;
-	font-style: italic;
-	/*	text-decoration: none; */
+    color: #a3c159;
+    font-style: italic;
+    /*  text-decoration: none; */
 }
 
 a.green:hover, a.green:active {
-	color: #000000;
+    color: #000000;
 }
 
 /*</group>*/
@@ -93,232 +122,246 @@ a.green:hover, a.green:active {
 /*<group=Layout>*/
 
 #red a:link {
-	color: #ff0f00;
-	text-decoration: none;
+    color: #ff0f00;
+    text-decoration: none;
 }
 
 #red a:visited {
-	color: #ff6765;
-	text-decoration: none;
+    color: #ff6765;
+    text-decoration: none;
 }
 
 #red a:hover, a:active {
-	color: #000000;
+    color: #000000;
 }
 
 #orange a:link {
-	color: #ff8100;
-	text-decoration: none;
+    color: #ff8100;
+    text-decoration: none;
 }
 
 #orange a:visited {
-	color: #ffaa4e;
-	text-decoration: none;
+    color: #ffaa4e;
+    text-decoration: none;
 }
 
 #orange a:hover, a:active {
-	color: #000000;
+    color: #000000;
 }
 
 #green a:link {
-	color: #a3c159;
-	text-decoration: none;
+    color: #a3c159;
+    text-decoration: none;
 }
 
 #green a:visited {
-	color: #a3c159;
-	text-decoration: none;
+    color: #a3c159;
+    text-decoration: none;
 }
 
 #green a:hover, a:active {
-	color: #000000;
+    color: #000000;
 }
 
 #container {
-	background: #FFFFFF right; /* This Is The BG Color Of The Main Div */
-	width: 100%;
-/*	margin: 0px auto; /* Right And Left Margin Widths To Auto */
-	text-align: left; /* Hack To Keep IE5 Windows Happy */
-	color: #3e3e3e;
-	color: #333333;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-/*    border: 1px red solid; */
+    background: #FFFFFF right; /* This Is The BG Color Of The Main Div */
+    width: 100%;
+/*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
+    text-align: left; /* Hack To Keep IE5 Windows Happy */
+    color: #3e3e3e;
+    color: #333333;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 #header {
-	width: 100%;
-	text-align: left;
-	list-style: none;
-	height: 111px;
-	background: #f0f9f9 url(header_bg.jpg) no-repeat;
-/*    border: 1px black solid; */
+    width: 100%;
+    text-align: left;
+    list-style: none;
+    height: 10.09em;
+    /* height: 111px; */
+    background: #f0f9f9 url(header_bg.jpg) no-repeat;
 }
 
 #header img {
-	display: inline;
-	float: right;
-	margin-top: 30px;
-	margin-right: 40px;
+    display: inline;
+    float: right;
+    /*margin-top: 2.73em;
+    margin-right: 3.64em;*/
+    margin-top: 30px;
+    margin-right: 40px;
+
+
 }
 
 #header h1 {
-	color: #0ca0ad;
-	margin: 0px;
-	font-size: 24px;
-	padding: 30px 20px 0px 45px;
+    color: #0ca0ad;
+    margin: 0.0em;
+    font-size: 2.18em;
+
+/*    padding: 2.73em 1.82em 0.0em 4.09em;
+      padding: 30px 20px 0px 45px;
+                top, right, bottom and left
+      */
+    padding-top:    1em;
+    padding-right:  0em;
+    padding-bottom: 0em;
+    padding-left:   2em;
 }
 
 #header h2 {
-	color: #70c2cc;
-	margin: 0px;
-	font-size: 18px;
-	font-weight: normal;
-	padding-right: 20px;
-	padding-left: 45px;
+    color: #70c2cc;
+    margin: 0.0em;
+    font-size: 1.64em;
+    font-weight: normal;
+    padding-right: 1.82em;
+    padding-left: 4.09em;
 }
 
 #header a {
-	color: #70c2cc;
-	margin: 0px;
-	font-size: 14px;
-	font-weight: normal;
-	padding-top:   10px;
-	padding-right: 0px;
-	padding-left: 45px;
+    color: #70c2cc;
+    margin: 0.0em;
+    font-size: 1.27em;
+    font-weight: normal;
+    padding-top:   0.91em;
+    padding-right: 0.0em;
+    padding-left: 4.09em;
+    padding-bottom:   0.91em;
 }
 
 #main {
-	width: 100%;
-/*	float: left;*/
-	text-align: left;
-/*	padding-top: 10px;
-	padding-bottom: 10px;
+    width: 100%;
+/*  float: left;*/
+    text-align: left;
+/*  padding-top: 0.91em;
+    padding-bottom: 0.91em;
 */
-    padding-left: 0px;
-	padding-right: 0px;
-/*  border: 1px green solid;*/
+    padding-left: 0.0em;
+    padding-right: 0.0em;
 }
 
 #main #left {
-	line-height: 2.0em;
-	float: left;
-	width: 49%;
-	padding-right: 0px;
-	padding-left: 0px;
-    border: 1px orange solid;
+    line-height: 2.0em;
+    float: left;
+    width: 49%;
+    padding-right: 0.0em;
+    padding-left: 0.0em;
+    border: 0.091em orange solid;
 }
 
 #main #right {
-	line-height: 2.0em;
-	float: right; 
-	width: 49%;
-	padding-right: 0px;
-	padding-left: 0px;
-    border: 1px orange solid;
+    line-height: 2.0em;
+    float: right;
+    width: 49%;
+    padding-right: 0.0em;
+    padding-left: 0.0em;
+    border: 0.091em orange solid;
 }
 
 #main h1 {
-	color: #0ca0ad;
-	font-size: 20px;
-	font-weight: normal;
-	margin-bottom: 3px;
-	padding-right: 5px;
-	padding-left: 5px;
+    color: #0ca0ad;
+    font-size: 1.82em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
+    padding-right: 0.45em;
+    padding-left: 0.45em;
 }
 
 #main h2 {
-	color: #0ca0ad;
-	font-size: 18px;
-	font-weight: normal;
-	margin-bottom: 3px;
-	padding-right: 5px;
-	padding-left: 5px;
+    color: #0ca0ad;
+    font-size: 1.64em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
+    padding-right: 0.45em;
+    padding-left: 0.45em;
 }
 
 #main h3 {
-	color: #0ca0ad;
-	font-size: 16px;
-	font-weight: normal;
-	margin-bottom: 3px;
-	padding-right: 5px;
-	padding-left: 5px;
+    color: #0ca0ad;
+    font-size: 1.45em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
+    padding-right: 0.45em;
+    padding-left: 0.45em;
 }
 
 #main p {
-	padding-right: 5px;
-	padding-left: 5px;
+    padding-right: 0.45em;
+    padding-left: 0.45em;
 }
 
 #main table {
-	padding-right: 5px;
-	padding-left: 5px;
+    padding-right: 0.45em;
+    padding-left: 0.45em;
 }
 
 #footer {
-	width: 100%;
-/*	margin: 0px auto; /* Right And Left Margin Widths To Auto */
-	text-align: center; /* Hack To Keep IE5 Windows Happy */;
-	height: 31px;
-/*	background: #ffffff;*/
-	background: #f0f9f9;
-	color: #000000;
-	font-size: 11px;
-/*    border: 1px yellow solid;*/
+    width: 100%;
+/*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
+    text-align: center; /* Hack To Keep IE5 Windows Happy */;
+    height: 2.82em;
+    background: #f0f9f9;
+    color: #000000;
+    font-size: 1.01em;
 }
 
 #footer p {
-	margin: 0px;
-	padding: 10px 0px 0px 0px;
+    margin: 0.0em;
+    padding: 0.91em 0.0em 0.0em 0.0em;
 }
 
 #footer a {
-	color: #a3c159;
-	text-decoration: none;
+    color: #a3c159;
+    text-decoration: none;
 }
 
 #footer a:hover {
-	text-decoration: none;
-	color: #000000;
+    text-decoration: none;
+    color: #000000;
 }
-	
+
 /*</group>*/
 
 /*<group=Global Classes>*/
 
 remark {
-	background: #0ca0ad;
-	padding: 10px;
-	color: #ffffff;
-	font-size: 16px;
-	font-style: italic;
-	font-weight: bold;
+    background: #0ca0ad;
+    padding: 0.91em;
+    color: #ffffff;
+    font-size: 1.45em;
+    font-style: italic;
+    font-weight: bold;
 }
 .standout {
-	background: #0ca0ad;
-	padding: 10px;
-	color: #ffffff;
-	font-size: 13px;
-	font-style: italic;
-	font-weight: bold;
+    background: #0ca0ad;
+    padding: 0.91em;
+    color: #ffffff;
+    font-size: 1.18em;
+    font-style: italic;
+    font-weight: bold;
 }
 
 h1 {
-	color: #0ca0ad;
-	font-size: 20px;
-	font-weight: normal;
-	margin-bottom: 3px;
+    color: #0ca0ad;
+    font-size: 1.82em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
 }
 
 h2 {
-	color: #0ca0ad;
-	font-size: 18px;
-	font-weight: normal;
-	margin-bottom: 3px;
+    color: #0ca0ad;
+    font-size: 1.64em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
 }
 
 h3 {
-	color: #0ca0ad;
-	font-size: 16px;
-	font-weight: normal;
-	margin-bottom: 3px;
+    color: #0ca0ad;
+    font-size: 1.45em;
+    font-weight: normal;
+    margin-bottom: 0.27em;
+}
+
+/* Class that can be added by JS in eg customTables */
+.smallerEm {
+     font-size: 0.8em;
 }

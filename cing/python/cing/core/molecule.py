@@ -3227,6 +3227,24 @@ Atom class: Defines object for storing atom properties
         return self.db.hasProperties('methylproton')
     #end def
 
+    def isMethylProtonButNotPseudo( self ):
+        """
+        Return True if atm is a methyl proton but not a pseudo atom.
+        """
+        if not self.db.hasProperties('methylproton'):
+            return False
+        return not self.isPseudoAtom()
+    #end def
+
+    def isIsopropylOrGuanidinium( self ):
+        """Return True if atom is a Leu or Val isopropyl or Arg guanidinium pseudo"""
+        n = len(self.db.real)
+        if (n == 4) or (n == 6):
+            return True
+        return False
+    #end def
+
+
     def isProton( self ):
         """Return Tue if atm is 1H
         """
