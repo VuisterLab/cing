@@ -1,4 +1,9 @@
+// Mostly Tested with recent versions of Safari 3.2.3, Firefox 3.0.8 on Mac &
+// MS IE 8.0.6001.xx and Google Chrome 1.0.154.xx on Windows Vista on 2009-06-08
+
 // Id is always unique within document tree so no list needed.
+// Use pretty long names since there is no additional namespace set up in javascript.
+
 function setDisplayById(id, displayAttribute) {
     var d = document.getElementById(id);
     if (d) {
@@ -25,20 +30,16 @@ function showHideByCheckBox(id, box) {
     // document.getElementById(id).style.display = vis;
 }
 
-// From http://www.tek-tips.com/faqs.cfm?fid=6620
-// Trim function, trims all leading and trailing spaces:
-String.prototype.trim = function() {
-    return (this.replace(/^[\s\xA0]+/, "").replace(/[\s\xA0]+$/, ""))
+function toggleShowHideByCheckBox(id1, id2, box) {
+    // If checkbox is checked the element with id1 is visible and id2 not and vice versa.
+    if (box.checked) {
+        showById(id1)
+        hideById(id2)
+    } else {
+        showById(id2)
+        hideById(id1)
+    }
+    // var vis = (box.checked) ? "block" : "none";
+    // document.getElementById(id).style.display = vis;
 }
 
-// startsWith to check if a string starts with a particular character sequence:
-String.prototype.startsWith = function(str) {
-    return (this.match("^" + str) == str)
-}
-
-// endsWith to check if a string ends with a particular character sequence:
-String.prototype.endsWith = function(str) {
-    return (this.match(str + "$") == str)
-}
-
-// <!-- <table id="y" style='display:none'> -->

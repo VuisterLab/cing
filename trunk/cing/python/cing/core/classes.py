@@ -1159,6 +1159,19 @@ class PeakList( NTlist ):
         self.rogScore  = ROGscore()
     #end def
 
+    def minMaxDimension(self):
+        """Return a tuple of the min and max of the spectral dimensions from all peaks
+        usually min == max but not guaranteed.
+        Will return (None,None) for empty lists
+        """
+        minD = None
+        maxD = None
+        for peak in self:
+            minD = min(peak.dimension, minD)
+            maxD = max(peak.dimension, maxD)
+        return (minD,maxD)
+
+
     def peakFromAtoms( self, atoms, onlyAssigned=True ):
         """Append a new Peak based on atoms list
            Return Peak instance, or None
@@ -2177,6 +2190,15 @@ class DihedralRestraint( NTdict ):
             return res.name + '.' + name
         else:
             return ''
+    #end def
+
+    def getDihedralName(self):
+        """
+        Construct a name;
+        have to do dynamically because upon restoring, the atoms are not yet defined
+        """
+        _res, name, _tmp = self.retrieveDefinition()
+        return name
     #end def
 
     def __str__(self):

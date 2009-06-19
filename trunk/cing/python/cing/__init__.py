@@ -51,6 +51,7 @@ __credits__    = """More info at http://nmr.cmbi.ru.nl/CING
 """ + __copyright__ # TODO: misusing credits for pydoc
 
 versionStr = "%s" % cingVersion
+cingRevisionUrl = "http://code.google.com/p/cing/source/detail?r="
 if cingRevision:
     versionStr += " (r%d)" % cingRevision
 

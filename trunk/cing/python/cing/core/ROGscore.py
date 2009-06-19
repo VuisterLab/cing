@@ -83,6 +83,17 @@ class ROGscore(NTdict):
                 dst('li' , openTag=False)
     #        dst('ul', openTag=False)
 
+    def createHtmlColorForString(self, dst, str):
+        """ Add the given str to the destination in a color reflecting the rog score.
+        Because the text needs to be encapsulated in a tag; the italics def is always used.
+        """
+        kw = {'style': 'font-style: italic'}
+        if self.isCritiqued():
+            color = COLOR_ORANGE
+            if self.isRed():
+                color = COLOR_RED
+            kw['color'] = color
+        dst('font' , str, **kw)
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The so called ROG score.

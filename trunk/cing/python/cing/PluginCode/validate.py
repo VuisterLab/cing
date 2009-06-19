@@ -159,7 +159,7 @@ def criticizePeaks( project, toFile=True ):
                     resonance.atom.peakPositions.append(peak.positions[i])
                     if not resonance.atom.isAssigned():
                         peak.rogScore.setMaxColor( COLOR_ORANGE,
-                                                    sprintf('ORANGE: dimension %d: Atom %s not assigned', i, resonance.atom)
+                                                    sprintf('ORANGE: %s unassigned', resonance.atom)
                                                   )
                     else:
                         if resonance.atom.db.spinType in errorMargins:
@@ -1237,6 +1237,8 @@ def validateAssignments( project, toFile = True   ):
             # Check if all realAtoms are assigned in case there is a pseudo atom
             if atm.hasPseudoAtom():
                 for a in atm.pseudoAtom().realAtoms():
+                    if a.isMethylProtonButNotPseudo():
+                        continue
                     if not a.isAssigned():
                         string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
 #                        NTmessage('%-20s %s', atm, string )

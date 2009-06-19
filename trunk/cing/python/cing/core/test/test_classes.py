@@ -20,8 +20,8 @@ import unittest
 class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
-    
-    def test_HTMLfile_simple(self):
+
+    def setupSimplestProject(self):
         entryId = 'test'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -31,7 +31,11 @@ class AllChecks(TestCase):
         project.appendMolecule(molecule) # Needed for html.
         molecule.updateAll()
         project.setupHtml() # Needed for creating the sub dirs.
-        
+        return project
+
+    def test_HTMLfile_simple(self):
+        project = self.setupSimplestProject()
+
         myhtml = HTMLfile('myTest.html', project, 'A Test')
         myhtml.header("a header")
         myhtml('h1', 'It is a test')
@@ -89,14 +93,14 @@ class AllChecks(TestCase):
 #        project.save()
         project.runCingChecks()
         project.setupHtml()
-        project.generateHtml(htmlOnly = htmlOnly)    
+        project.generateHtml(htmlOnly = htmlOnly)
         project.renderHtml()
-        
+
 
     def tttest_HTMLfile(self):
 
         """
-        Create two html files (project and moleucle) that have relative links to each other.
+        Create two html files (project and molecule) that have relative links to each other.
         Exercising the machinery in HTMLfile class.
         """
         entryId = "test_HTMLfile"

@@ -3,13 +3,12 @@ var g_CarEle = null;
 var g_iCavDivLeft;
 var g_iCavDivTop;
 
-function SetCavTimer(evt)
-{
+function SetCavTimer(evt) {
     var e = (window.event) ? window.event : evt;
     var src = (e.srcElement) ? e.srcElement : e.target;
 
-    //g_iCavDivLeft = e.clientX - 2;
-    //g_iCavDivTop = e.clientY + 19;
+    // g_iCavDivLeft = e.clientX - 2;
+    // g_iCavDivTop = e.clientY + 19;
     g_iCavDivLeft = e.clientX - 2 + document.body.scrollLeft;
     g_iCavDivTop = e.clientY + 19 + document.body.scrollTop;
 
@@ -18,8 +17,7 @@ function SetCavTimer(evt)
     g_CarEle = src;
 }
 
-function CancelCavTimer(evt)
-{
+function CancelCavTimer(evt) {
     var e = (window.event) ? window.event : evt;
     var src = (e.srcElement) ? e.srcElement : e.target;
 
@@ -31,12 +29,9 @@ function CancelCavTimer(evt)
     g_CarEle = null;
 }
 
-function ShowCavTitle()
-{
-    for (var i = g_CarEle.attributes.length - 1; i >= 0; i--)
-    {
-        if (g_CarEle.attributes[i].name.toUpperCase() == 'CAVTITLE')
-        {
+function ShowCavTitle() {
+    for ( var i = g_CarEle.attributes.length - 1; i >= 0; i--) {
+        if (g_CarEle.attributes[i].name.toUpperCase() == 'CAVTITLE') {
             var div = document.getElementById('cavTitleDiv');
             if (div)
                 break;
@@ -58,8 +53,9 @@ function ShowCavTitle()
             sTop = g_iCavDivTop.toString();
             sTop += 'px';
             div.style.top = sTop;
-            
-            div.innerHTML = g_CarEle.attributes[i].value.split("\n").join("<br>").split(" ").join("&nbsp;");
+
+            div.innerHTML = g_CarEle.attributes[i].value.split("\n").join(
+                    "<br>").split(" ").join("&nbsp;");
             document.body.appendChild(div);
 
             var iWidth = div.scrollWidth + 10;

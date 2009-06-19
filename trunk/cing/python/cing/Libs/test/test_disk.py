@@ -15,7 +15,7 @@ class AllChecks(TestCase):
         DONE = "DONE"
         f = open(DONE,"w")
         for i in range(10):
-            f.write("Line %d\n" % i)            
+            f.write("Line %d\n" % i)
         f.close()
         f2 = open(DONE,"r")
         lastLineList = tail(f2,1)

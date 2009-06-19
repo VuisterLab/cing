@@ -21,11 +21,11 @@ class AllChecks(TestCase):
 #        entryList = "AR3436AOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg ParvulustatOrg TTScoOrg TTScoParis VpR247Org "+\
 #                    "VpR247Paris VpR247Piscataway Wln34Paris apoTTHAcisOrg apoTTHAtransOrg mia40Org taf3Org wln34Org wln34Piscataway"
 #        entryList = entryList.split()
-#        entryList = "taf3".split()
+        entryList = "AR3436Org".split()
 #        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
 #TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
 
-        entryList = "CuTTHAcisFrankfurt".split()
+#        entryList = "apoTTHAcisOrg apoTTHAtransOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg mia40Org ParvulustatOrg taf3Org TTScoOrg".split()
 #        entryList = """
 #        apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway""".split()
