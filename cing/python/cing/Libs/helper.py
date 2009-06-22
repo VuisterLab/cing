@@ -39,9 +39,10 @@ def getSvnRevision():
             for cingSvnInfo in cingSvnInfoList:
                 if  cingSvnInfo.startswith('Revision:'):
                     cingRevisionStr = cingSvnInfo.split()[ - 1]
-                    cingRevision = int(cingRevisionStr) 
+                    cingRevision = int(cingRevisionStr)
                     return cingRevision
     except:
         pass
+#        _NTwarning("Failed to getSvnRevision()" )
     return None
 

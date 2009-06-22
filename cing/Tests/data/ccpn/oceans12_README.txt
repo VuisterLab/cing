@@ -21,7 +21,8 @@ On the restraint side:
 **********************
 1brv Discover
 1bus no parsed
-1cjg XPLOR
+1cjg XPLOR ambi restraints (end of first block) but a large entry
+1ieh XPLOR ambi
 1iv6 EMBOSS
 1kr8 Amber with RDCs. Has missing atoms.
 2hgh CYANA with RDCs.
