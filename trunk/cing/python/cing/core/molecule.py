@@ -3153,7 +3153,7 @@ Atom class: Defines object for storing atom properties
 
         realAtomList = pseudoAtom.realAtoms()
         if len(realAtomList) > 2:
-            NTcodeerror("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
+            NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
             return None
 
         if self == realAtomList[0]:

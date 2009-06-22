@@ -68,6 +68,9 @@ dbase.close()
 HTML_TAG_PRE = "<PRE>"
 HTML_TAG_PRE2 = "</PRE>"
 
+# class is a reserved keyword in python so encapsulate in dictonary.
+checkBoxClassAttr = {"class": "mediumCheckbox"}
+
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -935,7 +938,13 @@ class HTMLfile:
         # Append a default footer
         defaultFooter = NTlist()
         self._appendTag( defaultFooter, 'p', closeTag=False)
-        self._appendTag( defaultFooter, None, sprintf( ' %s  version %s ', programName, cingVersion) )
+        self._appendTag( defaultFooter, None, sprintf( ' %s version %s ', programName, cingVersion) )
+
+#        if not cingRevision:
+#            NTdebug("Trying to get CING revision; again...")
+#            cingRevision = getSvnRevision()
+
+#        NTdebug("CING revision [%s]" % cingRevision)
         if cingRevision:
             cingRevisionUrlStr = cingRevisionUrl + `cingRevision`
             self._appendTag( defaultFooter, None, '(' , closeTag=False)
@@ -1107,12 +1116,14 @@ class HTMLfile:
 
         if not source:
             # Happens for 2k0e
-            NTwarning("No Cing object source defined here")
+            NTwarning("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         if not destination:
             # Happens for 2k0e
-            NTwarning("No Cing object destination defined here")
+            NTwarning("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         link = self.findHtmlLocation( source, destination, id )
@@ -1870,7 +1881,12 @@ class ResidueHTMLfile( HTMLfile ):
 
         for dr in t.rows(drl):
             t.nextColumn()
-            self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto distance restraint %d', dr.id))
+
+            isAmbi = len(dr.atomPairs) > 1
+            drId = "%s" % dr.id
+            if isAmbi:
+                drId = "%s.00" % dr.id
+            self.insertHtmlLink(self.right, self.residue, dr, text=drId, title=sprintf('goto distance restraint %d', dr.id))
 
             if len(dr.atomPairs):
                 pair = dr.atomPairs[0]
@@ -1880,10 +1896,13 @@ class ResidueHTMLfile( HTMLfile ):
                     t.nextColumn()
                     # not including the . anymore since there will already be a ' ' space that can't be removed.
                     self.insertHtmlLink( self.right, self.residue, chain,   text = chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)) )
-                    self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, title = sprintf('goto residue %s', residue._Cname(-1)) )
+                    if residue == self.residue:
+                        self.right( 'i', residue.name )
+                    else:
+                        self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, title = sprintf('goto residue %s', residue._Cname(-1)) )
                     self.insertHtmlLink( self.right, self.residue, atom,    text = atom.name,    title = sprintf('goto atom %s', atom._Cname(-1)) )
                 # end for
-                if len(dr.atomPairs) > 1:
+                if isAmbi:
                     t(None,'etc.')
             #end for
 
@@ -2094,8 +2113,8 @@ class AtomsHTMLfile( HTMLfile ):
         table.nextColumn()
         self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
 
-        table.nextColumn()
-        self.insertHtmlLink( self.main, self.atomList, atom,    text = atom.name)
+        table.nextColumn(atom.name)
+#        self.insertHtmlLink( self.main, self.atomList, atom,    text = atom.name)
 
         table.nextColumn(valueStr)
         table.nextColumn(errorStr)
@@ -2175,7 +2194,7 @@ class AtomsHTMLfile( HTMLfile ):
 
         if atomCritiquedPresent:
 #           checked="false"
-            self.main("input", boxStr, type="checkbox", onclick=onclickStr)
+            self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
         self.main('h1', openTag=False)
 
         if atomCritiquedPresent:
@@ -2288,7 +2307,8 @@ class RestraintListHTMLfile( HTMLfile ):
     def _rowDr(self, restraint, idx, table, isSourceForAtom=True):
         """Generate one row in table for restraint.
         Id will be set to first atomPair
-        If isSourceForAtom is not set then..
+        If isSourceForAtom is not set then the row will not be labelled as a the source for only one can be
+        and we're inserting 2 of these tables into the HTML DOM tree.
         """
 
         # A restraint with just one pair can be identified by not adding a sub id for the first pair!
@@ -2471,9 +2491,23 @@ class RestraintListHTMLfile( HTMLfile ):
         tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
         # Make table with only critigued atoms if needed
         itemListCritiqued = []
-        for item in self.restraintList:
-            if item.rogScore.isCritiqued():
-                itemListCritiqued.append(item)
+
+        mapRowIdx2RestraintAtomPair = {}
+        mapRowIdx2RestraintAtomPairCritiqued = {}
+        rowIdx = 0
+        rowIdxCritiqued = 0
+        for restraint in self.restraintList:
+            for idx, _atomPair in enumerate(restraint.atomPairs):
+                mapRowIdx2RestraintAtomPair[rowIdx] = ( restraint, idx)
+                rowIdx +=1
+                if restraint.rogScore.isCritiqued():
+                    mapRowIdx2RestraintAtomPairCritiqued[rowIdxCritiqued] = ( restraint, idx)
+                    rowIdxCritiqued += 1
+            if restraint.rogScore.isCritiqued():
+                itemListCritiqued.append(restraint)
+#                pairListCritiquedCount += pairCount
+        pairListCount = rowIdx # determines row cound
+        pairListCritiquedCount = rowIdxCritiqued # determines row cound
 
         # reenable after testing is done.
         itemCritiquedPresent = len(itemListCritiqued) > 0
@@ -2487,7 +2521,9 @@ class RestraintListHTMLfile( HTMLfile ):
 
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("input", boxStr, type="checkbox", onclick=onclickStr)
+            self.main("h1", "Restraints", closeTag = False)
+            self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+            self.main("h1", openTag = False)
 
         if itemCritiquedPresent:
             # Make short hidden table.
@@ -2498,19 +2534,24 @@ class RestraintListHTMLfile( HTMLfile ):
             self.main("h1", "Critiqued restraints")
             table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-short" , **tableKwds )
 
-            for item in table.rows( itemListCritiqued ):
-                for idx in range(len(item.atomPairs)):
-                    self._rowDr( item, idx, table, isSourceForAtom=False )
+
+            for rowIdx in table.rows(range(pairListCritiquedCount)):
+                restraint, idx = mapRowIdx2RestraintAtomPairCritiqued[rowIdx]
+                self._rowDr( restraint, idx, table, isSourceForAtom=False )
             self.main("div", openTag=False)
 
 
         self.main("div", closeTag=False, id=k2)
-        self.main("h1", "All atoms")
+        self.main("h1", "All restraints")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-long", **tableKwds )
-        for item in table.rows( self.restraintList ):
+        table.rows(range(pairListCount)) # set the rows
+#        for restraint in self.restraintList:
 #        for item in table.rows( self.restraintList[0:10] ):
-            for idx in range(len(item.atomPairs)):
-                self._rowDr( item, idx, table )
+#            idx = 0 # index of atomPair within restraint
+        for rowIdx in table.rows(range(pairListCount)):
+            restraint, idx = mapRowIdx2RestraintAtomPair[rowIdx]
+            self._rowDr( restraint, idx, table )
+#            idx += 1
         self.main("div", openTag=False)
         self.render()
     #end def
@@ -2562,7 +2603,9 @@ class RestraintListHTMLfile( HTMLfile ):
 
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("input", boxStr, type="checkbox", onclick=onclickStr)
+            self.main("h1", "Restraints", closeTag = False)
+            self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+            self.main("h1", openTag = False)
 
         if itemCritiquedPresent:
             # Make short hidden table.
@@ -2738,7 +2781,9 @@ class PeakListHTMLfile( HTMLfile ):
 
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("input", boxStr, type="checkbox", onclick=onclickStr)
+            self.main("h1", "Peaks", closeTag = False)
+            self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+            self.main("h1", openTag = False)
 
         if itemCritiquedPresent:
             # Make short hidden table.

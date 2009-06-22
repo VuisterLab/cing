@@ -242,7 +242,7 @@ a.green:hover, a.green:active {
 #main #left {
     line-height: 2.0em;
     float: left;
-    width: 49%;
+    width: 43%;
     padding-right: 0.0em;
     padding-left: 0.0em;
     border: 0.091em orange solid;
@@ -251,7 +251,7 @@ a.green:hover, a.green:active {
 #main #right {
     line-height: 2.0em;
     float: right;
-    width: 49%;
+    width: 55%;
     padding-right: 0.0em;
     padding-left: 0.0em;
     border: 0.091em orange solid;
@@ -365,3 +365,10 @@ h3 {
 .smallerEm {
      font-size: 0.8em;
 }
+
+/* Used for checkboxes like selecting only the critiqued records.
+.mediumCheckbox {
+   height: 1.73em;
+   width: 1.73em;
+}
+
