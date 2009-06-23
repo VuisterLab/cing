@@ -1309,14 +1309,15 @@ class DistanceRestraint( NTdict ):
                 comment = 'RED: fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_RED, comment)
-        if (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
-            comment = 'ORANGE: violSd: %7.2f' % self.violSd
-#            NTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
         if (project.valSets.DR_RMSALL_BAD != None) and (self.violSd >= project.valSets.DR_RMSALL_BAD):
             comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
+        elif (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
+            comment = 'ORANGE: violSd: %7.2f' % self.violSd
+#            NTdebug(comment)
+            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+
 
         if project.valSets.FLAG_MISSING_COOR:
             #modelCount = self.getModelCount()
@@ -2043,7 +2044,7 @@ class DihedralRestraint( NTdict ):
             comment = 'RED: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
-        if (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
+        elif (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
             comment = 'ORANGE: violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)

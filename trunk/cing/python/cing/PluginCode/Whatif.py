@@ -815,9 +815,8 @@ Name   :    0 ; A    ;  171 ; VAL  ; _    ;  CA  ; _
                         ^ Res Id
                                              ^ Atom Id
             """
-
         # New or old format.
-        if string.find(';'):
+        if string.find(';')>=0:
             try:
                 a = string.split(';')
                 a = [el.strip() for el in a]
