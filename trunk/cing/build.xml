@@ -4,107 +4,108 @@
 
 
 <project name="cing" default="iCing-servlet-install" basedir=".">
-	<description>Builds, tests, and runs the project cing.</description>
-	<echo>Starting Ant with updated build file</echo>
-	<property file="cing.properties" />
+    <description>Builds, tests, and runs the project cing.</description>
+    <echo>Starting Ant with updated build file</echo>
+    <property file="cing.properties" />
 
-	<!-- Added for functionality. Requires a ant-contrib.jar in classpath. -->
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+    <!-- Added for functionality. Requires a ant-contrib.jar in classpath. -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<target name="init" description="init">
-		<!-- Set the below to development 0 or production 1-->
-		<property name="isProduction" value="1" />
-		<if>
-			<equals arg1="${isProduction}" arg2="1" />
-			<then>
-				<echo message="Now in CING environment for production." />
-				<property name="home.web.port" value="${home.web.port.prod}" />
-				<property name="home.web.machine" value="${home.web.machine.prod}" />
-				<property name="home.web.machine.looped" value="${home.web.machine.looped.prod}" />
-			</then>
-			<else>
-				<echo message="Now in CING environment for development." />
-				<property name="home.web.port" value="${home.web.port.dev}" />
-				<property name="home.web.machine" value="${home.web.machine.dev}" />
-				<property name="home.web.machine.looped" value="${home.web.machine.looped.dev}" />
-			</else>
-		</if>
-		<property name="home.web.url" value="${home.web.machine}/${ant.project.name}" />
-		<property name="home.web.usermachine" value="${home.web.user}@${home.web.machine}" />
-
-
-		<if>
-			<not>
-				<available file="${build.classes.dir}" />
-			</not>
-			<then>
-				<echo message="Creating the path: ${build.classes.dir}." />
-				<mkdir dir="${build.classes.dir}" />
-			</then>
-		</if>
+    <target name="init" description="init">
+        <!-- Set the below to development 0 or production 1-->
+        <property name="isProduction" value="1" />
+        <if>
+            <equals arg1="${isProduction}" arg2="1" />
+            <then>
+                <echo message="Now in CING environment for production." />
+                <property name="home.web.port" value="${home.web.port.prod}" />
+                <property name="home.web.machine" value="${home.web.machine.prod}" />
+                <property name="home.web.machine.looped" value="${home.web.machine.looped.prod}" />
+            </then>
+            <else>
+                <echo message="Now in CING environment for development." />
+                <property name="home.web.port" value="${home.web.port.dev}" />
+                <property name="home.web.machine" value="${home.web.machine.dev}" />
+                <property name="home.web.machine.looped" value="${home.web.machine.looped.dev}" />
+            </else>
+        </if>
+        <property name="home.web.url" value="${home.web.machine}/${ant.project.name}" />
+        <property name="home.web.usermachine" value="${home.web.user}@${home.web.machine}" />
 
 
-		<copy verbose="true" file="python/cing/valSets.cfg" todir="java/src/cing/public/example" />
-		<echo message="Synced configuration file to iCing examples." />
+        <if>
+            <not>
+                <available file="${build.classes.dir}" />
+            </not>
+            <then>
+                <echo message="Creating the path: ${build.classes.dir}." />
+                <mkdir dir="${build.classes.dir}" />
+            </then>
+        </if>
 
-	</target>
 
+        <copy verbose="true" file="python/cing/valSets.cfg" todir="java/src/cing/public/example" />
+        <echo message="Synced configuration file to iCing examples." />
+
+    </target>
+
+    <!--
     <target name="set-version" depends="init">
-    	
         <tstamp>
             <format property="cing_version" pattern="yyyyMMdd-HHmm" />
         </tstamp>
         <echo message="Initiating cing version: ${cing_version}" />
-    	
+
         <replaceregexp file="java/src/cing/client/Settings.java" match="String VERSION = (.*)" replace='String VERSION = "${cing_version}";' byline="true" />
-        <echo message="Changed Settings.java to reflect new version." /> 
+        <echo message="Changed Settings.java to reflect new version." />
     </target>
-	
-	<target name="iweb-CING-install" depends="init">
-		<echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
-		<echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
-		<scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
-			<fileset dir="${home.web.local.dir}" />
-		</scp>
-		<!--
-		<sync verbose="true"></sync>
-		<copydir dest="" src="" ></copydir>
-		-->
-	</target>
+    -->
 
-	<target name="iCing--install" depends="init, iCing-servlet-install, iCing-static-install">
-		<echo message="Ensure that the iCing dir already exists remotely." />
-	</target>
+    <target name="iweb-CING-install" depends="init">
+        <echo message="Please insure that the iWeb sites have been compiled first. This ant target can alternatively be done from within iWeb." />
+        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
+        <scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
+            <fileset dir="${home.web.local.dir}" />
+        </scp>
+        <!--
+        <sync verbose="true"></sync>
+        <copydir dest="" src="" ></copydir>
+        -->
+    </target>
 
-
-	<target name="iCing-static-install" depends="init">
-		<echo message="Ensure that the iCing dir already exists remotely." />
-
-		<scp todir="${home.web.user}@${home.web.machine.looped}:${server.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
-			<fileset dir="${server.web.dir.local}" />
-		</scp>
-	</target>
+    <target name="iCing--install" depends="init, iCing-servlet-install, iCing-static-install">
+        <echo message="Ensure that the iCing dir already exists remotely." />
+    </target>
 
 
-	<target name="iCing-servlet-install" depends="init">
-		<echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
+    <target name="iCing-static-install" depends="init">
+        <echo message="Ensure that the iCing dir already exists remotely." />
 
-		<copy todir="${icing.production.local.dir}/WEB-INF/classes">
-			<fileset dir="java/bin" />
-		</copy>
-		<!-- The Wattos code changes every now and then so it needs to be included live. Every now and then.-->
-		<copy todir="${icing.production.local.dir}/WEB-INF/classes">
-			<fileset dir="${WS}/wattos/build" />
-		</copy>
+        <scp todir="${home.web.user}@${home.web.machine.looped}:${server.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
+            <fileset dir="${server.web.dir.local}" />
+        </scp>
+    </target>
 
-		<zip destfile="java/${icing.war.file}">
-			<fileset dir="${icing.production.local.dir}" />
-		</zip>
 
-		<echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" />
-		<echo message="with port = ${home.web.port} and knownhosts=${home.web.knownhosts} passphrase=${home.web.passphrase} keyfile=${home.web.keyfile} " />
-		<scp todir="${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
-			<fileset file="java/${icing.war.file}" />
-		</scp>
-	</target>
+    <target name="iCing-servlet-install" depends="init">
+        <echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
+
+        <copy todir="${icing.production.local.dir}/WEB-INF/classes">
+            <fileset dir="java/bin" />
+        </copy>
+        <!-- The Wattos code changes every now and then so it needs to be included live. Every now and then.-->
+        <copy todir="${icing.production.local.dir}/WEB-INF/classes">
+            <fileset dir="${WS}/wattos/build" />
+        </copy>
+
+        <zip destfile="java/${icing.war.file}">
+            <fileset dir="${icing.production.local.dir}" />
+        </zip>
+
+        <echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" />
+        <echo message="with port = ${home.web.port} and knownhosts=${home.web.knownhosts} passphrase=${home.web.passphrase} keyfile=${home.web.keyfile} " />
+        <scp todir="${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
+            <fileset file="java/${icing.war.file}" />
+        </scp>
+    </target>
 </project>

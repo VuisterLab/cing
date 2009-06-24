@@ -7,8 +7,12 @@ import java.util.Arrays;
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
     public static final boolean DO_DEBUG = false;
-    /** The next statement should not be changed by a single char. It gets updated by ant make file. */
-    public static final String VERSION = "20090504-1045";
+    /** The next statement should updated manually now.*/
+    public static final String VERSION = "0.88";
+    /** The next statement should updated manually now.*/
+    public static final String REVISION = "588";
+    /** URL for svn site specific for certain revision. */
+    public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
