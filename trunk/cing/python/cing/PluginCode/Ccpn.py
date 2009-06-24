@@ -358,6 +358,13 @@ class Ccpn:
         return True # To distinguish success from failure.
     # end def importFromCcpn
 
+    def isNonDescriptiveMolSysDefault(self, name):
+        name = name.replace('_', '')
+        name = name.lower()
+        if name.find("molecularsystem") >= 0:
+            return True
+        return False
+
     def importFromCcpnMolecule(self, modelCount=None):
         '''Descrn: Import MolSystems (Molecules) from Ccpn.Project instance and
                    append it to Cing.Project instance, including chains, residues
@@ -386,7 +393,11 @@ class Ccpn:
         self.ccpnConstraintStoreList = ccpnConstraintStoreList
 
         for ccpnMolSys in self.ccpnMolSystemList:
-            moleculeName = self.project.uniqueKey(self._ensureValidName(ccpnMolSys.code))
+            moleculeName = self._ensureValidName(ccpnMolSys.code)
+            if self.isNonDescriptiveMolSysDefault( moleculeName ):
+                moleculeName = self.project.name
+            moleculeName = self.project.uniqueKey(moleculeName)
+
             self.molecule = Molecule(name = moleculeName)
             self.project.appendMolecule(self.molecule)
 

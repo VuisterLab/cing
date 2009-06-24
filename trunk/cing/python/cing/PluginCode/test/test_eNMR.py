@@ -17,65 +17,65 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def ttttestEnmr(self):
-        entryList = """
-AR3436Cheshire
-AR3436Lyon
-AR3436Org
-AR3436Piscataway
-AR3436Seattle
-AR3436Utrecht
-BASPLyon
-BASPOrg
-BASPParis
-CuTTHAcisFrankfurt
-CuTTHAcisLyon
-CuTTHAcisOrg
-CuTTHAcisPiscataway
-CuTTHAtransFrankfurt
-CuTTHAtransLyon
-CuTTHAtransOrg
-CuTTHAtransPiscataway
-ParvulustatFrankfurt
-ParvulustatLyon
-ParvulustatOrg
-ParvulustatParis
-ParvulustatPiscataway
-TTScoFrankfurt
-TTScoLyon
-TTScoOrg
-TTScoParis
-TTScoPiscataway
-VpR247Cheshire
-VpR247Lyon
-VpR247Org
-VpR247Paris
-VpR247Piscataway
-VpR247Seattle
-VpR247Utrecht
-apoTTHAcisFrankfurt
-apoTTHAcisLyon
-apoTTHAcisOrg
-apoTTHAtransFrankfurt
-apoTTHAtransLyon
-apoTTHAtransOrg
-mia40Frankfurt
-mia40Lyon
-mia40Org
-mia40Piscataway
-taf3Lyon
-taf3Org
-taf3Paris
-taf3Piscataway
-wln34Frankfurt
-wln34Lyon
-wln34Org
-wln34Paris
-wln34Piscataway
-        """.split()
+    def tttestEnmr(self):
+#        entryList = """
+#AR3436Cheshire
+#AR3436Lyon
+#AR3436Org
+#AR3436Piscataway
+#AR3436Seattle
+#AR3436Utrecht
+#BASPLyon
+#BASPOrg
+#BASPParis
+#CuTTHAcisFrankfurt
+#CuTTHAcisLyon
+#CuTTHAcisOrg
+#CuTTHAcisPiscataway
+#CuTTHAtransFrankfurt
+#CuTTHAtransLyon
+#CuTTHAtransOrg
+#CuTTHAtransPiscataway
+#ParvulustatFrankfurt
+#ParvulustatLyon
+#ParvulustatOrg
+#ParvulustatParis
+#ParvulustatPiscataway
+#TTScoFrankfurt
+#TTScoLyon
+#TTScoOrg
+#TTScoParis
+#TTScoPiscataway
+#VpR247Cheshire
+#VpR247Lyon
+#VpR247Org
+#VpR247Paris
+#VpR247Piscataway
+#VpR247Seattle
+#VpR247Utrecht
+#apoTTHAcisFrankfurt
+#apoTTHAcisLyon
+#apoTTHAcisOrg
+#apoTTHAtransFrankfurt
+#apoTTHAtransLyon
+#apoTTHAtransOrg
+#mia40Frankfurt
+#mia40Lyon
+#mia40Org
+#mia40Piscataway
+#taf3Lyon
+#taf3Org
+#taf3Paris
+#taf3Piscataway
+#wln34Frankfurt
+#wln34Lyon
+#wln34Org
+#wln34Paris
+#wln34Piscataway
+#        """.split()
 
 #        entryList = entryList.split()
-#        entryList = "BASPOrg".split()
+        entryList = "BASPLyon".split()
 #        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
 #TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
 
