@@ -3,7 +3,15 @@
 # of a CCPN project to an iCing server.
 
 import os, tarfile, time, random, glob
-import urllib2, httplib, mimetypes, mimetools
+import httplib, mimetypes, mimetools
+
+try:
+  import urllib2
+except ImportError, err:
+  print "* Warning * Cannot import Python module urllib2."
+  print " - Please check your SSL libraries."
+  print " - Submission to to the iCing server will not work."
+  print err
 
 from memops.gui.MessageReporter import showWarning, showYesNo
 
@@ -17,6 +25,11 @@ FORM_ACTION_STATUS = "Status"
 FORM_ACTION_PROJECT_NAME = "ProjectName"
 FORM_ACTION_PURGE = "Purge"
 FORM_ACTION_LOG = "Log"
+
+FORM_RESIDUES = "Residues"
+FORM_ENSEMBLE = "Ensemble"
+FORM_VERBOSITY = "Verbosity"
+
 RESPONSE_EXIT_CODE = 'ExitCode'
 RESPONSE_SUCCESS = 'Success'
 RESPONSE_RESULT = 'Result'
@@ -56,7 +69,7 @@ def ccpnCingSubmitMacro(argServer, url="https://nmr.cmbi.ru.nl/"):
 
             print status
             for i in range(100):
-              time.sleep(5)
+              time.sleep(60)
               status2 = iCingStatus(credentials, iCingUrl)
               print status2
               
@@ -139,7 +152,20 @@ def iCingRun(credentials, url):
     data = credentials + [(FORM_ACTION,FORM_ACTION_RUN),]
     return  sendRequest(url, data, files=None)
 
+def iCingResidueSelection(credentials, url, residuesString):
+    """Send a residue selection to the iCing server
+    """
+     
+    data = credentials + [(FORM_RESIDUES,residuesString),]
+    return  sendRequest(url, data, files=None)
     
+def iCingEnsembleSelection(credentials, url, modelsString):
+    """Send a residue selection to the iCing server
+    """
+     
+    data = credentials + [(FORM_ENSEMBLE,modelsString),]
+    return  sendRequest(url, data, files=None)
+  
 def iCingLog(credentials, url):
     """Get iCing server log associated with given credentials.
     """

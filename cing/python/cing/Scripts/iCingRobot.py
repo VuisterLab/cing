@@ -1,12 +1,16 @@
 # Script for testing of FileUpload at the CGI server and the other commands at the main iCing server.
 # Run: python -u $CINGROOT/python/cing/iCing/test/iCingRobot.py
-from cing import cingDirTestsData 
+from cing import cingDirTestsData
 from cing import verbosityDebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.forkoff import do_cmd
-#from cing.iCing.iCingServer import PORT_SERVER
+from cing.Libs.NTutils import NTwarning
 import cing
+import mimetools
 import os
+import random
+import time
+import urllib2
 
 FORM_ACCESS_KEY = "AccessKey"
 FORM_USER_ID = "UserId"
@@ -19,89 +23,240 @@ FORM_ACTION_PROJECT_NAME = "ProjectName"
 FORM_ACTION_PURGE = "Purge"
 FORM_ACTION_LOG = "Log"
 
+RESPONSE_EXIT_CODE = 'ExitCode'
+RESPONSE_SUCCESS = 'Success'
+RESPONSE_RESULT = 'Result'
+RESPONSE_DONE = 'done'
+
+DEFAULT_URL = 'https://nmr.cmbi.ru.nl/'
+
+def getRandomKey(size=6):
+    """Get a random alphanumeric string of a given size"""
+    # Suggesting something from what Tim took:
+    ALPHANUMERIC = [chr(x) for x in range(48,58)+range(65,91)+range(97,123)]
+    random.shuffle(ALPHANUMERIC)
+
+    n = len(ALPHANUMERIC)-1
+    random.seed(time.time()*time.time())
+
+    return ''.join([ALPHANUMERIC[random.randint(0,n)] for x in range(size)])
+
+def getResultUrls(credentials, entryId, url=None):
+
+    userId = credentials[0][1]
+    accessKey = credentials[1][1]
+
+    resultBaseUrl = os.path.join(url, 'tmp/cing', userId, accessKey)
+    resultHtmlUrl = os.path.join(resultBaseUrl, entryId + ".cing", "index.html")
+    resultLogUrl = os.path.join(resultBaseUrl, "cingRun.log")
+    resultZipUrl = os.path.join(resultBaseUrl, entryId + "_CING_report.zip")
+
+    return resultBaseUrl, resultHtmlUrl, resultLogUrl, resultZipUrl
+
+def sendRequest(url, fields, files):
+    """Function to send form fields and files to a given URL.
+    """
+
+    contentType, bodyData = encodeForm(fields, files)
+
+    headerDict = {'User-Agent': 'anonymous',
+                  'Content-Type': contentType,
+                  'Content-Length': str(len(bodyData))
+                  }
+
+    request = urllib2.Request(url, bodyData, headerDict)
+    response = urlOpen(request)
+
+    if not response:
+      return
+
+    jsonTxt = response.read()
+
+    result = _processResponse(jsonTxt)
+    if result.get(RESPONSE_EXIT_CODE) != RESPONSE_SUCCESS:
+        msg  = 'Request not successful. Action was: %s' % fields
+        msg += ' Response was: %s' % jsonTxt
+        NTwarning('Failure %s' % msg)
+        return
+
+    return result
+
+def urlOpen(request):
+
+    try:
+        response = urllib2.urlopen(request)
+
+    except urllib2.URLError, e:
+        if hasattr(e, 'reason'):
+            if isinstance(request, urllib2.Request):
+              url = request.get_full_url()
+            else:
+              url = request
+
+            msg = 'Connection to server URL %s failed with reason:\n%s' % (url, e.reason)
+
+        elif hasattr(e, 'code'):
+            msg =    'Server request failed and returned code:\n%s' % e.code
+
+        else:
+            msg = 'Server totally barfed with no reason or fail code'
+
+        NTwarning('Failure %s'% msg)
+        return
+
+    return response
+
+def _processResponse(text):
+    """Convert the strings the iCingServer sends back into Python
+       When Python 2.6 is the CCPn standards this should use the JSON
+       libraries.
+    """
+
+    text = text[2:-2]
+
+    dataDict = {}
+
+    for pair in text.split('","'):
+      data = pair.split('":"')
+
+      if len(data) == 2:
+        key , value = data
+        dataDict[key] = value
+      else:
+        print "Trouble",  pair
+
+
+    return dataDict
+
+#########################################################################################
+# Initial code from http://www.voidspace.org.uk/python/cgi.shtml#upload                                                #
+#########################################################################################
+
+BOUNDARY = mimetools.choose_boundary()
+
+def encodeForm(fields, files=None, lineSep='\r\n',
+               boundary='-----'+BOUNDARY+'-----'):
+    """Function to encode form fields and files so that they can be sent to a URL"""
+
+    if not files:
+        files = []
+
+    lines = []
+    if isinstance(fields, dict):
+        fields = fields.items()
+
+
+    for (key, fileName, value) in files:
+        #fileType = mimetypes.guess_type(fileName)[0] or 'application/octet-stream'
+        fileType = 'application/octet-stream'
+
+        lines.append('--' + boundary)
+        lines.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, fileName))
+        if not fileType.startswith('text'):
+            lines.append('Content-Transfer-Encoding: binary')
+        lines.append('Content-Type: %s' % fileType)
+        #lines.append('Content-Length: %s\r\n' % str(len(value)))
+        lines.append('')
+        lines.append(value)
+
+    for (key, value) in fields:
+        lines.append('--' + boundary)
+        lines.append('Content-Disposition: form-data; name="%s"' % key)
+        lines.append('')
+        lines.append(value)
+
+
+    lines.append('--' + boundary + '--')
+    lines.append('')
+
+    bodyData = lineSep.join(lines)
+    contentType = 'multipart/form-data; boundary=%s' % boundary
+
+    return contentType, bodyData
+
+
 def iCingRobot():
 #    NTwarning("Expect errors without a server up and running.")
-    NTmessage("Firing up the iCing robot; aka CCPN Analysis example interface to CING")
-    ## queries possible
-    doSave  = 0
-    doRun   = 0
-    doStatus= 0
-    doLog   = 0
-    doPname = 0
-    doPurge = 1
+    NTmessage("Firing up the iCing robot; aka example interface to CING")
 
-    ## credentials.
-    user_id = os.getenv("USER", "UnknownUser")
-#    user_id = "jd3"
+    ## queries possible; do one at a time going down the list.
+    ## After the run is started the status will let you know if the run is finished
+    ## The log will show what the server is doing at any one time.
+    doSave  = 1 # Upload to iCing and show derived urls
+    doRun   = 0 # Start the run in Nijmegen
+    doStatus= 0 # Find out if the run finished
+    doLog   = 0 # Get the next piece of log file (may be empty)
+    doPname = 0 # Get the project name back. This is the entryId below.
+    doPurge = 0 # Remove data from server again.
+
+    # User id should be a short id (<without any special chars.)
+#    user_id = os.getenv("USER", "UnknownUser")
+    user_id = "iCingRobot"
     access_key = "123456"
+#    accessKey = getRandomKey() # Use a different one in a production setup.
 
-#    user_id = "Tim"
-#    access_key = "TimsDirtySecret"
+    entryId = '1brv' # 68K, smallest for quick testing.
 
-#    entryId = '1brv' # 68K, smallest for quick testing.
-    entryId = '1a4d' # 388K
+    # Select one of 2 types by uncommenting it
+    inputFileType = 'CCPN'
+#    inputFileType = 'PDB'
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
-#    rpcUrl = "localhost/iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
-#    rpcUrl = "localhost:8888/cing.iCing/serv/iCingServlet" # this is for the development when running in gwt hosted mode with embedded tomcat server at 8888.
-#/    rpcUrl = "dodos.dyndns.org/icing/serv/iCingServlet" # testing production-like 
-    rpcUrl = "https://nmr.cmbi.ru.nl/icing/serv/iCingServlet" # testing production
-                                
+    pdbFile = os.path.join(cingDirTestsData, "pdb", entryId, 'pdb' + entryId + ".ent")
+
+    inputFile = ccpnFile
+    if inputFileType == 'PDB':
+        inputFile = pdbFile
+
+    url = DEFAULT_URL
+    rpcUrl=url+"icing/serv/iCingServlet"
+
+    credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
+
 ##############################################################################################################
-    credentialSettings = "-F UserId=%s -F AccessKey=%s" % ( user_id, access_key)
-    cmdSave = "curl %s -F Action=%s -F UploadFile=@%s %s" % (
-        credentialSettings, 
-        FORM_ACTION_SAVE, 
-        ccpnFile, 
-        rpcUrl)
+
     if doSave:
-        NTmessage("Curling to: " + rpcUrl)
-        do_cmd(cmdSave)
-    
-    
+        data = credentials + [(FORM_ACTION,FORM_ACTION_SAVE),]
+        fileObj = open(inputFile, 'rb')
+        files = [( FORM_UPLOAD_FILE_BASE, inputFile, fileObj.read() ),]
+
+        result = sendRequest(rpcUrl, data, files)
+        if not result:
+            NTerror("Failed to save file to server")
+        else:
+            print "result of save request: %s" % result
+            urls = getResultUrls(credentials, entryId, url)
+            print "Base URL", urls[0]
+            print "Results URL:", urls[1]
+            print "Log URL:", urls[2]
+            print "Zip URL:", urls[3]
+
+
 ##############################################################################################################
-    cmdRun = """curl %s\
-        -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_RUN, rpcUrl)
+    files = None
+
     if doRun:
-        NTmessage("Curling to: " + rpcUrl)
-        do_cmd(cmdRun)
-    
-##############################################################################################################
-    cmdStatus = """curl %s\
-        -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_STATUS, rpcUrl)
+        data = credentials + [(FORM_ACTION,FORM_ACTION_RUN),]
+        print  sendRequest(rpcUrl, data, files)
+
     if doStatus:
-        NTmessage("Curling to: " + rpcUrl)
-        do_cmd(cmdStatus) 
-    
-##############################################################################################################
-    cmdLog = """curl %s\
-        -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_LOG, rpcUrl)
+        data = credentials + [(FORM_ACTION,FORM_ACTION_STATUS),]
+        print  sendRequest(rpcUrl, data, files)
+
     if doLog:
-        NTmessage("Curling to: " + rpcUrl)
-        do_cmd(cmdLog)
-    
-##############################################################################################################
-    cmdPname = """curl %s\
-        -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_PROJECT_NAME, rpcUrl)
+        data = credentials + [(FORM_ACTION,FORM_ACTION_LOG),]
+        print  sendRequest(rpcUrl, data, files)
+
     if doPname:
-        NTmessage("Curling to: " + rpcUrl)
-                
-        do_cmd(cmdPname)
-    
-##############################################################################################################
-    cmdPname = """curl %s\
-        -F Action=%s \
-        %s """ % (credentialSettings, FORM_ACTION_PURGE, rpcUrl)
+        data = credentials + [(FORM_ACTION,FORM_ACTION_PROJECT_NAME),]
+        print  sendRequest(rpcUrl, data, files)
+
     if doPurge:
-        NTmessage("Curling to: " + rpcUrl)
-        do_cmd(cmdPname)
+        data = credentials + [(FORM_ACTION,FORM_ACTION_PURGE),]
+        print  sendRequest(rpcUrl, data, files)
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     iCingRobot()
-    
-    
-    
+
+
+
