@@ -183,9 +183,9 @@ def iCingRobot():
     ## After the run is started the status will let you know if the run is finished
     ## The log will show what the server is doing at any one time.
     doSave  = 1 # Upload to iCing and show derived urls
-    doRun   = 0 # Start the run in Nijmegen
-    doStatus= 0 # Find out if the run finished
-    doLog   = 0 # Get the next piece of log file (may be empty)
+    doRun   = 1 # Start the run in Nijmegen
+    doStatus= 1 # Find out if the run finished
+    doLog   = 1 # Get the next piece of log file (may be empty)
     doPname = 0 # Get the project name back. This is the entryId below.
     doPurge = 0 # Remove data from server again.
 
@@ -195,17 +195,24 @@ def iCingRobot():
     access_key = "123456"
 #    accessKey = getRandomKey() # Use a different one in a production setup.
 
-    entryId = '1brv' # 68K, smallest for quick testing.
+#    entryId = '1brv' # 68K, smallest for quick testing.
+    entryId = 'gb1' # only included in xplor variant as single model.
 
-    # Select one of 2 types by uncommenting it
-    inputFileType = 'CCPN'
+    # Select one of the types by uncommenting it
+#    inputFileType = 'CCPN'
 #    inputFileType = 'PDB'
+    inputFileType = 'XPLOR'
+
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
     pdbFile = os.path.join(cingDirTestsData, "pdb", entryId, 'pdb' + entryId + ".ent")
+    xplorFile = os.path.join(cingDirTestsData, "xplor", entryId, entryId + ".pdb")
 
     inputFile = ccpnFile
     if inputFileType == 'PDB':
         inputFile = pdbFile
+    elif inputFileType == 'XPLOR':
+        inputFile = xplorFile
+
 
     url = DEFAULT_URL
     rpcUrl=url+"icing/serv/iCingServlet"

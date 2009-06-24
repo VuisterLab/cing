@@ -166,10 +166,10 @@ public class iCing implements EntryPoint, HistoryListener {
 
         String userAgent = UtilsJS.getUserAgent().toLowerCase();
         /** Considering http://msdn.microsoft.com/en-us/library/ms537503.aspx
-         * E.g. Windows-RSS-Platform/1.0 (MSIE 7.0; Windows NT 5.1) 
+         * E.g. Windows-RSS-Platform/1.0 (MSIE 7.0; Windows NT 5.1)
          */
         String msg = "userAgent: [" + userAgent + "]";
-        GenClient.showDebug(msg);        
+        GenClient.showDebug(msg);
         if (userAgent.contains("msie") ) {
             showBrowserWarning();
         }
@@ -177,8 +177,14 @@ public class iCing implements EntryPoint, HistoryListener {
     }
 
     private void showFooter() {
+//        String x = null;
+        String cingRevisionUrl = Settings.CING_REVISION_URL + Settings.REVISION;
+        String cingRevisionhtml = "(" +
+        "<a href=\""+cingRevisionUrl+"\">r"+Settings.REVISION+
+        "</a>)" + GenClient.eol;
+
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
-                + "CING  " + c.version() + " 0.8 (iCing v." + Settings.VERSION + ")\t" + GenClient.eol
+                + "CING  " + c.version() + " "+Settings.VERSION+" " + cingRevisionhtml + "\t" + GenClient.eol
                 + "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t" + GenClient.eol
                 + "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>" + GenClient.eol + " " + c.and()
                 + " \t" + GenClient.eol + "<a href=\"mailto:alanwilter@gmail.com\">Alan Wilter Sousa da Silva</a>"
@@ -253,7 +259,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
     public void showBrowserWarning() {
         About h = new About();
-        String userAgent = UtilsJS.getUserAgent().toLowerCase();        
+        String userAgent = UtilsJS.getUserAgent().toLowerCase();
         String msg = c.warningBrowser() + "[" + userAgent + "]" + "<BR>" + c.PleaseUse();
         GenClient.showError(msg);
         h.setHTML(msg);
@@ -628,7 +634,7 @@ public class iCing implements EntryPoint, HistoryListener {
 
     /**
      * Get the style name of the reference element defined in the current GWT theme style sheet.
-     * 
+     *
      * @param prefix
      *            the prefix of the reference style name
      * @return the style name
@@ -644,7 +650,7 @@ public class iCing implements EntryPoint, HistoryListener {
     /**
      * So this method is not in GenClient because all methods there are static Make sure that where ever the verbosity
      * can be set to debug it is also calling this routine.
-     * 
+     *
      * @param doDebugNow
      */
     public void setVerbosityToDebug(boolean doDebugNow) {
