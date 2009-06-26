@@ -1,5 +1,5 @@
 #summary How to program against the iCing web service
-#labels Featured,Phase-Design
+#labels Phase-Design
 
 = Premisses =
 
