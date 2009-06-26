@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>How to install CING for development on Eclipse</title>
+</head>
+<body>
+Install the requirements: Last updated on 11/11/2008<br><br>
+<ol>
+<li><b>Install Fink</b>
+<br>Make sure you have the unstable trees in your /sw/etc/fink.conf too. I had to add:
+        <PRE>/unstable/main and /unstable/fink </PRE>
+ and do: <PRE>fink selfupdate</PRE>
+ <li><b>Install Matlibplot  plotting utilities</b>
+<pre>fink install matplotlib-py25</pre>
+ Note that this also installs the python 2.5  numeric dependencies.
+ You might have to make a single change in something like line 508 of:<br>/sw/lib/python2.5/site-packages/matplotlib/backends/backend_pdf.py from:<br>
+ <PRE>unicode = cp1252.decoding_map[charcode] or 0</PRE>
+ to:
+ <PRE>unicode = 0</pre>
+This was reported and fixed. In Matlibplot version: 0.98.3-1 tested the problem is gone.
+See <a href="http://sourceforge.net/tracker/?func=detail&atid=560720&aid=1907021&group_id=80706">here</a>.
+<br><br>Another thing to worry about is the settings in .matplotlib/matplotlibrc (Which I had to create from example).
+ Make sure the back end set here allows rendering without going to an X server.
+So perhaps you need to create the file and then change from:
+<pre>backend     : GTKAgg </pre>
+to:
+<pre>backend     : Agg </pre>
+See this <a href="http://matplotlib.sourceforge.net/backends.html">discussion</a>.
+Another note here: watch out for on JFD's mac the X server gets opened on request by any process asking for it. This might limit application as a headless tool and was overcome by  setting the variables in the above rc file:<br>backend     : Agg
+<pre>
+numerix     : numpy # important for other deps.<br>interactive : False
+</pre>
+Finally create a symlink for python in order to override macs:
+<pre>cd /sw/bin; ln -s python2.5 python</pre>
+
+
+<li><b>Install cython</b>
+<pre>fink install cython-py25</pre>This package has been absent at times but was installed to: Cython-0.9.6.13.1-py2.5.egg-info. Strange.<li><b>Install gawk</b>
+<pre>fink install gawk</pre>
+ <li><b>Install ImageMagick (for convert program)</b>
+<pre>fink install imagemagick</pre>
+
+
+ <li><b>(Optionally) install povray</b>
+ <pre>fink install povray</pre>
+ </li>
+ <li><b>(Optionally) install IPython</b>
+ <pre>fink install ipython-py25</pre>
+ </li>
+ <li><b>(Optionally) install CCPN</b>
+ <pre>http://sourceforge.net/projects/ccpn</pre>
+ </li>
+ <li><b>(Optionally) install Wattos</b>
+ <pre>http://code.google.com/p/wattos/</pre>
+ <li><b>(Optionally) install What If</b>
+ <pre>From http://swift.cmbi.kun.nl/whatif/</pre>
+ Edit the Whati If installation dir in the 2 files  (3 lines) below <br><br>./DO_WHATIF.COM:DIR=/Users/jd/workspace34/whatif
+<br>./WHATIF.FIG:/Users/jd/workspace34/whatif/dbdata/
+<br>./WHATIF.FIG:/Users/jd/workspace34/whatif/qualty/
+<br><br>Note that compilation with macports gcc42 gfortran:
+/opt/local/bin/gfortran-mp-4.2
+works for compiling what if.<br>This is of course redundant with the fink setup but macports didn't have all required packages last time JFD checked (winter '07).<br>
+Found the dep by:
+<pre>port provides /opt/local/lib/gcc42/libgfortran.2.dylib
+</pre>
+
+<li><b>(Optionally) install Xplor</b>
+ <pre>From http://nmr.cit.nih.gov/xplor-nih/</pre>
+
+ <li><b>(Optionally) install Procheck NMR</b>
+ <pre>Google it. Or get a copy from JFD which works except for the last lines in the summary file.</pre>
+ <li><b>(Optionally) install Aqua</b>
+ <pre>From http://code.google.com/p/faquad/</pre>
+ <li><b>(Optionally) install pyMol</b>
+ <pre>fink install pymol-py25</pre>
+
+ <li><b>(Optionally) install Molmol</b>
+ <pre>Google it. Or get a copy from JFD which runs fine headless.</pre>
+
+<li><b>Setup Eclipse</b><BR>
+Always start from command line instead of Dock/Taskbar so that it gets your environment settings such as
+PRODIR for the PROCHECK_NMR installation.<br>
+CING is being developed on Eclipse 3.4 with PyDev Extensions for automatic code analysis and organization.
+ShellEd can be used in eclipse but version 1.0.3 fails whereas 1.0.2 works fine.<LI><b>Setup SVN  archive</b><BR>
+Register with google code to get a user account. Configure Eclipse for SVN; for 3.4 follow instructions from: http://blog.punchbarrel.com/2008/06/30/using-the-new-subversion-integration-in-eclipse-ganymede/<br>Check out the CING project from SVN in Eclipse. <br>
+This is a two wizard step process; first the SVN then the Pydev wizard.<br><br>
+<img src="svn_setup.png">
+<Br>
+<li><b>Project tree</b>
+<br>The project tree with the python code expanded should look something like:<br>
+<img src="project_overview.png">
+<Br>
+<li><b>PYTHONPATH inside Eclipse</b>
+<br>Add the local python dir to your PYTHONPATH inside Eclipse. The CCPN is mandatory
+but the Wattos python dir is really optional.
+<BR>
+<img src="python_path_setup.png"><br>
+<li><b>svn executable bit setting</b>
+<br>Use the svn properties browser to set the executable bit as per below.
+<BR>
+<img src="svn executable bit setting.png"><br>
+</ol>
+
+</body>
+</html>

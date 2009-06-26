@@ -117,7 +117,7 @@ def check_python():
     if version < 2.5:
         _NTerror('Failed to find Python version 2.5 or higher.')
         _NTerror('Current version is %s' % sys.version[:5])
-        _NTerror("Python 2.4 in the package managers such as yum, fink, and apt come with a matplotlib version that doesn't work with CING.")
+        _NTerror("Python 2.4 in the package managers such as yum, fink, port, and apt come with a 'mat plot lib' version that doesn't work with CING.")
         hasDep = False
     if hasDep:
         _NTmessage("........ Found 'Python'")

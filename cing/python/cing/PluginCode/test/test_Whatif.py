@@ -11,36 +11,36 @@ from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
 from cing.core.classes import Project
 from cing.core.constants import IUPAC
-from matplotlib.numerix.mlab import amax
-from numpy.core.arrayprint import array2string
-from numpy.core.arrayprint import set_printoptions
 from unittest import TestCase
 import cing
 import os
-import sys
 import unittest
+#from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
+#from numpy.core.arrayprint import array2string
+#from numpy.core.arrayprint import set_printoptions
+#import sys
 
 class AllChecks(TestCase):
 
-    def tttestHistogram(self):
-        resType = 'GLY'
-        for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
-            hist = histRamaBySsAndResType[ssType][resType]
-            sumHist =  sum(sum(hist))
-            maxHist =  amax(amax(hist))
-            NTdebug( 'histRamaBySsAndResType[%s][%s]' % (ssType, resType))
-            NTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
-            sys.output_line_width = 9999 # queried below.
-            set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
-            try:
-                strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
-                NTdebug( '\n%s' % strHist )
-            except:
-                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib
-                pass
+#    def tttestHistogram(self):
+#        from matplotlib.numerix.mlab import amax
+#        resType = 'GLY'
+#        for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
+#            hist = histRamaBySsAndResType[ssType][resType]
+#            sumHist =  sum(sum(hist))
+#            maxHist =  amax(amax(hist))
+#            NTdebug( 'histRamaBySsAndResType[%s][%s]' % (ssType, resType))
+#            NTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
+#            sys.output_line_width = 9999 # queried below.
+#            set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
+#            try:
+#                strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
+#                NTdebug( '\n%s' % strHist )
+#            except:
+#                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib
+#                pass
 
     def testRunWhatif(self):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry

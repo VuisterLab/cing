@@ -150,7 +150,7 @@ class Molgrap(NTdict):
             results_dir = root,
             )
         if status:
-            print "Molgrap.run: rendering/converting entry:", entry_code
+            NTdebug( "Molgrap.run: rendering/converting entry: %s" % entry_code)
             return True
 
 #        ## Remove temporary files if successful and possible
