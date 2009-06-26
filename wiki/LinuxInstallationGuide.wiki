@@ -1,9 +1,5 @@
 #summary Step by step instruction on Linux
 
-Please see [http://code.google.com/p/cing/source/browse/trunk/cing/Documentation/setupEclipse/development_installation_eclipse.html here] for complete instructions for installing using Eclipse.
-
-Also, you are likely finding new exceptions due to your specific setup. Please report them back to me at jurgenfd@gmail.com so I can improve the compatibility of the code.
-
 == Linux version ==
 {{{
 Linux version 2.6.27-11-generic (buildd@rothera) (gcc version 4.3.2 (Ubuntu 4.3.2-1ubuntu11) ) #1 SMP Thu Jan 29 19:24:39 UTC 2009
@@ -67,3 +63,5 @@ unsetenv CLASSPATH
 }}}
 
 For more permanent changes adjust the generated $CINGROOT/cing.csh
+
+From here you should follow the generalized [SetupCING]
