@@ -1,4 +1,5 @@
 #summary Setting up CING
+#labels Featured
 
 = Premise =
 First install the dependencies as described: MacInstallationGuide or LinuxInstallationGuide
