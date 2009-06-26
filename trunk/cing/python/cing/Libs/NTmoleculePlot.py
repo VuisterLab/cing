@@ -1,4 +1,4 @@
-#No matplotlib items imported here.
+#No mat plot lib items imported here.
 # Only code specific for molecule.py related things.
 # It would be good to move the ResPlot class here too.
 
@@ -51,20 +51,20 @@ class MoleculePlotSet:
     def renderMoleculePlotSet(self, fileName, createPngCopyToo = True):
         """
         Create a PDF with possibly multiple pages of this MoleculePlotSet.
-        
-        If createPngCopyToo is set then also created are: 
-        - _pin.gif file per set, 
+
+        If createPngCopyToo is set then also created are:
+        - _pin.gif file per set,
         - png file per set, and
         - png files per page.
-        
-        
-        The fileName is for the output of course. 
-        
-        The directory of that filename is also take for any other plots created. 
+
+
+        The fileName is for the output of course.
+
+        The directory of that filename is also take for any other plots created.
         """
         self.fileName = fileName
         self.createPngCopyToo = createPngCopyToo
-        
+
         # next variable must have same dimensions as self.keyLoLoL
         self.pointsLoLoL = [] # list per res in rangeList of lists
         for row in self.keyLoLoL:
@@ -86,10 +86,10 @@ class MoleculePlotSet:
 #        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
 #        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
         resNumb = 0
-        
+
         # start a new plot page for each resList
         for resList in self.rangeList:
-            for res in resList: 
+            for res in resList:
                 resNumb += 1
 #                NTdebug(`res`)
                 r = 0 # r for row
@@ -99,14 +99,14 @@ class MoleculePlotSet:
                     for mainOrAlt in row:
 #                        NTdebug("mainOrAlt: %s" % mainOrAlt)
                         pointsL = pointsLoL[i]
-                        j = 0 # for each 
+                        j = 0 # for each
                         for item in mainOrAlt:
 #                            NTdebug("item: %s" % item)
                             points = pointsL[j]
                             itemDictKeyList = item.keys()
                             itemDictKeyList.sort()
 #                            NTdebug("itemDictKeyList: %s" % itemDictKeyList)
-                            color = None        
+                            color = None
                             if getDeepByKeys( item, USE_ROG_FOR_COLOR_STR):
                                 color = res.rogScore.colorLabel
                             k = 0
@@ -136,28 +136,28 @@ class MoleculePlotSet:
         self.fileNameList = []
         self.pathPngList = []
         self.ps = None
-        
+
         f = self._renderMoleculePlotSetOriginal
         if self.makeCorrelationPlot:
-            f = self._renderMoleculePlotSetCorrelation                       
+            f = self._renderMoleculePlotSetCorrelation
         if f():
             return True
-            
+
         if joinPdfPages(self.fileNameList, self.fileName):
             NTerror('Failed to joinPdfPages from %s to: %s' % (self.fileNameList, fileName))
             return True
-        
+
         if createPngCopyToo:
             head, _tail = os.path.split(fileName)             # split is on last /
             # Just do the _pin.gif
             if not convert2Web(self.pathPngList, outputDir = head, doPrint = False, doFull = False):
                 NTerror('Failed to convert2Web from %s to: %s' % (self.pathPngList, head))
                 return True
-            
+
             if montage(self.pathPngList, fileName[: - 4] + ".png"):
                 NTerror('Failed to montage from %s to: %s' % (self.pathPngList, fileName[: - 4] + ".png"))
                 return True
-            
+
         # Remove the single pdf files.
         for fn in self.fileNameList:
             os.unlink(fn)
@@ -211,7 +211,7 @@ class MoleculePlotSet:
             length = ntPlotList[0].MAX_WIDTH_IN_RESIDUES
             start = (r - 1) * length
 
-            
+
             for i in range(nrows):
                 pointsLoL = self.pointsLoLoL[i]
                 pointsForAutoscaling = [] # might be done differently in future when alternative axis doesn't have same scale as main axis.
@@ -219,17 +219,17 @@ class MoleculePlotSet:
                     pointsL = pointsLoL[j]
                     for k in range(len(pointsL)): # k usually just 0
                         points = pointsL[k]
-                        for lineTypeIdx, serie in enumerate(points): # extra loop for potentially multiple series                            
+                        for lineTypeIdx, serie in enumerate(points): # extra loop for potentially multiple series
                             pointsOffset = convertPointsToPlotRange(serie, xOffset = - start, yOffset = 0, start = 0, length = length)
                             pointAttr = plusPoint
                             if j:      # alternative y-axis
                                 pointAttr = circlePoint
-#                            NTdebug("Using lineTypeIdx %d %s"%(lineTypeIdx, cingLineTypeList[lineTypeIdx]))                            
+#                            NTdebug("Using lineTypeIdx %d %s"%(lineTypeIdx, cingLineTypeList[lineTypeIdx]))
                             pointAttr.lineType = cingLineTypeList[lineTypeIdx]
     #                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
                             ntPlotList[i].lines(pointsOffset, pointAttr)
                             pointsForAutoscaling += pointsOffset
-                        
+
 #                NTdebug( 'autoScaleY row %d' % (i))
                 ntPlotList[i].autoScaleY(pointsForAutoscaling)
                 if getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR):
@@ -260,13 +260,13 @@ class MoleculePlotSet:
                 return True
 
             if self.createPngCopyToo:
-                fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r) 
+                fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r)
                 if ps.hardcopy(fileNamePng):
                     NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
                     return True
                 self.pathPngList.append(fileNamePng)
         # end for resList in rangeList:
-        
+
     def _renderMoleculePlotSetCorrelation(self):
         nrows = len(self.keyLoLoL)
         ps = NTplotSet() # closes any previous plots
@@ -298,7 +298,7 @@ class MoleculePlotSet:
 #            NTdebug("i (nrows): %d" % i)
             pointsLoL = self.pointsLoLoL[i]
             pointsForAutoscalingY = [] # might be done differently in future when alternative axis doesn't have same scale as main axis.
-            pointsForAutoscalingX = [] 
+            pointsForAutoscalingX = []
             for j in range(len(pointsLoL)): # j is 0 for main or 1 for alt
                 pointsL = pointsLoL[j]
 #                NTdebug("j: %d pointsL %s" % (j, pointsL))
@@ -311,7 +311,7 @@ class MoleculePlotSet:
 #                        NTdebug("l: %d point %s" % (l, point))
                         if not (l % 2):
                             xValueList = point
-                            continue                  
+                            continue
                         yValueList = point
                         for resId, resValueListTupleX in enumerate(xValueList):
                              # skip the residue location; it's not used in this variant of the code.
@@ -325,15 +325,15 @@ class MoleculePlotSet:
                             if not resValueListY:
 #                                NTdebug("No resValueListY")
                                 continue
-                                
+
 #                            NTdebug("resValueListX: %s" % resValueListX)
 #                            NTdebug("resValueListY: %s" % resValueListY)
                             Xav, Xsd, _n = resValueListX.average()
                             Yav, Ysd, _n = resValueListY.average()
                             if isNaN(Xsd): # No sd for single model ensembles.
-                                Xsd = 0.1                           
+                                Xsd = 0.1
                             if isNaN(Ysd):
-                                Ysd = 0.1                           
+                                Ysd = 0.1
                             width = Xsd * 2
                             height = Ysd * 2
                             if False: # while testing since sd are too large to plot then.
@@ -374,7 +374,7 @@ class MoleculePlotSet:
 
             ntPlotList[i].autoScaleX(pointsForAutoscalingX)
             ntPlotList[i].autoScaleY(pointsForAutoscalingY)
-            
+
             if getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR):
                 ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
 
@@ -390,13 +390,13 @@ class MoleculePlotSet:
             return True
 
         if self.createPngCopyToo:
-            fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r) 
+            fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r)
             if ps.hardcopy(fileNamePng):
                 NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
                 return True
             self.pathPngList.append(fileNamePng)
     # end for resList in rangeList:
-        
+
 
 class ResPlotSet(NTplotSet):
     """A single page with one or more rows of plots."""
@@ -410,7 +410,7 @@ class ResPlotSet(NTplotSet):
 def offSet(inputList, xOffset = 0., yOffset = 0.):
     result = []
     for i in inputList:
-        if i[0] == None: 
+        if i[0] == None:
             x = None
         else:
             x = i[0] + xOffset

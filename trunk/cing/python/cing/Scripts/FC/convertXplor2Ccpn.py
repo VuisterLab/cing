@@ -4,9 +4,12 @@ Used for eNMR workshop Lyon data sets.
 """
 
 from ccpnmr.format.converters.CnsFormat import CnsFormat
-
+from cing import cingDirTestsData
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.forkoff import do_cmd
 from glob import glob
 from memops.api import Implementation
@@ -15,47 +18,75 @@ import cing
 import os
 import shutil
 
+
 __author__     = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
 
-def convert(projectName, rootDir):
-    datasetDir = os.path.join(rootDir, projectName)
-    nijmegenDir = os.path.join(datasetDir, "Nijmegen")
-    authorDir = os.path.join(datasetDir, "Authors")
-    os.chdir(nijmegenDir)
+def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
+    """The structure when done will be:
 
-    projectPath = os.path.join(nijmegenDir, projectName)
-    if os.path.exists(projectPath):
-        shutil.rmtree(projectPath)
+    rootDir -> -> inputDir -> xxxx.pdb etc.
+               -> outputDir -> xxxx -> ccp etc.
+               -> xxxx.tgz (the resulting CCPN data)
+
+    E.g.
+    taf3Piscataway -> Authors ->  all.pdb etc.
+                   -> Nijmegen -> taf3Piscataway -> ccp etc.
+                   -> taf3Piscataway.tgz
+
+    Or in iCingSetup the rootDir is eg: /Library/WebServer/Documents/tmp/cing/ano/WjtXOz
+    with project name gb1
+
+    WjtXOz -> XPLOR  -> gb1.pdb etc.
+           -> CCPN   -> gb1 -> ccpn etc.
+           -> gb1.tgz
+
+
+    The in and out paths are relative to the rootDir.
+            """
+    inputDir = os.path.join(rootDir, inputDir)
+    outputDir = os.path.join(rootDir, outputDir)
+
+    if not os.path.exists(inputDir):
+        NTerror("Failed to find")
+    if os.path.exists(outputDir):
+        shutil.rmtree(outputDir)
+
+    os.mkdir(outputDir)
+    os.chdir(outputDir)
+
+    ccpnProjectPath = os.path.join(outputDir, projectName)
+    if os.path.exists(ccpnProjectPath):
+        shutil.rmtree(ccpnProjectPath)
 
     project = Implementation.MemopsRoot(name = projectName)
 
     nmrProject = project.newNmrProject(name = project.name)
     structureGeneration = nmrProject.newStructureGeneration()
-    guiRoot = Tkinter.Tk()
+    guiRoot = Tkinter.Tk() #  headless possible?
     format = CnsFormat(project, guiRoot, verbose = 1)
 
-    globPattern = authorDir + '/*.pdb'
+    globPattern = inputDir + '/*.pdb'
     fileList = glob(globPattern)
     NTdebug("From %s will read files: %s" % (globPattern,fileList))
     format.readCoordinates(fileList, strucGen = structureGeneration, minimalPrompts = 1, linkAtoms = 0)
 
     ccpnConstraintListOfList = []
 
-    globPattern = authorDir + '/*_noe.tbl'
+    globPattern = inputDir + '/*_noe.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read files: %s" % (globPattern,fileList))
     if fileList:
         ccpnConstraintList = format.readDistanceConstraints(fileList[0])
         ccpnConstraintListOfList.append( ccpnConstraintList )
 
-    globPattern = authorDir + '/*_hbond.tbl'
+    globPattern = inputDir + '/*_hbond.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read in files: %s" % (globPattern,fileList))
     if fileList:
         ccpnConstraintList = format.readDistanceConstraints(fileList[0])
         ccpnConstraintListOfList.append( ccpnConstraintList )
 
-    globPattern = authorDir + '/*_dihe.tbl'
+    globPattern = inputDir + '/*_dihe.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read in total files: %s" % (globPattern,fileList))
     if fileList:
@@ -86,17 +117,28 @@ def convert(projectName, rootDir):
     guiRoot.destroy()
 
 if __name__ == '__main__':
-
     cing.verbosity = verbosityDebug
-    rootDir = "/Users/jd/workspace34/cing/Tests/data/eNMR"
+
+    xplorDir = os.path.join(cingDirTestsData, "xplor")
 #    projectName = sys.argv[0]
 #    done: BASPLyon CuTTHAcisLyon
 #    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
 #    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
-    projectList = """   taf3Piscataway""".split()
+    projectList = """gb1""".split()
 #    projectList = [ "BASPLyon" ]
     # failed for
     # BASPLyon
 
     for projectName in projectList:
-        convert(projectName, rootDir)
+        testDataEntry = os.path.join(xplorDir, projectName)
+        rootDir = os.path.join(cingDirTmp,projectName)
+        inputDirRel="XPLOR"
+        inputDir = os.path.join(rootDir, inputDirRel)
+        if os.path.exists(rootDir):
+            NTmessage("Removing original rootDir: %s" % rootDir)
+            shutil.rmtree(rootDir)
+        os.mkdir(rootDir)
+
+        NTmessage("Copying input from %s to %s" % (testDataEntry, inputDir))
+        shutil.copytree( testDataEntry, inputDir)
+        convertXplor2Ccpn(projectName, rootDir)

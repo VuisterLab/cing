@@ -3570,7 +3570,7 @@ def limitToRange(v, low, hi):
     return v
 
 def NTmax(*args):
-    """Usefull as matplotlib overrides buildin"""
+    """Usefull as mat plot lib overrides buildin"""
     result = args[0]
     for a in args:
         if a > result:
@@ -3579,7 +3579,7 @@ def NTmax(*args):
 
 #
 def NTmin(*args):
-    """Usefull as matplotlib overrides buildin"""
+    """Usefull as mat plot lib overrides buildin"""
     result = args[0]
     for a in args:
         if a < result:
