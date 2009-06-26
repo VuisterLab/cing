@@ -1,0 +1,24 @@
+#summary Step by step instruction on Mac
+
+== Mac version ==
+{{{
+Mac OS X 10.5.7 (9J61)
+}}}
+
+== Install Mac Ports ==
+
+From http://www.macports.org/
+
+== Install mandatory deps ==
+
+As root do:
+{{{
+port install py25-matplotlib
+port install py25-ipython
+port install povray
+port install imagemagick
+port install ghostscript
+}}}
+The only problem I had was for a download that failed at our university but worked from home.
+
+From here you should follow the generalized [SetupCING]
