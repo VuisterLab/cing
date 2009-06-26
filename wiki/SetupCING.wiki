@@ -22,3 +22,6 @@ $CINGROOT/dis/Cython.
 cing --test -v 0
 }}}
 If all is fine it should only list ok at the end of each test.
+
+= Optional installs =
+A lot of functionality comes from optional installations; see OptionalInstallNotes.
