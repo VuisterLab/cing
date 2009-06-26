@@ -1,5 +1,8 @@
 #summary Setting up CING
 
+= Premise =
+First install the dependencies as described: MacInstallationGuide or LinuxInstallationGuide
+
 = Setup script =
 Replace $CINGROOT with your CING installation directory.
 {{{
