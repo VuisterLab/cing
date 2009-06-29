@@ -43,11 +43,11 @@ import time
 if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
-        NTmessage("Missing java classpath which is a dep for Wattos")
+        NTdebug("Missing java classpath which is an optional dependency for Wattos")
         raise ImportWarning('Wattos')
     if not (('/Users/jd/workspace34/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
              '/Users/jd/workspace34/wattos/build' in cingPaths.classpath)):
-        NTmessage("Missing Wattos jar in classpath [%s] which is a dep for Wattos" % cingPaths.classpath)
+        NTdebug("Missing Wattos jar in classpath [%s] which is an optional dep for Wattos" % cingPaths.classpath)
         raise ImportWarning('Wattos')
 #    NTmessage('Using Wattos')
 

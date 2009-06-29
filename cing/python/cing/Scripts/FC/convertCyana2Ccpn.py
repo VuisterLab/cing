@@ -3,9 +3,8 @@ Original from Wim Vranken.
 Used for eNMR workshop Lyon data sets.
 """
 
-from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from ccpnmr.format.converters.CyanaFormat import CyanaFormat
-
+from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.forkoff import do_cmd
@@ -109,13 +108,13 @@ def convert(projectName, rootDir):
 if __name__ == '__main__':
 
     cing.verbosity = verbosityDebug
-    rootDir = "/Users/jd/workspace34/cing/Tests/data/eNMR"
+    rootDir = "/Users/jd/eNMR"
 #    projectName = sys.argv[0]
 #    done: BASPLyon CuTTHAcisLyon
 #    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
 #    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
-    projectList = """   CuTTHAtransFrankfurt ParvulustatFrankfurt TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt """.split()
-#    projectList = [ "BASPLyon" ]
+#    projectList = """   CuTTHAtransFrankfurt ParvulustatFrankfurt TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt """.split()
+    projectList = [ "VpR247Lyon" ]
     # failed for
     # BASPLyon
 

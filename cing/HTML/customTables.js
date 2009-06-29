@@ -6,6 +6,7 @@
 jQuery(document).ready(function() {
 
     $("table[id^='dataTables-atomList']").dataTable({
+        "sDom": 'T<"clear">lfrtip',
         "bSort": true,
         // Initially show the natural order in molecule in order to show critiqued near by when coming in from other page.
         "aaSorting": [[0,'asc'], [1,'asc'], [3,'asc']],
@@ -32,7 +33,8 @@ jQuery(document).ready(function() {
         "bLengthChange": true,
         "iDisplayLength": 10000,
         "bFilter": true,
-        "bProcessing": true
+        "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip'
 //        "bStateSave": true, // uses cookie! test first! Not really nicer..
 //        "bAutoWidth": false,
     } );
@@ -306,4 +308,10 @@ jQuery(document).ready(function() {
           { "sType": "html", "sClass": "left" } //10 criteria is html too (list)
       ]
     } );
+
+    $("#example").dataTable({
+        "sDom": 'T<"clear">lfrtip'
+    } );
+
+
 });
