@@ -867,13 +867,16 @@ class HTMLfile:
             multilineTitles.js
             util.js
             jquery.js
-            dataTableMedia/js/jquery.datatables.js
             customTables.js
+            dataTableMedia/js/jquery.dataTables.js
+            dataTableMedia/js/TableTools.js
+            dataTableMedia/ZeroClipboard/ZeroClipboard.js
             """
 
         importCssListStr = """
             cing.css
             dataTableMedia/css/demo_table.css
+            dataTableMedia/css/TableTools.css
             """
 
 #<link media="screen" href="../cing.css" type="text/css" rel="stylesheet"/>

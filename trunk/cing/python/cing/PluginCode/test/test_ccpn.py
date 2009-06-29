@@ -22,9 +22,9 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-#        entryList = "1brv".split()
+        entryList = "1brv".split()
 #        entryList = "1brv_cs_peaks".split()
-        entryList = "1ieh".split()
+#        entryList = "1ieh".split()
 #        entryList = "1ai0".split()
 #        entryList = "1ti3".split()
 #        entryList = "Cu_CopK".split()
@@ -47,7 +47,7 @@ class AllChecks(TestCase):
         useNrgArchive = False
         modelCount=None
         if fastestTest:
-            modelCount=99
+            modelCount=1
             htmlOnly = True
             doWhatif = False
             doProcheck = False

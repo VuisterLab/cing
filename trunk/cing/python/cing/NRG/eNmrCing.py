@@ -78,11 +78,12 @@ class nrgCing(Lister):
         self.data_dir = os.path.join(self.results_base_dir, 'data')
 #        self.results_dir        = '/big/jurgen/molgrap/'        + run_id
         self.tmp_dir = self.results_dir + '/_tmp_'
-        self.results_host = 'localhost'
-        if self.isProduction:
-            # Needed for php script.
-            self.results_host = 'nmr.cmbi.ru.nl'
-        self.results_url = 'http://' + self.results_host + '/' + self.results_base + '/'
+        # all relative now.
+#        self.results_host = 'localhost'
+#        if self.isProduction:
+#            # Needed for php script.
+#            self.results_host = 'nmr.cmbi.ru.nl'
+#        self.results_url = 'http://' + self.results_host + '/' + self.results_base + '/'
 
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
@@ -110,7 +111,8 @@ class nrgCing(Lister):
         ## Total number of child processes to be done if all scheduled to be done
         ## are indeed to be done. This is set later on and perhaps adjusted
         ## when the user interrupts the process by ctrl-c.
-        self.url_redirecter = self.results_url + '/redirect.php'
+
+#        self.url_redirecter = self.results_url + '/redirect.php'
 
         self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
         ## Dictionary with matches pdb to bmrb
@@ -122,7 +124,8 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/index.html'
+#        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/index.html' # relative link below
+        self.cing_link_template = '../data/%t/%s/%s.cing/index.html'
         self.pdb_entries_White = {}
         self.processes_todo = None
         ## Dictionary with pid:entry_code info on running children
@@ -476,13 +479,13 @@ class nrgCing(Lister):
 #        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
-        NTmessage("Copy the adjusted php script")
-        org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.php')
-        new_file = os.path.join(self.results_dir, 'redirect.php')
-        file_content = open(org_file, 'r').read()
-        old_string = 'URL_BASE'
-        file_content = string.replace(file_content, old_string, self.results_url)
-        open(new_file, 'w').write(file_content)
+#        NTmessage("Copy the adjusted php script")
+#        org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.php')
+#        new_file = os.path.join(self.results_dir, 'redirect.php')
+#        file_content = open(org_file, 'r').read()
+#        old_string = 'URL_BASE'
+#        file_content = string.replace(file_content, old_string, self.results_url)
+#        open(new_file, 'w').write(file_content)
 
         NTmessage("Copy the adjusted html redirect")
         org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.html')
