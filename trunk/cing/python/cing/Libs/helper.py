@@ -46,3 +46,4 @@ def getSvnRevision():
 #        _NTwarning("Failed to getSvnRevision()" )
     return None
 
+

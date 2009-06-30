@@ -109,6 +109,8 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+from cing import OS_TYPE_LINUX
+from cing import OS_TYPE_MAC
 from cing import __author__ #@UnusedImport
 from cing import __copyright__ #@UnusedImport
 from cing import __credits__ #@UnusedImport
@@ -119,16 +121,17 @@ from cing import cingPythonDir
 from cing import cingVersion
 from cing import header
 from cing import starttime
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
+from cing.core.parameters import osType
 from cing.core.parameters import plugins
 from string import join
 import cing
@@ -174,8 +177,8 @@ def getStartMessage():
     """
     user = os.getenv("USER", "Unknown user")
     machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
-    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
-    on = "%s (%s)" % (machine, ostype)
+#    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
+    on = "%s (%s)" % (machine, osType)
     at = time.asctime()
 #    atForFileName = "%s" % at
 #    atForFileName = re.sub('[ :]', '_', atForFileName)
@@ -463,6 +466,11 @@ def getParser():
 project = None # after running main it will be filled.
 
 def main():
+
+    if not ( osType == OS_TYPE_MAC or
+             osType == OS_TYPE_LINUX ):
+        NTerror("CING only runs on unix")
+        sys.exit(1)
 
     global project
     global options

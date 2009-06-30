@@ -156,8 +156,8 @@ def check_pylab():
         result = 1
     except:
         _NTwarning('Failed to find Matplotlib.')
-    if not result:
-        _NTmessage("........ Found 'Matplotlib'")
+    if result:
+        _NTmessage("........ Found 'Matplotlib.pylab'")
     return result
 
 def check_ccpn():
@@ -189,10 +189,10 @@ def check_ccpn():
     if gotRequiredCcpnModules:
         _NTmessage("........ Found 'CCPN'")
     else:
-        _NTwarning('Failed to find CCPN.')
+        _NTmessage('Failed to find CCPN.')
 
     if missing:
-        _NTwarning( 'Missing (optional) packages: ' + ', '.join(missing))
+        _NTmessage( 'Missing (optional) packages: ' + ', '.join(missing))
 
 # disabled for this needs to be no extra- dependency. A version of numarray should
 # be in matplotlib. In fact the code doesn't refer to numarray anywhere. Or JFD
@@ -307,6 +307,7 @@ def _writeCingShellFile(isTcsh):
     print '==> Note by JFD'
     print ' There is another dependency; cython. Please install it and run:'
     print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
+    print ' After installing cython; rerun setup.py or manually update the settings file.'
 #end def
 #------------------------------------------------------------------------------------
 
@@ -340,7 +341,7 @@ if __name__ == '__main__':
 
     xplorPath,err  = _NTgetoutput('which xplor')
     if not xplorPath:
-        _NTwarning("Could not find 'xplor'")
+        _NTmessage("Could not find 'xplor'")
         parametersDict['xplorPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'xplor'")
@@ -358,7 +359,7 @@ if __name__ == '__main__':
             _NTmessage("........ Found 'procheck_nmr'")
             parametersDict['procheckPath'] = procheckPath
     else:
-        _NTwarning("Could not find 'procheck_nmr'")
+        _NTmessage("Could not find 'procheck_nmr'")
         parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
 
 #    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
@@ -373,7 +374,7 @@ if __name__ == '__main__':
             _NTmessage("........ Found 'aqua'")
             parametersDict['aqpcPath'] = aqpcPath
     else:
-        _NTwarning("Could not find 'aqua'")
+        _NTmessage("Could not find 'aqua'")
         parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
 
     whatifPath,err  = _NTgetoutput('which DO_WHATIF.COM')
@@ -384,7 +385,7 @@ if __name__ == '__main__':
         if os.path.exists(defaultWhatifPath):
             whatifPath = defaultWhatifPath
     if not whatifPath:
-        _NTwarning("Could not find 'what if'")
+        _NTmessage("Could not find 'what if'")
     else:
         _NTmessage("........ Found 'what if'")
         whatifPath = strip(whatifPath)
@@ -392,7 +393,7 @@ if __name__ == '__main__':
         head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
-            _NTwarning("Could not find 'dssp'")
+            _NTmessage("Could not find 'dssp'")
         else:
             _NTmessage("........ Found 'dssp'")
             parametersDict['dsspPath'] = dsspPath
@@ -407,7 +408,7 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        _NTwarning("Could not find 'Wattos'")
+        _NTmessage("Could not find 'Wattos'")
 #        _NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
         _NTmessage("........ Found 'wattos'")
@@ -438,7 +439,7 @@ if __name__ == '__main__':
 
     molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
-        _NTwarning("Could not find 'molmol'")
+        _NTmessage("Could not find 'molmol'")
         parametersDict['molmolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'molmol'")
@@ -446,7 +447,7 @@ if __name__ == '__main__':
 
     povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
-        _NTwarning("Could not find 'povray'")
+        _NTmessage("Could not find 'povray'")
         parametersDict['povrayPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'povray'")
@@ -456,7 +457,7 @@ if __name__ == '__main__':
     # others.
     pyMolPath,err  = ('/sw/lib/pymol-py25', None)
     if not pyMolPath:
-        _NTwarning("Could not find 'pymol' code (optional)")
+        _NTmessage("Could not find 'pymol' code (optional)")
         parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'pymol' code")
@@ -465,7 +466,7 @@ if __name__ == '__main__':
     # Just to get a message to user; not important.
     pyMolBinPath,err  = _NTgetoutput('which pymol')
     if not pyMolBinPath:
-        _NTwarning("Could not find 'pymol' binary (optional)")
+        _NTmessage("Could not find 'pymol' binary (optional)")
 #        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'pymol' binary")

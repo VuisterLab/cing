@@ -1,4 +1,7 @@
 from cing.Libs.NTutils import NTdict
+from cing import OS_TYPE_MAC
+from cing import OS_TYPE_LINUX
+from cing import osType
 import cing
 import os
 
@@ -93,6 +96,11 @@ for key in cingPaths.keys():
 
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
+
+shiftxExecutable = 'shiftx'
+if osType == OS_TYPE_LINUX:
+    shiftxExecutable = 'shiftx_linux'
+
 cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx')
 if cingPaths.classpath:
     cingPaths.classpath = cingPaths.classpath.split(':')

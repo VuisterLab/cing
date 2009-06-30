@@ -1,3 +1,5 @@
+"""python $CINGROOT/python/cing/PluginCode/test/test_shiftx.py 
+"""
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
@@ -20,10 +22,10 @@ class AllChecks(TestCase):
         pdbConvention = IUPAC
 #        entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"  RNA-protein complex.
-#        entryId = "1brv_1model"
+        entryId = "1brv_1model"
 #        entryId = "1tgq_1model" # withdrawn entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
-        entryId = "H2_2Ca_53"
+#        entryId = "H2_2Ca_53"
 
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR
