@@ -1211,20 +1211,24 @@ class ProjectHTMLfile( HTMLfile ):
         #end for
 
         # create an redirect index page in top of project
-        fmt = '''
+        # Changed time to 1 second so that the user at least knows she is redirected and
+        # the browser back functionality is maintained.
+        timeToWait = '1'
+        fmt = '''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>%s/title>
-<meta http-equiv="Refresh" content="0; url=%s">
+<title>%s
+</title>
+<meta http-equiv="Refresh" content="%s; url=%s">
 </head>
 <body>
-Redirecting to %s
+<H1>Redirecting to %s in %s seconds.</H1>
 </body>
 </html>
 '''
         f = open(project.path('index.html'),'w')
         path = os.path.join(self.project.molecule.name, moleculeDirectories['html'], 'index.html')
-        fprintf(f, fmt, title, path, path)
+        fprintf(f, fmt, title, timeToWait, path, path, timeToWait)
         f.close()
     #end def
 
