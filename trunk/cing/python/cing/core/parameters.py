@@ -1,5 +1,4 @@
 from cing.Libs.NTutils import NTdict
-from cing import OS_TYPE_MAC
 from cing import OS_TYPE_LINUX
 from cing import osType
 import cing
@@ -100,8 +99,7 @@ if cingPaths.convert:
 shiftxExecutable = 'shiftx'
 if osType == OS_TYPE_LINUX:
     shiftxExecutable = 'shiftx_linux'
-
-cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, 'shiftx')
+cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, shiftxExecutable)
 if cingPaths.classpath:
     cingPaths.classpath = cingPaths.classpath.split(':')
 
