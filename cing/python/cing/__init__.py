@@ -81,6 +81,33 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 # When specified differently it should also be reflected in some dictionaries
 # so better not.
 
+OS_TYPE_MAC = 'darwin'
+OS_TYPE_LINUX = 'linux'
+OS_TYPE_WINDOWS = 'windows' # unsupported.
+OS_TYPE_UNKNOWN = 'unknown'
+
+def getOsType():
+    """Return the type of OS, mapped to either darwin, linux, or windows from sys.platform"""
+
+    # Known platforms to JFD.
+    _platformMap = {
+        'darwin': 'Darwin',
+        'win32': 'Microsoft Windows',
+        'linux2': 'Linux',
+        'sunos5': 'Solaris',
+        'freebsd6': 'FreeBSD 6.0'
+    }
+    if sys.platform.startswith('darwin'):
+        return OS_TYPE_MAC
+    if sys.platform.startswith('linux'):
+        return OS_TYPE_LINUX
+    if sys.platform.startswith('sunos'): # Probably needs it's own type in future.
+        return OS_TYPE_LINUX
+    if sys.platform.startswith('win'):
+        return OS_TYPE_WINDOWS
+    return OS_TYPE_UNKNOWN
+osType = getOsType()
+
 #try:
 #    from localConstants import criteriaDict #@UnresolvedImport
 #except:
