@@ -1,4 +1,5 @@
 #summary Step by step instruction on Linux
+#labels Featured
 
 == Linux version ==
 {{{
@@ -9,10 +10,10 @@ Linux version 2.6.27-11-generic (buildd@rothera) (gcc version 4.3.2 (Ubuntu 4.3.
 
 == Install matplotlib ==
 
-Look for version 0.98.3-1 or higher. Developed with 0.98.5-1
-This installs python2.5 versions of everything on my test os; bigbird.cmbi.umcn.nl. This is the minimum python version: 2.5 because with the package managers 2.4 has a matplotlib that fails.
+Look for version 0.98.3-1 or higher.
+This installs the minimum python 2.5 versions of everything.
 
-Configure matplotlib by putting the configuration file in the download section here:
+Configure matplotlib by putting the configuration file from the download section:
 {{{
 http://cing.googlecode.com/files/matplotlibrc
 }}}
