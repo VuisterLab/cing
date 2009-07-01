@@ -153,7 +153,7 @@ def makePyMolByResidueROGMacro(project, path = None):
     """See doc at:
 http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
 """
-    NTdebug('makePyMolByResidueROGMacro')
+#    NTdebug('makePyMolByResidueROGMacro')
 
     _scriptStartupTxt = """#!/usr/bin/env python
 # Or execute: python THIS_FILE
@@ -231,7 +231,7 @@ def makePyMolByResidueMacro(project, keys,
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
     """
-    NTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    NTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
 
     # Just for testing:
     pdbCode = '1brv'

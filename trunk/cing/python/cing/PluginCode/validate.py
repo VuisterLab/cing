@@ -27,7 +27,6 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
-from cing import NaNstring
 from cing import cingPythonCingDir
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTcodeerror
@@ -91,7 +90,7 @@ def runCingChecks( project, ranges=None ):
     project.validateRestraints( toFile=True)
     project.validateDihedrals()
     project.validateModels()
-#    project.validateAssignments(toFile=True) in criticize now
+#    project.validateAssignments() in criticize now
     project.mergeResonances()
 
     project.checkForSaltbridges(toFile=True)
@@ -159,7 +158,7 @@ def criticizePeaks( project, toFile=True ):
                     resonance.atom.peakPositions.append(peak.positions[i])
                     if not resonance.atom.isAssigned():
                         peak.rogScore.setMaxColor( COLOR_ORANGE,
-                                                    sprintf('ORANGE: %s unassigned', resonance.atom)
+                                                    sprintf('%s unassigned', resonance.atom)
                                                   )
                     else:
                         if resonance.atom.db.spinType in errorMargins:
@@ -167,13 +166,13 @@ def criticizePeaks( project, toFile=True ):
                             errM = errorMargins[resonance.atom.db.spinType]
                             if math.fabs(resonance.value-shift)> 2.0*errM:
                                 peak.rogScore.setMaxColor( COLOR_RED,
-                                    sprintf('RED: dimension %d: position (%.2f) - shift Atom %s (%.2f) > 2.0*(%.2f)',
+                                    sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 2.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
 
                             elif math.fabs(resonance.value-shift)> 1.0*errM:
                                 peak.rogScore.setMaxColor( COLOR_ORANGE,
-                                    sprintf('ORANGE: dimension %d: position (%.2f) - shift Atom %s (%.2f) > 1.0*(%.2f)',
+                                    sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 1.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
                             #end if
@@ -185,7 +184,7 @@ def criticizePeaks( project, toFile=True ):
         #end for
     #end for
 
-#    project.validateAssignments(toFile = False)
+#    project.validateAssignments()
 
     for atm in project.molecule.allAtoms():
         atm.peakPositions.average()
@@ -253,11 +252,11 @@ def _criticizeResidue( residue, valSets ):
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
-                comment = 'RED: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
+                comment = 'whatif %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
-                comment = 'ORANGE: whatif [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
+                comment = 'whatif %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
@@ -289,11 +288,11 @@ def _criticizeResidue( residue, valSets ):
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
-                comment = 'RED: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
+                comment = 'Procheck %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
-                comment = 'ORANGE: procheck [%s] value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
+                comment = 'Procheck %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
@@ -332,11 +331,11 @@ def _criticizeResidue( residue, valSets ):
             timesKnownSd = avViol / OMEGA_SD
             postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), OMEGA_SD)
             if (valSets.OMEGA_MAXALL_BAD != None) and (avViol >= valSets.OMEGA_MAXALL_BAD):
-                comment = 'RED: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
+                comment = '%s value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
                 residue.rogScore.setMaxColor( COLOR_RED, comment )
 #                NTdebug('Set to red')
             elif (valSets.OMEGA_MAXALL_POOR != None) and (avViol >= valSets.OMEGA_MAXALL_POOR):
-                comment = 'ORANGE: [%s] value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_POOR, postFixStr)
+                comment = '%s value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_POOR, postFixStr)
                 residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
 #                NTdebug('Set to orange (perhaps)')
             residue.rogScore[key] = avViol
@@ -369,7 +368,7 @@ def criticize(project, toFile=True):
     criticizePeaks( project, toFile=toFile )
 
     # Assignments
-    validateAssignments( project, toFile=toFile )
+    validateAssignments( project )
 
     if project.molecule:
         project.molecule.rogScore.reset()
@@ -1140,7 +1139,7 @@ EXPECTED_ASSIGNMENT             = 'EXPECTED_ASSIGNMENT'
 INVALID_STEREO_ASSIGNMENT       = 'STEREO_ASSIGNMENT'
 SHIFT                           = 'SHIFT'
 
-def validateAssignments( project, toFile = True   ):
+def validateAssignments( project  ):
     """
     Validate the assignments; check for potential problems and inconsistencies
     Add's NTlist instance with strings of warning description to each atom as
@@ -1149,12 +1148,12 @@ def validateAssignments( project, toFile = True   ):
     New: skipping issuing a warning MISSING_ASSIGNMENT when no chemical shifts are present of that nucleii.
 
     return a NTlist of atoms with errors.
-    Generate output in moleculeName/Cing/validateAssignments.txt if toFile is True.
 
     return None on code error.
 
     @todo: Also correlate assignment with peak values (if present)
     """
+
 #    NTdebug("Starting validateAssignments")
     if not project.molecule:
         NTdebug('validateAssignments: no molecule defined')
@@ -1346,79 +1345,6 @@ def validateAssignments( project, toFile = True   ):
                 project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
         #end if
     #end for
-
-
-    if toFile:
-        #path = project.mkdir( project.directories.analysis, project.molecule.name )
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis, 'validateAssignments.txt')
-        fp = open( fname,'w' )
-        if not fp:
-            NTerror("Failed to open for writing: " + fname)
-            return None
-#        NTdebug("Writing assignment validation to: " + fname)
-
-        fmt = '%-18s   %8s %6s %6s   %8s %6s   %8s %8s  %8s %6s   %s\n'
-        for res in project.molecule.allResidues():
-            fprintf(fp, fmt, '#',  'resonance', 'error', 'stereo', 'shiftx', 'error', 'delta', 'error', 'dbase', 'error', 'Critique')
-
-            for atm in res.allAtoms():
-                #TODO: this code also appears in AtomsHTMLfile
-                sav     = None
-                ssd     = None
-                delta   = None
-                rdelta  = None
-                dav     = None
-                dsd     = None
-                value   = None
-                error   = None
-
-                if atm.has_key('shiftx') and len(atm.shiftx) > 0:
-                    sav = atm.shiftx.av
-                    ssd = atm.shiftx.sd
-                if atm.isAssigned() and sav:
-                    delta = atm.resonances().value - sav
-                    rdelta = 1.0
-                    if ssd > 0.0:
-                        rdelta = sav/ssd
-                if atm.db.shift:
-                    dav = atm.db.shift.average
-                    dsd = atm.db.shift.sd
-                if atm.resonances():
-                    value = atm.resonances().value
-                    error = atm.resonances().error
-
-                savStr     = val2Str(sav,   '%6.2f', 6 )
-                ssdStr     = val2Str(ssd,   '%6.2f', 6 )
-                deltaStr   = val2Str(delta, '%6.2f', 6 )
-                rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
-                davStr     = val2Str(dav,   '%6.2f', 6 )
-                dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-                valueStr   = val2Str(value, '%6.2f', 6 ) # was sometimes set to a NOSHIFT
-                if valueStr==NaNstring:
-                    error=None
-                errorStr   = val2Str(error, '%6.2f', 6 )
-
-                if atm.isStereoAssigned():
-                    stereo = 'S'
-                else:
-                    stereo = '.'
-
-                fprintf(fp,fmt,
-                        atm._Cname(-1),
-                        valueStr,
-                        errorStr,
-                        stereo,
-                        savStr, ssdStr,
-                        deltaStr, rdeltaStr,
-                        davStr, dsdStr,
-                        atm.validateAssignment.format()
-                       )
-            #end for
-        #end for
-        fp.close()
-        NTdetail('==> validateAssignments: output to "%s"', fname)
-    #end if
-
     return result
 #end def
 

@@ -17,7 +17,7 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def testEnmr(self):
+    def tttestEnmr(self):
 #        entryList = """
 #AR3436Cheshire
 #AR3436Lyon
@@ -75,7 +75,7 @@ class AllChecks(TestCase):
 #        """.split()
 
 #        entryList = entryList.split()
-        entryList = "VpR247Frankfurt".split()
+        entryList = "BASPParis".split()
 #        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
 #TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
 

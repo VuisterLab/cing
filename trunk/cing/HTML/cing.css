@@ -35,7 +35,8 @@ body {
     text-align: left;
     /*text-align: center; changed to make popup html code align left*/
     color: #000000;
-    font: 100.1% Verdana, Arial, Helvetica, sans-serif; /** Trick from http://www.astahost.com/info.php/Sizes-Webdesign-Em-Px_t8926.html */
+    /** Scales back all font sizes in CING report to better match */
+    font: 88.0%% Verdana, Arial, Helvetica, sans-serif;
 }
 
 p {
@@ -284,12 +285,7 @@ a.green:hover, a.green:active {
     padding-left: 0.45em;
 }
 
-#main p {
-    padding-right: 0.45em;
-    padding-left: 0.45em;
-}
-
-#main table {
+#main p,i,table,a,ol,ul {
     padding-right: 0.45em;
     padding-left: 0.45em;
 }
