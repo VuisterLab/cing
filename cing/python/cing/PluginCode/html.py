@@ -95,7 +95,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 #    NTdebug( 'angle: ' + `angle`)
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (600,369)
-    plot = NTplot( title  = residue._Cname(1),
+    plot = NTplot( title  = residue._Cname(2),
       xRange = (plotparams.min, plotparams.max),
       xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
       xLabel = dihedralName,
@@ -200,7 +200,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
     if not plotTitle:
         if isSingleResiduePlot:
-            plotTitle = residue._Cname(1)
+            plotTitle = residue._Cname(2)
         else:
             plotTitle = '%d residues'
 
@@ -1869,7 +1869,7 @@ class ResidueHTMLfile( HTMLfile ):
 
 
         columnFormats = [
-                            ('#',           {'title':'Restraint number. Only ambi restraints show a dot.'} ),
+                            ('#',           {'title':'Restraint number. Only ambiguous restraints show a dot.'} ),
 
                             ('atom 1',      {'title':'First atom with links to chain, residue and atom entities.'} ),
                             ('atom 2',      {'title':'Second atom with links to chain, residue and atom entities.'} ),
@@ -2156,11 +2156,11 @@ class AtomsHTMLfile( HTMLfile ):
         self.insertHtmlLink( self.header, self.atomList, self.project, text = 'Home' )
         self.insertHtmlLink( self.header, self.atomList, self.project.molecule, text = 'Molecule' )
 
-        refItem = os.path.join( self.project.moleculePath('analysis'),'validateAssignments.txt')
-        abstractResource = NTdict()        # mimic an object
-        abstractResource.htmlLocation = ( refItem, HTMLfile.top )
-        if os.path.exists(refItem):
-            self.insertHtmlLink( self.header, self.atomList, abstractResource, text = 'Text file' )
+#        refItem = os.path.join( self.project.moleculePath('analysis'),'validateAssignments.txt')
+#        abstractResource = NTdict()        # mimic an object
+#        abstractResource.htmlLocation = ( refItem, HTMLfile.top )
+#        if os.path.exists(refItem):
+#            self.insertHtmlLink( self.header, self.atomList, abstractResource, text = 'Text file' )
 
         columnFormats = [   ('ch', {} ),
                             ('resi', {} ),
@@ -2292,10 +2292,10 @@ class RestraintListHTMLfile( HTMLfile ):
             self.insertHtmlLink( self.header, restraintList, next, text = next.name )
         except: pass
 
-        self.main('h3',closeTag=False)
-        for l in restraintList.format().split('\n')[:-1]:
-            self.main('br', l )
-        self.main('h3',openTag=False)
+#        self.main('h3',closeTag=False)
+#        for l in restraintList.format().split('\n')[:-1]:
+        self.main(None, restraintList.formatHtml())
+#        self.main('h3',openTag=False)
 
         if restraintList.__CLASS__ == 'DistanceRestraintList':
             self._generateDistanceRestraintHtml(htmlOnly=htmlOnly)
@@ -2465,7 +2465,7 @@ class RestraintListHTMLfile( HTMLfile ):
         Checkbox will toggle between showing either first or second division.
         """
 
-        columnFormats = [   ('#', {'title':'Restraint number. Only ambi restraints show a dot'} ),
+        columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 
                             ('ch1', {'title':'Chain identifier of first atom'} ),
                             ('ri1', {'title':'Residue number of first atom'} ),
@@ -2489,9 +2489,13 @@ class RestraintListHTMLfile( HTMLfile ):
                             ('vSd'   , {'title':'Violation standard deviation.'}),
                             ('vMx'    , {'title':'Violation maximum value in any one model.'}),
 
-                            ('c1'    , {'title':'Count of violations above threshold of 0.1 Ang.'}),
-                            ('c3'    , {'title':'Count of violations above threshold of 0.3 Ang.'}),
-                            ('c5'    , {'title':'Count of violations above threshold of 0.5 Ang.'}),
+#                            ('c1'    , {'title':'Count of violations between 0.1 and 0.3 Ang.'}),
+#                            ('c3'    , {'title':'Count of violations between 0.3 and 0.5 Ang.'}),
+#                            ('c5'    , {'title':'Count of violations over 0.5 Ang.'}),
+
+                            ('c1'    , {'title':'Count of violations over 0.1 Ang.'}),
+                            ('c3'    , {'title':'Count of violations over 0.3 Ang.'}),
+                            ('c5'    , {'title':'Count of violations over 0.5 Ang.'}),
 
                             ('Critique'  , {'title':'Any number of remarks to consider.'})
                        ]

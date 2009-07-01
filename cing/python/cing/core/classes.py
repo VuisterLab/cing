@@ -1290,31 +1290,31 @@ class DistanceRestraint( NTdict ):
         self.rogScore.reset()
 #        NTdebug( '%s' % self )
         if (project.valSets.DR_MAXALL_BAD != None) and (self.violMax >= project.valSets.DR_MAXALL_BAD):
-            comment = 'RED: violMax: %7.2f' % self.violMax
+            comment = 'violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.DR_MAXALL_POOR != None) and (self.violMax >= project.valSets.DR_MAXALL_POOR):
-            comment = 'ORANGE: violMax: %7.2f' % self.violMax
+            comment = 'violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_POOR != None) and (project.valSets.DR_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
-                comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
+                comment = 'fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_BAD != None) and (project.valSets.DR_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
-                comment = 'RED: fractionAbove: %7.2f' % fractionAbove
+                comment = 'fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_RED, comment)
         if (project.valSets.DR_RMSALL_BAD != None) and (self.violSd >= project.valSets.DR_RMSALL_BAD):
-            comment = 'RED: violSd: %7.2f' % self.violSd
+            comment = 'violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
-            comment = 'ORANGE: violSd: %7.2f' % self.violSd
+            comment = 'violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
@@ -1542,53 +1542,6 @@ class DistanceRestraint( NTdict ):
         self.violSd     = None     # Sd of violations
         self.violSum    = 0.0      # Sum of violations
 
-#        for i in range( modelCount):
-#            d = 0.0;
-#            for atm1,atm2 in self.atomPairs:
-#                # skip trivial cases
-#                if atm1 == atm2:
-#                    continue
-#
-#                #expand pseudoatoms
-#                atms1 = atm1.realAtoms()
-#                atms2 = atm2.realAtoms()
-#                for a1 in atms1:
-#                    #print '>>>', a1.format()
-#                    if len( a1.coordinates ) > i:
-#                        for a2 in atms2:
-#                            #print '>>', atm1, a1, atm2, a2
-#                            if len(a2.coordinates) > i:
-##                                tmp = NTdistanceOpt( a1.coordinates[i], a2.coordinates[i] )
-##                                e1 = a1.coordinates[i].e
-##                                e2 = a2.coordinates[i].e
-##                                v = NTcVector(e1[0]-e2[0],e1[1]-e2[1],e1[2]-e2[2]
-##                                tmp = v.length()
-##                                if tmp > 0.0:
-##                                    d += math.pow( tmp, -6.0 )
-#                                d += Rm6dist(a1.coordinates[i].e,a2.coordinates[i].e)
-#                            else:
-#                                self.error = True
-#                            #end if
-#                        #end for
-#                    else:
-#                        self.error = True
-#                    #end if
-#                #end for
-#            #end for
-#            try:
-#                self.distances.append( math.pow(d, -0.166666666666666667) )
-#            except:
-#                self.error = True
-#                msg = "AtomPair (%s,%s) without coordinates" % (atm1.toString(), atm2.toString())
-#                NTdebug(msg)
-#                self.rogScore.setMaxColor( COLOR_RED, msg )
-#                return (None, None, None, None)
-#            #end try
-#        #end for loop over models
-#        self.av, self.sd, self.n = NTaverage( self.distances )
-#        self.min = min( self.distances )
-#        self.max = max( self.distances )
-
         self.distances = NTfill( 0.0, modelCount)
         models = range( modelCount )
         i = 0
@@ -1742,6 +1695,7 @@ class DistanceRestraint( NTdict ):
             msg = addPreTagLines(msg)
         return msg
     #end def
+
 #end class
 
 
@@ -1941,6 +1895,49 @@ ROG score:         %s
         return msg
     #end def
 
+    def formatHtml( self ):
+
+        header = self.name
+        if hasattr(self, 'rogScore'):
+            if self.rogScore.isCritiqued():
+                header = '<font color="%s">%s</font>' % (self.rogScore.colorLabel, header)
+        header = '<h3>DistanceRestraintList %s</h3>' % header
+
+        msg = '''%s
+<BR>
+<table>
+<TR><TD>sequential    </TD><TD align="right">%4d</TD></TR>
+<TR><TD>intra-residual</TD><TD align="right">%4d</TD></TR>
+<TR><TD>medium-range  </TD><TD align="right">%4d</TD></TR>
+<TR><TD>long-range    </TD><TD align="right">%4d</TD></TR>
+<TR><TD>ambigious     </TD><TD align="right">%4d</TD></TR>
+<TR><TD>sum           </TD><TD align="right">%4d</TD></TR>
+</table>
+<BR>
+<table>
+<TR><TD>rmsd</TD>               <TD> %s +- %s                    </TD></TR>
+<TR><TD>violations <-0.1 A (lower-bound violations)</TD><TD align="right"> %4d </TD></TR>
+<TR><TD>violations > 0.1 A </TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 0.3 A </TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 0.5 A </TD><TD align="right"> %4d                          </TD></TR>
+</table>
+''' % (
+    header,
+    len(self.intraResidual),
+    len(self.sequential),
+    len(self.mediumRange),
+    len(self.longRange),
+    len(self.ambigious),
+    len(self),
+    val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
+    self.violCountLower,
+    self.violCount1,
+    self.violCount3,
+    self.violCount5
+  )
+        return msg
+    #end def
+
     def save(self,path=None):
         """
         Create a SML file
@@ -2018,34 +2015,34 @@ class DihedralRestraint( NTdict ):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        NTdebug( '%s (dih)' % self )
         if (project.valSets.AC_MAXALL_BAD != None) and (self.violMax >= project.valSets.AC_MAXALL_BAD):
-            comment = 'RED: violMax: %7.2f' % self.violMax
+            comment = 'violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.AC_MAXALL_POOR != None) and (self.violMax >= project.valSets.AC_MAXALL_POOR):
-            comment = 'ORANGE: violMax: %7.2f' % self.violMax
+            comment = 'violMax: %7.2f' % self.violMax
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_POOR != None) and (project.valSets.AC_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
-                comment = 'ORANGE: fractionAbove: %7.2f' % fractionAbove
+                comment = 'fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_BAD != None) and (project.valSets.AC_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
-                comment = 'RED: fractionAbove: %7.2f' % fractionAbove
+                comment = 'fractionAbove: %7.2f' % fractionAbove
     #            NTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_RED, comment)
 
         if (project.valSets.AC_RMSALL_BAD != None) and (self.violSd >= project.valSets.AC_RMSALL_BAD):
-            comment = 'RED: violSd: %7.2f' % self.violSd
+            comment = 'violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
-            comment = 'ORANGE: violSd: %7.2f' % self.violSd
+            comment = 'violSd: %7.2f' % self.violSd
 #            NTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
@@ -2359,6 +2356,33 @@ ROG score:            %s
         header = '%s DihedralRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name,self.status,len(self), dots)
         msg = header + msg
+        return msg
+    #end def
+
+    def formatHtml( self, allowHtml=False ):
+        header = self.name
+        if hasattr(self, 'rogScore'):
+            if self.rogScore.isCritiqued():
+                header = '<font color="%s">%s</font>' % (self.rogScore.colorLabel, header)
+        header = '<h3>DihedralRestraintList %s</h3>' % header
+
+        msg = '''%s
+<BR>
+<table>
+<TR><TD>count               </TD><TD align="right">%4d</TD></TR>
+<TR><TD>rmsd:               </TD><TD> %s +- %s                    </TD></TR>
+<TR><TD>violations > 1 degree</TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 3 degrees</TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 5 degrees</TD><TD align="right"> %4d                          </TD></TR>
+</table>
+''' % (
+    header,
+    len(self),
+    val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
+    self.violCount1,
+    self.violCount3,
+    self.violCount5
+  )
         return msg
     #end def
 

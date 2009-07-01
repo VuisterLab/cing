@@ -68,20 +68,22 @@ class ROGscore(NTdict):
             return
         refExists = False
         if refExists:
+            dst('ul' , closeTag=False)
             for color,comment in self.colorCommentList:
                 kw = {'href':''}
                 kw['class'] = color
                 dst('li' , closeTag=False)
                 dst('a' , comment, **kw)
                 dst('li' , openTag=False)
-    #        dst('ul', openTag=False)
+            dst('ul', openTag=False)
         else:
+            dst('ul', closeTag=False)
             for color,comment in self.colorCommentList:
                 kw = {'color':color}
                 dst('li' , closeTag=False)
                 dst('font' , comment, **kw)
                 dst('li' , openTag=False)
-    #        dst('ul', openTag=False)
+            dst('ul', openTag=False)
 
     def createHtmlColorForString(self, dst, str):
         """ Add the given str to the destination in a color reflecting the rog score.

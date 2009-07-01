@@ -62,19 +62,19 @@ jQuery(document).ready(function() {
                       { "sType": "html" },
                       { "sType": "html" },
 //                      // values.
-                      {"sClass": "right"},   //        lower.
-//                      {"sClass": "right"},   //        target
-                      {"sClass": "right"},  //        upper
-                      {"sClass": "right"},   //        av
-                      {"sClass": "right"},   //        sd
-                      {"sClass": "right"},   //        min
-                      {"sClass": "right"},   //        max
-                      {"sClass": "right"},   //        vAv
-                      {"sClass": "right"},   //        vSd
-                      {"sClass": "right"},   //        vMax
-                      {"sClass": "right"},   //        c.1
-                      {"sClass": "right"},   //        c.3
-                      {"sClass": "right"},   //        c.5
+                      {"sType": "numeric", "sClass": "right"},   //        lower.
+//                    "sType": "numeric",  {"sClass": "right"},   //        target
+                     {"sType": "numeric", "sClass": "right"},  //        upper
+                     {"sType": "numeric", "sClass": "right"},   //        av
+                     {"sType": "numeric", "sClass": "right"},   //        sd
+                     {"sType": "numeric", "sClass": "right"},   //        min
+                     {"sType": "numeric", "sClass": "right"},   //        max
+                     {"sType": "numeric", "sClass": "right"},   //        vAv
+                     {"sType": "numeric", "sClass": "right"},   //        vSd
+                     {"sType": "numeric", "sClass": "right"},   //        vMax
+                     {"sType": "numeric", "sClass": "right"},   //        c.1
+                     {"sType": "numeric", "sClass": "right"},   //        c.3
+                     {"sType": "numeric", "sClass": "right"},   //        c.5
                       { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
