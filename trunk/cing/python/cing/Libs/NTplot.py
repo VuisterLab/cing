@@ -29,8 +29,10 @@ from matplotlib.lines import Line2D
 from matplotlib.mlab import frange
 from matplotlib.numerix.mlab import amax
 from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
+from matplotlib.path import Path
 from matplotlib.pylab import annotate
 from matplotlib.pylab import axes
 from matplotlib.pylab import bar
@@ -60,6 +62,7 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy.core.numeric import arange
 import math
+import numpy as np
 
 try:
     import Image
@@ -69,9 +72,6 @@ except ImportError:
     haveImage = False
 #end try
 
-
-
-# NOTE WELL: use only 1 NTplot instance at a time.
 haveBiggles = False
 try:
     import biggles
@@ -79,18 +79,7 @@ try:
 except ImportError:
     NTdebug("Failed to import biggles; will try to use MatLibPlot")
 
-# TODO: remove hard dependency.
 useMatPlotLib = True
-# Use a backend that allows headless (without GUI) printing in addition to GUI.
-#use('Agg') # it needs to be called above first, not here
-
-#try:
-#    from pylab import * # preferred importing. Includes nx imports.
-#    from matplotlib.collections import LineCollection
-#    useMatPlotLib = True
-#except ImportError:
-#    NTdebug("Failed to import MatLibPlot; check installation.")
-
 
 dpi=72.27 # Latex definition
 inches_per_pt = 1./dpi
@@ -389,7 +378,7 @@ class NTplot( NTdict ):
         for v in yValueList:
             r = bottom + height * v
             result.append( r )
-#            NTdebug('NTplot.convert_yunitsResPlot: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
+#            NTdebug('NTplot.scaleAndMove_yValuesFromAxesToData: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
         return result
 
     def move( self, point ):
@@ -463,8 +452,8 @@ class NTplot( NTdict ):
             NTerror("Failed to ellipse because not useMatPlotLib")
             return True
         # Expose matplot lib routine.
-#        e = Ellipse(xy=point, width=0.2*rand(), height=0.2*rand())
-        e = Ellipse(xy=point, width=width, height=height)
+#        e = Ellipse(startPoint=point, width=0.2*rand(), height=0.2*rand())
+        e = Ellipse(startPoint=point, width=width, height=height)
         e.set_clip_box(self.axis.bbox)
         if color:
             e.set_facecolor(color)
@@ -753,11 +742,11 @@ class NTplot( NTdict ):
         if useMatPlotLib:
             kwds = self.mapAttributes2MatLibText(attributes)
 
-            xy=(point[0], point[1])
+            startPoint=(point[0], point[1])
             axes(self.axis) # Claim current axis.
             annotate(text,
-                        xy=xy,           # in data coordinate system; assuming only one occurrence.
-                        xytext=xy,
+                        xy=startPoint,           # in data coordinate system; assuming only one occurrence.
+                        xytext=startPoint,
                         xycoords='data', # default: use the axes data coordinate system
                         textcoords='data',
                         **kwds
@@ -930,7 +919,6 @@ class NTplot( NTdict ):
                 grid(True)
             else:
                 grid(False)
-
         else:
             #update settings
             self.b.title         = self.title
@@ -957,7 +945,8 @@ class NTplot( NTdict ):
             biggles.configure('width',    self.hardcopySize[0] )
             biggles.configure('height',   self.hardcopySize[1] )
             biggles.configure('fontface', self.font)
-
+        # end if
+    # end def
 
     def histogram( self, theList, low, high, bins, leftMargin=0.05, rightMargin=0.05,
                    attributes=defaultAttributes, valueIndexPairList=None ):
@@ -1004,7 +993,7 @@ class NTplot( NTdict ):
 #                    NTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
                     self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
                     self.axis.annotate("model "+`modelNum`,
-#                                xy=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
+#                                startPoint=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
                                 xy=(value+0.01, 1),                       # in data coordinate system; assuming only one occurrence.
                                 xytext=(value, outlierLocHeight),
                                 xycoords='data', # default: use the axes data coordinate system
@@ -1223,39 +1212,6 @@ class NTplotSet( NTdict ):
 
         if useMatPlotLib:
             pass # will set below only on hardcopy.
-#            fig_width_pt  = self.hardcopySize[0]
-#            if self.hardcopySize[1]:
-#                fig_height_pt = self.hardcopySize[1]
-#            else:
-#                fig_height_pt = int(fig_width_pt*golden_mean)
-##            fig_size_pt   = [fig_width_pt,fig_height_pt]
-##            print fig_size_pt
-#            fig_width     = fig_width_pt*inches_per_pt  # width in inches
-#            fig_height    = fig_height_pt*inches_per_pt # height in inches
-#            fig_size      = [fig_width,fig_height]
-#
-##            NTdebug("Getting hardcopySize: "+`self.hardcopySize`)
-##            NTdebug("Setting sizeInches:   "+`fig_size`)
-#
-#            params = {#'backend':          self.graphicsOutputFormat, # this is plain wrong
-#                      'figure.dpi':       dpi,
-#                      'figure.figsize':   fig_size,
-#                      'savefig.dpi':      dpi,
-#                      'savefig.figsize':  fig_size,
-#                       }
-#            rcParams.update(params)
-##            ion() # interactive on
-##            draw() # force a draw
-##            ioff() # interactive off.
-#
-#            self.figure = Figure( frameon=False,
-#                                  dpi=dpi,
-#                                  figsize=fig_size,
-#                                  facecolor='white',
-#                                  edgecolor='white',
-#                                   )
-#            NTdebug('In __init__: using self.figure.get_size_inches: '+`self.figure.get_size_inches()`)
-
         else:
             if not haveBiggles:
                 NTerror("NTplotSet.__init__: No biggles")
@@ -1385,7 +1341,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
     colorBaseC    = 'purple'
     colorLine     = 'black'
     colorBackNoSecStruct = 'lightgrey'
-    resPerPlot    = 100 # Number of residues per plot"""
+#    resPerPlot    = 100 # Number of residues per plot"""
 
     hueRed  = 0.
     hueBlue = 0.68
@@ -1396,7 +1352,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         NTplot.__init__(self, **kwargs)
 #        self.molecule = None
 #        self.resList = None # NTlist of residue objects.
-        self.xRange = ( 0, 50 )
+        self.xRange = ( 0, ResPlot.MAX_WIDTH_IN_RESIDUES )
         self.xLabel = 'Sequence'
         self.resIconHeight =  1.
         self.iconBoxYheight= 0.16 # in axis coordinates [0,1] the height of the residue type icon.
@@ -1492,7 +1448,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             resChar = resChar.upper()
             color = 'green'
             x = iconBoxXstart + i + 0.5
-            y = self.convert_yunits([ iconBoxYstart ])[0]          # data coordinates
+            y = self.convert_yunits([ iconBoxYstart ])[0] # convert to data coordinates
             text = resChar
             attributes = fontAttributes()
             attributes.fontColor=color
@@ -1547,75 +1503,72 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
     def drawResIcons(self, ySpaceAxis=.06):
         """Vary ySpaceAxis for raising it more depending on other items to be
-        plotted"""
-        if useMatPlotLib:
-            kwargs = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorHelixIn, 'clip_on':None}
-    #        seqLength = len(self.resList)
+        plotted
+        Call AFTER scaling of axes. So all calls to matplotlib will be in 'data'
+        coordinate system.
+        JFD had y-axis coordinates in 'axes' coordindate system before. Now all variables not using data
+        coordinate system are named with e.g. Axis as in ySpaceAxis.
+        """
+#        NTdebug("In drawResIcons ySpaceAxis is %s" % ySpaceAxis)
+        kwargs = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorHelixIn, 'clip_on':None}
 
-    #        yIconSpaceAxis= 0.005     # axis, the vertical open area from within box
 
-            iconBoxXstart = 0              # data
-    #        iconBoxXwidth = seqLength     # data
-            iconBoxYstart = 1 + ySpaceAxis # axis
+        iconBoxXstart = 0              # data coordinate system
+        iconBoxYstartAxis = 1 + ySpaceAxis # axis coordinate system
+        height = scale_yValuesFromAxesToData( self.axis, [self.iconBoxYheight])[0]
+        iconBoxYstart = scaleAndMove_yValuesFromAxesToData(self.axis, [ iconBoxYstartAxis ])[0]
 
-    #        self.xRange       = (0,iconBoxXwidth)   # x-axis (min,max) tuple, None is autoscale
+        # Get a background with Z-scores of accessibility.
+        i = 0
+        for res in self.resList:
+            accessibilityZscoreList = res.getDeepByKeys(WHATIF_STR,INOCHK_STR,VALUE_LIST_STR)
+            if not accessibilityZscoreList:
+                accessibilityZscore = None
+            else:
+                accessibilityZscore = accessibilityZscoreList.average()[0]
+            color = mapAccessibilityZscore2Color(accessibilityZscore) # get an rgb tuple
+            startPoint = ( iconBoxXstart + i, iconBoxYstart)
+#            NTdebug("RangeIcon: startPoint %s %s" % startPoint)
+            p = RangeIcon( startPoint=startPoint,width=1,height=height, seq=1, axis=self.axis,edgecolor=color, facecolor=color, clip_on=None )
+            self.axis.add_patch(p)
+            i += 1
 
-            # Get a background with Z-scores of accessibility.
-            i = 0
-            for res in self.resList:
-                accessibilityZscoreList = res.getDeepByKeys(WHATIF_STR,INOCHK_STR,VALUE_LIST_STR)
-    #            NTdebug('accessibilityZscoreList: %s', accessibilityZscoreList)
-                if not accessibilityZscoreList:
-                    accessibilityZscore = None
-                else:
-                    accessibilityZscore = accessibilityZscoreList.average()[0]
-                color = mapAccessibilityZscore2Color(accessibilityZscore) # get an rgb tuple
-                xy = ( iconBoxXstart + i, iconBoxYstart)
-    #            NTdebug("color: %8s %-80s" % (accessibilityZscore, color))
-                p = RangeIcon( seq=1,axis=self.axis,xy=xy,width=1,height=self.iconBoxYheight,
-                               edgecolor=color, facecolor=color, clip_on=None,
-                               )
-                if useMatPlotLib:
-                    self.axis.add_patch(p)
-                i += 1
-
-            # Get a icons for secondary structure
-            secStructElementList = self.getsecStructElementList()
-            i = 0
-            for element in secStructElementList:
+        # Get a icons for secondary structure
+        secStructElementList = self.getsecStructElementList()
+        i = 0
+        for element in secStructElementList:
 #                NTdebug(`element`)
-                elementLength = len(element)
-                res = element[0]
+            elementLength = len(element)
+            res = element[0]
 #                secStruct = getProcheckSecStructConsensus( res )
-                secStruct = getDsspSecStructConsensus( res )
-                if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
-                    secStruct = None
-                if secStruct == ' ':
-                    secStruct = None
+            secStruct = getDsspSecStructConsensus( res )
+            if secStruct == 'H' and elementLength < 2: # Can't plot a helix of length 1 residue
+                secStruct = None
+            if secStruct == ' ':
+                secStruct = None
 #                NTdebug('res: %s, secStruct %s, and length: %d', res, secStruct, elementLength)
 
-                xy = ( iconBoxXstart + i, iconBoxYstart)
-                width = elementLength
+            width = elementLength
+            startPoint = ( iconBoxXstart + i, iconBoxYstart)
 
-                rangeIconList = RangeIconList( axis=self.axis,secStruct=secStruct,seq=elementLength,
-                    xy=xy,width=width,height=self.iconBoxYheight,**kwargs)
-                if rangeIconList.addPatches():
-                    NTerror("Failed to addPatches for element with residues: %s", element)
-                    continue
-                for p in rangeIconList.patchList:
-                    if useMatPlotLib:
-                        self.axis.add_patch(p)
-                i += elementLength
-
-
+            rangeIconList = RangeIconList( axis=self.axis,secStruct=secStruct,seq=elementLength,
+                startPoint=startPoint,width=width,height=height,**kwargs)
+            if rangeIconList.addPatches():
+                NTerror("Failed to addPatches for element with residues: %s", element)
+                continue
+            for p in rangeIconList.patchList:
+                self.axis.add_patch(p)
+            i += elementLength
+        # end for
+    # end def
+# end class
 
 class RangeIconList:
-    def __init__(self, axis=None, secStruct=' ', seq=1, xy=None, width=None, height=None,
-                 **kwargs):
+    def __init__(self, axis=None, secStruct=' ', seq=1, startPoint=None, width=None, height=None, **kwargs):
         self.patchList= []
         self.seq      = seq
         self.secStruct= secStruct
-        self.xy       = xy
+        self.startPoint= startPoint
         self.width    = width
         self.height   = height
         self.axis     = axis
@@ -1628,15 +1581,16 @@ class RangeIconList:
         "Return True on error"
 #        NTmessage("Doing addPatches for seq: %d", self.seq)
 
+#        self.secStruct='H' #: disable after debugging.
         if self.secStruct=='S':
-            p = StrandIcon(seq=self.seq, axis=self.axis, xy=self.xy,
+            p = StrandIcon(seq=self.seq, axis=self.axis, startPoint=self.startPoint,
                            width=self.width, height=self.height,**self.kwargs)
             if not p:
                 NTerror("Failed to create StrandIcon")
                 return True
             self.patchList.append( p )
         elif self.secStruct=='H':
-            helixIconList = HelixIconList(seq=self.seq, xy=self.xy,
+            helixIconList = HelixIconList(seq=self.seq, startPoint=self.startPoint,
                 width=self.width, height=self.height,axis=self.axis,**self.kwargs)
             if helixIconList.addPatches():
                 NTerror("Failed to create HelixIconList")
@@ -1648,30 +1602,46 @@ class RangeIconList:
             for p in plist:
                 self.patchList.append( p )
         elif self.secStruct==None:
-            p = CoilIcon(seq=self.seq, axis=self.axis, xy=self.xy, width=self.width, height=self.height,**self.kwargs)
+#            p = CoilIcon(self.startPoint, self.width, self.height,self.seq, self.axis, **self.kwargs)
+            kwargsLocal = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorCoil, 'clip_on':None}
+            p = CoilIcon(seq=self.seq, axis=self.axis, startPoint=self.startPoint, width=self.width, height=self.height,**kwargsLocal)
             if not p:
                 NTerror("Failed to create CoilIcon")
                 return True
             self.patchList.append( p )
-        else:
-            NTerror("Failed to find one of 3 states, doing addPatches for seq: %d and self.secStruct: %s", (self.seq, self.secStruct))
-            return True
+#        else:
+#            NTerror("Failed to find one of 3 states, doing addPatches for seq: %d and self.secStruct: %s", (self.seq, self.secStruct))
+#            return True
 
 class HelixIconList(RangeIconList):
     """ Draw helices in half turn increments scale back x-coordinate to fit odd
         numbered residue helices.    """
 
-    def toAxes( self, verts ):
-        """Translating the xy coordinates from local system x=[0,n] and y=[0,1]
+#        HELIX_PERIOD = 4.- HELIX_HWIDTH # 3.15 In real life this is 3.6 for an regular alpha helix
+    # The reason for choosing a smaller period is that the helix nicely aligns with its
+    # outer edges.
+    HELIX_HWIDTH = 90.*11/13 # retro engineered from procheck. Horizontal width in units of degrees on periodic.
+    def transformIconToData( self, verts ):
+        """Translating the startPoint coordinates from local system x=[0,n] and y=[0,1]
         to axes coordinate system for x and
         to data coordinate system for y.
         """
         for v in verts:
-            v[0] += self.xy[0]                   # axes coordinates
+            v[0] += self.startPoint[0]                   # axes coordinates
             v[1] *= self.height
-            v[1] += self.xy[1]
-            l    = [ v[1] ]
-            v[1] = convert_yunitsResPlot(self.axis, l)[0]          # data coordinates
+            v[1] += self.startPoint[1]
+#            v[1] = scaleAndMove_yValuesFromAxesToData(self.axis, [ v[1] ] )[0]          # data coordinates
+
+
+#        NTdebug("Vertices icon: %s" % verts)
+#        NTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
+#        NTdebug("self.height: %s in data system" % self.height)
+
+#        for v in verts:
+#            v[0] += self.startPoint[0]
+#            v[1] *= self.height
+#            v[1] += self.startPoint[1]
+#        NTdebug("Vertices data: %s" % verts)
 
     def addPatches(self):
         """Returns True on error.
@@ -1682,10 +1652,6 @@ class HelixIconList(RangeIconList):
             NTcodeerror('Number of helical residues in resList needs to be at least two.')
             return True
 
-        HELIX_HWIDTH = 90.*11/13 # retro engineered from procheck. Horizontal width in units of degrees on periodic.
-#        HELIX_PERIOD = 4.- HELIX_HWIDTH # 3.15 In real life this is 3.6 for an regular alpha helix
-        # The reason for choosing a smaller period is that the helix nicely aligns with its
-        # outer edges.
         n = self.seq
         # Round the number of turns to halves. Halfturns to ints.
         # n  ht     n   ht
@@ -1695,7 +1661,7 @@ class HelixIconList(RangeIconList):
         # 3  2      8   4
         # 4  2      .etc.
         halfTurnsTotal = (n + 1)/ 2
-        hw = HELIX_HWIDTH / 2.
+        hw = HelixIconList.HELIX_HWIDTH / 2.
 #        NTdebug("halfTurnsTotal: %8.3f ", halfTurnsTotal )
 #        NTdebug("hw: %8.3f ", hw )
         # After contemplating for a long time, it seems that the easiest coordinate
@@ -1793,7 +1759,7 @@ class HelixIconList(RangeIconList):
             # on the x axis from -hw to 360 + hw.
             # Also need to compensate for when there are e.g. only 3 residue
             # full turn plots.
-            totalWidthInDegrees = halfTurnsTotal * 180. + HELIX_HWIDTH
+            totalWidthInDegrees = halfTurnsTotal * 180. + HelixIconList.HELIX_HWIDTH
             xScaleFactor = n/totalWidthInDegrees
             scale(    verts, xScaleFactor, 1)
 #            NTdebug('verts almost in icon system  [(0,n),(0,1)]')
@@ -1804,103 +1770,96 @@ class HelixIconList(RangeIconList):
 #            NTdebug('verts in icon system  [(0,n),(0,yScaleFactor)]')
 #            NTdebug( vertsToString(verts) )
 
-            self.toAxes(verts)
+            self.transformIconToData(verts)
 #            NTdebug('verts in axes')
 #            NTdebug( vertsToString(verts) )
-            p = RangeIconPoly( xy=verts, axis=self.axis, **self.kwargs )
+            p = RangeIconPoly( verts=verts, axis=self.axis, **self.kwargs )
             self.patchList.append(p)
             drawnPoly += 1
 
-class RangeIcon(Rectangle):
-    """A drawing specific for the residue type and in the case of
+class RangeIcon(Polygon):
+    """
+    A drawing specific for the residue type and in the case of
     amino acids also it's DSSP determined secondary structure
     classification.
         seq is length of icon in residue count.
-        xy is an x,y tuple lower, left
-        width and height are of outer dimensions like xy.
-    """
-    def __init__(self, seq=None, axis=None, *args, **kwargs ):
-        Rectangle.__init__(self, *args, **kwargs)
+        startPoint is an x,y tuple lower, left
+        width and height are of outer dimensions like startPoint.
+
+        startPoint in data coordinate system now.
+
+        b------c
+        |      |
+        a------d
+"""
+    def __init__(self, seq=1, axis=None, startPoint=None, width=1, height=None, **kwargs):
+        Patch.__init__(self, **kwargs)
         self.seq = seq
         self.axis= axis
+        self.startPoint = startPoint
+        self.width = width
+        self.height = height
+        left, right = startPoint[0], startPoint[0] + width
+        bottom, top = startPoint[1], startPoint[1] + height
 
-    def toAxes( self, verts ):
-        """See namesake
+        a = [left,bottom]
+        b = [left,top]
+        c = [right,top]
+        d = [right,bottom]
+
+        verts = [ a,b,c,d ]
+        vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
+        self._path = Path(vertsAsArray)
+        self.set_closed(True)
+
+#        NTdebug("Created a Rectangle at position %s with width, height: %s, %s" % ( startPoint, width, height ))
+#        NTdebug("While axes have extends: %s %s" % (axis.get_xlim(), axis.get_ylim()))
+
+    def transformIconToData( self, verts ):
+        """Icon system has a y-axis range of [0,1] and x-axis range of [0,q].
+        'data' system has a y-axis range e.g. [-1,6] for the bounding box of the plot. Icons are just above it.
+        the x axis is the same at [0,n] for n residues. Always q<n.
+
+        In place operation.
         """
+#        NTdebug("Vertices icon: %s" % verts)
+#        NTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
+#        NTdebug("self.height: %s in data system" % self.height)
+
         for v in verts:
-            v[0] += self.xy[0]
+            v[0] += self.startPoint[0]
             v[1] *= self.height
-            v[1] += self.xy[1]
-            l    = [ v[1] ]
-            v[1] = convert_yunitsResPlot(self.axis, l)[0]          # data coordinates
-
-    def get_verts(self):
-        """
-        Return the vertices of the icon.
-        translating the y coordinate from axes coordinate system to
-        data coordinate system.
-        """
-        self.set_clip_on(None) # weird that this needs to be called this low in the code.
-
-        x, y = self.xy
-        left, right = self.convert_xunits((x, x + self.width))
-        bottom, top = convert_yunitsResPlot(self.axis, (y, y + self.height))
-
-        verts = ( (left,  bottom),
-                  (left,  top),
-                  (right, top),
-                  (right, bottom) )
-#        NTdebug('xy   : %s', self.xy)
-#        NTdebug(' self.width   : %s',  self.width)
-#        NTdebug(' self.height  : %s',  self.height)
-#        NTdebug('verts: %s', verts)
-        return verts
+            v[1] += self.startPoint[1]
+#        NTdebug("Vertices data: %s" % verts)
 
 
 
 class RangeIconPoly(Polygon):
-    def __init__(self, seq=None, axis=None, *args, **kwargs ):
-        Polygon.__init__(self, *args, **kwargs)
-        self.seq = seq
+    def __init__(self, verts=None, axis=None, **kwargs):
+        Patch.__init__(self, **kwargs)
         self.axis= axis
-        if not self.axis:
-            NTcodeerror('no self.axis in RangeIconList')
-#            sys.exit(1)
-            return
 
-    def get_verts(self):
-        """
-        Return the vertices of the icon.
-        translating the y coordinate to axes coordinate system.
-        xy is a sequence of (x,y) 2 tuples.
-        """
-        self.set_clip_on(None) # weird that this needs to be called this low in the code.
-
-        xs, ys = zip(*self.xy)[:2]
-        xs = self.convert_xunits(xs)
-        ys = convert_yunitsResPlot(self.axis, ys)
-        return zip(xs, ys)
+        vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
+        self._path = Path(vertsAsArray)
+        self.set_closed(True)
 
 class CoilIcon(RangeIcon):
     """
     Draw an arrow for part of a potential beta stranded sheet.
-    """
-    def get_verts(self):
-        """
-        Return the vertices of the icon.
-        translating the y coordinate to axes coordinate system.
 #
 #        b------c
 #        |      |
 #        a------d
 #
-        # The y coordinates are in [0,1] first for the maximum resList
-        # they can span.
+        # The x and y coordinates are in data coordinates.
         # The x coordinates are from [0,n] where n is the length of the
-        # sequence.
-        """
-        self.set_clip_on(None) # weird that this needs to be called this low in the code.
-        COIL_WIDTH = 0.08
+        # sequence. Y can have any range.
+    """
+    COIL_WIDTH = 0.08
+
+    def __init__(self, seq=None, axis=None, startPoint=None, width=None, height=None,**kwargs):
+        RangeIcon.__init__(self, seq=seq, axis=axis, startPoint=startPoint, width=width, height=height, **kwargs)
+
         n = self.seq
         a = [0,0]
         b = [0,1]
@@ -1908,25 +1867,25 @@ class CoilIcon(RangeIcon):
         d = [n,0]
 
         verts = [ a,b,c,d ]
-#        NTdebug('verts in local system [0-n,0-1]: %s', verts)
-        scaleCentered(verts, 1., COIL_WIDTH)
-#        NTdebug('verts in icon system  [0-n,0-r]:  %s', verts)
-        self.toAxes(verts)
-#        NTdebug('verts in axes                  :  %s', verts)
-        return verts
+#        NTdebug("Vertices local: %s" % verts)
+        scaleCentered(verts, 1., CoilIcon.COIL_WIDTH)
+        self.transformIconToData(verts)
+
+        vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
+        self._path = Path(vertsAsArray)
+        self.set_closed(True)
+    # end def
+# end class
+
 
 
 class StrandIcon(RangeIcon):
     """
     Draw an arrow for part of a potential beta stranded sheet.
     """
-    def __init__(self, seq=None, axis=None, xy=None, width=None, height=None,
-                 **kwargs
-                 ):
-        RangeIcon.__init__(self, seq=seq, axis=axis, xy=xy, width=width, height=height, **kwargs)
-#        NTdebug('In StrandIcon.__init__: one strand seq: %d', self.seq)
+    ARROW_WIDTH = 0.6
 
-    def get_verts(self):
+    def __init__(self, seq=None, axis=None, startPoint=None, width=None, height=None,**kwargs):
         """
         Return the vertices of the icon.
         translating the y coordinate to axes coordinate system.
@@ -1940,10 +1899,10 @@ class StrandIcon(RangeIcon):
         # The x coordinates are from [0,n] where n is the length of the
         # sequence.
         """
-        self.set_clip_on(None) # weird that this needs to be called this low in the code.
-        ARROW_WIDTH = 0.6
+        RangeIcon.__init__(self, seq=seq, axis=axis, startPoint=startPoint, width=width, height=height, **kwargs)
+
         n = self.seq
-        x = (1-ARROW_WIDTH)/2.
+        x = (1-StrandIcon.ARROW_WIDTH)/2.
         a = [0,x]
         b = [0,1-x]
         c = [n-1,1-x]
@@ -1960,9 +1919,15 @@ class StrandIcon(RangeIcon):
         r = 2./3 # from procheck retro engineered
         scaleCentered(verts, 1., r)
 #        NTdebug('verts in icon system  [0-n,0-r]:  %s', verts)
-        self.toAxes(verts)
+        self.transformIconToData(verts)
 #        NTdebug('verts in axes                  :  %s', verts)
-        return verts
+
+        vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
+        self._path = Path(vertsAsArray)
+        self.set_closed(True)
+    # end def
+# end class
+
 
 
 
@@ -2052,9 +2017,30 @@ def vertsToString( verts ):
     result = result[:-1] #Remove eol
     return result
 
+def getHeightFromAxis(axis):
+    yViewInterval = axis.get_ylim()
+    bottom = yViewInterval[0]
+    top    = yViewInterval[1]
+    height = top-bottom
+    return height
 
-def convert_yunitsResPlot(axis, yValueList):
-    """Convert from value in y-axis coordinates [0,1] to
+def scale_yValuesFromAxesToData(axis, yValueList):
+    """Just rescale from axes to data coordinate system.
+    E.g. ylim=[-1,9]  input    result
+                        0     0
+                        0.5   5
+    """
+    height = getHeightFromAxis(axis)
+    result = []
+    for v in yValueList:
+        r = height * v
+        result.append( r )
+    # end for
+#    NTdebug('scale_yValuesFromAxesToData last y value: %8.3f becomes: %8.3f with bottom,top %8.3f' % (v,r,height) )
+    return result
+
+def scaleAndMove_yValuesFromAxesToData(axis, yValueList):
+    """Convert y value in axis coordinates [0,1] to
     data coordinates [bottom,top].
 
     E.g. ylim=[0,10] input    result
@@ -2071,8 +2057,8 @@ def convert_yunitsResPlot(axis, yValueList):
     for v in yValueList:
         r = bottom + height * v
         result.append( r )
-#        NTdebug('convert_yunitsResPlot: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
-
+    # end for
+#    NTdebug('scaleAndMove_yValuesFromAxesToData last vertex: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
     return result
 
 
@@ -2239,114 +2225,3 @@ def integerNumberOnly(x,_dummy):
     if remainder > 0.001:
         return ''
     return '%.0f' % x
-
-
-# Junk follows
-#        binSize   = 10
-#        binCount  = 360/binSize
-#        colorList = ['blue', 'red', 'green']
-#        colorList = ['blue'] * 3
-
-
-
-#            c_dbav, s_dbav = getEnsembleAverageAndSigmaFromHistogram( hist )
-#            Zscore = hist - c_dbav
-#            Zscore = Zscore / s_dbav
-
-        #    vmax = maxHist # Focus on low density regions?
-#            norm = colors.Normalize(vmin=0, vmax=100)
-#            minZscore = amin(amin( Zscore ))
-#            maxZscore = amax(amax( Zscore ))
-#
-#            ZscoreDB = Zscore - DB_RAMCHK[0] # av
-#            ZscoreDB /= DB_RAMCHK[1] # sd
-#
-#            minZscoreDB = amin(amin( ZscoreDB ))
-#            maxZscoreDB = amax(amax( ZscoreDB ))
-#
-#            NTdebug('Hist max,sum                     : %8.0f %8.0f' % (maxHist,sumHist))
-#            NTdebug('Hist av,sd                       : %8.3f %8.3f' % (c_dbav,s_dbav))
-#            NTdebug('Zscore min, max                  : %8.3f %8.3f' % (minZscore, maxZscore))
-#            NTdebug('ZscoreDB c_dbav,s_dbav,minZ, maxZ: %8.3f %8.3f %8.3f %8.3f' % (DB_RAMCHK[0],DB_RAMCHK[1],minZscoreDB, maxZscoreDB))
-#
-#            if c_dbav < 2.0:
-#                NTwarning('Skipping low-density plot (with c_dbav<2) %s' )
-#                return True
-
-#            levels = (-10., -5., -2., 0., 5., 10., 25., 50., 100., 200)
-#            levels = range(10,60,10) # as in fig.1 of robs paper.
-            # by percentage.
-
-        #    zeroLevel = [0.0]
-    #        ps = NTplotSet() # closes any previous plots
-    #        ps.hardcopySize = [1200,1200]
-        #    NTdebug( 'plotparams1: %r' % plotparams1)
-        #    NTdebug( 'xRange: %r' % `xRange`)
-        #    xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize)
-        #    yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize)
-    #        _plot = ps.createSubplot(1,1,1)
-        #    plot = NTplot( #title  = titleStr,
-        #      xRange = xRange,
-        #      xTicks = xTicks,
-        #      xLabel = dihedralName1,
-        #      yRange = yRange,
-        #      yTicks = yTicks,
-        #      yLabel = dihedralName2)
-        #    ps.addPlot(plot)
-    #        kwds = {
-    #          'left': 0.0,   # the left side of the subplots of the figure
-    #          'right': 1.0,    # the right side of the subplots of the figure
-    #          'bottom': 0.0,   # the bottom of the subplots of the figure
-    #          'top': 1.0,      # the top of the subplots of the figure
-    #                }
-    #        ps.subplotsAdjust(**kwds)
-        #    X, Y = meshgrid(x, y)
-
-
-
-        #    NTdebug("Covering extent: " +`extent`)
-        #    extent = (range[0][0],range[0][1],range[1][0],range[1][1])
-#            sumHist = sum(sum( hist ))
-        #    x = nx.arange(plotparams1.min, plotparams1.max+0.01, binSize)
-        #    y = nx.arange(plotparams2.min, plotparams2.max+0.01, binSize)
-
-#            im.set_norm(norm)
-
-        #    cset1 = contourf(X, Y, Z, levels,
-        #                            cmap=cm.get_cmap('jet', len(levels)-1),
-        #                            )
-
-        #    cset1 = contourf(X, Y, Z, levels,
-        #        cmap=cm.get_cmap('jet', len(levels)-1),
-        #        origin='lower')
-
-######            cset2 = contour(hist, levels,
-######    #        cset2 = contour(ZscoreDB,
-######                colors = colorList[i],
-######                hold='on',
-######                extent=extent,
-######                origin='lower')
-######            clabel(cset2, inline=0, fmt = '%.0f',
-######                colors = colorList[i],
-######                   fontsize=12)
-
-        #    fmt = '%1.3f'
-        #    csetZero = contour(Zscore, zeroLevel,
-        #        colors = 'green',
-        #        hold='on',
-        #        extent=extent,
-        #        linewidths=3,
-        #        origin='lower')
-        #    for c in cset2.collections:
-        #        c.set_linestyle('solid')
-        #    cset = contour(Z, cset1.levels, hold='on', colors = 'black',
-        #            origin='lower',
-        #            extent=extent)
-#            colorbar(im)
-        #    colorbar(cset2)
-            # It is easier here to make a separate call to contour than
-            # to set up an array of colors and linewidths.
-            # We are making a thick green line as a zero contour.
-            # Specify the zero level as a tuple with only 0 in it.
-        #    colorbar(cset1)
-        #    ps.show()

@@ -39,7 +39,6 @@ jQuery(document).ready(function() {
 //        "bAutoWidth": false,
     } );
 
-//    $('table[id]*=dataTables_DRList-').dataTable({
     $("table[id^='dataTables-DRList']").dataTable({
         "bSort": true,
         "aaSorting": [[0,'asc']],

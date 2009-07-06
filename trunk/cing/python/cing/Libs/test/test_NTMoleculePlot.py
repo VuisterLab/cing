@@ -61,7 +61,6 @@ class AllChecks(TestCase):
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
 #        entryId = "2hgh_1model"
         entryId = "1brv_1model"
-#        entryId = "1brv_1model"
 
         pdbConvention = IUPAC
         ranges = None
@@ -90,6 +89,7 @@ class AllChecks(TestCase):
         # Fast
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 
+        project.runDssp()
         if actuallyRunWhatif:
             self.assertFalse(runWhatif(project))
         else:
@@ -123,7 +123,7 @@ class AllChecks(TestCase):
                         if not actuallyRunWhatif:
                             angList.append(random()*10-0) # Simulate abs max of Z-scores.
                             bndList.append(random()*5+1)  # offset by 1 but still want to start from zero?
-                            quaList.append(random()*5+1)
+                            quaList.append(random()*100+1)
                             ramList.append(random()*5+1)
                             c12List.append(random()*5+1)
                             rotList.append(random()*5+1)
@@ -185,13 +185,11 @@ class AllChecks(TestCase):
         plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  ROTCHK_STR ]
         plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
         plotAttributesRowMain[ USE_MAX_VALUE_STR]   = 10.0
-        
+
         keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
 
-
-
         moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
-        moleculePlotSet.renderMoleculePlotSet( 'residuePlotSetAll.pdf',
+        moleculePlotSet.renderMoleculePlotSet( 'test_NTMoleculePlot.pdf',
             createPngCopyToo=True  )
 
 if __name__ == "__main__":

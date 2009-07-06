@@ -194,16 +194,6 @@ class MoleculePlotSet:
                     else: # alternative y-axis?
                         ntPlotList[i].labelAxes(position, label, attributes = attr)
 
-            # Draw secondary structure elements and accessibility
-            # Set x range and major ticker.
-            # The major ticker determines the grid layout.
-            # leave space for res types but get it right on top.
-            # .18 at nrows = 4
-            # Needs to be done before re-scaling the y axis from [0,1]
-            ySpaceAxisResIcons = .06 + (nrows - 1) * .04
-            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
-            ntPlotList[0].drawResIcons(ySpaceAxis = ySpaceAxisResIcons)
-
             plusPoint = pointAttributes(type = 'plus', size = self.pointSize, color = self.colorMain)
             circlePoint = pointAttributes(type = 'circle', size = self.pointSize, color = self.colorAlt)
             plusPoint.lineColor = self.colorMain
@@ -242,7 +232,7 @@ class MoleculePlotSet:
                     ntPlotList[i].setYrange((ntPlotList[i].yRange[0], maxValue))
 
 
-            ySpaceAxisResTypes = .02 + (nrows - 1) * .01
+            ySpaceAxisResTypes = .02 + (nrows - 1) * .01 # ..05            
             ntPlotList[0].drawResTypes(ySpaceAxis = ySpaceAxisResTypes) # Weirdly can only be called after yRange is set.
 
             for i in range(nrows):
@@ -252,6 +242,16 @@ class MoleculePlotSet:
                 # Set the grid and major tickers
                 # also sets the grid lines for major. Do last as it won't rescale with plot yet.
                 ntPlotList[i].drawResNumbers(showLabels = showLabels)
+
+            # Draw secondary structure elements and accessibility
+            # Set x range and major ticker.
+            # The major ticker determines the grid layout.
+            # leave space for res types but get it right on top.
+            # .18 at nrows = 4
+            # Needs to be done before re-scaling the y axis from [0,1]
+            ySpaceAxisResIcons = .06 + (nrows - 1) * .04 # .14
+            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
+            ntPlotList[0].drawResIcons(ySpaceAxis = ySpaceAxisResIcons)
 
             # Actually plot
             self.fileNameList.append('%s%03d.pdf' % (self.fileName[: - 4], r))
