@@ -1,20 +1,17 @@
 """
-    Whatif Module
-    First version: gv June 3, 2007
-    Second version by jfd.
-
-    Adapted GWV September 2008: worked around parse error;
+Whatif Module
+First version: gv June 3, 2007
 """
 # Fix these strings so we can get some automated code checking by pydev extensions.
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
 from cing import issueListUrl
-from cing.core.molecule import dots
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTaverage2
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
@@ -22,11 +19,11 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
+from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
@@ -39,6 +36,7 @@ from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import CHECK_ID_STR
 from cing.PluginCode.required.reqWhatif import CHICHK_STR
 from cing.PluginCode.required.reqWhatif import FLPCHK_STR
+from cing.PluginCode.required.reqWhatif import HNDCHK_STR
 from cing.PluginCode.required.reqWhatif import INOCHK_STR
 from cing.PluginCode.required.reqWhatif import LEVEL_STR
 from cing.PluginCode.required.reqWhatif import LOC_ID_STR
@@ -57,14 +55,19 @@ from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.core.constants import IUPAC
+from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
-from cing.PluginCode.required.reqWhatif import HNDCHK_STR
 import os
 import time
+
+if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
+#    NTdebug("No whatif installed.")
+    raise ImportWarning(WHATIF_STR)
+#NTmessage('Using Whatif')
 
 class WhatifResult( NTdict ):
     """

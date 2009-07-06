@@ -12,15 +12,19 @@ Residue
 #@PydevCodeAnalysisIgnore
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.parameters import cingPaths
+from cing.Libs.NTutils import NTfill, NTlist, printf, fprintf, sprintf, getDeepByKeys
+from cing.Libs.fpconst import NaN, isNaN
+from cing.Libs.svd import SVDfit
+from cing.PluginCode.Whatif import Whatif # JFD: this statement causes this plugin to be skipped on systems without Whatif.
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.molecule import dots
-from cing.PluginCode.Whatif import Whatif
+from cing.core.parameters import cingPaths
+from math import cos, sin, pi
+from math import sqrt
 from random import random
 import cing #@Reimport
-
 import os #@Reimport
-from math import cos, sin, pi
-from cing.Libs.svd import SVDfit
+
 
 class PseudoRotation( SVDfit ):
     """
@@ -420,9 +424,6 @@ def procheck_old( project, ranges=None ):
     return project.molecule.procheck
 #end def
 
-from math import sqrt
-from cing.Libs.NTutils import NTfill, NTlist, printf, fprintf, sprintf, getDeepByKeys
-from cing.Libs.fpconst import NaN, isNaN
 
 #import yasaramodule as yasara
 
@@ -831,7 +832,6 @@ def getResidueValidation(validStore, residue, context, keyword):
 #    #end if
 #    return (rama, chi12, bb)
 ##end def
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
 
 
 class CingSummaryDict( NTdict ):
