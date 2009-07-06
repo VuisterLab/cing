@@ -18,6 +18,7 @@ port install py25-ipython
 port install povray
 port install imagemagick
 port install ghostscript
+port install py25-pil
 }}}
 The only problem I had was for a download that failed at our university but worked from home.
 
