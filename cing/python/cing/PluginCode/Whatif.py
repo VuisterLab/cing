@@ -166,6 +166,7 @@ class Whatif( NTdict ):
                 ('MISCHK',  None,          'Missing atoms',                                             'Missing atoms'),
                 ('MO2CHK',  None,          'Missing C-terminal oxygen atoms',                           'Missing C-terminal oxygen atoms'),
                 ('NAMCHK',  None,          'Atom names',                                                'Atom names'),
+                ('NOCAAA',  None,          'Non-canonical residue',                                     'Non-canonical residue'),
                 ('NQACHK', 'packingQuality2','2nd generation packing quality',                          'New quality'),
                 ('NTCHK',   None,          'Acid group conformation check',                             'COOH check'),
                 ('OMECHK', 'omegas',       'Omega angle restraints',                                    'Omega check'),
@@ -779,7 +780,7 @@ RMS Z-scores, should be close to 1.0:
 
                 for curLocId in curLocDic.keys():
                     curListDic = curLocDic[curLocId]
-                    NTdebug("Working on curLocId:   " + `curLocId`)
+#                    NTdebug("Working on curLocId:   " + `curLocId`)
 #                    NTdebug("Working on curListDic: " + `curListDic`)
 
                     nameTuple = self.translateResAtmString( curLocId )

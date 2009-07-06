@@ -98,12 +98,13 @@ class AllChecks(TestCase):
         nrows = 3
         ntPlot1 = ps.createSubplot(nrows,1,1,useResPlot=True)
         ntPlot2 = ps.createSubplot(nrows,1,2)
-#        ntPlot3 = ps.createSubplot(nrows,1,3)
+        ntPlot3 = ps.createSubplot(nrows,1,3)
         ntPlot1.xTicks = []
         point = [0,1]
         sizes = [.2,.3]
         ntPlot1.box(point, sizes)
         ntPlot2.box(point, sizes)
+        ntPlot3.box(point, sizes)
 
         ps.hardcopySize = (400,300)
 #        ps.show()

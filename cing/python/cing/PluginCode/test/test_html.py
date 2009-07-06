@@ -45,8 +45,7 @@ class AllChecks(TestCase):
         return project
 
     def testMakeHtmlTableWithJavascriptEnabled(self):
-        """CSS and Javascript is going to determine much of the formatting."""
-
+#        CSS and Javascript is going to determine much of the formatting.
         project = self.setupSimplestProject()
         h = HTMLfile(project.htmlPath('test.html'), project)
         columnFormats = [ ('col1', {}),

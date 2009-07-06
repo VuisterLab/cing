@@ -1,6 +1,6 @@
 """
 Unit test
-python $CINGROOT/python/cing/PluginCode/test/test_validate.py  |& tee ~/test_validate.log &
+python $CINGROOT/python/cing/PluginCode/test/test_validate.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp

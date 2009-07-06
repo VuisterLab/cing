@@ -165,7 +165,7 @@ class AllChecks(TestCase):
         y = 0.8      # axes coordinates
         height = 0.2 # axes.
 
-        helixIconList = HelixIconList(axis=ax,seq=width, xy=(x,y),width=width,height=height)
+        helixIconList = HelixIconList(seq=width, startPoint=(x,y),width=width,height=height,axis=ax)
         self.assertFalse(helixIconList.addPatches())
         for p in helixIconList.patchList:
             ax.add_patch(p)

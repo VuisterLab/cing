@@ -78,6 +78,7 @@ class AllChecks(TestCase):
         NTdebug("Reading files from directory: " + cyanaDirectory)
         # Fast
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        project.runDssp()
 
         rangeList = project.molecule.getFixedRangeList(
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=ranges )
@@ -218,15 +219,6 @@ class AllChecks(TestCase):
                 if i != nrows-1:
                     ntPlotList[i].xLabel = None
 
-            # Draw secondary structure elements and accessibility
-            # Set x range and major ticker.
-            # The major ticker determines the grid layout.
-            # leave space for res types but get it right on top.
-#            .18 at nrows = 4
-            # Needs to be done before re-scaling the y axis from [0,1]
-            ySpaceAxisResIcons = .06 + (nrows-1) * .04
-            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
-            ntPlotList[0].drawResIcons( ySpaceAxis=ySpaceAxisResIcons )
 
 
             plusPoint   = pointAttributes( type='plus',   size=1.5, color='black' )
@@ -273,6 +265,15 @@ class AllChecks(TestCase):
                 # also sets the grid lines for major. Do last as it won't rescale with plot yet.
                 ntPlotList[i].drawResNumbers( showLabels=showLabels)
 
+            # Draw secondary structure elements and accessibility
+            # Set x range and major ticker.
+            # The major ticker determines the grid layout.
+            # leave space for res types but get it right on top.
+#            .18 at nrows = 4
+            # Needs to be done before re-scaling the y axis from [0,1] ???????
+            ySpaceAxisResIcons = .06 + (nrows-1) * .04
+            ntPlotList[0].iconBoxYheight = 0.16 * nrows / 3. # .16 at nrows=3
+            ntPlotList[0].drawResIcons( ySpaceAxis=ySpaceAxisResIcons )
 
             # Set the grid and major tickers
             fileNameList.append( 'residuePlotSet%03d.pdf' % r)
