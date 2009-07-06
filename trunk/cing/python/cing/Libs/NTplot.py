@@ -456,7 +456,7 @@ class NTplot( NTdict ):
             return True
         # Expose matplot lib routine.
 #        e = Ellipse(startPoint=point, width=0.2*rand(), height=0.2*rand())
-        e = Ellipse(startPoint=point, width=width, height=height)
+        e = Ellipse(xy=point, width=width, height=height)
         e.set_clip_box(self.axis.bbox)
         if color:
             e.set_facecolor(color)
