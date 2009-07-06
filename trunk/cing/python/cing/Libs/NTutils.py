@@ -4336,7 +4336,7 @@ def isAlmostEqual( ntList, epsilon):
 def toPoundedComment(str):
     result = []
     for line in str.split('\n'):
-        NTdebug("Processing line: [%s]" % line)
+#        NTdebug("Processing line: [%s]" % line)
         result.append( '# %s' % line )
     resultStr = join(result, '\n')
     return resultStr

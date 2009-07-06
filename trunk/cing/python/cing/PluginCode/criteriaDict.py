@@ -1,5 +1,4 @@
 from cing import programName
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.constants import ANY_ENTITY_LEVEL
@@ -24,7 +23,7 @@ criteriaDict = {
   },
   programName: {
     ANY_ENTITY_LEVEL: {
-    # See Fig2. in 
+    # See Fig2. in
      'dr_maxall': { POOR_PROP:  ( OPERATION_GREATER_THAN, 0.5 ),
                     BAD_PROP:   ( OPERATION_GREATER_THAN, 1.0 )
                  },
@@ -33,11 +32,11 @@ criteriaDict = {
      'dr_rms': { POOR_PROP:  ( OPERATION_GREATER_THAN, 0.05 ),
                  BAD_PROP:   ( OPERATION_GREATER_THAN, 0.1 )
                  },
-     'dr_avall': { 
+     'dr_avall': {
                  POOR_PROP:  ( OPERATION_GREATER_THAN, 0.01 ),
                  BAD_PROP:   ( OPERATION_GREATER_THAN, 0.02 )
                  },
-     'dr_avviol': { 
+     'dr_avviol': {
                  POOR_PROP:  ( OPERATION_GREATER_THAN, 0.1 ),
                  BAD_PROP:   ( OPERATION_GREATER_THAN, 0.2 )
                  },
@@ -48,4 +47,4 @@ criteriaDict = {
 cingCriticismDict = criteriaDict[ programName ]
 
 #NTmessage( `criteriaDict` )
-NTdebug( "Read criteriDict.py version 0.0.0" )
+#NTdebug( "Read criteriDict.py version 0.0.0" )

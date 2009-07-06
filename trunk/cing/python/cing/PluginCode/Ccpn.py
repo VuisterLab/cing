@@ -32,7 +32,7 @@ import os
 import re
 import string
 import tarfile
-NaN = float('Nan')
+#NaN = float('Nan') # JFD not sure if this is the same as in cing.Libs.fpconst
 if True:
     from cing.Libs.NTutils import ImportWarning
     from cing.Libs.NTutils import NTmessage
@@ -47,7 +47,7 @@ if True:
         from ccp.util.Validation import getEnsembleValidationStore #@UnresolvedImport
         from ccp.util.Validation import getResidueValidation #@UnresolvedImport
         from memops.api.Implementation import MemopsRoot
-        from memops.general.Constants import currentModelVersion
+#        from memops.general.Constants import currentModelVersion
         from memops.general.Io import loadProject
     except:
         switchOutput(True)
@@ -86,7 +86,7 @@ if True:
 """
 
 class Ccpn:
-    NTdebug("Using CCPN version %s" % currentModelVersion)
+#    NTdebug("Using CCPN version %s" % currentModelVersion)
 
     SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1. / 1e9 # there's a bug in pydev extension preventing me to write: 1.e-9
     # Reported: https://sourceforge.net/tracker2/index.php?func=detail&aid=2049228&group_id=85796&atid=577329
@@ -124,13 +124,13 @@ class Ccpn:
     CCPN_DIHEDRAL_CONSTRAINT_LIST = 'DihedralConstraintList'
     CCPN_RDC_CONSTRAINT_LIST = 'RdcConstraintList'
     CCPN_CS_CONSTRAINT_LIST = 'ChemShiftConstraintList'
-    
-    CCPN_RUN_MEASUREMENT = 'MeasurementListData' 
+
+    CCPN_RUN_MEASUREMENT = 'MeasurementListData'
     CCPN_RUN_CONSTRAINT = 'ConstraintStoreData'
     CCPN_RUN_STRUCTURE = 'StructureEnsembleData'
     CCPN_RUN_RESIDUE = 'MolResidueData'
     CCPN_RUN_PEAK = 'PeakListData'
-    
+
     CCPN_CLASS_RESTRAINT = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT,
                             RESTRAINT_IDX_HBOND: CCPN_HBOND_CONSTRAINT,
                             RESTRAINT_IDX_DIHEDRAL: CCPN_DIHEDRAL_CONSTRAINT,
@@ -269,7 +269,7 @@ class Ccpn:
         ccpnMolSystemList = []
 
         ccpnCalc = self.ccpnCingRun
-        molSystem = None  
+        molSystem = None
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             # Mol System is the one associated with chosen structure
             structureData = ccpnCalc.findFirstData(className=self.CCPN_RUN_STRUCTURE,
@@ -277,7 +277,7 @@ class Ccpn:
             if structureData:
               molSystem = structureData.molSystem
             else:
-              molSystem = None  
+              molSystem = None
 
         # Determine which CCPN molSystems to work with
         if moleculeName and molSystem:
@@ -388,7 +388,7 @@ class Ccpn:
            When modelCount is not None it will limit the number of models imported.
            Output: True or None on error.
         '''
-        
+
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             self.ccpnCingRun = ccpnCalc = self.ccpnProject.cingRun
         else:
@@ -409,9 +409,9 @@ class Ccpn:
             for constraintData in ccpnCalc.findFirstAllData(className=self.CCPN_RUN_CONSTRAINT, ioRole='input'):
               ccpnConstraintLists.update(constraintData.constraintLists)
             ccpnConstraintLists = list(ccpnConstraintLists)
-        
+
         # No ccpnCalc or ccpnCalc could be empty
-        if not ccpnConstraintLists: 
+        if not ccpnConstraintLists:
             # Default to
             ccpnConstraintLists = []
             for constraintStore in self.ccpnNmrProject.sortedNmrConstraintStores():
@@ -462,15 +462,15 @@ class Ccpn:
         ccpnMolSys = self.molecule.ccpn
         ccpnStructureEnsemble = None
         ccpnCalc = self.ccpnCingRun
-        
+
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             structureData = ccpnCalc.findFirstData(className=self.CCPN_RUN_STRUCTURE,
                                                    molSystemCode=ccpnMolSys.code,
                                                    ioRole='input')
             if structureData:
                 ccpnStructureEnsemble = structureData.structureEnsemble
-        
-        # No ccpnCalc or ccpnCalc is empty    
+
+        # No ccpnCalc or ccpnCalc is empty
         if not ccpnStructureEnsemble:
             # Default
             ccpnStructureEnsembles = ccpnMolSys.sortedStructureEnsembles()
@@ -484,7 +484,7 @@ class Ccpn:
                 # otherwise no point in continuing
                 msg = 'CCPN mol system %s has no structures'
                 NTerror(msg % ccpnMolSys.code)
-                
+
         if False: # Block for debug.
             try:
                 ensembleName = ccpnStructureEnsemble.structureGeneration.name
@@ -865,9 +865,9 @@ class Ccpn:
             ccpnMolSys = self.molecule.ccpn
             for measurementData in ccpnCalc.findAllData(className=self.CCPN_RUN_MEASUREMENT,
                                                         ioRole='input'):
-                measurementList = measurementData.measurementList  
-                if measurementList and measurementList.className == 'ShiftList':            
-                    doneSetShifts = self._getCcpnShiftList(ccpnMolSys, measurementList)  
+                measurementList = measurementData.measurementList
+                if measurementList and measurementList.className == 'ShiftList':
+                    doneSetShifts = self._getCcpnShiftList(ccpnMolSys, measurementList)
 
         # No ccpCalc or ccpnCalc is empty
         if not doneSetShifts:
@@ -1047,7 +1047,7 @@ class Ccpn:
               for spectrum in experiment.sortedDataSources():
                   for peakList in spectrum.peakLists:
                       peakLists.append(peakList)
-        
+
         return peakLists
 
     def _getShiftAtomNameMapping(self, ccpnShiftList, molSystem):
@@ -1673,15 +1673,15 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # TJS: Definitely - It matches Extend-NMR and Analysis
         # JFD: how about when there is no cingRun? It's created below then...
         # TJS: Yes. Added creation of new object to store results
-        
+
         if hasattr(self.ccpnProject, 'nmrCalcStores'): # Protect old CCPN versions
             nmrProject = self.ccpnProject.currentNmrProject or \
                          self.ccpnProject.findFirstNmrProject() or \
                          self.ccpnProject.newNmrProject(name='%s Default' % CING)
- 
+
             ccpnNmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name=CING) or \
                                self.ccpnProject.newNmrCalcStore(name=CING, nmrProject=nmrProject)
- 
+
             if ccpnNmrCalcStore.runs:
                 # Always use the most recently setup run if there is one.
                 run = ccpnNmrCalcStore.sortedRuns()[-1]
@@ -1690,9 +1690,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 run = ccpnNmrCalcStore.newRun(status='provisional')
         else:
             run = None
-        
+
         self.ccpnProject.cingRun = run
-        
+
         return True
 
     def createCcpn(self, ccpnFolder = None):

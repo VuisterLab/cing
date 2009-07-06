@@ -494,7 +494,8 @@ def main():
     NTdebug('args: %s', _args)
 
     # The weird location of this import is because we want it to be verbose.
-    from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
+#    from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
+    # JFD: already present in __init__.py.
 
     if options.test:
         testOverall(namepattern="test_*.py")

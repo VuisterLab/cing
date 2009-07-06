@@ -20,7 +20,8 @@ import sys
 try:
     import yasaramodule as yasara #@UnresolvedImport
 except:
-    NTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
+    pass
+#    NTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
 
 MolmolColorDict = dict(green = '0 1 0', orange = '1 0.647 0', red = '1 0 0')
 
