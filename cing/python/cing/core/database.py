@@ -12,9 +12,11 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTcodeerror
-
 import os
 import sys
+
+# NB This routine gets executed before main.py gets a chance to set the verbosity.
+#     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
 
 patches = False
 
@@ -303,7 +305,7 @@ class MolDef( NTtree ):
         """
         Call postProcessing routines of all ResidueDefs and atomDefs
         """
-        NTdebug("==> Creating translation dictionaries ... ")
+#        NTdebug("==> Creating translation dictionaries ... ")
         for res in self:
             res.postProcess()
             for atm in res:
@@ -1021,7 +1023,7 @@ class DihedralDef( NTtree ):
 def importNameDefs( tableFile, name)   :
     "Import residue and atoms name defs from tableFile"
 
-    NTdebug('==> Importing database file '+ tableFile )
+#    NTdebug('==> Importing database file '+ tableFile )
 
     mol = MolDef( name = 'mol' )
     obj = mol # object point to 'active' object (i.e. mol, residue, dihedral or atom); attributes get appended to obj.
@@ -1117,8 +1119,8 @@ def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
 #path, fname, ext = NTpath( __file__ )
 #print '>>', __file__, path
 # import the database table and generate the db-tree
-NTdebug('importing NTdb')
-NTdebug( '>' + INTERNAL )
+#NTdebug('importing NTdb')
+#NTdebug( '>' + INTERNAL )
 
 #print '>',os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL)
 

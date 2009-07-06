@@ -70,7 +70,7 @@ class Dssp:
             if not self.project.molecule.hasAminoAcid():
                 NTmessage('Dssp.run: skipping because no amino acid in this molecule')
                 return
-                
+
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
                     pass
@@ -210,9 +210,9 @@ def runDssp(project, parseOnly = False)   :
     """
     # check if dssp is present
     if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("No whatif installed so skipping this step")
+        NTmessage("No whatif installed so skipping runDssp")
         return
-    
+
     if not project.molecule:
         NTerror('dssp: no molecule defined')
         return None

@@ -12,6 +12,12 @@ from traceback import format_exc
 import glob
 import os
 
+# NB This routine gets executed before main.py gets a chance to set the verbosity.
+#     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
+
+#print "Now at importPlugin.py"
+#NTdebug("This is NTdebug in importPlugin.py")
+
 #-----------------------------------------------------------------------------
 # import the plugins
 #-----------------------------------------------------------------------------
@@ -29,8 +35,8 @@ def importPlugin( pluginName ):
             plugin = plugins[pluginName]
 #            NTdebug("reloading same module just to see it change")
             reload( plugin.module )
-        except ImportWarning: # JFD: don't know why this doesn't catch the failures. TODO: figure out.
-            NTdebug("Skipping reload of an optional compound.")
+        except ImportWarning: # Disable after done debugging; can't use NTdebug yet.
+            print "Skipping reload of an optional compound."
         except Exception:
             NTexception('A reload failed for ' + pluginName)
             return None
@@ -43,21 +49,22 @@ def importPlugin( pluginName ):
         #JFD changed from default to zero which means to only try absolute imports.
         pluginCodeModulePackage = __import__( pluginCodeModule, globals(), locals(), [pluginName])
         isInstalled = True
+        NTdebug( "Installed plugin: [%s]" % pluginName )
     except ImportWarning:
-        NTdebug("Skipping import of an optional compound.")
+        NTdebug( "Skipping import of an optional plugin: [%s]" % pluginName )
         isInstalled = False
     except:
 #        traceBackObject = sys.exc_info()[2]
         traceBackString = format_exc()
         NTerror(traceBackString)
-        NTerror('Failed to import pluginCodeModule: [%s]' % pluginName)
+        NTerror( 'Failed to import pluginCodeModule: [%s]' % pluginName)
         return None
 
 
     pluginModule = None
     if isInstalled:
     #    NTdebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
-        NTdebug('importPlugin: ' + pluginName )
+#        NTdebug('importPlugin: ' + pluginName )
         if not hasattr(pluginCodeModulePackage, pluginName):
             NTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
             return None
@@ -100,6 +107,7 @@ pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 #    NTdebug('importPlugin: Running CING without CCPN support')
 #    pluginFileList.remove( os.path.join( pluginDir, 'Ccpn.py') )
 
+#print "Now at importPlugin.py real job"
 for _p in pluginFileList:
     _d,_pname,_e = NTpath(_p)
 #    try:

@@ -67,8 +67,9 @@ import numpy as np
 try:
     import Image
     haveImage = True
+    NTdebug("Installed python Image library (pil)")
 except ImportError:
-    NTdebug("Failed to import Image; certain plot options will fail")
+    NTerror("Failed to import Image; certain plot options will fail")
     haveImage = False
 #end try
 
@@ -76,8 +77,10 @@ haveBiggles = False
 try:
     import biggles
     haveBiggles = True
+    NTdebug("Installed python Biggles library")
 except ImportError:
-    NTdebug("Failed to import biggles; will try to use MatLibPlot")
+    pass
+#    NTdebug("Failed to import biggles; will try to use MatLibPlot")
 
 useMatPlotLib = True
 
