@@ -17,7 +17,6 @@ from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import readTextFromFile
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
@@ -114,7 +113,7 @@ class Regine(Lister):
 #        NTdebug("atom = decodeNameTuple(XPLOR, chainName, resNum, atomName): %s = %s %s %s [%s]" % (
 #                 atom, XPLOR, chainName, resNum, atomName))
         if not atom:
-            NTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName))
+#            NTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) # TODO check; message disabled for improving other debugging.
             return None
         return atom.resonances()
 

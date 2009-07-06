@@ -2,12 +2,12 @@
 Classes for dealing with STAR syntax
 """
 from cing import verbosity
+import re
 
 __author__    = "$Author$"
 ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
-import re
 
 """
 Some handy patterns and functions for dealing with text in the STAR syntax.
@@ -365,8 +365,7 @@ def semicolon_block_collapse( text ):
 
     # Original code: can't handle re matches that are too long
     #text, count = pattern_semicolon_block.subn( semicolon_block_replace, text )
-    if verbosity >= 9:
-        print 'Done [%s] subs with semicolon blocks' % count
+#    NTdebug('Done [%s] subs with semicolon blocks' % count)
     return text
 
 def semicolon_block_expand( text ):
@@ -482,8 +481,8 @@ def comments_strip( text ):
                 count += 1
         i += 1
 
-    if verbosity >= 9:
-        print 'Done [%s] comment subs' % count
+#    if verbosity >= 9:
+#    NTdebug( 'Done [%s] comment subs' % count )
     if lines:
         text = "\n".join(lines)
 #    text = lines.join("\n")

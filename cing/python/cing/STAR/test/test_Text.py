@@ -3,6 +3,8 @@ from cing.STAR.Text import comments_strip
 from unittest import TestCase
 import os
 import unittest
+#from cing import verbosityDebug
+#import cing
 
 
 class AllChecks(TestCase):
@@ -22,12 +24,13 @@ class AllChecks(TestCase):
 #        posExpected = 34
 #        self.assertEqual( valueExpected, value )
 #        self.assertEqual( posExpected, pos)
-        
+
+# JFD had to remove the beginning space before the pound because Eclipse removes it in the expected too.
         t2 = """
- # comment 1
+# comment 1
 """
         t2noComment = """
- 
+
 """
         self.assertEqual(t2noComment,comments_strip( t2 ))
 
@@ -35,31 +38,26 @@ class AllChecks(TestCase):
         text = """
 # my comment exactly
 foo # comment
-value#stil a value
+value#still a value
 bar
 ; # actual data
 ;
 """
-        textExpected = """
-
-foo 
-value#stil a value
+        textExpected = "\n\nfoo "+"""
+value#still a value
 bar
 ; # actual data
 ;
 """
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
-    
+
     def testcomments_strip2(self):
         text = """
 H' # comment
 H" # also
 """
-        textExpected = """
-H' 
-H" 
-"""
+        textExpected = """\nH' \nH" \n"""
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
 
@@ -67,20 +65,16 @@ H"
         text = """
 H# # comment
 """
-        textExpected = """
-H# 
-"""
+        textExpected = "\nH# \n"
 
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
 
     def testcomments_strip3(self):
         text = """
-H# 
+H#
 """
-        textExpected = """
-H# 
-"""
+        textExpected = "\nH#\n"
 
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
@@ -109,9 +103,7 @@ test2 # no comment 2
         text = """
 'quoted value with embedded # comment' # real comment
 """
-        textExpected = """
-'quoted value with embedded # comment' 
-"""
+        textExpected = "\n'quoted value with embedded # comment' \n"
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
 
@@ -119,9 +111,8 @@ test2 # no comment 2
         text = """
 "quoted value with embedded # comment" # real comment
 """
-        textExpected = """
-"quoted value with embedded # comment" 
-"""
+        textExpected = '\n"quoted value with embedded # comment" \n'
+
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
 
@@ -130,8 +121,7 @@ test2 # no comment 2
 "quoted 'complications ; ' with embedded # comment" # real comment
 """
         textExpected = """
-"quoted 'complications ; ' with embedded # comment" 
-"""
+"quoted 'complications ; ' with embedded # comment" \n"""
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
 
@@ -140,11 +130,10 @@ test2 # no comment 2
 "quoted 'complications;' with embedded # comment" # real comment
 """
         textExpected = """
-"quoted 'complications;' with embedded # comment" 
-"""
+"quoted 'complications;' with embedded # comment" \n"""
         textNew = comments_strip( text )
         self.assertEqual( textNew, textExpected)
-    
+
     def testcomments_strip9(self):
         text = """
 ;
@@ -160,4 +149,5 @@ test2 # no comment 2
         self.assertEqual( textNew, textExpected)
 
 if __name__ == "__main__":
+#    cing.verbosity = verbosityDebug
     unittest.main()
