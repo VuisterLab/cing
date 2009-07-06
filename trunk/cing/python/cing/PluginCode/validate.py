@@ -408,9 +408,10 @@ def criticize(project, toFile=True):
             NTdetail('==> Criticizing project: output to "%s"', path)
 
             # Generate an xml summary file
-            path = project.moleculePath('analysis', 'cingSummaryDict.xml')
-            s = project.getCingSummaryDict()
-            s.save( path )
+            # When Whatif optional component isn't installed this fails. Disabled for now.
+#            path = project.moleculePath('analysis', 'cingSummaryDict.xml')
+#            s = project.getCingSummaryDict()
+#            s.save( path )
         else:
             NTdetail('==> Criticizing project')
         #end if

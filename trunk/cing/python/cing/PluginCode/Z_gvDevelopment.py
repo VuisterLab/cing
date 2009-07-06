@@ -882,6 +882,7 @@ class CingSummaryDict( NTdict ):
 
                     )
         # Add all Whatif summary check Id's
+        # The below causes an exception when called on a system that has no Whatif.
         for checkId in Whatif.summaryCheckIdList:
             key = 'WI_' + Whatif.cingCheckId(checkId)
             self[key] = None
