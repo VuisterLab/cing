@@ -3529,7 +3529,7 @@ def matchString( source, target ):
     return True
 #end def
 
-def val2Str(value, fmt, count=None):
+def val2Str(value, fmt, count=None, useNanString=True):
     """Utility for translating numeric values to strings allowing the value
     to be a None and returning the NaNstring in such case. When the value is
     None the count determines how long the return string will be.
@@ -3538,7 +3538,8 @@ def val2Str(value, fmt, count=None):
     """
 
     if value==None:
-        value = None
+        pass
+#        value = None
     elif not isinstance(value, float):
 #        try to parse it as a float and see
         try:
@@ -3552,6 +3553,8 @@ def val2Str(value, fmt, count=None):
         value = None
     if value == None:
         if not count:
+            if not useNanString:
+                return ''
             return NaNstring
         return ("%"+`count`+"s") % NaNstring
     return fmt % value

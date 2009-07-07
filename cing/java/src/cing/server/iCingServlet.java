@@ -54,7 +54,7 @@ public class iCingServlet extends HttpServlet {
      * */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             java.io.IOException {
-        General.showDebug("processing doPost by iCingServlet version: [" + Settings.VERSION + "]");
+        General.showDebug("processing doPost by iCingServlet revision: [" + Settings.REVISION + "]");
         JSONObject result = new JSONObject();
 
         File pathUser = null;
@@ -263,7 +263,7 @@ public class iCingServlet extends HttpServlet {
 
     /**
      * If the exit code was not set yet then set it to success
-     * 
+     *
      * @param response
      * @param result
      */
@@ -315,7 +315,7 @@ public class iCingServlet extends HttpServlet {
 
         if (list.length < 1) {
             return null;
-        }        
+        }
         return list[0];
     }
 
@@ -339,7 +339,7 @@ public class iCingServlet extends HttpServlet {
 //                projectName = Ut.getProjectNameFromCcpnProjectFile( pathProject );
             }
         }
-        
+
         // covers the case of not ccpn and failure of getting ccpn's.
         if ( projectName == null ) {
             projectName = InOut.getFilenameBase(projectFilePath);
@@ -350,9 +350,9 @@ public class iCingServlet extends HttpServlet {
 
     /**
      * Actually saves the file
-     * 
+     *
      * @param parameterMap
-     * 
+     *
      * @param item
      * @return a JSON string.
      */
@@ -485,7 +485,7 @@ public class iCingServlet extends HttpServlet {
 
     /**
      * Actually saves the file
-     * 
+     *
      * @param item
      * @return a JSON string.
      */
@@ -512,7 +512,7 @@ public class iCingServlet extends HttpServlet {
         General.showDebug("fn   : " + fileName);
         fileName = Utils.getFileNameWithoutPath(fileName);
         General.showDebug("fn(b): " + fileName);
-                
+
         /**
          * TODO: read up on safety issues here. No .. or forward slash allowed.
          */
@@ -549,7 +549,7 @@ public class iCingServlet extends HttpServlet {
 
     /**
      * Saves the validation settings file: valSets.cfg
-     * 
+     *
      * @param item
      * @return a JSON string.
      */
@@ -607,7 +607,7 @@ public class iCingServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param response
      * @param result
      *            Message will be byte by byte and end up in a PRE block

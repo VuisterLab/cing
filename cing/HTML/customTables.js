@@ -17,15 +17,20 @@ jQuery(document).ready(function() {
                       { "sType": "numeric", "sClass": "right" },// resi
                       { "sType": "html" }, 						// resn
                       { "sType": "html" }, 						// atom name
+                      { "sType": "html" }, 						// atom type
+                      { "sClass": "center"}, 					// stereo
+
                       { "sType": "numeric", "sClass": "right"}, // obs
                       { "sType": "numeric", "sClass": "right"}, // error
-                      { "sClass": "center"}, 					// stereo
+
                       { "sType": "numeric", "sClass": "right"}, // shiftx
                       { "sType": "numeric", "sClass": "right"}, // error
                       { "sType": "numeric", "sClass": "right"}, // delta
-                      { "sType": "numeric", "sClass": "right"}, // error
+
                       { "sType": "numeric", "sClass": "right"}, // dbase
-                      { "sType": "numeric", "sClass": "right"}, // sd
+                      { "sType": "numeric", "sClass": "right"}, // error
+                      { "sType": "numeric", "sClass": "right"}, // delta
+
                       { "sType": "html", "sClass": "left", "sWidth":"100em" } // criteria is html too (list)
                   ],
         // Pagination options.
@@ -48,6 +53,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
          // atom 1
@@ -87,6 +93,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" },// #
                       { "sType": "html" }, 						// ch
@@ -120,6 +127,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -148,6 +156,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -182,6 +191,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -222,6 +232,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -311,6 +322,4 @@ jQuery(document).ready(function() {
     $("#example").dataTable({
         "sDom": 'T<"clear">lfrtip'
     } );
-
-
 });

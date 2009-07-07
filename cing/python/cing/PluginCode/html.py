@@ -2071,7 +2071,7 @@ class AtomsHTMLfile( HTMLfile ):
         sav     = None
         ssd     = None
         delta   = None
-        rdelta  = None
+        ddelta  = None
         dav     = None
         dsd     = None
         value   = None
@@ -2081,12 +2081,7 @@ class AtomsHTMLfile( HTMLfile ):
             sav = atom.shiftx.av
             ssd = atom.shiftx.sd
         atomResonanceCollapsed = atom.resonances()
-#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
-        if atom.isAssigned() and sav:
-            delta = atomResonanceCollapsed.value - sav
-            rdelta = 1.0
-            if ssd > 0.0:
-                rdelta = sav/ssd
+
         if atom.db.shift:
             dav = atom.db.shift.average
             dsd = atom.db.shift.sd
@@ -2094,16 +2089,24 @@ class AtomsHTMLfile( HTMLfile ):
             value = atomResonanceCollapsed.value
             error = atomResonanceCollapsed.error
 
-        savStr     = val2Str(sav,   '%6.2f', 6 )
-        ssdStr     = val2Str(ssd,   '%6.2f', 6 )
-        deltaStr   = val2Str(delta, '%6.2f', 6 )
-        rdeltaStr  = val2Str(rdelta,'%6.2f', 6 )
-        davStr     = val2Str(dav,   '%6.2f', 6 )
-        dsdStr     = val2Str(dsd,   '%6.2f', 6 )
-        valueStr   = val2Str(value, '%6.2f', 6 )
+#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
+        if value:
+            if sav:
+                delta = value - sav
+            if dav:
+                ddelta = value - dav
+
+
+        savStr     = val2Str(sav,   '%6.2f', useNanString=False )
+        ssdStr     = val2Str(ssd,   '%6.2f', useNanString=False )
+        deltaStr   = val2Str(delta, '%6.2f', useNanString=False )
+        ddeltaStr  = val2Str(ddelta,'%6.2f', useNanString=False )
+        davStr     = val2Str(dav,   '%6.2f', useNanString=False )
+        dsdStr     = val2Str(dsd,   '%6.2f', useNanString=False )
+        valueStr   = val2Str(value, '%6.2f', useNanString=False )
         if valueStr==NaNstring:
             error=None
-        errorStr   = val2Str(error, '%6.2f', 6 )
+        errorStr   = val2Str(error, '%6.2f', useNanString=False )
 
         chain   = atom.residue.chain
         residue = atom.residue
@@ -2121,21 +2124,25 @@ class AtomsHTMLfile( HTMLfile ):
         self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
 
         table.nextColumn(atom.name)
+        spinTypeStr = getDeepByKeys(atom, 'db', 'spinType')
+        if not spinTypeStr:
+            spinTypeStr = ''
+        table.nextColumn(spinTypeStr)
 #        self.insertHtmlLink( self.main, self.atomList, atom,    text = atom.name)
-
-        table.nextColumn(valueStr)
-        table.nextColumn(errorStr)
         if atom.isStereoAssigned():
             table.nextColumn('S')
         else:
-            table.nextColumn('.')
+            table.nextColumn('')
 
-        for val,err in [(savStr,   ssdStr),
-                        (deltaStr, rdeltaStr),
-                        (davStr,   dsdStr)]:
+        table.nextColumn(valueStr)
+        table.nextColumn(errorStr)
+
+        for val,err,d in [(savStr,   ssdStr, deltaStr),
+                          (davStr,   dsdStr, ddeltaStr)]:
             table.nextColumn(val)
             table.nextColumn(err)
-#        end for
+            table.nextColumn(d)
+        # end for
 
         table.nextColumn()
         atom.rogScore.createHtmlForComments(self.main)
@@ -2162,20 +2169,25 @@ class AtomsHTMLfile( HTMLfile ):
 #        if os.path.exists(refItem):
 #            self.insertHtmlLink( self.header, self.atomList, abstractResource, text = 'Text file' )
 
-        columnFormats = [   ('ch', {} ),
-                            ('resi', {} ),
-                            ('resn', {} ),
-                            ('atom', {} ),
-                            ('obs.', {}),
-                            ('error' , {}),
-                            ('stereo' , {}),
-                            ('shiftx', {}),
-                            ('error' , {}),
-                            ('delta'   , {}),
-                            ('error'   , {}),
-                            ('dbase'   , {}),
-                            ('sd'    , {}),
-                            ('Critique'  , {})
+        columnFormats = [   ('ch',   {'title':'Chain identifier of atom'} ),
+                            ('resi', {'title':'Residue number of atom'} ),
+                            ('resn', {'title':'Residue type (links to specific residue) of atom'} ),
+                            ('atom', {'title':'Name of atom'} ),
+                            ('iso',  {'title':'NMR isotope.'} ),
+                            ('stereo' , {'title':'S indicates the atom is stereospecifically assigned.'}),
+
+                            ('obs.',    {'title':'Observed chemical shift.'}),
+                            ('error' ,  {'title':'Error estimate of observed chemical shift.'}),
+
+                            ('shiftx',  {'title':'Shiftx predicted chemical shift'}),
+                            ('error' ,  {'title':'Error estimate in Shiftx prediction.'}),
+                            ('delta'  , {'title':'Observed minus predicted chemical shift.'}),
+
+                            ('dbase'  , {'title':'CING database chemical shift.'}),
+                            ('error'    ,  {'title':'CING database chemical shift variation.'}),
+                            ('delta',   {'title':'Observed minus database chemical shift.'}),
+
+                            ('Critique'  , {'title':'Any number of remarks to consider.'})
                        ]
         tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
         # Make table with only critigued atoms if needed
@@ -2356,16 +2368,16 @@ class RestraintListHTMLfile( HTMLfile ):
             # end for
         # end if
 
-        table.nextColumn(val2Str(restraint.lower, '%.2f'),)
+        table.nextColumn(val2Str(restraint.lower, '%.2f',useNanString=False),)
 #        table.nextColumn(val2Str(restraint.target, '%.2f'),)
-        table.nextColumn(val2Str(restraint.upper, '%.2f'),)
-        table.nextColumn(val2Str(restraint.av, '%.2f'),)
-        table.nextColumn(val2Str(restraint.sd, '%.2f'),)
-        table.nextColumn(val2Str(restraint.min, '%.2f'),)
-        table.nextColumn(val2Str(restraint.max, '%.2f'),)
-        table.nextColumn(val2Str(restraint.violAv, '%.2f'),)
-        table.nextColumn(val2Str(restraint.violSd, '%.2f'),)
-        table.nextColumn(val2Str(restraint.violMax, '%.2f'),)
+        table.nextColumn(val2Str(restraint.upper, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.av, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.sd, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.min, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.max, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.violAv, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.violSd, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.violMax, '%.2f',useNanString=False),)
         table.nextColumn(val2Str(restraint.violCount1, '%i'),)
         table.nextColumn(val2Str(restraint.violCount3, '%i'),)
         table.nextColumn(val2Str(restraint.violCount5, '%i'),)
@@ -2444,9 +2456,9 @@ class RestraintListHTMLfile( HTMLfile ):
         table.nextColumn(val2Str(restraint.cav, '%.2f'),)
         table.nextColumn(val2Str(restraint.cv, '%.4f'),)
         table.nextColumn(val2Str(restraint.violCount3, '%i'),)
-        table.nextColumn(val2Str(restraint.violAv, '%.2f'),)
-        table.nextColumn(val2Str(restraint.violSd, '%.2f'),)
-        table.nextColumn(val2Str(restraint.violMax, '%.2f'),)
+        table.nextColumn(val2Str(restraint.violAv, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.violSd, '%.2f',useNanString=False),)
+        table.nextColumn(val2Str(restraint.violMax, '%.2f',useNanString=False),)
 
         if restraint.rogScore.isCritiqued():
             table.nextColumn()
@@ -2687,10 +2699,10 @@ class PeakListHTMLfile( HTMLfile ):
         # end for
 # HEIGHT & VOLUME
         fmt = '%.2e'
-        table.nextColumn(val2Str(peak.height.value, fmt))
-        table.nextColumn(val2Str(peak.height.error, fmt))
-        table.nextColumn(val2Str(peak.volume.value, fmt))
-        table.nextColumn(val2Str(peak.volume.error, fmt))
+        table.nextColumn(val2Str(peak.height.value, fmt,useNanString=False))
+        table.nextColumn(val2Str(peak.height.error, fmt,useNanString=False))
+        table.nextColumn(val2Str(peak.volume.value, fmt,useNanString=False))
+        table.nextColumn(val2Str(peak.volume.error, fmt,useNanString=False))
 # ATOM(S)
         for i in range(self.dimPeakList):
             atom = None
@@ -2701,7 +2713,7 @@ class PeakListHTMLfile( HTMLfile ):
             # end if
             if not atom:
                 for _j in range(4):
-                    table.nextColumn('.')
+                    table.nextColumn('')
                 # end for
                 continue
             # end if
