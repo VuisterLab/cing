@@ -22,4 +22,10 @@ port install py25-pil
 }}}
 The only problem I had was for a download that failed at our university but worked from home.
 
+I do create a soft link for the python2.5 executable as root:
+{{{
+cd /opt/local/bin
+ln -s python2.5 python
+}}}
+
 From here you should follow the generalized [SetupCING]
