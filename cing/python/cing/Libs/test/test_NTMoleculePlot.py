@@ -12,32 +12,30 @@ from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST5_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
+from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
-from cing.PluginCode.Whatif import ANGCHK_STR
-from cing.PluginCode.Whatif import BBCCHK_STR
-from cing.PluginCode.Whatif import BNDCHK_STR
-from cing.PluginCode.Whatif import C12CHK_STR
-from cing.PluginCode.Whatif import INOCHK_STR
-from cing.PluginCode.Whatif import QUACHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import ROTCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.Whatif import Whatif
-from cing.PluginCode.Whatif import runWhatif
-from cing.PluginCode.procheck import PROCHECK_STR
+from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.required.reqWhatif import ANGCHK_STR
+from cing.PluginCode.required.reqWhatif import BBCCHK_STR
+from cing.PluginCode.required.reqWhatif import BNDCHK_STR
+from cing.PluginCode.required.reqWhatif import C12CHK_STR
+from cing.PluginCode.required.reqWhatif import INOCHK_STR
+from cing.PluginCode.required.reqWhatif import QUACHK_STR
+from cing.PluginCode.required.reqWhatif import RAMCHK_STR
+from cing.PluginCode.required.reqWhatif import ROTCHK_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from random import random
 from unittest import TestCase
-from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
 import cing
 import os #@Reimport
 import unittest
@@ -89,8 +87,9 @@ class AllChecks(TestCase):
         # Fast
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 
-        project.runDssp()
+#        project.runDssp()
         if actuallyRunWhatif:
+            from cing.PluginCode.Whatif import runWhatif
             self.assertFalse(runWhatif(project))
         else:
             rangeList = project.molecule.getFixedRangeList(
@@ -163,17 +162,17 @@ class AllChecks(TestCase):
         plotAttributesRowMain[ KEY_LIST3_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowMain[ KEY_LIST4_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowMain[ KEY_LIST5_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
-        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  QUACHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = QUACHK_STR
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
         plotAttributesRowMain = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
-        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  RAMCHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = RAMCHK_STR
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
         plotAttributesRowMain = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
-        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BBCCHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = BBCCHK_STR
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
         plotAttributesRowMain = NTdict()
@@ -181,8 +180,8 @@ class AllChecks(TestCase):
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowAlte[ KEY_LIST2_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
-        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  C12CHK_STR ]
-        plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  ROTCHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = C12CHK_STR
+        plotAttributesRowAlte[ YLABEL_STR]   = ROTCHK_STR
         plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
         plotAttributesRowMain[ USE_MAX_VALUE_STR]   = 10.0
 

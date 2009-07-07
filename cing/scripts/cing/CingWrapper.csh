@@ -10,7 +10,7 @@
 
 setenv UJ                 /Users/jd
 setenv WS                 $UJ/workspace34
-setenv CCPNMR_TOP_DIR     $WS/ccpn 
+setenv CCPNMR_TOP_DIR     $WS/ccpn
 setenv CINGROOT           $WS/cing
 setenv WATTOSROOT         $WS/wattos
 setenv aquaroot           $WS/aquad
@@ -23,7 +23,7 @@ setenv MOLMOLHOME         $UJ/progs/molmolM
 setenv HOME               /Library/WebServer/Documents/servlet-cing-home
 #setenv HOME               $UJ
 
-# Possible improvement could be to have the debug flag below here be defined from 
+# Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.
 set verbosityDebug = 0
 
@@ -32,10 +32,10 @@ set script = CingWrapper.csh
 
 ##No changes required below this line
 ###############################################################################
-    
+
 # Requirements below:
 limit cputime   24000   # Maximum number of seconds the CPU can spend
-                        # on any single process spawned. 100 minutes seems to be top. 
+                        # on any single process spawned. 100 minutes seems to be top.
                         # Nop, Entry 2vda (Haddock 1,000 aa) was not even halfway with 100 minutes.
 limit filesize   500m   # Maximum size of any one file
 limit datasize  1000m   # Maximum size of data (including stack)
@@ -44,8 +44,14 @@ umask 2                 # The files created will be having special permissions.
 
 # PYTHONPATH  will be completely set by cing.csh.
 unsetenv PYTHONPATH
-# fink
-source /sw/bin/init.csh
+
+# fink or macports
+set useFink = 0
+if ( $useFink ) then
+    source /sw/bin/init.csh
+else
+    set path = ( /opt/local/bin /opt/local/sbin $path )
+endif
 
 if ( $verbosityDebug) then
     echo "DEBUG: Wrap for HOME / user           $HOME / $user"
@@ -96,9 +102,9 @@ if ( ! -e "/Users/jd/progs/molmolM/setup/PdbAtoms" ) then
 endif
 
 if ( $verbosityDebug) then
-	echo "DEBUG: Initializing python from       $PYTHONPATH"	
-	echo "DEBUG: Using CING arguments:          [$argv]"
-	echo "DEBUG: Starting script $script on `date`"
+    echo "DEBUG: Initializing python from       $PYTHONPATH"
+    echo "DEBUG: Using CING arguments:          [$argv]"
+    echo "DEBUG: Starting script $script on `date`"
 endif
 
 # short notation for $argv or even $argv[*] is $* but let's be verbose.
