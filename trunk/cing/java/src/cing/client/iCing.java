@@ -179,12 +179,12 @@ public class iCing implements EntryPoint, HistoryListener {
     private void showFooter() {
 //        String x = null;
         String cingRevisionUrl = Settings.CING_REVISION_URL + Settings.REVISION;
-        String cingRevisionhtml = "(" +
+        String cingRevisionhtml = "iCing " +
         "<a href=\""+cingRevisionUrl+"\">r"+Settings.REVISION+
-        "</a>)" + GenClient.eol;
+        "</a> by" + GenClient.eol;
 
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
-                + "CING  " + c.version() + " "+Settings.VERSION+" " + cingRevisionhtml + "\t" + GenClient.eol
+                + cingRevisionhtml + "\t" + GenClient.eol
                 + "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t" + GenClient.eol
                 + "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>" + GenClient.eol + " " + c.and()
                 + " \t" + GenClient.eol + "<a href=\"mailto:alanwilter@gmail.com\">Alan Wilter Sousa da Silva</a>"

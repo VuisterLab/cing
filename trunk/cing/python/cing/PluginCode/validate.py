@@ -1207,8 +1207,7 @@ def validateAssignments( project  ):
             if av and sd:
                 delta = math.fabs(shift - av) / sd
                 if delta > 3.0:
-                    string = sprintf('%s: %.2f ppm is at %.1f*sd from (%.2f,%.2f)',
-                                     SHIFT, shift, delta, av, sd )
+                    string = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
                     result.append( atm )
                     atm.validateAssignment.append(string)
                 #end if
