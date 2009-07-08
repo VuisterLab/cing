@@ -29,10 +29,3 @@ ln -s python2.5 python
 }}}
 
 From here you should follow the generalized [SetupCING]
-
-== Consider these OPTIONAL packages ==
-{{{
-port install osxutils
-}}}
-
-They do not even add functionality to CING but are simply nice to have.
