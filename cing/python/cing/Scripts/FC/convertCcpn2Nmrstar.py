@@ -30,7 +30,10 @@ def convert(projectName, inputDir, outputFile):
     nmrProject = ccpnProject.currentNmrProject
 
     nmrEntry.structureGenerations = nmrProject.sortedStructureGenerations()
-    nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalysiss() # watch out for misspelling.
+    try: # ccpn stable as 08 Jul 2009
+        nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalysiss() # watch out for misspelling.
+    except AttributeError: # ccpn trunk fixed misspelled function
+        nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalyses()
     nmrEntry.measurementLists = nmrProject.sortedMeasurementLists()
 
     # Hack to hook up coordinates, hopefully correctly (Wim 30/04/2009)
