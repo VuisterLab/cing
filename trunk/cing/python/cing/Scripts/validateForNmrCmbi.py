@@ -1,11 +1,13 @@
 from cing import cingDirScripts
+from cing import cingDirTestsData
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import gunzip
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
+from cing.Scripts.validateEntry import PROJECT_TYPE_CYANA
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
-from cing import cingDirTestsData
 import cing
 import os
 
@@ -30,7 +32,10 @@ restraintsConvention  = CYANA
 extraArgList = ( inputDir,
                  outputDir,
                  pdbConvention,
-                 restraintsConvention )
+                 restraintsConvention,
+                 `ARCHIVE_TYPE_BY_ENTRY`,
+                 `PROJECT_TYPE_CYANA`
+                  )
 
 if doUnzipFirst:
     entryListFile = file(entryListFileName, 'r')

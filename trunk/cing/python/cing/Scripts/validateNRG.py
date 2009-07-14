@@ -5,6 +5,7 @@ from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
+from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 import cing
 import os
 import sys
@@ -26,7 +27,7 @@ inputDir = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
 #inputDir = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
 outputDir = startDir
 
-extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`)
+extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
 
 retrieveEntryListFromNRG = False
 
@@ -39,7 +40,7 @@ if retrieveEntryListFromNRG:
     if writeEntryListToFile(entryListFileName, entry_list_nrg_docr):
         NTerror("Failed to write entry list")
         sys.exit(1)
-        
+
 # disable next line for regular run.
 writeEntryListToFile(entryListFileName, ['1brv'])
 
