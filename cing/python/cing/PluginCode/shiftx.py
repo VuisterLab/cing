@@ -1,6 +1,6 @@
 """
 Adds shiftx method to predict chemical shifts. The shiftx program is included as binaries for Mac OSX and 32 bit
-Linux in the bin directory. 
+Linux in the bin directory.
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
@@ -34,7 +34,7 @@ if True: # block
         NTdebug("Missing shiftx which is a dep for shiftx")
         useModule = False
     if not useModule:
-        raise ImportWarning('shiftx')    
+        raise ImportWarning('shiftx')
 #    NTmessage('Using shiftx')
 
 contentFile = 'content.xml'
@@ -66,7 +66,7 @@ format file:
   1     G  CA      45.2787
   or in 1afp
   10    K  HZ3      3.7795 # A HZ3 that might not be present.
-  
+
 
 
     """
@@ -299,7 +299,7 @@ def restoreShiftx( project, tmp=None ):
 
     if os.path.exists( xmlFile ):
         NTdetail('==> Restoring shiftx results')
-        NTdebug('Using xmlFile "%s"', xmlFile)
+#        NTdebug('Using xmlFile "%s"', xmlFile)
     else:
         NTdebug('Shiftx results xmlFile "%s" not found', xmlFile)
         return None
@@ -310,7 +310,7 @@ def restoreShiftx( project, tmp=None ):
         return None
 
     shiftxResult.keysformat()
-    NTdebug( 'shiftxResult:\n%s', shiftxResult.format() )
+#    NTdebug( 'shiftxResult:\n%s', shiftxResult.format() )
 
     if shiftxResult.moleculeName != project.molecule.name:
         NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',

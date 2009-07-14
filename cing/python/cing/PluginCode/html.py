@@ -1195,19 +1195,23 @@ class ProjectHTMLfile( HTMLfile ):
         #css and javascript now in HTML dir
         htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
+        NTdebug("Listing: [%s]" % htmlPath )
         for f in os.listdir( htmlPath ):
-#            NTdebug("Listing: [%s]" % f)
+            NTdebug("Listing item: [%s]" % f)
             htmlFile = os.path.join(htmlPath,f)
             if os.path.isfile(htmlFile):
                 shutil.copy( htmlFile, project.htmlPath() )
             elif os.path.isdir(htmlFile):
-#                NTdebug("Listing dir: [%s]" % f)
+                NTdebug("Listing dir: [%s]" % f)
                 if f == '.svn':
                     continue
                 dst = os.path.join( project.htmlPath(), f)
-#                NTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
+                NTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
+                if os.path.exists(dst):
+                    NTdebug("Removing directory: %s" % dst)
+                    shutil.rmtree(dst)
                 shutil.copytree(htmlFile,  dst )
-
+            # end elif
         #end for
 
         # create an redirect index page in top of project

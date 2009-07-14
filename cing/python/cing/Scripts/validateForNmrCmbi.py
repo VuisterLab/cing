@@ -5,6 +5,7 @@ from cing.Libs.NTutils import gunzip
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
+from cing import cingDirTestsData
 import cing
 import os
 
@@ -16,11 +17,12 @@ startDir              = '/Users/jd/Sites/cing/out'
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
 entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
 PDBZ2                 = '/Users/jd/wattosTestingPlatform/pdb//data/structures/divided/pdb'
-doUnzipFirst          = True # Ensure input (unzipped) is present first.
+doUnzipFirst          = False # Ensure input (unzipped) is present first.
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'
-inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
+#inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
+inputDir              = os.path.join(cingDirTestsData, "cyana")
 outputDir             = startDir
 pdbConvention         = PDB
 restraintsConvention  = CYANA

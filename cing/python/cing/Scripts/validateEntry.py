@@ -20,6 +20,10 @@ import os
 import sys
 import urllib
 
+ARCHIVE_TYPE_FLAT = 0
+ARCHIVE_TYPE_BY_ENTRY = 1
+ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 2
+
 def usage():
     NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
 
@@ -166,11 +170,6 @@ def main(entryId, *extraArgList):
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
         do_cmd(cmd)
 
-
-
-ARCHIVE_TYPE_FLAT = 0
-ARCHIVE_TYPE_BY_ENTRY = 1
-ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 2
 
 def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
     """Retrieves tgz file from url to current working dir assuming the

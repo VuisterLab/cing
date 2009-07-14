@@ -3,7 +3,6 @@ Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
 from cing import header
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -69,9 +68,10 @@ def mkMacros(project):
 def makePdbForMacros(project):
     """
     Other todos
-    Link naar macros vanaf de project page.
+    Link naar macros vanaf de project page. TODO: finish coding.
     """
-    NTmessage('==> Exporting pdb files with one and all models for macros. TODO: finish coding.')
+#    NTmessage('==> Exporting pdb files with one and all models for macros.')
+    pass
 #    pathPdb = project.path( project.directories.PDB )
 #    path = os.path.join( pathPdb, project.molecule.name + '.pdb')
 #
@@ -292,7 +292,7 @@ spectrum b, %s, selection=all, minimum=minValue, maximum=maxValue
 
 def makeMolmolByResidueROGMacro(project, path = None):
 
-    NTdebug('makeMolmolByResidueROGMacro')
+#    NTdebug('makeMolmolByResidueROGMacro')
 
     macroTxt = """%s
 
@@ -385,7 +385,7 @@ def makeMolmolByResidueMacro(project, keys,
                             path = None
                            ):
 
-    NTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    NTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
     macroTxt = \
 """%s
 
