@@ -5,9 +5,12 @@ from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.core.classes import Project
+from cing.core.constants import CCPN
+from cing.core.constants import CING
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
 from cing.core.constants import PDB
@@ -17,12 +20,19 @@ from cing.main import getStopMessage
 from shutil import rmtree
 import cing
 import os
+import shutil
 import sys
 import urllib
 
-ARCHIVE_TYPE_FLAT = 0
-ARCHIVE_TYPE_BY_ENTRY = 1
-ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 2
+ARCHIVE_TYPE_FLAT = 'FLAT'
+ARCHIVE_TYPE_BY_ENTRY = 'BY_ENTRY'
+ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 'BY_CH23_BY_ENTRY'
+
+PROJECT_TYPE_CING = CING
+PROJECT_TYPE_CCPN = CCPN
+PROJECT_TYPE_CYANA = CYANA
+#PROJECT_TYPE_XPLOR = 3 # Not done yet.
+PROJECT_TYPE_DEFAULT = PROJECT_TYPE_CING
 
 def usage():
     NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
@@ -36,7 +46,7 @@ def main(entryId, *extraArgList):
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = False # disables whatif actual run
     doProcheck = False
-    tgzCing = True # Create a tgz for the cing project
+    tgzCing = True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     if fastestTest:
         htmlOnly = True
         doWhatif = False
@@ -48,25 +58,39 @@ def main(entryId, *extraArgList):
     NTmessage(header)
     NTmessage(getStartMessage())
 
-    expectedNumberOfArguments = 5
+    expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
+    expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
         NTerror("Got arguments: " + `extraArgList`)
         NTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
+        NTerror("Expected arguments: %s" % expectedArgumentList)
         return True
 
     entryCodeChar2and3 = entryId[1:3]
-    inputDir = os.path.join(extraArgList[0], entryId)
+
+    inputDir = extraArgList[0]
     outputDir = os.path.join(extraArgList[1], 'data', entryCodeChar2and3, entryId)
     pdbConvention = extraArgList[2] #@UnusedVariable
     restraintsConvention = extraArgList[3]
     archiveType = extraArgList[4]
+    projectType = extraArgList[5]
+
+    if archiveType == ARCHIVE_TYPE_FLAT:
+        pass
+        # default
+    elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
+        inputDir = os.path.join(inputDir, entryId)
+    elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
+        inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
 
     NTdebug("Using:")
     NTdebug("inputDir:             " + inputDir)
     NTdebug("outputDir:            " + outputDir)
     NTdebug("pdbConvention:        " + pdbConvention)
     NTdebug("restraintsConvention: " + restraintsConvention)
+    NTdebug("archiveType:          " + archiveType)
+    NTdebug("projectType:          " + projectType)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -82,7 +106,8 @@ def main(entryId, *extraArgList):
                 return
             NTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
             rmtree(cingEntryDir)
-
+        # end if.
+    # end if.
 
     os.chdir(outputDir)
 
@@ -90,36 +115,47 @@ def main(entryId, *extraArgList):
     if project.removeFromDisk():
         NTerror("Failed to remove existing project (if present)")
         return True
+    # end if.
 
-    project = Project.open(entryId, status = 'new')
-
-    isCcpnProject = False
+    fileNameTgz = entryId + '.tgz'
+    if projectType == PROJECT_TYPE_CING:
+        fileNameTgz = entryId + '.cing.tgz'
     # if true will do retrieveTgzFromUrl.
     if inputDir.startswith("http") or inputDir.startswith("file"):
-        fileNameTgz = entryId + '.tgz'
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
             if FORCE_RETRIEVE_INPUT:
                 os.unlink(fileNameTgz)
                 stillToRetrieve = True
+            # end if
         else:
             stillToRetrieve = True
-
+        # end if
         if stillToRetrieve:
              retrieveTgzFromUrl(entryId, inputDir, archiveType = archiveType)
-
+        # end if
         if not os.path.exists(fileNameTgz):
             NTerror("Tgz should already have been present skipping entry")
             return
+        # end if
+    # end if.
 #            retrieveTgzFromUrl(entryId, inputDir)
-        isCcpnProject = True
 
-    if isCcpnProject:
-        fileNameTgz = entryId + '.tgz'
+    if projectType == PROJECT_TYPE_CING:
+        # Needs to be copied because the open method doesn't take a directory argument..
+        fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
+        shutil.copy(fullFileNameTgz, '.')
+        project = Project.open(entryId, status = 'old')
+        if not project:
+            NTerror("Failed to init old project")
+            return True
+    elif projectType == PROJECT_TYPE_CCPN:
+        project = Project.open(entryId, status = 'new')
         if not project.initCcpn(ccpnFolder = fileNameTgz):
             NTerror("Failed to init project from ccpn")
             return True
-    else:
+    elif projectType == PROJECT_TYPE_CYANA:
+        project = Project.open(entryId, status = 'new')
         pdbFileName = entryId + ".pdb"
     #    pdbFilePath = os.path.join( inputDir, pdbFileName)
         pdbFilePath = os.path.join(inputDir, pdbFileName)
@@ -154,12 +190,13 @@ def main(entryId, *extraArgList):
                                convention = restraintsConvention,
                                copy2sources = True,
                                **kwds)
+
     project.save()
     if project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif):
         NTerror("Failed to validate project read")
         return True
     project.save()
-    if isCcpnProject:
+    if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz
         rmdir(entryId) # temporary ccpn dir
@@ -167,6 +204,8 @@ def main(entryId, *extraArgList):
     if tgzCing:
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
+        if os.path.exists(tgzFileNameCing):
+            NTwarning("Overwriting: "+tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
         do_cmd(cmd)
 

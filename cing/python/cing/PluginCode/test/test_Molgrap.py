@@ -22,8 +22,8 @@ class AllChecks(TestCase):
         pdbConvention = CYANA
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-        entryId = "1a4d" # Small much studied PDB NMR entry
-#        entryId = "1brv_1model" # Small much studied PDB NMR entry
+#        entryId = "1a4d" # Small much studied PDB NMR entry
+        entryId = "1brv_1model" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"
         if entryId.startswith("1YWUcdGMP"):
             pdbConvention = XPLOR

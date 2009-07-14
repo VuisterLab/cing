@@ -2,6 +2,7 @@
 from cing import cingDirScripts
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
+from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 import cing
 import os
 
@@ -23,7 +24,7 @@ inputDir = 'file:///Users/jd/workspace34/cing/Tests/data/eNMR'
 #inputDir = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
 outputDir = startDir
 
-extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`)
+extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
 
 # disable next line for regular run.
 #writeEntryListToFile(entryListFileName, ['1brv'])
