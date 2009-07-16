@@ -18,68 +18,7 @@ class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
     def tttestEnmr(self):
-#        entryList = """
-#AR3436Cheshire
-#AR3436Lyon
-#AR3436Org
-#AR3436Piscataway
-#AR3436Seattle
-#AR3436Utrecht
-#BASPLyon
-#BASPOrg
-#BASPParis
-#CuTTHAcisFrankfurt
-#CuTTHAcisLyon
-#CuTTHAcisOrg
-#CuTTHAcisPiscataway
-#CuTTHAtransFrankfurt
-#CuTTHAtransLyon
-#CuTTHAtransOrg
-#CuTTHAtransPiscataway
-#ParvulustatFrankfurt
-#ParvulustatLyon
-#ParvulustatOrg
-#ParvulustatParis
-#ParvulustatPiscataway
-#TTScoFrankfurt
-#TTScoLyon
-#TTScoOrg
-#TTScoParis
-#TTScoPiscataway
-#VpR247Cheshire
-#VpR247Lyon
-#VpR247Org
-#VpR247Paris
-#VpR247Piscataway
-#VpR247Seattle
-#VpR247Utrecht
-#apoTTHAcisFrankfurt
-#apoTTHAcisLyon
-#apoTTHAcisOrg
-#apoTTHAtransFrankfurt
-#apoTTHAtransLyon
-#apoTTHAtransOrg
-#mia40Frankfurt
-#mia40Lyon
-#mia40Org
-#mia40Piscataway
-#taf3Lyon
-#taf3Org
-#taf3Paris
-#taf3Piscataway
-#wln34Frankfurt
-#wln34Lyon
-#wln34Org
-#wln34Paris
-#wln34Piscataway
-#        """.split()
-
-#        entryList = entryList.split()
-        entryList = "BASPParis".split()
-#        entryList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
-#TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()
-
-#        entryList = "apoTTHAcisOrg apoTTHAtransOrg BASPOrg CuTTHAcisOrg CuTTHAtransOrg mia40Org ParvulustatOrg taf3Org TTScoOrg".split()
+        entryList = "VpR247Seattle".split()
 #        entryList = """
 #        apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway""".split()
@@ -91,7 +30,6 @@ class AllChecks(TestCase):
 #        apoTTHAtransFrankfurt apoTTHAtransLyon apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway
 #""".split()
-#        entryList = "CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
@@ -106,7 +44,7 @@ class AllChecks(TestCase):
             htmlOnly = True
             doWhatif = False
             doProcheck = False
-            doWattos = False
+            doWattos = True
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)

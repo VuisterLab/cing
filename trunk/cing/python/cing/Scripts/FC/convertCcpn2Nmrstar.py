@@ -1,24 +1,21 @@
-#python $CINGROOT/python/cing/Scripts/FC/convertCcpn2Nmrstar.py
+# Execute like e.g.:
+# python $CINGROOT/python/cing/Scripts/FC/convertCcpn2Nmrstar.py VpR247Seattle . VpR247Seattle.str
 
 """
 Original from Wim Vranken.
 """
-
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
 from memops.general.Io import loadProject
 from msd.nmrStar.IO.NmrStarExport import NmrStarExport
-import cing
 import os
 import sys
 
-__author__ = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
+__author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 
 def convert(projectName, inputDir, outputFile):
 
-    NTdebug("projectName: %s" % projectName)
-    NTdebug("inputDir: %s" % inputDir)
-    NTdebug("outputFile: %s" % outputFile)
+    print "projectName: %s" % projectName
+    print "inputDir: %s" % inputDir
+    print "outputFile: %s" % outputFile
     ccpnPath = os.path.join(inputDir, projectName)
     ccpnProject = loadProject(ccpnPath)
 
@@ -30,11 +27,20 @@ def convert(projectName, inputDir, outputFile):
     nmrProject = ccpnProject.currentNmrProject
 
     nmrEntry.structureGenerations = nmrProject.sortedStructureGenerations()
+    if not nmrEntry.structureGenerations:
+         print "Failed to find nmrEntry.structureGenerations from nmrProject; creating a new one."
+         strucGen   = nmrProject.newStructureGeneration()
+         nmrEntry.addStructureGeneration(strucGen)
+
     try: # ccpn stable as 08 Jul 2009
         nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalysiss() # watch out for misspelling.
     except AttributeError: # ccpn trunk fixed misspelled function
         nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalyses()
+    if not nmrEntry.structureAnalyses:
+         print "Failed to find nmrEntry.structureAnalyses"
     nmrEntry.measurementLists = nmrProject.sortedMeasurementLists()
+    if not nmrEntry.measurementLists:
+         print "Failed to find nmrEntry.measurementLists"
 
     # Hack to hook up coordinates, hopefully correctly (Wim 30/04/2009)
     if nmrEntry.structureGenerations:
@@ -43,11 +49,15 @@ def convert(projectName, inputDir, outputFile):
         if strucGen.structureEnsemble:
           hasStructureEnsemble = True
           break
-
+        # end if
+      # end for
+      print "hasStructureEnsemble: %s" % hasStructureEnsemble
       # This will only work dependably if there is one structureGeneration, one structureEnsemble...
       # Take the one that was created last in any case, fingers crossed that they match up!
       if not hasStructureEnsemble and ccpnProject.structureEnsembles:
         nmrEntry.sortedStructureGenerations()[-1].structureEnsemble = ccpnProject.sortedStructureEnsembles()[-1]
+      # end if
+    # end if
 
     for ne in nmrProject.sortedExperiments(): # will be sortedNmrExperiments
         for ds in ne.sortedDataSources():
@@ -63,7 +73,7 @@ def convert(projectName, inputDir, outputFile):
 
 
 if __name__ == '__main__':
-    cing.verbosity = verbosityDebug
+#    cing.verbosity = verbosityDebug
 #    projectName = "1brv"
 #    inputDir = cingDirTmp
 #    outputFile = os.path.join(cingDirTmp, projectName + ".str")
