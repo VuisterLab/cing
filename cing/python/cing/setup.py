@@ -456,6 +456,8 @@ if __name__ == '__main__':
     # TODO: enable real location finder. This just works for JFD but shouldn't bother
     # others.
     pyMolPath,err  = ('/sw/lib/pymol-py25', None)
+    if not os.path.exists(pyMolPath):
+        pyMolPath = '/sw/lib/pymol-py26' # for AWSS
     if not pyMolPath:
         _NTmessage("Could not find 'pymol' code (optional)")
         parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE

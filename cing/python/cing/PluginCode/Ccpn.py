@@ -88,8 +88,9 @@ if True:
 class Ccpn:
 #    NTdebug("Using CCPN version %s" % currentModelVersion)
 
-    SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1. / 1e9 # there's a bug in pydev extension preventing me to write: 1.e-9
+    SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1.e-9 # there's a bug in pydev extension preventing me to write: 1.e-9
     # Reported: https://sourceforge.net/tracker2/index.php?func=detail&aid=2049228&group_id=85796&atid=577329
+    # FIXED: 19 Jul 09
 
     RESTRAINT_IDX_DISTANCE = 0
     RESTRAINT_IDX_HBOND = 1
@@ -209,19 +210,26 @@ class Ccpn:
             # Get a TarFile class.
             ccpnRootDirectory = None # Will become linkNmrStarData at first.
             tar = tarfile.open(self.project.ccpnFolder, "r:gz")
+            tarFileNames = []
             for itar in tar:
                 tar.extract(itar.name, '.') # itar is a TarInfo object
 #                NTdebug("extracted: " + itar.name)
                 # Try to match: BASP/memops/Implementation/BASP.xml
                 if not ccpnRootDirectory: # pick only the first one.
+                    tarFileNames.append(itar.name)
                     if isRootDirectory(itar.name):
                         ccpnRootDirectory = itar.name.replace("/", '')
                         if not ccpnRootDirectory:
                             NTerror("Skipping potential ccpnRootDirectory")
             tar.close()
             if not ccpnRootDirectory:
-                NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
-                return None
+                # in python 2.6 tarfile class doesn't append '/' in root dir anymore
+                # sorting by length and taking the shortest, likely the root dir.
+                tarFileNames.sort()
+                ccpnRootDirectory = tarFileNames[0]
+                if not os.path.isdir(ccpnRootDirectory):
+                    NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
+                    return None
 
             if ccpnRootDirectory != self.project.name:
                 NTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
