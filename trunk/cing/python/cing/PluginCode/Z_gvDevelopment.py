@@ -23,6 +23,7 @@ from math import cos, sin, pi
 from math import sqrt
 from random import random
 import cing #@Reimport
+
 import os #@Reimport
 
 
@@ -425,8 +426,67 @@ def procheck_old( project, ranges=None ):
 #end def
 
 
-#import yasaramodule as yasara
 
+def mkJmolMacros( project ):
+    """
+    Generate the Jmol macros in the moleculeDirectories.Jmol dir.
+    """
+    if not project.molecule:
+        NTerror('mkJmolMacros: no molecule defined')
+        return
+    #end if
+
+    # save first model
+    molName = project.molecule.name + '_0'
+    path = project.moleculePath('jmol', molName + '.pdb')
+    project.molecule.toPDBfile( path, model=0 )
+
+#    mkYasaraByResidueMacro(project, ['procheck','gf'],
+#                           minValue=-3.0,maxValue=1.0,
+#                           reverseColorScheme=True,
+#                           path=project.moleculePath('yasara','gf.mcr')
+#                          )
+#
+#    mkYasaraByResidueMacro(project, ['Qshift','backbone'],
+#                           minValue=0.0,maxValue=0.05,
+#                           reverseColorScheme=False,
+#                           path=project.moleculePath('yasara','Qshift.mcr')
+#                          )
+
+    mkJmolByResidueROGMacro(project, object=1, path=project.moleculePath('jmol','rog.spt'))
+#end def
+
+def mkJmolByResidueROGMacro( project, object=None, path=None, stream=None ):
+    if path:
+        stream = open( path, 'w')
+    elif stream:
+        pass
+    else:
+        stream = sys.stdout
+    #end if
+
+    if not stream:
+        NTerror('mkJmolByResidueROGMacro: undefined output stream')
+        return
+    #endif
+
+    if object==None:
+        fprintf( stream, 'select *; color grey\n' )
+    else:
+        fprintf( stream, 'select */%d; color grey\n', object )
+
+
+    for res in project.molecule.allResidues():
+        if object==None:
+            fprintf( stream, 'select %d:%s.*; ', res.resNum, res.chain.name )
+        else:
+            fprintf( stream, 'select %d:%s.*/%d; ', res.resNum, res.chain.name, object )
+        fprintf( stream, 'color %s\n', res.rogScore.colorLabel )
+    #end for
+
+    if path:
+        stream.close()
+#end def
 
 
 
@@ -1021,6 +1081,8 @@ def getCingSummaryDict( project ):
 
 # register the functions
 methods  = [(procheck_old, None),
+            (mkJmolByResidueROGMacro,None),
+            (mkJmolMacros,None),
             (getCingSummaryDict, None )
            ]
 #saves    = []

@@ -423,6 +423,11 @@ def getParser():
                       dest="ipython",
                       help="Start ipython interpreter"
                      )
+    parser.add_option("--yasara",
+                      action="store_true",
+                      dest="yasara",
+                      help="Start interactive yasara interpreter"
+                     )
     parser.add_option("--validate",
                       action="store_true", dest="validate", default=False,
                       help="Run doValidate.py script [in current or cing directory]"
@@ -463,7 +468,15 @@ def getParser():
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
     return parser
+#end def
+
 project = None # after running main it will be filled.
+
+def yasara( project ):
+    from cing.PluginCode.yasaraPlugin import yasaraShell
+    yasaraShell( project )
+#end def
+
 
 def main():
 
@@ -716,9 +729,18 @@ def main():
     #------------------------------------------------------------------------------------
     if options.ipython:
         from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed('', banner='--------Dropping to IPython--------',
-                                    exit_msg='--------Leaving IPython--------')
+        ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
+                                banner='--------Dropping to IPython--------',
+                                exit_msg='--------Leaving IPython--------'
+                              )
         ipshell()
+    #end if
+
+    #------------------------------------------------------------------------------------
+    # yasara ipython
+    #------------------------------------------------------------------------------------
+    if options.yasara:
+        yasara(project)
     #end if
 
     #------------------------------------------------------------------------------------

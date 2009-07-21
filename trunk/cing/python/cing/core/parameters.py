@@ -47,6 +47,7 @@ moleculeDirectories = NTdict(
     analysis   = 'Cing',
     shiftx     = 'Shiftx',
     html       = 'HTML',
+    jmol       = 'Macros/Jmol',
     pymol      = 'Macros/pyMol',
     yasara     = 'Macros/Yasara',
     molmol     = 'Macros/Molmol'

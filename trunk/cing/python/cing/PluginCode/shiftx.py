@@ -103,7 +103,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
     to each atom for which there are predictions, or empty list otherwise.
 
     Throws warnings for non-protein residues.
-    Returns project or None on error.
+    Returns shiftxStatus dict or None on error.
 
     Shiftx works on pdb files, uses only one model (first), so we have to write the files separately and analyze them
     one at the time.
@@ -169,12 +169,17 @@ def runShiftx( project, parseOnly=False, model=None   ):
                              rootPath = root, redirectOutput = False)
 
     # Storage of results for later
-    shiftxResult = NTdict( version      = cing.cingVersion,
-                           moleculeName = project.molecule.name, # just to have it
-                           models       = models,
-                           baseName     = baseName,
-                           chains       = NTlist()    # list of (chainNames, outputFile) tuples to be parsed
-                         )
+    project.shiftxStatus.completed    = False
+    project.shiftxStatus.parsed       = False
+    project.shiftxStatus.version      = cing.cingVersion
+    project.shiftxStatus.moleculeName = project.molecule.name # just to have it
+    project.shiftxStatus.models       = models
+    project.shiftxStatus.baseName     = baseName
+    project.shiftxStatus.path         = root
+    project.shiftxStatus.contentFile  = contentFile
+    project.shiftxStatus.chains       = NTlist()    # list of (chainNames, outputFile) tuples to be parsed
+    project.shiftxStatus.keysformat()
+
 
     for model in NTprogressIndicator(models):
         # set filenames
@@ -199,7 +204,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
                 # According to the readme in shiftx with the source this is the way to call it.
                 chainId =  "1" + chain.name
                 outputFile = rootname + '_' + chain.name + '.out'
-                shiftxResult.chains.append( (chain.name, outputFile) )
+                project.shiftxStatus.chains.append( (chain.name, outputFile) )
 
                 shiftx(chainId, rootname + '.pdb', outputFile )
                 outputFile = os.path.join(root,outputFile)
@@ -221,10 +226,15 @@ def runShiftx( project, parseOnly=False, model=None   ):
     # Calculate average's for each atom
     averageShiftx(project)
 
-    # store the xmlFile
-    obj2XML( shiftxResult, path=os.path.join( root, contentFile ))
+    calcQshift( project )
 
-    return project
+    # store the status as xmlFile
+    project.shiftxStatus.completed    = True
+    project.shiftxStatus.parsed       = True
+    obj2XML( project.shiftxStatus, path=os.path.join( root, contentFile ))
+    project.shiftxStatus.keysformat()
+
+    return project.shiftxStatus
 #end def
 
 
@@ -289,50 +299,71 @@ def restoreShiftx( project, tmp=None ):
     Return project or None on error
     """
 
+    root = project.moleculePath( 'shiftx' )
+
     if project.molecule == None:
         NTdebug('restoreShiftx: no molecule defined')
         return None
     #end if
-
-    root = project.moleculePath( 'shiftx' )
-    xmlFile = os.path.join( root, contentFile )
-
-    if os.path.exists( xmlFile ):
-        NTdetail('==> Restoring shiftx results')
-#        NTdebug('Using xmlFile "%s"', xmlFile)
-    else:
-        NTdebug('Shiftx results xmlFile "%s" not found', xmlFile)
-        return None
-    #end if
-
-    shiftxResult = XML2obj( xmlFile )
-    if not shiftxResult:
-        return None
-
-    shiftxResult.keysformat()
-#    NTdebug( 'shiftxResult:\n%s', shiftxResult.format() )
-
-    if shiftxResult.moleculeName != project.molecule.name:
-        NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
-                   project.molecule.name, shiftxResult.moleculeName
-                 )
 
     # initialize the shiftx attributes
     for atm in project.molecule.allAtoms():
         atm.shiftx = NTlist()
     #end for
 
-    for chainName, outputFile in shiftxResult.chains:
+    # Older versions; initialte the required keys of shiftxStatus
+    if project.version < 0.881:
+        xmlFile = os.path.join( root, contentFile )
+
+        if os.path.exists( xmlFile ):
+            NTdetail('==> Restoring shiftx results')
+            NTdebug('Using xmlFile "%s"', xmlFile)
+        else:
+            NTdebug('Shiftx results xmlFile "%s" not found', xmlFile)
+            return None
+        #end if
+
+        shiftxResult = XML2obj( xmlFile )
+        if not shiftxResult:
+            return None
+
+        project.shiftxStatus.update( shiftxResult )
+        project.shiftxStatus.path = root
+        project.shiftxStatus.parsed = False
+        project.shiftxStatus.completed = True
+    #end if
+
+    project.shiftxStatus.keysformat()
+    NTdebug( 'project.shiftxStatus:\n%s', project.shiftxStatus.format() )
+
+    if not project.shiftxStatus.completed:
+        return project
+
+
+    if project.shiftxStatus.moleculeName != project.molecule.name:
+        NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
+                   project.molecule.name, project.shiftxStatus.moleculeName
+                 )
+    if project.shiftxStatus.path != root:
+        NTwarning('restoreShiftx: current shiftx root path "%s" does not match xmlFile "%s"',
+                   root, project.shiftxStatus.path
+                 )
+
+    for chainName, outputFile in project.shiftxStatus.chains:
         parseShiftxOutput( os.path.join(root,outputFile), project.molecule, chainName )
     #end for
 
     # Average the methyl proton shifts and b-methylene
-    _averageMethylAndMethylene( project, shiftxResult.models )
+    _averageMethylAndMethylene( project, project.shiftxStatus.models )
 
     # Calculate average's for each atom
     averageShiftx(project)
 
     calcQshift( project )
+
+    project.shiftxStatus.parsed = True
+    project.shiftxStatus.keysformat()
+
 
     return project
 #end def

@@ -29,13 +29,13 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.88
+cingVersion     = 0.90
 cingRevision    = getSvnRevision()
 
 
 
 __version__     = cingVersion # for pydoc
-__date__        = '9 March 2009'
+__date__        = '23 April 2009'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
 authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
@@ -149,11 +149,13 @@ if not os.path.exists(cingDirTmp):
 
 starttime = time.time()
 
-# Define some we are used to use from the toplevel Cing api
+#---------------------------------------------------------------------------------------------
+# Define toplevel CING api
 # dont move these to the top as they become circular.
 # The order within this list is important too. For one thing, pydev extensions code analysis can't
 # track imports well if not correct.
-#from cing.Libs.NTutils import NTlist
+#---------------------------------------------------------------------------------------------
+
 from cing.Libs.NTutils      import *
 from cing.Libs.AwkLike      import AwkLike
 
@@ -166,9 +168,29 @@ from cing.core.classes      import DistanceRestraint, DistanceRestraintList
 from cing.core.classes      import DihedralRestraint, DihedralRestraintList
 from cing.core.classes      import RDCRestraint,      RDCRestraintList
 
+#---------------------------------------------------------------------------------------------
+# functional imports: Order matters!
+#---------------------------------------------------------------------------------------------
+
+# Try a Yasara import
+# GV: We could change this by defining yasaradir in the CING setup
+try:
+    from yasara import yasaradir
+    if os.path.exists(yasaradir):
+        sys.path.append(os.path.join(yasaradir,'pym'))
+        sys.path.append(os.path.join(yasaradir,'plg'))
+    else:
+        NTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
+        exit(1)
+except:
+    yasaradir = None
+#end try
+
 from cing.core.molecule     import *
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
 from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods
+
+
 
 
