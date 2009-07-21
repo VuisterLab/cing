@@ -167,6 +167,7 @@ Project: Top level Cing project class
                            procheckStatus           =  NTdict( completed=False, ranges=None ),
                            dsspStatus               =  NTdict( completed=False ),
                            whatifStatus             =  NTdict( completed=False ),
+                           shiftxStatus             =  NTdict( completed=False ),
 
 
                            # store a reference to the global things we might need
@@ -223,7 +224,7 @@ Project: Top level Cing project class
                       'storedInCcpnFormat',
                       'reports',
                       'history',
-                      'procheckStatus', 'dsspStatus', 'whatifStatus'
+                      'procheckStatus', 'dsspStatus', 'whatifStatus', 'shiftxStatus'
                     )
     #end def
 
@@ -488,6 +489,9 @@ Project: Top level Cing project class
 
             pr.contentIsRestored = False
 
+            pr.whatifStatus.parsed = False
+            pr.shiftxStatus.parsed = False
+
             try:
                 # <= 0.75 version have string
                 pr.version = float(pr.version.split()[0])
@@ -661,7 +665,7 @@ Project: Top level Cing project class
         """To slim down the memory footprint; should allow garbage collection."""
         attributeToRemove = "ccpn"
         try:
-            self.removeRecursivelyAttribute( attributeToRemove )
+        	self.removeRecursivelyAttribute( attributeToRemove )
         except:
             NTerror("Failed removeCcpnReferences")
 
@@ -1171,7 +1175,6 @@ class PeakList( NTlist ):
             maxD = max(peak.dimension, maxD)
         return (minD,maxD)
 
-
     def peakFromAtoms( self, atoms, onlyAssigned=True ):
         """Append a new Peak based on atoms list
            Return Peak instance, or None
@@ -1319,6 +1322,7 @@ class DistanceRestraint( NTdict ):
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
 
+
         if project.valSets.FLAG_MISSING_COOR:
             #modelCount = self.getModelCount()
             for atm1, atm2 in self.atomPairs:
@@ -1452,8 +1456,8 @@ class DistanceRestraint( NTdict ):
         otherwise: keep atom with lower residue index first
         """
 
-        # GV says; order needs to stay: is beeing used for easier
-        # (manual) analysis.
+		# GV says; order needs to stay: is beeing used for easier
+		# (manual) analysis.
 
 
         if pair[0] == None or pair[1] == None:
@@ -1547,8 +1551,8 @@ class DistanceRestraint( NTdict ):
         i = 0
         for atm1,atm2 in self.atomPairs:
 
-            # GV says: Check are done to prevent crashes upon rereading
-            # datasets with floating/adhoc residues/atoms
+        	# GV says: Check are done to prevent crashes upon rereading
+        	# datasets with floating/adhoc residues/atoms
 
             # skip trivial cases
             if atm1 == atm2:
@@ -1695,7 +1699,6 @@ class DistanceRestraint( NTdict ):
             msg = addPreTagLines(msg)
         return msg
     #end def
-
 #end class
 
 
@@ -2101,11 +2104,11 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-                                self.atoms[0].coordinates[i],
-                                self.atoms[1].coordinates[i],
-                                self.atoms[2].coordinates[i],
-                                self.atoms[3].coordinates[i]
-                              )
+        	                    self.atoms[0].coordinates[i],
+            	                self.atoms[1].coordinates[i],
+                	            self.atoms[2].coordinates[i],
+                    	        self.atoms[3].coordinates[i]
+                        	  )
                 self.dihedrals.append( d )
             #end for
         except:
@@ -2563,7 +2566,7 @@ class RDCRestraintList( NTlist ):
             NTwarning("See also issue: %s%d"%(issueListUrl,133))
         else:
             if len(self[0].atomPairs):
-                modelCount = self[0].atomPairs[0].residue.chain.molecule.modelCount
+            	modelCount = self[0].atomPairs[0].residue.chain.molecule.modelCount
         #end if
 
         if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz

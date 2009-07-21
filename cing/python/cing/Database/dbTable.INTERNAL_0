@@ -14560,9 +14560,9 @@ END_RESIDUE
 
 #=======================================================================
 #   internal short
-RESIDUE ZN2P     ZN2P
+RESIDUE ZN     ZN
 #=======================================================================
-    nameDict = {'BMRBd': None, 'IUPAC': 'ZN', 'AQUA': 'ZN', 'INTERNAL_0': 'ZN2P', 'INTERNAL_1': 'ZN2P', 'CYANA': 'ZN', 'CYANA2': 'ZN', 'PDB': 'ZN', 'XPLOR': 'ZN2'}
+    nameDict = {'BMRBd': None, 'IUPAC': 'ZN', 'AQUA': 'ZN', 'INTERNAL_0': 'ZN', 'INTERNAL_1': 'ZN', 'CYANA': 'ZN', 'CYANA2': 'ZN', 'PDB': 'ZN', 'XPLOR': 'ZN2'}
     comment = 'Zinc 2plus ion'
     properties = ['ion', 'metal', 'charged']
     #---------------------------------------------------------------
@@ -14572,11 +14572,11 @@ RESIDUE ZN2P     ZN2P
         karplus = None
     END_DIHEDRAL
     #---------------------------------------------------------------
-    ATOM ZN2P
+    ATOM ZN
     #---------------------------------------------------------------
         topology = []
         properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-        nameDict = {'BMRBd': None, 'IUPAC': 'ZN', 'AQUA': 'ZN', 'INTERNAL_0': 'ZN2P', 'INTERNAL_1': 'ZN', 'CYANA': 'ME', 'CYANA2': 'ME', 'PDB': 'ZN', 'XPLOR': 'ZN+2'}
+        nameDict = {'BMRBd': None, 'IUPAC': 'ZN', 'AQUA': 'ZN', 'INTERNAL_0': 'ZN', 'INTERNAL_1': 'ZN', 'CYANA': 'ME', 'CYANA2': 'ME', 'PDB': 'ZN', 'XPLOR': 'ZN+2'}
         aliases = ['ZN', 'ME']
         pseudo = None
         real = []

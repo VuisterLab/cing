@@ -568,16 +568,28 @@ class Molecule( NTtree ):
             # .zap('resNum') returns the items collapsed by residue number
             # if two residues in the same chain have the same residue number then
             #  the resulting list will have the one of the 2 residues in there
-            #  twice; which is a bug JFD thinks.
-            resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
+            #  twice; which is a bug JFD thinks. GWV: No, because resNum should be unique
+            #  to the chain
+            #resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
+            # But it will be an error because if two chains have identical residues numbers,
+            # only one will be added.
+            # Adding chain id's is alos an issue
+            resnumDict = NTdict()
+            for res in self.allResidues():
+                resnumDict.setdefault(res.resNum, [])
+                resnumDict[res.resNum].append(res)
+            #end for
+            #print '>>',self.name
+            #print resnumDict.items()
             ranges =  asci2list(ranges)
             ranges.sort()
             result = NTlist()
             for resNum in ranges:
                 if resnumDict.has_key(resNum):
-                    result.append(resnumDict[resNum])
+                    for r in resnumDict[resNum]:
+                        result.append(r)
                 else:
-                    NTerror('Error Molecule.ranges2list: invalid residue number [%d]\n', resNum )
+                    NTerror('Molecule.ranges2list: invalid residue number [%d]', resNum )
             return result
 
         if isinstance( ranges, list ):
@@ -1432,6 +1444,40 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
+    def selectFitAtoms( self, ranges=None, backboneOnly=True, includeProtons = False ):
+        """
+        Select the atoms to be fitted
+        return NTlist instance or NoneObject on error
+        """
+
+        if self.modelCount <= 0:
+            return NoneObject
+        #end if
+
+##        self.ensemble = Ensemble( molecule )
+
+        # Partition the Atoms
+        fitted        = []
+        fitResidues   = self.ranges2list( ranges )
+        # store the ranges
+        self.ranges   = list2asci( fitResidues.zap('resNum'))
+
+        for res in fitResidues:
+            for a in res.allAtoms():
+                if len(a.coordinates) != self.modelCount:
+                    continue
+                if ( (not includeProtons and a.isProton()) ):
+                    continue
+                if backboneOnly and a.isSidechain():
+                    continue
+                else:
+                    fitted.append( a )
+                #end if
+            #end for
+        #end for
+        return fitted
+    #end def
+
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
         """
         Superpose the coordinates of molecule
@@ -1445,31 +1491,32 @@ Return an Molecule instance or None on error
 ##        self.ensemble = Ensemble( molecule )
 
         # Partition the Atoms
-        fitted        = []
-        notFitted     = []
-        noCoordinates = []
-        fitResidues   = self.ranges2list( ranges )
-        # store the ranges
-        self.ranges   = list2asci( fitResidues.zap('resNum'))
-
-        for res in self.allResidues():
-            fitResidue = res in fitResidues
-            for a in res.allAtoms():
-                if len(a.coordinates) != self.modelCount:
-                    noCoordinates.append( a )
-                    continue
-                if ( (not fitResidue) or
-                     (not includeProtons and a.isProton()) ):
-                    notFitted.append( a )
-                    continue
-                if backboneOnly and a.isSidechain():
-                    notFitted.append( a )
-                else:
-                    fitted.append( a )
-                #end if
-            #end for
-        #end for
-        #print fitted
+#        fitted        = []
+#        notFitted     = []
+#        noCoordinates = []
+#        fitResidues   = self.ranges2list( ranges )
+#        # store the ranges
+#        self.ranges   = list2asci( fitResidues.zap('resNum'))
+#
+#        for res in self.allResidues():
+#            fitResidue = res in fitResidues
+#            for a in res.allAtoms():
+#                if len(a.coordinates) != self.modelCount:
+#                    noCoordinates.append( a )
+#                    continue
+#                if ( (not fitResidue) or
+#                     (not includeProtons and a.isProton()) ):
+#                    notFitted.append( a )
+#                    continue
+#                if backboneOnly and a.isSidechain():
+#                    notFitted.append( a )
+#                else:
+#                    fitted.append( a )
+#                #end if
+#            #end for
+#        #end for
+#        #print fitted
+        fitted = self.selectFitAtoms( ranges=ranges, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
         NTmessage("==> Superposing: fitted %s on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)",
                       self, len(fitted), ranges, backboneOnly, includeProtons
@@ -1500,7 +1547,7 @@ Return an Molecule instance or None on error
         if models == None:
             models = sprintf('%s-%s', 0, self.modelCount-1)
 
-        NTmessage("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
+        NTdetail("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
         selectedResidues = self.ranges2list( ranges )
         selectedModels   = self.models2list( models )

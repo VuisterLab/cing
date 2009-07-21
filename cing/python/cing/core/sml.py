@@ -857,8 +857,8 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
-            p0 = project.molecule.decodeNameTuple(ap[0])
-            p1 = project.molecule.decodeNameTuple(ap[1])
+            p0 = project.decodeNameTuple(ap[0])
+            p1 = project.decodeNameTuple(ap[1])
             if p0 and p1:
                 dr.appendPair( (p0, p1) )
             else:
@@ -922,7 +922,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
 
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
-        dr.atoms = decode( dr.atoms, project.molecule )
+        dr.atoms = decode( dr.atoms, project )
         if dr.atoms == None or None in dr.atoms:
             NTerror('SMLDihedralRestraintHandler.endHandler: invalid atom(s) %s', dr.atoms)
         return dr
@@ -979,8 +979,8 @@ class SMLRDCRestraintHandler( SMLhandler ):
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
-            p0 = project.molecule.decodeNameTuple(ap[0])
-            p1 = project.molecule.decodeNameTuple(ap[1])
+            p0 = project.decodeNameTuple(ap[0])
+            p1 = project.decodeNameTuple(ap[1])
             if p0 and p1:
                 dr.appendPair( (p0, p1) )
             else:
