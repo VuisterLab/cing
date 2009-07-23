@@ -5,7 +5,7 @@
 
 ## Adjusted by gv for specific purpose of NTmol
 
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdebug #@UnusedImport
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -1566,7 +1566,7 @@ class PDBFile(list):
                 atomCount += 1
             self.append(pdb_record)
 
-        NTdebug("PDBFile: read %d records (%d atoms) from %s", len(self), atomCount, fileName )
+#        NTdebug("PDBFile: read %d records (%d atoms) from %s", len(self), atomCount, fileName )
 
     def save_file(self, fil):
         """Saves the PDBFile object in PDB file format to File object fil.

@@ -1,0 +1,2 @@
+YASARA_STR = "Yasara"
+YASARA_LOWERCASE_STR = 'yasara'

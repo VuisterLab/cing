@@ -15,27 +15,22 @@ from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
+from cing.Libs.NTutils import NTmessage
+from cing import verbosityNothing
 import cing
 import os
 import unittest
 
 class AllChecks(TestCase):
 
+    entryList = "1brv".split()
+#    entryList = "1brv_cs_peaks".split()
+#    entryList = "1ai0".split()
+#    entryList = "1a4d".split()
+#    entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
+# Set for creating ccpn projects from cyana pdbs.
+#    entryList = "1a4d 1ai0 1brv_1model 1hkt_1model 1i1s 1ka3 1tgq_1model 1tkv 1y4o_1model 2hgh_1model 2hm9 H2_2Ca_53".split()
     def testInitCcpn(self):
-        entryList = "1brv".split()
-#        entryList = "1brv_cs_peaks".split()
-#        entryList = "1ieh".split()
-#        entryList = "1ai0".split()
-#        entryList = "1ti3".split()
-#        entryList = "Cu_CopK".split()
-#        entryList = "1hue".split()
-#        entryList = "H1GI".split()
-#        entryList = "taf3".split()
-#        entryList = "1a4d".split()
-#        entryList = "2k0e_all".split()
-
-#        entryList = "a18v_xeasy".split()
-#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
@@ -55,7 +50,7 @@ class AllChecks(TestCase):
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
-        for entryId in entryList:
+        for entryId in AllChecks.entryList:
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
@@ -80,54 +75,60 @@ class AllChecks(TestCase):
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
 
-    def tttestCreateCcpn(self):
+    def testCreateCcpn(self):
+        doRestraints = False
         pdbConvention = IUPAC
         restraintsConvention = CYANA
-        entryId = "1brv_1model" # Small much studied PDB NMR entry
-        if entryId.startswith("1YWUcdGMP"):
-            pdbConvention = XPLOR
-        if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
-        if entryId.startswith("1tgq"):
-            pdbConvention = PDB
-        if entryId.startswith("1brv"):
-            pdbConvention = IUPAC
 
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
-        project = Project(entryId)
-        self.failIf(project.removeFromDisk())
-        project = Project.open(entryId, status = 'new')
-        cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-        pdbFileName = entryId + ".pdb"
-        pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
-        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
+        for entryId in AllChecks.entryList:
+            # Allow pdb files to be of different naming systems for this test.
+            if entryId.startswith("2hgh"):
+                pdbConvention = CYANA
+            if entryId.startswith("1tgq"):
+                pdbConvention = PDB
+            if entryId.startswith("1brv"):
+                pdbConvention = IUPAC
+            if entryId.startswith("1YWUcdGMP"):
+                pdbConvention = XPLOR
 
-        NTdebug("Reading files from directory: " + cyanaDirectory)
-        kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]
-                  }
-        if entryId.startswith("1YWUcdGMP"):
-            del(kwds['acoFiles'])
+            project = Project(entryId)
+            self.failIf(project.removeFromDisk())
+            project = Project.open(entryId, status = 'new')
+            cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
+            pdbFileName = entryId + ".pdb"
+            pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
+            project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
 
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
-            self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
-                "Converter for cyana also needs a seq file before a prot file can be imported")
-            kwds['protFile'] = entryId
-            kwds['seqFile'] = entryId
+            if doRestraints:
+                NTdebug("Reading files from directory: " + cyanaDirectory)
+                kwds = {'uplFiles': [ entryId ],
+                        'acoFiles': [ entryId ]
+                          }
+                if entryId.startswith("1YWUcdGMP"):
+                    del(kwds['acoFiles'])
 
-        # Skip restraints if absent.
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
-            project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
-                        copy2sources = True,
-                        **kwds)
-#        project.save()
-        ccpnFolder = entryId
-        self.assertTrue(project.createCcpn(ccpnFolder))
-        self.assertTrue(project.saveCcpn())
+                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
+                    self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
+                        "Converter for cyana also needs a seq file before a prot file can be imported")
+                    kwds['protFile'] = entryId
+                    kwds['seqFile'] = entryId
+
+                # Skip restraints if absent.
+                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
+                    project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
+                                copy2sources = True,
+                                **kwds)
+            # end if
+            project.save()
+            NTmessage( "Project: %s" % project)
+            ccpnFolder = entryId
+            self.assertTrue(project.saveCcpn(ccpnFolder))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
     cing.verbosity = verbosityOutput
+    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
     unittest.main()

@@ -109,7 +109,7 @@ class pdbParser:
             NTerror('pdbParser: missing PDB-file "%s"', pdbFile)
             return None
 
-        NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile)
+        NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile)
 
         self.pdbRecords = PyMMLib.PDBFile(pdbFile)
         if not self.pdbRecords:
@@ -126,7 +126,7 @@ class pdbParser:
     def _records2tree(self):
         """Convert the pdbRecords in a tree-structure. Really a HoHoH; Hash of...
         """
-        NTdebug("Now in _records2tree")
+#        NTdebug("Now in _records2tree")
         self.tree = NTtree('tree') # Tree like structure of pdbFile
         chn = None
         res = None
@@ -222,14 +222,14 @@ class pdbParser:
         if not foundModel: # X-rays do not have MODEL record
             self.modelCount = 1
 
-        NTdebug('end pdbParser._records2tree: parsed %d pdb records, %d models', atmCount, self.modelCount)
+#        NTdebug('end pdbParser._records2tree: parsed %d pdb records, %d models', atmCount, self.modelCount)
     #end def
 
     def _matchResiduesAndAtoms(self):
         """
         Match residues and Atoms in the tree to CING db using self.convention
         """
-        NTdebug("Now in _matchResiduesAndAtoms")
+#        NTdebug("Now in _matchResiduesAndAtoms")
         unmatchedAtomByResDict = {}
 #        unmatchedResDict = {}
         for res in self.tree.subNodes(depth = 2):

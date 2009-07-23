@@ -78,19 +78,25 @@ CING_SHELL_TEMPLATE = \
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
 %(export)s  CYTHON%(equals)s%(cingRoot)s/dist/Cython
 %(export)s  PYMOL_PATH%(equals)s%(pyMolPath)s
+%(export)s  YASARA_PATH%(equals)s%(yasaraPath)s
+
+# Adding each component individually to PYTHONPATH
+%(export)s  CING_VARS%(equals)s$CINGROOT/python
+%(export)s  CING_VARS%(equals)s${CING_VARS}:$CYTHON
+%(export)s  CING_VARS%(equals)s${CING_VARS}:$PYMOL_PATH/modules
+%(export)s  CING_VARS%(equals)s${CING_VARS}:$YASARA_PATH/yasara/pym:$YASARA_PATH/yasara/plg
 
 if %(conditional)s then
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYMOL_PATH}/modules:${PYTHONPATH}
+    %(export)s PYTHONPATH%(equals)s${CING_VARS}:${PYTHONPATH}
 else
-    %(export)s PYTHONPATH%(equals)s$CINGROOT/python:${CYTHON}:${PYMOL_PATH}/modules
+    %(export)s PYTHONPATH%(equals)s${CING_VARS}
 %(close_if)s
 
-# Use -u to ensure messaging streams for stdout/stderr
-#     don't mingle.
+# Use -u to ensure messaging streams for stdout/stderr don't mingle (too much).
 alias cing%(equals)s'python -u $CINGROOT/python/cing/main.py'
 alias cyana2cing%(equals)s'python -u $CINGROOT/python/cyana2cing/cyana2cing.py'
 alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
-alias cython%(equals)s'${CYTHON}/bin/cython'
+alias cython%(equals)s'$CYTHON/bin/cython'
 
 '''
 #------------------------------------------------------------------------------------
@@ -293,9 +299,6 @@ def _writeCingShellFile(isTcsh):
     fp = open(cname,'w')
     fp.write(text)
     fp.close()
-    # for bash it's necessary that the file be executable for this user.
-    #AWSS: not really
-    #chmod(cname, 0755)
 
     print ''
     print '==> Please check/modify %s <===' % (cname)
@@ -458,6 +461,8 @@ if __name__ == '__main__':
     pyMolPath,err  = ('/sw/lib/pymol-py25', None)
     if not os.path.exists(pyMolPath):
         pyMolPath = '/sw/lib/pymol-py26' # for AWSS
+        if not os.path.exists(pyMolPath):
+            pyMolPath = None
     if not pyMolPath:
         _NTmessage("Could not find 'pymol' code (optional)")
         parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE
@@ -465,8 +470,23 @@ if __name__ == '__main__':
         _NTmessage("........ Found 'pymol' code")
         parametersDict['pyMolPath'] = strip(pyMolPath)
 
+    # TODO: enable real location finder. This just works for JFD but shouldn't bother
+    # others.
+#    yasaraBasePath,err  = ('/Applications/YASARA-dynamics 8.2.3.app', None)
+    yasaraBasePath,err  = ('/Applications/YASARA.app', None)
+    if not os.path.exists(yasaraBasePath):
+        _NTmessage("Could not find 'Yasara' code (optional)")
+        parametersDict['yasaraPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _NTmessage("........ Found 'Yasara' code")
+        parametersDict['yasaraPath'] = strip(yasaraBasePath)
+
     # Just to get a message to user; not important.
     pyMolBinPath,err  = _NTgetoutput('which pymol')
+    if not pyMolBinPath:
+        pyMolBinPath = '//sw/bin/pymol'
+        if not os.path.exists(pyMolBinPath):
+            pyMolBinPath = None
     if not pyMolBinPath:
         _NTmessage("Could not find 'pymol' binary (optional)")
 #        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE

@@ -21,10 +21,10 @@ ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
 
-"""
-Returns 0 for success.
-"""
 def do_cmd( cmd ):
+    """
+    Returns False for success.
+    """
     NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
@@ -37,14 +37,18 @@ def do_cmd( cmd ):
     status = pipe.close()
 
     if output:
-        print output
+        NTmessage( output )
 
     ## Success
-    if ( status != None ):
-        NTerror("Failed shell command:")
-        NTerror( cmd )
-        NTerror("Output: %s" % output)
-        NTerror("Status: %s" % status)
+    if status == None:
+        return
+
+    NTerror("Failed shell command:")
+    NTerror( cmd )
+    NTerror("Output: %s" % output)
+    NTerror("Status: %s" % status)
+    return True
+# end def
 
 def get_cmd_output( cmd ):
     NTdebug( "Doing command: %s" % cmd )

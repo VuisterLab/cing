@@ -65,7 +65,6 @@ from cing.core.constants import NOSHIFT
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Residue
-from cing.core.molecule import disulfideScore
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
 from cing.PluginCode.html import addPreTagLines
@@ -94,9 +93,11 @@ def runCingChecks( project, ranges=None ):
     project.mergeResonances()
 
     project.checkForSaltbridges(toFile=True)
-    project.checkForDisulfides(toFile=True)
+#    project.checkForDisulfides(toFile=True)
     if project.molecule:
         project.molecule.calculateRMSDs( ranges=ranges)
+        project.molecule.idDisulfides(toFile=True, applyBonds=False)
+
     project.criticize(toFile=True)
     project.summary(toFile=True)
     project.mkMacros()
@@ -694,64 +695,6 @@ def validateRestraints( project, toFile = True)   :
         fprintf(fp, msg)
     #end if
 #end def
-
-def checkForDisulfides(project, toFile=True):
-    """Just check for potential disulfide bonds.
-    TODO: merge this code with identical one in molecules.py#idDisulfides
-    """
-#    NTdebug('Identify the disulfide bonds.')
-
-    if not project.molecule:
-        NTerror('checkForDisulfides: no molecule defined')
-        return None
-    #end if
-
-    if project.molecule.modelCount == 0:
-        NTwarning('checkForDisulfides: no models for "%s"', project.molecule)
-        return
-    #end if
-    cys=project.molecule.residuesWithProperties('CYS')
-    cyss=project.molecule.residuesWithProperties('CYSS') # It might actually have been read correctly.
-    for c in cyss:
-        if c not in cys:
-            cys.append(c)
-
-    iList = range(len(cys))
-    iList.reverse()
-    # delete from the end as not to mess up the in operator below.
-    for i in iList:
-        c = cys[i]
-        if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
-            NTwarning("No coordinates for CA, skipping residue: %s" % c)
-            del( cys[i] )
-
-    disulfides = NTlist()
-    # all cys(i), cys(j) pairs with j>i
-    for i in range(len(cys)):
-        c1 = cys[i]
-        for j in range(i+1, len(cys)):
-            c2 = cys[j]
-            scoreList = disulfideScore( c1, c2)
-            disulfides.append( (c1, c2, scoreList) ) # keep track of data
-        #end for
-    #end for
-    if toFile:
-        path = project.moleculePath('analysis','disulfides.txt')
-        f = file(path,'w')
-        fprintf(f, '========= Disulfide analysis %s =========\n\n', project.molecule)
-        for c1,c2,scoreList in disulfides:
-            fprintf(f, '%s %s: scores dCa, dCb, S-S dihedral: %s ', c1,c2,scoreList)
-            if scoreList[3] >= 0.9:
-                fprintf(f,' certain disulfide\n')
-            elif scoreList[3] >= 0.3:
-                fprintf(f,' potential disulfide\n')
-            else:
-                fprintf(f,'\n')
-            #end if
-        #end for
-        NTmessage('==> Disulfide analysis, output to %s', path)
-    #end if
-# end def
 
 
 def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
@@ -1463,7 +1406,6 @@ methods  = [(validateDihedrals, None),
             (summary, None),
 
             (checkForSaltbridges, None),
-            (checkForDisulfides, None),
             (fixStereoAssignments, None),
            ]
 #saves    = []

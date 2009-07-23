@@ -1,7 +1,3 @@
-"""
-    Wattos Module
-    First version: jfd Dec 11, 2007
-"""
 from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
@@ -48,8 +44,9 @@ if True: # block
 #    if not (('/Users/jd/workspace34/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
 #             '/Users/jd/workspace34/wattos/build' in cingPaths.classpath) or
 #             ('/Users/alan/workspace/Wattos/lib/Wattos.jar' in cingPaths.classpath)):
-    if not (('/lib/Wattos.jar' in `cingPaths.classpath`) or ('/build' in `cingPaths.classpath`)):
-        NTdebug("Missing Wattos jar in classpath [%s] which is an optional dep for Wattos" % cingPaths.classpath)
+    classpathCombinedAgain = ':'.join(cingPaths.classpath)
+    if not (('/lib/Wattos.jar' in classpathCombinedAgain) or ('/build' in classpathCombinedAgain)):
+        NTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
         raise ImportWarning('Wattos')
 #    NTmessage('Using Wattos')
 
@@ -330,7 +327,7 @@ def runWattos(project, tmp = None):
     fullname = os.path.abspath(fullname)
 
     if os.path.exists(fullname):
-        if os.unlink(fullname):
+        if not os.unlink(fullname):
             NTmessage("Removing existing file: %s" % fullname)
         else:
             NTerror("Failed to remove existing file: %s" % fullname)
@@ -342,7 +339,7 @@ def runWattos(project, tmp = None):
         return None
 
     if not nmrStar.toNmrStarFile(fullname):
-        NTdebug("Failed to nmrStar.toNmrStarFile") # change to error when cing to ccpn is functional.
+        NTmessage("Failed to nmrStar.toNmrStarFile (fine if there wasn't a CCPN project to start with)")
         return None
 
     if not os.path.exists(fullname):
@@ -357,7 +354,7 @@ def runWattos(project, tmp = None):
     # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
     timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
     timeRunEstimatedInSecondsStr = sprintf("%4.0f", timeRunEstimated * 60)
-    NTmessage('==> Running Wattos read for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
+    NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
     scriptFileName = "wattos.script"
     scriptFullFileName = os.path.join(wattosDir, scriptFileName)
     open(scriptFullFileName, "w").write(scriptComplete)
@@ -372,7 +369,7 @@ def runWattos(project, tmp = None):
     now = time.time()
     wattosExitCode = wattosProgram()
 
-    NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+    NTmessage("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
     if wattosExitCode:
         NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
         return None

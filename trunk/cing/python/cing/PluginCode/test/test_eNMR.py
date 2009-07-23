@@ -61,7 +61,7 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,
-                                              doWattos=doWattos ))
+                                              doWattos = doWattos ))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail

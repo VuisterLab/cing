@@ -172,25 +172,7 @@ from cing.core.classes      import RDCRestraint,      RDCRestraintList
 # functional imports: Order matters!
 #---------------------------------------------------------------------------------------------
 
-# Try a Yasara import
-# GV: We could change this by defining yasaradir in the CING setup
-try:
-    from yasara import yasaradir
-    if os.path.exists(yasaradir):
-        sys.path.append(os.path.join(yasaradir,'pym'))
-        sys.path.append(os.path.join(yasaradir,'plg'))
-    else:
-        NTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
-        exit(1)
-except:
-    yasaradir = None
-#end try
-
 from cing.core.molecule     import *
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
 from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods
-
-
-
-
