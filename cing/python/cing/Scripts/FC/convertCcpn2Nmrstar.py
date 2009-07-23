@@ -27,10 +27,25 @@ def convert(projectName, inputDir, outputFile):
     nmrProject = ccpnProject.currentNmrProject
 
     nmrEntry.structureGenerations = nmrProject.sortedStructureGenerations()
-    if not nmrEntry.structureGenerations:
-         print "Failed to find nmrEntry.structureGenerations from nmrProject; creating a new one."
-         strucGen   = nmrProject.newStructureGeneration()
-         nmrEntry.addStructureGeneration(strucGen)
+    if nmrEntry.structureGenerations:
+        print "Using structureGenerations from nmrProject"
+    else:
+        ncs = ccpnProject.findFirstNmrConstraintStore()
+        sG = None
+        if not ncs:
+            print "Failed to find any NmrConstraintStore from project"
+        else:
+            sG = ncs.findFirstStructureGeneration()
+        if sG:
+            nmrEntry.addStructureGeneration( sG )
+            print "Using structureGenerations from nmrProject"
+        else:
+            print "Failed to find nmrEntry.structureGenerations from nmrProject or nmrConstraintStore; creating a new one."
+            strucGen = nmrProject.newStructureGeneration()
+            nmrEntry.addStructureGeneration(strucGen)
+        # end if
+        # end if
+    # end if
 
     try: # ccpn stable as 08 Jul 2009
         nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalysiss() # watch out for misspelling.

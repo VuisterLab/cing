@@ -34,6 +34,7 @@ from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.PluginCode.html import addPreTagLines
 from cing.core.ROGscore import ROGscore
+#from cing.core.classes import projects # circular.
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -150,6 +151,7 @@ class Molecule( NTtree ):
         self.content.saveAllXML()
         self.content.keysformat()
 
+        self.project = None # JFD: don't know where it gets set but it exists.
 #        NTdebug('Molecule.__init__: %s', self )
         #end if
     #end def
@@ -949,7 +951,7 @@ class Molecule( NTtree ):
         """
 
         if not self.resonanceCount:
-            NTmessage("Skipping project.mergeResonances because there are no resonances")
+            NTmessage("Skipping molecule.mergeResonances because there are no resonances")
             return
 
         for atom in self.allAtoms():
@@ -1137,11 +1139,15 @@ class Molecule( NTtree ):
         for atm in self.allAtoms():
             atm.calculateMeanCoordinate()
 
-    def idDisulfides(self):
-        """Just identify the disulfide bonds.
+    def idDisulfides(self, toFile=False, applyBonds=True):
+        """Identify the disulfide bonds.
         Takes into account residues with missing coordinates as long as they are all missing.
+        By default the bonds that are determined with a certainty above CUTOFF_SCORE will actually be
+        applied.
         """
+
         CUTOFF_SCORE = 0.9 # Default is 0.9
+        CUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
 
         if self.modelCount == 0:
             NTwarning('idDisulfides: no models for "%s"', self)
@@ -1165,7 +1171,9 @@ class Molecule( NTtree ):
                 del( cys[i] )
 #                needs testing.
         pairList = []
+        disulfides = [] # same as pairList but with scoreList.
         cyssDict2Pair = {}
+
         # all cys(i), cys(j) pairs with j>i
         for i in range(len(cys)):
             c1 = cys[i]
@@ -1204,14 +1212,50 @@ class Molecule( NTtree ):
                     if toAdd:
                         pair = (c1, c2)
                         pairList.append(pair)
+                        disulfides.append( (c1, c2,scoreList))
                         cyssDict2Pair[c1] = pair
                         cyssDict2Pair[c2] = pair
+        # end for
         if pairList:
-            NTmessage( '==> Molecule %s: Potential disulfide bridges: %d' %( self.name, len(pairList)))
+            NTmessage( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
 #            for pair in pairList:
 #                NTdebug( '%s %s' % (pair[0], pair[1] ))
         else:
             NTdetail( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
+        # end if
+
+        if toFile:
+            path = self.project.moleculePath('analysis','disulfides.txt')
+            f = file(path,'w')
+            fprintf(f, '========= Disulfide analysis %s =========\n\n', self)
+            for c1,c2,scoreList in disulfides:
+                fprintf(f, '%s %s: scores dCa, dCb, S-S dihedral: %s ', c1,c2,scoreList)
+                if scoreList[3] >= CUTOFF_SCORE:
+                    fprintf(f,' certain disulfide\n')
+                elif scoreList[3] >= CUTOFF_SCORE_MAYBE:
+                    fprintf(f,' potential disulfide\n')
+                else:
+                    fprintf(f,'\n')
+            #end for
+            NTmessage('==> Disulfide analysis, output to %s', path)
+        #end if
+
+        if applyBonds:
+            for c1,c2,scoreList in disulfides:
+#                NTdebug('%s %s: scores dCa, dCb, S-S dihedral: %s ' %( c1,c2,scoreList))
+                if scoreList[3] < CUTOFF_SCORE:
+#                    NTdebug("Skipping potential disulfide")
+                    continue
+                for c in (c1, c2):
+                    if c.hasProperties('CYSS'):
+#                        NTdebug("Skipping %s that is already a CYSS" % c)
+                        continue
+                    c.mutate('CYSS') # this looses connections to ccpn in residue and atom objects.
+
+
+
+    #end if
+
     # end def
 
     def syncModels(self ):
@@ -1281,8 +1325,6 @@ class Molecule( NTtree ):
         self.atomList = AtomList( self )
         if not self.atomList:
             NTcodeerror("Failed to generate AtomList in molecule#updateAll")
-
-
         self.updateTopology()
     #end def
 
@@ -2111,8 +2153,8 @@ Chain class: defines chain properties and methods
         return res
     #end def
 
-    def removeResidue( self, residue)   :
-        if (not residue in self._children):
+    def removeResidue( self, residue):
+        if not residue in self._children:
             NTerror( 'Chain.removeResidue: residue "%s" not present in chain %s',
                      residue, self
                    )
@@ -2128,7 +2170,7 @@ Chain class: defines chain properties and methods
         self._parent.atomCount -= len( residue.atoms )
 
         res = self.removeChild( residue )
-        if (res == None):
+        if res == None:
             NTerror('Chain.removeResidue: error removing %s from %s', residue, self)
             return None
         else:
@@ -2362,12 +2404,14 @@ Residue class: Defines residue properties
         return self
     #end def
 
-    def mutate( self, resName   ):
+    def mutate( self, resName ):
         """
         Mutate residue to resName:
             Generate newResidue <Residue> instance.
             Move the 'like' atoms from self to newResidue.
             Replace self by newResidue in chain.
+
+        NB this looses connections from/to CCPN in residue and atom objects.
 
         Return (self,newResidue) tuple or None on error
         """
@@ -2379,7 +2423,7 @@ Residue class: Defines residue properties
         #end if
         newRes  = Residue( resName, self.resNum )
 
-        NTmessage('==> Mutating %s to %s', self._Cname(-1), newRes._Cname(-1) )
+        NTmessage('==> Mutating %s to %s', self._Cname(-1), resName )
 
         # remove old name references
         del( self._parent[self.name] )

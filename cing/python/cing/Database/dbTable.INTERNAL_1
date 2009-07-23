@@ -11828,7 +11828,7 @@ RESIDUE	DT       t
 #=======================================================================
     nameDict = {'BMRBd': 'THY', 'IUPAC': 'DT', 'AQUA': 'T', 'INTERNAL_0': 'THY', 'INTERNAL_1': 'DT', 'CYANA': 'THY', 'CYANA2': 'THY', 'PDB': 'THY', 'XPLOR': 'THY'}
     comment = 'deoxy-thymine'
-    properties = ['nucleic', 'thymine']
+    properties = ['nucleic', 'deoxy', 'thymine']
     #---------------------------------------------------------------
     DIHEDRAL EPSI
     #---------------------------------------------------------------
@@ -14450,7 +14450,7 @@ RESIDUE	HOH      O
 #=======================================================================
     nameDict = {'BMRBd': 'HOH', 'IUPAC': 'HOH', 'AQUA': 'HOH', 'INTERNAL_0': 'HOH', 'INTERNAL_1': 'HOH', 'CYANA': None, 'CYANA2': None, 'PDB': 'HOH', 'XPLOR': 'HOH'}
     comment = 'Regular Water residue'
-    properties = ['small', 'polar']
+    properties = ['water', 'small', 'polar']
     #---------------------------------------------------------------
     ATOM O
     #---------------------------------------------------------------

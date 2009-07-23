@@ -13,41 +13,42 @@ from cing.PluginCode.Ccpn import isRootDirectory
 from cing.PluginCode.Ccpn import patchCcpnResDescriptor
 from cing.core.sml import NTdict
 from unittest import TestCase
+from cing.PluginCode.Ccpn import modifyResidueDescriptorForTerminii
 import cing
-import unittest    
+import unittest
 
 class AllChecks(TestCase):
 
-    def testIsRootDirectory(self):
+    def tttestIsRootDirectory(self):
         self.assertTrue( isRootDirectory("linkNmrStarData/"))
         self.assertTrue( isRootDirectory("linkNmrStarData//"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
-        
-        
-    def testRestraintsValuesRegular(self):
+
+
+    def tttestRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
-        
+
         msgHoL = MsgHoL()
-#        lower, upper, targetValue, error     
-        rList = [     
-                 (0.0, 3.0, 4.0, 1.0), # Should give a warning and just use lower/upper as is. 
-                 (0.0, 3.0, 4.0, None), # Same 
-                 (0.0, 5.5, 5.5, None), # failed for entry 2cka with original code. 
+#        lower, upper, targetValue, error
+        rList = [
+                 (0.0, 3.0, 4.0, 1.0), # Should give a warning and just use lower/upper as is.
+                 (0.0, 3.0, 4.0, None), # Same
+                 (0.0, 5.5, 5.5, None), # failed for entry 2cka with original code.
                  (None, None, 5.5, None),
                  (None, None, 5.5, 1.0),
                  (None, None, None, None),
                  (None, 4.0, None, None), # upper bound only
                  (2.0, None, None, None), # lower only
                  (-2.0, 5.0, None, None), # should give reasonable error and unset distance lower bound
-                  
-                 (-5.0, 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 10 degrees. 
-                 (5.0, - 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 350 degrees. 
-                 (None, None, - 10.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 20 degrees. 
-                 (None, None, 350.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Same. 
+
+                 (-5.0, 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 10 degrees.
+                 (5.0, - 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 350 degrees.
+                 (None, None, - 10.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 20 degrees.
+                 (None, None, 350.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Same.
                  (None, None, 123.0, 200.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Give a reasonable warning and sets to full circle by setting to (0,-SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
                    ]
-        cingRlist = [ 
+        cingRlist = [
                      (0.0, 3.0),
                      (0.0, 3.0),
                      (0.0, 5.5),
@@ -57,7 +58,7 @@ class AllChecks(TestCase):
                      (None, 4.0),
                      (2.0, None),
                      (None, 5.0),
-                     
+
                      (-5.0, 5.0), # dihedrals
                      (5.0, - 5.0),
                      (-30.0, 10.0),
@@ -68,9 +69,9 @@ class AllChecks(TestCase):
         for i in range(len(rList)):
             cc = rList[i]
             ccpnConstraint = NTdict()
-            ccpnConstraint.lowerLimit = cc[0] 
-            ccpnConstraint.upperLimit = cc[1] 
-            ccpnConstraint.targetValue = cc[2] 
+            ccpnConstraint.lowerLimit = cc[0]
+            ccpnConstraint.upperLimit = cc[1]
+            ccpnConstraint.targetValue = cc[2]
             ccpnConstraint.error = cc[3]
             restraintTypeIdx = Ccpn.RESTRAINT_IDX_DISTANCE
             if len(cc) >= 5:
@@ -86,10 +87,10 @@ class AllChecks(TestCase):
                 self.assertEquals(ci[0], cie[0])
                 self.assertEquals(ci[1], cie[1])
             msgHoL.showMessage(999, 999, 999, 999)
-    def testPatchCcpnResDescriptor(self):
-        rList = [ # result, description, ccpnMolType, linking,     
+    def tttestPatchCcpnResDescriptor(self):
+        rList = [ # result, description, ccpnMolType, linking,
                  ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_START],
-                 ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!  
+                 ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!
                  ['prot:HG1', "prot:HG1;deprot:H''", Ccpn.CCPN_PROTEIN, Ccpn.CCPN_END],
                  ['prot:HD1;prot:HE2', 'prot:HD1;prot:HE2', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_MIDDLE],
                  [Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_PROTEIN, Ccpn.CCPN_MIDDLE], # not an issue anymore.
@@ -100,17 +101,37 @@ class AllChecks(TestCase):
             NTdebug("d: %s" % d)
             self.assertEquals(d[0], patchCcpnResDescriptor(d[1], d[2], d[3]))
     # end def
-    
-    def testCcpnProjectNameFromFileName(self):
+
+    def testModifyResidueDescriptorForTerminii( self ):
+
+        seqLength = 3
+        # Note the list is the same as above; the assert has the first 2 argument switched.
+        rList = [ # result, description, ccpnMolType, linking,
+                 ['neutral', "deprot:H''", Ccpn.CCPN_PROTEIN, 2], # C-terminus
+                 ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, 0], # N-terminus
+                 ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, 0], # do not touch!
+                 ['prot:HG1', "prot:HG1;deprot:H''", Ccpn.CCPN_PROTEIN, 2],
+                 ['prot:A,B;deprot:X,Y', "prot:A,B;deprot:H'',X,Y", Ccpn.CCPN_PROTEIN, 2],
+                 ['prot:HD1,HE2', 'prot:HD1,HE2', Ccpn.CCPN_PROTEIN, 1],
+                 [Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_DEPROT_HG, Ccpn.CCPN_PROTEIN, 1], # not an issue anymore.
+                   ]
+
+        for i in range(len(rList)):
+            d = rList[i]
+            NTdebug("d: %s" % d)
+            self.assertEquals(d[1], modifyResidueDescriptorForTerminii( d[0], d[3], seqLength, d[2]))
+
+
+    def tttestCcpnProjectNameFromFileName(self):
         inputList = ["BASP/memops/Implementation/BASP.xml",
                      "/X/Y/memops/Implementation/BASP.xml", # base not important.
                      "bla.xml",
                      "/X/Y/memops/Implementation/BA SP.xml"
                      ]
         expectedList = ['BASP',
-                        'BASP', 
+                        'BASP',
                         None,
-                        'BA SP' 
+                        'BA SP'
                         ]
         for i, input in enumerate(inputList):
             result = getProjectNameInFileName(input)

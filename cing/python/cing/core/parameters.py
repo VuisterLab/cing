@@ -1,6 +1,6 @@
-from cing.Libs.NTutils import NTdict
 from cing import OS_TYPE_LINUX
 from cing import osType
+from cing.Libs.NTutils import NTdict
 import cing
 import os
 
@@ -84,7 +84,7 @@ cingPaths = NTdict(
     ps2pdf       = os.getenv('ps2pdfPath'),
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
-    classpath    = os.getenv('CLASSPATH'),
+    classpath    = os.getenv('CLASSPATH')
 )
 
 # Keep the below in sync with the one in setup.py

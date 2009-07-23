@@ -70,6 +70,9 @@ __credits__ = cing.__credits__
 
 projects = NTlist()
 
+"CRV stands for CRiteria Value CRS stands for CRiteria String"
+CRV_NONE = "-999.9";
+
 #-----------------------------------------------------------------------------
 # Cing classes and routines
 #-----------------------------------------------------------------------------
@@ -137,8 +140,6 @@ Project: Top level Cing project class
     def __init__( self, name ):
 
         root, name = Project.rootPath( name )
-        "CRV stands for CRiteria Value CRS stands for CRiteria String"
-        self.CRV_NONE = "-999.9";
 
         NTdict.__init__(   self,
                            __CLASS__                = 'Project',
@@ -267,7 +268,7 @@ Project: Top level Cing project class
         for item in config.items('DEFAULT'):
             key = item[0].upper()  # upper only.
             try:
-                if item[1] == self.CRV_NONE:
+                if item[1] == CRV_NONE:
                     value = None
                 else:
                     value = float(item[1])

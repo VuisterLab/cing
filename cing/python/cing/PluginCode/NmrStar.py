@@ -19,7 +19,7 @@ class NmrStar():
         NTdebug("starting toNmrStarFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            NTdebug("Failed to find ccpn attribute project. TODO: code this first.")
+            NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
@@ -65,10 +65,12 @@ class NmrStar():
             NTerror("Failed to get a descent str file name from: [%s]" % fileName)
             return
 
+        scriptFileName = "$CINGROOT/python/cing/Scripts/FC/convertCcpn2Nmrstar.py"
         logFileName = tail.replace(".str", "")
         logFileName += "_convertCcpn2Nmrstar.log"
-        convertProgram = ExecuteProgram("python -u $CINGROOT/python/cing/Scripts/FC/convertCcpn2Nmrstar.py",
-                                        rootPath = outputDir, redirectOutputToFile = logFileName)
+        convertProgram = ExecuteProgram("python -u %s" % scriptFileName,
+                rootPath = outputDir, redirectOutputToFile = logFileName)
+        NTmessage("Running Wim Vranken's FormatConverter from script %s" % scriptFileName )
         exitCode = convertProgram("%s %s %s" % (projectName, inputDir, fileName))
         if exitCode:
             NTerror("Failed convertProgram with exit code: " + `exitCode`)

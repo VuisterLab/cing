@@ -14678,7 +14678,7 @@ RESIDUE HOH      O
 #=======================================================================
     nameDict = {'CCPN': 'other Hoh neutral', 'BMRBd': 'HOH', 'IUPAC': 'HOH', 'AQUA': 'HOH', 'INTERNAL_0': 'HOH', 'INTERNAL_1': 'HOH', 'CYANA': None, 'CYANA2': None, 'PDB': 'HOH', 'XPLOR': 'HOH'}
     comment = 'Regular Water residue'
-    properties = ['small', 'polar']
+    properties = ['small', 'polar', 'water']
     #---------------------------------------------------------------
     ATOM O
     #---------------------------------------------------------------
