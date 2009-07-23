@@ -3372,6 +3372,8 @@ class ExecuteProgram(NTdict):
                  redirectOutputToFile = False,
                  redirectInputFromDummy = False,
                  redirectInputFromFile = False,
+                 appendPathList = None,
+                 appendEnvVariableDict = None,
                  *args, **kwds):
         NTdict.__init__(self, pathToProgram  = pathToProgram,
                                rootPath       = rootPath,
@@ -3379,6 +3381,8 @@ class ExecuteProgram(NTdict):
                                redirectOutputToFile   = redirectOutputToFile,
                                redirectInputFromDummy = redirectInputFromDummy,
                                redirectInputFromFile  = redirectInputFromFile,
+                               appendPathList = appendPathList,
+                               appendEnvVariableDict = appendEnvVariableDict,
                                *args, **kwds
                        )
         self.jobcount = 0
@@ -3397,6 +3401,21 @@ class ExecuteProgram(NTdict):
         else:
             cmd = sprintf('%s %s', self.pathToProgram, " ".join(args))
         #end if
+
+        if self.appendPathList:
+            pathListAllTogether = ':'.join( self.appendPathList )
+            cmdPathAppend = 'export PATH=%s:$PATH' % pathListAllTogether
+            cmd = cmdPathAppend + '; ' + cmd
+
+        if self.appendEnvVariableDict:
+            envVariableList = self.appendEnvVariableDict.keys()
+            envVariableList.sort()
+            extraEnvList = []
+            for envVariable in envVariableList:
+                extraEnvList.append( 'export %s=%s' % (envVariable, self.appendEnvVariableDict[ envVariable ]))
+            extraEnvCmd = ':'.join( extraEnvList )
+            cmd = extraEnvCmd + '; ' + cmd
+
 
         if self.redirectInputFromDummy and self.redirectInputFromFile:
             NTerror("Can't redirect from dummy and from a file at the same time")
@@ -3422,7 +3441,7 @@ class ExecuteProgram(NTdict):
         elif self.redirectOutputToFile:
             cmd = sprintf('%s > %s 2>&1', cmd, self.redirectOutputToFile)
             self.jobcount += 1
-#        NTdebug('==> Executing ('+cmd+') ... ')
+        NTdebug('==> Executing ('+cmd+') ... ')
         code = os.system(cmd)
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code

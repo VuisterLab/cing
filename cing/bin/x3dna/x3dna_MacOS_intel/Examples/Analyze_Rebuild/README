@@ -1,0 +1,95 @@
+[1] Four set of PDB files are given here to illustrate the analysis procedures:
+    adh026  --- A-DNA
+    bdl084  --- B-DNA
+    pd0001  --- nucleosome DNA structure
+    pde0128 --- DNA-protein complex with A-DNA and B-DNA junction
+
+    The *.inp files for each of the DNA structure were generated with
+    "find_pair". Using bdl084.pdb as an example:
+                       find_pair -t bdl084.pdb bdl084.inp
+
+    The "-t" option will also take HETATM records in PDB file into
+    consideration. While it does matter for bdl084.pdb here, it is necessary for
+    structures involving non-standard A, T, C, G and U residues which are
+    sometimes put into HETATM records (e.g., in RNA). As a rule, always put "-t"
+    option to "find_pair".
+
+    With "bdl084.inp" in hand, run "analyze" against it to get various
+    structural parameters:
+                               analyze bdl084.inp
+
+    The above to step can be combined:
+                    find_pair -t bdl084.pdb stdout | analyze
+
+    The four structures can be analyzed simultaneously as follows:
+              analyze adh026.inp bdl084.inp pd0001.inp pde0128.inp
+
+    In addition to the main parameter output file (*.out), each run of "analyze"
+    also generates a serial of other files with fixed names. Each time "analyze"
+    is executed, these files are re-written unless renamed.
+
+    Finally "multi_str.inp" contains all the above *.inp files in one, and is
+    suitable for "manalyze" which is a Perl script calling "analyze":
+                           manalyze multi_str.inp
+ 
+[2] Rebuilding with the sugar-phosphate backbone
+    The rebuilding of a DNA structure rely on its base sequence and associated
+    base-pair and step parameters, and a set of standard Atomic_?.pdb data file.
+    
+    The rebuilding algorithm is rigorous as far as the base-pair geometry is
+    concerned. However, approximate sugar-phosphate conformations can be
+    attached to the bases as they are built. This way, you get a full atomic
+    structure with the sugar-phosphate backbone.
+
+    In directory BASEPARS/ATOMIC/, there are four set of standard PDB files,
+    corresponding to A-DNA (C3'-endo), B-DNA (C2'-endo), RNA (C3'-endo plus
+    O2') and NDB96 (default, no backbone). The base geometry in each set are
+    identical.
+
+    To use a set other than the default, simply copy these files to their
+    Atomic_?.pdb counterpart. I.e., BDNA_stdA.pdb ---> Atomic_A.pdb
+    A simple Perl script "cp_std" helps with this process. 
+    For example:
+                       cp_std BDNA
+    will put the B-DNA set into your current directory (as in this directory).
+    Please note that 3DNA search for Atomic_?.pdb files in the order of
+     a). current directory;
+     b). $X3DNA/BASEPARS (default);
+     c). $HOME/BASEPARS (if $X3DNA is not defined)
+
+   To rebuild bdl084 with standard C2'-endo B-DNA sugar-phosphate backbone,
+   here is the procedure:
+                    find_pair -t bdl084.pdb stdout | analyze
+   You get "bp_step.par" which contains base-pair sequence and step parameters.
+   (Another file, "bp_helical.par", which contains helical parameters, is also
+   suitable for the following rebuilding process.)
+                      rebuild -atomic bp_step.par temp.pdb
+   Use RASMOL to have a look of "temp.pdb". It contains explicitly all valence
+   bonds.
+
+   To verify that the algorithms used in 3DNA is rigorous and reversible,
+   re-analyze the rebuilt structure "temp.pdb", and you will get the same
+   base-pair parameters as directly from "bdl084.pdb". Alternatively, you
+   could superimpose "temp.pdb" to "bdl084.pdb", and you will find that the
+   RMSD is virtually zero if only base atoms (i.e., excluding backbone) are
+   considered. If the sugar-phosphate backbone atoms (full-atom) are also
+   used, the results for three DNA structures are as follows:
+ 
+                                     pd0001   bdl084   adh026
+                      full-atom       0.82     0.73     0.52*
+                      base-atom       0.05     0.02     0.03
+
+    (In rebuilding full-atomic model, regular sugar-phosphate backbone
+    conformation was used: B-type for pd0001 and bdl084, and A-type for
+    adh026. It should be noted that the labeling of O1P/O2P atoms in adh026
+    from the NDB is not consistent with the convention. Thus the RMS values
+    for full-atom corresponds the those after correction with a utility
+    program "o1p_o2p".)
+
+    By matching Atomic_?.pdb with base sequence, it is also possible to
+    generate a DNA structure with mixed A- and B-DNA conformation, as in
+    pde0128.pdb.
+
+                                  ==============================================
+                                     Xiang-Jun Lu (xiangjun@rutchem.rutgers.edu)
+                                                                    July 6, 2001
