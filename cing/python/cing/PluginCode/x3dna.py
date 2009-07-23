@@ -5,11 +5,14 @@ Linux in the bin directory.
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTprogressIndicator
+from cing.PluginCode.pdb import moleculeToPDBfile
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
-from cing.PluginCode.pdb import moleculeToPDBfile
-from cing.Libs.NTutils import NTerror
+import cing
 import os
 
 useModule = True
@@ -21,6 +24,8 @@ if not useModule:
     raise ImportWarning('x3dna')
 
 contentFile = 'content.xml'
+
+X3DNA_NAN = '----'
 
 def x3dnaPath(project, *args):
     """
@@ -56,13 +61,53 @@ def runX3dna(project, parseOnly = False, modelNum = None):
     appendEnvVariableDict[ 'X3DNA' ] = x3dnaMainDir
     x3dna = ExecuteProgram(pathToProgram = x3dnascript, rootPath = root, redirectOutput = True,
         appendPathList = appendPathList, appendEnvVariableDict = appendEnvVariableDict)
+
+    # Storage of results for later
+    project.x3dnaStatus.completed    = False
+    project.x3dnaStatus.parsed       = False
+    project.x3dnaStatus.version      = cing.cingVersion
+    project.x3dnaStatus.moleculeName = project.molecule.name # just to have it
+#    project.x3dnaStatus.models       = models
+#    project.x3dnaStatus.baseName     = baseName
+    project.x3dnaStatus.path         = root
+    project.x3dnaStatus.contentFile  = contentFile
+    project.x3dnaStatus.chains       = NTlist()    # list of (chainNames, outputFile) tuples to be parsed
+    project.x3dnaStatus.keysformat()
+
     # The input file for is a pdb file
+    skippedAtoms = [] # Keep a list of skipped atoms for later
+    skippedResidues = []
+    skippedChains = []
+
+    for chain in project.molecule.allChains():
+        skippChain = True
+        for res in chain.allResidues():
+            if not res.hasProperties('nucleic'):
+                skippedResidues.append(res)
+                for atm in res.allAtoms():
+                    atm.pdbSkipRecord = True
+                    skippedAtoms.append( atm )
+                #end for
+            else:
+                res.x3dna = NTlist()
+                skippChain = False
+            #end if
+            if skippChain:
+                skippedChains.append(chain)
+        #end for
+    #end for
+    if skippedResidues:
+        NTmessage('x3dna: non-nucleotides %s will be skipped.',  skippedResidues)
+
+
+
     # We do not specify any output files, these are set based on the input filename in the x3dna.csh script
     # pdbFile=project.molecule.toPDB()
     nModels = project.molecule.modelCount
     name = project.molecule.name
 #    modelDict={}
-    for modelNum in range(0, nModels):
+    for modelNum in NTprogressIndicator(range(nModels)):
+#    for modelNum in range(0, nModels):
         NTmessage('Running X3DNA on modelNum %i of %s' % (modelNum, name))
         baseName = '%s_model_%i' % (name, modelNum)
         pdbFilePath = os.path.join(rootPath, baseName + '.pdb')
@@ -76,8 +121,16 @@ def runX3dna(project, parseOnly = False, modelNum = None):
         if not results:
             NTerror("Failed to parseX3dnaOutput")
             return None
-        NTmessage( results )
+        NTdebug( "X3DNA results: %s" % results )
 #        print results
+
+    # Restore the 'default' state
+    for atm in skippedAtoms:
+        atm.pdbSkipRecord = False
+
+    project.x3dnaStatus.completed    = True
+    project.x3dnaStatus.parsed       = True
+
     return True
 
 def parseX3dnaOutput(fileName):
@@ -160,12 +213,12 @@ def parseX3dnaParameterBlock(parameterBlock):
                 results[bp] = results.get(bp, {})
                 results[bp].update(dict(
                                         bp_str = line.split()[1],
-                                        shear = float(line.split()[2]),
-                                        stretch = float(line.split()[3]),
-                                        stagger = float(line.split()[4]),
-                                        buckle = float(line.split()[5]),
-                                        propeller = float(line.split()[6]),
-                                        opening = float(line.split()[7])
+                                        shear = parseX3dnaFloat(line.split()[2]),
+                                        stretch = parseX3dnaFloat(line.split()[3]),
+                                        stagger = parseX3dnaFloat(line.split()[4]),
+                                        buckle = parseX3dnaFloat(line.split()[5]),
+                                        propeller = parseX3dnaFloat(line.split()[6]),
+                                        opening = parseX3dnaFloat(line.split()[7])
                                         )
                                    )
 
@@ -195,12 +248,12 @@ def parseX3dnaParameterBlock(parameterBlock):
                                     step = step,
                                     step_str = step_str,
                                     bp_str = bp_str,
-                                    shift = float(line.split()[2]),
-                                    slide = float(line.split()[3]),
-                                    rise = float(line.split()[4]),
-                                    tilt = float(line.split()[5]),
-                                    roll = float(line.split()[6]),
-                                    twist = float(line.split()[7])
+                                    shift = parseX3dnaFloat(line.split()[2]),
+                                    slide = parseX3dnaFloat(line.split()[3]),
+                                    rise = parseX3dnaFloat(line.split()[4]),
+                                    tilt = parseX3dnaFloat(line.split()[5]),
+                                    roll = parseX3dnaFloat(line.split()[6]),
+                                    twist = parseX3dnaFloat(line.split()[7])
                                     )
                                 )
 
@@ -229,10 +282,10 @@ def parseX3dnaParameterBlock(parameterBlock):
                                     step = step,
                                     step_str = step_str,
                                     bp_str = bp_str,
-                                    minPP = float(line.split()[2]),
-                                    minPP_ref = float(line.split()[3]),
-                                    majPP = float(line.split()[4]),
-                                    majPP_ref = float(line.split()[5])
+                                    minPP = parseX3dnaFloat(line.split()[2]),
+                                    minPP_ref = parseX3dnaFloat(line.split()[3]),
+                                    majPP = parseX3dnaFloat(line.split()[4]),
+                                    majPP_ref = parseX3dnaFloat(line.split()[5])
                                     )
                                 )
 
@@ -498,7 +551,10 @@ for each dinucleotide step
 '''
 }
 
-
+def parseX3dnaFloat(str):
+    if str == X3DNA_NAN:
+        return None
+    return float(str)
 
 # register the functions
 methods = [(runX3dna, None),

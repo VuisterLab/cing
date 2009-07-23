@@ -3239,7 +3239,7 @@ Atom class: Defines object for storing atom properties
 
         pseudoAtom = self.pseudoAtom()
         if not pseudoAtom:
-            NTdebug("There is no pseudo defined for %s" % self)
+#            NTdebug("There is no pseudo defined for %s" % self)
             return None
 
         realAtomList = pseudoAtom.realAtoms()

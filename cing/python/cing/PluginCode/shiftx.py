@@ -311,7 +311,7 @@ def restoreShiftx( project, tmp=None ):
         atm.shiftx = NTlist()
     #end for
 
-    # Older versions; initialte the required keys of shiftxStatus
+    # Older versions; initialize the required keys of shiftxStatus
     if project.version < 0.881:
         xmlFile = os.path.join( root, contentFile )
 
