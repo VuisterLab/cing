@@ -1,6 +1,8 @@
 """
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_x3dna.py
+
+Open the ???.r3d files in pymol or so; they're nice.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -16,10 +18,11 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        entryList = "1cjg".split()
-#        entryList = "2hgh".split()
-#        entryList = "1brv".split()
+        entryList = "1b4y".split() # triple helix but it only gets analyzed to a double helix.
 #        entryList = "1cjg".split()
+#        entryList = "2hgh".split()
+#        entryList = "1a4d".split()
+#        entryList = "1brv".split() # protein only entry
 #        entryList = ["SRYBDNA"]
 
         useNrgArchive = False

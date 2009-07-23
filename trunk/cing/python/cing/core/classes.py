@@ -169,6 +169,7 @@ Project: Top level Cing project class
                            dsspStatus               =  NTdict( completed=False ),
                            whatifStatus             =  NTdict( completed=False ),
                            shiftxStatus             =  NTdict( completed=False ),
+                           x3dnaStatus             =  NTdict( completed=False ),
 
 
                            # store a reference to the global things we might need
@@ -492,6 +493,7 @@ Project: Top level Cing project class
 
             pr.whatifStatus.parsed = False
             pr.shiftxStatus.parsed = False
+            pr.x3dnaStatus.parsed = False
 
             try:
                 # <= 0.75 version have string
