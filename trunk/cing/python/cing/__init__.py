@@ -73,7 +73,7 @@ verbosityDebug    = 9 # add debugging info (not recommended for casual user)
 
 verbosityDefault  = verbosityOutput
 verbosity         = verbosityDefault
-#verbosity         = verbosityDebug # disable when done debugging e.g. importPlugin.py
+verbosity         = verbosityDebug # disable when done debugging e.g. importPlugin.py
 
 #- configure local settings:
 #    Create a file localConstants parallel to the setup.py file and add definitions that

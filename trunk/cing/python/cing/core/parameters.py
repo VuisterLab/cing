@@ -1,6 +1,7 @@
 from cing import OS_TYPE_LINUX
 from cing import osType
 from cing.Libs.NTutils import NTdict
+from cing import OS_TYPE_MAC
 import cing
 import os
 
@@ -44,6 +45,7 @@ moleculeDirectories = NTdict(
     dssp       = 'Dssp',
     whatif     = 'Whatif',
     wattos     = 'Wattos',
+    x3dna      = 'X3DNA',
     analysis   = 'Cing',
     shiftx     = 'Shiftx',
     html       = 'HTML',
@@ -101,6 +103,11 @@ shiftxExecutable = 'shiftx'
 if osType == OS_TYPE_LINUX:
     shiftxExecutable = 'shiftx_linux'
 cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, shiftxExecutable)
+
+cingPaths.x3dna = None
+if osType == OS_TYPE_MAC:
+    cingPaths.x3dna = os.path.join(cing.cingRoot, cingPaths.bin, 'x3dna' )
+
 if cingPaths.classpath:
     cingPaths.classpath = cingPaths.classpath.split(':')
 
