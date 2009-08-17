@@ -59,7 +59,7 @@ class Wattos(NTdict):
 
     nameDefs = [
                 (COMPLCHK_STR, 'NOE Completeness 4Ang.', 'NOE Completeness 4A'),
-                (OBS_COUNT_STR, 'Restraint count', 'Restrainnt Observed/Expected/Matched'),
+                (OBS_COUNT_STR, 'Restraint count', 'Restraints Observed/Expected/Matched'),
                 (OBS_ATOM_COUNT_STR, 'Atom count', 'Atom count'),
     ]
 

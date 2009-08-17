@@ -108,6 +108,10 @@ cingPaths.x3dna = None
 if osType == OS_TYPE_MAC:
     cingPaths.x3dna = os.path.join(cing.cingRoot, cingPaths.bin, 'x3dna' )
 
+cingPaths.MolProbity = None
+if osType == OS_TYPE_MAC:
+    cingPaths.MolProbity = os.path.join(cing.cingRoot, cingPaths.bin, 'molprobity' )
+
 if cingPaths.classpath:
     cingPaths.classpath = cingPaths.classpath.split(':')
 

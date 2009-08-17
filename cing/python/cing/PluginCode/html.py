@@ -53,6 +53,8 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
+from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.Libs.find import find
 import os
 import shelve
 import shutil
@@ -1195,7 +1197,7 @@ class ProjectHTMLfile( HTMLfile ):
         #css and javascript now in HTML dir
         htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
-        NTdebug("Listing: [%s]" % htmlPath )
+#        NTdebug("Listing: [%s]" % htmlPath )
         for f in os.listdir( htmlPath ):
 #            NTdebug("Listing item: [%s]" % f)
             htmlFile = os.path.join(htmlPath,f)
@@ -1203,7 +1205,7 @@ class ProjectHTMLfile( HTMLfile ):
                 shutil.copy( htmlFile, project.htmlPath() )
             elif os.path.isdir(htmlFile):
 #                NTdebug("Listing dir: [%s]" % f)
-                if f == '.svn':
+                if f.find('.svn') >= 0:
                     continue
                 dst = os.path.join( project.htmlPath(), f)
 #                NTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
@@ -1211,6 +1213,14 @@ class ProjectHTMLfile( HTMLfile ):
 #                    NTdebug("Removing directory: %s" % dst)
                     shutil.rmtree(dst)
                 shutil.copytree(htmlFile,  dst )
+                # TODO: exclude .svn items within subdir
+                svnDirectoryList = find(".svn", startdir=dst)
+                for f2 in svnDirectoryList:
+#                    NTdebug("Considering removing directory: %s" % (f2))
+                    if os.path.exists(f2):
+#                        NTdebug("Removing directory: %s" % f2)
+                        shutil.rmtree(f2)
+
             # end elif
         #end for
 
@@ -1618,6 +1628,64 @@ class MoleculeHTMLfile( HTMLfile ):
         if not anyWattosPlotsGenerated:
             main('h2', "No Wattos plots found at all")
         #end for doWhatif check.
+    #end def
+
+    def _generateX3dnaHtml(self, htmlOnly=False):
+        """Generate the X3dna html code
+        """
+        main = self.main
+        project = self.project
+        molecule = self.molecule
+
+        NTmessage("Creating X3dna html")
+        if not htmlOnly:
+            if hasattr(plugins, X3DNA_STR) and plugins[ X3DNA_STR ].isInstalled:
+                if project.createHtmlX3dna():
+                    NTerror('Failed to createHtmlX3dna')
+                    return True
+                #end if
+            #end if
+        #end if
+
+        anyPlotsGenerated = False
+
+        main('h1','X3DNA') # TODO: check capitalization
+        ncols = 6
+        main('table',  closeTag=False)
+        plotCount = -1
+        for p,d in NTprogressIndicator(wattosPlotList):
+            plotCount += 1
+            link = os.path.join('../..',
+                        project.moleculeDirectories[X3DNA_STR], molecule.name + p + ".pdf")
+            linkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
+                        project.moleculeDirectories[X3DNA_STR], molecule.name + p + ".pdf")
+            if not os.path.exists( linkReal ):
+                continue # Skip their inclusion.
+
+            pinupLink = os.path.join('../..',
+                        project.moleculeDirectories[X3DNA_STR], molecule.name + p + "_pin.gif" )
+            fullLink = os.path.join('../..',
+                        project.moleculeDirectories[X3DNA_STR], molecule.name + p + ".png" )
+            anyPlotsGenerated = True
+            if plotCount % ncols == 0:
+                if plotCount:
+                    main('tr',  openTag=False)
+                main('tr',  closeTag=False)
+            main('td',  closeTag=False)
+            main('a',   "",         href = fullLink, closeTag=False )
+            main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+            main('a',   "",         openTag=False )
+            main('br')
+            main('a',   d,          href = link )
+            main('td',  openTag=False)
+        #end for plot
+
+        if plotCount: # close any started rows.
+            main('tr',  openTag=False)
+        main('table',  openTag=False) # close table
+        if not anyPlotsGenerated:
+            main('h2', "No X3DNA plots found at all")
+        #end
     #end def
 
     def generateHtml(self, htmlOnly=False):

@@ -154,12 +154,12 @@ class Molgrap(NTdict):
             return True
 
 #        ## Remove temporary files if successful and possible
-#        try:
-#            os.unlink( pdb_first_file_name )
-#            os.unlink( pov_file_name )
-#            os.unlink( pov_cor_file_name )
-#        except:
-#            pass
+        try:
+            os.unlink( pdb_first_file_name )
+            os.unlink( pov_file_name )
+            os.unlink( pov_cor_file_name )
+        except:
+            pass
 
 
     """

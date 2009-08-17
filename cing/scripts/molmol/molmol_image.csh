@@ -3,7 +3,7 @@
 # USE: molmol_image.csh pdb_file tmp_dir pdb_id
 # make a pov ray file in a temporary directory as these files can become
 # quite large
-echo "DEBUG: 0"
+#echo "DEBUG: 0"
 set mac_file       = molmol_images.mac
 set log_file       = molmol_images.log
 set pdb_file       = $1
@@ -21,7 +21,7 @@ set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
 
 date
-echo "DEBUG: 1"
+#echo "DEBUG: 1"
 
 # check if we got the right amount of parameters
 if ( $# != 7 ) then
@@ -54,7 +54,7 @@ if ( 1 ) then
     echo "molmol_image.csh found id         :" $id       >> $log_file
     date                                                 >> $log_file
 endif
-echo "DEBUG: 2"
+#echo "DEBUG: 2"
 
 start:
 # Make the MOLMOL macro
@@ -71,7 +71,7 @@ else
   echo "WARNING: no EXPDTA record found in pdb file"
   echo "WARNING: assuming model is from NMR because safest in context"
 endif
-echo "DEBUG: 3"
+#echo "DEBUG: 3"
 
 # 1 kB per 1 amino acid residue for NMR; approximately
 # Anything below   100 aminoacids will be at resolution 3
@@ -96,7 +96,7 @@ endif
 
 #echo "Assuming multiplication factor:   $mul"       >> $log_file
 echo "Precision for pov file:           $precision" >> $log_file
-echo "DEBUG: 4"
+#echo "DEBUG: 4"
 
 # Notes for the macro file:
 # -1- No empty lines allowed.
@@ -113,16 +113,16 @@ else
     if ( $backcolor == "white" ) then
         echo "BackColor 1 1 1" >> $mac_file
     else
-	    if ( $backcolor == "cing_turqoise" ) then
-	    	# 250 250 246 from cing header image picked.
-	        echo "BackColor 0.9609375 0.9765625 0.9765625" >> $mac_file
-	    else
-        	echo "ERROR: color not found for: $backcolor"
-        	goto usage
+        if ( $backcolor == "cing_turqoise" ) then
+            # 250 250 246 from cing header image picked.
+            echo "BackColor 0.9609375 0.9765625 0.9765625" >> $mac_file
+        else
+            echo "ERROR: color not found for: $backcolor"
+            goto usage
         endif
     endif
 endif
-echo "DEBUG: 5"
+#echo "DEBUG: 5"
 
 cat >> $mac_file << EOD
 Rendering 1 1 0 1 1 1 1 1
@@ -193,13 +193,13 @@ EOD
 if ( -e $MOLMOLHOME/dump ) then
     \rm -f $MOLMOLHOME/dump
 endif
-echo "DEBUG: 6"
+#echo "DEBUG: 6"
 
 # Run the stuff through molmol
 setenv MOLMOLDEV TTY/NO
 $executableMm -t -f - < $mac_file >>& $log_file
 set molmol_status = $status
-echo "DEBUG: 7"
+#echo "DEBUG: 7"
 
 if ( $molmol_status ) then
     if ( $try == 1 ) then
@@ -225,8 +225,8 @@ endif
 
 # Remove the temporary stuff
 # Don't remove input and log file if no pov file was created.
-# DEBUG: uncomment next line
-#\rm -f $mac_file $log_file
+# DEBUG: comment next line if you want to keep the files.
+\rm -f $mac_file $log_file
 
 exit 0
 

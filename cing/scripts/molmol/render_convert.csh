@@ -13,8 +13,6 @@ set log            = $tmp_dir/$id"_render_convert".log
 set tga_tmp        = $tmp_dir/$id.tga
 set testing        = 0
 
-#set povray_dir = /share/linux/src/povray-3.6
-
 # No changes below
 ###############################################
 cd $results_dir
@@ -75,7 +73,7 @@ endif
 echo "DEBUG: trying to remove the temporary stuff: $tga_tmp $log"
 
 # Don't remove input and log file if no picture file was created.
-\rm -f $tga_tmp 
+\rm -f $tga_tmp
 \rm -f $log
 
 exit ( 0 )

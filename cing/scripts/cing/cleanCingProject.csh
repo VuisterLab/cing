@@ -15,9 +15,14 @@ find .\
 
 exit 0
 
+cd /Library/WebServer/Documents/NRG-CING/data/br
+find . -name "*.pov" -exec rm {} \;
+find . -name ".svn" -exec rm -rf {} \;
+
 # Junk follows after the above exit
 set list = ( 1i1s 1ka3 1tgq 1y4o )
 foreach x ( $list )
     echo "Doing $x"
     tar -czf $x.cing.tgz $x.cing
 end
+

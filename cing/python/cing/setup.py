@@ -505,3 +505,4 @@ if __name__ == '__main__':
     isTcsh = answer == "y"
 
     _writeCingShellFile(isTcsh)
+    _NTmessage("TODO: configure MolProbity by running it's setup.sh") # TODO:

@@ -838,7 +838,7 @@ class NTplot( NTdict ):
 
     def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
         """Using the list of points autoscale the y axis.
-        If no list is given then the routine simply returns now.
+        If no list is given then the routine simply returns False.
         If the list only contains nulls the min and max will be assumed 0 and 1.
         If the min equals the max then the max is simply taken as min increased by one.
         If the min is None then the min is assumed to be zero and max will become one.
