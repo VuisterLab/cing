@@ -371,8 +371,6 @@ class nrgCing(Lister):
     #            fprintf(fp, ' ')
                 fp.close()
 
-
-
     def make_individual_pages(self, entry_code):
         """
         Just making the one page specific for an entry
@@ -647,10 +645,10 @@ if __name__ == '__main__':
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
-                isProduction=isProduction)
+    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot,
+                updateIndices=updateIndices, isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
     NTmessage("Finished creating the NRG-CING indices")
-    # TODO: remove all but .csv files for updating whynot. Keep api because in future we might be able to say exactly
-    # why an entry fails at a certain stage.
+    #TODO: remove all but .csv files for updating whynot.
+    #Keep api because in future we might be able to say exactly why an entry fails at a certain stage.

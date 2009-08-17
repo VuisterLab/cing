@@ -210,15 +210,6 @@ class Whatif( NTdict ):
     NUMBER_RESIDUES_PER_SECONDS = 7 # Was 13 before.
 
     debugCheck = 'BNDCHK'
-    # Create a dictionary for fast lookup.
-#    nameDict = NTdict()
-#    shortNameDict = NTdict()
-#    for row in nameDefs:
-#        n1 = row[0]
-#        nameDict[n1] = row[1]
-#        if len(row) >= 3:
-#            shortNameDict[n1] = row[2]
-    # GV shorter
     cingNameDict  = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,1)) )
     nameDict      = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,2)) )
     shortNameDict = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,3)) )

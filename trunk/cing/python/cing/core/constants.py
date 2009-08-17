@@ -82,7 +82,9 @@ HBRL_LEVEL = 'HBondRestraintList'
 AC_LEVEL = 'DihedralRestraint'
 ACL_LEVEL = 'DihedralRestraintList'
 RDC_LEVEL = 'RDCRestraint'
-RDCL_LEVEL = 'RDCRestraintList'
+RDCL_LEVEL = 'RDCRestraintList' # unused so far
+COPLANAR_LEVEL = 'Coplanar'
+COPLANARL_LEVEL = 'CoplanarList' # unused so far
 
 POOR_PROP = 'POOR'
 BAD_PROP  = 'BAD'

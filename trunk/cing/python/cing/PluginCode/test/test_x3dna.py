@@ -11,6 +11,9 @@ from cing import verbosityError
 from cing import verbosityNothing
 from cing.core.classes import Project
 from unittest import TestCase
+from cing.Libs.NTutils import NTdebug
+from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.PluginCode.x3dna import createHtmlX3dna
 import cing
 import os
 import unittest
@@ -26,6 +29,7 @@ class AllChecks(TestCase):
 #        entryList = ["SRYBDNA"]
 
         useNrgArchive = False
+        showValues = True
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
@@ -41,6 +45,14 @@ class AllChecks(TestCase):
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
             project.save()
             self.assertTrue(project.runX3dna())
+            project.save()
+            self.assertFalse(createHtmlX3dna(project))
+
+            if showValues:
+                for coplanar in project.coplanars[0]:
+#                    NTdebug(coplanar.format())
+                    NTdebug('%r' % coplanar[X3DNA_STR])
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

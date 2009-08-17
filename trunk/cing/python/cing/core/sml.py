@@ -32,7 +32,6 @@ from cing.core.constants import AC_LEVEL
 from cing.core.constants import DR_LEVEL
 from cing.core.constants import RDC_LEVEL
 
-
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
 
@@ -44,6 +43,8 @@ from cing.core.constants import INTERNAL
 
 #The following imports we need for restoring the project
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
+from cing.core.constants import COPLANAR_LEVEL
+from cing.core.classes import Coplanar
 
 import os
 import sys
@@ -1029,6 +1030,46 @@ class SMLRDCRestraintListHandler( SMLhandler ):
     #end def
 #end class
 RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
+
+class SMLCoplanarHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = COPLANAR_LEVEL )
+    #end def
+
+    def handle(self, line, fp, project=None):
+        return # ask Geerten for input
+        coplanar = Coplanar()
+        return self.dictHandler(coplanar, fp, project)
+    #end def
+
+    def endHandler(self, coplanar, project):
+        return # ask Geerten for input
+    #end def
+
+    def toSML(self, coplanar, stream ):
+        """
+            For Coplanar (based on DistanceRestraint)
+        """
+        return # ask Geerten for input
+    #end def
+#end class
+
+
+class SMLCoplanarListHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'CoplanarList' )
+    #end def
+
+    def handle(self, line, fp, project=None):
+        return
+    #end def
+
+    def toSML(self, drl, fp):
+        return
+    #end def
+#end class
 
 class SMLResidueDefHandler( SMLhandler ):
 

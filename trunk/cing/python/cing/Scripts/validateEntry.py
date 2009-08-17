@@ -223,8 +223,10 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
         return
 
     pathInsert = ''
-    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
-        pathInsert = '/%s' % entryId
+    # TODO: check
+    # Commented out the next lines for NRG-CING but not certain this will work for all uses of this script.
+#    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
+#        pathInsert = '/%s' % entryId
     if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         entryCodeChar2and3 = entryId[1:3]
         pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)

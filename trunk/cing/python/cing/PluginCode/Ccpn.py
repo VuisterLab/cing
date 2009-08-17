@@ -595,7 +595,7 @@ class Ccpn:
 #                    NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
                 else:
                     # Happens for every terminal residue
-#                    NTdebug("Residue '%s' not identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
+                    NTdebug("Residue '%s' not identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
                     matchingConvention = INTERNAL
                     if NTdb.isValidResidueName(ccpnResName3Letter):
 #                        NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResName3Letter, matchingConvention))

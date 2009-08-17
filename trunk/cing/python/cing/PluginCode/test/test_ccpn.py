@@ -23,7 +23,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1brv".split()
+    entryList = "1b4y".split()
+#    entryList = "2jn8".split()
 #    entryList = "1brv_cs_peaks".split()
 #    entryList = "1ai0".split()
 #    entryList = "1a4d".split()
@@ -36,9 +37,9 @@ class AllChecks(TestCase):
         fastestTest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
-        doWhatif = False # disables whatif actual run
-        doProcheck = False
-        doWattos = False
+        doWhatif = True # disables whatif actual run
+        doProcheck = True
+        doWattos = True
         useNrgArchive = False
         modelCount=None
         if fastestTest:
@@ -65,6 +66,8 @@ class AllChecks(TestCase):
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
             if not os.path.exists(ccpnFile):
                 ccpnFile = os.path.join(inputArchiveDir, entryId + ".tar.gz")
+                if not os.path.exists(ccpnFile):
+                    self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
             self.assertTrue(project.save())
@@ -72,10 +75,10 @@ class AllChecks(TestCase):
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,
                                               doWattos=doWattos ))
-#            self.assertTrue(project.exportValidation2ccpn())
-#            self.assertFalse(project.removeCcpnReferences())
+            self.assertTrue(project.exportValidation2ccpn())
+            self.assertFalse(project.removeCcpnReferences())
 
-    def testCreateCcpn(self):
+    def tttestCreateCcpn(self):
         doRestraints = False
         pdbConvention = IUPAC
         restraintsConvention = CYANA

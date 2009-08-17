@@ -26,7 +26,27 @@ import sys
 
 CONSENSUS_STR = 'consensus'
 
-class NTlist(list):
+class Lister:
+    """Example from 'Learning Python from O'Reilly publisher'"""
+    def __repr__(self):
+        return ("<Instance of %s, address %s:\n%s>" %
+           (self.__class__.__name__, id(self), self.attrnames()))
+
+    def attrnames(self):
+        result=''
+        keys = self.__dict__.keys()
+        keys.sort()
+        for attr in keys:
+            if attr[:2] == "__":
+                result = result + "\tname %s=<built-in>\n" % attr
+            else:
+                result = result + "\tname %s=%s\n" % (attr, self.__dict__[attr])
+        return result
+    #end def
+#end class
+
+
+class NTlist(list, Lister):
     """
     NTlist: list which is callable:
       __call__(index=-1) index<0: returns last item added or None for empty list
@@ -977,7 +997,7 @@ NTdictDepth    = 0
 NTdictMaxDepth = 1
 NTdictCycles   = []
 
-class NTdict(dict):
+class NTdict(dict, Lister):
     """
         class NTdict: Base class for all mapping NT objects.
 
@@ -3851,8 +3871,13 @@ def addDeepByKeys(d, value, *keyList):
     return d.setDeepByKeys(v, *keyList)
 
 def getDeepByKeysOrDefault(c, default, *keyList):
+    """NEW: store default if returned; remember silence is key.
+    TODO: JFD to run tests on this change in api!
+    """
     result = getDeepByKeys(c, *keyList)
     if result == None:
+        setDeepByKeys(c, default, *keyList)
+#        NTdebug("Also set deep by keys the default that is returned now")
         return default
     return result
 
@@ -4176,25 +4201,6 @@ def bytesToFormattedString(size):
 #        if msg[0] != "'":
 #            msg = "'" + msg + "'"
 #    return msg
-
-class Lister:
-    """Example from 'Learning Python from O'Reilly publisher'"""
-    def __repr__(self):
-        return ("<Instance of %s, address %s:\n%s>" %
-           (self.__class__.__name__, id(self), self.attrnames()))
-
-    def attrnames(self):
-        result=''
-        keys = self.__dict__.keys()
-        keys.sort()
-        for attr in keys:
-            if attr[:2] == "__":
-                result = result + "\tname %s=<built-in>\n" % attr
-            else:
-                result = result + "\tname %s=%s\n" % (attr, self.__dict__[attr])
-        return result
-    #end def
-#end class
 
 """
 This function checks to see if the string is a reasonable candidate for a
