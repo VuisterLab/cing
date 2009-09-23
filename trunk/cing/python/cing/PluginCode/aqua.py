@@ -12,6 +12,8 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.core.constants import AQUA
 from cing.core.molecule import Atom
+from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import NTcodeerror
 import time
 #-----------------------------------------------------------------------------
 def exportAtom2aqua( atom ):
@@ -74,18 +76,31 @@ def export2aqua( project, tmp=None ):
         for drl in drLoL:
             for dr in drl:
                 if typeId == 0:
-#                   Distance
+#                   Distance conversions
                     upper = dr.upper
                     if not upper:
-                        lower = MAX_DISTANCE_ANY_ATOM_PAIR
+                        upper = MAX_DISTANCE_ANY_ATOM_PAIR
                     lower = dr.lower
                     if not lower:
                         lower = MIN_DISTANCE_ANY_ATOM_PAIR
-                    result = 'NOEUPLO %s %s  %8.3f  %8.3f' % (
+                    if not isinstance(lower, float):
+                        NTcodeerror("What is the lower class: %s" % lower.__class__) # JFD Failed to reproduce the cause of issue 185 so keeping this statement in.
+                        return True
+
+#                    NTdebug("lower: %s" % lower)
+                    fmt = '%8.3f'
+                    upperStr = val2Str(upper, fmt)
+                    if not upperStr:
+                        upperStr = val2Str(MAX_DISTANCE_ANY_ATOM_PAIR, fmt)
+                    lowerStr = val2Str(lower, fmt)
+                    if not lowerStr:
+                        lowerStr = val2Str(MIN_DISTANCE_ANY_ATOM_PAIR, fmt)
+
+                    result = 'NOEUPLO %s %s  %s  %s' % (
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
-                                 upper,
-                                 lower )
+                                 upperStr, lowerStr )
+                    NTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
                         if warningCount == warningCountMax+1:
@@ -112,7 +127,7 @@ def export2aqua( project, tmp=None ):
                             strResidue ="Unknown"
                             if hasattr(dr, 'residue'):
                                 strResidue = '%s' % dr.residue
-                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.", 
+                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.",
                                       dr.id, strResidue)
                         warningCountAngle += 1
                         #return None
