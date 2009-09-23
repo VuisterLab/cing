@@ -14,16 +14,17 @@ from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
 import cing
-import os 
+import os
 import unittest
 
 class AllChecks(TestCase):
-        
+
     def testProcheckNMR_Aqua(self):
         runAqua = True
-        showProcheckResults = False        
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry 
-        entryId = "1brv_1model" # Small much studied PDB NMR entry 
+        showProcheckResults = False
+        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+        entryId = "1dsv"
+#        entryId = "1brv_1model" # Small much studied PDB NMR entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         ranges = None
         pdbConvention = IUPAC
@@ -36,15 +37,15 @@ class AllChecks(TestCase):
             pdbConvention = PDB
         if entryId.startswith("1brv"):
             pdbConvention = IUPAC
-            
+
         if entryId == "2hgh":
             # Note that CING doesn't support chain ids in range selection for procheck. TODO
             # in the case of 2hgh this is not a problem because the residue numbering doesn't
             # overlap between the chain A protein and chain B RNA.
-            ranges = "2-11,13-33,35-54"  
+            ranges = "2-11,13-33,35-54"
                 # 1 and 55 are 5' and 3' terminii which are a little looser.
                 # 12, and 34 are bases that are not basepaired.
-            ranges += ",104-105,115-136,145-190"  
+            ranges += ",104-105,115-136,145-190"
                 # 106-114 is a loop
                 # 137-144 is a loop
                 # 191-193 are 3 Zn ions.
@@ -54,8 +55,8 @@ class AllChecks(TestCase):
     #        RESIDUES  35  B   54  B
     #        RESIDUES 104  A  105  A
     #        RESIDUES 115  A  136  A
-    #        RESIDUES 145  A  190  A        
-            
+    #        RESIDUES 145  A  190  A
+
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
         project = Project( entryId )
@@ -68,11 +69,11 @@ class AllChecks(TestCase):
 
         NTdebug("Reading files from directory: " + cyanaDirectory)
         kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]              
+                'acoFiles': [ entryId ]
                   }
         if entryId.startswith("1YWUcdGMP"):
             del(kwds['acoFiles'])
-            
+
         if os.path.exists( os.path.join( cyanaDirectory, entryId+".prot")):
             self.assertTrue( os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")),
                 "Converter for cyana also needs a seq file before a prot file can be imported" )
@@ -87,12 +88,12 @@ class AllChecks(TestCase):
 
         project.save()
         self.failIf(project.runProcheck(ranges = ranges, createPlots=True, runAqua=runAqua) is None)
-        
-        if showProcheckResults:                                    
+
+        if showProcheckResults:
             for res in project.molecule.allResidues():
                 NTdebug(`res` +" "+ `res.procheck.secStruct`)
-        
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()
-    
+

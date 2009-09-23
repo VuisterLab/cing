@@ -26,6 +26,8 @@ class AllChecks(TestCase):
 #    entryList = "1b4y".split()
 #    entryList = "2jn8".split()
     entryList = "1brv_cs_pk_2mdl".split()
+#    entryList = "1dsv".split()
+
 #    entryList = "1ai0".split()
 #    entryList = "1a4d".split()
 #    entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
@@ -46,7 +48,7 @@ class AllChecks(TestCase):
             modelCount=1
             htmlOnly = True
             doWhatif = False
-            doProcheck = False
+            doProcheck = True
             doWattos = False
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =

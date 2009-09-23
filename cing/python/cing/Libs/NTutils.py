@@ -3609,7 +3609,8 @@ def val2Str(value, fmt, count=None, useNanString=True):
 #        try to parse it as a float and see
         try:
             # reduce the next message to debug or lower when happy.
-#            NTdebug("In val2Str the input [%s] was not a None and also not of type float; trying to parse as float now" % value)
+            if not isinstance(value, int): # no debug warning for ints; easy to parse.
+                NTdebug("In val2Str the input [%s] was not a None and also not of type float; trying to parse as float now" % value)
             value = float(value)
         except:
             NTwarning("In val2Str the input was not a None and also not of type float; failed to parse as float as well.")
