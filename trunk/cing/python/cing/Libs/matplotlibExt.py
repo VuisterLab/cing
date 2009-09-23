@@ -1,6 +1,6 @@
 from matplotlib import colors
-from matplotlib._cm import LUTSIZE
-from matplotlib._cm import datad
+from matplotlib.cm import LUTSIZE
+from matplotlib.cm import datad
 
 # JFD no idea what the difference between the below columns are:
 #                           ->|  |<-
@@ -8,7 +8,7 @@ _gray_inv_data =  {
                'red':   ((0., 1, 1), (1., 0, 0)),
                'green': ((0., 1, 1), (1., 0, 0)),
                'blue':  ((0., 1, 1), (1., 0, 0))}
-               
+
 _red_inv_data =  {
                'red':   ((0., 1, 1), (1., 1, 1)),
                'green': ((0., 1, 1), (1., 0, 0)),
