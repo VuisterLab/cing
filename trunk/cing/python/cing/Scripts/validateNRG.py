@@ -1,4 +1,13 @@
 # python -u $CINGROOT/python/cing/Scripts/validateNRG.py
+# Check which ones are running by setting screen to a large width (300 chars) then do something like:
+# ps -le | head -1;ps -le | grep BY_ENTR | grep -v 'cd '
+# E.g.
+#   501 29210 29209    4000   0  18  0   386856 301464 -      R    187bfe90 ??        15:23.41
+#/opt/local/Library/Frameworks/Python.framework/Versions/2.5/Resources/Python.app/Contents/MacOS/Python -u
+#/Users/jd/workspace34/cingStable/python/cing/Scripts/validateEntry.py 1rf8
+#file://Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN
+# Tells you this entry has been running for 15 minutes 23 seconds.
+
 from cing import cingDirScripts
 from cing.Libs.NTutils import NTerror
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone

@@ -2165,11 +2165,13 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
                     return (0.0, - Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
 
             if lower == None:
-                msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed dev).")
+                if restraintTypeIdx != Ccpn.RESTRAINT_IDX_DIHEDRAL:
+                    msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
                 lower = constraint.targetValue - error
 
             if upper == None:
-                msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed dev).")
+                if restraintTypeIdx != Ccpn.RESTRAINT_IDX_DIHEDRAL:
+                    msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
                 upper = constraint.targetValue + error
 
 
@@ -2369,7 +2371,9 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
 
     # Set value of the score
     validObj.textValue = residue.rogScore.colorLabel or None
-    validObj.details = '\n'.join(residue.rogScore.colorCommentList) or None
+    # Failed for 2jn8 because one of the items itself was a tuple instead of string.
+#    validObj.details = '\n'.join(residue.rogScore.colorCommentList) or None
+    validObj.details = residue.rogScore.getColorCommentText() or None
 
     return validObj
 

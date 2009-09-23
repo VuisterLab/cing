@@ -23,8 +23,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1b4y".split()
-#    entryList = "2jn8".split()
+#    entryList = "1b4y".split()
+    entryList = "2jn8".split()
 #    entryList = "1brv_cs_peaks".split()
 #    entryList = "1ai0".split()
 #    entryList = "1a4d".split()

@@ -119,19 +119,21 @@ def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-    xplorDir = os.path.join(cingDirTestsData, "xplor")
+#    xplorDir = os.path.join(cingDirTestsData, "xplor")
+    xplorDir = os.path.join(cingDirTestsData, "eNMR")
 #    projectName = sys.argv[0]
 #    done: BASPLyon CuTTHAcisLyon
 #    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
 #    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
 #    projectList = """gb1""".split()
-    projectList = """1tgq""".split()
-#    projectList = [ "BASPLyon" ]
+#    projectList = """1tgq""".split()
+    projectList = [ "HR5537AUtrecht" ]
     # failed for
     # BASPLyon
 
     for projectName in projectList:
-        testDataEntry = os.path.join(xplorDir, projectName)
+#        testDataEntry = os.path.join(xplorDir, projectName)
+        testDataEntry = os.path.join(xplorDir, projectName, 'Authors')
         rootDir = os.path.join(cingDirTmp,projectName)
         inputDirRel="XPLOR"
         inputDir = os.path.join(rootDir, inputDirRel)

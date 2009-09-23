@@ -1,5 +1,7 @@
 # Script for testing of FileUpload at the CGI server and the other commands at the main iCing server.
-# Run: python -u $CINGROOT/python/cing/iCing/test/iCingRobot.py
+# Run: python -u $CINGROOT/python/cing/Scripts/iCingRobot.py
+# There is a unit test at: cing.Scripts.test.testiCingRobot
+
 from cing import cingDirTestsData
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTerror
@@ -28,7 +30,14 @@ RESPONSE_SUCCESS = 'Success'
 RESPONSE_RESULT = 'Result'
 RESPONSE_DONE = 'done'
 
-DEFAULT_URL = 'https://nmr.cmbi.ru.nl/'
+DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production with https security turned on
+#DEFAULT_URL = 'http://localhost' # local tomcat instance TODO: configure
+#DEFAULT_URL = 'http://localhost' # local gwt embedded tomcat instance
+DEFAULT_RPC_PORT = ''
+#DEFAULT_RPC_PORT = ':8888'
+
+DEFAULT_URL_PATH = 'icing' # ?? lower case?
+#DEFAULT_URL_PATH = 'cing.iCing' # use for gwt embedded tomcat
 
 def getRandomKey(size=6):
     """Get a random alphanumeric string of a given size"""
@@ -183,25 +192,25 @@ def iCingRobot():
     ## After the run is started the status will let you know if the run is finished
     ## The log will show what the server is doing at any one time.
     doSave  = 1 # Upload to iCing and show derived urls
-    doRun   = 1 # Start the run in Nijmegen
+    doRun   = 0 # Start the run in Nijmegen
     doStatus= 1 # Find out if the run finished
     doLog   = 1 # Get the next piece of log file (may be empty)
-    doPname = 0 # Get the project name back. This is the entryId below.
-    doPurge = 0 # Remove data from server again.
+    doPname = 1 # Get the project name back. This is the entryId below.
+    doPurge = 1 # Remove data from server again.
 
     # User id should be a short id (<without any special chars.)
 #    user_id = os.getenv("USER", "UnknownUser")
     user_id = "iCingRobot"
-    access_key = "123456"
-#    accessKey = getRandomKey() # Use a different one in a production setup.
+#    access_key = "123456"
+    access_key = getRandomKey() # Use a different one in a production setup.
 
-#    entryId = '1brv' # 68K, smallest for quick testing.
-    entryId = 'gb1' # only included in xplor variant as single model.
+    entryId = '1brv' # 68K, smallest for quick testing.
+#    entryId = 'gb1' # only included in xplor variant as single model.
 
     # Select one of the types by uncommenting it
-#    inputFileType = 'CCPN'
+    inputFileType = 'CCPN'
 #    inputFileType = 'PDB'
-    inputFileType = 'XPLOR'
+#    inputFileType = 'XPLOR'
 
     ccpnFile = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
     pdbFile = os.path.join(cingDirTestsData, "pdb", entryId, 'pdb' + entryId + ".ent")
@@ -214,8 +223,8 @@ def iCingRobot():
         inputFile = xplorFile
 
 
-    url = DEFAULT_URL
-    rpcUrl=url+"icing/serv/iCingServlet"
+#    rpcUrl=DEFAULT_URL+"icing/serv/iCingServlet"
+    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet"
 
     credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
 
@@ -231,7 +240,7 @@ def iCingRobot():
             NTerror("Failed to save file to server")
         else:
             print "result of save request: %s" % result
-            urls = getResultUrls(credentials, entryId, url)
+            urls = getResultUrls(credentials, entryId, DEFAULT_URL)
             print "Base URL", urls[0]
             print "Results URL:", urls[1]
             print "Log URL:", urls[2]

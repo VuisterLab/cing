@@ -157,6 +157,12 @@ class AllChecks(TestCase):
         self.assertEquals(val2Str(None, "%03d", useNanString=False), '')
 
 
+    def testNTlistDifference(self):
+        xL = NTlist( 'a', 'b' )
+        yL = NTlist( 'b', 'c' )
+        xLdiff = xL.difference(yL)
+        self.assertEquals(xLdiff, ['a'])
+
     def tttestSwitchOutput( self):
         """Note that this fails but used to work.
         Is this because it gets called upon importing the CCPN module already. Nop.?
