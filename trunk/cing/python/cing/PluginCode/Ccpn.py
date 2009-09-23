@@ -29,6 +29,7 @@ from cing.core.sml import NTlist
 from shutil import move
 from shutil import rmtree
 from cing.Libs.NTutils import NTmessageNoEOL
+import cing
 import shutil
 import os
 import re
@@ -2280,9 +2281,11 @@ def exportValidation2ccpn(project):
             pass
 #            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
     #end for
-#    switchOutput(False) # disable standard out.
+    if cing.verbosity < cing.verbosityDebug:
+        switchOutput(False) # disable standard out.
     project.ccpn.saveModified()
-#    switchOutput(True)
+    if cing.verbosity < cing.verbosityDebug:
+        switchOutput(True)
     return project
 #end def
 

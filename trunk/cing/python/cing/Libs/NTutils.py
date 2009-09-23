@@ -12,6 +12,8 @@ from fnmatch import fnmatch
 from gzip import GzipFile
 from string  import find
 from string import join
+from subprocess import PIPE
+from subprocess import Popen
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 import array
@@ -3390,7 +3392,10 @@ def formatList(theList, fmt = '%s\n'):
 ######################################################################################################
 def NTgetoutput(cmd):
     """Return output from command as (stdout,sterr) tuple"""
-    inp, out, err = os.popen3(cmd)
+#    inp, out, err = os.popen3(cmd)
+    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
+
     output = ''
     for line in out.readlines(): output += line
     errors = ''
@@ -3495,7 +3500,8 @@ def getOsResult( cmd ):
 #    NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
-    pipe = os.popen( cmd )
+#    pipe = os.popen( cmd )
+    pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
     output = pipe.read()
 
     ##  The program exit status is available by the following construct

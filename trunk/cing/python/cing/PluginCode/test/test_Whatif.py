@@ -25,7 +25,6 @@ import unittest
 class AllChecks(TestCase):
 
 #    def tttestHistogram(self):
-#        from matplotlib.numerix.mlab import amax
 #        resType = 'GLY'
 #        for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
 #            hist = histRamaBySsAndResType[ssType][resType]

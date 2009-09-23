@@ -1,3 +1,5 @@
+from subprocess import PIPE
+from subprocess import Popen
 import os
 
 """Very simple functions only here that can be instantiated without the general CING setup.
@@ -8,7 +10,10 @@ Called from cing's main __init__.py and setup.py.
 #===============================================================================
 def _NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
-    inp,out,err = os.popen3( cmd )
+#    inp,out,err = os.popen3( cmd ) # not forward compatible to python 2.6.
+    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
+
     output = ''
     for line in out.readlines():
         output += line

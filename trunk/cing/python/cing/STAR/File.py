@@ -18,6 +18,8 @@ from cing.STAR.Text import pattern_tag_name_nws
 from cing.STAR.Text import pattern_tagtable_loop
 from cing.STAR.Text import pattern_tagtable_loop_nws
 from cing.STAR.Text import semicolon_block_collapse
+from subprocess import Popen
+from subprocess import PIPE
 import os
 import re
 #import profile
@@ -364,7 +366,8 @@ class File (Lister):
         ##  Note that these commands are only valid on Unix
         ##  Standard error is thrown on the bit bucket.
         cmd = "%s < %s 2>/dev/null" % ('formatNMRSTAR', self.filename)
-        pipe = os.popen(cmd)
+#        pipe = os.popen(cmd)
+        pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
         output = pipe.read()
 
         ##  The program exit status is available by the following construct
