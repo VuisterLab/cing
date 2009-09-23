@@ -27,7 +27,6 @@ from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
 from matplotlib.lines import Line2D
 from matplotlib.mlab import frange
-from matplotlib.numerix.mlab import amax
 from matplotlib.patches import Ellipse
 from matplotlib.patches import Patch
 from matplotlib.patches import Polygon
@@ -60,6 +59,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
+from numpy.core.fromnumeric import amax
 from numpy.core.numeric import arange
 import math
 import numpy as np

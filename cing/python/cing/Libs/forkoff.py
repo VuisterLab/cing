@@ -10,6 +10,8 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from subprocess import Popen
+from subprocess import PIPE
 import os
 import signal
 import sys
@@ -28,7 +30,8 @@ def do_cmd( cmd ):
     NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
-    pipe = os.popen( cmd )
+#    pipe = os.popen( cmd )
+    pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
     output = pipe.read()
 
     ##  The program exit status is available by the following construct
@@ -54,7 +57,8 @@ def get_cmd_output( cmd ):
     NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
-    pipe = os.popen( cmd )
+#    pipe = os.popen( cmd )
+    pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
     output = pipe.read()
 
     ##  The program exit status is available by the following construct

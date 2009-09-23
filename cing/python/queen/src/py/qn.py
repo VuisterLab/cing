@@ -1,4 +1,7 @@
 #@PydevCodeAnalysisIgnore
+from queen.queen import nmvconf
+from subprocess import PIPE
+from subprocess import Popen
 import string,os,sys,math,socket,time,shutil,copy,types,random,glob,fnmatch,nmv,pdb_file
 
 #  ======================================================================
@@ -3311,7 +3314,9 @@ class graceplot:
     plotfile = "%s.%s"%(os.path.splitext(self.path)[0],format)
     # GENERATE THE PLOT
     if format=='ps':
-      os.popen("gracebat -printfile %s %s"%(plotfile,self.path))
+#      os.popen("gracebat -printfile %s %s"%(plotfile,self.path))
+      cmd = "gracebat -printfile %s %s" % (plotfile,self.path)
+      _pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
 
   # CLOSE
   # =====
@@ -3382,7 +3387,10 @@ class xplor_script:
       self.write("stop")
       self.script.close()
       # RUN XPLOR WITH THE SCRIPT
-      log = os.popen("%s < %s"%(self.xplor,self.scriptpath))
+#      log = os.popen("%s < %s"%(self.xplor,self.scriptpath))
+      cmd = "%s < %s"%(self.xplor,self.scriptpath)
+      log = Popen(cmd, shell=True, stdout=PIPE).stdout
+
       # CHECK FOR ERRORS
       xplorlog = log.read()
       skiperrors = string.count(xplorlog,"POWELL-ERR")

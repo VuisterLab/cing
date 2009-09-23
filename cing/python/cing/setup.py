@@ -2,6 +2,8 @@
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import atoi
 from string import strip
+from subprocess import PIPE
+from subprocess import Popen
 import os
 import sys
 import time
@@ -32,7 +34,10 @@ respective functionalities.
 #===============================================================================
 def _NTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
-    inp,out,err = os.popen3( cmd )
+#    inp,out,err = os.popen3( cmd )
+    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
+
     output = ''
     for line in out.readlines():
         output += line
