@@ -57,7 +57,7 @@ public class iCing implements EntryPoint, HistoryListener {
     public static final int WIDTH_MENU = 900;
     public static final String widthMenuStr = Integer.toString(WIDTH_MENU);
     /**
-     * How often does iCing check and update asynchronously; DEFAULT 4000 for production.
+     * How often does iCing check and update asynchronously; DEFAULT 4000 for production. Not in use for now.
      */
     public static final int REFRESH_INTERVAL = 2000;
     public static final int REFRESH_INTERVAL_LOG = 4000;

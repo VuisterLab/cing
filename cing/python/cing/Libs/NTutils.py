@@ -7,12 +7,13 @@ from cing import verbosityOutput
 from cing import verbosityWarning
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from copy import deepcopy
 from fnmatch import fnmatch
 from gzip import GzipFile
 from string  import find
+from string import join
 from xml.dom import minidom, Node
 from xml.sax import saxutils
-from string import join
 import array
 import cing
 import datetime
@@ -269,6 +270,25 @@ class NTlist(list, Lister):
                 i += 1
         #end while
     #end def
+    def difference(self, other):
+        """Returns a new set of self minus other
+        This is a common operation. Order in list will not be altered.
+        Capitalization will not be altered.
+        If duplicates are present in this/self list then they might not all be removed (multiset semantics).
+        """
+        result = deepcopy(self)
+        for element in other:
+            NTdebug("Trying element: %s" % element)
+            try:
+                idx = list.index(result, element)
+                NTdebug("idx: %s" % idx)
+                if idx >= 0:
+                    NTdebug("removed: %s" % element)
+                    del result[idx]
+            except ValueError:
+                pass
+        return result
+
 
     def reorder(self, indices):
         """Return a new NTlist, ordered according to indices or None on error

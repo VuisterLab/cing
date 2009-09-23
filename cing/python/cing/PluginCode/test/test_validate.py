@@ -36,7 +36,6 @@ class AllChecks(TestCase):
         restraintsConvention = CYANA
         doValidate = True
         writeXeasy = True
-#        entryId = "2jn8"
 #        entryId = "1ai0"
 #        entryId = "1brv"        # Small much studied PDB NMR entry
         entryId = "1brv_1model"        # Small much studied PDB NMR entry

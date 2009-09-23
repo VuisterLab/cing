@@ -637,7 +637,7 @@ if __name__ == '__main__':
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
-    writeWhyNot = True
+    writeWhyNot = False
     updateIndices = True
     isProduction = True
     new_hits_entry_list = [] # define empty for checking new ones.

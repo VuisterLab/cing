@@ -17,8 +17,8 @@ import unittest
 class AllChecks(TestCase):
 
     # can only be done with eNMRworkshop data so disabled for now.
-    def tttestEnmr(self):
-        entryList = "VpR247Seattle".split()
+    def testEnmr(self):
+        entryList = "ET109AredOrg".split()
 #        entryList = """
 #        apoTTHAtransOrg mia40Frankfurt mia40Lyon mia40Org
 #        mia40Piscataway taf3Lyon taf3Org taf3Piscataway wln34Frankfurt wln34Lyon wln34Org wln34Paris wln34Piscataway""".split()
@@ -44,7 +44,7 @@ class AllChecks(TestCase):
             htmlOnly = True
             doWhatif = False
             doProcheck = False
-            doWattos = True
+            doWattos = False
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)

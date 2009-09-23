@@ -1,3 +1,9 @@
+# TODO rename to Xplor-NIH
+# get target in DR.
+# Configure amount of data to keep. nothing, 1 mb, 10 mb, 100 mb.
+# nothing is just data in cing.
+# Charles mentioning that except nucleic acids the IUPAC conventions can be generated for CING.
+
 """
 Adds export2xplor methods to:
 DistanceRestraint , DistanceRestraintList, DihedralRestraint, DihedralRestraintList,
@@ -30,16 +36,19 @@ Atom, Molecule and Project classes.
 !!NEED to Check periodicity in dihedrals
 
 """
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
+from cing.core.classes import Project
+from cing.core.constants import IUPAC
 from cing.core.constants import XPLOR
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
@@ -267,6 +276,99 @@ def export2xplor( project, tmp=None ):
         path = project.path( project.directories.xplor, mol.name + '_%03d.pdb' )
         mol.export2xplor( path)
     #end for
+#end def
+
+def createProjectFromXplorMemory():
+    '''
+    Using Xplor-NIH API to generate a CING project from memory.
+    Returns the new project.
+    '''
+
+    # For now we just read an xplor generated PDB file
+    name = 'name in xplor'
+    pdbFile = 'pdbFile from xplor'
+    project = Project.open(name, status='new')
+    project.initPDB(pdbFile=pdbFile, convention=IUPAC)
+
+    # Fill in for example the DRs
+    getDistanceRestraintFromXplorMemory( project )
+    project.save()
+#    project.validate() # better called from a separate routine.
+
+def getDistanceRestraintFromXplorMemory( project, convention ):
+    """Convert DR from XPLOR in memory to CING in memory.
+       return a DistanceRestraintList or None on error
+       Probably we can take convention out from the parameters
+    """
+    maxErrorCount = 50
+    errorCount = 0
+
+    # check the molecule
+    if not project or not project.molecule:
+        NTdebug("getDistanceRestraintFromXplorMemory: initialize molecule first")
+        return None
+    #end if
+    molecule = project.molecule
+
+    name = 'DR name in xplor'
+    result        = project.distances.new( name=name, status='keep')
+    # Temporary dictionary for fast lookup of atom objects by tuple of (segi, resi, name)
+    atomDict      = molecule._getAtomDictWithChain(convention)
+
+    DRlistXPLOR = [] # TODO: fill in...
+    for _dr in DRlistXPLOR:
+        atmIdxList = [[1,3],[4,6]]
+        atmList = []
+        i=0
+        for atmIdx in atmIdxList:
+            NTdebug("Doing atmIdx: " + `atmIdx`)
+            t = ( 'A', 99, 'HA3' ) # TODO: from XPLOR
+            atm = None
+            if atomDict.has_key(t):
+                atm = atomDict[t]
+            if not atm:
+                if errorCount <= maxErrorCount:
+                    NTerror('Failed to decode for atom %s; line: %s', t)
+                if errorCount == maxErrorCount+1:
+                    NTerror("And so on")
+                errorCount += 1
+                i+=1
+                continue
+            atmList.append( atm )
+            i+=1
+        if len(atmList) != 2:
+            continue
+        # Unpack convenience variables.
+        atm1 = atmList[0]
+        atm2 = atmList[1]
+#        NTdebug("atom 1: " + `atm1`)
+#        NTdebug("atom 2: " + `atm2`)
+        upper = 5. # TODO: from XPLOR
+        if not upper:
+            NTerror("Skipping line without valid upper bound on line: [" + upper +']')
+            continue
+
+        # ambiguous restraint, should be append to last one
+        if upper == 0:
+            result().appendPair( (atm1,atm2) )
+            continue
+        lower = 'bogus'
+
+        r = DistanceRestraint( atomPairs= [(atm1,atm2)], lower=lower, upper=upper )
+        result.append( r )
+        # also store extra info if present
+        peak = 9.999
+        if peak:
+            r.peak = peak
+#        if line.NF >= 11:
+#            r.SUP = line.float( 11 )
+#        if line.NF >= 13:
+#            r.QF = line.float( 13 )
+    #end for
+    if errorCount:
+        NTerror("Found number of errors importing upl file: " + `errorCount`)
+    NTmessage('==> importUpl: new %s', result )
+    return result
 #end def
 
 #-----------------------------------------------------------------------------

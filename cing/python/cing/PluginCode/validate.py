@@ -410,9 +410,9 @@ def criticize(project, toFile=True):
 
             # Generate an xml summary file
             # When Whatif optional component isn't installed this fails. Disabled for now.
-#            path = project.moleculePath('analysis', 'cingSummaryDict.xml')
-#            s = project.getCingSummaryDict()
-#            s.save( path )
+            path = project.moleculePath('analysis', 'cingSummaryDict.xml')
+            s = project.getCingSummaryDict()
+            s.save( path )
         else:
             NTdetail('==> Criticizing project')
         #end if

@@ -2652,6 +2652,25 @@ class RDCRestraintList(NTlist):
         return msg
     #end def
 
+    def formatHtml(self, allowHtml = False):
+        header = self.name
+        if hasattr(self, 'rogScore'):
+            if self.rogScore.isCritiqued():
+                header = '<font color="%s">%s</font>' % (self.rogScore.colorLabel, header)
+        header = '<h3>RDCRestraintList %s</h3>' % header
+
+        msg = '''%s
+<BR>
+<table>
+<TR><TD>count               </TD><TD align="right">%4d</TD></TR>
+</table>
+''' % (
+    header,
+    len(self)
+  )
+        return msg
+    #end def
+
     def save(self, path = None):
         """
         Create a SML file

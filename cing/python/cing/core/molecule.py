@@ -518,6 +518,15 @@ class Molecule( NTtree ):
         return result
     #end def
 
+    def _getAtomDictWithchain(self, convention=INTERNAL):
+        """
+        Return a dict instance with (chainId, resNum, atomName), Atom mappings.
+        NB. atomName according to convention
+        For decoding usage with CYANA/XEASY, and SHIFTX routines
+        """
+        NTcodeerror("Need to code dict in _getAtomDictWithchain")
+        return None
+
     def _getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
@@ -4168,6 +4177,15 @@ def disulfideScore( cys1, cys2 ):
     if not mc: # see entry 1abt
         NTwarning("No coordinates for CA of residue: %s" % cys1)
         return None
+
+    # For C alpha only models
+    for cysResidue in [ cys1, cys2 ]:
+        for atomName in [ 'CA', 'CB', 'SG' ]:
+            atom = cysResidue[atomName]
+            if not len(atom.coordinates):
+                NTmessage("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
+                return None
+
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )

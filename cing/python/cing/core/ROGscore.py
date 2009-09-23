@@ -130,6 +130,14 @@ class ROGscore(NTdict):
         # Keep comments for red and orange together.
         NTsort( self.colorCommentList, 0, inplace=True)
     #end def
+
+    def getColorCommentText(self):
+        resultTxtList = []
+        for element in self.colorCommentList:
+            resultTxtList.append(`element`)
+        return '\n'.join(resultTxtList)
+
+    #end def
 #end class
 
 class XMLROGscoreHandler( XMLhandler ):
