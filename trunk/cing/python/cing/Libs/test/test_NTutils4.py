@@ -38,13 +38,13 @@ class AllChecks(TestCase):
 
     def testRmsNTlist(self):
         serie = NTlist()
-        serie.append( 0.0 )
+        serie.append(0.0)
         rms = serie.rms()
         self.assertEquals(rms, 0.0)
-        serie.append( 1.0 )
+        serie.append(1.0)
         rms = serie.rms()
         self.assertAlmostEquals(rms, 0.707, 3)
-        serie.append( 2.0 )
+        serie.append(2.0)
         rms = serie.rms()
         self.assertAlmostEquals(rms, 1.291, 3)
 
@@ -57,6 +57,29 @@ b
 # b
 # """
         self.assertEquals(expectedOutput, toPoundedComment(str))
+
+
+    def testNTlistRemoveDuplicates(self):
+        # Note the test for an empty line is included.
+        x = NTlist()
+#        x.removeDuplicates()
+#        self.assertFalse(x)
+        n = 5000
+        y = range(n)
+        x.addList(['a', 'b', 'b', 'c'])
+        x.addList(y)
+        # For n = 1000 this takes
+        # 0  0.9 seconds
+        # 1  0.8
+        # 2  0.007
+        # For n = 5000 this takes
+        # 0  21.0 seconds
+        # 1  ??
+        # 2  0.035 (linear)
+        x.removeDuplicates(useVersion = 2)
+        self.assertTrue(len(x) == n + 3)
+#        x.removeDuplicates()
+#        self.assertTrue( len(x) == 3)
 
 
 if __name__ == "__main__":

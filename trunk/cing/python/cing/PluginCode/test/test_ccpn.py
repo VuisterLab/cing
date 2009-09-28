@@ -6,8 +6,10 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityDetail
+from cing import verbosityNothing
 from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTmessage
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from cing.core.constants import CYANA
@@ -15,17 +17,17 @@ from cing.core.constants import IUPAC
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from unittest import TestCase
-from cing.Libs.NTutils import NTmessage
-from cing import verbosityNothing
 import cing
 import os
 import unittest
+
 
 class AllChecks(TestCase):
 
 #    entryList = "1b4y".split()
 #    entryList = "2jn8".split()
-    entryList = "1brv_cs_pk_2mdl".split()
+#    entryList = "Kalcya1model".split()
+    entryList = "1brv".split()
 #    entryList = "1dsv".split()
 
 #    entryList = "1ai0".split()
@@ -48,7 +50,7 @@ class AllChecks(TestCase):
             modelCount=1
             htmlOnly = True
             doWhatif = False
-            doProcheck = True
+            doProcheck = False
             doWattos = False
 #            useNrgArchive = False
         self.failIf(os.chdir(cingDirTmp), msg =
