@@ -100,7 +100,7 @@ def export2aqua( project, tmp=None ):
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
                                  upperStr, lowerStr )
-                    NTdebug("result: %s" % result)
+#                    NTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
                         if warningCount == warningCountMax+1:
