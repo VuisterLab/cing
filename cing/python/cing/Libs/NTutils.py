@@ -259,18 +259,57 @@ class NTlist(list, Lister):
         return NTzap(self, *byItems)
     #end def
 
-    def removeDuplicates(self):
-        """Can be optimized when needed by doing a sorted lookup table"""
+    def removeDuplicates(self, useVersion = 2):
+        """
+        Removes all duplicate
+        Can be optimized when needed by doing a sorted lookup table; It is extremely slow to take a slice every time."""
         if len(self) <= 1:
             return
-        i = 1
-        while i < len(self):
-#            print '>i=',i,  'list=',self[0:i],  'item=',self[i], 'len=',len(self)
-            if self[i] in self[0:i]:
-                self.pop(i)
-            else:
-                i += 1
-        #end while
+#        useVersion = 2
+        if useVersion == 0:
+            i = 1
+            while i < len(self):
+#                NTdebug( '>i=%s     len=%s     item=%s' % ( i, len(self), self[i]))
+                if self[i] in self[0:i]:
+#                    NTdebug ( '>popping %s' %  i )
+                    self.pop(i)
+                else:
+                    i += 1
+            #end while
+        elif useVersion == 1:
+            i = len(self) - 1
+            while i > 0:
+#                NTdebug( '>i=%s     len=%s     item=%s' % ( i, len(self), self[i]))
+                iObject = self[i] # for speed take a convenience variable.
+                objectIfound = False
+                for j in range(i):
+#                    NTdebug ( '>Checking for j = %s' %  j )
+                    if iObject == self[j]:
+#                        NTdebug ( 'objectIfound i = %s' %  i )
+                        objectIfound = True
+                        break # only breaks inner loop over j
+                    # end if
+                # end for
+                if objectIfound:
+#                    NTdebug ( '>popping i = %s' %  i )
+#                    del iObject # fails
+                    del self[i]
+                # end if
+                i -= 1
+            #end while
+        else:
+            # Only add new items to a temporary list
+            seenDictionary = {}
+            result = []
+            for i in range(len(self)):
+                if not seenDictionary.has_key(self[i]):
+                    seenDictionary[ self[i] ] = None
+                    result.append( self[i] )
+            #end for
+            del self[0:len(self)]
+            self.addList(result)
+#            self.
+        # end if
     #end def
     def difference(self, other):
         """Returns a new set of self minus other
