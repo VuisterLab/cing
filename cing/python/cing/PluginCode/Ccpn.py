@@ -388,7 +388,7 @@ class Ccpn:
             nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name='CING')
             if nmrCalcStore:
                 run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
-            
+                
             else:
                 run = None
             
@@ -397,6 +397,8 @@ class Ccpn:
             
         else:
             self.ccpnCingRun = ccpnCalc = None
+            
+        NTmessage('==> Using run specification "%s" from CCPN project', str(ccpnCalc))
 
         if not self._getCcpnMolSystemList():
             NTerror("Failed to _getCcpnMolSystemList")
