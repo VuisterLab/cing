@@ -398,7 +398,7 @@ class Ccpn:
         ccpnConstraintLists = []
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             ccpnConstraintLists = set() # Repeats technically possible
-            for constraintData in ccpnCalc.findFirstAllData(className = self.CCPN_RUN_CONSTRAINT, ioRole = 'input'):
+            for constraintData in ccpnCalc.findAllData(className = self.CCPN_RUN_CONSTRAINT, ioRole = 'input'):
               ccpnConstraintLists.update(constraintData.constraintLists)
             ccpnConstraintLists = list(ccpnConstraintLists)
 
