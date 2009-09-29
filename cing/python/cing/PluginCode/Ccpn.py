@@ -241,6 +241,9 @@ class Ccpn:
         self.ccpnProject.cing = self.project
             # end if
 
+        # Unless the below attr exists CING wont try to pick up CCPN NmrCalc settings
+        self.ccpnProject.cingRun = None
+
         return self.project
     # end def initCcpn
 
@@ -382,7 +385,16 @@ class Ccpn:
         '''
 
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
-            self.ccpnCingRun = ccpnCalc = self.ccpnProject.cingRun
+            nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name='CING')
+            if nmrCalcStore:
+                run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
+            
+            else:
+                run = None
+            
+            self.ccpnCingRun = ccpnCalc = run
+            self.ccpnProject.cingRun = run
+            
         else:
             self.ccpnCingRun = ccpnCalc = None
 
