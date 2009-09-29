@@ -270,7 +270,7 @@ class Ccpn:
             structureData = ccpnCalc.findFirstData(className = self.CCPN_RUN_STRUCTURE,
                                                    ioRole = 'input')
             if structureData:
-              ccpnMolSystem = structureData.molSystem
+              ccpnMolSystem = structureData.structureEnsemble.molSystem
             else:
               ccpnMolSystem = None
 
@@ -395,10 +395,12 @@ class Ccpn:
             self.ccpnCingRun = ccpnCalc = run
             self.ccpnProject.cingRun = run
             
+            if run:
+              runText = '%s:%s' % (nmrCalcStore.name, run.serial)
+              NTmessage('==> Using run specification "%s" from CCPN project', runText)
         else:
             self.ccpnCingRun = ccpnCalc = None
             
-        NTmessage('==> Using run specification "%s" from CCPN project', str(ccpnCalc))
 
         if not self._getCcpnMolSystemList():
             NTerror("Failed to _getCcpnMolSystemList")
