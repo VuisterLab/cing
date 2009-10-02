@@ -40,9 +40,10 @@
     <extend-property name="locale" values="es" />
     <extend-property name="locale" values="fr" />
     <extend-property name="locale" values="it" />
+    <extend-property name="locale" values="jp" />
     <extend-property name="locale" values="nl" />
     <extend-property name="locale" values="pt" />
-     
+
 
     <!-- Specify the servlet that handles file uploads.
     Note that apache/tomcat on production is setup to proxy:

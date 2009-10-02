@@ -165,23 +165,23 @@ public class iCing implements EntryPoint, HistoryListener {
         onHistoryChanged(initToken);
 
         String userAgent = UtilsJS.getUserAgent().toLowerCase();
-        /** Considering http://msdn.microsoft.com/en-us/library/ms537503.aspx
-         * E.g. Windows-RSS-Platform/1.0 (MSIE 7.0; Windows NT 5.1)
+        /**
+         * Considering http://msdn.microsoft.com/en-us/library/ms537503.aspx E.g. Windows-RSS-Platform/1.0 (MSIE 7.0;
+         * Windows NT 5.1)
          */
         String msg = "userAgent: [" + userAgent + "]";
         GenClient.showDebug(msg);
-        if (userAgent.contains("msie") ) {
+        if (userAgent.contains("msie")) {
             showBrowserWarning();
         }
 
     }
 
     private void showFooter() {
-//        String x = null;
+        // String x = null;
         String cingRevisionUrl = Settings.CING_REVISION_URL + Settings.REVISION;
-        String cingRevisionhtml = "iCing " +
-        "<a href=\""+cingRevisionUrl+"\">r"+Settings.REVISION+
-        "</a> by" + GenClient.eol;
+        String cingRevisionhtml = "iCing " + "<a href=\"" + cingRevisionUrl + "\">r" + Settings.REVISION + "</a> by"
+                + GenClient.eol;
 
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
                 + cingRevisionhtml + "\t" + GenClient.eol
@@ -294,7 +294,7 @@ public class iCing implements EntryPoint, HistoryListener {
         verticalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
         topPanel.setCellHorizontalAlignment(verticalPanel, HasHorizontalAlignment.ALIGN_LEFT);
 
-        final Label icingLabel = new Label(c.iCing() + " (BETA " + c.release() + ")");
+        final Label icingLabel = new Label(c.iCing());
         verticalPanel.add(icingLabel);
         icingLabel.setStylePrimaryName("h1");
 
@@ -333,6 +333,7 @@ public class iCing implements EntryPoint, HistoryListener {
         localeMap.put("fr", i++);
         localeMap.put("it", i++);
         localeMap.put("nl", i++);
+        localeMap.put("jp", i++);
         localeMap.put("pt", i++);
 
         listBoxLocale.addItem("中文", "cn");
@@ -341,6 +342,7 @@ public class iCing implements EntryPoint, HistoryListener {
         listBoxLocale.addItem("Español", "es");
         listBoxLocale.addItem("Français", "fr");
         listBoxLocale.addItem("Italiano", "it");
+        listBoxLocale.addItem("日本語", "jp");
         listBoxLocale.addItem("Nederlands", "nl");
         listBoxLocale.addItem("Português", "pt");
 

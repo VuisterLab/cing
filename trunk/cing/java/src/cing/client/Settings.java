@@ -10,7 +10,7 @@ public interface Settings {
     /** The next statement should updated manually now.*/
 //    public static final String VERSION = "0.88"; discontinued as it is different here from CING and might lead to confusion.
     /** The next statement should updated manually now. Can be automated by ant script querying svn info like for WATTOS project*/
-    public static final String REVISION = "630";
+    public static final String REVISION = "642";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
     /** Local install location of CING */
