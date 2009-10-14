@@ -791,17 +791,19 @@ class Ccpn:
                    that Cing molecules are already mapped to CCPN molSystems
            Inputs: CCPN MolSystem.MolSystem, CCPN Nmr.ShiftList
            Output: True or None for Error.
+
+           NB CING data model has no CS list entity but rather stores the info at the atom level.
         """
 
         NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
-        molecule = ccpnMolSystem.cing
-        molecule.newResonances()
+        self.molecule.newResonances()
 
         knownTroubleResidues = {} # To avoid repeating the same messages over
 
-        ccpnShifts = shiftMapping.keys()
-        for ccpnShift in ccpnShifts:
+        # Called KeyList because of name class with ccpnShiftList
+        ccpnShiftKeyList = shiftMapping.keys()
+        for ccpnShift in ccpnShiftKeyList:
             shiftValue = ccpnShift.value
             shiftError = ccpnShift.error
             ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
@@ -816,24 +818,32 @@ class Ccpn:
                 knownTroubleResidues[ccpnResidue] = True
                 continue
 
+            atomsTouched = {} # Use a hash to prevent double counting.
             for ccpnAtom in ccpnAtoms:
                 try:
                     atom = ccpnAtom.cing
-                    atom.resonances().value = shiftValue
-                    atom.resonances().error = shiftError
-                    index = len(atom.resonances) - 1
+                    a = atom
+                    # Since we don't show methyls in the assignment list any more; they appear lost; this fixes issue 192.
+                    if atom.isMethylProton() and atom.pseudoAtom():
+                        a = atom.pseudoAtom()
+
+                    index = len(a.resonances) - 1
+                    lastAtomResonance = a.resonances[index]
+                    lastAtomResonance.value = shiftValue
+                    lastAtomResonance.error = shiftError
                     # TODO: set setStereoAssigned
 
                     # Make mutual linkages between CCPN and Cing objects
-                    # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
-                    atom.resonances[index].ccpn = ccpnShift
-                    ccpnShift.cing = atom.resonances[index]
+                    lastAtomResonance.ccpn = ccpnShift
+                    ccpnShift.cing = lastAtomResonance
+                    atomsTouched[a] = None
                 except:
                     msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
                     NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
-
-        NTdetail("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
+            # end for.
+        NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
                          ccpnShiftList.name, ccpnShiftList.parent.name)
+        NTmessage("==> CING (pseudo-)atom with resonances updated %s" % atomsTouched.keys())
 
         return True
 
@@ -1074,8 +1084,11 @@ class Ccpn:
             atomList = []
             if not ccpnAtomSetList:
                 NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
+                continue
             for ccpnAtomSet in ccpnAtomSetList:
+#                NTdebug("Working on ccpnAtomSet: %r" % ccpnAtomSet)
                 for ccpnAtom in ccpnAtomSet.atoms:
+#                    NTdebug("Working on ccpnAtom: %r" % ccpnAtom)
                     atomList.append(ccpnAtom)
             ccpnShift = ccpnResonanceToShiftMap[ccpnResonance]
             ccpnShiftMappingResult[ccpnShift] = [ccpnResidue, tuple(atomList) ]
