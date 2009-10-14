@@ -388,19 +388,19 @@ class Ccpn:
             nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name='CING')
             if nmrCalcStore:
                 run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
-                
+
             else:
                 run = None
-            
+
             self.ccpnCingRun = ccpnCalc = run
             self.ccpnProject.cingRun = run
-            
+
             if run:
               runText = '%s:%s' % (nmrCalcStore.name, run.serial)
               NTmessage('==> Using run specification "%s" from CCPN project', runText)
         else:
             self.ccpnCingRun = ccpnCalc = None
-            
+
 
         if not self._getCcpnMolSystemList():
             NTerror("Failed to _getCcpnMolSystemList")
@@ -807,6 +807,7 @@ class Ccpn:
             ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
 
             if knownTroubleResidues.get(ccpnResidue):
+                NTdebug("Skipping known trouble residue: %s" % ccpnResidue )
                 continue
 
             if not hasattr(ccpnResidue, 'cing'):
@@ -1042,22 +1043,28 @@ class Ccpn:
         """Descrn: Internal function to create a dictionary that maps between CCPN Shift objects (which in turn link to CCPN
                    Resonances) and a list of the CCPN Residues and Atoms to which they may be assigned.
            Inputs: CCPN Nmr.ShiftList, CCPN MoleSystem.MolSystem
-           Output: Dict of CCPN Nmr.Shift:[CCPN MolSystem.Residue, Tuple of CCPN MolSystem.Atoms]
+           Output: Dict of CCPN Nmr.Shift:[CCPN MolSystem.Residue, Tuple of CCPN MolSystem.Atoms] which may be empty
+                   if the input is empty.
         """
 
         NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
+        ccpnShiftMappingResult = {}
+
+        if not len(ccpnShiftList.measurements):
+            NTwarning("Ccpn Shift List has no members; is empty")
+            return ccpnShiftMappingResult
 
         for ccpnShift in ccpnShiftList.measurements:
             ccpnResonance = ccpnShift.resonance
             ccpnResonanceList.append(ccpnResonance)
             ccpnResonanceToShiftMap[ccpnResonance] = ccpnShift
+#            NTdebug("Mapped CCPN resonance %s to CCPN shift %s" % (ccpnResonance, ccpnShift))
 
-        ccpnShiftMappingResult = {}
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
-#                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
                 continue
             ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
             ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
