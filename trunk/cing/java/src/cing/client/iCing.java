@@ -326,32 +326,36 @@ public class iCing implements EntryPoint, HistoryListener {
         // // Map to location in list.
         HashMap<String, Integer> localeMap = new HashMap<String, Integer>();
         int i = 0;
-        localeMap.put("cn", i++);
+        /**
+         * Two letter codes are taken by ISO 639-1 specs at:
+         * http://www.sil.org/iso639-3/codes.asp?order=639_1
+         */
         localeMap.put("de", i++);
         localeMap.put("en", i++);
         localeMap.put("es", i++);
         localeMap.put("fr", i++);
         localeMap.put("it", i++);
+        localeMap.put("ja", i++);
         localeMap.put("nl", i++);
-        localeMap.put("jp", i++);
         localeMap.put("pt", i++);
+        localeMap.put("ru", i++);
+        localeMap.put("zh", i++);
 
-        listBoxLocale.addItem("中文", "cn");
         listBoxLocale.addItem("Deutsch", "de");
         listBoxLocale.addItem("English", "en");
         listBoxLocale.addItem("Español", "es");
         listBoxLocale.addItem("Français", "fr");
         listBoxLocale.addItem("Italiano", "it");
-        listBoxLocale.addItem("日本語", "jp");
+        listBoxLocale.addItem("日本語", "ja");
         listBoxLocale.addItem("Nederlands", "nl");
         listBoxLocale.addItem("Português", "pt");
+        listBoxLocale.addItem("Русский", "ru");
+        listBoxLocale.addItem("中文", "zh");
 
         String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
-
-        int idx = 2;
-        idx = localeMap.get(currentLocale);
+        int idx = localeMap.get(currentLocale);
         if (idx < 0) {
-            idx = 2; // en is default
+            idx = 1; // en is default
         }
         listBoxLocale.setSelectedIndex(idx);
 

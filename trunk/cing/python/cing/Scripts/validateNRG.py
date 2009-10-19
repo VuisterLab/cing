@@ -1,4 +1,6 @@
 # python -u $CINGROOT/python/cing/Scripts/validateNRG.py
+# create dirs below by hand:
+# mkdir -p /Library/WebServer/Documents/NRG-CING/cmbi8/comments/
 # Check which ones are running by setting screen to a large width (300 chars) then do something like:
 # ps -le | head -1;ps -le | grep BY_ENTR | grep -v 'cd '
 # E.g.
