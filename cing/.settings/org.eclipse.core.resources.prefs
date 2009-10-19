@@ -1,21 +1,23 @@
-#Fri Oct 02 13:53:29 CEST 2009
+#Mon Oct 19 16:16:30 CEST 2009
 eclipse.preferences.version=1
 encoding//java/src/cing/client/iCing.java=UTF-8
-encoding//java/src/cing/client/iCingConstants-cn-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-de-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-es-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-fr-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-it-todo.properties=UTF-8
-encoding//java/src/cing/client/iCingConstants-jp-todo.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants-ja-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-nl-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants-pt-todo.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants-ru-todo.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants-zh-todo.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants.properties=UTF-8
-encoding//java/src/cing/client/iCingConstants_cn.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_de.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_es.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_fr.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_it.properties=UTF-8
-encoding//java/src/cing/client/iCingConstants_jp.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants_ja.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_nl.properties=UTF-8
 encoding//java/src/cing/client/iCingConstants_pt.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants_ru.properties=UTF-8
+encoding//java/src/cing/client/iCingConstants_zh.properties=UTF-8
 encoding//python/cing/Scripts/lostInTranslation.py=utf-8

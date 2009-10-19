@@ -713,7 +713,7 @@ class Ccpn:
                                     break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-                                    NTwarning("Skippng coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom))
+                                    NTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom))
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
                             # end for

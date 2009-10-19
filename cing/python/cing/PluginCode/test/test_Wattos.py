@@ -17,7 +17,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testWattos(self):
+    "Enable again when issue 193 with NMR-STAR format has been alleviated; "
+    def tttestWattos(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
         entryList = "1brv".split()
