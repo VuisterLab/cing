@@ -28,7 +28,8 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
-entryListFileName = os.path.join(startDir, 'list', 'entry_list_nrg_docr.csv')
+#entryListFileName = os.path.join(startDir, 'list', 'entry_list_nrg_docr.csv')
+entryListFileName = os.path.join(startDir, 'list', 'entry_list_failed.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
