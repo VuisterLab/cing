@@ -11,11 +11,12 @@ import sys
 
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 
-def convert(projectName, inputDir, outputFile):
+def convert(projectName, inputDir, outputFile, excludeSaveFrames = ('general_distance_constraints',) ):
 
     print "projectName: %s" % projectName
     print "inputDir: %s" % inputDir
     print "outputFile: %s" % outputFile
+    print "excludeSaveFrames: %s" % excludeSaveFrames
     ccpnPath = os.path.join(inputDir, projectName)
     ccpnProject = loadProject(ccpnPath)
 
@@ -80,7 +81,7 @@ def convert(projectName, inputDir, outputFile):
                 nmrEntry.addPeakList(pl)
 
     nmrStarExport = NmrStarExport(nmrEntry, nmrStarVersion = '3.1', forceEntryId = '1')
-    nmrStarExport.createFile(outputFile, verbose = True)
+    nmrStarExport.createFile(outputFile, excludeSaveFrames= excludeSaveFrames, verbose = True)
 
     # Set the header comment - only set this if you need a standard header!
     topComment = "# File written for CING by NmrStarExport.py code"
