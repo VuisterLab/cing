@@ -796,6 +796,9 @@ def validateSaltbridge( residue1, residue2 ):
 #    NTdebug('validateSaltBridge: %s %s', residue1, residue2)
 
     # Definitions of the centroids according to the paper
+    # TODO: fix problem as in 1bzb most likely due to uncommon residues within getting recognized as regular ones.
+    # Recode to use fullnames including variants.
+
     centroids = NTdict(
         E = ['OE1','OE2'],
         D = ['OD1','OD2'],
@@ -839,7 +842,12 @@ def validateSaltbridge( residue1, residue2 ):
 
     for residue in [residue1, residue2]:
         for atmName in centroids[residue.db.shortName]:
-            atm = residue[atmName]
+            atm = None
+            try: # Fails for entry 1bzb which has a NH2 residue capping the C-terminus.
+                atm = residue[atmName]
+            except:
+                NTerror("Failed to get atom for atom name [%s] in residue [%s]" % (atmName, residue))
+                return None
             if len(atm.coordinates) == 0:
                 # Happens for all residues without coordinates. E.g. 1brv 159-170
 #                NTerror('validateSaltbridge: no coordinates for atom %s', atm)
