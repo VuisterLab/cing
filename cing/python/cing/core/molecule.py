@@ -50,6 +50,7 @@ from database import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 import math
 import os
 import sys
@@ -1165,8 +1166,8 @@ class Molecule( NTtree ):
 
 #        NTdebug('Identify the disulfide bonds.')
         cys=self.residuesWithProperties('CYS')
-        cyss=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
-        for c in cyss:
+        cyssTmp=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
+        for c in cyssTmp:
             if c not in cys:
                 cys.append(c)
 
@@ -1175,7 +1176,11 @@ class Molecule( NTtree ):
         # delete from the end as not to mess up the in operator below.
         for i in iList:
             c = cys[i]
-            if not len(c.CA.coordinates): # model count see entry 1abt and issue 137
+            coordinatesRetrieved = getDeepByKeysOrAttributes(c, 'CA', 'coordinates')
+            if not coordinatesRetrieved:
+                NTdebug("No coordinates for CA even set, skipping residue: %s" % c)
+                del( cys[i] )
+            elif not len(coordinatesRetrieved): # model count see entry 1abt and issue 137
                 NTdebug("No coordinates for CA, skipping residue: %s" % c)
                 del( cys[i] )
 #                needs testing.
@@ -3258,6 +3263,9 @@ Atom class: Defines object for storing atom properties
         if len(realAtomList) > 2:
             NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
             return None
+        if len(realAtomList) < 2:
+            NTwarning("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
+            return None
 
         if self == realAtomList[0]:
             return  realAtomList[1]
@@ -3512,7 +3520,7 @@ Atom class: Defines object for storing atom properties
 
         # efficiency in my mind
         if inputLength != realAtomListLength:
-            NTdebug("Found unrepresentative pseudo [%s] for atomList: %s" % (pseudoAtom, atomList ))
+            NTdebug("Found unrepresentative pseudo [%s] for atomList: [%s] and realAtomListLength: [%s]" % (pseudoAtom, atomList, realAtomListLength ))
             return None
 
         for atom in atomList:
