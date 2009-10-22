@@ -30,8 +30,9 @@ RESPONSE_SUCCESS = 'Success'
 RESPONSE_RESULT = 'Result'
 RESPONSE_DONE = 'done'
 
-DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production with https security turned on
-#DEFAULT_URL = 'http://localhost' # local tomcat instance TODO: configure
+#DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production without https security turned on
+DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
+#DEFAULT_URL = 'http://localhost' # local tomcat instance
 #DEFAULT_URL = 'http://localhost' # local gwt embedded tomcat instance
 DEFAULT_RPC_PORT = ''
 #DEFAULT_RPC_PORT = ':8888'
