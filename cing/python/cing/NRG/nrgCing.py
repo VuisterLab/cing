@@ -272,29 +272,29 @@ class nrgCing(Lister):
                 NTerror("No NMR entries found")
                 return 0
             NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
+        # end if writeWhyNot
 
+        self.entry_list_nrg = getBmrbNmrGridEntries()
+        if not self.entry_list_nrg:
+            NTerror("No NRG entries found")
+            return 0
+        NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
 
-            self.entry_list_nrg = getBmrbNmrGridEntries()
-            if not self.entry_list_nrg:
-                NTerror("No NRG entries found")
-                return 0
-            NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
+        ## The list of all entry_codes for which tgz files have been found
+        self.entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+        if not self.entry_list_nrg_docr:
+            NTerror("No NRG DOCR entries found")
+            return 0
+        NTmessage("Found %s NRG DOCR entries." % len(self.entry_list_nrg_docr))
+        if len(self.entry_list_nrg_docr) < 3000:
+            NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
+            return 0
 
-            ## The list of all entry_codes for which tgz files have been found
-            self.entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
-            if not self.entry_list_nrg_docr:
-                NTerror("No NRG DOCR entries found")
-                return 0
-            NTmessage("Found %s NRG DOCR entries." % len(self.entry_list_nrg_docr))
-            if len(self.entry_list_nrg_docr) < 3000:
-                NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
-                return 0
-
-            (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
-            if not self.entry_list_tried:
-                NTerror("Failed to find entries that CING tried.")
-                return 0
-            NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
+        (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
+        if not self.entry_list_tried:
+            NTerror("Failed to find entries that CING tried.")
+            return 0
+        NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
         if not self.entry_list_done:
             NTerror("Failed to find entries that CING did.")
@@ -312,7 +312,7 @@ class nrgCing(Lister):
 
 
     def doWriteWhyNot(self):
-        "Create WHY_NOT list"
+        NTdebug("Create WHY_NOT list")
         whyNot = WhyNot()
         # Loop for speeding up the checks. Most are not nmr.
         for entryId in self.entry_list_pdb:
@@ -637,7 +637,7 @@ if __name__ == '__main__':
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
-    writeWhyNot = False
+    writeWhyNot = True
     updateIndices = True
     isProduction = True
     new_hits_entry_list = [] # define empty for checking new ones.
