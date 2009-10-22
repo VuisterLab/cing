@@ -112,12 +112,14 @@ def export2aqua( project, tmp=None ):
                         result += ( '\n#       %s %s AMBI not read by Aqua' % (
                                  atomPair[0].export2aqua(),
                                  atomPair[1].export2aqua()))
+                    # end for
                 else:
                     # Dihderal
                     """Return string with restraint in Aqua format
                         ANGLE  [CHAIN id]  residue_name  residue_number  [INSERT code]
                         ...angle_name  bound_high  bound_low
                     """
+                    result = None
                     # (<Residue>, angleName, <AngleDef>) tuple
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()
                     if not angleName:
@@ -130,20 +132,34 @@ def export2aqua( project, tmp=None ):
                             NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.",
                                       dr.id, strResidue)
                         warningCountAngle += 1
-                        #return None
+                    else:
+                        atom = dr.atoms[1] # this is true except for Omega? TODO correct!
+                        if angleName == "OMEGA":
+                            atom = dr.atoms[2]
+                        residue = atom.residue
+                        chain = residue.chain
+                        try:
+                            result = 'ANGLE CHAIN %-3s %-4s %4d %-10s %8.2f %8.2f' % (
+                                              chain.name,
+                                              residue.resName,
+                                              residue.resNum,
+                                              angleName,
+                                              dr.lower,
+                                              dr.upper)
+                        except:
+                            result = None
+                            if warningCountAngle == warningCountMax+1:
+                                NTwarning("And so on")
+                            elif warningCountAngle <= warningCountMax:
+                                strResidue ="Unknown"
+                                if hasattr(dr, 'residue'):
+                                    strResidue = '%s' % dr.residue
+                                NTwarning("Skipping dihedral angle restraint '%s' (%s) because conversion of data to string failed.",
+                                          dr.id, strResidue)
+                            warningCountAngle += 1
 
-                    atom = dr.atoms[1] # this is true except for Omega? TODO correct!
-                    if angleName == "OMEGA":
-                        atom = dr.atoms[2]
-                    residue = atom.residue
-                    chain = residue.chain
-                    result = 'ANGLE CHAIN %-3s %-4s %4d %-10s %8.2f %8.2f' % (
-                                      chain.name,
-                                      residue.resName,
-                                      residue.resNum,
-                                      angleName,
-                                      dr.lower,
-                                      dr.upper)
+                    # end else
+                # end else
                 if result:
                     countActual += 1
                     restraintListText.append(result)

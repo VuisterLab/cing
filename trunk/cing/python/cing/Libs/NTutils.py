@@ -4385,7 +4385,7 @@ class MsgHoL(NTdict):
     def appendDebug(self, msg):
         self[ DEBUG_ID ].append(msg)
 
-    def showMessage( self, MAX_ERRORS = 5, MAX_WARNINGS = 5, MAX_MESSAGES = 5, MAX_DEBUGS = 100 ):
+    def showMessage( self, MAX_ERRORS = 5, MAX_WARNINGS = 5, MAX_MESSAGES = 5, MAX_DEBUGS = 20 ):
         "Limited printing of errors and the like; might have moved the arguments to the init but let's not waste time."
 
         typeCountList = { ERROR_ID: MAX_ERRORS, WARNING_ID: MAX_WARNINGS, MESSAGE_ID: MAX_MESSAGES, DEBUG_ID: MAX_DEBUGS }

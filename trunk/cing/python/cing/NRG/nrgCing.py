@@ -29,6 +29,7 @@ from cing.Libs import forkoff
 from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import is_pdb_code
@@ -144,7 +145,7 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/CING_%s/HTML/index.html'
+        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
 #        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html' NEW
         self.pdb_entries_White = {}
         self.processes_todo = None
@@ -347,6 +348,11 @@ class nrgCing(Lister):
         # end loop over entries
         whyNotStr = '%s' % whyNot
 #        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
+
+        self.entry_list_failed = NTlist()
+        self.entry_list_failed.addList( self.entry_list_tried )
+        self.entry_list_failed = self.entry_list_failed.difference(self.entry_list_done)
+
         writeTextToFile("NRG-CING.txt", whyNotStr)
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
@@ -354,6 +360,7 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
+        writeTextToFile("entry_list_failed.csv", toCsv(self.entry_list_failed))
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
         NTdebug("Copying to: " + why_not_db_comments_file)
@@ -430,8 +437,8 @@ class nrgCing(Lister):
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
-        cingImage = '../data/%t/%s/%s.cing/CING_%s/HTML/mol.gif' # old
-#        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif' # NEW
+#        cingImage = '../data/%t/%s/%s.cing/CING_%s/HTML/mol.gif' # old
+        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif' # NEW
         example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
         file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()
