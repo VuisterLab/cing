@@ -242,6 +242,7 @@ def _averageMethylAndMethylene( project, models ):
     """
     Routine to average the methyl proton shifts and b-methylene, before calculating average per atom
     """
+    nmodels = len(models)
 #    NTdebug('shiftx: doing _averageMethylAndMethylene')
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():
@@ -259,14 +260,25 @@ def _averageMethylAndMethylene( project, models ):
                 #end for
 
                 if not skip:
-                    shifts  = NTfill(0.0,len(models))
-                    for i in range(len(models)):
+                    shiftsComplete = True # fails for issue 201 with entry 2e5r For atom [<Atom MET57.CE>] proton [<Atom MET57.HE2>]
+                    shifts  = NTfill(0.0,nmodels)
+                    for i in range(nmodels):
                         for p in protons:
-                            shifts[i] += p.shiftx[i]
+                            if len(p.shiftx) > i:
+                                shifts[i] += p.shiftx[i]
+                            else:
+                                NTerror("For atom [%s] proton [%s] no shiftx found; skipping _averageMethylAndMethylene" % (atm, p) )
+                                shiftsComplete = False
+                            # end if
                         #end for
                         shifts[i] /= len(protons)
                     #end for
-                    protons[0].pseudoAtom().shiftx = shifts
+                    ps = protons[0].pseudoAtom()
+                    if shiftsComplete:
+                        ps.shiftx = shifts
+                    else:
+                        ps.shiftx = NTlist() # just an empty list.
+                    #end if
                 #end if
             #end if
         #end if

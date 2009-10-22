@@ -30,6 +30,7 @@ class AllChecks(TestCase):
     entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "1d2l".split() # not svn committed
 #    entryList = "1bzb".split()
+#    entryList = "2e5r".split()
 
 #    entryList = "1ai0".split()
 #    entryList = "1a4d".split()
