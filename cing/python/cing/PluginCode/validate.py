@@ -49,15 +49,15 @@ from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.peirceTest import peirceTest
+from cing.PluginCode.html import addPreTagLines
 from cing.PluginCode.html import removePreTagLines
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-#from cing.PluginCode.required.reqWhatif import WI_SUMMARY_STR
 from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
@@ -67,7 +67,6 @@ from cing.core.molecule import Chain
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
-from cing.PluginCode.html import addPreTagLines
 import math
 import os
 import shelve
@@ -750,7 +749,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         for res2 in residues2:
             #print '>>', res1, res2
             s = validateSaltbridge(res1,res2)
-            if s:
+            if s and s.result: # no s.result for entry 1f96 issue 197
                 if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
                     pass
                 else:
@@ -958,9 +957,15 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     #end for
 
     summary.result = result
-    summary.rAv, summary.rSd, summary.modelCount = result.zap('r').average()
-    summary.min   = min( result.zap('r') )
-    summary.max   = max( result.zap('r') )
+    r_resultNTList = result.zap('r') # cache for speed
+    summary.rAv, summary.rSd, summary.modelCount = r_resultNTList.average()
+    if r_resultNTList:
+        summary.min   = min( r_resultNTList )
+        summary.max   = max( r_resultNTList )
+    else:
+        summary.min   = NaN
+        summary.max   = NaN
+
     summary.thetaAv, summary.thetaSd, _n = result.zap('theta').average()
     summary.types = zip( types,counts)
     if not summary.rSd:

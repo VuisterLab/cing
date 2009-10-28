@@ -268,7 +268,7 @@ Quit
             wattosTuple = (entityAssemblyId, compIndexId, compId)
             residue = self.locateWattosResidue(*wattosTuple)
             if not residue:
-                NTerror("Failed to find Wattos residue in CING: %s" % (wattosTuple))
+                NTerror("Failed to find Wattos residue in CING: %s %s %s" % (wattosTuple))
                 return True
 
             residueWattosDic = residue.setdefault(WATTOS_STR, NTdict())

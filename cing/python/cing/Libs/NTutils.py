@@ -319,12 +319,12 @@ class NTlist(list, Lister):
         """
         result = deepcopy(self)
         for element in other:
-            NTdebug("Trying element: %s" % element)
+#            NTdebug("Trying element: %s" % element)
             try:
                 idx = list.index(result, element)
-                NTdebug("idx: %s" % idx)
+#                NTdebug("idx: %s" % idx)
                 if idx >= 0:
-                    NTdebug("removed: %s" % element)
+#                    NTdebug("removed: %s" % element)
                     del result[idx]
             except ValueError:
                 pass
