@@ -515,10 +515,10 @@ class Ccpn:
         # Set all the chains for this ccpnMolSystem
         for ccpnChain in ccpnMolSys.sortedChains():
 
-            ccpnChainLetter = ensureValidChainId(ccpnChain.pdbOneLetterCode)
-    #        NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChainLetter, ccpnChain.pdbOneLetterCode))
-            if ccpnChainLetter != ccpnChain.pdbOneLetterCode:
-                NTdebug("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, ccpnChainLetter))
+            pdbOneLetterCode = ensureValidChainId(ccpnChain.pdbOneLetterCode)
+#            NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
+            if pdbOneLetterCode != ccpnChain.pdbOneLetterCode:
+                NTmessage("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
 #                NTdebug("Find out if this leads to inconsistencies in CING")
                 # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
@@ -565,7 +565,7 @@ class Ccpn:
     #       21 water                5 $water                U . . yes yes . . . 1 1
     #    stop_
 
-            chain = self.molecule.addChain(ccpnChainLetter)
+            chain = self.molecule.addChain(pdbOneLetterCode)
 
             # Make mutual linkages between Ccpn and Cing instances
             chain.ccpn = ccpnChain

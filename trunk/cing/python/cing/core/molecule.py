@@ -311,8 +311,15 @@ class Molecule( NTtree ):
         if name==None:
             name = self.getChainIdForChainCount()
         if name in self:
-            NTerror( 'Molecule.addChain: chain "%s" already present', name )
-            return None
+            NTwarning( 'Molecule.addChain: chain "%s" already present' % name )
+            newName = self.getNextAvailableChainId()
+            if not newName:
+                NTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
+                return None
+            NTwarning( 'Molecule.addChain: got next available one: %s' % newName)
+            name = newName
+
+#            return None
         #end if
         chain = Chain( name=name, **kwds )
         self._addChild( chain )
@@ -2127,7 +2134,7 @@ Chain class: defines chain properties and methods
     defaultChainId = _DEFAULT_CHAIN_ID
     'See documentation: molecule#ensureValidChainId'
 
-    NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valied chain code but needs to be able to be passed on commandline
+    NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valid chain code but needs to be able to be passed on commandline
     # like in: Scripts/getPhiPsiWrapper.py
 
     def __init__( self, name, **kwds ):
@@ -4232,7 +4239,7 @@ def isValidChainId( chainId ):
 #        return False
 #    return True
 
-def ensureValidChainId(chainId ):
+def ensureValidChainId( chainId ):
     """See doc Molecule#ensureValidChainIdForThisMolecule
     In absence of an existing molecule this routine can only return the default chain id
     if the presented id is not valid.
@@ -4241,6 +4248,7 @@ def ensureValidChainId(chainId ):
     if isValidChainId( chainId ):
         return chainId
     if chainId and len(chainId) > 1:
+        NTerror("Truncating chainId [%s] to first char only" % chainId)
         chainId = chainId[0]
     if isValidChainId( chainId ):
         return chainId
