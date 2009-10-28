@@ -990,10 +990,14 @@ class HTMLfile:
         else:
             openTag = openTag +  '>'
         #end if
+
         # JFD found bug with using "from cgi import escape"; didn't work for me. Changed to below is also good
         # idea because of security according to first comment at: http://code.activestate.com/recipes/52220/
         # Can't seem to get this fixed so jus inlining the method.
-        content = self.escape(''.join(args))
+        content = ''
+        if args:
+            content = self.escape(''.join(args))
+
         if (tag in self.noContent):
             closeTag = ''
         else:
@@ -2026,16 +2030,18 @@ class ResidueHTMLfile( HTMLfile ):
         for dr in t.rows(drl):
             t.nextColumn()
             self.insertHtmlLink(self.right, self.residue, dr, text=val2Str(dr.id,'%d'), title=sprintf('goto dihedral restraint %d', dr.id))
-
-            t.nextColumn(dr.getDihedralName())
+            dihedralName = dr.getDihedralName()
+            if not dihedralName: # For entry 1kos, issue 198
+                dihedralName = "Unknown dihedral name"
+            t.nextColumn(dihedralName)
 
             t.nextColumn(val2Str(dr.lower,'%.1f'))
             t.nextColumn(val2Str(dr.upper,'%.1f'))
             t.nextColumn(val2Str(dr.cav,'%.1f'))
             t.nextColumn(val2Str(dr.cv,'%.4f'))
 
-            t.nextColumn(sprintf(val2Str(dr.violAv,'%.1f')))
-            t.nextColumn(sprintf(val2Str(dr.violSd,'%.1f')))
+            t.nextColumn(val2Str(dr.violAv,'%.1f'))
+            t.nextColumn(val2Str(dr.violSd,'%.1f'))
             t.nextColumn(val2Str(dr.violMax,'%.1f'))
             t.nextColumn(val2Str(dr.violCount3,'%d'))
 

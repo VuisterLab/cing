@@ -587,12 +587,16 @@ class Ccpn:
                 chemCompVar = ccpnResidue.chemCompVar
                 chemComp = chemCompVar.chemComp
                 ccpnLinking = ccpnResidue.linking # start, middle, or end.
-                ccpnResName3Letter = chemComp.code3Letter   # e.g. HIS
+                ccpnResName3Letter = chemComp.code3Letter   # e.g. HIS absent in the case of entry 1kos, issue 198, for nucleic acid "5mu"
                 ccpnResCode = ccpnResidue.ccpCode           # e.g. HIS
                 ccpnResDescriptor = chemCompVar.descriptor  # e.g. protein His prot:HE2;deprot:HD1
 
                 ccpnResDescriptorPatched = patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking)
-
+                if not ccpnResName3Letter:
+                    if not ccpnResCode:
+                        NTcodeerror("found a ccpn residue without a ccpnResCode for residue: %s; skipping" % ccpnResidue)
+                        continue
+                    ccpnResName3Letter = ccpnResCode
 #    nameDict = {'CCPN': 'DNA A deprot:H1'..
                 ccpnResNameInCingDb = "%s %s %s" % (ccpnResidue.molType, ccpnResCode, ccpnResDescriptorPatched)
 #                NTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
@@ -642,6 +646,10 @@ class Ccpn:
                 resNameCing = ccpnResNameInCingDb
                 if matchingConvention == INTERNAL:
                     resNameCing = ccpnResName3Letter
+
+                if not resNameCing:
+                    NTcodeerror("Failed to get a resNameCing for ccpnResidue: [" + ccpnResidue + ']')
+                    continue
                 residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = Cterminal)
                 if not residue:
                     NTcodeerror("Failed to add residue: [" + resNameCing + ']')
