@@ -117,7 +117,7 @@ if cingPaths.classpath:
 
 cingPaths.keysformat() #define a format string for 'pretty' output
 
-outlierColor = 'red'
+outlierColor = 'black'
 plotParameters = NTdict(
     #default
     dihedralDefault = NTdict(
@@ -125,7 +125,7 @@ plotParameters = NTdict(
         max      =  360.0,
         mticksize=   10,
         ticksize =   60,
-        color    = 'green', # use names that are html legal here so matplot knows them.
+        color    = 'blue', # use names that are html legal here so matplot knows them.
         outlier  = outlierColor,
         average  = 'blue',
         lower    = 'orange',

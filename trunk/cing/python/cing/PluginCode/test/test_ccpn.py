@@ -30,7 +30,7 @@ class AllChecks(TestCase):
     entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "1d2l".split() # not svn committed
 #    entryList = "1bzb".split()
-#    entryList = "1ma2".split()
+#    entryList = "1f96".split()
 
 #    entryList = "1ai0".split()
 #    entryList = "1a4d".split()
@@ -49,7 +49,7 @@ class AllChecks(TestCase):
         useNrgArchive = False
         modelCount=None
         if fastestTest:
-            modelCount=20
+            modelCount=2
             htmlOnly = True
             doWhatif = False
             doProcheck = False
@@ -82,7 +82,7 @@ class AllChecks(TestCase):
                                               doWhatif = doWhatif,
                                               doWattos=doWattos ))
             self.assertTrue(project.exportValidation2ccpn())
-            self.assertFalse(project.removeCcpnReferences())
+#            self.assertFalse(project.removeCcpnReferences())
 
     def tttestCreateCcpn(self):
         doRestraints = False

@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# Author: Jurgen F. Doreleijers 
+# Author: Jurgen F. Doreleijers
 # Put in cron like:
 # /Users/jd/workspace34/cing/scripts/cing/getNRG_ccpn.csh
 
@@ -7,6 +7,8 @@
 set MIRRORDIR=/Library/WebServer/Documents/NRG-CING/recoordSync        # your top level rsync directory needs to exist
 #set USER_ID = jurgen
 
+# For local copy use e.g.:
+# \cp -f $ccpn_tmp_dir/data/recoord/$x/$x.tgz $MIRRORDIR/$x/$x.tgz
 ###################################################################
 ## No changes below except user id and specific word such as azvv.
 set SERVER=tang.bmrb.wisc.edu:/big/docr/ccpn_tmp/data/recoord/         # remote server name; trailing slash is important
@@ -15,8 +17,8 @@ set SERVER=tang.bmrb.wisc.edu:/big/docr/ccpn_tmp/data/recoord/         # remote 
 # status on the final grep will be zero when it did grep something.
 ps -elf | grep azvv | grep rsync | grep -v grep
 if ( ! $status ) then
-	echo "Stopping this cron job for another hasn't finished; see above list"
-	exit 0
+    echo "Stopping this cron job for another hasn't finished; see above list"
+    exit 0
 endif
 
 # Watch out for not changing the azvv option below without changing it above.
