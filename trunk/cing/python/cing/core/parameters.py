@@ -117,7 +117,9 @@ if cingPaths.classpath:
 
 cingPaths.keysformat() #define a format string for 'pretty' output
 
-outlierColor = 'black'
+#outlierColor = 'red' # use names that are html legal here so matplot knows them
+outlierColor = '#CC66FF' #  iWeb lavender
+
 plotParameters = NTdict(
     #default
     dihedralDefault = NTdict(
@@ -125,7 +127,8 @@ plotParameters = NTdict(
         max      =  360.0,
         mticksize=   10,
         ticksize =   60,
-        color    = 'blue', # use names that are html legal here so matplot knows them.
+#        color    = 'green',
+        color    = '#990099', # iWeb plum
         outlier  = outlierColor,
         average  = 'blue',
         lower    = 'orange',

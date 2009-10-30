@@ -12,6 +12,7 @@ from cing.core.classes import Project
 from unittest import TestCase
 from cing.PluginCode.NmrStar import NmrStar
 from cing import verbosityNothing
+from cing.Libs.NTutils import NTcodeerror
 import cing
 import os
 import unittest
@@ -21,10 +22,10 @@ class AllChecks(TestCase):
     def testNmrStar(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
-        entryList = "1brv".split()
+#        entryList = "1brv".split()
 #        entryList = "basp2".split()
 #        entryList = "taf3".split()
-#        entryList = "1a4d".split()
+        entryList = "1a4d".split() # don't use the same entry code as for test_ccpn.py until issue 213 is resolved.
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 #        entryList = "1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e".split()

@@ -4,6 +4,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTcodeerror
 import os
 
 __author__ += 'Wim Vranken '
@@ -11,7 +12,13 @@ __author__ += 'Wim Vranken '
 class NmrStar():
     def __init__(self, project):
         self.project = project
+        self.ccpnProject = None
 
+    def _nullCcpnAndCingProject(self):
+        del( self.ccpnProject ) # hopefull forces GC.
+        del( self.project ) # hopefull forces GC.
+        self.ccpnProject = None
+        self.project = None
 
     def toNmrStarFile(self, fileName):
         """Return None on error"""
@@ -79,4 +86,10 @@ class NmrStar():
             NTerror("Failed to find result file [%s]" % fileName)
             return
         NTmessage("==> NMR-STAR project written at %s" % fileName)
+
+        try:
+            self._nullCcpnAndCingProject()
+        except:
+            NTcodeerror( "Failed to nullCcpnProject()" )
+
         return True # Just to be explicit.
