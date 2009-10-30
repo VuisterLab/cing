@@ -274,15 +274,12 @@ def testOverall(namepattern):
                           ]
     startdir = cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
-    # enable next line to do a single check only.
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/iCing/test/test_Json.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_ccpn.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Molgrap.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Procheck.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_validate.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_Wattos.py']
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_NmrStar.py']
+    # enable next line(s) to do a single check only.
 #    nameList = ['/Users/jd/workspace34/cing/python/cing/Libs/test/test_Imagery.py']
+#    nameList = [
+#                '/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_NmrStar.py',
+#                '/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_ccpn.py'
+#                ]
     NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
@@ -675,14 +672,14 @@ def main():
     #------------------------------------------------------------------------------------
     # Merge resonances
     #------------------------------------------------------------------------------------
-    if (options.merge):
+    if options.merge:
         project.mergeResonances()
     #end if
 
     #------------------------------------------------------------------------------------
     # Generate peaks
     #------------------------------------------------------------------------------------
-    if (options.generatePeaks):
+    if options.generatePeaks:
         gp = options.generatePeaks.split(',')
         if len(gp) != 2:
             NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")

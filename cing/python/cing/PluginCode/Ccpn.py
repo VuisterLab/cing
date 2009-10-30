@@ -36,7 +36,7 @@ import re
 import string
 import tarfile
 
-if True:
+if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     from cing.Libs.NTutils import ImportWarning
     from cing.Libs.NTutils import NTmessage
     from cing.Libs.NTutils import switchOutput
