@@ -798,7 +798,7 @@ class Ccpn:
                    to the relevant Cing objects. This function assumes
                    that Cing molecules are already mapped to CCPN molSystems
            Inputs: CCPN MolSystem.MolSystem, CCPN Nmr.ShiftList
-           Output: True or None for Error.
+           Output: True or None for error.
 
            NB CING data model has no CS list entity but rather stores the info at the atom level.
         """
@@ -808,6 +808,7 @@ class Ccpn:
         self.molecule.newResonances()
 
         knownTroubleResidues = {} # To avoid repeating the same messages over
+        atomsTouched = {} # Use a hash to prevent double counting.
 
         # Called KeyList because of name class with ccpnShiftList
         ccpnShiftKeyList = shiftMapping.keys()
@@ -826,7 +827,6 @@ class Ccpn:
                 knownTroubleResidues[ccpnResidue] = True
                 continue
 
-            atomsTouched = {} # Use a hash to prevent double counting.
             for ccpnAtom in ccpnAtoms:
                 try:
                     atom = ccpnAtom.cing
@@ -848,10 +848,12 @@ class Ccpn:
                 except:
                     msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
                     NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
-            # end for.
+            # end for.over ccpnAtoms.
+        # end for.over shifts.
+
         NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
                          ccpnShiftList.name, ccpnShiftList.parent.name)
-        NTmessage("==> CING (pseudo-)atom with resonances updated %s" % atomsTouched.keys())
+        NTmessage("==> CING (pseudo-)atom with resonances updated numbering %s" % len(atomsTouched.keys()))
 
         return True
 
