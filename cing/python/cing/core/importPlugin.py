@@ -110,6 +110,9 @@ pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 #print "Now at importPlugin.py real job"
 for _p in pluginFileList:
     _d,_pname,_e = NTpath(_p)
+#    if _pname.find('Whatif')>=0:
+#        NTdebug("Skipping import of plugin Whatif")
+#        continue
 #    try:
     importPlugin( _pname )
 #    except:

@@ -3,7 +3,6 @@ Adds html generation methods
 """
 from cing import NaNstring
 from cing import authorList
-from cing import cingPythonCingDir
 from cing import cingRevision
 from cing import cingRevisionUrl
 from cing import cingRoot
@@ -56,16 +55,15 @@ from cing.core.parameters import plugins
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.Libs.find import find
 import os
-import shelve
 import shutil
 
 
-dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-dbase = shelve.open( dbaseFileName )
+#dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
+#dbase = shelve.open( dbaseFileName )
 #        histCombined               = dbase[ 'histCombined' ]
 #histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-dbase.close()
+#dbase.close()
 
 HTML_TAG_PRE = "<PRE>"
 HTML_TAG_PRE2 = "</PRE>"

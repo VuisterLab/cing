@@ -60,7 +60,7 @@ class AllChecks(TestCase):
             x = NTlist(-45, -80,  125) # outside the range.
             y = NTlist(-65, -63, -125)
             # 1 SMALL boxe
-            lower1, upper1 = -120.00, -120.05 # if within 0.1 they're considered the same and order shouldn't matter.
+            lower1, upper1 = -120.00, -125.05 # if within 0.1 they're considered the same and order shouldn't matter.
             lower2, upper2 = 0,  100
             # 4 boxes:
 #            lower1, upper1 = 120,   0

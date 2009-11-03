@@ -6,13 +6,12 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityDetail
+from cing import verbosityNothing
 from cing import verbosityOutput
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.NmrStar import NmrStar
 from cing.core.classes import Project
 from unittest import TestCase
-from cing.PluginCode.NmrStar import NmrStar
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTcodeerror
 import cing
 import os
 import unittest

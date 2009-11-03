@@ -27,7 +27,6 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
-from cing import cingPythonCingDir
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -68,19 +67,17 @@ from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
 import math
-import os
-import shelve
 import sys
 #from cing.PluginCode.Whatif import criticizeByWhatif
 #from cing.core.classes import HTMLfile
 #from cing.core.classes import htmlObjects
 
-dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-dbase = shelve.open( dbaseFileName )
+#dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
+#dbase = shelve.open( dbaseFileName )
 #        histCombined               = dbase[ 'histCombined' ]
 #histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-dbase.close()
+#dbase.close()
 
 def runCingChecks( project, ranges=None ):
     project.partitionRestraints()

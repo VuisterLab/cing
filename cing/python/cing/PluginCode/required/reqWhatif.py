@@ -1,6 +1,7 @@
 from cing import cingDirData
+#from pprint import pprint
+import cPickle
 import os
-import shelve
 
 WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
 
@@ -35,17 +36,34 @@ FLPCHK_STR       = 'FLPCHK'
 ACCLST_STR       = 'ACCLST'
 BMPCHK_STR       = 'BMPCHK'
 
-_dbase_file_abs_name =  os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
-_dbase = shelve.open( _dbase_file_abs_name )
-histRamaCombined                = _dbase[ 'histRamaCombined' ]
-histRamaBySsAndResType          = _dbase[ 'histRamaBySsAndResType' ]
-histRamaBySsAndCombinedResType  = _dbase[ 'histRamaBySsAndCombinedResType' ]
-_dbase.close()
-_dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
-_dbase = shelve.open( _dbase_file_abs_name )
-histJaninBySsAndResType         = _dbase[ 'histJaninBySsAndResType' ]
-histJaninBySsAndCombinedResType = _dbase[ 'histJaninBySsAndCombinedResType' ]
-_dbase.close()
+if True:
+    dbase_file_abs_name =  os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
+    #dbaseTemp = shelve.open( dbase_file_abs_name )
+    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+    dbaseTemp = cPickle.load(dbase_file)
+#    pprint.pprint(dbaseTemp)
+    histRamaCombined                = dbaseTemp[ 'histRamaCombined' ]
+    histRamaBySsAndResType          = dbaseTemp[ 'histRamaBySsAndResType' ]
+    histRamaBySsAndCombinedResType  = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
+#    pprint(histRamaCombined)
+    dbase_file.close()
+    #dbaseTemp.close()
+
+    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
+    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+    dbaseTemp = cPickle.load(dbase_file)
+    histJaninBySsAndResType         = dbaseTemp[ 'histJaninBySsAndResType' ]
+    histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
+    dbase_file.close()
+
+# Disable when debugged:
+if False:
+    histRamaCombined         = None
+    histRamaBySsAndResType = None
+    histRamaBySsAndCombinedResType = None
+    histJaninBySsAndResType         = None
+    histJaninBySsAndCombinedResType = None
+
 
 wiPlotList = []
 # GV: moved to outer level to not always call createHtmlWhatif
