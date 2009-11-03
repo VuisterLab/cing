@@ -8,14 +8,14 @@ from cing.Libs.NTutils import floatParse
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
+from cing.PluginCode.required.reqDssp import to3StateUpper
 from cing.core.classes import Project
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
-from cing.PluginCode.required.reqDssp import to3StateUpper
+import cPickle
 import cing
 import csv
 import os
-import shelve
 
 
 """
@@ -123,10 +123,19 @@ def main():
     #        hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys( histJaninBySsAndCombinedResType, hist2d, ssType )
 
-    dbase = shelve.open( dbase_file_abs_name )
+    # Throws a verbose error message on python 2.6.3 as per issue http://code.google.com/p/cing/issues/detail?id=211
+    # Using Pickle instead
+#    dbase = shelve.open( dbase_file_abs_name )
+#    dbase.close()
+
+    if os.path.exists(dbase_file_abs_name):
+        os.unlink(dbase_file_abs_name)
+    output = open(dbase_file_abs_name, 'wb')
+    dbase = {}
     dbase[ 'histJaninBySsAndCombinedResType' ] = histJaninBySsAndCombinedResType
     dbase[ 'histJaninBySsAndResType' ]         = histJaninBySsAndResType
-    dbase.close()
+    cPickle.dump(dbase, output, -1)
+    output.close()
 
 
 

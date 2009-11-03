@@ -1099,14 +1099,17 @@ class NTplot( NTdict ):
         colorList= [ 'green',   'blue',   'yellow']
         i = 0
         for hist in histList:
+#        for hist in [ histList[0] ]:
 #            if i == 9: # skip some when testing.
 #                i += 1
 #                continue
             maxHist = amax(amax( hist ))
+#            NTdebug("maxHist: %s" % maxHist)
             hist *= 100./maxHist
             palette = cmapList[i]
-            palette.set_over( colorList[i], 1.0) # alpha is 1.0
-            palette.set_under(alpha = 0.0)
+            palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0
+#            palette.set_under(alpha = 0.0)
+            palette.set_under(color = 'white', alpha = 0.0 )
 #            histm = masked_where(hist < minPercentage, hist, copy=1)
             norm = colors.Normalize(vmin = minPercentage,
                                     vmax = maxPercentage, clip = False)

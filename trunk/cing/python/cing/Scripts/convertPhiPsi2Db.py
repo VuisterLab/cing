@@ -18,18 +18,18 @@ from numpy.lib.twodim_base import histogram2d
 import cing
 import csv
 import os
-import shelve
-
+#import shelve
+import pickle
 
 """
 Takes a file with dihedral angles values and converts them to a python pickle file
 with histograms for (combined) residue and sec. struct. types.
 
 Please note well that the values are per residue and that the value range is much
-smaller than per molecule values. The per-molecule values are scaled by a sigma. 
+smaller than per molecule values. The per-molecule values are scaled by a sigma.
 See formula 8 in Rob Hooft's paper:
 
-Hooft et al. Objectively judging the quality of a protein structure from a 
+Hooft et al. Objectively judging the quality of a protein structure from a
 Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
 """
 
@@ -59,7 +59,7 @@ bins = (xGrid,yGrid)
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
 
-      
+
 def main():
     cvs_file_abs_name_gz = cvs_file_abs_name + '.gz'
     gunzip( cvs_file_abs_name_gz )
@@ -70,7 +70,7 @@ def main():
 #    histByCombinedSsAndResType = {}
     valuesByEntrySsAndResType       = {}
     hrange = (xRange, yRange)
-        
+
     for row in reader:
 #        7a3h,A,VAL ,   5,H, -62.8, -52.8
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
@@ -82,30 +82,30 @@ def main():
         psi = float(psi)
         if not (inRange(phi) and inRange(psi)):
             NTerror("phi and/or psi not in range for row: %s" % `row`)
-            return 
+            return
         appendDeepByKeys(valuesBySsAndResType, phi, ssType,resType,'phi' )
         appendDeepByKeys(valuesBySsAndResType, psi, ssType,resType,'psi' )
 #        NTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
         appendDeepByKeys(valuesByEntrySsAndResType, phi, entryId, ssType,resType,'phi' )
         appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType,resType,'psi' )
-    del(reader) # closes the file handles 
+    del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
 #    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
 #    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
     (Cav, Csd ) = ( 1.0, 1.0 )
     NTdebug("Overall found av,sd,n: " + `(Cav, Csd)`)
-    
+
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
             hist2d, _xedges, _yedges = histogram2d(
-                valuesBySsAndResType[ssType][resType]['psi'], 
-                valuesBySsAndResType[ssType][resType]['phi'], 
-                bins = binCount, 
+                valuesBySsAndResType[ssType][resType]['psi'],
+                valuesBySsAndResType[ssType][resType]['phi'],
+                bins = binCount,
                 range= hrange)
 #            hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys( histRamaBySsAndResType, hist2d, ssType, resType )
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
-    
+
     for ssType in valuesBySsAndResType.keys():
         phi = []
         psi = []
@@ -117,7 +117,7 @@ def main():
         hist2d, _xedges, _yedges = histogram2d(
             psi, # Note that the x is the psi for some stupid reason,
             phi, # otherwise the imagery but also the [row][column] notation is screwed.
-            bins = binCount, 
+            bins = binCount,
             range= hrange)
 #        hist2d = zscaleHist( hist2d, Cav, Csd )
         setDeepByKeys( histRamaBySsAndCombinedResType, hist2d, ssType )
@@ -130,12 +130,12 @@ def main():
                 continue
             phi += valuesBySsAndResType[ssType][resType]['phi']
             psi += valuesBySsAndResType[ssType][resType]['psi']
-    
+
     NTdebug('Total number of residues: %d' % len(psi))
     hist2d, _xedges, _yedges = histogram2d(
         psi, # Note that the x is the psi for some stupid reason,
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
-        bins = binCount, 
+        bins = binCount,
         range= hrange)
 #    sumHistCombined = sum( hist2d )
 #    sumsumHistCombined = sum( sumHistCombined )
@@ -145,12 +145,21 @@ def main():
 #    hist2d = zscaleHist( hist2d, Cav, Csd )
 #    NTdebug('hist2d scaled  : \n%s' % hist2d)
 
-    
-    dbase = shelve.open( dbase_file_abs_name )
+
+    if os.path.exists(dbase_file_abs_name):
+        os.unlink(dbase_file_abs_name)
+#    dbase = shelve.open( dbase_file_abs_name )
+    output = open(dbase_file_abs_name, 'wb')
+#    dbase = {'bar':'milky'}
+    dbase = {}
+    # Pickle the list using the highest protocol available.
     dbase[ 'histRamaCombined' ]               = hist2d
     dbase[ 'histRamaBySsAndCombinedResType' ] = histRamaBySsAndCombinedResType
     dbase[ 'histRamaBySsAndResType' ]         = histRamaBySsAndResType
-    dbase.close()
+#    pickle.dump(dbase, output, -1)
+    pickle.dump(dbase, output)
+    output.close()
+#    dbase.close()
 
 def zscaleHist( hist2d, Cav, Csd ):
     hist2d -= Cav
@@ -165,13 +174,13 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
     interpolatedValue = interpolatedValueArray[ 0, 0 ]
 #    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
     return interpolatedValue
-    
-    
-    
+
+
+
 def getRescaling(valuesByEntrySsAndResType):
     '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
     http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
-    '''            
+    '''
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
         histRamaBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
@@ -185,7 +194,7 @@ def getRescaling(valuesByEntrySsAndResType):
                 his = getDeepByKeys(histRamaBySsAndResTypeExcludingEntry,ssType,resType)
                 if his == None:
                     NTdebug('when testing not all residues are present in smaller sets.')
-                    continue 
+                    continue
                 (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
 #                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
                 if c_sd == None:
@@ -195,8 +204,8 @@ def getRescaling(valuesByEntrySsAndResType):
                     NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets.')
                     continue
                 for k in range(len(angleList0)):
-                    ck = getValueFromHistogramUsingInterpolation( 
-                        histRamaBySsAndResTypeExcludingEntry[ssType][resType], 
+                    ck = getValueFromHistogramUsingInterpolation(
+                        histRamaBySsAndResTypeExcludingEntry[ssType][resType],
                         angleList0[k], angleList1[k])
                     zk = ( ck - c_av ) / c_sd
 #                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
@@ -223,8 +232,8 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
                 angleList1 = valuesBySsAndResType[ssType][resType]['psi']
                 appendDeepByKeys(result,angleList0,ssType,resType,'phi')
                 appendDeepByKeys(result,angleList1,ssType,resType,'psi')
-        
-        
+
+
     for ssType in result.keys():
         for resType in result[ssType].keys():
             angleList0 = result[ssType][resType]['phi']
@@ -234,19 +243,19 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
             hist2d, _xedges, _yedges = histogram2d(
                 angleList1, # think rows (y)
                 angleList0, # think columns (x)
-                bins = binCount, 
+                bins = binCount,
                 range= hrange)
             setDeepByKeys( histRamaBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
 
     return histRamaBySsAndResTypeExcludingEntry
 
 
-    
-def inRange(a): 
+
+def inRange(a):
     if a < plotparams1.min or a > plotparams1.max:
         return False
     return True
-             
+
 if __name__ == '__main__':
     cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug

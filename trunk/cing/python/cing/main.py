@@ -474,12 +474,10 @@ def yasara( project ):
     yasaraShell( project )
 #end def
 
-
 def main():
-
     if not ( osType == OS_TYPE_MAC or
              osType == OS_TYPE_LINUX ):
-        NTerror("CING only runs on unix")
+        NTerror("CING only runs on mac or linux.")
         sys.exit(1)
 
     global project

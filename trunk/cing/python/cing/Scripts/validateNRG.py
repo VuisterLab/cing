@@ -29,7 +29,8 @@ startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
 #entryListFileName = os.path.join(startDir, 'list', 'entry_list_nrg_docr.csv')
-entryListFileName = os.path.join(startDir, 'list', 'entry_list_failed.csv')
+#entryListFileName = os.path.join(startDir, 'list', 'entry_list_failed.csv')
+entryListFileName = os.path.join(startDir, 'entry_list_failed.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
@@ -61,7 +62,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     startDir,
                     processes_max = 2,
                     delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
-                    max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
+                    max_time_to_wait = 60 * 60 * 4, # 1y4o took 2367s. 2k0e is largest taking ???.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
                     MAX_ENTRIES_TODO = 1,

@@ -25,7 +25,6 @@ python -u $CINGROOT/python/cing/NRG/nrgCing.py
 """
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing.Libs import forkoff
 from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
@@ -46,6 +45,7 @@ from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
+from glob import glob
 import cing
 import csv
 import os
@@ -162,7 +162,12 @@ class nrgCing(Lister):
 
         ## List of 'new' entries for which hits were found
         self.new_hits_entry_list = []
-        self.done_entry_list = []
+        # From disk.
+        self.entry_list_tried = []  # .cing directory and .log file present so it was tried to start but might not have finished
+        self.entry_list_crashed = [] # has a stack trace
+        self.entry_list_stopped = [] # was stopped by time out or by user or by system (any other type of stop but stack trace)
+        self.entry_list_done = [] # finished to completion of the cing run.
+
 
     """ Returns zero for failure
     """
@@ -200,26 +205,10 @@ class nrgCing(Lister):
         return 1
 
 
-    """
-    Check the resource dir for existence of all needed items.
-    this is quit i/o intensive but the only way to guarantee it
-    as the pickle might get out of sync with reality
-    Returns one for complete resource.
-    """
-    def is_complete_resource(self, entry_code):
-        NTdebug("checking is_complete_resource for entry: " + entry_code)
-        sub_dir = entry_code[1:3]
-        indexFileName = os.path.join (self.results_dir, 'data', sub_dir, entry_code, entry_code + ".cing", 'index.html')
-        return os.path.isfile(indexFileName)
-
-
     def getCingEntriesTriedAndDone(self):
-        "Returns list or None for error"
-        NTdebug("From disk get the entries done in NRG-CING")
+        "Returns list or True for error"
 
-        entry_list_tried = []
-        entry_list_done = []
-
+        NTdebug("From disk get the entries tried, todo, crashed, and stopped in NRG-CING")
 
         subDirList = os.listdir('data')
         for subDir in subDirList:
@@ -234,18 +223,27 @@ class nrgCing(Lister):
                     if entry_code != ".DS_Store":
                         NTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
+                NTdebug("Working on: " + entry_code)
 
                 cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
                     continue
 
-                entry_list_tried.append(entry_code)
+                # Look for last log file
+                entrySubDir = os.path.join('data',subDir,entry_code)
+                logList = glob( entrySubDir+'/*.log')
+                if not logList:
+                    continue
+                self.entry_list_tried.append(entry_code)
+
+                logLastFile = logList[-1]
+                NTmessage("Found logLastFile %s" % logLastFile)
+
+
+                # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if os.path.exists(indexFileEntry):
-                    entry_list_done.append(entry_code)
-
-
-        return (entry_list_tried, entry_list_done)
+                    self.entry_list_done.append(entry_code)
 
 
     """
@@ -291,7 +289,9 @@ class nrgCing(Lister):
             NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
             return 0
 
-        (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
+        if self.getCingEntriesTriedAndDone():
+            NTerror("Failed to dissect entries tried and done")
+            return 0
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
             return 0
@@ -377,33 +377,6 @@ class nrgCing(Lister):
                 fp = open(fileName, 'w')
     #            fprintf(fp, ' ')
                 fp.close()
-
-    def make_individual_pages(self, entry_code):
-        """
-        Just making the one page specific for an entry
-        Returns 0 for success.
-        """
-        NTmessage("Making page for entry: " + entry_code)
-        if self.regenerating_pickle:
-            return 0
-        ## Check to see if there was all giffie files were actually made
-        ## If not then still exit with an error
-        if not self.is_complete_resource(entry_code):
-            NTerror("despite checks no gif fie found for entry: " + entry_code)
-            return 1
-
-    def do_analyses_loop(self, processes_max):
-        ## Setup a job list
-        return
-        job_list = []
-
-        for entry_code in self.new_hits_entry_list:
-            job = (self.make_individual_pages, (entry_code,))
-            job_list.append(job)
-
-        f = forkoff.ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
-        self.done_entry_list = f.forkoff_start(job_list, self.delay_between_submitting_jobs)
-        NTmessage("Finished following list: %s" % self.done_entry_list)
 
 
     def update_index_files(self):
@@ -631,10 +604,6 @@ class nrgCing(Lister):
             NTerror("can't search matching entries")
             os._exit(1)
 
-        ## Make the individual and overall web pages including
-        ## new versions of the scripts used.
-        m.do_analyses_loop(processes_max=processors)
-
         if not m.update_index_files():
             NTerror("can't update index files")
 
@@ -654,8 +623,9 @@ if __name__ == '__main__':
     ## Initialize the project
     m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot,
                 updateIndices=updateIndices, isProduction=isProduction)
-#    m.getCingEntriesTriedAndDone()
-    m.update(new_hits_entry_list)
+    m.getCingEntriesTriedAndDone()
+
+#    m.update(new_hits_entry_list) # TODO enable after done testing.
     NTmessage("Finished creating the NRG-CING indices")
     #TODO: remove all but .csv files for updating whynot.
     #Keep api because in future we might be able to say exactly why an entry fails at a certain stage.
