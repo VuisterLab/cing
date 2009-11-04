@@ -8,6 +8,8 @@ Molecule:
 Residue
     procheck: NTdict instance with procheck values for this residue
 
+
+
 """
 #@PydevCodeAnalysisIgnore
 from cing.Libs.AwkLike import AwkLike
