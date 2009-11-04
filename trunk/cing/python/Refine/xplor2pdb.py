@@ -19,6 +19,7 @@ from cing.Libs.PyMMLib import REMARK
 from cing.Libs.PyMMLib import TER
 from cing.core.constants import XPLOR
 from cing.core.database import NTdb
+#from cing import NTdb
 #from cing.core.dictionaries import NTdbGetAtom
 import sys
 

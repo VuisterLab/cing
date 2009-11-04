@@ -1,7 +1,8 @@
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTdict
 from cing.core.constants import IUPAC
-from cing.core.database import NTdb
+#from cing.core.database import NTdb
+from cing import NTdb
 #from cing.core.dictionaries import NTdbGetAtom
 from cing.Libs.NTutils import NTmessage
 

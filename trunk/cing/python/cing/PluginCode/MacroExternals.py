@@ -347,15 +347,15 @@ def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme):
            TODO: implement reverseColorScheme
            """
     if minValue > maxValue:
-        NTerror("minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue))
+        NTerror("mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue))
         swapMemory = minValue
         minValue = maxValue
         maxValue = swapMemory
     if value > maxValue:
-        NTwarning("value > maxValue (%s > %s) got limited to bound" % (value, maxValue))
+        NTwarning("mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue))
         value = maxValue
     if value < minValue:
-        NTwarning("value < minValue (%s > %s) got limited to bound" % (value, minValue))
+        NTwarning("mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue))
         value = minValue
 
 

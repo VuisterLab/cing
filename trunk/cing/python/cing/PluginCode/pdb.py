@@ -512,10 +512,12 @@ class MatchGame:
             return res.db
 
 #        insert new residue.
-        res.db = NTdb.appendResidueDef(name = res.resName, shortName = '_')
+        res.db = NTdb.appendResidueDef(name = res.resName, shortName = '_', comment='From parsing PDB file')
         if not res.db:
             NTcodeerror("Adding a non-standard residue should have been possible.")
             return None
+        res.db.nameDict[self.convention] = res.resName
+
         # Just a check, disable for speed.
         _x = NTdb.getResidueDefByName(res.resName)
         if not _x:

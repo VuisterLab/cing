@@ -271,7 +271,7 @@ def export2gif(molecule, path, project = None):
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
         NTdebug("copying default image from %s to %s" % (src, path))
-        os.link(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
+        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
         return True
     return None
 

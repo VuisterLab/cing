@@ -1141,7 +1141,7 @@ class NTdict(dict, Lister):
 #        return
 #        if hasattr(self, attr):
         if not self.has_key(attr):
-            raise AttributeError
+            raise AttributeError( '"%s" not found.' % attr )
         return self[attr]
     #end def
 

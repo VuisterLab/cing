@@ -33,6 +33,7 @@ from cing.core.constants import INTERNAL
 from cing.core.constants import NOSHIFT
 from cing.core.constants import X_AXIS
 from cing.core.database import NTdb
+#from cing import NTdb
 #from cing.core.dictionaries import isValidAtomName
 #from cing.core.dictionaries import isValidResidueName
 from cing.core.database import translateAtomName

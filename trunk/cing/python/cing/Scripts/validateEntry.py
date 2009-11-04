@@ -241,7 +241,7 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
         if not os.path.isfile(fullPathSource):
             NTerror("%s is not a file" % (fullPathSource))
             return True
-        os.link(fullPathSource, fileNameTgz)
+        os.symlink(fullPathSource, fileNameTgz)
     elif url.startswith('http:/'):
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
         NTdebug("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
