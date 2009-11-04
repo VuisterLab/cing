@@ -128,6 +128,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import OptionParser
 from cing.Libs.NTutils import findFiles
+from cing.Libs.NTutils import sprintf
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
@@ -167,6 +168,27 @@ def format(object):
     return  "%s" % object
 #end def
 
+def getInfoMessage():
+
+    from cing.core.sml import SMLversion
+    return sprintf(
+"""
+Version:           %.3f
+Revision:          %s (%s)
+Date:              %s
+Database:          %s
+SML:               %.3f
+
+CING root:         %s
+CING tmp:          %s
+
+Default verbosity: %d
+""",
+     cing.cingVersion, cing.cingRevision, cing.cingRevisionUrl+str(cing.cingRevision),
+     cing.__date__, cing.INTERNAL,  SMLversion,
+     cing.cingRoot, cing.cingDirTmp,
+     cing.verbosityDefault
+    )
 
 def getStartMessage():
     """
@@ -340,6 +362,11 @@ def getParser():
                       dest="pydoc",
                       help="start pydoc server and browse documentation"
                      )
+    parser.add_option("--info",
+                      action="store_true",
+                      dest="info",
+                      help="Print some program info to stdout"
+                     )
     parser.add_option("-n", "--name", "--project",
                       dest="name", default=None,
                       help="NAME of the project (required)",
@@ -474,7 +501,9 @@ def yasara( project ):
     yasaraShell( project )
 #end def
 
+
 def main():
+
     if not ( osType == OS_TYPE_MAC or
              osType == OS_TYPE_LINUX ):
         NTerror("CING only runs on mac or linux.")
@@ -497,6 +526,8 @@ def main():
 
     NTmessage(header)
     NTmessage(getStartMessage())
+
+    NTdebug(getInfoMessage())
 
     NTdebug('options: %s', options)
     NTdebug('args: %s', _args)
@@ -528,6 +559,11 @@ def main():
         NTmessage('    Type <control-c> to quit')
         webbrowser.open('http://localhost:9999/cing.html')
         pydoc.serve(port=9999)
+        sys.exit(0)
+    #end if
+
+    if options.info:
+        NTmessage(getInfoMessage())
         sys.exit(0)
     #end if
 

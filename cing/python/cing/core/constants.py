@@ -5,7 +5,7 @@ CNS          CNS nomenclature; amounts to XPLOR
 CYANA        CYANA 1.x nomenclature
 CYANA2       CYANA 2.x nomenclature
 DYANA        DYANA nomenclature; amounts to CYANA
-INTERNAL     Internal nomenclature
+INTERNAL     Current internal nomenclature (INTERNAL_0 or INTERNAL_1)
 IUPAC        IUPAC Nomenclature
 PDB          Old (PDB2) nomenclature
 SPARKY       Sparky nomenclature, amounts to IUPAC

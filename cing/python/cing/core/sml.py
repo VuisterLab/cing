@@ -32,11 +32,13 @@ from cing.core.constants import AC_LEVEL
 from cing.core.constants import DR_LEVEL
 from cing.core.constants import RDC_LEVEL
 
+
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
 
 from cing.core.database import AtomDef
 from cing.core.database import DihedralDef
+from cing.core.database import MolDef
 from cing.core.database import ResidueDef
 
 from cing.core.constants import INTERNAL
@@ -80,7 +82,7 @@ class smlFile(file):
     #end def
 
     def readlines(self):
-        lines = self.readlines(self)
+        lines = file.readlines(self)
         self.NR += len(lines)
         return lines
     #end def
@@ -294,7 +296,7 @@ Example file:
     #end def
     readline = staticmethod( readline )
 
-    def fromFile( fileName, obj=None)   :
+    def fromFile( fileName, obj=None, **kwds)   :
         """
         Static method to restore new object from SML file.
         obj is carried along for convenience to pass an external info if needed.
@@ -309,7 +311,7 @@ Example file:
         line = SMLhandler.readline( fp )
         if len(line) > 0 and SMLstarthandlers.has_key(line[1]):
             handler = SMLstarthandlers[line[1]]
-            newObj  = handler.handle( line, fp, obj )
+            newObj  = handler.handle( line, fp, obj, **kwds )
         else:
             NTerror('SMLhandler.fromFile: invalid SML file line %d "%s"', fp.NR, line[0])
 #        newObj  = smlhandler.handle( None, fp, obj )
@@ -319,7 +321,7 @@ Example file:
     #end def
     fromFile = staticmethod( fromFile )
 
-    def toFile(self, object, fileName)   :
+    def toFile(self, object, fileName, **kwds)   :
         """
         Save element of theList to fileName for restoring later with fromFile method
         Returns object or None on error.
@@ -336,7 +338,7 @@ Example file:
             fp.close()
             return None
 
-        object.SMLhandler.toSML( object, fp )
+        object.SMLhandler.toSML( object, fp, **kwds )
         fprintf( fp, '%s\n', smlhandler.endTag )
 
 #        NTdebug('saved %s to "%s"', object, fileName ) # JFD adds; it's a duplicate of the NTdetail message.
@@ -1070,6 +1072,14 @@ class SMLCoplanarListHandler( SMLhandler ):
         return
     #end def
 #end class
+class SMLMolDefHandler( SMLhandler ):
+    """Just a container to MolDef SMl
+    """
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'MolDef' )
+    #end def
+#end class
+MolDef.SMLhandler = SMLMolDefHandler()
 
 class SMLResidueDefHandler( SMLhandler ):
 
@@ -1079,18 +1089,24 @@ class SMLResidueDefHandler( SMLhandler ):
 
     def handle(self, line, fp, molDef=None):
         if molDef == None:
-            NTerror('SMLResidueDefHandler.handle: line %d, undefined molDef', fp.NR)
+            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, undefined molDef', fp.name, fp.NR)
             self.jumpToEndTag(fp)
             return None
         #end if
-        if len(line) < 4:
-            NTerror('SMLResidueDefHandler.handle: line %d, incomplete ResidueDef syntax "%s"', fp.NR, line)
+        if len(line) < 5:
+            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
             self.jumpToEndTag(fp)
             return None
         #end if
+        if line[4] != INTERNAL:
+            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)', fp.name, fp.NR, line[4], INTERNAL)
+            self.jumpToEndTag(fp)
+            return None
+        #end if
+
         resDef = molDef.appendResidueDef(line[2], line[3])
         if not resDef:
-            NTerror('SMLResidueDefHandler.handle: line %d, error initiating ResidueDef instance "%s"', fp.NR, line[2])
+            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, error initiating ResidueDef instance "%s"', fp.name, fp.NR, line[2])
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -1107,7 +1123,7 @@ class SMLResidueDefHandler( SMLhandler ):
         """
         fprintf( stream, '\n#=======================================================================\n')
         fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'internal', 'short')
-        fprintf( stream,   '%s  \t%-8s %-8s\n', self.startTag, resDef.translate(convention), resDef.shortName )
+        fprintf( stream,   '%s  \t%-8s %-8s %-8s\n', self.startTag, resDef.translate(convention), resDef.shortName, convention)
         fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
@@ -1261,8 +1277,38 @@ class SMLAtomDefHandler( SMLhandler ):
         #end if
         fprintf( stream, "\t\t%-10s = %r\n", 'topology', top2 )
 
+        # real; optionally convert
+        if convention == INTERNAL or len(atmDef.real) == 0:
+            real2 = atmDef.real
+        else:
+            real2 = []
+            for a in atmDef.real:
+                adef = atmDef.residueDef.getAtomDefByName( a )
+                if adef == None:
+                    NTerror('AtomDef.exportDef: %s real atom "%s" not decoded', atmDef, a)
+                else:
+                    real2.append( adef.translate( convention ) )
+                #end if
+            #end for
+        #end if
+        fprintf( stream, "\t\t%-10s = %r\n", 'real', real2 )
+
+        # pseudo; optionally convert
+        if convention == INTERNAL or atmDef.pseudo == None:
+            pseudo2 = atmDef.pseudo
+        else:
+            pseudo2 = None
+            adef = atmDef.residueDef.getAtomDefByName( atmDef.pseudo )
+            if adef == None:
+                NTerror('AtomDef.exportDef: %s pseudo atom "%s" not decoded', atmDef, atmDef.pseudo)
+            else:
+                pseudo2 = adef.translate( convention )
+            #end for
+        #end if
+        fprintf( stream, "\t\t%-10s = %r\n", 'pseudo', pseudo2 )
+
         # Others
-        for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm']:
+        for attr in ['nameDict','aliases','type','spinType','shift','hetatm']:
             if atmDef.has_key(attr):
                 fprintf( stream, "\t\t%-10s = %r\n", attr, atmDef[attr] )
         #end for
@@ -1283,12 +1329,12 @@ class SMLAtomDefHandler( SMLhandler ):
 AtomDef.SMLhandler = SMLAtomDefHandler()
 
 
-def obj2SML( obj, smlFile ):
+def obj2SML( obj, smlFile, **kwds ):
     """
     Generate SML file from object.
     Return obj or None on error
     """
-    if smlhandler.toFile(obj, smlFile) == None:
+    if smlhandler.toFile(obj, smlFile, **kwds) == None:
         return None
     return obj
 #end def

@@ -15,7 +15,10 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.NTutils import NTfill, NTlist, printf, fprintf, sprintf, getDeepByKeys
 from cing.Libs.fpconst import NaN, isNaN
 from cing.Libs.svd import SVDfit
-from cing.PluginCode.Whatif import Whatif # JFD: this statement causes this plugin to be skipped on systems without Whatif.
+try:
+    from cing.PluginCode.Whatif import Whatif # JFD: this statement causes this plugin to be skipped on systems without Whatif.
+except:
+    pass
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths

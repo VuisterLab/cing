@@ -1,5 +1,6 @@
 from cing.core.constants import XPLOR
-from cing.core.database import NTdb
+from cing import NTdb
+#from cing.core.database import NTdb
 from cing.core.constants import CYANA
 
 """Use the CYANA names as a basis and then do some subs.

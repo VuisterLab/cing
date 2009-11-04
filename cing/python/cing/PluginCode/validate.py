@@ -63,6 +63,7 @@ from cing.core.constants import COLOR_RED
 from cing.core.constants import NOSHIFT
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
+from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
@@ -793,7 +794,7 @@ def validateSaltbridge( residue1, residue2 ):
 
     # Definitions of the centroids according to the paper
     # TODO: fix problem as in 1bzb most likely due to uncommon residues within getting recognized as regular ones.
-    # Recode to use fullnames including variants.
+    # Recode to use fullnames including variants.(Store in Database?)
 
     centroids = NTdict(
         E = ['OE1','OE2'],
@@ -1093,7 +1094,7 @@ EXPECTED_ASSIGNMENT             = 'EXPECTED_ASSIGNMENT'
 INVALID_STEREO_ASSIGNMENT       = 'STEREO_ASSIGNMENT'
 SHIFT                           = 'SHIFT'
 
-def validateAssignments( project  ):
+def moleculeValidateAssignments( molecule  ):
     """
     Validate the assignments; check for potential problems and inconsistencies
     Add's NTlist instance with strings of warning description to each atom as
@@ -1108,24 +1109,18 @@ def validateAssignments( project  ):
     @todo: Also correlate assignment with peak values (if present)
     """
 
-#    NTdebug("Starting validateAssignments")
-    if not project.molecule:
-        NTdebug('validateAssignments: no molecule defined')
-        return None
-    #end if
-
-    funcName = validateAssignments.func_name
-    result = NTlist()
-    if project.molecule.resonanceCount == 0:
+    funcName = moleculeValidateAssignments.func_name
+    result   = NTlist()
+    if molecule.resonanceCount == 0:
+        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
         pass
-#        NTdebug("No resonance assignments read so no real validation on it can be done. Let's try anyway.")
 #        return result
 
     # Keep track of what assignments are done and don't complain about specific ones missing
     # if there are none at all assigned of that type.
-    # Just initialize the ones that are checked below; not 1H or P etc.
-    hasAssignment = {'13C': False, '15N': False}
-    for atm in project.molecule.allAtoms():
+    # Just initialize the ones that are checked below; not 1H or P etc.; GV added 1H anyway
+    hasAssignment = {'1H': False, '13C': False, '15N': False}
+    for atm in molecule.allAtoms():
 #        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
         if atm.isAssigned():
             # spintype is not available for pseudos etc. perhaps
@@ -1134,9 +1129,9 @@ def validateAssignments( project  ):
             if spinType:
                 hasAssignment[spinType] = True
 #    hasAssignment = {'13C': True, '15N': True}
-    NTmessage("Found assignments for the following spin types: %s" % hasAssignment)
+    NTdetail("Molecule.validateAssignments: Found assignments for the following spin types: %s" % hasAssignment.keys())
 
-    for atm in project.molecule.allAtoms():
+    for atm in molecule.allAtoms():
         atm.rogScore.reset()
         atm.validateAssignment = NTlist()
         if atm.isAssigned():
@@ -1294,11 +1289,32 @@ def validateAssignments( project  ):
 
         if atm.validateAssignment:
             atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
-            if hasattr(project.molecule, 'atomList'):
-                project.molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
+            if hasattr(molecule, 'atomList'):
+                molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
         #end if
     #end for
     return result
+#end def
+#Patch the Molecule class
+Molecule.validateAssignments = moleculeValidateAssignments
+
+def validateAssignments( project  ):
+    """
+    Validate the assignments of current molecule in project.
+    Calls Molecule.validateAssignment for the action (defined above).
+
+    return a NTlist of atoms with errors.
+
+    return None on code error.
+    """
+
+#    NTdebug("Starting validateAssignments")
+    if not project.molecule:
+        NTdebug('validateAssignments: no molecule defined')
+        return None
+    #end if
+
+    return project.molecule.validateAssignments()
 #end def
 
 def restoreDihRestraintInfo(project):

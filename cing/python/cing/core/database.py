@@ -8,17 +8,19 @@ from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import fprintf
 from cing import cingPythonCingDir
+#from cing import NTdb
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import obj2XML
+from cing.Libs.NTutils import XML2obj
 import os
 import sys
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
 #     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
-
-patches = False
 
 """
 __________________________________________________________________________________________________________
@@ -98,6 +100,9 @@ Removed XML saves; patch the properties for duplicates
 1-4 Nov 2008:
 Moved code from dictionaries.py to MolDef class
 Implemented new methods for MolDef class
+
+29 Jul 2009:
+Completed the SML implementation
 __________________________________________________________________________________________________________
 """
 DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
@@ -168,9 +173,17 @@ class MolDef( NTtree ):
     #end def
 
     def appendResidueDef( self, name, shortName, **kwds ):
+        """
+        Append a new ResidueDef instance name, shortName
+        Return instance or None on error
+        """
         resDef = ResidueDef( name, shortName, **kwds )
         if self.has_key(name):
             oldResDef = self[name]
+            if not oldResDef.canBeModified:
+                NTerror('MolDef.appendResidueDef: replacing residueDef "%s" not allowed', oldResDef)
+                return None
+            #end if
             NTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
             self.replaceChild( oldResDef, resDef )
         else:
@@ -179,6 +192,34 @@ class MolDef( NTtree ):
         resDef.molDef = self
         resDef.postProcess()
         return resDef
+    #end def
+
+    def _restoreFromSML( self, convention=INTERNAL ):
+        """
+            Restore the MolDef instance from CING ResidueDef SML files
+        """
+        rootPath = os.path.realpath(os.path.join(cingPythonCingDir, 'Database' , convention) )
+        if not os.path.exists( rootPath ):
+            NTcodeerror('MolDef._restoreFromSML: rootPath "%s" does not exist; bailing out!', rootPath)
+            sys.exit(1)
+        #end if
+        restoreFromSML( rootPath, self, convention=convention )
+        # set the flag to disallow modifications
+        for rdef in self:
+            rdef.canBeModified = False
+            for adef in rdef:
+                adef.canBeModified = False
+        return NTdb
+    #end def
+
+    def _saveToSML( self, convention=INTERNAL ):
+        """
+            Save the MolDef instance to CING ResidueDef SML files; optionally convert to convention
+        """
+        rootPath = os.path.realpath(os.path.join(cingPythonCingDir, 'Database' , convention) )
+        if not os.path.exists( rootPath ):
+            os.makedirs(  rootPath )
+        saveToSML( self, rootPath, convention )
     #end def
 
     def appendResidueDefFromSMLfile(self, SMLfile):
@@ -360,6 +401,7 @@ class ResidueDef( NTtree ):
                            convention  = INTERNAL,
                            name        = name,
                            shortName   = shortName,
+                           canBeModified = True,
                            comment     = None,
                            nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
                            atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialization
@@ -381,15 +423,30 @@ class ResidueDef( NTtree ):
     #end def
 
     def appendAtomDef( self, name, **kwds ):
-        if self.has_key(name):
-            NTerror('ResidueDef.appendAtomDef: atomDef "%s" already exists', name)
+        """
+        Add an AtomDef instance name to ResidueDef
+
+        return instance or None on error
+        """
+        if not self.canBeModified:
+            NTerror('ResidueDef.appendAtomDef: modifying "%s" is not allowed', self)
             return None
         #end if
-        atm = AtomDef( name, **kwds )
-        self._addChild( atm )
-        atm.residueDef = self
-        atm.postProcess()
-        return atm
+
+        atmDef = AtomDef( name, **kwds )
+        if self.has_key(name):
+            oldAtmDef = self[name]
+            if not oldAtmDef.canBeModified:
+                NTerror('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
+                return None
+            #end if
+            NTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)
+            self.replaceChild( oldAtmDef, atmDef )
+        else:
+            self._addChild( atmDef )
+        atmDef.residueDef = self
+        atmDef.postProcess()
+        return atmDef
     #end def
 
     def appendAtomListDef( self, nameList=[], **kwds ):
@@ -706,7 +763,8 @@ class AtomDef( NTtree ):
                            name        = name,     # Internal name
                            nameDict    = {INTERNAL_0:name, INTERNAL_1:name}, # default initialization, to be
                                                                              # updated later.
-                           aliases     = [],       # list of aliases
+                           aliases     = [],       # list of aliases,
+                           canBeModified = True,
 
                            residueDef  = None,     # ResidueDef instance
 
@@ -1115,94 +1173,126 @@ def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
     return None
 #end def
 
+def saveToSML( rDefList, rootPath, convention=INTERNAL ):
+    """
+    Save ResidueDefs of rDefList as SML files in rootPath; optionally translate to convention
+    """
+    #print '>>', rootPath
+    fileList = NTlist()
+    for rdef in rDefList:
+        fname = rdef.translate(convention) +'.sml'
+        fileList.append(fname)
+        path = os.path.join(rootPath, fname)
+        NTdebug('saveToSML: saving %s to"%s"', rdef, path)
+        #obj2SML( rdef, path, convention=convention) cannot use, because it will generate circular imports!
+        rdef.SMLhandler.toFile( rdef, path, convention=convention )
+    #end for
+    # save a content file
+    obj2XML( fileList,path=os.path.join(rootPath, 'content.xml') )
+#end def
 
-#path, fname, ext = NTpath( __file__ )
-#print '>>', __file__, path
-# import the database table and generate the db-tree
-#NTdebug('importing NTdb')
-#NTdebug( '>' + INTERNAL )
-
-#print '>',os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL)
-
-NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
-
-
-# Patch N- and C-termini
-from cing import IUPAC,CCPN,XPLOR
-protein = NTdb.residuesWithProperties('protein')
-for res in protein[:-1]:
-
-    N = res.N
-    N.NterminalTopology = [(0,'CA')]
-
-    if 'HN' in res: #non-proline
-        hn = res.HN
-        #print hn
-
-        for hName in ['H1','H2','H3']:
-            ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
-                                                     'INTERNAL_1':hName,
-                                                      IUPAC:hName,
-                                                      CCPN:hName,
-                                                      XPLOR:hName,
-                                                    },
-                                         aliases=[],
-                                         pseudo = None,
-                                         real   = [],
-                                         shift  = hn.shift,
-                                         spinType = '1H',
-                                         topology = [(0,'N')],
-                                         type = 'H_AMI'
-                                 )
-            ad.postProcess()
-            N.NterminalTopology.append( (0,hName) )
-        #end for
-
-    else: # proline (cis and trans)
-
-        for hName in ['H2','H3']:
-            ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
-                                                     'INTERNAL_1':hName,
-                                                      IUPAC:hName,
-                                                      CCPN:hName,
-                                                      XPLOR:hName,
-                                                    },
-                                         aliases=[],
-                                         pseudo = None,
-                                         real   = [],
-                                         shift  = NTdict(average=8.3,sd=0.5), #just some numbers
-                                         spinType = '1H',
-                                         topology = [(0,'N')],
-                                         type = 'H_AMI'
-                                 )
-            ad.postProcess()
-            N.NterminalTopology.append( (0,hName) )
-        #end for
+def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
+    """
+    restore ResidueDefs from SML files in rootPath to a MolDef instance mDef
+    """
+    path = os.path.join(rootPath, 'content.xml')
+    fileList = XML2obj( path=path )
+    if fileList == None:
+        NTerror('restoreFromSML: unable to open "%s"', path)
+        return None
     #end if
+    for rfile in fileList:
+        path = os.path.join(rootPath, rfile)
+        NTdebug('restoreSML: restoring from "%s"', path)
+        mDef.appendResidueDefFromSMLfile( path)
+    #end for
+#end def
 
-    # Add O' alias for terminal oxygen
-    res.O.aliases=['O',"O'"]
-    res.O.postProcess()
 
-    # add C-terminal OXT
-    ad = res.appendAtomDef( 'OXT', nameDict={'INTERNAL_0':'OXT',
-                                             'INTERNAL_1':'OXT',
-                                               IUPAC:"OXT,O''",
-                                               CCPN:"O''",
-                                               XPLOR:'OXT',
-                                             },
-                                     aliases=["OXT","O''"],
-                                     pseudo = None,
-                                     real   = [],
-                                     spinType = '16O',
-                                     topology = [(0,'C')],
-                                     type = 'O_BYL'
-                             )
-    ad.postProcess()
-    res.C.CterminalTopology = [(0,'CA'),(0,'O'),(0,'OXT')]
+#NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
+NTdb = MolDef( name = 'NTdb') # Database instance; to be filled later,otherwise we get circular imports
 
-#end for
+patch=False
+if patch:
+    # Patch N- and C-termini
+    from cing import IUPAC,CCPN,XPLOR
+    protein = NTdb.residuesWithProperties('protein')
+    for res in protein[:-1]:
 
+        N = res.N
+        N.NterminalTopology = [(0,'CA')]
+
+        if 'HN' in res: #non-proline
+            hn = res.HN
+            #print hn
+
+            for hName in ['H1','H2','H3']:
+                ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
+                                                         'INTERNAL_1':hName,
+                                                          IUPAC:hName,
+                                                          CCPN:hName,
+                                                          XPLOR:hName,
+                                                        },
+                                             aliases=[],
+                                             pseudo = None,
+                                             real   = [],
+                                             shift  = hn.shift,
+                                             spinType = '1H',
+                                             topology = [(0,'N')],
+                                             type = 'H_AMI',
+                                             properties = hn.properties[1:]
+                                     )
+                ad.postProcess()
+                N.NterminalTopology.append( (0,hName) )
+            #end for
+
+        else: # proline (cis and trans)
+
+            for hName in ['H2','H3']:
+                ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
+                                                         'INTERNAL_1':hName,
+                                                          IUPAC:hName,
+                                                          CCPN:hName,
+                                                          XPLOR:hName,
+                                                        },
+                                             aliases=[],
+                                             pseudo = None,
+                                             real   = [],
+                                             shift  = NTdict(average=8.3,sd=0.5), #just some numbers
+                                             spinType = '1H',
+                                             topology = [(0,'N')],
+                                             type = 'H_AMI',
+                                             properties = hn.properties[1:]
+                                     )
+                ad.postProcess()
+                N.NterminalTopology.append( (0,hName) )
+            #end for
+        #end if
+
+        # Add O' alias for terminal oxygen
+        res.O.aliases=['O',"O'"]
+        res.O.postProcess()
+
+        # add C-terminal OXT
+        ad = res.appendAtomDef( 'OXT', nameDict={'INTERNAL_0':'OXT',
+                                                 'INTERNAL_1':'OXT',
+                                                   IUPAC:"OXT,O''",
+                                                   CCPN:"O''",
+                                                   XPLOR:'OXT',
+                                                 },
+                                         aliases=["OXT","O''"],
+                                         pseudo = None,
+                                         real   = [],
+                                         spinType = '16O',
+                                         topology = [(0,'C')],
+                                         type = 'O_BYL',
+                                         properties = res.O.properties[1:]
+                                 )
+        ad.postProcess()
+        res.C.CterminalTopology = [(0,'CA'),(0,'O'),(0,'OXT')]
+
+    #end for
+#end if
 
 
 

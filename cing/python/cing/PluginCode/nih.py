@@ -9,14 +9,27 @@ Methods:
 
 """
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTfile
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import sprintf
+from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
-from cing.core.molecule import allAtoms
-from cing.core.molecule import allResidues
+#from cing.core.molecule import allAtoms
+#from cing.core.molecule import allResidues
+from cing.Libs.fpconst import NaN
+
 import array
+
+import sys
+import os
 
 
 NIHheaderDefinitionString = """
@@ -472,9 +485,9 @@ NIHheaderDefinitionString = """
 #define FOLD_BAD            0 /* Folding can't be performed (extracted data). */
 #define FOLD_ORDINARY       1 /* Ordinary folding, no sign inversion.         */
 """
-#-----------------------------------------------------------------------------
+
+
 # Parse and create NIH header definitions
-#-----------------------------------------------------------------------------
 NIHheaderDefs = NTdict()
 for l in AwkLikeS( NIHheaderDefinitionString, minNF = 3 ):
     if (l.dollar[1] == '#define'):
@@ -673,68 +686,606 @@ def parseNMRPipeHeader( data ):
     return header
 #end def
 
+
+# Python Tablefile implementation
+# Formerly in Talos/nmrPipeTable.py
+class nmrPipeTabRow( NTdict ):
+    """
+    Class defining a row in a nmrTable file
+    """
+
+    def __init__( self, table, id, **kwds ):
+        NTdict.__init__( self, __CLASS__  = 'nmrPipeTabRow',
+                                 table      = table,
+                                 id         = id,
+                                 name       = 'row'+str(id),
+                                 __FORMAT__ = '%(name)s',
+                                 **kwds
+                          )
+        # set defaults to None
+        for c in self.keys():
+            self.setdefault( c, None )
+        #end for
+    #end def
+
+    def keys( self ):
+        """overide keys method to define collums as 'active' items"""
+        keys = []
+        for c in self.table.columnDefs:
+            keys.append( c.name )
+        return keys
+    #end def
+
+    def __iter__( self ):
+        for v in self.values():
+            yield v
+        #end for
+    #end def
+
+    def __str__( self ):
+        r = ''
+        for col in self.table.columnDefs:
+            if not col.hide:
+                if self[col.name] == None:
+                    dot=col.fmt.find('.')
+                    if dot < 0:
+                        fmt = col.fmt[:-1] + 's'
+                    else:
+                        fmt = col.fmt[0:dot] + 's'
+                    #endif
+
+                    r = r + fmt % (self.table.noneIndicator) + ' '
+                else:
+                    r = r + sprintf(col.fmt, self[ col.name ] ) + ' '
+                #end if
+            #end if
+        #end for
+        return r
+    #end def
+#end class
+
+class nmrPipeTable( NTdict ):
+    """
+    nmrPipeTable class
+    implemented as NTdict of NTdict's, i.e.
+
+    element (row-0, INDEX) indexed as
+        tab[0].INDEX   or tab[0]['INDEX']
+
+    tab = nmrPipeTable()                # Empty table
+    tab = nmrPipeTable( 'tabFile' )     # table from tabFile
+
+    METHODS:
+
+    addColumn( name, fmt = "%s", default=None ):
+        Add column 'name' to table; set values to 'default'
+
+    hideColumn( *cNames )
+        Hide column(s) cNames
+
+    showColumn( *cNames )
+        Show columns cNames
+
+    addRow( **kwds ):
+        Add row to table, optional kwds can be used to set values
+
+    readFile( tabFile  ):
+        Read table from tabFile
+
+    write( stream=sys.stdout ):
+        Write table to stream
+
+    writeFile( tabFile)   :
+        Open tabFile, write table and close tabFile
+
+    """
+
+    def __init__( self, tabFile=None, **kwds ):
+        NTdict.__init__( self, __CLASS__ = 'nmrPipeTab', **kwds )
+
+        self.setdefault('noneIndicator', '-') # character to identify the None value
+
+        self.columnDefs = NTlist()          # list of column definitions, implemented
+                                            # as NTdict
+        self.rows       = NTlist()
+        self.nrows      = 0
+        self.remarks    = NTlist()
+        self.data       = NTdict()
+        self.tabFile    = tabFile
+
+        if (tabFile):
+            self.readFile( tabFile  )
+        #end if
+    #end def
+
+    def format(self):
+        return sprintf(
+'''=== nmrPipeTable "%s" ===
+columns:  %s
+nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
+        )
+
+
+    def addRow( self, **kwds ):
+        """
+        Add row to table, optional kwds can be used to set values
+        """
+        row = nmrPipeTabRow( table=self, id=self.nrows, **kwds )
+        self[ self.nrows ] = row
+        self.rows.append( row )
+        self.nrows += 1
+        return row
+    #end def
+
+    def addColumn( self, name, fmt = "%s", default=None ):
+        """
+        Add column 'name' to table; set values to 'default'
+        return columnDef, or None on error
+        """
+        if name in self:
+            NTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
+            return None
+        #end if
+
+        col = NTdict( name=name,
+                        fmt=fmt,
+                        id=len(self.columnDefs),
+                        hide=False,
+                        __FORMAT__ = '%(name)s'
+                      )
+        self.columnDefs.append( col )
+        self[name] = col
+        for row in self:
+            row[name] = default
+        #end for
+
+        return col
+    #end def
+
+    def column( self, cName ):
+        """Return list of values of column cName or None on error
+        """
+        if cName not in self: return None
+
+        col = NTlist()
+        for row in self:
+            col.append( row[cName] )
+        #end for
+        return col
+    #end def
+
+    def hideColumn( self, *cNames ):
+        """
+        Hide column(s) cNames
+        """
+        for c in cNames:
+            if not c in self:
+                NTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
+            else:
+                self[c].hide = True
+            #end if
+        #end for
+    #end def
+
+    def showColumn( self, *cNames ):
+        """
+        Show column(s) cNames
+        """
+        for c in cNames:
+            if not c in self:
+                NTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
+            else:
+                self[c].hide = False
+            #end if
+        #end for
+    #end def
+
+    def readFile( self, tabFile  ):
+        """
+        Read table from tabFile
+        """
+        NTdebug('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
+
+        #end if
+
+        for line in AwkLike( tabFile, minNF = 1, commentString = '#' ):
+            if ( line.dollar[1] == 'REMARK' and line.NF > 1 ):
+                self.remarks.append( line.dollar[2:] )
+
+            elif ( line.dollar[1] == 'VARS' ):
+                for v in line.dollar[2:]:
+                    self.addColumn( name=v )
+                #end for
+            elif ( line.dollar[1] == 'FORMAT' ):
+                i = 0
+                for f in line.dollar[2:]:
+                    self.columnDefs[i].fmt=f
+                    i += 1
+                #end for
+            elif ( line.dollar[1] == 'DATA' and line.NF > 3 ):
+                self.data[line.dollar[2]] = line.dollar[3:]
+
+            elif ( line.NF == len( self.columnDefs ) ):
+                row = self.addRow()
+                for i in range( 0, line.NF ):
+                    col = self.columnDefs[i]
+
+                    if (line.dollar[i+1] == self.noneIndicator):
+                        row[col.name] = None
+                    else:
+                        # derive conversion function from fmt field
+                        if (col.fmt[-1:] in ['f','e','E','g','G']):
+                            func = float
+                        elif (col.fmt[-1:] in ['d','o','x','X']):
+                            func = int
+                        else:
+                            func = str
+                        #end if
+                        row[ col.name ] = func( line.dollar[i+1] )
+                    #endif
+                #end for
+            else:
+                pass
+            #end if
+        #end for
+        self.tabFile = tabFile
+    #end def
+
+    def write( self, stream=sys.stdout):
+        """
+        Write tab to stream
+        """
+        for r in self.remarks:
+            fprintf( stream, 'REMARK %s\n', r )
+        #end for
+        fprintf( stream, '\n' )
+
+        for d,v in self.data.iteritems():
+            fprintf( stream, 'DATA %s %s\n', d, v ) # Note: only ONE space between DATA and identifier!!!
+        #end for
+        fprintf( stream, '\n' )
+
+        fprintf(     stream, 'VARS    ' )
+        for c in self.columnDefs:
+            if not c.hide: fprintf( stream, '%s ', c.name )
+        #end for
+        fprintf( stream, '\n' )
+
+        fprintf(     stream, 'FORMAT  ' )
+        for c in self.columnDefs:
+            if not c.hide: fprintf( stream, '%s ', c.fmt )
+        #end for
+        fprintf( stream, '\n' )
+
+        fprintf( stream, '\n' )
+        for row in self:
+            fprintf( stream, '%s\n', row )
+        #end for
+
+    #end def
+
+    def writeFile( self, tabFile)   :
+        """
+        Write table to tabFile.
+        Return True on error
+        """
+        file = open( tabFile, 'w' )
+        if file == None:
+            NTerror('nmrPipeTable.writeFile: error opening "%s"', tabFile)
+            return True
+        self.write( file )
+        file.close()
+        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
+        return False
+    #end def
+
+    #iteration overrides: loop over row indices or rows
+    def keys( self ):
+        return range( 0, self.nrows )
+    #end def
+
+    def __iter__( self ):
+        for row in self.rows:
+            yield row
+        #end for
+    #end def
+#end def
+
+
 #-----------------------------------------------------------------------------
 # NIH routines
 #-----------------------------------------------------------------------------
-def exportShifts2Talos( molecule, fileName=None)   :
-    """Export shifts to talos format
+def exportShifts2TalosPlus( project, fileName=None):
+    """Export shifts to TalosPlus format
+
+    Return True on error.
+
+---------------------------------------------------
+
+An example of the required shift table format is shown below. Complete examples can be found in the talos/shifts and talos/test directories. Specifically:
+
+In the current version of TALOS/TALOS+, residue numbering must begin at 1.
+The protein sequence should be given as shown, using one or more "DATA SEQUENCE" lines. Space characters in the sequence will be ignored. Use "c" for oxidized CYS (CB ~ 42.5 ppm) and "C" for reduced CYS (CB ~ 28 ppm) in both the sequence header and the shift table.
+The table must include columns for residue ID, one-character residue name, atom name, and chemical shift.
+The table must include a "VARS" line which labels the corresponding columns of the table.
+The table must include a "FORMAT" line which defines the data type of the corresponding columns of the table.
+Atom names are always given exactly as:
+    HA       for H-alpha of all residues except glycine
+    HA2      for the first H-alpha of glycine residues
+    HA3      for the second H-alpha
+    C        for C' (CO)
+    CA       for C-alpha
+    CB       for C-beta
+    N        for N-amide
+    HN       for H-amide
+As noted, there is an exception for naming glycine assignments, which should use HA2 and HA3 instead of HA. In the case of glycine HA2/HA3 assignments, TALOS/TALOS+ will use the average value of the two, so that it is not necessary to have these assigned stereo specifically ; for use of TALOS/TALOS+, the assignment can be arbitrary. Note however that the assignment must be given exactly as either "HA2" or "HA3" rather than "HA2|HA3" etc.
+Other types of assignments may be present in the shift table; they will be ignored.
+
+Example shift table (excerpts):
+
+   REMARK Ubiquitin input for TALOS, HA2/HA3 assignments arbitrary.
+
+   DATA SEQUENCE MQIFVKTLTG KTITLEVEPS DTIENVKAKI QDKEGIPPDQ QRLIFAGKQL
+   DATA SEQUENCE EDGRTLSDYN IQKESTLHLV LRLRGG
+
+   VARS   RESID RESNAME ATOMNAME SHIFT
+   FORMAT %4d   %1s     %4s      %8.3f
+
+     1 M           HA                  4.23
+     1 M           C                 170.54
+     1 M           CA                 54.45
+     1 M           CB                 33.27
+     2 Q           N                 123.22
+     2 Q           HA                  5.25
+     2 Q           C                 175.92
+     2 Q           CA                 55.08
+     2 Q           CB                 30.76
+---------------------------------------------------
+
     """
 
-    if not molecule:
-        return None
+    if not project:
+        return True
     #end if
 
+    if not project.molecule:
+        NTerror('exportShifts2TalosPlus: no molecule defined')
+        return True
+    molecule = project.molecule
+    residues = molecule.residuesWithProperties('protein')
+
+    table = nmrPipeTable()
+    table.remarks.append( sprintf('shifts from %s', molecule.name ) )
+    residueOffset = residues[0].resNum-1 # residue numbering has to start from 1
+    table.remarks.append( sprintf('residue numbering offset  %d', residueOffset ) )
+
+#   generate a one-letter sequence string; map 'all chains to one sequence'
+    seqString = ''
+    for res in residues:
+#        seqString = seqString + res.db.shortName JFD mod; wrong, look at format def above!
+        if res.translate(INTERNAL_0) == 'CYSS':
+            seqString = seqString + 'c' # oxidized
+        else:
+            seqString = seqString + res.db.shortName
+    #end for
+
+#   data
+    table.data.SEQUENCE = seqString
+
+#   add collun entries
+    table.addColumn('RESID',    '%-4d')
+    table.addColumn('RESNAME',  '%-4s')
+    table.addColumn('ATOMNAME', '%-4s')
+    table.addColumn('SHIFT',    '%8.3f')
+
+    # defines IUPAC to talos mapping and nuclei used
+    talosDict = dict(
+                 N  = 'N',
+                 H  = 'HN',
+                 CA = 'CA',
+                 HA = 'HA',
+                 HA2= 'HA2',
+                 HA3= 'HA3',
+                 QA = 'HA2,HA3', # QA will be translsate into real atoms
+                 CB = 'CB',
+                 C  = 'C'
+                 )
+    talosNuclei = talosDict.keys()
+
+    atmCount = 0
+    for resId,res in enumerate(residues):
+        for ac in res.allAtoms():
+            atomName = ac.translate(IUPAC)
+            if (ac.isAssigned() and ( atomName in talosNuclei)):
+                shift = ac.shift() # save the shift, because Gly QA pseudo atom does get expanded
+                for ra in ac.realAtoms():
+                    # Translate to TalosPlus
+                    if talosDict.has_key(atomName):
+                        atomName = talosDict[atomName]
+                    else:
+                        NTerror('exportShifts2TalosPlus: strange, we should not be here (ra=%s)', ra)
+                        continue
+                    #end if
+
+                    #print '>', seqString[resId:resId+1]
+                    table.addRow( RESID=resId+1, RESNAME=seqString[resId:resId+1], ATOMNAME=atomName, SHIFT=shift)
+                    atmCount += 1
+                #end for
+            #end if
+        #end for
+    #end for
+
+    # save the table
     if not fileName:
         fileName = molecule.name + '.tab'
+    if not table.writeFile(fileName):
+        NTmessage( '==> exportShifts2TalosPlus:  %-4d shifts   written to "%s"', atmCount, fileName )
+#end def
+
+def _importTableFile( tabFile, molecule ):
+    """import a tabFile, match to residue instances of molecule
+
+    Return the nmrPipeTable instance or None on error
+    """
+
+    if not os.path.exists( tabFile ):
+        NTerror('_importTableFile: table file "%s" not found', tabFile)
+        return None
+
+    if molecule==None:
+        NTerror('_importTableFile: no molecule defined')
+        return None
+
+    # residues for which we will analyze; same as used in export2talosPlus
+    residues = molecule.residuesWithProperties('protein')
+
+    table = nmrPipeTable()
+    table.readFile(tabFile)
+
+    for row in table:
+        # find the residue
+        row.residue = None
+
+        if row.RESID > len(residues):
+            NTerror('_importTableFile: invalid RESID %d',  row.RESID)
+            continue
+
+        # map back onto CING
+        res = residues[row.RESID-1] # RESID started at 1
+        if res.db.shortName != row.RESNAME.upper(): # also allow for the 'c'
+            NTerror('_importTableFile: invalid RESNAME %s and CING %s',  row.RESNAME, res)
+            continue
+
+        row.residue = res
+        #print res, row
+    #end for
+    return table
+#end def
+
+def importTalosPlus( project, predFile, ssFile=None ):
+    """
+    Import TalosPlus results from pred.tab and pred.ss.tab
+    """
+
+    if not project:
+        return True
     #end if
 
-    f = open( fileName, 'w' )
+    if not project.molecule:
+        NTerror('importTalosPlus: no molecule defined')
+        return True
+    molecule = project.molecule
+    for res in molecule.allResidues():
+        res.talosPlus = None
 
-#   generate a oneletter sequence string
-    seqString = ''
-    for res in allResidues( molecule ):
-#        seqString = seqString + res.db.shortName JFD mod.
-        seqString = seqString + res.shortName
-    #end for
+    table = _importTableFile( predFile, molecule )
 
-#   header
-    fprintf( f, 'REMARK shifts from %s\n\n', molecule.name )
-    fprintf( f, 'DATA SEQUENCE %s\n\n', seqString )
-    fprintf( f, 'VARS   RESID   RESNAME ATOMNAME SHIFT\n' )
-    fprintf( f, '%s\n\n', 'FORMAT       %4d     %1s     %4s      %8.3f' )
+    for row in table:
 
-    talosUsed = ['N', 'H', 'CA', 'HA', 'HA1', 'HA2', 'HA3', 'CB', 'C']
+        #print '>', row, row.residue
+        talosPlus = NTdict( residue = row.residue,
+                             phi = NTvalue( row.PHI, row.DPHI, '%.1f +- %.1f'),
+                             psi = NTvalue( row.PSI, row.DPSI, '%.1f +- %.1f'),
+                             S2  = row.S2,
+                             count = row.COUNT,
+                             classification = row.CLASS,
+                             ss_class = None,
+                             ss_confidence = NaN,
+                            __FORMAT__ = '%(residue)s   %(phi)s  %(psi)s  %(count)s %(classification)s   %(S2).2f   %(ss_class)s %(ss_confidence).2f'
+                          )
 
-    count = 0
-    for ac in allAtoms( molecule ):
-        atomName    = ac.translate(IUPAC)
-        if (ac.isAssigned() and (atomName in talosUsed)):
-            fprintf( f, '%4d    %1s     %4s      %8.3f\n',
-                        ac._parent.resNum,
-#                        ac._parent.db.shortName, JFD mod.
-                        ac._parent.shortName,
-                        atomName,
-                        ac.shift()
-                   )
-            count += 1
+        if talosPlus.classification == 'None':
+            talosPlus.phi.value = NaN
+            talosPlus.phi.error = NaN
+            talosPlus.psi.value = NaN
+            talosPlus.psi.error = NaN
         #end if
+
+        row.residue.talosPlus = talosPlus
     #end for
 
-    f.close()
-
-    NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"', count, fileName )
+    # do the second ss file
+    if ssFile:
+        table = _importTableFile( ssFile, molecule )
+        for row in table:
+            row.residue.talosPlus.ss_class = row.SS_CLASS
+            row.residue.talosPlus.ss_confidence = row.CONFIDENCE
+        #end for
     #end if
 #end def
 
-#-----------------------------------------------------------------------------
-def export2NIH( project, tmp=None ):
+
+#def exportShifts2Talos( molecule, fileName=None)   :
+#    """Export shifts to talos format
+#    """
+#
+#    if not molecule:
+#        return None
+#    #end if
+#
+#    if not fileName:
+#        fileName = molecule.name + '.tab'
+#    #end if
+#
+#    f = open( fileName, 'w' )
+#
+##   generate a oneletter sequence string
+#    seqString = ''
+#    for res in allResidues( molecule ):
+##        seqString = seqString + res.db.shortName JFD mod.
+#        if res.translate(INTERNAL_1) == 'CYSS':
+#            seqString = seqString + 'c' # oxidized
+#        else:
+#            seqString = seqString + res.shortName
+#    #end for
+#
+##   header
+#    fprintf( f, 'REMARK shifts from %s\n\n', molecule.name )
+#    fprintf( f, 'DATA SEQUENCE %s\n\n', seqString )
+#    fprintf( f, 'VARS   RESID   RESNAME ATOMNAME SHIFT\n' )
+#    fprintf( f, '%s\n\n', 'FORMAT       %4d     %1s     %4s      %8.3f' )
+#
+#    talosUsed = ['N', 'H', 'CA', 'HA', 'HA1', 'HA2', 'HA3', 'QA', 'CB', 'C']
+#
+#    count = 0
+#    for ac in allAtoms( molecule ):
+#        if (ac.isAssigned() and (atomName in talosUsed)):
+#            # construct the Talos name, especially expand the GLY QA, but code is general
+#            if not ac.isPseudoAtom():
+#                atomName = ac.translate(IUPAC)
+#            else:
+#                atomName = ''
+#                for ra in ac.realAtoms():
+#                    atomName = atomName + '|' + ra.translate(IUPAC)
+#                atomName = atomName[1:]
+#            #end if
+#
+#
+#            fprintf( f, '%4d    %1s     %4s      %8.3f\n',
+#                        ac._parent.resNum,
+##                        ac._parent.db.shortName, JFD mod.
+#                        ac._parent.shortName,
+#                        atomName,
+#                        ac.shift()
+#                   )
+#            count += 1
+#        #end if
+#    #end for
+#
+#    f.close()
+#
+#    NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"', count, fileName )
+#    #end if
+##end def
+
+def export2nih( project, tmp=None ):
     """
     Export resonances to NIH (talos) format
     """
 
     for mol in project.molecules:
-        fileName = project.path( project.directories.nih, mol.name+'.talos' )
-        exportShifts2Talos(  mol, fileName=fileName )
+        fileName = project.path( project.directories.nih, mol.name+'.talosPlus.tab' )
+        exportShifts2TalosPlus(  project, fileName=fileName )
     #end for
 
 #     for pl in project.peakLists:
@@ -742,13 +1293,14 @@ def export2NIH( project, tmp=None ):
 #         exportPeaks2Sparky( pl, peakFile)
     #end for
 #end def
+
 #-----------------------------------------------------------------------------
 
 # register the functions
-methods  = []
+methods  = [(importTalosPlus,None)]
 saves    = []
 restores = []
-exports  = [(export2NIH, None)]
+exports  = [(export2nih, None)]
 
 
 #-----------------------------------------------------------------------------

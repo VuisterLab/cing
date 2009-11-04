@@ -2258,9 +2258,12 @@ def initCcpn(project, ccpnFolder, modelCount = None):
        Output: Cing.Project or None on error.
     '''
     # work horse class.
+    if not os.path.exists( ccpnFolder ):
+        NTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
+        return None
     ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
     if not ccpn.importFromCcpn(modelCount = modelCount):
-        NTerror("Failed importFromCcpn")
+        NTerror("initCcpn: Failed importFromCcpn")
         return None
     return project
 

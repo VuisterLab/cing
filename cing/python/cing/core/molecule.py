@@ -47,6 +47,7 @@ from cing.core.constants import XPLOR
 from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from database import NTdb
+#from cing import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
@@ -315,7 +316,7 @@ class Molecule( NTtree ):
             newName = self.getNextAvailableChainId()
             if not newName:
                 NTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
-                return None
+            return None
             NTwarning( 'Molecule.addChain: got next available one: %s' % newName)
             name = newName
 
@@ -944,6 +945,7 @@ class Molecule( NTtree ):
         for atom in self.allAtoms():
             atom.addResonance()
         #end for
+        self.currentResonancesIndex = self.resonanceCount
         self.resonanceCount += 1
         self.resonanceSources.append(source)
     #end def
@@ -1162,7 +1164,6 @@ class Molecule( NTtree ):
         By default the bonds that are determined with a certainty above CUTOFF_SCORE will actually be
         applied.
         """
-
         CUTOFF_SCORE = 0.9 # Default is 0.9
         CUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
 
@@ -1194,7 +1195,6 @@ class Molecule( NTtree ):
         pairList = []
         disulfides = [] # same as pairList but with scoreList.
         cyssDict2Pair = {}
-
         # all cys(i), cys(j) pairs with j>i
         for i in range(len(cys)):
             c1 = cys[i]
@@ -1346,6 +1346,8 @@ class Molecule( NTtree ):
         self.atomList = AtomList( self )
         if not self.atomList:
             NTcodeerror("Failed to generate AtomList in molecule#updateAll")
+
+
         self.updateTopology()
     #end def
 
@@ -2174,7 +2176,7 @@ Chain class: defines chain properties and methods
         return res
     #end def
 
-    def removeResidue( self, residue):
+    def removeResidue( self, residue)   :
         if not residue in self._children:
             NTerror( 'Chain.removeResidue: residue "%s" not present in chain %s',
                      residue, self
@@ -2425,7 +2427,7 @@ Residue class: Defines residue properties
         return self
     #end def
 
-    def mutate( self, resName ):
+    def mutate( self, resName   ):
         """
         Mutate residue to resName:
             Generate newResidue <Residue> instance.
@@ -4202,8 +4204,7 @@ def disulfideScore( cys1, cys2 ):
             atom = cysResidue[atomName]
             if not len(atom.coordinates):
                 NTmessage("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
-                return None
-
+        return None
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
@@ -4239,7 +4240,7 @@ def isValidChainId( chainId ):
 #        return False
 #    return True
 
-def ensureValidChainId( chainId ):
+def ensureValidChainId(chainId ):
     """See doc Molecule#ensureValidChainIdForThisMolecule
     In absence of an existing molecule this routine can only return the default chain id
     if the presented id is not valid.
