@@ -7,6 +7,7 @@ from cing import cingRoot
 from cing import cingVersion
 from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
+from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTaverage
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
@@ -34,13 +35,21 @@ from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImpor
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
-from cing.PluginCode.html import addPreTagLines
+from cing.Libs.html import addPreTagLines
+from cing.Libs.html import generateHtml
+from cing.Libs.html import renderHtml
+from cing.Libs.html import setupHtml
+from cing.Libs.pdb import export2PDB
+from cing.Libs.pdb import importPDB
+from cing.Libs.pdb import initPDB
+from cing.core.CingSummary import CingSummary
 from cing.core.ROGscore import ROGscore
 from cing.core.constants import AC_LEVEL
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 from cing.core.constants import DRL_LEVEL
 from cing.core.constants import DR_LEVEL
+from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
 from cing.core.constants import RDC_LEVEL
 from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
@@ -54,8 +63,19 @@ from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
+from cing.core.validate import checkForSaltbridges
+from cing.core.validate import criticize
+from cing.core.validate import criticizePeaks
+from cing.core.validate import fixStereoAssignments
+from cing.core.validate import partitionRestraints
+from cing.core.validate import runCingChecks
+from cing.core.validate import summary
+from cing.core.validate import validate
+from cing.core.validate import validateAssignments
+from cing.core.validate import validateDihedrals
+from cing.core.validate import validateModels
+from cing.core.validate import validateRestraints
 from shutil import rmtree
-from cing.Libs.NTutils import Lister
 import cing
 import math
 import os
@@ -157,12 +177,11 @@ Project: Top level Cing project class
                            distanceListNames        =  NTlist(),    # list to store distancelist names names for save and restore
                            dihedralListNames        =  NTlist(),    # list to store dihedrallist names for save and restore
                            rdcListNames             =  NTlist(),    # list to store rdclist names for save and restore
-                           coplanarListNames = NTlist(), # list to store rdclist names for save and restore
+                           coplanarListNames = NTlist(), # list to store  names for save and restore
 
                            reports                  =  NTlist(),    # list with validation reports names
 
                            history                  =  History(),
-
                            contentIsRestored        =  False,       # True if Project.restore() has been called
                            storedInCcpnFormat       =  False,       #
 
@@ -222,6 +241,8 @@ Project: Top level Cing project class
 #        self.makeObjectPaths() # generates the objectPaths dict from the nameLists
 
         self.rogScore   = ROGscore()
+        self.summaryDict = CingSummary()
+
         self.valSets = NTdict()
         self.readValidationSettings(fn=None)
 
@@ -296,6 +317,14 @@ Project: Top level Cing project class
             self.valSets[key] = value # name value pairs.
         #end for
         self.valSets.keysformat()
+    #end def
+
+    def getCingSummaryDict( self ):
+        """Get a CING summary dict from self
+        Return summayDict or None on error
+        """
+        self.summaryDict.getSummaryFromProject(self)
+        return self.summaryDict
     #end def
 
     #-------------------------------------------------------------------------
@@ -598,6 +627,28 @@ Project: Top level Cing project class
         return None
     #end def
 
+    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2  ):
+        """
+        Calculate a superposition of current active molecule
+        return rmsd result of molecule, or None on error
+
+        """
+
+        if not self.molecule:
+            NTerror('Project.superpose: undefined molecule')
+            return None
+        #end if
+
+        if self.molecule.modelCount == 0:
+            NTerror('Project.superpose: no coordinates for %s\n', self.molecule)
+            return None
+        #end if
+        self.molecule.superpose(ranges=ranges, backboneOnly=backboneOnly,
+                                   includeProtons = includeProtons, iterations=iterations
+                                  )
+        return self.molecule.rmsd
+    #end def
+
     def save( self):
         """
         Save project data;
@@ -688,7 +739,7 @@ Project: Top level Cing project class
         """To slim down the memory footprint; should allow garbage collection."""
         attributeToRemove = "ccpn"
         try:
-        	self.removeRecursivelyAttribute( attributeToRemove )
+            self.removeRecursivelyAttribute( attributeToRemove )
         except:
             NTerror("Failed removeCcpnReferences")
 
@@ -884,7 +935,64 @@ Project: Top level Cing project class
             NTerror("Failed to remove existing cing project")
             return True
 
-#end class
+    # Convenience methods calls to validate.py.
+    def initPDB(self, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
+        """Initializes from a pdb file."""
+        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update, allowNonStandardResidue = allowNonStandardResidue)
+
+    def importPDB(self, pdbFile, convention = IUPAC, nmodels = None):
+        """Initializes from a pdb file."""
+        return importPDB(self, pdbFile, convention = convention, nmodels = nmodels)
+
+    def export2PDB(self, tmp = None):
+        """Initializes from a pdb file."""
+        return export2PDB(self, tmp = tmp)
+
+    def validateAssignments(self):
+        return validateAssignments(self)
+
+    def validateDihedrals(self):
+        return validateDihedrals(self)
+
+    def validateModels(self):
+        return validateModels(self)
+
+    def validateRestraints( self, toFile = True):
+        return validateRestraints( self, toFile = toFile)
+
+    def criticizePeaks( self, toFile=True ):
+        return criticizePeaks( self, toFile = toFile)
+
+    def fixStereoAssignments( self, toFile=True ):
+        return fixStereoAssignments( self, toFile = toFile)
+
+    def summary( self, toFile=True ):
+        return summary( self, toFile = toFile)
+
+    def criticize(self, toFile=True):
+        return criticize(self, toFile=toFile)
+
+    def validate( self, ranges=None, parseOnly=False, htmlOnly=False, doProcheck = True, doWhatif=True, doWattos=True ):
+        return validate( self, ranges=ranges, parseOnly=parseOnly, htmlOnly=htmlOnly, doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos )
+
+    def runCingChecks( self, ranges=None ):
+        return runCingChecks( self, ranges=ranges )
+
+    def checkForSaltbridges( self, cutoff = 0.5, toFile=False):
+        return checkForSaltbridges( self, cutoff = cutoff, toFile=toFile)
+
+    def partitionRestraints( self, tmp=None ):
+        return partitionRestraints( self, tmp=tmp )
+
+    def setupHtml(self):
+        return setupHtml(self)
+
+    def renderHtml(self):
+        return renderHtml(self)
+
+    def generateHtml( self, htmlOnly=False ):
+        return generateHtml( self, htmlOnly=htmlOnly )
+
 
 
 class XMLProjectHandler( XMLhandler ):
@@ -1475,8 +1583,8 @@ class DistanceRestraint( NTdict ):
         otherwise: keep atom with lower residue index first
         """
 
-		# GV says; order needs to stay: is beeing used for easier
-		# (manual) analysis.
+        # GV says; order needs to stay: is beeing used for easier
+        # (manual) analysis.
 
 
         if pair[0] == None or pair[1] == None:
@@ -1578,8 +1686,8 @@ class DistanceRestraint( NTdict ):
         i = 0
         for atm1,atm2 in self.atomPairs:
 
-        	# GV says: Check are done to prevent crashes upon rereading
-        	# datasets with floating/adhoc residues/atoms
+            # GV says: Check are done to prevent crashes upon rereading
+            # datasets with floating/adhoc residues/atoms
 
             # skip trivial cases
             if atm1 == atm2:
@@ -2197,11 +2305,11 @@ class DihedralRestraint( NTdict ):
         try:
             for i in range(modelCount):
                 d = NTdihedralOpt(
-        	                    self.atoms[0].coordinates[i],
-            	                self.atoms[1].coordinates[i],
-                	            self.atoms[2].coordinates[i],
-                    	        self.atoms[3].coordinates[i]
-                        	  )
+                                self.atoms[0].coordinates[i],
+                                self.atoms[1].coordinates[i],
+                                self.atoms[2].coordinates[i],
+                                self.atoms[3].coordinates[i]
+                              )
                 self.dihedrals.append( d )
             #end for
         except:
@@ -2687,7 +2795,7 @@ class RDCRestraintList( NTlist ):
             NTwarning("See also issue: %s%d"%(issueListUrl,133))
         else:
             if len(self[0].atomPairs):
-            	modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
+                modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
         if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz

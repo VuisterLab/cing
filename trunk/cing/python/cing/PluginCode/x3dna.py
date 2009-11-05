@@ -21,7 +21,6 @@ from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.fpconst import NaN
-from cing.PluginCode.pdb import moleculeToPDBfile
 from cing.PluginCode.required.reqX3dna import BUCKLE_STR
 from cing.PluginCode.required.reqX3dna import MAJPP_STR
 from cing.PluginCode.required.reqX3dna import MINPP_STR
@@ -42,6 +41,7 @@ from cing.core.classes import Coplanar
 from cing.core.classes import CoplanarList
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
+from cing.Libs.pdb import moleculeToPDBfile
 import cing
 import os
 

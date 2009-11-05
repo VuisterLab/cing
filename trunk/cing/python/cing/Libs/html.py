@@ -3000,14 +3000,3 @@ def sortListByRogAndKey(theList, sortKey=None, descending=True):
             listGreen.append(item)
     theList = listRed + listOrange + listGreen
     return theList
-
-
-# register the functions
-methods  = [(setupHtml, None),
-            (generateHtml, None),
-            (renderHtml, None)
-           ]
-#saves    = []
-#restores = [
-#           ]
-#exports  = []

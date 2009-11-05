@@ -4,11 +4,11 @@ python $CINGROOT/python/cing/PluginCode/test/test_html.py
 """
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing.PluginCode.html import HTML_TAG_PRE
-from cing.PluginCode.html import HTML_TAG_PRE2
-from cing.PluginCode.html import HTMLfile
-from cing.PluginCode.html import MakeHtmlTable
-from cing.PluginCode.html import removePreTagLines
+from cing.Libs.html import HTML_TAG_PRE
+from cing.Libs.html import HTML_TAG_PRE2
+from cing.Libs.html import HTMLfile
+from cing.Libs.html import MakeHtmlTable
+from cing.Libs.html import removePreTagLines
 from cing.core.classes import Project
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule

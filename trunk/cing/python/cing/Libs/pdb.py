@@ -850,12 +850,3 @@ def export2PDB(project, tmp = None):
     #end for
     return None
 #end def
-
-# register the functions
-methods = [(initPDB, None),
-            (importPDB, None)
-           ]
-#saves    = []
-#restores = []
-exports = [(export2PDB, None)
-           ]
