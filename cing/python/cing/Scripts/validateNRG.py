@@ -62,8 +62,8 @@ doScriptOnEntryList(pythonScriptFileName,
                     startDir,
                     processes_max = 2,
                     delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
-                    max_time_to_wait = 60 * 60 * 4, # 1y4o took 2367s. 2k0e is largest taking ???.
-                    # 1ai0 took over 20 min; let's set this to 1 hour
+                    max_time_to_wait = 60 * 60 * 6, # 2p80 took the longest: 5.2 hours.
+                    # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
                     START_ENTRY_ID = 0,
                     MAX_ENTRIES_TODO = 1,
                     extraArgList = extraArgList)

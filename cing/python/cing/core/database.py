@@ -1,21 +1,19 @@
+from cing import cingPythonCingDir
+from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
+from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import XML2obj
+from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import obj2XML
 from cing.core.constants import INTERNAL
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import INTERNAL_1
 from cing.core.constants import LOOSE
-from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import fprintf
-from cing import cingPythonCingDir
-#from cing import NTdb
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import XML2obj
 import os
 import sys
 

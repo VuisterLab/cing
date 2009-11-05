@@ -57,10 +57,10 @@ class AllChecks(TestCase):
 
 #        p.yRange = None # Should autoscale the plot in y.
         ps.hardcopy('testPlotVaria.png')
-#        ps.show()
+        ps.show()
 
 
-    def testPlotModelHisto(self):
+    def tttestPlotModelHisto(self):
         ps = NTplotSet() # closes any previous plots
         outliersPerModel = { 0:2, 1:3 }
         valueList = outliersPerModel.values()
@@ -86,13 +86,13 @@ class AllChecks(TestCase):
 
 
 
-    def testTo3StateUpper(self):
+    def tttestTo3StateUpper(self):
         self.assertEquals(     to3StateUpper(['S','E']), [' ','S'])
         self.assertEquals(     to3StateUpper(['h','H']), [' ','H'])
         self.assertNotEquals(  to3StateUpper([' ','H']), ['H','H'])
         self.assertEquals(     to3StateUpper(['X','H']), [' ','H'])
 
-    def testPlotSet(self):
+    def tttestPlotSet(self):
 #        hardcopySize = (60,30)
         ps = NTplotSet() # closes any previous plots
         nrows = 3

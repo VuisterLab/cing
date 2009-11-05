@@ -174,7 +174,7 @@ from cing.core.classes      import RDCRestraint,      RDCRestraintList
 # Try a Yasara import
 # GV: We could change this by defining yasaradir in the CING setup
 try:
-    from yasara import yasaradir
+    from yasara import yasaradir #@UnresolvedImport # JFD: why not add the functionality from the plugin ?
     if os.path.exists(yasaradir):
         sys.path.append(os.path.join(yasaradir,'pym'))
         sys.path.append(os.path.join(yasaradir,'plg'))
@@ -191,8 +191,7 @@ from cing.core.sml          import obj2SML      # This also initializes the SMLh
 from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods
 
 
-#from cing.core.database     import NTdb
-from cing.core.database     import NTdb
+from cing.core.database     import NTdb #@Reimport
 NTdb._restoreFromSML()                          # This initializes the database
 
 

@@ -8,28 +8,25 @@ Methods:
         Export resonances talos format
 
 """
-from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTfile
-from cing.Libs.NTutils import NTerror
+from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTfile
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
+from cing.Libs.fpconst import NaN
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
-#from cing.core.molecule import allAtoms
-#from cing.core.molecule import allResidues
-from cing.Libs.fpconst import NaN
-
 import array
-
-import sys
 import os
+import sys
+
+
 
 
 NIHheaderDefinitionString = """
