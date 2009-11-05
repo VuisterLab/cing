@@ -1,6 +1,8 @@
 """
 Adds x3dna method to analyze DNA structures. The x3dna program is included as binaries for Mac OSX in the bin directory.
 """
+from cing import OS_TYPE_MAC
+from cing import osType
 from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
@@ -21,6 +23,7 @@ from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.fpconst import NaN
+from cing.Libs.pdb import moleculeToPDBfile
 from cing.PluginCode.required.reqX3dna import BUCKLE_STR
 from cing.PluginCode.required.reqX3dna import MAJPP_STR
 from cing.PluginCode.required.reqX3dna import MINPP_STR
@@ -41,15 +44,17 @@ from cing.core.classes import Coplanar
 from cing.core.classes import CoplanarList
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
-from cing.Libs.pdb import moleculeToPDBfile
 import cing
 import os
 
 useModule = True
-# TODO: test if the binary is actually applicable to the system os.
-if not os.path.exists(cingPaths.x3dna):
-    NTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
+if osType == OS_TYPE_MAC: # only installed for mac os currently.
+    if not os.path.exists(cingPaths.x3dna): # cingPaths.x3dna gets set in __init__ for MAC.
+        NTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
+        useModule = False
+else:
     useModule = False
+
 if not useModule:
     raise ImportWarning('x3dna')
 
