@@ -25,6 +25,8 @@ public class FileView extends iCingView {
     final Button nextButton = new Button();
     final FlexTable flexTable = new FlexTable();
     final Button addButton = new Button();
+    final HTML NRG_CING_HTML = new HTML();
+
     private final Message statusMessage = new Message("invisible empty msg", Message.SHAKE, 0.5);
 
     int i = 0;
@@ -54,6 +56,12 @@ public class FileView extends iCingView {
         verticalPanel.add(statusMessage);
         // Since there is no status initially, hide the status message
         statusMessage.setVisible(false);
+
+        // Or visit NRG-CING for CING validation reports of an existing PDB NMR entry.
+        String htmlText = "<P>"+c.Or_visit_NRG_CIN()+"</P>";
+        htmlText = htmlText.replace("NRG-CING", "<A HREF=\"" + Settings.NRG_CING_URL + "\">NRG-CING</A>");
+        NRG_CING_HTML.setHTML(htmlText);
+        verticalPanel.add(NRG_CING_HTML);
 
         DecoratorPanel decPanel = new DecoratorPanel();
         final HorizontalPanel horizontalPanel = new HorizontalPanel();
@@ -105,7 +113,7 @@ public class FileView extends iCingView {
         nextButton.setText(c.Next());
         nextButton.setTitle(c.Set_the_criteria());
     }
-    
+
     public boolean showStartButton() {
         flexTable.setWidget(0, 0, startButton);
         startButton.setTitle(c.Select_file_s_());
@@ -137,7 +145,7 @@ public class FileView extends iCingView {
 
     /**
      * flexTable ->cingQuerySave.formLayoutPanel
-     * 
+     *
      * @return true on error.
      */
     public boolean addUploadRow() {
@@ -387,7 +395,7 @@ public class FileView extends iCingView {
                 setExample(listBox_Program, listBox_Type, listBox_Subtype, listBox_Other, egHtml);
             }
         });
-        
+
         setExample(listBox_Program, listBox_Type, listBox_Subtype, listBox_Other, egHtml);
         flexTable.setWidget(currentRowIdx, egIdx, egHtml);
 
@@ -401,7 +409,7 @@ public class FileView extends iCingView {
     }
 
     void setExample(ListBox listBox_Program, ListBox listBox_Type, ListBox listBox_Subtype,
-            ListBox listBox_Other, HTML egHtml) {        
+            ListBox listBox_Other, HTML egHtml) {
         /** Keep block together */
         String program = Utils.getListBoxItemText(listBox_Program);
         String type = Utils.getListBoxItemText(listBox_Type);
@@ -409,7 +417,7 @@ public class FileView extends iCingView {
         String other = Utils.getListBoxItemText(listBox_Other);
 
         String egFilename = Classification.getExample(program, type, subType, other);
-        
+
         String exampleUrl = "example/" + egFilename;
         exampleUrl = c.E_g_() + " <A HREF=\"" + exampleUrl + "\">"   + egFilename + "</a>";
         egHtml.setHTML(exampleUrl);
