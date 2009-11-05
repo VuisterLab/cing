@@ -10,9 +10,11 @@ public interface Settings {
     /** The next statement should updated manually now.*/
 //    public static final String VERSION = "0.88"; discontinued as it is different here from CING and might lead to confusion.
     /** The next statement should updated manually now. Can be automated by ant script querying svn info like for WATTOS project*/
-    public static final String REVISION = "646";
+    public static final String REVISION = "662";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
+    /** URL for NRG-CING. */
+    public static final String NRG_CING_URL = "http://nmr.cmbi.ru.nl/NRG-CING";
     /** Local install location of CING */
     public static final String CINGROOT = "/Users/jd/workspace34/cing";
     /** Wrapper to take care of environment settings and some os specific things. */

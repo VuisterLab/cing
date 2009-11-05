@@ -440,6 +440,14 @@ public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   String After_a_while_it();
 
   /**
+   * Translated "Or visit NRG-CING for a CING validation report of an existing PDB NMR entry.".
+   * 
+   * @return translated "Or visit NRG-CING for a CING validation report of an existing PDB NMR entry."
+   * @gwt.key Or_visit_NRG_CIN
+   */
+  String Or_visit_NRG_CIN();
+
+  /**
    * Translated "Omega".
    * 
    * @return translated "Omega"
