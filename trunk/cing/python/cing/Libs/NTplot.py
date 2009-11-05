@@ -7,9 +7,6 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import isAlmostEqual
 from cing.Libs.NTutils import limitToRange
-from cing.Libs.matplotlibExt import blue_inv
-from cing.Libs.matplotlibExt import green_inv
-from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqDssp import to3StateUpper
@@ -21,6 +18,7 @@ from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
+from matplotlib import cm
 from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib.axes import Axes
@@ -59,6 +57,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import Locator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
+from numpy import ma
 from numpy.core.fromnumeric import amax
 from numpy.core.numeric import arange
 import math
@@ -1092,27 +1091,58 @@ class NTplot( NTdict ):
         This routine will calculate the c_dbav, s_dbav
         """
 
-        alpha = 0.8
+        alpha = 0.8 # was 0.8; looks awful with alpha = 1
         extent = self.xRange + self.yRange
         # make sure helix and sheet are plotted over coil
+
+        green_inv  = colors.LinearSegmentedColormap.from_list('inv_green', ('white', 'green'))
+        blue_inv   = colors.LinearSegmentedColormap.from_list('inv_blue', ('white', 'blue'))
+        yellow_inv = colors.LinearSegmentedColormap.from_list('inv_yellow', ('white', 'yellow'))
+
         cmapList= [   green_inv, blue_inv, yellow_inv ]
         colorList= [ 'green',   'blue',   'yellow']
         i = 0
+#        i = 2
         for hist in histList:
-#        for hist in [ histList[0] ]:
-#            if i == 9: # skip some when testing.
-#                i += 1
-#                continue
+#        for hist in [ histList[i] ]:
             maxHist = amax(amax( hist ))
+#            minHist = amin(amin( hist ))
 #            NTdebug("maxHist: %s" % maxHist)
+#            NTdebug("minHist: %s" % minHist)
             hist *= 100./maxHist
-            palette = cmapList[i]
-            palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0
-#            palette.set_under(alpha = 0.0)
-            palette.set_under(color = 'white', alpha = 0.0 )
-#            histm = masked_where(hist < minPercentage, hist, copy=1)
+
+            # Just make a copy...
+            hist = ma.masked_where(hist <= minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
+#            hist = ma.masked_where(hist < minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
+            # the above is a workaround in order to use the 'bad' utility of the api.
+            # The problem is that it doesn't do nice alpha mixing so disabled again to find solution.
+
+            if True:
+                palette = cmapList[i]
+                palette.set_under(color = 'w', alpha = 0.0 ) # alpha is 0.0
+                palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
+                palette.set_bad(color = 'w', alpha = 0.0 )
+            else:
+                # Set up a colormap for debugging
+                palette = cm.gray
+                palette.set_over('r', 1.0)
+                palette.set_under('g', 1.0)
+                palette.set_bad('b', 1.0)
+                # Alternatively, we could use
+                # palette.set_bad(alpha = 0.0)
+                # to make the bad region transparent.  This is the default.
+                # If you comment out all the palette.set* lines, you will see
+                # all the defaults; under and over will be colored with the
+                # first and last colors in the palette, respectively.
+
+#            palette._set_extremes()
+
             norm = colors.Normalize(vmin = minPercentage,
-                                    vmax = maxPercentage, clip = False)
+                                    vmax = maxPercentage, clip = True) # clip is False
+#            NTdebug("under: %s" % str(palette._rgba_under))
+#            NTdebug("over : %s" % str(palette._rgba_over))
+#            NTdebug("bad  : %s" % str(palette._rgba_bad))
+
             imshow( hist,
                     interpolation='bicubic',
 #                    interpolation = 'nearest', # bare data.

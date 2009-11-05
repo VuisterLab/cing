@@ -62,3 +62,32 @@ end
 
 
 echo "\nFound number of log files: $#logFileList"
+
+
+
+exit 0
+
+# hand commands follow:
+# scan for the maximum time taken.
+grep '\[' ~/analyzeLastLogNRG-CING_2009-11-04.log | sed -e 's/\[//' | sed -e 's/\]//' | gawk '{print $2}' | sort -n | head
+
+set listToRemove = ( 1f8h 2k77 2px9 1j6t 1jtw 2con 2new 1vrc 2exg 1dx1 1his 1hit 1r2n )
+cd /Library/WebServer/Documents/NRG-CING/data
+foreach x ( $listToRemove )
+    set ch23 = ( `echo $x | cut -c2-3` )
+    set entryDir = $ch23/$x
+    \rm -rf $entryDir >& /dev/null
+end
+
+
+set list = ( 1bn0 1chv 1ont 1x5b 1xv3 1y8f 2ff0 2k0j 2k1n 2k3m 2k61 )
+cd /Library/WebServer/Documents/NRG-CING/data
+set logFileList = ()
+foreach x ( $list )
+    set ch23 = ( `echo $x | cut -c2-3` )
+    set logFile = (`find $ch23/$x -depth 1 -name "$x*.log" | sort | tail -1`)
+    set logFileList = ($logFileList $logFile)
+end
+vi $logFileList
+
+
