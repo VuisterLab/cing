@@ -47,9 +47,9 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
+from cing.Libs.html import addPreTagLines
+from cing.Libs.html import removePreTagLines
 from cing.Libs.peirceTest import peirceTest
-from cing.PluginCode.html import addPreTagLines
-from cing.PluginCode.html import removePreTagLines
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
@@ -1418,25 +1418,3 @@ def validateModels( self)   :
 #    for m, count in self.models.items():
 #        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
 #end def
-
-
-# register the functions
-methods  = [(validateDihedrals, None),
-            (validateModels,None),
-            (validateAssignments, None),
-            (validateRestraints, None),
-#
-            (runCingChecks, None),
-            (validate,None),
-            (criticizePeaks, None),
-            (summary, None),
-
-            (checkForSaltbridges, None),
-            (fixStereoAssignments, None),
-           ]
-#saves    = []
-restores = [
-            (partitionRestraints,None),
-            (criticize,None),
-           ]
-#exports  = []

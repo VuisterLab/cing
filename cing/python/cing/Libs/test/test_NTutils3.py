@@ -6,7 +6,6 @@ from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import bytesToFormattedString
 from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.NTutils import toCsv
-from cing.PluginCode.html import HTMLfile
 from cing.core.classes import Project
 from cing.core.classes import ROGscore
 from cing.core.constants import COLOR_ORANGE
@@ -15,15 +14,16 @@ from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from unittest import TestCase
+from cing.Libs.html import HTMLfile
 import cing
-import os 
+import os
 import unittest
 
 class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
 
-    def testROGscore(self):       
+    def testROGscore(self):
         entryId = 'test'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -33,7 +33,7 @@ class AllChecks(TestCase):
         project.appendMolecule(molecule) # Needed for html.
         molecule.updateAll()
         project.setupHtml() # Needed for creating the sub dirs.
-         
+
         a = Atom(resName='ALA', atomName='HN')
         a.criticize()
         self.assertTrue(a)
@@ -61,7 +61,7 @@ class AllChecks(TestCase):
         a.rogScore.addHTMLkeywords(kw)
         myhtml.main("a", 'or by popup', **kw)
         myhtml.render()
-        
+
     def tttestBytesToFormattedString(self):
         byteList = [ 1, 1000, 1300, 1600, 13000 * 1024, 130 * 1000 * 1024 * 1024  ]
         expectedResults = [ '0K', '1K', '1K', '2K', '13M', '127G' ]
@@ -91,21 +91,21 @@ class AllChecks(TestCase):
             self.assertEquals(directory, expectedDirectory[i])
             self.assertEquals(basename, expectedBasename[i])
             self.assertEquals(extension, expectedExtension[i])
-            
+
     def tttestMsgHoL(self):
         msgHol = MsgHoL()
         for i in range(5):
             msgHol.appendMessage("Message %d" % i)
             msgHol.appendDebug("Debug %d" % i)
         msgHol.showMessage(MAX_MESSAGES=2)
-        
+
     def tttestCSV(self):
         input = ['1brv', '9pcy' ]
         NTdebug("csv: [" + toCsv(input) + "]")
     def tttestGetDateTimeStampForFileName(self):
         NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
 
-            
+
 if __name__ == "__main__":
 #    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug

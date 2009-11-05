@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_pdb.py
+python $CINGROOT/python/cing/Libs/test/test_pdb.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp

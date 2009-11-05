@@ -19,6 +19,7 @@ from cing.Libs.NTutils import angle3Dopt
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import obj2XML
@@ -32,9 +33,8 @@ from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
-from cing.PluginCode.html import addPreTagLines
+from cing.Libs.html import addPreTagLines
 from cing.core.ROGscore import ROGscore
-#from cing.core.classes import projects # circular.
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
@@ -47,11 +47,9 @@ from cing.core.constants import XPLOR
 from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from database import NTdb
-#from cing import NTdb
 from math import acos
 from math import pi
 from parameters   import plotParameters
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
 import math
 import os
 import sys

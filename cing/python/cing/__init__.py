@@ -109,12 +109,6 @@ def getOsType():
     return OS_TYPE_UNKNOWN
 osType = getOsType()
 
-#try:
-#    from localConstants import criteriaDict #@UnresolvedImport
-#except:
-#    criteriaDict = criteriaDict
-
-
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
 
