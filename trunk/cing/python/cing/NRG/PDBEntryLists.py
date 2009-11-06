@@ -8,9 +8,9 @@ from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
 import urllib
 
-#urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/"
+urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/"
 #urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backupAn_2009-08-03/"
-urlDB2 = "http://nmr.cmbi.ru.nl/~jd/viavia/mr_mysql_backup/"
+#urlDB2 = "http://nmr.cmbi.ru.nl/~jd/viavia/mr_mysql_backup/"
 
 #ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids"
 ocaUrl = "http://www.ebi.ac.uk/msd-srv/oca/oca-bin/ocaids"

@@ -35,6 +35,7 @@ from cing.Libs.NTutils import is_pdb_code
 from cing.Libs.NTutils import symlink
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.disk import rmdir
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
 from cing.NRG.PDBEntryLists import getPdbEntries
@@ -46,6 +47,8 @@ from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
 from glob import glob
+from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTutils import NTdict
 import cing
 import csv
 import os
@@ -149,8 +152,12 @@ class nrgCing(Lister):
 #        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html' NEW
         self.pdb_entries_White = {}
         self.processes_todo = None
+
+        self.entry_list_obsolete = NTlist()
+        self.ENTRY_DELETED_COUNT_MAX = 20
         ## Dictionary with pid:entry_code info on running children
         self.child_d = {}
+
 
         ##No changes required below this line
         ###############################################################################
@@ -161,13 +168,19 @@ class nrgCing(Lister):
         os.chdir(self.results_dir)
 
         ## List of 'new' entries for which hits were found
-        self.new_hits_entry_list = []
-        # From disk.
-        self.entry_list_tried = []  # .cing directory and .log file present so it was tried to start but might not have finished
-        self.entry_list_crashed = [] # has a stack trace
-        self.entry_list_stopped = [] # was stopped by time out or by user or by system (any other type of stop but stack trace)
-        self.entry_list_done = [] # finished to completion of the cing run.
+        self.new_hits_entry_list = NTlist()
+        self.entry_list_pdb = NTlist()
+        self.entry_list_nmr = NTlist()
+        self.entry_list_nrg = NTlist()
+        self.entry_list_nrg_docr = NTlist()
 
+        # From disk.
+        self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
+        self.entry_list_crashed = NTlist()    # has a stack trace
+        self.entry_list_stopped = NTlist()    # was stopped by time out or by user or by system (any other type of stop but stack trace)
+        self.entry_list_done = NTlist()       # finished to completion of the cing run.
+        self.entry_list_todo = NTlist()
+        self.timeTakenDict = NTdict()
 
     """ Returns zero for failure
     """
@@ -206,7 +219,10 @@ class nrgCing(Lister):
 
 
     def getCingEntriesTriedAndDone(self):
-        "Returns list or True for error"
+        """Returns list or True for error
+        Will remove entry directories if they do not occur in NRG up to a maximum number as not to whipe out
+        every one in a single blow by accident.
+        """
 
         NTdebug("From disk get the entries tried, todo, crashed, and stopped in NRG-CING")
 
@@ -225,27 +241,63 @@ class nrgCing(Lister):
                     continue
                 NTdebug("Working on: " + entry_code)
 
-                cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
+                entrySubDir = os.path.join('data',subDir,entry_code)
+                if not entry_code in self.entry_list_nrg_docr:
+                    NTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
+                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
+                        rmdir( entrySubDir )
+                        self.entry_list_obsolete.append(entry_code)
+                    else:
+                        NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s" % (
+                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                # end if
+
+                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
                     continue
 
                 # Look for last log file
-                entrySubDir = os.path.join('data',subDir,entry_code)
                 logList = glob( entrySubDir+'/*.log')
                 if not logList:
                     continue
+                # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_list_tried.append(entry_code)
 
                 logLastFile = logList[-1]
                 NTmessage("Found logLastFile %s" % logLastFile)
-
+#                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
+#                text = readTextFromFile(logLastFile)
+                for r in AwkLike( logLastFile ):
+                    line = r.dollar[0]
+                    if line.startswith('CING took       :'):
+                        NTdebug("Matched line: %s" % line)
+                        timeTakenStr = r.dollar[r.NF-1]
+                        self.timeTakenDict[entry_code] = float(timeTakenStr)
+                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+                    if line.startswith('Traceback (most recent call last)'):
+                        NTdebug("Matched line: %s" % line)
+                        if entry_code in self.entry_list_crashed:
+                            NTdebug("was already found before; not adding again.")
+                        else:
+                            self.entry_list_crashed.append(entry_code)
+                # end for AwkLike
+                if not self.timeTakenDict.has_key(entry_code):
+                    # was stopped by time out or by user or by system (any other type of stop but stack trace)
+                    self.entry_list_stopped.append(entry_code)
+                    continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if os.path.exists(indexFileEntry):
                     self.entry_list_done.append(entry_code)
 
+            # end for entryDir
+        # end for subDir
+        timeTakenList = NTlist()
+        timeTakenList.addList( self.timeTakenDict.values() )
+        NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
 
+    # end def
     """
     Set the list of matched entries and the dictionary holding the
     number of matches. They need to be defined as globals to this module.
@@ -257,34 +309,34 @@ class nrgCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for PDB entries from different databases.")
+        NTdebug("Looking for PDB entries from the OCA and BMRB databases.")
 
         if self.writeWhyNot:
-            self.entry_list_pdb = getPdbEntries()
+            self.entry_list_pdb.addList( getPdbEntries() )
             if not self.entry_list_pdb:
                 NTerror("No PDB entries found")
                 return 0
             NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
 
-            self.entry_list_nmr = getPdbEntries(onlyNmr=True)
+            self.entry_list_nmr.addList( getPdbEntries(onlyNmr=True))
             if not self.entry_list_nmr:
                 NTerror("No NMR entries found")
                 return 0
             NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
         # end if writeWhyNot
 
-        self.entry_list_nrg = getBmrbNmrGridEntries()
+        self.entry_list_nrg.addList( getBmrbNmrGridEntries() )
         if not self.entry_list_nrg:
             NTerror("No NRG entries found")
             return 0
         NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
 
         ## The list of all entry_codes for which tgz files have been found
-        self.entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
+        self.entry_list_nrg_docr.addList(  getBmrbNmrGridEntriesDOCRfREDDone() )
         if not self.entry_list_nrg_docr:
             NTerror("No NRG DOCR entries found")
             return 0
-        NTmessage("Found %s NRG DOCR entries." % len(self.entry_list_nrg_docr))
+        NTmessage("Found %s NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
         if len(self.entry_list_nrg_docr) < 3000:
             NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
             return 0
@@ -292,15 +344,22 @@ class nrgCing(Lister):
         if self.getCingEntriesTriedAndDone():
             NTerror("Failed to dissect entries tried and done")
             return 0
+
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
-            return 0
-        NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
+        self.entry_list_todo.addList(self.entry_list_nrg_docr)
+        self.entry_list_todo = self.entry_list_todo.difference( self.entry_list_done )
+
+        NTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
+        NTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
+        NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_list_stopped))
         if not self.entry_list_done:
             NTerror("Failed to find entries that CING did.")
-            return 0
-        NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
+        NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
+        NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
+
+        NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
 
         if self.writeWhyNot:
             self.doWriteWhyNot()
@@ -349,10 +408,6 @@ class nrgCing(Lister):
         whyNotStr = '%s' % whyNot
 #        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
 
-        self.entry_list_failed = NTlist()
-        self.entry_list_failed.addList( self.entry_list_tried )
-        self.entry_list_failed = self.entry_list_failed.difference(self.entry_list_done)
-
         writeTextToFile("NRG-CING.txt", whyNotStr)
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
@@ -360,7 +415,10 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
-        writeTextToFile("entry_list_failed.csv", toCsv(self.entry_list_failed))
+        writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
+        writeTextToFile("entry_list_crashed.csv", toCsv(self.entry_list_crashed))
+        writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
+        writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
         NTdebug("Copying to: " + why_not_db_comments_file)
@@ -623,9 +681,9 @@ if __name__ == '__main__':
     ## Initialize the project
     m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot,
                 updateIndices=updateIndices, isProduction=isProduction)
-    m.getCingEntriesTriedAndDone()
+#    m.getCingEntriesTriedAndDone()
 
-#    m.update(new_hits_entry_list) # TODO enable after done testing.
+    m.update(new_hits_entry_list) # TODO enable after done testing.
     NTmessage("Finished creating the NRG-CING indices")
     #TODO: remove all but .csv files for updating whynot.
     #Keep api because in future we might be able to say exactly why an entry fails at a certain stage.
