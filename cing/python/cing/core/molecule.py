@@ -3449,6 +3449,7 @@ Atom class: Defines object for storing atom properties
         """
         an = self.translate( convention )
         if not an: return (None,None,None,None,None,None,convention)
+
         return (self.residue.chain.molecule.name,
                 self.residue.chain.name,
                 self.residue.resNum,

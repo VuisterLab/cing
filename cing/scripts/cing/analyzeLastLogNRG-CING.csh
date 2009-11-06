@@ -81,6 +81,7 @@ end
 
 
 set list = ( 1bn0 1chv 1ont 1x5b 1xv3 1y8f 2ff0 2k0j 2k1n 2k3m 2k61 )
+set list = ( 1xv3 2ff0 2k0j 2k1n 2k3m 2k61 )
 cd /Library/WebServer/Documents/NRG-CING/data
 set logFileList = ()
 foreach x ( $list )
