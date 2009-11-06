@@ -28,8 +28,9 @@ class AllChecks(TestCase):
     NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testConvert2Web(self):
-            
+
         fn = "pc_nmr_11_rstraints.ps"
+#        fn = "1vnd_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
         outputPath = cingDirTmp
@@ -45,8 +46,8 @@ class AllChecks(TestCase):
         fn1 = "pc_nmr_11_rstraints.pdf"
         self.assertFalse( joinPdfPagesByGhostScript( [fn1,fn1], "pc_nmr_11_rstraints_echo.pdf"))
 
-    def testConvert2Html(self):
-        inputPath = os.path.join( cingDirTestsData, 'imagery')  
+    def tttestConvert2Html(self):
+        inputPath = os.path.join( cingDirTestsData, 'imagery')
         inputPathList = map(os.path.join, [inputPath]*2, ['residuePlotSetAll001.png', 'residuePlotSetAll002.png'] )
         outputPath = os.path.join( cingDirTmp, 'residuePlotSetAll.png' )
         self.assertFalse( montage(inputPathList, outputPath) )

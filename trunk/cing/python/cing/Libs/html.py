@@ -136,19 +136,25 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 #        NTdebug("dr: " + dr.format())
         bounds = NTlist(dr.lower, dr.upper)
         bounds.limit(plotparams.min, plotparams.max)
-        if bounds[0] < bounds[1]: # single box
-            point = (bounds[0], 0) # lower left corner of only box.
-            sizes = (bounds[1]-bounds[0],ylimMax)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-        else: # two boxes
-            # right box
-            point = (bounds[0], 0) # lower left corner of first box.
-            sizes = (plotparams.max-bounds[0],ylimMax)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-            point = (plotparams.min, 0) # lower left corner of second box.
-            sizes = (bounds[1]-plotparams.min,ylimMax)
-            plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-
+        hasBounds = True
+        for i in range(2):
+            if bounds[i] == None: # fails for entry 1bn0
+                NTerror("No bound [%d] found for restraint: %s" % (i,dr) )
+                hasBounds = False
+        if hasBounds:
+            if bounds[0] < bounds[1]: # single box
+                point = (bounds[0], 0) # lower left corner of only box.
+                sizes = (bounds[1]-bounds[0],ylimMax)
+                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+            else: # two boxes
+                # right box
+                point = (bounds[0], 0) # lower left corner of first box.
+                sizes = (plotparams.max-bounds[0],ylimMax)
+                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+                point = (plotparams.min, 0) # lower left corner of second box.
+                sizes = (bounds[1]-plotparams.min,ylimMax)
+                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
+        # end if
 
     # Always plot the cav line
     plot.line( (aAv, 0), (aAv, ylimMax),

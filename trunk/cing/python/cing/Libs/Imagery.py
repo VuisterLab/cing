@@ -9,6 +9,12 @@ def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.convert:
         NTerror("No cingPaths.convert in convertImageMagick")
         return True
+    if inputPath == None: # happened for entry 2k1n after convert failed.
+        NTerror("In convertImageMagick: got None for inputPath")
+        return True
+    if outputPath == None:
+        NTerror("In convertImageMagick: got None for outputPath")
+        return True
     convert = ExecuteProgram(cingPaths.convert, redirectOutput=False) # No output expected
     cmd = options
     if extraOptions:
@@ -24,6 +30,13 @@ def montageImageMagick(inputPath,outputPath,options,extraOptions=None):
         return True
     if not cingPaths.montage:
         return True
+    if inputPath == None:
+        NTerror("In montageImageMagick: got None for inputPath")
+        return True
+    if outputPath == None:
+        NTerror("In montageImageMagick: got None for outputPath")
+        return True
+
     convert = ExecuteProgram(cingPaths.montage, redirectOutput=False) # No output expected
     cmd = options
     if extraOptions:
@@ -40,6 +53,9 @@ def convertGhostScript(inputPath,options,extraOptions=None):
     if not cingPaths.ghostscript:
         NTerror("No cingPaths.ghostscript in montageImageMagick")
         return True
+    if inputPath == None:
+        NTerror("In convertGhostScript: got None for inputPath")
+        return True
     gs = ExecuteProgram(cingPaths.ghostscript, redirectOutputToFile='/dev/null')
     cmd = options
     if extraOptions:
@@ -53,6 +69,13 @@ def convertPs2Pdf(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.ps2pdf:
         NTerror("No cingPaths.ps2pdf in convertPs2Pdf")
         return True
+    if inputPath == None: # happened for entry 2k1n after convert failed.
+        NTerror("In convertPs2Pdf: got None for inputPath")
+        return True
+    if outputPath == None:
+        NTerror("In convertPs2Pdf: got None for outputPath")
+        return True
+
     convert = ExecuteProgram(cingPaths.ps2pdf, redirectOutput=False) # No output expected
     cmd = options
     if extraOptions:
@@ -116,8 +139,8 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
     if not cingPaths.ghostscript:
         NTerror("No cingPaths.ghostscript in convert2Web")
         return True
-    
-    
+
+
     optionsPinUp = "-delay 200 -geometry 102" # geometry's first argument is width
     optionsFull  = "-delay 200 -geometry 1024"
     optionsPrint = ""
@@ -183,18 +206,19 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
 
     if doPinUp:
         pinupPath = os.path.join( head, root+"_pin.gif")
-        if convertImageMagick(pathStr, pinupPath, optionsPinUp):
+        if convertImageMagick(pathStr+"'[0-8]'", pinupPath, optionsPinUp): # Use only first 9 pages for pinup.
             NTerror("Failed to generated pinup")
             pinupPath = None
     if doFull:
         if doMontage:
+            # Just do the first 9 as this runs out of memory with 1vnd
             fullPath  = os.path.join( head, root+".png")
-            if montage(pathFirst, fullPath, extraOptions = "-density 144" ):
+            if montage(pathFirst+"'[0-8]'", fullPath, extraOptions = "-density 144" ):
                 NTerror('Failed to montage from %s to: %s' % ( pathFirst, fullPath ))
                 return True
         else:
             fullPath  = os.path.join( head, root+".gif")
-            if convertImageMagick(pathStr, fullPath, optionsFull):
+            if convertImageMagick(pathStr+"'[0-8]'", fullPath, optionsFull):
                 NTerror("Failed to generated full gif")
                 fullPath = None
 

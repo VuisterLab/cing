@@ -68,7 +68,7 @@ try:
     haveImage = True
     NTdebug("Installed python Image library (pil)")
 except ImportError:
-    NTerror("Failed to import Image; certain plot options will fail")
+    NTerror("Failed to import python Image library (pil); certain plot options will fail")
     haveImage = False
 #end try
 
