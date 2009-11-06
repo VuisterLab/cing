@@ -20,14 +20,15 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 
-        if False:
+        if True:
             l = getBmrbNmrGridEntriesDOCRfREDDone()
             NTdebug("getBmrbNmrGridEntriesDOCRfREDDone NMR: %d %s" % (len(l), l))
             self.assertTrue( l )
         if True:
             l = getBmrbNmrGridEntries()
-            NTdebug("getBmrbNmrGridEntriesDOCRfREDDone NMR: %d %s" % (len(l), l))
+            NTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(l), l))
             self.assertTrue( l )
+            self.assertTrue( len(l) > 5000 ) # Fails if NRG is down or corrupted.
 
         if False:
             nmrList = getPdbEntries(onlyNmr = True)

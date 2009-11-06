@@ -128,6 +128,26 @@ class NTlist(list, Lister):
         pydoc.doc(self, title='%s')
     #end def
 
+    def statsFloat(self):
+        """Return standard statistics in case the data is interpreted as floats.
+        Assumes numeric list, None elements ignored.
+        """
+        fmt = '%8.3f'
+        self.average()
+        text = """Count              %8d
+Average            %s
+Standard deviation %s
+Minimum            %s
+Maximum            %s
+Sum                %s
+""" % ( self.n,
+        val2Str(self.av, fmt),
+        val2Str(self.sd, fmt),
+        val2Str(self.min(), fmt),
+        val2Str(self.max(), fmt),
+        val2Str(self.sum(), fmt) )
+        return text
+
     def getConsensus(self, minFraction=1.):
         if not hasattr(self, CONSENSUS_STR):
             self.setConsensus(minFraction=minFraction)
@@ -4307,8 +4327,14 @@ def writeTextToFile(fileName, txt):
 
 def toCsv(input):
     result = ''
-    for item in input:
-        result += "%s\n" % item
+    if isinstance(input, list):
+        for item in input:
+            result += "%s\n" % item
+    if isinstance(input, dict):
+        keyList = input.keys()
+        keyList.sort()
+        for key in keyList:
+            result += "%s,%s\n" % ( key, str(input[key]) )
     return result
 
 
