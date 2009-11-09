@@ -5,25 +5,26 @@
 
 # You should CHANGE THE NEXT THREE LINES to suit your local setup
 set MIRRORDIR=/Library/WebServer/Documents/NRG-CING/recoordSync        # your top level rsync directory needs to exist
-#set USER_ID = jurgen
 
 # For local copy use e.g.:
 # \cp -f $ccpn_tmp_dir/data/recoord/$x/$x.tgz $MIRRORDIR/$x/$x.tgz
 ###################################################################
-## No changes below except user id and specific word such as azvv.
-set SERVER=tang.bmrb.wisc.edu:/big/docr/ccpn_tmp/data/recoord/         # remote server name; trailing slash is important
 
-# replace azvv by another specific word if process doesn't start up.
+## No changes below except user id and specific word such as azvv.
+set SERVER=grunt.bmrb.wisc.edu:/raid/docr/ccpn_tmp/data/recoord/         # remote server name; trailing slash is important
+
+#set SERVER=grunt.bmrb.wisc.edu:/raid/mr_anno_progress/
+
 # status on the final grep will be zero when it did grep something.
-ps -elf | grep azvv | grep rsync | grep -v grep
+ps -elf | grep rsync | grep -v grep
 if ( ! $status ) then
-    echo "Stopping this cron job for another hasn't finished; see above list"
+    echo "Stopping this cron job for another rsync hasn't finished; see above list"
     exit 0
 endif
 
-# Watch out for not changing the azvv option below without changing it above.
-rsync -azvv -f '+ */*.tgz' -f '- */*' \
+rsync -av -f '+ */*.tgz' -f '- */*' \
     --delete --stats --progress  \
-    -e 'ssh -l jurgen' $SERVER $MIRRORDIR
+    -e "ssh jurgen@tang.bmrb.wisc.edu ssh" \
+    $SERVER $MIRRORDIR
 
 echo "Finished"
