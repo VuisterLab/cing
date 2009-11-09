@@ -102,7 +102,8 @@ class CingSummary( NTdict ):
         self.CING_green  = round(rog[2],1)
 
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
-        if self.proteinResidueCount > 0 and project.molecule.has_key('procheck') and project.molecule.procheck and project.molecule.procheck.summary:
+        if (self.proteinResidueCount > 0 and project.molecule.has_key('procheck') and project.molecule.procheck and
+            project.molecule.has_key('summary') and project.molecule.procheck.summary):
             self.PC_core       = project.molecule.procheck.summary.core
             self.PC_allowed    = project.molecule.procheck.summary.allowed
             self.PC_generous   = project.molecule.procheck.summary.generous

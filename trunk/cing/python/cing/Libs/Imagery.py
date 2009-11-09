@@ -200,16 +200,17 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
     if doPrint:
         printPath = os.path.join( head, root+".pdf")
         if convertPs2Pdf( pathStr, printPath, optionsPrint):
-            NTerror("Failed to generated print")
-            printPath = None
+            NTerror("Failed to generate print")
+            printPath = None # failed for 2k1n_11_rstraints.ps
         pathStr = pathFirst = printPath
 
-    if doPinUp:
+    if doPinUp and pathStr:
         pinupPath = os.path.join( head, root+"_pin.gif")
         if convertImageMagick(pathStr+"'[0-8]'", pinupPath, optionsPinUp): # Use only first 9 pages for pinup.
-            NTerror("Failed to generated pinup")
+            NTerror("Failed to generate pinup")
             pinupPath = None
-    if doFull:
+
+    if doFull and pathStr and pathFirst:
         if doMontage:
             # Just do the first 9 as this runs out of memory with 1vnd
             fullPath  = os.path.join( head, root+".png")
