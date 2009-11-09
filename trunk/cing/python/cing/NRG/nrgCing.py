@@ -239,7 +239,7 @@ class nrgCing(Lister):
                     if entry_code != ".DS_Store":
                         NTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
-                NTdebug("Working on: " + entry_code)
+#                NTdebug("Working on: " + entry_code)
 
                 entrySubDir = os.path.join('data',subDir,entry_code)
                 if not entry_code in self.entry_list_nrg_docr:
@@ -264,20 +264,20 @@ class nrgCing(Lister):
                 self.entry_list_tried.append(entry_code)
 
                 logLastFile = logList[-1]
-                NTmessage("Found logLastFile %s" % logLastFile)
+#                NTdebug("Found logLastFile %s" % logLastFile)
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
                 for r in AwkLike( logLastFile ):
                     line = r.dollar[0]
                     if line.startswith('CING took       :'):
-                        NTdebug("Matched line: %s" % line)
+#                        NTdebug("Matched line: %s" % line)
                         timeTakenStr = r.dollar[r.NF-1]
                         self.timeTakenDict[entry_code] = float(timeTakenStr)
-                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                     if line.startswith('Traceback (most recent call last)'):
-                        NTdebug("Matched line: %s" % line)
+#                        NTdebug("Matched line: %s" % line)
                         if entry_code in self.entry_list_crashed:
-                            NTdebug("was already found before; not adding again.")
+                            NTwarning("was already found before; not adding again.")
                         else:
                             self.entry_list_crashed.append(entry_code)
                 # end for AwkLike
