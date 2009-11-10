@@ -71,6 +71,21 @@ HTML_TAG_PRE2 = "</PRE>"
 # class is a reserved keyword in python so encapsulate in dictonary.
 checkBoxClassAttr = {"class": "mediumCheckbox"}
 
+# Specific for the CING project is the code UA-4413187-1
+# It's inserted only into the top level index.html; one per cing report.
+GOOGLE_ANALYTICS_TEMPLATE = """
+<!-- The script below will anonymously report usage data to Google Analytics by any javascript enabled browser. -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-4413187-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+"""
+
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -974,6 +989,13 @@ class HTMLfile:
         self.stream.write(self.closeTag('div'))
 
         self.indent=0
+
+        # Text has to be right before the closing body tag.
+        # Othersise JFD would have customized footer of subclass ProjectHTMLfile
+        if isinstance(self, ProjectHTMLfile):
+#            NTdebug("Writing google spy to project html footer")
+            self.stream.write(GOOGLE_ANALYTICS_TEMPLATE)
+
         self.stream.write(self.closeTag('body'))
         self.stream.write(self.closeTag('html'))
 
