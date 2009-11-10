@@ -1,7 +1,6 @@
 #!/bin/csh -f
 # Author: Jurgen F. Doreleijers
-# Put in cron like:
-# /Users/jd/workspace34/cing/scripts/cing/getNRG_ccpn.csh
+# $CINGROOT/scripts/cing/getNRG_ccpn.csh
 
 # You should CHANGE THE NEXT THREE LINES to suit your local setup
 set MIRRORDIR=/Library/WebServer/Documents/NRG-CING/recoordSync        # your top level rsync directory needs to exist
@@ -22,7 +21,7 @@ if ( ! $status ) then
     exit 0
 endif
 
-rsync -av -f '+ */*.tgz' -f '- */*' \
+rsync -av -f '+ */1brv.tgz' -f '- */*' \
     --delete --stats --progress  \
     -e "ssh jurgen@tang.bmrb.wisc.edu ssh" \
     $SERVER $MIRRORDIR

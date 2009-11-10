@@ -49,6 +49,7 @@ from cing.NRG.WhyNot import WhyNotEntry
 from glob import glob
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTdict
+from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 import cing
 import csv
 import os
@@ -97,7 +98,7 @@ class nrgCing(Lister):
         if self.isProduction:
             # Needed for php script.
             self.results_host = 'nmr.cmbi.ru.nl'
-        self.results_url = 'http://' + self.results_host + '/' + self.results_base + '/'
+        self.results_url = 'http://' + self.results_host + '/' + self.results_base # NEW without trailing slash.
 
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
@@ -150,6 +151,7 @@ class nrgCing(Lister):
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
         self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
 #        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html' NEW
+
         self.pdb_entries_White = {}
         self.processes_todo = None
 
@@ -254,11 +256,13 @@ class nrgCing(Lister):
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
+                    NTmessage("Failed to find directory: %s" % cingDirEntry)
                     continue
 
                 # Look for last log file
                 logList = glob( entrySubDir+'/*.log')
                 if not logList:
+                    NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                     continue
                 # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_list_tried.append(entry_code)
@@ -277,19 +281,42 @@ class nrgCing(Lister):
                     if line.startswith('Traceback (most recent call last)'):
 #                        NTdebug("Matched line: %s" % line)
                         if entry_code in self.entry_list_crashed:
-                            NTwarning("was already found before; not adding again.")
+                            NTwarning("%s was already found before; not adding again." % entry_code)
                         else:
                             self.entry_list_crashed.append(entry_code)
                 # end for AwkLike
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
+                    NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
-                if os.path.exists(indexFileEntry):
-                    self.entry_list_done.append(entry_code)
+                if not os.path.exists(indexFileEntry):
+                    NTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry) )
+                    self.entry_list_stopped.append(entry_code)
+                    continue
+
+                projectHtmlFile = os.path.join(cingDirEntry, entry_code, "HTML/index.html")
+                if not os.path.exists(projectHtmlFile):
+                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile) )
+                    self.entry_list_stopped.append(entry_code)
+                    continue
+
+                if False: # disable when done.
+                    # Just patching for when they were absent
+                    file_content = open(projectHtmlFile, 'r').read()
+                    old_string = """</div>
+</body>"""
+                    new_string = """</div>
+%s
+</body>""" %  GOOGLE_ANALYTICS_TEMPLATE
+                    file_content = string.replace(file_content, old_string, new_string)
+
+                    open(projectHtmlFile, 'w').write(file_content)
+
+                self.entry_list_done.append(entry_code)
 
             # end for entryDir
         # end for subDir
@@ -468,14 +495,16 @@ class nrgCing(Lister):
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
-#        cingImage = '../data/%t/%s/%s.cing/CING_%s/HTML/mol.gif' # old
-        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif' # NEW
+        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
         example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
         file_name = os.path.join (self.base_dir, "data", "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
         new_string = time.asctime()
         file_content = string.replace(file_content, old_string, new_string)
+
+        old_string = r"<!-- INSERT FOOTER HERE -->"
+        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
 
         ## Count will track the number of entries done per index file
         entries_done_per_file = 0
@@ -671,7 +700,7 @@ if __name__ == '__main__':
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
-    writeWhyNot = True
+    writeWhyNot = False
     updateIndices = True
     isProduction = True
     new_hits_entry_list = [] # define empty for checking new ones.

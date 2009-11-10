@@ -14,6 +14,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import symlink
 from cing.Libs.forkoff import get_cmd_output
+from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 import cing
 import csv
 import os
@@ -305,6 +306,9 @@ class validationExercises(Lister):
         old_string = r"<!-- INSERT NEW DATE HERE -->"
         new_string = time.asctime()
         file_content = string.replace(file_content, old_string, new_string)
+
+        old_string = r"<!-- INSERT FOOTER HERE -->"
+        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
 
         ## Count will track the number of entries done per index file
         entries_done_per_file = 0
