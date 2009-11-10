@@ -3,10 +3,18 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
+from cing import cingPythonDir
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
+from cing.Scripts.iCingRobot import encodeForm
+from cing.Scripts.iCingRobot import urlOpen
+from cing.Libs.NTutils import NTcodeerror
+import os
 import urllib
+import urllib2
 
 urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backup/"
 #urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backupAn_2009-08-03/"
@@ -78,8 +86,40 @@ def writeEntryListToFile(fileName, entryList):
         return True
     writeTextToFile(fileName, csvText)
 
+def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySolidState = False):
+    """Includes solution and solid state NMR if onlyNMR is chosen
+    """
+    dir_name = os.path.join(cingPythonDir, 'cing', 'NRG', 'data')
+    if onlySolidState:
+        inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR_solid.xml')
+    elif onlyNmr:
+        if mustHaveExperimentalNmrData:
+            inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR_exp.xml')
+        else:
+            inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR.xml')
+    else:
+        if mustHaveExperimentalNmrData:
+            NTcodeerror("Can't query for onlyNmr = True AND mustHaveExperimentalNmrData = True")
+            return
+        else:
+            inputFile = os.path.join(dir_name, 'RESTqueryPDB.xml')
 
-def getPdbEntries(onlyNmr = False):
+    rpcUrl = 'http://www.rcsb.org/pdb/rest/search'
+    queryText = open(inputFile, 'r').read()
+    NTdebug("queryText:\n%s" % queryText)
+    NTdebug("querying...")
+    req = urllib2.Request(url=rpcUrl, data=queryText)
+    f = urllib2.urlopen(req)
+    result = f.readlines()
+
+    if not result:
+        NTerror("Failed to save file to server")
+        return
+    NTdebug("Done successfully.")
+    return result
+
+
+def getPdbEntriesOca(onlyNmr = False):
   result = []
   urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
   if testingLocally:
@@ -111,3 +151,4 @@ def getPdbEntries(onlyNmr = False):
             result.append(pdbCode)
   result.sort()
   return result
+
