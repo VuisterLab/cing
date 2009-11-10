@@ -307,6 +307,7 @@ class nrgCing(Lister):
                 if False: # disable when done.
                     # Just patching for when they were absent
                     file_content = open(projectHtmlFile, 'r').read()
+                    open(projectHtmlFile+".bak", 'w').write(file_content)
                     old_string = """</div>
 </body>"""
                     new_string = """</div>

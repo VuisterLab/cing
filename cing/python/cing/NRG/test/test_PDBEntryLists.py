@@ -20,25 +20,40 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 
-        if True:
+        if False:
             l = getBmrbNmrGridEntriesDOCRfREDDone()
             NTdebug("getBmrbNmrGridEntriesDOCRfREDDone NMR: %d %s" % (len(l), l))
             self.assertTrue( l )
-        if True:
+        if False:
             l = getBmrbNmrGridEntries()
             NTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(l), l))
             self.assertTrue( l )
             self.assertTrue( len(l) > 5000 ) # Fails if NRG is down or corrupted.
 
+        if True:
+            # fast check because there are only a few.
+            nmrSolidExpList = getPdbEntries(onlySolidState = True)
+            self.assertTrue( nmrSolidExpList )
+            self.assertTrue( len(nmrSolidExpList) >= 35  )  # November 10, 2009
+            NTdebug("getPdbEntries NMR solid: %d" % (len(nmrSolidExpList)))
+
+        if False:
+            nmrExpList = getPdbEntries(onlyNmr = True, mustHaveExperimentalNmrData = True)
+            self.assertTrue( nmrExpList )
+            self.assertTrue( len(nmrExpList) >= 5385  )  # November 10, 2009
+            NTdebug("getPdbEntries NMR exp: %d" % (len(nmrExpList)))
+
         if False:
             nmrList = getPdbEntries(onlyNmr = True)
-            NTdebug("getPdbEntries NMR: %d %s" % (len(nmrList), nmrList))
             self.assertTrue( nmrList )
+            self.assertTrue( len(nmrList) >= 8107  )
+            NTdebug("getPdbEntries NMR: %d" % (len(nmrList)))
 
         if False:
             pdbList = getPdbEntries(onlyNmr = False)
-            NTdebug("getPdbEntries ALL: %d %s" % (len(pdbList), pdbList))
             self.assertTrue( pdbList )
+            self.assertTrue( len(pdbList) >= 61248 )
+            NTdebug("getPdbEntries ALL: %d" % (len(pdbList)))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
