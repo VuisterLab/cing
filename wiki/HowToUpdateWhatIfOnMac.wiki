@@ -6,7 +6,7 @@
 
 Add username to service by asking Maarten H.
 {{{
-svn co https://svn.cmbi.ru.nl/repos/whatif/trunk/ whatif
+svn co https://svn.cmbi.ru.nl/whatif/trunk/ whatif
 }}}
 
 == Update ==
