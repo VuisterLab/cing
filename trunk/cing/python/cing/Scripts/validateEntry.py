@@ -42,15 +42,17 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = True
+    fastestTest = True # default: False
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
     doWhatif = False # disables whatif actual run
     doProcheck = False
-    tgzCing = True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
+    doWattos = False
+    tgzCing = False # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     if fastestTest:
         htmlOnly = True
         doWhatif = False
         doProcheck = False
+        doWattos = False
     FORCE_REDO = True
     FORCE_RETRIEVE_INPUT = True
 
@@ -192,7 +194,7 @@ def main(entryId, *extraArgList):
                                **kwds)
 
     project.save()
-    if project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif):
+    if project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif, doWattos=doWattos):
         NTerror("Failed to validate project read")
         return True
     project.save()
@@ -205,7 +207,7 @@ def main(entryId, *extraArgList):
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
         if os.path.exists(tgzFileNameCing):
-            NTwarning("Overwriting: "+tgzFileNameCing)
+            NTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
         do_cmd(cmd)
 
@@ -219,7 +221,7 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
     """
     fileNameTgz = entryId + '.tgz'
     if os.path.exists(fileNameTgz):
-        NTmessage("Tgz already present skip downloading")
+        NTmessage("Tgz already present, skipping download")
         return
 
     pathInsert = ''
@@ -234,7 +236,7 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
     if url.startswith('file:/'):
         pathSource = url.replace('file:/', '')
         fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz)
-        NTdebug("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
+        NTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
         if not os.path.exists(fullPathSource):
             NTerror("%s does not exist." % (fullPathSource))
             return True
@@ -244,7 +246,7 @@ def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
         os.symlink(fullPathSource, fileNameTgz)
     elif url.startswith('http:/'):
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
-        NTdebug("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
+        NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
         urllib.urlretrieve(urlNameTgz, fileNameTgz)
     else:
         NTerror("url has to start with http:/ or file:/ but was: %s" % (url))

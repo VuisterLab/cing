@@ -23,6 +23,7 @@ valSets.cfg             Validation settings. Might be moved around.
 
 """
 from cing.Libs.helper import getSvnRevision
+from cing.Libs.helper import isInternetConnected
 import os
 import sys
 import time
@@ -109,6 +110,8 @@ def getOsType():
     return OS_TYPE_UNKNOWN
 osType = getOsType()
 
+"""Can be reset later when internet is up again"""
+internetConnected = isInternetConnected()
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)
 
@@ -187,7 +190,3 @@ from cing.core.sml          import SML2obj      # This also initializes the SMLh
 
 from cing.core.database     import NTdb #@Reimport
 NTdb._restoreFromSML()                          # This initializes the database
-
-
-
-

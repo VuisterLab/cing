@@ -1,0 +1,23 @@
+#!/bin/sh
+# startup script for service mysql, created by daemonic
+
+. /etc/rc.common
+
+case "$1" in
+  start)
+
+    ConsoleMessage "Starting MySQL database server"
+
+    if [ -x /sw/bin/mysqld_safe ]; then
+      # run the daemon
+      /sw/bin/mysqld_safe  &
+
+    fi
+
+    ;;
+  stop)
+    killall mysqld_safe mysqld
+    ;;
+esac
+
+exit 0

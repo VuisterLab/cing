@@ -1,5 +1,6 @@
 from subprocess import PIPE
 from subprocess import Popen
+import urllib2
 import os
 
 """Very simple functions only here that can be instantiated without the general CING setup.
@@ -50,5 +51,22 @@ def getSvnRevision():
         pass
 #        _NTwarning("Failed to getSvnRevision()" )
     return None
+# end def
 
+def isInternetConnected():
+    """Retrieves about 6 kbytes from google; takes 0.2 seconds on fast network."""
+    url = 'http://www.google.com'
+    req = urllib2.Request(url=url)
+    result = None
+    try:
+        f = urllib2.urlopen(req)
+        result = f.readlines()
+    except:
+#        print "DEBUG: Failed to find internet connection to: %s\nDEBUG: Presuming internet is down." % url
+        pass
 
+    if result:
+#        print "DEBUG: isInternetConnected retrieved from %s:\n%s" % (url,result)
+        return True
+    return False
+# end def

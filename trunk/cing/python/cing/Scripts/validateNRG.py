@@ -27,12 +27,7 @@ cing.verbosity = cing.verbosityDebug
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-#entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
-#entryListFileName = os.path.join(startDir, 'list', 'entry_list_nrg_docr.csv')
-#entryListFileName = os.path.join(startDir, 'list', 'entry_list_failed.csv')
-entryListFileName = os.path.join(startDir, 'entry_list_failed.csv')
-#entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
-#entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
+entryListFileName = os.path.join(startDir, 'entry_list_todo.csv')
 
 # parameters for validateEntry
 #inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
@@ -55,7 +50,7 @@ if retrieveEntryListFromNRG:
         sys.exit(1)
 
 # disable next line for regular run.
-writeEntryListToFile(entryListFileName, ['1brv'])
+#writeEntryListToFile(entryListFileName, ['1brv'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
@@ -65,5 +60,5 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 60 * 60 * 6, # 2p80 took the longest: 5.2 hours.
                     # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 1,
+                    MAX_ENTRIES_TODO = 200,
                     extraArgList = extraArgList)
