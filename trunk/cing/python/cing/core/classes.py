@@ -1588,8 +1588,14 @@ class DistanceRestraint( NTdict ):
 
 
         if pair[0] == None or pair[1] == None:
-            NTerror('DistanceRestraint.appendPair: invalid pair %s', pair)
+            NTerror('DistanceRestraint.appendPair: invalid pair %s', str(pair))
             return
+        #end if
+
+        for atom in pair:
+            if not hasattr(atom,'id'): # happens for 1f8h
+                NTerror('DistanceRestraint.appendPair: invalid pair %s for atom: %s' % (str(pair),str(atom)))
+                return
         #end if
 
         # gv 24 Jul: just use atoms id, they are unique and ordered

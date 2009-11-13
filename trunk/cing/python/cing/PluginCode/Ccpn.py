@@ -1308,6 +1308,11 @@ class Ccpn:
                 # end if
 
                 distanceRestraint = DistanceRestraint(atomPairList, lower, upper)
+                if not distanceRestraint: # happened for entry 1f8h
+                    # restraints that will not be imported
+                    msgHoL.appendMessage("%s failed to be instantiated as CING DistanceRestraint" % (ccpnDistanceConstraint))
+                    continue
+                # end if
 
                 distanceRestraint.ccpn = ccpnDistanceConstraint
                 ccpnDistanceConstraint.cing = distanceRestraint
