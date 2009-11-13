@@ -19,7 +19,7 @@ if ( ! $status ) then
     exit 0
 endif
 
-rsync -av -f '+ */1brv.tgz' -f '- */*' \
+rsync -av -f '+ */1f8h.tgz' -f '- */*' \
     --delete --stats --progress  \
     $SERVER $MIRRORDIR
 

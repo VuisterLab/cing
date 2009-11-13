@@ -27,7 +27,8 @@ cing.verbosity = cing.verbosityDebug
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/NRG-CING'
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName = os.path.join(startDir, 'entry_list_todo.csv')
+#entryListFileName = os.path.join(startDir, 'entry_list_todo.csv')
+entryListFileName = os.path.join(startDir, 'entry_list_single.csv')
 
 # parameters for validateEntry
 #inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
@@ -38,7 +39,6 @@ outputDir = startDir
 extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
 
 retrieveEntryListFromNRG = False
-
 if retrieveEntryListFromNRG:
     ## The list of all entry_codes for which tgz files have been found
     entry_list_nrg_docr = getBmrbNmrGridEntriesDOCRfREDDone()
@@ -50,7 +50,7 @@ if retrieveEntryListFromNRG:
         sys.exit(1)
 
 # disable next line for regular run.
-#writeEntryListToFile(entryListFileName, ['1brv'])
+writeEntryListToFile(entryListFileName, ['1f8h'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
@@ -60,5 +60,5 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 60 * 60 * 6, # 2p80 took the longest: 5.2 hours.
                     # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 200,
+                    MAX_ENTRIES_TODO = 2,
                     extraArgList = extraArgList)
