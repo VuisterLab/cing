@@ -13,19 +13,25 @@ From http://www.macports.org/
 
 As root do:
 {{{
-port install py25-matplotlib
-port install py25-ipython
+port install py26-matplotlib
+port install py26-ipython
 port install povray
 port install imagemagick
 port install ghostscript
-port install py25-pil
+port install py26-pil
 }}}
 The only problem I had was for a download that failed at our university but worked from home.
 
-I do create a soft link for the python2.5 executable as root:
+I do create a soft link for the python2.6 executable as root:
 {{{
 cd /opt/local/bin
-ln -s python2.5 python
+ln -s python2.6 python
+}}}
+
+== Install optional packages NOT NEEDED ==
+
+{{{
+port install py26-mysql
 }}}
 
 From here you should follow the generalized [SetupCING]
