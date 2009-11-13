@@ -4,13 +4,9 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
 from cing import cingPythonDir
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
-from cing.Scripts.iCingRobot import encodeForm
-from cing.Scripts.iCingRobot import urlOpen
 from cing.Libs.NTutils import NTcodeerror
 import os
 import urllib
@@ -106,8 +102,8 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
 
     rpcUrl = 'http://www.rcsb.org/pdb/rest/search'
     queryText = open(inputFile, 'r').read()
-    NTdebug("queryText:\n%s" % queryText)
-    NTdebug("querying...")
+#    NTdebug("queryText:\n%s" % queryText)
+#    NTdebug("querying...")
     req = urllib2.Request(url=rpcUrl, data=queryText)
     f = urllib2.urlopen(req)
     result = f.readlines()
@@ -115,11 +111,12 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
     if not result:
         NTerror("Failed to save file to server")
         return
-    NTdebug("Done successfully.")
+#    NTdebug("Done successfully.")
     return result
 
 
 def getPdbEntriesOca(onlyNmr = False):
+  """Not really used anymore"""
   result = []
   urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
   if testingLocally:

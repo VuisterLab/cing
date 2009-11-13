@@ -164,8 +164,8 @@ class nrgCing(Lister):
         ##No changes required below this line
         ###############################################################################
 
-        NTmessage("Publish results at directory    : " + self.results_dir)
-        NTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
+#        NTdebug("Publish results at directory    : " + self.results_dir)
+#        NTdebug("Do maximum number of entries    : " + `self.max_entries_todo`)
 
         os.chdir(self.results_dir)
 
@@ -173,7 +173,8 @@ class nrgCing(Lister):
         self.new_hits_entry_list = NTlist()
         self.entry_list_pdb = NTlist()
         self.entry_list_nmr = NTlist()
-        self.entry_list_nrg = NTlist()
+        self.entry_list_nmr_exp = NTlist()
+        self.entry_list_nrg = NTlist()          # should be the same as self.entry_list_nmr_exp
         self.entry_list_nrg_docr = NTlist()
 
         # From disk.
@@ -337,7 +338,7 @@ class nrgCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for PDB entries from the OCA and BMRB databases.")
+        NTdebug("Looking for entries from the PDB and BMRB databases.")
 
         if self.writeWhyNot:
             self.entry_list_pdb.addList( getPdbEntries() )
@@ -351,6 +352,12 @@ class nrgCing(Lister):
                 NTerror("No NMR entries found")
                 return 0
             NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
+
+            self.entry_list_nmr_exp.addList( getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData = True))
+            if not self.entry_list_nmr_exp:
+                NTerror("No NMR with experimental data entries found")
+                return 0
+            NTmessage("Found %s NMR with experimental data entries." % len(self.entry_list_nmr_exp))
         # end if writeWhyNot
 
         self.entry_list_nrg.addList( getBmrbNmrGridEntries() )
@@ -439,6 +446,7 @@ class nrgCing(Lister):
         writeTextToFile("NRG-CING.txt", whyNotStr)
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
+        writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
         writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
@@ -701,7 +709,7 @@ if __name__ == '__main__':
     max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
     processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
-    writeWhyNot = False
+    writeWhyNot = True
     updateIndices = True
     isProduction = True
     new_hits_entry_list = [] # define empty for checking new ones.
