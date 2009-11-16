@@ -71,6 +71,7 @@ exit 0
 # scan for the maximum time taken.
 grep '\[' ~/analyzeLastLogNRG-CING_2009-11-04.log | sed -e 's/\[//' | sed -e 's/\]//' | gawk '{print $2}' | sort -n | head
 
+# remove the entry
 set listToRemove = ( 1f8h 2k77 2px9 1j6t 1jtw 2con 2new 1vrc 2exg 1dx1 1his 1hit 1r2n )
 cd /Library/WebServer/Documents/NRG-CING/data
 foreach x ( $listToRemove )
@@ -80,6 +81,7 @@ foreach x ( $listToRemove )
 end
 
 
+# get the log files
 set list = ( 1bn0 1chv 1ont 1x5b 1xv3 1y8f 2ff0 2k0j 2k1n 2k3m 2k61 )
 set list = ( 1xv3 2ff0 2k0j 2k1n 2k3m 2k61 )
 cd /Library/WebServer/Documents/NRG-CING/data
@@ -92,3 +94,10 @@ end
 vi $logFileList
 
 
+# move the log files
+set list = ( `find . -depth 2 -name "[0-9]*" | cut -c6- | sort` )
+foreach x ( $list )
+    set ch23 = ( `echo $x | cut -c2-3` )
+    mkdir $ch23/$x/log_validateEntry >& /dev/null
+    mv $ch23/$x/*.log $ch23/$x/log_validateEntry >& /dev/null
+end
