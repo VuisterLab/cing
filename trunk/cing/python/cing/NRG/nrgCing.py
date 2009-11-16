@@ -1,32 +1,24 @@
 """
-This script will use NRG files to generate CING reports
-
-If the pickle is polluted do the following steps:
-  -0- remove pickle.
-  -1- set skip_newer_entries_if_images_exist = 1
-      set regenerating_pickle = 1
-      set the number of entries high and use 100 processors
-  -2- run (takes less than an hour)
-  -3- reset all the default options again and run again
-
-
-When you need to stop a batch processing, send a signal
-to it for interuption. E.g. when 22059 is the PID of "python nrgCing.py 1"
-do "kill -15 22059". Let it finish for a while when you see:
-WARNING: Caught interrupt in parent.
-WARNING: Trying to finish up by waiting for subprocesses
-WARNING: only 965 out of 1000 jobs were started (not all successfully finished perhaps)
-or similar. The minus of -15 is necessary because it needs to signal it's children.
+This script will use NRG files to generate the CING reports as well as the
+indices that live on top of them.
 
 Execute like:
 
 python -u $CINGROOT/python/cing/NRG/nrgCing.py
 
+As a cron job this will:
+    - create a todo list
+    - run entries todo
+    - create new lists and write them to file.
 """
+
+from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import cingRoot
+from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
@@ -36,8 +28,9 @@ from cing.Libs.NTutils import symlink
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
 from cing.Libs.disk import rmdir
+from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
+from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRDone
 from cing.NRG.PDBEntryLists import getPdbEntries
 from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
 from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
@@ -46,54 +39,99 @@ from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
+from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
+from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from glob import glob
-from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTdict
-from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 import cing
 import csv
 import os
 import shutil
 import string
+import sys
 import time
 import urllib
 
-class MyDict(Lister):
-    """just a simple dictionary"""
-    def __init__(self):
-        self.d = {}
 
-class EntryInfo(Lister):
-    def __init__(self, time=None):
-        self.time = time
+def run():
+
+    max_entries_todo = 2    # was 500 (could be as many as u like)
+    max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
+    processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
+    writeWhyNot = True
+    updateIndices = True
+    isProduction = True
+    getTodoList = False # If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
+    new_hits_entry_list = [] # define empty for checking new ones.
+#    new_hits_entry_list = ['1d3z']
+#    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
+
+    ## Initialize the project
+    m = nrgCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
+                updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
+
+    NTdebug("Publish results at directory    : " + m.results_dir)
+    NTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
+
+    # Get the PDB info to see which entries can/should be done.
+    if m.searchPdbEntries():
+        NTerror("Failed to searchPdbEntries")
+        sys.exit(1)
+
+    if new_hits_entry_list:
+        m.entry_list_todo.addList(new_hits_entry_list)
+    elif getTodoList:
+        # Get todo list and some others.
+        if m.getCingEntryInfo():
+            NTerror("Failed to getCingEntryInfo (first time).")
+            sys.exit(1)
+
+    if m.entry_list_todo:
+        if m.runCing():
+            NTerror("Failed to runCing")
+            sys.exit(1)
+
+    # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
+    if m.getCingEntryInfo():
+        NTerror("Failed to getCingEntryInfo")
+        sys.exit(1)
+
+    # Retrieve the linkages between BMRB and PDB entries.
+    if m.getBmrbLinks():
+        NTerror("Failed to get BMRB-PDB links")
+        os.exit(1)
+
+    if m.updateIndexFiles():
+        NTerror("Failed to update index files.")
+# end def run
 
 
 class nrgCing(Lister):
 
     def __init__(self,
-                 max_entries_todo=1,
-                 max_time_to_wait=20,
-                 writeWhyNot=False,
-                 updateIndices=False,
-                 isProduction=False
+                 max_entries_todo = 1,
+                 max_time_to_wait = 20,
+                 processes_max = 2,
+                 writeWhyNot = False,
+                 writeTheManyFiles = False,
+                 updateIndices = False,
+                 isProduction = False
                 ):
 
+        "Write the info for the WhyNot database"
         self.writeWhyNot = writeWhyNot
+        "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
+        self.writeTheManyFiles = writeTheManyFiles
         self.updateIndices = updateIndices
         "Only during production we do a write to WHY_NOT"
         self.isProduction = isProduction
 
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
-        self.backcolor = 'cing_blue'
 
         self.results_base = 'NRG-CING'
-        self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
-        self.results_dir = self.results_base_dir
-
-        self.data_dir = os.path.join(self.results_base_dir, 'data')
-#        self.results_dir        = '/big/jurgen/molgrap/'        + run_id
-        self.tmp_dir = self.results_dir + '/_tmp_'
+        self.results_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
+        self.data_dir = os.path.join(self.results_dir, 'data')
         self.results_host = 'localhost'
         if self.isProduction:
             # Needed for php script.
@@ -102,43 +140,21 @@ class nrgCing(Lister):
 
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
-
-#        if self.isProduction:
-#            # For file: /usr/scratch/whynot/comments/20090106_NRG-CING.txt_done
-#            self.why_not_db_comments_dir = "/Volumes/cmbi8/usr/scratch/whynot/comments"
-#            # For many files like: /usr/data/raw/nmr-cing/d3/1d3z/1d3z.exist
-#            self.why_not_db_raw_dir = "/Volumes/cmbi8/usr/data/data/raw/nrg-cing"
-#        else:
-        self.why_not_db_comments_dir = os.path.join(self.results_base_dir,"cmbi8","comments")
-        self.why_not_db_raw_dir = os.path.join(self.results_base_dir,"cmbi8","raw")
-
+        self.why_not_db_comments_dir = os.path.join(self.results_dir, "cmbi8", "comments")
+        self.why_not_db_raw_dir = os.path.join(self.results_dir, "cmbi8", "raw")
         self.why_not_db_comments_file = 'NRG-CING.txt_done'
 
-        ## Maximum number of pictures to create before ending
-        ## and writting the pickle and web page overview again.
-        ## Restart the process to do any remaining entries.
-        ## Don't overlap processes!!!
         self.max_entries_todo = max_entries_todo
         self.max_time_to_wait = max_time_to_wait
-
-        ## When set to non-zero the algorithm will update the modification
-        ## time for an updated pdb file in the pickle but will not
-        ## regenerate the images provided that they are present already
-        ## Default is 0
-        self.skip_updated_pdb_files = 0
-
-        ## Will never actually try to create an image when set to 1
-        ## Default is 0
-        self.regenerating_pickle = 0
+        self.processes_max = processes_max
 
         ## How long to wait between submitting individual jobs when on the cluster.
         ##self.delay_between_submitting_jobs = 5
-        self.delay_between_submitting_jobs = 0
+        self.delay_between_submitting_jobs = 15
         ## Total number of child processes to be done if all scheduled to be done
         ## are indeed to be done. This is set later on and perhaps adjusted
         ## when the user interrupts the process by ctrl-c.
         self.url_redirecter = self.results_url + '/redirect.php'
-
         self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
         ## Dictionary with matches pdb to bmrb
         self.matches_many2one = {}
@@ -150,22 +166,9 @@ class nrgCing(Lister):
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
         self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
-#        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html' NEW
-
-        self.pdb_entries_White = {}
-        self.processes_todo = None
-
-        self.entry_list_obsolete = NTlist()
-        self.ENTRY_DELETED_COUNT_MAX = 20
-        ## Dictionary with pid:entry_code info on running children
-        self.child_d = {}
-
 
         ##No changes required below this line
         ###############################################################################
-
-#        NTdebug("Publish results at directory    : " + self.results_dir)
-#        NTdebug("Do maximum number of entries    : " + `self.max_entries_todo`)
 
         os.chdir(self.results_dir)
 
@@ -184,10 +187,12 @@ class nrgCing(Lister):
         self.entry_list_done = NTlist()       # finished to completion of the cing run.
         self.entry_list_todo = NTlist()
         self.timeTakenDict = NTdict()
+        self.entry_list_obsolete = NTlist()
+        self.ENTRY_DELETED_COUNT_MAX = 20
 
-    """ Returns zero for failure
+    """ Returns True for failure
     """
-    def get_bmrb_links(self):
+    def getBmrbLinks(self):
         url_many2one = self.url_csv_file_link_base + "/score_many2one.csv"
         url_one2many = self.url_csv_file_link_base + "/score_one2many.csv"
 
@@ -197,7 +202,7 @@ class nrgCing(Lister):
                 reader = csv.reader(resource)
             except IOError:
                 NTerror("couldn't open url for reader: " + url_links)
-                return 0
+                return True
 
             try:
                 _header_read = reader.next()
@@ -215,19 +220,26 @@ class nrgCing(Lister):
                 pass
 
             if url_links == url_many2one:
-                NTmessage("Found number of matches from PDB to BMRB entries: %d" % len(self.matches_many2one))
+                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
             else:
-                NTmessage("Found number of matches from BMRB to PDB entries: %d" % len(self.matches_one2many))
-        return 1
+                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
 
 
-    def getCingEntriesTriedAndDone(self):
-        """Returns list or True for error
+    def getCingEntryInfo(self):
+        """Returns True for error
         Will remove entry directories if they do not occur in NRG up to a maximum number as not to whipe out
         every one in a single blow by accident.
         """
 
-        NTdebug("From disk get the entries tried, todo, crashed, and stopped in NRG-CING")
+        NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
+
+        self.entry_list_obsolete = NTlist()
+        self.entry_list_tried = NTlist()
+        self.entry_list_crashed = NTlist()
+        self.entry_list_stopped = NTlist()
+        self.entry_list_done = NTlist()
+        self.entry_list_todo = NTlist()
+
 
         subDirList = os.listdir('data')
         for subDir in subDirList:
@@ -235,7 +247,7 @@ class nrgCing(Lister):
                 if subDir != ".DS_Store":
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data',subDir))
+            entryList = os.listdir(os.path.join('data', subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
@@ -244,11 +256,11 @@ class nrgCing(Lister):
                     continue
 #                NTdebug("Working on: " + entry_code)
 
-                entrySubDir = os.path.join('data',subDir,entry_code)
+                entrySubDir = os.path.join('data', subDir, entry_code)
                 if not entry_code in self.entry_list_nrg_docr:
                     NTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
                     if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
-                        rmdir( entrySubDir )
+                        rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
                         NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s" % (
@@ -261,7 +273,7 @@ class nrgCing(Lister):
                     continue
 
                 # Look for last log file
-                logList = glob( entrySubDir+'/*.log')
+                logList = glob(entrySubDir + '/log_validateEntry/*.log')
                 if not logList:
                     NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                     continue
@@ -272,11 +284,11 @@ class nrgCing(Lister):
 #                NTdebug("Found logLastFile %s" % logLastFile)
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
-                for r in AwkLike( logLastFile ):
+                for r in AwkLike(logLastFile):
                     line = r.dollar[0]
                     if line.startswith('CING took       :'):
 #                        NTdebug("Matched line: %s" % line)
-                        timeTakenStr = r.dollar[r.NF-1]
+                        timeTakenStr = r.dollar[r.NF - 1]
                         self.timeTakenDict[entry_code] = float(timeTakenStr)
 #                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                     if line.startswith('Traceback (most recent call last)'):
@@ -295,96 +307,27 @@ class nrgCing(Lister):
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if not os.path.exists(indexFileEntry):
-                    NTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry) )
+                    NTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 projectHtmlFile = os.path.join(cingDirEntry, entry_code, "HTML/index.html")
                 if not os.path.exists(projectHtmlFile):
-                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile) )
+                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
-
-                if False: # disable when done.
-                    # Just patching for when they were absent
-                    file_content = open(projectHtmlFile, 'r').read()
-                    open(projectHtmlFile+".bak", 'w').write(file_content)
-                    old_string = """</div>
-</body>"""
-                    new_string = """</div>
-%s
-</body>""" %  GOOGLE_ANALYTICS_TEMPLATE
-                    file_content = string.replace(file_content, old_string, new_string)
-
-                    open(projectHtmlFile, 'w').write(file_content)
-
                 self.entry_list_done.append(entry_code)
-
             # end for entryDir
         # end for subDir
-        timeTakenList = NTlist()
-        timeTakenList.addList( self.timeTakenDict.values() )
+        timeTakenList = NTlist() # local variable.
+        timeTakenList.addList(self.timeTakenDict.values())
         NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
-
-    # end def
-    """
-    Set the list of matched entries and the dictionary holding the
-    number of matches. They need to be defined as globals to this module.
-    Return zero on error.
-    """
-    def search_matching_entries(self):
-        self.match = MyDict()
-#        modification_time = os.path.getmtime("/Users/jd/.cshrc")
-#        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
-
-        ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for entries from the PDB and BMRB databases.")
-
-        if self.writeWhyNot:
-            self.entry_list_pdb.addList( getPdbEntries() )
-            if not self.entry_list_pdb:
-                NTerror("No PDB entries found")
-                return 0
-            NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
-
-            self.entry_list_nmr.addList( getPdbEntries(onlyNmr=True))
-            if not self.entry_list_nmr:
-                NTerror("No NMR entries found")
-                return 0
-            NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
-
-            self.entry_list_nmr_exp.addList( getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData = True))
-            if not self.entry_list_nmr_exp:
-                NTerror("No NMR with experimental data entries found")
-                return 0
-            NTmessage("Found %s NMR with experimental data entries." % len(self.entry_list_nmr_exp))
-        # end if writeWhyNot
-
-        self.entry_list_nrg.addList( getBmrbNmrGridEntries() )
-        if not self.entry_list_nrg:
-            NTerror("No NRG entries found")
-            return 0
-        NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
-
-        ## The list of all entry_codes for which tgz files have been found
-        self.entry_list_nrg_docr.addList(  getBmrbNmrGridEntriesDOCRfREDDone() )
-        if not self.entry_list_nrg_docr:
-            NTerror("No NRG DOCR entries found")
-            return 0
-        NTmessage("Found %s NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
-        if len(self.entry_list_nrg_docr) < 3000:
-            NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
-            return 0
-
-        if self.getCingEntriesTriedAndDone():
-            NTerror("Failed to dissect entries tried and done")
-            return 0
 
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
 
         self.entry_list_todo.addList(self.entry_list_nrg_docr)
-        self.entry_list_todo = self.entry_list_todo.difference( self.entry_list_done )
+        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
         NTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
         NTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
@@ -393,17 +336,70 @@ class nrgCing(Lister):
             NTerror("Failed to find entries that CING did.")
         NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
         NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
-
         NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+    # end def
 
-        if self.writeWhyNot:
-            self.doWriteWhyNot()
+    """
+    Set the list of matched entries and the dictionary holding the
+    number of matches. They need to be defined as globals to this module.
+    Return True on error.
+    Also searches the PDB and BMRB databases itself.
+    """
+    def searchPdbEntries(self):
+#        modification_time = os.path.getmtime("/Users/jd/.cshrc")
+#        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
-        if self.updateIndices:
-            self.update_index_files()
+        ## following statement is equivalent to a unix command like:
+        NTdebug("Looking for entries from the PDB and BMRB databases.")
 
-        NTdebug("premature return until coded completely... TODO:")
-        return True
+        self.entry_list_pdb.addList(getPdbEntries())
+        if not self.entry_list_pdb:
+            NTerror("No PDB entries found")
+            return True
+        NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
+
+        self.entry_list_nmr.addList(getPdbEntries(onlyNmr = True))
+        if not self.entry_list_nmr:
+            NTerror("No NMR entries found")
+            return True
+        NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
+
+        self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr = True, mustHaveExperimentalNmrData = True))
+        if not self.entry_list_nmr_exp:
+            NTerror("No NMR with experimental data entries found")
+            return True
+        NTmessage("Found %s NMR with experimental data entries." % len(self.entry_list_nmr_exp))
+
+        self.entry_list_nrg.addList(getBmrbNmrGridEntries())
+        if not self.entry_list_nrg:
+            NTerror("No NRG entries found")
+            return True
+        NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
+
+        ## The list of all entry_codes for which tgz files have been found
+        self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
+        if not self.entry_list_nrg_docr:
+            NTerror("No NRG DOCR entries found")
+            return True
+        NTmessage("Found %s NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
+        if len(self.entry_list_nrg_docr) < 3000:
+            NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
+            return True
+
+
+
+    def doWriteEntryLoL(self):
+        writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
+        writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
+        writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
+        writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
+        writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
+        writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
+        writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
+        writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
+        writeTextToFile("entry_list_crashed.csv", toCsv(self.entry_list_crashed))
+        writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
+        writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
 
 
     def doWriteWhyNot(self):
@@ -438,43 +434,39 @@ class nrgCing(Lister):
 
 #            whyNotEntry.comment = PRESENT_IN_CING
             # Entries that are present in the database do not need a comment
-            del( whyNot[entryId] )
+            del(whyNot[entryId])
         # end loop over entries
         whyNotStr = '%s' % whyNot
 #        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
 
         writeTextToFile("NRG-CING.txt", whyNotStr)
-        writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
-        writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
-        writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
-        writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
-        writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
-        writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
-        writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
-        writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
-        writeTextToFile("entry_list_crashed.csv", toCsv(self.entry_list_crashed))
-        writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
-        writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
         NTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy("NRG-CING.txt", why_not_db_comments_file)
-        for entryId in self.entry_list_done:
-            # For many files like: /usr/data/raw/nmr-cing/           d3/1d3z/1d3z.exist
-            char23 = entryId[1:3]
-            subDir = os.path.join(self.why_not_db_raw_dir, char23, entryId)
-            if not os.path.exists(subDir):
-                os.makedirs(subDir)
-            fileName = os.path.join(subDir, entryId + ".exist")
-            if not os.path.exists(fileName):
-#                NTdebug("Creating: " + fileName)
-                fp = open(fileName, 'w')
-    #            fprintf(fp, ' ')
-                fp.close()
+        if self.writeTheManyFiles:
+            for entryId in self.entry_list_done:
+                # For many files like: /usr/data/raw/nmr-cing/           d3/1d3z/1d3z.exist
+                char23 = entryId[1:3]
+                subDir = os.path.join(self.why_not_db_raw_dir, char23, entryId)
+                if not os.path.exists(subDir):
+                    os.makedirs(subDir)
+                fileName = os.path.join(subDir, entryId + ".exist")
+                if not os.path.exists(fileName):
+    #                NTdebug("Creating: " + fileName)
+                    fp = open(fileName, 'w')
+        #            fprintf(fp, ' ')
+                    fp.close()
 
 
-    def update_index_files(self):
-        "Updating the index files"
+    def updateIndexFiles(self):
+        """Updating the index files.
+        Return True on error."""
+
+        if not self.updateIndices:
+            return
+
+        NTmessage("Updating index files")
 
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
@@ -488,7 +480,7 @@ class nrgCing(Lister):
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
         if not self.entry_list_done:
             NTwarning("No entries done, skipping creation of indexes")
-            return 1
+            return
 
         self.entry_list_done.sort()
 
@@ -684,44 +676,35 @@ class nrgCing(Lister):
         headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
         shutil.copy(cssFile, indexDir)
         shutil.copy(headerBgFile, indexDir)
-        return 1
 
-    def update(self, new_hits_entry_list=None):
-        if not m.get_bmrb_links():
-            NTerror("can't get bmrb links")
-            os._exit(1)
 
-        ## Searches and matches
-#        if new_hits_entry_list:
-#            m.new_hits_entry_list = new_hits_entry_list
-#            NTmessage("Doing list of new entries: %s" % new_hits_entry_list)
-#        else:
-        if not m.search_matching_entries():
-            NTerror("can't search matching entries")
-            os._exit(1)
+    def runCing(self):
+        """On self.entry_list_todo.
+        Return True on error.
+        """
+        entryListFileName = "entry_list_todo.csv"
+        writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
-        if not m.update_index_files():
-            NTerror("can't update index files")
+        pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
+        inputDir = 'file://' + self.results_dir + '/recoordSync'
+        outputDir = self.results_dir
+        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
+
+        if not doScriptOnEntryList(pythonScriptFileName,
+                            entryListFileName,
+                            self.results_dir,
+                            processes_max = self.processors,
+                            delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
+                            max_time_to_wait = self.max_time_to_wait,
+                            # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
+                            START_ENTRY_ID = 0, # default.
+                            MAX_ENTRIES_TODO = self.max_entries_todo,
+                            extraArgList = extraArgList):
+            NTerror("Failed to doScriptOnEntryList")
+            os.exit(1)
+    # end def runCing.
+
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
-
-    max_entries_todo = 1    # was 500 (could be as many as u like)
-    max_time_to_wait = 12000 # 1y4o took more than 600. This is one of the optional arguments.
-    processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
-    writeWhyNot = True
-    updateIndices = True
-    isProduction = True
-    new_hits_entry_list = [] # define empty for checking new ones.
-#    new_hits_entry_list = ['1d3z']
-#    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
-
-    ## Initialize the project
-    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot,
-                updateIndices=updateIndices, isProduction=isProduction)
-#    m.getCingEntriesTriedAndDone()
-
-    m.update(new_hits_entry_list) # TODO enable after done testing.
-    NTmessage("Finished creating the NRG-CING indices")
-    #TODO: remove all but .csv files for updating whynot.
-    #Keep api because in future we might be able to say exactly why an entry fails at a certain stage.
+    run()

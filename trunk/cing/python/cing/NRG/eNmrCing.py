@@ -174,9 +174,9 @@ class nrgCing(Lister):
                 pass
 
             if url_links == url_many2one:
-                NTmessage("Found number of matches from PDB to BMRB entries: %d" % len(self.matches_many2one))
+                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
             else:
-                NTmessage("Found number of matches from BMRB to PDB entries: %d" % len(self.matches_one2many))
+                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
         return 1
 
 

@@ -105,6 +105,7 @@ public class iCing implements EntryPoint, HistoryListener {
         // Window.alert(c.Uncaught_ex() +GenClient.eol + e);
         // }
         // });
+        
         c = GWT.create(iCingConstants.class);
         // Watch out because although this setting is needed here; there's
         // another needed at the end of this routine too.

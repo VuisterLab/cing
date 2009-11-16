@@ -44,10 +44,10 @@ def main(entryId, *extraArgList):
 
     fastestTest = True # default: False
     htmlOnly = False # default is False but enable it for faster runs without some actual data.
-    doWhatif = False # disables whatif actual run
-    doProcheck = False
-    doWattos = False
-    tgzCing = False # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
+    doWhatif = True # disables whatif actual run
+    doProcheck = True
+    doWattos = True
+    tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     if fastestTest:
         htmlOnly = True
         doWhatif = False
