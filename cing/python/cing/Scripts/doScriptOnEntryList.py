@@ -38,7 +38,6 @@ def mkSubDirStructure(startDir, entryCodeList, pythonScriptFileNameRoot):
             NTmessage("Creating dir: " + logDir)
             os.mkdir(logDir)
 
-
 def doScriptOnEntryList(pythonScriptFileName,
           entryListFileName,
           startDir                       ='.',
@@ -50,6 +49,7 @@ def doScriptOnEntryList(pythonScriptFileName,
           MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO,
           expectPdbEntryList             = True
           ):
+    """Return True on error"""
 #    if os.chdir(cingDirTmp):
 #        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
 

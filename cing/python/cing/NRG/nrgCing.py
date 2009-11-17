@@ -48,13 +48,12 @@ import csv
 import os
 import shutil
 import string
-import sys
 import time
 import urllib
 
 
 def run():
-
+    """Return True on error"""
     max_entries_todo = 2    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
     processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
@@ -62,7 +61,7 @@ def run():
     updateIndices = True
     isProduction = True
     getTodoList = False # If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-    new_hits_entry_list = [] # define empty for checking new ones.
+    new_hits_entry_list = ['1bus'] # define empty for checking new ones.
 #    new_hits_entry_list = ['1d3z']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
@@ -76,7 +75,7 @@ def run():
     # Get the PDB info to see which entries can/should be done.
     if m.searchPdbEntries():
         NTerror("Failed to searchPdbEntries")
-        sys.exit(1)
+        return True
 
     if new_hits_entry_list:
         m.entry_list_todo.addList(new_hits_entry_list)
@@ -84,30 +83,31 @@ def run():
         # Get todo list and some others.
         if m.getCingEntryInfo():
             NTerror("Failed to getCingEntryInfo (first time).")
-            sys.exit(1)
+            return True
 
     if m.entry_list_todo:
         if m.runCing():
             NTerror("Failed to runCing")
-            sys.exit(1)
+            return True
 
     # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
     if m.getCingEntryInfo():
         NTerror("Failed to getCingEntryInfo")
-        sys.exit(1)
+        return True
 
     # Retrieve the linkages between BMRB and PDB entries.
     if m.getBmrbLinks():
         NTerror("Failed to get BMRB-PDB links")
-        os.exit(1)
+        return True
 
     if m.updateIndexFiles():
         NTerror("Failed to update index files.")
+        return True
 # end def run
 
 
 class nrgCing(Lister):
-
+    """Main class for running CING reports on NRG and maintaining the statistics."""
     def __init__(self,
                  max_entries_todo = 1,
                  max_time_to_wait = 20,
@@ -118,13 +118,13 @@ class nrgCing(Lister):
                  isProduction = False
                 ):
 
-        "Write the info for the WhyNot database"
         self.writeWhyNot = writeWhyNot
-        "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
+        "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
+        "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
         self.updateIndices = updateIndices
-        "Only during production we do a write to WHY_NOT"
         self.isProduction = isProduction
+        "Only during production we do a write to WHY_NOT"
 
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
@@ -188,11 +188,11 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.timeTakenDict = NTdict()
         self.entry_list_obsolete = NTlist()
-        self.ENTRY_DELETED_COUNT_MAX = 20
+        self.ENTRY_DELETED_COUNT_MAX = 2
 
-    """ Returns True for failure
-    """
+
     def getBmrbLinks(self):
+        """ Returns True for failure"""
         url_many2one = self.url_csv_file_link_base + "/score_many2one.csv"
         url_one2many = self.url_csv_file_link_base + "/score_one2many.csv"
 
@@ -339,13 +339,13 @@ class nrgCing(Lister):
         NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
     # end def
 
-    """
-    Set the list of matched entries and the dictionary holding the
-    number of matches. They need to be defined as globals to this module.
-    Return True on error.
-    Also searches the PDB and BMRB databases itself.
-    """
     def searchPdbEntries(self):
+        """
+        Set the list of matched entries and the dictionary holding the
+        number of matches. They need to be defined as globals to this module.
+        Return True on error.
+        Also searches the PDB and BMRB databases itself.
+        """
 #        modification_time = os.path.getmtime("/Users/jd/.cshrc")
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
@@ -389,6 +389,7 @@ class nrgCing(Lister):
 
 
     def doWriteEntryLoL(self):
+        """Write the entry list of each list to file"""
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
         writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
@@ -403,6 +404,7 @@ class nrgCing(Lister):
 
 
     def doWriteWhyNot(self):
+        "Write the WHYNOT files"
         NTdebug("Create WHY_NOT list")
         whyNot = WhyNot()
         # Loop for speeding up the checks. Most are not nmr.
@@ -690,10 +692,10 @@ class nrgCing(Lister):
         outputDir = self.results_dir
         extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
 
-        if not doScriptOnEntryList(pythonScriptFileName,
+        if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
                             self.results_dir,
-                            processes_max = self.processors,
+                            processes_max = self.processes_max,
                             delay_between_submitting_jobs = 15, # why is this so long? because of time outs at tang?
                             max_time_to_wait = self.max_time_to_wait,
                             # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
@@ -701,7 +703,7 @@ class nrgCing(Lister):
                             MAX_ENTRIES_TODO = self.max_entries_todo,
                             extraArgList = extraArgList):
             NTerror("Failed to doScriptOnEntryList")
-            os.exit(1)
+            return True
     # end def runCing.
 
 

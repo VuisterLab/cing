@@ -1,4 +1,4 @@
-# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/Scripts/storeNRGCING2db.py 1brv .
+# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/NRG/storeNRGCING2db.py 1brv .
 from cing import header
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
@@ -11,6 +11,7 @@ import MySQLdb
 import cing
 import os
 import sys
+
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url.
@@ -63,16 +64,29 @@ def main(entryId, *extraArgList):
         NTerror("Mysql connection failed: %d: %s" % (e.args[0], e.args[1]))
         return True
 
-    cursor = conn.cursor ()
-    cursor.execute ("SELECT VERSION()")
-    row = cursor.fetchone ()
-    NTdebug("server version: %s" % row[0])
+    cursor = conn.cursor()
+    cursor.execute("SELECT VERSION()")
+    row = cursor.fetchone()
+    NTmessage("server version: %s" % row[0])
+
+    for residue in project.molecule.allResidues():
+        NTmessage("Residue: %s" % residue)
+
+#    cursor.execute ("""
+#           INSERT INTO entry (name, category)
+#           VALUES
+#             ('snake', 'reptile'),
+#             ('frog', 'amphibian'),
+#             ('tuna', 'fish'),
+#             ('racoon', 'mammal')
+#         """)
+#
+#    NTmessage("Number of rows inserted: %d" % cursor.rowcount)
 
 
 
-
-    #cursor.close()
-    #conn.close ()
+    cursor.close()
+    conn.close ()
 
 
 if __name__ == "__main__":
