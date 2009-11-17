@@ -27,10 +27,10 @@ def my_sleep( arg ):
 
 class AllChecks(TestCase):
 
-    def testRun(self):
+    def tttestRun(self):
         # important to switch to temp space before starting to generate files for the project.
         os.chdir(cingDirTmp)
-        ## Test is disable because it takes 10 seconds to run.
+        ## Test takes 5 seconds to run.
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(
@@ -38,7 +38,7 @@ class AllChecks(TestCase):
                 max_time_to_wait    = 5,
                 verbosity           = 2
                 )
-    
+
         ## Sleep long
         job_0       = ( my_sleep, (9999,) )
         ## Sleep
@@ -46,10 +46,10 @@ class AllChecks(TestCase):
         ## Sleep short
         job_2       = ( my_sleep, (1.2,) )
         job_list    = [ job_0, job_1, job_2 ]
-    
-        done_list   = f.forkoff_start( job_list, 0 )    
+
+        done_list   = f.forkoff_start( job_list, 0 )
         NTmessage("Finished ids: %s", done_list)
-        
+
     def ttttttttttestRun2(self):
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
@@ -58,7 +58,7 @@ class AllChecks(TestCase):
                 max_time_to_wait    = 10,
                 verbosity           = 2
                 )
-    
+
         ## Sleep long
 #        job_1       = ( do_cmd, ('date',) )
 #        job_2       = ( do_cmd, ('echo "hello world"',) )
@@ -67,10 +67,10 @@ class AllChecks(TestCase):
         # disabled jobs because it will show up when unit testing and we don't want that.
 #        job_4 = job_0
         job_list    = [ job_3 ]
-    
-        done_list   = f.forkoff_start( job_list, 0 )    
+
+        done_list   = f.forkoff_start( job_list, 0 )
         NTmessage("Finished ids: %s", done_list)
-        
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

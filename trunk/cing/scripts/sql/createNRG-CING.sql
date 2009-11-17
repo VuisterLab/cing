@@ -9,8 +9,8 @@
 -- Notes:
 -- * Setup commands are specific for database type: MySQL
 -- * Run by command like:
--- * mysql -u root nrgcing < $CINGROOT/scripts/sql/createNRG-CING.sql
-    -- no output means no errors.
+-- * mysql -u nrgcing1 -p4I4KMS nrgcing < $CINGROOT/scripts/sql/createNRG-CING.sql
+-- no output means no errors.
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
@@ -38,7 +38,8 @@ CREATE TABLE entry
     is_membrane                    BOOLEAN DEFAULT NULL,
     is_multimeric                  BOOLEAN DEFAULT NULL,
     in_recoord                     BOOLEAN DEFAULT NULL,
-    in_dress                       BOOLEAN DEFAULT NULL
+    in_dress                       BOOLEAN DEFAULT NULL,
+    rog                            INT DEFAULT NULL
 ) TYPE = INNODB;
 CREATE INDEX entry_001 ON entry (bmrb_id);
 CREATE INDEX entry_002 ON entry (pdb_id);
@@ -55,6 +56,7 @@ CREATE TABLE chain
     entry_id                        INT             NOT NULL,
     detail                          VARCHAR(255)    DEFAULT 'A',
     pdb_id                          CHAR(4),
+    rog                            INT DEFAULT NULL,
     FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
 ) TYPE = INNODB;
 -- Some common queries are helped by these indexes..
@@ -71,8 +73,11 @@ CREATE TABLE residue
     author_id                      VARCHAR(255)     NOT NULL,
     is_common                      BOOLEAN DEFAULT 1,
     is_termin                      BOOLEAN DEFAULT 0,
+    rog                            INT DEFAULT NULL,
     FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
 ) TYPE = INNODB;
 CREATE INDEX residue_001 ON residue (chain_id);
 CREATE INDEX residue_002 ON residue (number);
+
+
