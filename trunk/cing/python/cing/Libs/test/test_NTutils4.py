@@ -13,7 +13,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testSwitchOutput(self):
+    def tttestSwitchOutput(self):
         x1 = "Message to debug"
         x2 = "Message to debug 2 should not show up."
         x3 = "Message to debug 3"
@@ -81,6 +81,15 @@ b
 #        x.removeDuplicates()
 #        self.assertTrue( len(x) == 3)
 
+    def testNTlistSort(self):
+        """Test failure by recursion"""
+        x = NTlist()
+        y = range(5)
+        x.addList(y)
+        x.sort()
+        y.sort()
+        list.sort(x)
+        list.sort(y)
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

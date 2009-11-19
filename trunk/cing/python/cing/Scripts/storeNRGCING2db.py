@@ -1,4 +1,4 @@
-# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/NRG/storeNRGCING2db.py 1brv .
+# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/Scripts/storeNRGCING2db.py 1brv .
 from cing import header
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
