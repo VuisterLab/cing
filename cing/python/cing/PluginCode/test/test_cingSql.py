@@ -13,14 +13,14 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttest_CingSql(self):
+    def test_CingSql(self):
         cSql = cingSql()
         self.assertFalse(cSql.connect())
         nextId = cSql.getNextSequenceId()
         NTdebug("Got nextId: %d" % nextId)
         self.assertTrue( nextId )
 
-    def test_SqlAlchemy(self):
+    def tttest_SqlAlchemy(self):
         csql = csqlAlchemy()
         self.assertFalse(csql.connect())
 #        nextId = cSql.getNextSequenceId()
