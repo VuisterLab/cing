@@ -6,6 +6,7 @@ from cing.PluginCode.required.reqOther import SQL_STR
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     from cing.Libs.NTutils import ImportWarning
     from cing.Libs.NTutils import switchOutput
+    switchOutput(False)
     try:
         from sqlalchemy import create_engine
     except:
@@ -13,7 +14,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         raise ImportWarning(SQL_STR)
     finally:
         switchOutput(True)
-    NTmessage('Using Sql')
+    NTmessage('Using SqlAlchemy')
 
 class cgenericSql():
     "Class for connecting to any MySql database."

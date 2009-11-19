@@ -1,8 +1,20 @@
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-import MySQLdb
+from cing.PluginCode.required.reqOther import SQL_STR
 
+if True: # for easy blocking of data, preventing the code to be resorted with imports above.
+    from cing.Libs.NTutils import ImportWarning
+    from cing.Libs.NTutils import switchOutput
+    switchOutput(False)
+    try:
+        import MySQLdb
+    except:
+        switchOutput(True)
+        raise ImportWarning(SQL_STR)
+    finally:
+        switchOutput(True)
+    NTmessage('Using MySQLdb')
 
 class genericSql():
     "Class for connecting to any MySql database."
