@@ -1,7 +1,9 @@
 #!/bin/tcsh
 # Author: Jurgen F. Doreleijers
 # $CINGROOT/scripts/cing/nrgCing.csh
-
+# Should be run from cron without output to cron.
+#
+# Enable next line if CINGROOT variable etc. is to be changed.
 #source /Users/jd/cingStableSetings.csh
 
 ###################################################################
@@ -11,15 +13,40 @@ limit filesize   500m   # Maximum size of any one file
 limit datasize  1000m   # Maximum size of data (including stack)
 limit coredumpsize 0    # Maximum size of core dump file
 
-# status on the final grep will be zero when it did grep something.
-ps -ww | grep "$0" | grep -v grep | grep -v $$
-if ( ! $status ) then
-    echo "Stopping this job for another hasn't finished; see above list"
-    exit 0
+#set date_string = (`date | sed -e 's/ /_/g'`)
+set date_string = (`date "+%Y_%m_%d-%H_%M_%S"`)
+
+set prog_string = $0:t:r
+#set log_dir     = $tmp_dir/$prog_string
+set log_dir     = /Library/WebServer/Documents/NRG-CING/log
+set log_file    = $log_dir/$prog_string"_$date_string".log
+
+mkdir -p $log_dir
+
+if ( -e $log_file ) then
+    echo "ERROR: failed $CINGROOT/scripts/cing/nrgCing.csh because log file already exists: $log_file"
+    exit 1
 endif
 
-echo "Starting nrgCing.csh"
+echo before
+# status on the final grep will be zero when it did grep something.
+# $$ is the process number of current shell.
+# Need to add the x flag to grep to catch the process without having a controlling terminal.
+# a flag for all processes including cron's
+# ww for extra wide display showing the full command and parameters.
+ps -axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
+if ( ! $status ) then
+    echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
+    exit 1
+endif
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py
+echo after
+sleep 9999
+echo done
+exit 1
 
-echo "Finished"
+echo "Starting nrgCing.csh" >>& $log_file
+
+python -u $CINGROOT/python/cing/NRG/nrgCing.py >>& $log_file
+
+echo "Finished" >>& $log_file

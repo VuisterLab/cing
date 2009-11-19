@@ -82,17 +82,19 @@ end
 
 
 # get the log files
-set list = ( 1bn0 1chv 1ont 1x5b 1xv3 1y8f 2ff0 2k0j 2k1n 2k3m 2k61 )
-set list = ( 1xv3 2ff0 2k0j 2k1n 2k3m 2k61 )
+set scriptName = storeNRGCING2db
 cd /Library/WebServer/Documents/NRG-CING/data
+set list = ( `cat ../entry_list_done.csv`)
+#set list = ( 1brv )
 set logFileList = ()
 foreach x ( $list )
     set ch23 = ( `echo $x | cut -c2-3` )
-    set logFile = (`find $ch23/$x -depth 1 -name "$x*.log" | sort | tail -1`)
+    set logFile = (`find $ch23/$x/log_$scriptName -depth 1 -name "$x*.log" | sort | tail -1`)
     set logFileList = ($logFileList $logFile)
 end
-vi $logFileList
-
+echo $logFileList
+#grep Traceback $logFileList # fails because too large array.
+echo $logFileList | xargs grep Traceback
 
 # move the log files
 set list = ( `find . -depth 2 -name "[0-9]*" | cut -c6- | sort` )

@@ -47,7 +47,7 @@ class AllChecks(TestCase):
         doProcheck = True
         doWattos = True
         useNrgArchive = False
-        modelCount=None
+        modelCount=99
         if fastestTest:
             modelCount=2
             htmlOnly = True

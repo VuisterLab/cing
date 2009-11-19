@@ -3026,6 +3026,14 @@ Atom class: Defines object for storing atom properties
             return False
     #end def
 
+    def getModelCount(self):
+        """
+        Returns the number of models derived from the top level object; molecule.
+        This might be different from the length of self.coordinates in case the sync hasn't been done yet.
+        """
+        return self.residue.chain.molecule.modelCount
+    #end def
+
     def addResonance( self, value=NaN, error=NaN ):
         r = Resonance( atom=self, value=value, error = error )
         r.resonanceIndex = len(self.resonances)

@@ -60,9 +60,9 @@ def run():
     writeWhyNot = True
     updateIndices = True
     isProduction = True
-    getTodoList = False # If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-    new_hits_entry_list = ['1bus'] # define empty for checking new ones.
-#    new_hits_entry_list = ['1d3z']
+    getTodoList = False # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
+#    new_hits_entry_list = ['1bus'] # define empty for checking new ones.
+    new_hits_entry_list = []
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
@@ -93,6 +93,14 @@ def run():
     # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
     if m.getCingEntryInfo():
         NTerror("Failed to getCingEntryInfo")
+        return True
+
+    if m.doWriteEntryLoL():
+        NTerror("Failed to doWriteEntryLoL")
+        return True
+
+    if m.doWriteWhyNot():
+        NTerror("Failed to doWriteWhyNot")
         return True
 
     # Retrieve the linkages between BMRB and PDB entries.
@@ -405,7 +413,12 @@ class nrgCing(Lister):
 
     def doWriteWhyNot(self):
         "Write the WHYNOT files"
-        NTdebug("Create WHY_NOT list")
+        if self.writeWhyNot:
+            NTdebug("Create WHY_NOT list")
+        else:
+            NTmessage("Skipping create WHY_NOT list")
+            return
+
         whyNot = WhyNot()
         # Loop for speeding up the checks. Most are not nmr.
         for entryId in self.entry_list_pdb:

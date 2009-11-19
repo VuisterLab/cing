@@ -363,6 +363,12 @@ Sum                %s
         return result
     #end def
 
+    def sort(self, byItem=None ):
+        "Sort the list byItem"
+        NTsort( self, byItem, inplace=True)
+        return self
+    #end def
+
     def setCurrent(self, item):
         if item in self:
             self.current = item
@@ -2969,18 +2975,21 @@ class Sorter:
         aux.sort()
 
         result = [data[i] for dummy, i in aux]
-        if inplace: data[:] = result
+        if inplace:
+            data[:] = result
         return result
     #end def
 
     def byItem(self, data, itemindex=None, inplace=False):
         if itemindex is None:
             if inplace:
-                data.sort()
+#                data.sort() # Gave recursion
+                list.sort(data)
                 result = data
             else:
                 result = data[:]
-                result.sort()
+#                result.sort()
+                list.sort(result)
             #end if
             return result
         else:
