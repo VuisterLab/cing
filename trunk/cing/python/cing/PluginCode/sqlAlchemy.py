@@ -1,8 +1,19 @@
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from sqlalchemy import create_engine
+from cing.PluginCode.required.reqOther import SQL_STR
 
+if True: # for easy blocking of data, preventing the code to be resorted with imports above.
+    from cing.Libs.NTutils import ImportWarning
+    from cing.Libs.NTutils import switchOutput
+    try:
+        from sqlalchemy import create_engine
+    except:
+        switchOutput(True)
+        raise ImportWarning(SQL_STR)
+    finally:
+        switchOutput(True)
+    NTmessage('Using Sql')
 
 class cgenericSql():
     "Class for connecting to any MySql database."
