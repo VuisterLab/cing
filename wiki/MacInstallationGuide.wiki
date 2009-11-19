@@ -20,7 +20,7 @@ port install imagemagick
 port install ghostscript
 port install py26-pil
 }}}
-The only problem I had was for a download that failed at our university but worked from home.
+Make sure the matplotlib version is at least 0.99.1.1.
 
 I do create a soft link for the python2.6 executable as root:
 {{{
