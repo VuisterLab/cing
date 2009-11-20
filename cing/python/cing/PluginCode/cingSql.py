@@ -14,7 +14,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         raise ImportWarning(SQL_STR)
     finally:
         switchOutput(True)
-    NTmessage('Using MySQLdb')
+#    NTdebug('Using MySQLdb')
 
 class genericSql():
     "Class for connecting to any MySql database."

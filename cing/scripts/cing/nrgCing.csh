@@ -3,8 +3,9 @@
 # $CINGROOT/scripts/cing/nrgCing.csh
 # Should be run from cron without output to cron.
 #
-# Enable next line if CINGROOT variable etc. is to be changed.
-#source /Users/jd/cingStableSetings.csh
+if ( -e /Users/jd/cingStableSetings.csh ) then
+    source /Users/jd/cingStableSetings.csh
+endif
 
 ###################################################################
 # Requirements below:
@@ -28,7 +29,6 @@ if ( -e $log_file ) then
     exit 1
 endif
 
-echo before
 # status on the final grep will be zero when it did grep something.
 # $$ is the process number of current shell.
 # Need to add the x flag to grep to catch the process without having a controlling terminal.
@@ -39,11 +39,6 @@ if ( ! $status ) then
     echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
     exit 1
 endif
-
-echo after
-sleep 9999
-echo done
-exit 1
 
 echo "Starting nrgCing.csh" >>& $log_file
 

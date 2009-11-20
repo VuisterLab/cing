@@ -2631,7 +2631,7 @@ class RDCRestraint(DistanceRestraint):
 #end class
 
 
-class RDCRestraintList(NTlist):
+class RDCRestraintList(RestraintList):
     """List of RDCRestraint"""
 
     def __init__(self, name, status = 'keep'):

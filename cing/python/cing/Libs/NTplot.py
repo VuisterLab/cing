@@ -7,6 +7,9 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import isAlmostEqual
 from cing.Libs.NTutils import limitToRange
+from cing.Libs.matplotlibExt import blue_inv
+from cing.Libs.matplotlibExt import green_inv
+from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqDssp import to3StateUpper
@@ -1095,9 +1098,10 @@ class NTplot( NTdict ):
         extent = self.xRange + self.yRange
         # make sure helix and sheet are plotted over coil
 
-        green_inv  = colors.LinearSegmentedColormap.from_list('inv_green', ('white', 'green'))
-        blue_inv   = colors.LinearSegmentedColormap.from_list('inv_blue', ('white', 'blue'))
-        yellow_inv = colors.LinearSegmentedColormap.from_list('inv_yellow', ('white', 'yellow'))
+        # When matplotlib 0.99.1.1 is the default this can obsolete matplotlibExt.py in CING.
+#        blue_inv   = colors.LinearSegmentedColormap.from_list('inv_blue', ('white', 'blue'))
+#        green_inv  = colors.LinearSegmentedColormap.from_list('inv_green', ('white', 'green'))
+#        yellow_inv = colors.LinearSegmentedColormap.from_list('inv_yellow', ('white', 'yellow'))
 
         cmapList= [   green_inv, blue_inv, yellow_inv ]
         colorList= [ 'green',   'blue',   'yellow']
