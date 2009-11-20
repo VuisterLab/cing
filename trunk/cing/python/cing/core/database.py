@@ -1201,7 +1201,7 @@ def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
     #end if
     for rfile in fileList:
         path = os.path.join(rootPath, rfile)
-        NTdebug('restoreSML: restoring from "%s"', path)
+#        NTdebug('restoreSML: restoring from "%s"', path)
         mDef.appendResidueDefFromSMLfile( path)
     #end for
 #end def

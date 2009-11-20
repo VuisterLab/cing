@@ -3,7 +3,7 @@ from cing.Libs.NTutils import printf
 from cing.Libs.NTutils import sprintf
 
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdebug #@UnusedImport
 from cing.Libs.NTutils import NTwarning
 
 from cing.Libs.NTutils import NTlist
@@ -316,7 +316,7 @@ Example file:
             NTerror('SMLhandler.fromFile: invalid SML file line %d "%s"', fp.NR, line[0])
 #        newObj  = smlhandler.handle( None, fp, obj )
         fp.close()
-        NTdebug('Restored %s from "%s"', newObj, fileName )
+#        NTdebug('Restored %s from "%s"', newObj, fileName )
         return newObj
     #end def
     fromFile = staticmethod( fromFile )

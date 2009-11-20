@@ -8,18 +8,20 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     from cing.Libs.NTutils import switchOutput
     switchOutput(False)
     try:
+        # All sql imports here and not above.
         from sqlalchemy import create_engine
+        from sqlalchemy.orm.session import sessionmaker
     except:
         switchOutput(True)
         raise ImportWarning(SQL_STR)
     finally:
         switchOutput(True)
-    NTmessage('Using SqlAlchemy')
+#    NTdebug('Using SqlAlchemy')
 
 class cgenericSql():
     "Class for connecting to any MySql database."
-    def __init__(self, host = 'localhost', user = 'anonymous', passwd = 'nobody@gmail.com', unix_socket = '/tmp/mysql.sock', db = "mydb"):
-        NTdebug("Initializing genericSql")
+    def __init__(self, host = 'localhost', user = 'nobody@noaddress.no', passwd = '', unix_socket = '/tmp/mysql.sock', db = ""):
+        NTdebug("Initializing cgenericSql")
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -32,29 +34,31 @@ class cgenericSql():
 
     def connect(self):
         "Return True on error"
-        self.engine = create_engine('mysql://%s/%s' % ( self.host,
-             self.db
+        self.engine = create_engine('mysql://%s/%s?user=%s&unix_socket=%s&passwd=%s' % ( self.host,
+             self.db,
+             self.user,
+             self.unix_socket,
+             self.passwd
             ),echo = True)
-        kwds = {}
-        kwds[ 'unix_socket' ] = self.unix_socket
-        self.conn = self.engine.connect(**kwds)
-        if not self.engine:
-            self.conn = None
+        self.conn = self.engine.connect()
+
+        if not self.conn:
             NTerror("Mysql connection failed" )
             return True
+        NTmessage("Now connected to Mysql database %s by %s" % (self.db, self.user))
+#        self.metadata = MetaData() maintained by caller.
+        self.Session = sessionmaker(bind=self.engine)
+        self.session = self.Session() # instantiation.
+        if not self.session:
+            NTerror("Mysql connection failed because session was not retrieved." )
+            return True
 
-        self.cursor.execute("SELECT VERSION()")
-        row = self.cursor.fetchone()
-        version = row[0]
-        NTmessage("Now connected to Mysql %s database %s by %s" % (version, self.db, self.user))
-
-        NTmessage("Now connected to Mysql %s database %s by %s" % (version, self.db, self.user))
 
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
     def __init__(self, host = 'localhost', user = 'nrgcing1', passwd = '4I4KMS', unix_socket = '/tmp/mysql.sock', db = "nrgcing"):
         cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db)
-        NTdebug("Initialized cingSql")
+        NTdebug("Initialized csqlAlchemy")
 
 #    def getNextSequenceId(self, table_name = 'entry'):
 #        """Reserve a new id in the sequence generator table. Get unique sequence id from db.

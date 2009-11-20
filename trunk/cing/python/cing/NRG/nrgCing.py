@@ -54,13 +54,13 @@ import urllib
 
 def run():
     """Return True on error"""
-    max_entries_todo = 2    # was 500 (could be as many as u like)
+    max_entries_todo = 50    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
     processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = True
     updateIndices = True
     isProduction = True
-    getTodoList = False # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
+    getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
 #    new_hits_entry_list = ['1bus'] # define empty for checking new ones.
     new_hits_entry_list = []
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
