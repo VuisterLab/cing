@@ -6,12 +6,13 @@
 Linux version 2.6.27-14-server (buildd@rothera) (gcc version 4.3.2 (Ubuntu 4.3.2-1ubuntu12) ) #1 SMP Mon Aug 31 13:57:10 UTC 2009
 }}}
 
-== Install apt ==
-
 == Install matplotlib ==
 
 Look for version 0.99.1.1 or higher.
 This installs the minimum versions of everything.
+{{{
+sudo aptitude install python-matplotlib
+}}}
 
 Configure matplotlib by putting the configuration file from the download section:
 {{{
@@ -24,8 +25,9 @@ in a directory that might already be created:
 
 == Install other deps ==
 {{{
-ImageMagick.x86_64
-wings-povray.x86_64 # or something like povray UNTESTED.
+sudo aptitude install imagemagick
+sudo aptitude install povray
+# or wings-povray.x86_64 # or something like povray UNTESTED.
 }}}
 
 == Configure CING ==
