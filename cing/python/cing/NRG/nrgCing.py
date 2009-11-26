@@ -54,7 +54,7 @@ import urllib
 
 def run():
     """Return True on error"""
-    max_entries_todo = 50    # was 500 (could be as many as u like)
+    max_entries_todo = 20    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
     processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = True
@@ -235,7 +235,7 @@ class nrgCing(Lister):
 
     def getCingEntryInfo(self):
         """Returns True for error
-        Will remove entry directories if they do not occur in NRG up to a maximum number as not to whipe out
+        Will remove entry directories if they do not occur in NRG up to a maximum number as not to whip out
         every one in a single blow by accident.
         """
 
@@ -244,7 +244,7 @@ class nrgCing(Lister):
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
         self.entry_list_crashed = NTlist()
-        self.entry_list_stopped = NTlist()
+        self.entry_list_stopped = NTlist() # mutely exclusive from entry_list_crashed
         self.entry_list_done = NTlist()
         self.entry_list_todo = NTlist()
 
@@ -292,6 +292,7 @@ class nrgCing(Lister):
 #                NTdebug("Found logLastFile %s" % logLastFile)
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
+                entryCrashed = False
                 for r in AwkLike(logLastFile):
                     line = r.dollar[0]
                     if line.startswith('CING took       :'):
@@ -305,6 +306,10 @@ class nrgCing(Lister):
                             NTwarning("%s was already found before; not adding again." % entry_code)
                         else:
                             self.entry_list_crashed.append(entry_code)
+                            entryCrashed = True
+                if entryCrashed:
+                    continue # don't mark it as stopped anymore.
+
                 # end for AwkLike
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
@@ -324,6 +329,13 @@ class nrgCing(Lister):
                     NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
+
+                molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
+                if not os.path.exists(molGifFile):
+                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                    self.entry_list_stopped.append(entry_code)
+                    continue
+
                 self.entry_list_done.append(entry_code)
             # end for entryDir
         # end for subDir

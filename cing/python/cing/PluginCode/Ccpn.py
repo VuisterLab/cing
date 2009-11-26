@@ -2218,12 +2218,14 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 
             if lower == None:
                 if restraintTypeIdx != Ccpn.RESTRAINT_IDX_DIHEDRAL:
-                    msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
+                    pass
+#                    msgHoL.appendDebug("Setting lower bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
                 lower = constraint.targetValue - error
 
             if upper == None:
                 if restraintTypeIdx != Ccpn.RESTRAINT_IDX_DIHEDRAL:
-                    msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
+                    pass
+#                    msgHoL.appendDebug("Setting upper bound from target and (perhaps assumed dev). For restraint: %s" % constraint )
                 upper = constraint.targetValue + error
 
 

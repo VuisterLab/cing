@@ -880,6 +880,7 @@ class HTMLfile:
 
         relativePath = self.relativePath()
 
+        icon_emailSrc = os.path.join(relativePath, "icon_email.gif")
         # other util JS utilities
         # multiline popups by JavaScript
         # jQuery JS utilities
@@ -975,9 +976,13 @@ class HTMLfile:
             self._appendTag( defaultFooter, 'a', 'r'+`cingRevision`, href=cingRevisionUrlStr)
             self._appendTag( defaultFooter, None, ')' , openTag=False)
 
+        self._appendTag( defaultFooter, None, ' ' )
         n = len(authorList)-1
         for i,author in enumerate(authorList):
-            self._appendTag( defaultFooter, 'a', author[0], href=sprintf("mailto:%s", author[1]))
+            self._appendTag( defaultFooter, None, author[0] )
+            self._appendTag( defaultFooter, 'a', href=sprintf("mailto:%s", author[1]), closeTag=False)
+            self._appendTag( defaultFooter, 'img', src=icon_emailSrc)
+            self._appendTag( defaultFooter, 'a', openTag=False)
             if i==(n-1):
                 self._appendTag( defaultFooter, None,' and ')
             elif i<n:
@@ -1422,7 +1427,7 @@ class ProjectHTMLfile( HTMLfile ):
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
-                NTdebug("ProjectHtmlFile.generateHtml: Trying to create : " + pathMolGif)
+                NTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
                 self.project.molecule.export2gif(pathMolGif, project=self.project)
             else:
                 NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
