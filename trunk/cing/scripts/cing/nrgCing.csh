@@ -40,7 +40,9 @@ if ( ! $status ) then
     exit 1
 endif
 
-echo "Starting nrgCing.csh" >>& $log_file
+echo "Starting nrgCing.csh with [$$] and [$0]" >>& $log_file
+# TODO: Remove next line when done.
+#exit 1
 
 python -u $CINGROOT/python/cing/NRG/nrgCing.py >>& $log_file
 
