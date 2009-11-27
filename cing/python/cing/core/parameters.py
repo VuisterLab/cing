@@ -104,9 +104,9 @@ shiftxExecutable = PLEASE_ADD_EXECUTABLE_HERE
 _platformArchitecture = platform.architecture()[0]
 if osType == OS_TYPE_LINUX:
     if _platformArchitecture == '64bit':
-        shiftxExecutable = 'shiftx_linux'
-    elif _platformArchitecture == '32bit':
         shiftxExecutable = 'shiftx_linux64'
+    elif _platformArchitecture == '32bit':
+        shiftxExecutable = 'shiftx_linux'
 elif osType == OS_TYPE_MAC:
     shiftxExecutable = 'shiftx'
 
