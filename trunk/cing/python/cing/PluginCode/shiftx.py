@@ -27,7 +27,7 @@ from cing.core.parameters import validationSubDirectories
 from math import sqrt
 import cing
 import os
-import platform
+import platform #@UnusedImport
 
 
 if True: # block
@@ -37,10 +37,9 @@ if True: # block
         NTdebug("Missing shiftx which is a dep for shiftx")
         useModule = False
 
-    if osType == OS_TYPE_LINUX and platform.architecture()[0] == '64bit':
-        NTdebug("Included shiftx fails on 64bit Linux so disabling the plugin.")
-        raise ImportWarning('shiftx')
-
+#    if osType == OS_TYPE_LINUX and platform.architecture()[0] == '64bit':
+#        NTdebug("Included shiftx fails on 64bit Linux so disabling the plugin.")
+#        raise ImportWarning('shiftx')
 
     if not useModule:
         raise ImportWarning('shiftx')

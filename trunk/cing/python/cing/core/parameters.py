@@ -2,6 +2,7 @@ from cing import OS_TYPE_LINUX
 from cing import osType
 from cing.Libs.NTutils import NTdict
 from cing import OS_TYPE_MAC
+import platform
 import cing
 import os
 
@@ -99,9 +100,16 @@ for key in cingPaths.keys():
 if cingPaths.convert:
     cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
 
-shiftxExecutable = 'shiftx'
+shiftxExecutable = PLEASE_ADD_EXECUTABLE_HERE
+_platformArchitecture = platform.architecture()[0]
 if osType == OS_TYPE_LINUX:
-    shiftxExecutable = 'shiftx_linux'
+    if _platformArchitecture == '64bit':
+        shiftxExecutable = 'shiftx_linux'
+    elif _platformArchitecture == '32bit':
+        shiftxExecutable = 'shiftx_linux64'
+elif osType == OS_TYPE_MAC:
+    shiftxExecutable = 'shiftx'
+
 cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, shiftxExecutable)
 
 cingPaths.x3dna = None
