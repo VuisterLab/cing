@@ -95,7 +95,7 @@ def getOsType():
     _platformMap = {
         'darwin': 'Darwin',
         'win32': 'Microsoft Windows',
-        'linux2': 'Linux',
+        'linux2': 'Linux', # Ubuntu 10.9 on 64 bit and others
         'sunos5': 'Solaris',
         'freebsd6': 'FreeBSD 6.0'
     }
@@ -109,6 +109,7 @@ def getOsType():
         return OS_TYPE_WINDOWS
     return OS_TYPE_UNKNOWN
 osType = getOsType()
+
 
 """Can be reset later when internet is up again"""
 internetConnected = isInternetConnected()

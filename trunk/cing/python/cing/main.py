@@ -137,6 +137,7 @@ from cing.core.parameters import plugins
 from string import join
 import cing
 import os
+import platform
 import sys
 import time
 import unittest
@@ -200,7 +201,7 @@ def getStartMessage():
     user = os.getenv("USER", "Unknown user")
     machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
 #    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
-    on = "%s (%s)" % (machine, osType)
+    on = "%s (%s/%s)" % (machine, osType,platform.architecture()[0])
     at = time.asctime()
 #    atForFileName = "%s" % at
 #    atForFileName = re.sub('[ :]', '_', atForFileName)
