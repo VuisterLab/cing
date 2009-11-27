@@ -1,10 +1,11 @@
-"""python $CINGROOT/python/cing/PluginCode/test/test_shiftx.py 
+"""python $CINGROOT/python/cing/PluginCode/test/test_shiftx.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing import verbosityNothing
+from cing.PluginCode.shiftx import runShiftx #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA2
