@@ -27,10 +27,19 @@ in a directory that might already be created:
 
 == Install other deps ==
 {{{
-sudo aptitude install imagemagick
-sudo aptitude install povray
-sudo aptitude install python-dev
-# for Cython dependency.
+python-matplotlib
+python-dev
+cython
+ipython
+imagemagick
+
+# Optional (but you might have them any way)
+gawk
+subversion
+konsole
+tcsh
+csh
+povray
 }}}
 
 == Configure CING ==
