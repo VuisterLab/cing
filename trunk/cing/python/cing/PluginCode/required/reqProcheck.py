@@ -4,6 +4,11 @@ PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc unde
 SECSTRUCT_STR      = 'secStruct'
 CONSENSUS_SEC_STRUCT_FRACTION = 0.6
 
+gf_STR = 'gf'
+gf_PHIPSI_STR = 'gfPHIPSI'
+gf_CHI12_STR = 'gfCHI12'
+gf_CHI1_STR = 'gfCHI1'
+
 #MXMODL Maximum number of models
 #left at 60 in   viol2pdb because the same as MXFILE
 MAX_PROCHECK_NMR_MODELS = 60

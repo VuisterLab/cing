@@ -6,6 +6,9 @@ from cing.core.constants import COLOR_GREEN
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import COLOR_RED
 
+rogScoreStr = 'rogScore'
+"Attribute name in e.g. residue object."
+
 class ROGscore(NTdict):
     """
     Red orange green with comments.
@@ -121,8 +124,8 @@ class ROGscore(NTdict):
 
         if isinstance(comment, list):
             for commentSingle in comment:
-               commentTuple = (colorLabel, commentSingle )
-               self.colorCommentList.append( commentTuple )# grow list with potentially multiple comments.
+                commentTuple = (colorLabel, commentSingle )
+                self.colorCommentList.append( commentTuple )# grow list with potentially multiple comments.
         else:
             commentTuple = (colorLabel, comment )
             self.colorCommentList.append(commentTuple)

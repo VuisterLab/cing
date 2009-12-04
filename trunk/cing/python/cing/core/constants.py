@@ -86,6 +86,12 @@ RDCL_LEVEL = 'RDCRestraintList' # unused so far
 COPLANAR_LEVEL = 'Coplanar'
 COPLANARL_LEVEL = 'CoplanarList' # unused so far
 
+DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
+AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
+VIOL1_STR = 'violCount1'
+VIOL3_STR = 'violCount3'
+VIOL5_STR = 'violCount5'
+
 POOR_PROP = 'POOR'
 BAD_PROP  = 'BAD'
 
