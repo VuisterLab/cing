@@ -21,7 +21,6 @@ from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
-from matplotlib import cm
 from matplotlib import colors
 from matplotlib import rcParams
 from matplotlib.axes import Axes
@@ -1126,12 +1125,12 @@ class NTplot( NTdict ):
                 palette.set_under(color = 'w', alpha = 0.0 ) # alpha is 0.0
                 palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
                 palette.set_bad(color = 'w', alpha = 0.0 )
-            else:
-                # Set up a colormap for debugging
-                palette = cm.gray
-                palette.set_over('r', 1.0)
-                palette.set_under('g', 1.0)
-                palette.set_bad('b', 1.0)
+#            else:
+#                # Set up a colormap for debugging
+#                palette = cm.gray # failed for JFD after switching to Eclipse 35. Probably not related.
+#                palette.set_over('r', 1.0)
+#                palette.set_under('g', 1.0)
+#                palette.set_bad('b', 1.0)
                 # Alternatively, we could use
                 # palette.set_bad(alpha = 0.0)
                 # to make the bad region transparent.  This is the default.

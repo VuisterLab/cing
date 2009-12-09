@@ -16,6 +16,6 @@ public class UtTest extends TestCase {
         String result = Ut.mapToPythonRFC822ConfigurationSettings(parameterMap);
         General.showDebug("result: [" + result +"]");
         // Just learning java:
-        General.showDebug("should be xxx: [" + (true? "xxx":"yyy") +"]");
+//        General.showDebug("should be xxx: [" + (true? "xxx":"yyy") +"]");
     }
 }

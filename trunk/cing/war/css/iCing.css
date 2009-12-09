@@ -1,0 +1,225 @@
+.loginPrompt {
+  background: #dddddd;
+	font-style: italic;
+	margin-bottom: 20px;
+	padding: 10px;
+	font-size: 1.25em;
+	border: thin solid #aaaaaa;
+}
+
+
+.gwtsolutions-Message { 
+   padding: 20px; 
+   margin-bottom: 10px; 
+   font-style: italic; 
+   background: lightGray; 
+   width: 250px; 
+   height: 2em; 
+}
+
+.successBorder { 
+   border: thin solid darkGray; 
+} 
+ 
+.failureBorder { 
+   border: thick solid red; 
+} 
+
+.nameField {
+	width: 15em;
+}
+
+.passwordField {
+	width: 8em;
+}
+
+.welcomeMsg {
+  margin-bottom: 20px;
+	font-style: italic;
+	color: blue;
+}
+
+.BigText {
+  font-size: large;
+}
+.LoudText {
+  font-weight:  bold;
+}
+
+body { 
+	background-color: white;
+	color: black;
+	font-family: Arial, sans-serif;
+	font-size: small;
+	margin: 5px;
+}
+
+a {	
+	color: darkblue;
+}
+
+a:visited {	
+	color: darkblue; 
+}
+
+
+.gray {
+	/* showing defuncts */
+    color: #d0d0d0;
+}
+
+.red {
+	color: #ff0f00;
+/*  font-weight: bold;
+    text-decoration: none; */
+}
+
+a.red:link {
+	color: #ff0f00;
+/*	font-weight: bold;
+	text-decoration: none; */
+}
+
+a.red:visited {
+	color: #ff0f00;
+	font-style: italic;
+/*	text-decoration: none; */
+}
+
+a.red:hover, a.red:active {
+	color: #000000;
+}
+
+.orange {
+	color: #ff8100;
+/*  text-decoration: none; */
+}
+
+a.orange:link {
+    color: #ff8100;
+/*  text-decoration: none; */
+}
+
+a.orange:visited {
+	color: #ff8100;
+	font-style: italic;
+	/*	text-decoration: none; */
+}
+
+a.orange:hover, a.orange:active {
+	color: #000000;
+}
+
+a.green:link {
+	color: #a3c159;
+/*	text-decoration: none; */
+}
+
+a.green:visited {
+	color: #a3c159;
+	font-style: italic;
+	/*	text-decoration: none; */
+}
+
+a.green:hover, a.green:active {
+	color: #000000;
+}
+
+/*</group>*/
+
+/*<group=Layout>*/
+
+#red a:link {
+	color: #ff0f00;
+	text-decoration: none;
+}
+
+#red a:visited {
+	color: #ff6765;
+	text-decoration: none;
+}
+
+#red a:hover, a:active {
+	color: #000000;
+}
+
+#orange a:link {
+	color: #ff8100;
+	text-decoration: none;
+}
+
+#orange a:visited {
+	color: #ffaa4e;
+	text-decoration: none;
+}
+
+#orange a:hover, a:active {
+	color: #000000;
+}
+
+#green a:link {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+#green a:visited {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+#green a:hover, a:active {
+	color: #000000;
+}
+
+
+/*<group=Global Classes>*/
+
+remark {
+	background: #0ca0ad;
+	padding: 10px;
+	color: #ffffff;
+	font-size: 16px;
+	font-style: italic;
+	font-weight: bold;
+}
+.standout {
+	background: #0ca0ad;
+	padding: 10px;
+	color: #ffffff;
+	font-size: 13px;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.h1 {
+	color: #0ca0ad;
+	font-size: 25px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h2 {
+	color: #0ca0ad;
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h3 {
+	color: #0ca0ad;
+	font-size: 14px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h1-red {
+	color: red;
+}
+
+.h1-orange {
+	color: orange;
+}
+
+.gwt-MenuItem-disabled  {
+	background: #888;
+}
