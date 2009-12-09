@@ -2,8 +2,6 @@
 Adds shiftx method to predict chemical shifts. The shiftx program is included as binaries for Mac OSX and 32 bit
 Linux in the bin directory.
 """
-from cing import OS_TYPE_LINUX
-from cing import osType
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
@@ -36,11 +34,6 @@ if True: # block
     if not os.path.exists( cingPaths.shiftx ):
         NTdebug("Missing shiftx which is a dep for shiftx")
         useModule = False
-
-#    if osType == OS_TYPE_LINUX and platform.architecture()[0] == '64bit':
-#        NTdebug("Included shiftx fails on 64bit Linux so disabling the plugin.")
-#        raise ImportWarning('shiftx')
-
     if not useModule:
         raise ImportWarning('shiftx')
 #    NTmessage('Using shiftx')

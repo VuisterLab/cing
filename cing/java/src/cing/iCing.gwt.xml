@@ -1,15 +1,6 @@
 <module>
-
       <!-- Inherit the core Web Toolkit stuff.                        -->
     <inherits name='com.google.gwt.user.User' />
-    <!--
-        Inherit the default GWT style sheet. Changed to use explicit files
-        from gwt for instantiations. <inherits
-        name='com.google.gwt.user.theme.standard.Standard' />
-    -->
-    <!-- Inherit sound support
-    <inherits name='com.allen_sauer.gwt.voices.gwt-voices' />
-    -->
     <!-- Inherit message support                        	-->
     <inherits name='com.gwtsolutions.components.Components' />
     <inherits name="com.google.gwt.json.JSON" />
@@ -22,19 +13,10 @@
     <stylesheet src='Showcase.css'/>
 
     <inherits name="com.google.gwt.user.theme.standard.Standard" />
-    <!--
-    <inherits name="com.google.gwt.user.theme.standard.StandardResources" />
-    <inherits name="com.google.gwt.user.theme.chrome.ChromeResources" />
-    <inherits name="com.google.gwt.user.theme.dark.DarkResources" />
-
-    <stylesheet src='css/gwt/standard/standard.css'/>
-    <stylesheet src='css/sc/standard/Showcase.css'/>
-
-    -->
     <entry-point class="cing.client.iCing" />
 
     <extend-property name="locale" values="en" />
-<!-- Disable for quicker testing/compiling. -->
+<!-- Disable for quicker testing/compiling.
     <extend-property name="locale" values="de" />
     <extend-property name="locale" values="es" />
     <extend-property name="locale" values="fr" />
@@ -44,7 +26,7 @@
     <extend-property name="locale" values="pt" />
     <extend-property name="locale" values="ru" />
     <extend-property name="locale" values="zh" />
-
+-->
 
     <!-- Specify the servlet that handles file uploads.
     Note that apache/tomcat on production is setup to proxy:
@@ -53,4 +35,5 @@
     ProxyPassReverse  /icing/serv http://localhost:8080/icing
     -->
     <servlet path="/serv/iCingServlet" class="cing.server.iCingServlet" />
+
 </module>

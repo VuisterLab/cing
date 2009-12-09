@@ -1,23 +1,8 @@
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTzap
-from cing.PluginCode.Whatif import Whatif
+from cing.Libs.NTutils import NTdebug, NTdict, NTerror, NTmessage
 from cing.PluginCode.required.reqOther import SQL_STR
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
-from cing.PluginCode.required.reqProcheck import gf_CHI12_STR
-from cing.PluginCode.required.reqProcheck import gf_CHI1_STR
-from cing.PluginCode.required.reqProcheck import gf_PHIPSI_STR
-from cing.PluginCode.required.reqProcheck import gf_STR
 from cing.PluginCode.required.reqWhatif import OMECHK_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.ROGscore import rogScoreStr
-from cing.core.constants import DR_STR
-from cing.core.constants import VIOL1_STR
-from cing.core.constants import VIOL3_STR
-from cing.core.constants import VIOL5_STR
+from cing.core.constants import DR_STR, VIOL1_STR, VIOL3_STR, VIOL5_STR
 import warnings
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
@@ -131,17 +116,17 @@ class csqlAlchemy(cgenericSql):
         self.mapCing[ ( self.levelIdResidue, DR_STR, VIOL5_STR ) ] = ( self.levelIdResidue, 'dis_c5_viol' )
 
         # WHAT IF
-        wiChkIdList = NTzap(Whatif.nameDefs,0)
-        for checkId in wiChkIdList:
-            columnName = 'wi_' + checkId
-            self.mapCing[ ( self.levelIdResidue, WHATIF_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
-
-        # PROCHECK
-        pcChkIdList = ( gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR )
-        for checkId in pcChkIdList:
-            columnName = 'pc_' + checkId
-            self.mapCing[ ( self.levelIdResidue, PROCHECK_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
-        NTdebug("mapCing: %s" % self.mapCing)
+#        wiChkIdList = NTzap(Whatif.nameDefs,0)
+#        for checkId in wiChkIdList:
+#            columnName = 'wi_' + checkId
+#            self.mapCing[ ( self.levelIdResidue, WHATIF_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
+#
+#        # PROCHECK
+#        pcChkIdList = ( gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR )
+#        for checkId in pcChkIdList:
+#            columnName = 'pc_' + checkId
+#            self.mapCing[ ( self.levelIdResidue, PROCHECK_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
+#        NTdebug("mapCing: %s" % self.mapCing)
     def autoload(self):
         """Return True on error"""
         cgenericSql.autoload(self)
