@@ -1,12 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.0/distro-source/core/src/gwt-module.dtd">
 <module>
       <!-- Inherit the core Web Toolkit stuff.                        -->
     <inherits name='com.google.gwt.user.User' />
     <!-- Inherit message support                        	-->
     <inherits name='com.gwtsolutions.components.Components' />
     <inherits name="com.google.gwt.json.JSON" />
-
     <inherits name='com.google.gwt.i18n.I18N' /> <!--  Language support -->
-
     <stylesheet src='iCing.css'/>
     <stylesheet src='gwt-standard.css'/>
     <stylesheet src='gwt-iCing.css'/>
@@ -33,7 +33,7 @@
     # For the gwt tomcat server
     ProxyPass         /icing/serv http://localhost:8080/icing
     ProxyPassReverse  /icing/serv http://localhost:8080/icing
-    -->
     <servlet path="/serv/iCingServlet" class="cing.server.iCingServlet" />
+    -->
 
 </module>
