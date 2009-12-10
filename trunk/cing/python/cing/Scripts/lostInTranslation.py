@@ -15,14 +15,15 @@ class lostInTranslation():
     """Find the missing phrases in each language iCing tries to support"""
 
     def __init__(self):
-        self.gwtDir = "java/src/cing/client"
+#        self.gwtDir = "java/src/cing/client"
+        self.gwtDir = "src/cing/client"
         absPathGwtDir = os.path.join(cing.cingRoot, self.gwtDir )
         if os.chdir(absPathGwtDir):
             NTerror("Failed to change to directory: "+absPathGwtDir)
             sys.exit(1)
     
     def findPhrases(self):
-#        CINGROOT = os.getenv("CINGROOT", "/Users/jd/workspace34/cing") # default value should not be used...
+#        CINGROOT = os.getenv("CINGROOT", "/Users/jd/workspace35/cing") # default value should not be used...
         propList  = glob( 'iCingConstants_*.properties') 
         NTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
         propBaseFile = os.path.join( 'iCingConstants.properties' )

@@ -227,7 +227,10 @@ Test targets suppressed because -junit argument was not specified when running w
 
   <target name="build" depends="gwtc" description="Build this project" />
 
+<!--
   <target name="war" depends="build" description="Create a war file">
+-->
+  <target name="war" description="Create a war file">
     <zip destfile="iCing.war" basedir="war"/>
   </target>
 

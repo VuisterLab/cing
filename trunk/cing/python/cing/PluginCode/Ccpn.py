@@ -2096,11 +2096,11 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
                 # TODO: IMPORTANT Resonances Better Target resonances, error, weight
 # Currently fails as:
-#  File "/Users/jd/workspace34/cing/python/cing/PluginCode/Ccpn.py", line 1837, in createCcpnRestraints
+#  File "/Users/jd/workspace35/cing/python/cing/PluginCode/Ccpn.py", line 1837, in createCcpnRestraints
 #    error = upper - lower)
-#  File "/Users/jd/workspace34/ccpn/python/ccp/api/nmr/NmrConstraint.py", line 32136, in newDistanceConstraint
+#  File "/Users/jd/workspace35/ccpn/python/ccp/api/nmr/NmrConstraint.py", line 32136, in newDistanceConstraint
 #    return DistanceConstraint(self, **attrlinks)
-#  File "/Users/jd/workspace34/ccpn/python/ccp/api/nmr/NmrConstraint.py", line 42901, in __init__
+#  File "/Users/jd/workspace35/ccpn/python/ccp/api/nmr/NmrConstraint.py", line 42901, in __init__
 #    % (self, key))
 #ApiError: <ccp.nmr.NmrConstraint.DistanceConstraint [1, 1, None]>: error setting resonances - not a modeled attribute
 
@@ -2136,7 +2136,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 
        Mind you that CING only supports lower and upper bounds like cyana so far.
 
-       In CCPN according to: file:///Users/jd/workspace34/ccpn/python/ccp/api/doc/nmr/NmrConstraint/DistanceConstraint/index.html
+       In CCPN according to: file:///Users/jd/workspace35/ccpn/python/ccp/api/doc/nmr/NmrConstraint/DistanceConstraint/index.html
        none of the four is mandatory.
 
        When CING wants access to more than lower/upper then this code needs to be updated.

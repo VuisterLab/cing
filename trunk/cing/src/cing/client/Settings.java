@@ -18,7 +18,7 @@ public interface Settings {
     /** URL for NRG-CING. */
     public static final String NRG_CING_URL = "http://nmr.cmbi.ru.nl/NRG-CING";
     /** Local install location of CING */
-    public static final String CINGROOT = "/Users/jd/workspace34/cing";
+    public static final String CINGROOT = "/Users/jd/workspace35/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
     public static final String CING_WRAPPER_SCRIPT = CINGROOT + "/scripts/cing/CingWrapper.csh";
     /** Relative url of results from a CING run */

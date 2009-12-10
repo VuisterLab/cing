@@ -1,8 +1,11 @@
+from cing import verbosityWarning
 from cing.Libs.NTutils import NTdebug, NTdict, NTerror, NTmessage
 from cing.PluginCode.required.reqOther import SQL_STR
 from cing.PluginCode.required.reqWhatif import OMECHK_STR
 from cing.core.ROGscore import rogScoreStr
 from cing.core.constants import DR_STR, VIOL1_STR, VIOL3_STR, VIOL5_STR
+from cing.Libs.NTutils import NTexception
+import cing
 import warnings
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
@@ -55,7 +58,13 @@ class cgenericSql(NTdict):
              self.unix_socket,
              self.passwd
             ), echo = self.echo)
-        self.conn = self.engine.connect()
+        try:
+            self.conn = self.engine.connect()
+        except:
+            if cing.verbosity >= verbosityWarning:
+                NTexception("Failed to connect to MySql engine")
+                pass
+            return True
         if not self.conn:
             NTerror("Mysql connection failed")
             return True

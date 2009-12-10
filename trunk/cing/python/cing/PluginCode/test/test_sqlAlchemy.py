@@ -99,12 +99,13 @@ class AllChecks(TestCase):
         NTdebug(str(ed_user))
 #        NTdebug(ed_user.extraCol)
 
-    def test_SqlAlchemy(self):
+    def ttest_SqlAlchemy(self):
+        """Only enable when db is installed, configured and running"""
         pdb_id = '1brv'
         res_number = 171
 
         csql = csqlAlchemy()
-        csql.connect()
+        self.assertFalse( csql.connect() )
         csql.autoload()
 
         execute = csql.conn.execute

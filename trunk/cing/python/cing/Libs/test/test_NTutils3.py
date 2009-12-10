@@ -81,9 +81,9 @@ class AllChecks(TestCase):
 
 
     def tttestNTpath(self):
-        pathList = [ "/Users/jd/.cshrc", "/Users/jd/workspace34", "/Users/jd/workspace34/" ]
-        expectedDirectory = [ '/Users/jd' , "/Users/jd" , "/Users/jd/workspace34"]
-        expectedBasename = [ '','workspace34', '' ]
+        pathList = [ "/Users/jd/.cshrc", "/Users/jd/workspace35", "/Users/jd/workspace35/" ]
+        expectedDirectory = [ '/Users/jd' , "/Users/jd" , "/Users/jd/workspace35"]
+        expectedBasename = [ '','workspace35', '' ]
         expectedExtension = [ '.cshrc', '', '' ]
         for i in range(len(pathList)):
             (directory, basename, extension) = NTpath(pathList[i])
