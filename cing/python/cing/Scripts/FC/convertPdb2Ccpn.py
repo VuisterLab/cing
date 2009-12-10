@@ -46,7 +46,7 @@ def convert(projectName, rootDir):
 if __name__ == '__main__':
 
     cing.verbosity = verbosityDebug
-    rootDir = "/Users/jd/workspace34/cing/Tests/data/eNMR"
+    rootDir = "/Users/jd/workspace35/cing/Tests/data/eNMR"
 #    projectName = sys.argv[0]
     projectList = """CuTTHAcisFrankfurt CuTTHAtransFrankfurt ParvulustatFrankfurt
 TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt""".split()

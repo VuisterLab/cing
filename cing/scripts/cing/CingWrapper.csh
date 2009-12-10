@@ -9,9 +9,9 @@
 
 
 setenv UJ                 /Users/jd
-setenv WS                 $UJ/workspace34
+setenv WS                 $UJ/workspace35
 setenv CCPNMR_TOP_DIR     $WS/ccpn
-setenv CINGROOT           $UJ/workspace35/cing
+setenv CINGROOT           $WS/cing
 setenv WATTOSROOT         $WS/wattos
 setenv aquaroot           $WS/aquad
 setenv procheckroot       $UJ/progs/procheck
@@ -64,10 +64,6 @@ if ( $verbosityDebug) then
 endif
 
 if ( $verbosityDebug) then
-    echo "DEBUG: Wrap for HOME / user           $HOME / $user"
-endif
-
-if ( $verbosityDebug) then
     echo "DEBUG: Initializing CING from         $CINGROOT"
 endif
 source $CINGROOT/cing.csh
@@ -108,10 +104,10 @@ if ( $verbosityDebug) then
 endif
 
 # short notation for $argv or even $argv[*] is $* but let's be verbose.
-#cing $argv
+cing $argv
 
 # Testing...
-python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
+#python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
 #$MOLMOLHOME/molmol -t -f - < 1brv_1model_molmol_images.mac
 #pwd;ls;date
 

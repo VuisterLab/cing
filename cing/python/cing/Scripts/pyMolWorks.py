@@ -29,7 +29,7 @@ cmd.spectrum()
 
 try:
    pdbCode = '1brv'
-   pdbFile = urllib2.urlopen('file:///Users/jd/workspace34/cing/Tests/data/pdb/'+
+   pdbFile = urllib2.urlopen('file:///Users/jd/workspace35/cing/Tests/data/pdb/'+
         pdbCode + '/pdb' +
         pdbCode + '.ent')
    cmd.read_pdbstr(pdbFile.read(), pdbCode)

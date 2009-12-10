@@ -20,7 +20,7 @@ entryListFileName = os.path.join(startDir, 'list', 'entry_list.csv')
 # parameters for validateEntry
 #inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
 #inputDir = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
-inputDir = 'file:///Users/jd/workspace34/cing/Tests/data/eNMR'
+inputDir = 'file:///Users/jd/workspace35/cing/Tests/data/eNMR'
 #inputDir = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
 outputDir = startDir
 

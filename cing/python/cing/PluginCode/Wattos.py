@@ -41,8 +41,8 @@ if True: # block
     if not cingPaths.classpath:
         NTdebug("Missing java classpath which is an optional dependency for Wattos")
         raise ImportWarning('Wattos')
-#    if not (('/Users/jd/workspace34/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
-#             '/Users/jd/workspace34/wattos/build' in cingPaths.classpath) or
+#    if not (('/Users/jd/workspace35/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
+#             '/Users/jd/workspace35/wattos/build' in cingPaths.classpath) or
 #             ('/Users/alan/workspace/Wattos/lib/Wattos.jar' in cingPaths.classpath)):
     classpathCombinedAgain = ':'.join(cingPaths.classpath)
     if not (('/lib/Wattos.jar' in classpathCombinedAgain) or ('/build' in classpathCombinedAgain)):

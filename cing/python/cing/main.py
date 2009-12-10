@@ -298,10 +298,10 @@ def testOverall(namepattern):
     startdir = cingPythonDir
     nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
     # enable next line(s) to do a single check only.
-#    nameList = ['/Users/jd/workspace34/cing/python/cing/Libs/test/test_Imagery.py']
+#    nameList = ['/Users/jd/workspace35/cing/python/cing/Libs/test/test_Imagery.py']
 #    nameList = [
-#                '/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_NmrStar.py',
-#                '/Users/jd/workspace34/cing/python/cing/PluginCode/test/test_ccpn.py'
+#                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
+#                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py'
 #                ]
     NTdebug('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
