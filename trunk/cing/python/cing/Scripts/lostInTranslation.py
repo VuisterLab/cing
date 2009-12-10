@@ -17,14 +17,16 @@ class lostInTranslation():
     def __init__(self):
 #        self.gwtDir = "java/src/cing/client"
         self.gwtDir = "src/cing/client"
+        self.lostInTranslationDir = "lostInTranslation"
+        "Relative to the self.gwtDir"
         absPathGwtDir = os.path.join(cing.cingRoot, self.gwtDir )
         if os.chdir(absPathGwtDir):
             NTerror("Failed to change to directory: "+absPathGwtDir)
             sys.exit(1)
-    
+
     def findPhrases(self):
 #        CINGROOT = os.getenv("CINGROOT", "/Users/jd/workspace35/cing") # default value should not be used...
-        propList  = glob( 'iCingConstants_*.properties') 
+        propList  = glob( 'iCingConstants_*.properties')
         NTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
         propBaseFile = os.path.join( 'iCingConstants.properties' )
         propBaseMap = self.getPropMap( propBaseFile )
@@ -35,6 +37,7 @@ class lostInTranslation():
 #                                       n
             countryCode = propFile[n-13:n-11]
             fileTodo = 'iCingConstants-%2s-todo.properties' %  countryCode
+            fileTodo = os.path.join( self.lostInTranslationDir, fileTodo )
             nf = codecs.open( fileTodo, "w", "utf-8" )
             NTmessage("Writing to file: " + fileTodo)
             propMap = self.getPropMap( propFile )
@@ -51,10 +54,10 @@ class lostInTranslation():
                 nf.write( u"\n" ) # might be utf-8
 #                NTmessage("Lost: " + key)
             nf.close()
-                
+
     def getPropMap( self, propBaseFile ):
         f = codecs.open( propBaseFile, "r", "utf-8" )
-        # now the reads will result in unicode being returned.        
+        # now the reads will result in unicode being returned.
         r={}
         lineNo = 0
         for line in f:
@@ -67,13 +70,13 @@ class lostInTranslation():
             except :
                 NTerror("In file [%s] on line [%d]: [%s]" % (propBaseFile, lineNo, line))
                 raise # re-raise the current exception (new in 1.5)
-            
+
             key = key.strip()
             value = value.strip()
             r[key]=value
         return r
-        
-            
+
+
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug

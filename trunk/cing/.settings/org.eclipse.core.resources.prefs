@@ -1,16 +1,7 @@
-#Wed Dec 09 15:10:54 CET 2009
+#Thu Dec 10 15:22:58 CET 2009
 eclipse.preferences.version=1
 encoding//python/cing/Scripts/lostInTranslation.py=utf-8
 encoding//src/cing/client/iCing.java=UTF-8
-encoding//src/cing/client/iCingConstants-de-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-es-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-fr-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-it-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-ja-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-nl-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-pt-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-ru-todo.properties=UTF-8
-encoding//src/cing/client/iCingConstants-zh-todo.properties=UTF-8
 encoding//src/cing/client/iCingConstants.properties=UTF-8
 encoding//src/cing/client/iCingConstants_de.properties=UTF-8
 encoding//src/cing/client/iCingConstants_es.properties=UTF-8
@@ -21,3 +12,12 @@ encoding//src/cing/client/iCingConstants_nl.properties=UTF-8
 encoding//src/cing/client/iCingConstants_pt.properties=UTF-8
 encoding//src/cing/client/iCingConstants_ru.properties=UTF-8
 encoding//src/cing/client/iCingConstants_zh.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-de-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-es-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-fr-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-it-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-ja-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-nl-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-pt-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-ru-todo.properties=UTF-8
+encoding//src/cing/client/lostInTranslation/iCingConstants-zh-todo.properties=UTF-8
