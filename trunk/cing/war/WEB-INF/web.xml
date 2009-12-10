@@ -4,18 +4,27 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-  
+
   <!-- Servlets -->
   <servlet>
     <servlet-name>greetServlet</servlet-name>
     <servlet-class>cing.server.GreetingServiceImpl</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>greetServlet</servlet-name>
     <url-pattern>/icing/greet</url-pattern>
   </servlet-mapping>
-  
+
+	<servlet>
+	  <servlet-name>iCingServlet</servlet-name>
+	  <servlet-class>cing.server.iCingServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	  <servlet-name>iCingServlet</servlet-name>
+	  <url-pattern>/icing/serv/iCingServlet</url-pattern>
+	</servlet-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>iCing.html</welcome-file>

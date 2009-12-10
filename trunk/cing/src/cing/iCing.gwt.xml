@@ -37,6 +37,16 @@
     <extend-property name="locale" values="ru" />
 -->
     <extend-property name="locale" values="zh" />
+
+
+    <!-- Specify the servlet that handles file uploads.
+    Note that apache/tomcat on production is setup to proxy:
+    # For the gwt tomcat server
+    ProxyPass         /icing/serv http://localhost:8080/icing
+    ProxyPassReverse  /icing/serv http://localhost:8080/icing
+    -->
+    <servlet path="/serv/iCingServlet" class="cing.server.iCingServlet" />
+
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
 
