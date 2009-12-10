@@ -68,7 +68,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	// public static String currentAccessKey = "234567";
 	public static String currentAccessKey = null;
 	public static String currentUserId = "ano"; // TODO: implement security
-												// functionality later.
+	// functionality later.
 
 	/**
 	 * NB the html text eol have to be lowercase \<br\>
@@ -138,7 +138,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		// Order matters. Status is sometimes displayed so needs to be last.
 		views = new ArrayList();
 		views.add(logView); // Important to keep this one first so that others
-							// can log into it.
+		// can log into it.
 		views.add(welcome);
 		views.add(fileView);
 		views.add(cingLogView);
@@ -158,7 +158,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		vPanel.setSpacing(5);
 
 		setVerbosityToDebug(Settings.DO_DEBUG); // partner with the above call
-												// to
+		// to
 		showLoadingMessage(false);
 		showFooter();
 
@@ -190,8 +190,8 @@ public class iCing implements EntryPoint, HistoryListener {
 	private void showFooter() {
 		// String x = null;
 		String cingRevisionUrl = Settings.CING_REVISION_URL + Settings.REVISION;
-		String cingRevisionhtml = "iCing " + "<a href=\"" + cingRevisionUrl
-				+ "\">r" + Settings.REVISION + "</a> by" + GenClient.eol;
+		String cingRevisionhtml = "iCing " + "(<a href=\"" + cingRevisionUrl
+				+ "\">r" + Settings.REVISION + "</a>)" + GenClient.eol;
 
 		final HTML html = new HTML(
 				"<div id=\"footer\">"
@@ -201,15 +201,25 @@ public class iCing implements EntryPoint, HistoryListener {
 						+ cingRevisionhtml
 						+ "\t"
 						+ GenClient.eol
-						+ "<a href=\"mailto:g.vuister@science.ru.nl\">Geerten W. Vuister</a>, \t"
+						+ "Geerten W. Vuister \t"
+						+ "<a href=\"mailto:g.vuister@science.ru.nl\">"
+						+ "<img src=\"images/icon_email.gif\">"
+						+ "</a>"
+						+ ", \t"
 						+ GenClient.eol
-						+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">Jurgen F. Doreleijers</a>"
+						+ "Jurgen F. Doreleijers \t"
+						+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">"
+						+ "<img src=\"images/icon_email.gif\">"
+						+ "</a> \t"
 						+ GenClient.eol
 						+ " "
 						+ c.and()
 						+ " \t"
 						+ GenClient.eol
-						+ "<a href=\"mailto:alanwilter@gmail.com\">Alan Wilter Sousa da Silva</a>"
+						+ "Alan Wilter Sousa da Silva \t"
+						+ "<a href=\"mailto:alanwilter@gmail.com\">"
+						+ "<img src=\"images/icon_email.gif\">"
+						+ "</a> \t"
 						+ "</p>" + GenClient.eol + "</div>" + GenClient.eol);
 		vPanel.add(html);
 		html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -368,7 +378,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("ja", i++);
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
-//		localeMap.put("ru", i++);
+		// localeMap.put("ru", i++);
 		localeMap.put("zh", i++);
 
 		listBoxLocale.addItem("Deutsch", "de");
@@ -379,15 +389,15 @@ public class iCing implements EntryPoint, HistoryListener {
 		listBoxLocale.addItem("日本語", "ja");
 		listBoxLocale.addItem("Nederlands", "nl");
 		listBoxLocale.addItem("Português", "pt");
-//		listBoxLocale.addItem("Русский", "ru");
+		// listBoxLocale.addItem("Русский", "ru");
 		listBoxLocale.addItem("中文", "zh");
 
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
-		if ( currentLocale.equals("default")){
+		if (currentLocale.equals("default")) {
 			currentLocale = "en";
 		}
-//		GenClient.showDebug("localeMap: " + localeMap);
-//		GenClient.showDebug("currentLocale: " + currentLocale);
+		// GenClient.showDebug("localeMap: " + localeMap);
+		// GenClient.showDebug("currentLocale: " + currentLocale);
 		int idx = localeMap.get(currentLocale);
 		if (idx < 0) {
 			idx = 1; // en is default
@@ -480,7 +490,7 @@ public class iCing implements EntryPoint, HistoryListener {
 			}
 		};
 
-		menuBar_iCing.addItem(c.About(), commandAbout);
+		menuBar_iCing.addItem(c.About() + " iCing", commandAbout);
 		menuBar_iCing.addItem(c.Preferences(), commandPref);
 		menuBar.addItem(c.iCing(), menuBar_iCing);
 		menuBar.addItem(c.File(), menuBar_file);
@@ -718,11 +728,11 @@ public class iCing implements EntryPoint, HistoryListener {
 		String result = "";
 		for (int i = 1; i <= Settings.accessKeyLength; i++) {
 			int idxChar = Random.nextInt(allowedCharacters.length()); // equal
-																		// chance
-																		// for A
-																		// as
-																		// for
-																		// others.
+			// chance
+			// for A
+			// as
+			// for
+			// others.
 			result += allowedCharacters.charAt(idxChar);
 		}
 		// result = "123456"; // TODO: disable for production.
