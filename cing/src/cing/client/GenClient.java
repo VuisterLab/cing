@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
+import cing.client.i18n.iCingConstants;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 /**

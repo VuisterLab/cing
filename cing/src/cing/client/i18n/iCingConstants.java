@@ -1,8 +1,8 @@
-package cing.client;
+package cing.client.i18n;
 
 /**
  * Interface to represent the constants contained in resource bundle:
- * 	'/Users/jd/workspace35/cing/war/WEB-INF/classes/cing/client/iCingConstants.properties'.
+ * 	'/Users/jd/workspace35/cing/src/cing/client/i18n/iCingConstants.properties'.
  */
 public interface iCingConstants extends com.google.gwt.i18n.client.Constants {
   
