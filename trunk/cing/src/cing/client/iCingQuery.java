@@ -22,27 +22,27 @@ public class iCingQuery {
 		} else {
 //			GenClient.showDebug("in iCingQuery() found icing: " + icing.toString());
 		}
-		
+
 		serverFormHandler = new FormHandlerMain(icing);
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		/** From the manual: the base URL is guaranteed to end with a slash */
 		String moduleBaseUrlWithPort = GWT.getModuleBaseURL();
 		String actionServerUrl = moduleBaseUrlWithPort + Settings.SERVLET_URL;
-		formPanel.setAction(actionServerUrl);		
-		GenClient.showDebug("actionServerUrl: [" + actionServerUrl + "]");		
+		formPanel.setAction(actionServerUrl);
+		GenClient.showDebug("actionServerUrl: [" + actionServerUrl + "]");
 
 		formVerticalPanel.add(action);
 		formVerticalPanel.add(new Hidden(Settings.FORM_PARM_ACCESS_KEY, iCing.currentAccessKey));
 		formVerticalPanel.add(new Hidden(Settings.FORM_PARM_USER_ID, iCing.currentUserId));
-		
+
 		formPanel.setWidget(formVerticalPanel);
 		formPanel.addFormHandler(serverFormHandler);
 	}
 
 	/**
 	 * Assume just one exists. The formHandler should already have the icing setting set.
-	 * 
+	 *
 	 * @param serverFormHandler
 	 */
 	public void setFormHandler(FormHandlerMain formHandler) {

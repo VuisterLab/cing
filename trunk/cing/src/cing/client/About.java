@@ -1,5 +1,7 @@
 package cing.client;
 
+import cing.client.i18n.iCingConstants;
+
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;

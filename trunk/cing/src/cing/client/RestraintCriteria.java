@@ -1,5 +1,7 @@
 package cing.client;
 
+import cing.client.i18n.iCingConstants;
+
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;

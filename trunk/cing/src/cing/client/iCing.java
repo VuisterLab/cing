@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cing.client.i18n.iCingConstants;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.HeadElement;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -17,6 +20,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -193,6 +197,8 @@ public class iCing implements EntryPoint, HistoryListener {
 		String cingRevisionhtml = "iCing " + "(<a href=\"" + cingRevisionUrl
 				+ "\">r" + Settings.REVISION + "</a>)" + GenClient.eol;
 
+		String imgHtml = "<img class=\"gwt-Image\" style=\"width:16px;height:12px;border:0px\" src=\"images/icon_email.gif\">";
+
 		final HTML html = new HTML(
 				"<div id=\"footer\">"
 						+ GenClient.eol
@@ -201,15 +207,14 @@ public class iCing implements EntryPoint, HistoryListener {
 						+ cingRevisionhtml
 						+ "\t"
 						+ GenClient.eol
-						+ "Geerten W. Vuister \t"
-						+ "<a href=\"mailto:g.vuister@science.ru.nl\">"
-						+ "<img src=\"images/icon_email.gif\">"
-						+ "</a>"
-						+ ", \t"
+						+ "Geerten W. Vuister"
+						+ " <a href=\"mailto:g.vuister@science.ru.nl\">"
+						+ imgHtml
+						+ "</a>, \t"
 						+ GenClient.eol
 						+ "Jurgen F. Doreleijers \t"
 						+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">"
-						+ "<img src=\"images/icon_email.gif\">"
+						+ imgHtml
 						+ "</a> \t"
 						+ GenClient.eol
 						+ " "
@@ -218,7 +223,7 @@ public class iCing implements EntryPoint, HistoryListener {
 						+ GenClient.eol
 						+ "Alan Wilter Sousa da Silva \t"
 						+ "<a href=\"mailto:alanwilter@gmail.com\">"
-						+ "<img src=\"images/icon_email.gif\">"
+						+ imgHtml
 						+ "</a> \t"
 						+ "</p>" + GenClient.eol + "</div>" + GenClient.eol);
 		vPanel.add(html);
@@ -406,10 +411,12 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		listBoxLocale.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
-				String localeName = listBoxLocale.getValue(listBoxLocale
-						.getSelectedIndex());
-				Window.open(UtilsJS.getHostPageLocation() + "?locale="
-						+ localeName, "_self", "");
+//				Window.open(UtilsJS.getHostPageLocation() + "?locale="
+//						+ localeName, "_self", "");
+		        String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
+		        UrlBuilder builder = Location.createUrlBuilder().setParameter("locale",
+		            localeName);
+		        Window.Location.replace(builder.buildString());
 			}
 		});
 

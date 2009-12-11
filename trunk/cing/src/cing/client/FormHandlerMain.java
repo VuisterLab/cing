@@ -2,6 +2,8 @@ package cing.client;
 
 import java.util.Set;
 
+import cing.client.i18n.iCingConstants;
+
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
