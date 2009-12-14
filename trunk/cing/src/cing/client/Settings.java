@@ -6,13 +6,13 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value. */
-    public static final boolean DO_DEBUG = true;
+    public static final boolean DO_DEBUG = false;
     /** Instead of messages to the iCing log window; show them on the stdout stream */
-    public static final boolean DEBUG2STDOUT = true;
+    public static final boolean DEBUG2STDOUT = false;
     /** The next statement should updated manually now.*/
 //    public static final String VERSION = "0.88"; discontinued as it is different here from CING and might lead to confusion.
     /** The next statement should updated manually now. Can be automated by ant script querying svn info like for WATTOS project*/
-    public static final String REVISION = "698";
+    public static final String REVISION = "706";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
     /** URL for NRG-CING. */

@@ -25,7 +25,7 @@ setenv HOME               /Library/WebServer/Documents/servlet-cing-home
 
 # Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.
-set verbosityDebug = 1
+set verbosityDebug = 0
 
 
 set script = CingWrapper.csh

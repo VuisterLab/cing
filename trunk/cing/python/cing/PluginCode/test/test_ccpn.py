@@ -40,7 +40,7 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
