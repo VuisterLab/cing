@@ -357,9 +357,8 @@ class GenClient {
 			String date_str = DateTimeFormat.getLongTimeFormat().format(today);
 			message = date_str + " " + message;
 		}
+		System.out.println(message);
 		if (Settings.DEBUG2STDOUT) {
-			System.out.println(message);
-		} else {
 			Utils.appendHtml(message + eol, iCing.area);
 		}
 	}

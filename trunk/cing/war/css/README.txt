@@ -1,1 +1,0 @@
-The gwt dir is here only so that gwt designer can find them. The css will be used differently.

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--<module>-->
 <module rename-to='icing'>
-<!--  <set-property name="user.agent" value="safari" />-->
-<!--  Pick from: ie6,gecko,gecko1_8,safari,opera
-On Firefox 3.5.5 is: gecko but don't set the above when testing in Web mode.
--->
   <!-- Inherit the core Web Toolkit stuff.
   The order of the below style sheets matters.
   -->
@@ -31,6 +28,12 @@ On Firefox 3.5.5 is: gecko but don't set the above when testing in Web mode.
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='cing.client.iCing'/>
+
+    <!-- User Agent -->
+	<!--  Pick from: ie6,gecko,gecko1_8,safari,opera
+	On Firefox 3.5.5 is: gecko but don't set the above when testing in Web mode.
+	-->
+    <set-property name="user.agent" value="safari,gecko1_8,ie6" />
 
 <!--    <extend-property name="locale" values="en" />-->
 <!-- Disable for quicker testing/compiling.
