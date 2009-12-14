@@ -15,11 +15,11 @@ class lostInTranslation():
     """Find the missing phrases in each language iCing tries to support"""
 
     def __init__(self):
-#        self.gwtDir = "java/src/cing/client"
-        self.gwtDir = "src/cing/client"
-        self.lostInTranslationDir = "lostInTranslation"
-        "Relative to the self.gwtDir"
-        absPathGwtDir = os.path.join(cing.cingRoot, self.gwtDir )
+#        self.i18nDir = "java/src/cing/client"
+        self.i18nDir = "src/cing/client/i18n"
+        self.lostInTranslationDir = "../lostInTranslation"
+        "Relative to the self.i18nDir"
+        absPathGwtDir = os.path.join(cing.cingRoot, self.i18nDir )
         if os.chdir(absPathGwtDir):
             NTerror("Failed to change to directory: "+absPathGwtDir)
             sys.exit(1)

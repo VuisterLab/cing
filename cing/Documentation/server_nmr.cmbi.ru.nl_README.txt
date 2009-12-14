@@ -9,16 +9,10 @@ Jurgen's setup
             saying mysql should be upgraded to create a required file. Probably to do with change from case-sensitive
             FS to case aware FS. Since it is not yet essential skipped for now.
     Workaround: start by hand from System Preferences.
-- fcweb (checked from Madison).
-   TODO: fails the automatic startup after reboot. Solution by hand:
-   launchctl unload /System/Library/LaunchAgents/fcweb.plist
-   launchctl   load /System/Library/LaunchAgents/fcweb.plist
-   if unload fails then the only solution seems to be a hard restart.
 
 Geerten's setup
 - proteins website: http://nmr.cmbi.ru.nl (checked from Madison).
 - mac fusion (check by hand by doing Finder->Connect to server-> https://proteins.dyndns.org/gDisk
     Unable to check from a remote site yet. Can't do a scp or a ssh to https://proteins.dyndns.org/gDisk
-    TODO:
 - svn TODO: JFD hasn't checked yet.
 

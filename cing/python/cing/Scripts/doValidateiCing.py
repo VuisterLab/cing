@@ -6,7 +6,7 @@ from cing.Libs.NTutils import NTmessage
 # Run and parse/Only parse the results
 parseOnly = False
 
-fastestTest = False
+fastestTest = True
 
 htmlOnly = False # default is False but enable it for faster runs without some actual data.
 doWhatif = True # disables whatif actual run

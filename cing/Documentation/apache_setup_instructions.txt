@@ -1,8 +1,8 @@
 * Apache relay server on www.cmbi.ru.nl:/var/log/httpd
-    nmr.cmbi.ru.nl-error_log    
+    nmr.cmbi.ru.nl-error_log
     nmr.cmbi.ru.nl-access_log
 
-* Mac's apache 
+* Mac's apache
     There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
@@ -12,13 +12,13 @@
         LoadModule php5_module        libexec/apache2/libphp5.so
     Redirect old cased icing url in apache's settings (Thanks to: http://www.yolinux.com/TUTORIALS/ApacheRedirect.html)
         Redirect permanent /iCing /icing
-    
+
 monitor with:
 	tail -f /private/var/log/apache2/*_log &
 
 - processing is done as _www:admin account.
     So don't use the suEXEC way.
-    
+
     httpd -V
 
     Restart by:
@@ -32,21 +32,23 @@ monitor with:
 
     Install /Library/WebServer/Documents/favicon.ico
     	Create it with gimp; square it and reduce size to 16x16 and save as pnm. Then use:
-    	http://netpbm.sourceforge.net/doc//ppmtowinicon.html to 
+    	http://netpbm.sourceforge.net/doc//ppmtowinicon.html to
     	ppmtowinicon -output favicon.ico favicon.pnm
-    	 
+
     In the System Preference of the Mac
         Sharing
             Turn on "Web Sharing" and check server in browser.
 
 # For the gwt tomcat server
-ProxyPass         /icing/serv http://localhost:8080/icing
-ProxyPassReverse  /icing/serv http://localhost:8080/icing
+# For the gwt tomcat server
+ProxyPass         /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
+ProxyPassReverse  /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
+ProxyPass         /icing http://localhost:8080/icing
+ProxyPassReverse  /icing http://localhost:8080/icing
 
 The tomcat server in eclipse works together with the apache configured here.
 
 # For the NRG tomcat web app.
 ProxyPass         / http://localhost:8080/NRG/MRGridServlet
 ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
-            
-            
+

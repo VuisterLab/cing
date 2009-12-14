@@ -7,6 +7,7 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import NTdebug
 import cing
 import mimetools
 import os
@@ -31,11 +32,11 @@ RESPONSE_RESULT = 'Result'
 RESPONSE_DONE = 'done'
 
 #DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production without https security turned on
-DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
-#DEFAULT_URL = 'http://localhost' # local tomcat instance
+#DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
+DEFAULT_URL = 'http://localhost' # local tomcat instance
 #DEFAULT_URL = 'http://localhost' # local gwt embedded tomcat instance
-DEFAULT_RPC_PORT = ''
-#DEFAULT_RPC_PORT = ':8888'
+#DEFAULT_RPC_PORT = ''
+DEFAULT_RPC_PORT = ':8080'
 
 DEFAULT_URL_PATH = 'icing' # ?? lower case?
 #DEFAULT_URL_PATH = 'cing.iCing' # use for gwt embedded tomcat
@@ -194,10 +195,10 @@ def iCingRobot():
     ## The log will show what the server is doing at any one time.
     doSave  = 1 # Upload to iCing and show derived urls
     doRun   = 0 # Start the run in Nijmegen
-    doStatus= 1 # Find out if the run finished
-    doLog   = 1 # Get the next piece of log file (may be empty)
-    doPname = 1 # Get the project name back. This is the entryId below.
-    doPurge = 1 # Remove data from server again.
+    doStatus= 0 # Find out if the run finished
+    doLog   = 0 # Get the next piece of log file (may be empty)
+    doPname = 0 # Get the project name back. This is the entryId below.
+    doPurge = 0 # Remove data from server again.
 
     # User id should be a short id (<without any special chars.)
 #    user_id = os.getenv("USER", "UnknownUser")
@@ -224,9 +225,11 @@ def iCingRobot():
         inputFile = xplorFile
 
 
-#    rpcUrl=DEFAULT_URL+"icing/serv/iCingServlet"
-    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet"
+    rpcUrl=DEFAULT_URL+"/icing/serv/iCingServlet"
+#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet" # TODO make this line working and not the below line!
+#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/iCingServlet"
 
+    NTdebug("rpcUrl: " + rpcUrl)
     credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
 
 ##############################################################################################################
@@ -274,6 +277,3 @@ def iCingRobot():
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     iCingRobot()
-
-
-

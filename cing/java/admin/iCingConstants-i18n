@@ -1,4 +1,4 @@
 #!/bin/sh
 APPDIR=`dirname $0`/../..;
-java -cp "$APPDIR/src:$APPDIR/../bin:/Users/jd/progs/gwt-2.0.0/gwt-user.jar:/Users/jd/progs/gwt-2.0.0/gwt-dev.jar" com.google.gwt.i18n.tools.I18NSync -out $APPDIR/src cing.client.iCingConstants  ;
+java -cp "$APPDIR/src:$APPDIR/../bin:/Users/jd/progs/gwt-2.0.0/gwt-user.jar:/Users/jd/progs/gwt-2.0.0/gwt-dev.jar" com.google.gwt.i18n.tools.I18NSync -out $APPDIR/src cing.client.i18n.iCingConstants  ;
 

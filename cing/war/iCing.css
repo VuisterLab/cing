@@ -1,0 +1,412 @@
+/**
+ * Stolen from Showcase GWT tutorial example. iCing specific section below this section.
+ */
+.Application-Reference-chrome {
+  height: 5px;
+  width: 5px;
+  zoom: 1;
+}
+.Application-top {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.Application-title {
+  padding: 0px 0px 0px 10px;
+}
+.Application-title h1 {
+  color: #666;
+  margin: 0px;
+  padding: 0px 0px 0px 4px;
+  font-size: 22px;
+}
+.Application-title h2 {
+  color: #333;
+  margin: 0px;
+  padding: 0px 0px 0px 4px;
+  font-size: 16px;
+}
+.Application-links {
+  padding: 2px 13px 2px 0px;
+  background: #eee;
+}
+.Application-links .gwt-HTML{
+  font-size: 12px;
+}
+.Application-options {
+  padding: 6px 10px 0px 0px;
+}
+.Application-options .gwt-ListBox {
+  width: 150px;
+  font-size: 11px;
+  color: blue;
+  margin-left: 4px;
+}
+.Application-options td {
+  font-size: 12px;
+}
+.Application-options .gwt-ToggleButton {
+  width: 36px;
+  height: 16px;
+  margin: 3px 0px 0px 10px;
+  padding: 0px;
+}
+.Application-options .gwt-ToggleButton-down,
+.Application-options .gwt-ToggleButton-down-hovering {
+  cursor: default;
+}
+.Application-options .sc-ThemeButton-standard {
+  background: #d0e4f6;
+}
+.Application-options .sc-ThemeButton-chrome {
+  background: #ccc;
+}
+.Application-options .sc-ThemeButton-dark {
+  background: #3d3d3d;
+}
+.Application-menu {
+  width: 18em;
+  text-align: left;
+}
+
+/**
+ * Applied to widgets in the content area.
+ */
+.Application-content-decorator {
+  margin-right: 8px;
+}
+.Application-content-title {
+  padding: 4px 0px 3px 6px;
+  text-align: left;
+  background: #530a0a url(../gwt/chrome/images/hborder.png) repeat-x 0px -2003px;
+  border-bottom: 2px solid #e3e3e3;
+}
+.Application-content-title .gwt-TabBarItem {
+  background: none;
+  padding: 0px;
+}
+.Application-content-title  .gwt-TabBarItem .gwt-Label {
+  padding-right: 20px;
+  color: #888888;
+}
+.Application-content-title  .gwt-TabBarItem-selected .gwt-Label {
+  color: black;
+}
+.Application-content-wrapper {
+  text-align: left;
+}
+.sc-ContentWidget {
+  padding: 10px 20px;
+}
+.sc-ContentWidget-name {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding-bottom: 15px;
+}
+.sc-ContentWidget-description {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #CDCDCD;
+  margin-bottom: 15px;
+}
+.sc-ContentWidget pre {
+  border: 1px solid #888;
+  background: #eeeeee;
+  padding: 10px 2px;
+  margin: 10px 0px;
+}
+
+/**
+ * Applied to specific components in Content Widgets.
+ */
+.cw-BasicPopup-thumb {
+  cursor: pointer;
+  cursor: hand;
+}
+
+.cw-DictionaryExample-headerRow td {
+  color: #7aa5d6;
+  text-decoration: underline;
+  font-weight: bold;
+  padding-left: 20px;
+}
+.cw-DictionaryExample-dataRow td {
+  padding-left: 20px;
+}
+
+.cw-DockPanel td {
+  border: 1px solid #BBBBBB;
+  padding: 3px;
+}
+
+.cw-FlexTable td {
+  border: 1px solid #BBBBBB;
+  padding: 3px;
+}
+
+.cw-FlexTable-buttonPanel td {
+  border: 0px;
+}
+
+.cw-FlowPanel-checkBox {
+  margin-right: 20px;
+}
+
+.cw-RedText {
+  color: red;
+}
+
+.cw-RichText {
+  border: 1px solid #BBBBBB;
+  border-spacing: 0px;
+}
+
+.cw-StackPanelHeader {
+  padding-left: 7px;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+
+#Clean up the above for the below will overwrite many
+
+.gwt-Button {
+  color:green;
+}
+
+.gwt-MenuItem-disabled  {
+	background: #888;
+}
+
+.loginPrompt {
+	padding: 20px;
+	margin-bottom: 10px;
+    background: lightGray;
+	font-style: italic;
+	border: thin solid lightGray;
+}
+
+.gwtsolutions-Message {
+   padding: 20px;
+   margin-bottom: 10px;
+   background: lightGray;
+   font-style: italic;
+   height: 4em;
+   width: 850px;
+}
+
+.successBorder {
+   border: thin solid darkGray;
+}
+
+.failureBorder {
+   border: thick solid red;
+}
+
+.nameField {
+	width: 15em;
+}
+
+.passwordField {
+	width: 8em;
+}
+
+.welcomeMsg {
+  margin-bottom: 20px;
+	font-style: italic;
+	color: blue;
+}
+
+.BigText {
+  font-size: large;
+}
+.LoudText {
+  font-weight:  bold;
+}
+
+body {
+	background-color: white;
+	color: black;
+	font-family: Arial, sans-serif;
+	font-size: small;
+	margin: 5px;
+}
+
+a:link {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+a:hover, a:active {
+	color: #000000;
+}
+
+a {
+	color: darkblue;
+}
+
+a:visited {
+	color: darkblue;
+}
+
+
+.gray {
+	/* showing defuncts */
+    color: #d0d0d0;
+}
+
+.red {
+	color: #ff0f00;
+/*  font-weight: bold;
+    text-decoration: none; */
+}
+
+a.red:link {
+	color: #ff0f00;
+/*	font-weight: bold;
+	text-decoration: none; */
+}
+
+a.red:visited {
+	color: #ff0f00;
+	font-style: italic;
+/*	text-decoration: none; */
+}
+
+a.red:hover, a.red:active {
+	color: #000000;
+}
+
+.orange {
+	color: #ff8100;
+/*  text-decoration: none; */
+}
+
+a.orange:link {
+    color: #ff8100;
+/*  text-decoration: none; */
+}
+
+a.orange:visited {
+	color: #ff8100;
+	font-style: italic;
+	/*	text-decoration: none; */
+}
+
+a.orange:hover, a.orange:active {
+	color: #000000;
+}
+
+a.green:link {
+	color: #a3c159;
+/*	text-decoration: none; */
+}
+
+a.green:visited {
+	color: #a3c159;
+	font-style: italic;
+	/*	text-decoration: none; */
+}
+
+a.green:hover, a.green:active {
+	color: #000000;
+}
+
+/*</group>*/
+
+/*<group=Layout>*/
+
+#red a:link {
+	color: #ff0f00;
+	text-decoration: none;
+}
+
+#red a:visited {
+	color: #ff6765;
+	text-decoration: none;
+}
+
+#red a:hover, a:active {
+	color: #000000;
+}
+
+#orange a:link {
+	color: #ff8100;
+	text-decoration: none;
+}
+
+#orange a:visited {
+	color: #ffaa4e;
+	text-decoration: none;
+}
+
+#orange a:hover, a:active {
+	color: #000000;
+}
+
+#green a:link {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+#green a:visited {
+	color: #a3c159;
+	text-decoration: none;
+}
+
+#green a:hover, a:active {
+	color: #000000;
+}
+
+
+/*<group=Global Classes>*/
+
+remark {
+	background: #0ca0ad;
+	padding: 10px;
+	color: #ffffff;
+	font-size: 16px;
+	font-style: italic;
+	font-weight: bold;
+}
+.standout {
+	background: #0ca0ad;
+	padding: 10px;
+	color: #ffffff;
+	font-size: 13px;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.h1 {
+	color: #0ca0ad;
+	font-size: 25px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h2 {
+	color: #0ca0ad;
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h3 {
+	color: #0ca0ad;
+	font-size: 14px;
+	font-weight: normal;
+	margin-bottom: 3px;
+}
+
+.h1-red {
+	color: red;
+}
+
+.h1-orange {
+	color: orange;
+}
+
