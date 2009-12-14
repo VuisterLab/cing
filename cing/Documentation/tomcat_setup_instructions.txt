@@ -5,61 +5,62 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
     Do what it says but add a -m32 flag to CFLAGS before doing your make to the file Makedefs
     Thanks to http://crashingdaily.wordpress.com/2008/11/12/compiling-a-32-bit-jsvc-on-a-64-bit-machine/
     - Made many changes to Tomcat5.sh as suggested by tomcatonosx.html
-    
-    
+
+
 * On mac:
     -Using mac installed version (Apache Tomcat/5.5.23):
     # runs under as root (TODO: run under tomcat user as this poses a security risk)
     export CATALINA_HOME=/Library/Tomcat
+    setenv CATALINA_HOME /Library/Tomcat
     $CATALINA_HOME/bin/Tomcat5.sh start
     $CATALINA_HOME/bin/Tomcat5.sh stop
-    
+
     Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
     CATALINA_OPTS="-Xms1800m -Xmx1800m"
-    
+
 	$CATALINA_HOME/bin/shutdown.sh (RETIRED)
 	$CATALINA_HOME/bin/startup.sh
-	
+
 	Test by url like: https://nmr.cmbi.ru.nl/icing/serv/iCingServlet should give:
 	{"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
-	
+
 - Logs:
 	tail -f $CATALINA_HOME/logs/catalina.out  &
 - Webapps:x
 	$CATALINA_HOME/webapps
-	
-	
+
+
 - NOT DONE YET: add a proxy port in $CATALINA_HOME/conf/server.xml:
     <Connector
       className="org.apache.catalina.connector.http.HttpConnector"
       port="8080"
       proxyPort="80"
-    > 
+    >
     Add the proxyPort setting to the Connector tag in your server.xml.
-	And to the apache setup with proxies?	
-	
+	And to the apache setup with proxies?
+
 # Fink specific	(not using fink's with cing servlet)
     setenv CATALINA_HOME /sw/var/tomcat5
 - Status:
-	ps -a | grep TOMCAT5LAUNCH | grep -v grep 
+	ps -a | grep TOMCAT5LAUNCH | grep -v grep
 
 
-- Use fink installed apache tomcat5 
-	
+- Use fink installed apache tomcat5
+
 - Restart:
 	/sw/bin/tomcat5 restart
 
-    
+
     /sw/etc/tomcat5/tomcat.conf (just one file here)
     /sw/share/webapps
-    
-    
-    
-    
+
+
+
+
 - Then configure Apache such that it will forward the requests on 80 to 8080:
     http://tomcat.apache.org/tomcat-5.5-doc/proxy-howto.html and the apache
     setup instructions in this local dir.
-    
+
 * New installation of NRG31 on tang:
     * only changed 'WebModule' to 'NRG' from the below. Keeping all ports the same.
     * put web.xml in: /usr/share/tomcat5/webapps/NRG/WEB-INF (no changes from old one needed)
@@ -67,7 +68,7 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
 * servlet engine Apache Tomcat/5.5.20 installed on tang
     * port 8080 but redirection from standard port 80 should occur as per above for Stella.
     * tomcat:x:151:101:Tomacat web user:/share/tomcat:/sbin/nologin
-        not allowed to be a login-able user. 
+        not allowed to be a login-able user.
     * CATALINA_HOME /usr/share/tomcat5
     * -/conf Configuration but only change:
             /servlet_data/ diff -w /usr/share/tomcat5/conf/tomcat5.conf*
@@ -75,12 +76,12 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
             < JAVA_OPTS="-Dcatalina.ext.dirs=/usr/share/tomcat5/shared/lib:/usr/share/tomcat5/common/lib"
             ---
             > JAVA_OPTS="$JAVA_OPTS -Dcatalina.ext.dirs=$CATALINA_HOME/shared/lib:$CATALINA_HOME/common/lib"
-    
+
     * /usr/share/tomcat5/webapps/NRG/WEB-INF/lib Place for jars.
     * OLD /usr/share/tomcat5/webapps/WebModule/WEB-INF/lib Place for jars.
 
     * /etc/init.d/tomcat5 restart
-    * For now use old setup in: 
+    * For now use old setup in:
 -       rwxr--r-- 1 jurgen users 1570717 Jan 19 10:25 /share/wattos/Wattos/lib/Wattos.jar*
     * Access logs configured in:/conf/server.xml. Note that the filename format
         seems to be unconfigurable to do by week but is ok.
@@ -113,13 +114,13 @@ lrwxrwxrwx    1 root     root           16 Dec 14 16:42 /etc/rc.d/rc5.d/K19tomca
 lrwxrwxrwx    1 root     root           16 Dec 14 16:39 /etc/rc.d/rc5.d/S98tomcat -> ../init.d/tomcat
         Tomcat starts after the mysql daemon and stops before mysqld stops.
     * jsvc is the program that is the tomcat daemon and it runs under
-        root and another part under tomcat user names.        
-    * access logs in: 
+        root and another part under tomcat user names.
+    * access logs in:
         /var/log/tomcat (up to date)
         /bmrb/admin/logs/tang/mrgridservlets/access_log.2004-12.txt etc. (old)
     * access and error logs in:
         /usr/local/jakarta-tomcat/logs/catalina.err and out.
-    * version similar to the tomcat 5.0.19 installation that comes with NetBeans 
+    * version similar to the tomcat 5.0.19 installation that comes with NetBeans
         (on windows for JFDs development machine)
     * the internal administration features aren't installed for safety.
     * There are additional log files from before 2005 that tracked access when the servlets were
@@ -128,4 +129,3 @@ lrwxrwxrwx    1 root     root           16 Dec 14 16:39 /etc/rc.d/rc5.d/S98tomca
     * Robots like:
         72.30.132.34 - - [01/Jun/2006:00:07:29 -0600] "GET /robots.txt HTTP/1.0" 404 983 "-" "Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)"
         they caused a large overhead; 3 million requests in 9 months for tomcat alone.
-        

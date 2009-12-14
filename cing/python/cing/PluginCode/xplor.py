@@ -278,22 +278,37 @@ def export2xplor( project, tmp=None ):
     #end for
 #end def
 
-def createProjectFromXplorMemory():
+def createProjectFromXplorMemory(name="xplorNIH", sim=None):
     '''
-    Using Xplor-NIH API to generate a CING project from memory.
+    Using Xplor-NIH API to generate a CING project (with specified name) from
+    memory, given an Xplor-NIH Simulation. If sim is not specified, the
+    current simulation will be used.
+
     Returns the new project.
     '''
 
+    if sim==None:
+        from simulation import currentSimulation #@UnresolvedImport
+        sim= currentSimulation()
+        pass
+
+    from tempfile import NamedTemporaryFile
+    tmpfile=NamedTemporaryFile(suffix=".pdb")
+
+    import protocol #@UnresolvedImport
+    from atomSel import AtomSel #@UnresolvedImport
+    tmpfile.write(protocol.writePDB("",selection=AtomSel("all",sim)))
+    tmpfile.flush()
+
     # For now we just read an xplor generated PDB file
-    name = 'name in xplor'
-    pdbFile = 'pdbFile from xplor'
     project = Project.open(name, status='new')
-    project.initPDB(pdbFile=pdbFile, convention=IUPAC)
+    project.initPDB(pdbFile=tmpfile.name, convention=IUPAC)
 
     # Fill in for example the DRs
-    getDistanceRestraintFromXplorMemory( project )
+    #getDistanceRestraintFromXplorMemory( project )
     project.save()
 #    project.validate() # better called from a separate routine.
+    return project
 
 def getDistanceRestraintFromXplorMemory( project, convention ):
     """Convert DR from XPLOR in memory to CING in memory.
@@ -373,7 +388,7 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
 
 #-----------------------------------------------------------------------------
 # register the functions in the project class
-methods  = [(newMoleculeFromXplor, None)
+methods  = [(newMoleculeFromXplor, None),
            ]
 #saves    = []
 #restores = []

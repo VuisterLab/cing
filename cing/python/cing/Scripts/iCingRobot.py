@@ -7,7 +7,6 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTdebug
 import cing
 import mimetools
 import os
@@ -32,14 +31,20 @@ RESPONSE_RESULT = 'Result'
 RESPONSE_DONE = 'done'
 
 #DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production without https security turned on
-#DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
-DEFAULT_URL = 'http://localhost' # local tomcat instance
+DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
+#DEFAULT_URL = 'http://localhost' # local tomcat instance
 #DEFAULT_URL = 'http://localhost' # local gwt embedded tomcat instance
 #DEFAULT_RPC_PORT = ''
-DEFAULT_RPC_PORT = ':8080'
+#DEFAULT_RPC_PORT = ':8080'
 
 DEFAULT_URL_PATH = 'icing' # ?? lower case?
 #DEFAULT_URL_PATH = 'cing.iCing' # use for gwt embedded tomcat
+
+rpcUrl=DEFAULT_URL+"/icing/serv/iCingServlet"
+#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet" # TODO make this line working and not the below line!
+#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/iCingServlet"
+
+NTmessage("rpcUrl: " + rpcUrl)
 
 def getRandomKey(size=6):
     """Get a random alphanumeric string of a given size"""
@@ -225,11 +230,6 @@ def iCingRobot():
         inputFile = xplorFile
 
 
-    rpcUrl=DEFAULT_URL+"/icing/serv/iCingServlet"
-#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet" # TODO make this line working and not the below line!
-#    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/iCingServlet"
-
-    NTdebug("rpcUrl: " + rpcUrl)
     credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
 
 ##############################################################################################################
