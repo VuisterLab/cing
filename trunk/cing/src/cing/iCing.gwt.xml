@@ -43,9 +43,8 @@
     <extend-property name="locale" values="nl" />
     <extend-property name="locale" values="pt" />
     <extend-property name="locale" values="zh" />
-<!-- Add when Nadia finds keyboard.
     <extend-property name="locale" values="ru" />
--->
+
     <!-- Specify the servlet that handles file uploads.
     Note that apache/tomcat on production is setup to proxy:
     # For the gwt tomcat server

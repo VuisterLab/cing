@@ -1,6 +1,6 @@
 # python -u $CINGROOT/python/cing/NRG/checkValidationCriteria.py
-
-from cing import cingDirScripts
+# NB this script fails if the MySql backend is not installed.
+from cing import cingPythonDir
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 import cing
 import os
@@ -11,8 +11,8 @@ cing.verbosity = cing.verbosityDebug
 
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/NRG-CING'
-#pythonScriptFileName = os.path.join(cingPythonDir, 'cing', 'NRG', 'storeNRGCING2db.py') # moved out of NRG since it contains optional imports.
-pythonScriptFileName = os.path.join(cingDirScripts, 'storeNRGCING2db.py')
+cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
+pythonScriptFileName = os.path.join(cingDirNRG, 'storeNRGCING2db.py')
 entryListFileName = os.path.join(startDir, 'entry_list_done.csv')
 
 inputDir = '.'
@@ -25,9 +25,9 @@ extraArgList = (inputDir)
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
-                    processes_max = 3,
-                    delay_between_submitting_jobs = 5,
+                    processes_max = 2,
+                    delay_between_submitting_jobs = 1,
                     max_time_to_wait = 60 * 6,
-                    START_ENTRY_ID = 0,
+                    START_ENTRY_ID = 21,
                     MAX_ENTRIES_TODO = 1,
                     extraArgList = extraArgList)
