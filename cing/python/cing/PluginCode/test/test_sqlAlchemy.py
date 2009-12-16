@@ -99,8 +99,9 @@ class AllChecks(TestCase):
         NTdebug(str(ed_user))
 #        NTdebug(ed_user.extraCol)
 
-    def ttest_SqlAlchemy(self):
-        """Only enable when db is installed, configured and running"""
+    def tttttest_SqlAlchemy(self):
+        """Testing SqlAlchemy setup.
+        Only enable when db is installed, configured and running"""
         pdb_id = '1brv'
         res_number = 171
 
@@ -109,44 +110,46 @@ class AllChecks(TestCase):
         csql.autoload()
 
         execute = csql.conn.execute
-
-        #result = csql.conn.execute(csql.entry.delete())
-        result = execute(csql.entry.delete().where(csql.entry.c.pdb_id == pdb_id))
+        centry = csql.entry
+        cchain = csql.chain
+        cresidue = csql.residue
+        #result = csql.conn.execute(centry.delete())
+        result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
         if result.rowcount:
             NTdebug("Removed original entries numbering: %s" % result.rowcount)
         else:
             NTdebug("No original entry present yet.")
 
-        #ins = csql.entry.insert().values(entry_id=1,pdb_id='1brv')
-        #print ins
+        #ins = centry.insert().values(entry_id=1,pdb_id='1brv')
+        #NTdebug( ins )
         #ins.compile().params # show the set parameters/values.
-        #result = csql.conn.execute(csql.entry.insert().values(entry_id=1,pdb_id='1brv'))
-        result = csql.conn.execute(csql.entry.insert().values(pdb_id=pdb_id, name=pdb_id))
+        #result = csql.conn.execute(centry.insert().values(entry_id=1,pdb_id='1brv'))
+        result = csql.conn.execute(centry.insert().values(pdb_id=pdb_id, name=pdb_id))
         entry_id = result.last_inserted_ids()[0]
         NTdebug("Inserted entry %s" % entry_id)
 
-        result = csql.conn.execute(csql.chain.insert().values(entry_id=entry_id))
+        result = csql.conn.execute(cchain.insert().values(entry_id=entry_id))
         chain_id = result.last_inserted_ids()[0]
-        NTdebug("Inserted chainZZ %s" % chain_id)
+        NTdebug("Inserted chain %s" % chain_id)
 
         #for j in range(1):
         #    for i in range(1):
-        result = csql.conn.execute(csql.residue.insert().values(entry_id=entry_id, chain_id=chain_id),
+        result = csql.conn.execute(cresidue.insert().values(entry_id=entry_id, chain_id=chain_id),
                     number=res_number)
         residue_id = result.last_inserted_ids()[0]
         NTdebug("Inserted residue %s" % residue_id)
 
-        result = csql.conn.execute(csql.residue.update().where(csql.residue.c.residue_id == residue_id).values(number=res_number+999))
+        result = csql.conn.execute(cresidue.update().where(cresidue.c.residue_id == residue_id).values(number=res_number+999))
         NTdebug("Updated residues numbering %s" % result.rowcount)
 
         # Needed for the above hasn't been autocommitted.
         csql.session.commit()
 
-        for residue in csql.session.query(csql.residue):
+        for residue in csql.session.query(cresidue):
             NTdebug("New residue number %s" % residue.number)
 
-        for instance in csql.session.query(csql.entry):
-            print instance.pdb_id
+        for instance in csql.session.query(centry):
+            NTdebug( "Retrieved entry instance: %s" % instance.pdb_id )
 
 
 if __name__ == "__main__":

@@ -1700,7 +1700,7 @@ class DistanceRestraint(Restraint):
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
         modelCount = self.getModelCount()
-        if modelCount == 0:
+        if not modelCount:
             NTerror('DistanceRestraint.calculateAverage: No structure models (%s)', self)
             self.error = True
             return (None, None, None, None)

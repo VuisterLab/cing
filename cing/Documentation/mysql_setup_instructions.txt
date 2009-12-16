@@ -1,0 +1,1 @@
+SEE: $NRG/scripts/Documentation/mysql_setup_instructions.txt

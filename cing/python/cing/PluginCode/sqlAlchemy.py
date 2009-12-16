@@ -93,7 +93,7 @@ class cgenericSql(NTdict):
             columnNameList = [c.name for c in table.columns]
             NTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
         #The MetaData object supports some handy methods, such as getting a list of Tables in the order (or reverse) of their dependency:
-#        with warnings.catch_warnings(): # can't use the python 2.5 feature since it's not always enabled. TODO: update when no longer supporting 2.5
+#        with warnings.catch_warnings(): # can't use the python 2.5 feature since it's not always enabled. Update when no longer supporting 2.5
         if True:
             warnings.simplefilter("ignore")
             for t in self.metadata.table_iterator(reverse=False):
@@ -105,7 +105,7 @@ class cgenericSql(NTdict):
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
     def __init__(self, host = 'localhost', user = 'nrgcing1', passwd = '4I4KMS', unix_socket = '/tmp/mysql.sock', db = "nrgcing", echo=False):
-        cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db,echo=False)
+        cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db,echo=True)
         NTdebug("Initialized csqlAlchemy")
         # be explicit here to take advantage of code analysis.
         self.tableNameList = ['entry', 'chain', 'residue' ]

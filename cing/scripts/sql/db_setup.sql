@@ -18,6 +18,9 @@ CREATE USER 'nrgcing1'@'localhost' ;
 SET PASSWORD FOR 'nrgcing1'@'localhost' = PASSWORD('4I4KMS');
 update user set file_priv='Y' where user='nrgcing1';
 
+select r.rog, count(*) from residue r
+group by r.rog;
+
 -- not sure where the next line belongs:
 use nrgcing;
 GRANT ALL ON * TO 'nrgcing1';

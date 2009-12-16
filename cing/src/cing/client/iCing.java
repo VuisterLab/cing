@@ -199,33 +199,16 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		String imgHtml = "<img class=\"gwt-Image\" style=\"width:16px;height:12px;border:0px\" src=\"images/icon_email.gif\">";
 
-		final HTML html = new HTML(
-				"<div id=\"footer\">"
-						+ GenClient.eol
-						+ "<p align=\"center\">"
-						+ GenClient.eol
-						+ cingRevisionhtml
-						+ "\t"
-						+ GenClient.eol
-						+ "Geerten W. Vuister"
-						+ " <a href=\"mailto:g.vuister@science.ru.nl\">"
-						+ imgHtml
-						+ "</a>, \t"
-						+ GenClient.eol
-						+ "Jurgen F. Doreleijers \t"
-						+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">"
-						+ imgHtml
-						+ "</a> \t"
-						+ GenClient.eol
-						+ " "
-						+ c.and()
-						+ " \t"
-						+ GenClient.eol
-						+ "Alan Wilter Sousa da Silva \t"
-						+ "<a href=\"mailto:alanwilter@gmail.com\">"
-						+ imgHtml
-						+ "</a> \t"
-						+ "</p>" + GenClient.eol + "</div>" + GenClient.eol);
+		final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol
+				+ "<p align=\"center\">" + GenClient.eol + cingRevisionhtml
+				+ "\t" + GenClient.eol + "Geerten W. Vuister"
+				+ " <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml
+				+ "</a>, \t" + GenClient.eol + "Jurgen F. Doreleijers \t"
+				+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">" + imgHtml
+				+ "</a> \t" + GenClient.eol + " " + c.and() + " \t"
+				+ GenClient.eol + "Alan Wilter Sousa da Silva \t"
+				+ "<a href=\"mailto:alanwilter@gmail.com\">" + imgHtml
+				+ "</a> \t" + "</p>" + GenClient.eol + "</div>" + GenClient.eol);
 		vPanel.add(html);
 		html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 	}
@@ -383,7 +366,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		localeMap.put("ja", i++);
 		localeMap.put("nl", i++);
 		localeMap.put("pt", i++);
-		// localeMap.put("ru", i++);
+		localeMap.put("ru", i++);
 		localeMap.put("zh", i++);
 
 		listBoxLocale.addItem("Deutsch", "de");
@@ -394,7 +377,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		listBoxLocale.addItem("日本語", "ja");
 		listBoxLocale.addItem("Nederlands", "nl");
 		listBoxLocale.addItem("Português", "pt");
-		// listBoxLocale.addItem("Русский", "ru");
+		listBoxLocale.addItem("Русский", "ru");
 		listBoxLocale.addItem("中文", "zh");
 
 		String currentLocale = LocaleInfo.getCurrentLocale().getLocaleName();
@@ -411,12 +394,13 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		listBoxLocale.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
-//				Window.open(UtilsJS.getHostPageLocation() + "?locale="
-//						+ localeName, "_self", "");
-		        String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
-		        UrlBuilder builder = Location.createUrlBuilder().setParameter("locale",
-		            localeName);
-		        Window.Location.replace(builder.buildString());
+				// Window.open(UtilsJS.getHostPageLocation() + "?locale="
+				// + localeName, "_self", "");
+				String localeName = listBoxLocale.getValue(listBoxLocale
+						.getSelectedIndex());
+				UrlBuilder builder = Location.createUrlBuilder().setParameter(
+						"locale", localeName);
+				Window.Location.replace(builder.buildString());
 			}
 		});
 
