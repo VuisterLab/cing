@@ -134,13 +134,17 @@ cingDirScripts         = os.path.join(cingPythonCingDir,"Scripts")
 cingDirData            = os.path.join(cingRoot,         "data")
 cingDirTmp             = os.path.join("/tmp" , "cing")
 
+# The TMPDIR environemnt variable will override the default above but not the one that
+# might be defined in localConstants.py.
 try:
     from localConstants import cingDirTmp #@UnresolvedImport
 except:
-    pass # cingDirTmp was set above already.
+    if os.environ.has_key("TMPDIR"):
+        cingDirTmp = os.path.join(os.environ["TMPDIR"] , "cing")
+# end if
 
 if not os.path.exists(cingDirTmp):
-    print("Creating a temporary dir for cing: [%s]" % cingDirTmp)
+#    print("DEBUG: Creating a temporary dir for cing: [%s]" % cingDirTmp)
     if os.mkdir(cingDirTmp):
         print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)
         sys.exit(1)
