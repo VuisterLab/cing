@@ -32,7 +32,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testiCingRobot(self):
+    def tttestiCingRobot(self):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
@@ -44,10 +44,10 @@ class AllChecks(TestCase):
         ## The log will show what the server is doing at any one time.
         doSave  = 1 # Upload to iCing and show derived urls
         doRun   = 0 # Start the run in Nijmegen
-        doStatus= 1 # Find out if the run finished
-        doLog   = 1 # Get the next piece of log file (may be empty)
-        doPname = 1 # Get the project name back. This is the entryId below.
-        doPurge = 1 # Remove data from server again.
+        doStatus= 0 # Find out if the run finished
+        doLog   = 0 # Get the next piece of log file (may be empty)
+        doPname = 0 # Get the project name back. This is the entryId below.
+        doPurge = 0 # Remove data from server again.
 
         # User id should be a short id (<without any special chars.)
     #    user_id = os.getenv("USER", "UnknownUser")

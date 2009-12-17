@@ -48,7 +48,6 @@ from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
 from cing.core.constants import XPLOR
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
@@ -302,7 +301,7 @@ def createProjectFromXplorMemory(name="xplorNIH", sim=None):
 
     # For now we just read an xplor generated PDB file
     project = Project.open(name, status='new')
-    project.initPDB(pdbFile=tmpfile.name, convention=IUPAC)
+    project.initPDB(pdbFile=tmpfile.name, convention=XPLOR)
 
     # Fill in for example the DRs
     #getDistanceRestraintFromXplorMemory( project )

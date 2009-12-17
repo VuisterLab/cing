@@ -1,7 +1,7 @@
 -- STEP BY STEP PROCEDURE FOR SETTING UP NEW DB
 
 -- login with root password
---mysql -u root  mysql
+-- mysql -u root  mysql
 -- The db isn't available anywhere but on the host itself so this posses no security problem.
 
 -- Notes:
@@ -28,7 +28,7 @@ GRANT ALL ON * TO 'nrgcing1';
 -- GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost.localdomain' IDENTIFIED BY 'slavepass';
 
 -- create the tables within
-mysql -h localhost -u nrgcing1 -p4I4KMS  nrgcing < $CINGROOT/scripts/sql/createNRG-CING.sql
+mysql -u nrgcing1 -p4I4KMS  nrgcing < $CINGROOT/scripts/sql/createNRG-CING.sql
 
 
 -- OR load very fast! Dump from 1 database to the next.
