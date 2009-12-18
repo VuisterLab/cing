@@ -191,6 +191,7 @@ class Whatif( NTdict ):
                 ('AAINLI',  None,          'Unknown check',                                             'Unknown check'),
                 ('ATHYBO',  None,          'Unknown check',                                             'Unknown check'),
                 ('BBAMIS',  None,          'Unknown check',                                             'Unknown check'),
+                ('FATAL',   None,          'Fatal errors',                                              'Unknown check'), # new in Version  : 8.0 (20091126-0948)
                 ('TORCHK',  None,          'Unknown check',                                             'Unknown check')
                  ]
 

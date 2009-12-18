@@ -12,7 +12,6 @@ from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
 from unittest import TestCase
 import cing
 import os
@@ -45,9 +44,11 @@ class AllChecks(TestCase):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-        entryId = "1brv_1model"
+#        entryId = "1brv_1model"
+        entryId = "1brv_cs_pk_2mdl"
+
 #        entryId = "1tgq_1model"
-        pdbConvention = IUPAC
+#        pdbConvention = IUPAC
         parseOnly = False # normal is False
         showValues = True
 
@@ -56,11 +57,20 @@ class AllChecks(TestCase):
         if not parseOnly:
             project.removeFromDisk()
             project = Project.open( entryId, status='new' )
-            cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-            pdbFileName = entryId+".pdb"
-            pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-            NTdebug("Reading files from directory: " + cyanaDirectory)
-            project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+#            cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
+#            pdbFileName = entryId+".pdb"
+#            pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+#            NTdebug("Reading files from directory: " + cyanaDirectory)
+#            project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+            inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+
+            ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
+            if not os.path.exists(ccpnFile):
+                ccpnFile = os.path.join(inputArchiveDir, entryId + ".tar.gz")
+                if not os.path.exists(ccpnFile):
+                    self.fail("Neither %s or the .tgz exist" % ccpnFile)
+
+            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=999))
 
 #        print project.cingPaths.format()
         self.assertFalse(runWhatif(project, parseOnly=parseOnly))

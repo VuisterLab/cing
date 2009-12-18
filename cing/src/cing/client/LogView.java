@@ -65,7 +65,7 @@ public class LogView extends iCingView {
 //        String userAgent = "Browser (user agent): [" + UtilsJS.getUserAgent().toLowerCase() + "]";
         String iniMsg = Utils.preStart;
         iniMsg += c.Expect_to_see() + GenClient.eol;
-        iniMsg += c.Verbosity_may() + GenClient.eol;
+//        iniMsg += c.Verbosity_may() + GenClient.eol;
 //        iniMsg += userAgent + GenClient.eol;
         iniMsg += Utils.preEnd;
         area.setHTML(iniMsg);
