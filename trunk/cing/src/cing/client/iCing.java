@@ -194,29 +194,25 @@ public class iCing implements EntryPoint, HistoryListener {
 	private void showFooter() {
 		// String x = null;
 		String cingRevisionUrl = Settings.CING_REVISION_URL + Settings.REVISION;
-		String cingRevisionhtml = "iCing " + "(<a href=\"" + cingRevisionUrl
-				+ "\">r" + Settings.REVISION + "</a>)" + GenClient.eol;
+		String cingRevisionhtml = "iCing " + "(<a href=\"" + cingRevisionUrl + "\">r" + Settings.REVISION + "</a>)"
+				+ GenClient.eol;
 
 		String imgHtml = "<img class=\"gwt-Image\" style=\"width:16px;height:12px;border:0px\" src=\"images/icon_email.gif\">";
 
-		final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol
-				+ "<p align=\"center\">" + GenClient.eol + cingRevisionhtml
-				+ "\t" + GenClient.eol + "Geerten W. Vuister"
-				+ " <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml
-				+ "</a>, \t" + GenClient.eol + "Jurgen F. Doreleijers \t"
-				+ "<a href=\"mailto:jurgend@cmbi.ru.nl\">" + imgHtml
-				+ "</a> \t" + GenClient.eol + " " + c.and() + " \t"
-				+ GenClient.eol + "Alan Wilter Sousa da Silva \t"
-				+ "<a href=\"mailto:alanwilter@gmail.com\">" + imgHtml
-				+ "</a> \t" + "</p>" + GenClient.eol + "</div>" + GenClient.eol);
+		final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
+				+ cingRevisionhtml + "\t" + GenClient.eol + "Geerten W. Vuister"
+				+ " <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml + "</a>, \t" + GenClient.eol
+				+ "Jurgen F. Doreleijers \t" + "<a href=\"mailto:jurgend@cmbi.ru.nl\">" + imgHtml + "</a> \t"
+				+ GenClient.eol + " " + c.and() + " \t" + GenClient.eol + "Alan Wilter Sousa da Silva \t"
+				+ "<a href=\"mailto:alanwilter@gmail.com\">" + imgHtml + "</a> \t" + "</p>" + GenClient.eol + "</div>"
+				+ GenClient.eol);
 		vPanel.add(html);
 		html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 	}
 
 	public void onHistoryChanged(String historyToken) {
 		if (historyToken == null || historyToken.length() == 0) {
-			GenClient.showError("Got an unknown history token: ["
-					+ historyToken + "]");
+			GenClient.showError("Got an unknown history token: [" + historyToken + "]");
 		}
 		if (iCing.WELCOME_STATE.equals(historyToken)) {
 			loadWelcomeView();
@@ -281,8 +277,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	public void showBrowserWarning() {
 		About h = new About();
 		String userAgent = UtilsJS.getUserAgent().toLowerCase();
-		String msg = c.warningBrowser() + "[" + userAgent + "]" + "<BR>"
-				+ c.PleaseUse();
+		String msg = c.warningBrowser() + "[" + userAgent + "]" + "<BR>" + c.PleaseUse();
 		GenClient.showError(msg);
 		h.setHTML(msg);
 		h.details.setHTML(h.details.getHTML() + "<BR>" + c.for_help());
@@ -307,17 +302,14 @@ public class iCing implements EntryPoint, HistoryListener {
 		topPanel.add(iCingLogo);
 		iCingLogo.setSize("49", "40");
 		iCingLogo.setUrl("images/cing.png");
-		topPanel.setCellVerticalAlignment(iCingLogo,
-				HasVerticalAlignment.ALIGN_MIDDLE);
-		topPanel.setCellHorizontalAlignment(iCingLogo,
-				HasHorizontalAlignment.ALIGN_LEFT);
+		topPanel.setCellVerticalAlignment(iCingLogo, HasVerticalAlignment.ALIGN_MIDDLE);
+		topPanel.setCellHorizontalAlignment(iCingLogo, HasHorizontalAlignment.ALIGN_LEFT);
 
 		final VerticalPanel verticalPanel = new VerticalPanel();
 		topPanel.add(verticalPanel);
 		verticalPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 		verticalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		topPanel.setCellHorizontalAlignment(verticalPanel,
-				HasHorizontalAlignment.ALIGN_LEFT);
+		topPanel.setCellHorizontalAlignment(verticalPanel, HasHorizontalAlignment.ALIGN_LEFT);
 
 		final Label icingLabel = new Label(c.iCing());
 		verticalPanel.add(icingLabel);
@@ -329,16 +321,13 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		final VerticalPanel verticalPanel_1 = new VerticalPanel();
 		topPanel.add(verticalPanel_1);
-		verticalPanel_1
-				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		verticalPanel_1.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		verticalPanel_1.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		topPanel.setCellHorizontalAlignment(verticalPanel_1,
-				HasHorizontalAlignment.ALIGN_RIGHT);
+		topPanel.setCellHorizontalAlignment(verticalPanel_1, HasHorizontalAlignment.ALIGN_RIGHT);
 
 		final HorizontalPanel horizontalPanel_1 = new HorizontalPanel();
 		verticalPanel_1.add(horizontalPanel_1);
-		horizontalPanel_1
-				.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		horizontalPanel_1.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		horizontalPanel_1.setSpacing(5);
 
 		final Image imageI18n = new Image();
@@ -394,13 +383,18 @@ public class iCing implements EntryPoint, HistoryListener {
 
 		listBoxLocale.addChangeListener(new ChangeListener() {
 			public void onChange(Widget sender) {
+				String localeName = listBoxLocale.getValue(listBoxLocale.getSelectedIndex());
+
+				// original method.
 				// Window.open(UtilsJS.getHostPageLocation() + "?locale="
 				// + localeName, "_self", "");
-				String localeName = listBoxLocale.getValue(listBoxLocale
-						.getSelectedIndex());
-				UrlBuilder builder = Location.createUrlBuilder().setParameter(
-						"locale", localeName);
-				Window.Location.replace(builder.buildString());
+				String windowLocationOrg = UtilsJS.getHostPageLocation() + "?locale=" + localeName;
+				GenClient.showDebug("windowLocationOrg: " + windowLocationOrg);
+
+				UrlBuilder builder = Location.createUrlBuilder().setParameter("locale", localeName);
+				String windowLocation = builder.buildString();
+				GenClient.showDebug("windowLocation: " + windowLocation);
+				Window.Location.replace(windowLocation);
 			}
 		});
 
@@ -418,11 +412,11 @@ public class iCing implements EntryPoint, HistoryListener {
 				loadFileView();
 			}
 		};
-		Command commandLog = new Command() {
-			public void execute() {
-				loadLogView();
-			}
-		};
+		// Command commandLog = new Command() {
+		// public void execute() {
+		// loadLogView();
+		// }
+		// };
 		Command commandCingLog = new Command() {
 			public void execute() {
 				loadCingLogView();
@@ -433,16 +427,16 @@ public class iCing implements EntryPoint, HistoryListener {
 		// loadLoginView();
 		// }
 		// };
-		Command commandPref = new Command() {
-			public void execute() {
-				loadPrefView();
-			}
-		};
-		Command commandWelcome = new Command() {
-			public void execute() {
-				loadWelcomeView();
-			}
-		};
+		// Command commandPref = new Command() {
+		// public void execute() {
+		// loadPrefView();
+		// }
+		// };
+		// Command commandWelcome = new Command() {
+		// public void execute() {
+		// loadWelcomeView();
+		// }
+		// };
 		Command commandOptions = new Command() {
 			public void execute() {
 				loadOptionsView();
@@ -482,7 +476,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		};
 
 		menuBar_iCing.addItem(c.About() + " iCing", commandAbout);
-		menuBar_iCing.addItem(c.Preferences(), commandPref);
+		// menuBar_iCing.addItem(c.Preferences(), commandPref);
 		menuBar.addItem(c.iCing(), menuBar_iCing);
 		menuBar.addItem(c.File(), menuBar_file);
 		menuBar_file.addItem(c.Upload(), commandFile);
@@ -501,15 +495,16 @@ public class iCing implements EntryPoint, HistoryListener {
 		// menuItemReport.addStyleDependentName("disabled");
 		menuBar_view.addItem(c.Log() + " CING", commandCingLog);
 		// menuItemLogCing.addStyleDependentName("disabled");
-		menuBar_view.addItem(c.Log() + " iCing", commandLog);
+		// menuBar_view.addItem(c.Log() + " iCing", commandLog);
 		// MenuItem menuItem3D = menuBar.addItem(c.threeD(), (Command) null);
 		// menuItem3D.addStyleDependentName("disabled"); // try to improve
 		// styling.
 		menuBar.setWidth(widthMenuStr);
-		final MenuBar menuBar_help = new MenuBar(true);
-		menuBar.addItem(c.Help(), menuBar_help);
-		menuBar_help.addItem(c.Welcome(), commandWelcome);
-		menuBar_help.addItem(c.Help(), commandHelp);
+		// final MenuBar menuBar_help = new MenuBar(true);
+		// menuBar.addItem(c.Help(), menuBar_help);
+		menuBar.addItem(c.Help(), commandHelp);
+		// menuBar_help.addItem(c.Welcome(), commandWelcome);
+		// menuBar_help.addItem(c.Help(), commandHelp);
 
 		rootPanel.add(vPanel);
 		// rootPanel.setWidth("950px");
@@ -587,8 +582,7 @@ public class iCing implements EntryPoint, HistoryListener {
 	@SuppressWarnings("unused")
 	private void updateStyleSheets() {
 		// Generate the names of the style sheets to include
-		String gwtStyleSheet = "css/gwt/" + CURRENT_THEME + "/" + CURRENT_THEME
-				+ ".css";
+		String gwtStyleSheet = "css/gwt/" + CURRENT_THEME + "/" + CURRENT_THEME + ".css";
 		// String showcaseStyleSheet = "css/sc/" + CUR_THEME + "/Showcase.css";
 		// if (LocaleInfo.getCurrentLocale().isRTL()) {
 		// gwtStyleSheet = gwtStyleSheet.replace(".css", "_rtl.css");
@@ -606,13 +600,11 @@ public class iCing implements EntryPoint, HistoryListener {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element elem = Element.as(node);
 				if (elem.getTagName().equalsIgnoreCase("link")
-						&& elem.getPropertyString("rel").equalsIgnoreCase(
-								"stylesheet")) {
+						&& elem.getPropertyString("rel").equalsIgnoreCase("stylesheet")) {
 					styleSheetsFound = true;
 					String href = elem.getPropertyString("href");
 					// If the correct style sheets are already loaded, then we
-					// should have
-					// nothing to remove.
+					// should have nothing to remove.
 					// if (!href.contains(gwtStyleSheet) &&
 					// !href.contains(showcaseStyleSheet)) {
 					if (!href.contains(gwtStyleSheet)) {
@@ -623,8 +615,7 @@ public class iCing implements EntryPoint, HistoryListener {
 		}
 
 		if (styleSheetsFound && toRemove.size() == 0) {
-			GenClient
-					.showError("Return since we already have the correct style sheets");
+			GenClient.showError("Return since we already have the correct style sheets");
 			return;
 		}
 
@@ -657,31 +648,23 @@ public class iCing implements EntryPoint, HistoryListener {
 				// Different themes use different background colors for the body
 				// element, but IE only changes the background of the visible
 				// content on the page instead of changing the background color
-				// of the
-				// entire page. By changing the display style on the body
-				// element, we
-				// force IE to redraw the background correctly.
-				RootPanel.getBodyElement().getStyle().setProperty("display",
-						"none");
-				RootPanel.getBodyElement().getStyle()
-						.setProperty("display", "");
+				// of the entire page. By changing the display style on the body
+				// element, we force IE to redraw the background correctly.
+				RootPanel.getBodyElement().getStyle().setProperty("display", "none");
+				RootPanel.getBodyElement().getStyle().setProperty("display", "");
 				RootPanel.get().add(vPanel);
 			}
 		};
-		StyleSheetLoader.loadStyleSheet(modulePath + gwtStyleSheet,
-				getCurrentReferenceStyleName("gwt"), callback);
+		StyleSheetLoader.loadStyleSheet(modulePath + gwtStyleSheet, getCurrentReferenceStyleName("gwt"), callback);
 
 		// Load the showcase specific style sheet after the GWT theme style
 		// sheet so
 		// that custom styles supercede the theme styles.
 		// StyleSheetLoader.loadStyleSheet(modulePath + showcaseStyleSheet,
-		// getCurrentReferenceStyleName("Application"), // should
-		// // this
-		// // really
-		// // be
-		// // Application
-		// // instead of iCing? YES
+		// getCurrentReferenceStyleName("Application"),
 		// callback);
+		// should this really be Application instead of iCing? YES
+
 	}
 
 	/**
@@ -718,16 +701,11 @@ public class iCing implements EntryPoint, HistoryListener {
 		String allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		String result = "";
 		for (int i = 1; i <= Settings.accessKeyLength; i++) {
-			int idxChar = Random.nextInt(allowedCharacters.length()); // equal
-			// chance
-			// for A
-			// as
-			// for
-			// others.
+			int idxChar = Random.nextInt(allowedCharacters.length());
+			// equal chance for A as for others.
 			result += allowedCharacters.charAt(idxChar);
 		}
 		// result = "123456"; // TODO: disable for production.
-
 		return result;
 	}
 }

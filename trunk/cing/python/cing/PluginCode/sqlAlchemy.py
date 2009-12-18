@@ -105,7 +105,7 @@ class cgenericSql(NTdict):
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
     def __init__(self, host = 'localhost', user = 'nrgcing1', passwd = '4I4KMS', unix_socket = '/tmp/mysql.sock', db = "nrgcing", echo=False):
-        cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db,echo=True)
+        cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db,echo=echo)
         NTdebug("Initialized csqlAlchemy")
         # be explicit here to take advantage of code analysis.
         self.tableNameList = ['entry', 'chain', 'residue' ]

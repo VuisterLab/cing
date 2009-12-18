@@ -32,7 +32,7 @@
 	<!--  Pick from: ie6,gecko,gecko1_8,safari,opera
 	On Firefox 3.5.5 is: gecko but don't set the above when testing in Web mode.
 	-->
-<!--    <set-property name="user.agent" value="safari" />-->
+<!--    <set-property name="user.agent" value="gecko1_8" />-->
 
     <extend-property name="locale" values="en" />
     <extend-property name="locale" values="de" />

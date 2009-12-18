@@ -40,7 +40,6 @@ monitor with:
             Turn on "Web Sharing" and check server in browser.
 
 # For the gwt tomcat server
-# For the gwt tomcat server
 ProxyPass         /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
 ProxyPassReverse  /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
 ProxyPass         /icing http://localhost:8080/icing
