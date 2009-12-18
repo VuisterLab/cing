@@ -44,7 +44,7 @@ class AllChecks(TestCase):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-        entryId = "1brv_1model"
+        entryId = "1brv"
 #        entryId = "1brv_cs_pk_2mdl"
 
 #        entryId = "1tgq_1model"
