@@ -65,6 +65,7 @@ from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
+from cing.core.molecule import RMSD_STR
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
 import math
@@ -455,17 +456,28 @@ def summary( project, toFile = True ):
     Generate a summary string and store to text file
     Return summary string or None on error.
     """
+
+    incompleteItems = []
+    """For keeping track of which programs/checks were not run"""
+
     if not project.molecule:
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
 
-    msg = sprintf( '%s CING SUMMARY project %s %s\n', dots, project.name, dots )
-
+    msg = ''
 #    msg += sprintf( '%s\n', project.molecule.format() )
 
-    if project.molecule.has_key('rmsd' ):
+    skippedRmsd = False # keep logic simple.
+    if project.molecule.has_key( RMSD_STR ):
         msg += project.molecule.rmsd.format(allowHtml=True)
 #        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
+        if not project.molecule.modelCount:
+            # empty molecule can't have meaningfull rmsds and this might be an important factor to note here.
+            skippedRmsd = True
+    else:
+        skippedRmsd = True
+    if skippedRmsd:
+        incompleteItems.append( RMSD_STR )
 
     for drl in project.distances + project.dihedrals + project.rdcs:
         msg += drl.format(allowHtml=True) + '\n'
@@ -481,6 +493,8 @@ def summary( project, toFile = True ):
     if wiSummary:
         msg += "\n%s WHAT IF Summary %s\n" % (dots, dots )
         msg += addPreTagLines(wiSummary)
+    else:
+        incompleteItems.append( WHATIF_STR )
 
     pc = getDeepByKeys(project.molecule, PROCHECK_STR)
     if pc:
@@ -489,20 +503,42 @@ def summary( project, toFile = True ):
             msg += '\n' + addPreTagLines(pc.summary.format())
         else:
             NTerror("Failed to find the procheck summary attribute")
+    else:
+        incompleteItems.append( PROCHECK_STR )
 
     wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR)
     if wattosSummary:
         msg += "\n%s Wattos Summary %s\n" % (dots, dots )
         msg += '\n' + addPreTagLines(wattosSummary)
+    else:
+        incompleteItems.append( WATTOS_STR )
 
+#    skippedShiftx = False
+    # don't mark nucleic acid only entries at all.
+    if project.molecule.hasAminoAcid():
+        shiftx = getDeepByKeys(project.molecule, SHIFTX_STR)
+        if not shiftx:
+#            NTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
+            incompleteItems.append( SHIFTX_STR )
+
+    topMsg = sprintf( '%s CING SUMMARY project %s %s', dots, project.name, dots )
+    if not incompleteItems:
+        topMsg += '\nAll applicable programs/checks were performed'
+#    for checkId in incompleteItems:
+    else:
+        topMsg += '\nWARNING: Program(s) or check(s) NOT performed: %s' % incompleteItems
+#        topMsg += '\n<font color=orange>WARNING:</font> This may affect the CING ROG scoring.'
+        topMsg += '\nThis may affect the CING ROG scoring.'
+
+    msg = topMsg + '\n' + msg
 
     if toFile:
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         NTmessage( '==> summary, output to %s', fname)
-#        NTdebug(" msg: " + msg)
+        NTdebug(" msg: " + msg)
         msgClean = removePreTagLines( msg )
-#        NTdebug(" msgClean: " + msgClean)
+        NTdebug(" msgClean: " + msgClean)
         fprintf( fp, msgClean )
         fp.close()
     #end if

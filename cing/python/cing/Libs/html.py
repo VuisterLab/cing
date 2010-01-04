@@ -3006,7 +3006,6 @@ def removePreTagLines(msg):
     resultList = []
     msgList = msg.split('\n')
     for l in msgList:
-
         if l.startswith(HTML_TAG_PRE) or l.startswith(HTML_TAG_PRE2):
             continue
         resultList.append(l)

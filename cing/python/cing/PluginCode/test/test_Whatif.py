@@ -50,7 +50,7 @@ class AllChecks(TestCase):
 #        entryId = "1tgq_1model"
 #        pdbConvention = IUPAC
         parseOnly = False # normal is False
-        showValues = True
+        showValues = False
 
         os.chdir(cingDirTmp)
         project = Project( entryId )
