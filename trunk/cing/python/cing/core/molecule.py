@@ -61,6 +61,7 @@ import sys
 #==============================================================================
 AtomIndex = 1
 _DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
+RMSD_STR = 'rmsd'
 
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
@@ -153,7 +154,7 @@ class Molecule( NTtree ):
 
         self.project = None # JFD: don't know where it gets set but it exists.
 #        NTdebug('Molecule.__init__: %s', self )
-        #end if
+        self.rmsd = None
     #end def
 
     def format(self):

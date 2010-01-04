@@ -748,6 +748,9 @@ RMS Z-scores, should be close to 1.0:
                 NTerror("check dictionary: "+`check`)
                 return True
 #            NTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
+            if check[LEVEL_STR] == 'MOLECULE':
+                NTdebug("Skipping any check related to this level for now; for now only the check labelled FATAL")
+                continue
             idx = levelIdList.index( check[LEVEL_STR] )
             if idx < 0:
                 NTerror("Whatif._processCheckdb: Unknown Level ["+check[LEVEL_STR]+"] in check:"+check[CHECK_ID_STR]+' '+check[TEXT_STR])
