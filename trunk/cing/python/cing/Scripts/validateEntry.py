@@ -48,7 +48,10 @@ def main(entryId, *extraArgList):
     doProcheck = True
     doWattos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
+#    modelCount=2
+    modelCount=None # default setting is None
     if fastestTest:
+        modelCount=2
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -93,6 +96,7 @@ def main(entryId, *extraArgList):
     NTdebug("restraintsConvention: " + restraintsConvention)
     NTdebug("archiveType:          " + archiveType)
     NTdebug("projectType:          " + projectType)
+    NTdebug("modelCount:           " + modelCount)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -153,7 +157,7 @@ def main(entryId, *extraArgList):
             return True
     elif projectType == PROJECT_TYPE_CCPN:
         project = Project.open(entryId, status = 'new')
-        if not project.initCcpn(ccpnFolder = fileNameTgz):
+        if not project.initCcpn(ccpnFolder = fileNameTgz, modelCount=modelCount):
             NTerror("Failed to init project from ccpn")
             return True
     elif projectType == PROJECT_TYPE_CYANA:
@@ -170,7 +174,7 @@ def main(entryId, *extraArgList):
                 pdbConvention = CYANA
             if entryId.startswith("1tgq"):
                 pdbConvention = PDB
-        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
+        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention, nmodels=modelCount)
         NTdebug("Reading files from directory: " + inputDir)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]
@@ -191,6 +195,7 @@ def main(entryId, *extraArgList):
             project.cyana2cing(cyanaDirectory = inputDir,
                                convention = restraintsConvention,
                                copy2sources = True,
+                               nmodels = modelCount,
                                **kwds)
 
     project.save()

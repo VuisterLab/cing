@@ -6,9 +6,42 @@
 from cing import header
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.PluginCode.required.reqDssp import getDsspSecStructConsensusId
+from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.required.reqProcheck import gf_CHI12_STR
+from cing.PluginCode.required.reqProcheck import gf_CHI1_STR
+from cing.PluginCode.required.reqProcheck import gf_PHIPSI_STR
+from cing.PluginCode.required.reqProcheck import gf_STR
+from cing.PluginCode.required.reqWattos import COMPLCHK_STR
+from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqWhatif import ACCLST_STR
+from cing.PluginCode.required.reqWhatif import ANGCHK_STR
+from cing.PluginCode.required.reqWhatif import BA2CHK_STR
+from cing.PluginCode.required.reqWhatif import BBCCHK_STR
+from cing.PluginCode.required.reqWhatif import BH2CHK_STR
+from cing.PluginCode.required.reqWhatif import BMPCHK_STR
+from cing.PluginCode.required.reqWhatif import BNDCHK_STR
+from cing.PluginCode.required.reqWhatif import C12CHK_STR
+from cing.PluginCode.required.reqWhatif import CHICHK_STR
+from cing.PluginCode.required.reqWhatif import DUNCHK_STR
+from cing.PluginCode.required.reqWhatif import FLPCHK_STR
+from cing.PluginCode.required.reqWhatif import HNDCHK_STR
+from cing.PluginCode.required.reqWhatif import INOCHK_STR
+from cing.PluginCode.required.reqWhatif import MISCHK_STR
+from cing.PluginCode.required.reqWhatif import MO2CHK_STR
+from cing.PluginCode.required.reqWhatif import NQACHK_STR
+from cing.PluginCode.required.reqWhatif import OMECHK_STR
+from cing.PluginCode.required.reqWhatif import PL2CHK_STR
+from cing.PluginCode.required.reqWhatif import PL3CHK_STR
+from cing.PluginCode.required.reqWhatif import PLNCHK_STR
+from cing.PluginCode.required.reqWhatif import QUACHK_STR
+from cing.PluginCode.required.reqWhatif import RAMCHK_STR
+from cing.PluginCode.required.reqWhatif import ROTCHK_STR
+from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
+from cing.PluginCode.required.reqWhatif import WGTCHK_STR
+from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
 from cing.main import getStartMessage
@@ -60,21 +93,21 @@ def main(pdb_id, *extraArgList):
 
     # shortcuts
     p = project
-    mol = project.molecule #@UnusedVariable
-    m = project.molecule #@UnusedVariable
-    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
+    molecule = project.molecule
+#    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
+    p.validate(parseOnly=True, htmlOnly=True)
 
     csql = csqlAlchemy()
     if csql.connect():
         NTerror("Failed to connect to DB")
         return True
-
     csql.autoload()
 
     execute = csql.conn.execute
     centry = csql.entry
     cchain = csql.chain
     cresidue = csql.residue
+    catom = csql.atom
 
     # WATCH OUT WITH THE BELOW COMMANDS.
     #result = csql.conn.execute(centry.delete())
@@ -84,7 +117,93 @@ def main(pdb_id, *extraArgList):
     else:
         NTdebug("No original entry present yet.")
 
-    result = csql.conn.execute(centry.insert().values(pdb_id=pdb_id, name=pdb_id, res_count=m.residueCount, model_count = m.modelCount))
+    chainList = molecule.allChains()
+    is_multimeric = False
+    if len(chainList) > 1:
+        is_multimeric = True
+
+    chothia_class = molecule.cothiaClassInt()
+
+    distance_count = project.distances.lenRecursive()
+    dihedral_count = project.dihedrals.lenRecursive()
+    rdc_count = project.rdcs.lenRecursive()
+    peak_count = project.peaks.lenRecursive()
+    # TODO: test
+    assignmentCountMap = project.molecule.getAssignmentCountMap()
+    cs_count = assignmentCountMap['overall']
+    cs1H_count = assignmentCountMap['1H']
+    cs13C_count = assignmentCountMap['13C']
+    cs15N_count = assignmentCountMap['15N']
+
+    # WI
+    p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
+    p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR)
+    p_wi_bndchk = molecule.getDeepAvgByKeys(WHATIF_STR, BNDCHK_STR, VALUE_LIST_STR)
+    p_wi_c12chk = molecule.getDeepAvgByKeys(WHATIF_STR, C12CHK_STR, VALUE_LIST_STR)
+    p_wi_chichk = molecule.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
+    p_wi_flpchk = molecule.getDeepAvgByKeys(WHATIF_STR, FLPCHK_STR, VALUE_LIST_STR)
+    p_wi_hndchk = molecule.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
+    p_wi_inochk = molecule.getDeepAvgByKeys(WHATIF_STR, INOCHK_STR, VALUE_LIST_STR)
+    p_wi_nqachk = molecule.getDeepAvgByKeys(WHATIF_STR, NQACHK_STR, VALUE_LIST_STR)
+    p_wi_omechk = molecule.getDeepAvgByKeys(WHATIF_STR, OMECHK_STR, VALUE_LIST_STR)
+    p_wi_pl2chk = molecule.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
+    p_wi_pl3chk = molecule.getDeepAvgByKeys(WHATIF_STR, PL3CHK_STR, VALUE_LIST_STR)
+    p_wi_plnchk = molecule.getDeepAvgByKeys(WHATIF_STR, PLNCHK_STR, VALUE_LIST_STR)
+    p_wi_quachk = molecule.getDeepAvgByKeys(WHATIF_STR, QUACHK_STR, VALUE_LIST_STR)
+    p_wi_ramchk = molecule.getDeepAvgByKeys(WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR)
+    p_wi_rotchk = molecule.getDeepAvgByKeys(WHATIF_STR, ROTCHK_STR, VALUE_LIST_STR)
+
+    # PC
+    p_pc_gf = molecule.getDeepByKeys(PROCHECK_STR, gf_STR)
+    p_pc_gf_chi12 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI12_STR)
+    p_pc_gf_chi1 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI1_STR)
+    p_pc_gf_phipsi = molecule.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
+
+    # Wattos
+    noe_compl4 = molecule.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+
+    # Overall rog
+    rogC = molecule.rogScore.rogInt()
+
+    result = csql.conn.execute(centry.insert().values(
+        pdb_id=pdb_id,
+        name=pdb_id,
+        is_multimeric=is_multimeric,
+        chothia_class=chothia_class,
+        res_count=molecule.residueCount,
+        model_count=molecule.modelCount,
+        distance_count=distance_count,
+        dihedral_count=dihedral_count,
+        rdc_count=rdc_count,
+        peak_count=peak_count,
+        cs_count=cs_count,
+        cs1H_count=cs1H_count,
+        cs13C_count=cs13C_count,
+        cs15N_count=cs15N_count,
+        wi_bbcchk=p_wi_bbcchk,
+        wi_bmpchk=p_wi_bmpchk,
+        wi_bndchk=p_wi_bndchk,
+        wi_c12chk=p_wi_c12chk,
+        wi_chichk=p_wi_chichk,
+        wi_flpchk=p_wi_flpchk,
+        wi_hndchk=p_wi_hndchk,
+        wi_inochk=p_wi_inochk,
+        wi_nqachk=p_wi_nqachk,
+        wi_omechk=p_wi_omechk,
+        wi_pl2chk=p_wi_pl2chk,
+        wi_pl3chk=p_wi_pl3chk,
+        wi_plnchk=p_wi_plnchk,
+        wi_quachk=p_wi_quachk,
+        wi_ramchk=p_wi_ramchk,
+        wi_rotchk=p_wi_rotchk,
+    	pc_gf=p_pc_gf,
+    	pc_gf_chi12=p_pc_gf_chi12,
+    	pc_gf_chi1=p_pc_gf_chi1,
+    	pc_gf_phipsi=p_pc_gf_phipsi,
+        noe_compl4=noe_compl4,
+        rog=rogC
+        )
+    )
     entry_id = result.last_inserted_ids()[0]
     NTdebug("Inserted entry id %s" % entry_id)
 
@@ -96,16 +215,19 @@ def main(pdb_id, *extraArgList):
 
     for chain in project.molecule.allChains():
         nameC = chain.name
+        chothia_class = molecule.cothiaClassInt()
         rogC = chain.rogScore.rogInt()
-        result = csql.conn.execute(cchain.insert().values(entry_id=entry_id, name=nameC, rog=rogC))
+        result = csql.conn.execute(cchain.insert().values(
+            entry_id=entry_id,
+            name=nameC,
+            chothia_class=chothia_class,
+            rog=rogC,
+            )
+        )
         chain_id = result.last_inserted_ids()[0]
         NTdebug("Inserted chain id %s" % chain_id)
         for residue in chain.allResidues():
-            valueMapList = []
 #            NTmessage("Residue: %s" % residue)
-
-            valueMap = NTdict()
-            valueMapList.append(valueMap)
 
             # CING
     #        print m.C.ASN46.distanceRestraints
@@ -122,16 +244,121 @@ def main(pdb_id, *extraArgList):
 #                valueMap[ 'dis_c1_viol' ] = drList.violCount1
 #                valueMap[ 'dis_c3_viol' ] = drList.violCount3
 #                valueMap[ 'dis_c5_viol' ] = drList.violCount5
-            #for j in range(1):
-            #    for i in range(1):
+
             nameR = residue.resName
             numberR = residue.resNum
+            dssp_id = getDsspSecStructConsensusId(residue)
+
+            # WI
+            r_wi_acclst = residue.getDeepAvgByKeys(WHATIF_STR, ACCLST_STR, VALUE_LIST_STR)
+            r_wi_angchk = residue.getDeepAvgByKeys(WHATIF_STR, ANGCHK_STR, VALUE_LIST_STR)
+            r_wi_bbcchk = residue.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
+            r_wi_bmpchk = residue.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR)
+            r_wi_bndchk = residue.getDeepAvgByKeys(WHATIF_STR, BNDCHK_STR, VALUE_LIST_STR)
+            r_wi_c12chk = residue.getDeepAvgByKeys(WHATIF_STR, C12CHK_STR, VALUE_LIST_STR)
+            r_wi_flpchk = residue.getDeepAvgByKeys(WHATIF_STR, FLPCHK_STR, VALUE_LIST_STR)
+            r_wi_inochk = residue.getDeepAvgByKeys(WHATIF_STR, INOCHK_STR, VALUE_LIST_STR)
+            r_wi_omechk = residue.getDeepAvgByKeys(WHATIF_STR, OMECHK_STR, VALUE_LIST_STR)
+            r_wi_pl2chk = residue.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
+            r_wi_pl3chk = residue.getDeepAvgByKeys(WHATIF_STR, PL3CHK_STR, VALUE_LIST_STR)
+            r_wi_plnchk = residue.getDeepAvgByKeys(WHATIF_STR, PLNCHK_STR, VALUE_LIST_STR)
+            r_wi_quachk = residue.getDeepAvgByKeys(WHATIF_STR, QUACHK_STR, VALUE_LIST_STR)
+            r_wi_ramchk = residue.getDeepAvgByKeys(WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR)
+            r_wi_rotchk = residue.getDeepAvgByKeys(WHATIF_STR, ROTCHK_STR, VALUE_LIST_STR)
+
+            # PC
+            r_pc_gf = residue.getDeepByKeys(PROCHECK_STR, gf_STR)
+            r_pc_gf_chi12 = residue.getDeepByKeys(PROCHECK_STR, gf_CHI12_STR)
+            r_pc_gf_chi1 = residue.getDeepByKeys(PROCHECK_STR, gf_CHI1_STR)
+            r_pc_gf_phipsi = residue.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
+
+            # Wattos
+            noe_compl4 = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+
             rogR = residue.rogScore.rogInt()
-            result = csql.conn.execute(cresidue.insert().values(entry_id=entry_id, chain_id=chain_id),
-                        name=nameR,number=numberR, rog=rogR)
+            result = csql.conn.execute(cresidue.insert().values(
+                entry_id=entry_id,
+                chain_id=chain_id,
+                name=nameR,
+                number=numberR,
+                dssp_id=dssp_id,
+                wi_acclst=r_wi_acclst,
+                wi_angchk=r_wi_angchk,
+                wi_bbcchk=r_wi_bbcchk,
+                wi_bmpchk=r_wi_bmpchk,
+                wi_bndchk=r_wi_bndchk,
+                wi_c12chk=r_wi_c12chk,
+                wi_flpchk=r_wi_flpchk,
+                wi_inochk=r_wi_inochk,
+                wi_omechk=r_wi_omechk,
+                wi_pl2chk=r_wi_pl2chk,
+                wi_pl3chk=r_wi_pl3chk,
+                wi_plnchk=r_wi_plnchk,
+                wi_quachk=r_wi_quachk,
+                wi_ramchk=r_wi_ramchk,
+                wi_rotchk=r_wi_rotchk,
+		pc_gf=r_pc_gf,
+		pc_gf_chi12=r_pc_gf_chi12,
+		pc_gf_chi1=r_pc_gf_chi1,
+		pc_gf_phipsi=r_pc_gf_phipsi,
+                noe_compl4=noe_compl4,
+                rog=rogR
+                )
+            )
             residue_id = result.last_inserted_ids()[0]
             NTdebug("Inserted residue %s" % residue_id)
+            for atom in residue.allAtoms():
+                a_name = atom.name
+                # WI
+                a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR)
+                a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR)
+                a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
+                a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
+                a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
+                a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
+                a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
+                a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
+                a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
+                # Store only atoms for which there is usefull info.
+                useFullColumns = [
+                    a_wi_ba2lst,
+                    a_wi_bh2chk,
+                    a_wi_chichk,
+                    a_wi_dunchk,
+                    a_wi_hndchk,
+                    a_wi_mischk,
+                    a_wi_mo2chk,
+                    a_wi_pl2chk,
+                    a_wi_wgtchk
+                ]
+                hasUsefullColumn = False
+                for column in useFullColumns:
+                    if column != None:
+                        hasUsefullColumn = True
+                if not hasUsefullColumn:
+                    continue
+                a_rog = atom.rogScore.rogInt()
+                result = csql.conn.execute(catom.insert().values(
+                    entry_id=entry_id,
+                    chain_id=chain_id,
+                    residue_id=residue_id,
+                    name=a_name,
+                    wi_ba2lst=a_wi_ba2lst,
+                    wi_bh2chk=a_wi_bh2chk,
+                    wi_chichk=a_wi_chichk,
+                    wi_dunchk=a_wi_dunchk,
+                    wi_hndchk=a_wi_hndchk,
+                    wi_mischk=a_wi_mischk,
+                    wi_mo2chk=a_wi_mo2chk,
+                    wi_pl2chk=a_wi_pl2chk,
+                    wi_wgtchk=a_wi_wgtchk,
+                    rog=a_rog
+                    )
+                )
+                atom_id = result.last_inserted_ids()[0]
+                NTdebug("Inserted atom %s" % atom_id)
+            # end for atom
         # end for residue
     # end for chain
 

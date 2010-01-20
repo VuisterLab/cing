@@ -1,0 +1,60 @@
+Follow pdbj_README.txt in this directory from:
+http://pdbjr0.pdbj.org/~akinjo/mine/README.txt
+
+REad: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
+
+port install postgresql84-server
+
+setenv PGDATA /Users/jd/opt/postgresql84/defaultdb
+setenv PGBIN /Users/jd/opt/bin
+
+
+-- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
+on: "The solution to the /dev/null error:"
+
+> sudo dscl . -create /Users/postgres UserShell /bin/sh
+> sudo dscl . -create /Users/postgres NFSHomeDirectory /opt/local/var/db/postgresql83
+
+--  2 -- Fix problem with getline. described here:
+http://www.stereoplex.com/2008/feb/5/error-compiling-postgresql-83-on-leopard-rl_comple/
+./configure --prefix=/Users/jd/opt --with-python --with-libxml --with-libxslt --with-libedit-preferred
+
+--->  Creating launchd control script
+###########################################################
+# A startup item has been generated that will aid in
+# starting postgresql84-server with launchd. It is disabled
+# by default. Execute the following command to start it,
+# and to cause it to launch at startup:
+#
+# sudo launchctl load -w /Library/LaunchDaemons/org.macports.postgresql84-server.plist
+###########################################################
+--->  Installing postgresql84-server @8.4.1_0
+
+To create a database instance, after install do
+ sudo mkdir -p $PGDATA
+ sudo chown postgres:postgres $PGDATA
+ sudo su postgres -c 'initdb -D $PGDATA'
+
+To tweak your DBMS, consider increasing kern.sysv.shmmax by adding an increased kern.sysv.shmmax .. to /etc/sysctl.conf
+
+Start:
+	sudo su postgres -c '/Users/jd/opt/bin/pg_ctl -D /Users/jd/opt/postgresql84/defaultdb -l /tmp/logfile start'
+Stop:
+	sudo su postgres -c '/Users/jd/opt/bin/pg_ctl -D /Users/jd/opt/postgresql84/defaultdb stop'
+
+
+Connect as postgres unix user:
+	psql
+	create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+	alter database nrgcing owner to nrgcing1;
+
+Connect as jd unix user:
+	createdb nrgcing
+	psql -l
+
+
+-- Getting started help:
+\? from the psql monitor
+\l list db
+\dt' list tables
+\d atom list a table

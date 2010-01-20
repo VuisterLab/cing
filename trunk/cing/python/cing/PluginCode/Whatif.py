@@ -53,6 +53,7 @@ from cing.PluginCode.required.reqWhatif import TEXT_STR
 from cing.PluginCode.required.reqWhatif import TYPE_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import nameDefs
 from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.core.constants import IUPAC
 from cing.core.molecule import dots
@@ -61,6 +62,8 @@ from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
+from cing.core.constants import ATOM_LEVEL
+from cing.core.constants import RES_LEVEL
 import os
 import time
 
@@ -135,65 +138,6 @@ class Whatif( NTdict ):
 
     Instantiated only from runWhatif
     """
-    #define some more user friendly names
-    # List of defs at:
-    # http://www.yasara.org/pdbfinder_file.py.txt
-    # http://swift.cmbi.ru.nl/whatif/html/chap23.html
-    # All are in text record of file to be parsed so they're kind of redundant.
-    # Second element is an alternative CING id
-    # Fourth element is optional short name suitable for labeling a y-axis.
-
-    #            WHATIF     CING
-    nameDefs =[
-                ('ACCLST',  None,          'Relative accessibility',                                    'Rel. accessibility'),
-                ('ALTATM',  None,          'Amino acids inside ligands check/Attached group check',     'Amino acids inside ligands check/Attached group check'),
-                ('ANGCHK', 'angles',       'Angles',                                                    'Bond angle'),
-                ('BA2CHK',  None,          'Hydrogen bond acceptors',                                   'Hydrogen bond acceptors'),
-                ('BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
-                ('BH2CHK',  None,          'Hydrogen bond donors',                                      'Hydrogen bond donors'),
-                ('BMPCHK', 'bumps',        'Bumps',                                                     'Summed bumps'),
-                ('BNDCHK', 'bondLengths',  'Bond lengths',                                              'Bond lengths'),
-                ('BVALST',  None,          'B-Factors',                                                 'B-Factors'),
-                ('C12CHK', 'janin',        'Janin',                                                     'Janin Z'),
-#duplicate                ('CHICHK',  None,          'Torsions',                                                  'Aver. torsions Z.'),
-                ('CCOCHK',  None,          'Inter-chain connection check',                              'Inter-chain connection check'),
-                ('CHICHK', 'torsion',      'Torsion angle check',                                       'Torsion angle check'),
-                ('DUNCHK',  None,          'Duplicate atom names in ligands',                           'Duplicate atom names in ligands'),
-                ('EXTO2',   None,          'Test for extra OXTs',                                       'Test for extra OXTs'),
-                ('FLPCHK',  None,          'Peptide flip',                                              'Peptide flip'),
-                ('H2OCHK',  None,          'Water check',                                               'Water check'),
-                ('H2OHBO',  None,          'Water Hydrogen bond',                                       'Water Hydrogen bond'),
-                ('HNDCHK', 'chiralities',  'Chirality',                                                 'Chirality'),
-                ('HNQCHK',  None,          'Flip HIS GLN ASN hydrogen-bonds',                           'Flip HIS GLN ASN hydrogen-bonds'),
-                ('INOCHK', 'accessibilities','Accessibility',                                             'Accessibility Z.'),
-                ('MISCHK',  None,          'Missing atoms',                                             'Missing atoms'),
-                ('MO2CHK',  None,          'Missing C-terminal oxygen atoms',                           'Missing C-terminal oxygen atoms'),
-                ('NAMCHK',  None,          'Atom names',                                                'Atom names'),
-                ('NOCAAA',  None,          'Non-canonical residue',                                     'Non-canonical residue'),
-                ('NQACHK', 'packingQuality2','2nd generation packing quality',                          'New quality'),
-                ('NTCHK',   None,          'Acid group conformation check',                             'COOH check'),
-                ('OMECHK', 'omegas',       'Omega angle restraints',                                    'Omega check'),
-                ('PC2CHK',  None,          'Proline puckers',                                           'Proline puckers'),
-                ('PDBLST',  None,          'List of residues',                                          'List of residues'),
-                ('PL2CHK',  None,          'Connections to aromatic rings',                             'Plan. to aromatic'),
-                ('PL3CHK',  None,          'Side chain planarity with hydrogens attached',              'NA planarity'),
-                ('PLNCHK', 'planarities',  'Protein side chain planarities',                            'Protein SC planarity'),
-                ('PRECHK',  None,          'Missing backbone atoms.',                                   'Missing backbone atoms.'),
-                ('PUCCHK',  None,          'Ring puckering in Prolines',                                'Ring puckering in Prolines'),
-                ('QUACHK', 'packingQuality1','Directional Atomic Contact Analysis, aka 1st generation packing quality', 'Packing quality'),
-                ('RAMCHK', 'ramachandran', 'Ramachandran Z-score',                                      'Ramachandr.' ),
-                ('ROTCHK', 'rotamer',      'Rotamers',                                                  'Rotamer normality'),
-                ('SCOLST',  None,          'List of symmetry contacts',                                 'List of symmetry contacts'),
-                ('TO2CHK',  None,          'Missing C-terminal groups',                                 'Missing C-terminal groups'),
-                ('TOPPOS',  None,          'Ligand without know topology',                              'Ligand without know topology'),
-                ('WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
-                ('Hand',    None,          '(Pro-)chirality or handness check',                         'Handness'),
-                ('AAINLI',  None,          'Unknown check',                                             'Unknown check'),
-                ('ATHYBO',  None,          'Unknown check',                                             'Unknown check'),
-                ('BBAMIS',  None,          'Unknown check',                                             'Unknown check'),
-                ('FATAL',   None,          'Fatal errors',                                              'Unknown check'), # new in Version  : 8.0 (20091126-0948)
-                ('TORCHK',  None,          'Unknown check',                                             'Unknown check')
-                 ]
 
 #              'Bond max Z',
     DEFAULT_RESIDUE_POOR_SCORES = {}
@@ -211,9 +155,9 @@ class Whatif( NTdict ):
     NUMBER_RESIDUES_PER_SECONDS = 7 # Was 13 before.
 
     debugCheck = 'BNDCHK'
-    cingNameDict  = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,1)) )
-    nameDict      = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,2)) )
-    shortNameDict = NTdict( zip( NTzap(nameDefs,0), NTzap(nameDefs,3)) )
+    cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
+    nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
+    shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
     cingNameDict.keysformat()
     nameDict.keysformat()
     shortNameDict.keysformat()
@@ -236,7 +180,6 @@ class Whatif( NTdict ):
                               "Version":None
                               }
 #    recordKeyWordsToIgnore.append( "IGNORE" ) # Added by JFD
-
 
     scriptBegin = """
 # CING generated What If (WI) script
@@ -731,8 +674,8 @@ RMS Z-scores, should be close to 1.0:
 #        self.mols     = NTdict(MyName="Mol")
         self.residues = NTdict(MyName="Res")
         self.atoms    = NTdict(MyName="Atom")
-#        levelIdList     = ["MOLECULE", "RESIDUE", "ATOM" ]
-        levelIdList     = [ "RESIDUE", "ATOM" ]
+
+        levelIdList     = [ RES_LEVEL, ATOM_LEVEL ]
         selfLevels      = [ self.residues, self.atoms ]
         selfLevelChecks = [ self.residueSpecificChecks, self.atomSpecificChecks ]
         # sorting on mols, residues, and atoms

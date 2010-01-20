@@ -9,6 +9,7 @@ gf_PHIPSI_STR = 'gfPHIPSI'
 gf_CHI12_STR = 'gfCHI12'
 gf_CHI1_STR = 'gfCHI1'
 
+gf_LIST_STR = [ gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR]
 #MXMODL Maximum number of models
 #left at 60 in   viol2pdb because the same as MXFILE
 MAX_PROCHECK_NMR_MODELS = 60

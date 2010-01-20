@@ -84,7 +84,7 @@ end
 # get the log files
 set scriptName = storeNRGCING2db
 cd /Library/WebServer/Documents/NRG-CING/data
-set list = ( `cat ../entry_list_done.csv`)
+set list = ( `cat ../entry_list_done_sub.csv`)
 #set list = ( 1brv )
 set logFileList = ()
 foreach x ( $list )

@@ -50,7 +50,7 @@ if retrieveEntryListFromNRG:
         sys.exit(1)
 
 # disable next line for regular run.
-writeEntryListToFile(entryListFileName, ['1f8h'])
+writeEntryListToFile(entryListFileName, ['1brv'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,

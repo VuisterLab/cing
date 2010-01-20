@@ -26,7 +26,14 @@ class NmrStar():
         NTdebug("starting toNmrStarFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
+            NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.")
+#            cwd = os.getcwd()
+#            ccpnFolder = os.path.join(cwd, self.project.name + '.tgz')
+#            if os.path.exists(ccpnFolder):
+#                NTdebug("Found parallel parked tgz with ccpn project.")
+#                self.project.ccpnFolder = ccpnFolder
+#            else:
+#                NTmessage("No parallel parked directory or tgz with ccpn project found.")
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
@@ -42,7 +49,6 @@ class NmrStar():
             print "baseNameList %s" % baseNameList
             baseName = baseNameList[0]
             ccpnFolder = os.path.join(head, baseName)
-
         if not ccpnFolder:
             NTerror("No CCPN project folder defined thus no NmrStar export possible.")
             return

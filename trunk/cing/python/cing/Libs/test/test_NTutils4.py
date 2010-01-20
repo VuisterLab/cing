@@ -91,6 +91,18 @@ b
         list.sort(x)
         list.sort(y)
 
+    def testNTlistLenRecursive(self):
+        """Test failure by recursion"""
+        x = NTlist()
+        y = NTlist()
+        z = NTlist()
+        x.append(y)
+        x.append(z)
+        x.append(100)
+        y.append(200)
+        y.append(300)
+        self.assertEquals( x.lenRecursive(), 3)
+
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     unittest.main()
