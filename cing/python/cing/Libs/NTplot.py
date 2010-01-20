@@ -88,6 +88,7 @@ useMatPlotLib = True
 dpi=72.27 # Latex definition
 inches_per_pt = 1./dpi
 golden_mean = (math.sqrt(5.)-1.)/2.     # Aesthetic ratio where possible.
+DEFAULT_FONT_SIZE = 12
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -96,6 +97,7 @@ golden_mean = (math.sqrt(5.)-1.)/2.     # Aesthetic ratio where possible.
 #-----------------------------------------------------------------------------
 # Plotting attributes
 #-----------------------------------------------------------------------------
+
 
 def NTplotAttributes( **kwds ):
     a = NTdict()
@@ -134,7 +136,7 @@ def NTplotAttributes( **kwds ):
 
     # fonts
     a.font       = 'Helvetica'
-    a.fontSize   = 12
+    a.fontSize   = DEFAULT_FONT_SIZE
     a.fontColor  = 'black'
 
     # text
@@ -160,12 +162,12 @@ def boxAttributes( fill=True, fillColor='black', line=False, lineColor='black', 
                            )
 #end def
 
-def fontAttributes( font='Helvetica', size=12, color='black', alpha=1. ):
+def fontAttributes( font='Helvetica', size=DEFAULT_FONT_SIZE, color='black', alpha=1. ):
     return NTplotAttributes( font=font, fontSize=size, fontColor=color, alpha=alpha )
 #end def
 
-def fontVerticalAttributes( horizontalalignment='left', verticalalignment  = 'center', rotation   = 'vertical' ):
-    result = fontAttributes()
+def fontVerticalAttributes( horizontalalignment='left', verticalalignment  = 'center', rotation   = 'vertical', size=DEFAULT_FONT_SIZE ):
+    result = fontAttributes(size=size)
     result.horizontalalignment=horizontalalignment
     result.verticalalignment=verticalalignment
     result.rotation=rotation
@@ -426,7 +428,6 @@ class NTplot( NTdict ):
         self.move( points[0] )
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
-
 
     def scatter(self, x,y,s,c,marker=None,verts =None):
         """Return true on error UNTESTED.
@@ -1066,8 +1067,10 @@ class NTplot( NTdict ):
 
     def setMinorTicks(self, space):
         if useMatPlotLib:
-            minorLocator   = MultipleLocator(space)
+            minorLocator = MultipleLocator(space)
             self.axis.xaxis.set_minor_locator(minorLocator)
+            minorLocator = MultipleLocator(space)
+            self.axis.yaxis.set_minor_locator(minorLocator)
             self.setTickLineWidth()
 
 

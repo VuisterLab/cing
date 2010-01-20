@@ -236,7 +236,7 @@ Quit
 
         saveFrameCompl = sfList[0]
         tagTableComplHeader = saveFrameCompl.tagtables[0]
-        completenessMol = tagTableComplHeader.getStringListByColumnName("_NOE_completeness_stats.Completeness_cumulative_pct")
+        completenessMol = tagTableComplHeader.getFloatListByColumnName("_NOE_completeness_stats.Completeness_cumulative_pct")
         if completenessMol:
             completenessMol = completenessMol[0]
 
@@ -283,11 +283,11 @@ Quit
             residueWattosDic.setDeepByKeys(expCount, EXP_COUNT_STR, VALUE_LIST_STR)
             residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR)
 
-        self.molecule.setDeepByKeys([completenessMol], WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+        self.molecule.setDeepByKeys(completenessMol, WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
         NTdebug('done with _processComplCheck')
     #end def
 
-def runWattos(project, tmp = None):
+def runWattos(project, tmp = None, parseOnly=False):
     """
         Run and import the wattos results per model.
         All models in the ensemble of the molecule will be checked.
@@ -322,57 +322,59 @@ def runWattos(project, tmp = None):
         return None
 
     wattosDir = project.mkdir(molecule.name, project.moleculeDirectories.wattos)
-    fileName = 'project.str'
-    fullname = os.path.join(os.path.curdir, wattosDir, fileName)
-    fullname = os.path.abspath(fullname)
 
-    if os.path.exists(fullname):
-        if not os.unlink(fullname):
-            NTmessage("Removing existing file: %s" % fullname)
-        else:
-            NTerror("Failed to remove existing file: %s" % fullname)
+    if not parseOnly:
+        fileName = 'project.str'
+        fullname = os.path.join(os.path.curdir, wattosDir, fileName)
+        fullname = os.path.abspath(fullname)
+
+        if os.path.exists(fullname):
+            if not os.unlink(fullname):
+                NTmessage("Removing existing file: %s" % fullname)
+            else:
+                NTerror("Failed to remove existing file: %s" % fullname)
+                return None
+
+        nmrStar = NmrStar(project)
+        if not nmrStar:
+            NTerror("Failed to create NmrStar(project)")
             return None
 
-    nmrStar = NmrStar(project)
-    if not nmrStar:
-        NTerror("Failed to create NmrStar(project)")
-        return None
+        if not nmrStar.toNmrStarFile(fullname):
+            NTmessage("Failed to nmrStar.toNmrStarFile (fine if there wasn't a CCPN project to start with)")
+            return None
 
-    if not nmrStar.toNmrStarFile(fullname):
-        NTmessage("Failed to nmrStar.toNmrStarFile (fine if there wasn't a CCPN project to start with)")
-        return None
+        if not os.path.exists(fullname):
+            NTerror("Failed to create file [%s] in nmrStar.toNmrStarFile" % fullname)
+            return None
 
-    if not os.path.exists(fullname):
-        NTerror("Failed to create file in nmrStar.toNmrStarFile")
-        return None
+        scriptComplete = wattos.scriptTemplate
+        scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
+        scriptComplete = scriptComplete.replace("VERBOSITY", `cing.verbosity`)
 
-    scriptComplete = wattos.scriptTemplate
-    scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
-    scriptComplete = scriptComplete.replace("VERBOSITY", `cing.verbosity`)
+        # Let's ask the user to be nice and not kill us
+        # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
+        timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
+        timeRunEstimatedInSecondsStr = sprintf("%4.0f", timeRunEstimated * 60)
+        NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
+        scriptFileName = "wattos.script"
+        scriptFullFileName = os.path.join(wattosDir, scriptFileName)
+        open(scriptFullFileName, "w").write(scriptComplete)
+    #    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+        wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+        logFileName = "wattos_compl.log"
+        wattosProgram = ExecuteProgram(wattosPath, rootPath = wattosDir,
+                                 redirectOutputToFile = logFileName,
+                                 redirectInputFromFile = scriptFileName)
+        # The last argument becomes a necessary redirection into fouling Wattos into
+        # thinking it's running interactively.
+        now = time.time()
+        wattosExitCode = wattosProgram()
 
-    # Let's ask the user to be nice and not kill us
-    # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
-    timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
-    timeRunEstimatedInSecondsStr = sprintf("%4.0f", timeRunEstimated * 60)
-    NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
-    scriptFileName = "wattos.script"
-    scriptFullFileName = os.path.join(wattosDir, scriptFileName)
-    open(scriptFullFileName, "w").write(scriptComplete)
-#    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
-    wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
-    logFileName = "wattos_compl.log"
-    wattosProgram = ExecuteProgram(wattosPath, rootPath = wattosDir,
-                             redirectOutputToFile = logFileName,
-                             redirectInputFromFile = scriptFileName)
-    # The last argument becomes a necessary redirection into fouling Wattos into
-    # thinking it's running interactively.
-    now = time.time()
-    wattosExitCode = wattosProgram()
-
-    NTmessage("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
-    if wattosExitCode:
-        NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
-        return None
+        NTmessage("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+        if wattosExitCode:
+            NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
+            return None
 
     fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
     if not os.path.exists(fullname):
@@ -385,7 +387,7 @@ def runWattos(project, tmp = None):
         return None
 
 
-    pathOutSurplus = os.path.join(path, 'wattos_surplus_chk_summary.txt')
+    pathOutSurplus = os.path.join(path, wattos.SURPLUS_CHECK_FILE_NAME_BASE + '_summary.txt')
     if not os.path.exists(pathOutSurplus): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathOutSurplus))
         return True
@@ -432,7 +434,7 @@ def runWattos(project, tmp = None):
     completenessMolStr = NaNstring
     completenessMol = molecule.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
     if completenessMol:
-        completenessMolStr = val2Str(completenessMol[0], "%.2f")
+        completenessMolStr = val2Str(completenessMol, "%.2f")
     complStatement = 'Overall NOE completeness is %s percent\n' % completenessMolStr
 
     summary = '\n\n'.join([surplusSummary, complStatement])

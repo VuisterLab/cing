@@ -82,6 +82,7 @@ import sys
 #dbase.close()
 
 def runCingChecks( project, ranges=None ):
+    """This set of routines needs to be run after a project is restored."""
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints( toFile=True)
@@ -122,7 +123,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
             project.runProcheck(ranges=ranges, parseOnly=parseOnly)
     if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
         if doWattos:
-            project.runWattos()
+            project.runWattos(parseOnly=parseOnly)
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
@@ -536,9 +537,9 @@ def summary( project, toFile = True ):
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         NTmessage( '==> summary, output to %s', fname)
-        NTdebug(" msg: " + msg)
+#        NTdebug(" msg: " + msg)
         msgClean = removePreTagLines( msg )
-        NTdebug(" msgClean: " + msgClean)
+#        NTdebug(" msgClean: " + msgClean)
         fprintf( fp, msgClean )
         fp.close()
     #end if
@@ -1155,16 +1156,11 @@ def moleculeValidateAssignments( molecule  ):
     # Keep track of what assignments are done and don't complain about specific ones missing
     # if there are none at all assigned of that type.
     # Just initialize the ones that are checked below; not 1H or P etc.; GV added 1H anyway
-    hasAssignment = {'1H': False, '13C': False, '15N': False}
-    for atm in molecule.allAtoms():
-#        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
-        if atm.isAssigned():
-            # spintype is not available for pseudos etc. perhaps
-            spinType = getDeepByKeys(atm, 'db', 'spinType')
-#            NTdebug("spinType: %s" % spinType)
-            if spinType:
-                hasAssignment[spinType] = True
-#    hasAssignment = {'13C': True, '15N': True}
+    assignmentCountMap = molecule.getAssignmentCountMap()
+    hasAssignment = {}
+    for key in assignmentCountMap.keys():
+        hasAssignment[key] = assignmentCountMap[key] > 0
+
     NTdetail("Molecule.validateAssignments: Found assignments for the following spin types: %s" % hasAssignment.keys())
 
     for atm in molecule.allAtoms():

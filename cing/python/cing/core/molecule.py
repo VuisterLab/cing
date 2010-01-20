@@ -19,6 +19,7 @@ from cing.Libs.NTutils import angle3Dopt
 from cing.Libs.NTutils import asci2list
 from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import list2asci
@@ -34,6 +35,9 @@ from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.Libs.html import addPreTagLines
+from cing.PluginCode.required.reqDssp import DSSP_H
+from cing.PluginCode.required.reqDssp import DSSP_S
+from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.core.ROGscore import ROGscore
 from cing.core.constants import COLOR_ORANGE
 from cing.core.constants import CYANA
@@ -76,8 +80,65 @@ NTmolParameters = NTdict(
 )
 
 dots = '-----------'
+
+chothiaClassA = 'a'
+chothiaClassB = 'b'
+chothiaClassAB = 'a/b'
+chothiaClassC = 'c' # only coil
+mapChothia_class2Int = {chothiaClassA: 0, chothiaClassB : 1, chothiaClassAB : 2, chothiaClassC : 3, None: None}
+
+def cothiaClassInt(cothiaClass):
+    """Integer value for fast lookup in db. Return None if class parameter is None"""
+    return mapChothia_class2Int[ cothiaClass ]
+
+def countDsspSecStructConsensus(resList):
+    """Determine if molecule has at least one of alpha or beta protein regions.
+    Molecule may contain other types of macromolecules than protein.
+    Return None if DSSP wasn't run or no amino acids are present.
+    """
+    countA = 0
+    countB = 0
+    countC = 0
+    for res in resList:
+        r = getDsspSecStructConsensus( res )
+        if r == DSSP_H:
+            countA += 1
+        elif r == DSSP_S:
+            countB += 1
+        else:
+            countC += 1
+    return countA, countB, countC
+
+def cothiaClass(resList):
+    """Determine if molecule has at least one of alpha or beta protein regions.
+    Molecule may contain other types of macromolecules than protein.
+    Return None if DSSP wasn't run or no amino acids are present.
+    """
+    countA, countB, countC = countDsspSecStructConsensus(resList)
+    if countA:
+        if countB:
+            return chothiaClassAB
+        else:
+            return chothiaClassA
+    elif countB:
+        return chothiaClassB
+
+    # There is a difference between Coil and None.
+    if countC:
+        return chothiaClassC
+
+    return None
+
+class ResidueList():
+    def countDsspSecStructConsensus(self):
+        return countDsspSecStructConsensus(self.allResidues())
+    def cothiaClass(self):
+        return cothiaClass(self.allResidues())
+    def cothiaClassInt(self):
+        return cothiaClassInt(cothiaClass(self.allResidues()))
+
 #==============================================================================
-class Molecule( NTtree ):
+class Molecule( NTtree, ResidueList ):
     """
     Molecule class: defines the holder for molecule items.
 
@@ -196,6 +257,19 @@ class Molecule( NTtree ):
         return str(self)
     #end def
 
+    def getAssignmentCountMap(self):
+        """Returns dictionary by isotope and overall keys with boolean values."""
+        assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, 'overall': 0}
+        for atm in self.allAtoms():
+    #        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
+            if atm.isAssigned():
+                # spintype is not available for pseudos etc. perhaps
+                spinType = getDeepByKeys(atm, 'db', 'spinType')
+    #            NTdebug("spinType: %s" % spinType)
+                if spinType:
+                    assignmentCountMap[spinType] += 1
+                    assignmentCountMap['overall'] += 1
+        return assignmentCountMap
 
     def setAllChildrenByKey(self, key, value):
         "Set chain,res, and atom children's keys to value"
@@ -1508,6 +1582,10 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
+    def molTypeInt(self):
+        """Integer value for fast lookup in db"""
+        return self.mapColorString2Int[ self.colorLabel ]
+
     def selectFitAtoms( self, ranges=None, backboneOnly=True, includeProtons = False ):
         """
         Select the atoms to be fitted
@@ -2095,7 +2173,7 @@ class RmsdResult( NTdict ):
 
 
 
-class Chain( NTtree ):
+class Chain( NTtree, ResidueList ):
     """
 -------------------------------------------------------------------------------
 Chain class: defines chain properties and methods
@@ -2155,6 +2233,7 @@ Chain class: defines chain properties and methods
     def isNullValue(id):
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
+
 
     def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, FiveTerminal=False, ThreeTerminal=False, **kwds ):
         if self.has_key(resNum):
@@ -2238,6 +2317,25 @@ Chain class: defines chain properties and methods
         #end for
         return result
     #end def
+
+    def countDsspSecStructConsensus(self):
+        """Determine if molecule has at least one of alpha or beta protein regions.
+        Molecule may contain other types of macromolecules than protein.
+        Return None if DSSP wasn't run or no amino acids are present.
+        """
+        countA = 0
+        countB = 0
+        countC = 0
+        for res in self.allResidues():
+            r = getDsspSecStructConsensus( res )
+            if r == DSSP_H:
+                countA += 1
+            elif r == DSSP_S:
+                countB += 1
+            else:
+                countC += 1
+        return countA, countB, countC
+
 
     def atomsWithProperties(self, *properties ):
         """

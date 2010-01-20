@@ -25,7 +25,7 @@ extraArgList = (inputDir)
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
-                    processes_max = 2,
+                    processes_max = 8,
                     delay_between_submitting_jobs = 1,
                     max_time_to_wait = 60 * 6,
                     START_ENTRY_ID = 21,

@@ -7,51 +7,30 @@
 --     Protein Biophysics, Radboud University Nijmegen, the Netherlands.
 --
 -- Notes:
--- * Setup commands are specific for database type: MySQL
+-- * Setup commands are specific for database type: PostgreSQL
 -- * Run by command like:
--- * mysql -u nrgcing1 -p4I4KMS nrgcing < $CINGROOT/scripts/sql/createNRG-CING.sql
+-- * psql --quiet nrgcing nrgcing1 < $CINGROOT/scripts/sql/createNRG-CING_psql.sql
 -- no output means no errors.
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
 -- Remove previous copies in bottom up order.
 -- This will automatically drop the index created too.
-DROP TABLE IF EXISTS author_list;
-DROP TABLE IF EXISTS author;
 DROP TABLE IF EXISTS atom;
 DROP TABLE IF EXISTS residue;
 DROP TABLE IF EXISTS chain;
 DROP TABLE IF EXISTS entry;
 
--- author (stored only once)
-CREATE TABLE author
-(
-    author_id                      INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name                           VARCHAR(255), -- 'Spronk, C.A.E.M.'
---   cing
-    rog                            INT DEFAULT NULL
-) TYPE = INNODB;
-CREATE INDEX author_001 ON author (author_id);
-CREATE INDEX author_002 ON author (name);
-
--- author list
-CREATE TABLE author_list
-(
-    author_list_id                 INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
---    entry_id                       INT              NOT NULL,
-    author_id                      INT              NOT NULL,
---    FOREIGN KEY (entry_id)         REFERENCES entry (entry_id) ON DELETE CASCADE,
-    FOREIGN KEY (author_id)        REFERENCES author (author_id) -- do not cascade
-) TYPE = INNODB;
-CREATE INDEX author_list_001 ON author_list (author_list_id);
--- CREATE INDEX author_list_002 ON author_list (entry_id);
-CREATE INDEX author_list_003 ON author_list (author_id);
+--CREATE TABLE entry
+--(
+--    entry_id                       SERIAL UNIQUE,
+--    name                           VARCHAR(255)
+--)
 
 -- entry
 CREATE TABLE entry
 (
-    entry_id                       INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    author_list_id                 INT,
+    entry_id                       SERIAL UNIQUE,
     name                           VARCHAR(255),
     bmrb_id                        INT,
     casd_id                        CHAR(255),
@@ -113,10 +92,9 @@ CREATE TABLE entry
 --   wattos
     noe_compl4                     FLOAT DEFAULT NULL,
 
-    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
+--    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
     rog                            INT DEFAULT NULL
---    FOREIGN KEY (author_list_id) REFERENCES author_list (author_list_id) ON DELETE CASCADE
-) TYPE = INNODB;
+);
 CREATE INDEX entry_001 ON entry (bmrb_id);
 CREATE INDEX entry_002 ON entry (pdb_id);
 
@@ -129,22 +107,23 @@ CREATE INDEX entry_002 ON entry (pdb_id);
 
 
 --    mol_type
+DROP TABLE IF EXISTS chain;
 CREATE TABLE chain
 (
-    chain_id                        INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    entry_id                        INT             NOT NULL,
+    chain_id                        SERIAL UNIQUE,
+    entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
     chothia_class                   INT DEFAULT NULL,
     rog                             INT DEFAULT NULL,
     FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
-) TYPE = INNODB;
+);
 -- Some common queries are helped by these indexes..
 CREATE INDEX chain_001 ON chain (entry_id);
 
 -- residue
 CREATE TABLE residue
 (
-    residue_id                     INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    residue_id                     SERIAL UNIQUE,
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     number                         INT              NOT NULL,
@@ -210,7 +189,7 @@ CREATE TABLE residue
 
     FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
-) TYPE = INNODB;
+);
 CREATE INDEX residue_001 ON residue (chain_id);
 CREATE INDEX residue_002 ON residue (entry_id);
 CREATE INDEX residue_003 ON residue (number);
@@ -222,7 +201,7 @@ CREATE INDEX residue_006 ON residue (dis_c5_viol);
 -- atom
 CREATE TABLE atom
 (
-    atom_id                        INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    atom_id                        SERIAL UNIQUE,
     residue_id                     INT              NOT NULL,
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,
@@ -242,10 +221,9 @@ CREATE TABLE atom
     FOREIGN KEY (residue_id)        REFERENCES residue (residue_id) ON DELETE CASCADE,
     FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
-) TYPE = INNODB;
-CREATE INDEX atom_001 ON atom (atom_id);
-CREATE INDEX atom_002 ON atom (residue_id);
-CREATE INDEX atom_003 ON atom (chain_id);
-CREATE INDEX atom_004 ON atom (entry_id);
-CREATE INDEX atom_005 ON atom (name);
+);
+CREATE INDEX atom_001 ON atom (residue_id);
+CREATE INDEX atom_002 ON atom (chain_id);
+CREATE INDEX atom_003 ON atom (entry_id);
+CREATE INDEX atom_004 ON atom (name);
 

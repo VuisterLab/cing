@@ -1,10 +1,7 @@
 from cing import verbosityWarning
 from cing.Libs.NTutils import NTdebug, NTdict, NTerror, NTmessage
-from cing.PluginCode.required.reqOther import SQL_STR
-from cing.PluginCode.required.reqWhatif import OMECHK_STR
-from cing.core.ROGscore import rogScoreStr
-from cing.core.constants import DR_STR, VIOL1_STR, VIOL3_STR, VIOL5_STR
 from cing.Libs.NTutils import NTexception
+from cing.PluginCode.required.reqOther import SQL_STR
 import cing
 import warnings
 
@@ -52,6 +49,8 @@ class cgenericSql(NTdict):
 
     def connect(self):
         "Return True on error"
+#        create_engine('oracle://PDBe:password@cmbiora/PDBE') for oracle driver call.
+
         self.engine = create_engine('mysql://%s/%s?user=%s&unix_socket=%s&passwd=%s' % (self.host,
              self.db,
              self.user,
@@ -108,34 +107,17 @@ class csqlAlchemy(cgenericSql):
         cgenericSql.__init__(self, host = host, user = user, passwd = passwd, unix_socket = unix_socket, db = db,echo=echo)
         NTdebug("Initialized csqlAlchemy")
         # be explicit here to take advantage of code analysis.
-        self.tableNameList = ['entry', 'chain', 'residue' ]
+        self.tableNameList = ['entry', 'chain', 'residue', 'atom', 'author', 'author_list' ]
         self.entry = None
         self.chain = None
         self.residue = None
+        self.atom = None
+        self.author = None
+        self.author_list = None
 
         self.levelIdResidue     = "residue"  # mirrors WI setup.
         self.levelIdAtom        = "atom"
 
-        self.mapCing = NTdict()
-        """Maps a CING tuple (level_id, key1,,,keyN) to a SQL tuple (table_name, column_name)"""
-        # CING
-        self.mapCing[ ( self.levelIdResidue, rogScoreStr, OMECHK_STR ) ] = ( self.levelIdResidue, 'omega_dev_av_all' )
-        self.mapCing[ ( self.levelIdResidue, DR_STR, VIOL1_STR ) ] = ( self.levelIdResidue, 'dis_c1_viol' )
-        self.mapCing[ ( self.levelIdResidue, DR_STR, VIOL3_STR ) ] = ( self.levelIdResidue, 'dis_c3_viol' )
-        self.mapCing[ ( self.levelIdResidue, DR_STR, VIOL5_STR ) ] = ( self.levelIdResidue, 'dis_c5_viol' )
-
-        # WHAT IF
-#        wiChkIdList = NTzap(Whatif.nameDefs,0)
-#        for checkId in wiChkIdList:
-#            columnName = 'wi_' + checkId
-#            self.mapCing[ ( self.levelIdResidue, WHATIF_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
-#
-#        # PROCHECK
-#        pcChkIdList = ( gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR )
-#        for checkId in pcChkIdList:
-#            columnName = 'pc_' + checkId
-#            self.mapCing[ ( self.levelIdResidue, PROCHECK_STR, checkId, VALUE_LIST_STR ) ] = ( self.levelIdResidue, columnName )
-#        NTdebug("mapCing: %s" % self.mapCing)
     def autoload(self):
         """Return True on error"""
         cgenericSql.autoload(self)

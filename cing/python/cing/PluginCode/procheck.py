@@ -36,6 +36,7 @@ from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import MAX_PROCHECK_NMR_MODELS
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
+from cing.PluginCode.required.reqProcheck import gf_LIST_STR
 from cing.PluginCode.required.reqProcheck import to3StateUpper
 from cing.core.constants import AQUA
 from cing.core.molecule import dots
@@ -54,7 +55,7 @@ if True: # block
         NTdebug("Missing procheck_nmr which is a dep for procheck")
         useModule = False
     if not useModule:
-        raise ImportWarning('procheck')    
+        raise ImportWarning('procheck')
 #    NTmessage('Using procheck')
 
 #Trying to accommodate at least
@@ -175,7 +176,7 @@ consensus:           %(consensus)s"""
                        )
 #end class
 
-class Procheck:
+class Procheck( NTdict ):
     """
     From Jurgen:
 
@@ -294,7 +295,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
     rangesFileName = 'ranges.txt'
     procheckScript = 'procheck_nmr.scr'
 
-    def __init__(self, project):
+    def __init__(self, project, **kwds):
+        NTdict.__init__( self, __CLASS__ = PROCHECK_STR, **kwds )
         """
         Procheck class allows running procheck_nmr and parsing of results
         """
@@ -328,11 +330,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         Return True on error (None on success; Python default)
         """
         #
-        
+
         if self.molecule.modelCount == 0:
             NTwarning('Procheck run: no models for "%s"', self.molecule)
             return
-        
+
         # It's actually important not to write any to Procheck then because
         # there might be more than 200 stretches which upsets PC.
         NTmessage('==> Running procheck_nmr')
@@ -508,11 +510,10 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         # reset the procheck dictionary of each residue
         for res in self.molecule.allResidues():
-            if res.has_key('procheck'):
-                del(res['procheck'])
+            if res.has_key(PROCHECK_STR):
+                del(res[PROCHECK_STR])
             res.procheck = ProcheckResidueResult(res)
         #end for
-
 
         for i in range(1, modelCount+1):
             modelCountStr = "%03d" % i
@@ -531,6 +532,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             if not os.path.exists(path):
                 NTerror('Procheck.parseResult: file "%s" not found', path)
                 return True
+
 
             for line in AwkLike(path, minLength = 64, commentString = "#"):
 #                NTdebug("working on line: %s" % line.dollar[0])
@@ -552,10 +554,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                         continue
                     # Insert for key: "field" if missing an empty  NTlist.
                     residue.procheck.setdefault(field, NTlist())
+#                    NTdebug( "For residue %s field %s found value %s" % ( residue, field, value ) )
                     residue.procheck[field].append(value)
 #                    NTdebug("field %s has values: %s" % ( field, residue.procheck[field]))
-                #end for
-            #end for
+                #end for result
+            #end for line
         #end for
 
         path = os.path.join(self.rootPath, '%s.edt' % self.molecule.name)
@@ -584,7 +587,19 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 residue.procheck[field] = value
             #end for
         #end for
-
+        for field in gf_LIST_STR:
+            resultList = NTlist()
+            for residue in self.molecule.allResidues():
+                value = residue.getDeepByKeys(PROCHECK_STR, field)
+#                NTdebug( "For residue %s field %s found value %s" % ( residue, field, value ) )
+                resultList.append(  value )
+            averageTuple = resultList.average()
+#            NTdebug( "resultList %s" % resultList )
+            # Nones will be ignored. Empty list will return )None,,)
+            if averageTuple: # get average only
+                self.molecule[PROCHECK_STR][field] = averageTuple[0]
+            else:
+                NTwarning("No average over molecule obtained in procheck for %s" % field)
         # summary
         path = os.path.join(self.rootPath, '%s.sum' % self.molecule.name)
         if not os.path.exists(path):
@@ -646,19 +661,21 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     if project.molecule.modelCount == 0:
         NTwarning('runProcheck: no models for "%s"', project.molecule)
         return
-    
-    if not project.molecule.hasAminoAcid():    
+
+    if not project.molecule.hasAminoAcid():
 #    if len(project.molecule.residuesWithProperties('protein')) == 0:
            NTdebug("Skipping procheck as there is no protein in the current molecule")
            return
-    if project.molecule.has_key('procheck'):
-        del(project.molecule.procheck)
+    if project.molecule.has_key(PROCHECK_STR):
+        del(project.molecule[PROCHECK_STR])
     #end if
 
     pcheck = Procheck(project)
     if not pcheck:
         NTerror("runProcheck: Failed to get procheck instance of project")
         return True
+
+    project.molecule[PROCHECK_STR] = pcheck
 
     if not parseOnly:
         if not pcheck.run(ranges=ranges,createPlots=createPlots, runAqua=runAqua):
@@ -668,9 +685,7 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
         pcheck.ranges = ranges
         pcheck.parseResult()
 
-    project.molecule.procheck = pcheck
-
-    return project.molecule.procheck
+    return project.molecule[PROCHECK_STR]
 #end def
 
 def restoreProcheck( project, tmp=None ):

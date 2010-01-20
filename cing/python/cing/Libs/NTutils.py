@@ -128,6 +128,18 @@ class NTlist(list, Lister):
         pydoc.doc(self, title='%s')
     #end def
 
+    def lenRecursive(self):
+        """Recursively walk thru any children elements that are also of type NTlist
+        [ [1], [2,3] ] will give a length of 3
+        """
+        count = 0
+        for element in self:
+            if isinstance(element, NTlist):
+                count += element.lenRecursive()
+            else:
+                count += 1
+        return count
+
     def statsFloat(self):
         """Return standard statistics in case the data is interpreted as floats.
         Assumes numeric list, None elements ignored.
@@ -1459,7 +1471,35 @@ class NTdict(dict, Lister):
         return None
 
 
+    def getDeepAvgByKeys(self, *keyList):
+        """Return first item only of tuple with av, sd, n for NTlist if found
+        otherwise return None
+        """
+        result = self.getDeepByKeys(*keyList)
+        if result == None:
+#            NTdebug("None returned by getDeepByKeys() in getDeepAvgByKeys")
+            return None
+        if not isinstance(result, NTlist):
+            NTerror("result is not an instance of NTlist so it can't be averaged")
+            return None
+        r = result.average()
+        if r == None:
+            NTdebug("None returned by average() in getDeepAvgByKeys")
+            return None
+        return r[0]
 
+    def getDeepFirstByKeys(self, *keyList):
+        """Return first item only if found otherwise return None"""
+        result = self.getDeepByKeys(*keyList)
+        if result == None:
+            return None
+        if not isinstance(result, list):
+            NTerror("result is not an instance of NTlist in getDeepFirstByKeys.")
+            return None
+        if not len(result):
+            NTerror("result is empty NTlist in getDeepFirstByKeys.")
+            return None
+        return result[0]
 
 
     def getdefault(self, key, defaultKey):
