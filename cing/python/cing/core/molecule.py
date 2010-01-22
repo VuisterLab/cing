@@ -2871,6 +2871,7 @@ class Dihedral( NTlist ):
 
         cav,cv,_n = self.cAverage(min=self.range[0],max=self.range[1])
 
+        self.limit(self.range[0], self.range[1])
         return cav,cv
     #end def
 #end class

@@ -128,6 +128,14 @@ if True:
     histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
     dbase_file.close()
 
+if False:
+    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db.dat' )
+    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+    dbaseTemp = cPickle.load(dbase_file)
+    histd1d2BySsAndResType         = dbaseTemp[ 'histd1d2BySsAndResType' ]
+    histd1d2BySsAndCombinedResType = dbaseTemp[ 'histd1d2BySsAndCombinedResType' ]
+    dbase_file.close()
+
 # Disable when debugged:
 if False:
     histRamaCombined         = None

@@ -1,3 +1,6 @@
+-- Entry count 62635 on Thu Jan 21 10:41:06 CET 2010
+SELECT count(*) FROM brief_summary;
+
 SELECT * FROM information_schema.tables
 where table_schema = 'pdbj' AND table_name like 'pdbx_SG_project%'
 limit 200;
@@ -64,7 +67,7 @@ AND s.docid NOT IN ( select docid from "//pdbx_SG_project/initial_of_center")
 group by primary_citation_author_name
 order by p2.val asc
 --order by count(s.pdbid) desc
-limit 100000;
+limit 100;
 
 
 -- Get NMR entries NOT from SG projects

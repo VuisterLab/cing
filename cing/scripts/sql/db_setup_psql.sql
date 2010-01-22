@@ -1,47 +1,31 @@
 -- STEP BY STEP PROCEDURE FOR SETTING UP NEW DB
 
--- login with root password
 -- psql
--- mysql -u root  mysql
--- The db isn't available anywhere but on the host itself so this posses no security problem.
+-- Todo: When the db is available anywhere but on the host itself this is a security problem.
 
 -- Notes:
     --  # no escapes for any char but the first.
     -- no backslash escape '\' needed when using double quotes in windows.
-
-	create role nrgcing1 LOGIN CREATEDB SUPERUSER;
-	alter database nrgcing owner to nrgcing1;
-
-Connect as jd unix user:
-	createdb nrgcing
-	psql -l
-
-
 -- Getting started help:
-\? from the psql monitor
-\l list db
-\dt' list tables
-\d atom list a table
+--\? from the psql monitor
+--\l list db
+--\dt' list tables
+--\d atom list a table
 
-
+--create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+--alter database nrgcing owner to nrgcing1;
 
 -- create it
 create database nrgcing;
 create database pdbmlplus;
 
+-- now from command line:
+createlang plpgsql nrgcing
+createlang plpgsql pdbmlplus
 
 -- creating the account
-use mysql;
-CREATE USER 'nrgcing1'@'localhost' ;
-SET PASSWORD FOR 'nrgcing1'@'localhost' = PASSWORD('4I4KMS');
-update user set file_priv='Y' where user='nrgcing1';
-
-select r.rog, count(*) from residue r
-group by r.rog;
-
--- not sure where the next line belongs:
-use nrgcing;
-GRANT ALL ON * TO 'nrgcing1';
+create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+create role pdbj LOGIN CREATEDB SUPERUSER;
 
 -- GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost.localdomain' IDENTIFIED BY 'slavepass';
 
