@@ -160,6 +160,11 @@ plotParameters.CHI2.xlabelLat = '$\chi 2$'
 plotParameters.CHI3 = plotParameters.dihedralDefault.copy()
 plotParameters.CHI3.xlabelLat = '$\chi 3$'
 
+plotParameters.Cb4N = plotParameters.dihedralDefault.copy()
+plotParameters.Cb4N.xlabelLat = '$Cb4N$'
+
+plotParameters.Cb4C = plotParameters.dihedralDefault.copy()
+plotParameters.Cb4C.xlabelLat = '$Cb4C$'
 
 
 # Define globals
