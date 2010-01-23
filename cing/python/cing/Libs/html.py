@@ -34,9 +34,11 @@ from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import list2asci #@UnusedImport
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
+from cing.Libs.find import find
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import wattosPlotList
+from cing.PluginCode.required.reqWhatif import BBCCHK_STR
 from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import RAMCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
@@ -45,15 +47,17 @@ from cing.PluginCode.required.reqWhatif import histJaninBySsAndCombinedResType
 from cing.PluginCode.required.reqWhatif import histJaninBySsAndResType
 from cing.PluginCode.required.reqWhatif import histRamaBySsAndCombinedResType
 from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
+from cing.PluginCode.required.reqWhatif import histd1d2BySsAndCombinedResType
+from cing.PluginCode.required.reqWhatif import histd1d2BySsAndResType
 from cing.PluginCode.required.reqWhatif import wiPlotList
+from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
 from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
 from cing.core.constants import PDB
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
-from cing.PluginCode.required.reqX3dna import X3DNA_STR
-from cing.Libs.find import find
 import os
 import shutil
 
@@ -179,7 +183,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 
 
 def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
-                      plotTitle = None, htmlOnly=False ):
+                      plotTitle = None, plotCav = True, htmlOnly=False ):
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
@@ -187,6 +191,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
        Note that residue can also be a list of residues. A single plot will
        be created for all together were the appropriate background histograms
        will be picked.
+
+       plotCav determines if the circular varience average is plotted.
 
        Return None on error or ps on success.
     '''
@@ -208,11 +214,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
     if htmlOnly:
         return True # indicating success
@@ -224,7 +230,6 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             plotTitle = residue._Cname(2)
         else:
             plotTitle = '%d residues'
-
 
 
 #    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
@@ -249,8 +254,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     elif dihedralName1=='CHI1' and dihedralName2=='CHI2':
         histBySsAndCombinedResType = histJaninBySsAndCombinedResType
         histBySsAndResType         = histJaninBySsAndResType
+    elif dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
+        histBySsAndCombinedResType = histd1d2BySsAndCombinedResType
+        histBySsAndResType         = histd1d2BySsAndResType
     else:
-        NTcodeerror("makeDihedralPlot called for non Rama/Janin")
+        NTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
         return None
 
     histList = []
@@ -315,10 +323,17 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
 
+        if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
+            bb = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR, 0)
+            NTdebug('BBCCHK %f' % bb)
+
+            if bb < BBCCHK_CUTOFF:
+                myPoint.pointColor='red'
+
         plot.points( zip( d1, d2 ), attributes=myPoint )
 
         # Plot the cav point for single residue plots.
-        if isSingleResiduePlot:
+        if isSingleResiduePlot and plotCav:
             myPoint = myPoint.copy()
             myPoint.pointSize = 8.0
             myPoint.pointType = 'circle'

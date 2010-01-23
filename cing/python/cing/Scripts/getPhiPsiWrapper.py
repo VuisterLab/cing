@@ -31,12 +31,12 @@ def main():
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
     entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
 
-    START_ENTRY_ID                 =2 # default 0
-    MAX_ENTRIES_TODO               =10 # default a ridiculously large number like 999999
+    START_ENTRY_ID                 =12 # default 0
+    MAX_ENTRIES_TODO               =2 # default a ridiculously large number like 999999
 
     doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,
                         max_time_to_wait = 240, # 1gkp  took over 120
-                        processes_max                  = 1,   # default 3
+                        processes_max                  = 8,   # default 3
                         START_ENTRY_ID                 = START_ENTRY_ID, # default 0
                         MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO # default a ridiculously large number like 999999
                         )

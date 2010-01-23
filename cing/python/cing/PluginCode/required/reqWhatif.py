@@ -128,7 +128,7 @@ if True:
     histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
     dbase_file.close()
 
-if False:
+if True:
     dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db.dat' )
     dbase_file = open(dbase_file_abs_name, 'rb') # read binary
     dbaseTemp = cPickle.load(dbase_file)
