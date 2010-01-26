@@ -4,10 +4,10 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
 from cing import cingPythonDir
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
-from cing.Libs.NTutils import NTcodeerror
 import os
 import urllib
 import urllib2
@@ -95,6 +95,7 @@ def getBmrbNmrGridEntriesDOCRDone():
 def writeEntryListToFile(fileName, entryList):
     "Returns True on failure"
     csvText = toCsv(entryList)
+    NTdebug("entryList: [%s]" % entryList)
     if not csvText:
         NTerror("Failed to get CSV for %s" % entryList)
         return True
@@ -113,8 +114,9 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
             inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR.xml')
     else:
         if mustHaveExperimentalNmrData:
-            NTcodeerror("Can't query for onlyNmr = True AND mustHaveExperimentalNmrData = True")
-            return
+            inputFile = os.path.join(dir_name, 'RESTqueryPDB_exp.xml')
+#            NTcodeerror("Can't query for onlyNmr = True AND mustHaveExperimentalNmrData = True")
+#            return
         else:
             inputFile = os.path.join(dir_name, 'RESTqueryPDB.xml')
 
@@ -124,10 +126,12 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
 #    NTdebug("querying...")
     req = urllib2.Request(url=rpcUrl, data=queryText)
     f = urllib2.urlopen(req)
-    result = f.readlines()
+    result = []
+    for record in f.readlines():
+        result.append(record.rstrip().lower())
 
     if not result:
-        NTerror("Failed to save file to server")
+        NTerror("Failed to read file from server")
         return
 #    NTdebug("Done successfully.")
     return result

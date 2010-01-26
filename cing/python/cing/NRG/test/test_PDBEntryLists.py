@@ -41,7 +41,7 @@ class AllChecks(TestCase):
             self.assertTrue(l)
             self.assertTrue(len(l) > 5000) # Fails if NRG is down or corrupted.
 
-        if True:
+        if False:
             # fast check because there are only a few.
             nmrSolidExpList = getPdbEntries(onlySolidState = True)
             self.assertTrue(nmrSolidExpList)
@@ -65,6 +65,13 @@ class AllChecks(TestCase):
             self.assertTrue(pdbList)
             self.assertTrue(len(pdbList) >= 61248)
             NTdebug("getPdbEntries ALL: %d" % (len(pdbList)))
+
+        if True:
+            pdbList = getPdbEntries(mustHaveExperimentalNmrData = True)
+            self.assertTrue(pdbList)
+            self.assertTrue(len(pdbList) >= 1)
+            NTdebug("getPdbEntries exp: %d" % (len(pdbList)))
+#            NTdebug("%s" % pdbList)
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

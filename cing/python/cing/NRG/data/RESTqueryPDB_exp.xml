@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orgPdbCompositeQuery version="1.0">
+ <queryRefinement>
+  <queryRefinementLevel>0</queryRefinementLevel>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLUTION NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>376</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLUTION NMR</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>1</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>2</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>X-RAY</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>3</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>ELECTRON MICROSCOPY</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>4</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>ELECTRON CRYSTALLOGRAPHY</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>5</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>FIBER DIFFRACTION</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>6</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>NEUTRON DIFFRACTION</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>7</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLUTION SCATTERING</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>8</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>HYBRID</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>9</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>OTHER</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>7</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR, Has Experimental Data=Y</description>
+    <runtimeMilliseconds>18</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLUTION SCATTERING</mvStructure.expMethod.value>
+    <mvStructure.hasExperimentalData.value>Y</mvStructure.hasExperimentalData.value>
+  </orgPdbQuery>
+ </queryRefinement>
+</orgPdbCompositeQuery>

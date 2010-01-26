@@ -35,9 +35,6 @@ CREATE TABLE entry
     bmrb_id                        INT,
     casd_id                        CHAR(255),
     pdb_id                         CHAR(4),
-    dep_date                       DATE,
-    release_date                                   DATE,
-    last_rev_date                                  DATE,
     is_solid                       BOOLEAN DEFAULT NULL, -- ssnmr
     is_paramagnetic                BOOLEAN DEFAULT NULL, -- paramagnetic.
     is_membrane                    BOOLEAN DEFAULT NULL, -- membrane
