@@ -1,5 +1,8 @@
 Follow pdbj_README.txt in this directory from:
-http://pdbjr0.pdbj.org/~akinjo/mine/README.txt
+
+ftp://ftp.pdbj.org/mine/00README.txt
+See in directory pdbj_mine parallel to this file.
+
 For some reason on stella it was fine to set the max_locks_per_transaction to 256 whereas on nmr
 it was an error and prevented the server to start up.
 
@@ -74,6 +77,7 @@ Connect as jd unix user:
 
 - add PGDATA to exclusion list of spotlight and TM.
 - Create file /etc/sysctl.conf with 1G (100 Mb now) and reboot:
+NOTE THIS BELOW CRASHED TOMCAT JAVA ENVIRONMENT. SWITCHED BACK TO DEFAULT SETTINGS.
 From: http://serverfault.com/questions/10226/how-to-set-the-shmmax-parameter-on-mac-os-x
 kern.sysv.shmmax=524288000
 kern.sysv.shmmin=1
@@ -84,41 +88,23 @@ kern.sysv.shmall=131072000
 kern.sysv.maxproc=2048
 kern.maxprocperuid=512
 
-Or do on line but settings will not persist.
-jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=104857600
-kern.sysv.shmmax: 4194304 -> 104857600
-jd:nmr/~/ sudo su
-sh-3.2# sysctl -w kern.sysv.shmmin=1
-kern.sysv.shmmin: 1 -> 1
-sh-3.2# sysctl -w kern.sysv.shmmni=64
-kern.sysv.shmmni: 32
-sysctl: kern.sysv.shmmni: Operation not permitted
-sh-3.2# sysctl -w kern.sysv.shmseg=16
-kern.sysv.shmseg: 8 -> 16
-sh-3.2# sysctl -w kern.sysv.semmns=130
-kern.sysv.semmns: 87381
-sysctl: kern.sysv.semmns: Invalid argument
-sh-3.2# sysctl -w kern.sysv.shmall=4096
-kern.sysv.shmall: 1024 -> 4096
-sh-3.2# sysctl -w kern.sysv.maxproc=2048
-name maxproc in kern.sysv.maxproc is unknown
-sh-3.2# sysctl -w kern.maxprocperuid=512
-kern.maxprocperuid: 266 -> 512
+on nmr using (fink recommends):
+kern.sysv.shmmax=8388608
+kern.sysv.shmmin=1
+kern.sysv.shmmni=64
+kern.sysv.shmseg=8
+kern.sysv.shmall=32768
 
-
-Check after reboot if the settings persisted:
-sysctl kern.sysv.shmmax
 or for all shared memory related settings:
 sysctl -a | grep shm
+Or do on line but settings will not persist.
+jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=104857600 DID THIS WORK?
+
+
 
 It failed to reload the weekly run with setting of 256 as suggested so increased to:
 max_locks_per_transaction = 1024
 This was running 93 Mb (675 Mb uncompressed SQL)
 
-fink recommends:
-/etc/sysctl.conf.pg
-kern.sysv.shmmax=8388608 # very different!
-kern.sysv.shmmin=1
-kern.sysv.shmmni=64
-kern.sysv.shmseg=8
-kern.sysv.shmall=32768
+Set a password:
+http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html

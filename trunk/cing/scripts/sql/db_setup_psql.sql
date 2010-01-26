@@ -24,8 +24,22 @@ createlang plpgsql nrgcing
 createlang plpgsql pdbmlplus
 
 -- creating the account
-create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+create role nrgcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
+
+create role nrgcing_reader LOGIN PASSWORD '4I4KMS';
+grant select to nrgcing_reader
+
 create role pdbj LOGIN CREATEDB SUPERUSER;
+DROP ROLE pdbj_reader;
+
+create role pdbj_reader WITH PASSWORD '4I4KMS' LOGIN CREATEDB SUPERUSER;
+
+alter role nrgcing1 WITH PASSWORD '4I4KMS'
+
+REVOKE ALL ON database pdbmlplus FROM pdbj_reader;
+GRANT ALL ON database pdbmlplus TO pdbj_reader;
+
+REVOKE ALL ON brief_summary FROM pdbj_reader;
 
 -- GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost.localdomain' IDENTIFIED BY 'slavepass';
 

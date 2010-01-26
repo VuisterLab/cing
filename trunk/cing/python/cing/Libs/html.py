@@ -1,6 +1,7 @@
 """
 Adds html generation methods
 """
+
 from cing import NaNstring
 from cing import authorList
 from cing import cingRevision
@@ -324,13 +325,17 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             myPoint.pointType = 'square'
 
         if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
-            bb = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR, 0)
-            NTdebug('BBCCHK %f' % bb)
-
-            if bb < BBCCHK_CUTOFF:
-                myPoint.pointColor='red'
-
-        plot.points( zip( d1, d2 ), attributes=myPoint )
+            # Plot individually.
+            bbList = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
+            for i,bb in enumerate(bbList):
+                NTdebug('BBCCHK %f' % bb)
+                if bb < BBCCHK_CUTOFF:
+                    myPoint.pointColor='red'
+                else:
+                    myPoint.pointColor='green'
+                plot.point( (d1[i], d2[i]), attributes=myPoint )
+        else: # plot all at once.
+            plot.points( zip( d1, d2 ), attributes=myPoint )
 
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot and plotCav:

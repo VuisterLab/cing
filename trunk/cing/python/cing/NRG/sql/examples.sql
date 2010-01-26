@@ -1,8 +1,15 @@
 -- Entry count 62635 on Thu Jan 21 10:41:06 CET 2010
 SELECT count(*) FROM brief_summary;
 
-SELECT * FROM information_schema.tables
-where table_schema = 'pdbj' AND table_name like 'pdbx_SG_project%'
+-- entry count per experimentele technique
+select count(*), exptl_method
+from pdbj.brief_summary
+group by exptl_method
+order by count(*) desc;
+
+
+SELECT table_name FROM information_schema.tables
+where table_schema = 'pdbj' AND table_name like '%exp%data%'
 limit 200;
 
 SELECT * FROM information_schema.tables
@@ -65,8 +72,8 @@ AND p1.val = 'primary'
 --AND p2.val = 'Doreleijers, J.F.'
 AND s.docid NOT IN ( select docid from "//pdbx_SG_project/initial_of_center")
 group by primary_citation_author_name
-order by p2.val asc
---order by count(s.pdbid) desc
+--order by p2.val asc
+order by count(s.pdbid) desc
 limit 100;
 
 

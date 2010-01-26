@@ -22,7 +22,7 @@ if ( $status ) then
 	exit 1
 endif
 
-if ( ! -e $TMPFILE )
+if ( ! -e $TMPFILE ) then
 	echo "ERROR: $TMPFILE not found"
 	exit 1
 endif
