@@ -215,11 +215,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
     if htmlOnly:
         return True # indicating success

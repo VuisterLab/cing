@@ -1,8 +1,9 @@
 #!/bin/csh -f
 # Author: Jurgen F. Doreleijers
 # Fri Jun  2 14:37:52 CDT 2006
+# To be put into a weekly cron tab file.
 
-set tmp_dir = /tmp
+set tmp_dir = /Users/jd/tmpPdbj
 ###################################################################
 ## No changes below
 

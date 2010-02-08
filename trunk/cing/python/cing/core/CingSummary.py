@@ -8,6 +8,7 @@ from cing.Libs.NTutils import obj2XML
 from cing.Libs.fpconst import NaN
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.parameters import plugins
+from cing.Libs.NTutils import NTmessage
 import cing
 import os
 
@@ -59,7 +60,7 @@ class CingSummary( NTdict ):
 
                     )
         if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-            from cing.PluginCode.Whatif import Whatif
+            from cing.PluginCode.Whatif import Whatif # JFD: This breaks the plugin concept somewhat.
             # Add all Whatif summary check Id's
             # The below causes an exception when called on a system that has no Whatif.
             for checkId in Whatif.summaryCheckIdList:
@@ -103,17 +104,21 @@ class CingSummary( NTdict ):
 
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
         if (self.proteinResidueCount > 0 and project.molecule.has_key('procheck') and project.molecule.procheck and
-            project.molecule.has_key('summary') and project.molecule.procheck.summary):
+            project.molecule.procheck.has_key('summary') and project.molecule.procheck.summary):
+            NTmessage("Going to add procheck results to summary.")
+            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
             self.PC_core       = project.molecule.procheck.summary.core
             self.PC_allowed    = project.molecule.procheck.summary.allowed
             self.PC_generous   = project.molecule.procheck.summary.generous
             self.PC_disallowed = project.molecule.procheck.summary.disallowed
             self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
+        else:
+            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
         #end if
 
         # Whatif
         if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-            from cing.PluginCode.Whatif import Whatif
+            from cing.PluginCode.Whatif import Whatif # JFD mentions bad practise to do here. Move to the top.
             if self.proteinResidueCount > 0 and project.whatifStatus.completed and project.whatifStatus.parsed:
                 for checkId in Whatif.summaryCheckIdList:
                     if project.molecule[WHATIF_STR].has_key(checkId):
