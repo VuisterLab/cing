@@ -86,13 +86,21 @@ WHERE p1.val LIKE '%NMR'
 AND s.docid NOT IN ( select docid from "//pdbx_SG_project/initial_of_center")
 LIMIT 10;
 
--- Count number of residues per entry.
+-- Count number of residues per NMR entry since last year.
 WITH slen(docid, entity_id, len) AS
 (SELECT docid, p.val, COUNT(*)
  FROM "//entity_poly_seq/@entity_id" p
  GROUP BY docid,p.val)
-SELECT b.pdbid, SUM(e.pdbx_number_of_molecules * s.len)
+SELECT SUM(e.pdbx_number_of_molecules * s.len) AS l, b.pdbid
 FROM brief_summary b
 JOIN entity e ON e.docid = b.docid
 JOIN slen s ON s.docid = e.docid AND s.entity_id = e.id
+JOIN "//exptl/@method" p1 ON s.docid = p1.docid
+WHERE p1.val LIKE '%NMR'
+AND b.release_date >= '1-1-2009'
 GROUP BY b.pdbid
+order by l desc;
+
+
+
+

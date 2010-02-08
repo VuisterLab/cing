@@ -39,6 +39,8 @@ alter role nrgcing1 WITH PASSWORD '4I4KMS'
 REVOKE ALL ON database pdbmlplus FROM pdbj_reader;
 GRANT ALL ON database pdbmlplus TO pdbj_reader;
 
+GRANT ALL ON pdbmlplus.pdbj.brief_summary TO nrgcing1;
+
 REVOKE ALL ON brief_summary FROM pdbj_reader;
 
 -- GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost.localdomain' IDENTIFIED BY 'slavepass';

@@ -2214,7 +2214,6 @@ class DihedralRestraint(Restraint):
 #    DR_RMSALL_BAD  = 0.3 # Angstrom rms violations. # Normally 0.3 but set low for testing 1brv to
 
     def __init__(self, atoms, lower, upper, **kwds):
-
         if upper < lower:
             upper += 360.0
         Restraint.__init__(self,
@@ -2222,6 +2221,10 @@ class DihedralRestraint(Restraint):
                               upper = upper,
                               **kwds
                        )
+        self.dihedrals = NTlist() # list with dihedral values for each model
+        self.cav = None      # Average dihedral value
+        self.cv = None      # cv on dihedral
+
         self.setdefault('discontinuous', False)
         self.__CLASS__ = AC_LEVEL
         self.atoms = NTlist(*atoms)
@@ -2289,7 +2292,7 @@ class DihedralRestraint(Restraint):
         #end if
 
         if None in self.atoms.zap('meanCoordinate'):
-            NTerror('DihedralRestraint: atom without coordinates %s', self.atoms)
+            NTerror('DihedralRestraint: atom(s) without coordinates %s', self.atoms)
             return (None, None)
         #end if
 
@@ -2300,7 +2303,7 @@ class DihedralRestraint(Restraint):
         #end if
 
 
-        #set the default values
+        #set the default values (JFD: this needs to be fully done in initializer in case code fails as for issue 222)
         self.dihedrals = NTlist() # list with dihedral values for each model
         self.cav = None      # Average dihedral value
         self.cv = None      # cv on dihedral
