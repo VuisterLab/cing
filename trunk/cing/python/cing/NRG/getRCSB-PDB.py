@@ -18,7 +18,7 @@ cing.verbosity = cing.verbosityDebug
 
 os.chdir(cingDirTmp)
 
-testing = True
+testing = False
 if testing: # testing with smaller set
     pdbList = getPdbEntries(mustHaveExperimentalNmrData = True,onlySolidState=True)
 else:

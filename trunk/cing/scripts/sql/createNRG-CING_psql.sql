@@ -16,10 +16,10 @@ SET AUTOCOMMIT=1;
 
 -- Remove previous copies in bottom up order.
 -- This will automatically drop the index created too.
-DROP TABLE IF EXISTS atom;
-DROP TABLE IF EXISTS residue;
-DROP TABLE IF EXISTS chain;
-DROP TABLE IF EXISTS entry;
+DROP TABLE IF EXISTS nrgcing.atom;
+DROP TABLE IF EXISTS nrgcing.residue;
+DROP TABLE IF EXISTS nrgcing.chain;
+DROP TABLE IF EXISTS nrgcing.entry;
 
 --CREATE TABLE entry
 --(
@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS entry;
 --)
 
 -- entry
-CREATE TABLE entry
+CREATE TABLE nrgcing.entry
 (
     entry_id                       SERIAL UNIQUE,
     name                           VARCHAR(255),
@@ -92,8 +92,8 @@ CREATE TABLE entry
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
     rog                            INT DEFAULT NULL
 );
-CREATE INDEX entry_001 ON entry (bmrb_id);
-CREATE INDEX entry_002 ON entry (pdb_id);
+CREATE INDEX entry_001 ON nrgcing.entry (bmrb_id);
+CREATE INDEX entry_002 ON nrgcing.entry (pdb_id);
 
 -- mrfile
 -- MySQL doesn't accept the SYSDATE default for date_modified so always present date on insert.
@@ -104,21 +104,20 @@ CREATE INDEX entry_002 ON entry (pdb_id);
 
 
 --    mol_type
-DROP TABLE IF EXISTS chain;
-CREATE TABLE chain
+CREATE TABLE nrgcing.chain
 (
     chain_id                        SERIAL UNIQUE,
     entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
     chothia_class                   INT DEFAULT NULL,
     rog                             INT DEFAULT NULL,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (entry_id)          REFERENCES nrgcing.entry (entry_id) ON DELETE CASCADE
 );
 -- Some common queries are helped by these indexes..
-CREATE INDEX chain_001 ON chain (entry_id);
+CREATE INDEX chain_001 ON nrgcing.chain (entry_id);
 
 -- residue
-CREATE TABLE residue
+CREATE TABLE nrgcing.residue
 (
     residue_id                     SERIAL UNIQUE,
     chain_id                       INT              NOT NULL,
@@ -184,19 +183,19 @@ CREATE TABLE residue
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
 
-    FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (chain_id)          REFERENCES nrgcing.chain (chain_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)          REFERENCES nrgcing.entry (entry_id) ON DELETE CASCADE
 );
-CREATE INDEX residue_001 ON residue (chain_id);
-CREATE INDEX residue_002 ON residue (entry_id);
-CREATE INDEX residue_003 ON residue (number);
-CREATE INDEX residue_004 ON residue (dssp_id);
-CREATE INDEX residue_005 ON residue (rog);
-CREATE INDEX residue_006 ON residue (dis_c5_viol);
+CREATE INDEX residue_001 ON nrgcing.residue (chain_id);
+CREATE INDEX residue_002 ON nrgcing.residue (entry_id);
+CREATE INDEX residue_003 ON nrgcing.residue (number);
+CREATE INDEX residue_004 ON nrgcing.residue (dssp_id);
+CREATE INDEX residue_005 ON nrgcing.residue (rog);
+CREATE INDEX residue_006 ON nrgcing.residue (dis_c5_viol);
 
 
 -- atom
-CREATE TABLE atom
+CREATE TABLE nrgcing.atom
 (
     atom_id                        SERIAL UNIQUE,
     residue_id                     INT              NOT NULL,
@@ -215,12 +214,12 @@ CREATE TABLE atom
     wi_wgtchk                      FLOAT DEFAULT NULL,
 --   cing
     rog                            INT DEFAULT NULL,
-    FOREIGN KEY (residue_id)        REFERENCES residue (residue_id) ON DELETE CASCADE,
-    FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (residue_id)        REFERENCES nrgcing.residue (residue_id) ON DELETE CASCADE,
+    FOREIGN KEY (chain_id)          REFERENCES nrgcing.chain (chain_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)          REFERENCES nrgcing.entry (entry_id) ON DELETE CASCADE
 );
-CREATE INDEX atom_001 ON atom (residue_id);
-CREATE INDEX atom_002 ON atom (chain_id);
-CREATE INDEX atom_003 ON atom (entry_id);
-CREATE INDEX atom_004 ON atom (name);
+CREATE INDEX atom_001 ON nrgcing.atom (residue_id);
+CREATE INDEX atom_002 ON nrgcing.atom (chain_id);
+CREATE INDEX atom_003 ON nrgcing.atom (entry_id);
+CREATE INDEX atom_004 ON nrgcing.atom (name);
 
