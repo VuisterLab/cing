@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# From: http://ripary.com/postgresql.html
+
+# Source common setup, including /etc/hostconfig
+. /etc/rc.common
+
+pgsqlHost=(`hostname|/opt/local/bin/gawk -F'[.]' '{print tolower($1)}'| sed -e 's/[-0-9]//g'`)
+
+if [ $pgsqlHost = 'stella' ]; then
+	export PGDATA=/Users/jd/opt/postgresql84/defaultdb
+	export PGBIN=/Users/jd/opt/bin
+else
+	export PGDATA=/pgdata
+	export PGBIN=/usr/local/pgsql/bin
+fi
+
+StartService ( ) {
+    # Don't start unless PostgreSQL is enabled in /etc/hostconfig
+    if [ "${POSTGRESQL:-NO-}" = "-YES-" ]; then
+        ConsoleMessage "Starting PostgreSQL"
+        sudo -u postgres $PGBIN/pg_ctl \
+            -D $PGDATA \
+            -l $PGDATA/logfile start
+    fi
+}
+
+StopService ( ) {
+    ConsoleMessage "Stopping PostgreSQL"
+    sudo -u postgres $PGBIN/pg_ctl -D $PGDATA stop
+}
+
+RestartService ( ) {
+    if [ "${POSTGRESQL:-NO-}" = "-YES-" ]; then
+        ConsoleMessage "Restarting PostgreSQL"
+        StopService
+        StartService
+    else
+        StopService
+    fi
+}
+
+RunService "$1"

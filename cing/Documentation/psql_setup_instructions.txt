@@ -8,10 +8,12 @@ it was an error and prevented the server to start up.
 
 Read: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 
+sudo SystemStarter stop PostgreSQL
+sudo SystemStarter start PostgreSQL
+
 # stella
 setenv PGDATA /Users/jd/opt/postgresql84/defaultdb
 setenv PGBIN /Users/jd/opt/bin
-
 # nmr
 setenv PGDATA /pgdata
 setenv PGBIN /usr/local/pgsql/bin
@@ -32,31 +34,12 @@ stella:
 nmr:
 ./configure --prefix=/usr/local/pgsql --with-python --with-libxml --with-libxslt --with-libedit-preferred
 
---->  Creating launchd control script
-###########################################################
-# A startup item has been generated that will aid in
-# starting postgresql84-server with launchd. It is disabled
-# by default. Execute the following command to start it,
-# and to cause it to launch at startup:
-#
-# sudo launchctl load -w /Library/LaunchDaemons/org.macports.postgresql84-server.plist
-###########################################################
---->  Installing postgresql84-server @8.4.1_0
-
 To create a database instance, after install do
  sudo mkdir -p $PGDATA
  sudo chown postgres:postgres $PGDATA
  sudo su postgres -c 'initdb -D $PGDATA'
 
 To tweak your DBMS, consider increasing kern.sysv.shmmax by adding an increased kern.sysv.shmmax .. to /etc/sysctl.conf
-
-stella:
-	sudo su postgres -c '/Users/jd/opt/bin/pg_ctl -D /Users/jd/opt/postgresql84/defaultdb -l /tmp/logfile start'
-	sudo su postgres -c '/Users/jd/opt/bin/pg_ctl -D /Users/jd/opt/postgresql84/defaultdb stop'
-nmr:
-	sudo su postgres -c '/usr/local/pgsql/bin/pg_ctl -D /pgdata -l /tmp/pg_logfile start'
-	sudo su postgres -c '/usr/local/pgsql/bin/pg_ctl -D /pgdata stop'
-
 
 Connect as postgres unix user:
 	psql
@@ -108,3 +91,9 @@ This was running 93 Mb (675 Mb uncompressed SQL)
 
 Set a password:
 http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html
+
+For automatic start/stop follow instructions at:
+http://ripary.com/postgresql.html
+using:
+$CINGROOT/scripts/sql/PostgreSQL
+'''You can disable automatic startup at any time by editing /etc/hostconfig.'''
