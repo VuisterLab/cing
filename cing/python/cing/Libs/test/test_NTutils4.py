@@ -82,7 +82,6 @@ b
 #        self.assertTrue( len(x) == 3)
 
     def testNTlistSort(self):
-        """Test failure by recursion"""
         x = NTlist()
         y = range(5)
         x.addList(y)
@@ -92,7 +91,6 @@ b
         list.sort(y)
 
     def testNTlistLenRecursive(self):
-        """Test failure by recursion"""
         x = NTlist()
         y = NTlist()
         z = NTlist()

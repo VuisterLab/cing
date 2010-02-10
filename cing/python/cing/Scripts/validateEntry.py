@@ -1,4 +1,8 @@
-# python -u $CINGROOT/python/cing/Scripts/validateEntry.py
+# Execute like:
+# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv
+# python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py 1brv \
+# file:///Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN
+
 from cing import header
 from cing import verbosityDebug
 from cing import verbosityNothing
@@ -90,13 +94,13 @@ def main(entryId, *extraArgList):
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
 
     NTdebug("Using:")
-    NTdebug("inputDir:             " + inputDir)
-    NTdebug("outputDir:            " + outputDir)
-    NTdebug("pdbConvention:        " + pdbConvention)
-    NTdebug("restraintsConvention: " + restraintsConvention)
-    NTdebug("archiveType:          " + archiveType)
-    NTdebug("projectType:          " + projectType)
-    NTdebug("modelCount:           " + modelCount)
+    NTdebug("inputDir:             %s" % inputDir)
+    NTdebug("outputDir:            %s" % outputDir)
+    NTdebug("pdbConvention:        %s" % pdbConvention)
+    NTdebug("restraintsConvention: %s" % restraintsConvention)
+    NTdebug("archiveType:          %s" % archiveType)
+    NTdebug("projectType:          %s" % projectType)
+    NTdebug("modelCount:           %s" % modelCount)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 

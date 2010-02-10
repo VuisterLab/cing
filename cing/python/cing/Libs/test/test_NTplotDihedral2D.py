@@ -265,7 +265,7 @@ class AllChecks(TestCase):
         y = NTlist(-65, -63, -125)
 
         # important to switch to temp space before starting to generate files for the project.
-        project     = Project('testPlotHistoDihedrald1d2')
+#        project     = Project('testPlotHistoDihedrald1d2')
         plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
         plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
 
