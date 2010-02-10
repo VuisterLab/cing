@@ -18,7 +18,7 @@ fi
 StartService ( ) {
     # Don't start unless PostgreSQL is enabled in /etc/hostconfig
     if [ "${POSTGRESQL:-NO-}" = "-YES-" ]; then
-        ConsoleMessage "Starting PostgreSQL"
+        ConsoleMessage "Starting PostgreSQL from $PGBIN with $PGDATA"
         sudo -u postgres $PGBIN/pg_ctl \
             -D $PGDATA \
             -l $PGDATA/logfile start

@@ -55,7 +55,7 @@ Connect as jd unix user:
 \? from the psql monitor
 \l list db
 \dt' list tables
-\d atom list a table
+\d atom list a table called atom.
 
 
 - add PGDATA to exclusion list of spotlight and TM.

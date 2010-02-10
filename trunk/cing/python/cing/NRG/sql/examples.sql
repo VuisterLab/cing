@@ -78,7 +78,7 @@ limit 100;
 
 
 -- Get NMR entries NOT from SG projects
-SELECT count(s.pdbid)
+explain SELECT count(s.pdbid)
 FROM brief_summary s
 JOIN "//exptl/@method" p1 ON s.docid = p1.docid
 WHERE p1.val LIKE '%NMR'
