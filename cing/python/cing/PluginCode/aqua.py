@@ -16,7 +16,7 @@ from cing.Libs.NTutils import val2Str
 from cing.Libs.NTutils import NTcodeerror
 import time
 #-----------------------------------------------------------------------------
-def exportAtom2aqua( atom ):
+def exportAtom2aqua(atom):
     """
         returns string in aqua format from the manual:
         NOEULD  [CHAIN id]  residue_name  residue_number  [INSERT code]  atom_name
@@ -39,7 +39,7 @@ Atom.export2aqua = exportAtom2aqua
 MIN_DISTANCE_ANY_ATOM_PAIR = 1.8
 MAX_DISTANCE_ANY_ATOM_PAIR = 999.9
 
-def export2aqua( project, tmp=None ):
+def export2aqua(project, tmp=None):
     """
         export distanceRestraintLists to aqua
         export Molecules to PDB files in aqua format
@@ -62,19 +62,29 @@ def export2aqua( project, tmp=None ):
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
         exportPath = project.directories.aqua
-        path = project.path( exportPath, project.name +'.' + extensionList[typeId] )
-        NTmessage("Writing to: " + path )
-        fp = open( path, 'w' )
+        path = project.path(exportPath, project.name + '.' + extensionList[typeId])
+        NTmessage("Writing to: " + path)
+        fp = open(path, 'w')
         if not fp:
-            NTerror('Unable to open: ' + path )
+            NTerror('Unable to open: ' + path)
             return
         countActual = 0
         restraintListText = []
-        warningCountMax = 10
+#        warningCountMax = 10 # DEFAULT
+        warningCountMax = 10000 # TESTING
         warningCount = 0
-        warningCountAngle = 0
+        ambiDistanceCount = 0
+        skippedDihedralCount = 0
         for drl in drLoL:
             for dr in drl:
+                if not dr.isValidForAquaExport():
+                    if warningCount == warningCountMax + 1:
+                        NTwarning("And so on")
+                    elif warningCount <= warningCountMax:
+                        NTwarning("Restraint is not valid for export to Aqua (perhaps missing assignment? As in issue 224)\n%s" % dr)
+                    ambiDistanceCount += 1
+                    warningCount += 1
+                    continue
                 if typeId == 0:
 #                   Distance conversions
                     upper = dr.upper
@@ -99,17 +109,19 @@ def export2aqua( project, tmp=None ):
                     result = 'NOEUPLO %s %s  %s  %s' % (
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
-                                 upperStr, lowerStr )
+                                 upperStr, lowerStr)
 #                    NTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
-                        if warningCount == warningCountMax+1:
+                        if warningCount == warningCountMax + 1:
                             NTwarning("And so on")
                         elif warningCount <= warningCountMax:
-                            NTwarning("Ambiguous restraint exported as unambiguous for Aqua  ["+`warningCount`+"]")
+                            NTwarning("Ambiguous restraint exported as unambiguous for Aqua  [" + `ambiDistanceCount` + "]")
+                        ambiDistanceCount += 1
                         warningCount += 1
+
                     for atomPair in dr.atomPairs[1:]:
-                        result += ( '\n#       %s %s AMBI not read by Aqua' % (
+                        result += ('\n#       %s %s AMBI not read by Aqua' % (
                                  atomPair[0].export2aqua(),
                                  atomPair[1].export2aqua()))
                     # end for
@@ -123,15 +135,15 @@ def export2aqua( project, tmp=None ):
                     # (<Residue>, angleName, <AngleDef>) tuple
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()
                     if not angleName:
-                        if warningCountAngle == warningCountMax+1:
+                        if skippedDihedralCount == warningCountMax + 1:
                             NTwarning("And so on")
-                        elif warningCountAngle <= warningCountMax:
-                            strResidue ="Unknown"
+                        elif skippedDihedralCount <= warningCountMax:
+                            strResidue = "Unknown"
                             if hasattr(dr, 'residue'):
                                 strResidue = '%s' % dr.residue
                             NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.",
                                       dr.id, strResidue)
-                        warningCountAngle += 1
+                        skippedDihedralCount += 1
                     else:
                         atom = dr.atoms[1] # this is true except for Omega? TODO correct!
                         if angleName == "OMEGA":
@@ -148,16 +160,15 @@ def export2aqua( project, tmp=None ):
                                               dr.upper)
                         except:
                             result = None
-                            if warningCountAngle == warningCountMax+1:
+                            if skippedDihedralCount == warningCountMax + 1:
                                 NTwarning("And so on")
-                            elif warningCountAngle <= warningCountMax:
-                                strResidue ="Unknown"
+                            elif skippedDihedralCount <= warningCountMax:
+                                strResidue = "Unknown"
                                 if hasattr(dr, 'residue'):
                                     strResidue = '%s' % dr.residue
                                 NTwarning("Skipping dihedral angle restraint '%s' (%s) because conversion of data to string failed.",
                                           dr.id, strResidue)
-                            warningCountAngle += 1
-
+                            skippedDihedralCount += 1
                     # end else
                 # end else
                 if result:
@@ -165,25 +176,25 @@ def export2aqua( project, tmp=None ):
                     restraintListText.append(result)
                 else:
                     NTwarning("Skipped restraint")
-        if warningCount:
-            NTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: ["+`warningCount`+"]")
-        if warningCountAngle:
-            NTwarning("Dihedral angle restraint not exported                for Aqua for count: ["+`warningCountAngle`+"]")
+        if ambiDistanceCount:
+            NTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: [%s]" % ambiDistanceCount)
+        if skippedDihedralCount:
+            NTwarning("Dihedral angle restraint not exported                for Aqua for count: [%s]" % skippedDihedralCount)
         if countActual:
             # Important to let the join do this as one for optimalization.
             restraintListTextCombined = '\n'.join(restraintListText)
-            fprintf( fp, 'Restraint list generated by CING for Aqua on: %s\n', time.asctime() )
-            fprintf( fp, 'count %d type aqua\n', count )
-            fprintf( fp, restraintListTextCombined )
+            fprintf(fp, 'Restraint list generated by CING for Aqua on: %s\n', time.asctime())
+            fprintf(fp, 'count %d type aqua\n', count)
+            fprintf(fp, restraintListTextCombined)
             fp.close()
         else:
-            NTwarning("Failed to convert a single restraint of this type: "+restraintTypeList[typeId])
+            NTwarning("Failed to convert a single restraint of this type: " + restraintTypeList[typeId])
             return True
 #-----------------------------------------------------------------------------
 # register the functions in the project class
-methods  = [
+methods = [
            ]
 #saves    = []
 #restores = []
-exports  = [(export2aqua, None),
+exports = [(export2aqua, None),
            ]

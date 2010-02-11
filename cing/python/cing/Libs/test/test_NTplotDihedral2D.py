@@ -306,16 +306,16 @@ class AllChecks(TestCase):
             for i in [-1,0,1]:
                 triplet.append( res.sibling(i) )
             if None in triplet:
-                print 'Skipping ', res
+                NTdebug(  'Skipping ' % res)
 
             else:
                 CA_atms = triplet.zap('CA')
                 CB_atms = triplet.zap('CB')
 
-                print res, triplet, CA_atms, CB_atms
+                NTdebug(  "%s %s %s %s" % ( res, triplet, CA_atms, CB_atms))
 
                 if None in CB_atms: # skip Gly for now
-                    print 'Skipping ', res
+                    NTdebug(  'Skipping %s'% res)
                 else:
                     d1 = Dihedral( res, 'Cb4N', range=[0.0,360.0] )
                     d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
@@ -329,7 +329,7 @@ class AllChecks(TestCase):
 
                     bb = getDeepByKeys( res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR, 0) # check first one.
                     if bb ==  None:
-                        print 'Skipping without BB', res
+                        NTdebug( 'Skipping without BB %s' % res)
                         continue
 
                     if d1.cv < 0.03 and d2.cv < 0.03: # Only include structured residues
@@ -337,7 +337,7 @@ class AllChecks(TestCase):
         #                    bb = res.Whatif.bbNormality.valueList[i]
                             bb = getDeepByKeys( res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR, i)
                             if bb ==  None:
-                                print 'Skipping without BB', res
+                                NTdebug(  'Skipping without BB %s'% res)
                                 continue
                             angles = NTlist() # store phi, psi, chi1, chi2
                             for angle in ['PHI','PSI','CHI1','CHI2']:
