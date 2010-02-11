@@ -1414,6 +1414,12 @@ class Restraint(NTdict):
         NTwarning("%s.getModelCount returned None for all %d atom(pair)s; giving up." % (self.__CLASS__, len(self.atomPairs)))
         return None
     #end def
+
+    def isValidForAquaExport(self):
+        """Determine if the restraint can be exported to Aqua."""
+        NTerror("Restraint.isValidForAquaExport needs to be overriden.")
+    #end def
+
     def listViolatingModels(self, cutoff = 0.3):
         """
         Examine for violations larger then cutoff, return list of violating models or None on error
@@ -1467,6 +1473,33 @@ class DistanceRestraint(Restraint):
             self.appendPair(pair)
         #end for
     #end def
+
+    def isValidForAquaExport(self):
+        """Determine if the restraint can be exported to Aqua.
+        Simplified to checking if all partners have at least one assigned atom.
+
+        E.g. of a valid self.atomPairs
+        [ [ HA ] [ HB,HC ],
+          [ HA ] [ HD ] ]
+        """
+        if not self.atomPairs:
+            NTdebug("Failed to find any atom pair in %s" % self)
+            return False
+        for i, atomPair in enumerate(self.atomPairs):
+            if not atomPair: # eg [ HA ] [ HB,HC ]
+                NTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
+                return False
+            for j, atomList in enumerate(atomPair):
+                if not atomList: # eg [ HB,HC ]
+                    NTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
+                    return False
+                for k, atom in enumerate(atomList):
+                    if not atom: # eg HB
+                        NTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
+                        return False
+        return True
+    #end def
+
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
@@ -2228,6 +2261,24 @@ class DihedralRestraint(Restraint):
         self.setdefault('discontinuous', False)
         self.__CLASS__ = AC_LEVEL
         self.atoms = NTlist(*atoms)
+    #end def
+
+    def isValidForAquaExport(self):
+        """Determine if the restraint can be exported to Aqua.
+        Simplified to checking if there are 4 real atoms.
+        """
+        if not self.atoms:
+            NTdebug("Failed to find any atom in %s" % self)
+            return False
+        l = len(self.atoms)
+        if l != 4:
+            NTdebug("Expected four atoms but found %d in:\n%s" % (l,self))
+            return False
+        for i, atom in enumerate(self.atoms):
+            if not atom:
+                NTdebug("Failed to find valid atom in:\n%s" % (i,self))
+                return False
+        return True
     #end def
 
     def criticize(self, project):
