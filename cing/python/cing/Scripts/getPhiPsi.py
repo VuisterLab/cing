@@ -3,7 +3,7 @@ Read PDB files for their dihedrals; not just phi psi anymore..
 
 
 cd /Users/jd/tmp/cingTmp/d1d2_wi_db
-python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1a7S A
+python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1a7s A
 """
 from cing import verbosityDebug
 from cing import verbosityOutput
@@ -26,9 +26,13 @@ from cing.core.classes import Project
 from cing.core.constants import IUPAC
 from cing.core.molecule import Chain
 from cing.core.molecule import Dihedral
+from cing.core.molecule import commonAAList
 import cing
 import os
 import sys
+import yasara
+
+yasara.info.mode = 'txt'
 
 if dihedralComboTodo == Ramachandran:
     DIHEDRAL_NAME_1 = 'PHI'
@@ -59,13 +63,28 @@ def doEntry( entryCode, chainCode ):
     localPdbFileName = entryCode+chainCode+".pdb"
     os.rename(pdbFileName, localPdbFileName)
 
+    # Add hydrogens
+    obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
+#    obj = yasara.LoadPDB(localPdbFileName, Center = 'No', Correct = 'No', Model=1)
+#    yasara.CleanAll() # needed for OptHydObj
+#    yasara.OptHydObj(obj,method='Yasara')
+    yasara.AddHydObj(obj)
+    newPdbFileName = entryCode+chainCode+"_hyd.pdb"
+    yasara.SavePDB(obj,newPdbFileName,format='IUPAC', transform='No')
+    yasara.Clear()
+
+
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
-    project.initPDB( pdbFile=localPdbFileName, convention = IUPAC )
+    project.initPDB( pdbFile=newPdbFileName, convention = IUPAC, nmodels=1 )
     project.runDssp()
-    os.unlink(localPdbFileName)
+    if False:
+        os.unlink(localPdbFileName)
+        os.unlink(newPdbFileName)
+
+
 #    project.procheck(createPlots=False, runAqua=False)
 #    if not project.dssp():
 #        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
@@ -81,6 +100,10 @@ def doEntry( entryCode, chainCode ):
 
         resList = chain.allResidues()
         for res in resList:
+            if res.resName not in commonAAList:
+#                NTdebug( "Skipping uncommon residue: %s" % res)
+                continue
+
             triplet = NTlist()
             for i in [-1,0,1]:
                 triplet.append( res.sibling(i) )
@@ -99,10 +122,23 @@ def doEntry( entryCode, chainCode ):
 #                    NTdebug( 'Skipping residue without triplet %s' % res)
                     continue
                 CA_atms = triplet.zap('CA')
-                CB_atms = triplet.zap('CB')
+                CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
+                for tripletResidue in triplet:
+                    if tripletResidue.resName not in commonAAList:
+                        NTdebug( "Skipping triplet %s with uncommon residue: %s" % (triplet, tripletResidue))
+                        continue
+                    CB_atm = None
+                    if tripletResidue.has_key('CB'):
+                        CB_atm = tripletResidue.CB
+                    elif tripletResidue.has_key('HA2'):
+                        CB_atm = tripletResidue.HA2
+                    else:
+                        NTerror( 'Skipping for absent CB/HA2 in tripletResidue %s of triplet %s' % ( tripletResidue, triplet ))
+                        continue
+                    CB_atms.append(CB_atm)
 #                print res, triplet, CA_atms, CB_atms
-                if None in CB_atms: # skip Gly for now
-#                    NTdebug( 'Skipping for absent CB (e.g. HOH & GLY) in triplet %s' % res )
+                if len(CB_atms) != 3: # skip Gly for now
+                    NTerror( '"CB" (or HA2) missing in triplet %s' % res )
                     continue
 
                 d1 = Dihedral( res, DIHEDRAL_NAME_1, range=range0_360)

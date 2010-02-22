@@ -31,7 +31,7 @@ def main():
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
     entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
 
-    START_ENTRY_ID                 =12 # default 0
+    START_ENTRY_ID                 =0 # default 0
     MAX_ENTRIES_TODO               =2 # default a ridiculously large number like 999999
 
     doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,

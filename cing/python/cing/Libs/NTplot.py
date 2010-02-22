@@ -429,7 +429,7 @@ class NTplot( NTdict ):
         for p in points[1:]:
             self.draw( endPoint=p, attributes=attributes )
 
-    def scatter(self, x,y,s,c,marker=None,verts =None):
+    def scatter(self, x,y,s=20, c='b',marker=None,verts =None):
         """Return true on error UNTESTED.
 
         Make a scatter plot of x versus y, where x, y are 1-D sequences
@@ -851,7 +851,7 @@ class NTplot( NTdict ):
 
         min = None
         max = None
-        if not pointList:
+        if len(pointList) == 0:
             return
 
         for point in pointList:
