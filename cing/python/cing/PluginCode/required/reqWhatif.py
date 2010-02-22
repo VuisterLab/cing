@@ -136,7 +136,7 @@ if True:
     histd1d2BySsAndCombinedResType = dbaseTemp[ 'histd1d2BySsAndCombinedResType' ]
     dbase_file.close()
 
-if True:
+if False:
     dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db2.dat' )
     dbase_file = open(dbase_file_abs_name, 'rb') # read binary
     dbaseTemp = cPickle.load(dbase_file)

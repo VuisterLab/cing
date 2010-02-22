@@ -382,7 +382,7 @@ class AllChecks(TestCase):
         hist2 = [10, 21, 22]
         NTdebug("%s" % convolute(hist1, hist2))
 
-    def testPlotDihedralD1_2d(self):
+    def tttestPlotDihedralD1_2d(self):
         dihedralName1 = 'Cb4N'
         dihedralName2 = 'Cb4C'
         graphicsFormat = "png"
