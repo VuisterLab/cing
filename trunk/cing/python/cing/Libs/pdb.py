@@ -282,6 +282,9 @@ class pdbParser:
 #                print '>', ch, res, res.skip, res.db
                 if not res.skip and res.db != None:
                     residue = chain.addResidue(res.db.name, res.resNum)
+                    if residue == None:
+                        NTerror("Not adding residue: %s" % res)
+                        continue
                     residue.addAllAtoms()
                 #end if
             #end for
