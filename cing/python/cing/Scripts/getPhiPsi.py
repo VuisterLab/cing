@@ -3,7 +3,7 @@ Read PDB files for their dihedrals; not just phi psi anymore..
 
 
 cd /Users/jd/tmp/cingTmp/d1d2_wi_db
-python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1a7s A
+python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1fsg A
 """
 from cing import verbosityDebug
 from cing import verbosityOutput
@@ -138,7 +138,7 @@ def doEntry( entryCode, chainCode ):
                     CB_atms.append(CB_atm)
 #                print res, triplet, CA_atms, CB_atms
                 if len(CB_atms) != 3: # skip Gly for now
-                    NTerror( '"CB" (or HA2) missing in triplet %s' % res )
+                    NTerror( '"CB" (or HA2) missing in triplet %s' % triplet )
                     continue
 
                 d1 = Dihedral( res, DIHEDRAL_NAME_1, range=range0_360)
