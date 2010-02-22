@@ -19,6 +19,10 @@ setenv PGDATA /pgdata
 setenv PGBIN /usr/local/pgsql/bin
 
 
+Configuration at:
+$PGDATA/postgresql.conf
+e.g. shows default port to be 5432
+
 -- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 on: "The solution to the /dev/null error:"
 

@@ -20,8 +20,10 @@ if ( ! $status ) then
     exit 0
 endif
 
-rsync -av -f '+ */1brv.tgz' -f '- */*' \
-    --delete --stats --progress  \
+# leaving out options of verbosity so I get a smaller email.
+# --progress -v
+rsync -a -f '+ */1brv.tgz' -f '- */*' \
+    --delete --stats \
     -e "ssh $SERVER ssh" \
     $SOURCEDIR $CLIENT':'$MIRRORDIR
 

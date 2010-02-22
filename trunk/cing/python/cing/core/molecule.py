@@ -87,6 +87,11 @@ chothiaClassAB = 'a/b'
 chothiaClassC = 'c' # only coil
 mapChothia_class2Int = {chothiaClassA: 0, chothiaClassB : 1, chothiaClassAB : 2, chothiaClassC : 3, None: None}
 
+# Only 20 AA and 5 NA; Nota Bena no variants.
+commonAAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL ASPH GLUH HISD HISE LYS+ ARG+".split()
+commonNAList = "A T G C U".split()
+commonResidueList = commonAAList + commonNAList
+
 def cothiaClassInt(cothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
     return mapChothia_class2Int[ cothiaClass ]
@@ -2722,6 +2727,11 @@ Residue class: Defines residue properties
         """Return True for C-terminal residue; ie. a residue with OXT (O'') atom.
         """
         return self.Cterminal
+
+    def isCommon(self, resType):
+        """Return True if residue is one of the common 20 AA or 5 NA.
+        """
+        return resType in commonResidueList
 
     def hasProperties(self, *properties):
         """
