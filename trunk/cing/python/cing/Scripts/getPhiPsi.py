@@ -6,17 +6,19 @@ cd /Users/jd/tmp/cingTmp/d1d2_wi_db
 python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1fsg A
 """
 from cing import verbosityDebug
-from cing import verbosityOutput
-from cing import verbosityWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTmessageNoEOL
+from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import floatFormat
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import gunzip
+from cing.Libs.NTutils import switchOutput
 from cing.Libs.fpconst import NaN
 from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
@@ -25,14 +27,29 @@ from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
 from cing.core.constants import IUPAC
 from cing.core.molecule import Chain
-from cing.core.molecule import Dihedral
+from cing.core.molecule import DIHEDRAL_NAME_Cb4C
+from cing.core.molecule import DIHEDRAL_NAME_Cb4N
 from cing.core.molecule import commonAAList
+from matplotlib.cbook import flatten
 import cing
 import os
 import sys
-import yasara
 
-yasara.info.mode = 'txt'
+BFACTOR_COLUMN = 7
+IDX_COLUMN = 8
+
+if True: # for easy blocking of data, preventing the code to be resorted with imports above.
+    switchOutput(False)
+    try:
+        import yasara
+        yasara.info.mode = 'txt'
+        yasara.Console('off')
+    except:
+        switchOutput(True)
+        raise ImportWarning(YASARA_STR)
+    finally: # finally fails in python below 2.5
+        switchOutput(True)
+    NTmessage('Using Yasara')
 
 if dihedralComboTodo == Ramachandran:
     DIHEDRAL_NAME_1 = 'PHI'
@@ -42,13 +59,12 @@ elif dihedralComboTodo == Janin:
     DIHEDRAL_NAME_1 = 'CHI1'
     DIHEDRAL_NAME_2 = 'CHI2'
 elif dihedralComboTodo == d1d2:
-    DIHEDRAL_NAME_1 = 'Cb4N'
-    DIHEDRAL_NAME_2 = 'Cb4C'
-
-range0_360 = [0.0,360.0]
+    DIHEDRAL_NAME_1 = DIHEDRAL_NAME_Cb4N
+    DIHEDRAL_NAME_2 = DIHEDRAL_NAME_Cb4C
 
 def doEntry( entryCode, chainCode ):
     char23 = entryCode[1:3]
+
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
     pdbFileNameZipped = pdbFileName+'.gz'
     if not os.path.exists(pdbFileNameZipped):
@@ -63,9 +79,8 @@ def doEntry( entryCode, chainCode ):
     localPdbFileName = entryCode+chainCode+".pdb"
     os.rename(pdbFileName, localPdbFileName)
 
-    # Add hydrogens
+    # Add hydrogens using Yasara
     obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
-#    obj = yasara.LoadPDB(localPdbFileName, Center = 'No', Correct = 'No', Model=1)
 #    yasara.CleanAll() # needed for OptHydObj
 #    yasara.OptHydObj(obj,method='Yasara')
     yasara.AddHydObj(obj)
@@ -84,7 +99,6 @@ def doEntry( entryCode, chainCode ):
         os.unlink(localPdbFileName)
         os.unlink(newPdbFileName)
 
-
 #    project.procheck(createPlots=False, runAqua=False)
 #    if not project.dssp():
 #        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
@@ -92,7 +106,10 @@ def doEntry( entryCode, chainCode ):
 
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
 
+    lineList = []
+    idx = -1
     strSum = ''
+
     for chain in project.molecule.allChains():
         if chain.name != chainCode:
             NTdebug('Skipping chain in: entry %s for chain code: %s' % (entryCode,chain.name) )
@@ -104,11 +121,6 @@ def doEntry( entryCode, chainCode ):
 #                NTdebug( "Skipping uncommon residue: %s" % res)
                 continue
 
-            triplet = NTlist()
-            for i in [-1,0,1]:
-                triplet.append( res.sibling(i) )
-#            NTdebug( "Considering: %s,%s,%-4s,%4d" % (entryCode, chain.name, res.resName, res.resNum))
-
             if dihedralComboTodo == Ramachandran:
                 if not (res.has_key(DIHEDRAL_NAME_1) and res.has_key(DIHEDRAL_NAME_2)):
                     NTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
@@ -118,41 +130,8 @@ def doEntry( entryCode, chainCode ):
                     NTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
             elif dihedralComboTodo == d1d2:
-                if None in triplet:
-#                    NTdebug( 'Skipping residue without triplet %s' % res)
-                    continue
-                CA_atms = triplet.zap('CA')
-                CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
-                for tripletResidue in triplet:
-                    if tripletResidue.resName not in commonAAList:
-                        NTdebug( "Skipping triplet %s with uncommon residue: %s" % (triplet, tripletResidue))
-                        continue
-                    CB_atm = None
-                    if tripletResidue.has_key('CB'):
-                        CB_atm = tripletResidue.CB
-                    elif tripletResidue.has_key('HA2'):
-                        CB_atm = tripletResidue.HA2
-                    else:
-                        NTerror( 'Skipping for absent CB/HA2 in tripletResidue %s of triplet %s' % ( tripletResidue, triplet ))
-                        continue
-                    CB_atms.append(CB_atm)
-#                print res, triplet, CA_atms, CB_atms
-                if len(CB_atms) != 3: # skip Gly for now
-                    NTerror( '"CB" (or HA2) missing in triplet %s' % triplet )
-                    continue
-
-                d1 = Dihedral( res, DIHEDRAL_NAME_1, range=range0_360)
-                d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
-                d1.calculateValues()
-                res[DIHEDRAL_NAME_1] = d1 # append dihedral to residue
-
-                d2 = Dihedral( res, DIHEDRAL_NAME_2, range=range0_360)
-                d2.atoms = [CB_atms[1], CA_atms[1], CA_atms[2], CB_atms[2]]
-                d2.calculateValues()
-                res[DIHEDRAL_NAME_2] = d2 # append dihedral to residue
-
-                if not (res.has_key(DIHEDRAL_NAME_1) and res.has_key(DIHEDRAL_NAME_2)):
-                    NTdebug('Skipping residue both requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                if not res.has_key(DIHEDRAL_NAME_1):
+                    NTdebug('Skipping residue because no first requested angle in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
 
             secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR)
@@ -170,12 +149,27 @@ def doEntry( entryCode, chainCode ):
 
             d1_value_str = floatFormat( d1_value_list[0], "%6.1f" ) # counterpart is floatParse
             d2_value_str = floatFormat( d2_value_list[0], "%6.1f" )
-            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s\n" % (entryCode, chain.name, res.resName, res.resNum, secStruct,
-                d1_value_str, d2_value_str )
-#            NTmessageNoEOL(str)
+
+            dihedral1 = res[DIHEDRAL_NAME_1]
+            atomList = dihedral1.atoms
+            coordinatesList = NTzap(atomList, 'coordinates')
+            # reshape resulting: NTlist(NTlist(Coordinate(
+#            flatList = map( lambda c: c, flatten(coordinatesList) ) # works but next is nicer
+            flatList = [c for c in flatten(coordinatesList)]
+
+            bfactorList = NTzap(flatList,'Bfac')
+            max_bfactor = max(bfactorList)
+            idx += 1 # starts at 0 when inserted.
+            lineItem = [ entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor, idx ]
+            lineList.append(lineItem)
+            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % tuple(lineItem[:IDX_COLUMN])
+            NTmessageNoEOL(str)
             strSum += str # expensive
-    if project.removeFromDisk():
-        NTerror("Failed to remove project from disk for entry: ", entryCode)
+
+#    if project.removeFromDisk():
+#        NTerror("Failed to remove project from disk for entry: ", entryCode)
+    if not project.save():
+        NTerror("Failed to save project to disk for entry: " + entryCode)
 
     file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
     resultsFileName = file_name_base + '_wi_db_%s.csv' % ( entryCode+chainCode )
@@ -187,7 +181,5 @@ def doEntry( entryCode, chainCode ):
 
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityWarning
-    cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
     doEntry(*sys.argv[1:])

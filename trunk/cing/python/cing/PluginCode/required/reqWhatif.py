@@ -1,9 +1,5 @@
-from cing import cingDirData
 from cing.core.constants import ATOM_LEVEL
 from cing.core.constants import RES_LEVEL
-import cPickle
-import os
-#from pprint import pprint
 
 WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
 
@@ -108,51 +104,41 @@ nameDefs =[
             (RES_LEVEL, 'TORCHK',  None,          'Unknown check',                                             'Unknown check')
 ]
 
-if True:
-    dbase_file_abs_name =  os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
-    #dbaseTemp = shelve.open( dbase_file_abs_name )
-    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
-    dbaseTemp = cPickle.load(dbase_file)
-#    pprint.pprint(dbaseTemp)
-    histRamaCombined                = dbaseTemp[ 'histRamaCombined' ]
-    histRamaBySsAndResType          = dbaseTemp[ 'histRamaBySsAndResType' ]
-    histRamaBySsAndCombinedResType  = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
-#    pprint(histRamaCombined)
-    dbase_file.close()
-    #dbaseTemp.close()
-
-    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
-    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
-    dbaseTemp = cPickle.load(dbase_file)
-    histJaninBySsAndResType         = dbaseTemp[ 'histJaninBySsAndResType' ]
-    histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
-    dbase_file.close()
-
-if True:
-    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db.dat' )
-    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
-    dbaseTemp = cPickle.load(dbase_file)
-    histd1d2BySsAndResType         = dbaseTemp[ 'histd1d2BySsAndResType' ]
-    histd1d2BySsAndCombinedResType = dbaseTemp[ 'histd1d2BySsAndCombinedResType' ]
-    dbase_file.close()
-
-if False:
-    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db2.dat' )
-    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
-    dbaseTemp = cPickle.load(dbase_file)
-    histd1BySsAndResTypes         = dbaseTemp[ 'histd1BySsAndResTypes' ]
-    histd1ByResTypes = dbaseTemp[ 'histd1ByResTypes' ]
-    histd1BySs = dbaseTemp[ 'histd1BySs' ]
-    histd1 = dbaseTemp[ 'histd1' ]
-    dbase_file.close()
+#if True:
+#    dbase_file_abs_name =  os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'phipsi_wi_db.dat' )
+#    #dbaseTemp = shelve.open( dbase_file_abs_name )
+#    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+#    dbaseTemp = cPickle.load(dbase_file)
+##    pprint.pprint(dbaseTemp)
+#    histRamaCombined                = dbaseTemp[ 'histRamaCombined' ]
+#    histRamaBySsAndResType          = dbaseTemp[ 'histRamaBySsAndResType' ]
+#    histRamaBySsAndCombinedResType  = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
+##    pprint(histRamaCombined)
+#    dbase_file.close()
+#    #dbaseTemp.close()
+#
+#    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'chi1chi2_wi_db.dat' )
+#    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+#    dbaseTemp = cPickle.load(dbase_file)
+#    histJaninBySsAndResType         = dbaseTemp[ 'histJaninBySsAndResType' ]
+#    histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
+#    dbase_file.close()
+#
+#if True:
+#    dbase_file_abs_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf', 'cb4ncb4c_wi_db.dat' )
+#    dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+#    dbaseTemp = cPickle.load(dbase_file)
+#    histd1d2BySsAndResType         = dbaseTemp[ 'histd1BySsAndResType' ]
+#    histd1d2BySsAndCombinedResType = dbaseTemp[ 'histd1BySsAndCombinedResType' ]
+#    dbase_file.close()
 
 # Disable when debugged:
-if False:
-    histRamaCombined         = None
-    histRamaBySsAndResType = None
-    histRamaBySsAndCombinedResType = None
-    histJaninBySsAndResType         = None
-    histJaninBySsAndCombinedResType = None
+#if False:
+#    histRamaCombined         = None
+#    histRamaBySsAndResType = None
+#    histRamaBySsAndCombinedResType = None
+#    histJaninBySsAndResType         = None
+#    histJaninBySsAndCombinedResType = None
 
 
 wiPlotList = []

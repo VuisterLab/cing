@@ -13,6 +13,10 @@ d1d2 = 'd1d2'
 #dihedralTodo = Ramachandran
 #dihedralTodo = Janin
 dihedralComboTodo = d1d2
+# Throw away the worst 10 % within the chain.
+DEFAULT_BFACTOR_PERCENTAGE_FILTER = 10 # integer number please.
+# Then after the above check throw away additionaly any residue above 20
+DEFAULT_MAX_BFACTOR = 20
 
 def main():
     """This is a potentially dangerous script. It took JFD an hour one time
@@ -29,7 +33,8 @@ def main():
     # parameters for doScriptOnEntryList
     startDir              = os.path.join(cingDirTmp,     subdir)
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
-    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
+#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
+    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28.LIS')
 
     START_ENTRY_ID                 =0 # default 0
     MAX_ENTRIES_TODO               =2 # default a ridiculously large number like 999999

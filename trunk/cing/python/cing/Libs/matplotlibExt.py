@@ -13,13 +13,17 @@ _red_inv_data =  {
                'red':   ((0., 1, 1), (1., 1, 1)),
                'green': ((0., 1, 1), (1., 0, 0)),
                'blue':  ((0., 1, 1), (1., 0, 0))}
+#_green_inv_data =  {
+#               'red':   ((0., 0, 0),
+#                         (1., 0, 0)),
+#               'green': ((0., 0, 0),
+#                         (1., 1, 1)),
+#               'blue':  ((0., 0, 0),
+#                         (1., 0, 0))}
 _green_inv_data =  {
-               'red':   ((0., 0, 0),
-                         (1., 0, 0)),
-               'green': ((0., 0, 0),
-                         (1., 1, 1)),
-               'blue':  ((0., 0, 0),
-                         (1., 0, 0))}
+               'red':   ((0., 1, 1), (1., 0, 0)),
+               'green': ((0., 1, 1), (1., 1, 1)),
+               'blue':  ((0., 1, 1), (1., 0, 0))}
 _blue_inv_data =  {
                'red':   ((0., 1, 1), (1., 0, 0)),
                'green': ((0., 1, 1), (1., 0, 0)),
@@ -40,5 +44,3 @@ datad[ 'red_inv' ]    = _red_inv_data
 datad[ 'green_inv' ]  = _green_inv_data
 datad[ 'blue_inv' ]   = _blue_inv_data
 datad[ 'yellow_inv' ] = _yellow_inv_data
-
-

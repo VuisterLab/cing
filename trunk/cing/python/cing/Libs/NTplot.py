@@ -909,10 +909,16 @@ class NTplot( NTdict ):
                 ylabel(self.yLabel)
 
             if isinstance(self.xTicks, list):
-                xticks(self.xTicks)# A list with actual values like 0,60,120...
+                if isinstance(self.xTicks[0],str):
+                    xticks(arange(0.5,len(self.xTicks)+0.5),self.xTicks)
+                else:
+                    xticks(self.xTicks)# A list with actual values like 0,60,120...
                 # or empty
             if isinstance(self.yTicks, list):
-                yticks(self.yTicks)# A list with actual values like 0,60,120...
+                if isinstance(self.yTicks[0],str):
+                    yticks(arange(0.5,len(self.yTicks)+0.5),self.yTicks)
+                else:
+                    yticks(self.yTicks)# A list with actual values like 0,60,120...
 
             if self.xRange is not None:
                 xlim(self.xRange)
@@ -1107,8 +1113,8 @@ class NTplot( NTdict ):
 
         cmapList= [   green_inv, blue_inv, yellow_inv ]
         colorList= [ 'green',   'blue',   'yellow']
+#        i = 0
         i = 0
-#        i = 2
         for hist in histList:
 #        for hist in [ histList[i] ]:
             maxHist = amax(amax( hist ))
