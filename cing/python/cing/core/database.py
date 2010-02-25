@@ -427,7 +427,7 @@ class ResidueDef( NTtree ):
         return instance or None on error
         """
         if not self.canBeModified:
-            NTerror('ResidueDef.appendAtomDef: modifying "%s" is not allowed', self)
+#            NTwarning('ResidueDef.appendAtomDef: modifying "%s" is not allowed', self)
             return None
         #end if
 
@@ -435,7 +435,7 @@ class ResidueDef( NTtree ):
         if self.has_key(name):
             oldAtmDef = self[name]
             if not oldAtmDef.canBeModified:
-                NTerror('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
+#                NTwarning('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
                 return None
             #end if
             NTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)

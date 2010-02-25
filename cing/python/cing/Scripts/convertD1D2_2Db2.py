@@ -15,16 +15,23 @@ from cing import cingDirData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityOutput
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import floatParse
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
 from cing.PluginCode.required.reqDssp import to3StateUpper
+from cing.Scripts.getPhiPsi import BFACTOR_COLUMN
+from cing.Scripts.getPhiPsi import IDX_COLUMN
+from cing.Scripts.getPhiPsiWrapper import DEFAULT_BFACTOR_PERCENTAGE_FILTER
+from cing.Scripts.getPhiPsiWrapper import DEFAULT_MAX_BFACTOR
 from cing.core.classes import Project
-from cing.core.molecule import commonAAList
+from cing.core.database import NTdb
+from cing.core.molecule import common20AAList
 from matplotlib.pyplot import hist
 import cPickle
 import cing
@@ -34,10 +41,10 @@ import os
 
 
 file_name_base = 'cb4ncb4c_wi_db'
-file_name_base2 = 'cb4ncb4c_wi_db2'
+#file_name_base2 = 'cb4ncb4c_wi_db2'
 # .gz extension is appended in the code.
 cvs_file_name = file_name_base + '.csv'
-dbase_file_name = file_name_base2 + '.dat'
+dbase_file_name = file_name_base + '.dat'
 dir_name = os.path.join(cingDirData, 'PluginCode', 'WhatIf')
 cvs_file_abs_name = os.path.join(dir_name, cvs_file_name)
 dbase_file_abs_name = os.path.join(dir_name, dbase_file_name)
@@ -60,6 +67,25 @@ yRange = (plotparams2.min, plotparams2.max)
 
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
+
+if False:
+    lineList = [] # TODO: fix.
+    lineListSorted = NTsort(lineList,BFACTOR_COLUMN,inplace=False)
+    # Now throw away the worst 10 % of residues.
+    n = len(lineListSorted)
+    bad_count = int(round((n * DEFAULT_BFACTOR_PERCENTAGE_FILTER) / 100.))
+    k = n-bad_count
+    NTmessage("Removing at least %d from %d residues" % (bad_count,n))
+    badIdxList = [lineItem[IDX_COLUMN] for lineItem in lineListSorted[k:n]]
+    strSum = ''
+    for i, lineItem in enumerate(lineList):
+        max_bfactor = lineItem[BFACTOR_COLUMN]
+        if max_bfactor > DEFAULT_MAX_BFACTOR:
+            NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
+            continue
+        if i in badIdxList:
+            NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
+            continue
 
 
 def main():
@@ -92,15 +118,21 @@ def main():
         resNum = int(resNum)
         ssType = to3StateUpper(ssType)[0]
         resType = resType.strip()
+        db = NTdb.getResidueDefByName( resType )
+        if not db:
+            NTerror("resType not in db: %s" % resType)
+            return
+        resType = db.nameDict['IUPAC']
         d1 = d1.strip()
         d1 = floatParse(d1)
         if isNaN(d1):
+#            NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
             continue
         if not inRange(d1):
             NTerror("d1 not in range for row: %s" % `row`)
             return
 
-        if not (resType in commonAAList):
+        if not (resType in common20AAList):
 #            NTmessage("Skipping uncommon residue: %s" % resType)
             if not ( resType in skippedResTypes):
                 skippedResTypes.append( resType )
@@ -109,7 +141,6 @@ def main():
             appendDeepByKeys(valueBySsAndResTypes, d1, ssType, resType, prevResType)
             appendDeepByKeys(valueByResTypes, d1, resType, prevResType)
             appendDeepByKeys(valueBySs, d1, ssType)
-#            appendDeepByKeys(value, d1)
             value.append( d1 )
         prevResType = resType
         prevResNum = resNum
@@ -119,6 +150,7 @@ def main():
     del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
     NTmessage("Skipped skippedResTypes: %r" % skippedResTypes )
+    NTmessage("Got count of values: %r" % len(value) )
     # fill FOUR types of hist.
     # TODO: filter differently for pro/gly
     keyListSorted1 = valueBySsAndResTypes.keys();
@@ -177,7 +209,6 @@ def main():
 
     cPickle.dump(dbase, output, -1)
     output.close()
-
 
 
 def inRange(a):

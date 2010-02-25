@@ -252,7 +252,7 @@ class pdbParser:
 #                   aName = moveFirstDigitToEnd(atm.name) # worry about this?
                     atm.db = res.db.appendAtomDef(atm.name)
                     if not atm.db:
-                        NTcodeerror("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
+#                        NTwarning("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
                         continue
 
         msg = "Non-standard (residues and their) atoms"

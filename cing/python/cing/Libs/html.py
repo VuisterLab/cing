@@ -4,6 +4,7 @@ Adds html generation methods
 
 from cing import NaNstring
 from cing import authorList
+from cing import cingDirData
 from cing import cingRevision
 from cing import cingRevisionUrl
 from cing import cingRoot
@@ -44,21 +45,15 @@ from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import RAMCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.PluginCode.required.reqWhatif import histJaninBySsAndCombinedResType
-from cing.PluginCode.required.reqWhatif import histJaninBySsAndResType
-from cing.PluginCode.required.reqWhatif import histRamaBySsAndCombinedResType
-from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
-from cing.PluginCode.required.reqWhatif import histd1d2BySsAndCombinedResType
-from cing.PluginCode.required.reqWhatif import histd1d2BySsAndResType
 from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
-from cing.core.constants import CHARS_PER_LINE_OF_PROGRESS
-from cing.core.constants import PDB
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
+import cPickle
 import os
 import shutil
 
@@ -183,6 +178,57 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 #end def
 
 
+class HistogramsForPlotting():
+    """Class for enabling load on demand
+Funny doesn't seem to speed booting up. And it really doesn't get loaded.
+    """
+    def __init__(self):
+        self.histRamaCombined                = None
+        self.histRamaBySsAndResType          = None
+        self.histRamaBySsAndCombinedResType  = None
+        self.histJaninBySsAndResType         = None
+        self.histJaninBySsAndCombinedResType = None
+        self.histd1BySsAndResTypes          = None
+        self.histd1ByResTypes  = None
+        self.histd1BySs  = None
+        self.histd1  = None
+
+        self.histDir = os.path.join( cingDirData, 'PluginCode', 'WhatIf')
+#        self.initHist()
+
+    def initHist(self):
+        if True:
+            dbase_file_abs_name =  os.path.join( self.histDir, 'phipsi_wi_db.dat' )
+            #dbaseTemp = shelve.open( dbase_file_abs_name )
+            dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+            dbaseTemp = cPickle.load(dbase_file)
+        #    pprint.pprint(dbaseTemp)
+            self.histRamaCombined                = dbaseTemp[ 'histRamaCombined' ]
+            self.histRamaBySsAndResType          = dbaseTemp[ 'histRamaBySsAndResType' ]
+            self.histRamaBySsAndCombinedResType  = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
+        #    pprint(histRamaCombined)
+            dbase_file.close()
+            #dbaseTemp.close()
+
+            dbase_file_abs_name = os.path.join( self.histDir, 'chi1chi2_wi_db.dat' )
+            dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+            dbaseTemp = cPickle.load(dbase_file)
+            self.histJaninBySsAndResType         = dbaseTemp[ 'histJaninBySsAndResType' ]
+            self.histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
+            dbase_file.close()
+        if True:
+            dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
+            dbase_file = open(dbase_file_abs_name, 'rb') # read binary
+            dbaseTemp = cPickle.load(dbase_file)
+            self.histd1BySsAndResTypes = dbaseTemp[ 'histd1BySsAndResTypes' ]
+            self.histd1ByResTypes = dbaseTemp[ 'histd1ByResTypes' ]
+            self.histd1BySs = dbaseTemp[ 'histd1BySs' ]
+            self.histd1 = dbaseTemp[ 'histd1' ]
+            dbase_file.close()
+# end class
+
+hPlot = HistogramsForPlotting()
+
 def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
                       plotTitle = None, plotCav = True, htmlOnly=False ):
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
@@ -249,15 +295,19 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yLabel = dihedralName2)
     ps.addPlot(plot)
 
+    if hPlot.histRamaBySsAndCombinedResType == None:
+        hPlot.initHist()
+
+    doingNewD1D2plot = False
     if dihedralName1=='PHI' and dihedralName2=='PSI':
-        histBySsAndCombinedResType = histRamaBySsAndCombinedResType
-        histBySsAndResType         = histRamaBySsAndResType
+        histBySsAndCombinedResType = hPlot.histRamaBySsAndCombinedResType
+        histBySsAndResType         = hPlot.histRamaBySsAndResType
     elif dihedralName1=='CHI1' and dihedralName2=='CHI2':
-        histBySsAndCombinedResType = histJaninBySsAndCombinedResType
-        histBySsAndResType         = histJaninBySsAndResType
-    elif dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
-        histBySsAndCombinedResType = histd1d2BySsAndCombinedResType
-        histBySsAndResType         = histd1d2BySsAndResType
+        histBySsAndCombinedResType = hPlot.histJaninBySsAndCombinedResType
+        histBySsAndResType         = hPlot.histJaninBySsAndResType
+    elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
+        histBySsAndResType         = hPlot.histd1BySsAndResTypes
+        doingNewD1D2plot = True
     else:
         NTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
         return None
@@ -266,17 +316,22 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
     ssTypeList.sort()
     # The assumption is that the derived residues can be represented by the regular.
-    resNamePdb = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
-    if len( resNamePdb ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
-        resNamePdb = resNamePdb[:3]  # .pdb files have a max of 3 chars in their residue name.
-#    NTdebug('Looked up residue.resName %s to resNamePdb %s' % ( residue.resName,resNamePdb ))
+    resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
+    if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
+        resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
+#    NTdebug('Looked up residue.resName %s to resName %s' % ( residue.resName,resName ))
 
     for ssType in ssTypeList:
-        hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
         if isSingleResiduePlot:
-            hist = getDeepByKeys(histBySsAndResType,ssType,resNamePdb)
+            if doingNewD1D2plot:
+                # depending on doOnlyOverall it will actually return an array of hist.
+                hist = residue.getTripletHistogramList( doOnlyOverall = False )
+            else:
+                hist = getDeepByKeys(histBySsAndResType,ssType,resName)
+        else:
+            hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
         if hist != None:
-#            NTdebug('Appending for ssType %s and resNamePdb %s' % ( ssType,resNamePdb ))
+#            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(hist)
     if histList:
 #        NTdebug('Will do dihedralComboPlot')

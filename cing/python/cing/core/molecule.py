@@ -21,6 +21,7 @@ from cing.Libs.NTutils import cross3Dopt
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import length3Dopt
 from cing.Libs.NTutils import list2asci
 from cing.Libs.NTutils import obj2XML
@@ -35,24 +36,20 @@ from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.Libs.html import addPreTagLines
+from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
 from cing.PluginCode.required.reqDssp import DSSP_S
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.core.ROGscore import ROGscore
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import CYANA
-from cing.core.constants import CYANA2
-from cing.core.constants import CYANA_NON_RESIDUES
-from cing.core.constants import INTERNAL
-from cing.core.constants import IUPAC
-from cing.core.constants import LOOSE
-from cing.core.constants import NOSHIFT
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from database import NTdb
 from math import acos
 from math import pi
+from numpy.core.defmatrix import mat
+from numpy.core.numeric import ndarray
+from numpy.ma.core import multiply
 from parameters   import plotParameters
 import math
 import os
@@ -88,7 +85,8 @@ chothiaClassC = 'c' # only coil
 mapChothia_class2Int = {chothiaClassA: 0, chothiaClassB : 1, chothiaClassAB : 2, chothiaClassC : 3, None: None}
 
 # Only 20 AA and 5 NA; Nota Bena no variants.
-commonAAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL ASPH GLUH HISD HISE LYS+ ARG+".split()
+common20AAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL".split()
+commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split()
 commonNAList = "A T G C U".split()
 commonResidueList = commonAAList + commonNAList
 
@@ -911,9 +909,8 @@ class Molecule( NTtree, ResidueList ):
             #end for
             l = len(atm.resonances)
             if l < self.resonanceCount:
-                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
-                          atm, l, self.resonanceCount
-                        )
+#                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
+#                          atm, l, self.resonanceCount)
                 for _i in range(l,self.resonanceCount):
                     atm.addResonance()
                 #end for
@@ -1222,7 +1219,7 @@ class Molecule( NTtree, ResidueList ):
         """
 #        NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
-#            res.addAllDihedrals()
+#            res.addDihedralsAll()
             for d in res.dihedrals:
                 d.calculateValues()
             #end for
@@ -1406,7 +1403,7 @@ class Molecule( NTtree, ResidueList ):
            Calculate the rmsd's
         """
         for res in self.allResidues():
-            res.addAllDihedrals()
+            res.addDihedralsAll()
         if self.modelCount > 0:
             self.syncModels()
             self.updateDihedrals()
@@ -2636,8 +2633,9 @@ Residue class: Defines residue properties
         #end if
     #end def
 
-    def addAllDihedrals(self):
-        """Add all dihedrals according to definition database.
+    def addDihedralsAll(self):
+        """Add all dihedrals according to definition database plus
+        the new D1.
         """
         self.dihedrals = NTlist()
         if self.db:
@@ -2653,6 +2651,7 @@ Residue class: Defines residue properties
                 #end if
             #end for
         #end if
+        self.addDihedralD1()
     #end def
 
     def translate( self, convention ):
@@ -2781,6 +2780,133 @@ Residue class: Defines residue properties
         return result
     #end def
 
+    def addDihedralD1(self):
+        """Calculates and adds the Cb4N dihedral to this residue and the same dihedral as
+        Cb4C to the previous residue.
+
+        Return None on error.
+        First residue in chain will return a d1 of None.
+        """
+
+        if not self.hasProperties('protein'):
+            return
+#        TODO: change to HA3 when CING switches to IUPAC
+        doublet = NTlist()
+        for i in [-1,0]:
+            doublet.append( self.sibling(i) )
+
+        if None in doublet:
+            if not self.isNterminal():
+                NTerror( 'Skipping non N-terminal residue without doublet %s' % self)
+            return
+        CA_atms = doublet.zap('CA')
+        CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
+        for doubletResidue in doublet:
+            if doubletResidue.resName not in commonAAList:
+                NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
+                continue
+
+            CB_atm = None
+            if doubletResidue.has_key('CB'):
+                CB_atm = doubletResidue.CB
+            elif doubletResidue.has_key(GLY_HA3_NAME_CING):
+                CB_atm = doubletResidue[GLY_HA3_NAME_CING]
+            else:
+                NTerror( 'Skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+                continue
+            CB_atms.append(CB_atm)
+#                print res, triplet, CA_atms, CB_atms
+        if len(CB_atms) != len(doublet): # skip for preceding or trailing uncommon residues for now.
+#            NTdebug( '"CB" (or %s) missing in triplet %s' % (GLY_HA3_NAME_CING, doublet ))
+            return
+        prevRes = doublet[0]
+        d1 = Dihedral( self, DIHEDRAL_NAME_Cb4N, range=range0_360)
+        d1PrevRes = Dihedral( prevRes, DIHEDRAL_NAME_Cb4C, range=range0_360)
+        d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
+        d1PrevRes.atoms = d1.atoms
+
+        d1.calculateValues()
+        d1PrevRes.calculateValues()
+        self[DIHEDRAL_NAME_Cb4N] = d1 # append dihedral to residue
+        prevRes[DIHEDRAL_NAME_Cb4C] = d1PrevRes # append dihedral to residue
+        self.dihedrals.append(d1)
+        prevRes.dihedrals.append(d1PrevRes)
+
+        # Make sure we always have something to hold onto.
+        d1_value_list = getDeepByKeysOrDefault( self, [ NaN ], DIHEDRAL_NAME_Cb4N)
+        return d1_value_list
+    #end def
+
+    def getTripletHistogramList(self, doOnlyOverall = False ):
+        """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
+        an empty array when it could not be constructed.
+        Return None on error.
+        """
+
+        triplet = NTlist()
+        for i in [-1,0,1]:
+            triplet.append( self.sibling(i) )
+
+        if None in triplet:
+            NTdebug( 'Skipping residue without triplet %s' % self)
+            return []
+
+        resTypePrev = triplet[0].db.shortName
+        resType     = triplet[1].db.shortName
+        resTypeNext = triplet[2].db.shortName
+
+
+        hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
+        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext)
+        if hist1 == None:
+            NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
+            return []
+        if hist2 == None:
+            NTdebug('skipping for hist2 is empty for [%s] [%s]' % (resType, resTypeNext))
+            return []
+        sumh1 = sum(hist1)
+        sumh2 = sum(hist2)
+
+        # Plot a density background
+        histList = []
+
+        if doOnlyOverall:
+            hist1 = 100.0 * hist1 / sumh1
+            hist2 = 100.0 * hist2 / sumh2
+            m1 = mat(hist1)
+            m2 = mat(hist2).transpose()
+            hist = multiply(m1,m2)
+            histList.append(hist)
+        else:
+            ssTypeList = hPlot.histd1BySsAndResTypes.keys() #@UndefinedVariable
+            ssTypeList.sort() # in place sort to: space, H, S
+            for ssType in ssTypeList:
+                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypeNext)
+                if hist1 == None:
+                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
+                    continue
+                if hist2 == None:
+                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+                    continue
+
+                sumh1 = sum(hist1)
+                sumh2 = sum(hist2)
+
+                hist1 = 100.0 * hist1 / sumh1
+                hist2 = 100.0 * hist2 / sumh2
+                m1 = mat(hist1)
+                m2 = mat(hist2).transpose()
+                hist = multiply(m1,m2)
+# TODO: why the next 3 lines?
+                l = len(hist1)
+                if ssType == ' ':
+                    hist = ndarray(shape=(l, l), dtype=float, order='F')
+                histList.append(hist)
+            # end for
+        # end if
+        return histList
+
     def toSML(self, stream=sys.stdout ):
         if hasattr(Residue,'SMLhandler'):
             Residue.SMLhandler.toSML( self, stream )
@@ -2800,23 +2926,21 @@ class Dihedral( NTlist ):
 
         self.residue = residue
         self.name = dihedralName
+        self.atoms = None # Moved up here for clarity.
+        self.db = None
+        self.range = range
+        self.cav = NaN
+        self.cv  = NaN
+
         if not range:
             plotpars = plotParameters.getdefault(dihedralName,'dihedralDefault')
             self.range = ( plotpars.min, plotpars.max )
-        else:
-            self.range = range
         #end if
 
-
-        if not dihedralName or not residue or not residue.db or not residue.db.has_key(dihedralName):
-            self.db = None
-            self.atoms = None
-        else:
+        if not (not dihedralName or not residue or not residue.db or not residue.db.has_key(dihedralName)):
             self.db = residue.db[dihedralName]
             atoms = translateTopology( self.residue, self.db.atoms )
-            if atoms == None or len(atoms) != 4 or None in atoms:
-                self.atoms = None
-            else:
+            if not (atoms == None or len(atoms) != 4 or None in atoms):
                 self.atoms  = atoms
                 #add dihedral to dict for lookup later
                 self.residue.chain.molecule._dihedralDict[(atoms[0],atoms[1],atoms[2],atoms[3])] = \
@@ -2825,8 +2949,6 @@ class Dihedral( NTlist ):
                     (self.residue, dihedralName, self.db)
             #end if
         #end if
-        self.cav = NaN
-        self.cv  = NaN
     #end def
 
     def __str__(self):
