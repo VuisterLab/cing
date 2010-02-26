@@ -18,6 +18,8 @@ from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.PluginCode.required.reqWhatif import INOCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.core.constants import SCALE_BY_MAX
+from cing.core.constants import SCALE_BY_SUM
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
@@ -62,6 +64,7 @@ from matplotlib.ticker import NullFormatter
 from numpy import ma
 from numpy.core.fromnumeric import amax
 from numpy.core.numeric import arange
+from numpy.core.fromnumeric import amin
 import math
 import numpy as np
 
@@ -1093,13 +1096,15 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
 
-    def dihedralComboPlot(self, histList, minPercentage =  2.0, maxPercentage = 20.0):
+    def dihedralComboPlot(self, histList, scaleBy = SCALE_BY_MAX, minPercentage =  2.0, maxPercentage = 20.0):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
         Return True on error.
 
         Input histogram should be the bare counts.
         This routine will calculate the c_dbav, s_dbav
+
+        scaleBy can be Max, or Sum
         """
 
         alpha = 0.8 # was 0.8; looks awful with alpha = 1
@@ -1117,12 +1122,19 @@ class NTplot( NTdict ):
         i = 0
         for hist in histList:
 #        for hist in [ histList[i] ]:
-            maxHist = amax(amax( hist ))
-#            minHist = amin(amin( hist ))
-#            NTdebug("maxHist: %s" % maxHist)
-#            NTdebug("minHist: %s" % minHist)
-            hist *= 100./maxHist
-
+            if scaleBy == SCALE_BY_MAX:
+                maxHist = amax(amax( hist ))
+                minHist = amin(amin( hist ))
+                NTdebug("maxHist: %s" % maxHist)
+                NTdebug("minHist: %s" % minHist)
+                hist *= 100./maxHist
+            elif scaleBy == SCALE_BY_SUM:
+                sumHist = sum(sum( hist ))
+                NTdebug("sumHist: %s" % sumHist)
+                hist *= 100./sumHist
+            else:
+                NTerror("parameter invalid in dihedralComboPlot")
+                return
             # Just make a copy...
             hist = ma.masked_where(hist <= minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
 #            hist = ma.masked_where(hist < minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under

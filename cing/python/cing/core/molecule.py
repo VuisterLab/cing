@@ -2795,7 +2795,7 @@ Residue class: Defines residue properties
 
         if None in doublet:
             if not self.isNterminal():
-                NTerror( 'Skipping non N-terminal residue without doublet %s' % self)
+                NTwarning( 'Skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
             return
         CA_atms = doublet.zap('CA')
         CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
