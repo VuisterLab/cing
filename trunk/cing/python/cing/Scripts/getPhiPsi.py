@@ -14,11 +14,9 @@ from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import floatFormat
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import gunzip
-from cing.Libs.NTutils import switchOutput
 from cing.Libs.fpconst import NaN
 from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
-from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
@@ -35,18 +33,8 @@ import cing
 import os
 import sys
 
-if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    switchOutput(False)
-    try:
-        import yasara
-        yasara.info.mode = 'txt'
-        yasara.Console('off')
-    except:
-        switchOutput(True)
-        raise ImportWarning(YASARA_STR)
-    finally: # finally fails in python below 2.5
-        switchOutput(True)
-    NTmessage('Using Yasara')
+# Keep a copy of the CING project.
+doSave = False
 
 if dihedralComboTodo == Ramachandran:
     DIHEDRAL_NAME_1 = 'PHI'
@@ -59,7 +47,7 @@ elif dihedralComboTodo == d1d2:
     DIHEDRAL_NAME_1 = DIHEDRAL_NAME_Cb4N
     DIHEDRAL_NAME_2 = DIHEDRAL_NAME_Cb4C
 
-def doEntry( entryCode, chainCode ):
+def doYasara( entryCode, chainCode ):
     char23 = entryCode[1:3]
 
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
@@ -76,6 +64,11 @@ def doEntry( entryCode, chainCode ):
     localPdbFileName = entryCode+chainCode+".pdb"
     os.rename(pdbFileName, localPdbFileName)
 
+    import yasara
+    yasara.info.mode = 'txt'
+    yasara.Console('off')
+    NTmessage('Using Yasara')
+
     # Add hydrogens using Yasara
     obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
 #    yasara.CleanAll() # needed for OptHydObj
@@ -84,22 +77,21 @@ def doEntry( entryCode, chainCode ):
     newPdbFileName = entryCode+chainCode+"_hyd.pdb"
     yasara.SavePDB(obj,newPdbFileName,format='IUPAC', transform='No')
     yasara.Clear()
+#    yasara.StopPlugin()
+#    yasara.Exit()
 
+    os.unlink(localPdbFileName)
 
+def doEntry( entryCode, chainCode ):
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
+    newPdbFileName = entryCode+chainCode+"_hyd.pdb"
     project.initPDB( pdbFile=newPdbFileName, convention = IUPAC, nmodels=1 )
     project.runDssp()
     if False:
-        os.unlink(localPdbFileName)
         os.unlink(newPdbFileName)
-
-#    project.procheck(createPlots=False, runAqua=False)
-#    if not project.dssp():
-#        NTerror('Failed DSSP on entry %s chain code: %s' % (entryCode,chainCode) )
-#        return True
 
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
 
@@ -163,10 +155,12 @@ def doEntry( entryCode, chainCode ):
             NTmessageNoEOL(str)
             strSum += str # expensive
 
-#    if project.removeFromDisk():
-#        NTerror("Failed to remove project from disk for entry: ", entryCode)
-    if not project.save():
-        NTerror("Failed to save project to disk for entry: " + entryCode)
+    if doSave:
+        if not project.save():
+            NTerror("Failed to save project to disk for entry: " + entryCode)
+    else:
+        if project.removeFromDisk():
+            NTerror("Failed to remove project from disk for entry: ", entryCode)
 
     file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
     resultsFileName = file_name_base + '_wi_db_%s.csv' % ( entryCode+chainCode )

@@ -1,5 +1,8 @@
 """
 python $CINGROOT/python/cing/Scripts/getPhiPsiWrapper.py
+
+Use below to find the entries done and todo:
+
 """
 from cing import cingDirScripts
 from cing import cingDirTmp

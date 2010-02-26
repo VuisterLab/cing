@@ -534,8 +534,6 @@ def plotDihedralD1_2d(doOnlyOverall = True):
                 sumh2 = sum(hist2)
                 plot.title += ' %d-%d' % (sumh1,sumh2)
                 if doOnlyOverall:
-                    hist1 = 100.0 * hist1 / sumh1
-                    hist2 = 100.0 * hist2 / sumh2
                     m1 = mat(hist1)
                     m2 = mat(hist2).transpose()
                     hist = multiply(m1,m2)
@@ -558,8 +556,8 @@ def plotDihedralD1_2d(doOnlyOverall = True):
                         sumh2 = sum(hist2)
                         plot.title += " '%s' %d-%d" % (ssType, sumh1,sumh2)
 
-                        hist1 = 100.0 * hist1 / sumh1
-                        hist2 = 100.0 * hist2 / sumh2
+#                        hist1 = 100.0 * hist1 / sumh1
+#                        hist2 = 100.0 * hist2 / sumh2
                         m1 = mat(hist1)
                         m2 = mat(hist2).transpose()
                         hist = multiply(m1,m2)
