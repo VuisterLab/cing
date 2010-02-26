@@ -16,7 +16,9 @@ dihedralComboTodo = d1d2
 # Throw away the worst 10 % within the chain.
 DEFAULT_BFACTOR_PERCENTAGE_FILTER = 10 # integer number please.
 # Then after the above check throw away additionaly any residue above 20
-DEFAULT_MAX_BFACTOR = 20
+DEFAULT_MAX_BFACTOR = 40
+BFACTOR_COLUMN = 7
+IDX_COLUMN = 8
 
 def main():
     """This is a potentially dangerous script. It took JFD an hour one time
