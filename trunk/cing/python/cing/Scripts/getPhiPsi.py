@@ -35,9 +35,6 @@ import cing
 import os
 import sys
 
-BFACTOR_COLUMN = 7
-IDX_COLUMN = 8
-
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     switchOutput(False)
     try:
@@ -160,9 +157,9 @@ def doEntry( entryCode, chainCode ):
             bfactorList = NTzap(flatList,'Bfac')
             max_bfactor = max(bfactorList)
             idx += 1 # starts at 0 when inserted.
-            lineItem = [ entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor, idx ]
+            lineItem = ( entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor )
             lineList.append(lineItem)
-            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % tuple(lineItem[:IDX_COLUMN])
+            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % lineItem
             NTmessageNoEOL(str)
             strSum += str # expensive
 
@@ -178,7 +175,7 @@ def doEntry( entryCode, chainCode ):
     resultsFile.write(strSum)
 #    NTdebug( '\n'+strSum )
     resultsFile.flush()
-
+    resultsFile.close() # otherwise too many open files error.
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

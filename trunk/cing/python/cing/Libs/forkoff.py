@@ -388,7 +388,7 @@ class Process:
             exit_pid, exit_status = os.waitpid(pid, options)
         except OSError, info:
             if self.verbosity:
-                NTwarning("caught an OSError with info:", info)
+                NTwarning("caught an OSError with info: %s" % info)
 
         return exit_pid, exit_status
 
@@ -405,7 +405,7 @@ class Process:
             os.kill( pid, sig )
         except OSError, info:
             if self.verbosity:
-                NTwarning("caught an OSError with info:", info)
+                NTwarning("caught an OSError with info: %s" % info)
             return 0
 
 

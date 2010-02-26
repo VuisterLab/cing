@@ -55,8 +55,6 @@ import math
 import os
 import sys
 
-
-
 #==============================================================================
 # Global variables
 #==============================================================================
@@ -2802,7 +2800,8 @@ Residue class: Defines residue properties
         CA_atms = doublet.zap('CA')
         CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
         for doubletResidue in doublet:
-            if doubletResidue.resName not in commonAAList:
+            resTypeSimple = getDeepByKeys(doubletResidue.db.nameDict, IUPAC)
+            if resTypeSimple not in commonAAList:
                 NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
                 continue
 

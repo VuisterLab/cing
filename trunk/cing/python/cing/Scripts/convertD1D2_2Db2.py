@@ -19,16 +19,17 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import floatParse
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
 from cing.PluginCode.required.reqDssp import to3StateUpper
-from cing.Scripts.getPhiPsi import BFACTOR_COLUMN
-from cing.Scripts.getPhiPsi import IDX_COLUMN
+from cing.Scripts.getPhiPsiWrapper import BFACTOR_COLUMN
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_BFACTOR_PERCENTAGE_FILTER
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_MAX_BFACTOR
+from cing.Scripts.getPhiPsiWrapper import IDX_COLUMN
 from cing.core.classes import Project
 from cing.core.database import NTdb
 from cing.core.molecule import common20AAList
@@ -60,33 +61,7 @@ plotparams2 = project.plotParameters.getdefault(dihedralName2, 'dihedralDefault'
 xRange = (plotparams1.min, plotparams1.max)
 yRange = (plotparams2.min, plotparams2.max)
 
-
-# Used for linear interpolation
-#xGrid,yGrid = ogrid[ plotparams1.min:plotparams1.max:binCountJ, plotparams1.min:plotparams1.max:binCountJ ]
-#bins = (xGrid,yGrid)
-
-#pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
-
-if False:
-    lineList = [] # TODO: fix.
-    lineListSorted = NTsort(lineList,BFACTOR_COLUMN,inplace=False)
-    # Now throw away the worst 10 % of residues.
-    n = len(lineListSorted)
-    bad_count = int(round((n * DEFAULT_BFACTOR_PERCENTAGE_FILTER) / 100.))
-    k = n-bad_count
-    NTmessage("Removing at least %d from %d residues" % (bad_count,n))
-    badIdxList = [lineItem[IDX_COLUMN] for lineItem in lineListSorted[k:n]]
-    strSum = ''
-    for i, lineItem in enumerate(lineList):
-        max_bfactor = lineItem[BFACTOR_COLUMN]
-        if max_bfactor > DEFAULT_MAX_BFACTOR:
-            NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
-            continue
-        if i in badIdxList:
-            NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
-            continue
-
 
 def main():
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
@@ -100,54 +75,90 @@ def main():
     histd1BySsAndResTypes = {}
     histd1ByResTypes = {}
     histd1BySs = {}
-#    histd1 = []
 
-#    hrange = (xRange, yRange)
 
-    prevEntryId = None
-    prevChainId = None
-    prevResType = None
-    prevResNum = None
+    linesByEntry = {}
+    for row in reader:
+        entryId = row[0]
+        if not linesByEntry.has_key(entryId):
+            linesByEntry[ entryId ] = []
+        linesByEntry[ entryId ].append( row )
+    del(reader) # closes the file handles
 
     skippedResTypes = []
-    for row in reader:
-#1zzk,A,GLN ,  17,E, 205.2, 193.6
-#1zzk,A,VAL ,  18,E, 193.6, 223.2
-#1zzk,A,THR ,  19,E, 223.2, 190.1
-        (entryId, chainId, resType, resNum, ssType, d1, _d2) = row
-        resNum = int(resNum)
-        ssType = to3StateUpper(ssType)[0]
-        resType = resType.strip()
-        db = NTdb.getResidueDefByName( resType )
-        if not db:
-            NTerror("resType not in db: %s" % resType)
-            return
-        resType = db.nameDict['IUPAC']
-        d1 = d1.strip()
-        d1 = floatParse(d1)
-        if isNaN(d1):
-#            NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
-            continue
-        if not inRange(d1):
-            NTerror("d1 not in range for row: %s" % `row`)
-            return
+    entryIdList = linesByEntry.keys()
+    entryIdList.sort()
 
-        if not (resType in common20AAList):
-#            NTmessage("Skipping uncommon residue: %s" % resType)
-            if not ( resType in skippedResTypes):
-                skippedResTypes.append( resType )
-            continue
-        if isSibling(entryId, chainId, resNum, prevEntryId, prevChainId, prevResNum):
-            appendDeepByKeys(valueBySsAndResTypes, d1, ssType, resType, prevResType)
-            appendDeepByKeys(valueByResTypes, d1, resType, prevResType)
-            appendDeepByKeys(valueBySs, d1, ssType)
-            value.append( d1 )
-        prevResType = resType
-        prevResNum = resNum
-        prevChainId = chainId
-        prevEntryId = entryId
+    # Do some pre filtering.
+    for entryId2 in entryIdList:
+        lineList = linesByEntry[ entryId2 ]
+        for idx,line in enumerate(lineList):
+            line.append(idx)
+        lineListSorted = NTsort(lineList,BFACTOR_COLUMN,inplace=False)
+        # Now throw away the worst 10 % of residues.
+        n = len(lineListSorted)
+        bad_count = int(round((n * DEFAULT_BFACTOR_PERCENTAGE_FILTER) / 100.))
+        to_remove_count = n-bad_count
+        NTmessage("Removing at least %d from %d residues" % (bad_count,n))
+        badIdxList = [lineItem[IDX_COLUMN] for lineItem in lineListSorted[to_remove_count:n]]
+        iList = range(n)
+        iList.reverse()
+        for i in iList:
+            lineItem = lineList[i]
+            max_bfactor = float(lineItem[BFACTOR_COLUMN])
+            if max_bfactor > DEFAULT_MAX_BFACTOR:
+                NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
+                del lineList[i] # TODO: check if indexing is still right or we shoot in the foot.
+                continue
+            if i in badIdxList:
+                NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
+                del lineList[i]
+                continue
+        removed_count = n - len(lineList)
+        NTdebug("Reduced list by %d" % removed_count)
+        if removed_count < bad_count:
+            NTwarning("Failed to remove at least %d residues" % bad_count)
 
-    del(reader) # closes the file handles
+    for entryId2 in entryIdList:
+        prevChainId = None
+        prevResType = None
+        prevResNum = None
+        for row in linesByEntry[ entryId2 ]:
+    #1zzk,A,GLN ,  17,E, 205.2, 193.6
+    #1zzk,A,VAL ,  18,E, 193.6, 223.2
+    #1zzk,A,THR ,  19,E, 223.2, 190.1
+            (entryId, chainId, resType, resNum, ssType, d1, _d2, _max_bfactor, _idx) = row
+            resNum = int(resNum)
+            ssType = to3StateUpper(ssType)[0]
+            resType = resType.strip()
+            db = NTdb.getResidueDefByName( resType )
+            if not db:
+                NTerror("resType not in db: %s" % resType)
+                return
+            resType = db.nameDict['IUPAC']
+            d1 = d1.strip()
+            d1 = floatParse(d1)
+            if isNaN(d1):
+                NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
+                continue
+            if not inRange(d1):
+                NTerror("d1 not in range for row: %s" % `row`)
+                return
+
+            if not (resType in common20AAList):
+    #            NTmessage("Skipping uncommon residue: %s" % resType)
+                if not ( resType in skippedResTypes):
+                    skippedResTypes.append( resType )
+                continue
+            if isSibling(chainId, resNum, prevChainId, prevResNum):
+                appendDeepByKeys(valueBySsAndResTypes, d1, ssType, resType, prevResType)
+                appendDeepByKeys(valueByResTypes, d1, resType, prevResType)
+                appendDeepByKeys(valueBySs, d1, ssType)
+                value.append( d1 )
+            prevResType = resType
+            prevResNum = resNum
+            prevChainId = chainId
+
     os.unlink(cvs_file_abs_name)
     NTmessage("Skipped skippedResTypes: %r" % skippedResTypes )
     NTmessage("Got count of values: %r" % len(value) )
@@ -216,18 +227,14 @@ def inRange(a):
         return False
     return True
 
-def isSibling(entryId, chainId, resNum, prevEntryId, prevChainId, prevResNum):
+def isSibling(chainId, resNum, prevChainId, prevResNum):
     if prevResNum == None:
         return False
     if prevChainId == None:
         return False
-    if prevEntryId == None:
-        return False
     if resNum != prevResNum + 1:
         return False
     if chainId != prevChainId:
-        return False
-    if entryId != prevEntryId:
         return False
     return True
 
