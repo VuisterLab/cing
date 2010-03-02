@@ -2635,8 +2635,12 @@ Residue class: Defines residue properties
         """Add all dihedrals according to definition database plus
         the new D1.
         """
-        self.dihedrals = NTlist()
+        # Speed optimization.
+        if self.hasProperties('water'):
+            return
+
         if self.db:
+            self.dihedrals = NTlist()
             for d in self.db.dihedrals:
                 dihed = Dihedral( self, d.name )
                 if dihed.atoms:

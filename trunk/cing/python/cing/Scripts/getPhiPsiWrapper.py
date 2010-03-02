@@ -23,26 +23,29 @@ DEFAULT_MAX_BFACTOR = 40
 BFACTOR_COLUMN = 7
 IDX_COLUMN = 8
 
+subdir = None
+if dihedralComboTodo == Ramachandran:
+    subdir = 'phipsi_wi_db'
+elif dihedralComboTodo == Janin:
+    subdir = 'chi1chi2_wi_db'
+elif dihedralComboTodo == d1d2:
+    subdir = 'd1d2_wi_db'
+
 def main():
     """This is a potentially dangerous script. It took JFD an hour one time
     to realize it was called inadvertently by not having it wrappen in a function.
 """
 
-    if dihedralComboTodo == Ramachandran:
-        subdir = 'phipsi_wi_db'
-    elif dihedralComboTodo == Janin:
-        subdir = 'chi1chi2_wi_db'
-    elif dihedralComboTodo == d1d2:
-        subdir = 'd1d2_wi_db'
 
     # parameters for doScriptOnEntryList
     startDir              = os.path.join(cingDirTmp,     subdir)
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
 #    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
-    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28.LIS')
+#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28.LIS')
+    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_todo.txt')
 
     START_ENTRY_ID                 =0 # default 0
-    MAX_ENTRIES_TODO               =2 # default a ridiculously large number like 999999
+    MAX_ENTRIES_TODO               =1 # default a ridiculously large number like 999999
 
     doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,
                         max_time_to_wait = 240, # 1gkp  took over 120

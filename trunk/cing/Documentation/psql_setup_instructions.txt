@@ -99,5 +99,6 @@ http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html
 For automatic start/stop follow instructions at:
 http://ripary.com/postgresql.html
 using:
-$CINGROOT/scripts/sql/PostgreSQL
+$CINGROOT/scripts/sql/PostgreSQL copied to:
+/Library/StartupItems/PostgreSQL/PostgreSQL
 '''You can disable automatic startup at any time by editing /etc/hostconfig.'''

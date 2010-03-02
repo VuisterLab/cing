@@ -1096,7 +1096,7 @@ NTdictDepth    = 0
 NTdictMaxDepth = 1
 NTdictCycles   = []
 
-class NTdict(dict, Lister):
+class NTdict(dict):
     """
         class NTdict: Base class for all mapping NT objects.
 
@@ -1152,6 +1152,10 @@ class NTdict(dict, Lister):
           adapted __eq__.
           Changed implementation in __hash__ due to recursion error.
     """
+
+    # Made into class object because it is the same for each instance.
+    hiddenAttributesMap = {'__OBJECTID__':0, '__CLASS__':0, '__FORMAT__':0, '__SAVEXML__':0, '__SAVEALLXML__':0}
+    hiddenAttributesSize = len( hiddenAttributesMap.keys() )
     def __init__(self, *args, **kwds):
         global NTdictObjectId
 
@@ -1165,7 +1169,6 @@ class NTdict(dict, Lister):
 
         self['__OBJECTID__'] = NTdictObjectId
         NTdictObjectId      += 1
-        self['__HIDDEN__']   = ['__HIDDEN__', '__OBJECTID__', '__CLASS__', '__FORMAT__', '__SAVEXML__', '__SAVEALLXML__']
     #end def
 
     #------------------------------------------------------------------
@@ -1181,7 +1184,7 @@ class NTdict(dict, Lister):
         if not self.has_key(attr):
             raise AttributeError( '"%s" not found.' % attr )
         return self[attr]
-    #end def
+#    end def
 
 
     def __setattr__(self, attr, value):
@@ -1336,7 +1339,7 @@ class NTdict(dict, Lister):
         # append hidden keys if asked for
         keys = self.keys()
         if hidden:
-            keys = keys + self.__HIDDEN__
+            keys = keys + NTdict.hiddenAttributesMap.keys()
 #    print '>>',keys
         for key in keys:
             msg += sprintf('%-12s : %s\n', key, str(self[key]))
@@ -1532,11 +1535,23 @@ class NTdict(dict, Lister):
         keys = dict.keys(self)
         # i.e. we only need to remove the 'local' stuff here
         # remove keys that should be hidden
-        for key in self.__HIDDEN__:
-            keys.remove(key)
-        # sort keys as well
-        keys.sort()
-        return keys
+        m = NTdict.hiddenAttributesMap
+#        if False:
+#            for key in m.keys():
+##                if not (key in keys):
+##                    NTerror("Failed for key %s and keys for %s" % (key,self))
+##                    return []
+#                keys.remove(key)
+#            # sort keys as well
+#            keys.sort()
+#            return keys
+        goodKeys = []
+        for key in keys:
+            if not m.has_key(key):
+#                continue
+                goodKeys.append(key)
+        goodKeys.sort()
+        return goodKeys
 
     def __iter__(self):
         """__iter__ returns keys
@@ -1564,7 +1579,10 @@ class NTdict(dict, Lister):
             yield item
 
     def __len__(self):
-        return len(self.keys())
+        # Soeeded up reading pdb file 1brv from 11 to 5 seconds.
+#        return len(self.keys())
+        keys = dict.keys(self)
+        return len(keys) - NTdict.hiddenAttributesSize
 
     def popitem(self):
         keys = self.keys()
@@ -4361,6 +4379,14 @@ def getDateTimeStampForFileName():
     return date_stamp
 
 
+def readLinesFromFile(fileName, doStrip=True):
+    NTdebug("Reading from file %s" % ( fileName))
+    if doStrip:
+        lineList = [ line.strip() for line in open(fileName).readlines() ]
+    else:
+        lineList = open(fileName).readlines()
+    NTdebug("Read number of lines: %d" %  len(lineList))
+    return lineList
 
 def readTextFromFile(fileName):
     NTdebug("Reading from file %s" % ( fileName))

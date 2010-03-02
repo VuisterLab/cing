@@ -15,6 +15,8 @@ from cing.main import format
 from unittest import TestCase
 import cing
 import os
+import profile
+import pstats
 import unittest #@UnusedImport Too difficult for code analyzer.
 
 class AllChecks(TestCase):
@@ -99,10 +101,11 @@ if __name__ == "__main__":
     cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
-#    profile.run('unittest.main()', fn)
-#    p = pstats.Stats(fn)
-##     enable a line or two below for useful profiling info
-#    p.sort_stats('time').print_stats(10)
-#    p.sort_stats('cumulative').print_stats(2)
-
-    unittest.main()
+    if True:
+        profile.run('unittest.main()', fn)
+        p = pstats.Stats(fn)
+    #     enable a line or two below for useful profiling info
+        p.sort_stats('time').print_stats(10)
+        p.sort_stats('cumulative').print_stats(2)
+    else:
+        unittest.main()

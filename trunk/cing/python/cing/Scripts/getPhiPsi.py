@@ -2,9 +2,10 @@
 Read PDB files for their dihedrals; not just phi psi anymore..
 
 
-cd /Users/jd/tmp/cingTmp/d1d2_wi_db
-python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1fsg A
+cd /Users/jd/tmp/cingTmp
+python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
+from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
@@ -21,6 +22,7 @@ from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
 from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo # once executed all code there, hilarious locks until after an hour JFD realized.
+from cing.Scripts.getPhiPsiWrapper import subdir
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
 from cing.core.constants import IUPAC
@@ -48,6 +50,7 @@ elif dihedralComboTodo == d1d2:
     DIHEDRAL_NAME_2 = DIHEDRAL_NAME_Cb4C
 
 def doYasara( entryCode, chainCode ):
+    """Called from getPhiPsiWrapperYasara"""
     char23 = entryCode[1:3]
 
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
@@ -67,7 +70,7 @@ def doYasara( entryCode, chainCode ):
     import yasara
     yasara.info.mode = 'txt'
     yasara.Console('off')
-    NTmessage('Using Yasara')
+    NTmessage('Using Yasara on %s' % entryCode)
 
     # Add hydrogens using Yasara
     obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
@@ -87,11 +90,10 @@ def doEntry( entryCode, chainCode ):
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
-    newPdbFileName = entryCode+chainCode+"_hyd.pdb"
+
+    newPdbFileName = os.path.join(cingDirTmp, subdir, 'pdb_hyd', entryCode+chainCode+"_hyd.pdb")
     project.initPDB( pdbFile=newPdbFileName, convention = IUPAC, nmodels=1 )
     project.runDssp()
-    if False:
-        os.unlink(newPdbFileName)
 
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
 
