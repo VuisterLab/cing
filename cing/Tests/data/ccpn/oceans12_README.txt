@@ -1,5 +1,5 @@
 Why these (originally) 12 test entries were special to JFD, CP, WV
-1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e
+1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e 1v0e
 
 Molecular system:
 **********************
@@ -16,6 +16,7 @@ Molecular system:
 1iv6 complex
 2k0e Largest in total (35 Mb cif file; 160 models with each 148 residues.
 2jzn Entry with wildly different models in the ensemble.
+1v0e Large X-ray entry with ~5,000 residues (hexamer of 666 AA) containing 3,000+ water molecules.
 
 On the restraint side:
 **********************

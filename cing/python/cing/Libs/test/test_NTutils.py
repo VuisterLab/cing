@@ -89,13 +89,16 @@ class AllChecks(TestCase):
 #        };
 
     def testGeneral(self):
-        s = NTdict(aap = 'noot', mies = 1)
+        s = NTdict(aap = 'foo', mies = 1)
+        self.assertEqual( len(s.keys()), 2)
         s.setdefault('mies', 2)
         s.setdefault('kees', [])
         s.kees = [0, 1, 3]
         s.name = 'ss'
+        self.assertEqual( len(s.keys()), 4) # aap mies kees name
 
         b = s.copy()
+        self.assertEqual( len(b.keys()), 4)
 
         p = s.popitem()
         while p:

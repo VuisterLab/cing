@@ -7,7 +7,6 @@ Use below to find the entries done and todo:
 from cing import cingDirScripts
 from cing import cingDirTmp
 from cing.Libs.NTutils import NTmessage
-from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.getPhiPsi import doYasara
 import cing
 import os
