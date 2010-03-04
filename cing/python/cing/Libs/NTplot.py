@@ -24,6 +24,7 @@ from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
 from matplotlib import colors
+from matplotlib import pyplot
 from matplotlib import rcParams
 from matplotlib.axes import Axes
 from matplotlib.cbook import silent_list
@@ -34,7 +35,6 @@ from matplotlib.patches import Patch
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
 from matplotlib.path import Path
-from matplotlib.pylab import annotate
 from matplotlib.pylab import axes
 from matplotlib.pylab import bar
 from matplotlib.pylab import cla
@@ -63,8 +63,8 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import NullFormatter
 from numpy import ma
 from numpy.core.fromnumeric import amax
-from numpy.core.numeric import arange
 from numpy.core.fromnumeric import amin
+from numpy.core.numeric import arange
 import math
 import numpy as np
 
@@ -76,17 +76,6 @@ except ImportError:
     NTerror("Failed to import python Image library (pil); certain plot options will fail")
     haveImage = False
 #end try
-
-haveBiggles = False
-try:
-    import biggles
-    haveBiggles = True
-    NTdebug("Installed python Biggles library")
-except ImportError:
-    pass
-#    NTdebug("Failed to import biggles; will try to use MatLibPlot")
-
-useMatPlotLib = True
 
 dpi=72.27 # Latex definition
 inches_per_pt = 1./dpi
@@ -207,40 +196,6 @@ openBox            = boxAttributes( fill=False, fillColor='black', line=True, li
 
 plusPoint          = pointAttributes( type='plus',          size=2.0, color='blue' )
 circlePoint        = pointAttributes( type='circle',        size=2.0, color='blue' )
-
-#Biggles symbol types:
-#        "none"                : 0,
-#        "dot"                : 1,
-#        "plus"                : 2,
-#        "asterisk"            : 3,
-#        "circle"            : 4,
-#        "cross"                : 5,
-#        "square"            : 6,
-#        "triangle"            : 7,
-#        "diamond"            : 8,
-#        "star"                : 9,
-#        "inverted triangle"        : 10,
-#        "starburst"            : 11,
-#        "fancy plus"            : 12,
-#        "fancy cross"            : 13,
-#        "fancy square"            : 14,
-#        "fancy diamond"            : 15,
-#        "filled circle"            : 16,
-#        "filled square"            : 17,
-#        "filled triangle"        : 18,
-#        "filled diamond"        : 19,
-#        "filled inverted triangle"    : 20,
-#        "filled fancy square"        : 21,
-#        "filled fancy diamond"        : 22,
-#        "half filled circle"        : 23,
-#        "half filled square"        : 24,
-#        "half filled triangle"        : 25,
-#        "half filled diamond"        : 26,
-#        "half filled inverted triangle" : 27,
-#        "half filled fancy square"    : 28,
-#        "half filled fancy diamond"    : 29,
-#        "octagon"            : 30,
-#        "filled octagon"        : 31,
 
 # pylab
 #            -     : solid line
@@ -370,9 +325,7 @@ class NTplot( NTdict ):
 
         self.plotID       = "Plot A" # will be overridden by NTplotSet where needed.
                                         # Can be numeric e.g. in case of rectangular layout of set.
-        if useMatPlotLib:
-            rect = [.1, .1, .8, .8 ] # ll_x, ll_y, w, h
-            self.axis = axes(rect) # To be overridden by NTplotSet if needed.
+        self.axis = axes([.1, .1, .8, .8 ] ) # To be overridden by NTplotSet if needed. # ll_x, ll_y, w, h
 
         self.update( kwds )
 
@@ -400,19 +353,10 @@ class NTplot( NTdict ):
         ydata=(self.currentPoint[1], endPoint[1])
 #        NTdebug("xdata: " + `xdata`)
 #        NTdebug("ydata: " + `ydata`)
-        if useMatPlotLib:
-            line2D = Line2D(xdata, ydata)
-            attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
-            line2D.set( **attributesMatLibPlot )
-            self.axis.add_artist(line2D)
-        else:
-            self.b.add(
-                biggles.Curve( xdata, ydata,
-                               linetype  = attributes.lineType,
-                               linewidth = attributes.lineWidth,
-                               linecolor = attributes.lineColor
-                             )
-            )
+        line2D = Line2D(xdata, ydata)
+        attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
+        line2D.set( **attributesMatLibPlot )
+        self.axis.add_artist(line2D)
         self.currentPoint = endPoint
     #end def
 
@@ -448,17 +392,10 @@ class NTplot( NTdict ):
 
         s is a size argument in points squared.
         """
-        if not useMatPlotLib:
-            NTerror("Failed to scatter because not useMatPlotLib")
-            return True
-        # Expose matplot lib routine.
         self.axis.scatter(x,y,s,c,marker=marker,verts =verts)
 
     def ellipse(self, point, width=3.0, height=1.0, color=None, alpha=None):
         """Return true on error UNTESTED."""
-        if not useMatPlotLib:
-            NTerror("Failed to ellipse because not useMatPlotLib")
-            return True
         # Expose matplot lib routine.
 #        e = Ellipse(startPoint=point, width=0.2*rand(), height=0.2*rand())
         e = Ellipse(xy=point, width=width, height=height)
@@ -486,43 +423,14 @@ class NTplot( NTdict ):
         if not attributes:
             attributes=defaultAttributes
 
-        if useMatPlotLib:
-            attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)
-            rectangle = Rectangle(point,
-                width=sizes[0],
-                height=sizes[1],
-                **attributesMatLibPlot )
-            self.axis.add_artist(rectangle)
+        attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)
+        rectangle = Rectangle(point,
+            width=sizes[0],
+            height=sizes[1],
+            **attributesMatLibPlot )
+        self.axis.add_artist(rectangle)
 #            NTdebug("box added to artist")
-        else:
-            self.move(  point )
-            # clockwise
-            #  p2---p3
-            #   |   |
-            #  p1---p4
-            p1 = point
-            p2 = (point[0],          point[1]+sizes[1])
-            p3 = (point[0]+sizes[0], point[1]+sizes[1])
-            p4 = (point[0]+sizes[0], point[1])
-
-    #        self.closedObject( [p1,p2,p3,p4], attributes )
-            if attributes.fill:
-                self.b.add(
-                    biggles.FillBetween( [p1[0], p2[0], p3[0]],
-                                         [p1[1], p2[1], p3[1]],
-                                         [p1[0], p4[0], p3[0]],
-                                         [p1[1], p4[1], p3[1]],
-                                         fillcolor = attributes.fillColor
-                                       )
-                )
-            #end if
-            if attributes.line:
-                self.draw( p2, attributes )
-                self.draw( p3, attributes )
-                self.draw( p4, attributes )
-                self.draw( p1, attributes )
-            #end if
-        #end def
+    #end def
 
     def mapAttributes2MatLibPlotLine2D(self, attributes=defaultAttributes):
         if not attributes:
@@ -674,53 +582,29 @@ class NTplot( NTdict ):
         if attributes.has_key('pointType'):
             if not attributes.pointType:
                 attributes.pointType= 'none' # Changed to have no point as this is more common for all.
-        if useMatPlotLib:
-            attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
+        attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
 #            print attributesMatLibPlot['marker']
-            x = point[0]
-            y = point[1]
-            axes(self.axis) # Claim current axis.
-            line2D, = plot( [x], [y] )
+        x = point[0]
+        y = point[1]
+        axes(self.axis) # Claim current axis.
+        line2D, = plot( [x], [y] )
 #            NTdebug('before getp(line2D):')
 #            getp(line2D)
-            line2D.set( **attributesMatLibPlot)
-            xerror=None
-            yerror=None
-            if len(point) >2:
-                xerror=point[2]
-                if len(point) >3:
-                    yerror=point[3]
+        line2D.set( **attributesMatLibPlot)
+        xerror=None
+        yerror=None
+        if len(point) >2:
+            xerror=point[2]
+            if len(point) >3:
+                yerror=point[3]
 #            (l0, caplines, barcols) = errorbar([x], [y], xerr=xerror, yerr=yerror, ecolor=attributesMatLibPlot['color'])
-            errorbar([x], [y], xerr=xerror, yerr=yerror, ecolor=attributesMatLibPlot['color'])
+        errorbar([x], [y], xerr=xerror, yerr=yerror, ecolor=attributesMatLibPlot['color'])
 #            line2Dlist = NTlist() # Allow appending of lists.
 #            line2Dlist.append(l0)
 #            line2Dlist.addList(caplines)
 #            line2Dlist.addList(barcols)
 #            attributesMatLibPlotNoMarker = self.removeMarkerAttributes(attributesMatLibPlot)
 #            self.setMatLibPlotLine2DListPropsPoint( line2Dlist, attributesMatLibPlotNoMarker)
-        else:
-            self.move(  (point[0],point[1]) )
-            self.b.add(
-               biggles.Point( point[0], point[1],
-                              symboltype = attributes.pointType,
-                              symbolsize = attributes.pointSize,
-                              color      = attributes.pointColor
-                            )
-            )
-            if (len(point) > 2 and point[2] >= 0.0):
-                self.b.add(
-                    biggles.SymmetricErrorBarsX( [point[0]], [point[1]], [point[2]],
-                                                 color = attributes.pointColor
-                                               )
-                )
-            #end if
-            if (len(point) > 3 and point[3] >= 0.0):
-                self.b.add(
-                   biggles.SymmetricErrorBarsY( [point[0]], [point[1]], [point[3]],
-                                                 color = attributes.pointColor
-                                              )
-                )
-            #end if
     #end def
 
     def points( self, points, attributes=defaultAttributes ):
@@ -736,38 +620,21 @@ class NTplot( NTdict ):
     def labelAxes(self, point, text, attributes=defaultAttributes ):
         """Point needs to be specified in axis coordinate system [0,1]
         """
-        if useMatPlotLib:
-            kwds = self.mapAttributes2MatLibText(attributes)
+        kwds = self.mapAttributes2MatLibText(attributes)
 #            NTdebug("In labelAxes using kwds: %s", kwds)
-            self.axis.text( point[0], point[1], text,
-                transform=self.axis.transAxes, **kwds)
+        self.axis.text( point[0], point[1], text,
+            transform=self.axis.transAxes, **kwds)
 
-    def label( self, point, text, attributes=defaultAttributes ):
+    def label( self, point, txt, attributes=defaultAttributes ):
         """Point needs to be specified in data coordinate system
         """
         if not attributes:
             attributes=defaultAttributes
-        if useMatPlotLib:
-            kwds = self.mapAttributes2MatLibText(attributes)
-
-            startPoint=(point[0], point[1])
-            axes(self.axis) # Claim current axis.
-            annotate(text,
-                        xy=startPoint,           # in data coordinate system; assuming only one occurrence.
-                        xytext=startPoint,
-                        xycoords='data', # default: use the axes data coordinate system
-                        textcoords='data',
-                        **kwds
-                        )
-        else:
-            self.b.add(
-                biggles.DataLabel( point[0], point[1], text,
-                                   fontface = attributes.font,
-                                   fontsize = float(attributes.fontSize)/4.0,
-#                                   texthalign = attributes.textAlign,
-                                   color = attributes.fontColor
-                                 )
-            )
+        kwds = self.mapAttributes2MatLibText(attributes)
+        NTdebug("Found kwds: %s" % kwds)
+        startPoint=(point[0], point[1])
+        axes(self.axis) # Claim current axis.
+        pyplot.text(startPoint[0],startPoint[1],txt, **kwds)
     #end def
 
     def labeledPoint( self, point, text, attributes=defaultAttributes ):
@@ -779,9 +646,8 @@ class NTplot( NTdict ):
 
     def setYrange(self, range):
         self.yRange = range
-        if useMatPlotLib:
-            ylocator = self.axis.yaxis.get_major_locator()
-            ylocator.set_bounds( range[0], range[1] )
+        ylocator = self.axis.yaxis.get_major_locator()
+        ylocator.set_bounds( range[0], range[1] )
 
     def autoScaleYByValueList( self, valueList, startAtZero=False, useIntegerTickLabels=False ):
         pointList = []
@@ -830,15 +696,14 @@ class NTplot( NTdict ):
             min = 0.
 
 #        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
-        if useMatPlotLib:
-            xlocator = self.axis.xaxis.get_major_locator()
-            xlocator.set_bounds( min, max )
-            self.axis.autoscale_view( scalex=True, scaley=False)
-            self.xRange = self.axis.get_xlim()
-            if useIntegerTickLabels:
-                formatter = FuncFormatter(integerNumberOnly)
-                xaxis = self.axis.xaxis
-                xaxis.set_major_formatter( formatter )
+        xlocator = self.axis.xaxis.get_major_locator()
+        xlocator.set_bounds( min, max )
+        self.axis.autoscale_view( scalex=True, scaley=False)
+        self.xRange = self.axis.get_xlim()
+        if useIntegerTickLabels:
+            formatter = FuncFormatter(integerNumberOnly)
+            xaxis = self.axis.xaxis
+            xaxis.set_major_formatter( formatter )
 
 
     def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
@@ -884,82 +749,53 @@ class NTplot( NTdict ):
             min = 0.
 
 #        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
-        if useMatPlotLib:
-            ylocator = self.axis.yaxis.get_major_locator()
-            ylocator.set_bounds( min, max )
-            self.axis.autoscale_view( scalex=False, scaley=True)
-            self.yRange = self.axis.get_ylim()
-            if useIntegerTickLabels:
-                formatter = FuncFormatter(integerNumberOnly)
-                yaxis = self.axis.yaxis
-                yaxis.set_major_formatter( formatter )
+        ylocator = self.axis.yaxis.get_major_locator()
+        ylocator.set_bounds( min, max )
+        self.axis.autoscale_view( scalex=False, scaley=True)
+        self.yRange = self.axis.get_ylim()
+        if useIntegerTickLabels:
+            formatter = FuncFormatter(integerNumberOnly)
+            yaxis = self.axis.yaxis
+            yaxis.set_major_formatter( formatter )
 
 
     def updateSettings( self ):
 #        NTdebug("Now in updateSettings")
 
-        if useMatPlotLib:
-            if not self.axis:
-                raise "No axis object in NTplot"
-            if not isinstance(self.axis, Axes):
-                raise "Axis in NTplot not of correct type."
-            axes(self.axis) # Claim current axis.
-            if self.title:
-                title( self.title )
-            if self.xLabel:
-                xlabel(self.xLabel)
-            if self.yLabel:
-                ylabel(self.yLabel)
+        if not self.axis:
+            raise "No axis object in NTplot"
+        if not isinstance(self.axis, Axes):
+            raise "Axis in NTplot not of correct type."
+        axes(self.axis) # Claim current axis.
+        if self.title:
+            title( self.title )
+        if self.xLabel:
+            xlabel(self.xLabel)
+        if self.yLabel:
+            ylabel(self.yLabel)
 
-            if isinstance(self.xTicks, list):
-                if isinstance(self.xTicks[0],str):
-                    xticks(arange(0.5,len(self.xTicks)+0.5),self.xTicks)
-                else:
-                    xticks(self.xTicks)# A list with actual values like 0,60,120...
-                # or empty
-            if isinstance(self.yTicks, list):
-                if isinstance(self.yTicks[0],str):
-                    yticks(arange(0.5,len(self.yTicks)+0.5),self.yTicks)
-                else:
-                    yticks(self.yTicks)# A list with actual values like 0,60,120...
-
-            if self.xRange is not None:
-                xlim(self.xRange)
-#                NTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
-            if self.yRange is not None:
-                ylim(self.yRange)
-#                NTmessage("Set the ylim in MatPlotLib")
-            if self.xGrid is not None:
-                grid(True)
+        if isinstance(self.xTicks, list):
+            if isinstance(self.xTicks[0],str):
+                xticks(arange(0.5,len(self.xTicks)+0.5),self.xTicks)
             else:
-                grid(False)
+                xticks(self.xTicks)# A list with actual values like 0,60,120...
+            # or empty
+        if isinstance(self.yTicks, list):
+            if isinstance(self.yTicks[0],str):
+                yticks(arange(0.5,len(self.yTicks)+0.5),self.yTicks)
+            else:
+                yticks(self.yTicks)# A list with actual values like 0,60,120...
+
+        if self.xRange is not None:
+            xlim(self.xRange)
+#                NTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
+        if self.yRange is not None:
+            ylim(self.yRange)
+#                NTmessage("Set the ylim in MatPlotLib")
+        if self.xGrid is not None:
+            grid(True)
         else:
-            #update settings
-            self.b.title         = self.title
-            self.b.xlabel        = self.xLabel
-            self.b.ylabel        = self.yLabel
-
-            self.b.x.draw_axis   = self.xAxis
-            self.b.y.draw_axis   = self.yAxis
-            self.b.x2.draw_ticks = 0
-            self.b.y2.draw_ticks = 0
-            self.b.x.tickdir     = 1
-            self.b.y.tickdir     = 1
-
-            self.b.x.ticks       = self.xTicks
-            self.b.y.ticks       = self.yTicks
-
-            self.b.aspect_ratio  = self.aspectRatio
-            self.b.xrange        = self.xRange
-            self.b.yrange        = self.yRange
-
-            self.b.x.draw_grid   = self.xGrid
-            self.b.y.draw_grid   = self.yGrid
-
-            biggles.configure('width',    self.hardcopySize[0] )
-            biggles.configure('height',   self.hardcopySize[1] )
-            biggles.configure('fontface', self.font)
-        # end if
+            grid(False)
     # end def
 
     def histogram( self, theList, low, high, bins, leftMargin=0.05, rightMargin=0.05,
@@ -973,64 +809,56 @@ class NTplot( NTdict ):
             return # Nothing to add.
         his = NThistogram( theList, low, high, bins ) # A NTlist
         self.maxY = max(his)
-        if useMatPlotLib:
-            step = (high-low)/bins
-            ind = arange(low,high,step)  # the x locations for the groups
+
+        step = (high-low)/bins
+        ind = arange(low,high,step)  # the x locations for the groups
 #            NTdebug("Creating x coor for bins: " + `ind`)
-            axes(self.axis) # Claim current axis.
-            _patches = bar(ind, his, step,
-                color    =attributes.fillColor,
-                edgecolor=attributes.fillColor)
+        axes(self.axis) # Claim current axis.
+        _patches = bar(ind, his, step,
+            color    =attributes.fillColor,
+            edgecolor=attributes.fillColor)
 
-            if valueIndexPairList: # Were dealing with outliers.
+        if valueIndexPairList: # Were dealing with outliers.
 #                NTdebug("Annotating the outliers with a arrow and string")
-                tmpValueIndexPairList = deepcopy(valueIndexPairList)
-                tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
+            tmpValueIndexPairList = deepcopy(valueIndexPairList)
+            tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
 
-                xlim = self.axis.get_xlim()
-                ylim = self.axis.get_ylim()
-                _ylim_min, ylim_max = ylim
+            xlim = self.axis.get_xlim()
+            ylim = self.axis.get_ylim()
+            _ylim_min, ylim_max = ylim
 #                NTdebug("xlim: " + `xlim`)
 #                NTdebug("ylim: " + `ylim`)
-                outlierLocHeight = ylim_max # In data coordinate system
-                outlierLocHeightMin = ylim_max*.1 # In data coordinate system
+            outlierLocHeight = ylim_max # In data coordinate system
+            outlierLocHeightMin = ylim_max*.1 # In data coordinate system
 #                NTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
-                for item in tmpValueIndexPairList:
-                    value = item[1]
-                    modelNum = item[0]
-                    if not value: # Don't annotate zero values.
-                        continue
-                    outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.
-                    if outlierLocHeight < outlierLocHeightMin:
-                        outlierLocHeight = outlierLocHeightMin
+            for item in tmpValueIndexPairList:
+                value = item[1]
+                modelNum = item[0]
+                if not value: # Don't annotate zero values.
+                    continue
+                outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.
+                if outlierLocHeight < outlierLocHeightMin:
+                    outlierLocHeight = outlierLocHeightMin
 #                    NTdebug("Setting data point to: " + `value` +", 1")
 #                    NTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
-                    self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
-                    self.axis.annotate("model "+`modelNum`,
+                self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
+                self.axis.annotate("model "+`modelNum`,
 #                                startPoint=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
-                                xy=(value+0.01, 1),                       # in data coordinate system; assuming only one occurrence.
-                                xytext=(value, outlierLocHeight),
-                                xycoords='data', # default: use the axes data coordinate system
-                                textcoords='data',
-                                arrowprops=dict(facecolor=attributes.fillColor,
-                                                edgecolor=attributes.fillColor,
-                                                shrink=0.05,
-                                                width=1, # Width of arrow
-                                                headwidth=4
-                                                ),
-                                horizontalalignment='left',
-                                verticalalignment='bottom',
-                                )
-                # Do at the end because the plot command resets the boundaries?
-                self.axis.set_ylim(ymax = ylim_max+1) # get some clearance at the top
-
-        else:
-            for bin in range( bins ):
-                if his[bin] > 0:
-                    self.box( point = ( his.low+(bin+leftMargin)*his.binSize, 0.0 ),
-                              sizes = ( his.binSize*(1.0-(leftMargin+rightMargin)), float(his[bin]) ),
-                              attributes = attributes
+                            xy=(value+0.01, 1),                       # in data coordinate system; assuming only one occurrence.
+                            xytext=(value, outlierLocHeight),
+                            xycoords='data', # default: use the axes data coordinate system
+                            textcoords='data',
+                            arrowprops=dict(facecolor=attributes.fillColor,
+                                            edgecolor=attributes.fillColor,
+                                            shrink=0.05,
+                                            width=1, # Width of arrow
+                                            headwidth=4
+                                            ),
+                            horizontalalignment='left',
+                            verticalalignment='bottom',
                             )
+            # Do at the end because the plot command resets the boundaries?
+            self.axis.set_ylim(ymax = ylim_max+1) # get some clearance at the top
 
     def barChart( self, barList, leftMargin=-0.5, rightMargin=0.5, attributes=defaultAttributes ):
         """
@@ -1047,40 +875,34 @@ class NTplot( NTdict ):
                       attributes = attributes)
 
     def get_ylim(self):
-        if useMatPlotLib:
-            return self.axis.get_ylim()
-        return None
+        return self.axis.get_ylim()
 
     def get_ticklines(self):
         'Return the ticklines lines as a list of Line2D instance; overcoming a lack of "feature" in api'
 #        print ax
-        if useMatPlotLib:
-            lines = []
-            xaxis = self.axis.get_xaxis()
-            yaxis = self.axis.get_yaxis()
-            for axis in [ xaxis, yaxis ]:
-                for tick in axis.majorTicks:
-                    lines.append(tick.tick1line)
-                    lines.append(tick.tick2line)
-                for tick in axis.minorTicks:
-                    lines.append(tick.tick1line)
-                    lines.append(tick.tick2line)
-            return silent_list('Line2D ticklines', lines)
-        return []
+        lines = []
+        xaxis = self.axis.get_xaxis()
+        yaxis = self.axis.get_yaxis()
+        for axis in [ xaxis, yaxis ]:
+            for tick in axis.majorTicks:
+                lines.append(tick.tick1line)
+                lines.append(tick.tick2line)
+            for tick in axis.minorTicks:
+                lines.append(tick.tick1line)
+                lines.append(tick.tick2line)
+        return silent_list('Line2D ticklines', lines)
 
     def setTickLineWidth(self, size=1):
         tlList = self.get_ticklines()
-        if useMatPlotLib:
-            for tl in tlList:
-                tl.set_markeredgewidth(size) # Unreported feature.
+        for tl in tlList:
+            tl.set_markeredgewidth(size) # Unreported feature.
 
     def setMinorTicks(self, space):
-        if useMatPlotLib:
-            minorLocator = MultipleLocator(space)
-            self.axis.xaxis.set_minor_locator(minorLocator)
-            minorLocator = MultipleLocator(space)
-            self.axis.yaxis.set_minor_locator(minorLocator)
-            self.setTickLineWidth()
+        minorLocator = MultipleLocator(space)
+        self.axis.xaxis.set_minor_locator(minorLocator)
+        minorLocator = MultipleLocator(space)
+        self.axis.yaxis.set_minor_locator(minorLocator)
+        self.setTickLineWidth()
 
 
     def imshow(self, imageFileName):
@@ -1268,36 +1090,18 @@ class NTplotSet( NTdict ):
         self.update( kwds ) # Overwrites hardcopySize etc.
         self.graphicsOutputFormat = 'png'
 
-#        NTdebug('Using self.hardcopySize: '+`self.hardcopySize`)
-
-        if useMatPlotLib:
-            pass # will set below only on hardcopy.
-        else:
-            if not haveBiggles:
-                NTerror("NTplotSet.__init__: No biggles")
-            else:
-                #initialize the biggles plot
-                biggles.configure('persistent','no')
-                self.b = biggles.FramedPlot()
-                self.move( (0.0, 0.0) )
-        #endif
+#        NTdebug('Using self.hardcopySize: '+`self.hardcopySize`)=
     #end def
 
     def close( self ):
         "Closes a 'window'"
-        if useMatPlotLib:
-            close('all')
-            cla() # clear current axes
-            clf() # clear current figure
-#        else:
-#            self.b.close() #?
+        close('all')
+        cla() # clear current axes
+        clf() # clear current figure
 
     def show( self ):
         self.updateSettings()
-        if useMatPlotLib:
-            show()
-        else:
-            self.b.show()
+        show()
 
     def hardcopy( self, fileName, graphicsFormat = 'png' ):
         """        Returns True on error.         """
@@ -1318,19 +1122,16 @@ class NTplotSet( NTdict ):
         fig_height    = fig_height_pt*inches_per_pt # height in inches
         fig_size      = [fig_width,fig_height]
 
-        if useMatPlotLib:
-            params = {#'backend':          self.graphicsOutputFormat,
-                      'figure.dpi':       dpi,
-                      'figure.figsize':   fig_size,
-                      'savefig.dpi':      dpi,
-                      'savefig.figsize':  fig_size,
-                       }
-            rcParams.update(params)
-            figure = gcf()
-            figure.set_size_inches(  fig_size )
-            savefig(fileName)
-        else:
-            self.b.write_img( graphicsFormat, self.hardcopySize[0], self.hardcopySize[1], fileName )
+        params = {#'backend':          self.graphicsOutputFormat,
+                  'figure.dpi':       dpi,
+                  'figure.figsize':   fig_size,
+                  'savefig.dpi':      dpi,
+                  'savefig.figsize':  fig_size,
+                   }
+        rcParams.update(params)
+        figure = gcf()
+        figure.set_size_inches(  fig_size )
+        savefig(fileName)
 
     def updateSettings( self ):
 
@@ -1353,8 +1154,7 @@ class NTplotSet( NTdict ):
     def createPlot(self, plotId="Plot from NTplotSet", *args):
         ntPlot = NTplot(plotId=plotId)
         self.plotSet[plotId] = ntPlot
-        if useMatPlotLib:
-            ntPlot.axis = Axes( *args )
+        ntPlot.axis = Axes( *args )
         return self.getplot(plotId)
 
     def createSubplot(self, numRows, numCols, plotNum,
@@ -1378,8 +1178,7 @@ class NTplotSet( NTdict ):
         return self.getPlot(plotNum)
 
     def subplotsAdjust(self, **args ):
-        if useMatPlotLib:
-            subplots_adjust( **args )
+        subplots_adjust( **args )
 
 class ResPlot(NTplot):
     """Plot class for sequence of residues
@@ -1480,7 +1279,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 #        xaxis.set_minor_formatter( minorFormatter )
 
     def drawResTypes(self, ySpaceAxis=.06):
-        """Since we want color residue types and the current api of matplotlib
+        """Since we want to color residue types and the current api of matplotlib
         is hard to extend that way we do this outside of it.
         """
 #        seqLength = len(self.resList)
@@ -1492,6 +1291,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
         i = 0
         for res in self.resList:
+            NTdebug("drawResTypes for: %s" % res )
             resChar = 'x'
             if res.shortName:
                 resChar = res.shortName
@@ -1506,14 +1306,15 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                 resChar = resChar[0:1] # truncate A171 to A
 
             resChar = resChar.upper()
-            color = 'green'
             x = iconBoxXstart + i + 0.5
             y = self.convert_yunits([ iconBoxYstart ])[0] # convert to data coordinates
             text = resChar
             attributes = fontAttributes()
-            attributes.fontColor=color
+            attributes.fontColor=res.rogScore.colorLabel
             attributes.horizontalalignment='center'
 #            NTdebug(`attributes`)
+#            y = 5.0 # for testing
+            NTdebug("x,y: %s,%s" % (x,y))
             self.label( (x,y) , text, attributes )
             i += 1
 
@@ -1522,20 +1323,19 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         with the option set to False.
         Will also draw a vertical line to indicate the chain breaks.
         """
-        if useMatPlotLib:
-            majorFormatter = NullFormatter()
-            if showLabels:
-                majorFormatter = FormatResNumbersFormatter(self.resList)
+        majorFormatter = NullFormatter()
+        if showLabels:
+            majorFormatter = FormatResNumbersFormatter(self.resList)
 
-            xaxis = self.axis.xaxis
-            xaxis.set_major_formatter( majorFormatter )
-            # Watch out next command also affects the minor tickers..
-            xaxis.set_ticks_position('both')
-            self.setMinorTickerToRes()
-            self.axis.xaxis.set_major_locator (  LocatorResidueMajorTicks( self.resList ))
-                #        xaxis.set_label_position('top')
-    #        xaxis.set_ticklabels('') # remove the major tick labels but keep the ticks.
-    #        tickList = xaxis.get_minor_ticks()
+        xaxis = self.axis.xaxis
+        xaxis.set_major_formatter( majorFormatter )
+        # Watch out next command also affects the minor tickers..
+        xaxis.set_ticks_position('both')
+        self.setMinorTickerToRes()
+        self.axis.xaxis.set_major_locator (  LocatorResidueMajorTicks( self.resList ))
+            #        xaxis.set_label_position('top')
+#        xaxis.set_ticklabels('') # remove the major tick labels but keep the ticks.
+#        tickList = xaxis.get_minor_ticks()
         locs = []
 #        totalNumberResidues = len(self.resList)
         idx = -0.5
@@ -2240,6 +2040,7 @@ class FormatResTypesFormatter(Formatter):
                 resProp = resProp[0:1] # truncate A171 to A
 
             self.resPropList.append(resProp.upper())
+        NTdebug("FormatResTypesFormatter initialized with: %s" % self.resPropList )
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'

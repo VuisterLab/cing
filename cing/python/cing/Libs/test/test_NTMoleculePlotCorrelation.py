@@ -13,7 +13,6 @@ from cing.Libs.NTmoleculePlot import USE_ROG_FOR_COLOR_STR
 from cing.Libs.NTmoleculePlot import XLABEL_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import ResPlot
-from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTlist
@@ -41,7 +40,6 @@ class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
-    NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testMoleculePlot(self):
 

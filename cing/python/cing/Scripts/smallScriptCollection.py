@@ -1,4 +1,4 @@
-#!env python
+#!/usr/bin/env python -u
 
 """
 Needed a place to store just one time use small scripts that replace some shell scripting

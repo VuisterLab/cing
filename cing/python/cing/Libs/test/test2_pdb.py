@@ -21,15 +21,15 @@ import unittest
 class AllChecks(TestCase):
 
     def testPdbFile(self):
-        NTwarning("This test case will take about 5 minutes and is recommended to be done before major releases.")
+        NTwarning("This test case will take about 5 (+3 for 1v0e) minutes and is recommended to be done before major releases.")
     #        entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryList = "1a4d".split() # Small much studied PDB NMR entry
     #        entryId = "1brv" # Small much studied PDB NMR entry
     #        entryId = "2hgh_1model"
 #        entryList = "1kr8".split()
 #        entryList = "1otz".split() # 61 chains of which one is ' '
-        entryList = "1v0e".split()
-#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 1otz 2hgh 2k0e".split()
+#        entryList = "1v0e".split()
+        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 1otz 2hgh 2k0e".split()
         for entryId in entryList:
 
             pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)
@@ -47,7 +47,7 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
-    doProfile = True
+    doProfile = False
     cing.verbosity = verbosityDebug
     if doProfile:
         fn = os.path.join(cingDirTmp, 'testPdbFileProfile.log')

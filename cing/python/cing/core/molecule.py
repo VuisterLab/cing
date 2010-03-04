@@ -2881,7 +2881,7 @@ Residue class: Defines residue properties
             hist = multiply(m1,m2)
             histList.append(hist)
         else:
-            ssTypeList = hPlot.histd1BySsAndResTypes.keys() #@UndefinedVariable
+            ssTypeList = hPlot.histd1BySsAndResTypes.keys()
             ssTypeList.sort() # in place sort to: space, H, S
             for ssType in ssTypeList:
                 hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)

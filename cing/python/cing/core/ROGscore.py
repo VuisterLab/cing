@@ -33,7 +33,8 @@ class ROGscore(NTdict):
 
 
     def __str__(self):
-        return str(self.colorLabel)
+#        return str(self.colorLabel)
+        return self.colorLabel
 
     def reset(self):
         self.colorLabel = COLOR_GREEN

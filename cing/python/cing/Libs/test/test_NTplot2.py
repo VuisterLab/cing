@@ -8,7 +8,6 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import triangularList
-from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTlist
 from cing.Libs.peirceTest import peirceTest
@@ -30,8 +29,6 @@ class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
-    NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
-
 
     def testPlotHistoDihedral(self):
         ps = NTplotSet() # closes any previous plots
