@@ -7,8 +7,6 @@ from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import greenLine
 from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTplot import useMatPlotLib
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTfill
 from unittest import TestCase
 from cing.PluginCode.procheck import to3StateUpper
@@ -21,7 +19,6 @@ class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
-    NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testPlotVaria(self):
         ps = NTplotSet() # closes any previous plots

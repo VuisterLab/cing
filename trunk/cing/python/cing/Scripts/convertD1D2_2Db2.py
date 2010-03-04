@@ -63,6 +63,9 @@ yRange = (plotparams2.min, plotparams2.max)
 
 os.chdir(cingDirTmp)
 
+lineCountMax = 1000 * 1000 * 10 # in fact only 1 M lines
+lineCountMax = 2 # testing order
+
 def main():
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
     gunzip(cvs_file_abs_name_gz)
@@ -78,12 +81,15 @@ def main():
 
 
     linesByEntry = {}
+    lineCount = 0
     for row in reader:
+        lineCount += 1
+        if lineCount > lineCountMax:
+            break
         entryId = row[0]
         if not linesByEntry.has_key(entryId):
             linesByEntry[ entryId ] = []
         linesByEntry[ entryId ].append( row )
-    del(reader) # closes the file handles
 
     skippedResTypes = []
     entryIdList = linesByEntry.keys()
@@ -213,10 +219,10 @@ def main():
         os.unlink(dbase_file_abs_name)
     output = open(dbase_file_abs_name, 'wb')
     dbase = {}
-    dbase[ 'histd1BySsAndResTypes' ] = histd1BySsAndResTypes
-    dbase[ 'histd1ByResTypes' ] = histd1ByResTypes
-    dbase[ 'histd1BySs' ] = histd1BySs
-    dbase[ 'histd1' ] = histd1
+    dbase[ 'histd1BySsAndResTypes' ] = histd1BySsAndResTypes # 92 kb uncompressed in the case of ~1000 lines only
+    dbase[ 'histd1ByResTypes' ] = histd1ByResTypes # 56 kb
+    dbase[ 'histd1BySs' ] = histd1BySs # 4 kb
+    dbase[ 'histd1' ] = histd1 #  4 kb
 
     cPickle.dump(dbase, output, -1)
     output.close()

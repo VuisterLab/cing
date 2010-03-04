@@ -17,9 +17,9 @@ d1d2 = 'd1d2'
 #dihedralTodo = Janin
 dihedralComboTodo = d1d2
 # Throw away the worst 10 % within the chain.
-DEFAULT_BFACTOR_PERCENTAGE_FILTER = 10 # integer number please.
+DEFAULT_BFACTOR_PERCENTAGE_FILTER = 5 # DEFAULT from Gert: 10
 # Then after the above check throw away additionaly any residue above 20
-DEFAULT_MAX_BFACTOR = 40
+DEFAULT_MAX_BFACTOR = 60 # Default from Gert 40; Sander suggested to take 2 sd instead perhaps.
 BFACTOR_COLUMN = 7
 IDX_COLUMN = 8
 

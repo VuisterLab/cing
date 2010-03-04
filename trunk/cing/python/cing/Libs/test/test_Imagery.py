@@ -9,7 +9,6 @@ from cing import verbosityError
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.Imagery import joinPdfPagesByGhostScript
 from cing.Libs.Imagery import montage
-from cing.Libs.NTplot import useMatPlotLib
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
 from cing.core.parameters import cingPaths
@@ -25,7 +24,6 @@ class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
-    NTdebug("Using matplot (True) or biggles: %s", useMatPlotLib)
 
     def testConvert2Web(self):
 

@@ -19,7 +19,7 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.html import HistogramsForPlotting
+from cing.Libs.html import hPlot
 from cing.Libs.html import makeDihedralPlot
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
@@ -38,8 +38,10 @@ from cing.core.molecule import Dihedral
 from cing.core.molecule import common20AAList
 from matplotlib import colors
 from matplotlib.pyplot import imshow
+from numpy.core.arrayprint import set_printoptions
 from numpy.core.defmatrix import mat
 from numpy.core.fromnumeric import amax
+from numpy.core.fromnumeric import amin
 from numpy.core.numeric import ndarray
 from numpy.core.numeric import zeros
 from numpy.ma.core import masked_where
@@ -48,7 +50,6 @@ import cing
 import os
 import sys
 
-hPlot = HistogramsForPlotting()
 hPlot.initHist()
 
 # important to switch to temp space before starting to generate files for the project.
@@ -402,7 +403,8 @@ def plotDihedralD1_1d():
     project = Project.open(entryId, status='new')
 
 #    interestingResTypeList = [ 'GLY' ]
-    interestingResTypeList = [ 'GLY', 'ALA' ]
+#    interestingResTypeList = [ 'GLY', 'ALA' ]
+    interestingResTypeList = [ 'CYS', 'PRO' ]
     for resType in common20AAList:
         for resTypePrev in common20AAList:
             if resType not in interestingResTypeList:
@@ -414,7 +416,7 @@ def plotDihedralD1_1d():
 #            if resTypePrev != 'ALA':
 #                continue
 
-            title = 'd1 %s %s' % (resType, resTypePrev)
+            title = 'd1 %s(i-1) %s(i)' % (resTypePrev, resType)
             NTmessage("plotting: %s" % title)
 
             plotparams = project.plotParameters.getdefault(dihedralName, 'dihedralDefault')
@@ -456,7 +458,8 @@ def plotDihedralD1_1d():
                 lAttr = solidLine(color=colorList[i])
                 plot.lines(points, attributes=lAttr)
 
-            fn = title + "_d1d2." + graphicsFormat
+            fn = "d1 %s %s_d1d2." % (resTypePrev, resType)
+            fn += graphicsFormat
             ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
     project.removeFromDisk()
@@ -580,56 +583,45 @@ def plotDihedralD1_2d(doOnlyOverall = True):
     project.removeFromDisk()
 
 def plotHistogramOverall():
-    dihedralName1 = 'Cb4N'
-    dihedralName2 = 'Cb4C'
+    dihedralName1 = 'resType'
+    dihedralName2 = 'resTypePrev'
     graphicsFormat = "png"
     alpha = 0.8 # was 0.8; looks awful with alpha = 1
     n = 20
-    d = 3 # number of ss types.
+#    d = 3 # number of ss types.
     extent = ( 0, n ) + ( 0, n )
-    minPercentage =  100.
-    maxPercentage = 200.
     cmapList= [   green_inv, blue_inv, yellow_inv ]
     colorList= [ 'green',   'blue',   'yellow']
     i = 1 # decides on color picked.
 
+    # If set it will do a single ssType otherwise the overall.
+    doOverall = True
+    if doOverall:
+        ssType = None
+    else:
+        ssType = ' '
+
     entryId = 'plotHistogramOverall'
+    if ssType:
+        entryId = 'plotHistogram"%s"' % ssType
     title = entryId
     # does it matter to import it just now?
-    project = Project(entryId)
-    project.removeFromDisk()
-    project = Project.open(entryId, status='new')
 
     m = zeros((n*n), dtype=int).reshape(n,n)
-    mBySs = zeros((n,n,d), dtype=int).reshape(n,n,d)
-    tickList = []
+#    mBySs = zeros((n,n,d), dtype=int).reshape(n,n,d)
+    tickList = [ NTdb.getResidueDefByName( resType ).shortName for resType in common20AAList]
+    tickListRev = tickList[:]
+    tickListRev.reverse()
     for r,resTypePrev in enumerate(common20AAList):
-#        if r !=0: # for debugging.
-#            continue
-        db = NTdb.getResidueDefByName( resTypePrev )
-        tickList.append(db.shortName)
         for c,resType in enumerate(common20AAList):
-#            if c !=0:
-#                continue
-
-            hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
+            if doOverall:
+                hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
+            else:
+                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
             if hist1 == None:
                 NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
                 continue
-            sumh1 = sum(hist1)
-            m[r,c] = sumh1
-
-            ssTypeList = hPlot.histd1BySsAndResTypes.keys() #@UndefinedVariable
-            ssTypeList.sort() # in place sort to: space, H, S
-            for l, ssType in enumerate(ssTypeList):
-                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
-                if hist1 == None:
-                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
-                    continue
-                sumh1 = sum(hist1)
-                mBySs[r,c,l] = sumh1
-            # end ssType
-        # end
+            m[r,c] = sum(hist1)
 
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (500, 500)
@@ -639,31 +631,44 @@ def plotHistogramOverall():
       xTicks=tickList,
       xLabel=dihedralName1,
       yRange=(0., n),
-      yTicks=tickList,
+      yTicks=tickListRev,
       yLabel=dihedralName2)
     ps.addPlot(plot)
 
+    set_printoptions(linewidth=1000)
     NTmessage('m: %s' % m)
+    minCount =  300.
+    maxCount = 1000.
+    if False:
+        minCount =  0.
+        maxCount =  1.
+    if ssType:
+        minCount /= 3.
+        maxCount /= 3.
     hist = m
     maxHist = amax(amax( hist ))
-    hist *= 100./maxHist
-    hist = masked_where(hist <= minPercentage, hist, copy=1)
+    minHist = amin(amin( hist ))
+    NTmessage('maxHist: %s' % maxHist) # 9165 of total of ~ 1 M.
+    NTmessage('minHist: %s' % minHist) # 210
+    NTmessage('tickList: %s' % tickList) # 210
+#    hist *= 100./maxHist
+    hist = masked_where(hist <= minCount, hist, copy=1)
 
     palette = cmapList[i]
     palette.set_under(color = 'red', alpha = 1.0 ) # alpha is 0.0
     palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
     palette.set_bad(color = 'red', alpha = 1.0 )
-    norm = colors.Normalize(vmin = minPercentage,
-                            vmax = maxPercentage, clip = True) # clip is False
+
+
+    norm = colors.Normalize(vmin = minCount, vmax = maxCount, clip = True) # clip is False
     imshow( hist,
-            interpolation=None,
+            interpolation='nearest',
 #            interpolation='bicubic',
-            origin='lower',
+            origin='upper',
             extent=extent,
             alpha=alpha,
             cmap=palette,
             norm = norm )
-
     fn = title + "_d1d2." + graphicsFormat
     ps.hardcopy(fn, graphicsFormat)
 
@@ -724,7 +729,7 @@ def plotDihedralD1D2():
     ssTypeList = hPlot.histd1d2BySsAndCombinedResType.keys() #@UndefinedVariable
     ssTypeList.sort() # in place sort to: space, H, S
     for ssType in ssTypeList:
-        hist = getDeepByKeys(hPlot.histd1d2BySsAndCombinedResType, ssType)
+        hist = getDeepByKeys(hPlot.histd1d2BySsAndCombinedResType, ssType) #@UndefinedVariable
         if hist != None:
             NTdebug('appending [%s]' % ssType)
             histList.append(hist)
@@ -855,7 +860,7 @@ def plotDihedralD1D2byResType():
         ssTypeList = hPlot.histd1d2BySsAndResType.keys() #@UndefinedVariable
         ssTypeList.sort() # in place sort to: space, H, S
         for ssType in ssTypeList:
-            hist = getDeepByKeys(hPlot.histd1d2BySsAndResType, ssType, resType)
+            hist = getDeepByKeys(hPlot.histd1d2BySsAndResType, ssType, resType) #@UndefinedVariable
             if hist != None:
                 NTdebug('appending [%s]' % ssType)
                 histList.append(hist)
