@@ -399,7 +399,7 @@ Sum                %s
         lk = len(keyList)
 #        NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
         if not lk:
-            NTdebug("Asked for a get on a dictionary without a key")
+#            NTdebug("Asked for a get on a dictionary without a key")
             return None
         key = keyList[0]
 
@@ -1453,7 +1453,7 @@ class NTdict(dict):
         lk = len(keyList)
 #      NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
         if not lk:
-            NTdebug("Asked for a get on a dictionary without a key")
+#            NTdebug("Asked for a get on a dictionary without a key")
             return None
         key = keyList[0]
 
@@ -1788,6 +1788,17 @@ class NTtree(NTdict):
     def __repr__( self ):
         return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
     #end def
+
+    def getParent(self, level=1):
+        if level < 0:
+            NTerror("NTtree.getParent called with level < 0: n being: %s" % level)
+            return None
+        if level == 0:
+            return self # Luke, I'm you're father.
+        parent = self._parent
+        if parent == None:
+            return None
+        return parent.getParent(level=level-1)
 
     def addChild(self, name, **kwds):
         child = NTtree(name=name, **kwds)
@@ -3612,7 +3623,7 @@ class ExecuteProgram(NTdict):
         elif self.redirectOutputToFile:
             cmd = sprintf('%s > %s 2>&1', cmd, self.redirectOutputToFile)
             self.jobcount += 1
-        NTdebug('==> Executing ('+cmd+') ... ')
+#        NTdebug('==> Executing ('+cmd+') ... ')
         code = os.system(cmd)
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
@@ -4045,7 +4056,7 @@ def getDeepByKeys(c, *keyList):
     lk = len(keyList)
 #      NTdebug("Now in getDeepByKeys for keylist length: %d" % lk)
     if not lk:
-        NTdebug("Asked for a get on a dictionary without a key")
+#        NTdebug("Asked for a get on a dictionary without a key")
         return None
     key = keyList[0]
 

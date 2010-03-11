@@ -773,8 +773,8 @@ def moleculeToPDBfile(molecule, path, model = None, convention = IUPAC, max_mode
     NB model should be ZERO for the first model. Not one.
     Returns True on error.
     """
-    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
-             molecule, path, model, convention)
+#    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
+#             molecule, path, model, convention)
     pdbFile = molecule.toPDB(model = model, convention = convention, max_models = None)
     if not pdbFile:
         return True

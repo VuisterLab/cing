@@ -23,50 +23,11 @@ from cing.core.constants import SCALE_BY_SUM
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
-from matplotlib import colors
 from matplotlib import pyplot
-from matplotlib import rcParams
-from matplotlib.axes import Axes
-from matplotlib.cbook import silent_list
-from matplotlib.lines import Line2D
-from matplotlib.mlab import frange
 from matplotlib.patches import Ellipse
 from matplotlib.patches import Patch
-from matplotlib.patches import Polygon
-from matplotlib.patches import Rectangle
 from matplotlib.path import Path
-from matplotlib.pylab import axes
-from matplotlib.pylab import bar
-from matplotlib.pylab import cla
-from matplotlib.pylab import clf
-from matplotlib.pylab import close
-from matplotlib.pylab import errorbar
-from matplotlib.pylab import gcf
-from matplotlib.pylab import grid
-from matplotlib.pylab import imshow
-from matplotlib.pylab import plot
-from matplotlib.pylab import savefig
-from matplotlib.pylab import show # prone to change.
-from matplotlib.pylab import subplot
-from matplotlib.pylab import subplots_adjust
-from matplotlib.pylab import title
-from matplotlib.pylab import xlabel
-from matplotlib.pylab import xlim
-from matplotlib.pylab import xticks
-from matplotlib.pylab import ylabel
-from matplotlib.pylab import ylim
-from matplotlib.pylab import yticks
-from matplotlib.ticker import Formatter
-from matplotlib.ticker import FuncFormatter
-from matplotlib.ticker import Locator
-from matplotlib.ticker import MultipleLocator
-from matplotlib.ticker import NullFormatter
-from numpy import ma
-from numpy.core.fromnumeric import amax
-from numpy.core.fromnumeric import amin
-from numpy.core.numeric import arange
-import math
-import numpy as np
+from matplotlib.pylab import * #@UnusedWildImport
 
 try:
     import Image
@@ -631,7 +592,7 @@ class NTplot( NTdict ):
         if not attributes:
             attributes=defaultAttributes
         kwds = self.mapAttributes2MatLibText(attributes)
-        NTdebug("Found kwds: %s" % kwds)
+#        NTdebug("Found kwds: %s" % kwds)
         startPoint=(point[0], point[1])
         axes(self.axis) # Claim current axis.
         pyplot.text(startPoint[0],startPoint[1],txt, **kwds)
@@ -918,12 +879,12 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
 
-    def dihedralComboPlot(self, histList, scaleBy = SCALE_BY_MAX, minPercentage =  2.0, maxPercentage = 20.0):
+    def dihedralComboPlot(self, histList, minPercentage =  2.0, maxPercentage = 20.0, scaleBy = SCALE_BY_MAX ):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
         Return True on error.
 
-        Input histogram should be the bare counts.
+        Input histogram should be the bare counts using floats.
         This routine will calculate the c_dbav, s_dbav
 
         scaleBy can be Max, or Sum
@@ -942,26 +903,37 @@ class NTplot( NTdict ):
         colorList= [ 'green',   'blue',   'yellow']
 #        i = 0
         i = 0
-        for hist in histList:
-#        for hist in [ histList[i] ]:
+        if len(histList) > len(cmapList):
+            NTerror("Found length of histList:%d larger than cmapList's:%d" % ( len(histList),len(cmapList)))
+            return True
+        for i,myHist in enumerate(histList):
+#        for myHist in [ histList[i] ]:
+#            NTmessage('myHist: %s' % myHist)
+#            print myHist
+            if myHist.dtype != 'float64':
+                NTerror("expected a histogram matrix with float values but found type: %s" % myHist.dtype)
+                return True
             if scaleBy == SCALE_BY_MAX:
-                maxHist = amax(amax( hist ))
-                minHist = amin(amin( hist ))
-                NTdebug("maxHist: %s" % maxHist)
-                NTdebug("minHist: %s" % minHist)
-                hist *= 100./maxHist
+                maxHist = amax( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
+#                minHist = amin( myHist )
+#                NTdebug("maxHist: %s" % maxHist)
+#                NTdebug("minHist: %s" % minHist)
+                factor = 100./maxHist
+                myHist *= factor
             elif scaleBy == SCALE_BY_SUM:
-                sumHist = sum(sum( hist ))
-                NTdebug("sumHist: %s" % sumHist)
-                hist *= 100./sumHist
+                sumHist = sum( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
+#                NTdebug("sumHist: %s" % sumHist)
+                factor = 100./sumHist
+                myHist *= factor
             else:
                 NTerror("parameter invalid in dihedralComboPlot")
-                return
+                return True
             # Just make a copy...
-            hist = ma.masked_where(hist <= minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
-#            hist = ma.masked_where(hist < minPercentage, hist, copy=1) # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
+            myHist = ma.masked_where(myHist <= minPercentage, myHist, copy=1)
+            # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
             # the above is a workaround in order to use the 'bad' utility of the api.
             # The problem is that it doesn't do nice alpha mixing so disabled again to find solution.
+#            NTmessage('myHist (scaled/masked): %s' % myHist)
 
             if True:
                 palette = cmapList[i]
@@ -983,22 +955,22 @@ class NTplot( NTdict ):
 
 #            palette._set_extremes()
 
-            norm = colors.Normalize(vmin = minPercentage,
+            norm = Normalize(vmin = minPercentage,
                                     vmax = maxPercentage, clip = True) # clip is False
 #            NTdebug("under: %s" % str(palette._rgba_under))
 #            NTdebug("over : %s" % str(palette._rgba_over))
 #            NTdebug("bad  : %s" % str(palette._rgba_bad))
 
-            imshow( hist,
+            imshow( myHist,
                     interpolation='bicubic',
 #                    interpolation = 'nearest', # bare data.
                     origin='lower',
                     extent=extent,
                     alpha=alpha,
                     cmap=palette,
-                    norm = norm )
+                    norm = norm
+                     )
 #            NTdebug('plotted %d %s' % (i, cmapList[i].name))
-            i += 1
         # end for
 
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
@@ -1291,7 +1263,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
         i = 0
         for res in self.resList:
-            NTdebug("drawResTypes for: %s" % res )
+#            NTdebug("drawResTypes for: %s" % res )
             resChar = 'x'
             if res.shortName:
                 resChar = res.shortName
@@ -1314,7 +1286,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             attributes.horizontalalignment='center'
 #            NTdebug(`attributes`)
 #            y = 5.0 # for testing
-            NTdebug("x,y: %s,%s" % (x,y))
+#            NTdebug("x,y: %s,%s" % (x,y))
             self.label( (x,y) , text, attributes )
             i += 1
 

@@ -17,6 +17,7 @@ Molecular system:
 2k0e Largest in total (35 Mb cif file; 160 models with each 148 residues.
 2jzn Entry with wildly different models in the ensemble.
 1v0e Large X-ray entry with ~5,000 residues (hexamer of 666 AA) containing 3,000+ water molecules.
+2fws First Ca2+ binding domain of the Na,Ca-exchanger (NCX1) from GWV lab.
 
 On the restraint side:
 **********************

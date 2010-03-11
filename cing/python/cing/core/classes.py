@@ -53,6 +53,7 @@ from cing.core.constants import DRL_LEVEL
 from cing.core.constants import DR_LEVEL
 from cing.core.constants import IUPAC
 from cing.core.constants import LOOSE
+from cing.core.constants import RDCL_LEVEL
 from cing.core.constants import RDC_LEVEL
 from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
 from cing.core.molecule import Atom
@@ -78,7 +79,6 @@ from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
 from shutil import rmtree
-from cing.core.constants import RDCL_LEVEL
 import cing
 import math
 import os
@@ -237,6 +237,12 @@ Project: Top level Cing project class
                                          nameListKey = 'coplanarListNames',
                                          basePath = directories.restraints + '/%s.coPlanars'
                                        )
+#        self.dihEntities = _ProjectList(project = self,
+#                                         classDef = DihedralEntityList,
+#                                         nameListKey = 'dihEntityListNames',
+#                                         basePath = directories.restraints + '/%s.dihEntities'
+#                                       )
+
 
         # store reference to self
         #self[name] = self
@@ -1082,7 +1088,7 @@ class _ProjectList(NTlist):
         """
         saved = NTlist()
         for l in self:
-            NTdebug('l is %s' % l)
+#            NTdebug('l is %s' % l)
             if l.status == 'keep':
                 NTdetail('==> Saving %s to %s', l, l.objectPath)
                 if self.classDef.SMLhandler.toFile(l, l.objectPath) == l:
@@ -1400,18 +1406,21 @@ class Restraint(NTdict):
         Return 0 if it doesn't have any models or None on error.
         """
         modelCount = None
+
         if self.__CLASS__ == DR_LEVEL or self.__CLASS__ == RDC_LEVEL:
+#            lAtom  = len(self.atomPairs)
             for atompair in self.atomPairs:
                 for atom in atompair:
                     modelCount = atom.getModelCount()
-                if modelCount != None:
-                    return modelCount
+                    if modelCount != None:
+                        return modelCount
         else:
+#            lAtom  = len(self.atoms)
             for atom in self.atoms:
                 modelCount = atom.getModelCount()
                 if modelCount != None:
                     return modelCount
-        NTwarning("%s.getModelCount returned None for all %d atom(pair)s; giving up." % (self.__CLASS__, len(self.atomPairs)))
+#        NTwarning("%s.getModelCount returned None for all %d atom(pair)s; giving up." % (self.__CLASS__, lAtom))
         return None
     #end def
 
@@ -1548,7 +1557,7 @@ class DistanceRestraint(Restraint):
                                                  # incompleteness
                     #if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates (%s)" % a.toString()
-                        NTdebug(msg)
+#                        NTdebug(msg)
                         self.rogScore.setMaxColor(COLOR_RED, msg)
                     #end if
                 #end for
@@ -1705,6 +1714,9 @@ class DistanceRestraint(Restraint):
         else:
             r1 = atm1.residue
             r2 = atm2.residue
+            if not (r1.chain and r2.chain):
+                # Deals with removed residues which don't have a parent anymore.
+                return -1
             delta = int(math.fabs(r1.chain._children.index(r1) - r2.chain._children.index(r2)))
             if delta == 1:
                 return 1
@@ -1734,7 +1746,7 @@ class DistanceRestraint(Restraint):
 
         modelCount = self.getModelCount()
         if not modelCount:
-            NTerror('DistanceRestraint.calculateAverage: No structure models (%s)', self)
+#            NTdebug('DistanceRestraint.calculateAverage: No structure models (%s)', self)
             self.error = True
             return (None, None, None, None)
         #end if
@@ -1805,7 +1817,7 @@ class DistanceRestraint(Restraint):
         #end for
         if self.error:
             msg = "AtomPair (%s,%s) model %d without coordinates" % (atm1.toString(), atm2.toString(), i)
-            NTdebug(msg)
+#            NTdebug(msg)
             self.rogScore.setMaxColor(COLOR_RED, msg)
             return (None, None, None, None)
         #end if
@@ -1951,9 +1963,9 @@ class RestraintList(NTlist):
             if modelCount != None:
                 return modelCount
             if i == MAX_RESTRAINTS_TO_TEST:
-                NTwarning("getModelCount returned None for the first %d restraints; giving up." % i)
+#                NTwarning("getModelCount returned None for the first %d restraints; giving up." % i)
                 return None
-        NTwarning("getModelCount returned None for all %d restraints; giving up." % len(self))
+#        NTwarning("getModelCount returned None for all %d restraints; giving up." % len(self))
         return None
     #end def
 
@@ -2024,7 +2036,7 @@ class DistanceRestraintList(RestraintList):
         or (None, None, None, None, None) on error
         """
 
-        NTdebug('DistanceRestraintList.analyze: %s', self)
+#        NTdebug('DistanceRestraintList.analyze: %s', self)
 
         if (len(self) == 0):
             # happens for entry 2k0e imported from CCPN. Has unlinked restraints.
@@ -2032,15 +2044,9 @@ class DistanceRestraintList(RestraintList):
             return (None, None, None, None, None)
         #end if
 
-        modelCount = 0
-        # JFD disabled bug in below statement
-#        if len(self[0].atomPairs and self[0].atomPairs[0][0]):
-        if len(self[0].atomPairs):
-            modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
-        #end if
-
-        if modelCount == 0:
-            NTerror('DistanceRestraintList.analyze: "%s" modelCount 0', self.name)
+        modelCount = self.getModelCount()
+        if not modelCount:
+            NTerror('DistanceRestraintList.analyze: "%s" modelCount %s' % (self.name, modelCount))
             return (None, None, None, None, None)
         #end if
 
@@ -2328,7 +2334,7 @@ class DihedralRestraint(Restraint):
                                              # can crash when reading back NRG dataset because of their
                                              # incompleteness
                     msg = "Missing coordinates in dihedral (%s)" % a.toString()
-                    NTdebug(msg)
+#                    NTdebug(msg)
                     self.rogScore.setMaxColor(COLOR_RED, msg)
     #end def
 
@@ -2418,15 +2424,18 @@ class DihedralRestraint(Restraint):
         or
         (None,None,None) on error
         """
+        resultError = (None, None, None)
         if (not self.atoms or (None in self.atoms)):
-            return (None, None, None)
+            return resultError
         #end if
-        mol = self.atoms[0].residue.chain.molecule
 
+#        mol = self.atoms[0].residue.chain.molecule
+        mol = self.atoms[0].getMolecule()
+        if mol == None:
+            return resultError
         if mol._dihedralDict.has_key(tuple(self.atoms)):
             return mol._dihedralDict[tuple(self.atoms)]
-        else:
-            return (None, None, None)
+        return resultError
         #end if
     #end def
 
@@ -2526,7 +2535,7 @@ class DihedralRestraintList(RestraintList):
             if calculateFirst:
                 (cav, _cv) = dr.calculateAverage()
                 if cav == None:
-                    NTdebug("Failed to calculate average for: " + self.format())
+#                    NTdebug("Failed to calculate average for: " + self.format())
                     continue # skipping dihedral with a missing coordinate or so.
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
@@ -2921,49 +2930,6 @@ def getFractionAbove(valueList, threshold):
     return n / len(valueList)
 
 
-#class AtomList( NTlist ):
-#    """
-#    Class based on NTlist that holds atoms.
-#    Also manages the "id's". GV wants to know why as atoms have an id???
-#    Sort by item of Atom Class.
-#
-#    NB this list is only instantiated for the validate plugin. It has very little
-#    functionality. Most functionality should be in Residue, Chains, etc.
-#    """
-#    def __init__( self, project, status='keep' ):
-#        NTlist.__init__( self )
-#        self.name       = project.molecule.name + '.atoms'
-#        self.status     = status      # Status of the list; 'keep' indicates storage required
-#        self.currentId  = 0           # Id for each element of list
-#        self.rogScore   = ROGscore()
-#        self.appendFromMolecule( project.molecule )
-#        self.criticize()
-#    #end def
-#
-#    def criticize(self):
-#        for atom in self:
-##            atom.criticize()
-#            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
-#
-#    def append( self, o ):
-#        o.id = self.currentId
-#        NTlist.append( self, o )
-#        self.currentId += 1
-#
-#    def appendFromMolecule( self, molecule ):
-#        for atom in molecule.allAtoms():
-#            self.append( atom )
-#
-#    def __str__( self ):
-#        return sprintf( '<AtomList "%s" (%s,%d)>',self.name,self.status,len(self) )
-#    #end def
-#
-#    def format( self ):
-#        return sprintf( '%s AtomList "%s" (%s,%d) %s\n',
-#                      dots, self.name,self.status,len(self), dots)
-#    #end def
-##end class
-#==============================================================================
 
 class Coplanar(NTdict):
     """Collection of data on an individual base pair, triplet or quadruplet.

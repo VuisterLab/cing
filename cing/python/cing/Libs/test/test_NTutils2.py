@@ -7,15 +7,15 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import getTextBetween
+from cing.Libs.fpconst import NaN
 from cing.core.molecule import Molecule
 from random import random
 from unittest import TestCase
-from cing.Libs.fpconst import NaN
 import cing
 import unittest
 
 class AllChecks(TestCase):
- 
+
     def testNTdict(self):
         a = NTdict( b=NTdict( anItem='there'))
 #        NTdebug( '0 '+ `a` )
@@ -42,7 +42,7 @@ class AllChecks(TestCase):
         self.assertFalse(a.getDeepByKeys('b','c',9)) # better not throw an error.
         self.assertEquals('default value',
             a.getDeepByKeysOrDefault('default value',9)) # returns default
-        
+
         self.assertEquals(2,
             a.getDeepByKeys('b','c',1)) # get the second element by key 1
 
@@ -57,7 +57,7 @@ class AllChecks(TestCase):
         appendDeepByKeys(a, 13, 'b', 1)
         strComplexObject = '%s' % a
         self.assertEquals(strComplexObject, "{'b': [10, [11, 13], 12]}")
-        
+
 
     def testNTmessage(self):
         aStringToBe = 123
@@ -94,15 +94,25 @@ class AllChecks(TestCase):
         v = cing.verbosity
         cing.verbosity = verbosityNothing
         for i in range( 1*10):
-            top.addResidue( `random()`,i )
+            res = top.addResidue( `random()`,i )
+            for j in range( 5):
+                atom = res.addAtom( `random()`,j )
         cing.verbosity = v
 
         resList = top.allResidues()
         middleValue = resList[len(resList)/2]
-        
+
         for _i in range( 1*10):
 #            _x = middleValue.sibling(0) # getting myself back should not take time.
             _x = middleValue.sibling(1) # this tends to be very expensive
+
+        newMol = atom.getParent(level = 3)
+        self.assertEqual(mol,newMol)
+        newMol = atom.getMolecule()
+        self.assertEqual(mol,newMol)
+        res.removeAtom(atom.name)
+        newMol = atom.getMolecule()
+        self.assertEqual(newMol, None)
 
     def testNTvalue(self):
         s = "%s"  % NTvalue(value=None,  error=None, fmt='%.3f (+- %.3f)')
@@ -134,10 +144,10 @@ class AllChecks(TestCase):
         s = "abcdefg"
         start = 'bc'
         end = 'f'
-        expected = "bcdef" 
+        expected = "bcdef"
         t = getTextBetween( s, start, end )
         self.assertEquals( t, expected )
-        
+
         # Some multi line stuff.
         s = """# 79 # Note: Summary report for users of a structure
 This is an overall summary of the quality of the structure as
@@ -149,14 +159,14 @@ The second part of the table mostly gives an impression of how well
 the model conforms to common refinement constraint values. The
 first part of the table shows a number of constraint-independent
 quality indicators.
- 
+
  Structure Z-scores, positive is better than average:
   1st generation packing quality :  -3.135
   2nd generation packing quality :  -1.174
   Ramachandran plot appearance   :  -3.291 (poor)
   chi-1/chi-2 rotamer normality  :  -5.390 (bad)
   Backbone conformation          :  -3.116 (poor)
- 
+
  RMS Z-scores, should be close to 1.0:
   Bond lengths                   :   1.642 (loose)
   Bond angles                    :   1.394
@@ -185,14 +195,14 @@ The second part of the table mostly gives an impression of how well
 the model conforms to common refinement constraint values. The
 first part of the table shows a number of constraint-independent
 quality indicators.
- 
+
  Structure Z-scores, positive is better than average:
   1st generation packing quality :  -3.135
   2nd generation packing quality :  -1.174
   Ramachandran plot appearance   :  -3.291 (poor)
   chi-1/chi-2 rotamer normality  :  -5.390 (bad)
   Backbone conformation          :  -3.116 (poor)
- 
+
  RMS Z-scores, should be close to 1.0:
   Bond lengths                   :   1.642 (loose)
   Bond angles                    :   1.394
@@ -203,7 +213,7 @@ quality indicators.
 """
         t = getTextBetween( s, start, end, endIncl=False )
         self.assertEquals( t, expected )
-        
+
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
