@@ -48,7 +48,6 @@ from database import NTdb
 from math import acos
 from math import pi
 from numpy.core.defmatrix import mat
-from numpy.core.numeric import ndarray
 from numpy.ma.core import multiply
 from parameters   import plotParameters
 import math
@@ -1374,7 +1373,7 @@ class Molecule( NTtree, ResidueList ):
         unmatchedAtomByResDict = {}
         for atom in atomListToSyncToSink:
             res = atom._parent
-            if not res.deleteAtom(atom.name):
+            if not res.removeAtom(atom.name):
                 NTcodeerror("Failed to delete atom %s from residue %s" % ( atom, res ))
             # JFD: Report all together now.
             if not unmatchedAtomByResDict.has_key(res.resName):
@@ -1730,11 +1729,11 @@ Return an Molecule instance or None on error
                     for atm in res.rmsd.bbtemp:
                         # JFD: when there are 2 models of 1brv and VAL H1 is only present in the second model
                         # the len is 1 and model will become 1.
-                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#deleteAtom.
+                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#removeAtom.
                             Vbb.append(atm.coordinates[model].e)
                         else:
                             Vbb.append(atm.coordinates[0].e)
-                            NTcodeerror("TODO: fix Residue#deleteAtom.")
+                            NTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
                     res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
 
@@ -1752,11 +1751,11 @@ Return an Molecule instance or None on error
                                                             # since we may supply an external list
                     Vhv = []
                     for atm in res.rmsd.hvtemp:
-                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#deleteAtom.
+                        if len(atm.coordinates)>=(model+1): # JFD adds because for now I don't seem to be able to do Residue#removeAtom.
                             Vhv.append(atm.coordinates[model].e)
                         else:
                             Vhv.append(atm.coordinates[0].e)
-                            NTcodeerror("TODO: fix Residue#deleteAtom.")
+                            NTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
                     res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
 
@@ -2590,7 +2589,7 @@ Residue class: Defines residue properties
         return self,newRes
     #end def
 
-    def deleteAtom(self, name, convention=INTERNAL ):
+    def removeAtom(self, name, convention=INTERNAL ):
         """JFD adds: GV please check
         Return Atom on success or None on error
         """
@@ -2843,7 +2842,12 @@ Residue class: Defines residue properties
     def getTripletHistogramList(self, doOnlyOverall = False ):
         """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
         an empty array when it could not be constructed.
+
+        If doOnlyOverall it will be a list with a single element. If not then
+        it will be a list of three elements one each for every sstype.
+
         Return None on error.
+            or emtpy array when it could not be constructed.
         """
 
         triplet = NTlist()
@@ -2851,60 +2855,62 @@ Residue class: Defines residue properties
             triplet.append( self.sibling(i) )
 
         if None in triplet:
-            NTdebug( 'Skipping residue without triplet %s' % self)
+#            NTdebug( 'Skipping residue without triplet %s' % self)
             return []
 
-        resTypePrev = triplet[0].db.shortName
-        resType     = triplet[1].db.shortName
-        resTypeNext = triplet[2].db.shortName
-
+        resTypePrev = getDeepByKeys(triplet[-1].db.nameDict, IUPAC)
+        resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
+        resTypeNext = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
 
         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
         hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext)
         if hist1 == None:
-            NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
+#            NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
             return []
         if hist2 == None:
-            NTdebug('skipping for hist2 is empty for [%s] [%s]' % (resType, resTypeNext))
+#            NTdebug('skipping for hist2 is empty for [%s] [%s]' % (resType, resTypeNext))
             return []
-        sumh1 = sum(hist1)
-        sumh2 = sum(hist2)
+#        sumh1 = sum(hist1)
+#        sumh2 = sum(hist2)
 
         # Plot a density background
         histList = []
 
         if doOnlyOverall:
-            hist1 = 100.0 * hist1 / sumh1
-            hist2 = 100.0 * hist2 / sumh2
-            m1 = mat(hist1)
-            m2 = mat(hist2).transpose()
+#            hist1 = 100.0 * hist1 / sumh1
+#            hist2 = 100.0 * hist2 / sumh2
+            m1 = mat(hist1,dtype='float')
+            m2 = mat(hist2,dtype='float')
+            m2 = m2.transpose()
             hist = multiply(m1,m2)
             histList.append(hist)
         else:
+#            print hPlot.histd1BySsAndResTypes
             ssTypeList = hPlot.histd1BySsAndResTypes.keys()
             ssTypeList.sort() # in place sort to: space, H, S
+#            NTdebug("ssTypeList: %s" % ssTypeList)
             for ssType in ssTypeList:
+#                NTdebug("Processing ssType: %s" % ssType)
                 hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
-                hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypeNext)
+                hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
                 if hist1 == None:
-                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
+                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
                     continue
                 if hist2 == None:
                     NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
                     continue
-
-                sumh1 = sum(hist1)
-                sumh2 = sum(hist2)
-
-                hist1 = 100.0 * hist1 / sumh1
-                hist2 = 100.0 * hist2 / sumh2
-                m1 = mat(hist1)
-                m2 = mat(hist2).transpose()
+#                sumh1 = sum(hist1)
+#                sumh2 = sum(hist2)
+#                hist1 = 100.0 * hist1 / sumh1
+#                hist2 = 100.0 * hist2 / sumh2
+                m1 = mat(hist1,dtype='float')
+                m2 = mat(hist2,dtype='float')
+                m2 = m2.transpose()
                 hist = multiply(m1,m2)
-# TODO: why the next 3 lines?
-                l = len(hist1)
-                if ssType == ' ':
-                    hist = ndarray(shape=(l, l), dtype=float, order='F')
+## TODO: why the next 3 lines?
+#                l = len(hist1)
+#                if ssType == ' ':
+#                    hist = ndarray(shape=(l, l), dtype=float, order='F')
                 histList.append(hist)
             # end for
         # end if
@@ -3224,7 +3230,10 @@ Atom class: Defines object for storing atom properties
 
         if showChainId:
             chn = res._parent
-            result = chn.name + '.'
+            if chn == None:
+                result = ' .'
+            else:
+                result = chn.name + '.'
         else:
             result = ''
         # Compressed for speed.
@@ -3256,6 +3265,9 @@ Atom class: Defines object for storing atom properties
         """
         Returns True if atom has less coordinates instances than would be expected from modelCount
         """
+        if self.getModelCount() == None:
+            return True
+
         if len(self.coordinates) < self.residue.chain.molecule.modelCount:
             return True
         else:
@@ -3267,8 +3279,19 @@ Atom class: Defines object for storing atom properties
         Returns the number of models derived from the top level object; molecule.
         This might be different from the length of self.coordinates in case the sync hasn't been done yet.
         """
-        return self.residue.chain.molecule.modelCount
+#        return self.residue.chain.molecule.modelCount
+        modelCount = getDeepByKeys(self, 'residue', 'chain', 'molecule', 'modelCount' )
+#        if modelCount == None:
+#            NTdebug("Failed to get modelCount for atom")
+        return modelCount
     #end def
+
+    def getMolecule(self):
+        mol = self.getParent(level=3) # TODO : test.
+#        if mol == None:
+#            NTdebug("Failed to get molecule for atom")
+#        return self.residue.chain.molecule
+        return mol
 
     def addResonance( self, value=NaN, error=NaN ):
         r = Resonance( atom=self, value=value, error = error )
@@ -4009,6 +4032,39 @@ class AtomList( NTlist ):
         return str(self)
     #end def
 #end class
+
+#class DihedralEntityList( NTlist ):
+#    """
+#    Class based on NTlist that holds all dihedrals with a certain name for all occurences in the project.
+#    Compare with
+#    """
+#    def __init__( self, molecule ):
+#        NTlist.__init__( self )
+#        self.name       = molecule.name + '.dihedrals'
+#        self.molecule = molecule
+##        self.status     = status      # Status of the list; 'keep' indicates storage required
+#        self.currentId  = 0           # Id for each element of list
+#        self.rogScore   = ROGscore()
+##        self.appendFromMolecule( molecule )
+#        self.criticize()
+#    #end def
+#
+#    def criticize(self):
+#        pass
+#
+#    def append( self, o ):
+#        o.id = self.currentId
+#        NTlist.append( self, o )
+#        self.currentId += 1
+#
+#    def __str__( self ):
+#        return sprintf( '<DihedralEntityList "%s" (%d)>',self.name, len(self) )
+#    #end def
+#
+#    def format( self ):
+#        return str(self)
+#    #end def
+##end class
 
 class CoordinateOld( list ):
     """

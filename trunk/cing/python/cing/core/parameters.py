@@ -64,6 +64,7 @@ htmlDirectories = NTdict(
 #    atoms       = 'Atoms',
     models      = 'Molecule/Models',
     restraints  = 'Restraints',
+    dihedrals   = 'Dihedrals',
     peaks       = 'Peaks'
 )
 htmlDirectories.keysformat() #define a format string for 'pretty' output

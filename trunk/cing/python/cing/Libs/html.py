@@ -27,6 +27,7 @@ from cing.Libs.NTutils import NTmkdir
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTprogressIndicator
 from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import NTzap
@@ -86,6 +87,12 @@ pageTracker._trackPageview();
 } catch(err) {}</script>
 """
 
+NO_CHAIN_TO_GO_TO = 'no chain to go to'
+
+image2DdihedralWidth  = 500
+image2Ddihedralheight = 500
+imageSmall2DdihedralWidth  = 300
+imageSmall2Ddihedralheight = 300
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -203,28 +210,38 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
         #    pprint.pprint(dbaseTemp)
-            self.histRamaCombined                = dbaseTemp[ 'histRamaCombined' ]
-            self.histRamaBySsAndResType          = dbaseTemp[ 'histRamaBySsAndResType' ]
-            self.histRamaBySsAndCombinedResType  = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
+            self.histRamaCombined                   = dbaseTemp[ 'histRamaCombined' ]
+            self.histRamaBySsAndResType             = dbaseTemp[ 'histRamaBySsAndResType' ]
+            self.histRamaBySsAndCombinedResType     = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
         #    pprint(histRamaCombined)
             dbase_file.close()
             #dbaseTemp.close()
-
+#            sumHist = core.sum(self.histRamaCombined, axis=None)
+#            NTdebug("Rama          sum: %d" % sumHist)
+#            sumHist = core.sum(self.histRamaBySsAndResType['H']['HIS'])
+#            NTdebug("Rama [H][HIS] sum: %d" % sumHist)
+        if True:
             dbase_file_abs_name = os.path.join( self.histDir, 'chi1chi2_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
-            self.histJaninBySsAndResType         = dbaseTemp[ 'histJaninBySsAndResType' ]
-            self.histJaninBySsAndCombinedResType = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
+            self.histJaninBySsAndResType            = dbaseTemp[ 'histJaninBySsAndResType' ]
+            self.histJaninBySsAndCombinedResType    = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
             dbase_file.close()
+#            sumHist = core.sum(self.histJaninBySsAndResType['H']['HIS'])
+#            NTdebug("Janin [H][HIS] sum: %d" % sumHist)
         if True:
             dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
-            self.histd1BySsAndResTypes = dbaseTemp[ 'histd1BySsAndResTypes' ]
-            self.histd1ByResTypes = dbaseTemp[ 'histd1ByResTypes' ]
-            self.histd1BySs = dbaseTemp[ 'histd1BySs' ]
-            self.histd1 = dbaseTemp[ 'histd1' ]
+            self.histd1BySsAndResTypes              = dbaseTemp[ 'histd1BySsAndResTypes' ]
+            self.histd1ByResTypes                   = dbaseTemp[ 'histd1ByResTypes' ]
+            self.histd1BySs                         = dbaseTemp[ 'histd1BySs' ]
+            self.histd1                             = dbaseTemp[ 'histd1' ]
             dbase_file.close()
+#            sumHist = core.sum(self.histd1)
+#            NTdebug("D1D2               sum: %d" % sumHist)
+#            sumHist = core.sum(self.histd1BySsAndResTypes['H']['HIS']['HIS'])
+#            NTdebug("D1D2 [H][HIS][HIS] sum: %d" % sumHist)
 # end class
 
 hPlot = HistogramsForPlotting()
@@ -285,7 +302,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
 
     ps =NTplotSet() # closes any previous plots
-    ps.hardcopySize = (500,500)
+    ps.hardcopySize = (image2DdihedralWidth,image2Ddihedralheight)
     plot = NTplot( title  = plotTitle,
       xRange = (plotparams1.min, plotparams1.max),
       xTicks = range(int(plotparams1.min), int(plotparams1.max+1), plotparams1.ticksize),
@@ -299,6 +316,10 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         hPlot.initHist()
 
     doingNewD1D2plot = False
+    minPercentage =  MIN_PERCENTAGE_RAMA
+    maxPercentage = MAX_PERCENTAGE_RAMA
+    scaleBy = SCALE_BY_MAX
+
     if dihedralName1=='PHI' and dihedralName2=='PSI':
         histBySsAndCombinedResType = hPlot.histRamaBySsAndCombinedResType
         histBySsAndResType         = hPlot.histRamaBySsAndResType
@@ -307,6 +328,9 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         histBySsAndResType         = hPlot.histJaninBySsAndResType
     elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
         histBySsAndResType         = hPlot.histd1BySsAndResTypes
+        minPercentage =  MIN_PERCENTAGE_D1D2
+        maxPercentage = MAX_PERCENTAGE_D1D2
+        scaleBy = SCALE_BY_SUM
         doingNewD1D2plot = True
     else:
         NTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
@@ -321,21 +345,30 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
 #    NTdebug('Looked up residue.resName %s to resName %s' % ( residue.resName,resName ))
 
-    for ssType in ssTypeList:
-        if isSingleResiduePlot:
-            if doingNewD1D2plot:
-                # depending on doOnlyOverall it will actually return an array of hist.
-                hist = residue.getTripletHistogramList( doOnlyOverall = False )
+    if doingNewD1D2plot:
+        # depending on doOnlyOverall it will actually return an array of myHist.
+        myHist = residue.getTripletHistogramList( doOnlyOverall = False )
+        if myHist == None:
+            NTerror("Encountered an error getting the hist for %s" % residue)
+            return None
+        if len(myHist) == 0:
+#            NTdebug("Found no histogram for %s" % residue)
+            return None
+        histList += myHist # extend the list.
+    else:
+        for ssType in ssTypeList:
+            if isSingleResiduePlot:
+                myHist = getDeepByKeys(histBySsAndResType,ssType,resName)
             else:
-                hist = getDeepByKeys(histBySsAndResType,ssType,resName)
-        else:
-            hist = getDeepByKeys(histBySsAndCombinedResType,ssType)
-        if hist != None:
-#            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
-            histList.append(hist)
+                myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
+            if myHist == None:
+                NTerror("Encountered an error getting the hist for %s" % residue)
+                return None
+        #            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
+            histList.append(myHist)
     if histList:
 #        NTdebug('Will do dihedralComboPlot')
-        plot.dihedralComboPlot(histList)
+        plot.dihedralComboPlot(histList, minPercentage =  minPercentage, maxPercentage = maxPercentage, scaleBy = scaleBy)
 
 
 
@@ -372,7 +405,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         # Plot data points on top for painters algorithm without alpha blending.
         myPoint = plusPoint.copy()
         myPoint.pointColor = 'green'
-        myPoint.pointSize = 6.0
+        myPoint.pointSize = 6.0 # was 6.0
+#        myPoint.pointSize = 10.0
         myPoint.pointEdgeWidth = 1.0
         if res.resName == 'GLY':
             myPoint.pointType = 'triangle'
@@ -382,13 +416,18 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
             # Plot individually.
             bbList = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
-            for i,bb in enumerate(bbList):
-                NTdebug('BBCCHK %f' % bb)
-                if bb < BBCCHK_CUTOFF:
-                    myPoint.pointColor='red'
+
+            for i,d1Element in enumerate(d1):
+                if not bbList:
+                    myPoint.pointColor='blue'
                 else:
-                    myPoint.pointColor='green'
-                plot.point( (d1[i], d2[i]), attributes=myPoint )
+                    bb = bbList[i]
+                    NTdebug('BBCCHK %f' % bb)
+                    if bb > BBCCHK_CUTOFF:
+                        myPoint.pointColor='red'
+                    else:
+                        myPoint.pointColor='green'
+                plot.point( (d1Element, d2[i]), attributes=myPoint )
         else: # plot all at once.
             plot.points( zip( d1, d2 ), attributes=myPoint )
 
@@ -433,11 +472,11 @@ def setupHtml(project):
     molecule = project.molecule
 
     ProjectHTMLfile( project )
-    MoleculeHTMLfile( project, molecule )
     for chain in molecule.allChains():
         ChainHTMLfile( project, chain )
     for res in molecule.allResidues():
         ResidueHTMLfile( project, res )
+    MoleculeHTMLfile( project, molecule ) # Do after ResidueHTMLfile for it will combine some of it's plots. # JFD
 
     if hasattr(molecule, 'atomList'):
         AtomsHTMLfile( project, molecule.atomList )
@@ -475,13 +514,14 @@ def generateHtml( project, htmlOnly=False ):
         NTmessage(' and images.')
 
     project.html.generateHtml(htmlOnly=htmlOnly)
-    project.molecule.html.generateHtml(htmlOnly=htmlOnly)
     for chain in project.molecule.allChains():
         chain.html.generateHtml(htmlOnly=htmlOnly)
         NTmessage("Html for chain %s and its residues", chain.name)
         for res in NTprogressIndicator(chain.allResidues(), CHARS_PER_LINE_OF_PROGRESS):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
+    project.molecule.html.generateHtml(htmlOnly=htmlOnly) # JFD: needs to happen after residue pages were created.
+
     NTmessage("Html for atoms and models")
     if hasattr(project.molecule, 'atomList'):
         project.molecule.atomList.html.generateHtml(htmlOnly=htmlOnly)
@@ -699,17 +739,24 @@ class MakeHtmlTable:
 #end class
 
 
-def _makeResidueTableHtml( obj, residues, text=None ):
+def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName = None,
+            imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight ):
     """
     Make a table with links to residues in html.main of obj
+    If the pictureBaseName is not None then insert it from it's residue directory
+    if it's present.
+
     Return True on error.
     """
-    ncols = 10
+
     width = '6.0em' # reserve some space per residue in chain table
     kwds = { 'style': "width: %s" % width }
     kwds['align'] = 'right'
-    if text:
-        obj.html.main('h1',text)
+
+    html = obj.html
+    main = html.main
+#    if text:
+#        main('h1',text)
     if not residues:
         NTerror("Failed to _makeResidueTableHtml")
         return True
@@ -717,34 +764,52 @@ def _makeResidueTableHtml( obj, residues, text=None ):
     r0 = residues[0]
     r1 = r0.resNum
     r2 = r0.resNum/ncols *ncols + ncols-1
-    obj.html.main('table', closeTag=False)
-    obj.html.main('tr', closeTag=False)
-    obj.html.main( 'td',sprintf('%d-%d',r1,r2), **kwds )
+    main('table', closeTag=False)
+    main('tr', closeTag=False)
+    main( 'td',sprintf('%d-%d',r1,r2), **kwds )
     for _emptyCell in range( r0.resNum%ncols ):
-        obj.html.main('td', **kwds)
-#        obj.html.main('td')
+        main('td', **kwds)
+#        main('td')
 
     prevRes = None
+    project = obj.html.project
+    mol = project.molecule #@UnusedVariable
     for res in residues:
         chainBreakDetected = (prevRes!=None) and (prevRes.resNum != (res.resNum - 1))
         if chainBreakDetected or res.resNum%ncols == 0:
             r1 = res.resNum/ncols *ncols
             r2 = r1+ncols-1
-            obj.html.main('tr', openTag=False)
-            obj.html.main('tr', closeTag=False)
-            obj.html.main('td',sprintf('%d-%d',r1,r2), **kwds)
+            main('tr', openTag=False)
+            main('tr', closeTag=False)
+            main('td',sprintf('%d-%d',r1,r2), **kwds)
             for _emptyCell in range( res.resNum%ncols ):
-                obj.html.main('td', **kwds)
+                main('td', **kwds)
 
         # add residue to table
-        obj.html.main('td', closeTag=False, **kwds)
-        obj.html.insertHtmlLink(obj.html.main, obj, res, text=res.name)
-        obj.html.main('td', openTag=False)
+        main('td', closeTag=False, **kwds)
+
+        if pictureBaseName:
+            # file:///Users/jd/tmp/cingTmp/1brv.cing/1brv/HTML/Dihedrals/Ramachandran.html#_top
+            tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  pictureBaseName + ".png" )
+            relLink = os.path.join('../', tailLink)
+            absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
+#            print tailLink, relLink, absLink
+            if os.path.exists(absLink):
+#            if True:
+                main('a',   "",         href = relLink, closeTag=False )
+                main('img', "",         src=relLink, height=imageHeight, width=imageWidth )
+                main('a',   "",         openTag=False )
+            else:
+                main('a', "n/a")
+            main('br')
+        # end if
+        html.insertHtmlLink(main, obj, res, text=res.name)
+        main('td', openTag=False)
         prevRes = res
     #end for over res in residues
 
-    obj.html.main('tr', openTag=False)
-    obj.html.main('table', openTag=False)
+    main('tr', openTag=False)
+    main('table', openTag=False)
 #end def
 
 
@@ -1143,6 +1208,11 @@ class HTMLfile:
         downSep = htmlPath.count(sep)
         return (upSep-downSep-1) * pardirSep
 
+#    def findHtmlLocationResidueIndex(self, source, destinationResidue, id=None ):
+#        if not hasattr(source,'htmlLocation'):
+#            NTerror('findHtmlLocationResidue: No htmlLocation attribute associated to object %s', source)
+#            return None
+
     def findHtmlLocation(self, source, destination, id=None ):
         '''Description: given 2 Cing objects returns the relative path between them.
            Inputs: Cing objects souce, destination
@@ -1156,7 +1226,7 @@ class HTMLfile:
         # Destination is the target.
         for item in [source, destination]:
             if not hasattr(item,'htmlLocation'):
-                NTerror('HTMLfile.findHtmlLocation: No htmlLocation attribute associated to object %s', item)
+#                NTerror('HTMLfile.findHtmlLocation: No htmlLocation attribute associated to object %s', item)
                 return None
 
         # Strip leading dot for rest of algorithm.
@@ -1231,21 +1301,19 @@ class HTMLfile:
 
         if not source:
             # Happens for 2k0e
-            NTwarning("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+#            NTwarning("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+#            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         if not destination:
-            # Happens for 2k0e
-            NTwarning("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+            # Happens for 2k0e and all projects with missing topology
+#            NTwarning("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+#            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         link = self.findHtmlLocation( source, destination, id )
 #        NTdebug('From source: %s to destination: %s, id=%s using relative link: %s' ,
-#                 source.htmlLocation, destination.htmlLocation, id,link
-#               )
-
+#                 source.htmlLocation, destination.htmlLocation, id,link)
 
         kw = {'href':link}
         #if not destination.has_key('colorLabel'):
@@ -1502,7 +1570,7 @@ class ProjectHTMLfile( HTMLfile ):
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
-                NTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
+#                NTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
                 self.project.molecule.export2gif(pathMolGif, project=self.project)
             else:
                 NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
@@ -1517,6 +1585,47 @@ class ProjectHTMLfile( HTMLfile ):
         #end if
 
         htmlMain('table', openTag=False)
+        self.render()
+    #end def
+#end class
+
+class DihedralHTMLfile( HTMLfile ):
+    """
+    Class to generate HTML files for combined Dihedral instance
+    """
+    ncols = 5
+
+    def __init__(self, project, dihedralEntity ):
+        # Create the HTML directory for this dihedral
+        fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralEntity.name + '.html' )
+        dihedralEntity.htmlLocation = ( fileName, HTMLfile.top )
+#        NTdebug("dihedralEntity.htmlLocation[0]: %s" % dihedralEntity.htmlLocation[0])
+        HTMLfile.__init__(self, fileName, title='Dihedral ' + dihedralEntity.name, project=project)
+        if hasattr(dihedralEntity, 'html'):
+            del(dihedralEntity.html)
+        dihedralEntity.html = self
+        self.dihedralEntity = dihedralEntity
+#        NTdebug("self.dihedralEntity.htmlLocation[0]: %s" % self.dihedralEntity.htmlLocation[0])
+    #end def
+
+    def generateHtml(self, htmlOnly=False):
+        """
+        Generate the HTML code and/or Figs depending htmlOnly
+        """
+        # Reset CING content
+        self._resetCingContent()
+        self.header('h1', 'Dihedral '+self.dihedralEntity.name)
+
+#        self.main('h1','Residue-based analysis')
+        mol = self.project.molecule
+        for chain in mol.allChains():
+#            print '>>',mol, chain
+            self.insertHtmlLinkInTag( 'h1', self.main, mol, chain, text='Chain %s' % chain.name )
+            _makeResidueTableHtml( self.dihedralEntity, residues=chain.allResidues(), ncols=DihedralHTMLfile.ncols,
+                    pictureBaseName = self.dihedralEntity.name,
+                    imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight)
+#            alternativeMain = self.main,
+        #end for
         self.render()
     #end def
 #end class
@@ -1618,6 +1727,71 @@ class MoleculeHTMLfile( HTMLfile ):
         main('table',  openTag=False) # close table
         if not anyProcheckPlotsGenerated:
             main('h2', "No procheck plots found at all")
+    #end def
+
+    def _generateDihedralHtml(self, htmlOnly=False):
+        """Generate the Whatif html code
+        """
+        ncols = 12 # Needs to be twice 6 or adjust the formatting below in dihedralList with BOGUS inserted.
+
+        main = self.main
+        molecule = self.molecule
+
+        if not htmlOnly:
+            NTmessage("Creating dihedrals combined for all residues html")
+#                if project.createHtmlWhatif():
+#                    NTerror('Failed to createHtmlWhatif')
+#                    return True
+
+        BOGUS_DIHEDRAL_ID = 'BOGUS'
+        # USE THE BOGUS for alignment within the table.
+        dihedralList = """      Ramachandran Janin D1D2 PHI PSI BOGUS
+                                CHI1 CHI2 CHI3 CHI4 OMEGA BOGUS
+                                ALPHA BETA GAMMA DELTA EPSILON ZETA
+                                NU0 NU1 NU2 NU3 NU4 CHI
+                        """.split()
+
+        dihedralPresentMap = {}
+        moleculeDir, _tmp, _tmp = NTpath( self.fileName )
+        for residue in molecule.allResidues():
+#            NTdebug("_generateDihedralHtml for %s" % residue)
+            resDir =  os.path.join(moleculeDir, residue.chain.name, residue.name )
+#            NTdebug("resDir: %s" % resDir)
+            if not os.path.exists(resDir):
+                NTerror("Failed to find resDir: %s" % resDir)
+            for dihed in dihedralList:
+                tmpPath = os.path.join(resDir, dihed + '.png')
+#                print 'tmpPath:', tmpPath, os.path.exists(tmpPath)
+                if os.path.exists(tmpPath):
+                    dihedralPresentMap[ dihed ] = None
+        dihList = dihedralPresentMap.keys()
+        main('h1','Dihedrals combined')
+        if dihList:
+            main('table',  closeTag=False)
+            plotCount = 0 # The number of actual plots shown in the table
+            for dihed in NTprogressIndicator(dihedralList):
+                if plotCount % ncols == 0:
+                    if plotCount:
+                        main('tr',  openTag=False)
+                    main('tr',  closeTag=False)
+                main('td',  closeTag=False)
+                if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
+                    dihedralEntity = NTtree( dihed ) # Just like e.g. Residue is a NTtree
+                    dihedralEntity._parent = molecule
+                    dihedralHTMLfile = DihedralHTMLfile(self.project, dihedralEntity)
+                    dihedralHTMLfile.generateHtml(htmlOnly)
+                    self.insertHtmlLink(main, molecule, dihedralEntity, text=dihed)
+                else:
+                    main(BOGUS_DIHEDRAL_ID)
+                main('td',  openTag=False)
+                plotCount += 1
+            #end for plot
+
+            if plotCount: # close any started rows.
+                main('tr',  openTag=False)
+            main('table',  openTag=False) # close table
+        else:
+            main('h2', "No plots available")
     #end def
 
     def _generateWhatifHtml(self, htmlOnly=False):
@@ -1819,6 +1993,7 @@ class MoleculeHTMLfile( HTMLfile ):
             self.main('h1', 'Model-based analysis')
             self.insertHtmlLink(self.main, self.molecule, self.molecule.ensemble, text='Models page')
 
+        self._generateDihedralHtml(htmlOnly=htmlOnly)
         self.main('h1', 'Structure-based analysis')
         #Use a dummy object for referencing the salt-bridges text-file for now
         _dummy = NTdict()
@@ -1916,22 +2091,23 @@ class ResidueHTMLfile( HTMLfile ):
 
         # Reset CING content
         self._resetCingContent()
-
         # 0: angle 1 name
         # 1: angle 2 name
         # 2: Angle combination name
         # 3: Tuple of arbitrary number of keys to value to show
         # 4: Name of value to show (eg QUACHK)
-        plotList = [['PHI',  'PSI',  'Ramachandran', (WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR), RAMCHK_STR ],
-                    ['CHI1', 'CHI2', 'Janin',        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR), C12CHK_STR]
+        plotDihedral2dList = [['PHI',  'PSI',  'Ramachandran', (WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR), RAMCHK_STR ],
+                    ['CHI1', 'CHI2', 'Janin',        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR), C12CHK_STR],
+                    [DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2', (), None]
                    ]
+
         graphicsFormatExtension = 'png'
         plottedList = []
 #        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)
 #        if not htmlOnly:
 #            NTdebug("Residue %s: generating dihedral plots", self.residue )
 
-        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
+        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotDihedral2dList:
 #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
             ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
             if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
@@ -1980,11 +2156,20 @@ class ResidueHTMLfile( HTMLfile ):
 #        residue.html.left( 'h2', openTag=False)
 
         # 2D plots
-        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotList:
+        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotDihedral2dList:
             plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
             if not plotDihedralComboName in plottedList: # failed on first attempt already. No sense in trying again.
                 continue
+
+            tailLink = os.path.join( htmlDirectories.dihedrals, plotDihedralComboName + '.html' )
+            # up from Molecule/A/ala181 to tailLink
+            relLink = os.path.join('../../..', tailLink)
+#            absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
+#            print "all: tailLink, relLink, absLink", tailLink, relLink, absLink
+
+            residue.html.left('a',   "",      href = relLink, closeTag=False )
             residue.html.left( 'h2', plotDihedralComboName, id=plotDihedralComboName)
+            residue.html.left('a',   "",         openTag=False )
 
             tmpPath2D = os.path.join(resdir, plotFileNameDihedral2D)
             if os.path.exists(tmpPath2D):
@@ -2084,7 +2269,12 @@ class ResidueHTMLfile( HTMLfile ):
                     chain   = atom.residue.chain
                     t.nextColumn()
                     # not including the . anymore since there will already be a ' ' space that can't be removed.
-                    self.insertHtmlLink( self.right, self.residue, chain,   text = chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)) )
+                    chName = NaNstring
+                    titleStr = NO_CHAIN_TO_GO_TO
+                    if chain:
+                        chName = chain.name
+                        titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                    self.insertHtmlLink( self.right, self.residue, chain,   text = chName,   title = titleStr )
                     if residue == self.residue:
                         self.right( 'i', residue.name )
                     else:
@@ -2300,7 +2490,13 @@ class AtomsHTMLfile( HTMLfile ):
         # reference label of atom; insert a dummy character
         self.main( 'i', '', id=atom.htmlLocation[1][1:])
 
-        self.insertHtmlLink( self.main, self.atomList, chain,   text =       chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)))
+        chName = NaNstring
+        titleStr = NO_CHAIN_TO_GO_TO
+        if chain:
+            chName = chain.name
+            titleStr = sprintf('goto chain %s', chain._Cname(-1))
+
+        self.insertHtmlLink( self.main, self.atomList, chain,   text =       chName,   title = titleStr)
 
         table.nextColumn(`residue.resNum`)
 
@@ -2542,7 +2738,14 @@ class RestraintListHTMLfile( HTMLfile ):
                 # reference label of DR; insert a dummy tag
                 if i == 0 and idx==0 and isSourceForAtom:
                     self.main( 'i', '', id=restraint.htmlLocation[1][1:])
-                self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)))
+
+
+                chName = NaNstring
+                titleStr = NO_CHAIN_TO_GO_TO
+                if chain:
+                    chName = chain.name
+                    titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
                 table.nextColumn(`residue.resNum`)
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
@@ -2612,7 +2815,13 @@ class RestraintListHTMLfile( HTMLfile ):
             table.nextColumn()
             if isSourceForAtom:
                 self.main( 'i', '', id=restraint.htmlLocation[1][1:])
-            self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)))
+            chName = NaNstring
+            titleStr = NO_CHAIN_TO_GO_TO
+            if chain:
+                chName = chain.name
+                titleStr = sprintf('goto chain %s', chain._Cname(-1))
+
+            self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
             self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
@@ -2906,7 +3115,14 @@ class PeakListHTMLfile( HTMLfile ):
             table.nextColumn()
             if i == 0:
                 self.main( 'i', '', id=peak.htmlLocation[1][1:])
-            self.insertHtmlLink( self.main, self.peakList, chain,   text =       chain.name,   title = sprintf('goto chain %s', chain._Cname(-1)))
+
+            chName = NaNstring
+            titleStr = NO_CHAIN_TO_GO_TO
+            if chain:
+                chName = chain.name
+                titleStr = sprintf('goto chain %s', chain._Cname(-1))
+
+            self.insertHtmlLink( self.main, self.peakList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
             self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
@@ -3061,7 +3277,7 @@ class EnsembleHTMLfile( HTMLfile ):
     #        self.project.models[i] holds the number of outliers for model i.
     #        models is a NTdict containing per model a list of outliers.
             outliers = [self.project.models[i] for i in range(len(self.ensemble))]
-            NTdebug( '>> Number of outliers per model: ' + `outliers`)
+#            NTdebug( '>> Number of outliers per model: ' + `outliers`)
             plot.barChart( self.project.models.items(), 0.05, 0.95,
                            attributes = boxAttributes( fillColor='green' )
                          )

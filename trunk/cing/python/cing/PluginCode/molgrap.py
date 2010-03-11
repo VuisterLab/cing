@@ -50,7 +50,7 @@ class Molgrap(NTdict):
         self.projectDirTmp = cingDirTmp
         if project:
             self.projectDirTmp = os.path.abspath(project.path(directories.tmp))
-        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
+#        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
 
     """Creates a large gif to path for the given molecule.
     Return True on error and False on success.
@@ -87,8 +87,8 @@ class Molgrap(NTdict):
             export = True
 
         if export:
-            NTdebug("First looking for atoms that should not be fed to molmol")
-            NTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
+#            NTdebug("First looking for atoms that should not be fed to molmol")
+#            NTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
 
 #            skippedAtoms = [] # Keep a list of skipped atoms for later
 #            skippedResidues = []
@@ -219,7 +219,9 @@ class Molgrap(NTdict):
         program = ExecuteProgram(script_file_name, rootPath = self.projectDirTmp, redirectOutputToFile = log_file_name)
         if program(""):
             NTerror("Failed shell command: " + script_file_name)
-            NTerror("Have you installed povray-includes or similar?\n      For some Linuxes 'colors.inc' doesn't come with povray")
+            NTerror("Suggestion 1: Have you installed povray-includes or similar?")
+            NTerror("For some Linuxes 'colors.inc' doesn't come with povray")
+            NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough?")
             return True
 #        try:
 #            os.unlink(script_file_name)
@@ -271,7 +273,8 @@ def export2gif(molecule, path, project = None):
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
         NTdebug("copying default image from %s to %s" % (src, path))
-        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
+        os.link(src, path) # us a real copy
+#        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
         return True
     return None
 

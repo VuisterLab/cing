@@ -1148,9 +1148,9 @@ def moleculeValidateAssignments( molecule  ):
 
     funcName = moleculeValidateAssignments.func_name
     result   = NTlist()
-    if molecule.resonanceCount == 0:
-        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
-        pass
+#    if molecule.resonanceCount == 0:
+#        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
+#        pass
 #        return result
 
     # Keep track of what assignments are done and don't complain about specific ones missing
@@ -1161,7 +1161,7 @@ def moleculeValidateAssignments( molecule  ):
     for key in assignmentCountMap.keys():
         hasAssignment[key] = assignmentCountMap[key] > 0
 
-    NTdetail("Molecule.validateAssignments: Found assignments for the following spin types: %s" % hasAssignment.keys())
+#    NTdebug("Molecule.validateAssignments: Found assignments for the following spin types: %s" % hasAssignment.keys())
 
     for atm in molecule.allAtoms():
         atm.rogScore.reset()
