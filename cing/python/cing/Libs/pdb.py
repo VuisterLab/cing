@@ -29,12 +29,12 @@ Speed check: 103.609s for pdbParser.importCoordinates: <Molecule "pdb2k0e" (C:1,
 """
 from cing.Libs import PyMMLib
 from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.core.constants import CYANA
 from cing.core.constants import CYANA_NON_RESIDUES
@@ -187,7 +187,7 @@ class pdbParser:
                         chn = self.tree[chainId]
                     #end if
                     if not chn:
-                        NTdebug('pdbParser._records2tree: strange, we should not have a None for chain; record %s', record)
+                        NTwarning('pdbParser._records2tree: strange, we should not have a None for chain; record %s', record)
                         continue
                     #end if
 
@@ -197,7 +197,7 @@ class pdbParser:
                         res = chn[fullResName]
                     #end if
                     if not res:
-                        NTdebug('pdbParser._records2tree: strange, we should not have a None for residue; record %s', record)
+                        NTwarning('pdbParser._records2tree: strange, we should not have a None for residue; record %s', record)
                         continue
                     #end if
 
@@ -207,7 +207,7 @@ class pdbParser:
                         atm = res[atmName]
                     #end if
                     if not atm:
-                        NTdebug('pdbParser._records2tree: strange, we should not have a None for atom; record %s', record)
+                        NTwarning('pdbParser._records2tree: strange, we should not have a None for atom; record %s', record)
                         continue
                     #end if
                     atomDict[t] = atm
@@ -399,7 +399,7 @@ class pdbParser:
                 if len(atom.coordinates) <= model:
                     atom.addCoordinate(record.x, record.y, record.z, Bfac = record.tempFactor, occupancy = record.occupancy)
                 else:
-                    NTdebug('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
+                    NTmessage('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
                 #end if
             #end if
         #end for
@@ -411,7 +411,7 @@ class pdbParser:
         if update:
             self.molecule.updateAll()
 
-        NTdebug('pdbParser.importCoordinates: %s', self.molecule)
+#        NTdebug('pdbParser.importCoordinates: %s', self.molecule)
         return False
     #end def
 #end class

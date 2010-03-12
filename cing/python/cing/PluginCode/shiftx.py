@@ -5,7 +5,6 @@ Linux in the bin directory.
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -32,7 +31,7 @@ if True: # block
     useModule = True
     # TODO: test if the binary is actually applicable to the system os.
     if not os.path.exists( cingPaths.shiftx ):
-        NTdebug("Missing shiftx which is a dep for shiftx")
+        NTmessage("Missing shiftx which is a dep for shiftx")
         useModule = False
     if not useModule:
         raise ImportWarning('shiftx')
@@ -315,7 +314,7 @@ def restoreShiftx( project, tmp=None ):
     root = project.moleculePath( 'shiftx' )
 
     if project.molecule == None:
-        NTdebug('restoreShiftx: no molecule defined')
+        NTmessage('restoreShiftx: no molecule defined')
         return None
     #end if
 
@@ -330,9 +329,9 @@ def restoreShiftx( project, tmp=None ):
 
         if os.path.exists( xmlFile ):
             NTdetail('==> Restoring shiftx results')
-            NTdebug('Using xmlFile "%s"', xmlFile)
+#            NTdebug('Using xmlFile "%s"', xmlFile)
         else:
-            NTdebug('Shiftx results xmlFile "%s" not found', xmlFile)
+            NTwarning('Shiftx results xmlFile "%s" not found', xmlFile)
             return None
         #end if
 
@@ -347,7 +346,7 @@ def restoreShiftx( project, tmp=None ):
     #end if
 
     project.shiftxStatus.keysformat()
-    NTdebug( 'project.shiftxStatus:\n%s', project.shiftxStatus.format() )
+#    NTdebug( 'project.shiftxStatus:\n%s', project.shiftxStatus.format() )
 
     if not project.shiftxStatus.completed:
         return project
@@ -420,7 +419,7 @@ def calcQshift( project, tmp=None ):
     """Calculate per residue Q factors between assignment and shiftx results
     """
     if not project.molecule:
-        NTdebug('calcQshift: no molecule defined')
+        NTmessage('calcQshift: no molecule defined')
         return None
     #end if
     NTdetail('==> calculating Q-factors for chemical shift')

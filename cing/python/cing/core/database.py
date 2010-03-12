@@ -1,7 +1,6 @@
 from cing import cingPythonCingDir
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
@@ -182,7 +181,7 @@ class MolDef( NTtree ):
                 NTerror('MolDef.appendResidueDef: replacing residueDef "%s" not allowed', oldResDef)
                 return None
             #end if
-            NTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
+#            NTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
             self.replaceChild( oldResDef, resDef )
         else:
             self._addChild( resDef )
@@ -269,11 +268,11 @@ class MolDef( NTtree ):
         """return True if resName is a valid for convention, False otherwise
         """
         if not resName:
-            NTdebug('MolDef.isValidResidueName: undefined residue name')
+#            NTdebug('MolDef.isValidResidueName: undefined residue name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-            NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
+#            NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getResidueDefByName( resName, convention=convention) != None)
@@ -285,11 +284,11 @@ class MolDef( NTtree ):
         """
 
         if not resName:
-            NTdebug('MolDef.getResidueDefByName: undefined residue name')
+#            NTdebug('MolDef.getResidueDefByName: undefined residue name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-            NTdebug('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
+#            NTdebug('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         rn = resName.strip()
@@ -304,15 +303,15 @@ class MolDef( NTtree ):
     #  print '>>', resName, atomName
 
         if not resName:
-            NTdebug('MolDef.isValidAtomName: undefined residue name')
+#            NTdebug('MolDef.isValidAtomName: undefined residue name')
             return None
         #end if
         if not atmName:
-            NTdebug('MolDef.isValidAtomName: undefined atom name')
+#            NTdebug('MolDef.isValidAtomName: undefined atom name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-            NTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
+#            NTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getAtomDefByName( resName, atmName, convention=convention) != None)
@@ -327,11 +326,11 @@ class MolDef( NTtree ):
             return None
         #end if
         if not atmName:
-            NTdebug('MolDef.getAtomDefByName: undefined atom name')
+#            NTdebug('MolDef.getAtomDefByName: undefined atom name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-            NTdebug('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
+#            NTdebug('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         resDef = self.getResidueDefByName( resName, convention=convention )
@@ -438,7 +437,7 @@ class ResidueDef( NTtree ):
 #                NTwarning('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
                 return None
             #end if
-            NTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)
+#            NTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)
             self.replaceChild( oldAtmDef, atmDef )
         else:
             self._addChild( atmDef )
@@ -450,8 +449,8 @@ class ResidueDef( NTtree ):
     def appendAtomListDef( self, nameList=[], **kwds ):
         """Not used yet; to be used in CCPN reader..."""
         for atomName in nameList:
-            atm = self.appendAtomDef(atomName,**kwds)
-            NTdebug("Added to residue: %s atom %s" % (self, atm))
+            _atm = self.appendAtomDef(atomName,**kwds)
+#            NTdebug("Added to residue: %s atom %s" % (self, atm))
     #end def
 
     def appendDihedral( self, name, **kwds ):
@@ -1181,7 +1180,7 @@ def saveToSML( rDefList, rootPath, convention=INTERNAL ):
         fname = rdef.translate(convention) +'.sml'
         fileList.append(fname)
         path = os.path.join(rootPath, fname)
-        NTdebug('saveToSML: saving %s to"%s"', rdef, path)
+#        NTdebug('saveToSML: saving %s to"%s"', rdef, path)
         #obj2SML( rdef, path, convention=convention) cannot use, because it will generate circular imports!
         rdef.SMLhandler.toFile( rdef, path, convention=convention )
     #end for

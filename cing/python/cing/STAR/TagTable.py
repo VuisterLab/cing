@@ -2,8 +2,8 @@
 Classes for dealing with STAR syntax
 """
 from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 from cing.STAR.Text import isStarNan
 from cing.STAR.Text import pattern_quoted
 from cing.STAR.Text import pattern_quotes_needed
@@ -160,7 +160,7 @@ class TagTable (Lister):
     def getStringListByColumnName(self, columnName):
         """Return a list of values or None for Error"""
         if columnName not in self.tagnames:
-            NTdebug("columnName %s not in self.tagnames: %s" % (columnName, self.tagnames))
+            NTmessage("columnName %s not in self.tagnames: %s" % (columnName, self.tagnames))
             return None
         idx = self.tagnames.index(columnName)
         if idx < 0:
@@ -173,25 +173,25 @@ class TagTable (Lister):
     def getFloatListByColumnName(self, columnName):
         """Convenience function."""
         return self.getSpecificListByColumnName( columnName, float, "float")
-            
+
     def getSpecificListByColumnName(self, columnName, function, dataType):
         """Return a list of values or None for Error"""
         resultNative = self.getStringListByColumnName(columnName)
         if not resultNative:
             return None
-        
+
         result = []
         for i,row in enumerate(resultNative):
             if isStarNan(row):
                 result.append( None )
             else:
                 try:
-                    result.append( function(row) )                    
+                    result.append( function(row) )
                 except:
                     NTerror("Value on row %d: [%s] is not an %s" % ( i, row, dataType))
                     return None
         return result
-            
+
     """
     A title identifying a tagtable by its tagnames
     simply the space separated concatenation of the tag names
@@ -426,7 +426,7 @@ class TagTable (Lister):
         while pos < pos_end:
             if self.verbosity > 2:
                 if pos - count > count_hash:
-                    NTdebug('##### %s chars processed ######' % count_hash)
+                    NTmessage('##### %s chars processed ######' % count_hash)
                     count = pos
             ## 1 char search; ', ", or ; at beginning of line
             match_quoted = pattern_quoted.search( text, pos, pos_end )

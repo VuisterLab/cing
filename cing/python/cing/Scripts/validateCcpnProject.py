@@ -2,7 +2,6 @@
 python -u $CINGROOT/python/cing/Scripts/validateCcpnProject.py ccpnProjectDir
 """
 from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexit
 from cing.Libs.NTutils import NTwarning
@@ -15,17 +14,17 @@ import os
 import sys
 
 class ValidateCcpnProject():
-        
-    def validate(self, pathProject):        
+
+    def validate(self, pathProject):
         if os.chdir(pathProject):
             pass
 #            endError("Failed to change to dir: %s" % pathProject)
-                
-#        logToLog('Now in pathProject: ' + pathProject)        
+
+#        logToLog('Now in pathProject: ' + pathProject)
 
         project = Project( self.entryId )
         if project.removeFromDisk():
-            NTexit("Failed to remove potentially old project: [%s]" % self.entryId )      
+            NTexit("Failed to remove potentially old project: [%s]" % self.entryId )
         project = Project.open( self.entryId, status='new' )
         pdbList = glob('*.pdb')
         uplList = glob('*.upl')
@@ -52,23 +51,23 @@ class ValidateCcpnProject():
             else:
                 NTwarning( "Converter for ccpn also needs a seq file before a prot file can be imported" )
         if peakList:
-            NTdebug('found peakList: [%s]' % peakList)
+#            NTdebug('found peakList: [%s]' % peakList)
             kwds[ 'peakFiles' ] = stripExtensions( peakList )
         if project.ccpn2cing(ccpnDirectory=".", convention=self.restraintsConvention,
                         copy2sources = True, **kwds ) == None:
             NTexit('Failed to project.ccpn2cing')
         project.save()
-        
+
         if not project.validate(htmlOnly=self.htmlOnly,
-                            doProcheck = self.doProcheck, 
+                            doProcheck = self.doProcheck,
                             doWhatif=self.doWhatif ):
             NTerror('Failed to project.validate')
-            
-        
+
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     v = ValidateCcpnProject( sys.argv[1] )
     if v.validate():
         NTerror('Failed to ValidateCcpnProject.validate')
-        
+

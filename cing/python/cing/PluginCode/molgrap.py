@@ -4,12 +4,13 @@ Adds methods:
 """
 from cing import cingDirMolmolScripts
 from cing import cingDirTmp
+from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.TypeChecking import check_string
@@ -18,22 +19,21 @@ from cing.core.constants import IUPAC
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
-from cing import cingPythonCingDir
 import os
 
 if True: # block
     useModule = True
     if not cingPaths.convert:
-        NTdebug("Missing convert which is a dep for Molgrap")
+        NTmessage("Missing convert which is a dep for Molgrap")
         useModule = False
     if not cingPaths.ghostscript:
-        NTdebug("Missing ghostscript which is a dep for Molgrap")
+        NTmessage("Missing ghostscript which is a dep for Molgrap")
         useModule = False
     if not cingPaths.molmol:
-        NTdebug("Missing molmol which is a dep for Molgrap")
+        NTmessage("Missing molmol which is a dep for Molgrap")
         useModule = False
     if not cingPaths.povray:
-        NTdebug("Missing povray which is a dep for Molgrap")
+        NTmessage("Missing povray which is a dep for Molgrap")
         useModule = False
 
     if not useModule:
@@ -62,7 +62,7 @@ class Molgrap(NTdict):
             return
 
         if not os.environ.has_key('MOLMOLHOME'):
-            NTdebug('MOLMOLHOME not defined by user, using a temporary one')
+            NTmessage('MOLMOLHOME not defined by user, using a temporary one')
             os.putenv('MOLMOLHOME', self.projectDirTmp)
 
         apath = os.path.abspath(path)
@@ -150,7 +150,7 @@ class Molgrap(NTdict):
             results_dir = root,
             )
         if status:
-            NTdebug( "Molgrap.run: rendering/converting entry: %s" % entry_code)
+            NTmessage( "Molgrap.run: rendered/converted entry: %s" % entry_code)
             return True
 
 #        ## Remove temporary files if successful and possible
@@ -272,7 +272,7 @@ def export2gif(molecule, path, project = None):
         src =  os.path.join( cingPythonCingDir, 'PluginCode', 'data', 'UnknownImage.gif' )
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
-        NTdebug("copying default image from %s to %s" % (src, path))
+        NTmessage("copying default image from %s to %s" % (src, path))
         os.link(src, path) # us a real copy
 #        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
         return True

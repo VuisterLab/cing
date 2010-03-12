@@ -1,6 +1,5 @@
 # Obtained thru Tim Stevens.
 
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTwarning
 import mimetools
 import mimetypes
@@ -34,8 +33,8 @@ def encodeForm(fields, files=None, lineSep='\r\n',
     lines = []
     if isinstance(fields, dict):
         fields = fields.items()
- 
-        
+
+
     for (key, fileName, value) in files:
         fileType = mimetypes.guess_type(fileName)[0] or 'application/octet-stream'
         lines.append('--' + boundary)
@@ -46,20 +45,20 @@ def encodeForm(fields, files=None, lineSep='\r\n',
         #lines.append('Content-Length: %s\r\n' % str(len(value)))
         lines.append('')
         lines.append(value)
-        
+
     for (key, value) in fields:
         lines.append('--' + boundary)
         lines.append('Content-Disposition: form-data; name="%s"' % key)
         lines.append('')
         lines.append(value)
-     
-    
+
+
     lines.append('--' + boundary + '--')
     lines.append('')
-    
+
     bodyData = lineSep.join(lines)
-    contentType = 'multipart/form-data; boundary=%s' % boundary 
- 
+    contentType = 'multipart/form-data; boundary=%s' % boundary
+
     return contentType, bodyData
 
 
@@ -68,36 +67,36 @@ def sendRequest(url, fields, files=None):
     """
 
     contentType, bodyData = encodeForm(fields, files)
-    
+
     headerDict = {'User-Agent': 'anonymous',
                   'Content-Type': contentType,
                   'Content-Length': str(len(bodyData))
                   }
-    
-    NTdebug( "contentType: [%s]" % contentType )
-    NTdebug( "headerDict: [%s]" % headerDict )
+
+#    NTdebug( "contentType: [%s]" % contentType )
+#    NTdebug( "headerDict: [%s]" % headerDict )
 #    NTdebug( "bodyData: [%s]" % bodyData )
-    
+
     #enterRequest = urllib2.Request(url)
     #print urllib2.urlopen(enterRequest).read()
     #time.sleep(2)
-    
-    NTdebug("Requesting form to url: [" + url + "]")
+
+#    NTdebug("Requesting form to url: [" + url + "]")
     request = urllib2.Request(url, bodyData, headerDict)
-    
+
     try:
         response = urllib2.urlopen(request)
 
     except urllib2.URLError, e:
         if hasattr(e, 'reason'):
-            msg = 'Connection to server URL %s failed with reason:\n%s' % (url, e.reason)            
+            msg = 'Connection to server URL %s failed with reason:\n%s' % (url, e.reason)
         elif hasattr(e, 'code'):
-            msg = 'Server request failed and returned code:\n%s' % e.code 
+            msg = 'Server request failed and returned code:\n%s' % e.code
         else:
             msg = 'Server totally barfed with no reason of fail code'
-        NTwarning('Failure', msg)     
+        NTwarning('Failure', msg)
         return
-    
+
     return response.read()
- 
- 
+
+

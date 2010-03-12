@@ -7,7 +7,6 @@ from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -39,14 +38,14 @@ import time
 if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
-        NTdebug("Missing java classpath which is an optional dependency for Wattos")
+#        NTdebug("Missing java classpath which is an optional dependency for Wattos")
         raise ImportWarning('Wattos')
 #    if not (('/Users/jd/workspace35/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
 #             '/Users/jd/workspace35/wattos/build' in cingPaths.classpath) or
 #             ('/Users/alan/workspace/Wattos/lib/Wattos.jar' in cingPaths.classpath)):
     classpathCombinedAgain = ':'.join(cingPaths.classpath)
     if not (('/lib/Wattos.jar' in classpathCombinedAgain) or ('/build' in classpathCombinedAgain)):
-        NTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
+#        NTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
         raise ImportWarning('Wattos')
 #    NTmessage('Using Wattos')
 
@@ -284,7 +283,7 @@ Quit
             residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR)
 
         self.molecule.setDeepByKeys(completenessMol, WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
-        NTdebug('done with _processComplCheck')
+#        NTdebug('done with _processComplCheck')
     #end def
 
 def runWattos(project, tmp = None, parseOnly=False):

@@ -17,13 +17,11 @@ Residue
 
 """
 from cing import cingPythonCingDir
-from cing import verbosityDebug
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -42,17 +40,16 @@ from cing.core.constants import AQUA
 from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
-import cing
 import os
 
 
 if True: # block
     useModule = True
     if not cingPaths.aqpc:
-        NTdebug("Missing aqpc which is a dep for procheck")
+#        NTdebug("Missing aqpc which is a dep for procheck")
         useModule = False
     elif not cingPaths.procheck_nmr:
-        NTdebug("Missing procheck_nmr which is a dep for procheck")
+#        NTdebug("Missing procheck_nmr which is a dep for procheck")
         useModule = False
     if not useModule:
         raise ImportWarning('procheck')
@@ -307,8 +304,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         #generate the script
 
         self.redirectOutput = True
-        if cing.verbosity >= verbosityDebug:
-            self.redirectOutput=False
+#        if cing.verbosity >= verbosityDebug: # Done debugging.
+#            self.redirectOutput=False
 #        NTdebug("Will redirect procheck output: " + `self.redirectOutput`)
         self.procheck  = ExecuteProgram('./' + self.procheckScript,
                                         rootPath = self.rootPath,
@@ -343,7 +340,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             self.ranges = ranges
             # Convert the ranges and translate into procheck format
             selectedResidues = self.molecule.ranges2list(ranges)
-            NTdebug( '>selectedResidues: %s' % selectedResidues)
+#            NTdebug( '>selectedResidues: %s' % selectedResidues)
 
             # Next line doesn't work when there are the same residue numbers in different chains.
             # TODO: rewrite to account for chain differences too.
@@ -358,7 +355,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     rngs.append(selectedResidues[i+1])
 
             rngs.append(selectedResidues[-1])
-            NTdebug( '>ranges (just the boundaries): %s' % rngs)
+#            NTdebug( '>ranges (just the boundaries): %s' % rngs)
             path = os.path.join(self.rootPath, self.rangesFileName)
             fp = open(path, 'w')
             for i in range(0, len(rngs), 2):
@@ -366,7 +363,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     rngs[i  ].resNum, rngs[i  ].chain.name,
                     rngs[i+1].resNum, rngs[i+1].chain.name)
                 fprintf(fp, singleRange+"\n")
-                NTdebug( ">range: " + singleRange)
+#                NTdebug( ">range: " + singleRange)
             fp.close()
         #end if
 
@@ -387,9 +384,9 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', pcNmrParameterFileOrg)
         pcNmrParameterFileDestination = os.path.join(self.rootPath, 'procheck_nmr.prm')
         if os.path.exists(pcNmrParameterFileDestination):
-            NTdebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
+#            NTdebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)
             os.unlink(pcNmrParameterFileDestination)
-        NTdebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
+#        NTdebug("Copying "+pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
 
         try: # Don't allow this to mess up CING.1
             if copy(pcNmrParameterFile, pcNmrParameterFileDestination):
@@ -428,16 +425,16 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     fileName = self.project.name +'.' + extensionRestraintFile
                     path = os.path.join(srcDir, fileName )
                     if not os.path.exists(path):
-                        NTdebug("No "+ path+" file found (in Aqua export dir)")
+#                        NTdebug("No "+ path+" file found (in Aqua export dir)")
                         pass
                     else:
                         # Map from Aqua per project file to Cing per molecule file.
                         dstFileName = self.molecule.name + '.' + extensionRestraintFile
                         dstPath = os.path.join( self.rootPath, dstFileName )
                         if os.path.exists(dstPath):
-                            NTdebug("Removing existing copy: " + dstPath)
+#                            NTdebug("Removing existing copy: " + dstPath)
                             os.unlink(dstPath)
-                        NTdebug("Trying to copy from: " + path+" to: "+dstPath)
+#                        NTdebug("Trying to copy from: " + path+" to: "+dstPath)
                         if os.link(path, dstPath):
                             NTcodeerror("Failed to copy from: " + path+" to: "+self.rootPath)
                             return True
@@ -446,16 +443,17 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 if not canAqpc:
                     NTwarning("Skipping aqpc because failed to convert restraints to Aqua")
                 elif not hasRestraints:
-                    NTdebug("Skipping aqpc because no Aqua restraints were copied for Aqua")
+                    pass
+#                    NTdebug("Skipping aqpc because no Aqua restraints were copied for Aqua")
                 else:
-                    NTdebug("Trying aqpc")
+#                    NTdebug("Trying aqpc")
                     if self.aqpc( '-r6sum 1 ' + self.molecule.name + '.pdb'):
                         NTcodeerror("Failed to run aqpc; please consult the log file aqpc.log etc. in the molecules procheck directory.")
                         return True
                     else:
                         NTmessage("==> Finished aqpc successfully")
 
-        NTdebug("Trying procheck_nmr")
+#        NTdebug("Trying procheck_nmr")
         cmd = self.molecule.name +'.pdb'
         if ranges:
             cmd += ' ' + self.rangesFileName
@@ -525,7 +523,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                 modelCountStr = "000"
                 path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
                 if not os.path.exists(path):
-                    NTdebug('Procheck.parseResult: file "%s" not found assuming it was pc -server- version. ', path)
+#                    NTdebug('Procheck.parseResult: file "%s" not found assuming it was pc -server- version. ', path)
                     modelCountStr = "***"
 
             path = os.path.join(self.rootPath, '%s_%s.rin' % (self.molecule.name, modelCountStr))
@@ -565,7 +563,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if not os.path.exists(path):
             NTerror('Procheck.parseResult: file "%s" not found', path)
             return True
-        NTdebug( '> parsing edt >'+ path)
+#        NTdebug( '> parsing edt >'+ path)
 
         for line in AwkLike(path, minLength = 64, commentString = "#"):
             result = self._parseProcheckLine(line.dollar[0], self.procheckEnsembleDefs)
@@ -664,7 +662,7 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
 
     if not project.molecule.hasAminoAcid():
 #    if len(project.molecule.residuesWithProperties('protein')) == 0:
-           NTdebug("Skipping procheck as there is no protein in the current molecule")
+           NTmessage("Skipping procheck as there is no protein in the current molecule")
            return
     if project.molecule.has_key(PROCHECK_STR):
         del(project.molecule[PROCHECK_STR])

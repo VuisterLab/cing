@@ -544,7 +544,7 @@ RMS Z-scores, should be close to 1.0:
             self.checks = NTlist()
 
         if not os.path.exists(modelCheckDbFileName):
-            NTdebug('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
+#            NTdebug('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
             return True
 
         for line in AwkLike( modelCheckDbFileName, minNF = 3 ):
@@ -692,7 +692,7 @@ RMS Z-scores, should be close to 1.0:
                 return True
 #            NTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
             if check[LEVEL_STR] == 'MOLECULE':
-                NTdebug("Skipping any check related to this level for now; for now only the check labelled FATAL")
+#                NTdebug("Skipping any check related to this level for now; for now only the check labeled FATAL")
                 continue
             idx = levelIdList.index( check[LEVEL_STR] )
             if idx < 0:
@@ -711,8 +711,8 @@ RMS Z-scores, should be close to 1.0:
 #                NTdebug( 'check        : ' + `check`)
 #                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
                 if not check.has_key(LOC_ID_STR):
-                    NTdebug("Whatif._processCheckdb: There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
-                    NTdebug("  check: "+ `check`)
+#                    NTdebug("Whatif._processCheckdb: There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
+#                    NTdebug("  check: "+ `check`)
                     continue
                 curLocDic = check[LOC_ID_STR]
                 if not curLocDic:
@@ -1083,7 +1083,7 @@ def runWhatif( project, parseOnly=False ):
     #end if
 
 
-    NTdebug('Parsing whatif checks ')
+#    NTdebug('Parsing whatif checks ')
 
     # clear the whatif data structure
     if project.molecule.has_key(WHATIF_STR):

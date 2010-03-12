@@ -422,7 +422,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
                     myPoint.pointColor='blue'
                 else:
                     bb = bbList[i]
-                    NTdebug('BBCCHK %f' % bb)
+#                    NTdebug('BBCCHK %f' % bb)
                     if bb > BBCCHK_CUTOFF:
                         myPoint.pointColor='red'
                     else:
@@ -486,8 +486,8 @@ def setupHtml(project):
 
     if hasattr(molecule, 'ensemble'):
         EnsembleHTMLfile( project, molecule.ensemble )
-    else:
-        NTdebug("Not creating EnsembleHTMLfile because no ensemble")
+#    else:
+#        NTdebug("Not creating EnsembleHTMLfile because no ensemble")
 
     for restraintList in project.allRestraintLists():
         RestraintListHTMLfile( project, restraintList )
@@ -1572,8 +1572,8 @@ class ProjectHTMLfile( HTMLfile ):
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
 #                NTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
                 self.project.molecule.export2gif(pathMolGif, project=self.project)
-            else:
-                NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
+#            else:
+#                NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
 
         #end if
         if os.path.exists( pathMolGif ):
@@ -2724,7 +2724,7 @@ class RestraintListHTMLfile( HTMLfile ):
 #        NTdebug("Working on restraint.idx: "+restraintRowStr)
 
         if len(atomPair) == 0:
-            NTdebug("Found a restraint without any content in atomPair")
+#            NTdebug("Found a restraint without any content in atomPair")
             for _i in range(4*2):
                 table.nextColumn()
         else:
@@ -2805,7 +2805,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
         # Set chn, resi, resn for first atom if preesent.
         if len(restraint.atoms) == 0:
-            NTdebug("Found a restraint without any atoms")
+#            NTdebug("Found a restraint without any atoms")
             for _i in range(3):
                 table.nextColumn('.')
         else:

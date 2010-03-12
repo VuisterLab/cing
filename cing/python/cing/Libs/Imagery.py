@@ -1,5 +1,4 @@
 from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.core.parameters import cingPaths
 import re
@@ -178,11 +177,11 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
             return None
 
     if extension == ".pdf":
-        NTdebug("Will skip generating printable version as input is also a pdf")
+#        NTdebug("Will skip generating printable version as input is also a pdf")
         doPrint = False
 
     if extension == ".gif":
-        NTdebug("Will skip generating full size gif version as input is also a gif")
+#        NTdebug("Will skip generating full size gif version as input is also a gif")
         doFull = False
 
     pinupPath = None

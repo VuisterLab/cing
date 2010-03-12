@@ -14,7 +14,6 @@ Format input:
  20,5,20,1
 """
 from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import readTextFromFile
@@ -121,7 +120,7 @@ class Regine(Lister):
 def importReginePeakList(project, fn, offSet = 0, status='keep'):
     offSet = 157 # specific to 1brv
     r = Regine(project, offSet = offSet)
-    NTdebug("regine: %r" % r)
+    NTmessage("regine: %r" % r)
     peakList = r.readPeakList(fn)
     project.peaks.append( peakList )
     project.addHistory( 'Imported Xeasy peaks from "%s"' % fn )

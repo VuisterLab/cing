@@ -29,7 +29,6 @@ Atom:
 """
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -147,7 +146,7 @@ def criticizePeaks( project, toFile=True ):
     errorMargins = {'15N':0.15, '13C':0.15, '1H':0.01, '31P':0.15} # single sided
     for pl in project.peaks:
 
-        NTdebug('criticizePeaks %s', pl)
+#        NTdebug('criticizePeaks %s', pl)
 
         pl.rogScore.reset()
         for peak in pl:
@@ -237,7 +236,7 @@ def _criticizeResidue( residue, valSets ):
             thresholdValuePoor = valSets[ 'WI_' + key + '_POOR'  ]
             thresholdValueBad = valSets[ 'WI_' + key + '_BAD' ]
             if (thresholdValuePoor == None) or (thresholdValueBad == None):
-                NTdebug("Skipping What If " + key + " critique")
+#                NTdebug("Skipping What If " + key + " critique")
                 continue
 
             actualValue        = getDeepByKeys(residue, WHATIF_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
@@ -273,7 +272,7 @@ def _criticizeResidue( residue, valSets ):
             thresholdValueBad = valSets[ 'PC_' + key.upper() +'_BAD']
 
             if (thresholdValuePoor == None) or (thresholdValueBad == None):
-                NTdebug("Skipping procheck g factor critique")
+#                NTdebug("Skipping procheck g factor critique")
                 continue
 
             actualValue        = getDeepByKeys(residue,'procheck', key )
@@ -1146,7 +1145,7 @@ def moleculeValidateAssignments( molecule  ):
     @todo: Also correlate assignment with peak values (if present)
     """
 
-    funcName = moleculeValidateAssignments.func_name
+    funcName = moleculeValidateAssignments.func_name #@UnusedVariable
     result   = NTlist()
 #    if molecule.resonanceCount == 0:
 #        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
@@ -1179,7 +1178,7 @@ def moleculeValidateAssignments( molecule  ):
                 av = pseudo.db.shift.average
                 sd = pseudo.db.shift.sd
             else:
-                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
+#                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
                 av = None
                 sd = None
             #end if
@@ -1342,7 +1341,7 @@ def validateAssignments( project  ):
 
 #    NTdebug("Starting validateAssignments")
     if not project.molecule:
-        NTdebug('validateAssignments: no molecule defined')
+#        NTdebug('validateAssignments: no molecule defined')
         return None
     #end if
 

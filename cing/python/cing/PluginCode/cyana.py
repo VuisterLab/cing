@@ -27,7 +27,6 @@ Methods:
 
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
@@ -127,7 +126,7 @@ def importAco( project, acoFile, convention ):
     result     = project.dihedrals.new( name=name, status='keep')
     resNumDict = molecule._getResNumDict()
 
-    NTdebug("Now reading: " + acoFile)
+    NTmessage("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
 
         resNum = line.int(1)
@@ -452,7 +451,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         kwds.setdefault(f,  [])
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
-    NTdebug( '>>'+ `kwds` )
+#    NTdebug( '>>'+ `kwds` )
 
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
@@ -463,7 +462,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
             NTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
             return None
         #end if
-        NTdebug('Parsed PDB file "%s", molecule %s', pdbFile, mol)
+        NTmessage('Parsed PDB file "%s", molecule %s', pdbFile, mol)
         sources.append( pdbFile )
 
     if (kwds['seqFile'] != None and kwds['protFile'] != None):
@@ -502,7 +501,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         #end if
     #end for
 
-    NTdebug( str(sources) )
+#    NTdebug( str(sources) )
     sources.removeDuplicates()
     if copy2sources:
         for f in sources:
@@ -511,7 +510,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         #end for
     #end if
 
-    NTdebug( 'cyana2cing: %s', project.format())
+    NTmessage( 'cyana2cing: %s', project.format())
     return sources
 #end def
 

@@ -404,11 +404,11 @@ Sum                %s
         key = keyList[0]
 
         if not isinstance(key, int):
-            NTdebug("no int key in NTlist.getDeepByKeys: " + `key`)
+            NTwarning("no int key in NTlist.getDeepByKeys: " + `key`)
             return None
 
         if key >= len(self):
-            NTdebug("int key in NTlist.getDeepByKeys too large for this NTlist: " + `key`)
+            NTwarning("int key in NTlist.getDeepByKeys too large for this NTlist: " + `key`)
             return None
 
         value = self[key]
@@ -1419,7 +1419,7 @@ class NTdict(dict):
         Return None on success and True on error.
         """
         lk = len(keyList)
-        NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
+#        NTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
         if not lk:
             NTerror("Can't appendDeepByKeys without any key")
             return True
@@ -1487,7 +1487,7 @@ class NTdict(dict):
             return None
         r = result.average()
         if r == None:
-            NTdebug("None returned by average() in getDeepAvgByKeys")
+#            NTdebug("None returned by average() in getDeepAvgByKeys")
             return None
         return r[0]
 
@@ -3023,12 +3023,12 @@ def XML2obj(path=None, string=None):
         NTerror("XML2obj: no input defined")
         return None
 
-    NTdebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
+#    NTdebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
     if path:
         doc = minidom.parse(path)
     else:
         doc = minidom.parseString(string)
-    NTdebug("Done reading XML")
+#    NTdebug("Done reading XML")
     root = doc.documentElement
 
     result = NThandle(root)
@@ -3967,19 +3967,19 @@ def appendDeepByKeys(c, value, *keyList):
         if isinstance(c, list):
             # Make sure the list already has an element with the key as index.
             if key >= len(c):
-                NTdebug("Impossible situation: trying to go into a list at an index that isn't present.")
-                NTdebug("key: %d and list length: %d" % (key, len(c)))
+                NTwarning("Impossible situation: trying to go into a list at an index that isn't present.")
+                NTwarning("key: %d and list length: %d" % (key, len(c)))
                 return True
         elif isinstance(c, dict):
             if not c.has_key(key):
                 c[key] = [] # For last level a new -list- is made when absent.
         else:
-            NTdebug("The input complex object needs to be a (subclass of) dict or list")
+            NTwarning("The input complex object needs to be a (subclass of) dict or list")
             return True
 
         l = c[key]
         if not isinstance(l, list):
-            NTdebug("At the bottom level the input complex object needs to be a (subclass of) list")
+            NTwarning("At the bottom level the input complex object needs to be a (subclass of) list")
             return True
         if isinstance(value, list):
             for v in value:
@@ -4380,7 +4380,7 @@ def is_pdb_code( chk_string ):
 
 def symlink( file_1, file_2 ):
     cmd = "ln -s %s %s" % (file_1, file_2 )
-    NTdebug( "Running cmd: " + cmd )
+#    NTdebug( "Running cmd: " + cmd )
     os.system(cmd)
 
 def getDateTimeStampForFileName():
@@ -4391,16 +4391,16 @@ def getDateTimeStampForFileName():
 
 
 def readLinesFromFile(fileName, doStrip=True):
-    NTdebug("Reading from file %s" % ( fileName))
+#    NTdebug("Reading from file %s" % ( fileName))
     if doStrip:
         lineList = [ line.strip() for line in open(fileName).readlines() ]
     else:
         lineList = open(fileName).readlines()
-    NTdebug("Read number of lines: %d" %  len(lineList))
+#    NTdebug("Read number of lines: %d" %  len(lineList))
     return lineList
 
 def readTextFromFile(fileName):
-    NTdebug("Reading from file %s" % ( fileName))
+#    NTdebug("Reading from file %s" % ( fileName))
     fp = open(fileName, 'r')
     content = fp.read()
     return content

@@ -315,7 +315,7 @@ class gvProcheck:
             #end if
         #end for
         self.ranges.append(selectedResidues[-1])
-        NTdebug( 'Procheck ranges %d', self.ranges )
+#        NTdebug( 'Procheck ranges %d', self.ranges )
         #generate the ranges file
         path = os.path.join( self.rootPath, 'ranges')
         fp = open( path, 'w' )

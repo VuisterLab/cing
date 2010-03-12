@@ -257,7 +257,7 @@ def scriptPath(scriptFile):
     # get path to scriptFile
 
     if not os.path.exists(scriptFile):
-        NTdebug('Missed in current working directory the script file: %s' % scriptFile)
+#        NTwarning('Missed in current working directory the script file: %s' % scriptFile)
         scriptsDir = os.path.join(cingPythonCingDir, cingPaths.scripts)
         scriptFileAbs = os.path.join(scriptsDir, scriptFile)
         if not os.path.exists(scriptFileAbs):
@@ -303,7 +303,7 @@ def testOverall(namepattern):
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py'
 #                ]
-    NTdebug('will unit check: ' + `nameList`)
+    NTmessage('will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
