@@ -32,7 +32,7 @@ from matplotlib.pylab import * #@UnusedWildImport
 try:
     import Image
     haveImage = True
-    NTdebug("Installed python Image library (pil)")
+#    NTdebug("Installed python Image library (pil)")
 except ImportError:
     NTerror("Failed to import python Image library (pil); certain plot options will fail")
     haveImage = False
@@ -2012,7 +2012,7 @@ class FormatResTypesFormatter(Formatter):
                 resProp = resProp[0:1] # truncate A171 to A
 
             self.resPropList.append(resProp.upper())
-        NTdebug("FormatResTypesFormatter initialized with: %s" % self.resPropList )
+#        NTdebug("FormatResTypesFormatter initialized with: %s" % self.resPropList )
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'

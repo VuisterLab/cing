@@ -2,7 +2,6 @@
 python -u $CINGROOT/python/cing/Scripts/validateCyanaProject.py cyanaProjectDir
 """
 from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexit
 from cing.Libs.NTutils import NTmessage
@@ -29,17 +28,17 @@ class ValidateCyanaProject():
         self.restraintsConvention   = restraintsConvention
 
         if not ( os.path.exists(cyanaProjectDir) and os.path.isdir(cyanaProjectDir)):
-            NTexit("Given path is not an existing directory: [%s]" % cyanaProjectDir )      
+            NTexit("Given path is not an existing directory: [%s]" % cyanaProjectDir )
         directory, basename, _extension = NTpath(cyanaProjectDir)
         if os.chdir(cyanaProjectDir):
-            NTexit("Failed to change to directory: [%s]" % directory )      
+            NTexit("Failed to change to directory: [%s]" % directory )
         self.entryId = basename
         NTmessage('Setting entry to: [%s]' % self.entryId )
-        
-    def validate(self):        
+
+    def validate(self):
         project = Project( self.entryId )
         if project.removeFromDisk():
-            NTexit("Failed to remove potentially old project: [%s]" % self.entryId )      
+            NTexit("Failed to remove potentially old project: [%s]" % self.entryId )
         project = Project.open( self.entryId, status='new' )
         pdbList = glob('*.pdb')
         uplList = glob('*.upl')
@@ -66,23 +65,23 @@ class ValidateCyanaProject():
             else:
                 NTwarning( "Converter for cyana also needs a seq file before a prot file can be imported" )
         if peakList:
-            NTdebug('found peakList: [%s]' % peakList)
+#            NTdebug('found peakList: [%s]' % peakList)
             kwds[ 'peakFiles' ] = stripExtensions( peakList )
         if project.cyana2cing(cyanaDirectory=".", convention=self.restraintsConvention,
                         copy2sources = True, **kwds ) == None:
             NTexit('Failed to project.cyana2cing')
         project.save()
-        
+
         if not project.validate(htmlOnly=self.htmlOnly,
-                            doProcheck = self.doProcheck, 
+                            doProcheck = self.doProcheck,
                             doWhatif=self.doWhatif ):
             NTerror('Failed to project.validate')
-            
-        
+
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     v = ValidateCyanaProject( sys.argv[1] )
     if v.validate():
         NTerror('Failed to ValidateCyanaProject.validate')
-        
+

@@ -1,6 +1,5 @@
 from cing import __author__
 from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 from cing.Libs.NTutils import NTmessage
@@ -16,7 +15,7 @@ class RPF():
     def toRPFFile(self, fileName):
         """Return None on error"""
 
-        NTdebug("starting toRPFFile")
+        NTmessage("starting toRPFFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
             NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
@@ -24,7 +23,7 @@ class RPF():
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
         if not self.ccpnProject:
-            NTdebug("Failed to find ccpn project.")
+            NTmessage("Failed to find ccpn project.")
             return
 
         ccpnFolder = self.project.ccpnFolder

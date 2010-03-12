@@ -1,6 +1,5 @@
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTexception
@@ -49,9 +48,9 @@ def importPlugin( pluginName ):
         #JFD changed from default to zero which means to only try absolute imports.
         pluginCodeModulePackage = __import__( pluginCodeModule, globals(), locals(), [pluginName])
         isInstalled = True
-        NTdebug( "Installed plugin: [%s]" % pluginName )
+#        NTdebug( "Installed plugin: [%s]" % pluginName )
     except ImportWarning:
-        NTdebug( "Skipping import of an optional plugin: [%s]" % pluginName )
+#        NTdebug( "Skipping import of an optional plugin: [%s]" % pluginName )
         isInstalled = False
     except:
 #        traceBackObject = sys.exc_info()[2]

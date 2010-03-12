@@ -10,7 +10,6 @@ Methods:
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfile
@@ -881,7 +880,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Read table from tabFile
         """
-        NTdebug('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
+        NTmessage('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
 
         #end if
 
@@ -972,7 +971,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
             return True
         self.write( file )
         file.close()
-        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
+        NTmessage('==> Written nmrPipe table file "%s"', tabFile )
         return False
     #end def
 

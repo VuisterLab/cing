@@ -27,7 +27,7 @@ def do_cmd( cmd ):
     """
     Returns False for success.
     """
-    NTdebug( "Doing command: %s" % cmd )
+    NTmessage( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
 #    pipe = os.popen( cmd )
@@ -249,7 +249,7 @@ class ForkOff:
                     exit_pid, exit_status = self.p.process_wait( pid, os.WNOHANG )
                     if exit_pid:
                         if self.verbosity > 3:
-                            NTdebug("Process with pid [%s] exited with status [%s]" % \
+                            NTmessage("Process with pid [%s] exited with status [%s]" % \
                               (exit_pid, exit_status))
                         ## Pop pid/args from dictionary
                         fid = self.process_d[ exit_pid ]
@@ -263,7 +263,7 @@ class ForkOff:
                                 NTwarning("Process with fid: [%s] considered NOT done" % fid)
                         else:
                             if self.verbosity > 3:
-                                NTdebug("Process with fid: [%s] considered done" % fid)
+                                NTmessage("Process with fid: [%s] considered done" % fid)
                             self.done_jobs_list.append( fid )
                 ## Give the cpu 1 second rest in between the checks
                 ## if no process has exited
@@ -342,14 +342,14 @@ class Process:
             str = "ERROR: code error in Fork, process_start, pid =" + `os.getpid()`
             raise str
         if self.verbosity > 2:
-            NTdebug("Starting subprocess with pid: %s" % os.getpid())
-        if self.verbosity > 8:
-            NTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
+            NTmessage("Starting subprocess with pid: %s" % os.getpid())
+#        if self.verbosity > 8:
+#            NTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
 
         os.setpgid(0,0)
-        if self.verbosity > 8:
-            NTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % (
-                os.getpgrp(), os.getpid() ))
+#        if self.verbosity > 8:
+#            NTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % (
+#                os.getpgrp(), os.getpid() ))
 
         try:
             exit_status = apply( function, arguments )

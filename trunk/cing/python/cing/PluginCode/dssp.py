@@ -5,7 +5,6 @@ Add's runDssp method to project class
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
@@ -23,7 +22,7 @@ import os
 if True: # block
     useModule = True
     if not cingPaths.dssp:
-        NTdebug("Missing dssp which is a dep for dssp")
+        NTmessage("Missing cingPaths.dssp which is a dep")
         useModule = False
     if not useModule:
         raise ImportWarning('dssp')

@@ -1,6 +1,5 @@
 from cing import __author__
 from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 from cing.Libs.NTutils import NTmessage
@@ -23,7 +22,7 @@ class NmrStar():
     def toNmrStarFile(self, fileName):
         """Return None on error"""
 
-        NTdebug("starting toNmrStarFile")
+#        NTdebug("starting toNmrStarFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
             NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.")
@@ -38,7 +37,7 @@ class NmrStar():
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
         if not self.ccpnProject:
-            NTdebug("Failed to find ccpn project.")
+#            NTmessage("Failed to find ccpn project. This is normal if CING project didn't contain one previously generated.")
             return
 
         ccpnFolder = self.project.ccpnFolder

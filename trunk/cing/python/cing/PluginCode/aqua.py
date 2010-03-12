@@ -5,7 +5,6 @@ Adds methods:
 
 Unit testing is done thru procheck.
 """
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -58,12 +57,12 @@ def export2aqua(project, tmp=None):
         for drl in drLoL:
             count += len(drl)
         if not count:
-            NTdebug("Skipping export of empty restraint list")
+#            NTdebug("Skipping export of empty restraint list")
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
         exportPath = project.directories.aqua
         path = project.path(exportPath, project.name + '.' + extensionList[typeId])
-        NTmessage("Writing to: " + path)
+#        NTmessage("Writing to: " + path)
         fp = open(path, 'w')
         if not fp:
             NTerror('Unable to open: ' + path)

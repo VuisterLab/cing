@@ -369,7 +369,7 @@ class Molecule( NTtree, ResidueList ):
 
             self.modelCount = selectedModelCount
             self.updateAll() # needed otherwise the dihedral.baddies get thru.
-            NTdebug('After keepSelectedModels: %s' % self)
+#            NTdebug('After keepSelectedModels: %s' % self)
         except:
             NTerror("Failed keepSelectedModels; please check the input string [" + modelListStr + "]")
 
@@ -488,7 +488,7 @@ class Molecule( NTtree, ResidueList ):
 
 
         if not res.has_key(an):
-            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
             return None
 
         atm = res[an]
@@ -867,7 +867,7 @@ class Molecule( NTtree, ResidueList ):
             return None
         #end if
         content.keysformat()
-        NTdebug('content from xml-file: %s', content.format())
+#        NTdebug('content from xml-file: %s', content.format())
 
         mol = Molecule( name = content.name )
         if not mol:
@@ -887,7 +887,7 @@ class Molecule( NTtree, ResidueList ):
         mol._check()
         mol.updateAll()
 
-        NTdebug('%s', mol.format())
+#        NTdebug('%s', mol.format())
 
         return mol
     #end def
@@ -1205,7 +1205,8 @@ class Molecule( NTtree, ResidueList ):
                         #end try
                     #end for
                 else:
-                    NTdebug('Molecule.updateTopolgy: atm %s: odd db==None', atm)
+                    pass
+#                    NTdebug('Molecule.updateTopolgy: atm %s: odd db==None', atm)
                 #end if
             #end for
         #end for
@@ -1258,10 +1259,10 @@ class Molecule( NTtree, ResidueList ):
             c = cys[i]
             coordinatesRetrieved = getDeepByKeysOrAttributes(c, 'CA', 'coordinates')
             if not coordinatesRetrieved:
-                NTdebug("No coordinates for CA even set, skipping residue: %s" % c)
+#                NTdebug("No coordinates for CA even set, skipping residue: %s" % c)
                 del( cys[i] )
             elif not len(coordinatesRetrieved): # model count see entry 1abt and issue 137
-                NTdebug("No coordinates for CA, skipping residue: %s" % c)
+#                NTdebug("No coordinates for CA, skipping residue: %s" % c)
                 del( cys[i] )
 #                needs testing.
         pairList = []
@@ -1300,8 +1301,8 @@ class Molecule( NTtree, ResidueList ):
                             c_partner_found = c1
                             if c_partner_found == c:
                                 c_partner_found = c2
-                            NTdebug('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
-                                  c, c_partner_found_before, c_partner_found ))
+#                            NTdebug('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
+#                                  c, c_partner_found_before, c_partner_found ))
                     if toAdd:
                         pair = (c1, c2)
                         pairList.append(pair)
@@ -2805,7 +2806,7 @@ Residue class: Defines residue properties
         for doubletResidue in doublet:
             resTypeSimple = getDeepByKeys(doubletResidue.db.nameDict, IUPAC)
             if resTypeSimple not in commonAAList:
-                NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
+#                NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
                 continue
 
             CB_atm = None
@@ -2894,10 +2895,10 @@ Residue class: Defines residue properties
                 hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
                 hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
                 if hist1 == None:
-                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
+#                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
                     continue
                 if hist2 == None:
-                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+#                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
                     continue
 #                sumh1 = sum(hist1)
 #                sumh2 = sum(hist2)
@@ -3219,7 +3220,7 @@ Atom class: Defines object for storing atom properties
     def criticize(self):
 #        NTdebug( '%s' % self )
         if not len(self.coordinates):
-            NTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
+#            NTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
             self.rogScore.setMaxColor( COLOR_ORANGE, comment=ROGscore.ROG_COMMENT_NO_COOR)
 
     def toString(self, showChainId=True, showResidueType=True):
@@ -3795,12 +3796,12 @@ Atom class: Defines object for storing atom properties
 
         # efficiency in my mind
         if inputLength != realAtomListLength:
-            NTdebug("Found unrepresentative pseudo [%s] for atomList: [%s] and realAtomListLength: [%s]" % (pseudoAtom, atomList, realAtomListLength ))
+#            NTdebug("Found unrepresentative pseudo [%s] for atomList: [%s] and realAtomListLength: [%s]" % (pseudoAtom, atomList, realAtomListLength ))
             return None
 
         for atom in atomList:
             if atom not in realAtomList:
-                NTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))
+#                NTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))
                 return None
         return pseudoAtom
 

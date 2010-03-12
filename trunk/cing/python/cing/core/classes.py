@@ -319,7 +319,7 @@ Project: Top level Cing project class
                 valueFromStr = `self.valSets[key]`
                 if valueStr == valueFromStr:
                     continue  # no print
-                NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
+#                NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
             else:
 #                NTdebug("Adding              key " + key + " with value: " + valueStr)
                 pass
@@ -494,7 +494,7 @@ Project: Top level Cing project class
             possibleTgz = name + ".cing.tgz"
             possibleProjectDir = name + '.cing'
             if os.path.exists(possibleTgz) and not os.path.exists(possibleProjectDir):
-                NTdebug("Unpacking possibleTgz: " + possibleTgz)
+#                NTdebug("Unpacking possibleTgz: " + possibleTgz)
                 tar = tarfile.open(possibleTgz, "r:gz")
                 for itar in tar:
                     tar.extract(itar.name, '.') # itar is a TarInfo object
@@ -504,10 +504,10 @@ Project: Top level Cing project class
                     NTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"\n', name)
                     return None
             else:
-                if os.path.exists(possibleTgz):
-                    NTdebug("Skipping .tgz because there's already a .cing")
-                else:
+                if not os.path.exists(possibleTgz):
                     NTdebug("No " + possibleTgz + " found.")
+#                    NTdebug("Skipping .tgz because there's already a .cing")
+#                else:
 
             root, newName = Project.rootPath(name)
             if not root:
@@ -549,7 +549,7 @@ Project: Top level Cing project class
 
             if pr.version <= 0.75:
                 NTmessage('Project.Open: converting from CING version %s', pr.version)
-                NTdebug('Project.open: conversion: old project settings\n%s', pr.format())
+#                NTdebug('Project.open: conversion: old project settings\n%s', pr.format())
 
                 # 0.75 version had moleculeNames stored in molecules attribute
                 # >=0.76 version molecules is a ProjectList instance
@@ -572,7 +572,7 @@ Project: Top level Cing project class
                         path = pr.path('Molecules', molName) # old reference
                     else:
                         path = pr.path(directories.molecules, molName) # old reference, versions 0.48-0.75
-                    NTdebug('Project.open: trying molecule conversion from %s', path)
+#                    NTdebug('Project.open: trying molecule conversion from %s', path)
                     if not os.path.exists(path):
                         NTerror('Project.open: old molecule path "%s" does not exist.', path)
                         return None
@@ -596,7 +596,7 @@ Project: Top level Cing project class
                 pr.restore()
             #end if
 
-            NTdebug('Opened old project %s', pr)
+            NTmessage('Opened old project %s', pr)
 
         else:
             NTerror('ERROR Project.open: invalid status option "%s"\n', status)
@@ -937,7 +937,7 @@ Project: Top level Cing project class
         before exiting."""
         pathString, _name = self.rootPath(self.name)
         if not os.path.exists(pathString):
-            NTdebug("No cing project is found at: " + pathString)
+#            NTdebug("No cing project is found at: " + pathString)
             return None
         NTmessage('Removing existing cing project "%s"', self)
         if rmtree(pathString):
@@ -1492,19 +1492,19 @@ class DistanceRestraint(Restraint):
           [ HA ] [ HD ] ]
         """
         if not self.atomPairs:
-            NTdebug("Failed to find any atom pair in %s" % self)
+#            NTdebug("Failed to find any atom pair in %s" % self)
             return False
-        for i, atomPair in enumerate(self.atomPairs):
+        for i, atomPair in enumerate(self.atomPairs): #@UnusedVariable
             if not atomPair: # eg [ HA ] [ HB,HC ]
-                NTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
+#                NTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
                 return False
-            for j, atomList in enumerate(atomPair):
+            for j, atomList in enumerate(atomPair): #@UnusedVariable
                 if not atomList: # eg [ HB,HC ]
-                    NTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
+#                    NTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
                     return False
-                for k, atom in enumerate(atomList):
+                for k, atom in enumerate(atomList): #@UnusedVariable
                     if not atom: # eg HB
-                        NTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
+#                        NTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
                         return False
         return True
     #end def
@@ -2274,15 +2274,15 @@ class DihedralRestraint(Restraint):
         Simplified to checking if there are 4 real atoms.
         """
         if not self.atoms:
-            NTdebug("Failed to find any atom in %s" % self)
+#            NTdebug("Failed to find any atom in %s" % self)
             return False
         l = len(self.atoms)
         if l != 4:
-            NTdebug("Expected four atoms but found %d in:\n%s" % (l,self))
+#            NTdebug("Expected four atoms but found %d in:\n%s" % (l,self))
             return False
-        for i, atom in enumerate(self.atoms):
+        for i, atom in enumerate(self.atoms): #@UnusedVariable
             if not atom:
-                NTdebug("Failed to find valid atom in:\n%s" % (i,self))
+#                NTdebug("Failed to find valid atom in:\n%s" % (i,self))
                 return False
         return True
     #end def
@@ -2514,7 +2514,7 @@ class DihedralRestraintList(RestraintList):
         or (None, None, None, None, None) on error
         """
 
-        NTdebug('DihedralRestraintList.analyze: %s', self)
+#        NTdebug('DihedralRestraintList.analyze: %s', self)
 
         if not len(self):
             NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name)
@@ -2708,7 +2708,7 @@ class RDCRestraintList(RestraintList):
 
         """
 
-        NTdebug('RDCRestraintList.analyze: %s', self)
+#        NTdebug('RDCRestraintList.analyze: %s', self)
 
         if len(self) == 0:
             NTerror('RDCRestraintList.analyze: "%s" empty list', self.name)
@@ -2764,7 +2764,7 @@ class RDCRestraintList(RestraintList):
         Need implementation
         """
 
-        NTdebug('RDCRestraintList.criticize %s', self)
+#        NTdebug('RDCRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 

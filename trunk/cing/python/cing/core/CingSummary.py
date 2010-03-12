@@ -105,8 +105,8 @@ class CingSummary( NTdict ):
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
         if (self.proteinResidueCount > 0 and project.molecule.has_key('procheck') and project.molecule.procheck and
             project.molecule.procheck.has_key('summary') and project.molecule.procheck.summary):
-            NTmessage("Going to add procheck results to summary.")
-            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
+#            NTmessage("Going to add procheck results to summary.")
+#            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
             self.PC_core       = project.molecule.procheck.summary.core
             self.PC_allowed    = project.molecule.procheck.summary.allowed
             self.PC_generous   = project.molecule.procheck.summary.generous

@@ -13,9 +13,12 @@ def run():
     cing.verbosity = verbosityDebug
     NTdebug( "hello again" )
 
-# Commented out because profiling isn't part of unit testing.
-fn = 'fooprof'
-cProfile.run('run()', fn)
-p = pstats.Stats(fn)
-#p.sort_stats('time').print_stats(100)
-p.sort_stats('cumulative').print_stats(20)
+if True:
+    # Commented out because profiling isn't part of unit testing.
+    fn = 'fooprof'
+    cProfile.run('run()', fn)
+    p = pstats.Stats(fn)
+    #p.sort_stats('time').print_stats(100)
+    p.sort_stats('cumulative').print_stats(20)
+else:
+    run()

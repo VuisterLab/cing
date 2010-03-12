@@ -15,7 +15,6 @@ Methods:
         Export to Xeasy in CYANA/XEASY and CYANA2 formats
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTwarning
@@ -120,16 +119,15 @@ class Xeasy( NTdict ):
         #end for
 
         self.protFile = protFile
-        NTdebug('Xeasy.__init__: parsed %d residues, %d atoms from %s, %s',
-                      self.resCount, self.protCount, self.seqFile,self.protFile
-               )
+        NTmessage('Xeasy.__init__: parsed %d residues, %d atoms from %s, %s',
+                      self.resCount, self.protCount, self.seqFile,self.protFile)
         #end if
     #end def
 
     def map2molecule( self, molecule ):
         """map entries of the prot-dict onto an atom of molecule
         """
-        NTdebug('Xeasy.map2molecule: %s', molecule)
+#        NTdebug('Xeasy.map2molecule: %s', molecule)
         resNumDict = molecule._getResNumDict()
         maxToReport = 100 # no need to fill screen.
         errCount = 0
@@ -175,7 +173,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-        NTdebug('Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
+#        NTdebug('Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
         #end if
 
     #end def
@@ -289,7 +287,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-        NTdebug('Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
+        NTmessage('Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
         #end if
 
         return peaks
