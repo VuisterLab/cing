@@ -82,9 +82,11 @@ HBRL_LEVEL = 'HBondRestraintList'
 AC_LEVEL = 'DihedralRestraint'
 ACL_LEVEL = 'DihedralRestraintList'
 RDC_LEVEL = 'RDCRestraint'
-RDCL_LEVEL = 'RDCRestraintList' # unused so far
+RDCL_LEVEL = 'RDCRestraintList'
 COPLANAR_LEVEL = 'Coplanar'
-COPLANARL_LEVEL = 'CoplanarList' # unused so far
+COPLANARL_LEVEL = 'CoplanarList'
+DIHEDRAL_BY_PROJECT_LEVEL = 'DihedralByProject'
+DIHEDRALL_BY_PROJECT_LEVEL = 'DihedralByProjectList' # unused?
 
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
@@ -102,7 +104,7 @@ DIHEDRAL_NAME_Cb4C = 'Cb4C'
 GLY_HA3_NAME_CING = 'HA2'
 range0_360 = [0.,360.]
 
-SCALE_BY_MAX = 'SCALE_BY_MAX' # Ramachandran 
+SCALE_BY_MAX = 'SCALE_BY_MAX' # Ramachandran
 SCALE_BY_SUM = 'SCALE_BY_SUM' # D1D2
 SCALE_BY_DEFAULT = SCALE_BY_MAX
 

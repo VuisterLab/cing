@@ -34,6 +34,7 @@ from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImpor
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
 from cing.Libs.html import renderHtml
@@ -181,6 +182,7 @@ Project: Top level Cing project class
                            dihedralListNames = NTlist(), # list to store dihedrallist names for save and restore
                            rdcListNames = NTlist(), # list to store rdclist names for save and restore
                            coplanarListNames = NTlist(), # list to store  names for save and restore
+                           dihedralByProjectListNames = NTlist(), # list to store  names for save and restore
 
                            reports = NTlist(), # list with validation reports names
 
@@ -237,12 +239,11 @@ Project: Top level Cing project class
                                          nameListKey = 'coplanarListNames',
                                          basePath = directories.restraints + '/%s.coPlanars'
                                        )
-#        self.dihEntities = _ProjectList(project = self,
-#                                         classDef = DihedralEntityList,
-#                                         nameListKey = 'dihEntityListNames',
-#                                         basePath = directories.restraints + '/%s.dihEntities'
-#                                       )
-
+        self.dihedralByProjectList = _ProjectList(project = self,
+                                         classDef = DihedralByProjectList,
+                                         nameListKey = 'dihedralByProjectListNames',
+                                         basePath = directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
+                                       )
 
         # store reference to self
         #self[name] = self
@@ -258,7 +259,7 @@ Project: Top level Cing project class
         self.saveXML('version',
                       'name', 'created',
                       'moleculeNames',
-                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 'coplanarListNames',
+                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 'coplanarListNames', 'dihedralByProjectListNames',
                       'storedInCcpnFormat',
                       'reports',
                       'history',

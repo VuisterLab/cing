@@ -4034,38 +4034,6 @@ class AtomList( NTlist ):
     #end def
 #end class
 
-#class DihedralEntityList( NTlist ):
-#    """
-#    Class based on NTlist that holds all dihedrals with a certain name for all occurences in the project.
-#    Compare with
-#    """
-#    def __init__( self, molecule ):
-#        NTlist.__init__( self )
-#        self.name       = molecule.name + '.dihedrals'
-#        self.molecule = molecule
-##        self.status     = status      # Status of the list; 'keep' indicates storage required
-#        self.currentId  = 0           # Id for each element of list
-#        self.rogScore   = ROGscore()
-##        self.appendFromMolecule( molecule )
-#        self.criticize()
-#    #end def
-#
-#    def criticize(self):
-#        pass
-#
-#    def append( self, o ):
-#        o.id = self.currentId
-#        NTlist.append( self, o )
-#        self.currentId += 1
-#
-#    def __str__( self ):
-#        return sprintf( '<DihedralEntityList "%s" (%d)>',self.name, len(self) )
-#    #end def
-#
-#    def format( self ):
-#        return str(self)
-#    #end def
-##end class
 
 class CoordinateOld( list ):
     """
