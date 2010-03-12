@@ -29,9 +29,9 @@ class AllChecks(TestCase):
 #    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
 #    entryList = "1d2l".split() # not svn committed
 #    entryList = "1bzb".split()
-#    entryList = "1bus".split() # DEFAULT not 1brv because it clashes with other check's projects.
-    entryList = "1brv".split()
-#    entryList = "2fws".split()
+    entryList = "1bus".split() # DEFAULT not 1brv because it clashes with other check's projects.
+#    entryList = "1brv".split()
+    entryList = "2fws".split()
 #    entryList = "logH_test_new".split()
 
 #    entryList = "1ai0".split()
@@ -42,51 +42,63 @@ class AllChecks(TestCase):
     def testInitCcpn(self):
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = False
+        fastestTest = True
 
+        modelCount=99
+        redoFromCingProject = True
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
         useNrgArchive = False
-        modelCount=99
         ranges = None
         if fastestTest:
             modelCount=2
+            redoFromCingProject = False
             htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
-#            useNrgArchive = False
+
+        if redoFromCingProject:
+            useNrgArchive = False
+            doWhatif = False
+            doProcheck = False
+            doWattos = False
+
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in AllChecks.entryList:
-            project = Project.open(entryId, status = 'new')
-            self.assertTrue(project, 'Failed opening project: ' + entryId)
 
-            if useNrgArchive: # default is False
-#                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
-                # Mounted from nmr.cmbi.ru.nl
-#                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
-                inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
+            if redoFromCingProject:
+                project = Project.open(entryId, status = 'old')
             else:
-                inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+                project = Project.open(entryId, status = 'new')
+                self.assertTrue(project, 'Failed opening project: ' + entryId)
 
-            ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
-            if not os.path.exists(ccpnFile):
-                ccpnFile = os.path.join(inputArchiveDir, entryId + ".tar.gz")
+                if useNrgArchive: # default is False
+    #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                    # Mounted from nmr.cmbi.ru.nl
+    #                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                    inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
+                else:
+                    inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+
+                ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
                 if not os.path.exists(ccpnFile):
-                    self.fail("Neither %s or the .tgz exist" % ccpnFile)
+                    ccpnFile = os.path.join(inputArchiveDir, entryId + ".tar.gz")
+                    if not os.path.exists(ccpnFile):
+                        self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
-            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-            self.assertTrue(project.save())
+                self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
+                self.assertTrue(project.save())
             if False:
+                ranges = "171-173"
                 residueOfInterest = range(171,174)
                 for residue in project.molecule.A.allResidues():
                     if residue.resNum not in residueOfInterest:
     #                    NTmessage("Removing residue of no interest")
                         project.molecule.A.removeResidue(residue)
-                ranges = "171-173"
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               ranges=ranges,
                                               doProcheck = doProcheck,

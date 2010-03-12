@@ -41,14 +41,12 @@ from cing.Libs.find import find
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import wattosPlotList
-from cing.PluginCode.required.reqWhatif import BBCCHK_STR
 from cing.PluginCode.required.reqWhatif import C12CHK_STR
 from cing.PluginCode.required.reqWhatif import RAMCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqWhatif import wiPlotList
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
-from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import htmlDirectories
@@ -415,18 +413,18 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
         if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
             # Plot individually.
-            bbList = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
-
+#            bbList = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
+            myPoint.pointColor='blue'
             for i,d1Element in enumerate(d1):
-                if not bbList:
-                    myPoint.pointColor='blue'
-                else:
-                    bb = bbList[i]
-#                    NTdebug('BBCCHK %f' % bb)
-                    if bb > BBCCHK_CUTOFF:
-                        myPoint.pointColor='red'
-                    else:
-                        myPoint.pointColor='green'
+#                if not bbList:
+#                    myPoint.pointColor='blue'
+#                else:
+#                    bb = bbList[i]
+##                    NTdebug('BBCCHK %f' % bb)
+#                    if bb > BBCCHK_CUTOFF:
+#                        myPoint.pointColor='red'
+#                    else:
+#                        myPoint.pointColor='green'
                 plot.point( (d1Element, d2[i]), attributes=myPoint )
         else: # plot all at once.
             plot.points( zip( d1, d2 ), attributes=myPoint )
@@ -472,11 +470,18 @@ def setupHtml(project):
     molecule = project.molecule
 
     ProjectHTMLfile( project )
+    MoleculeHTMLfile( project, molecule )
     for chain in molecule.allChains():
         ChainHTMLfile( project, chain )
     for res in molecule.allResidues():
         ResidueHTMLfile( project, res )
-    MoleculeHTMLfile( project, molecule ) # Do after ResidueHTMLfile for it will combine some of it's plots. # JFD
+
+    DihedralByProjectListHTMLfile( project)
+    project.dihedralByProjectList.append(NTtree("dummy")) # circumvent check on emptiness.
+#    print "now  project.dihedralByProjectList initialized: " , project.dihedralByProjectList
+#    print "now tmp initialized: " , tmp
+#    print "now tmp initialized: " , tmp.dihedralByProjectList
+#    print "now it's initialized: " , project.dihedralByProjectList.html
 
     if hasattr(molecule, 'atomList'):
         AtomsHTMLfile( project, molecule.atomList )
@@ -514,13 +519,16 @@ def generateHtml( project, htmlOnly=False ):
         NTmessage(' and images.')
 
     project.html.generateHtml(htmlOnly=htmlOnly)
+    project.molecule.html.generateHtml(htmlOnly=htmlOnly)
     for chain in project.molecule.allChains():
         chain.html.generateHtml(htmlOnly=htmlOnly)
         NTmessage("Html for chain %s and its residues", chain.name)
         for res in NTprogressIndicator(chain.allResidues(), CHARS_PER_LINE_OF_PROGRESS):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
-    project.molecule.html.generateHtml(htmlOnly=htmlOnly) # JFD: needs to happen after residue pages were created.
+
+    NTmessage("Html for overall dihedrals")
+    project.dihedralByProjectList.html.generateHtml(htmlOnly=htmlOnly)
 
     NTmessage("Html for atoms and models")
     if hasattr(project.molecule, 'atomList'):
@@ -997,6 +1005,11 @@ class HTMLfile:
         pass
     #end def
 
+
+    def insertMinimalHeader( self, src ):
+        self.insertHtmlLink( self.header, src, self.project, text = 'Home' )
+        self.insertHtmlLink( self.header, src, self.project.molecule, text = 'Molecule' )
+
     def render(self):
         '''Description: write container to file Html.
            Inputs: a HTMLfile obj.
@@ -1301,14 +1314,14 @@ class HTMLfile:
 
         if not source:
             # Happens for 2k0e
-#            NTwarning("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-#            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+            NTdebug("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+            NTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         if not destination:
             # Happens for 2k0e and all projects with missing topology
-#            NTwarning("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-#            NTwarning("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+#            NTdebug("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+#            NTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         link = self.findHtmlLocation( source, destination, id )
@@ -1535,6 +1548,10 @@ class ProjectHTMLfile( HTMLfile ):
 
         if hasattr(self.project.molecule, 'atomList'):
             self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
+#        if self.project.dihedralByProjectList:
+#        print "TEST: ", self.project.dihedralByProjectList
+        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.dihedralByProjectList, text='Dihedrals' )
+
         htmlMain('ul', openTag=False)
 
         # peaks
@@ -1589,23 +1606,23 @@ class ProjectHTMLfile( HTMLfile ):
     #end def
 #end class
 
-class DihedralHTMLfile( HTMLfile ):
+class DihedralByProjectHTMLfile( HTMLfile ):
     """
     Class to generate HTML files for combined Dihedral instance
     """
     ncols = 5
 
-    def __init__(self, project, dihedralEntity ):
+    def __init__(self, project, dihedralByProject ):
         # Create the HTML directory for this dihedral
-        fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralEntity.name + '.html' )
-        dihedralEntity.htmlLocation = ( fileName, HTMLfile.top )
-#        NTdebug("dihedralEntity.htmlLocation[0]: %s" % dihedralEntity.htmlLocation[0])
-        HTMLfile.__init__(self, fileName, title='Dihedral ' + dihedralEntity.name, project=project)
-        if hasattr(dihedralEntity, 'html'):
-            del(dihedralEntity.html)
-        dihedralEntity.html = self
-        self.dihedralEntity = dihedralEntity
-#        NTdebug("self.dihedralEntity.htmlLocation[0]: %s" % self.dihedralEntity.htmlLocation[0])
+        fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByProject.name + '.html' )
+        dihedralByProject.htmlLocation = ( fileName, HTMLfile.top )
+#        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
+        HTMLfile.__init__(self, fileName, title='Dihedral ' + dihedralByProject.name, project=project)
+        if hasattr(dihedralByProject, 'html'):
+            del(dihedralByProject.html)
+        dihedralByProject.html = self
+        self.dihedralByProject = dihedralByProject
+#        NTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
     #end def
 
     def generateHtml(self, htmlOnly=False):
@@ -1614,20 +1631,138 @@ class DihedralHTMLfile( HTMLfile ):
         """
         # Reset CING content
         self._resetCingContent()
-        self.header('h1', 'Dihedral '+self.dihedralEntity.name)
+        self.header('h1', 'Dihedral '+self.dihedralByProject.name)
+        self.insertMinimalHeader(self.dihedralByProject)
+        self.insertHtmlLink( self.header, self.dihedralByProject, self.project.dihedralByProjectList, text = 'All dihedrals')
 
 #        self.main('h1','Residue-based analysis')
         mol = self.project.molecule
         for chain in mol.allChains():
 #            print '>>',mol, chain
             self.insertHtmlLinkInTag( 'h1', self.main, mol, chain, text='Chain %s' % chain.name )
-            _makeResidueTableHtml( self.dihedralEntity, residues=chain.allResidues(), ncols=DihedralHTMLfile.ncols,
-                    pictureBaseName = self.dihedralEntity.name,
+            _makeResidueTableHtml( self.dihedralByProject, residues=chain.allResidues(), ncols=self.ncols,
+                    pictureBaseName = self.dihedralByProject.name,
                     imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight)
 #            alternativeMain = self.main,
         #end for
         self.render()
     #end def
+#end class
+
+class DihedralByProjectListHTMLfile( HTMLfile ):
+    """
+    Class to generate HTML file for ALL combined Dihedral instance.
+
+    Hangs off the project but is really only used for the HTML generation and
+    has no real representation in molecular system description of CING.
+    """
+    def __init__(self, project ):
+        # Create the HTML directory for this dihedral
+        title='Dihedrals by Project List'
+        fileName = project.htmlPath( htmlDirectories.dihedrals, 'index.html' )
+        dihedralByProjectList = project.dihedralByProjectList
+        dihedralByProjectList.htmlLocation = ( fileName, HTMLfile.top )
+#        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
+        HTMLfile.__init__(self, fileName, project, title=title)
+        if hasattr(dihedralByProjectList, 'html'):
+            del(dihedralByProject.html)
+        dihedralByProjectList.html = self
+        self.dihedralByProjectList = dihedralByProjectList
+        self.title=title
+        self.molecule = project.molecule
+#        NTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
+    #end def
+
+    def generateHtml(self, htmlOnly=False):
+        """
+        Generate the HTML code and/or Figs depending htmlOnly
+        """
+        # Reset CING content
+        self._resetCingContent()
+        self.header('h1', self.title)
+        self.insertMinimalHeader(self.dihedralByProjectList)
+
+#        _navigateHtml( self.dihedralByProjectList )
+
+        ncols = 6 # Needs to be 6 or adjust the formatting below in dihedralList with BOGUS inserted.
+
+        main = self.main
+        molecule = self.molecule
+
+        if not htmlOnly:
+            NTmessage("Creating dihedrals combined for all residues html")
+#                if project.createHtmlWhatif():
+#                    NTerror('Failed to createHtmlWhatif')
+#                    return True
+
+        BOGUS_DIHEDRAL_ID = 'BOGUS'
+        # USE THE BOGUS for alignment within the table.
+        # The LB dihedral is from a pseudo residue; probably of little use.
+        dihedralList = """      Ramachandran Janin D1D2 BOGUS BOGUS BOGUS
+                                PHI PSI OMEGA BOGUS BOGUS BOGUS
+                                CHI1 CHI2 CHI3 CHI4 CHI5 CHI6
+                                CHI32 CHI42 BOGUS BOGUS BOGUS BOGUS
+                                ALPHA BETA GAMMA DELTA EPSILON ZETA
+                                NU0 NU1 NU2 NU3 NU4 CHI
+                                LB  BOGUS BOGUS BOGUS BOGUS BOGUS
+                        """.split()
+
+        dihedralPresentMap = {}
+        moleculeDir = os.path.join(self.project.moleculePath(), moleculeDirectories.html, htmlDirectories.molecule)
+        for residue in molecule.allResidues():
+#            NTdebug("_generateDihedralByProjectHtml for %s" % residue)
+            resDir =  os.path.join(moleculeDir, residue.chain.name, residue.name )
+#            NTdebug("resDir: %s" % resDir)
+            if not os.path.exists(resDir):
+                NTerror("Failed to find resDir: %s" % resDir)
+            for dihed in dihedralList:
+                tmpPath = os.path.join(resDir, dihed + '.png') #@UnusedVariable
+#                print 'tmpPath:', tmpPath, os.path.exists(tmpPath)
+                if os.path.exists(tmpPath):
+#                if True:
+                    dihedralPresentMap[ dihed ] = None
+
+        dihList = dihedralPresentMap.keys()
+        main('h1','Dihedrals combined')
+        if dihList:
+            main('table',  closeTag=False)
+            plotCount = 0 # The number of actual plots shown in the table
+            for dihed in dihedralList:
+                if plotCount % ncols == 0:
+                    if plotCount:
+                        main('tr',  openTag=False)
+                    main('tr',  closeTag=False)
+                main('td',  closeTag=False)
+                if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
+                    dihedralByProject = NTtree( dihed )
+                    self.dihedralByProjectList.append( dihedralByProject )
+                    dihedralHTMLfile = DihedralByProjectHTMLfile(self.project, dihedralByProject)
+                    dihedralHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
+                    self.insertHtmlLink(main, self.dihedralByProjectList, dihedralByProject, text=dihed)
+                else:
+                    main(BOGUS_DIHEDRAL_ID)
+                main('td',  openTag=False)
+                plotCount += 1
+            #end for plot
+
+            if plotCount: # close any started rows.
+                main('tr',  openTag=False)
+            main('table',  openTag=False) # close table
+        else:
+            main('h2', "No plots available")
+
+        self.render()
+
+        # Rendering done after complete list is compiled?
+#        i = 0
+#        for dihed in dihedralList:
+#            if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
+#                dihedralByProject = self.dihedralByProjectList[i]
+#                dihedralHTMLfile = dihedralByProject.html
+#                i += 1
+#                dihedralHTMLfile.generateHtml(htmlOnly)
+    #end def
+
 #end class
 
 class MoleculeHTMLfile( HTMLfile ):
@@ -1729,70 +1864,6 @@ class MoleculeHTMLfile( HTMLfile ):
             main('h2', "No procheck plots found at all")
     #end def
 
-    def _generateDihedralHtml(self, htmlOnly=False):
-        """Generate the Whatif html code
-        """
-        ncols = 12 # Needs to be twice 6 or adjust the formatting below in dihedralList with BOGUS inserted.
-
-        main = self.main
-        molecule = self.molecule
-
-        if not htmlOnly:
-            NTmessage("Creating dihedrals combined for all residues html")
-#                if project.createHtmlWhatif():
-#                    NTerror('Failed to createHtmlWhatif')
-#                    return True
-
-        BOGUS_DIHEDRAL_ID = 'BOGUS'
-        # USE THE BOGUS for alignment within the table.
-        dihedralList = """      Ramachandran Janin D1D2 PHI PSI BOGUS
-                                CHI1 CHI2 CHI3 CHI4 OMEGA BOGUS
-                                ALPHA BETA GAMMA DELTA EPSILON ZETA
-                                NU0 NU1 NU2 NU3 NU4 CHI
-                        """.split()
-
-        dihedralPresentMap = {}
-        moleculeDir, _tmp, _tmp = NTpath( self.fileName )
-        for residue in molecule.allResidues():
-#            NTdebug("_generateDihedralHtml for %s" % residue)
-            resDir =  os.path.join(moleculeDir, residue.chain.name, residue.name )
-#            NTdebug("resDir: %s" % resDir)
-            if not os.path.exists(resDir):
-                NTerror("Failed to find resDir: %s" % resDir)
-            for dihed in dihedralList:
-                tmpPath = os.path.join(resDir, dihed + '.png')
-#                print 'tmpPath:', tmpPath, os.path.exists(tmpPath)
-                if os.path.exists(tmpPath):
-                    dihedralPresentMap[ dihed ] = None
-        dihList = dihedralPresentMap.keys()
-        main('h1','Dihedrals combined')
-        if dihList:
-            main('table',  closeTag=False)
-            plotCount = 0 # The number of actual plots shown in the table
-            for dihed in NTprogressIndicator(dihedralList):
-                if plotCount % ncols == 0:
-                    if plotCount:
-                        main('tr',  openTag=False)
-                    main('tr',  closeTag=False)
-                main('td',  closeTag=False)
-                if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
-                    dihedralEntity = NTtree( dihed ) # Just like e.g. Residue is a NTtree
-                    dihedralEntity._parent = molecule
-                    dihedralHTMLfile = DihedralHTMLfile(self.project, dihedralEntity)
-                    dihedralHTMLfile.generateHtml(htmlOnly)
-                    self.insertHtmlLink(main, molecule, dihedralEntity, text=dihed)
-                else:
-                    main(BOGUS_DIHEDRAL_ID)
-                main('td',  openTag=False)
-                plotCount += 1
-            #end for plot
-
-            if plotCount: # close any started rows.
-                main('tr',  openTag=False)
-            main('table',  openTag=False) # close table
-        else:
-            main('h2', "No plots available")
-    #end def
 
     def _generateWhatifHtml(self, htmlOnly=False):
         """Generate the Whatif html code
@@ -1993,16 +2064,16 @@ class MoleculeHTMLfile( HTMLfile ):
             self.main('h1', 'Model-based analysis')
             self.insertHtmlLink(self.main, self.molecule, self.molecule.ensemble, text='Models page')
 
-        self._generateDihedralHtml(htmlOnly=htmlOnly)
         self.main('h1', 'Structure-based analysis')
         #Use a dummy object for referencing the salt-bridges text-file for now
         _dummy = NTdict()
         _dummy.htmlLocation = (self.project.moleculePath('analysis')+'/saltbridges.txt', HTMLfile.top )
         self.insertHtmlLink(self.main, self.molecule, _dummy, text='Salt bridges')
 
-        self._generateWhatifHtml(htmlOnly=htmlOnly)
-        self._generateProcheckHtml(htmlOnly=htmlOnly)
-        self._generateWattosHtml(htmlOnly=htmlOnly)
+        if False:
+            self._generateWhatifHtml(htmlOnly=htmlOnly)
+            self._generateProcheckHtml(htmlOnly=htmlOnly)
+            self._generateWattosHtml(htmlOnly=htmlOnly)
 
         #footer code is inserted upon rendering
         # render
@@ -2419,6 +2490,42 @@ class ResidueHTMLfile( HTMLfile ):
     #end def
 #end class
 
+#class DihedralByProject(NTtree):
+#    """Collection of plots per dihedral type.
+#    """
+#    def __init__(self, name):
+#        NTtree.__init__(self, __CLASS__ = DIHEDRAL_BY_PROJECT_LEVEL)
+#        self.name = name
+    #end def
+# end class
+
+class DihedralByProjectList( NTlist ):
+    """
+    Class based on NTlist that holds all dihedrals with a certain name for all occurences in the project.
+    Compare with
+    """
+    def __init__( self, molecule ):
+        NTlist.__init__( self )
+        self.name       = molecule.name + '.dihedralByProjectList'
+        self.molecule = molecule
+#        self.status     = status      # Status of the list; 'keep' indicates storage required
+        self.currentId  = 0           # Id for each element of list
+    #end def
+
+    def append( self, o ):
+        o.id = self.currentId
+        NTlist.append( self, o )
+        self.currentId += 1
+
+    def __str__( self ):
+        return sprintf( '<DihedralByProjectList "%s" (%d)>',self.name, len(self) )
+    #end def
+
+    def format( self ):
+        return str(self)
+    #end def
+#end class
+
 class AtomsHTMLfile( HTMLfile ):
     """Generate an Atoms html file for listing resonances
     """
@@ -2540,8 +2647,7 @@ class AtomsHTMLfile( HTMLfile ):
         self._resetCingContent()
 
         self.header('h1', 'Atom List '+ self.atomList.name)
-        self.insertHtmlLink( self.header, self.atomList, self.project, text = 'Home' )
-        self.insertHtmlLink( self.header, self.atomList, self.project.molecule, text = 'Molecule' )
+        self.insertMinimalHeader( self.atomList )
 
 #        refItem = os.path.join( self.project.moleculePath('analysis'),'validateAssignments.txt')
 #        abstractResource = NTdict()        # mimic an object
