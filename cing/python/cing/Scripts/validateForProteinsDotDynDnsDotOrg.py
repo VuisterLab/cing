@@ -20,7 +20,8 @@ cing.verbosity = cing.verbosityDebug
 startDir              = '/Library/WebServer/Documents/tmp/proteinsDotDynDnsDotOrg'
 
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
+#entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
+entryListFileName     = os.path.join(cingDirScripts, 'data', 'entryCodeListProteinsSite1')
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'
@@ -44,6 +45,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     processes_max = 2,
                     max_time_to_wait = 12000, # 1y4o took more than 600. This is one of the optional arguments.
                     START_ENTRY_ID                 = 0,
-                    MAX_ENTRIES_TODO               = 1,
+                    MAX_ENTRIES_TODO               = 10,
                     extraArgList=extraArgList)
 

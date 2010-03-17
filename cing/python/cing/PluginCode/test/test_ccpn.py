@@ -31,7 +31,7 @@ class AllChecks(TestCase):
 #    entryList = "1bzb".split()
     entryList = "1bus".split() # DEFAULT not 1brv because it clashes with other check's projects.
 #    entryList = "1brv".split()
-    entryList = "2fws".split()
+#    entryList = "2fws".split()
 #    entryList = "logH_test_new".split()
 
 #    entryList = "1ai0".split()

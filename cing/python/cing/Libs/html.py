@@ -2070,7 +2070,7 @@ class MoleculeHTMLfile( HTMLfile ):
         _dummy.htmlLocation = (self.project.moleculePath('analysis')+'/saltbridges.txt', HTMLfile.top )
         self.insertHtmlLink(self.main, self.molecule, _dummy, text='Salt bridges')
 
-        if False:
+        if True: # default is True; disable for speedy debugging
             self._generateWhatifHtml(htmlOnly=htmlOnly)
             self._generateProcheckHtml(htmlOnly=htmlOnly)
             self._generateWattosHtml(htmlOnly=htmlOnly)

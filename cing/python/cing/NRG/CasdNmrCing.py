@@ -23,6 +23,9 @@ Execute like:
 python -u $CINGROOT/python/cing/NRG/eNmrCing.py
 
 """
+
+BASE_NAME = 'CASD-NMR-CING'
+
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs import forkoff
@@ -70,9 +73,10 @@ class nrgCing(Lister):
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
         self.backcolor = 'cing_blue'
-        self.data_dir_local = "dataEnmr"
+        self.data_dir_local = "dataCASD-NMR"
 
-        self.results_base = 'eNMRworkshop'
+#        self.results_base = 'eNMRworkshop2'
+        self.results_base = BASE_NAME
         self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.results_dir = self.results_base_dir
 
@@ -195,7 +199,7 @@ class nrgCing(Lister):
 
     def getCingEntriesTriedAndDone(self):
         "Returns list or None for error"
-        NTdebug("From disk get the entries done in eNMR-CING")
+        NTdebug("From disk get the entries done in CASD-NMR CING")
 
         entry_list_tried = []
         entry_list_done = []
@@ -361,7 +365,7 @@ class nrgCing(Lister):
 #                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
-                result_string = "eNMR data sets"
+                result_string = "CASD-NMR data sets"
 
                 begin_entry_code = string.upper(self.entry_list_done[ begin_entry_count - 1 ])
                 end_entry_code = string.upper(self.entry_list_done[ end_entry_count - 1 ])
@@ -536,8 +540,9 @@ if __name__ == '__main__':
     writeWhyNot = True
     updateIndices = True
     isProduction = True
-    new_hits_entry_list = [] # define empty for checking new ones.
-    new_hits_entry_list = ['1d3z']
+#    new_hits_entry_list = [] # define empty for checking new ones.
+#    new_hits_entry_list = ['1d3z']
+    new_hits_entry_list = ['atT13Org']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
@@ -545,4 +550,4 @@ if __name__ == '__main__':
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
-    NTmessage("Finished creating the eNMR-CING indices")
+    NTmessage("Finished creating the CASD-NMR CING indices")
