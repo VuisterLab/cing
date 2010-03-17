@@ -21,12 +21,12 @@ import unittest
 class AllChecks(TestCase):
 
     def testRun(self):
-        fastestTest = False
+        fastestTest = True
 
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
+        htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
-        doWattos = False
+        doWattos = True
         if fastestTest:
             htmlOnly = True
             doWhatif = False

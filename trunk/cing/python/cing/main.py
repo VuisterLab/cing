@@ -330,6 +330,9 @@ def testOverall(namepattern):
         except ImportError, extraInfo:
             NTmessage("Skipping test report of an optional module: %s" % mod_name)
 
+    # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
+    if cing.verbosity <= cing.verbosityError:
+        cing.verbosity = cing.verbosityOutput
 
 def getParser():
     #------------------------------------------------------------------------------------

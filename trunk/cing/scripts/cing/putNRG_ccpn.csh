@@ -22,7 +22,7 @@ endif
 
 # leaving out options of verbosity so I get a smaller email.
 # --progress -v
-rsync -a -f '+ */1brv.tgz' -f '- */*' \
+rsync -a -f '+ */*.tgz' -f '- */*' \
     --delete --stats \
     -e "ssh $SERVER ssh" \
     $SOURCEDIR $CLIENT':'$MIRRORDIR
