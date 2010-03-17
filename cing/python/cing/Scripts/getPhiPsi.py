@@ -5,6 +5,7 @@ Read PDB files for their dihedrals; not just phi psi anymore..
 cd /Users/jd/tmp/cingTmp
 python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
+from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
@@ -15,6 +16,7 @@ from cing.Libs.NTutils import NTzap
 from cing.Libs.NTutils import floatFormat
 from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.NTutils import gunzip
+from cing.Libs.disk import copy
 from cing.Libs.fpconst import NaN
 from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
@@ -49,7 +51,7 @@ elif dihedralComboTodo == d1d2:
     DIHEDRAL_NAME_1 = DIHEDRAL_NAME_Cb4N
     DIHEDRAL_NAME_2 = DIHEDRAL_NAME_Cb4C
 
-def doYasara( entryCode, chainCode ):
+def doYasaraAddHydrogens( entryCode, chainCode ):
     """Called from getPhiPsiWrapperYasara"""
     char23 = entryCode[1:3]
 
@@ -84,6 +86,39 @@ def doYasara( entryCode, chainCode ):
 #    yasara.Exit()
 
     os.unlink(localPdbFileName)
+
+def doYasaraRewritePdb( entryCode ):
+    """Called from ipython"""
+
+    os.chdir(cingDirTmp)
+
+    inputDir              = os.path.join(cingDirTestsData, "cyana" )
+
+    pdbFileName = os.path.join(inputDir, entryCode, entryCode+'_org.pdb')
+    localPdbFileName = entryCode+"_org.pdb"
+    copy(pdbFileName, localPdbFileName)
+
+    import yasara
+    yasara.info.mode = 'txt'
+    yasara.Console('off')
+    NTmessage('Using Yasara on %s' % entryCode)
+
+    # Read all models.
+#    obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
+    obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No')
+#    yasara.CleanAll() # needed for OptHydObj
+#    yasara.OptHydObj(obj,method='Yasara')
+#    yasara.AddHydObj(obj)
+    os.unlink(localPdbFileName)
+
+    newPdbFileName = entryCode+".pdb"
+#    newPdbFileName = localPdbFileName
+
+    yasara.SavePDB(obj,newPdbFileName,format='IUPAC', transform='No')
+    yasara.Clear()
+#    yasara.StopPlugin()
+#    yasara.Exit()
+#    os.unlink(localPdbFileName)
 
 def doEntry( entryCode, chainCode ):
     project = Project.open( entryCode+chainCode, status='new' )

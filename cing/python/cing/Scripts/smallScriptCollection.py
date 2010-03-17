@@ -20,6 +20,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import readLinesFromFile
 from cing.Libs.NTutils import toCsv
 from cing.Libs.NTutils import writeTextToFile
+from cing.Scripts.getPhiPsi import doYasaraRewritePdb
 from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
@@ -74,6 +75,17 @@ def findMissingCsv():
     n = len(entriesList)
     NTmessage("Found %d from %d" % ( n-count, n ))
 
+def allDoYasaraRewritePdb():
+    for entry in """
+1i1s
+1ka3
+1tgq
+1tkv
+1y4o""".split():
+        doYasaraRewritePdb(entry)
+
 if __name__ == '__main__':
 #    truncatePdbList()
-    findMissingCsv()
+    allDoYasaraRewritePdb()
+#    findMissingCsv()
+
