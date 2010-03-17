@@ -8,7 +8,7 @@ from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CYANA
 from cing.core.constants import CYANA
-from cing.core.constants import PDB
+from cing.core.constants import IUPAC
 import cing
 import os
 
@@ -28,7 +28,8 @@ entryListFileName     = os.path.join(cingDirScripts, 'data', 'entryCodeListProte
 #inputDir              = '/Users/jd/Sites/cing/in/Tests/data/cyana'
 inputDir              = os.path.join(cingDirTestsData, "cyana" )
 outputDir             = startDir
-pdbConvention         = PDB
+#pdbConvention         = PDB before using Yasara to update.
+pdbConvention         = IUPAC
 restraintsConvention  = CYANA
 
 extraArgList = ( inputDir,
