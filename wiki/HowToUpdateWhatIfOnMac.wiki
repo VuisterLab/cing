@@ -33,6 +33,7 @@ etc... Or use 'find'.
   * DSSP failed to compile after doing a make all. Solution, get copy from CMBI. And remove it from Makefile#all target.
   * The getline compiles but gives a lot of noises so it must be bad. Get one from CMBI.
   * Note that the whatif/dbdata/RENATM.DAT file is currently missing from svn; get it from this project's Downloads.
+  * Adjust the files: DO_WHATIF.COM WHATIF.FIG for the main installation dir.
 
 == Dependencies ==
 
