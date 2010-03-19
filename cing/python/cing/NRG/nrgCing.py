@@ -332,7 +332,7 @@ class nrgCing(Lister):
 
                 molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                 if not os.path.exists(molGifFile):
-                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                    NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
 

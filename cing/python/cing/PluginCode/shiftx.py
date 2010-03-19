@@ -133,14 +133,15 @@ def runShiftx( project, parseOnly=False, model=None   ):
     NTmessage('==> Running shiftx' )
 
     skippedAtoms = [] # Keep a list of skipped atoms for later
-    skippedResidues = []
+    skippedResidues = [] # Only used for presenting to end user not actually used for skipping.
     skippedChains = []
 
     for chain in project.molecule.allChains():
         skippChain = True
         for res in chain.allResidues():
             if not res.hasProperties('protein'):
-                skippedResidues.append(res)
+                if not res.hasProperties('water'): # don't report waters
+                    skippedResidues.append(res)
                 for atm in res.allAtoms():
                     atm.pdbSkipRecord = True
                     skippedAtoms.append( atm )
