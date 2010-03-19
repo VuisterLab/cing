@@ -2,6 +2,10 @@
 # cd /Library/WebServer/Documents/NRG-CING/data/br/1brv
 # python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py 1brv \
 # file:///Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN
+# or:
+# cd /Library/WebServer/Documents/CASD-NMR-CING/data/tT/atT13Org
+# python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py atT13Org \
+# file:///Users/jd/CASD-NMR-CING/data /Library/WebServer/Documents/CASD-NMR-CING . . BY_ENTRY CCPN
 
 from cing import header
 from cing import verbosityDebug
@@ -10,6 +14,7 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import gunzip
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.core.classes import Project
@@ -28,13 +33,16 @@ import shutil
 import sys
 import urllib
 
+
 ARCHIVE_TYPE_FLAT = 'FLAT'
 ARCHIVE_TYPE_BY_ENTRY = 'BY_ENTRY'
+ARCHIVE_TYPE_BY_CH23 = 'BY_CH23'
 ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 'BY_CH23_BY_ENTRY'
 
 PROJECT_TYPE_CING = CING
 PROJECT_TYPE_CCPN = CCPN
 PROJECT_TYPE_CYANA = CYANA
+PROJECT_TYPE_PDB = PDB
 #PROJECT_TYPE_XPLOR = 3 # Not done yet.
 PROJECT_TYPE_DEFAULT = PROJECT_TYPE_CING
 
@@ -53,9 +61,9 @@ def main(entryId, *extraArgList):
     doWattos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
 #    modelCount=2
-    modelCount=None # default setting is None
+    modelCount = None # default setting is None
     if fastestTest:
-        modelCount=2
+        modelCount = 1
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -90,6 +98,8 @@ def main(entryId, *extraArgList):
         # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryId)
+    elif archiveType == ARCHIVE_TYPE_BY_CH23:
+        inputDir = os.path.join(inputDir, entryCodeChar2and3)
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
 
@@ -127,9 +137,17 @@ def main(entryId, *extraArgList):
         return True
     # end if.
 
-    fileNameTgz = entryId + '.tgz'
+#    extension = '.tgz'
+    formatFileName = '%s.tgz'
+#    fileNameTgz = entryId + '.tgz'
     if projectType == PROJECT_TYPE_CING:
-        fileNameTgz = entryId + '.cing.tgz'
+#        fileNameTgz = entryId + '.cing.tgz'
+        formatFileName = '%s.cing.tgz'
+    elif projectType == PROJECT_TYPE_PDB:
+        formatFileName = 'pdb%s.ent.gz'
+    fileNameTgz = formatFileName % entryId
+
+    NTdebug("fileNameTgz: %s" % fileNameTgz)
     # if true will do retrieveTgzFromUrl.
     if inputDir.startswith("http") or inputDir.startswith("file"):
         stillToRetrieve = False
@@ -142,7 +160,7 @@ def main(entryId, *extraArgList):
             stillToRetrieve = True
         # end if
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir, archiveType = archiveType)
+             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
             NTerror("Tgz should already have been present skipping entry")
@@ -155,17 +173,40 @@ def main(entryId, *extraArgList):
         # Needs to be copied because the open method doesn't take a directory argument..
         fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
         shutil.copy(fullFileNameTgz, '.')
-        project = Project.open(entryId, status = 'old')
+        project = Project.open(entryId, status='old')
         if not project:
             NTerror("Failed to init old project")
             return True
     elif projectType == PROJECT_TYPE_CCPN:
-        project = Project.open(entryId, status = 'new')
-        if not project.initCcpn(ccpnFolder = fileNameTgz, modelCount=modelCount):
+        project = Project.open(entryId, status='new')
+        if not project.initCcpn(ccpnFolder=fileNameTgz, modelCount=modelCount):
             NTerror("Failed to init project from ccpn")
             return True
+    elif projectType == PROJECT_TYPE_PDB:
+        project = Project.open(entryId, status='new')
+#        pdbFileFormats = [ entryId + ".pdb", "pdb" + entryId + ".ent.gz" ]
+#        for pdbFileName in pdbFileFormats:
+#        pdbFileName = "pdb" + entryId + ".ent.gz"
+#        #    pdbFilePath = os.path.join( inputDir, pdbFileName)
+#            pdbFilePath = os.path.join(inputDir, pdbFileName)
+#            if os.path.exists(pdbFilePath):
+#                break
+#        tmpPdbFile = None
+#        if pdbFileName.endswith('.gz'):
+        pdbFilePath = entryId + ".pdb"
+#        tmpPdbFile = pdbFilePath
+#        if os.path.exists(pdbFilePath):
+#            os.unlink(pdbFilePath)
+        gunzip(fileNameTgz, outputFileName=pdbFilePath, removeOriginal=True)
+        project.initPDB(pdbFile=pdbFilePath, convention=IUPAC, nmodels=modelCount)
+#        if tmpPdbFile:
+        if True:
+            NTdebug("Removing tmp: %s" % pdbFilePath)
+            os.unlink(pdbFilePath)
+
+
     elif projectType == PROJECT_TYPE_CYANA:
-        project = Project.open(entryId, status = 'new')
+        project = Project.open(entryId, status='new')
         pdbFileName = entryId + ".pdb"
     #    pdbFilePath = os.path.join( inputDir, pdbFileName)
         pdbFilePath = os.path.join(inputDir, pdbFileName)
@@ -178,7 +219,7 @@ def main(entryId, *extraArgList):
                 pdbConvention = CYANA
             if entryId.startswith("1tgq"):
                 pdbConvention = PDB
-        project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention, nmodels=modelCount)
+        project.initPDB(pdbFile=pdbFilePath, convention=pdbConvention, nmodels=modelCount)
         NTdebug("Reading files from directory: " + inputDir)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]
@@ -196,14 +237,21 @@ def main(entryId, *extraArgList):
 
         # Skip restraints if absent.
         if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
-            project.cyana2cing(cyanaDirectory = inputDir,
-                               convention = restraintsConvention,
-                               copy2sources = True,
-                               nmodels = modelCount,
+            project.cyana2cing(cyanaDirectory=inputDir,
+                               convention=restraintsConvention,
+                               copy2sources=True,
+                               nmodels=modelCount,
                                **kwds)
 
+#    if inputDirOrg == inputDirCASD_NMR:
+#    if True: # Default is False for this is specific to CASD-NMR
+#        NTmessage("Renaming molecule name to entry id: %s" % entryId)
+#        project.molecule.name = entryId # insufficient since all data is already initialized to disk.
+#        project.updateProject()
+#        project.molecule.rename( entryId )
+
     project.save()
-    if project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif, doWattos=doWattos):
+    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif, doWattos=doWattos):
         NTerror("Failed to validate project read")
         return True
     project.save()
@@ -221,14 +269,15 @@ def main(entryId, *extraArgList):
         do_cmd(cmd)
 
 
-def retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT):
+def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileName='%s.tgz'):
     """Retrieves tgz file from url to current working dir assuming the
     source is named:      $url/$x/$x.tgz
     Will skip the download if it's already present.
 
     Returns True on failure or None on success.
     """
-    fileNameTgz = entryId + '.tgz'
+#    fileNameTgz = entryId + extension
+    fileNameTgz = formatFileName % entryId
     if os.path.exists(fileNameTgz):
         NTmessage("Tgz already present, skipping download")
         return

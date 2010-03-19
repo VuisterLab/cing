@@ -54,7 +54,7 @@ def do_cmd( cmd ):
 # end def
 
 def get_cmd_output( cmd ):
-    NTdebug( "Doing command: %s" % cmd )
+#    NTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
 #    pipe = os.popen( cmd )
