@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
+python $CINGROOT/python/cing/PluginCode/test/test_xx.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
@@ -16,16 +16,16 @@ import unittest
 class AllChecks(TestCase):
 
     def testRetrieveTgzFromUrl(self):
-        self.failIf(os.chdir(cingDirTmp), msg = 
+        self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
         url = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
 #        url = 'file:/%s/ccpn' % (cingDirTestsData)
         entryId = '108d'
 #        entryId = '1brv'
-        fileNameTgz = entryId + '.tgz' 
+        fileNameTgz = entryId + '.tgz'
         if os.path.exists(fileNameTgz):
-            os.unlink(fileNameTgz)        
+            os.unlink(fileNameTgz)
 #        self.assertFalse(retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_FLAT))
         self.assertFalse(retrieveTgzFromUrl(entryId, url, archiveType = ARCHIVE_TYPE_BY_ENTRY))
 

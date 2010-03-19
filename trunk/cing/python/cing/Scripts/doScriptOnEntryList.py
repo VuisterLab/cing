@@ -4,10 +4,11 @@ and a file with a list of their names.
 """
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import getDateTimeStampForFileName
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
-from cing.Libs.NTutils import NTpath
+from random import shuffle
 import os
 
 """
@@ -47,7 +48,8 @@ def doScriptOnEntryList(pythonScriptFileName,
           extraArgList                   = None,
           START_ENTRY_ID                 = START_ENTRY_ID,
           MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO,
-          expectPdbEntryList             = True
+          expectPdbEntryList             = True,
+          shuffleBeforeSelecting         = False # fails for chain ids when included.
           ):
     """Return True on error"""
 #    if os.chdir(cingDirTmp):
@@ -84,12 +86,17 @@ def doScriptOnEntryList(pythonScriptFileName,
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
     lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
-    entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId]
+    if shuffleBeforeSelecting:
+        NTmessage("Shuffling entry list before selecting entries.")
+        entryCodeListCopy = entryCodeList[:]
+        shuffle(entryCodeListCopy)
+        entryCodeList = entryCodeListCopy[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
+        entryCodeList.sort()
     chainCodeList = chainCodeList[START_ENTRY_ID:lastEntryId]
 
-    NTmessage('Read      %04d entries    ' % entryCountTotal)
-    NTmessage('Selected  %04d entries    ' % entryCountSelected)
-    NTmessage('Sliced    %04d entries: %s' % (len(entryCodeList), entryCodeList ))
+    NTmessage('Read      %05d entries    ' % entryCountTotal)
+    NTmessage('Selected  %05d entries    ' % entryCountSelected)
+    NTmessage('Sliced    %05d entries: %s' % (len(entryCodeList), entryCodeList ))
 
 
     (_directory, pythonScriptFileNameRoot, _ext) = NTpath(pythonScriptFileName)

@@ -104,6 +104,9 @@ def writeEntryListToFile(fileName, entryList):
 def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySolidState = False):
     """Includes solution and solid state NMR if onlyNMR is chosen
     """
+    if False: # Default False; used for not bother sites.
+        return ['1a4d', '2d6p', '2e7r', '3ejo']
+
     dir_name = os.path.join(cingPythonDir, 'cing', 'NRG', 'data')
     if onlySolidState:
         inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR_solid.xml')

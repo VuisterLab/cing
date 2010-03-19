@@ -44,7 +44,7 @@ import urllib
 
 def run():
     """Return True on error"""
-    max_entries_todo = 0    # was 500 (could be as many as u like)
+    max_entries_todo = 1    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
     processes_max = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = False
@@ -54,7 +54,7 @@ def run():
 #    new_hits_entry_list = ['1cjg'] # define empty for checking new ones.
 #    new_hits_entry_list = []
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
-    new_hits_entry_list         = string.split("1a4d")
+    new_hits_entry_list         = string.split("3ejo 2e7r 2d6p")
 
     ## Initialize the project
     m = pdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
@@ -318,10 +318,10 @@ class pdbCing(Lister):
                     self.entry_list_stopped.append(entry_code)
                     continue
 
-                if True: # Default is True
+                if False: # Default is True
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
-                        NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                        NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                         self.entry_list_stopped.append(entry_code)
                         continue
 
@@ -687,7 +687,8 @@ class pdbCing(Lister):
                             # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
                             START_ENTRY_ID = 0, # default.
                             MAX_ENTRIES_TODO = self.max_entries_todo,
-                            extraArgList = extraArgList):
+                            extraArgList = extraArgList,
+                            shuffleBeforeSelecting = True ):
             NTerror("Failed to doScriptOnEntryList")
             return True
     # end def runCing.

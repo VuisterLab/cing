@@ -1006,7 +1006,8 @@ def runWhatif( project, parseOnly=False ):
 
         for res in project.molecule.allResidues():
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-                NTwarning('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
+                if not res.hasProperties('water'): # don't report waters
+                    NTwarning('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
                 project.whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 
@@ -1057,7 +1058,7 @@ def runWhatif( project, parseOnly=False ):
             NTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
             return True
 
-        if True:
+        if False:
             removeTempFiles(whatifDir)
 
         project.whatifStatus.completed = True
@@ -1166,7 +1167,7 @@ def removeTempFiles( whatifDir ):
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
 
-        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG", "*.ATM", ]:
+        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG", "*.ATM", "DAVADRUG.*", "PRODRUG.*" ]:
             for fn in glob(os.path.join(whatifDir,extension)):
                 removeList.append(fn)
         for fn in removeList:
