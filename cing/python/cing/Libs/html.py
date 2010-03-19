@@ -1560,7 +1560,7 @@ class ProjectHTMLfile( HTMLfile ):
             htmlMain('ul', closeTag=False)
             for pl in self.project.peaks:
                 if hasattr(pl,'html'):
-                    NTdebug("Doing [%s] " % (pl.name))
+#                    NTdebug("Doing peaks [%s] " % (pl.name))
                     self.insertHtmlLinkInTag( 'li', htmlMain, self.project, pl, text=pl.name)
             htmlMain('ul', openTag=False)
         #end if

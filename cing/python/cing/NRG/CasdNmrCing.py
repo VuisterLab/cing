@@ -24,8 +24,6 @@ python -u $CINGROOT/python/cing/NRG/eNmrCing.py
 
 """
 
-BASE_NAME = 'CASD-NMR-CING'
-
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs import forkoff
@@ -37,6 +35,7 @@ from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import symlink
 from cing.Libs.forkoff import get_cmd_output
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
+from cing.NRG import CASD_NMR_BASE_NAME
 import cing
 import csv
 import os
@@ -44,6 +43,7 @@ import shutil
 import string
 import time
 import urllib
+
 
 class MyDict(Lister):
     """just a simple dictionary"""
@@ -76,7 +76,7 @@ class nrgCing(Lister):
         self.data_dir_local = "dataCASD-NMR"
 
 #        self.results_base = 'eNMRworkshop2'
-        self.results_base = BASE_NAME
+        self.results_base = CASD_NMR_BASE_NAME
         self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.results_dir = self.results_base_dir
 

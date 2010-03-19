@@ -804,7 +804,7 @@ class Ccpn:
            NB CING data model has no CS list entity but rather stores the info at the atom level.
         """
 
-        NTdebug("Now in _getCcpnShiftList")
+#        NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         self.molecule.newResonances()
 

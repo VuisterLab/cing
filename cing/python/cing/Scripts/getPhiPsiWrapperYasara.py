@@ -7,7 +7,7 @@ Use below to find the entries done and todo:
 from cing import cingDirScripts
 from cing import cingDirTmp
 from cing.Libs.NTutils import NTmessage
-from cing.Scripts.getPhiPsi import doYasara
+from cing.Scripts.getPhiPsi import doYasaraAddHydrogens
 import cing
 import os
 
@@ -69,7 +69,7 @@ def main():
 
     for i, entryCode in enumerate(entryCodeList):
         chainCode = chainCodeList[i]
-        doYasara( entryCode, chainCode )
+        doYasaraAddHydrogens( entryCode, chainCode )
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug

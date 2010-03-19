@@ -4166,7 +4166,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
 
 
 
-def gunzip(fileNameZipped, outputFileName=None):
+def gunzip(fileNameZipped, outputFileName=None, removeOriginal=False):
     """Returns true on error. Uses python api instead of OS defaults"""
     if not fileNameZipped.endswith('.gz'):
         NTerror("Expected zipped file to have .gz extension; giving up.")
@@ -4181,6 +4181,9 @@ def gunzip(fileNameZipped, outputFileName=None):
     outF = file(fileName, 'wb');
     outF.write(s)
     outF.close()
+    if removeOriginal:
+        NTdebug("Removing file: %s" % fileNameZipped)
+        os.unlink(fileNameZipped)
 
 
 def getEnsembleAverageAndSigmaFromHistogram(his):
