@@ -101,7 +101,8 @@ nameDefs =[
             (RES_LEVEL, 'SCOLST',  None,          'List of symmetry contacts',                                 'List of symmetry contacts'),
             (RES_LEVEL, 'TO2CHK',  None,          'Missing C-terminal groups',                                 'Missing C-terminal groups'),
             (RES_LEVEL, 'TOPPOS',  None,          'Ligand without know topology',                              'Ligand without know topology'),
-            (RES_LEVEL, 'TORCHK',  None,          'Unknown check',                                             'Unknown check')
+            (RES_LEVEL, 'TORCHK',  None,          'Unknown check',                                             'Unknown check'),
+            (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing')
 ]
 
 #if True:

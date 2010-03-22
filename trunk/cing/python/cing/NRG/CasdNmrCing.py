@@ -1,5 +1,6 @@
 """
-This script will use eNMR files to generate CING reports
+This script will use CASD-NMR files to generate CING reports, see
+Scripts/validateforCASD_NMR.py
 
 If the pickle is polluted do the following steps:
   -0- remove pickle.
@@ -11,7 +12,7 @@ If the pickle is polluted do the following steps:
 
 
 When you need to stop a batch processing, send a signal
-to it for interuption. E.g. when 22059 is the PID of "python nrgCing.py 1"
+to it for interuption. E.g. when 22059 is the PID of "python CasdNmrCing.py 1"
 do "kill -15 22059". Let it finish for a while when you see:
 WARNING: Caught interrupt in parent.
 WARNING: Trying to finish up by waiting for subprocesses
@@ -55,7 +56,7 @@ class EntryInfo(Lister):
         self.time = time
 
 
-class nrgCing(Lister):
+class casdNmrCing(Lister):
 
     def __init__(self,
                  max_entries_todo=1,
@@ -199,12 +200,12 @@ class nrgCing(Lister):
 
     def getCingEntriesTriedAndDone(self):
         "Returns list or None for error"
-        NTdebug("From disk get the entries done in CASD-NMR CING")
+        NTdebug("From disk get the entries done in CASD-NMR-CING")
 
         entry_list_tried = []
         entry_list_done = []
 
-
+        NTdebug("Now in: " + os.getcwd())
         subDirList = os.listdir('data')
         for subDir in subDirList:
             if len(subDir) != 2:
@@ -225,10 +226,7 @@ class nrgCing(Lister):
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if os.path.exists(indexFileEntry):
                     entry_list_done.append(entry_code)
-
-
         return (entry_list_tried, entry_list_done)
-
 
     """
     Set the list of matched entries and the dictionary holding the
@@ -245,19 +243,19 @@ class nrgCing(Lister):
 
         (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
         if not self.entry_list_tried:
-            NTerror("Failed to find entries that CING tried.")
-            return 0
+            NTwarning("Failed to find entries that CING tried.")
+#            return 0
         NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
         if not self.entry_list_done:
-            NTerror("Failed to find entries that CING did.")
-            return 0
+            NTwarning("Failed to find entries that CING did.")
+#            return 0
         NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
 
         if self.updateIndices:
             self.update_index_files()
 
-        NTdebug("premature return until coded completely... TODO:")
+#        NTdebug("premature return until coded completely... TODO:")
         return True
 
 
@@ -322,7 +320,7 @@ class nrgCing(Lister):
 #        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
         cingImage = '../data/%t/%s/%s.cing/%x/HTML/mol.gif'
-        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a><BR>%S</td>'
+        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a><BR>%s</td>'
         file_name = os.path.join (self.base_dir, self.data_dir_local, "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
@@ -367,8 +365,10 @@ class nrgCing(Lister):
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 result_string = "CASD-NMR data sets"
 
-                begin_entry_code = string.upper(self.entry_list_done[ begin_entry_count - 1 ])
-                end_entry_code = string.upper(self.entry_list_done[ end_entry_count - 1 ])
+#                begin_entry_code = string.upper(self.entry_list_done[ begin_entry_count - 1 ])
+#                end_entry_code = string.upper(self.entry_list_done[ end_entry_count - 1 ])
+                begin_entry_code = self.entry_list_done[ begin_entry_count - 1 ]
+                end_entry_code = self.entry_list_done[ end_entry_count - 1 ]
                 new_row = [ file_id, begin_entry_code, end_entry_code ]
                 csvwriter.writerow(new_row)
 
@@ -454,7 +454,7 @@ class nrgCing(Lister):
                         x = 'Molecularsystem' # but not always.
 #                NTdebug("found molecular system name: %s" % x)
 
-                tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code))
+                tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code)) # does nothing because %S was omitted.
                 tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
                 tmp_string = string.replace(tmp_string, r"%t", t)
                 tmp_string = string.replace(tmp_string, r"%x", x)
@@ -516,9 +516,9 @@ class nrgCing(Lister):
             os._exit(1)
 
         ## Searches and matches
-#        if new_hits_entry_list:
-#            m.new_hits_entry_list = new_hits_entry_list
-#            NTmessage("Doing list of new entries: %s" % new_hits_entry_list)
+        if new_hits_entry_list:
+            m.new_hits_entry_list = new_hits_entry_list
+            NTmessage("Doing list of new entries: %s" % new_hits_entry_list)
 #        else:
         if not m.search_matching_entries():
             NTerror("can't search matching entries")
@@ -540,13 +540,13 @@ if __name__ == '__main__':
     writeWhyNot = True
     updateIndices = True
     isProduction = True
-#    new_hits_entry_list = [] # define empty for checking new ones.
+    new_hits_entry_list = [] # define empty for checking new ones.
 #    new_hits_entry_list = ['1d3z']
-    new_hits_entry_list = ['atT13Org']
+#    new_hits_entry_list = ['atT13']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = nrgCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
+    m = casdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
