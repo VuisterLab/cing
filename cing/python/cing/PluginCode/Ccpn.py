@@ -196,8 +196,12 @@ class Ccpn:
             tar = tarfile.open(self.project.ccpnFolder, "r:gz")
             tarFileNames = []
             for itar in tar:
+#                NTdebug("working on: " + itar.name)
+                # Omit files like AR3436A/._ccp from projects obtained from Wim.
+                if itar.name.count('._'):
+#                    NTdebug("Skipping special hidden file: " + itar.name)
+                    continue
                 tar.extract(itar.name, '.') # itar is a TarInfo object
-#                NTdebug("extracted: " + itar.name)
                 # Try to match: BASP/memops/Implementation/BASP.xml
                 if not ccpnRootDirectory: # pick only the first one.
                     tarFileNames.append(itar.name)
@@ -213,6 +217,7 @@ class Ccpn:
                 ccpnRootDirectory = tarFileNames[0]
                 if not os.path.isdir(ccpnRootDirectory):
                     NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
+                    NTerror("First listed directory after sorting: %s" % ccpnRootDirectory)
                     return None
 
             if ccpnRootDirectory != self.project.name:

@@ -65,6 +65,8 @@ def doScriptOnEntryList(pythonScriptFileName,
     entryCountTotal = 0
     for line in entryListFile.readlines():
         line = line.strip()
+        if line == '': # skip empty lines.
+            continue
         entryCountTotal += 1
         if expectPdbEntryList:
             entryCode = line[0:4].lower()
@@ -91,20 +93,22 @@ def doScriptOnEntryList(pythonScriptFileName,
         entryCodeListCopy = entryCodeList[:]
         shuffle(entryCodeListCopy)
         entryCodeList = entryCodeListCopy[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
-        entryCodeList.sort()
+    else:
+        entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
+    entryCodeList.sort()
     chainCodeList = chainCodeList[START_ENTRY_ID:lastEntryId]
 
     NTmessage('Read      %05d entries    ' % entryCountTotal)
     NTmessage('Selected  %05d entries    ' % entryCountSelected)
     NTmessage('Sliced    %05d entries: %s' % (len(entryCodeList), entryCodeList ))
+#    NTmessage('Sliced    %05d chains:  %s' % (len(chainCodeList), chainCodeList ))
 
 
     (_directory, pythonScriptFileNameRoot, _ext) = NTpath(pythonScriptFileName)
     mkSubDirStructure( startDir, entryCodeList, pythonScriptFileNameRoot )
     logScriptFileNameRoot = 'log_'+pythonScriptFileNameRoot
     job_list = []
-    i = 0
-    for entry_code in entryCodeList:
+    for i, entry_code in enumerate(entryCodeList):
         extraArgListStr = ''
         if extraArgList:
             extraArgListStr = ' '.join( extraArgList )
@@ -127,7 +131,6 @@ def doScriptOnEntryList(pythonScriptFileName,
              )
         job = ( do_cmd, (cmd,) )
         job_list.append( job )
-        i += 1
 
     f = ForkOff( processes_max       = processes_max,
             max_time_to_wait    = max_time_to_wait)

@@ -5,7 +5,10 @@
 # Execute like:
 # $CINGROOT/scripts/cing/analyzeLastLogNRG-CING.csh
 
-cd /Library/WebServer/Documents/NRG-CING/data
+#projectId = NRG-CING
+set projectId = PDB-CING
+
+cd /Library/WebServer/Documents/$projectId/data
 set logFileListName = '../logFileList.csv'
 
 set list = ( `find . -depth 2 -name "[0-9]*" | cut -c6- | sort` )

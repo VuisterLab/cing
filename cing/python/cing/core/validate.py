@@ -468,8 +468,11 @@ def summary( project, toFile = True ):
 #    msg += sprintf( '%s\n', project.molecule.format() )
 
     skippedRmsd = False # keep logic simple.
-    if project.molecule.has_key( RMSD_STR ):
-        msg += project.molecule.rmsd.format(allowHtml=True)
+    if project.molecule.has_key( RMSD_STR ) and project.molecule.rmsd:
+        # Next msg isn't returning when no models are present in CING.
+        msgNext = project.molecule.rmsd.format(allowHtml=True)
+        if msgNext:
+            msg += msgNext
 #        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
         if not project.molecule.modelCount:
             # empty molecule can't have meaningfull rmsds and this might be an important factor to note here.
