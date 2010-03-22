@@ -17,6 +17,7 @@ Residue
 
 """
 from cing import cingPythonCingDir
+from cing.Libs import disk
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import ExecuteProgram
@@ -392,7 +393,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         try: # Don't allow this to mess up CING.1
             if copy(pcNmrParameterFile, pcNmrParameterFileDestination):
-    #        if os.link(pcNmrParameterFile, pcNmrParameterFileDestination):
+    #        if os.link(pcNmrParameterFile, pcNmrParameterFileDestination): # don't use link in python for this.
                 NTerror("Procheck.run: Failed to copy from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
                 return True
         except:
@@ -437,7 +438,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 #                            NTdebug("Removing existing copy: " + dstPath)
                             os.unlink(dstPath)
 #                        NTdebug("Trying to copy from: " + path+" to: "+dstPath)
-                        if os.link(path, dstPath):
+#                        if os.link(path, dstPath):# don't use link in python for this.
+                        if disk.copy(path, dstPath):# don't use link in python for this.
                             NTcodeerror("Failed to copy from: " + path+" to: "+self.rootPath)
                             return True
                         hasRestraints = True
