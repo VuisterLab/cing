@@ -70,9 +70,14 @@ format file:
   10    K  HZ3      3.7795 # A HZ3 that might not be present.
 
 
-
+    Return True on error; eg. when the file is absent.
     """
+    if not os.path.exists(fileName):
+        NTerror("Failed to find %s" % fileName)
+        return True
+
     atomDict = molecule._getAtomDict(IUPAC, chainId)
+
     for line in AwkLike( fileName, commentString = '#', minNF = 4 ):
         if (line.float(4) != -666.000):
             lineCol1 = int(line.dollar[1].strip('*'))
@@ -213,7 +218,8 @@ def runShiftx( project, parseOnly=False, model=None   ):
                 outputFile = os.path.join(root,outputFile)
     #            outputFile = os.path.abspath(outputFile)
 #                NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
-                parseShiftxOutput( outputFile, project.molecule, chain.name )
+                if parseShiftxOutput( outputFile, project.molecule, chain.name ):
+                    NTerror("Failed parseShiftxOutput for %s" % outputFile) # TODO: check if continuation is reasonable.
             #end if
         #end for
         del( pdbFile )

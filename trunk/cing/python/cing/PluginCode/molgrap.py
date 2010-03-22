@@ -6,6 +6,7 @@ from cing import cingDirMolmolScripts
 from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingRoot
+from cing.Libs import disk
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
@@ -275,7 +276,8 @@ def export2gif(molecule, path, project = None):
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
         NTmessage("copying default image from %s to %s" % (src, path))
-        os.link(src, path) # us a real copy
+#        os.link(src, path) # us a real copy JFD: fails between 2 filesystems
+        disk.copy(src, path) # us a real copy
 #        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
         return True
     return None
