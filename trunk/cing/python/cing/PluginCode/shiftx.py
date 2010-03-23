@@ -145,7 +145,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         skippChain = True
         for res in chain.allResidues():
             if not res.hasProperties('protein'):
-                if not res.hasProperties('water'): # don't report waters
+                if not res.hasProperties('HOH'): # don't report waters
                     skippedResidues.append(res)
                 for atm in res.allAtoms():
                     atm.pdbSkipRecord = True
