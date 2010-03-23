@@ -6,6 +6,10 @@
 # cd /Library/WebServer/Documents/CASD-NMR-CING/data/tT/atT13Org
 # python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py atT13Org \
 # file:///Users/jd/CASD-NMR-CING/data /Library/WebServer/Documents/CASD-NMR-CING . . BY_ENTRY CCPN
+# or:
+# cd /Library/WebServer/Documents/PDB-CING/data/as/2as0
+# python -u /Users/jd/workspace35/cingStable/python/cing/Scripts/validateEntry.py 2as0  \
+# file:///Users/jd/wattosTestingPlatform/pdb/data/structures/divided/pdb /Library/WebServer/Documents/PDB-CING . . BY_CH23 PDB
 
 from cing import header
 from cing import verbosityDebug
@@ -54,7 +58,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = False # default: False
+    fastestTest = True # default: False
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True

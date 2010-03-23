@@ -363,8 +363,11 @@ fullstop y
         self.molecule[WHATIF_STR] = NTdict()
 
         modelIdx = -1
-        for line in AwkLike( fileName, minNF = 2, separator=':' ):
+
+        for line in AwkLike( fileName, minNF = 1, separator=':' ):
             l = line.dollar[0]
+            if len(l) < 2: # to prevent recursion bug in AwkLike code.
+                continue
 #            NTdebug("Read line: "+l)
 #            NTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
 #            NTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
@@ -728,11 +731,12 @@ RMS Z-scores, should be close to 1.0:
 
                     nameTuple = self.translateResAtmString( curLocId )
                     if not nameTuple:
-                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+#                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+                        NTwarning('Whatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
                         continue
                     entity = self.molecule.decodeNameTuple( nameTuple ) # can be a chain, residue or atom level object
                     if not entity:
-                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
+                        NTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
                         continue
                     #NTdebug("adding to entity: " + `entity`)
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
@@ -745,19 +749,20 @@ RMS Z-scores, should be close to 1.0:
         #end for
     #end def
 
-    def translateResAtmString( self, string ):
+    def translateResAtmString( self, string, convention=IUPAC):
         """Internal routine to split the residue or atom identifier string
             of the check.db file. E.g.:
             A- 187-HIS- CB
             A- 177-GLU
             return None for error
 
-            New version of whatif uses formats like:
+            Version of whatif Version  : 8.0 (20100310-0056) uses formats like:
 Name   :    0 ; A    ;  171 ; VAL  ; _
 Name   :    0 ; A    ;  171 ; VAL  ; _    ;  CA  ; _
+Name   :    0 ; A    ;   40 ; THR  ; _    ; HG21 ; _
+
                 ^ Chain Id
-                        ^ Res Id
-                                             ^ Atom Id
+                        ^ Res Id            ^ Atom Id
             """
         # New or old format.
         if string.find(';')>=0:
@@ -774,13 +779,13 @@ Name   :    0 ; A    ;  171 ; VAL  ; _    ;  CA  ; _
                 atomId = None
                 if len(a) == 7: # Is there an atom name too?
                     atomId = a[5]
-                return tuple( ['PDB',chId,resId,atomId] )
+                return tuple( [convention,chId,resId,atomId] )
             except:
                 return None
         else:
             try:
                 a = string.split('-')
-                t = ['PDB',a[0].strip(),int(a[1]), None]
+                t = [convention,a[0].strip(),int(a[1]), None]
                 if len(a) == 4: # Is there an atom name too?#                print '>', a
                     try:
                         _i = int(a[3])    # @TODO this is a whatif bug and should not be possible
@@ -1006,7 +1011,7 @@ def runWhatif( project, parseOnly=False ):
 
         for res in project.molecule.allResidues():
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-                if not res.hasProperties('water'): # don't report waters
+                if not res.hasProperties('HOH'): # don't report waters
                     NTwarning('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
                 project.whatifStatus.nonStandardResidues.append(repr(res))
         #end for

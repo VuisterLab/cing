@@ -18,6 +18,11 @@ class AwkLike:
      for line in AwkLike('myfile'):
          if line.NF > 1:
              print line.dollar[0], line.dollar[1]
+
+        JFD adds: iterations routine
+        fails on parsing entry 1o9l whatif's pdbout.txt when called in a naive way.
+        If the number of fields is less than required it runs out of recursion depth.
+        Workaround, don't filter here but outside the loop.
     """
 
     def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
@@ -44,38 +49,42 @@ class AwkLike:
         return self
 
     def next( self ):
-        """iterations routine"""
+        """iterations routine
+        JFD fails on parsing entry 1o9l whatif's pdbout.txt when called in a naive way.
+        If the number of fields is less than required it runs out of recursion depth.
+        Workaround, don't filter here but outside the loop.
+        """
         if not self.f:
             raise StopIteration
 
         self.line = self.f.readline()
         self.dollar = [self.line[:-1]] # -1 for excluding line terminator.
-
+#        print 'line:        [' + `self.line`  + ']'
         if len(self.line):
             self.NR += 1
             for f in self.line.split(self.separator):
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
-#                    NTdebug("Skipping fields after comment on line: " + self.dollar[0] )
-#                    NTdebug("   parsed so far: " + `self.dollar` )
+#                    NTdebug("Skipping fields after comment on line: [%s]" % self.line)
+#                    NTdebug("   parsed so far: %s" % `self.dollar` )
                     break
-#                NTdebug("Appending to parsed: ["+f+"]")
+#                NTdebug("Appending to parsed: [%s]" % f)
                 self.dollar.append( f )
             self.NF = len(self.dollar)-1
             if self.minLength >= 0:
                 if len(self.dollar[0]) < self.minLength:
-#                    NTdebug("Skipping line with less than required number of characters: " + self.dollar[0])
+#                    NTdebug("Skipping line with less than required number of characters: [%s]" % self.line)
                     return self.next()
             if self.minNF > 0:
                 if self.NF < self.minNF:
-#                    NTdebug("Skipping line with less than required number of fields: " + self.dollar[0])
+#                    NTdebug("Skipping line with less than required number of fields: [%s]" % self.line)
                     return self.next()
             if self.commentString:
                 if self.isComment( self.commentString ):
-#                    NTdebug("Skipping comment line: " + self.dollar[0])
+#                    NTdebug("Skipping comment line: [%]" % self.line)
                     return self.next()
             if self.skipHeaderLines >= self.NR:
-#                NTdebug('skipping header line [%d] which is less than or equal to [%d]' % (
+#                NTdebug('skipping header line [%d] which is less than or equal to [%s]' % (
 #                    self.NR, self.skipHeaderLines))
                 return self.next()
             return self
