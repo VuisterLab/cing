@@ -4,11 +4,13 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlimitSingleValue
+from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import removeRecursivelyAttribute
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.forkoff import do_cmd
+from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
@@ -28,11 +30,11 @@ from cing.core.molecule import unmatchedAtomByResDictToString
 from cing.core.sml import NTlist
 from shutil import move
 from shutil import rmtree
-from cing.Libs.NTutils import NTmessageNoEOL
+from cing.Libs.fpconst import isNaN
 import cing
-import shutil
 import os
 import re
+import shutil
 import string
 import tarfile
 
@@ -959,6 +961,14 @@ class Ccpn:
 
             shiftList = ccpnExperiment.shiftList
             if not shiftList:
+                shiftLists = self.ccpnNmrProject.findAllMeasurementLists(className='ShiftList')
+                if len(shiftLists) == 1:
+                    shiftList = self.ccpnNmrProject.findFirstMeasurementList(className='ShiftList')
+#                    shiftList = shiftLists[0] # no indexing allowed on sets so we repeat the search above.
+                else:
+                    NTwarning("Skipping simply getting the first shift list as there are more than one lists")
+
+            if not shiftList:
                 NTwarning("No shift list found for CCPN Experiment '%s'", ccpnExperiment.name)
                 continue
 
@@ -980,34 +990,29 @@ class Ccpn:
                 ccpnPeakDims = [pd for pd in ccpnPeak.sortedPeakDims() if pd.dataDimRef]
                 ccpnPositions = [pd.value for pd in ccpnPeakDims] #ppm
 
-                # Setup intensities
+                # Setup volumes & intensities
+                vValue = NaN
+                vError = NaN
                 ccpnVolume = ccpnPeak.findFirstPeakIntensity(intensityType = 'volume')
-                if (ccpnVolume):
-                    vValue = ccpnVolume.value or 0.00
-                    vError = ccpnVolume.error or 0.00
-                else:
-                    vValue = 0.00
-                    vError = 0.00
+                if ccpnVolume:
+                    vValue = ccpnVolume.value or NaN
+                    vError = ccpnVolume.error or NaN
 
                 if str(vValue) == 'inf':
                     vValue = NaN
 
+                hValue = NaN
+                hError = NaN
                 ccpnHeight = ccpnPeak.findFirstPeakIntensity(intensityType = 'height')
-                hValue = 0.00
-                hError = 0.00
                 if ccpnHeight:
-                    if hasattr(ccpnVolume, 'value'):
-                        hValue = ccpnVolume.value
-                    if hasattr(ccpnVolume, 'error'):
-                        hError = ccpnVolume.error
+                    hValue = ccpnHeight.value or NaN
+                    hError = ccpnHeight.error or NaN
 
                 if str(hValue) == 'inf':
                     hValue = NaN
 
-                if not (ccpnVolume or ccpnHeight):
-                    msg = "CCPN peak '%s' missing both volume and height"
-                    NTwarning(msg, ccpnPeak)
-
+                if isNaN(vValue) and isNaN(hValue):
+                    NTwarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
 
                 resonances = []
                 for peakDim in ccpnPeakDims:

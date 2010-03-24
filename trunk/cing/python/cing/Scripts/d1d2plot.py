@@ -7,7 +7,6 @@ make sure the projects to run are already in the tmpdir.
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing import verbosityError
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import plusPoint
@@ -23,6 +22,7 @@ from cing.Libs.html import makeDihedralPlot
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
 from cing.Libs.matplotlibExt import yellow_inv
+from cing.Libs.test.test_NTplot2 import plotTestHistoDihedral
 from cing.PluginCode.required.reqWhatif import BBCCHK_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
@@ -43,7 +43,8 @@ from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
 import cing
 import os
-
+import profile
+import pstats
 
 hPlot.initHist()
 set_printoptions(linewidth=100000)
@@ -218,7 +219,16 @@ def plotDihedral2DRama():
             plot.points(zip(x, y), attributes=myPoint)
 #            fn = os.path.join('bySsAndResType', ( ssTypeForFileName+"_"+resType+"."+graphicsFormat))
 #            fn = os.path.join('byResType', ( resType+"."+graphicsFormat))
-        fn = resType + "_rama." + graphicsFormat
+#        fn = resType + "_rama." + graphicsFormat
+        fnBase = resType + "_rama"
+        if True:
+            fn = fnBase + '.png'
+        else:
+            i=0
+            fn = None
+            while not fn or os.path.exists(fn):
+                i += 1
+                fn = fnBase + '_' + `i` + '.png'
         ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
 
@@ -832,11 +842,33 @@ def plotDihedralD1D2byResType():
 #        ps.hardcopy(fn, graphicsFormat)
         plot.show()
 
+def plotDihedral2DRamaWrapper():
+    for _i in range(20):
+        plotDihedral2DRama()
+
+def plotHistoDihedralWrapper():
+    for _i in range(2):
+#        unittest.main('cing.Libs.test.test_NTplot2', 'NTplot2Checks_a')
+        plotTestHistoDihedral()
+
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
+    fn = 'fooprof'
+    os.chdir(cingDirTmp)
     cing.verbosity = verbosityDebug
+    # Commented out because profiling isn't part of unit testing.
     if True:
+        if False:
+#            profile.run('plotDihedral2DRamaWrapper()', fn)
+            profile.run('plotHistoDihedralWrapper()', fn)
+            p = pstats.Stats(fn)
+        #     enable a line or two below for useful profiling info
+            p.sort_stats('time').print_stats(100)
+            p.sort_stats('cumulative').print_stats(100)
+        else:
+#            plotDihedral2DRamaWrapper()
+            plotHistoDihedralWrapper()
+    if False:
 #        entryList = "1y4o".split()
     #    entryList = "1tgq 1y4o".split()
         entryList = "1brv".split()
@@ -850,5 +882,3 @@ if __name__ == "__main__":
 #        plotDihedralD1_2d(False)
     if False:
         m = plotHistogramOverall()
-    if False:
-        plotDihedral2DRama()

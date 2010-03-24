@@ -6,6 +6,7 @@ from cing import cingDirMolmolScripts
 from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingRoot
+from cing import issueListUrl
 from cing.Libs import disk
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
@@ -225,6 +226,7 @@ class Molgrap(NTdict):
             NTerror("Suggestion 1: Have you installed povray-includes or similar?")
             NTerror("For some Linuxes 'colors.inc' doesn't come with povray")
             NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough?")
+            NTerror("Suggestion 3: Complex X-ray topology then consider looking at %s%s" % (issueListUrl,233))
             return True
 #        try:
 #            os.unlink(script_file_name)

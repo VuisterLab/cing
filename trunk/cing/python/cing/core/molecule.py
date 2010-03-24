@@ -33,8 +33,8 @@ from cing.Libs.cython.superpose import NTcMatrix #@UnresolvedImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
-from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.Libs.fpconst import NaN
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
@@ -46,9 +46,9 @@ from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from database import NTdb
 from math import acos
-from math import pi
-from numpy.core.defmatrix import mat
 from numpy.ma.core import multiply
+from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
+#from pylab import * #@UnusedWildImport # otherwise use this line.
 from parameters   import plotParameters
 import math
 import os
@@ -4433,7 +4433,7 @@ def chi3SS( dCbCb ):
     Page 684, eq. 9
     """
     try:
-        val = acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/pi
+        val = acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/math.pi
     except:
         val = NaN
     return val

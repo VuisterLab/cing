@@ -35,7 +35,7 @@ extraArgList = (inputDirCASD_NMR, outputDir, '.', '.', ARCHIVE_TYPE_BY_ENTRY, PR
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
-                    processes_max = 2,
+                    processes_max = 3,
                     delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour

@@ -45,7 +45,7 @@ import struct, operator
 _big_endian = struct.pack('i',1)[0] != '\x01'
 
 # and define appropriate constants
-if(_big_endian): 
+if(_big_endian):
     NaN    = struct.unpack('d', '\x7F\xF8\x00\x00\x00\x00\x00\x00')[0]
     PosInf = struct.unpack('d', '\x7F\xF0\x00\x00\x00\x00\x00\x00')[0]
     NegInf = -PosInf
@@ -90,7 +90,7 @@ def _mantissa(dval):
     mantissa += bb[2] << 40
     mantissa += bb[3] << 32
     mantissa += bb[4]
-    return mantissa 
+    return mantissa
 
 def _zero_mantissa(dval):
     """Determine whether the mantissa bits of the given double are all
@@ -128,7 +128,7 @@ def isNegInf(value):
 
 ##
 ## Functions to test public functions.
-## 
+##
 
 def test_isNaN():
     assert( not isNaN(PosInf) )
@@ -172,7 +172,7 @@ def test():
     test_isFinite()
     test_isPosInf()
     test_isNegInf()
-    
+
 if __name__ == "__main__":
     test()
 

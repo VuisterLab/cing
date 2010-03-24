@@ -549,7 +549,7 @@ RMS Z-scores, should be close to 1.0:
             self.checks = NTlist()
 
         if not os.path.exists(modelCheckDbFileName):
-#            NTdebug('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
+            NTerror('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
             return True
 
         for line in AwkLike( modelCheckDbFileName, minNF = 3 ):
