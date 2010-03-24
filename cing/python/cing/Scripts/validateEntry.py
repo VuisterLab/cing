@@ -67,7 +67,7 @@ def main(entryId, *extraArgList):
 #    modelCount=2
     modelCount = None # default setting is None
     if fastestTest:
-        modelCount = 1
+        modelCount = 2
         htmlOnly = True
         doWhatif = False
         doProcheck = False

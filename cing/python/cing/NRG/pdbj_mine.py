@@ -1,6 +1,6 @@
 '''
 Run like:
-python $CINGROOT/python/cing/NRG/pdbj_mine.py $CINGROOT/python/cing/NRG/sql/pdbj/sgForNmr.sql
+python $CINGROOT/python/cing/NRG/pdbj_mine.py $CINGROOT/python/cing/NRG/sql/tmp.sql
 '''
 from cing.Libs.NTutils import writeTextToFile
 import csv
@@ -39,13 +39,19 @@ def postQuery(sql_query, saveCsvFile = None, base_url='http://service.pdbj.org/m
     # Use a trick to read from txt now. Trick is to offer an array of lines that will be split.
     resultTxtList = resultTxt.splitlines()
     csvReader = csv.reader(resultTxtList, delimiter=',', quotechar='"')
+    total = 0
+    isHeader = True
     for row in csvReader:
         result.append(row)
+        if not isHeader:
+            total += int(row[1])
+        isHeader = False
     # show result
     print "DEBUG: Found result: %s" % result
+    print "DEBUG: Found total: %s" % total
     return result
 
 if __name__ == '__main__':
     sql_query = open(sys.argv[1], 'r').read()
 #    print 'sql_query: %s' % sql_query
-    postQuery(sql_query)
+    postQuery(sql_query,saveCsvFile='result.csv')
