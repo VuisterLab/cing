@@ -58,7 +58,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = True # default: False
+    fastestTest = False # default: False
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -151,7 +151,7 @@ def main(entryId, *extraArgList):
         formatFileName = 'pdb%s.ent.gz'
     fileNameTgz = formatFileName % entryId
 
-    NTdebug("fileNameTgz: %s" % fileNameTgz)
+#    NTdebug("fileNameTgz: %s" % fileNameTgz)
     # if true will do retrieveTgzFromUrl.
     if inputDir.startswith("http") or inputDir.startswith("file"):
         stillToRetrieve = False
@@ -291,9 +291,9 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
     # Commented out the next lines for NRG-CING but not certain this will work for all uses of this script.
 #    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
 #        pathInsert = '/%s' % entryId
-    if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
-        entryCodeChar2and3 = entryId[1:3]
-        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
+#    if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
+##        entryCodeChar2and3 = entryId[1:3]
+#        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
 
     if url.startswith('file:/'):
         pathSource = url.replace('file:/', '')

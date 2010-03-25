@@ -907,12 +907,12 @@ class Ccpn:
                     pass
 
 
-            if ccpnPeakLoL and (not ccpnShiftLoL):
-                NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
-
             if not ccpnShiftLoL:
 #                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
                 ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
+
+            if ccpnPeakLoL and (not ccpnShiftLoL):
+                NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
 #            NTdebug("Shift lists %r" % ccpnShiftLoL)
 

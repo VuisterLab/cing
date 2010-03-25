@@ -34,7 +34,7 @@ from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
 from cing.Libs.fpconst import isNaN
-from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import NaN #@UnusedImport not really but pydev flags it because of pylab wild imports
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
@@ -46,13 +46,10 @@ from cing.core.database import AtomDef
 from cing.core.database import translateAtomName
 from database import NTdb
 from math import acos
-from numpy.ma.core import multiply
-from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
-#from pylab import * #@UnusedWildImport # otherwise use this line.
+#from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
+from pylab import * #@UnusedWildImport # otherwise use this line.
 from parameters   import plotParameters
-import math
 import os
-import sys
 
 #==============================================================================
 # Global variables

@@ -2,8 +2,8 @@
 from cing import cingDirScripts
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 import cing
 import os
 
@@ -23,11 +23,11 @@ entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
 #inputDir              = '/Users/jd/wattosTestingPlatform/nozip/data/structures/all/pdb'
 #inputDir = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
 
-inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
+inputDirCASD_NMR = 'file:///Users/jd/%s/dataDivided' % CASD_NMR_BASE_NAME
 #inputDir = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
 outputDir = startDir
 
-extraArgList = (inputDirCASD_NMR, outputDir, '.', '.', ARCHIVE_TYPE_BY_ENTRY, PROJECT_TYPE_CCPN)
+extraArgList = (inputDirCASD_NMR, outputDir, '.', '.', ARCHIVE_TYPE_BY_CH23_BY_ENTRY, PROJECT_TYPE_CCPN)
 
 # disable next line for regular run.
 #writeEntryListToFile(entryListFileName, ['1brv'])
@@ -40,6 +40,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 10,
+                    MAX_ENTRIES_TODO = 1,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
