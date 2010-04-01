@@ -28,22 +28,27 @@ python -u $CINGROOT/python/cing/NRG/eNmrCing.py
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs import forkoff
+from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import Lister
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import readLinesFromFile
 from cing.Libs.NTutils import symlink
 from cing.Libs.forkoff import get_cmd_output
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import CASD_NMR_BASE_NAME
+from cing.NRG.CasdNmrMassageCcpnProject import baseDir
+from glob import glob
 import cing
 import csv
 import os
 import shutil
 import string
 import time
-import urllib
 
 
 class MyDict(Lister):
@@ -148,41 +153,9 @@ class casdNmrCing(Lister):
         ## List of 'new' entries for which hits were found
         self.new_hits_entry_list = []
         self.done_entry_list = []
-
-    """ Returns zero for failure
-    """
-    def get_bmrb_links(self):
-        url_many2one = self.url_csv_file_link_base + "/score_many2one.csv"
-        url_one2many = self.url_csv_file_link_base + "/score_one2many.csv"
-
-        for url_links in (url_many2one, url_one2many):
-            try:
-                resource = urllib.urlopen(url_links)
-                reader = csv.reader(resource)
-            except IOError:
-                NTerror("couldn't open url for reader: " + url_links)
-                return 0
-
-            try:
-                _header_read = reader.next()
-#                NTdebug("read header: %s" % header_read)
-                for row in reader:
-                    bmrb_code = row[0]
-                    pdb_code = row[1]
-                    if (url_links == url_many2one):
-                        self.matches_many2one[ pdb_code ] = bmrb_code
-                    else:
-                        self.matches_one2many[     bmrb_code ] = pdb_code
-                        self.matches_one2many_inv[ pdb_code  ] = bmrb_code
-            # Never know when the connection is finally empty.
-            except IOError:
-                pass
-
-            if url_links == url_many2one:
-                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
-            else:
-                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
-        return 1
+        self.entry_list_all = []
+        self.entry_anno_list_all = []
+        self.timeTakenDict = NTdict()
 
 
     """
@@ -227,6 +200,131 @@ class casdNmrCing(Lister):
                 if os.path.exists(indexFileEntry):
                     entry_list_done.append(entry_code)
         return (entry_list_tried, entry_list_done)
+
+
+    def getCingAnnoEntryInfo(self):
+        """Returns True for error
+        Checks the completeness and errors from annotation.
+        """
+
+        NTmessage("Get the entries tried, todo, crashed, and stopped from file system.")
+
+        self.entry_anno_list_obsolete = NTlist()
+        self.entry_anno_list_tried = NTlist()
+        self.entry_anno_list_crashed = NTlist()
+        self.entry_anno_list_stopped = NTlist() # mutely exclusive from entry_list_crashed
+        self.entry_anno_list_done = NTlist()
+        self.entry_anno_list_todo = NTlist()
+
+        cwdCache = os.getcwd()
+        os.chdir(baseDir)
+        subDirList = os.listdir('data')
+        for subDir in subDirList:
+            if len(subDir) != 2:
+                if subDir != ".DS_Store":
+                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                continue
+            entryList = os.listdir(os.path.join('data', subDir))
+            for entryDir in entryList:
+                entry_code = entryDir
+                if entry_code.startswith( "."):
+#                    NTdebug('Skipping hidden file: [' + entry_code + ']')
+                    continue
+                if entry_code.endswith( "Org") or entry_code.endswith( "Test"):
+#                    NTdebug('Skipping original entry: [' + entry_code + ']')
+                    continue
+                entrySubDir = os.path.join('data', subDir, entry_code)
+#                if not entry_code in self.entry_list_nrg_docr:
+#                    NTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
+#                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
+#                        rmdir(entrySubDir)
+#                        self.entry_list_obsolete.append(entry_code)
+#                    else:
+#                        NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s" % (
+#                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                # end if
+
+#                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
+#                if not os.path.exists(cingDirEntry):
+#                    NTmessage("Failed to find directory: %s" % cingDirEntry)
+#                    continue
+
+                # Look for last log file
+                logList = glob(entrySubDir + '/log_doAnno*/*.log')
+                if not logList:
+                    NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
+                    continue
+                # .cing directory and .log file present so it was tried to start but might not have finished
+                self.entry_anno_list_tried.append(entry_code)
+
+                logLastFile = logList[-1]
+#                NTdebug("Found logLastFile %s" % logLastFile)
+#                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
+#                text = readTextFromFile(logLastFile)
+                entryCrashed = False
+                for r in AwkLike(logLastFile):
+                    line = r.dollar[0]
+                    if line.startswith('CING took       :'):
+#                        NTdebug("Matched line: %s" % line)
+                        timeTakenStr = r.dollar[r.NF - 1]
+                        self.timeTakenDict[entry_code] = float(timeTakenStr)
+#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+                    if line.startswith('Traceback (most recent call last)'):
+#                        NTdebug("Matched line: %s" % line)
+                        if entry_code in self.entry_anno_list_crashed:
+                            NTwarning("%s was already found before; not adding again." % entry_code)
+                        else:
+                            self.entry_anno_list_crashed.append(entry_code)
+                            entryCrashed = True
+                    if line.count('Aborting'):
+                        NTdebug("Matched line: %s" % line)
+                        entryCrashed = True
+                        if entry_code in self.entry_anno_list_crashed:
+                            NTwarning("%s was already found before; not adding again." % entry_code)
+                        else:
+                            self.entry_anno_list_crashed.append(entry_code)
+                if entryCrashed:
+                    continue # don't mark it as stopped anymore.
+
+                # end for AwkLike
+                if not self.timeTakenDict.has_key(entry_code):
+                    # was stopped by time out or by user or by system (any other type of stop but stack trace)
+                    NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
+                    self.entry_anno_list_stopped.append(entry_code)
+                    continue
+
+                # Look for end statement from CING which shows it wasn't killed before it finished.
+                ccpnFileEntry = os.path.join(entrySubDir, "%s.tgz"%entry_code)
+                if not os.path.exists(ccpnFileEntry):
+                    NTmessage("%s Since ccpn file %s was not found assumed to have stopped" % (entry_code, ccpnFileEntry))
+                    self.entry_anno_list_stopped.append(entry_code)
+                    continue
+
+                self.entry_anno_list_done.append(entry_code)
+            # end for entryDir
+        # end for subDir
+        timeTakenList = NTlist() # local variable.
+        timeTakenList.addList(self.timeTakenDict.values())
+        NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
+
+        if not self.entry_anno_list_tried:
+            NTerror("Failed to find entries that CING tried.")
+
+        self.entry_anno_list_todo.addList(self.entry_anno_list_all)
+        self.entry_anno_list_todo = self.entry_anno_list_todo.difference(self.entry_anno_list_done)
+
+        NTmessage("Found %s entries overall for annotation." % len(self.entry_anno_list_all))
+        NTmessage("Found %s entries that CING tried (T)." % len(self.entry_anno_list_tried))
+        NTmessage("Found %s entries that CING crashed/failed (C)." % len(self.entry_anno_list_crashed))
+        NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_anno_list_stopped))
+        if not self.entry_anno_list_done:
+            NTerror("Failed to find entries that CING did.")
+        NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_anno_list_done))
+        NTmessage("Found %s entries todo (A-B)." % len(self.entry_anno_list_todo))
+        NTmessage("Found %s entries obsolete (not removed yet)." % len(self.entry_anno_list_obsolete))
+        NTmessage("Found entries todo:\n%s" % self.entry_anno_list_todo)
+        os.chdir(cwdCache)
+    # end def
 
     """
     Set the list of matched entries and the dictionary holding the
@@ -510,11 +608,13 @@ class casdNmrCing(Lister):
         shutil.copy(headerBgFile, indexDir)
         return 1
 
-    def update(self, new_hits_entry_list=None):
-        if not m.get_bmrb_links():
-            NTerror("can't get bmrb links")
-            os._exit(1)
+    def update(self, new_hits_entry_list=None,doCheckAnnotation=False):
+        entryListFileName = os.path.join(baseDir, 'list', 'entry_list_all.csv')
+        self.entry_anno_list_all = NTlist()
+        self.entry_anno_list_all.addList( readLinesFromFile(entryListFileName, doStrip=True))
 
+        if doCheckAnnotation:
+            self.getCingAnnoEntryInfo()
         ## Searches and matches
         if new_hits_entry_list:
             m.new_hits_entry_list = new_hits_entry_list
@@ -539,9 +639,10 @@ if __name__ == '__main__':
     processors = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = True
     updateIndices = True
+    doCheckAnnotation = True # default is False
     isProduction = True
     new_hits_entry_list = [] # define empty for checking new ones.
-    new_hits_entry_list = ['ET109AoxFrankfurt']
+#    new_hits_entry_list = ['ET109AoxFrankfurt']
 #    new_hits_entry_list = ['atT13']
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
@@ -549,5 +650,5 @@ if __name__ == '__main__':
     m = casdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
-    m.update(new_hits_entry_list)
+    m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)
     NTmessage("Finished creating the CASD-NMR CING indices")

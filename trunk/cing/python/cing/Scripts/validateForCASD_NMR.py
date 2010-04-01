@@ -1,9 +1,10 @@
 # python -u $CINGROOT/python/cing/Scripts/validateForENmrWorkshop.py
 from cing import cingDirScripts
 from cing.NRG import CASD_NMR_BASE_NAME
+from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
+from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 import cing
 import os
 
@@ -15,7 +16,7 @@ startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName = os.path.join(startDir, 'entry_list_108d.csv')
 #entryListFileName = os.path.join(startDir, 'list', 'entry_list.csv')
-entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
+entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList.csv')
 #entryListFileName = os.path.join('/Users/jd', 'entryCodeList-Oceans14.csv')
 
@@ -30,7 +31,7 @@ outputDir = startDir
 extraArgList = (inputDirCASD_NMR, outputDir, '.', '.', ARCHIVE_TYPE_BY_CH23_BY_ENTRY, PROJECT_TYPE_CCPN)
 
 # disable next line for regular run.
-#writeEntryListToFile(entryListFileName, ['1brv'])
+writeEntryListToFile(entryListFileName, ['NeR103AParis'])
 
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,

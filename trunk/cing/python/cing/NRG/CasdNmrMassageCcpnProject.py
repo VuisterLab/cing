@@ -10,22 +10,19 @@ if the input project is in cwd.
 
 Most functionality is hard-coded here so be careful reading the actual code.
 """
-from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
-from cing import verbosityDebug
+
 from cing.Libs.DBMS import DBMS
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.disk import copy
+from cing.Libs.disk import globMultiplePatterns
+from cing.Libs.disk import mkdirs
 from cing.NRG import CASD_NMR_BASE_NAME
-from cing.Scripts.FC.convertCyana2Ccpn import importCyanaRestraints
-from cing.core.classes import Project
-from glob import glob
+from cing.NRG.PDBEntryLists import writeEntryListToFile
+from cing.core.constants import CYANA
+from cing.core.constants import PDB
+from cing.core.constants import XPLOR
 from glob import glob1
-from matplotlib.cbook import mkdirs
-from memops.general.Io import loadProject
-from memops.general.Io import saveProject
-#import Tkinter
 import cing
 import os
 import tarfile
@@ -35,30 +32,11 @@ __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
 baseDir = '/Users/jd/CASD-NMR-CING'
 #dataOrgDir = os.path.join(baseDir, 'data')
-dataDividedDir = os.path.join(baseDir, 'dataDivided')
+dataDir = os.path.join(baseDir, 'data')
 startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
 
-def getCASD_NMR_DBMS():
-    csvFileDir = os.path.join(baseDir, 'Overview')
-    relationNames = glob1(csvFileDir, "*.csv")
-    relationNames = [ relationName[:-4] for relationName in relationNames]
-    dbms = DBMS()
-    dbms.readCsvRelationList(relationNames, csvFileDir)
-    return dbms
-
-dbms = getCASD_NMR_DBMS()
-sheetName = 'Overview1'
-participantTable = dbms.tables['%s-Participant' % sheetName]
-participationTable = dbms.tables['%s-Participation' % sheetName]
-targetTable = dbms.tables['%s-Target' % sheetName]
-cityList = participantTable.columnOrder[1:]
-#    cityList = [ 'Cheshire', 'Frankfurt', 'Lyon', 'Paris', 'Piscataway', 'Seattle', 'Utrecht' ]
-entryList = targetTable.getColumnByIdx(0)
-    #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
-    #    entryList = readLinesFromFile(entryListFileName) #@UnusedVariable
-
-def convertToBoolean(t):
-    """check if there is an x for each and creates a boolean Hash by row and Hash by column"""
+def convertToProgram(t):
+    """check if there is an x for each and creates a string Hash by row and Hash by column"""
 
     # Assumes first column has the row labels. This is called a header column in Numbers.
     rowLabelList = t.getColumnByIdx(0)
@@ -72,10 +50,79 @@ def convertToBoolean(t):
             if c == 0:
                 continue
             column = t.attr[columnLabel]
-            value = column[r]
-            valueBoolean = value != ''
-            resultRow[columnLabel] = valueBoolean
+            value = column[r].lower()
+
+            valueEnumerated = None
+            if value == 'c':
+                valueEnumerated = CYANA
+            if value == 'x':
+                valueEnumerated = XPLOR
+            if value == 'p':
+                valueEnumerated = PDB
+
+            resultRow[columnLabel] = valueEnumerated
     return result
+
+
+def getCASD_NMR_DBMS():
+    csvFileDir = os.path.join(baseDir, 'Overview')
+    relationNames = glob1(csvFileDir, "*.csv")
+    relationNames = [ relationName[:-4] for relationName in relationNames]
+    dbms = DBMS()
+    dbms.readCsvRelationList(relationNames, csvFileDir)
+    return dbms
+
+def createLayOutArchive():
+    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
+    os.chdir(inputDir)
+    for entryCode in entryList[:]:
+#    for entryCode in entryList[0:1]:
+        ch23 = entryCode[1:3]
+        for city in cityList:
+            entryCodeNew = entryCode + city
+            entryDir = os.path.join(ch23, entryCodeNew)
+            mkdirs(entryDir)
+
+def copyFromCasdNmr2CcpnArchive():
+    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
+    programHoH = convertToProgram(participationTable)
+    os.chdir(inputDir)
+    for entryCode in entryList:
+#    for entryCode in entryList[0:1]:
+        ch23 = entryCode[1:3]
+        for city in cityList:
+#        for city in cityList[0:1]:
+            entryCodeNew = entryCode + city
+            programId = getDeepByKeys(programHoH, entryCode, city)
+            if not (city == 'Test' or programId):
+#                NTdebug("Skipping %s" % entryCodeNew)
+                continue
+#            else:
+#                NTdebug("Looking at %s" % entryCodeNew)
+#                continue # TODO disable premature stop.
+
+            NTmessage("Working on: %s" % entryCodeNew)
+
+            inputEntryDir = os.path.join(inputDir, ch23, entryCodeNew)
+            outputEntryDir = os.path.join(dataDir, ch23, entryCodeNew)
+            inputAuthorDir = os.path.join(outputEntryDir, 'Author')
+            outputNijmegenDir = os.path.join(outputEntryDir, 'Nijmegen')
+
+            if not os.path.exists(inputAuthorDir):
+                mkdirs(inputAuthorDir)
+            if not os.path.exists(outputNijmegenDir):
+                mkdirs(outputNijmegenDir)
+            # prevent junk
+            patternList = "*.pdb *.upl *.aco *.tbl".split()
+            fnList = globMultiplePatterns(inputEntryDir, patternList)
+            for fn in fnList:
+                orgFn = os.path.join(inputEntryDir, fn)
+#                NTmessage("Copying from %s" % fn)
+#                fnBaseName = os.path.basename(fn)
+                dstFn = os.path.join(inputAuthorDir, fn)
+                NTmessage("Copying from %s to %s" % (orgFn, dstFn))
+                copy(orgFn, dstFn)
+
 
 def redoLayOutArchiveWim():
     inputDir = '/Users/jd/Downloads/casdNmrCcpn'
@@ -83,9 +130,9 @@ def redoLayOutArchiveWim():
     for entryCode in entryList[:]:
 #    for entryCode in entryList[0:1]:
         ch23 = entryCode[1:3]
-        entryCodeNew = entryCode+"Org"
-        entryDir = os.path.join(dataDividedDir,ch23,entryCodeNew)
-        tarPath = os.path.join(entryDir,entryCodeNew+".tgz")
+        entryCodeNew = entryCode + "Org"
+        entryDir = os.path.join(dataDir, ch23, entryCodeNew)
+        tarPath = os.path.join(entryDir, entryCodeNew + ".tgz")
 #        NTmessage("Tarring from %s to %s" % (entryCodeNew,tarPath))
         NTmessage("Creating %s" % tarPath)
         if not os.path.exists(entryDir):
@@ -93,137 +140,45 @@ def redoLayOutArchiveWim():
         if not os.path.exists(entryCodeNew):
             os.rename(entryCode, entryCodeNew)
         myTar = tarfile.open(tarPath, mode='w:gz') # overwrites
-        myTar.add( entryCodeNew )
+        myTar.add(entryCodeNew)
         myTar.close()
 
-def massageLoop():
-#    guiRoot = Tkinter.Tk()
-    guiRoot = None
+def getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList):
+    result = {}
+    for entry in entryList:
+        for city in cityList:
+            entryNew = entry + city
+            result[entryNew] = (entry, city)
+    return result
 
-    NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
-
-    isParticipatingHoH = convertToBoolean(participationTable)
-    maxCities = 10
-    maxEntries = 10
-    # Adjust the parameters below!
-    doAll = False # do full list or just some.
-    unpackOrgCcpnProject = True
-    startFromNewCcpnProject = False
-    replaceStructureEnsemble = True # From all *.pdb files in inputDir.
-    addRestraints = True
-#    swapCheck = True
-    doSaveProject = True
-    doExport = True
-
-    print 'doAll                           ', doAll
-    print 'unpackOrgCcpnProject            ', unpackOrgCcpnProject
-    print 'startFromNewCcpnProject         ', startFromNewCcpnProject
-    print 'replaceStructureEnsemble        ', replaceStructureEnsemble
-    print 'addRestraints                   ', addRestraints
-    print 'doSaveProject                   ', doSaveProject
-    print 'doExport                        ', doExport
-
-    if not doAll: # Disable for doing all.
-#        entryList = ['ET109Aox']
-#        maxEntries = min(maxEntries, len(entryList))
-    #    cityList = [ 'Cheshire', 'Frankfurt', 'Lyon', 'Paris', 'Piscataway', 'Seattle', 'Utrecht' ]
-        cityList = [ 'Frankfurt']
-        maxCities = min(maxCities, len(cityList))
-
-    for entryCode in entryList[0:maxEntries]:
-        ch23 = entryCode[1:3]
-        entryCodeOrg = entryCode + 'Org'
-        dataOrgEntryDir = os.path.join(dataDividedDir, ch23, entryCodeOrg)
-        ccpnFile = os.path.join(dataOrgEntryDir, entryCodeOrg + ".tgz")
-        for city in cityList[0:maxCities]:
-            entryCodeNew = entryCode + city
-            if not isParticipatingHoH[entryCode][city]:
-#                NTdebug("Skipping %s" % entryCodeNew)
-                continue
-            else:
-                NTdebug("Looking at %s" % entryCodeNew)
-#                continue # TODO disable premature stop.
-
-            dataDividedXDir = os.path.join(dataDividedDir, ch23)
-            entryDir = os.path.join(dataDividedXDir, entryCodeNew )
-            inputAuthorDir = os.path.join(entryDir, 'Author')
-            outputNijmegenDir = os.path.join(entryDir, 'Nijmegen')
-
-            if not os.path.exists(inputAuthorDir):
-                mkdirs(inputAuthorDir)
-            if not os.path.exists(outputNijmegenDir):
-                mkdirs(outputNijmegenDir)
-
-            os.chdir(outputNijmegenDir)
-
-            if unpackOrgCcpnProject:
-                # By reading the ccpn tgz into cing it is also untarred/tested.
-                project = Project.open(entryCodeOrg, status='new')
-                project.initCcpn(ccpnFolder=ccpnFile, modelCount=1)
-                project.removeFromDisk()
-                project.close(save=False)
-
-            if startFromNewCcpnProject:
-                ccpnProject = loadProject(entryCodeNew)
-            else:
-                ccpnProject = loadProject(entryCodeOrg)
-
-            nmrProject = ccpnProject.currentNmrProject
-            ccpnMolSystem = ccpnProject.findFirstMolSystem()
-            NTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
-        #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
-
-            if replaceStructureEnsemble:
-                structureEnsemble = ccpnProject.findFirstStructureEnsemble()
-                if structureEnsemble:
-                    NTmessage("Removing first found structureEnsemble")
-                    structureEnsemble.delete()
-                else:
-                    NTwarning("No structureEnsemble found; can't remove it.")
-
-                structureGeneration = nmrProject.newStructureGeneration()
-                globPattern = inputAuthorDir + '/*.pdb'
-                pdbFileList = glob(globPattern)
-                if not pdbFileList:
-                    NTerror("Skipping because there is no PDB file in: " + os.getcwd())
-                else:
-                    NTdebug("From %s will read files: %s" % (globPattern, pdbFileList))
-                    format = PseudoPdbFormat(ccpnProject, guiRoot, verbose=0)
-                    format.readCoordinates(pdbFileList, strucGen=structureGeneration, minimalPrompts=1, linkAtoms=0)
-
-            if addRestraints:
-                if hasCyanaRestraints(inputAuthorDir):
-                    importCyanaRestraints(ccpnProject, inputAuthorDir, guiRoot)
-
-            NTmessage('saving to new path if all checks are valid')
-            # the newPath basename will be taken according to ccpn code doc.
-            if doSaveProject:
-                saveProject(ccpnProject, checkValid=True, newPath=entryCodeNew, removeExisting=True)
-            if doExport:
-                tarPath = os.path.join(entryDir, entryCodeNew + ".tgz")
-                if os.path.exists(tarPath):
-                    NTmessage("Overwriting: " + tarPath)
-                myTar = tarfile.open(tarPath, mode='w:gz') # overwrites
-                myTar.add( entryCodeNew )
-                myTar.close()
-        # end for city
-    # end for entry
-    if guiRoot != None:
-        guiRoot.destroy()
+def createTodoList(entryList, cityList, programHoH):
+    entryListFileName = os.path.join(baseDir, 'list', 'entry_list_todo.csv')
+    newEntryList = []
+    for entry in entryList:
+        for city in cityList:
+            entryNew = entry + city
+            programId = getDeepByKeys(programHoH, entry, city)
+            if programId:
+                newEntryList.append(entryNew)
+    writeEntryListToFile(entryListFileName, newEntryList)
 # end def
 
-def hasCyanaRestraints(inputDir):
-    globPattern = inputDir + '/*.upl'
-    fileList = glob(globPattern)
-    if fileList:
-        return True
-
-    globPattern = inputDir + '/*.aco'
-    fileList = glob(globPattern)
-    if fileList:
-        return True
+dbms = getCASD_NMR_DBMS()
+sheetName = 'Overview1'
+participantTable = dbms.tables['%s-Participant' % sheetName]
+participationTable = dbms.tables['%s-Participation' % sheetName]
+targetTable = dbms.tables['%s-Target' % sheetName]
+cityList = participantTable.columnOrder[1:]
+entryList = targetTable.getColumnByIdx(0)
+programHoH = convertToProgram(participationTable)
+mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
+#NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+#print mapEntrycodeNew2EntrycodeAndCity
 
 if __name__ == '__main__':
-    cing.verbosity = verbosityDebug
-    massageLoop()
+    cing.verbosity = cing.verbosityDebug
+#    createTodoList(entryList, cityList,programHoH)
+#    createLayOutArchive()
+#    copyFromCasdNmr2CcpnArchive()
+#    annotateLoop()
 #    redoLayOutArchiveWim()

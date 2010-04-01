@@ -11,6 +11,7 @@ from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.Scripts.FC.convertCyana2Ccpn import printSequenceFromCcpnProject
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC
@@ -59,7 +60,6 @@ class AllChecks(TestCase):
             doWhatif = False
             doProcheck = False
             doWattos = False
-
         if redoFromCingProject:
             useNrgArchive = False
             doWhatif = False
@@ -99,7 +99,11 @@ class AllChecks(TestCase):
                     if residue.resNum not in residueOfInterest:
     #                    NTmessage("Removing residue of no interest")
                         project.molecule.A.removeResidue(residue)
-            self.assertFalse(project.validate(htmlOnly = htmlOnly,
+            if False:
+                ccpnProject = project.ccpn
+                printSequenceFromCcpnProject(ccpnProject)
+            if True:
+                self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               ranges=ranges,
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,

@@ -65,29 +65,6 @@ def convert(projectName, inputDir, projectNameNew):
     ccpnPathNew = os.path.join(inputDir, projectNameNew)
     saveProject(ccpnProject, checkValid=True, newPath=ccpnPathNew, removeExisting=True)
 
-
-
-def swapCheck(projectName, inputDir, projectNameNew ):
-
-    ccpnPath = os.path.join(inputDir, projectName)
-    ccpnProject = loadProject(ccpnPath)
-
-    ccpnMolSystem = ccpnProject.findFirstMolSystem()
-    NTmessage(  'found ccpnMolSystem: %s' % ccpnMolSystem )
-
-    if False:
-        from pdbe.adatah.Constraints import ConstraintsHandler
-        ch = ConstraintsHandler()
-        ncs = ccpnProject.findFirstNmrConstraintStore()
-        se = ccpnProject.findFirstStructureEnsemble()
-        ch.swapCheck(ncs,se,2)
-
-
-    NTmessage( 'saving to new path if all checks are valid' )
-    # the newPath basename will be taken according to ccpn code doc.
-    ccpnPathNew = os.path.join(inputDir, projectNameNew)
-    saveProject(ccpnProject, checkValid=True, newPath=ccpnPathNew, removeExisting=True)
-
 def getCASD_NMR_Overview1():
     startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
@@ -191,8 +168,6 @@ def processInputAndRun(): # TODO fix this code if usable.
     print "inputDir: %s" % inputDir
     print "outputDir: %s" % outputDir
 
-    if False:
-        swapCheck(projectName, inputDir)
     if False:
         convert(projectName, inputDir, projectNameNew )
 

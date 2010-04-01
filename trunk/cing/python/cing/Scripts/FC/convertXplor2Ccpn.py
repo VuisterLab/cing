@@ -10,7 +10,9 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.forkoff import do_cmd
+from cing.Scripts.FC.convertCyana2Ccpn import importPseudoPdb
 from glob import glob
 from memops.api import Implementation
 import Tkinter
@@ -60,61 +62,71 @@ def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
 
     project = Implementation.MemopsRoot(name = projectName)
 
-    nmrProject = project.newNmrProject(name = project.name)
-    structureGeneration = nmrProject.newStructureGeneration()
     guiRoot = Tkinter.Tk() #  headless possible?
-    format = CnsFormat(project, guiRoot, verbose = 1)
-
-    globPattern = inputDir + '/*.pdb'
-    fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern,fileList))
-    format.readCoordinates(fileList, strucGen = structureGeneration, minimalPrompts = 1, linkAtoms = 0)
-
-    ccpnConstraintListOfList = []
-
-    globPattern = inputDir + '/*_noe.tbl'
-    fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern,fileList))
-    if fileList:
-        ccpnConstraintList = format.readDistanceConstraints(fileList[0])
-        ccpnConstraintListOfList.append( ccpnConstraintList )
-
-    globPattern = inputDir + '/*_hbond.tbl'
-    fileList = glob(globPattern)
-    NTdebug("From %s will read in files: %s" % (globPattern,fileList))
-    if fileList:
-        ccpnConstraintList = format.readDistanceConstraints(fileList[0])
-        ccpnConstraintListOfList.append( ccpnConstraintList )
-
-    globPattern = inputDir + '/*_dihe.tbl'
-    fileList = glob(globPattern)
-    NTdebug("From %s will read in total files: %s" % (globPattern,fileList))
-    if fileList:
-        ccpnConstraintList = format.readDihedralConstraints(fileList[0])
-        ccpnConstraintListOfList.append( ccpnConstraintList )
-
-  # Many options are available - see ccpnmr.format.process.linkResonances
-  #
-  # The current options are the 'safest' to maintain the original information,
-  # although bear in mind that here all atoms in the original list are
-  # considered to be stereospecifically assigned
-  #
-    for ccpnConstraintList in ( ccpnConstraintListOfList ):
-        nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
-        structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
-        format.linkResonances(
-                      forceDefaultChainMapping = 1,
-                      globalStereoAssign = 1,
-                      setSingleProchiral = 1,
-                      setSinglePossEquiv = 1,
-                      strucGen = structureGeneration
-                      )
-
+    importXplorCoordinatesAndRestraints(project, inputDir, guiRoot, allowPopups=0, minimalPrompts=1, verbose=0)
     project.saveModified()
     tgzFileName = "../"+projectName + ".tgz"
     cmd = "tar -czf %s %s" % (tgzFileName, projectName)
     do_cmd(cmd)
     guiRoot.destroy()
+
+
+def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
+    NTdebug("Using presets %s" % `presets`)
+
+    if replaceCoordinates:
+        status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+        if status:
+            NTerror("Failed importCyanaCoordinatesAndRestraints")
+            return True
+
+    if not replaceRestraints:
+        return
+
+    formatCns = CnsFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
+    ccpnConstraintListOfList = []
+    globPattern = inputDir + '/*_noe.tbl'
+    fileList = glob(globPattern)
+    NTdebug("From %s will read files: %s" % (globPattern,fileList))
+    for fn in fileList:
+        fnBaseName = os.path.basename(fn).split('.')[0]
+        ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
+        ccpnConstraintList.setName(fnBaseName)
+        ccpnConstraintListOfList.append( ccpnConstraintList )
+
+    globPattern = inputDir + '/*_hbond.tbl'
+    fileList = glob(globPattern)
+    NTdebug("From %s will read in files: %s" % (globPattern,fileList))
+    for fn in fileList:
+        fnBaseName = os.path.basename(fn).split('.')[0]
+        ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
+        ccpnConstraintList.setName(fnBaseName)
+        ccpnConstraintListOfList.append( ccpnConstraintList )
+
+    globPattern = inputDir + '/*_dihe.tbl'
+    fileList = glob(globPattern)
+    NTdebug("From %s will read in total files: %s" % (globPattern,fileList))
+    for fn in fileList:
+        fnBaseName = os.path.basename(fn).split('.')[0]
+        ccpnConstraintList = formatCns.readDihedralConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
+        ccpnConstraintList.setName(fnBaseName)
+        ccpnConstraintListOfList.append( ccpnConstraintList )
+
+
+    ccpnConstraintList = getDeepByKeys( ccpnConstraintListOfList, 0) # no need to repeat
+    NTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
+    if ccpnConstraintList != None:
+#    for i, ccpnConstraintList in enumerate(ccpnConstraintListOfList):
+        NTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
+        nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
+        structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
+        formatCns.linkResonances(
+                      forceDefaultChainMapping = 1,
+                      globalStereoAssign = 1,
+                      setSingleProchiral = 1,
+                      setSinglePossEquiv = 1,
+                      strucGen = structureGeneration,
+                      allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose )
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
