@@ -3,9 +3,9 @@
 # python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py 1brv \
 # file:///Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN
 # or:
-# cd /Library/WebServer/Documents/CASD-NMR-CING/data/tT/atT13Org
-# python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py atT13Org \
-# file:///Users/jd/CASD-NMR-CING/data /Library/WebServer/Documents/CASD-NMR-CING . . BY_ENTRY CCPN
+# cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ACheshire
+# python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py NeR103ACheshire \
+#     file:///Users/jd/CASD-NMR-CING/dataDivided /Library/WebServer/Documents/CASD-NMR-CING . . BY_CH23_BY_ENTRY CCPN
 # or:
 # cd /Library/WebServer/Documents/PDB-CING/data/as/2as0
 # python -u /Users/jd/workspace35/cingStable/python/cing/Scripts/validateEntry.py 2as0  \

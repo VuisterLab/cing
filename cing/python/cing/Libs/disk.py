@@ -1,6 +1,7 @@
 # YASARA BioTools
 # Visit www.yasara.org for more...
 # Copyright by Elmar Krieger
+from glob import glob1
 from optparse import OptionParser
 from string import digits
 import fnmatch
@@ -43,18 +44,18 @@ def abspath(path):
 def copy(srcfilename,dstfilename,timespreserved=1,mod=None):
     """Throws an exception on some  failures and returns True
     on other. If all went fine it will return the default None
-    """ 
+    """
     if timespreserved:
         # copy2 CAN FAIL ON FAT PARTITIONS
-        try: 
+        try:
             shutil.copy2(srcfilename,dstfilename)
         except: timespreserved=0
     if not timespreserved:
         try:
             shutil.copy(srcfilename,dstfilename)
-        except: 
+        except:
             shutil.copyfile(srcfilename,dstfilename)
-    if mod != None: 
+    if mod != None:
         chmod(dstfilename,mod)
     # Whatever above, if the target is absent now the copy failed.
     if not os.path.exists(dstfilename):
@@ -235,7 +236,7 @@ def recursivedirlist(path):
                     pathlist=pathlist+subdirlist
     pathlist.sort()
     return(pathlist)
- 
+
 # DELETE A FILE
 # =============
 def remove(filename):
@@ -380,7 +381,7 @@ class Tailer(object):
         self.start_pos = self.file.tell()
         if end:
             self.seek_end()
-    
+
     def splitlines(self, data):
         return re.split('|'.join(self.line_terminators), data)
 
@@ -412,7 +413,7 @@ class Tailer(object):
             # The first charachter is a line terminator, don't count this one
             start += 1
 
-        while bytes_read > 0:          
+        while bytes_read > 0:
             # Scan forwards, counting the newlines in this bufferfull
             i = start
             while i < bytes_read:
@@ -454,7 +455,7 @@ class Tailer(object):
                 # found crlf
                 bytes_read -= 1
 
-        while bytes_read > 0:          
+        while bytes_read > 0:
             # Scan backward, counting the newlines in this bufferfull
             i = bytes_read - 1
             while i >= 0:
@@ -474,7 +475,7 @@ class Tailer(object):
             bytes_read, read_str = self.read(self.read_size)
 
         return None
-  
+
     def tail(self, lines=10):
         """\
         Return the last lines of the file.
@@ -491,7 +492,7 @@ class Tailer(object):
             return self.splitlines(data)
         else:
             return []
-               
+
     def head(self, lines=10):
         """\
         Return the top lines of the file.
@@ -501,9 +502,9 @@ class Tailer(object):
         for _i in xrange(lines):
             if not self.seek_line_forward():
                 break
-    
+
         end_pos = self.file.tell()
-        
+
         self.seek(0)
         data = self.file.read(end_pos - 1)
 
@@ -518,12 +519,12 @@ class Tailer(object):
 
         Based on: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/157035
         """
-        trailing = True       
-        
+        trailing = True
+
         while 1:
             where = self.file.tell()
             line = self.file.readline()
-            if line:    
+            if line:
                 if trailing and line in self.line_terminators:
                     # This is just the line terminator added to the end of the file
                     # before a new line, ignore.
@@ -614,7 +615,7 @@ def _main(filepath, options):
                     lines = tailer.head(options.lines)
                 else:
                     lines = tailer.tail(options.lines)
-        
+
                 for line in lines:
                     print line
             elif options.follow:
@@ -634,21 +635,21 @@ def _main(filepath, options):
         parser = OptionParser(usage='usage: %prog [options] filename')
         parser.add_option('-f', '--follow', dest='follow', default=False, action='store_true',
                           help='output appended data as  the  file  grows')
-    
+
         parser.add_option('-n', '--lines', dest='lines', default=10, type='int',
                           help='output the last N lines, instead of the last 10')
-    
+
         parser.add_option('-t', '--top', dest='head', default=False, action='store_true',
                           help='output lines from the top instead of the bottom. Does not work with follow')
-    
+
         parser.add_option('-s', '--sleep-interval', dest='sleep', default=1.0, metavar='S', type='float',
                           help='with  -f,  sleep  for  approximately  S  seconds between iterations')
-    
+
         parser.add_option('', '--test', dest='test', default=False, action='store_true',
                           help='Run some basic tests')
-    
+
         (options, args) = parser.parse_args()
-    
+
         if options.test:
             _test()
         elif not len(args) == 1:
@@ -656,3 +657,31 @@ def _main(filepath, options):
             sys.exit(1)
         else:
             _main(args[0], options)
+
+
+def globMultiplePatterns(dirname, patternList):
+    """Uses glob1(dirname, pattern) multiple times"""
+    result = []
+    for pattern in patternList:
+        result += glob1(dirname, pattern)
+    return result
+
+
+# Stolen from macostools
+EEXIST  =   17  #File exists
+def mkdirs(dst):
+    """Make directories leading to 'dst' if they don't exist yet"""
+    if dst == '' or os.path.exists(dst):
+        return
+    head, tail = os.path.split(dst)
+    if os.sep == ':' and not ':' in head:
+        head = head + ':'
+    mkdirs(head)
+
+    try:
+        os.mkdir(dst, 0777)
+    except OSError, e:
+        # be happy if someone already created the path
+        if e.errno != EEXIST:
+            raise
+
