@@ -53,11 +53,7 @@ Offset should be -416 why doesn't it figure that out?
 'ET109AoxSeattle'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AoxUtrecht2' : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AredCheshire': {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
-'ET109AredParis'   : {'readCoordinates': {'keywds': {
-                                                     'forceDefaultChainMapping': 1,
-#     'forceChainMappings': [['A', 'A', 1, 0]], # The RDC frame coordinates are messing things up. Best if removed.
-
-    },},},
+'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},}, # The RDC frame coordinates are messing things up. Best if removed.
 'ET109AredSeattle' : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AredUtrecht2': {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'PGR122ACheshire'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},

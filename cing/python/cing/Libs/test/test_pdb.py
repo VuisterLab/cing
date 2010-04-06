@@ -5,7 +5,7 @@ python $CINGROOT/python/cing/Libs/test/test_pdb.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing.Scripts.FC.convertCyana2Ccpn import printSequenceFromPdbFile
+from cing.Scripts.utils import printSequenceFromPdbFile
 from cing.core.classes import Project
 from cing.core.constants import IUPAC
 from unittest import TestCase

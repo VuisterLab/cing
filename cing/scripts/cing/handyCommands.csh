@@ -8,28 +8,27 @@ foreach x ( $list )
     tar -czf $baseDir/data/$x/$x.tgz $x
 end
 
+# Sync ALL to production
 cd /Users/jd/CASD-NMR-CING
 tar -cvf dataTgz.tar data/*/*/*.tgz
 scp -P 39676 dataTgz.tar localhost-nmr:/Users/jd/CASD-NMR-CING
 
 cd /Users/jd/CASD-NMR-CING/data
 \ls -1l */*/log_doAnn*/*.log
-grep "Aborting" */*/log_doAnn*/*.log
 
-CGR26ACheshire
-CGR26AFrankfurt
-CGR26ALyon
-CGR26APiscataway
-CGR26ASeattle4
-CGR26ASeattle5
-CGR26AUtrecht2
-PGR122ACheshire
-PGR122APiscataway
-PGR122ASeattle4
-PGR122AUtrecht
-ET109AoxSeattle
-ET109AoxUtrecht2
-ET109AredCheshire
-ET109AredParis
-ET109AredSeattle
-ET109AredUtrecht2
+# Sync single entry to production: without the need to decompress on production.
+cd ~/CASD-NMR-CING
+set x = ET109AoxParis
+set ch23 = ( `echo $x | cut -c2-3` )
+set dirEntry = data/$ch23/$x
+scp -P 39676 $dirEntry/$x.tgz localhost-nmr:/Users/jd/CASD-NMR-CING/$dirEntry
+
+scp -r -P 39676 list Overview localhost-nmr:/Users/jd/CASD-NMR-CING
+
+
+cd $D/CASD-NMR-CING
+scp -r -P 39676 list  localhost-nmr:/Library/WebServer/Documents/CASD-NMR-CING
+
+# Check logs
+cd $D/CASD-NMR-CING
+grep ERROR */*/log_validateEntry/*.log

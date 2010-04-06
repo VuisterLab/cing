@@ -11,7 +11,7 @@ from cing import verbosityOutput
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
-from cing.Scripts.FC.convertCyana2Ccpn import printSequenceFromCcpnProject
+from cing.Scripts.FC.utils import printSequenceFromCcpnProject
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import IUPAC

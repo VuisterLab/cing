@@ -27,7 +27,7 @@ from matplotlib import pyplot
 from matplotlib.patches import Ellipse
 from matplotlib.patches import Patch
 from matplotlib.path import Path
-from matplotlib.pylab import * #@UnusedWildImport
+from matplotlib.pylab import * #@UnusedWildImport for such functions as amax, arange, multiply, mat, etc...
 
 try:
     import Image

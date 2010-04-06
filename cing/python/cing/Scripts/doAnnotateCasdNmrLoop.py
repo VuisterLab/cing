@@ -20,7 +20,7 @@ if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'ET109AredParis'.split()
+    entryList = 'NeR103AParis'.split()
     writeEntryListToFile(entryListFileName, entryList)
 extraArgList = ()
 
@@ -36,6 +36,11 @@ doScriptOnEntryList(pythonScriptFileName,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
 
+"""
+Alternatively to the strategy above use a simple loop that
+does not put the log files nicely into separate directories etc.
+NOT USED AFTER MOVED HERE.
+"""
 def annotateLoop():
     maxCities = 100
     maxEntries = 100
