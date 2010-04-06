@@ -7,11 +7,12 @@ from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import dataDir
+from cing.NRG.CasdNmrMassageCcpnProject import mapEntrycodeNew2EntrycodeAndCity
 from cing.NRG.CasdNmrMassageCcpnProject import programHoH
 from cing.NRG.casdNmrPresetDict import presetDict
 from cing.Scripts.FC.convertCyana2Ccpn import importCyanaCoordinatesAndRestraints
-from cing.Scripts.FC.convertCyana2Ccpn import importPseudoPdb
 from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoordinatesAndRestraints
+from cing.Scripts.FC.utils import importPseudoPdb
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
@@ -23,7 +24,6 @@ from memops.general.Io import saveProject
 from pdbe.adatah.Constraints import ConstraintsHandler
 from shutil import copytree
 from shutil import rmtree
-from cing.NRG.CasdNmrMassageCcpnProject import mapEntrycodeNew2EntrycodeAndCity
 import Tkinter
 import cing
 import os
@@ -50,7 +50,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
     sourceIsOrgProject = True
     checkOrgProject = False
     replaceCoordinates = True # From all *.pdb files in inputDir.
-    replaceRestraints = False
+    replaceRestraints = True
     doSwapCheck = False
     doSaveProject = True
     doExport = True

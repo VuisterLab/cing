@@ -47,6 +47,8 @@ from cing.core.molecule import isValidChainId
 from cing.core.molecule import unmatchedAtomByResDictToString
 import os
 
+defaultPrintChainCode = '.'
+
 #==============================================================================
 # PDB stuff
 #==============================================================================

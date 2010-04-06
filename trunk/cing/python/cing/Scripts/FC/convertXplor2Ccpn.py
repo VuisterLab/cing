@@ -1,6 +1,6 @@
 """
 Original from Wim Vranken.
-Used for eNMR workshop Lyon data sets.
+Used for eNMR/weNMR workshop data sets.
 """
 
 from ccpnmr.format.converters.CnsFormat import CnsFormat
@@ -12,7 +12,7 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.forkoff import do_cmd
-from cing.Scripts.FC.convertCyana2Ccpn import importPseudoPdb
+from cing.Scripts.FC.utils import importPseudoPdb
 from glob import glob
 from memops.api import Implementation
 import Tkinter
@@ -21,7 +21,7 @@ import os
 import shutil
 
 
-__author__     = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
+__author__ = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
 
 def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     """The structure when done will be:
@@ -60,24 +60,23 @@ def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     if os.path.exists(ccpnProjectPath):
         shutil.rmtree(ccpnProjectPath)
 
-    project = Implementation.MemopsRoot(name = projectName)
+    project = Implementation.MemopsRoot(name=projectName)
 
     guiRoot = Tkinter.Tk() #  headless possible?
     importXplorCoordinatesAndRestraints(project, inputDir, guiRoot, allowPopups=0, minimalPrompts=1, verbose=0)
     project.saveModified()
-    tgzFileName = "../"+projectName + ".tgz"
+    tgzFileName = "../" + projectName + ".tgz"
     cmd = "tar -czf %s %s" % (tgzFileName, projectName)
     do_cmd(cmd)
     guiRoot.destroy()
 
 
 def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
-    NTdebug("Using presets %s" % `presets`)
 
     if replaceCoordinates:
         status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         if status:
-            NTerror("Failed importCyanaCoordinatesAndRestraints")
+            NTerror("Failed importXplorCoordinatesAndRestraints")
             return True
 
     if not replaceRestraints:
@@ -85,35 +84,36 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
 
     formatCns = CnsFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
     ccpnConstraintListOfList = []
+
     globPattern = inputDir + '/*_noe.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern,fileList))
+    NTdebug("From %s will read files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
         ccpnConstraintList.setName(fnBaseName)
-        ccpnConstraintListOfList.append( ccpnConstraintList )
+        ccpnConstraintListOfList.append(ccpnConstraintList)
 
     globPattern = inputDir + '/*_hbond.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read in files: %s" % (globPattern,fileList))
+    NTdebug("From %s will read in files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
         ccpnConstraintList.setName(fnBaseName)
-        ccpnConstraintListOfList.append( ccpnConstraintList )
+        ccpnConstraintListOfList.append(ccpnConstraintList)
 
     globPattern = inputDir + '/*_dihe.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read in total files: %s" % (globPattern,fileList))
+    NTdebug("From %s will read in total files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDihedralConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
         ccpnConstraintList.setName(fnBaseName)
-        ccpnConstraintListOfList.append( ccpnConstraintList )
+        ccpnConstraintListOfList.append(ccpnConstraintList)
 
 
-    ccpnConstraintList = getDeepByKeys( ccpnConstraintListOfList, 0) # no need to repeat
+    ccpnConstraintList = getDeepByKeys(ccpnConstraintListOfList, 0) # no need to repeat
     NTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
     if ccpnConstraintList != None:
 #    for i, ccpnConstraintList in enumerate(ccpnConstraintListOfList):
@@ -121,12 +121,12 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
         structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
         formatCns.linkResonances(
-                      forceDefaultChainMapping = 1,
-                      globalStereoAssign = 1,
-                      setSingleProchiral = 1,
-                      setSinglePossEquiv = 1,
-                      strucGen = structureGeneration,
-                      allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose )
+                      forceDefaultChainMapping=1,
+                      globalStereoAssign=1,
+                      setSingleProchiral=1,
+                      setSinglePossEquiv=1,
+                      strucGen=structureGeneration,
+                      allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose)
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
@@ -146,8 +146,8 @@ if __name__ == '__main__':
     for projectName in projectList:
 #        testDataEntry = os.path.join(xplorDir, projectName)
         testDataEntry = os.path.join(xplorDir, projectName, 'Authors')
-        rootDir = os.path.join(cingDirTmp,projectName)
-        inputDirRel="XPLOR"
+        rootDir = os.path.join(cingDirTmp, projectName)
+        inputDirRel = "XPLOR"
         inputDir = os.path.join(rootDir, inputDirRel)
         if os.path.exists(rootDir):
             NTmessage("Removing original rootDir: %s" % rootDir)
@@ -155,5 +155,5 @@ if __name__ == '__main__':
         os.mkdir(rootDir)
 
         NTmessage("Copying input from %s to %s" % (testDataEntry, inputDir))
-        shutil.copytree( testDataEntry, inputDir)
+        shutil.copytree(testDataEntry, inputDir)
         convertXplor2Ccpn(projectName, rootDir)
