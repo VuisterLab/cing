@@ -42,6 +42,9 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
     formatPseudoPdb = PseudoPdbFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
     nmrProject = ccpnProject.currentNmrProject
 #        nmrProject = project.newNmrProject(name=project.name)
+    structureEnsembleList = ccpnProject.sortedStructureEnsembles()
+    if len(structureEnsembleList) != 1:
+        NTerror("Failed to find single structureEnsemble; instead found: %d" % len(structureEnsembleList) )
     structureEnsemble = ccpnProject.findFirstStructureEnsemble()
     if structureEnsemble:
         NTmessage("Removing first found structureEnsemble")
@@ -54,6 +57,10 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
         NTdebug("No or empty structureGenerationList; creating a new one.")
         nmrProject.newStructureGeneration()
         structureGenerationList = nmrProject.sortedStructureGenerations()
+
+    if len(structureGenerationList) != 1:
+        NTerror("Failed to find single structureGeneration; instead found: %d" % len(structureGenerationList) )
+
     structureGeneration = structureGenerationList[0]
 #        structureGeneration = nmrProject.findFirstStructureGeneration()
 #        structureGeneration = nmrProject.newStructureGeneration()
@@ -69,7 +76,7 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
         return True
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_COORDINATES, KEYWORDS)
-    NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+#    NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
     reportDifference(ccpnProject, fileList[0])
 
     status = formatPseudoPdb.readCoordinates(fileList, strucGen=structureGeneration, linkAtoms=0, swapFirstNumberAtom=1,
@@ -77,18 +84,3 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
     if not status: # can return None or False on error
         NTerror("Failed to formatPseudoPdb.readCoordinates")
         return True # returns True on error
-
-
-#TODO: is this needed?
-#    status = formatPseudoPdb.linkResonances(
-#                  forceDefaultChainMapping = 1,
-#                  globalStereoAssign = 1,
-#                  setSingleProchiral = 1,
-#                  setSinglePossEquiv = 1,
-#                  strucGen = structureGeneration,
-#                  allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **keywds )
-#    if not status: # can return None or False on error
-#        NTerror("Failed to formatPseudoPdb.linkResonances")
-#        return True # returns True on error
-
-

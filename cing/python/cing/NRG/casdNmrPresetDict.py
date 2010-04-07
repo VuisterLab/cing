@@ -22,9 +22,15 @@ presetDict = {
   },
 
 'NeR103AParis': {
+  'comment': """
+' ' is used inside FC for where there is no chain code.
+The funny thing is that '   A' needs to be used for xplor's '   A' and not simply 'A'.
+
+ """,
   'linkResonances': {
    'keywds': {
-     'forceDefaultChainMapping': 1,
+#     'forceDefaultChainMapping': 1,
+     'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],
       },
     },
   },
@@ -53,12 +59,26 @@ Offset should be -416 why doesn't it figure that out?
 'ET109AoxSeattle'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AoxUtrecht2' : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AredCheshire': {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
-'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},}, # The RDC frame coordinates are messing things up. Best if removed.
 'ET109AredSeattle' : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'ET109AredUtrecht2': {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'PGR122ACheshire'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'PGR122APiscataway': {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'PGR122ASeattle4'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 'PGR122AUtrecht'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
+
+'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
+                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
+                      },
+'PGR122AParis2'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
+                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
+                      },
+
+'AtT13Paris'    : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+'CGR26AParis'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+'CtR69AParis'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+'ET109AoxParis' : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+'HR5537AParis'  : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+
+'VpR247Paris'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
 
 }

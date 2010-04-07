@@ -11,7 +11,10 @@ from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrDefault
 from cing.Libs.forkoff import do_cmd
+from cing.Scripts.FC.constants import KEYWORDS
+from cing.Scripts.FC.constants import LINK_RESONANCES
 from cing.Scripts.FC.utils import importPseudoPdb
 from glob import glob
 from memops.api import Implementation
@@ -85,15 +88,22 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
     formatCns = CnsFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
     ccpnConstraintListOfList = []
 
+    # Will overwrite the settings given to formatCns.linkResonances(  below
     globPattern = inputDir + '/*_noe.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read files: %s" % (globPattern, fileList))
+
+#    for fn in fileList[0:1]: # TODO:
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
         ccpnConstraintList.setName(fnBaseName)
         ccpnConstraintListOfList.append(ccpnConstraintList)
+        if not ccpnConstraintList:
+            NTerror("Failed to read")
+            return True
 
+#    globPattern = inputDir + '/*_hbond.tblXXXX' # TODO:
     globPattern = inputDir + '/*_hbond.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read in files: %s" % (globPattern, fileList))
@@ -103,6 +113,7 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         ccpnConstraintList.setName(fnBaseName)
         ccpnConstraintListOfList.append(ccpnConstraintList)
 
+#    globPattern = inputDir + '/*_dihe.tblXXXX' # TODO:
     globPattern = inputDir + '/*_dihe.tbl'
     fileList = glob(globPattern)
     NTdebug("From %s will read in total files: %s" % (globPattern, fileList))
@@ -112,21 +123,25 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         ccpnConstraintList.setName(fnBaseName)
         ccpnConstraintListOfList.append(ccpnConstraintList)
 
+    keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
+    NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
 
     ccpnConstraintList = getDeepByKeys(ccpnConstraintListOfList, 0) # no need to repeat
     NTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
     if ccpnConstraintList != None:
 #    for i, ccpnConstraintList in enumerate(ccpnConstraintListOfList):
+        keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
+        NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
         NTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
         nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
         structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
         formatCns.linkResonances(
-                      forceDefaultChainMapping=1,
+                      forceDefaultChainMapping=1, # may be overwritten by using forceChainMappings.
                       globalStereoAssign=1,
                       setSingleProchiral=1,
                       setSinglePossEquiv=1,
                       strucGen=structureGeneration,
-                      allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose)
+                      allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **keywds)
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug

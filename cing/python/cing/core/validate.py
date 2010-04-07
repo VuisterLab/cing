@@ -509,6 +509,7 @@ def summary( project, toFile = True ):
     else:
         incompleteItems.append( PROCHECK_STR )
 
+    # TODO: change this like shiftx setup with wattosStatus.
     wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR)
     if wattosSummary:
         msg += "\n%s Wattos Summary %s\n" % (dots, dots )
@@ -519,7 +520,8 @@ def summary( project, toFile = True ):
 #    skippedShiftx = False
     # don't mark nucleic acid only entries at all.
     if project.molecule.hasAminoAcid():
-        shiftx = getDeepByKeys(project.molecule, SHIFTX_STR)
+#        shiftx = getDeepByKeys(project.molecule, SHIFTX_STR) # modded by GWV in revision 624.
+        shiftx = project.shiftxStatus.completed
         if not shiftx:
 #            NTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
             incompleteItems.append( SHIFTX_STR )
