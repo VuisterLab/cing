@@ -16,7 +16,7 @@ scp -P 39676 dataTgz.tar localhost-nmr:/Users/jd/CASD-NMR-CING
 cd /Users/jd/CASD-NMR-CING/data
 \ls -1l */*/log_doAnn*/*.log
 
-# Sync single entry to production: without the need to decompress on production.
+# Copy single entry to production: without the need to decompress on production.
 cd ~/CASD-NMR-CING
 set x = ET109AoxParis
 set ch23 = ( `echo $x | cut -c2-3` )
@@ -25,6 +25,8 @@ scp -P 39676 $dirEntry/$x.tgz localhost-nmr:/Users/jd/CASD-NMR-CING/$dirEntry
 
 scp -r -P 39676 list Overview localhost-nmr:/Users/jd/CASD-NMR-CING
 
+# Copy all for processing
+scp -vr CASD-NMR-CING jd@nmr:/Users/jd
 
 cd $D/CASD-NMR-CING
 scp -r -P 39676 list  localhost-nmr:/Library/WebServer/Documents/CASD-NMR-CING

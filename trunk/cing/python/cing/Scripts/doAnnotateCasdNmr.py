@@ -55,17 +55,17 @@ def annotateEntry(entryCodeNew, *extraArgList):
     doSaveProject = True
     doExport = True
 
-    minimalPrompts = False
+    minimalPrompts = True
     verbose = True
 
     if isInteractive:
         allowPopups = True
-        minimalPrompts = True
-        verbose = True
+#        minimalPrompts = True
+#        verbose = True
     else:
         allowPopups = False
-        minimalPrompts = True
-        verbose = False
+#        minimalPrompts = True
+#        verbose = False
 
     print 'allowPopups                                                                                   ', allowPopups
     print 'isInteractive                                                                                 ', isInteractive

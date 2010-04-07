@@ -42,7 +42,7 @@ def abspath(path):
 # COPY FILE
 # =========
 def copy(srcfilename,dstfilename,timespreserved=1,mod=None):
-    """Throws an exception on some  failures and returns True
+    """Throws an exception on some failures and returns True
     on other. If all went fine it will return the default None
     """
     if timespreserved:

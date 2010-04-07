@@ -42,6 +42,7 @@ from cing.Libs.forkoff import get_cmd_output
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.CasdNmrMassageCcpnProject import baseDir
+from cing.NRG.CasdNmrMassageCcpnProject import entryList
 from glob import glob
 import cing
 import csv
@@ -153,7 +154,8 @@ class casdNmrCing(Lister):
         ## List of 'new' entries for which hits were found
         self.new_hits_entry_list = []
         self.done_entry_list = []
-        self.entry_list_all = []
+        self.entry_list_all = NTlist()
+        self.entry_list_todo = NTlist()
         self.entry_anno_list_all = []
         self.timeTakenDict = NTdict()
 
@@ -349,6 +351,17 @@ class casdNmrCing(Lister):
             NTwarning("Failed to find entries that CING did.")
 #            return 0
         NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
+
+        self.entry_list_all.addList( self.entry_anno_list_all )
+        for entry in entryList:
+            self.entry_list_all.append( entry + 'Org' )
+
+        self.entry_list_todo.addList(self.entry_list_all)
+        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+
+        NTmessage("Found entries overall: %s" % len(self.entry_list_all))
+        NTmessage("Found entries todo:    %s" % len(self.entry_list_todo))
+        NTmessage("Found entries todo:    \n%s" % self.entry_list_todo)
 
         if self.updateIndices:
             self.update_index_files()

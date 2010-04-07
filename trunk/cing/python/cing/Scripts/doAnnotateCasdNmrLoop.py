@@ -1,4 +1,5 @@
-# python -u $CINGROOT/python/cing/Scripts/validateForENmrWorkshop.py
+# python -u $CINGROOT/python/cing/Scripts/doAnnotateCasdNmrLoop.py
+
 from cing import cingDirScripts
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import getDeepByKeys
@@ -16,11 +17,11 @@ cing.verbosity = cing.verbosityDebug
 startDir = baseDir
 pythonScriptFileName = os.path.join(cingDirScripts, 'doAnnotateCasdNmr.py')
 if False:
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'NeR103AParis'.split()
+    entryList = 'PGR122AParis2'.split()
     writeEntryListToFile(entryListFileName, entryList)
 extraArgList = ()
 

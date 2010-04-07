@@ -15,12 +15,12 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 
-if False:
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
+if True:
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'ET109AoxParis'.split()
+    entryList = 'NeR103AParis'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
@@ -36,6 +36,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = 3600, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 1,
+                    MAX_ENTRIES_TODO = 100,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
