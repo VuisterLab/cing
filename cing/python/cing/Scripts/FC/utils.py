@@ -1,6 +1,7 @@
 """Utilities for working with CCPN/FC"""
 
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
+from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentSwapCheck
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
@@ -84,3 +85,31 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
     if not status: # can return None or False on error
         NTerror("Failed to formatPseudoPdb.readCoordinates")
         return True # returns True on error
+
+def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns):
+
+    """
+    Input:
+
+    nmrConstraintStore
+    structureEnsemble
+
+    numSwapCheckRuns: number of times this swap check is performed. 2 should be enough
+
+    """
+
+    print "\n### Checking stereo swaps and deassignment ###"
+
+    swapCheck = StereoAssignmentSwapCheck(nmrConstraintStore,structureEnsemble,verbose = True)
+
+#    violationCodes = {'xl': {'violation': 1.0, 'fraction': 0.00001},
+#                      'l': {'violation': 0.5, 'fraction': 0.5}}
+    # Use more restrictive cutoffs than the above defaults.
+    violationCodes = {'xl': {'violation': 0.5, 'fraction': 0.00001},
+                      'l': {'violation': 0.3, 'fraction': 0.5}}
+
+    for _swapCheckRun in range(0,numSwapCheckRuns):
+      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
+
+    print
+    print

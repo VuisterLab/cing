@@ -13,6 +13,7 @@ from cing.NRG.casdNmrPresetDict import presetDict
 from cing.Scripts.FC.convertCyana2Ccpn import importCyanaCoordinatesAndRestraints
 from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoordinatesAndRestraints
 from cing.Scripts.FC.utils import importPseudoPdb
+from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
 from cing.core.constants import CYANA
 from cing.core.constants import PDB
@@ -21,7 +22,7 @@ from cing.main import getStartMessage
 from cing.main import getStopMessage
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
-from pdbe.adatah.Constraints import ConstraintsHandler
+#from pdbe.adatah.Constraints import ConstraintsHandler
 from shutil import copytree
 from shutil import rmtree
 import Tkinter
@@ -51,7 +52,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
     checkOrgProject = False
     replaceCoordinates = True # From all *.pdb files in inputDir.
     replaceRestraints = True
-    doSwapCheck = False
+    doSwapCheck = True
     doSaveProject = True
     doExport = True
 
@@ -60,7 +61,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
 
     if isInteractive:
         allowPopups = True
-#        minimalPrompts = True
+        minimalPrompts = False
 #        verbose = True
     else:
         allowPopups = False
@@ -116,6 +117,9 @@ def annotateEntry(entryCodeNew, *extraArgList):
       NTmessage("In annotateLoop using preset values...")
 
     if sourceIsOrgProject:
+        if os.path.exists(entryCodeOrg):
+            NTmessage("Removing previous Org directory: %s" % entryCodeOrg)
+            rmtree(entryCodeOrg)
         do_cmd("tar -xzf " + ccpnFile)
         if os.path.exists(entryCodeNew):
             NTmessage("Removing previous directory: %s" % entryCodeNew)
@@ -157,10 +161,12 @@ def annotateEntry(entryCodeNew, *extraArgList):
             return
 
     if doSwapCheck:
-        constraintsHandler = ConstraintsHandler()
+#        constraintsHandler = ConstraintsHandler()
         nmrConstraintStore = ccpnProject.findFirstNmrConstraintStore()
         structureEnsemble = ccpnProject.findFirstStructureEnsemble()
-        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, 2)
+        numSwapCheckRuns = 3
+#        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
+        swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
 
     if doSaveProject:
 #        NTmessage('Checking validity and saving to new path')
