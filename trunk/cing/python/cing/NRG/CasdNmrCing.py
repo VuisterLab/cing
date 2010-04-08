@@ -179,6 +179,7 @@ class casdNmrCing(Lister):
 
         entry_list_tried = []
         entry_list_done = []
+        entry_list_crashed = []
 
         NTdebug("Now in: " + os.getcwd())
         subDirList = os.listdir('data')
@@ -193,15 +194,57 @@ class casdNmrCing(Lister):
                 if entry_code == ".DS_Store":
                     continue
 
-                cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
+                entrySubDir = os.path.join('data', subDir, entry_code)
+
+                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
                     continue
 
+                # Look for last log file
+                logList = glob(entrySubDir + '/log_validateEntry/*.log')
+                if not logList:
+                    NTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
+                    continue
+                # .cing directory and .log file present so it was tried to start but might not have finished
+#                self.entry_anno_list_tried.append(entry_code)
                 entry_list_tried.append(entry_code)
+                logLastFile = logList[-1]
+
+                entryCrashed = False
+                entryWithErrorMessage = False
+                for r in AwkLike(logLastFile):
+                    line = r.dollar[0]
+                    if line.startswith('CING took       :'):
+#                        NTdebug("Matched line: %s" % line)
+                        timeTakenStr = r.dollar[r.NF - 1]
+                        self.timeTakenDict[entry_code] = float(timeTakenStr)
+#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+                    if line.startswith('Traceback (most recent call last)'):
+#                        NTdebug("Matched line: %s" % line)
+                        if entry_code in entry_list_crashed:
+                            NTwarning("%s was already found before; not adding again." % entry_code)
+                        else:
+                            entry_list_crashed.append(entry_code)
+                            entryCrashed = True
+                    if line.count('ERROR:'):
+                        NTerror("Matched line: %s" % line)
+                        entryWithErrorMessage = True
+                    if line.count('Aborting'):
+                        NTdebug("Matched line: %s" % line)
+                        entryCrashed = True
+                        if entry_code in entry_list_crashed:
+                            NTwarning("%s was already found before; not adding again." % entry_code)
+                        else:
+                            entry_list_crashed.append(entry_code)
+                if entryWithErrorMessage:
+                    NTerror("Above for entry: %s" % entry_code)
+                if entryCrashed:
+                    continue # don't mark it as stopped anymore.
+
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if os.path.exists(indexFileEntry):
                     entry_list_done.append(entry_code)
-        return (entry_list_tried, entry_list_done)
+        return (entry_list_tried, entry_list_done, entry_list_crashed)
 
 
     def getCingAnnoEntryInfo(self):
@@ -278,6 +321,8 @@ class casdNmrCing(Lister):
                         else:
                             self.entry_anno_list_crashed.append(entry_code)
                             entryCrashed = True
+                    if line.count('ERROR:'):
+                        NTerror("Matched line: %s" % line)
                     if line.count('Aborting'):
                         NTdebug("Matched line: %s" % line)
                         entryCrashed = True
@@ -341,11 +386,13 @@ class casdNmrCing(Lister):
         ## following statement is equivalent to a unix command like:
         NTdebug("Looking for PDB entries from different databases.")
 
-        (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
+        (self.entry_list_tried, self.entry_list_done, self.entry_list_crashed) = \
+            self.getCingEntriesTriedAndDone()
         if not self.entry_list_tried:
             NTwarning("Failed to find entries that CING tried.")
 #            return 0
         NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
+        NTmessage("Found %s entries that crashed CING." % len(self.entry_list_crashed))
 
         if not self.entry_list_done:
             NTwarning("Failed to find entries that CING did.")
@@ -561,7 +608,8 @@ class casdNmrCing(Lister):
                     try:
                         x = output.split('/')[1] # ./Molecularsystem/HTML/mol.gif
                     except:
-                        NTerror("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
+#                        TODO: enable again for this is a valid check it just ruins my output on development.
+                        NTwarning("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
                         x = 'Molecularsystem' # but not always.
 #                NTdebug("found molecular system name: %s" % x)
 
@@ -641,8 +689,9 @@ class casdNmrCing(Lister):
         ## new versions of the scripts used.
         m.do_analyses_loop(processes_max=processors)
 
-        if not m.update_index_files():
-            NTerror("can't update index files")
+#        Disable for now TODO: enable again.
+#        if not m.update_index_files():
+#            NTerror("can't update index files")
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug

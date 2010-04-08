@@ -32,5 +32,22 @@ cd $D/CASD-NMR-CING
 scp -r -P 39676 list  localhost-nmr:/Library/WebServer/Documents/CASD-NMR-CING
 
 # Check logs
-cd $D/CASD-NMR-CING
+cd $D/CASD-NMR-CING/data
 grep ERROR */*/log_validateEntry/*.log
+
+# Clean the CS Rosetta 'PDB files'. E.g. AtT13Utrecht
+grep -v complete atc_pdb_org | grep -v '\-\-\-' > atc.pdb
+
+# Insert model records.
+cat PGR122A_total_pdb_org | gawk 'BEGIN{i=1;;printf "MODEL       %2d\n", i}\
+{print}/^END/ {i = i + 1;printf "MODEL       %2d\n", i}' | grep -v REMARK > PGR122A_total.pdb
+#and by hand remove the last
+
+# Copy from development to production
+
+#ON PRODUCTION
+cd /Volumes/tera4/CASD-NMR-CING/dataPrep
+#\rm -rf */*/Nijmegen/*
+\rm -rf */*/Author/*
+( cd /Volumes/jd/CASD-NMR-CING/data && tar -cpBf - */*/Author/* ) | ( tar -xpvf - )
+

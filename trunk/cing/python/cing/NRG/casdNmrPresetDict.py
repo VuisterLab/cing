@@ -70,7 +70,8 @@ Offset should be -416 why doesn't it figure that out?
                       'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
                       },
 'PGR122AParis2'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
-                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
+#                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
+#                      'linkResonances':  {'keywds': {'forceDefaultChainMapping': 1,},},
                       },
 
 'AtT13Paris'    : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
@@ -80,5 +81,12 @@ Offset should be -416 why doesn't it figure that out?
 'HR5537AParis'  : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
 
 'VpR247Paris'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+
+'AtT13Utrecht'   : {
+    'comments': 'ccpn met4 is pdb met1',
+    'readCoordinates': {'keywds': {
+     'forceChainMappings': [['A', ' ', 1, -3]],
+},},},
+
 
 }
