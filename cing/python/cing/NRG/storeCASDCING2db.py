@@ -1,6 +1,6 @@
 # Execute like:
-# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
-# python -u $CINGROOT/python/cing/NRG/storeNRGCING2db.py 1brv .
+# cd /Library/WebServer/Documents/CASD-NMR-CING/data/R3/AR3436ACheshire; \
+# python -u $CINGROOT/python/cing/NRG/storeNRGCING2db.py AR3436ACheshire .
 #
 # NB this script fails if the MySql backend is not installed.
 from cing import header
@@ -8,6 +8,8 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.NRG import CASD_DB_NAME
+from cing.NRG import CASD_DB_USER_NAME
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensusId
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqProcheck import gf_CHI12_STR
@@ -46,12 +48,14 @@ from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
 from cing.main import getStartMessage
 from cing.main import getStopMessage
+from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import select
 import cing
 import os
 import sys
 
 
-def main(pdb_id, *extraArgList):
+def main(casd_id, *extraArgList):
     """inputDir may be a directory or a url.
     Returns True on error.
     """
@@ -73,31 +77,10 @@ def main(pdb_id, *extraArgList):
 #    projectType = extraArgList[2]
 
     NTdebug("Using:")
-    NTdebug("pdb_id:              " + pdb_id)
+    NTdebug("casd_id:              " + casd_id)
     NTdebug("inputDir:             " + inputDir)
-    # presume the directory still needs to be created.
-    cingEntryDir = pdb_id + ".cing"
 
-    NTmessage("Now in %s" % os.path.curdir)
-
-    if not os.path.isdir(cingEntryDir):
-        NTerror("Failed to find input directory: %s" % cingEntryDir)
-        return
-    # end if.
-
-    # Needs to be copied because the open method doesn't take a directory argument..
-    project = Project.open(pdb_id, status='old')
-    if not project:
-        NTerror("Failed to init old project")
-        return True
-
-    # shortcuts
-    p = project
-    molecule = project.molecule
-#    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
-    p.validate(parseOnly=True, htmlOnly=True)
-
-    csql = csqlAlchemy()
+    csql = csqlAlchemy(user=CASD_DB_USER_NAME, db=CASD_DB_NAME, echo=False)
     if csql.connect():
         NTerror("Failed to connect to DB")
         return True
@@ -109,9 +92,32 @@ def main(pdb_id, *extraArgList):
     cresidue = csql.residue
     catom = csql.atom
 
+    # presume the directory still needs to be created.
+    cingEntryDir = casd_id + ".cing"
+
+    NTmessage("Now in %s" % os.path.curdir)
+
+    if not os.path.isdir(cingEntryDir):
+        NTerror("Failed to find input directory: %s" % cingEntryDir)
+        return
+    # end if.
+
+    # Needs to be copied because the open method doesn't take a directory argument..
+    project = Project.open(casd_id, status='old')
+    if not project:
+        NTerror("Failed to init old project")
+        return True
+
+    # shortcuts
+    p = project
+    molecule = project.molecule
+#    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
+    if True: # TODO: enable when done testing overall strategy.
+        p.validate(parseOnly=True, htmlOnly=True)
+
     # WATCH OUT WITH THE BELOW COMMANDS.
-    #result = csql.conn.execute(centry.delete())
-    result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
+    # Use CASD_ID as a kind of unique key. Enforced in DB.
+    result = execute(centry.delete().where(centry.c.casd_id == casd_id))
     if result.rowcount:
         NTdebug("Removed original entries numbering: %s" % result.rowcount)
     else:
@@ -166,8 +172,8 @@ def main(pdb_id, *extraArgList):
     rogC = molecule.rogScore.rogInt()
 
     result = csql.conn.execute(centry.insert().values(
-        pdb_id=pdb_id,
-        name=pdb_id,
+        casd_id=casd_id,
+        name=casd_id,
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,
         res_count=molecule.residueCount,
@@ -204,8 +210,18 @@ def main(pdb_id, *extraArgList):
         rog=rogC
         )
     )
-    entry_id = result.last_inserted_ids()[0]
+#    entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
+#    entry_id_list = result.inserted_primary_key() # wait for this new feature
+    entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()
+    if not entry_id_list:
+        NTerror("Failed to get the id of the inserted entry but got: %s" % entry_id_list)
+        return True
+    if len( entry_id_list ) != 1:
+        NTerror("Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
+        return True
+    entry_id = entry_id_list[0][0]
     NTdebug("Inserted entry id %s" % entry_id)
+
 
 #    for residue in csql.session.query(cresidue):
 #        NTdebug("New residue number %s" % residue.number)
@@ -224,7 +240,10 @@ def main(pdb_id, *extraArgList):
             rog=rogC,
             )
         )
-        chain_id = result.last_inserted_ids()[0]
+#        chain_id = result.last_inserted_ids()[0]
+    #    chain_id = result.inserted_primary_key() # wait for this new feature TODO:
+        s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
+        chain_id = execute(s).fetchall()[0][0]
         NTdebug("Inserted chain id %s" % chain_id)
         for residue in chain.allResidues():
 #            NTmessage("Residue: %s" % residue)
@@ -297,68 +316,77 @@ def main(pdb_id, *extraArgList):
                 wi_quachk=r_wi_quachk,
                 wi_ramchk=r_wi_ramchk,
                 wi_rotchk=r_wi_rotchk,
-		pc_gf=r_pc_gf,
-		pc_gf_chi12=r_pc_gf_chi12,
-		pc_gf_chi1=r_pc_gf_chi1,
-		pc_gf_phipsi=r_pc_gf_phipsi,
+        		pc_gf=r_pc_gf,
+        		pc_gf_chi12=r_pc_gf_chi12,
+        		pc_gf_chi1=r_pc_gf_chi1,
+        		pc_gf_phipsi=r_pc_gf_phipsi,
                 noe_compl4=noe_compl4,
                 rog=rogR
                 )
             )
-            residue_id = result.last_inserted_ids()[0]
-            NTdebug("Inserted residue %s" % residue_id)
-            for atom in residue.allAtoms():
-                a_name = atom.name
-                # WI
-                a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR)
-                a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR)
-                a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
-                a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
-                a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
-                a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
-                a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
-                a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
-                a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
-                # Store only atoms for which there is usefull info.
-                useFullColumns = [
-                    a_wi_ba2lst,
-                    a_wi_bh2chk,
-                    a_wi_chichk,
-                    a_wi_dunchk,
-                    a_wi_hndchk,
-                    a_wi_mischk,
-                    a_wi_mo2chk,
-                    a_wi_pl2chk,
-                    a_wi_wgtchk
-                ]
-                hasUsefullColumn = False
-                for column in useFullColumns:
-                    if column != None:
-                        hasUsefullColumn = True
-                if not hasUsefullColumn:
-                    continue
-                a_rog = atom.rogScore.rogInt()
-                result = csql.conn.execute(catom.insert().values(
-                    entry_id=entry_id,
-                    chain_id=chain_id,
-                    residue_id=residue_id,
-                    name=a_name,
-                    wi_ba2lst=a_wi_ba2lst,
-                    wi_bh2chk=a_wi_bh2chk,
-                    wi_chichk=a_wi_chichk,
-                    wi_dunchk=a_wi_dunchk,
-                    wi_hndchk=a_wi_hndchk,
-                    wi_mischk=a_wi_mischk,
-                    wi_mo2chk=a_wi_mo2chk,
-                    wi_pl2chk=a_wi_pl2chk,
-                    wi_wgtchk=a_wi_wgtchk,
-                    rog=a_rog
+#            residue_id = result.last_inserted_ids()[0]
+            s = select([cresidue.c.residue_id],and_(
+                  cresidue.c.entry_id == entry_id,
+                  cresidue.c.chain_id == chain_id,
+                  cresidue.c.number == numberR
+                  ))
+            residue_id = execute(s).fetchall()[0][0]
+            NTdebug("Inserted residue %s" % residue_id)
+            if False:
+                for atom in residue.allAtoms():
+                    a_name = atom.name
+                    # WI
+                    a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR)
+                    a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR)
+                    a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
+                    a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
+                    a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
+                    a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
+                    a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
+                    a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
+                    a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
+
+                    # Store only atoms for which there is usefull info.
+                    useFullColumns = [
+                        a_wi_ba2lst,
+                        a_wi_bh2chk,
+                        a_wi_chichk,
+                        a_wi_dunchk,
+                        a_wi_hndchk,
+                        a_wi_mischk,
+                        a_wi_mo2chk,
+                        a_wi_pl2chk,
+                        a_wi_wgtchk
+                    ]
+                    hasUsefullColumn = False
+                    for column in useFullColumns:
+                        if column != None:
+                            hasUsefullColumn = True
+                    if not hasUsefullColumn:
+                        continue
+                    a_rog = atom.rogScore.rogInt()
+                    result = csql.conn.execute(catom.insert().values(
+                        entry_id=entry_id,
+                        chain_id=chain_id,
+                        residue_id=residue_id,
+                        name=a_name,
+                        wi_ba2lst=a_wi_ba2lst,
+                        wi_bh2chk=a_wi_bh2chk,
+                        wi_chichk=a_wi_chichk,
+                        wi_dunchk=a_wi_dunchk,
+                        wi_hndchk=a_wi_hndchk,
+                        wi_mischk=a_wi_mischk,
+                        wi_mo2chk=a_wi_mo2chk,
+                        wi_pl2chk=a_wi_pl2chk,
+                        wi_wgtchk=a_wi_wgtchk,
+                        rog=a_rog
+                        )
                     )
-                )
-                atom_id = result.last_inserted_ids()[0]
-                NTdebug("Inserted atom %s" % atom_id)
-            # end for atom
+                    atom_id = result.last_inserted_ids()[0]
+                    NTdebug("Inserted atom %s" % atom_id)
+                # end for atom
+            # end if atom
         # end for residue
     # end for chain
 

@@ -165,8 +165,14 @@ def annotateEntry(entryCodeNew, *extraArgList):
         nmrConstraintStore = ccpnProject.findFirstNmrConstraintStore()
         structureEnsemble = ccpnProject.findFirstStructureEnsemble()
         numSwapCheckRuns = 3
+        if nmrConstraintStore:
+            if structureEnsemble:
+                swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
+            else:
+                NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+        else:
+            NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
 #        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
-        swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
 
     if doSaveProject:
 #        NTmessage('Checking validity and saving to new path')
