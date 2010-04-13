@@ -1184,7 +1184,7 @@ class NTdict(dict):
         if not self.has_key(attr):
             raise AttributeError( '"%s" not found.' % attr )
         return self[attr]
-#    end def
+    #end def
 
 
     def __setattr__(self, attr, value):
@@ -3421,7 +3421,7 @@ represent the full range of C's unsigned (long) integers.
            typecode as defined for array module
         """
         n = array.array(typecode, numbers)
-        self.write(n.tostring())
+        n.tofile(self)
     #end def
 
     def binaryRead(self, typecode, size):
