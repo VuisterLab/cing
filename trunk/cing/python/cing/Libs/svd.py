@@ -68,16 +68,21 @@ class SVDfit:
 
         self.chisq      = 0.0
         self.covariance = zeros((self.m,self.m))
+        self.c          = None # no fiting done
 
         # Create the design matrix A; equation to solve is A.c = b
 
+        #print '>', sigma
         for i in range(self.n):
-            if not sigma or sigma[i] == 0.0:
+            if sigma==None or sigma[i] == 0.0:
                 self.sigma[i] = 1.0
             else:
                 self.sigma[i] = sigma[i]
 
             f=function(self.xList[i], self.m)
+            if f==None:
+                NTerror('SVDfit: function returns None, check implementation')
+                return
             for j in range(m):
                 self.A[i,j] = f[j]/self.sigma[i]    # check/correct i/j, n/m conventions
             #end def
@@ -139,18 +144,18 @@ class SVDfit:
         for i in range(self.n):
             b[i] = yList[i]/self.sigma[i]
 
-        c = self.svbksb( b )
+        self.c = self.svbksb( b )
 
         # Calculate chisq
         self.chisq = 0
         for i in range(self.n):
             sum = 0.0
             for j in range(self.m):
-                sum += self.A[i][j]*c[j]
+                sum += self.A[i][j]*self.c[j]
             self.chisq += (sum-b[i])**2
         #end for
 
-        return c
+        return self.c
     #end def
 
     def svbksb(self, b):
@@ -182,6 +187,28 @@ class SVDfit:
 
         return c
     #end def
+
+    def simulate(self, xList ):
+        """
+        Return a list of simulated value's corresponding to x-ordinates in xList.
+        Assumes fit has been called before.
+
+        Return None on error
+        """
+        if self.c == None:
+            return None
+        result = []
+        ilist = range(self.m)
+        for x in xList:
+            ma = self.function( x, self.m )
+            if len(ma) < self.m:
+                return None
+            sum = 0.0
+            for i in ilist:
+                sum += self.c[i]*ma[i]
+            result.append(sum)
+        #end for
+        return result
 #end class
 
 

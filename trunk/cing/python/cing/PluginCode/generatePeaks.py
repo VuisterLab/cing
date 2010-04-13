@@ -263,7 +263,7 @@ class CBCACONH( ExperimentDef ):
                  ['CA','CB','CACB']
                 ]
 #end class
-expDict['CACBCONH'] = CBCACONH
+expDict['CBCACONH'] = CBCACONH
 expDict['HNCOCACB'] = CBCACONH
 
 #===========================================================================
@@ -392,7 +392,7 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
     """
     expName = experimentName.strip().upper()
     if expName not in expDict:
-        NTerror('ERROR: generatePeaks: experiment "%s" not defined\n\n', experimentName )
+        NTerror('generatePeaks: experiment "%s" not defined\n\n', experimentName )
         project.listPredefinedExperiments()
         return None
     #end if
