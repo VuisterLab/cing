@@ -3,16 +3,13 @@
 """
 Commands that are more like a loose script utilizing/testing the CING api.
 """
-#if False:
-#    from matplotlib import interactive
-#    from matplotlib import use #@UnusedImport
-#    use('TkAgg') # Instead of agg
-#    interactive(True)
-# block to start interactive plotting. Do not alter the sequence of the blocked commands!
+
 from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
+from cing.NRG import CASD_DB_NAME
+from cing.NRG import CASD_DB_USER_NAME
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.sml import NTdict
 from pylab import * #@UnusedWildImport # imports plt too now.
@@ -23,7 +20,7 @@ import cing
 
 cing.verbosity = verbosityDebug
 
-csql = csqlAlchemy()
+csql = csqlAlchemy(user=CASD_DB_USER_NAME, db=CASD_DB_NAME)
 csql.connect()
 csql.autoload()
 
@@ -41,9 +38,26 @@ r1 = cresidue.alias()
 r2 = cresidue.alias()
 
 #SQL: select count(*) from entry e;
-s = select([func.count(centry.c.entry_id)])
+#s = select([func.count(centry.c.entry_id)])
+#m = execute(s).fetchall()
+#NTdebug("Entry count: %s" % m)
+
+#SQL: select entry_id from entry e where e.casd_id='AR3436ACheshire';
+s = select([centry.c.entry_id, centry.c.casd_id], centry.c.casd_id == 'AR3436ACheshire')
 m = execute(s).fetchall()
 NTdebug("Entry count: %s" % m)
+
+#result = csql.conn.execute(centry.insert().values(casd_id='testje'))
+#print result.last_inserted_ids() # fails for postgres version I have.
+#
+#result = csql.session.execute(select([centry.c.entry_id]).where(centry.c.casd_id == 'testje'))
+#m = result.fetchall()
+#NTdebug("Entry count: %s" % m)
+#
+#s = select([centry.c.entry_id],and_(centry.c.casd_id == 'testje', centry.c.entry_id > 0))
+#result = csql.session.execute(s)
+#m = result.fetchall()
+#NTdebug("Entry count: %s" % m)
 
 #SQL: select r.rog, count(*) from residue r group by r.rog;
 #s = select([cresidue.c.rog, func.count(cresidue.c.rog)]).group_by(cresidue.c.rog)
@@ -67,29 +81,38 @@ NTdebug("Entry count: %s" % m)
 #NTdebug("Residues per entry: %s" % m)
 
 # START BLOCK
-s = select([e1.c.pdb_id, r1.c.rog, 100.0*func.count(r1.c.rog)/e1.c.res_count
-             ], from_obj=[e1.join(r1)]
-             ).group_by(e1.c.pdb_id, r1.c.rog)
-NTdebug( "SQL: %s" % s)
+s = select([e1.c.casd_id, e1.c.rog])
+NTdebug("SQL: %s" % s)
 m = execute(s).fetchall()
-#NTdebug("ROG percentage per entry: %s" % m)
+NTdebug("ROG per entry: %s" % m)
+
+# below works in MySql but not in Postgresql
+#s = select([e1.c.casd_id, r1.c.rog, 100.0 * func.count(r1.c.rog) / e1.c.res_count
+#             ], from_obj=[e1.join(r1)]
+#             ).group_by(e1.c.casd_id, r1.c.rog)
+s = select([e1.c.casd_id, r1.c.rog, 100.0 * func.count(r1.c.rog) / e1.c.res_count
+             ], from_obj=[e1.join(r1)]
+             ).group_by(e1.c.casd_id, r1.c.rog, e1.c.res_count).order_by(e1.c.casd_id,r1.c.rog)
+NTdebug("SQL: %s" % s)
+m = execute(s).fetchall()
+NTdebug("ROG per residue: %s" % m)
 
 perEntryRog = NTdict()
 for row in m:
 #    print row[0]
     k = row[0]
     if not perEntryRog.has_key(k):
-        perEntryRog[k] = NTfill(0.0,3)
+        perEntryRog[k] = NTfill(0.0, 3)
     perEntryRog[k][int(row[1])] = float(row[2])
 
-pdb_id_list = perEntryRog.keys()
-color = NTfill(0.0,3)
+casd_id_list = perEntryRog.keys()
+color = NTfill(0.0, 3)
 color[0] = NTlist() # green
 color[1] = NTlist()
 color[2] = NTlist()
 
-for entry_id in pdb_id_list:
-    l = perEntryRog[ entry_id ]
+for casd_id in casd_id_list:
+    l = perEntryRog[ casd_id ]
     for i in range(3):
         color[i].append(l[i])
 
@@ -105,17 +128,17 @@ for entry_id in pdb_id_list:
 #color[2] = [ 2,3,4]
 cla() # clear all.
 # scatter plot red (x) versus green (y)
-p = plt.plot( color[2], color[0], 'b+' )
-xlim(0,100)
-ylim(0,100)
+p = plt.plot(color[2], color[0], 'b+')
+xlim(0, 100)
+ylim(0, 100)
 a = gca()
 attributesMatLibPlot = {'linewidth' :5}
 xOffset = 20
-line2D = Line2D([0,100-xOffset], [xOffset, 100])
-line2D.set( **attributesMatLibPlot )
+line2D = Line2D([0, 100 - xOffset], [xOffset, 100])
+line2D.set(**attributesMatLibPlot)
 line2D.set_c('g')
 a.add_line(line2D)
-line2D = Line2D([xOffset,100], [0, 100-xOffset])
-line2D.set( **attributesMatLibPlot )
+line2D = Line2D([xOffset, 100], [0, 100 - xOffset])
+line2D.set(**attributesMatLibPlot)
 line2D.set_c('r')
 a.add_line(line2D)

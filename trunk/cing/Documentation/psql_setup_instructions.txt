@@ -48,7 +48,12 @@ To tweak your DBMS, consider increasing kern.sysv.shmmax by adding an increased 
 Connect as postgres unix user:
 	psql
 	create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+	create database nrgcing;
 	alter database nrgcing owner to nrgcing1;
+
+	create role casdcing1 LOGIN CREATEDB SUPERUSER;
+	create database casdcing;
+	alter database casdcing owner to casdcing1;
 
 Connect as jd unix user:
 	createdb nrgcing
