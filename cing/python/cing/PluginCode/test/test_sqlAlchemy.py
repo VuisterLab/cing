@@ -16,7 +16,7 @@ import cing
 import unittest
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Libs/test/test_cingSql.py
+python $CINGROOT/python/cing/PluginCode/test/test_sqlAlchemy.py
 """
 
 

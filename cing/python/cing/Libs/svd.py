@@ -19,6 +19,7 @@ svd = SVDfitPoly( xs, sigma=None, order=2)
 p = svd.fit(ys)
 print p
 """
+from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTwarning
 from numpy import zeros #@UnresolvedImport
 from numpy.linalg import svd

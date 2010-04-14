@@ -16,3 +16,22 @@ SELECT e.pdb_id FROM entry e, pdbmlplus.pdbj.brief_summary b
 WHERE e.pdb_id =b.pdbid
 AND e.pdb_id = '1brv';
 
+SELECT entry.name, entry.wi_nqachk FROM entry
+ORDER BY entry.name ASC, entry.wi_nqachk ASC;
+
+
+SELECT e.name, e.distance_count,e.dihedral_count FROM entry e
+where
+e.distance_count = 0
+AND e.dihedral_count = 0
+and e.name not like '%Org'
+ORDER BY e.name ASC;
+
+
+e.distance_count = 0
+AND e.dihedral_count = 0
+
+e.name = 'AR3436APiscataway2'
+
+
+

@@ -10,13 +10,14 @@ from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG.CasdNmrMassageCcpnProject import colorByLab
+from cing.NRG.CasdNmrMassageCcpnProject import labList
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.sml import NTdict
 from pylab import * #@UnusedWildImport # imports plt too now.
 from sqlalchemy.sql.expression import func
 from sqlalchemy.sql.expression import select #@Reimport
 import cing
-
 
 cing.verbosity = verbosityDebug
 
@@ -38,14 +39,14 @@ r1 = cresidue.alias()
 r2 = cresidue.alias()
 
 #SQL: select count(*) from entry e;
-#s = select([func.count(centry.c.entry_id)])
-#m = execute(s).fetchall()
-#NTdebug("Entry count: %s" % m)
+s = select([func.count(centry.c.entry_id)])
+m = execute(s).fetchall()
+NTdebug("Entry count: %s" % m)
 
 #SQL: select entry_id from entry e where e.casd_id='AR3436ACheshire';
 s = select([centry.c.entry_id, centry.c.casd_id], centry.c.casd_id == 'AR3436ACheshire')
 m = execute(s).fetchall()
-NTdebug("Entry count: %s" % m)
+NTdebug("Data: %s" % m)
 
 #result = csql.conn.execute(centry.insert().values(casd_id='testje'))
 #print result.last_inserted_ids() # fails for postgres version I have.
@@ -123,22 +124,31 @@ for casd_id in casd_id_list:
 
 # start plotting.
 
-
 #color[0] = [ 1,2,3]
 #color[2] = [ 2,3,4]
 cla() # clear all.
 # scatter plot red (x) versus green (y)
-p = plt.plot(color[2], color[0], 'b+')
-xlim(0, 100)
-ylim(0, 100)
-a = gca()
-attributesMatLibPlot = {'linewidth' :5}
-xOffset = 20
-line2D = Line2D([0, 100 - xOffset], [xOffset, 100])
-line2D.set(**attributesMatLibPlot)
-line2D.set_c('g')
-a.add_line(line2D)
-line2D = Line2D([xOffset, 100], [0, 100 - xOffset])
-line2D.set(**attributesMatLibPlot)
-line2D.set_c('r')
-a.add_line(line2D)
+for lab in labList:
+    lineColor = colorByLab[lab]
+    p = plt.plot(color[2], color[0], '+', colorXXXX=lineColor, label = lab)
+    xlim(0, 100)
+    ylim(0, 100)
+    xlabel('% residues green')
+    ylabel('% residues red')
+
+    legend( ('label1', 'label2', 'label3'), loc='upper left')
+    a = gca()
+
+
+    attributesMatLibPlot = {'linewidth' :2}
+    xOffset = 20
+    line2D = Line2D([0, 100 - xOffset], [xOffset, 100])
+    line2D.set(**attributesMatLibPlot)
+    line2D.set_c('g')
+    a.add_line(line2D)
+    line2D = Line2D([xOffset, 100], [0, 100 - xOffset])
+    line2D.set(**attributesMatLibPlot)
+    line2D.set_c('r')
+    a.add_line(line2D)
+
+savefig('rog.png')

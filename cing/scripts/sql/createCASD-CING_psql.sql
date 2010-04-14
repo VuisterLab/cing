@@ -165,6 +165,8 @@ CREATE TABLE residue
 --   cing
     rog                            INT DEFAULT NULL,
     omega_dev_av_all               FLOAT DEFAULT NULL,
+    cv_backbone                    FLOAT DEFAULT NULL,
+    cv_sidechain                   FLOAT DEFAULT NULL,
 
     distance_count                 INT DEFAULT NULL,
     dihedral_count                 INT DEFAULT NULL,

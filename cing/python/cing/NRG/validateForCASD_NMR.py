@@ -1,4 +1,4 @@
-# python -u $CINGROOT/python/cing/Scripts/validateForCASD_NMR.py
+# python -u $CINGROOT/python/cing/NRG/validateForCASD_NMR.py
 from cing import cingDirScripts
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
@@ -15,9 +15,9 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 
-if False:
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+if True:
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
     entryList = 'PGR122AParis2'.split()
