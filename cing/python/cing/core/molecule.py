@@ -3207,7 +3207,8 @@ Atom class: Defines object for storing atom properties
 
     def __str__( self ):
 #        return self._Cname( 1 )
-        return '<%s %s>' % ( self._className(), self._Cname(1) )
+#        return '<%s %s>' % ( self._className(), self._Cname(1) ) # increased level for resolving issue 236.
+        return '<%s %s>' % ( self._className(), self._Cname(2) ) # Include chain id as well as residue id.
     #end def
 
     def __repr__(self):
