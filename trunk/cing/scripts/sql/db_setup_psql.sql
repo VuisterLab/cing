@@ -35,6 +35,7 @@ DROP ROLE pdbj_reader;
 create role pdbj_reader WITH PASSWORD '4I4KMS' LOGIN CREATEDB SUPERUSER;
 
 alter role nrgcing1 WITH PASSWORD '4I4KMS'
+alter role casdcing1 WITH PASSWORD '4I4KMS'
 
 REVOKE ALL ON database pdbmlplus FROM pdbj_reader;
 GRANT ALL ON database pdbmlplus TO pdbj_reader;
@@ -57,7 +58,8 @@ mysql -u wattos1 -p4I4KMS wattos1 < $SJ/filetosaveto.sql
 and then copy the mrgrid data itself too
 cd /big/jurgen/DB/mrgrid/bfiles
 cp -rvfup wattos1/* wattos1
-/* just a comment to end the previous command interpreted by jedit as a comment **/
+
+-- just a comment to end the previous command interpreted by jedit as a comment **/
 
 -- More config
 set global query_cache_size=16000000;
@@ -73,3 +75,10 @@ SHOW VARIABLES LIKE 'query_cache%';
 # Setttings within Eclips db browser.C:\Documents and Settings\jurgen.WHELK.000\workspace\Wattos\lib\mysql-connector-java-5.0.3-bin.jar
 jdbc:mysql://localhost:3306/wattos1
 com.mysql.jdbc.Driver
+
+SELECT * FROM entry
+ORDER BY entry.name ASC;
+
+
+
+

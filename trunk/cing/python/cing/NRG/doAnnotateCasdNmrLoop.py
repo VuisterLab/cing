@@ -1,12 +1,12 @@
-# python -u $CINGROOT/python/cing/Scripts/doAnnotateCasdNmrLoop.py
+# python -u $CINGROOT/python/cing/NRG/doAnnotateCasdNmrLoop.py
 
-from cing import cingDirScripts
+from cing import cingPythonDir
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import getDeepByKeys
 from cing.NRG.CasdNmrMassageCcpnProject import baseDir
 from cing.NRG.CasdNmrMassageCcpnProject import programHoH
 from cing.NRG.PDBEntryLists import writeEntryListToFile
-from cing.Scripts.doAnnotateCasdNmr import annotateEntry
+from cing.NRG.doAnnotateCasdNmr import annotateEntry
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 import cing
 import os
@@ -15,10 +15,12 @@ cing.verbosity = cing.verbosityDebug
 
 # parameters for doScriptOnEntryList
 startDir = baseDir
-pythonScriptFileName = os.path.join(cingDirScripts, 'doAnnotateCasdNmr.py')
-if False:
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+
+cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
+pythonScriptFileName = os.path.join(cingDirNRG, 'doAnnotateCasdNmr.py')
+if True:
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
     entryList = 'AR3436ACheshire'.split()
@@ -30,10 +32,10 @@ doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
                     processes_max = 2,
-                    delay_between_submitting_jobs = 5,
+                    delay_between_submitting_jobs = 2,
                     max_time_to_wait = 600,
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 200,
+                    MAX_ENTRIES_TODO = 100,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
 

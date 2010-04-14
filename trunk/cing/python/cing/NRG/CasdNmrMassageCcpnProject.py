@@ -12,6 +12,7 @@ Most functionality is hard-coded here so be careful reading the actual code.
 """
 
 from cing.Libs.DBMS import DBMS
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.disk import copy
@@ -35,6 +36,15 @@ baseDir = '/Users/jd/CASD-NMR-CING'
 dataDir = os.path.join(baseDir, 'data')
 startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
 
+colorByLab = {
+    'Cheshire': 'green',
+    'Frankfurt': 'blue',
+    'Lyon': 'red',
+    'Paris': 'darkblue',
+    'Piscataway': 'orange',
+    'Seattle': 'gold',
+    'Utrecht': 'darkgreen'
+}
 def convertToProgram(t):
     """check if there is an x for each and creates a string Hash by row and Hash by column"""
 
@@ -168,12 +178,14 @@ sheetName = 'Overview1'
 participantTable = dbms.tables['%s-Participant' % sheetName]
 participationTable = dbms.tables['%s-Participation' % sheetName]
 targetTable = dbms.tables['%s-Target' % sheetName]
+labTable = dbms.tables['%s-LabAndCount' % sheetName]
+labList = labTable.columnOrder[0]
 cityList = participantTable.columnOrder[1:]
 entryList = targetTable.getColumnByIdx(0)
 programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
-#NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
-#print mapEntrycodeNew2EntrycodeAndCity
+NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+print labList
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug

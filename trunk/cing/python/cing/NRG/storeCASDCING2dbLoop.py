@@ -1,4 +1,4 @@
-# python -u $CINGROOT/python/cing/NRG/checkValidationCriteria.py
+# python -u $CINGROOT/python/cing/NRG/storeCASDCING2dbLoop.py
 # NB this script fails if the MySql backend is not installed.
 from cing import cingPythonDir
 from cing.NRG.PDBEntryLists import writeEntryListToFile
@@ -17,6 +17,7 @@ pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
 if True:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')

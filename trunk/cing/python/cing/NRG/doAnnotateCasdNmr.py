@@ -52,7 +52,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
     checkOrgProject = False
     replaceCoordinates = True # From all *.pdb files in inputDir.
     replaceRestraints = True
-    doSwapCheck = True
+    doSwapCheck = False
     doSaveProject = True
     doExport = True
 
