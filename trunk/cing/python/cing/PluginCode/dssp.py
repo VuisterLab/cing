@@ -6,11 +6,13 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import ExecuteProgram
 from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import sprintf
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
@@ -106,9 +108,9 @@ class Dssp:
         _taken = time.time() - now
 #        NTdebug("Finished dssp successfully in %8.1f seconds", _taken)
 
+#        self.project.dsspStatus.completed = True
+        self.project.status.dssp.completed = True
         self.parseResult()
-
-        self.project.dsspStatus.completed = True
         return True
     #end def
 
@@ -190,6 +192,7 @@ class Dssp:
                 residue[DSSP_STR].consensus = residue[DSSP_STR].secStruct.setConsensus(CONSENSUS_SEC_STRUCT_FRACTION)
                 residue[DSSP_STR].keysformat()
         #end for
+        self.project.status.dssp.parsed = True
     #end def
 
 
@@ -204,20 +207,41 @@ class Dssp:
 
 #end class
 
-def runDssp(project, parseOnly = False)   :
+def dsspDefault():
+    """ define the default dssp dict"""
+    return NTdict(
+                  directory    = 'Dssp',
+                  dsspTemplate = 'model_%03d.dssp',
+                  pdbTemplate  = 'model_%03d.pdb',
+                  molecule     = None,
+                  completed    = False,
+                  parsed       = False
+                 )
+#end def
+
+def runDssp(project, tmp=None)   :
     """
     Adds <Dssp> instance to molecule. Run dssp and parse result.
     Return None on error.
     """
     # check if dssp is present
     if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("No whatif installed so skipping runDssp")
+        NTmessage("runDssp: No whatif installed so skipping runDssp")
         return
 
-    if not project.molecule:
-        NTerror('dssp: no molecule defined')
+    if not project:
+        NTerror('runDssp: no project defined')
         return None
     #end if
+
+    if not project.molecule:
+        NTerror('runDssp: no molecule defined')
+        return None
+    #end if
+
+    project.status.dssp = dsspDefault()
+    project.status.dssp.molecule = project.molecule.nameTuple()
+    project.status.dssp.keysformat()
 
     if project.molecule.has_key('dssp'):
         del(project.molecule.dssp)
@@ -225,14 +249,13 @@ def runDssp(project, parseOnly = False)   :
 
     dcheck = Dssp(project)
     if not dcheck:
-        NTerror("Failed to get dssp instance of project")
+        NTerror("runDssp: Failed to get dssp instance of project")
         return None
 
-    if parseOnly:
-        dcheck.parseResult()
-    else:
-        dcheck.run()
+    dcheck.run()
     project.molecule.dssp = dcheck
+
+    project.history(sprintf('Ran dssp on molecule %s', project.molecule))
 
     return dcheck
 #end def
@@ -241,9 +264,43 @@ def restoreDssp(project, tmp = None):
     """
     Optionally restore dssp results
     """
-    if project.dsspStatus.completed:
-        NTmessage('==> restoring dssp results')
-        project.runDssp(parseOnly = True)
+    if not project:
+        NTerror('restoreDssp: no project defined')
+        return None
+    #end if
+
+    if not project.molecule:
+        return None
+    #end if
+#    for res in project.molecule.allResidues():
+#        res.dssp = None
+
+    project.status.setdefault('dssp', dsspDefault())
+    # old parameter
+    if 'dsspStatus' in project and project.dsspStatus and project.dsspStatus.completed:
+        project.status.dssp.completed = True
+        project.status.dssp.molecule = project.molecule.nameTuple()
+        project.dsspStatus = None # key is removed on next save
+    project.status.dssp.keysformat()
+    project.status.keysformat()
+
+    if not project.status.dssp.completed:
+        return
+
+    project.status.dssp.parsed = False
+
+    if project.molecule.has_key('dssp'):
+        del(project.molecule.dssp)
+    #end if
+
+    dcheck = Dssp(project)
+    if not dcheck:
+        NTerror("restoreDssp: Failed to get dssp instance of project")
+        return None
+
+    dcheck.parseResult()
+    NTdetail('==> Restored dssp results')
+    project.molecule.dssp = dcheck
 #end def
 
 def removeTempFiles( todoDir ):

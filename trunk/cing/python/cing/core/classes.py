@@ -67,6 +67,7 @@ from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
+from cing.core.parameters import validationSubDirectories
 from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
@@ -191,16 +192,19 @@ Project: Top level Cing project class
                            storedInCcpnFormat = False, #
 
                            procheckStatus = NTdict(completed = False, parsed = False, ranges = None),
-                           dsspStatus = NTdict(completed = False, parsed = False),
+#                           dsspStatus = NTdict(completed = False, parsed = False),
                            whatifStatus = NTdict(completed = False, parsed = False),
                            shiftxStatus = NTdict(completed = False, parsed = False),
-                           x3dnaStatus 				 = NTdict(completed = False, parsed = False),
+                           x3dnaStatus  = NTdict(completed = False, parsed = False),
+
+                           status = NTdict(), # General status dict for external programs
 
 
                            # store a reference to the global things we might need
                            gui = None, # Reference to CingGui instance
                            directories = directories,
                            moleculeDirectories = moleculeDirectories,
+                           validationSubDirectories = validationSubDirectories,
                            cingPaths = cingPaths,
                            plotParameters = plotParameters,
                            plugins = plugins
@@ -263,7 +267,7 @@ Project: Top level Cing project class
                       'storedInCcpnFormat',
                       'reports',
                       'history',
-                      'procheckStatus', 'dsspStatus', 'whatifStatus', 'shiftxStatus'
+                      'procheckStatus', 'whatifStatus', 'shiftxStatus', 'status'
                     )
     #end def
 
@@ -408,12 +412,8 @@ Project: Top level Cing project class
         """
         if not self.molecule:
             return None
-        path = self.mkdir(self.molecule.name) # should become self.mkdir( 'Validation', self.molecule.name )
-
-        if not path:
-            return None
-
-        return os.path.join(path, *args)
+        path = self.mkdir(self.molecule.name, *args) # should become self.mkdir( 'Validation', self.molecule.name )
+        return path
     #end def
 
 
@@ -538,7 +538,7 @@ Project: Top level Cing project class
 
             pr.whatifStatus.parsed = False
             pr.shiftxStatus.parsed = False
-            pr.dsspStatus.parsed = False
+#            pr.dsspStatus.parsed = False
             pr.procheckStatus.parsed = False
             pr.x3dnaStatus.parsed = False
 
