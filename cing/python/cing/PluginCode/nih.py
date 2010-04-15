@@ -1191,10 +1191,33 @@ def _importTableFile( tabFile, molecule ):
 
 class TalosPlusResult( NTdict ):
     """Class to store talos+ results
-        Merily a container to hook up sml saving
+       Merily a container to hook up sml saving
     """
-    def __repr__(self):
-        return '<TalosPlusResult>'
+    def __init__(self, **kwds):
+
+        NTdict.__init__( self,
+                         __CLASS__ = "TalosPlusResult",
+                         __FORMAT__ = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as "%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s (confidence: %(ss_confidence)4.2f)',
+                         **kwds
+                       )
+        self.setdefault('residue', None)
+        self.setdefault('phi', None)
+        self.setdefault('psi', None)
+        self.setdefault('count', 0)
+        self.setdefault('classification', None)
+        self.setdefault('S2', NaN)
+        self.setdefault('ss_class', None)
+        self.setdefault('ss_confidence', None)
+    #end def
+
+    def __str__(self):
+        return sprintf('<TalosPlusResult %s>', self.residue)
+
+#    def format(self):
+#        return sprintf( ,
+#                 self
+#                )
+    #end def
 #end class
 
 class SMLTalosPlusResultHandler( SMLhandler ):
@@ -1276,7 +1299,6 @@ def _importTalosPlus( project, predFile, ssFile=None ):
                                     classification = row.CLASS,
                                     ss_class = None,
                                     ss_confidence = NaN,
-                                    __FORMAT__ = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as "%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s (confidence: %(ss_confidence)4.2f)'
                                     )
 
         if talosPlus.classification == 'None':
