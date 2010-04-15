@@ -1453,7 +1453,7 @@ def restoreTalosPlus( project, tmp=None ):
     for res in project.molecule.allResidues():
         res.talosPlus = None
 
-    project.status.setdefault('talosPlus',talosDefault())
+    project.status.setdefault('talosPlus',talosDefaults())
     project.status.talosPlus.keysformat()
     project.status.keysformat()
 
