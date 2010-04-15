@@ -219,9 +219,11 @@ def dsspDefault():
                  )
 #end def
 
-def runDssp(project, tmp=None)   :
+def runDssp(project, parseOnly=False)   :
     """
     Adds <Dssp> instance to molecule. Run dssp and parse result.
+    (ParseOnly is only for backward compatibility)
+
     Return None on error.
     """
     # check if dssp is present
@@ -238,6 +240,13 @@ def runDssp(project, tmp=None)   :
         NTerror('runDssp: no molecule defined')
         return None
     #end if
+
+    # Legacy code: to be removed
+    if parseOnly:
+        if restoreDssp( project ):
+            return None
+        return project.molecule.dssp
+    # end legacy code
 
     project.status.dssp = dsspDefault()
     project.status.dssp.molecule = project.molecule.nameTuple()
@@ -262,15 +271,17 @@ def runDssp(project, tmp=None)   :
 
 def restoreDssp(project, tmp = None):
     """
-    Optionally restore dssp results
+    Restore dssp results if present
+
+    Return True on error
     """
     if not project:
         NTerror('restoreDssp: no project defined')
-        return None
+        return True
     #end if
 
     if not project.molecule:
-        return None
+        return True
     #end if
 #    for res in project.molecule.allResidues():
 #        res.dssp = None
@@ -296,7 +307,7 @@ def restoreDssp(project, tmp = None):
     dcheck = Dssp(project)
     if not dcheck:
         NTerror("restoreDssp: Failed to get dssp instance of project")
-        return None
+        return True
 
     dcheck.parseResult()
     NTdetail('==> Restored dssp results')
