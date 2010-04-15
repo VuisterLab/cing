@@ -10,17 +10,26 @@ Methods:
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfile
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
+from cing.core.parameters import cingPaths
+from cing.core.sml import obj2SML
+from cing.core.sml import SML2obj
+from cing.core.sml import SMLhandler
+from cing.core.sml import SMLsaveFormat
 import array
 import os
 import sys
@@ -880,7 +889,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Read table from tabFile
         """
-        NTmessage('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
+        NTdebug('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
 
         #end if
 
@@ -971,7 +980,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
             return True
         self.write( file )
         file.close()
-        NTmessage('==> Written nmrPipe table file "%s"', tabFile )
+        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
         return False
     #end def
 
@@ -1038,6 +1047,26 @@ Example shift table (excerpts):
      2 Q           CB                 30.76
 ---------------------------------------------------
 
+From talos+ randcoil.tab file:
+
+REMARK Talos Random Coil Table 2005.032.16.15
+REMARK Cornilescu, Delaglio and Bax
+REMARK CA/CB from Spera, Bax, JACS 91.
+REMARK Others from Wishart et al. J. Biomol. NMR, 5(1995), 67-81
+REMARK Pro N shift is the current database average (7 residues).
+REMARK HIS = Wishart's val - 0.5*(diff between prot./non-prot. Howarth&Lilley)
+
+DATA RESNAMES  A C c D E F G H I K L M N P Q R S T V W Y
+DATA ATOMNAMES HA CA CB C N HN
+
+#
+# Values for C are CYS-reduced.
+# Values for c are CYS-oxidized.
+# Values for H are HIS-unprotonated.
+# Values for h are for HIS-protonated.
+# Values for D and E are for protonated forms.
+---------------------------------------------------
+
     """
 
     if not project:
@@ -1095,6 +1124,7 @@ Example shift table (excerpts):
             if (ac.isAssigned() and ( atomName in talosNuclei)):
                 shift = ac.shift() # save the shift, because Gly QA pseudo atom does get expanded
                 for ra in ac.realAtoms():
+                    atomName = ra.translate(IUPAC)
                     # Translate to TalosPlus
                     if talosDict.has_key(atomName):
                         atomName = talosDict[atomName]
@@ -1158,9 +1188,67 @@ def _importTableFile( tabFile, molecule ):
     return table
 #end def
 
-def importTalosPlus( project, predFile, ssFile=None ):
+
+class TalosPlusResult( NTdict ):
+    """Class to store talos+ results
+        Merily a container to hook up sml saving
     """
-    Import TalosPlus results from pred.tab and pred.ss.tab
+    def __repr__(self):
+        return '<TalosPlusResult>'
+#end class
+
+class SMLTalosPlusResultHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'TalosPlusResult' )
+    #end def
+
+    def handle(self, line, fp, molecule=None):
+        # The handle restores the attributes of TalosPlus object
+        # Needs a valid molecule
+        if molecule == None: return None
+        tPlus = TalosPlusResult()
+        return self.dictHandler(tPlus, fp, molecule)
+    #end def
+
+    def endHandler(self, tPlus, molecule=None):
+        # Restore linkage
+        # Needs a valid molecule
+        if molecule == None: return None
+        res = molecule.decodeNameTuple(tPlus.residue)
+        if res == None:
+            NTerror('SMLTalosPlusResultHandler.endHandler: invalid nameTuple %s, ==> skipped Residue', tPlus.residue)
+            return None
+        #end if
+        tPlus.residue = res
+        res.talosPlus = tPlus
+        return tPlus
+    #end def
+
+    def toSML(self, tPlus, stream=sys.stdout ):
+        """
+        Write SML code for TalosPlus instance to stream
+        """
+        fprintf( stream, "%s\n", self.startTag )
+#       Can add attributes here; update endHandler if needed
+        for a in tPlus.keys():
+            #print ">>", a
+            if a == 'residue':
+                fprintf( stream, '%s = %r\n', a, tPlus[a].nameTuple(SMLsaveFormat) ) # encode the residue
+            else:
+                fprintf( stream, '%s = %r\n', a, tPlus[a] )
+        #end for
+
+        fprintf( stream, "%s\n", self.endTag )
+    #end def
+#end class
+#register this handler
+TalosPlusResult.SMLhandler = SMLTalosPlusResultHandler()
+
+
+def _importTalosPlus( project, predFile, ssFile=None ):
+    """
+    Helper code: Import TalosPlus results from pred.tab and pred.ss.tab
     """
 
     if not project:
@@ -1179,100 +1267,219 @@ def importTalosPlus( project, predFile, ssFile=None ):
     for row in table:
 
         #print '>', row, row.residue
-        talosPlus = NTdict( residue = row.residue,
-                             phi = NTvalue( row.PHI, row.DPHI, '%.1f +- %.1f'),
-                             psi = NTvalue( row.PSI, row.DPSI, '%.1f +- %.1f'),
-                             S2  = row.S2,
-                             count = row.COUNT,
-                             classification = row.CLASS,
-                             ss_class = None,
-                             ss_confidence = NaN,
-                            __FORMAT__ = '%(residue)s   %(phi)s  %(psi)s  %(count)s %(classification)s   %(S2).2f   %(ss_class)s %(ss_confidence).2f'
-                          )
+        talosPlus = TalosPlusResult(
+                                    residue = row.residue,
+                                    phi = NTvalue( row.PHI, row.DPHI, '%6.1f +- %4.1f'),
+                                    psi = NTvalue( row.PSI, row.DPSI, '%6.1f +- %4.1f'),
+                                    S2  = row.S2,
+                                    count = row.COUNT,
+                                    classification = row.CLASS,
+                                    ss_class = None,
+                                    ss_confidence = NaN,
+                                    __FORMAT__ = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as "%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s (confidence: %(ss_confidence)4.2f)'
+                                    )
 
         if talosPlus.classification == 'None':
             talosPlus.phi.value = NaN
             talosPlus.phi.error = NaN
             talosPlus.psi.value = NaN
             talosPlus.psi.error = NaN
+            talosPlus.S2 = NaN
         #end if
 
         row.residue.talosPlus = talosPlus
     #end for
 
     # do the second ss file
+    ssdict = dict( H = 'Helix', E='Extended', L='Coil' ) # X is translated to None
     if ssFile:
         table = _importTableFile( ssFile, molecule )
         for row in table:
-            row.residue.talosPlus.ss_class = row.SS_CLASS
+            row.residue.talosPlus.Q_H = row.Q_H    # Helix
+            row.residue.talosPlus.Q_E = row.Q_E    # Extended
+            row.residue.talosPlus.Q_L = row.Q_L    # Loop
+            if ssdict.has_key(row.SS_CLASS):
+                row.residue.talosPlus.ss_class = ssdict[row.SS_CLASS]
+            else:
+                row.residue.talosPlus.ss_class = None
             row.residue.talosPlus.ss_confidence = row.CONFIDENCE
         #end for
     #end if
 #end def
 
+def talosDefaults():
+    return NTdict(
+                  directory  = 'talosPlus',
+                  tableFile  = 'talosPlus.tab',
+                  predFile   = 'pred.tab',
+                  predSSFile = 'pred.ss.tab',
+                  smlFile    = 'talosPlus.sml',
+                  molecule   = None,
+                  completed  = False,
+                  parsed     = False,
+                 )
+#end def
 
-#def exportShifts2Talos( molecule, fileName=None)   :
-#    """Export shifts to talos format
-#    """
-#
-#    if not molecule:
-#        return None
-#    #end if
-#
-#    if not fileName:
-#        fileName = molecule.name + '.tab'
-#    #end if
-#
-#    f = open( fileName, 'w' )
-#
-##   generate a oneletter sequence string
-#    seqString = ''
-#    for res in allResidues( molecule ):
-##        seqString = seqString + res.db.shortName JFD mod.
-#        if res.translate(INTERNAL_1) == 'CYSS':
-#            seqString = seqString + 'c' # oxidized
-#        else:
-#            seqString = seqString + res.shortName
-#    #end for
-#
-##   header
-#    fprintf( f, 'REMARK shifts from %s\n\n', molecule.name )
-#    fprintf( f, 'DATA SEQUENCE %s\n\n', seqString )
-#    fprintf( f, 'VARS   RESID   RESNAME ATOMNAME SHIFT\n' )
-#    fprintf( f, '%s\n\n', 'FORMAT       %4d     %1s     %4s      %8.3f' )
-#
-#    talosUsed = ['N', 'H', 'CA', 'HA', 'HA1', 'HA2', 'HA3', 'QA', 'CB', 'C']
-#
-#    count = 0
-#    for ac in allAtoms( molecule ):
-#        if (ac.isAssigned() and (atomName in talosUsed)):
-#            # construct the Talos name, especially expand the GLY QA, but code is general
-#            if not ac.isPseudoAtom():
-#                atomName = ac.translate(IUPAC)
-#            else:
-#                atomName = ''
-#                for ra in ac.realAtoms():
-#                    atomName = atomName + '|' + ra.translate(IUPAC)
-#                atomName = atomName[1:]
-#            #end if
-#
-#
-#            fprintf( f, '%4d    %1s     %4s      %8.3f\n',
-#                        ac._parent.resNum,
-##                        ac._parent.db.shortName, JFD mod.
-#                        ac._parent.shortName,
-#                        atomName,
-#                        ac.shift()
-#                   )
-#            count += 1
-#        #end if
-#    #end for
-#
-#    f.close()
-#
-#    NTmessage( '==> exportShifts2Talos:  %-4d shifts   written to "%s"', count, fileName )
-#    #end if
-##end def
+def runTalosPlus(project, tmp=None):
+    """Perform a talos+ analysis
+    """
+    if project == None:
+        NTmessage("RunTalosPlus: No project defined")
+        return True
+
+    #tmp: to be entered in setup
+    cingPaths.talosPlus = 'talos+'
+
+    if cingPaths.talosPlus == None or cingPaths.talosPlus == 'PLEASE_ADD_EXECUTABLE_HERE':
+        NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
+        return
+
+    if project.molecule == None:
+        NTmessage("RunTalosPlus: No molecule defined")
+        return True
+
+    if project.molecule.resonanceCount == 0:
+        NTmessage("RunTalosPlus: No resonances defined")
+        return True
+
+    project.status.talosPlus = talosDefaults()
+    project.status.talosPlus.molecule = project.molecule.nameTuple()
+    project.status.talosPlus.keysformat()
+    talosDefs = project.status.talosPlus
+
+    path = project.validationPath( talosDefs.directory )
+    if not path:
+        return True
+
+    # Exporting the shifts
+    fileName = os.path.join(path, talosDefs.tableFile )
+    exportShifts2TalosPlus(  project, fileName=fileName )
+
+    # running TalosPlus
+    talosProgram = ExecuteProgram( cingPaths.talosPlus, rootPath = path,
+                                   redirectOutput = True
+                                 )
+    NTmessageNoEOL('==> Running talos+ ... ')
+    talosProgram('-in ' + talosDefs.tableFile)
+    NTmessage('Done!')
+    project.status.talosPlus.completed=True
+
+    # Importing the results
+    importTalosPlus( project )
+    saveTalosPlus( project )
+    project.history(sprintf('Ran talos+ on %s', project.molecule))
+    return
+#end def
+
+
+def importTalosPlus( project, tmp=None ):
+    """Import talosPlus results.
+    """
+    if project == None:
+        NTmessage("importTalosPlus: No project defined")
+        return True
+
+    if 'talosPlus' not in project.status:
+        NTmessage("importTalosPlus: No talos+ was run")
+        return True
+    talosDefs = project.status.talosPlus
+
+    path = project.validationPath( talosDefs.directory )
+    if not path:
+        NTerror('importTalosPlus: directory "%s" with talosPlus data not found', path)
+        return True
+
+    predFile = os.path.join(path, talosDefs.predFile )
+    if not os.path.exists(predFile):
+        NTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predFile)
+        return True
+
+    predSSFile = os.path.join(path, talosDefs.predSSFile )
+    if not os.path.exists(predSSFile):
+        NTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predSSFile)
+        return True
+
+    if _importTalosPlus( project, predFile, predSSFile ):
+        return True
+
+    project.status.talosPlus.parsed = True
+
+#end def
+
+def saveTalosPlus( project, tmp=None ):
+    """
+    Save talos+ results to sml file
+    """
+    if project == None:
+        NTmessage("saveTalosPlus: No project defined")
+        return True
+
+    if 'talosPlus' not in project.status:
+        NTmessage("importTalosPlus: No talos+ was run")
+        return True
+    talosDefs = project.status.talosPlus
+
+    path = project.validationPath( talosDefs.directory )
+    if not path:
+        NTerror('saveTalosPlus: directory "%s" with talosPlus data not found', path)
+        return True
+
+    if project.molecule == None:
+        NTmessage("saveTalosPlus: No molecule defined")
+        return True
+
+    l = NTlist()
+    for res in project.molecule.allResidues():
+        if res.has_key('talosPlus') and res.talosPlus != None:
+            l.append(res.talosPlus)
+    #end for
+    smlFile = os.path.join(path, talosDefs.smlFile )
+    obj2SML( l, smlFile)
+    NTdetail('==> Saved talos+ results to "%s"', smlFile)
+#end def
+
+def restoreTalosPlus( project, tmp=None ):
+    """
+    Restore talos+ results from sml file.
+
+    Return True on error
+    """
+    if project == None:
+        NTmessage("restoreTalosPlus: No project defined")
+        return True
+
+    if project.molecule == None:
+        return False # Gracefully returns
+    for res in project.molecule.allResidues():
+        res.talosPlus = None
+
+    project.status.setdefault('talosPlus',talosDefault())
+    project.status.talosPlus.keysformat()
+    project.status.keysformat()
+
+    if not project.status.talosPlus.completed:
+        return # Return gracefully
+
+
+    talosDefs = project.status.talosPlus
+    path = project.validationPath( talosDefs.directory)
+    if not path:
+        NTerror('restoreTalosPlus: directory "%s" with talosPlus data not found', path)
+        return True
+
+    smlFile = os.path.join(path, talosDefs.smlFile )
+    if not os.path.exists(smlFile):
+        NTerror('restoreTalosPlus: file "%s" with talosPlus data not found', path)
+        return True
+
+   # Restore the data
+    NTdetail('==> Restoring talos+ results from "%s"', smlFile)
+    l=SML2obj( smlFile, project.molecule)
+    if l==None:
+        return True
+
+    return
+#end def
 
 def export2nih( project, tmp=None ):
     """
@@ -1280,7 +1487,7 @@ def export2nih( project, tmp=None ):
     """
 
     for mol in project.molecules:
-        fileName = project.path( project.directories.nih, mol.name+'.talosPlus.tab' )
+        fileName = project.path( project.directories.nih, mol.name+'.'+talosDefs.tableFile )
         exportShifts2TalosPlus(  project, fileName=fileName )
     #end for
 
@@ -1293,9 +1500,11 @@ def export2nih( project, tmp=None ):
 #-----------------------------------------------------------------------------
 
 # register the functions
-methods  = [(importTalosPlus,None)]
-saves    = []
-restores = []
+methods  = [(runTalosPlus,None),
+            (importTalosPlus,None)
+           ]
+saves    = [(saveTalosPlus, None)]
+restores = [(restoreTalosPlus, False)]
 exports  = [(export2nih, None)]
 
 

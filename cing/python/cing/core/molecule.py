@@ -251,7 +251,7 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
     def __repr__(self):
-        return str(self)
+        return sprintf('<Molecule %s>', self._Cname(-1))
     #end def
 
     def getAssignmentCountMap(self):
@@ -2223,10 +2223,6 @@ Chain class: defines chain properties and methods
         self.residueCount = 0
     #end def
 
-    def __repr__(self):
-        return str(self)
-    #end def
-
     def isNullValue(id):
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
@@ -2437,9 +2433,9 @@ Residue class: Defines residue properties
                            self.footer( dots )
     #end def
 
-    def __repr__(self):
-        return str(self)
-    #end def
+#    def __repr__(self):
+#        return sprintf('<Residue %s>', self._Cname(-1))
+#    #end def
 
     def toString(self, showChainId=True, showResidueType=True):
         """A unique compact string identifier.e.g B.LYS282"""
@@ -3207,12 +3203,7 @@ Atom class: Defines object for storing atom properties
 
     def __str__( self ):
 #        return self._Cname( 1 )
-#        return '<%s %s>' % ( self._className(), self._Cname(1) ) # increased level for resolving issue 236.
         return '<%s %s>' % ( self._className(), self._Cname(2) ) # Include chain id as well as residue id.
-    #end def
-
-    def __repr__(self):
-        return str(self)
     #end def
 
     def criticize(self):

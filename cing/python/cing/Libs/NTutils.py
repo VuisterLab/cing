@@ -1786,8 +1786,33 @@ class NTtree(NTdict):
         return '<%s %s>' % (self._className(), self.name)
 
     def __repr__( self ):
-        return '<%s-Object (%d): %s>' % (self.__CLASS__, self.__OBJECTID__, self._Cname( -1 ))
+        return '<%s %s (%d)>' % (self.__CLASS__, self._Cname( -1 ), self.__OBJECTID__)
     #end def
+
+    def _decodeTreeName(self, nodeNames ):
+        """
+        Decode a list of nodeNames relative to self;
+        uses recursion
+        return NTtree object or None on error
+        """
+        #print ">>", self, nodeNames
+        if len(nodeNames) == 0:
+            return None
+        elif len(nodeNames) == 1:
+            if nodeNames[0] != self.name:
+                return None
+            return self
+        else:
+            if not self.has_key(nodeNames[1]):
+                return None
+            return self[nodeNames[1]]._decodeTreeName( nodeNames[1:])
+    #end def
+
+    def _decodeCname(self, Cname):
+       """Decode a Cname relative to self;
+       """
+       return self._decodeTreeName( Cname.split('.') )
+   #end def
 
     def getParent(self, level=1):
         if level < 0:
