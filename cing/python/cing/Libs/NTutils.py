@@ -570,6 +570,19 @@ Sum                %s
         return string
     #end def
 
+    def formatAll(self, start=0, stop=None):
+        """
+        Print every element of self on a single line using the format() method of the items
+        Optionally run from start to stop
+        """
+        if stop == None:
+            stop = len(self)
+        for i in range(start, stop):
+            print self[i].format()
+        #end for
+    #end def
+
+
 #    def formatHtml(self):
 #        if not self.format():
 #            return ''

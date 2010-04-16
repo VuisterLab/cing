@@ -1,7 +1,7 @@
 <SML> 0.23
 
 #=======================================================================
-#             	internal short   
+#             	internal short
 <ResidueDef>  	GLUH     E        INTERNAL_1
 #=======================================================================
 	comment    = 'Protonated (neutral) GLU (uncommon)'
@@ -10,43 +10,43 @@
 
 	dihedrals  = <NTlist>
 	#---------------------------------------------------------------
-	<DihedralDef> PHI     
+	<DihedralDef> PHI
 	#---------------------------------------------------------------
 		atoms    = [(-1, 'C'), (0, 'N'), (0, 'CA'), (0, 'C')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> PSI     
+	<DihedralDef> PSI
 	#---------------------------------------------------------------
 		atoms    = [(0, 'N'), (0, 'CA'), (0, 'C'), (1, 'N')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> CHI1    
+	<DihedralDef> CHI1
 	#---------------------------------------------------------------
 		atoms    = [(0, 'N'), (0, 'CA'), (0, 'CB'), (0, 'CG')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> CHI2    
+	<DihedralDef> CHI2
 	#---------------------------------------------------------------
 		atoms    = [(0, 'CA'), (0, 'CB'), (0, 'CG'), (0, 'CD')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> CHI3    
+	<DihedralDef> CHI3
 	#---------------------------------------------------------------
 		atoms    = [(0, 'CB'), (0, 'CG'), (0, 'CD'), (0, 'OE1')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> CHI42   
+	<DihedralDef> CHI42
 	#---------------------------------------------------------------
 		atoms    = [(0, 'CG'), (0, 'CD'), (0, 'OE2'), (0, 'HE2')]
 		karplus  = None
 	</DihedralDef>
 	#---------------------------------------------------------------
-	<DihedralDef> OMEGA   
+	<DihedralDef> OMEGA
 	#---------------------------------------------------------------
 		atoms    = [(-1, 'CA'), (-1, 'C'), (0, 'N'), (0, 'CA')]
 		karplus  = None
@@ -55,7 +55,7 @@
 
 	atoms      = <NTlist>
 	#---------------------------------------------------------------
-	<AtomDef> N       
+	<AtomDef> N
 	#---------------------------------------------------------------
 		topology   = [(-1, 'C'), (0, 'H'), (0, 'CA')]
 		real       = []
@@ -69,7 +69,7 @@
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNitrogen', 'nitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> H       
+	<AtomDef> H
 	#---------------------------------------------------------------
 		topology   = [(0, 'N')]
 		real       = []
@@ -83,7 +83,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> CA      
+	<AtomDef> CA
 	#---------------------------------------------------------------
 		topology   = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
 		real       = []
@@ -97,7 +97,7 @@
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HA      
+	<AtomDef> HA
 	#---------------------------------------------------------------
 		topology   = [(0, 'CA')]
 		real       = []
@@ -111,7 +111,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> CB      
+	<AtomDef> CB
 	#---------------------------------------------------------------
 		topology   = [(0, 'CA'), (0, 'HB2'), (0, 'HB3'), (0, 'CG')]
 		real       = []
@@ -125,7 +125,7 @@
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HB2     
+	<AtomDef> HB2
 	#---------------------------------------------------------------
 		topology   = [(0, 'CB')]
 		real       = []
@@ -139,7 +139,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HB3     
+	<AtomDef> HB3
 	#---------------------------------------------------------------
 		topology   = [(0, 'CB')]
 		real       = []
@@ -153,7 +153,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> QB      
+	<AtomDef> QB
 	#---------------------------------------------------------------
 		topology   = [(0, 'CB')]
 		real       = ['HB2', 'HB3']
@@ -167,7 +167,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> CG      
+	<AtomDef> CG
 	#---------------------------------------------------------------
 		topology   = [(0, 'CB'), (0, 'HG2'), (0, 'HG3'), (0, 'CD')]
 		real       = []
@@ -181,7 +181,7 @@
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HG2     
+	<AtomDef> HG2
 	#---------------------------------------------------------------
 		topology   = [(0, 'CG')]
 		real       = []
@@ -195,7 +195,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HG3     
+	<AtomDef> HG3
 	#---------------------------------------------------------------
 		topology   = [(0, 'CG')]
 		real       = []
@@ -209,7 +209,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasPseudoAtom', 'haspseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> QG      
+	<AtomDef> QG
 	#---------------------------------------------------------------
 		topology   = [(0, 'CG')]
 		real       = ['HG2', 'HG3']
@@ -223,7 +223,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> CD      
+	<AtomDef> CD
 	#---------------------------------------------------------------
 		topology   = [(0, 'CG'), (0, 'OE1'), (0, 'OE2')]
 		real       = []
@@ -237,7 +237,7 @@
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> OE1     
+	<AtomDef> OE1
 	#---------------------------------------------------------------
 		topology   = [(0, 'CD')]
 		real       = []
@@ -251,7 +251,7 @@
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> OE2     
+	<AtomDef> OE2
 	#---------------------------------------------------------------
 		topology   = [(0, 'CD'), (0, 'HE2')]
 		real       = []
@@ -265,12 +265,12 @@
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> HE2     
+	<AtomDef> HE2
 	#---------------------------------------------------------------
 		topology   = [(0, 'OE2')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'HE2', 'BMRBd': 'HE2', 'IUPAC': 'HE2', 'AQUA': 'HE2', 'INTERNAL_0': 'HE2', 'INTERNAL_1': 'HE2', 'CYANA': 'HE2', 'CYANA2': 'HE2', 'PDB': None, 'XPLOR': None}
+		nameDict   = {'CCPN': 'HE2', 'BMRBd': 'HE2', 'IUPAC': 'HE2', 'AQUA': 'HE2', 'INTERNAL_0': 'HE2', 'INTERNAL_1': 'HE2', 'CYANA': 'HE2', 'CYANA2': 'HE2', 'PDB': 'HE2', 'XPLOR': 'HE2'}
 		aliases    = []
 		type       = 'H_OXY'
 		spinType   = '1H'
@@ -279,7 +279,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> C       
+	<AtomDef> C
 	#---------------------------------------------------------------
 		topology   = [(0, 'CA'), (0, 'O'), (1, 'N')]
 		real       = []
@@ -293,7 +293,7 @@
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> O       
+	<AtomDef> O
 	#---------------------------------------------------------------
 		topology   = [(0, 'C')]
 		real       = []
@@ -307,7 +307,7 @@
 		properties = ['isNotProton', 'notproton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isSidechain', 'sidechain']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> H1      
+	<AtomDef> H1
 	#---------------------------------------------------------------
 		topology   = [(0, 'N')]
 		real       = []
@@ -321,7 +321,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> H2      
+	<AtomDef> H2
 	#---------------------------------------------------------------
 		topology   = [(0, 'N')]
 		real       = []
@@ -335,7 +335,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> H3      
+	<AtomDef> H3
 	#---------------------------------------------------------------
 		topology   = [(0, 'N')]
 		real       = []
@@ -349,7 +349,7 @@
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
-	<AtomDef> OXT     
+	<AtomDef> OXT
 	#---------------------------------------------------------------
 		topology   = [(0, 'C')]
 		real       = []
