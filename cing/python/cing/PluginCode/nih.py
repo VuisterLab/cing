@@ -1439,7 +1439,7 @@ def saveTalosPlus( project, tmp=None ):
         return True
 
     if 'talosPlus' not in project.status:
-        NTmessage("importTalosPlus: No talos+ was run")
+        NTdebug("importTalosPlus: No talos+ was run")
         return True
     talosDefs = project.status.talosPlus
 
@@ -1544,6 +1544,7 @@ def export2nih( project, tmp=None ):
     """
 
     for mol in project.molecules:
+        talosDefs = project.status.talosPlus
         fileName = project.path( project.directories.nih, mol.name+'.'+talosDefs.tableFile )
         exportShifts2TalosPlus(  project, fileName=fileName )
     #end for

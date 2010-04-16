@@ -15,7 +15,7 @@ startDir = '/Library/WebServer/Documents/CASD-NMR-CING'
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
 pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
-if True:
+if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
@@ -38,6 +38,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     delay_between_submitting_jobs = 1,
                     max_time_to_wait = 60 * 6,
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 100,
+                    MAX_ENTRIES_TODO = 1,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)

@@ -161,9 +161,10 @@ Sum                %s
         return text
 
     def getConsensus(self, minFraction=1.):
-        if not hasattr(self, CONSENSUS_STR):
-            self.setConsensus(minFraction=minFraction)
-        return getattr(self, CONSENSUS_STR)
+        return self.setConsensus(minFraction=minFraction)
+#        w = getattr(self, CONSENSUS_STR)
+#        print 'w: ', w
+#        return w
 
     def setConsensus(self, minFraction=1.):
         """Where there are only the same values set the consensus to it
@@ -177,12 +178,17 @@ Sum                %s
         setattr(self, CONSENSUS_STR, None)
         count = {}
         n = len(self)
+        minCount = minFraction * n
+#        print 'minCount: ', minCount
         for v in self:
             count.setdefault(v, 0)
             count[v] +=1
+#            print 'count: ', count
         for v in count:
-            if count[v] >= minFraction*n:
+#            print 'considering v: ', v
+            if count[v] >= minCount:
                 setattr(self, CONSENSUS_STR, v)
+#                print 'returning v: ', v
                 return v
         return False
     #end def
@@ -1489,7 +1495,9 @@ class NTdict(dict):
 
     def getDeepAvgByKeys(self, *keyList):
         """Return first item only of tuple with av, sd, n for NTlist if found
-        otherwise return None
+        otherwise return None.
+        If the first element of the list to average is a string then the consensus of
+        the list will be returned instead of a numerical value.
         """
         result = self.getDeepByKeys(*keyList)
         if result == None:
@@ -1498,11 +1506,21 @@ class NTdict(dict):
         if not isinstance(result, NTlist):
             NTerror("result is not an instance of NTlist so it can't be averaged")
             return None
+        if not result:
+#            NTdebug("result is an empty list in getDeepAvgByKeys")
+            return None
+        if isinstance(result[0], str):
+#            NTdebug("result is a string list in getDeepAvgByKeys")
+            x = result.setConsensus()
+#            NTdebug("x returned by getConsensus() in getDeepAvgByKeys %s" % x)
+            return x
+
         r = result.average()
         if r == None:
 #            NTdebug("None returned by average() in getDeepAvgByKeys")
             return None
         return r[0]
+
 
     def getDeepFirstByKeys(self, *keyList):
         """Return first item only if found otherwise return None"""

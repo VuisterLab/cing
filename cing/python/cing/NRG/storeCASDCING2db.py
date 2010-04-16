@@ -333,7 +333,7 @@ def main(casd_id, *extraArgList):
                   ))
             residue_id = execute(s).fetchall()[0][0]
             NTdebug("Inserted residue %s" % residue_id)
-            if False:
+            if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name
                     # WI
@@ -383,8 +383,15 @@ def main(casd_id, *extraArgList):
                         rog=a_rog
                         )
                     )
-                    atom_id = result.last_inserted_ids()[0]
-                    NTdebug("Inserted atom %s" % atom_id)
+#                    atom_id = result.last_inserted_ids()[0] # TODO: update to this again.
+                    s = select([catom.c.atom_id],and_(
+                          catom.c.entry_id == entry_id,
+                          catom.c.chain_id == chain_id,
+                          catom.c.residue_id == residue_id,
+                          catom.c.name == a_name
+                          ))
+                    atom_id = execute(s).fetchall()[0][0]
+                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
                 # end for atom
             # end if atom
         # end for residue

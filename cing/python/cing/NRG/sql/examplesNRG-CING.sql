@@ -25,13 +25,24 @@ where
 e.distance_count = 0
 AND e.dihedral_count = 0
 and e.name not like '%Org'
+and e.name not like '%Utrecht%'
+and e.name not like '%Seattle%'
+and e.name not like '%Cheshire%'
 ORDER BY e.name ASC;
 
+SELECT e.name, e.distance_count,e.dihedral_count FROM entry e
+where
+e.name not like '%Org'
+and e.name not like '%Utrecht%'
+and e.name not like '%Seattle%'
+and e.name not like '%Cheshire%'
+ORDER BY e.name ASC;
 
 e.distance_count = 0
 AND e.dihedral_count = 0
 
 e.name = 'AR3436APiscataway2'
 
+SELECT count(*) FROM entry e;
 
 

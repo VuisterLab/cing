@@ -1,5 +1,6 @@
 # See NRG presetDict.py
-#
+# vi $CINGROOT/python/cing/NRG/casdNmrPresetDict.py
+
 help = """
 
 'forceChainMappings': [[' ','CGR',1,-8]],   # Chain mapping: [chainCode ccpn datamodel, chainCode input, firstSeqId, offset]
@@ -67,7 +68,10 @@ Offset should be -416 why doesn't it figure that out?
 'PGR122AUtrecht'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},},},
 
 'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
-                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
+                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 89], ['A', '   A', 1, 89], ['A', 'A', 1, 89]],}},
+                      },
+'ET109AoxParis'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
+                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 89], ['A', '   A', 1, 89], ['A', 'A', 1, 89]],}},
                       },
 'PGR122AParis2'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1,},}, # The RDC frame coordinates are messing things up. Best if removed.
 #                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
@@ -75,9 +79,8 @@ Offset should be -416 why doesn't it figure that out?
                       },
 
 'AtT13Paris'    : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
-'CGR26AParis'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
+'CGR26AParis'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 40], ['A', '   A', 1, 40]],}}},
 'CtR69AParis'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
-'ET109AoxParis' : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
 'HR5537AParis'  : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
 
 'VpR247Paris'   : {'linkResonances': {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}}},
