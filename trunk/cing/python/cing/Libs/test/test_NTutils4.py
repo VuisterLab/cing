@@ -4,10 +4,11 @@ python -u $CINGROOT/python/cing/Libs/test/test_NTutils4.py
 """
 
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import switchOutput
-from unittest import TestCase
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import switchOutput
 from cing.Libs.NTutils import toPoundedComment
+from unittest import TestCase
+from cing.core.sml import NTdict
 import cing
 import unittest
 
@@ -100,6 +101,23 @@ b
         y.append(200)
         y.append(300)
         self.assertEquals( x.lenRecursive(), 3)
+    def testGetDeepAvgByKeys(self):
+        d=NTdict()
+        l = NTlist()
+        d['key'] = l
+        l.append('abc')
+        l.append('abc')
+        x = d.getDeepAvgByKeys('key')
+#        print 'x=', x
+        self.assertEquals( x, 'abc')
+
+        # Fraction by default needs to be 1.0; complete consensus
+        l.append('def')
+        x = d.getDeepAvgByKeys('key')
+        self.assertEquals( x, False)
+
+        x = l.getConsensus(minFraction=0.5)
+        self.assertEquals( x, 'abc')
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

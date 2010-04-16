@@ -214,11 +214,11 @@ CREATE TABLE atom
     name                           VARCHAR(255)     DEFAULT NULL,
 --   whatif
     wi_ba2chk                      FLOAT DEFAULT NULL,
-    wi_bh2chk                      FLOAT DEFAULT NULL,
+    wi_bh2chk                      VARCHAR(255) DEFAULT NULL,
     wi_chichk                      FLOAT DEFAULT NULL,
     wi_dunchk                      FLOAT DEFAULT NULL,
     wi_hndchk                      FLOAT DEFAULT NULL,
-    wi_mischk                      FLOAT DEFAULT NULL,
+    wi_mischk                      VARCHAR(255) DEFAULT NULL,
     wi_mo2chk                      FLOAT DEFAULT NULL,
     wi_pl2chk                      FLOAT DEFAULT NULL,
     wi_wgtchk                      FLOAT DEFAULT NULL,

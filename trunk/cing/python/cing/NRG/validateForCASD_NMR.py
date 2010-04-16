@@ -15,12 +15,12 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
 pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 
-if True:
+if False:
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'PGR122AParis2'.split()
+    entryList = 'CtR69ALyon CtR69ALyon2'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME

@@ -16,6 +16,9 @@ import unittest
 class AllChecks(TestCase):
 
     def testPdbFile(self):
+        self.failIf( os.chdir(cingDirTmp), msg=
+            "Failed to change to directory for temporary test files: "+cingDirTmp)
+
         entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "1hy8" # small, single model, very low scoring entry
 
@@ -30,6 +33,12 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
+        
+        m = project.molecule
+        m.toPDBfile('m001.pdb',model=0, convention='XPLOR')
+        m.initCoordinates()
+        m.importFromPDB('m001.pdb',convention='XPLOR')
+        
         self.assertFalse(project.mkMacros())
 
     def testPrintSequenceFromPdbFile(self):
