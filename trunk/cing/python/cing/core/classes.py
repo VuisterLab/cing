@@ -1970,6 +1970,7 @@ class RestraintList(NTlist):
         return None
     #end def
 
+
 class DistanceRestraintList(RestraintList):
     """
     Class based on NTlist that holds distanceRestraints.
@@ -2466,8 +2467,8 @@ class DihedralRestraint(Restraint):
             sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %7s)  ' + \
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
                      self, self.rogScore,
-                     val2Str(self.lower, "%4.1f", 4),
-                     val2Str(self.upper, "%4.1f", 4),
+                     val2Str(self.lower, "%6.1f", 6), # GV: does not fit in 4 fields, i.e -160.1
+                     val2Str(self.upper, "%6.1f", 6),
                      val2Str(self.cav, "%6.1f", 6),
                      val2Str(self.cv, "%7.4f", 7),
                      val2Str(self.violAv, "%4.1f", 4),

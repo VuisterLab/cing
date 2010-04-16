@@ -26,6 +26,7 @@ from cing.Libs.fpconst import NaN
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
+from cing.core.classes import DihedralRestraint
 from cing.core.sml import obj2SML
 from cing.core.sml import SML2obj
 from cing.core.sml import SMLhandler
@@ -1205,7 +1206,8 @@ class TalosPlusResult( NTdict ):
         self.setdefault('psi', None)
         self.setdefault('count', 0)
         self.setdefault('classification', None)
-        self.setdefault('S2', NaN)
+        self.setdefault('S2', NaN) #REMARK  Predicted order parameter (S2) from backbone chemical shifts for talosPlus.tab
+                                   #REMARK  from David Wishart's RCI method, JACS, 127(43), 14970-14971
         self.setdefault('ss_class', None)
         self.setdefault('ss_confidence', None)
     #end def
@@ -1503,6 +1505,39 @@ def restoreTalosPlus( project, tmp=None ):
     return
 #end def
 
+def talosPlus2restraints( project, name='talosPlus', status='keep', errorFactor=2.0 ):
+    """
+    Convert talos+ results to a dihedral restraint list
+    """
+    if project == None:
+        NTmessage("talosPlus2restraints: No project defined")
+        return True
+
+    if project.molecule == None:
+        NTmessage("talosPlus2restraints: No project defined")
+        return True
+
+    if not project.status.has_key('talosPlus') or not project.status.talosPlus.completed:
+        NTmessage("talosPlus2restraints: No talos+ data")
+        return True
+
+    dhl = project.dihedrals.new(name=name, status=status)
+    for res in project.molecule.allResidues():
+        if res.talosPlus and res.talosPlus.classification=='Good':
+            lower = res.talosPlus.phi.value-errorFactor*res.talosPlus.phi.error
+            upper = res.talosPlus.phi.value+errorFactor*res.talosPlus.phi.error
+            d = DihedralRestraint(res.PHI.atoms, lower, upper)
+            dhl.append(d)
+
+            lower = res.talosPlus.psi.value-errorFactor*res.talosPlus.psi.error
+            upper = res.talosPlus.psi.value+errorFactor*res.talosPlus.psi.error
+            d = DihedralRestraint(res.PSI.atoms, lower, upper)
+            dhl.append(d)
+        #end if
+    #end for
+    NTmessage('==> Created %s', dhl)
+#end def
+
 def export2nih( project, tmp=None ):
     """
     Export resonances to NIH (talos) format
@@ -1523,7 +1558,8 @@ def export2nih( project, tmp=None ):
 
 # register the functions
 methods  = [(runTalosPlus,None),
-            (importTalosPlus,None)
+            (importTalosPlus,None),
+            (talosPlus2restraints,None)
            ]
 saves    = [(saveTalosPlus, None)]
 restores = [(restoreTalosPlus, False)]

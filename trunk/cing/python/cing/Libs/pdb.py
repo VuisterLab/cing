@@ -105,7 +105,7 @@ class pdbParser:
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
-        self.matchGame = MatchGame(patchAtomNames = patchAtomNames, skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
+        self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames, skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
 
         if not os.path.exists(pdbFile):
             NTerror('pdbParser: missing PDB-file "%s"', pdbFile)
@@ -351,7 +351,7 @@ class pdbParser:
         """
         Import coordinates into self.molecule.
         Optionally use only first nmodels.
-        Optionally do not update dihedrals, mean-coordiates, .. (Be careful; only intended for conversion
+        Optionally do not update dihedrals, mean-coordinates, .. (Be careful; only intended for conversion
         purposes).
 
         Return True on error
@@ -594,6 +594,8 @@ class MatchGame:
         atm.db = res.db.getAtomDefByName(aName, convention = self.convention)
         if atm.db:
             return atm.db
+
+        #print '>============>', atm, aName, self.convention, res.db.format()
 
         # JFD adds hacks these debilitating simple variations if nothing is found so far
         # GWV does not like this at all and therefore hides it behind an option

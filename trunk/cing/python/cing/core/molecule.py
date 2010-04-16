@@ -1617,7 +1617,28 @@ Return an Molecule instance or None on error
         return fitted
     #end def
 
-    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2 ):
+    def _autoRanges(self, autoLimit):
+        """
+        Automatically define a set of ranges for superposition.
+        Return a list of residues
+        """
+        if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
+            r = NTlist()
+            for res in self.allResidues():
+                if res.talosPlus and not isNaN(res.talosPlus.S2) and res.talosPlus.S2>autoLimit:
+                    r.append(res)
+            #end for
+            if len(r) == 0:
+                NTwarning(' Molecule._autoRanges: empty list, taking all residues')
+                r = self.allResidues()
+        else:
+            NTwarning(' Molecule._autoRanges: no talos+ data, taking all residues')
+            r = self.allResidues()
+        #end if
+        return r
+    #end def
+
+    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.6 ):
         """
         Superpose the coordinates of molecule
         returns ensemble or NoneObject on error
@@ -1627,38 +1648,15 @@ Return an Molecule instance or None on error
             return NoneObject
         #end if
 
-##        self.ensemble = Ensemble( molecule )
+        if ranges=='auto':
+            ranges = self._autoRanges(autoLimit)
 
-        # Partition the Atoms
-#        fitted        = []
-#        notFitted     = []
-#        noCoordinates = []
-#        fitResidues   = self.ranges2list( ranges )
-#        # store the ranges
-#        self.ranges   = list2asci( fitResidues.zap('resNum'))
-#
-#        for res in self.allResidues():
-#            fitResidue = res in fitResidues
-#            for a in res.allAtoms():
-#                if len(a.coordinates) != self.modelCount:
-#                    noCoordinates.append( a )
-#                    continue
-#                if ( (not fitResidue) or
-#                     (not includeProtons and a.isProton()) ):
-#                    notFitted.append( a )
-#                    continue
-#                if backboneOnly and a.isSidechain():
-#                    notFitted.append( a )
-#                else:
-#                    fitted.append( a )
-#                #end if
-#            #end for
-#        #end for
-#        #print fitted
         fitted = self.selectFitAtoms( ranges=ranges, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
-        NTmessage("==> Superposing: fitted %s on %d atoms (ranges=%s, backboneOnly=%s, includeProtons=%s)",
-                      self, len(fitted), ranges, backboneOnly, includeProtons
+        selectedResidues = self.ranges2list( ranges )
+        selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
+        NTmessage("==> Superposing: fitted %s on %d atoms (residues=%s, backboneOnly=%s, includeProtons=%s)",
+                      self, len(fitted), selectedResiduesList, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
         NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
@@ -1686,12 +1684,14 @@ Return an Molecule instance or None on error
         if models == None:
             models = sprintf('%s-%s', 0, self.modelCount-1)
 
-        NTdetail("Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
         selectedResidues = self.ranges2list( ranges )
+        selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
         selectedModels   = self.models2list( models )
 
-        self.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + list2asci( selectedResidues.zap('resNum')) )
+        NTdetail("Calculating rmsd's (residues: %s, models: %s)", selectedResiduesList, models)
+
+        self.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + selectedResiduesList )
         for res in self.allResidues():
             res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
             res.rmsd.bbtemp = NTlist() # list of included bb-atms
