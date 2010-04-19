@@ -1,5 +1,9 @@
 #summary Checking out and updating What If for the Mac
 
+== Obsolete info below ==
+Best to ask for copy from authors. Then update the paths in:
+DO_WHATIF.COM WHATIF.FIG for the main installation dir.
+
 *Never do 'make all' it will screw up good files.
 
 == Check out ==
