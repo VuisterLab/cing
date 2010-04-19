@@ -1497,7 +1497,7 @@ def restoreTalosPlus( project, tmp=None ):
         return True
 
    # Restore the data
-    NTdetail('==> Restoring talos+ results from "%s"', smlFile)
+    NTmessage('==> Restoring talos+ results from "%s"', smlFile)
     l=SML2obj( smlFile, project.molecule)
     if l==None:
         return True
@@ -1544,6 +1544,7 @@ def export2nih( project, tmp=None ):
     """
 
     for mol in project.molecules:
+    	project.status.setdefault('talosPlus',talosDefaults())
         talosDefs = project.status.talosPlus
         fileName = project.path( project.directories.nih, mol.name+'.'+talosDefs.tableFile )
         exportShifts2TalosPlus(  project, fileName=fileName )

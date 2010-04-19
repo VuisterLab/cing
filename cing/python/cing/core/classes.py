@@ -19,6 +19,7 @@ from cing.Libs.NTutils import NTindent
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
@@ -728,6 +729,7 @@ Project: Top level Cing project class
             pl.restore()
         #end for
 
+        self.partitionRestraints()
         self.analyzeRestraints()
 #            l.criticize(self) now in criticize of validate plugin
 
@@ -1912,10 +1914,12 @@ class RestraintList(NTlist):
         NTlist.__init__(self)
         self.__CLASS__ = None
         self.name = name        # Name of the list
-        self.status = status      # Status of the list; 'keep' indicates storage required
-        self.currentId = 0       # Id for each element of list
+        self.status = status    # Status of the list; 'keep' indicates storage required
+        self.currentId = 0      # Id for each element of list
+        self._idDict = {}       # dictionary to look up id in case the list is sorted differently
+        self._byItem = None     # if not None: list was sorted _byItem.
 
-        self.rmsd = None    # rmsd per model, None indicate no analysis done
+        self.rmsd = None        # rmsd per model, None indicate no analysis done
         self.rmsdAv = 0.0
         self.rmsdSd = 0.0
         self.violCount1 = 0       # Total violations over 0.1 A (1 degree)
@@ -1936,20 +1940,49 @@ class RestraintList(NTlist):
     def append(self, restraint):
         restraint.id = self.currentId
         NTlist.append(self, restraint)
+        self._idDict[restraint.id] = restraint
         self.currentId += 1
     #end def
     def save(self, path = None):
         """
         Create a SML file
         Return self or None on error
+
+        Sort the list on id before saving, to preserve (original) order from save to restore.
         """
+        # sort the list on id number
+        NTsort( self, byItem='id', inplace=True)
+
         if not path: path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
             return None
         #end if
+
+        # restore original sorting
+        if self._byItem:
+            NTsort( self, byItem=self._byItem, inplace=True)
+
         NTdetail('==> Saved %s to "%s"', self, path)
         return self
+    #end def
+
+    def sort(self, byItem='id' ):
+        "Sort the list byItem; store the byItem "
+        NTsort( self, byItem, inplace=True)
+        self._byItem = byItem
+        return self
+    #end def
+
+    def getId(self, id):
+        """Return restraint instance with id
+        Returns None on error
+        """
+        if not self._idDict.has_key(id):
+            NTerror('RestraintList.getId: invalid id (%d)', id)
+            return None
+        #end if
+        return self._idDict[id]
     #end def
 
     def getModelCount(self):
@@ -2447,7 +2480,7 @@ class DihedralRestraint(Restraint):
         have to do dynamically because upon restoring, the atoms are not yet defined
         """
         res, name, _tmp = self.retrieveDefinition()
-        if name:
+        if res and name:
             return res.name + '.' + name
         else:
             return ''
@@ -2463,6 +2496,10 @@ class DihedralRestraint(Restraint):
     #end def
 
     def format(self):
+        # set the last string to something readable in terms of known dihedrals, or just the atoms if nothing is found
+        s = self.getName()
+        if len(s) == 0:
+            s = self.atoms.format('%-11s ')
         return  \
             sprintf('%-25s %-6s (Target: %s %s)  (Models: cav %6s cv %7s)  ' + \
                     '(Violations: av %4s max %4.1f counts %2d,%2d,%2d) %s',
@@ -2473,7 +2510,7 @@ class DihedralRestraint(Restraint):
                      val2Str(self.cv, "%7.4f", 7),
                      val2Str(self.violAv, "%4.1f", 4),
                      self.violMax, self.violCount1, self.violCount3, self.violCount5,
-                     self.atoms.format('%-11s ')
+                     s
                     )
     #end def
 #end class

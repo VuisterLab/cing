@@ -1665,7 +1665,8 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
 #        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
         HTMLfile.__init__(self, fileName, project, title=title)
         if hasattr(dihedralByProjectList, 'html'):
-            del(dihedralByProject.html)
+#            del(dihedralByProject.html) #GV thinks this was an error as it throws an error when regenerating html
+            del(dihedralByProjectList.html) #
         dihedralByProjectList.html = self
         self.dihedralByProjectList = dihedralByProjectList
         self.title=title

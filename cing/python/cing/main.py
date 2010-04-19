@@ -161,6 +161,20 @@ def pformat( object ):
     #end if
 #end def
 
+def pformatall( object, *args, **kwds ):
+#$%^%^&&*(()
+#
+# JURGEN: do NOT touch this routine! Only for interactive usage
+#
+#%%^$&*$($()
+#    print '>>', object
+    if hasattr(object,'formatAll'):
+        print object.formatAll(*args, **kwds)
+    else:
+        print formatall(object)
+    #end if
+#end def
+
 def format(object):
     """Returns the formatted object representation"""
 #    print '>>', object
@@ -240,12 +254,14 @@ def formatall(object):
         for obj in object:
             #printf(">>> [%d] >>> ", i)
             result += format(obj)
+            result += "\n"
             i += 1
         return result
     if isinstance(object, dict):
         for key, value in object.items():
             result += "%-15s : " % key
             result += format(value)
+            result += "\n"
         return result
     return format(object)
 #end def
@@ -679,7 +695,7 @@ def main():
 
  #   pr = print
     f = pformat #@UnusedVariable
-    fa = formatall #@UnusedVariable
+    fa = pformatall #@UnusedVariable
 
     if options.ensemble:
 #        NTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
