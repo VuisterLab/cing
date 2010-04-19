@@ -578,7 +578,7 @@ def partitionRestraints( project, tmp=None ):
     # dihedrals
     for drl in project.dihedrals:
         for restraint in drl:
-            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
+            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS and JFD will copy this logic to html class.
         #end for
     #end for
     #RDCs

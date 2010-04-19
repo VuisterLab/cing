@@ -43,6 +43,7 @@ from cing.Libs.html import setupHtml
 from cing.Libs.pdb import export2PDB
 from cing.Libs.pdb import importPDB
 from cing.Libs.pdb import initPDB
+from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.CingSummary import CingSummary
 from cing.core.ROGscore import ROGscore
 from cing.core.constants import ACL_LEVEL
@@ -1171,6 +1172,10 @@ class _ProjectList(NTlist):
             NTerror('_ProjectList.delete: name "%s" not found', name)
             return None
         #end if
+
+        s = sprintf('Deleted instance named "%s"' % name)
+        self.project.history(s)
+
         l = self.project[name]
         del(self.project[name])
         NTlist.remove(self, l)
@@ -1939,6 +1944,7 @@ class RestraintList(NTlist):
     #end def
     def append(self, restraint):
         restraint.id = self.currentId
+        restraint.parent = self # being able to go from restraint to restraint list is important.
         NTlist.append(self, restraint)
         self._idDict[restraint.id] = restraint
         self.currentId += 1
@@ -2644,6 +2650,9 @@ ROG score:            %s
   )
         return msg
     #end def
+
+    def isFromTalos(self):
+        return self.name.startswith(TALOSPLUS_LIST_STR)
 #end class
 
 

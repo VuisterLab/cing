@@ -39,6 +39,9 @@ from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.find import find
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
+from cing.PluginCode.required.reqNih import NUMBER_OF_SD_TALOS
+from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
+from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import wattosPlotList
 from cing.PluginCode.required.reqWhatif import C12CHK_STR
@@ -374,22 +377,48 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     for res in residueList:
         if isSingleResiduePlot:
             # res is equal to residue
-            dr1 = _matchDihedrals(res, dihedralName1)
-            dr2 = _matchDihedrals(res, dihedralName2)
+            for useTalos in ( False, True ):
+#                NTdebug("Plotting with useTalos %s" % useTalos)
+                dr1 = _matchDihedrals(res, dihedralName1,useTalos=useTalos)
+                dr2 = _matchDihedrals(res, dihedralName2,useTalos=useTalos)
 
-            if dr1 and dr2:
-                lower1, upper1 = dr1.lower, dr1.upper
-                lower2, upper2 = dr2.lower, dr2.upper
-            elif dr1:
-                lower1, upper1 = dr1.lower, dr1.upper
-                lower2, upper2 = plotparams2.min, plotparams2.max
-            elif dr2:
-                lower2, upper2 = dr2.lower, dr2.upper
-                lower1, upper1 = plotparams1.min, plotparams1.max
+                if dr1 and dr2:
+                    lower1, upper1 = dr1.lower, dr1.upper
+                    lower2, upper2 = dr2.lower, dr2.upper
+                elif dr1:
+                    lower1, upper1 = dr1.lower, dr1.upper
+                    lower2, upper2 = plotparams2.min, plotparams2.max
+                elif dr2:
+                    lower2, upper2 = dr2.lower, dr2.upper
+                    lower1, upper1 = plotparams1.min, plotparams1.max
 
-            if dr1 or dr2:
-                plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
-
+                if dr1 or dr2:
+                    if useTalos:
+                        if dihedralName1=='PHI' and dihedralName2=='PSI':
+                            classification = getDeepByKeys(res, TALOSPLUS_STR, TALOSPLUS_CLASS_STR)
+                            if classification == 'Good':
+                                talosPlus = getDeepByKeys(res, TALOSPLUS_STR)
+                                phi = getDeepByKeys(talosPlus, 'phi')
+                                psi = getDeepByKeys(talosPlus, 'psi')
+                                dev1 = NUMBER_OF_SD_TALOS * phi.error
+                                lower1 = phi.value - dev1
+                                upper1 = phi.value + dev1
+                                dev2 = NUMBER_OF_SD_TALOS * psi.error
+                                lower2 = psi.value - dev2
+                                upper2 = psi.value + dev2
+#                                NTdebug("Plotting TALOSPLUS for %s" % res)
+                                plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2, fill = False, fillColor='red') # fill is important to change
+                            # end if classification
+                        else:
+                            NTcodeerror("Expected dihedrals to be present and to be phi/psi if useTalos is on")
+                        # end check on Rama
+                    else:
+#                        NTdebug("Plotting regular dihedral for %s" % res)
+                        plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
+                    # end else
+                # end if
+            # end for useTalos
+        # end if isSingleResiduePlot
         d1 = res[dihedralName1]
         d2 = res[dihedralName2]
 
@@ -443,10 +472,27 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
 
 
-def _matchDihedrals(residue, dihedralName):
-    for dr in residue.dihedralRestraints:
-        if dr.angle == '%s_%i' % (dihedralName, residue.resNum):
-            return dr
+def _matchDihedrals(residue, dihedralName, useTalos=False):
+    """Matches considering useTalos
+    useTalos = None -> neglect filtering on it
+                True -> needs to be from Talos
+                False -> needs to NOT be from Talos; DEFAULT so not too many changes in code are needed.
+
+    Returns None or dihedral.
+    """
+    for dih in residue.dihedralRestraints:
+        if dih.angle == '%s_%i' % (dihedralName, residue.resNum):
+            if useTalos == None:
+#                NTdebug("Returning dihedral regardless of useTalos: %s" % dih)
+                return dih
+
+            isFromTalos = dih.parent.isFromTalos()
+            if useTalos == True and isFromTalos:
+#                NTdebug("Returning dihedral because is from Talos: %s" % dih)
+                return dih
+            if useTalos == False and not isFromTalos:
+#                NTdebug("Returning dihedral because is NOT from Talos: %s" % dih)
+                return dih
     return None
 #end def
 
@@ -2917,6 +2963,8 @@ class RestraintListHTMLfile( HTMLfile ):
                 table.nextColumn('.')
         else:
             atom = restraint.atoms[0]
+            if len(restraint.atoms)>1: # Fixes issue 238.
+                atom = restraint.atoms[1] # this is taking Alan's trick in classes.py
             chain   = atom.residue.chain
             residue = atom.residue
             table.nextColumn()

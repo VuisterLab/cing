@@ -15,6 +15,7 @@ import unittest
 class AllChecks(TestCase):
     entryList = []
 #    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
+#    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
 
     def testTalosPlus(self):
 
@@ -38,8 +39,9 @@ class AllChecks(TestCase):
                     self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-            self.assertTrue(project.runTalosPlus())
-#            self.assertTrue(project.save())
+            self.assertFalse(project.runTalosPlus())
+            self.assertTrue(project.save())
+            self.assertFalse(project.validate(htmlOnly = True, doProcheck = False, doWhatif = False, doWattos = False))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

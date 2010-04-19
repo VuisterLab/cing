@@ -23,14 +23,15 @@ from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
+from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
+from cing.core.classes import DihedralRestraint
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
-from cing.core.classes import DihedralRestraint
-from cing.core.sml import obj2SML
 from cing.core.sml import SML2obj
 from cing.core.sml import SMLhandler
 from cing.core.sml import SMLsaveFormat
+from cing.core.sml import obj2SML
 import array
 import os
 import sys
@@ -1345,10 +1346,14 @@ def talosDefaults():
 #end def
 
 def runTalosPlus(project, tmp=None):
-    """Perform a talos+ analysis
+    """Perform a talos+ analysis; parses the results; put into new CING dihedral restraint list; and
+    saves the results.
+
+    Returns True on error.
+    Returns False when talos is absent or when all is fine.
     """
     if project == None:
-        NTmessage("RunTalosPlus: No project defined")
+        NTerror("RunTalosPlus: No project defined")
         return True
 
     #tmp: to be entered in setup
@@ -1356,14 +1361,14 @@ def runTalosPlus(project, tmp=None):
 
     if cingPaths.talosPlus == None or cingPaths.talosPlus == 'PLEASE_ADD_EXECUTABLE_HERE':
         NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
-        return
+        return False
 
     if project.molecule == None:
-        NTmessage("RunTalosPlus: No molecule defined")
+        NTerror("RunTalosPlus: No molecule defined")
         return True
 
     if project.molecule.resonanceCount == 0:
-        NTmessage("RunTalosPlus: No resonances defined")
+        NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
         return True
 
     project.status.talosPlus = talosDefaults()
@@ -1389,15 +1394,24 @@ def runTalosPlus(project, tmp=None):
     project.status.talosPlus.completed=True
 
     # Importing the results
-    importTalosPlus( project )
-    saveTalosPlus( project )
+    if importTalosPlus( project ):
+        NTerror("Failed importTalosPlus")
+        return True
+    if talosPlus2restraints( project ):
+        NTerror("Failed talosPlus2restraints")
+        return True
+    if saveTalosPlus( project ):
+        NTerror("Failed saveTalosPlus")
+        return True
+
     project.history(sprintf('Ran talos+ on %s', project.molecule))
-    return
+    return False
 #end def
 
 
 def importTalosPlus( project, tmp=None ):
     """Import talosPlus results.
+    Return True on error.
     """
     if project == None:
         NTmessage("importTalosPlus: No project defined")
@@ -1433,6 +1447,8 @@ def importTalosPlus( project, tmp=None ):
 def saveTalosPlus( project, tmp=None ):
     """
     Save talos+ results to sml file
+    Returns True on error.
+    Returns None on success.
     """
     if project == None:
         NTmessage("saveTalosPlus: No project defined")
@@ -1505,9 +1521,9 @@ def restoreTalosPlus( project, tmp=None ):
     return
 #end def
 
-def talosPlus2restraints( project, name='talosPlus', status='keep', errorFactor=2.0 ):
+def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='keep', errorFactor=2.0 ):
     """
-    Convert talos+ results to a dihedral restraint list
+    Convert talos+ results to a CING dihedral restraint list
     """
     if project == None:
         NTmessage("talosPlus2restraints: No project defined")
@@ -1520,6 +1536,9 @@ def talosPlus2restraints( project, name='talosPlus', status='keep', errorFactor=
     if not project.status.has_key('talosPlus') or not project.status.talosPlus.completed:
         NTmessage("talosPlus2restraints: No talos+ data")
         return True
+
+    if name in project.dihedrals.names():
+        project.dihedrals.delete(name)
 
     dhl = project.dihedrals.new(name=name, status=status)
     for res in project.molecule.allResidues():

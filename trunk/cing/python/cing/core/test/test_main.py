@@ -9,7 +9,7 @@ class AllChecks(TestCase):
     def testFormatAll(self):
         entryIdList = ['foo',456]
         entryIdListStr = formatall(entryIdList)
-        self.assertEqual(entryIdListStr, "foo456")
+        self.assertEqual(entryIdListStr, "foo\n456\n")
         entryIdTuple = ('test',123)
 #        formatall(entryIdTuple) throws a TypeError
         self.assertRaises( TypeError, formatall, entryIdTuple)
