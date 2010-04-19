@@ -387,6 +387,17 @@ Sum                %s
         return self
     #end def
 
+    def reverse(self):
+        """Reverse the list, returning self. Regular list does not return anything.
+
+        This allows for
+        e.g.
+            myList.sort('id').reverse()[0]
+        """
+        list.reverse(self)
+        return self
+    #end def
+
     def setCurrent(self, item):
         if item in self:
             self.current = item
@@ -578,14 +589,20 @@ Sum                %s
 
     def formatAll(self, start=0, stop=None):
         """
-        Print every element of self on a single line using the format() method of the items
+        Generat string with every element of self on a single line using the format() method of the items
         Optionally run from start to stop
         """
         if stop == None:
             stop = len(self)
+        string = ''
         for i in range(start, stop):
-            print self[i].format()
+            object = self[i]
+            if hasattr(object, 'format'):
+                string +=  object.format() + '\n'
+            else:
+                string +=  str(object) + '\n'
         #end for
+        return string
     #end def
 
 
@@ -1520,7 +1537,6 @@ class NTdict(dict):
 #            NTdebug("None returned by average() in getDeepAvgByKeys")
             return None
         return r[0]
-
 
     def getDeepFirstByKeys(self, *keyList):
         """Return first item only if found otherwise return None"""

@@ -1623,10 +1623,31 @@ Return an Molecule instance or None on error
         Return a list of residues
         """
         if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
+            # we will do two passes:
+            # First: select all residues that have S2> autoLimit
+            # Second: fill gaps of one for 0.5<S2<autoLimit
+            for res in self.allResidues():
+                res._tmp = 0 # 0: do not qualify; 1: qualify first round; 2: check in second round
+                if res.talosPlus and not isNaN(res.talosPlus.S2):
+                    if res.talosPlus.S2>autoLimit:
+                        res._tmp = 1
+                    elif res.talosPlus.S2>0.5:
+                        res._tmp = 2
+                    #end if
+                #end if
+            #end if
+
+            # Pass two
             r = NTlist()
             for res in self.allResidues():
-                if res.talosPlus and not isNaN(res.talosPlus.S2) and res.talosPlus.S2>autoLimit:
+                if res._tmp == 1:
                     r.append(res)
+                elif res._tmp == 2:
+                    prev = res.sibling(-1)
+                    next = res.sibling(1)
+                    if prev and prev._tmp == 1 and next and next._tmp == 1:
+                        r.append(res)
+                #end if
             #end for
             if len(r) == 0:
                 NTwarning(' Molecule._autoRanges: empty list, taking all residues')
@@ -1638,7 +1659,7 @@ Return an Molecule instance or None on error
         return r
     #end def
 
-    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.6 ):
+    def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.7 ):
         """
         Superpose the coordinates of molecule
         returns ensemble or NoneObject on error

@@ -88,7 +88,7 @@ def runCingChecks( project, ranges=None ):
     project.validateDihedrals()
     project.validateModels()
 #    project.validateAssignments() in criticize now
-    project.mergeResonances()
+    # project.mergeResonances() GWV says: don't do this
 
     project.checkForSaltbridges(toFile=True)
 #    project.checkForDisulfides(toFile=True)
