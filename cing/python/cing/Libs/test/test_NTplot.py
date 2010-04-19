@@ -31,6 +31,7 @@ class AllChecks(TestCase):
 
         p.box( (1,0), (0.9,2), boxAttributes( lineColor='black', line=True, fillColor='blue', fill=True) )
         p.box( (2,0), (0.9,5), boxAttributes( lineColor='green', line=True, fillColor='red',  fill=True) )
+        p.box( (3,0), (0.9,4), boxAttributes( lineColor='green', line=True, fillColor='red',  fill=False) )
 #        p.point( (3,3.5,0,1),  pointAttributes(color='red') )
         color = 'red'
         p.point( (7,6,0,2), circlePoint(pointColor=color, fillColor=color, lineColor=color) )

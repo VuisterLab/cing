@@ -385,6 +385,7 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
 
         attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)
+#        NTdebug("Using attributesMatLibPlot: %s" % attributesMatLibPlot)
         rectangle = Rectangle(point,
             width=sizes[0],
             height=sizes[1],
@@ -496,11 +497,11 @@ class NTplot( NTdict ):
 
         keys = attributes.keys()
         if 'alpha' in keys:
-            result['alpha']                =  attributes.alpha
+            result['alpha']               =  attributes.alpha
         if 'fill' in keys:
             result['fill']                =  attributes.fill
         if 'fillColor' in keys:
-            result['facecolor']           =  attributes.fillColor
+            result['facecolor']           =  attributes.fillColor # is facecolor used if fill is False?
         if 'lineColor' in keys:
             result['edgecolor']           =  attributes.lineColor
 #        NTdebug("input  mapAttributes2MatLibPatches: " + `attributes`)
@@ -973,7 +974,7 @@ class NTplot( NTdict ):
 #            NTdebug('plotted %d %s' % (i, cmapList[i].name))
         # end for
 
-    def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2):
+    def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2, fill=True, fillColor=None):
 
         alpha = 0.3
         SMALL_ANGLE_DIFF_FOR_PLOT = 0.1
@@ -982,7 +983,8 @@ class NTplot( NTdict ):
         plotparamsYmin, plotparamsYmax = (self.yRange)
 
         plotparams = plotParameters.getdefault("None",'dihedralDefault')
-        fillColor = plotparams.lower
+        if fill and not fillColor:
+            fillColor = plotparams.lower
 
         bounds1 = NTlist(lower1, upper1)
         bounds2 = NTlist(lower2, upper2)
@@ -996,48 +998,55 @@ class NTplot( NTdict ):
             bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
 #        NTdebug("bounds1 : %s" % bounds1)
 #        NTdebug("bounds2 : %s" % bounds2)
+
+        boxAttr = boxAttributes(fill=fill, fillColor=fillColor, alpha=alpha)
+#        NTdebug("boxAttr : %s" % boxAttr)
+
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
                 point = (bounds1[0], bounds2[0]) # lower left corner of only box.
                 sizes = (bounds1[1]-bounds1[0],bounds2[1]-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr )
             else: # split box vertically.
                 # top box
                 point = (bounds1[0], bounds2[0]) # lower left corner of first box.
                 sizes = (bounds1[1]-bounds1[0],plotparamsYmax-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
                 # bottom box
                 point = (bounds1[0], plotparamsYmin) # lower left corner of second box.
                 sizes = (bounds1[1]-bounds1[0], bounds2[1]-plotparamsYmin)
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
         else: # at least two or four boxes
             if bounds2[0] < bounds2[1]: # 2 boxes; left and right
                 # left box
                 point = (plotparamsXmin, bounds2[0]) # lower left corner of first box.
                 sizes = (bounds1[1]-plotparamsXmin,bounds2[1]-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
                 # right box
                 point = (bounds1[0], bounds2[0]) # lower left corner of second box.
                 sizes = (plotparamsXmax-bounds1[0], bounds2[1]-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
             else:  # 4 boxes; lower left ll, lr, upper left ul, ur.
                 # ur
                 point = (bounds1[0], bounds2[0])
                 sizes = (plotparamsXmax-bounds1[0],plotparamsYmax-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
                 # lr
                 point = (bounds1[0], plotparamsYmin) # lower left corner of second box.
                 sizes = (plotparamsXmax-bounds1[0], bounds2[1]-plotparamsYmin)
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
                 # ul
                 point = (plotparamsXmin, bounds2[0])
                 sizes = (bounds1[1]-plotparamsXmin,plotparamsYmax-bounds2[0])
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
+                self.box(point, sizes, attributes=boxAttr)
                 # ll
                 point = (plotparamsXmin, plotparamsYmin) # lower left corner of second box.
                 sizes = (bounds1[1]-plotparamsXmin, bounds2[1]-plotparamsYmin)
-                self.box(point, sizes, boxAttributes(fillColor=fillColor, alpha=alpha))
-
+                self.box(point, sizes, attributes=boxAttr)
+            # end else
+        # end else
+    # end def
+# end class
 
 class NTplotSet( NTdict ):
     """Encapsulate one ore more plots in NTplotSet.
