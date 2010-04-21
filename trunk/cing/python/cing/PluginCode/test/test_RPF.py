@@ -6,14 +6,15 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityDetail
+from cing import verbosityNothing
 from cing import verbosityOutput
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.NmrStar import NmrStar
 from cing.core.classes import Project
 from unittest import TestCase
-from cing.PluginCode.NmrStar import NmrStar
-from cing import verbosityNothing
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -54,6 +55,9 @@ class AllChecks(TestCase):
             nmrStar = NmrStar(project)
             self.assertTrue( nmrStar )
             self.assertTrue( nmrStar.toNmrStarFile( fileName ))
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail

@@ -34,6 +34,7 @@ from random import random
 from unittest import TestCase
 import cing
 import os #@Reimport
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -76,6 +77,9 @@ class AllChecks(TestCase):
 
         ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
         self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
+        # Do not leave the old CCPN directory laying around since it might get added to by another test.
+        if os.path.exists(entryId):
+            self.assertFalse(shutil.rmtree(entryId))
 
         if doWhatif:
             self.assertFalse(project.validate(htmlOnly=htmlOnly,

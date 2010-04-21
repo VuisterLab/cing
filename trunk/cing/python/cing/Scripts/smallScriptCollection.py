@@ -66,11 +66,11 @@ def findMissingCsv():
 
     os.chdir(d1d2Dir)
     NTmessage("Now in %s" % os.getcwd())
-    entriesList = readLinesFromFile(os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28_noObs.LIS'))
+    entriesList = readLinesFromFile(os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS'))
 
     count = 0
-#    for code in entriesList:
-    for code in ['1abaA']:
+    for code in entriesList:
+#    for code in ['1abaA']:
         entryCode = code.strip()[0:4].lower()
         chainCode = code.strip()[4:5]
         ch23 = entryCode[1:3]

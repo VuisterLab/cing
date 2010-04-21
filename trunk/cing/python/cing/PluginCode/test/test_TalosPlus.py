@@ -11,12 +11,13 @@ from cing.core.classes import Project
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
 #    entryList = []
-#    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
-    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
+    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
+#    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
 
     def testTalosPlus(self):
 
@@ -48,6 +49,9 @@ class AllChecks(TestCase):
 #            del project
 #
 #            project = Project.open(entryId, status = 'old')
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

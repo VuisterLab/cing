@@ -1,3 +1,5 @@
+Below are the counts for the cb4n cb4c most likely; they add to over 1 million residues.
+
 Count 435559 in valueBySs[ ]
 Working on valueBySsAndResTypes for [ ][ALA]
 Working on valueBySsAndResTypes for [ ][ARG]

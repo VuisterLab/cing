@@ -12,6 +12,7 @@ from shutil import move #@UnusedImport
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -34,7 +35,7 @@ class AllChecks(TestCase):
         doProcheck = True
         doWattos = True
         if fastestTest:
-            htmlOnly = True 
+            htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
@@ -52,7 +53,10 @@ class AllChecks(TestCase):
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif,
                                               doWattos=doWattos ))
-#            self.assertFalse(project.removeCcpnReferences()) 
+#            self.assertFalse(project.removeCcpnReferences())
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail

@@ -4,7 +4,7 @@ the entries with standard deviation is:
 Overall found av,sd,n: (-1.36040035673, 0.033537074106736189, 555)
 The sd looks unbelievably small to JFD.
 
-Total number: 113749
+Total number: 113,749
 Total number of non-GLY/PRO residues: 98,751 (Original paper had 60,000)
 Number excludes PRO and GLY 14,998 (13 % of total)
 
@@ -25,12 +25,12 @@ WHAT IF> ramchk check.db
  A- 175-THR     -1.106    [H]   -1.090
  A- 176-CYS      0.180    [H]    0.399
  A- 177-GLU     -0.748    [ ]   -0.767
- A- 178-GLY     -0.005    [ ]    0.403
+ A- 178-GLY     -0.005    [ ]    0.403 .5 diff
  A- 179-ASN     -0.348    [ ]   -0.497
  A- 180-LEU     -0.941    [H]   -1.115
- A- 181-ALA     -1.019    [H]   -0.647
+ A- 181-ALA     -1.019    [H]   -0.647 .5 diff
  A- 182-CYS     -0.410    [H]   -0.566
- A- 183-LEU     -0.588    [H]   -1.030
+ A- 183-LEU     -0.588    [H]   -1.030 .5 diff
  A- 184-SER      0.184    [H]    0.400
  A- 185-LEU     -1.080    [H]   -1.177
  A- 186-CYS      0.099    [ ]    0.207
