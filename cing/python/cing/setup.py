@@ -201,10 +201,10 @@ def check_ccpn():
     if gotRequiredCcpnModules:
         _NTmessage("........ Found 'CCPN'")
     else:
-        _NTmessage('Failed to find CCPN.')
+        _NTmessage("Could not find 'CCPN' (optional)")
 
-    if missing:
-        _NTmessage( 'Missing (optional) packages: ' + ', '.join(missing))
+#    if missing:
+#        _NTmessage( 'Missing (optional) packages: ' + ', '.join(missing))
 
 # disabled for this needs to be no extra- dependency. A version of numarray should
 # be in matplotlib. In fact the code doesn't refer to numarray anywhere. Or JFD

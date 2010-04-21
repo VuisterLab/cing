@@ -11,6 +11,7 @@ Methods:
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import ExecuteProgram
+from cing.Libs.NTutils import ImportWarning
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
@@ -28,6 +29,7 @@ from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.classes import DihedralRestraint
 from cing.core.constants import INTERNAL_0
 from cing.core.constants import IUPAC
+from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
 from cing.core.sml import SML2obj
 from cing.core.sml import SMLhandler
@@ -39,10 +41,9 @@ import sys
 
 if True: # block
     useModule = True
-    if not cingPaths.talos:
+    if cingPaths.talos == None or cingPaths.talos == PLEASE_ADD_EXECUTABLE_HERE:
         NTmessage("Missing talos which is a dep for nih plugin")
         useModule = False
-
     if not useModule:
         raise ImportWarning(NIH_STR)
 #    NTmessage('Using ' + NIH_STR)
