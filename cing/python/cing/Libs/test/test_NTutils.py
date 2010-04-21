@@ -8,6 +8,7 @@ from cing import cingDirTmp
 from cing import cingPythonDir
 from cing import verbosityDebug
 from cing import verbosityNothing
+from cing.Libs.NTutils import NTcVarianceAverage
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -87,6 +88,25 @@ class AllChecks(TestCase):
 #                  {180, 180,    0},
 #                   {90, -70, -160}
 #        };
+
+    def testCircularAverageOfTwoDihdedrals(self):
+# VB van cing procheck routines
+#A 189 GLN   0.243   0.071   0.164   0.660   0.153   0.362   1.840   6.256  -0.73  -1.05 999.90  -0.89
+
+        lol = [  [  0.243, 0.071, 0.153 ],
+                 [  0.164, 0.660, 0.362 ],
+                 [ 0.0, 0.0, 0.0], # extremes
+                 [ 1.0, 1.0, 1.0], # extremes
+                 [ 0.0, 1.0, 0.293], # doesn't really make sense to JFD but here it is.
+                  ]
+
+        for cycle in lol:
+            cv1, cv2, cav = cycle
+            angleList = NTlist()
+            angleList.append(cv1)
+            angleList.append(cv2)
+            circularVariance = NTcVarianceAverage(angleList)
+            self.assertAlmostEqual(circularVariance, cav, places = 3)
 
     def testGeneral(self):
         s = NTdict(aap = 'foo', mies = 1)

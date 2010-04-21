@@ -39,15 +39,33 @@ if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
 #        NTdebug("Missing java classpath which is an optional dependency for Wattos")
-        raise ImportWarning('Wattos')
+        raise ImportWarning(WATTOS_STR)
 #    if not (('/Users/jd/workspace35/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
 #             '/Users/jd/workspace35/wattos/build' in cingPaths.classpath) or
 #             ('/Users/alan/workspace/Wattos/lib/Wattos.jar' in cingPaths.classpath)):
     classpathCombinedAgain = ':'.join(cingPaths.classpath)
     if not (('/lib/Wattos.jar' in classpathCombinedAgain) or ('/build' in classpathCombinedAgain)):
 #        NTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
-        raise ImportWarning('Wattos')
+        raise ImportWarning(WATTOS_STR)
+
 #    NTmessage('Using Wattos')
+#if True: # for easy blocking of data, preventing the code to be resorted with imports above.
+#    from cing.Libs.NTutils import ImportWarning
+#    from cing.Libs.NTutils import NTmessage
+#    from cing.Libs.NTutils import switchOutput
+#    from cing.PluginCode.required.reqCcpn import CCPN_STR
+#    switchOutput(False)
+#    try:
+#        import ccpnmr #@UnusedImport
+#        from ccp.general.Util import createMoleculeTorsionDict #@UnusedImport
+#        from memops.api.Implementation import MemopsRoot #@UnusedImport
+#        from memops.general.Io import loadProject #@UnusedImport
+#    except:
+#        switchOutput(True)
+#        raise ImportWarning(WATTOS_STR)
+#    finally: # finally fails in python below 2.5
+#        switchOutput(True)
+##    NTmessage('Using Ccpn')
 
 
 class Wattos(NTdict):

@@ -23,6 +23,7 @@ from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
+from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.classes import DihedralRestraint
 from cing.core.constants import INTERNAL_0
@@ -36,6 +37,16 @@ import array
 import os
 import sys
 
+if True: # block
+    useModule = True
+    if not cingPaths.talos:
+        NTmessage("Missing talos which is a dep for nih plugin")
+        useModule = False
+
+    if not useModule:
+        raise ImportWarning(NIH_STR)
+#    NTmessage('Using ' + NIH_STR)
+# end block
 
 
 
@@ -891,7 +902,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Read table from tabFile
         """
-        NTdebug('nmrPipeTable.readFile: Reading nmrPipe table file %s', tabFile )
+        NTmessage('Reading nmrPipe table file %s', tabFile )
 
         #end if
 
@@ -1345,7 +1356,7 @@ def talosDefaults():
                  )
 #end def
 
-def runTalosPlus(project, tmp=None):
+def runTalosPlus(project, tmp=None, parseOnly=False):
     """Perform a talos+ analysis; parses the results; put into new CING dihedral restraint list; and
     saves the results.
 
@@ -1357,41 +1368,42 @@ def runTalosPlus(project, tmp=None):
         return True
 
     #tmp: to be entered in setup
-    cingPaths.talosPlus = 'talos+'
+#    cingPaths.talosPlus = 'talos+'
+    if not parseOnly:
+        if cingPaths.talos == None or cingPaths.talos == 'PLEASE_ADD_EXECUTABLE_HERE':
+            NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
+            return False
 
-    if cingPaths.talosPlus == None or cingPaths.talosPlus == 'PLEASE_ADD_EXECUTABLE_HERE':
-        NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
-        return False
+        if project.molecule == None:
+            NTerror("RunTalosPlus: No molecule defined")
+            return True
 
-    if project.molecule == None:
-        NTerror("RunTalosPlus: No molecule defined")
-        return True
+        if project.molecule.resonanceCount == 0:
+            NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
+            return True
 
-    if project.molecule.resonanceCount == 0:
-        NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
-        return True
+        project.status.talosPlus = talosDefaults()
+        project.status.talosPlus.molecule = project.molecule.nameTuple()
+        project.status.talosPlus.keysformat()
+        talosDefs = project.status.talosPlus
 
-    project.status.talosPlus = talosDefaults()
-    project.status.talosPlus.molecule = project.molecule.nameTuple()
-    project.status.talosPlus.keysformat()
-    talosDefs = project.status.talosPlus
+        path = project.validationPath( talosDefs.directory )
+        if not path:
+            return True
 
-    path = project.validationPath( talosDefs.directory )
-    if not path:
-        return True
+        # Exporting the shifts
+        fileName = os.path.join(path, talosDefs.tableFile )
+        exportShifts2TalosPlus(  project, fileName=fileName )
 
-    # Exporting the shifts
-    fileName = os.path.join(path, talosDefs.tableFile )
-    exportShifts2TalosPlus(  project, fileName=fileName )
-
-    # running TalosPlus
-    talosProgram = ExecuteProgram( cingPaths.talosPlus, rootPath = path,
-                                   redirectOutput = True
-                                 )
-    NTmessageNoEOL('==> Running talos+ ... ')
-    talosProgram('-in ' + talosDefs.tableFile)
-    NTmessage('Done!')
-    project.status.talosPlus.completed=True
+        # running TalosPlus
+        talosProgram = ExecuteProgram( cingPaths.talos, rootPath = path,
+                                       redirectOutput = True
+                                     )
+        NTmessageNoEOL('==> Running talos+ ... ')
+        talosProgram('-in ' + talosDefs.tableFile)
+        NTmessage('Done!')
+        project.status.talosPlus.completed=True
+    # end if parse only.
 
     # Importing the results
     if importTalosPlus( project ):
@@ -1404,7 +1416,11 @@ def runTalosPlus(project, tmp=None):
         NTerror("Failed saveTalosPlus")
         return True
 
-    project.history(sprintf('Ran talos+ on %s', project.molecule))
+    verb = 'Ran'
+    if parseOnly:
+        verb = 'Parsed only'
+    msg = '%s talos+ on %s' % ( verb, project.molecule)
+    project.history(sprintf(msg))
     return False
 #end def
 
@@ -1455,7 +1471,7 @@ def saveTalosPlus( project, tmp=None ):
         return True
 
     if 'talosPlus' not in project.status:
-        NTdebug("importTalosPlus: No talos+ was run")
+        NTdebug("saveTalosPlus: No talos+ was run")
         return True
     talosDefs = project.status.talosPlus
 

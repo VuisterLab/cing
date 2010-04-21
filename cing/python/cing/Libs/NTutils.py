@@ -2546,6 +2546,19 @@ def NTcAverage(theList, min=0.0, max=360.0, radians = 0, byIndex=None):
     return (cav, cv, n)
 #end def
 
+def NTcVarianceAverage( cvList ):
+    """Average cv values like phi/psi
+    See:    http://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html
+    """
+    sumSquares = 0.
+    n = len(cvList)
+    for cv in cvList:
+        r = 1. - cv
+        sumSquares += r * r
+    r2 = sumSquares / n
+    cvResult = 1. - math.sqrt( r2 )
+    return cvResult
+
 def NTzap(theList, *byItems):
     """yield a new list from theList, extracting byItems from each
        element of theList or None if not present
