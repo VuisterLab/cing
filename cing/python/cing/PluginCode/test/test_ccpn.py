@@ -20,6 +20,7 @@ from cing.core.constants import XPLOR
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -30,8 +31,8 @@ class AllChecks(TestCase):
 #    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
 #    entryList = "1d2l".split() # not svn committed
 #    entryList = "1bzb".split()
-    entryList = "1bus".split() # DEFAULT not 1brv because it clashes with other check's projects.
-#    entryList = "1brv".split()
+#    entryList = "1bus".split() # DEFAULT not 1brv because it clashes with other check's projects.
+    entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "2fws".split()
 #    entryList = "logH_test_new".split()
 
@@ -51,6 +52,7 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
+        doTalos = True
         useNrgArchive = False
         ranges = None
         if fastestTest:
@@ -60,11 +62,13 @@ class AllChecks(TestCase):
             doWhatif = False
             doProcheck = False
             doWattos = False
+            doTalos = False
         if redoFromCingProject:
             useNrgArchive = False
             doWhatif = False
             doProcheck = False
             doWattos = False
+            doTalos = False
 
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
@@ -92,6 +96,7 @@ class AllChecks(TestCase):
 
                 self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
                 self.assertTrue(project.save())
+
             if False:
                 ranges = "171-173"
                 residueOfInterest = range(171,174)
@@ -107,10 +112,17 @@ class AllChecks(TestCase):
                                               ranges=ranges,
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,
-                                              doWattos=doWattos ))
+                                              doWattos=doWattos,
+                                              doTalos=doTalos
+                                               ))
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
+        # end for
+    # end def test
     def tttestCreateCcpn(self):
         doRestraints = False
         pdbConvention = IUPAC

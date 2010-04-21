@@ -9,13 +9,14 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityError
 from cing import verbosityNothing
-from cing.core.classes import Project
-from unittest import TestCase
 from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.PluginCode.x3dna import createHtmlX3dna
+from cing.core.classes import Project
+from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -53,6 +54,9 @@ class AllChecks(TestCase):
 #                    NTdebug(coplanar.format())
                     NTdebug('%r' % coplanar[X3DNA_STR])
 
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityNothing

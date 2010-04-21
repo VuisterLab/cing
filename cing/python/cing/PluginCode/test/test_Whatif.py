@@ -15,6 +15,7 @@ from cing.core.classes import Project
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 #from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
 #from numpy.core.arrayprint import array2string
@@ -50,7 +51,7 @@ class AllChecks(TestCase):
 #        entryId = "1tgq_1model"
 #        pdbConvention = IUPAC
         parseOnly = False # normal is False
-        showValues = False
+        showValues = True
 
         os.chdir(cingDirTmp)
         project = Project( entryId )
@@ -71,9 +72,10 @@ class AllChecks(TestCase):
                     self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=999))
-
+            self.assertFalse(runWhatif(project, parseOnly=False))
+        else:
+            project = Project.open( entryId, status='old' )
 #        print project.cingPaths.format()
-        self.assertFalse(runWhatif(project, parseOnly=parseOnly))
 
         project.save()
         if showValues:
@@ -82,11 +84,15 @@ class AllChecks(TestCase):
                 whatifResDict = res.getDeepByKeys(WHATIF_STR)
                 if not whatifResDict:
                     continue
-                checkIDList = whatifResDict.keys()
+#                checkIDList = whatifResDict.keys()
+                checkIDList = 'RAMCHK'.split()
                 for checkID in checkIDList:
                     valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
                     qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
                     NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
+        # Do not leave the old CCPN directory laying around since it might get added to by another test.
+        if os.path.exists(entryId):
+            self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

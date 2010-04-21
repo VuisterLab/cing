@@ -180,6 +180,8 @@ def getValueFromHistogramUsingInterpolation( hist, v0, v1):
 def getRescaling(valuesByEntrySsAndResType):
     '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
     http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
+    
+    Returns the average, standard deviation, and the number of elements in the distribution.
     '''
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():

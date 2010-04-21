@@ -886,7 +886,7 @@ class NTplot( NTdict ):
         Return True on error.
 
         Input histogram should be the bare counts using floats.
-        This routine will calculate the c_dbav, s_dbav
+        This routine used to calculate the c_dbav, s_dbav but no more.
 
         scaleBy can be Max, or Sum
         """

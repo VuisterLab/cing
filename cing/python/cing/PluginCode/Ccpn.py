@@ -199,6 +199,9 @@ class Ccpn:
             tarFileNames = []
             for itar in tar:
 #                NTdebug("working on: " + itar.name)
+                if os.path.exists(itar.name):
+                    NTerror("Will not untar %s by overwriting current copy" % itar.name)
+                    return None
                 # Omit files like AR3436A/._ccp from projects obtained from Wim.
                 if itar.name.count('._'):
 #                    NTdebug("Skipping special hidden file: " + itar.name)

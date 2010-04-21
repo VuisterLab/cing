@@ -14,6 +14,7 @@ from cing.core.classes import Project
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -54,6 +55,9 @@ class AllChecks(TestCase):
             nmrStar = NmrStar(project)
             self.assertTrue( nmrStar )
             self.assertTrue( nmrStar.toNmrStarFile( fileName ))
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail

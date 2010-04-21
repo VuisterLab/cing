@@ -185,7 +185,7 @@ entryList = targetTable.getColumnByIdx(0)
 programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
 NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
-print labList
+#print labList
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug

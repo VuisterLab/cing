@@ -14,6 +14,7 @@ from cing.core.constants import XPLOR
 from unittest import TestCase
 import cing
 import os
+import shutil
 import unittest
 
 class AllChecks(TestCase):
@@ -33,7 +34,7 @@ class AllChecks(TestCase):
             pdbConvention = PDB
         if entryId.startswith("1brv"):
             pdbConvention = IUPAC
-        
+
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
@@ -50,7 +51,7 @@ class AllChecks(TestCase):
         pathGif = os.path.join( cingDirTmp, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=None))
         self.assertTrue(os.path.exists(pathGif))
-        
+
     def ttttestMolgrapRunFromCcpnFile(self):
 #        entryId = "1cjg" # Nucleic acid entry.
 
@@ -66,8 +67,11 @@ class AllChecks(TestCase):
         pathGif = os.path.join( cingDirTmp, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=None))
         self.assertTrue(os.path.exists(pathGif))
-        
-        
+        # Do not leave the old CCPN directory laying around since it might get added to by another test.
+        if os.path.exists(entryId):
+            self.assertFalse(shutil.rmtree(entryId))
+
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()

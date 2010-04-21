@@ -63,6 +63,10 @@ class AllChecks(TestCase):
                                               doWhatif = doWhatif,
                                               doWattos=doWattos ))
             self.assertTrue(project.save())
+            # Do not leave the old CCPN directory laying around since it might get added to by another test.
+            if os.path.exists(entryId):
+                self.assertFalse(shutil.rmtree(entryId))
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDetail
