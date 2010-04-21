@@ -5,7 +5,7 @@
 
 # INITIALIZATION
 # Set all parameters in script: cing.csh
-# Application: iCing. Basicially needed because it can't run under say jd's user account.
+# Application: iCing. Basically needed because it can't run under say jd's user account.
 
 
 setenv UJ                 /Users/jd
@@ -87,6 +87,11 @@ if ( $verbosityDebug) then
     echo "DEBUG: Initializing ProcheckNMR from  $procheckroot"
 endif
 source $procheckroot/setup.scr
+
+setenv  talosPath /Users/jd/workspace35/talosplus/talos+
+if ( $verbosityDebug) then
+    echo "DEBUG: Initializing Talos+ from       $talosPath"
+endif
 
 if ( $verbosityDebug) then
     echo "DEBUG: Initializing MOLMOL from       $MOLMOLHOME"

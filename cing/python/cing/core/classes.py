@@ -985,8 +985,10 @@ Project: Top level Cing project class
     def criticize(self, toFile = True):
         return criticize(self, toFile = toFile)
 
-    def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True, doWattos = True):
-        return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif, doWattos = doWattos)
+    def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True,
+                 doWattos = True, doTalos = True):
+        return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
+                        doWattos = doWattos, doTalos = doTalos)
 
     def runCingChecks(self, ranges = None):
         return runCingChecks(self, ranges = ranges)

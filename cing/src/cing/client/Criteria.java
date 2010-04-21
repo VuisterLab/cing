@@ -124,7 +124,7 @@ public class Criteria extends iCingView {
     static ArrayList<String> pcCriteriaKeyList = new ArrayList<String>();
     static ArrayList<String> criteriaKeyListAll = new ArrayList<String>();
 
-    // Interface defaults; sync with those in $CINGROOT/python/cing/valSets.cfg.    
+    // Interface defaults; sync with those in $CINGROOT/python/cing/valSets.cfg.
     String CRV_AC_MAXALL_BAD = "10";
     String CRV_AC_MAXALL_POOR = "3";
     String CRV_AC_RMSALL_BAD = "5";
@@ -145,7 +145,7 @@ public class Criteria extends iCingView {
     String CRV_DR_THRESHOLD_FRAC_POOR = CRV_NONE;
     String CRV_DR_THRESHOLD_OVER_BAD = CRV_NONE;
     String CRV_DR_THRESHOLD_OVER_POOR = CRV_NONE;
-    String CRV_FLAG_MISSING_COOR = "true";    
+    String CRV_FLAG_MISSING_COOR = "true";
 //    String CRV_OMEGA_MAXALL_BAD = "20";
 //    String CRV_OMEGA_MAXALL_POOR = "15";
     String CRV_OMEGA_MAXALL_BAD = "14.1";
@@ -294,7 +294,7 @@ public class Criteria extends iCingView {
 
         janinTextBoxBad = new TextBox();
         wiTable.setWidget(rowIdxWiJanin, 2, janinTextBoxBad);
-        wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiBb, 2, HasHorizontalAlignment.ALIGN_CENTER);
+        wiTable.getCellFormatter().setHorizontalAlignment(rowIdxWiJanin, 2, HasHorizontalAlignment.ALIGN_CENTER);
         janinTextBoxBad.setText(CRV_WI_BAD_C12CHK);
         janinTextBoxBad.setStyleName("red");
         janinTextBoxBad.setWidth("3em");
@@ -307,13 +307,16 @@ public class Criteria extends iCingView {
 
         backboneNormalityCheckBox = new CheckBox();
         wiTable.setWidget(rowIdxWiBb, 0, backboneNormalityCheckBox);
-        backboneNormalityCheckBox.setChecked(true);
+        backboneNormalityCheckBox.setChecked(false);
         backboneNormalityCheckBox.setText(c.Backbone_norm());
         backboneNormalityCheckBox.addClickListener(new ClickListener() {
             public void onClick(final Widget sender) {
-                Utils.setEnabledAllInColumnsButFirst(wiTable, 4, backboneNormalityCheckBox.isChecked());
+                Utils.setEnabledAllInColumnsButFirst(wiTable, rowIdxWiBb, backboneNormalityCheckBox.isChecked());
             }
         });
+        // Disable the boxes markup.
+        Utils.setEnabledAllInColumnsButFirst(wiTable, rowIdxWiBb, backboneNormalityCheckBox.isChecked());
+//        backboneNormalityCheckBox.fireEvent(event) this would enable the
 
         janinTextBoxPoor = new TextBox();
         wiTable.setWidget(rowIdxWiJanin, 3, janinTextBoxPoor);
@@ -571,13 +574,13 @@ public class Criteria extends iCingView {
     /**
      * Per table the criteria will be read out into a settings map that is returned if all's well. The criteria will
      * also be added to the panel argument as hidden parameters.
-     * 
+     *
      * The values do need to be presented. An absent value might become supplemented within CING.
-     * 
+     *
      * CRV stands for CRiteria Value CRS stands for CRiteria String
-     * 
+     *
      * @param verticalPanel
-     * 
+     *
      * @return null on error.
      */
     public HashMap<String, String> getCriteria(VerticalPanel verticalPanel) {
