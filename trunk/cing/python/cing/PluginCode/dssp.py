@@ -25,7 +25,8 @@ import os
 
 if True: # block
     useModule = True
-    if not cingPaths.dssp:
+#    if not cingPaths.dssp:
+    if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
         NTmessage("Missing cingPaths.dssp which is a dep")
         useModule = False
     if not useModule:
