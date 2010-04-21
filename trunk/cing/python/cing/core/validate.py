@@ -50,6 +50,7 @@ from cing.Libs.html import addPreTagLines
 from cing.Libs.html import removePreTagLines
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
+from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
@@ -63,8 +64,8 @@ from cing.core.constants import NOSHIFT
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
-from cing.core.molecule import Residue
 from cing.core.molecule import RMSD_STR
+from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import plugins
 import math
@@ -105,11 +106,9 @@ def runCingChecks( project, ranges=None ):
 code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=True ):
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True ):
 # KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
-# python/cing/Scripts/doValidate.py
 # python/cing/Scripts/doValidateiCing.py
-# python/cing/PluginCod/validate.py#validate
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
@@ -123,6 +122,9 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
     if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
         if doWattos:
             project.runWattos(parseOnly=parseOnly)
+    if hasattr(plugins, NIH_STR) and plugins[ NIH_STR ].isInstalled:
+        if doTalos:
+            project.runTalosPlus(parseOnly=parseOnly)
     project.runCingChecks(ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)

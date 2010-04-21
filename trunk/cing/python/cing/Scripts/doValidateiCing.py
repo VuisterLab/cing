@@ -12,11 +12,13 @@ htmlOnly = False # default is False but enable it for faster runs without some a
 doWhatif = True # disables whatif actual run
 doProcheck = True
 doWattos = True
+doTalos = True
 if fastestTest:
     htmlOnly = True
     doWhatif = False
     doProcheck = False
     doWattos = False
+    doTalos = False
 
 project = project #@UndefinedVariable for Pydev extensions.
 options = options #@UndefinedVariable
@@ -29,11 +31,8 @@ if project.molecule == None:
     exit(1)
 #end if
 
-## TODO: disable after done debugging.
-#exit(0)
-
 project.validate( ranges=options.ranges, parseOnly=parseOnly,  htmlOnly=htmlOnly,
-                  doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos)
+                  doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos, doTalos=doTalos)
 
 NTmessage("Done with overall validation")
 

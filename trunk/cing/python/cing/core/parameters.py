@@ -88,6 +88,7 @@ cingPaths = NTdict(
     ps2pdf       = os.getenv('ps2pdfPath'),
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
+    talos        = os.getenv('talosPath'),
     classpath    = os.getenv('CLASSPATH')
 )
 

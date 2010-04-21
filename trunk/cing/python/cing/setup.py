@@ -77,6 +77,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  ps2pdfPath%(equals)s%(ps2pdfPath)s
 %(export)s  molmolPath%(equals)s%(molmolPath)s
 %(export)s  povrayPath%(equals)s%(povrayPath)s
+%(export)s  talosPath%(equals)s%(talosPath)s
 #############################################
 # No changes needed below this line.
 #############################################
@@ -460,6 +461,14 @@ if __name__ == '__main__':
     else:
         _NTmessage("........ Found 'povray'")
         parametersDict['povrayPath'] = strip(povrayPath)
+
+    talosPath,err  = _NTgetoutput('which talos+')
+    if not povrayPath:
+        _NTmessage("Could not find 'talos'")
+        parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _NTmessage("........ Found 'talos'")
+        parametersDict['talosPath'] = strip(talosPath)
 
     # TODO: enable real location finder. This just works for JFD but shouldn't bother
     # others.

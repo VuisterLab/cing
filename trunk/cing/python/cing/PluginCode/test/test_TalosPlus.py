@@ -6,6 +6,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.nih import runTalosPlus #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from unittest import TestCase
 import cing
@@ -13,9 +14,9 @@ import os
 import unittest
 
 class AllChecks(TestCase):
-    entryList = []
+#    entryList = []
 #    entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
-#    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
+    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
 
     def testTalosPlus(self):
 
@@ -39,9 +40,14 @@ class AllChecks(TestCase):
                     self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-            self.assertFalse(project.runTalosPlus())
-            self.assertTrue(project.save())
+#            self.assertFalse(project.runTalosPlus())
+#            self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly = True, doProcheck = False, doWhatif = False, doWattos = False))
+            self.assertTrue(project.save())
+#            project.close()
+#            del project
+#
+#            project = Project.open(entryId, status = 'old')
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
