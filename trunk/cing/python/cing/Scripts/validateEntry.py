@@ -64,6 +64,7 @@ def main(entryId, *extraArgList):
     doWhatif = True # disables whatif actual run
     doProcheck = True
     doWattos = True
+    doTalos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
 #    modelCount=2
     modelCount = None # default setting is None
@@ -73,6 +74,7 @@ def main(entryId, *extraArgList):
         doWhatif = False
         doProcheck = False
         doWattos = False
+        doTalos = False
     FORCE_REDO = True
     FORCE_RETRIEVE_INPUT = True
 
@@ -256,7 +258,8 @@ def main(entryId, *extraArgList):
 #        project.molecule.rename( entryId )
 
     project.save()
-    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif, doWattos=doWattos):
+    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif, 
+            doWattos=doWattos, doTalos=doTalos):
         NTerror("Failed to validate project read")
         return True
     project.save()

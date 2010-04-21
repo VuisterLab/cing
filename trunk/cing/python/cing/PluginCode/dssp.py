@@ -27,7 +27,7 @@ if True: # block
     useModule = True
 #    if not cingPaths.dssp:
     if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("Missing cingPaths.dssp which is a dep")
+        NTmessage("Missing dssp which is an optional dep")
         useModule = False
     if not useModule:
         raise ImportWarning('dssp')
