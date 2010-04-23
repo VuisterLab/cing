@@ -342,7 +342,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if ranges:
             self.ranges = ranges
             # Convert the ranges and translate into procheck format
-            selectedResidues = self.molecule.ranges2list(ranges)
+            selectedResidues = self.molecule.getResiduesFromRanges(ranges)
 #            NTdebug( '>selectedResidues: %s' % selectedResidues)
 
             # Next line doesn't work when there are the same residue numbers in different chains.

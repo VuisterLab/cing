@@ -31,7 +31,9 @@ import tarfile
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
-baseDir = '/Users/jd/CASD-NMR-CING'
+#baseDir = '/Users/jd/CASD-NMR-CING'
+baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
+
 #dataOrgDir = os.path.join(baseDir, 'data')
 dataDir = os.path.join(baseDir, 'data')
 startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME

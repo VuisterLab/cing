@@ -365,11 +365,16 @@ def restoreShiftx( project, tmp=None ):
         NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
                    project.molecule.name, project.shiftxStatus.moleculeName
                  )
-    if project.shiftxStatus.path != root:
+
+    # This needs fixing; current fix for projects  with longer root paths
+    _tmp1 = project.shiftxStatus.path.split('/')[-2:] # last two directories
+    _tmp2 = root.split('/')[-2:] # last two directories
+    if _tmp1 != _tmp2:
         NTwarning('restoreShiftx: current shiftx root path "%s" does not match xmlFile "%s"',
                    root, project.shiftxStatus.path
                  )
 
+    NTmessage("==> Restoring shiftx results")
     for chainName, outputFile in project.shiftxStatus.chains:
         parseShiftxOutput( os.path.join(root,outputFile), project.molecule, chainName )
     #end for

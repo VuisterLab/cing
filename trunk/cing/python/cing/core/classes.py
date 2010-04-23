@@ -730,6 +730,8 @@ Project: Top level Cing project class
             pl.restore()
         #end for
 
+        # this is also done in runCingChecks, but should be here to assure restraint
+        # partitioning and analysis for the external routines.
         self.partitionRestraints()
         self.analyzeRestraints()
 #            l.criticize(self) now in criticize of validate plugin
@@ -742,6 +744,8 @@ Project: Top level Cing project class
                 #end for
             #end if
         #end for
+
+        self.runCingChecks(toFile=False)
 
         self.contentIsRestored = True
 
@@ -990,8 +994,8 @@ Project: Top level Cing project class
         return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
                         doWattos = doWattos, doTalos = doTalos)
 
-    def runCingChecks(self, ranges = None):
-        return runCingChecks(self, ranges = ranges)
+    def runCingChecks(self, toFile=True):
+        return runCingChecks(self, toFile=toFile)
 
     def checkForSaltbridges(self, cutoff = 0.5, toFile = False):
         return checkForSaltbridges(self, cutoff = cutoff, toFile = toFile)
@@ -2024,6 +2028,9 @@ class DistanceRestraintList(RestraintList):
         self.__CLASS__ = DRL_LEVEL
         self.Hbond = False       # Hbond: fix to keep information about Hbond restraints from CCPN
         self.violCountLower = 0   # Total lower-bound violations over 0.1 A
+        self.violCount1 = 0
+        self.violCount3 = 0
+        self.violCount5 = 0
         self.violMax = 0.0   # Maximum violation
         self.violUpperMax = 0.0   # Max violation over upper bound
         self.violLowerMax = 0.0   # Max violation over lower bound

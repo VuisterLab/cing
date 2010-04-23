@@ -1,4 +1,5 @@
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTwarning
 import math
 
@@ -136,7 +137,7 @@ class Peirce:
         # At this point the row,y combination falls to the right of the table
         # row>=20 and we need delta to get an R value close to 1.
         if y >= x/2:
-            NTwarning("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
+            NTdebug("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
             return None
 
         lastValue = self.peirce[row][-1]

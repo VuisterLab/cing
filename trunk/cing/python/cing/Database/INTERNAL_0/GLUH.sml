@@ -6,7 +6,7 @@
 #=======================================================================
 	comment    = 'Protonated (neutral) GLU (uncommon)'
 	nameDict   = {'CCPN': 'protein Glu prot:HE2', 'INTERNAL_0': 'GLUH', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'BMRBd': 'GLU', 'INTERNAL_1': 'GLUH', 'CYANA': 'GLU', 'CYANA2': None, 'PDB': 'GLU', 'XPLOR': 'GLU'}
-	properties = ['protein', 'aliphatic', 'large', 'charged']
+	properties = ['protein', 'aliphatic', 'large', 'charged','isGlutamicAcid']
 
 	dihedrals  = <NTlist>
 	#---------------------------------------------------------------

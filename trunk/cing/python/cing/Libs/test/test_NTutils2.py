@@ -112,7 +112,7 @@ class AllChecks(TestCase):
         self.assertEqual(mol,newMol)
         res.removeAtom(atom.name)
         newMol = atom.getMolecule()
-        self.assertEqual(newMol, None)
+        self.assertEqual(newMol, mol)
 
     def testNTvalue(self):
         s = "%s"  % NTvalue(value=None,  error=None, fmt='%.3f (+- %.3f)')

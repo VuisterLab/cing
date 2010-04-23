@@ -81,24 +81,26 @@ import sys
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 #dbase.close()
 
-def runCingChecks( project, ranges=None ):
+def runCingChecks( project, toFile=True ):
     """This set of routines needs to be run after a project is restored."""
     project.partitionRestraints()
     project.analyzeRestraints()
-    project.validateRestraints( toFile=True)
+    project.validateRestraints(toFile)
     project.validateDihedrals()
     project.validateModels()
 #    project.validateAssignments() in criticize now
     # project.mergeResonances() GWV says: don't do this
 
-    project.checkForSaltbridges(toFile=True)
-#    project.checkForDisulfides(toFile=True)
-    if project.molecule:
-        project.molecule.calculateRMSDs( ranges=ranges)
-        project.molecule.idDisulfides(toFile=True, applyBonds=False)
+    project.checkForSaltbridges(toFile)
 
-    project.criticize(toFile=True)
-    project.summary(toFile=True)
+#    project.checkForDisulfides(toFile=True)
+# GWV this is done in molecule.updateAll
+#    if project.molecule:
+#        project.molecule.calculateRMSDs( ranges=ranges)
+#        project.molecule.idDisulfides(toFile, applyBonds=False)
+
+    project.criticize(toFile)
+    project.summary(toFile)
     project.mkMacros()
 #end def
 
@@ -125,7 +127,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
     if hasattr(plugins, NIH_STR) and plugins[ NIH_STR ].isInstalled:
         if doTalos:
             project.runTalosPlus(parseOnly=parseOnly)
-    project.runCingChecks(ranges=ranges)
+    project.runCingChecks(toFile=True)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
     project.renderHtml()
@@ -492,7 +494,7 @@ def summary( project, toFile = True ):
     if project.molecule.ranges:
         r = project.molecule.ranges
         msg += "\n%s CING ROG analysis (residues %s) %s\n%s\n" % \
-               (dots, r, dots, _ROGsummary(project.molecule.ranges2list(r), allowHtml=True))
+               (dots, r, dots, _ROGsummary(project.molecule.getResiduesFromRanges(r), allowHtml=True))
 
     wiSummary = getDeepByKeys(project.molecule, WHATIF_STR, 'summary')
     if wiSummary:
