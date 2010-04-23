@@ -1100,13 +1100,15 @@ def runWhatif( project, parseOnly=False ):
         if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
             NTerror("\nrunWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
-    #end if
+    	#end if
+    #end for
 
     if whatif._processCheckdb():
         NTerror("runWhatif: Failed to process check db")
         return True
 
-    pathPdbOut = os.path.join(path, 'pdbout.txt' )
+#    pathPdbOut = os.path.join(path, 'pdbout.txt' ) has only one model!
+    pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' )
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         NTerror("Path does not exist: %s" % (pathPdbOut))
         return True

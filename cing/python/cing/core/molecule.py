@@ -474,21 +474,26 @@ class Molecule( NTtree, ResidueList ):
             self._nameTupleDict[nameTuple] = res
             return res
 
-        resTranslated = res.translate(convention)
-        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
-#        if (not an or (an not in res)): return None
-        if not an:
-#            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
-            return None
-            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
-            # and look up the atom translation. This can of course be fixed in the db too.
+#        resTranslated = res.translate(convention)
+#        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
+##        if (not an or (an not in res)): return None
+#        if not an:
+##            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
+#            return None
+#            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
+#            # and look up the atom translation. This can of course be fixed in the db too.
+#
+#
+#        if not res.has_key(an):
+##            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#            return None
 
 
-        if not res.has_key(an):
-#            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
-            return None
+#        atm = res[an]
 
-        atm = res[an]
+        # GWV 20 Apr 2010: all in one call
+        atm = res.getAtom( atomName, convention )
+
         # JFD modifies to include brackets. Otherwise the 'and' operator has a higher precedence than '==' etc,
         if (resonanceIndex == None) and (model == None):
             self._nameTupleDict[nameTuple] = atm
@@ -638,17 +643,57 @@ class Molecule( NTtree, ResidueList ):
         return atomDict
     #end def
 
+    def getResiduesFromRanges(self, ranges, autoLimit=0.7):
+        """
+        Convert
+              either:
+                  'auto' keyword
+              or
+                  a residue ranges string, e.g. '10-20,34,50-60',
+              or
+                  a list with residue number or residue instances,
+              or
+                  None  ==> output will be all residues.
+
+        to a NTlist instance with residue objects.
+
+        Set the selectedResidues and selectedResiduesList attributes in Molecule instance
+
+        Return the list or None upon error.
+
+        Routine should replace ranges2list eventually
+
+        """
+        if ranges == 'auto':
+            selectedResidues = self._autoRanges( autoLimit )
+        elif ranges == 'all':
+            selectedResidues = self.allResidues()
+        else:
+            selectedResidues = self.ranges2list( ranges )
+
+        if not selectedResidues:
+            return None
+
+        self.selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
+        self.selectedResidues = selectedResidues
+
+        return selectedResidues
+    #end def
+
     def ranges2list( self, ranges ):
         """
             Convert
-              either a residue ranges string, e.g. '10-20,34,50-60',
-              or a list with residue number or residue instances,
-              or None,
+              either:
+                 a residue ranges string, e.g. '10-20,34,50-60',
+              or
+                  a list with residue number or residue instances,
+              or
+                  None  ==> output will be all residues.
 
            to a NTlist instance with residue objects.
 
            Return the list or None upon error.
-            When the input for ranges is None then the output will be all residues.
+
         """
         if ranges == None:
             return self.allResidues()
@@ -707,7 +752,7 @@ class Molecule( NTtree, ResidueList ):
         """
         selectedResidues = self.allResidues()
         if ranges:
-            selectedResidues = self.ranges2list( ranges )
+            selectedResidues = self.getResiduesFromRanges( ranges )
         r = NTlist()
         result = []
         for res in selectedResidues:
@@ -774,7 +819,7 @@ class Molecule( NTtree, ResidueList ):
                 result.append(model)
             #end for
             return result
-        NTerror('Error Molecule.ranges2list: undefined models type %s\n', type(models) )
+        NTerror('Error Molecule.models2list: undefined models type %s\n', type(models) )
         return None
     #end def
 
@@ -1391,6 +1436,7 @@ class Molecule( NTtree, ResidueList ):
 
     def updateAll( self)   :
         """Define and calculate the dihedral angles for all residues
+           Check for cis proline and update when found
            Calculate mean coordinates for all atoms
            Generate an ensemble from coordinates
            Generate an atomList
@@ -1402,6 +1448,16 @@ class Molecule( NTtree, ResidueList ):
         if self.modelCount > 0:
             self.syncModels()
             self.updateDihedrals()
+
+            #check for cis Pro's
+            for res in self.residuesWithProperties('PRO'):
+                if res.has_key('OMEGA') and res.OMEGA.isWithinLimits( -90.0, 90.0):
+                    # Cis omega; change to cPRO
+                    _tmp,new=res.mutate('cPRO')
+                    NTwarning('Molecule.updateAll: %s changed to %s', res.OMEGA, new )
+                #end if
+            #end for
+
             self.updateMean()
             self.ensemble = Ensemble( self )
 #            self.atomList = AtomList( self )
@@ -1416,7 +1472,6 @@ class Molecule( NTtree, ResidueList ):
         self.atomList = AtomList( self )
         if not self.atomList:
             NTcodeerror("Failed to generate AtomList in molecule#updateAll")
-
 
         self.updateTopology()
     #end def
@@ -1583,9 +1638,9 @@ Return an Molecule instance or None on error
         """Integer value for fast lookup in db"""
         return self.mapColorString2Int[ self.colorLabel ]
 
-    def selectFitAtoms( self, ranges=None, backboneOnly=True, includeProtons = False ):
+    def selectFitAtoms( self, fitResidues, backboneOnly=True, includeProtons = False ):
         """
-        Select the atoms to be fitted
+        Select the atoms to be fitted from a list of fitResidues
         return NTlist instance or NoneObject on error
         """
 
@@ -1597,7 +1652,7 @@ Return an Molecule instance or None on error
 
         # Partition the Atoms
         fitted        = []
-        fitResidues   = self.ranges2list( ranges )
+#        fitResidues   = self.ranges2list( ranges )
         # store the ranges
         self.ranges   = list2asci( fitResidues.zap('resNum'))
 
@@ -1669,12 +1724,13 @@ Return an Molecule instance or None on error
             return NoneObject
         #end if
 
-        if ranges=='auto':
-            ranges = self._autoRanges(autoLimit)
+        selectedResidues = self.getResiduesFromRanges( ranges, autoLimit=autoLimit )
+#        if ranges=='auto':
+#            ranges = self._autoRanges(autoLimit)
 
-        fitted = self.selectFitAtoms( ranges=ranges, backboneOnly=backboneOnly, includeProtons = includeProtons )
+        fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
-        selectedResidues = self.ranges2list( ranges )
+#        selectedResidues = self.ranges2list( ranges )
         selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
         NTmessage("==> Superposing: fitted %s on %d atoms (residues=%s, backboneOnly=%s, includeProtons=%s)",
                       self, len(fitted), selectedResiduesList, backboneOnly, includeProtons
@@ -1706,7 +1762,7 @@ Return an Molecule instance or None on error
             models = sprintf('%s-%s', 0, self.modelCount-1)
 
 
-        selectedResidues = self.ranges2list( ranges )
+        selectedResidues = self.getResiduesFromRanges( ranges )
         selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
         selectedModels   = self.models2list( models )
 
@@ -1902,7 +1958,8 @@ class Ensemble( NTlist ):
         self.molecule     = molecule
 
         for i in range(0,molecule.modelCount):
-            m = Model('model'+str(i), i )
+            mName = sprintf('%s_model_%d', molecule.name, i)
+            m = Model(mName, i )
             self.append( m )
         #end for
         self.averageModel = Model('averageModel', molecule.modelCount )
@@ -2029,13 +2086,13 @@ class Model( NTcMatrix ):
         """
         Superpose coordinates of self onto other.
         Use vectors of fitCoordinates for superposition.
-        return rmsd between self and other using fitCoordinates or -1.0 on Error
+        return rmsd between self and other using fitCoordinates or NaN on Error
         """
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
         if len(v1) != len(v2):
             NTerror("Model.superpose: unequal length fitCoordinates (%s and %s)", self, other)
-            return -1.0
+            return NaN
         #end if
 
         smtx = superposeVectors( v1, v2 )
@@ -2552,13 +2609,17 @@ Residue class: Defines residue properties
         """
         # find the database entry
         if resName not in NTdb:
-            self.db = NTdb[self.resName]
-            NTerror('Residue.mutate: residue "%s" not defined in database\n', resName )
+            #self.db = NTdb[self.resName]
+            NTerror('Residue.mutate: residue "%s" not defined in database', resName )
             return None
         #end if
         newRes  = Residue( resName, self.resNum )
+        if not newRes:
+            NTerror('Residue.mutate: error defining residue "%s"', resName )
+            return None
+        #end if
 
-        NTmessage('==> Mutating %s to %s', self._Cname(-1), resName )
+        NTdetail('==> Mutating %s to %s', self._Cname(-1), resName )
 
         # remove old name references
         del( self._parent[self.name] )
@@ -2580,13 +2641,17 @@ Residue class: Defines residue properties
         # Move like atoms from self, create new atoms if needed
         for atmDef in newRes.db.atoms:
             if (atmDef.name in self):
+                # remove the references to atm from self
                 atm = self.removeChild( self[atmDef.name] )
                 for alias in atm.db.aliases:
                     if alias in self:
                         del(self[alias])
                 #end for
                 self.atomCount -= 1
+
+                #add the atom to newRes
                 atm.residue = newRes
+                atm.db = atmDef
                 newRes._addChild( atm )
                 newRes.atomCount += 1
                 newRes.chain.molecule.atomCount += 1
@@ -2600,6 +2665,11 @@ Residue class: Defines residue properties
                 #end for
             #end if
         #end for
+
+        # dihedrals
+        newRes.addDihedralsAll()
+        for d in newRes.dihedrals:
+            d.calculateValues()
 
         return self,newRes
     #end def
@@ -2656,14 +2726,32 @@ Residue class: Defines residue properties
         if self.db:
             self.dihedrals = NTlist()
             for d in self.db.dihedrals:
+
                 dihed = Dihedral( self, d.name )
-                if dihed.atoms:
-                    self.dihedrals.append(dihed)
-                    self[dihed.name] = dihed
-                    # if db and aliases, add them; e.g. DNA/RNA DELTA==NU3
-                    if dihed.db:
-                        for aname in dihed.db.aliases:
-                            self[aname] = dihed
+                if dihed == None:
+                    continue
+
+                if dihed.atoms == None:
+                    continue
+ #               print '>>',dihed.format()
+
+                missingCoordinates = False
+                for a in dihed.atoms:
+
+                    if len(a.coordinates) != self.chain.molecule.modelCount:
+                        missingCoordinates = True
+                        continue
+                #end for
+                if missingCoordinates:
+                    continue
+
+                self.dihedrals.append(dihed)
+                self[dihed.name] = dihed
+                # if db and aliases, add them; e.g. DNA/RNA DELTA==NU3
+                if dihed.db:
+                    for aname in dihed.db.aliases:
+                         self[aname] = dihed
+                    #end for
                 #end if
             #end for
         #end if
@@ -2706,11 +2794,12 @@ Residue class: Defines residue properties
             return None
         #end if
 
-        if (convention != INTERNAL):
-            atomName = translateAtomName( convention, self.translate(convention), atomName, INTERNAL )
-        #end if
-        if self.has_key(atomName):
-            return self[atomName]
+#        if (convention != INTERNAL):
+#            atomName = translateAtomName( convention, self.translate(convention), atomName, INTERNAL )
+#        #end if
+        aDef = self.db.getAtomDefByName( atomName, convention )
+        if aDef and self.has_key(aDef.name):
+            return self[aDef.name]
         #end if
         return None
     #end def
@@ -2813,7 +2902,7 @@ Residue class: Defines residue properties
 
         if None in doublet:
             if not self.isNterminal():
-                NTwarning( 'Skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
+                NTdebug( 'Molecule.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
             return
         CA_atms = doublet.zap('CA')
         CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
@@ -2823,14 +2912,24 @@ Residue class: Defines residue properties
 #                NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
                 continue
 
-            CB_atm = None
-            if doubletResidue.has_key('CB'):
-                CB_atm = doubletResidue.CB
-            elif doubletResidue.has_key(GLY_HA3_NAME_CING):
-                CB_atm = doubletResidue[GLY_HA3_NAME_CING]
+#            CB_atm = None
+#            if doubletResidue.has_key('CB'):
+#                CB_atm = doubletResidue.CB
+#            elif doubletResidue.has_key(GLY_HA3_NAME_CING):
+#                CB_atm = doubletResidue[GLY_HA3_NAME_CING]
+#            else:
+#                NTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+#                continue
+
+            # Use the API!
+            if doubletResidue.hasProperties('GLY'):
+                CB_atm = doubletResidue.getAtom('HA3',IUPAC)
             else:
-                NTerror( 'Skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+                CB_atm = doubletResidue.getAtom('CB',IUPAC)
+            if not CB_atm:
+                NTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
                 continue
+
             CB_atms.append(CB_atm)
 #                print res, triplet, CA_atms, CB_atms
         if len(CB_atms) != len(doublet): # skip for preceding or trailing uncommon residues for now.
@@ -2842,8 +2941,8 @@ Residue class: Defines residue properties
         d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
         d1PrevRes.atoms = d1.atoms
 
-        d1.calculateValues()
-        d1PrevRes.calculateValues()
+#        d1.calculateValues() Should not do this as it will be done in updateAll
+#        d1PrevRes.calculateValues()
         self[DIHEDRAL_NAME_Cb4N] = d1 # append dihedral to residue
         prevRes[DIHEDRAL_NAME_Cb4C] = d1PrevRes # append dihedral to residue
         self.dihedrals.append(d1)
@@ -2975,6 +3074,16 @@ class Dihedral( NTlist ):
         #end if
     #end def
 
+    def isWithinLimits(self, lower, upper):
+        """
+        Check id cav is within [lower,upper] taking periodicity into account
+        """
+        tmp = NTlist(self.cav).limit(lower,lower+360.0) # Rescale cav to the range lower, lower+360.0
+        if tmp[0] >= lower and tmp[0] <= upper:
+            return True
+        return False
+    #end def
+
     def __str__(self):
         if self.residue:
             dname = self.residue.name + '.' + self.name
@@ -3016,6 +3125,8 @@ class Dihedral( NTlist ):
                 return NaN,NaN
             #end if
         #end for
+
+        del(self[:]) # initialize
 
         for i in range(0,l):
             self.append( NTdihedralOpt(
@@ -3191,12 +3302,6 @@ Atom class: Defines object for storing atom properties
 
         NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
 
-        self.__FORMAT__ = self.header( dots ) + '\n' +\
-                          'residue:     %(residue)s\n' +\
-                          'resonances:  %(resonances)s\n' +\
-                          'coordinates: %(coordinates)s\n' +\
-                          self.footer( dots )
-
         self.setdefault( 'stereoAssigned', False )
 
         self.resonances  = NTlist()
@@ -3226,6 +3331,15 @@ Atom class: Defines object for storing atom properties
 #        return self._Cname( 1 )
         return '<%s %s>' % ( self._className(), self._Cname(2) ) # Include chain id as well as residue id.
     #end def
+
+    def format(self):
+        return sprintf("""%s %s %s
+resonances:  %s
+coordinates: %s"""  , dots, self, dots
+                    , self.resonances
+                    , self.coordinates
+                    )
+        #end def
 
     def criticize(self):
 #        NTdebug( '%s' % self )

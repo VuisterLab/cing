@@ -643,6 +643,49 @@ Sum                %s
     #end def
 #end class
 
+
+class NTlistOfLists(NTlist):
+    """Generate a NTlist of NTlist's of rowSize, colSize filled with default's
+    """
+
+    def __init__( self, rowSize, colSize, default=None ):
+        NTlist.__init__( self )
+        for i in range(rowSize):
+            self.append(NTfill(default, colSize))
+        self.rowSize = rowSize
+        self.colSize = colSize
+    #end def
+
+    def getRow( self, rowIndex ):
+        """Get a row (trivial!)
+        Return None on error
+        """
+        if rowIndex < 0 or rowIndex > len(self):
+            return None
+        return self[rowIndex]
+    #end def
+
+    def getColumn( self, columnIndex ):
+        """Get a column (trivial!)
+        Return None on error
+        """
+        if columnIndex < 0 or columnIndex > self.colSize:
+            return None
+        result = NTlist()
+        for row in self:
+            result.append( row[columnIndex] )
+        return result
+    #end def
+
+    def format( self, fmt = '%s' ):
+        result = ''
+        for i in range(self.rowSize):
+            result = result + self[i].format(fmt=fmt) + '\n'
+        return result
+    #end def
+#end class
+
+
 def NTfill(value, n):
     """Return a NTlist instance with n elements of value
 
@@ -2341,6 +2384,18 @@ class NTvalue(NTdict):
         else:
             return self.value != other
         #end if
+    #end def
+
+    def sqrt(self):
+        if self.value < 0:
+            raise ValueError
+        elif self.value == 0:
+            v = self.value
+            e = self.error
+        else:
+            v = math.sqrt(self.value)
+            e = self.error / (2.0*self.value) # y = sqrt(x) ==> dY = 1/(2*sqrt(x)) *dx
+        return NTvalue(v, e, self.fmt, self.fmt2)
     #end def
 
     def toTuple(self):

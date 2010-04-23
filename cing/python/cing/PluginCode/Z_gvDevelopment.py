@@ -302,7 +302,7 @@ class gvProcheck:
         NTmessage('==> Running procheck_nmr, ranges %s, results in "%s" ...', ranges, self.rootPath)
 
         # Convert the ranges and translate into procheck_nmr format
-        selectedResidues = self.molecule.ranges2list( ranges )
+        selectedResidues = self.molecule.getResiduesFromRanges( ranges )
         NTsort(selectedResidues, 'resNum', inplace=True)
         # reduce this sorted list to pairs start, stop
         self.ranges = selectedResidues[0:1]
