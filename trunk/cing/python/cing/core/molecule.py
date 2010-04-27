@@ -1,6 +1,7 @@
 from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.NTutils import NTcVarianceAverage
 from cing.Libs.NTutils import NTcodeerror
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
@@ -33,8 +34,8 @@ from cing.Libs.cython.superpose import NTcMatrix #@UnresolvedImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
-from cing.Libs.fpconst import isNaN
 from cing.Libs.fpconst import NaN #@UnusedImport not really but pydev flags it because of pylab wild imports
+from cing.Libs.fpconst import isNaN
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
@@ -43,20 +44,18 @@ from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.core.ROGscore import ROGscore
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-from cing.core.database import translateAtomName
 from database import NTdb
 from math import acos
-#from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
-from pylab import * #@UnusedWildImport # otherwise use this line.
 from parameters   import plotParameters
+from pylab import * #@UnusedWildImport # otherwise use this line.
 import os
+#from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
 
 #==============================================================================
 # Global variables
 #==============================================================================
 AtomIndex = 1
 _DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
-RMSD_STR = 'rmsd'
 
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
@@ -1257,12 +1256,13 @@ class Molecule( NTtree, ResidueList ):
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
-#        NTdebug('Calculating dihedral angles')
+        NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
 #            res.addDihedralsAll()
             for d in res.dihedrals:
                 d.calculateValues()
             #end for
+            res.setCvBackboneSidechain() # will automatically skip amino acids.
         #end for
     #end def
 
@@ -2501,7 +2501,9 @@ Residue class: Defines residue properties
         self.dihedralRestraints = NTlist()
         self.rdcRestraints      = NTlist()
 
-
+        self.cv_backbone = None # filled by self.setCvBackboneSidechain
+        self.cv_sidechain = None
+        self.rmsd = None # will be filled by molecule.calculateRMSDs.
         self.rogScore = ROGscore()
 
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
@@ -2884,6 +2886,21 @@ Residue class: Defines residue properties
         #end for
         return result
     #end def
+
+    def setCvBackboneSidechain(self):
+        if not self.hasProperties('protein'):
+            return
+        # CING doesn't use IUPAC nomenclature for chi beyond 1. E.g. the iupac Chi2,1 in Ile is simply named Chi2.
+        # This is incorrect but does make the code very simple here.
+        # Optimized for speed so no loop setups.
+        cv1 = getDeepByKeysOrAttributes(self, PHI_STR, CV_STR)
+        cv2 = getDeepByKeysOrAttributes(self, PSI_STR, CV_STR)
+        self.cv_backbone = NTcVarianceAverage( (cv1, cv2) )
+
+        cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
+        cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
+        self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )
+
 
     def addDihedralD1(self):
         """Calculates and adds the Cb4N dihedral to this residue and the same dihedral as

@@ -13,9 +13,9 @@ import os
 Ramachandran = 'Ramachandran'
 Janin = 'Janin'
 d1d2 = 'd1d2'
-#dihedralTodo = Ramachandran
-#dihedralTodo = Janin
-dihedralComboTodo = d1d2
+dihedralComboTodo = Ramachandran
+#dihedralComboTodo = Janin
+#dihedralComboTodo = d1d2
 # Throw away the worst 10 % within the chain.
 DEFAULT_BFACTOR_PERCENTAGE_FILTER = 5 # DEFAULT from Gert: 10
 # Then after the above check throw away additionaly any residue above 20
@@ -41,8 +41,9 @@ def main():
     startDir              = os.path.join(cingDirTmp,     subdir)
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
 #    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
-#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28.LIS')
-    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_todo.txt')
+#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS')
+    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.19_Res1.3_2009-02-28_noObs.LIS')
+#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_todo.txt')
 
     START_ENTRY_ID                 =0 # default 0
     MAX_ENTRIES_TODO               =1 # default a ridiculously large number like 999999

@@ -668,7 +668,7 @@ class NTplot( NTdict ):
             xaxis.set_major_formatter( formatter )
 
 
-    def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False ):
+    def autoScaleY( self, pointList, startAtZero=False, useIntegerTickLabels=False, useVerboseLocator=False ):
         """Using the list of points autoscale the y axis.
         If no list is given then the routine simply returns False.
         If the list only contains nulls the min and max will be assumed 0 and 1.
@@ -710,11 +710,21 @@ class NTplot( NTdict ):
         if startAtZero and min >= 0.:
             min = 0.
 
-#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
-        ylocator = self.axis.yaxis.get_major_locator()
+        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+        if not useVerboseLocator:
+            ylocator = self.axis.yaxis.get_major_locator()
+        else:
+            NTerror("This part of the code needs to be tested")
+#            ylocator = MaxNLocator(nbins=20) # instead of default 10
+            ylocator = MultipleLocator(base=0.05) # instead of default 10
+
+            self.axis.yaxis.set_major_locator(ylocator)
         ylocator.set_bounds( min, max )
+
+        NTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
         self.axis.autoscale_view( scalex=False, scaley=True)
         self.yRange = self.axis.get_ylim()
+        NTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
         if useIntegerTickLabels:
             formatter = FuncFormatter(integerNumberOnly)
             yaxis = self.axis.yaxis

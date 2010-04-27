@@ -5,10 +5,12 @@ python -u $CINGROOT/python/cing/Libs/test/test_NTutils4.py
 
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import switchOutput
 from cing.Libs.NTutils import toPoundedComment
-from unittest import TestCase
 from cing.core.sml import NTdict
+from unittest import TestCase
 import cing
 import unittest
 
@@ -118,6 +120,21 @@ b
 
         x = l.getConsensus(minFraction=0.5)
         self.assertEquals( x, 'abc')
+
+    def testGetDeepByKeysOrAttributes(self):
+        value = 123
+        d = {}
+        keyList = 'a b c'.split()
+        setDeepByKeys(d, value, *keyList)
+        NTdebug("complex object: %s" % d)
+        valueOut = getDeepByKeysOrAttributes(d,*keyList)
+        self.assertEquals(value,valueOut)
+        keyList = [ 'a.b', 'c' ]
+        valueOut = getDeepByKeysOrAttributes(d,*keyList)
+        self.assertEquals(value,valueOut)
+        keyList = [ 'a.b.', 'c' ] # extra dot should mess this up.
+        valueOut = getDeepByKeysOrAttributes(d,*keyList)
+        self.assertFalse(valueOut) # None will evaluate to False as well.
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

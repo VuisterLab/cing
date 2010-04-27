@@ -22,13 +22,13 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTmessageNoEOL
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import NaN
 from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.classes import DihedralRestraint
-from cing.core.constants import INTERNAL_0
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
 from cing.core.sml import SML2obj
@@ -1562,13 +1562,17 @@ def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='keep', error
         if res.talosPlus and res.talosPlus.classification=='Good':
             lower = res.talosPlus.phi.value-errorFactor*res.talosPlus.phi.error
             upper = res.talosPlus.phi.value+errorFactor*res.talosPlus.phi.error
-            d = DihedralRestraint(res.PHI.atoms, lower, upper)
-            dhl.append(d)
+            atoms = getDeepByKeysOrAttributes( res, PHI_STR, ATOMS_STR )
+            if atoms:
+                d = DihedralRestraint(atoms, lower, upper)
+                dhl.append(d)
 
             lower = res.talosPlus.psi.value-errorFactor*res.talosPlus.psi.error
             upper = res.talosPlus.psi.value+errorFactor*res.talosPlus.psi.error
-            d = DihedralRestraint(res.PSI.atoms, lower, upper)
-            dhl.append(d)
+            atoms = getDeepByKeysOrAttributes( res, PSI_STR, ATOMS_STR )
+            if atoms:
+                d = DihedralRestraint(atoms, lower, upper)
+                dhl.append(d)
         #end if
     #end for
     NTmessage('==> Created %s', dhl)

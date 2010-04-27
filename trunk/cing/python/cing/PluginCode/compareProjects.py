@@ -1,12 +1,14 @@
-from cing.Libs.NTutils import NTlistOfLists
-from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTlistOfLists
+from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTvector
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import fprintf #@UnusedImport
 from cing.Libs.NTutils import printf
+from cing.Libs.NTutils import sprintf
+from cing.core.classes import Project
+from cing.core.constants import INTERNAL
 import math
 
 
@@ -171,7 +173,7 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
             #print '>>', i,j
             r = models[i].calculateRMSD( models[j] )
             if r == None:
-                NTerror('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], model[j])
+                NTerror('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], model[j]) #@UndefinedVariable for model
             else:
                 result[i][j] = r
                 result[j][i] = r
@@ -260,7 +262,7 @@ def calcPhiPsiRmsds( projects, ranges='auto', relative = True ):
     for i in range(l):
         for j in range(i+1,l):
             #print projects[i].group, projects[j].group
-            r, pw_i, pw_j, pw_ij = calculatePairWisePhiPsiRmsd( projects[i].molecule, projects[j].molecule, ranges = ranges)
+            _r, pw_i, pw_j, pw_ij = calculatePairWisePhiPsiRmsd( projects[i].molecule, projects[j].molecule, ranges = ranges)
             if relative:
                 rmsds[i][i] = pw_i/(pw_i*pw_i).sqrt()
                 rmsds[j][j] = pw_j/(pw_j*pw_j).sqrt()
@@ -288,7 +290,7 @@ def calcRmsds( projects, ranges='auto' ):
     for i in range(l):
         for j in range(i+1,l):
             print projects[i].group, projects[j].group
-            r, pw_i, pw_j, pw_ij = calculatePairWiseRmsd( projects[i].molecule, projects[j].molecule, ranges = ranges)
+            _r, pw_i, pw_j, pw_ij = calculatePairWiseRmsd( projects[i].molecule, projects[j].molecule, ranges = ranges)
             rmsds[i][i] = pw_i
             rmsds[j][j] = pw_j
             rmsds[i][j] = pw_ij

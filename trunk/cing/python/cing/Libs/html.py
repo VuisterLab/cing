@@ -11,6 +11,14 @@ from cing import cingRoot
 from cing import cingVersion
 from cing import programName
 from cing.Libs.Imagery import convert2Web
+from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
+from cing.Libs.NTmoleculePlot import KEY_LIST_STR
+from cing.Libs.NTmoleculePlot import MoleculePlotSet
+from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
+from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
@@ -94,6 +102,25 @@ image2DdihedralWidth  = 500
 image2Ddihedralheight = 500
 imageSmall2DdihedralWidth  = 300
 imageSmall2Ddihedralheight = 300
+
+cingPlotList = []
+cingPlotList.append( ('_01_d1d2','D1D2') )
+
+# Kinda like the one for Whatif but then using a possibly nested property key for second column.
+nameDefs =[
+#            (ATOM_LEVEL,'WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
+            (RES_LEVEL, 'rmsd',    None,          'Rmsd',                                                      'Rmsd'),
+            (RES_LEVEL, 'PHI.cv',  None,          'Circular variance Phi',                                     'CV Phi'),
+            (RES_LEVEL, 'PSI.cv',  None,          'Circular variance Psi',                                     'CV Psi'),
+#            (RES_LEVEL, 'BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
+]
+
+cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
+nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
+shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
+cingNameDict.keysformat()
+nameDict.keysformat()
+shortNameDict.keysformat()
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -185,6 +212,62 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
     return ps
 #end def
 
+
+def createHtmlCing(project, ranges=None):
+    """ Read out wiPlotList to see what get's created. """
+
+    # The following object will be responsible for creating a (png/pdf) file with
+    # possibly multiple pages
+    # Level 1: row
+    # Level 2: against main or alternative y-axis
+    # Level 3: plot parameters dictionary (extendable).
+    keyLoLoL = []
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ PHI_STR, CV_STR ]
+    plotAttributesRowMain[ KEY_LIST2_STR] = [ PSI_STR, CV_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ 'cv_backbone' ]
+    plotAttributesRowMain[ YLABEL_STR] = 'cv phi/psi'
+    plotAttributesRowAlte[ YLABEL_STR] = 'cv backbone'
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 1.0
+    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ CHI1_STR, CV_STR ]
+    plotAttributesRowMain[ KEY_LIST2_STR] = [ CHI2_STR, CV_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ 'cv_sidechain' ]
+    plotAttributesRowMain[ YLABEL_STR] = 'cv chi1/2'
+    plotAttributesRowAlte[ YLABEL_STR] = 'cv sidechain'
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    plotAttributesRowMain[ USE_MAX_VALUE_STR]   = 1.0
+    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowAlte = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ RMSD_STR, BACKBONE_AVERAGE_STR, VALUE_STR ]
+    plotAttributesRowAlte[ KEY_LIST_STR] = [ RMSD_STR, HEAVY_ATOM_AVERAGE_STR, VALUE_STR ]
+    plotAttributesRowMain[ YLABEL_STR] = BACKBONE_AVERAGE_STR
+    plotAttributesRowAlte[ YLABEL_STR] = HEAVY_ATOM_AVERAGE_STR
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ QSHIFT_STR, ALL_ATOMS_STR]
+    plotAttributesRowMain[ KEY_LIST2_STR] = [ QSHIFT_STR, BACKBONE_STR]
+    plotAttributesRowMain[ KEY_LIST3_STR] = [ QSHIFT_STR, HEAVY_ATOMS_STR]
+    plotAttributesRowMain[ KEY_LIST4_STR] = [ QSHIFT_STR, PROTONS_STR]
+    plotAttributesRowMain[ YLABEL_STR] = 'QCS all/bb/hvy/prt'
+    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 0.5
+    keyLoLoL.append([ [plotAttributesRowMain] ])
+
+    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[0][0] + ".pdf" )
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+#end def
 
 class HistogramsForPlotting():
     """Class for enabling load on demand
@@ -1912,6 +1995,64 @@ class MoleculeHTMLfile( HTMLfile ):
     #end def
 
 
+    def _generateCingHtml(self, htmlOnly=False):
+        """Generate the html code for the CING based plots.
+        """
+        main = self.main
+        project = self.project
+        molecule = self.molecule
+
+        if not htmlOnly:
+            NTmessage("Creating CING html")
+            if createHtmlCing(project):
+                NTerror('Failed to createHtmlCing')
+                return True
+            #end if
+        #end if
+        if False:
+            anyWIPlotsGenerated = False
+
+            main('h1','What If')
+            ncols = 6
+            main('table',  closeTag=False)
+            plotCount = 0 # The number of actual plots shown in the table
+            for p,d in NTprogressIndicator(wiPlotList):
+                wiLink = os.path.join('../..',
+                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
+                wiLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
+                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
+    #            NTdebug('wiLinkReal: ' + wiLinkReal)
+                if not os.path.exists( wiLinkReal ):
+    #                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
+                    continue # Skip their inclusion.
+
+                pinupLink = os.path.join('../..',
+                            project.moleculeDirectories.whatif, molecule.name + p + "_pin.gif" )
+                fullLink = os.path.join('../..',
+                            project.moleculeDirectories.whatif, molecule.name + p + ".png" )
+                anyWIPlotsGenerated = True
+                if plotCount % ncols == 0:
+                    if plotCount:
+                        main('tr',  openTag=False)
+                    main('tr',  closeTag=False)
+                main('td',  closeTag=False)
+                main('a',   "",         href = fullLink, closeTag=False )
+                main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+                main('a',   "",         openTag=False )
+                main('br')
+                main('a',   d,          href = wiLink )
+                main('td',  openTag=False)
+                plotCount += 1
+            #end for plot
+
+            if plotCount: # close any started rows.
+                main('tr',  openTag=False)
+            main('table',  openTag=False) # close table
+            if not anyWIPlotsGenerated:
+                main('h2', "No What If plots found at all")
+            #end for doWhatif check.
+    #end def
+
     def _generateWhatifHtml(self, htmlOnly=False):
         """Generate the Whatif html code
         """
@@ -2118,6 +2259,7 @@ class MoleculeHTMLfile( HTMLfile ):
         self.insertHtmlLink(self.main, self.molecule, _dummy, text='Salt bridges')
 
         if True: # default is True; disable for speedy debugging
+            self._generateCingHtml(htmlOnly=htmlOnly)
             self._generateWhatifHtml(htmlOnly=htmlOnly)
             self._generateProcheckHtml(htmlOnly=htmlOnly)
             self._generateWattosHtml(htmlOnly=htmlOnly)

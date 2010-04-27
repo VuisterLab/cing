@@ -650,7 +650,7 @@ class NTlistOfLists(NTlist):
 
     def __init__( self, rowSize, colSize, default=None ):
         NTlist.__init__( self )
-        for i in range(rowSize):
+        for _i in range(rowSize):
             self.append(NTfill(default, colSize))
         self.rowSize = rowSize
         self.colSize = colSize
@@ -2604,12 +2604,20 @@ def NTcAverage(theList, min=0.0, max=360.0, radians = 0, byIndex=None):
 def NTcVarianceAverage( cvList ):
     """Average cv values like phi/psi
     See:    http://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html
+    Circular variance average here is different than the one in Wattos.
+    Returns None when the list only contains None values.
+    None input values are ignored and are 'legal'.
     """
     sumSquares = 0.
     n = len(cvList)
     for cv in cvList:
-        r = 1. - cv
-        sumSquares += r * r
+        if cv == None:
+            n -= 1
+        else:
+            r = 1. - cv
+            sumSquares += r * r
+    if n <= 0:
+        return None
     r2 = sumSquares / n
     cvResult = 1. - math.sqrt( r2 )
     return cvResult
@@ -4242,13 +4250,24 @@ def getDeepByKeysOrAttributes(c, *keyList):
     If the key is an integer and the dict is not a dict but a list of sorts
     then the nice thing is that the element can be returned too!
 
+    If a key contains a period character then the keyList will be transformed to the split elements.
+    Use keys like 'a.b.c' and not: 'a..b', '.a', or 'a.'. They will not be caught.
+
     c for complex objects.
     Hacked for attributes too, in case key does not exist
 
     """
     lk  = len(keyList)
     key = keyList[0]
-
+#    NTdebug("Found keyList: "+`keyList`)
+#    NTdebug("Found key:     %s" % key)
+    if isinstance(key, str):
+        if key.find('.') > 0:
+            keyListTruncated = list(keyList[1:]) # can only concatenate with list not tuple.
+#            NTdebug("Found keyListTruncated: "+`keyListTruncated`)
+            keyListTruncated = key.split('.') + keyListTruncated
+#            NTdebug("Found keyListTruncated expanded: "+`keyListTruncated`)
+            return getDeepByKeysOrAttributes(c, *keyListTruncated)
     #NTdebug("getDeepByKeysOrAtributes: c:%s  keylist:%s  lk:%d  key: %s", c, keyList, lk, key)
 
     if not lk:
