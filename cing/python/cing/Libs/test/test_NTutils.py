@@ -98,6 +98,8 @@ class AllChecks(TestCase):
                  [ 0.0, 0.0, 0.0], # extremes
                  [ 1.0, 1.0, 1.0], # extremes
                  [ 0.0, 1.0, 0.293], # doesn't really make sense to JFD but here it is.
+                 [ None, 1.0, 1.0], # None for input is allowed.
+                 [ None, None, None], # Returns None if all input is None
                   ]
 
         for cycle in lol:
@@ -106,7 +108,10 @@ class AllChecks(TestCase):
             angleList.append(cv1)
             angleList.append(cv2)
             circularVariance = NTcVarianceAverage(angleList)
-            self.assertAlmostEqual(circularVariance, cav, places = 3)
+            if circularVariance == None:
+                self.assertEqual(circularVariance, cav)
+            else:
+                self.assertAlmostEqual(circularVariance, cav, places = 3)
 
     def testGeneral(self):
         s = NTdict(aap = 'foo', mies = 1)

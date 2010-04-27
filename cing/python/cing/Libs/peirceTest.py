@@ -1,6 +1,5 @@
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTwarning
 import math
 
 

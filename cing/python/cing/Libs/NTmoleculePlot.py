@@ -12,10 +12,12 @@ from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import pointAttributes
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.fpconst import isNaN
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 import os
 
 KEY_LIST_STR = 'keyList'
@@ -27,6 +29,7 @@ KEY_LIST5_STR = 'keyList5'
 XLABEL_STR = 'xLabel'
 YLABEL_STR = 'yLabel'
 USE_ZERO_FOR_MIN_VALUE_STR = 'useZeroForMinValue'
+USE_VERBOSE_Y_LOCATOR_STR = 'useVerboseYLocator' # Potentially more than the default 10 major ticks on Y axis.
 USE_MAX_VALUE_STR = 'useMaxValue'
 USE_ROG_FOR_COLOR_STR = 'useRogForColor'
 
@@ -83,7 +86,7 @@ class MoleculePlotSet:
                             continue
                         serie = []
                         points.append(serie)
-#        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
+        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
 #        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
         resNumb = 0
 
@@ -101,7 +104,7 @@ class MoleculePlotSet:
                         pointsL = pointsLoL[i]
                         j = 0 # for each
                         for item in mainOrAlt:
-#                            NTdebug("item: %s" % item)
+                            NTdebug("item: %s" % item)
                             points = pointsL[j]
                             itemDictKeyList = item.keys()
                             itemDictKeyList.sort()
@@ -115,8 +118,8 @@ class MoleculePlotSet:
                                     continue
                                 serie = points[k]
                                 keys = item[keyList]
-                                point = getDeepByKeys(res, *keys)
-    #                            NTdebug("Found point %s" % point )
+                                point = getDeepByKeysOrAttributes(res, *keys)
+                                NTdebug("Found point %s for keys %s" % (point, keys) )
                                 # Note that for a correlationPlot we keep the residue value as a list for all models.
                                 if isinstance(point, NTlist) and not self.makeCorrelationPlot:
                                     av, _sd, _n = point.average()
@@ -221,7 +224,8 @@ class MoleculePlotSet:
                             pointsForAutoscaling += pointsOffset
 
 #                NTdebug( 'autoScaleY row %d' % (i))
-                ntPlotList[i].autoScaleY(pointsForAutoscaling)
+                useVerboseLocator = getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_VERBOSE_Y_LOCATOR_STR)
+                ntPlotList[i].autoScaleY(pointsForAutoscaling, useVerboseLocator=useVerboseLocator)
                 if getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR):
 #                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
                     ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
@@ -232,7 +236,7 @@ class MoleculePlotSet:
                     ntPlotList[i].setYrange((ntPlotList[i].yRange[0], maxValue))
 
 
-            ySpaceAxisResTypes = .02 + (nrows - 1) * .01 # ..05            
+            ySpaceAxisResTypes = .02 + (nrows - 1) * .01 # ..05
             ntPlotList[0].drawResTypes(ySpaceAxis = ySpaceAxisResTypes) # Weirdly can only be called after yRange is set.
 
             for i in range(nrows):

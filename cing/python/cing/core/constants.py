@@ -73,6 +73,13 @@ CHAIN_LEVEL    = 'CHAIN'
 MOLECULE_LEVEL = 'MOLECULE'
 PROJECT_LEVEL  = 'PROJECT'
 
+ATOM_STR = 'atom'
+RES_STR = 'res'
+CHAIN_STR = 'chain'
+MOLECULE_STR = 'molecule'
+PROJECT_STR = 'project'
+ATOMS_STR = 'atoms'
+
 ANY_ENTITY_LEVEL = 'ANY_ENTITY'
 
 DR_LEVEL       = 'DistanceRestraint'
@@ -99,10 +106,27 @@ BAD_PROP  = 'BAD'
 
 CHARS_PER_LINE_OF_PROGRESS = 100
 
+PHI_STR = 'PHI'
+PSI_STR = 'PSI'
+CHI1_STR = 'CHI1'
+CHI2_STR = 'CHI2'
+CV_STR = 'cv'
+S2_STR = 'S2' # used in TalosPlus
+
 DIHEDRAL_NAME_Cb4N = 'Cb4N'
 DIHEDRAL_NAME_Cb4C = 'Cb4C'
 GLY_HA3_NAME_CING = 'HA2'
 range0_360 = [0.,360.]
+
+RMSD_STR = 'rmsd'
+VALUE_STR = "value"
+BACKBONE_AVERAGE_STR = 'backboneAverage'
+HEAVY_ATOM_AVERAGE_STR = 'heavyAtomsAverage'
+QSHIFT_STR = 'Qshift'
+ALL_ATOMS_STR = 'allAtoms'
+BACKBONE_STR = 'backbone'
+HEAVY_ATOMS_STR = 'heavyAtoms'
+PROTONS_STR = 'protons'
 
 SCALE_BY_MAX = 'SCALE_BY_MAX' # Ramachandran
 SCALE_BY_SUM = 'SCALE_BY_SUM' # D1D2

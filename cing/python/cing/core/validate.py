@@ -57,14 +57,10 @@ from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.core.constants import COLOR_GREEN
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
-from cing.core.constants import NOSHIFT
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
-from cing.core.molecule import RMSD_STR
 from cing.core.molecule import Residue
 from cing.core.molecule import dots
 from cing.core.parameters import plugins

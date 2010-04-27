@@ -608,7 +608,7 @@ def plotHistogramOverall():
             imshow( his,
                     interpolation='nearest',
         #            interpolation='bicubic',
-    #                origin='lower',
+                    origin='lower',
                     extent=extent,
                     alpha=alpha,
                     cmap=palette,
@@ -623,7 +623,7 @@ def plotHistogramOverall():
             l = m.reshape(n*n)
             hist(l,20)
             xlabel('pair count')
-            ylabel('number of occurances')
+            ylabel('number of occurrences')
             title(strTitle)
             fn = "plotHistOfHist_%s_d1d2.%s" % ( ssType, graphicsFormat )
             savefig(fn)
@@ -857,7 +857,7 @@ if __name__ == "__main__":
     os.chdir(cingDirTmp)
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
-    if True:
+    if False:
         if False:
 #            profile.run('plotDihedral2DRamaWrapper()', fn)
             profile.run('plotHistoDihedralWrapper()', fn)
@@ -880,5 +880,5 @@ if __name__ == "__main__":
 #        doOnlyOverall = False
         plotDihedralD1_2d(True)
 #        plotDihedralD1_2d(False)
-    if False:
+    if True:
         m = plotHistogramOverall()

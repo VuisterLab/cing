@@ -126,8 +126,15 @@ def doEntry( entryCode, chainCode ):
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
     project = Project.open( entryCode+chainCode, status='new' )
 
-    newPdbFileName = os.path.join(cingDirTmp, subdir, 'pdb_hyd', entryCode+chainCode+"_hyd.pdb")
-    project.initPDB( pdbFile=newPdbFileName, convention = IUPAC, nmodels=1 )
+    if dihedralComboTodo == d1d2:
+        pdbFileName = os.path.join(cingDirTmp, subdir, 'pdb_hyd', entryCode+chainCode+"_hyd.pdb")
+    else:
+        _pdbFileNameGz = os.path.join(cingDirTmp, subdir, entryCode+chainCode+"_hyd.pdb")
+        pdbFileName = os.path.join(cingDirTmp, subdir, entryCode+chainCode+"_hyd.pdb")
+
+    project.initPDB( pdbFile=pdbFileName, convention = IUPAC, nmodels=1 )
+    if dihedralComboTodo != d1d2:
+        os.unlink(pdbFileName)
     project.runDssp()
 
     NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )

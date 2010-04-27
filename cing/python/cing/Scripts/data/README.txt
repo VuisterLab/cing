@@ -10,11 +10,12 @@ PDB.LIS                     Contains the same entries as the What If database is
     below for R-factor<0.19 and Resolution<1.3 on February 28 2009.
     http://swift.cmbi.kun.nl/whatif/select/HTML/PDB.LIS-20090228-1.3-0.19
     Indeed, only 6 chains different!
+    So it is not the set of 555 used before.
 
 obsoleteSince2009-02-28.LIS
 	25 entries that have since that time become obsolete
 
-PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28_noObs.LIS
+PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS
 	Contains the set of chains for which the R factor is at least as good as 2.1 and
 	the X-ray resolution is at least as good as 2.0 Angstrom. It was derived from
 	the PDB on 2009-02-28. Finally, it excludes 25 entries that have since that time become obsolete.
@@ -24,6 +25,9 @@ PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28_noObs.LIS
 	The original list came from: http://swift.cmbi.kun.nl/whatif/select/SELECT_2.html
 	(Very hard to find; try from Gert's http://swift.cmbi.ru.nl/gv/start/)
 	It is listed there as February 28 2009 hence the above date in the title.
+
+PDB_WI_SELECT_Rfactor0.19_Res1.3_2009-02-28_noObs.LIS
+	Excludes: 1f9y 2b3n 2ozi
 
 PDB.LIS-20090228-2.0-0.21.txt
 	The original list came from: http://swift.cmbi.kun.nl/whatif/select/SELECT_2.html
