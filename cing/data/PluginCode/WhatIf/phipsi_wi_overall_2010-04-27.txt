@@ -1,15 +1,11 @@
-Over 555 PDB entries (a few more chains) the jack knifed averages over
+Over 447 PDB entries (a few more chains) the jack knifed averages over
 the entries with standard deviation is:
 
-TODO: UPDATE Overall found av,sd,n: (-1.36040035673, 0.033537074106736189, 555)
+Overall found av,sd,n: (-1.36040035673, 0.033537074106736189, 555)
 The sd looks unbelievably small to JFD.
 
-Total number: 113,749
-Total number of non-GLY/PRO residues: 98,751 (Original paper had 60,000)
-Number excludes PRO and GLY 14,998 (13 % of total)
-
 Found the following values for 1brv, model 1.
-
+This is WHAT IF version 20100310-0056
 WHAT IF> shohst
                      10
                       |
@@ -17,25 +13,27 @@ WHAT IF> shohst
 ( 171)-( 189)  HHHHTT HHHHHH
 but used procheck sec. struct. assignments.
 
-WHAT IF> ramchk check.db
-               what if           cing
- A- 172-PRO     -0.547    [ ]   -0.992 .5 diff <====== BIG DIFF
- A- 173-CYS     -0.061    [H]   -0.523 .5 diff
- A- 174-SER     -0.879    [H]   -1.133
- A- 175-THR     -1.106    [H]   -1.090
- A- 176-CYS      0.180    [H]    0.399
- A- 177-GLU     -0.748    [ ]   -0.767
- A- 178-GLY     -0.005    [ ]    0.403 .5 diff
- A- 179-ASN     -0.348    [ ]   -0.497
- A- 180-LEU     -0.941    [H]   -1.115
- A- 181-ALA     -1.019    [H]   -0.647 .5 diff
- A- 182-CYS     -0.410    [H]   -0.566
- A- 183-LEU     -0.588    [H]   -1.030 .5 diff
- A- 184-SER      0.184    [H]    0.400
- A- 185-LEU     -1.080    [H]   -1.177
- A- 186-CYS      0.099    [ ]    0.207
- A- 187-HIS     -0.489    [ ]   -0.612
- A- 188-ILE     -0.131    [ ]   -0.563
+WHAT IF> ramchk
+Fish out of: check.db
+               what if  what if     cing    cing
+                        20100310           20100427
+ A- 172-PRO     -0.547 -0.627 [ ]   -0.992   -1.433
+ A- 173-CYS     -0.061 -0.082 [H]   -0.523   -1.473
+ A- 174-SER     -0.879 -0.946 [H]   -1.133   -1.509
+ A- 175-THR     -1.106 -1.096 [H]   -1.090   -1.222
+ A- 176-CYS      0.180  0.355 [H]    0.399    0.302
+ A- 177-GLU     -0.748 -0.740 [ ]   -0.767   -0.915
+ A- 178-GLY     -0.005  0.233 [ ]    0.403   -0.439
+ A- 179-ASN     -0.348 -0.197 [ ]   -0.497   -0.495
+ A- 180-LEU     -0.941 -0.934 [H]   -1.115   -1.434
+ A- 181-ALA     -1.019 -0.975 [H]   -0.647    0.202
+ A- 182-CYS     -0.410 -0.267 [H]   -0.566   -0.974
+ A- 183-LEU     -0.588 -0.612 [H]   -1.030   -1.444
+ A- 184-SER      0.184  0.216 [H]    0.400    0.582
+ A- 185-LEU     -1.080 -1.045 [H]   -1.177   -1.454
+ A- 186-CYS      0.099  0.057 [ ]    0.207   -1.010
+ A- 187-HIS     -0.489 -0.229 [ ]   -0.612   -0.634
+ A- 188-ILE     -0.131  0.039 [ ]   -0.563    0.335
 
 CING:
 sumHist     sum of histogram given residue type and sec.struct. state
@@ -63,6 +61,24 @@ ssType [H] resType LEU sumHist 4084 maxHist 1243 c_dbav  659.5 s_dbav  472.6 ck 
 ssType [ ] resType CYS sumHist  781 maxHist   23 c_dbav    6.7 s_dbav    5.1 ck    7.7 zk    0.207 ZscoreDB   46.745
 ssType [ ] resType HIS sumHist 1199 maxHist   31 c_dbav    9.2 s_dbav    7.2 ck    4.8 zk   -0.612 ZscoreDB   22.322
 ssType [ ] resType ILE sumHist 1629 maxHist   61 c_dbav   20.1 s_dbav   15.1 ck   11.6 zk   -0.563 ZscoreDB   23.789
+
+DEBUG: For ssType   residue <Residue PRO172> model 0 with a2  138.035 a1  -47.116 c_av  134.470 c_sd   86.675 found ck   10.261 zk   -1.433
+DEBUG: For ssType H residue <Residue CYS173> model 0 with a2  -35.248 a1  -60.293 c_av   65.064 c_sd   39.182 found ck    7.343 zk   -1.473
+DEBUG: For ssType H residue <Residue SER174> model 0 with a2  -15.105 a1  -60.363 c_av  183.493 c_sd  121.182 found ck    0.592 zk   -1.509
+DEBUG: For ssType H residue <Residue THR175> model 0 with a2  -23.283 a1 -106.375 c_av  224.371 c_sd  175.509 found ck    9.887 zk   -1.222
+DEBUG: For ssType H residue <Residue CYS176> model 0 with a2  -42.086 a1  -69.378 c_av   65.064 c_sd   39.182 found ck   76.913 zk    0.302
+DEBUG: For ssType   residue <Residue GLUH177> model 0 with a2   50.323 a1   51.602 c_av   33.454 c_sd   34.078 found ck    2.258 zk   -0.915
+DEBUG: For ssType   residue <Residue GLY178> model 0 with a2   -2.443 a1  102.342 c_av   74.479 c_sd   78.026 found ck   40.230 zk   -0.439
+DEBUG: For ssType   residue <Residue ASN179> model 0 with a2  105.963 a1  -88.020 c_av   27.977 c_sd   29.740 found ck   13.245 zk   -0.495
+DEBUG: For ssType H residue <Residue LEU180> model 0 with a2  -25.364 a1  -63.516 c_av  549.218 c_sd  363.987 found ck   27.380 zk   -1.434
+DEBUG: For ssType H residue <Residue ALA181> model 0 with a2  -52.475 a1  -68.445 c_av  816.965 c_sd  458.675 found ck  909.650 zk    0.202
+DEBUG: For ssType H residue <Residue CYS182> model 0 with a2  -51.157 a1  -54.408 c_av   65.064 c_sd   39.182 found ck   26.892 zk   -0.974
+DEBUG: For ssType H residue <Residue LEU183> model 0 with a2  -32.913 a1  -57.383 c_av  549.218 c_sd  363.987 found ck   23.721 zk   -1.444
+DEBUG: For ssType H residue <Residue SER184> model 0 with a2  -38.773 a1  -69.929 c_av  183.493 c_sd  121.182 found ck  254.073 zk    0.582
+DEBUG: For ssType H residue <Residue LEU185> model 0 with a2  -20.475 a1  -70.740 c_av  549.218 c_sd  363.987 found ck   19.810 zk   -1.454
+DEBUG: For ssType   residue <Residue CYS186> model 0 with a2  165.999 a1  -70.265 c_av    6.556 c_sd    5.020 found ck    1.485 zk   -1.010
+DEBUG: For ssType   residue <Residue HISE187> model 0 with a2  134.562 a1  -96.449 c_av    8.728 c_sd    7.155 found ck    4.193 zk   -0.634
+DEBUG: For ssType   residue <Residue ILE188> model 0 with a2  108.774 a1  -92.050 c_av   15.739 c_sd   11.335 found ck   19.539 zk    0.335
 
 procheck rin
    1VAL A 171   999.90 -52.63-177.41-148.06 999.90 999.90 999.90   0.00   0.00  28.04   0.00  0.000  0.000  9 18  0.000  0.000

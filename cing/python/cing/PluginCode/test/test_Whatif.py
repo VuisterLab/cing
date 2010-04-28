@@ -8,10 +8,9 @@ from cing import verbosityDebug
 from cing import verbosityError
 from cing.Libs.NTutils import NTdebug
 from cing.PluginCode.Whatif import runWhatif
-from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
+from cing.core.constants import VALUE_LIST_STR
 from unittest import TestCase
 import cing
 import os

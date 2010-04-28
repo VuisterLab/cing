@@ -22,6 +22,8 @@ from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import floatParse
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
@@ -30,10 +32,16 @@ from cing.Scripts.getPhiPsiWrapper import BFACTOR_COLUMN
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_BFACTOR_PERCENTAGE_FILTER
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_MAX_BFACTOR
 from cing.Scripts.getPhiPsiWrapper import IDX_COLUMN
-from cing.core.classes import Project
 from cing.core.database import NTdb
 from cing.core.molecule import common20AAList
+from cing.core.validate import binCount
+from cing.core.validate import bins360
+from cing.core.validate import plotparams360
+from cing.core.validate import xGrid360
+from cing.core.validate import yGrid360
 from matplotlib.pyplot import hist
+from numpy.ma.core import multiply
+from numpy.matrixlib.defmatrix import mat
 import cPickle
 import cing
 import csv
@@ -50,21 +58,18 @@ dir_name = os.path.join(cingDirData, 'PluginCode', 'WhatIf')
 cvs_file_abs_name = os.path.join(dir_name, cvs_file_name)
 dbase_file_abs_name = os.path.join(dir_name, dbase_file_name)
 
-binSize = 10
-binCount = 360 / binSize
-binCountJ = (binCount + 0) * 1j # used for numpy's 'gridding'.
-dihedralName1 = "d1"
-dihedralName2 = "d2"
-project = Project('d1d2Plot')
-plotparams1 = project.plotParameters.getdefault(dihedralName1, 'dihedralDefault')
-plotparams2 = project.plotParameters.getdefault(dihedralName2, 'dihedralDefault')
+plotparams1 = plotparams360
+plotparams2 = plotparams360
 xRange = (plotparams1.min, plotparams1.max)
 yRange = (plotparams2.min, plotparams2.max)
+isRange360=True
+xGrid,yGrid = xGrid360,yGrid360
+bins = bins360
 
 os.chdir(cingDirTmp)
 
-lineCountMax = 1000 * 1000 * 10 # in fact only 1 M lines
-lineCountMax = 2 # testing order
+lineCountMax = 1000 * 1000 * 100 # in fact only 1 M lines
+#lineCountMax = 2 # testing order
 
 def main():
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
@@ -73,6 +78,7 @@ def main():
     valueBySsAndResTypes = {}
     valueByResTypes = {}
     valueBySs = {}
+    histd1CtupleBySsAndResTypes = {}
     value = [] # NB is an array without being keyed.
 
     histd1BySsAndResTypes = {}
@@ -196,6 +202,37 @@ def main():
                 hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
 #                NTmessage("Count %6d in valueBySsAndResTypes[%s][%s][%s]" % (sum(hist1d), ssType, resType, prevResType))
                 setDeepByKeys(histd1BySsAndResTypes, hist1d, ssType, resType, prevResType)
+        # Now that they are all in we can redo this.
+        for resType in keyListSorted2:
+            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+            keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
+            keyListSorted3.sort()
+            for resTypePrev in keyListSorted3:
+                keyListSorted4 = keyListSorted3[:] # take a copy
+                for resTypeNext in keyListSorted4:
+                    hist1 = getDeepByKeys(histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                    hist2 = getDeepByKeys(histd1BySsAndResTypes, ssType, resTypeNext, resType)
+                    if hist1 == None:
+                        NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
+                        continue
+                    if hist2 == None:
+                        NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+                        continue
+                    m1 = mat(hist1,dtype='float')
+                    m2 = mat(hist2,dtype='float')
+                    m2 = m2.transpose()
+                    hist2d = multiply(m1,m2)
+
+                    cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
+                    (c_av, c_sd) = cTuple
+                    NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
+                    if c_sd == None:
+                        NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                        continue
+                    if c_sd == 0.:
+                        NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
+                        continue
+                    setDeepByKeys( histd1CtupleBySsAndResTypes, cTuple, ssType, resType, resTypePrev, resTypeNext)
 
     keyListSorted1 = valueByResTypes.keys();
     keyListSorted1.sort()
@@ -220,6 +257,7 @@ def main():
     output = open(dbase_file_abs_name, 'wb')
     dbase = {}
     dbase[ 'histd1BySsAndResTypes' ] = histd1BySsAndResTypes # 92 kb uncompressed in the case of ~1000 lines only
+    dbase[ 'histd1CtupleBySsAndResTypes' ] = histd1CtupleBySsAndResTypes
     dbase[ 'histd1ByResTypes' ] = histd1ByResTypes # 56 kb
     dbase[ 'histd1BySs' ] = histd1BySs # 4 kb
     dbase[ 'histd1' ] = histd1 #  4 kb

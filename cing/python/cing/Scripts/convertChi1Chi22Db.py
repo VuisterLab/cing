@@ -2,15 +2,21 @@ from cing import cingDirData
 from cing import cingDirTmp
 from cing import verbosityDebug
 from cing import verbosityOutput
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import floatParse
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
 from cing.Libs.NTutils import gunzip
 from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.fpconst import isNaN
 from cing.PluginCode.required.reqDssp import to3StateUpper
-from cing.core.classes import Project
-from numpy.lib.index_tricks import ogrid
+from cing.core.molecule import common20AADict
+from cing.core.validate import binCount
+from cing.core.validate import bins360
+from cing.core.validate import plotparams360
+from cing.core.validate import xGrid360
+from cing.core.validate import yGrid360
 from numpy.lib.twodim_base import histogram2d
 import cPickle
 import cing
@@ -37,20 +43,15 @@ dir_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf' )
 cvs_file_abs_name   = os.path.join( dir_name, cvs_file_name )
 dbase_file_abs_name = os.path.join( dir_name, dbase_file_name )
 
-binSize   = 10
-binCount  = 360/binSize
-binCountJ = (binCount + 0)* 1j # used for numpy's 'gridding'.
 dihedralName1= "CHI1"
 dihedralName2= "CHI2"
-project     = Project('janinPlot')
-plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
-plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
+plotparams1 = plotparams360
+plotparams2 = plotparams360
 xRange = (plotparams1.min, plotparams1.max)
 yRange = (plotparams2.min, plotparams2.max)
-
-# Used for linear interpolation
-xGrid,yGrid = ogrid[ plotparams1.min:plotparams1.max:binCountJ, plotparams1.min:plotparams1.max:binCountJ ]
-bins = (xGrid,yGrid)
+isRange360=True
+xGrid,yGrid = xGrid360,yGrid360
+bins = bins360
 
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
 os.chdir(cingDirTmp)
@@ -64,14 +65,17 @@ def main():
     histJaninBySsAndResType         = {}
     histJaninBySsAndCombinedResType = {}
 #    histByCombinedSsAndResType = {}
+    histJaninCtupleBySsAndResType = {}
     valuesByEntrySsAndResType       = {}
     hrange = (xRange, yRange)
 
+    rowCount = 0
     for row in reader:
+        rowCount += 1
 #        7a3h,A,VAL ,   5,H, -62.8, -52.8
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
 #        7a3h,A,GLU ,   7,H, -63.5, -41.6
-        (entryId, _chainId, resType, _resNum, ssType, chi1, chi2) = row
+        (entryId, _chainId, resType, _resNum, ssType, chi1, chi2, _max_bfactor) = row
         ssType = to3StateUpper(ssType)[0]
         resType = resType.strip()
         chi1 = chi1.strip()
@@ -86,6 +90,11 @@ def main():
         if not inRange(chi2):
             NTerror("chi2 not in range for row: %s" % `row`)
             return
+        if not common20AADict.has_key( resType):
+            NTdebug("Residue not in common 20 for row: %s" % `row`)
+            rowCount -= 1
+            continue
+
         appendDeepByKeys(valuesBySsAndResType,      chi1,          ssType,resType,'chi1' )
         appendDeepByKeys(valuesByEntrySsAndResType, chi1, entryId, ssType,resType,'chi1' )
         appendDeepByKeys(valuesBySsAndResType,      chi2,          ssType,resType,'chi2' )
@@ -105,6 +114,16 @@ def main():
                     bins = binCount,
                     range= hrange)
                 setDeepByKeys( histJaninBySsAndResType, hist2d, ssType, resType )
+                cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
+                (c_av, c_sd) = cTuple
+                NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
+                if c_sd == None:
+                    NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                    continue
+                if c_sd == 0.:
+                    NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
+                    continue
+                setDeepByKeys( histJaninCtupleBySsAndResType, cTuple, ssType, resType)
 
     for ssType in valuesBySsAndResType.keys():
         chi1 = []
@@ -134,6 +153,8 @@ def main():
     dbase = {}
     dbase[ 'histJaninBySsAndCombinedResType' ] = histJaninBySsAndCombinedResType
     dbase[ 'histJaninBySsAndResType' ]         = histJaninBySsAndResType
+    dbase[ 'histJaninCtupleBySsAndResType' ]   = histJaninCtupleBySsAndResType
+    histJaninCtupleBySsAndResType
     cPickle.dump(dbase, output, -1)
     output.close()
 

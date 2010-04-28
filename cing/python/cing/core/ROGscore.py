@@ -1,10 +1,11 @@
+from cing.Libs.NTutils import NTaverage2
 from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import XMLhandler
-from cing.core.constants import COLOR_GREEN
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
+from cing.Libs.NTutils import sprintf
+from cing.core.constants import * #@UnusedWildImport
 
 rogScoreStr = 'rogScore'
 "Attribute name in e.g. residue object."
@@ -149,6 +150,50 @@ class ROGscore(NTdict):
         return '\n'.join(resultTxtList)
 
     #end def
+#end class
+
+
+class CingResult( NTdict ):
+    """
+    Class to store valueList CING results per model
+    Based on similar class WhatifResult class.
+    """
+    def __init__(self, checkID, level, modelCount ):
+        NTdict.__init__( self, __CLASS__ = 'CingResult',
+                         checkID = checkID,
+                         alternate = None,
+                         level   = level,
+#                         comment = Whatif.explain(checkID),
+                       )
+#        # Initialize the lists
+#        if Whatif.cingNameDict.has_key(checkID):
+#            self.alternate = Whatif.cingNameDict[checkID]
+#        for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
+        for c  in  [ VALUE_LIST_STR ]:
+            self[c] = NTfill( None, modelCount)
+
+        #self.keysformat()
+    #end def
+
+    def average(self, fmt='%5.2f +/- %4.2f'):
+        """Return average of valueList as NTvalue object
+        """
+        theList = self[VALUE_LIST_STR]
+        return NTaverage2(theList, fmt=fmt)
+
+    def __str__(self):
+        return '<CingResult %(checkID)s>' % self
+    #end def
+
+    def format(self):
+        return sprintf(
+"""%s CingResult %s (%s) %s
+comment   = %s
+alternate = %s
+valueList = %s
+""",                   dots, self.checkID, self.level, dots,
+                       self.comment, self.alternate, self.valueList
+                      )
 #end class
 
 class XMLROGscoreHandler( XMLhandler ):

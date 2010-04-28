@@ -2,10 +2,162 @@ Files:
 
 CONTENTS.txt            This file.
 phipsi_wi_db.csv.gz     Dihedral angles from what if's quality database
+						88,540 residues (77165 without G/P) in 463 chains in 447 entries from:
+						http://swift.cmbi.kun.nl/whatif/select/HTML/PDB.LIS-20090228-1.3-0.19
 phipsi_wi_entry.csv     Per entry Z-scores by jackknife procedure.
 phipsi_wi_overall.txt   Overall results.
 phipsi_wi_db.dat        Python pickle with histograms from Scripts/convertPhiPsi2Db.py
 
+chi1chi2_wi_db.csv.gz   xxx,xxx,xxx residues in xxx chains in xxx entries.
+etc...
 
 Note that the .dat files were made writable because of cgi server implementation.
 No clue how to do this in svn yet.
+
+
+Failures in phi/psi & Janin runs on April 27, 2010. Assumed to be CING read problems
+as before.
+1fsg
+1gvk
+1hj8
+1me4
+1mju
+2f91
+2h5c
+2qaa
+2qxi
+2uuf
+3edh
+
+Further more excluding:
+DEBUG: Residue not in common 20 for row: ['1c75', 'A', 'GLUH', '  58', 'H', ' -65.0', ' -40.5', '   8.7']
+DEBUG: Residue not in common 20 for row: ['1c75', 'A', 'GLUH', '  82', 'H', ' -66.1', ' -39.5', '   8.0']
+DEBUG: Residue not in common 20 for row: ['3dnj', 'A', 'HISE', '  79', 'H', ' -54.5', ' -41.7', '   9.5']
+DEBUG: Residue not in common 20 for row: ['1jm1', 'A', 'HISE', ' 142', 'T', ' -77.9', ' -71.2', '  11.8']
+DEBUG: Residue not in common 20 for row: ['1jm1', 'A', 'HISE', ' 173', 'T', '-136.7', '  12.7', '  13.4']
+DEBUG: Residue not in common 20 for row: ['1lkk', 'A', 'HISE', ' 148', 'T', ' -54.4', ' 131.6', '  13.3']
+DEBUG: Residue not in common 20 for row: ['1lkk', 'A', 'HISE', ' 180', 'E', '-121.8', ' 140.2', '   6.3']
+DEBUG: Residue not in common 20 for row: ['1lkk', 'A', 'HISE', ' 203', 'H', ' -59.2', ' -46.3', '   7.9']
+DEBUG: Residue not in common 20 for row: ['1lkk', 'A', 'HISE', ' 208', 'H', ' -58.7', ' -48.4', '   7.7']
+DEBUG: Residue not in common 20 for row: ['1n1p', 'A', 'HISE', ' 447', 'S', '-121.3', '  67.9', '   4.5']
+DEBUG: Residue not in common 20 for row: ['2nuk', 'A', 'HISE', ' 131', 'T', ' -76.5', ' -79.5', '   9.6']
+DEBUG: Residue not in common 20 for row: ['2nuk', 'A', 'HISE', ' 152', 'T', '-139.7', '  19.5', '  11.3']
+DEBUG: Residue not in common 20 for row: ['1o7j', 'A', 'HISE', ' 106', 'H', ' -54.3', ' -35.2', '   8.7']
+DEBUG: Residue not in common 20 for row: ['1o7j', 'A', 'HISE', ' 203', ' ', '-165.3', ' 171.2', '  10.2']
+DEBUG: Total number of included residues including PRO/GLY: 88526
+DEBUG: Overall found av,sd,n: (1.0, 1.0)
+DEBUG: Total number of residues without PRO/GLY: 77151
+
+For Rama:
+DEBUG: For ssType   residue type ALA found (c_av, c_sd)   62.065 54.447536490231109
+DEBUG: For ssType   residue type ARG found (c_av, c_sd)   18.358 15.35376027310507
+DEBUG: For ssType   residue type ASN found (c_av, c_sd)   27.977 29.740353853606916
+DEBUG: For ssType   residue type ASP found (c_av, c_sd)   34.564 28.946881932451245
+DEBUG: For ssType   residue type CYS found (c_av, c_sd)    6.556 5.019742809032735
+DEBUG: For ssType   residue type GLN found (c_av, c_sd)   16.148 12.795852347795195
+DEBUG: For ssType   residue type GLU found (c_av, c_sd)   33.454 34.078174956900106
+DEBUG: For ssType   residue type GLY found (c_av, c_sd)   74.479 78.025734333756276
+DEBUG: For ssType   residue type HIS found (c_av, c_sd)    8.728 7.1554406693294377
+DEBUG: For ssType   residue type ILE found (c_av, c_sd)   15.739 11.334522817140941
+DEBUG: For ssType   residue type LEU found (c_av, c_sd)   28.348 20.696138241933685
+DEBUG: For ssType   residue type LYS found (c_av, c_sd)   24.279 20.025192943722505
+DEBUG: For ssType   residue type MET found (c_av, c_sd)    6.062 4.5054090389555617
+DEBUG: For ssType   residue type PHE found (c_av, c_sd)   10.320 7.8330019417979768
+DEBUG: For ssType   residue type PRO found (c_av, c_sd)  134.470 86.674852726839546
+DEBUG: For ssType   residue type SER found (c_av, c_sd)   46.527 45.084626341118707
+DEBUG: For ssType   residue type THR found (c_av, c_sd)   26.131 16.903263234754402
+DEBUG: For ssType   residue type TRP found (c_av, c_sd)    7.807 6.8895911299929473
+DEBUG: For ssType   residue type TYR found (c_av, c_sd)   10.494 7.5785517807838181
+DEBUG: For ssType   residue type VAL found (c_av, c_sd)   19.042 13.068989908609977
+DEBUG: For ssType H residue type ALA found (c_av, c_sd)  816.965 458.67477341636646
+DEBUG: For ssType H residue type ARG found (c_av, c_sd)  267.873 161.03098345506572
+DEBUG: For ssType H residue type ASN found (c_av, c_sd)  121.775 84.100218167120801
+DEBUG: For ssType H residue type ASP found (c_av, c_sd)  246.114 136.2944424410239
+DEBUG: For ssType H residue type CYS found (c_av, c_sd)   65.064 39.181872515050991
+DEBUG: For ssType H residue type GLN found (c_av, c_sd)  260.470 154.62977131530178
+DEBUG: For ssType H residue type GLU found (c_av, c_sd)  447.243 269.34170430746889
+DEBUG: For ssType H residue type GLY found (c_av, c_sd)  170.097 110.17526490507321
+DEBUG: For ssType H residue type HIS found (c_av, c_sd)   75.276 53.809634027858479
+DEBUG: For ssType H residue type ILE found (c_av, c_sd)  350.822 252.52237397250394
+DEBUG: For ssType H residue type LEU found (c_av, c_sd)  549.218 363.98713685303676
+DEBUG: For ssType H residue type LYS found (c_av, c_sd)  326.032 192.01795259914587
+DEBUG: For ssType H residue type MET found (c_av, c_sd)  112.434 72.232480608539447
+DEBUG: For ssType H residue type PHE found (c_av, c_sd)  159.343 106.73305541041991
+DEBUG: For ssType H residue type PRO found (c_av, c_sd)  103.770 46.212888091362899
+DEBUG: For ssType H residue type SER found (c_av, c_sd)  183.493 121.18246999730631
+DEBUG: For ssType H residue type THR found (c_av, c_sd)  224.371 175.50898968304301
+DEBUG: For ssType H residue type TRP found (c_av, c_sd)   62.559 41.573743093239692
+DEBUG: For ssType H residue type TYR found (c_av, c_sd)  104.833 75.307718657344779
+DEBUG: For ssType H residue type VAL found (c_av, c_sd)  381.520 277.90120140313593
+DEBUG: For ssType S residue type ALA found (c_av, c_sd)   26.317 18.575592909521728
+DEBUG: For ssType S residue type ARG found (c_av, c_sd)   19.650 11.790558108139379
+DEBUG: For ssType S residue type ASN found (c_av, c_sd)    9.545 5.5751338844966973
+DEBUG: For ssType S residue type ASP found (c_av, c_sd)    8.752 5.6114812349806682
+DEBUG: For ssType S residue type CYS found (c_av, c_sd)    8.878 5.0683467921227665
+DEBUG: For ssType S residue type GLN found (c_av, c_sd)   14.402 7.6054207953229556
+DEBUG: For ssType S residue type GLU found (c_av, c_sd)   18.413 11.052752925706107
+DEBUG: For ssType S residue type GLY found (c_av, c_sd)    9.884 6.355515611770711
+DEBUG: For ssType S residue type HIS found (c_av, c_sd)    8.000 4.8197317004783864
+DEBUG: For ssType S residue type ILE found (c_av, c_sd)   71.432 49.580168129813849
+DEBUG: For ssType S residue type LEU found (c_av, c_sd)   46.771 30.622150080886772
+DEBUG: For ssType S residue type LYS found (c_av, c_sd)   19.969 10.931186232397389
+DEBUG: For ssType S residue type MET found (c_av, c_sd)    9.586 5.1577258407797784
+DEBUG: For ssType S residue type PHE found (c_av, c_sd)   26.609 15.362894354164755
+DEBUG: For ssType S residue type PRO found (c_av, c_sd)   31.108 20.953660932358961
+DEBUG: For ssType S residue type SER found (c_av, c_sd)   23.114 16.678287722981835
+DEBUG: For ssType S residue type THR found (c_av, c_sd)   37.758 25.356391110463232
+DEBUG: For ssType S residue type TRP found (c_av, c_sd)   10.007 6.4260156262714423
+DEBUG: For ssType S residue type TYR found (c_av, c_sd)   26.247 15.289077525998128
+DEBUG: For ssType S residue type VAL found (c_av, c_sd)   96.999 67.277742459317167
+
+# For Janin:
+DEBUG: For ssType   residue type ARG found (c_av, c_sd)   47.936 49.857498668468054
+DEBUG: For ssType   residue type ASN found (c_av, c_sd)   22.288 20.705962732276284
+DEBUG: For ssType   residue type ASP found (c_av, c_sd)   39.716 38.882796029688699
+DEBUG: For ssType   residue type GLN found (c_av, c_sd)   35.979 37.017865219104927
+DEBUG: For ssType   residue type GLU found (c_av, c_sd)   37.648 39.7118511497087
+DEBUG: For ssType   residue type HIS found (c_av, c_sd)    9.391 7.7728700657674352
+DEBUG: For ssType   residue type ILE found (c_av, c_sd)   55.489 41.082134336332039
+DEBUG: For ssType   residue type LEU found (c_av, c_sd)  204.977 168.47940860072183
+DEBUG: For ssType   residue type LYS found (c_av, c_sd)   66.216 68.336210313606117
+DEBUG: For ssType   residue type MET found (c_av, c_sd)   13.772 12.317300878622445
+DEBUG: For ssType   residue type PHE found (c_av, c_sd)   17.615 15.30451815225161
+DEBUG: For ssType   residue type PRO found (c_av, c_sd)  376.298 283.18907960521511
+DEBUG: For ssType   residue type SER found (c_av, c_sd)    6.137 5.3319263211697621
+DEBUG: For ssType   residue type THR found (c_av, c_sd)    9.337 7.2308297265872934
+DEBUG: For ssType   residue type TRP found (c_av, c_sd)    6.803 5.1319431889602711
+DEBUG: For ssType   residue type TYR found (c_av, c_sd)   17.778 15.580645076528567
+DEBUG: For ssType H residue type ARG found (c_av, c_sd)   45.305 32.601049250462225
+DEBUG: For ssType H residue type ASN found (c_av, c_sd)   26.937 28.180214989227689
+DEBUG: For ssType H residue type ASP found (c_av, c_sd)   68.597 65.922393135727859
+DEBUG: For ssType H residue type CYS found (c_av, c_sd)    1.333 0.5163977794943222
+DEBUG: For ssType H residue type GLN found (c_av, c_sd)   38.021 30.46876988799616
+DEBUG: For ssType H residue type GLU found (c_av, c_sd)   55.009 42.283223312946106
+DEBUG: For ssType H residue type HIS found (c_av, c_sd)    6.353 5.0126536911081958
+DEBUG: For ssType H residue type ILE found (c_av, c_sd)  225.891 207.47828333333234
+DEBUG: For ssType H residue type LEU found (c_av, c_sd)  231.553 173.28883830597829
+DEBUG: For ssType H residue type LYS found (c_av, c_sd)   63.020 49.60321047550913
+DEBUG: For ssType H residue type MET found (c_av, c_sd)   20.607 17.678723356949138
+DEBUG: For ssType H residue type PHE found (c_av, c_sd)   20.763 20.854385199633359
+DEBUG: For ssType H residue type PRO found (c_av, c_sd)   86.981 61.609765386986659
+DEBUG: For ssType H residue type SER found (c_av, c_sd)    3.483 2.6882356005859491
+DEBUG: For ssType H residue type THR found (c_av, c_sd)    7.302 6.2505920653978349
+DEBUG: For ssType H residue type TRP found (c_av, c_sd)    7.010 5.4603865830393028
+DEBUG: For ssType H residue type TYR found (c_av, c_sd)   15.407 15.950513225721739
+DEBUG: For ssType S residue type ARG found (c_av, c_sd)   23.716 18.463054076030605
+DEBUG: For ssType S residue type ASN found (c_av, c_sd)    6.137 4.8548807413800441
+DEBUG: For ssType S residue type ASP found (c_av, c_sd)    8.723 7.3805717858707212
+DEBUG: For ssType S residue type CYS found (c_av, c_sd)    1.286 0.4879500364742666
+DEBUG: For ssType S residue type GLN found (c_av, c_sd)   18.287 17.710159088646442
+DEBUG: For ssType S residue type GLU found (c_av, c_sd)   29.584 27.49937915962845
+DEBUG: For ssType S residue type HIS found (c_av, c_sd)    4.669 3.7783500783459139
+DEBUG: For ssType S residue type ILE found (c_av, c_sd)  126.504 103.92070936394686
+DEBUG: For ssType S residue type LEU found (c_av, c_sd)  125.958 96.441730022897332
+DEBUG: For ssType S residue type LYS found (c_av, c_sd)   31.569 27.021973414088592
+DEBUG: For ssType S residue type MET found (c_av, c_sd)    9.940 7.0486864829657367
+DEBUG: For ssType S residue type PHE found (c_av, c_sd)   25.642 25.97604536700663
+DEBUG: For ssType S residue type PRO found (c_av, c_sd)   57.914 36.563521143858047
+DEBUG: For ssType S residue type SER found (c_av, c_sd)    2.551 1.8947700618302155
+DEBUG: For ssType S residue type THR found (c_av, c_sd)    3.870 2.9861629481074807
+DEBUG: For ssType S residue type TRP found (c_av, c_sd)    8.454 8.1528021873084988
+DEBUG: For ssType S residue type TYR found (c_av, c_sd)   23.563 23.382061758978573

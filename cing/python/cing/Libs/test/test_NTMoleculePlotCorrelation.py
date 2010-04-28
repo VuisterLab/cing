@@ -24,15 +24,13 @@ from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import QUACHK_STR
 from cing.PluginCode.Whatif import RAMCHK_STR
 from cing.PluginCode.Whatif import ROTCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import Whatif
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.core.classes import Project
-from cing.core.constants import COLOR_RED
+from cing.core.constants import * #@UnusedWildImport
 from random import random
 from unittest import TestCase
-import cing
 import os #@Reimport
 import shutil
 import unittest

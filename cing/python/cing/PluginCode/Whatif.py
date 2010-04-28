@@ -27,43 +27,13 @@ from cing.Libs.NTutils import NoneObject
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
-from cing.PluginCode.required.reqWhatif import ACCLST_STR
-from cing.PluginCode.required.reqWhatif import ANGCHK_STR
-from cing.PluginCode.required.reqWhatif import BBCCHK_STR
-from cing.PluginCode.required.reqWhatif import BMPCHK_STR
-from cing.PluginCode.required.reqWhatif import BNDCHK_STR
-from cing.PluginCode.required.reqWhatif import C12CHK_STR
-from cing.PluginCode.required.reqWhatif import CHECK_ID_STR
-from cing.PluginCode.required.reqWhatif import CHICHK_STR
-from cing.PluginCode.required.reqWhatif import FLPCHK_STR
-from cing.PluginCode.required.reqWhatif import HNDCHK_STR
-from cing.PluginCode.required.reqWhatif import INOCHK_STR
-from cing.PluginCode.required.reqWhatif import LEVEL_STR
-from cing.PluginCode.required.reqWhatif import LOC_ID_STR
-from cing.PluginCode.required.reqWhatif import NQACHK_STR
-from cing.PluginCode.required.reqWhatif import OMECHK_STR
-from cing.PluginCode.required.reqWhatif import PL2CHK_STR
-from cing.PluginCode.required.reqWhatif import PL3CHK_STR
-from cing.PluginCode.required.reqWhatif import PLNCHK_STR
-from cing.PluginCode.required.reqWhatif import QUACHK_STR
-from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
-from cing.PluginCode.required.reqWhatif import RAMCHK_STR
-from cing.PluginCode.required.reqWhatif import ROTCHK_STR
-from cing.PluginCode.required.reqWhatif import TEXT_STR
-from cing.PluginCode.required.reqWhatif import TYPE_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.PluginCode.required.reqWhatif import nameDefs
-from cing.PluginCode.required.reqWhatif import wiPlotList
-from cing.core.constants import IUPAC
-from cing.core.molecule import dots
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
-from cing.core.constants import ATOM_LEVEL
-from cing.core.constants import RES_LEVEL
 import os
 import time
 

@@ -29,6 +29,7 @@ Atom:
 """
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import NTcodeerror
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTdetail
 from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
@@ -39,36 +40,43 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import appendDeepByKeys
 from cing.Libs.NTutils import formatList
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
+from cing.Libs.NTutils import setDeepByKeys
 from cing.Libs.NTutils import sprintf
 from cing.Libs.NTutils import val2Str
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.html import addPreTagLines
+from cing.Libs.html import hPlot
 from cing.Libs.html import removePreTagLines
+from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
+from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.core.ROGscore import CingResult
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
-from cing.core.molecule import dots
+from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
+from numpy.lib.index_tricks import ogrid
+from numpy.lib.twodim_base import histogram2d
 import math
 import sys
-#from cing.PluginCode.Whatif import criticizeByWhatif
-#from cing.core.classes import HTMLfile
-#from cing.core.classes import htmlObjects
 
 #dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
 #dbase = shelve.open( dbaseFileName )
@@ -84,6 +92,7 @@ def runCingChecks( project, toFile=True ):
     project.validateRestraints(toFile)
     project.validateDihedrals()
     project.validateModels()
+    project.validateDihedralCombinations()
 #    project.validateAssignments() in criticize now
     # project.mergeResonances() GWV says: don't do this
 
@@ -340,6 +349,43 @@ def _criticizeResidue( residue, valSets ):
             residue.rogScore[key] = avViol
         #end if
     # end for
+
+    if residue.has_key(CHK_STR) and residue.hasProperties('protein'):
+#        print '>', residue, residue.rogScore
+        for key in [RAMACHANDRAN_CHK_STR, CHI1CHI2_CHK_STR, D1D2_CHK_STR]: # TODO: disable those not needed.
+#        for key in [D1D2_CHK_STR]: # TODO: disable those not needed.
+#            NTdebug('Now criticizing %s, whatif key %s', residue, key )
+
+            thresholdValuePoor = valSets[ key + '_POOR'  ]
+            thresholdValueBad = valSets[ key + '_BAD' ]
+            if (thresholdValuePoor == None) or (thresholdValueBad == None):
+#                NTdebug("Skipping CING " + key + " critique")
+                continue
+
+            actualValue        = getDeepByKeys(residue, CHK_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
+            if actualValue == None:
+                NTdebug("None available for >> %s,%s" % ( residue,key))
+                continue
+            if isinstance(actualValue, NTlist):
+                actualValue = actualValue.average()[0]
+
+#            NTdebug('%s key %s: actual %s, thresholdPoor %s, thresholdBad %s', residue, key,
+#                    actualValue, thresholdValuePoor, thresholdValueBad)
+
+            actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
+            if actualValue < thresholdValueBad: # assuming Z score
+                comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
+                NTdebug(comment)
+                residue.rogScore.setMaxColor( COLOR_RED, comment)
+            elif actualValue < thresholdValuePoor:
+                comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
+                NTdebug(comment)
+                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+            #endif
+            residue.rogScore[key] = actualValue
+        #end for
+    #end if
+
 
 #    # Check for restraint violations
 #Geerten prefers to disable that for now.
@@ -1415,6 +1461,133 @@ def validateDihedrals(self):
                            len(d.outliers), d.outliers.zap(0) )
 #end def
 
+def validateDihedralCombinations(project):
+    """Validate the dihedral angle combinations such as the Ramachandran phi/psi
+    wrt databased derived preferences.
+    The routine (re-)sets properties such as:
+    res.CHK.RAMACHANDRAN_CHK.VALUE_LIST
+
+    TODO: improve to lookup best Z-score from all 3 histograms?
+    """
+
+    if not project.molecule:
+        return True
+    if not project.molecule.modelCount:
+        return True
+    modelCount = project.molecule.modelCount
+    if hPlot.histRamaBySsAndCombinedResType == None:
+        hPlot.initHist()
+
+    # 0: Check id
+    # 1: angle 1 name
+    # 2: angle 2 name
+    # 3: Angle combination name
+    plotDihedral2dLoL = [ # truncate if needed.
+        [RAMACHANDRAN_CHK_STR, PHI_STR,  PSI_STR,  'Ramachandran'],
+        [CHI1CHI2_CHK_STR, CHI1_STR, CHI2_STR, 'Janin'],
+        [D1D2_CHK_STR, DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2']
+       ]
+
+    tripletIdxList = [-1,0,1]
+    for residue in project.molecule.allResidues():
+        ssType = getDsspSecStructConsensus(residue)
+        if not ssType:
+            NTerror("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue to skip: %s" % (residue))
+            continue
+        # The assumption is that the derived residues can be represented by the regular.
+        resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
+        if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
+            resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
+        for checkIdx in range(len(plotDihedral2dLoL)):
+            checkId = plotDihedral2dLoL[checkIdx][0]
+#            NTdebug('Looking at %s %s' % (residue, checkId) )
+            dihedralName1 = plotDihedral2dLoL[checkIdx][1]
+            dihedralName2 = plotDihedral2dLoL[checkIdx][2]
+
+            residue[CHK_STR][checkId] = CingResult( checkId, level=RES_LEVEL, modelCount = modelCount)
+            ensembleValueList = getDeepByKeysOrAttributes( residue, CHK_STR, checkId, VALUE_LIST_STR )
+
+            doingNewD1D2plot = False
+            isRange360 = True # most common. (chis & ds)
+            resTypeList = None # used for lookup of C tuple
+            if dihedralName1==PHI_STR and dihedralName2==PSI_STR:
+                histBySsAndResType         = hPlot.histRamaBySsAndResType
+                histCtupleBySsAndResType   = hPlot.histRamaCtupleBySsAndResType
+                isRange360 = False
+            elif dihedralName1==CHI1_STR and dihedralName2==CHI2_STR:
+                histBySsAndResType         = hPlot.histJaninBySsAndResType
+                histCtupleBySsAndResType   = hPlot.histJaninCtupleBySsAndResType
+            elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
+                histBySsAndResType         = hPlot.histd1BySsAndResTypes
+                histCtupleBySsAndResType   = hPlot.histd1CtupleBySsAndResTypes
+                doingNewD1D2plot = True
+                triplet = NTlist()
+                for i in tripletIdxList:
+                    triplet.append( residue.sibling(i) )
+                if None in triplet:
+                    NTdebug( 'Skipping residue without triplet %s' % residue)
+                    continue
+                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]
+
+            else:
+                NTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
+                return None
+
+            if doingNewD1D2plot:
+                # depending on doOnlyOverall it will actually return an array of myHist.
+                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType  )
+                if myHistList == None:
+                    NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % residue)
+                    continue
+                if len(myHistList) != 1:
+                    NTdebug("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList),residue))
+                    continue
+                myHist = myHistList[0]
+            else:
+                myHist = getDeepByKeysOrAttributes(histBySsAndResType,ssType,resName)
+                if myHist == None:
+                    NTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
+                    continue
+
+            d1 = getDeepByKeysOrAttributes(residue, dihedralName1)
+            d2 = getDeepByKeysOrAttributes(residue, dihedralName2)
+
+            if not (d1 and d2):
+                NTdebug( 'in validateDihedralCombinations dihedrals not found for residue: %s and checkId %s; skipping' % (residue, checkId ))
+                continue
+
+            if not (len(d1) and len(d2)):
+                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 1: %s or', dihedralName1 )
+                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 2: %s; skipping'   , dihedralName2 )
+                continue
+
+            pointList = zip( d1, d2 ) # x,y tuple list NOT REALLY NEEDED JUST CHECKING COUNTS
+            modelCountNew = len(pointList)
+            if modelCountNew != modelCount:
+                NTwarning("Will use %d models instead of %d expected" %(modelCountNew, modelCount))
+            if not resTypeList:
+                resTypeList = [ resName ]
+            keyList = [ ssType ]
+            keyList += resTypeList
+            Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
+            if not Ctuple:
+                NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
+                continue
+            c_av, c_sd = Ctuple
+            for modelIdx in range(modelCountNew):
+                a1 = d1[modelIdx]
+                a2 = d2[modelIdx]
+                # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
+                ck = getValueFromHistogramUsingInterpolation( myHist, a2, a1, isRange360=isRange360)
+                zk = ( ck - c_av ) / c_sd
+#                NTdebug("For ssType %s residue %s model %d with a2 %8.2f a1 %8.2f c_av %8.2f c_sd %8.2f found ck %8.2f zk %8.2f " % (
+#                            ssType,residue,modelIdx,a2, a1,c_av, c_sd,ck,zk))
+                ensembleValueList[modelIdx] = zk
+
+#end def
+
+
+
 def validateModels( self)   :
     """Validate the models on the basis of the dihedral outliers
     """
@@ -1454,3 +1627,133 @@ def validateModels( self)   :
 #    for m, count in self.models.items():
 #        NTdebug('Model %2d: %2d backbone dihedral outliers', m, count )
 #end def
+
+# Originally in Scripts.convertPhiPsi2Db.py
+binSize   = 10
+binCount  = 360/binSize
+# for ogrid: If the step length is not a complex number, then the stop is not inclusive.
+#binCountJ = (binCount + 0)* 1j # used for numpy's 'gridding'.but fails anyway.
+# Used for linear interpolation
+# 0-360 is the most common range for the dihedrals; e.g. chis & ds
+plotparams360 = plotParameters.getdefault(CHI1_STR,'dihedralDefault')
+#xGrid360,yGrid360 = ogrid[ plotparams360.min:plotparams360.max:binCountJ, plotparams360.min:plotparams360.max:binCountJ ]
+xGrid360,yGrid360 = ogrid[ plotparams360.min:plotparams360.max:binSize, plotparams360.min:plotparams360.max:binSize ]
+bins360 = (xGrid360,yGrid360)
+
+plotparams180 = plotParameters.getdefault(PHI_STR,'dihedralDefault')
+#xGrid180,yGrid180 = ogrid[ plotparams180.min:plotparams180.max:binCountJ, plotparams180.min:plotparams180.max:binCountJ ]
+xGrid180,yGrid180 = ogrid[ plotparams180.min:plotparams180.max:binSize, plotparams180.min:plotparams180.max:binSize ]
+bins180 = (xGrid180,yGrid180)
+
+def zscaleHist( hist2d, Cav, Csd ):
+    hist2d -= Cav
+    hist2d /= Csd
+    return hist2d
+
+def getValueFromHistogramUsingInterpolation( hist, v0, v1, isRange360=True):
+    """Returns the value from the bin pointed to by v0,v1.
+        think
+    v0 row    y-axis
+    v1 col    x-axis
+    """
+    bins = bins180 # most common
+    if isRange360:
+        bins = bins360
+#    NTdebug("Selected bins: %s %s" % bins)
+
+    tx = ogrid[ v0:v0:1j, v1:v1:1j ]
+    interpolatedValueArray = interpn_linear( hist, tx, bins )
+    interpolatedValue = interpolatedValueArray[ 0, 0 ]
+#    NTdebug( 'tx: %-40s bins[1]: \n%s \nhist: \n%s\n%s' % ( tx, bins[1], hist, interpolatedValue ))
+    return interpolatedValue
+
+
+
+def getRescaling(valuesByEntrySsAndResType):
+    '''Use a jack knife technique to get an estimate of the average and sd over all entry) scores.
+    http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
+
+    Returns the average, standard deviation, and the number of elements in the distribution.
+    '''
+    C = NTlist()
+    for entryId in valuesByEntrySsAndResType.keys():
+        histRamaBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
+#        NTdebug("histRamaBySsAndResTypeExcludingEntry: %s" % histRamaBySsAndResTypeExcludingEntry )
+        z = NTlist()
+        for ssType in valuesByEntrySsAndResType[ entryId ].keys():
+            for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
+                angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
+                angleList0 = angleDict[ 'phi' ]
+                angleList1 = angleDict[ 'psi' ]
+                his = getDeepByKeys(histRamaBySsAndResTypeExcludingEntry,ssType,resType)
+                if his == None:
+                    NTdebug('when testing not all residues are present in smaller sets.')
+                    continue
+                (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
+#                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
+                if c_sd == None:
+                    NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                    continue
+                if c_sd == 0.:
+                    NTdebug('%s Got zero c_sd, ignoring histogram. This should only occur in smaller sets.' % entryId)
+                    continue
+                for k in range(len(angleList0)):
+                    ck = getValueFromHistogramUsingInterpolation(
+                        histRamaBySsAndResTypeExcludingEntry[ssType][resType],
+                        angleList0[k], angleList1[k])
+                    zk = ( ck - c_av ) / c_sd
+#                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
+                    z.append( zk )
+        (av, sd, n) = z.average()
+        NTdebug("%4s,%8.3f,%8.3f,%d" %( entryId, av, sd, n))
+        C.append( av )
+    (Cav, Csd, Cn) = C.average()
+    return (Cav, Csd, Cn)
+
+
+def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude, isRange360=True):
+    """Todo generalize to do other angles."""
+    xRange = (plotparams360.min, plotparams360.max)
+    yRange = (plotparams360.min, plotparams360.max)
+    hrange = (xRange, yRange)
+    histRamaBySsAndResTypeExcludingEntry = {}
+    result = {}
+
+    for entryId in valuesByEntrySsAndResType.keys():
+        if entryId == entryIdToExclude:
+            continue
+        valuesBySsAndResType = valuesByEntrySsAndResType[entryId]
+        for ssType in valuesBySsAndResType.keys():
+            for resType in valuesBySsAndResType[ssType].keys():
+                angleList0 = valuesBySsAndResType[ssType][resType]['phi']
+                angleList1 = valuesBySsAndResType[ssType][resType]['psi']
+                appendDeepByKeys(result,angleList0,ssType,resType,'phi')
+                appendDeepByKeys(result,angleList1,ssType,resType,'psi')
+
+
+    for ssType in result.keys():
+        for resType in result[ssType].keys():
+            angleList0 = result[ssType][resType]['phi']
+            angleList1 = result[ssType][resType]['psi']
+#            NTdebug( 'entry: %s ssType %s resType %s angleList0 %s' % (
+#                entryId, ssType, resType, angleList0 ))
+            hist2d, _xedges, _yedges = histogram2d(
+                angleList1, # think rows (y)
+                angleList0, # think columns (x)
+                bins = binCount,
+                range= hrange)
+            setDeepByKeys( histRamaBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
+
+    return histRamaBySsAndResTypeExcludingEntry
+
+
+
+def inRange(a, isRange360=True):
+    if isRange360:
+        if a < plotparams360.min or a > plotparams360.max:
+            return False
+        return True
+    if a < plotparams180.min or a > plotparams180.max:
+        return False
+    return True
+

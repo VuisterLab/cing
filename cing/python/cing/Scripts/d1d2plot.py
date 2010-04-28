@@ -23,25 +23,17 @@ from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
 from cing.Libs.matplotlibExt import yellow_inv
 from cing.Libs.test.test_NTplot2 import plotTestHistoDihedral
-from cing.PluginCode.required.reqWhatif import BBCCHK_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
 from cing.Scripts.d1d2plotConstants import CV_CUTOFF
 from cing.core.classes import Project
-from cing.core.constants import DIHEDRAL_NAME_Cb4C
-from cing.core.constants import DIHEDRAL_NAME_Cb4N
-from cing.core.constants import IUPAC
-from cing.core.constants import MAX_PERCENTAGE_D1D2
-from cing.core.constants import MIN_PERCENTAGE_D1D2
-from cing.core.constants import SCALE_BY_SUM
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Dihedral
 from cing.core.molecule import common20AAList
 from cing.core.parameters import plotParameters
 from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
-import cing
 import os
 import profile
 import pstats

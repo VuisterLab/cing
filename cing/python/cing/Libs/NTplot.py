@@ -16,10 +16,10 @@ from cing.PluginCode.required.reqDssp import to3StateUpper
 from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.PluginCode.required.reqWhatif import INOCHK_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.constants import SCALE_BY_MAX
 from cing.core.constants import SCALE_BY_SUM
+from cing.core.constants import VALUE_LIST_STR
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from copy import deepcopy
@@ -710,7 +710,7 @@ class NTplot( NTdict ):
         if startAtZero and min >= 0.:
             min = 0.
 
-        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         if not useVerboseLocator:
             ylocator = self.axis.yaxis.get_major_locator()
         else:
@@ -721,10 +721,10 @@ class NTplot( NTdict ):
             self.axis.yaxis.set_major_locator(ylocator)
         ylocator.set_bounds( min, max )
 
-        NTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
+#        NTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
         self.axis.autoscale_view( scalex=False, scaley=True)
         self.yRange = self.axis.get_ylim()
-        NTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
+#        NTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
         if useIntegerTickLabels:
             formatter = FuncFormatter(integerNumberOnly)
             yaxis = self.axis.yaxis

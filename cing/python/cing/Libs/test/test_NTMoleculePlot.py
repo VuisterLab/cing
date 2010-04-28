@@ -185,6 +185,11 @@ class AllChecks(TestCase):
         keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
 
         plotAttributesRowMain = NTdict()
+        plotAttributesRowMain[ KEY_LIST_STR] = [ CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_STR ]
+        plotAttributesRowMain[ YLABEL_STR] = 'Z phi/psi'
+        keyLoLoL.append([ [plotAttributesRowMain]])
+
+        plotAttributesRowMain = NTdict()
         plotAttributesRowAlte = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] = [ CHI1_STR, CV_STR ]
         plotAttributesRowMain[ KEY_LIST2_STR] = [ CHI2_STR, CV_STR ]
