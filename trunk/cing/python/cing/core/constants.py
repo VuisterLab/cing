@@ -44,6 +44,7 @@ CING       = 'CING'
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 
+dots = '-----------'
 
 X_AXIS = 0
 Y_AXIS = 1
@@ -117,6 +118,14 @@ DIHEDRAL_NAME_Cb4N = 'Cb4N'
 DIHEDRAL_NAME_Cb4C = 'Cb4C'
 GLY_HA3_NAME_CING = 'HA2'
 range0_360 = [0.,360.]
+
+VALUE_LIST_STR   = "valueList" # Originally in reqWhatif.py
+# Used for keying of residue entity (and potentially others) with CING's own Z-score values.
+CHK_STR = 'CHK'
+RAMACHANDRAN_CHK_STR = 'RAMACHANDRAN_CHK'
+CHI1CHI2_CHK_STR = 'CHI1CHI2_CHK'
+D1D2_CHK_STR = 'D1D2_CHK'
+
 
 RMSD_STR = 'rmsd'
 VALUE_STR = "value"

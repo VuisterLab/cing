@@ -14,8 +14,8 @@ from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
+from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
-import cing
 import os #@Reimport
 import sys
 

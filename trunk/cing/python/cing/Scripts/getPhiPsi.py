@@ -51,10 +51,15 @@ elif dihedralComboTodo == d1d2:
     DIHEDRAL_NAME_1 = DIHEDRAL_NAME_Cb4N
     DIHEDRAL_NAME_2 = DIHEDRAL_NAME_Cb4C
 
-def doYasaraAddHydrogens( entryCode, chainCode ):
-    """Called from getPhiPsiWrapperYasara"""
-    char23 = entryCode[1:3]
+def getLocalPdbFileWithChain(entryCode, chainCode ):
+    """Unzips the PDB file from default archive to local directory with the name:
+    entryCode+chainCode+".pdb"
 
+    The chainCode may not be the specific null value for chains but it may be None.
+    If None, then the outputfilename will be:
+    entryCode+".pdb"
+    """
+    char23 = entryCode[1:3]
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
     pdbFileNameZipped = pdbFileName+'.gz'
     if not os.path.exists(pdbFileNameZipped):
@@ -66,8 +71,18 @@ def doYasaraAddHydrogens( entryCode, chainCode ):
         return True
 
     gunzip(pdbFileNameZipped)
-    localPdbFileName = entryCode+chainCode+".pdb"
+    if chainCode:
+        localPdbFileName = entryCode+chainCode+".pdb"
+    else:
+        localPdbFileName = entryCode+".pdb"
     os.rename(pdbFileName, localPdbFileName)
+
+def doYasaraAddHydrogens( entryCode, chainCode ):
+    """Called from getPhiPsiWrapperYasara"""
+    if getLocalPdbFileWithChain(entryCode, chainCode ):
+        return True
+    # above ensures it exists at this point.
+    localPdbFileName = entryCode+chainCode+".pdb"
 
     import yasara
     yasara.info.mode = 'txt'
@@ -121,16 +136,22 @@ def doYasaraRewritePdb( entryCode ):
 #    os.unlink(localPdbFileName)
 
 def doEntry( entryCode, chainCode ):
+    """Returns True on error"""
+
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
         NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
+        return True
+
     project = Project.open( entryCode+chainCode, status='new' )
 
     if dihedralComboTodo == d1d2:
         pdbFileName = os.path.join(cingDirTmp, subdir, 'pdb_hyd', entryCode+chainCode+"_hyd.pdb")
     else:
-        _pdbFileNameGz = os.path.join(cingDirTmp, subdir, entryCode+chainCode+"_hyd.pdb")
-        pdbFileName = os.path.join(cingDirTmp, subdir, entryCode+chainCode+"_hyd.pdb")
+        if getLocalPdbFileWithChain(entryCode, chainCode ):
+            return True
+        # above ensures it exists at this point.
+        pdbFileName = entryCode+chainCode+".pdb"
 
     project.initPDB( pdbFile=pdbFileName, convention = IUPAC, nmodels=1 )
     if dihedralComboTodo != d1d2:
@@ -202,9 +223,11 @@ def doEntry( entryCode, chainCode ):
     if doSave:
         if not project.save():
             NTerror("Failed to save project to disk for entry: " + entryCode)
+            return True
     else:
         if project.removeFromDisk():
             NTerror("Failed to remove project from disk for entry: ", entryCode)
+            return True
 
     file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
     resultsFileName = file_name_base + '_wi_db_%s.csv' % ( entryCode+chainCode )

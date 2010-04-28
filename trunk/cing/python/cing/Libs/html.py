@@ -17,6 +17,7 @@ from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import NTplot
@@ -52,11 +53,7 @@ from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import wattosPlotList
-from cing.PluginCode.required.reqWhatif import C12CHK_STR
-from cing.PluginCode.required.reqWhatif import RAMCHK_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.PluginCode.required.reqWhatif import wiPlotList
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
@@ -104,23 +101,27 @@ imageSmall2DdihedralWidth  = 300
 imageSmall2Ddihedralheight = 300
 
 cingPlotList = []
-cingPlotList.append( ('_01_d1d2','D1D2') )
+cingPlotList.append( ('_01_cv_rms','cv/rms') )
+cingPlotList.append( ('_02_Qfactor_cs','Q-factor CS') )
+cingPlotList.append( ('_03_d1d2','D1D2') )
 
+# TODO: is it used?
 # Kinda like the one for Whatif but then using a possibly nested property key for second column.
-nameDefs =[
-#            (ATOM_LEVEL,'WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
-            (RES_LEVEL, 'rmsd',    None,          'Rmsd',                                                      'Rmsd'),
-            (RES_LEVEL, 'PHI.cv',  None,          'Circular variance Phi',                                     'CV Phi'),
-            (RES_LEVEL, 'PSI.cv',  None,          'Circular variance Psi',                                     'CV Psi'),
-#            (RES_LEVEL, 'BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
-]
-
-cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
-nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
-shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
-cingNameDict.keysformat()
-nameDict.keysformat()
-shortNameDict.keysformat()
+#nameDefs =[
+##            (ATOM_LEVEL,'WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
+#            (RES_LEVEL, 'rmsd',    None,          'Rmsd',                                                      'Rmsd'),
+#            (RES_LEVEL, 'PHI.cv',  None,          'Circular variance Phi',                                     'CV Phi'),
+#            (RES_LEVEL, 'PSI.cv',  None,          'Circular variance Psi',                                     'CV Psi'),
+#            (RES_LEVEL, RAMACHANDRAN_CHK_STR,  None,          '',                                     ''),
+##            (RES_LEVEL, 'BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
+#]
+#
+#cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
+#nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
+#shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
+#cingNameDict.keysformat()
+#nameDict.keysformat()
+#shortNameDict.keysformat()
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -214,7 +215,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 
 
 def createHtmlCing(project, ranges=None):
-    """ Read out wiPlotList to see what get's created. """
+    """ Read out cingPlotList to see what get's created. """
 
     # The following object will be responsible for creating a (png/pdf) file with
     # possibly multiple pages
@@ -253,7 +254,11 @@ def createHtmlCing(project, ranges=None):
     plotAttributesRowAlte[ YLABEL_STR] = HEAVY_ATOM_AVERAGE_STR
     plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
     keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[0][0] + ".pdf" )
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
 
+    keyLoLoL = []
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ QSHIFT_STR, ALL_ATOMS_STR]
     plotAttributesRowMain[ KEY_LIST2_STR] = [ QSHIFT_STR, BACKBONE_STR]
@@ -263,8 +268,33 @@ def createHtmlCing(project, ranges=None):
     plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
     plotAttributesRowMain[ USE_MAX_VALUE_STR] = 0.5
     keyLoLoL.append([ [plotAttributesRowMain] ])
+    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[1][0] + ".pdf" )
+    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
 
-    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[0][0] + ".pdf" )
+    keyLoLoL = []
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR]
+    plotAttributesRowMain[ YLABEL_STR] = 'Z RAM'
+    plotAttributesRowMain[ USE_MIN_VALUE_STR] = -3 # autoscaling is failing here at the moment.
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 3
+    keyLoLoL.append([ [plotAttributesRowMain] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR]
+    plotAttributesRowMain[ YLABEL_STR] = 'Z JAN'
+    plotAttributesRowMain[ USE_MIN_VALUE_STR] = -3 # autoscaling is failing here at the moment.
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 3
+    keyLoLoL.append([ [plotAttributesRowMain] ])
+
+    plotAttributesRowMain = NTdict()
+    plotAttributesRowMain[ KEY_LIST_STR] = [ CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR]
+    plotAttributesRowMain[ YLABEL_STR] = 'Z D1D2'
+    plotAttributesRowMain[ USE_MIN_VALUE_STR] = -3 # autoscaling is failing here at the moment.
+    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 3
+    keyLoLoL.append([ [plotAttributesRowMain] ])
+
+    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[2][0] + ".pdf" )
     moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
     moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
 #end def
@@ -276,10 +306,15 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
     def __init__(self):
         self.histRamaCombined                = None
         self.histRamaBySsAndResType          = None
+        self.histRamaCtupleBySsAndResType    = None
         self.histRamaBySsAndCombinedResType  = None
         self.histJaninBySsAndResType         = None
+        self.histJaninCtupleBySsAndResType         = None
         self.histJaninBySsAndCombinedResType = None
-        self.histd1BySsAndResTypes          = None
+        self.histd1BySsAndResTypes          = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
+        # NB hasing is: ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
+        #               3        20        20        20 = 2400 tuples of 2 floats precalculated.
+        self.histd1CtupleBySsAndResTypes          = None
         self.histd1ByResTypes  = None
         self.histd1BySs  = None
         self.histd1  = None
@@ -296,6 +331,7 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
         #    pprint.pprint(dbaseTemp)
             self.histRamaCombined                   = dbaseTemp[ 'histRamaCombined' ]
             self.histRamaBySsAndResType             = dbaseTemp[ 'histRamaBySsAndResType' ]
+            self.histRamaCtupleBySsAndResType       = dbaseTemp[ 'histRamaCtupleBySsAndResType' ]
             self.histRamaBySsAndCombinedResType     = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
         #    pprint(histRamaCombined)
             dbase_file.close()
@@ -304,20 +340,24 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
 #            NTdebug("Rama          sum: %d" % sumHist)
 #            sumHist = core.sum(self.histRamaBySsAndResType['H']['HIS'])
 #            NTdebug("Rama [H][HIS] sum: %d" % sumHist)
+
         if True:
             dbase_file_abs_name = os.path.join( self.histDir, 'chi1chi2_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
             self.histJaninBySsAndResType            = dbaseTemp[ 'histJaninBySsAndResType' ]
+            self.histJaninCtupleBySsAndResType      = dbaseTemp[ 'histJaninCtupleBySsAndResType' ]
             self.histJaninBySsAndCombinedResType    = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
             dbase_file.close()
 #            sumHist = core.sum(self.histJaninBySsAndResType['H']['HIS'])
 #            NTdebug("Janin [H][HIS] sum: %d" % sumHist)
+
         if True:
             dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
             self.histd1BySsAndResTypes              = dbaseTemp[ 'histd1BySsAndResTypes' ]
+            self.histd1CtupleBySsAndResTypes        = dbaseTemp[ 'histd1CtupleBySsAndResTypes' ]
             self.histd1ByResTypes                   = dbaseTemp[ 'histd1ByResTypes' ]
             self.histd1BySs                         = dbaseTemp[ 'histd1BySs' ]
             self.histd1                             = dbaseTemp[ 'histd1' ]
@@ -351,6 +391,9 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     if not residueList:
         NTerror( 'makeDihedralPlot called without residues in list' )
         return None
+
+    if hPlot.histRamaBySsAndCombinedResType == None:
+        hPlot.initHist()
 
     # Set residue to first residue. For looping over multiple residues the var
     # res will be used.
@@ -395,9 +438,6 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
       yTicks = range(int(plotparams2.min), int(plotparams2.max+1), plotparams2.ticksize),
       yLabel = dihedralName2)
     ps.addPlot(plot)
-
-    if hPlot.histRamaBySsAndCombinedResType == None:
-        hPlot.initHist()
 
     doingNewD1D2plot = False
     minPercentage =  MIN_PERCENTAGE_RAMA
@@ -1534,7 +1574,7 @@ class ProjectHTMLfile( HTMLfile ):
                     shutil.rmtree(dst)
                 shutil.copytree(htmlFile,  dst )
                 # TODO: exclude .svn items within subdir
-                svnDirectoryList = find(".svn", startdir=dst)
+                svnDirectoryList = find(".svn", startdir=dst) # don't use the one from pylab.
                 for f2 in svnDirectoryList:
 #                    NTdebug("Considering removing directory: %s" % (f2))
                     if os.path.exists(f2):
@@ -2009,48 +2049,48 @@ class MoleculeHTMLfile( HTMLfile ):
                 return True
             #end if
         #end if
-        if False:
-            anyWIPlotsGenerated = False
 
-            main('h1','What If')
-            ncols = 6
-            main('table',  closeTag=False)
-            plotCount = 0 # The number of actual plots shown in the table
-            for p,d in NTprogressIndicator(wiPlotList):
-                wiLink = os.path.join('../..',
-                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
-                wiLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
-                            project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
-    #            NTdebug('wiLinkReal: ' + wiLinkReal)
-                if not os.path.exists( wiLinkReal ):
-    #                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
-                    continue # Skip their inclusion.
+        anyCINGPlotsGenerated = False
+        main('h1','CING')
+        ncols = 6
+        main('table',  closeTag=False)
+        plotCount = 0 # The number of actual plots shown in the table
+        for p,d in NTprogressIndicator(cingPlotList):
+            cingLink = os.path.join('../..',
+                        project.moleculeDirectories.analysis, molecule.name + p + ".pdf")
+            cingLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
+                        project.moleculeDirectories.analysis, molecule.name + p + ".pdf")
 
-                pinupLink = os.path.join('../..',
-                            project.moleculeDirectories.whatif, molecule.name + p + "_pin.gif" )
-                fullLink = os.path.join('../..',
-                            project.moleculeDirectories.whatif, molecule.name + p + ".png" )
-                anyWIPlotsGenerated = True
-                if plotCount % ncols == 0:
-                    if plotCount:
-                        main('tr',  openTag=False)
-                    main('tr',  closeTag=False)
-                main('td',  closeTag=False)
-                main('a',   "",         href = fullLink, closeTag=False )
-                main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
-                main('a',   "",         openTag=False )
-                main('br')
-                main('a',   d,          href = wiLink )
-                main('td',  openTag=False)
-                plotCount += 1
-            #end for plot
+#            NTdebug('cingLinkReal: ' + cingLinkReal)
+            if not os.path.exists( cingLinkReal ):
+                NTwarning('Failed to find expected cingLinkReal: ' + cingLinkReal) # normal when whatif wasn't run.
+                continue # Skip their inclusion.
 
-            if plotCount: # close any started rows.
-                main('tr',  openTag=False)
-            main('table',  openTag=False) # close table
-            if not anyWIPlotsGenerated:
-                main('h2', "No What If plots found at all")
-            #end for doWhatif check.
+            pinupLink = os.path.join('../..',
+                        project.moleculeDirectories.analysis, molecule.name + p + "_pin.gif" )
+            fullLink = os.path.join('../..',
+                        project.moleculeDirectories.analysis, molecule.name + p + ".png" )
+            anyCINGPlotsGenerated = True
+            if plotCount % ncols == 0:
+                if plotCount:
+                    main('tr',  openTag=False)
+                main('tr',  closeTag=False)
+            main('td',  closeTag=False)
+            main('a',   "",         href = fullLink, closeTag=False )
+            main(    'img', "",     src=pinupLink ) # enclosed by _A_ tag.
+            main('a',   "",         openTag=False )
+            main('br')
+            main('a',   d,          href = cingLink )
+            main('td',  openTag=False)
+            plotCount += 1
+        #end for plot
+
+        if plotCount: # close any started rows.
+            main('tr',  openTag=False)
+        main('table',  openTag=False) # close table
+        if not anyCINGPlotsGenerated:
+            main('h2', "No CING plots found at all")
+        #end for doWhatif check.
     #end def
 
     def _generateWhatifHtml(self, htmlOnly=False):

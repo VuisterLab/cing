@@ -28,7 +28,6 @@ from cing import * #@UnusedWildImport
 from cing.Libs.NTutils import ImportWarning #@Reimport
 from cing.Libs.fpconst import NaN #@Reimport @UnusedImport
 from cing.Libs.fpconst import isNaN #@Reimport
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.main import format #@UnusedImport

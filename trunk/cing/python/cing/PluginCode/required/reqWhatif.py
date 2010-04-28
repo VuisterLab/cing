@@ -8,7 +8,7 @@ LOC_ID_STR       = "locID"
 LEVEL_STR        = "level"
 TEXT_STR         = "text"
 TYPE_STR         = "type"
-VALUE_LIST_STR   = "valueList"
+#VALUE_LIST_STR   = "valueList" now in constants.py
 QUAL_LIST_STR    = "qualList"
 
 INOCHK_STR       = 'INOCHK'

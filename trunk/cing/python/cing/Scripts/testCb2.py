@@ -8,9 +8,8 @@
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import fprintf
 from cing.Libs.NTutils import getDeepByKeys
-from cing.PluginCode.required.reqWhatif import BBCCHK_STR
-from cing.PluginCode.required.reqWhatif import VALUE_LIST_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Dihedral
 
 project = p #@UndefinedVariable

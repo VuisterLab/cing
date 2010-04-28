@@ -9,6 +9,7 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTfill
 from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTlist2dict
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTset
 from cing.Libs.NTutils import NTtree
@@ -69,7 +70,7 @@ NTmolParameters = NTdict(
     stereoFile     = 'stereo.xml'
 )
 
-dots = '-----------'
+#dots = '-----------' # moved to constants.py
 
 chothiaClassA = 'a'
 chothiaClassB = 'b'
@@ -79,9 +80,11 @@ mapChothia_class2Int = {chothiaClassA: 0, chothiaClassB : 1, chothiaClassAB : 2,
 
 # Only 20 AA and 5 NA; Nota Bena no variants.
 common20AAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL".split()
-commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split()
+commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split() # do not put these into common20AAList
 commonNAList = "A T G C U".split()
 commonResidueList = commonAAList + commonNAList
+
+common20AADict = NTlist2dict(common20AAList)
 
 def cothiaClassInt(cothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
@@ -2297,6 +2300,7 @@ Chain class: defines chain properties and methods
                           'residues (%(residueCount)d): %(residues)s\n' +\
                            self.footer( dots )
         self.rogScore = ROGscore()
+        self[CHK_STR] = NTdict()
         self.residues = self._children
         self.residueCount = 0
     #end def
@@ -2505,6 +2509,7 @@ Residue class: Defines residue properties
         self.cv_sidechain = None
         self.rmsd = None # will be filled by molecule.calculateRMSDs.
         self.rogScore = ROGscore()
+        self[CHK_STR] = NTdict()
 
         self.__FORMAT__ =  self.header( dots ) + '\n' +\
                           'shortName:  %(shortName)s\n' +\
@@ -2970,15 +2975,18 @@ Residue class: Defines residue properties
         return d1_value_list
     #end def
 
-    def getTripletHistogramList(self, doOnlyOverall = False ):
+    def getTripletHistogramList(self, doOnlyOverall = False, ssTypeRequested = None ):
         """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
         an empty array when it could not be constructed.
 
         If doOnlyOverall it will be a list with a single element. If not then
         it will be a list of three elements one each for every sstype.
 
+        If ssTypeRequested is None then all types will be returned otherwise just the
+        type requested.
+
         Return None on error.
-            or emtpy array when it could not be constructed.
+            or empty array when it could not be constructed.
         """
 
         triplet = NTlist()
@@ -3021,6 +3029,10 @@ Residue class: Defines residue properties
             ssTypeList.sort() # in place sort to: space, H, S
 #            NTdebug("ssTypeList: %s" % ssTypeList)
             for ssType in ssTypeList:
+                if ssTypeRequested and ssType != ssTypeRequested:
+#                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
+                    continue
+
 #                NTdebug("Processing ssType: %s" % ssType)
                 hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
                 hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
@@ -3038,10 +3050,6 @@ Residue class: Defines residue properties
                 m2 = mat(hist2,dtype='float')
                 m2 = m2.transpose()
                 hist = multiply(m1,m2)
-## TODO: why the next 3 lines?
-#                l = len(hist1)
-#                if ssType == ' ':
-#                    hist = ndarray(shape=(l, l), dtype=float, order='F')
                 histList.append(hist)
             # end for
         # end if
@@ -3324,6 +3332,7 @@ Atom class: Defines object for storing atom properties
         self.resonances  = NTlist()
         self.coordinates = NTlist()
         self.rogScore    = ROGscore()
+        self[CHK_STR] = NTdict()
 
         self._topology = None #intially None; defined by the updateTopolgy call of the Molecule class
 

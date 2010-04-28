@@ -27,11 +27,15 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
+        doTalos = True
+        nmodels = 1
         if fastestTest:
             htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
+            doTalos = False
+            nmodels = 1
         pdbConvention = CYANA
         restraintsConvention = CYANA
         doValidate = True
@@ -80,6 +84,7 @@ class AllChecks(TestCase):
 
         kwds = {}
         kwds['pdbFile'] = entryId
+        kwds['nmodels'] = nmodels
 
         # Skip restraints if absent.
         if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
@@ -110,7 +115,7 @@ class AllChecks(TestCase):
 
         if doValidate:
             self.assertFalse(project.validate(htmlOnly = htmlOnly,
-                                          doProcheck = doProcheck, doWhatif = doWhatif, doWattos = doWattos))
+                      doProcheck = doProcheck, doWhatif = doWhatif, doWattos = doWattos, doTalos=doTalos))
         if writeXeasy:
             self.assertFalse(project.export2Xeasy())
 

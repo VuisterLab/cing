@@ -20,17 +20,14 @@ from cing.PluginCode.Whatif import C12CHK_STR
 from cing.PluginCode.Whatif import INOCHK_STR
 from cing.PluginCode.Whatif import QUACHK_STR
 from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import VALUE_LIST_STR
 from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from random import random
 from unittest import TestCase
-import cing
 import os #@Reimport
 import unittest
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport

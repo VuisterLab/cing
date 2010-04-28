@@ -46,24 +46,11 @@ from cing.Libs.pdb import initPDB
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.CingSummary import CingSummary
 from cing.core.ROGscore import ROGscore
-from cing.core.constants import ACL_LEVEL
-from cing.core.constants import AC_LEVEL
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
-from cing.core.constants import COPLANARL_LEVEL
-from cing.core.constants import COPLANAR_LEVEL
-from cing.core.constants import DRL_LEVEL
-from cing.core.constants import DR_LEVEL
-from cing.core.constants import IUPAC
-from cing.core.constants import LOOSE
-from cing.core.constants import RDCL_LEVEL
-from cing.core.constants import RDC_LEVEL
-from cing.core.constants import VAL_SETS_CFG_DEFAULT_FILENAME
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
 from cing.core.molecule import NTdihedralOpt
 from cing.core.molecule import NTdistanceOpt #@UnusedImport
-from cing.core.molecule import dots
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
@@ -79,11 +66,11 @@ from cing.core.validate import runCingChecks
 from cing.core.validate import summary
 from cing.core.validate import validate
 from cing.core.validate import validateAssignments
+from cing.core.validate import validateDihedralCombinations
 from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
 from shutil import rmtree
-import cing
 import math
 import os
 import sys
@@ -970,6 +957,9 @@ Project: Top level Cing project class
 
     def validateDihedrals(self):
         return validateDihedrals(self)
+
+    def validateDihedralCombinations(self):
+        return validateDihedralCombinations(self)
 
     def validateModels(self):
         return validateModels(self)

@@ -3133,7 +3133,8 @@ def NTtoXML(obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
         fprintf(stream, "</dict>")
         fprintf(stream, lineEnd)
     else:
-        NTerror('NTtoXML: undefined object "%s": cannot generate XML\n', obj)
+        pass
+#        NTerror('NTtoXML: undefined object "%s": cannot generate XML\n', obj) # TODO: reenable when done testing.
     #end if
 #end def
 
@@ -4709,3 +4710,10 @@ def toPoundedComment(str):
     resultStr = join(result, '\n')
     return resultStr
 
+def NTlist2dict(lst):
+    """Takes a list of keys and turns it into a dict where the values are None."""
+
+    dic = {}
+    for k in lst:
+        dic[k] = None
+    return dic
