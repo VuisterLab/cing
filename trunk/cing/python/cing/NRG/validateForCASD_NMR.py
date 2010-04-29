@@ -13,11 +13,11 @@ cing.verbosity = cing.verbosityDebug
 
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
-pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
+pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntryForCasd.py')
 
-if False:
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+if True:
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
     entryList = 'CtR69ALyon CtR69ALyon2'.split()
@@ -37,7 +37,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
                     max_time_to_wait = max_time_to_wait, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
-                    START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 100,
+                    START_ENTRY_ID = 1,
+                    MAX_ENTRIES_TODO = 1,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)

@@ -55,6 +55,7 @@ from cing.Libs.fpconst import NaN
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.Libs.html import removePreTagLines
+from cing.Libs.numpyInterpolation import circularlizeMatrix
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
@@ -73,6 +74,7 @@ from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
+from copy import deepcopy
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 import math
@@ -1508,12 +1510,12 @@ def validateDihedralCombinations(project):
             ensembleValueList = getDeepByKeysOrAttributes( residue, CHK_STR, checkId, VALUE_LIST_STR )
 
             doingNewD1D2plot = False
-            isRange360 = True # most common. (chis & ds)
+            bins = bins360P # most common. (chis & ds)
             resTypeList = None # used for lookup of C tuple
             if dihedralName1==PHI_STR and dihedralName2==PSI_STR:
                 histBySsAndResType         = hPlot.histRamaBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histRamaCtupleBySsAndResType
-                isRange360 = False
+                bins = bins180P
             elif dihedralName1==CHI1_STR and dihedralName2==CHI2_STR:
                 histBySsAndResType         = hPlot.histJaninBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histJaninCtupleBySsAndResType
@@ -1546,19 +1548,19 @@ def validateDihedralCombinations(project):
             else:
                 myHist = getDeepByKeysOrAttributes(histBySsAndResType,ssType,resName)
                 if myHist == None:
-                    NTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
+#                    NTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
                     continue
 
             d1 = getDeepByKeysOrAttributes(residue, dihedralName1)
             d2 = getDeepByKeysOrAttributes(residue, dihedralName2)
 
             if not (d1 and d2):
-                NTdebug( 'in validateDihedralCombinations dihedrals not found for residue: %s and checkId %s; skipping' % (residue, checkId ))
+#                NTdebug( 'in validateDihedralCombinations dihedrals not found for residue: %s and checkId %s; skipping' % (residue, checkId ))
                 continue
 
             if not (len(d1) and len(d2)):
-                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 1: %s or', dihedralName1 )
-                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 2: %s; skipping'   , dihedralName2 )
+#                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 1: %s or', dihedralName1 )
+#                NTdebug( 'in validateDihedralCombinations dihedrals had no defining atoms for 2: %s; skipping'   , dihedralName2 )
                 continue
 
             pointList = zip( d1, d2 ) # x,y tuple list NOT REALLY NEEDED JUST CHECKING COUNTS
@@ -1574,11 +1576,16 @@ def validateDihedralCombinations(project):
                 NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
                 continue
             c_av, c_sd = Ctuple
+            if myHist == None:
+                NTerror("Got None for hist for %s" % residue)
+                continue
+
+            myHistP = circularlizeMatrix(myHist) # TODO: cache if this is too slow.
             for modelIdx in range(modelCountNew):
                 a1 = d1[modelIdx]
                 a2 = d2[modelIdx]
                 # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
-                ck = getValueFromHistogramUsingInterpolation( myHist, a2, a1, isRange360=isRange360)
+                ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
                 zk = ( ck - c_av ) / c_sd
 #                NTdebug("For ssType %s residue %s model %d with a2 %8.2f a1 %8.2f c_av %8.2f c_sd %8.2f found ck %8.2f zk %8.2f " % (
 #                            ssType,residue,modelIdx,a2, a1,c_av, c_sd,ck,zk))
@@ -1636,31 +1643,36 @@ binCount  = 360/binSize
 # Used for linear interpolation
 # 0-360 is the most common range for the dihedrals; e.g. chis & ds
 plotparams360 = plotParameters.getdefault(CHI1_STR,'dihedralDefault')
+plotparams360P = deepcopy(plotparams360)
+plotparams360P.min -= binSize
+plotparams360P.max += binSize
 #xGrid360,yGrid360 = ogrid[ plotparams360.min:plotparams360.max:binCountJ, plotparams360.min:plotparams360.max:binCountJ ]
 xGrid360,yGrid360 = ogrid[ plotparams360.min:plotparams360.max:binSize, plotparams360.min:plotparams360.max:binSize ]
 bins360 = (xGrid360,yGrid360)
+xGrid360P,yGrid360P = ogrid[ plotparams360P.min:plotparams360P.max:binSize, plotparams360P.min:plotparams360P.max:binSize ]
+bins360P = (xGrid360P,yGrid360P)
 
 plotparams180 = plotParameters.getdefault(PHI_STR,'dihedralDefault')
+plotparams180P = deepcopy(plotparams180)
+plotparams180P.min -= binSize
+plotparams180P.max += binSize
 #xGrid180,yGrid180 = ogrid[ plotparams180.min:plotparams180.max:binCountJ, plotparams180.min:plotparams180.max:binCountJ ]
 xGrid180,yGrid180 = ogrid[ plotparams180.min:plotparams180.max:binSize, plotparams180.min:plotparams180.max:binSize ]
 bins180 = (xGrid180,yGrid180)
+xGrid180P,yGrid180P = ogrid[ plotparams180P.min:plotparams180P.max:binSize, plotparams180P.min:plotparams180P.max:binSize ]
+bins180P = (xGrid180P,yGrid180P)
 
 def zscaleHist( hist2d, Cav, Csd ):
     hist2d -= Cav
     hist2d /= Csd
     return hist2d
 
-def getValueFromHistogramUsingInterpolation( hist, v0, v1, isRange360=True):
+def getValueFromHistogramUsingInterpolation( hist, v0, v1, bins):
     """Returns the value from the bin pointed to by v0,v1.
         think
     v0 row    y-axis
     v1 col    x-axis
     """
-    bins = bins180 # most common
-    if isRange360:
-        bins = bins360
-#    NTdebug("Selected bins: %s %s" % bins)
-
     tx = ogrid[ v0:v0:1j, v1:v1:1j ]
     interpolatedValueArray = interpn_linear( hist, tx, bins )
     interpolatedValue = interpolatedValueArray[ 0, 0 ]
@@ -1674,6 +1686,8 @@ def getRescaling(valuesByEntrySsAndResType):
     http://en.wikipedia.org/wiki/Resampling_%28statistics%29#Jackknife
 
     Returns the average, standard deviation, and the number of elements in the distribution.
+
+    TODO: ADJUST FOR CIRCULAR NATURE.
     '''
     C = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
