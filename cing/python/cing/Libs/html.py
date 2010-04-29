@@ -103,25 +103,7 @@ imageSmall2Ddihedralheight = 300
 cingPlotList = []
 cingPlotList.append( ('_01_cv_rms','cv/rms') )
 cingPlotList.append( ('_02_Qfactor_cs','Q-factor CS') )
-cingPlotList.append( ('_03_d1d2','D1D2') )
-
-# TODO: is it used?
-# Kinda like the one for Whatif but then using a possibly nested property key for second column.
-#nameDefs =[
-##            (ATOM_LEVEL,'WGTCHK',  None,          'Atomic occupancy check',                                    'Atomic occupancy check'),
-#            (RES_LEVEL, 'rmsd',    None,          'Rmsd',                                                      'Rmsd'),
-#            (RES_LEVEL, 'PHI.cv',  None,          'Circular variance Phi',                                     'CV Phi'),
-#            (RES_LEVEL, 'PSI.cv',  None,          'Circular variance Psi',                                     'CV Psi'),
-#            (RES_LEVEL, RAMACHANDRAN_CHK_STR,  None,          '',                                     ''),
-##            (RES_LEVEL, 'BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
-#]
-#
-#cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
-#nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
-#shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
-#cingNameDict.keysformat()
-#nameDict.keysformat()
-#shortNameDict.keysformat()
+cingPlotList.append( ('_03_Cb4N_Cb4C','D1D2') )
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -2063,7 +2045,7 @@ class MoleculeHTMLfile( HTMLfile ):
 
 #            NTdebug('cingLinkReal: ' + cingLinkReal)
             if not os.path.exists( cingLinkReal ):
-                NTwarning('Failed to find expected cingLinkReal: ' + cingLinkReal) # normal when whatif wasn't run.
+#                NTwarning('Failed to find expected cingLinkReal: ' + cingLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
@@ -2396,9 +2378,18 @@ class ResidueHTMLfile( HTMLfile ):
         # 2: Angle combination name
         # 3: Tuple of arbitrary number of keys to value to show
         # 4: Name of value to show (eg QUACHK)
-        plotDihedral2dList = [['PHI',  'PSI',  'Ramachandran', (WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR), RAMCHK_STR ],
-                    ['CHI1', 'CHI2', 'Janin',        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR), C12CHK_STR],
-                    [DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2', (), None]
+        plotDihedral2dList = [
+                    [PHI_STR,  PSI_STR,  'Ramachandran', [
+                        (WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR),
+                        (CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR)
+                         ]],
+                    [CHI1_STR, CHI2_STR, 'Janin',        [
+                        (WHATIF_STR, C12CHK_STR, VALUE_LIST_STR),
+                        (CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
+                        ]],
+                    [DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2', [
+                        (CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
+                        ]]
                    ]
 
         graphicsFormatExtension = 'png'
@@ -2407,7 +2398,7 @@ class ResidueHTMLfile( HTMLfile ):
 #        if not htmlOnly:
 #            NTdebug("Residue %s: generating dihedral plots", self.residue )
 
-        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotDihedral2dList:
+        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,_keyLoL in plotDihedral2dList:
 #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
             ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
             if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
@@ -2456,7 +2447,7 @@ class ResidueHTMLfile( HTMLfile ):
 #        residue.html.left( 'h2', openTag=False)
 
         # 2D plots
-        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keys,_tmp in plotDihedral2dList:
+        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,keyLoL in plotDihedral2dList:
             plotFileNameDihedral2D = plotDihedralComboName + '.' + graphicsFormatExtension
             if not plotDihedralComboName in plottedList: # failed on first attempt already. No sense in trying again.
                 continue
@@ -2476,17 +2467,20 @@ class ResidueHTMLfile( HTMLfile ):
                 residue.html.left( 'img', src = plotFileNameDihedral2D )
             else:
                 residue.html.left( 'i', 'No plot available')
-            # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
-            strToShow = '.'.join( keys )
-            av = getDeepByKeys(residue,*keys)
-            if av != None:
+            for keys in keyLoL:
+                # Try to show a What If average Z-score like: 'whatif.QUACHK.valueList 0.054 (+/- 0.012'
+                strToShow = '.'.join( keys )
+                av = getDeepByKeys(residue,*keys)
+                if av == None:
+                    continue
                 sd = None
                 if isinstance(av, NTlist):
                     ( av, sd, _n ) = av.average()
                 pointNTvalueStr = "%s"  % NTvalue(value=av, error=sd, fmt='%.2f (+- %.2f)', fmt2='%.2f' )
                 strToShow += ': %s' % pointNTvalueStr
                 residue.html.left( 'p', strToShow ) # The a tag is not filled yet. Might link to NTmoleculePlot?
-            #end if
+                #end if
+            #end for
         #end for
 
         # Dihedrals

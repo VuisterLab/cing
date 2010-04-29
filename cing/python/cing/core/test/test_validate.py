@@ -9,12 +9,8 @@ from cing import verbosityNothing
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import IUPAC
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import os
 import unittest
 
@@ -28,14 +24,15 @@ class AllChecks(TestCase):
         doProcheck = True
         doWattos = True
         doTalos = True
-        nmodels = 1
+        ranges = AUTO_STR
+        nmodels = None
         if fastestTest:
             htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
             doTalos = False
-            nmodels = 1
+            nmodels = 2
         pdbConvention = CYANA
         restraintsConvention = CYANA
         doValidate = True
@@ -44,7 +41,6 @@ class AllChecks(TestCase):
 #        entryId = "1brv"        # Small much studied PDB NMR entry
         entryId = "1brv_1model"        # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model" # RNA-protein complex.
-#        entryId = "1brv_1model"
 #        entryId = "1hkt_1model" # Geerten's first structure in PDB
 #        entryId = "1y4o_1model"
 #        entryId = "1y4o"
@@ -114,7 +110,7 @@ class AllChecks(TestCase):
             self.assertFalse(project.importReginePeakList(peaksFile, XPLOR))
 
         if doValidate:
-            self.assertFalse(project.validate(htmlOnly = htmlOnly,
+            self.assertFalse(project.validate(htmlOnly = htmlOnly, ranges=ranges,
                       doProcheck = doProcheck, doWhatif = doWhatif, doWattos = doWattos, doTalos=doTalos))
         if writeXeasy:
             self.assertFalse(project.export2Xeasy())

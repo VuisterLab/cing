@@ -1,4 +1,4 @@
-#No mat plot lib items imported here.
+# No mat plot lib items imported here.
 # Only code specific for molecule.py related things.
 # It would be good to move the ResPlot class here too.
 
