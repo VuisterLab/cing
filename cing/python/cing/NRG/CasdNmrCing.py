@@ -200,7 +200,7 @@ class casdNmrCing(Lister):
                     continue
 
                 # Look for last log file
-                logList = glob(entrySubDir + '/log_validateEntry/*.log')
+                logList = glob(entrySubDir + '/log_validateEntryForCasd/*.log')
                 if not logList:
                     NTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
                     continue

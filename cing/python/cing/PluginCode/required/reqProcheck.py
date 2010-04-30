@@ -2,7 +2,7 @@ from cing.Libs.NTutils import NTlist
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
 SECSTRUCT_STR      = 'secStruct'
-CONSENSUS_SEC_STRUCT_FRACTION = 0.6
+#CONSENSUS_SEC_STRUCT_FRACTION = 0.6 # not used anymore; just taking the most common one.
 
 gf_STR = 'gf'
 gf_PHIPSI_STR = 'gfPHIPSI'

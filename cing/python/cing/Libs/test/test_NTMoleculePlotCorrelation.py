@@ -40,7 +40,7 @@ class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
     os.chdir(cingDirTmp)
 
-    def testMoleculePlot(self):
+    def test_NTMoleculePlotCorrelation(self):
 
         showValues = False
         fastestTest = False

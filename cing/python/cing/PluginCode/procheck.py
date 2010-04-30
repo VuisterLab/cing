@@ -32,7 +32,6 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import fprintf
 from cing.Libs.disk import copy
-from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import MAX_PROCHECK_NMR_MODELS
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
@@ -632,7 +631,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 #                    c = itemList.setConsensus()
 #                    NTdebug('consensus: %s', c)
         for res in self.molecule.allResidues():
-            res.procheck.consensus = res.procheck.secStruct.setConsensus( CONSENSUS_SEC_STRUCT_FRACTION )
+#            res.procheck.consensus = res.procheck.secStruct.setConsensus( CONSENSUS_SEC_STRUCT_FRACTION )
+            res.procheck.consensus = res.procheck.secStruct.setConsensus( useLargest=True )
     #end def
 
     def getPostscriptFileNames(self):
@@ -706,7 +706,8 @@ def getProcheckSecStructConsensus( res ):
     result = None
     if secStructList:
         secStructList = to3StateUpper( secStructList )
-        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+#        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+        result = secStructList.getConsensus(useLargest=True) # will set it if not present yet.
 #    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
     return result
 

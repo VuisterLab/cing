@@ -984,8 +984,8 @@ Project: Top level Cing project class
         return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
                         doWattos = doWattos, doTalos = doTalos)
 
-    def runCingChecks(self, toFile=True):
-        return runCingChecks(self, toFile=toFile)
+    def runCingChecks(self, toFile=True, ranges = None):
+        return runCingChecks(self, toFile=toFile, ranges = ranges)
 
     def checkForSaltbridges(self, cutoff = 0.5, toFile = False):
         return checkForSaltbridges(self, cutoff = cutoff, toFile = toFile)

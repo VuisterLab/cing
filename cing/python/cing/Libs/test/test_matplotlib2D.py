@@ -8,7 +8,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testX(self):
+    def testMatplotlib(self):
 
 #        palette = cm.gray
 #        palette  = matplotlib.colors.LinearSegmentedColormap.from_list('inv_gray', ('black', 'white'))
