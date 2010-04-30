@@ -23,7 +23,7 @@ set ch23 = ( `echo $x | cut -c2-3` )
 set dirEntry = data/$ch23/$x
 scp -P 39676 $dirEntry/$x.tgz localhost-nmr:/Users/jd/CASD-NMR-CING/$dirEntry
 
-scp -r -P 39676 list Overview localhost-nmr:/Users/jd/CASD-NMR-CING
+scp -r -P 39676 list Overview Overview.numbers localhost-nmr:/Users/jd/CASD-NMR-CING
 
 # Copy all for processing
 scp -vr CASD-NMR-CING jd@nmr:/Users/jd

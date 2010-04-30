@@ -89,7 +89,7 @@ import sys
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
-    NTdebug("Now in runCingChecks")
+#    NTdebug("Now in runCingChecks")
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints(toFile)

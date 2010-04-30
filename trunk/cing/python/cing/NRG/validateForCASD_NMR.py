@@ -17,7 +17,7 @@ cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
 pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasd.py')
 #pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
-if True:
+if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')

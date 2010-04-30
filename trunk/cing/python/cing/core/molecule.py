@@ -1264,7 +1264,7 @@ class Molecule( NTtree, ResidueList ):
     def updateDihedrals( self)   :
         """Calculate the dihedral angles for all residues
         """
-        NTdebug('Calculating dihedral angles')
+#        NTdebug('Calculating dihedral angles')
         for res in self.allResidues():
 #            res.addDihedralsAll()
             for d in res.dihedrals:
@@ -1728,7 +1728,7 @@ Return an Molecule instance or None on error
         returns ensemble or NoneObject on error
         """
 
-        NTdebug("Now in superpose")
+#        NTdebug("Now in superpose")
         if self.modelCount <= 0:
             return NoneObject
         #end if
@@ -1745,12 +1745,12 @@ Return an Molecule instance or None on error
                       self, len(fitted), selectedResiduesList, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
-        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
-                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
-               )
+#        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+#                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
+#               )
         r = self.calculateRMSDs(ranges=ranges)
 #        NTerror("NB at this point only the molecule.ranges is set from superpose()")
-        self.ranges = self.selectedResiduesList # JFD: now it's set after superpose; 
+        self.ranges = self.selectedResiduesList # JFD: now it's set after superpose;
         # JFD: please check GWV
         NTdetail( r.format() )
         return self.ensemble
@@ -1765,7 +1765,7 @@ Return an Molecule instance or None on error
         When no models are present return NaN.
         """
 
-        NTdebug("Now in calculateRMSDs")
+#        NTdebug("Now in calculateRMSDs")
 
         if self.modelCount == 0:
             NTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
