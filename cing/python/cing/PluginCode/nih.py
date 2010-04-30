@@ -1472,7 +1472,7 @@ def saveTalosPlus( project, tmp=None ):
         return True
 
     if 'talosPlus' not in project.status:
-        NTdebug("saveTalosPlus: No talos+ was run")
+#        NTdebug("saveTalosPlus: No talos+ was run")
         return True
     talosDefs = project.status.talosPlus
 
