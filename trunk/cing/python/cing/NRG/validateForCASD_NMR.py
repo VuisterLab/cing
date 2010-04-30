@@ -1,5 +1,5 @@
 # python -u $CINGROOT/python/cing/NRG/validateForCASD_NMR.py
-from cing import cingDirScripts
+from cing import cingPythonDir
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
@@ -13,14 +13,17 @@ cing.verbosity = cing.verbosityDebug
 
 # parameters for doScriptOnEntryList
 startDir = '/Library/WebServer/Documents/%s' % CASD_NMR_BASE_NAME
-pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntryForCasd.py')
+cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
+pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasd.py')
+#pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
 if True:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'CtR69ALyon CtR69ALyon2'.split()
+    entryList = 'AtT13Lyon3'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
@@ -38,6 +41,6 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = max_time_to_wait, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 1,
+                    MAX_ENTRIES_TODO = 100,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)

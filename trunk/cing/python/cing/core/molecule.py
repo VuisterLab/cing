@@ -215,6 +215,11 @@ class Molecule( NTtree, ResidueList ):
         self.project = None # JFD: don't know where it gets set but it exists.
 #        NTdebug('Molecule.__init__: %s', self )
         self.rmsd = None
+
+        # NB the below types are confusing JFD.
+        self.selectedResiduesList = None # filled in by getResiduesFromRanges this is a string
+        self.selectedResidues = None # this is a python array
+
     #end def
 
     def format(self):
@@ -1467,8 +1472,8 @@ class Molecule( NTtree, ResidueList ):
 #            if not self.atomList:
 #                NTcodeerror("Failed to generate AtomList in molecule#updateAll")
             self.idDisulfides()
-            if not self.has_key('ranges'):
-                self.ranges = None
+#            if not self.has_key('ranges'): # JFD: now in init.
+#                self.ranges = None
             self.calculateRMSDs(ranges=self.ranges)
         #end if
         # Atom list is needed even when no coordinates are present.
@@ -1723,6 +1728,7 @@ Return an Molecule instance or None on error
         returns ensemble or NoneObject on error
         """
 
+        NTdebug("Now in superpose")
         if self.modelCount <= 0:
             return NoneObject
         #end if
@@ -1743,6 +1749,9 @@ Return an Molecule instance or None on error
                 self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
                )
         r = self.calculateRMSDs(ranges=ranges)
+#        NTerror("NB at this point only the molecule.ranges is set from superpose()")
+        self.ranges = self.selectedResiduesList # JFD: now it's set after superpose; 
+        # JFD: please check GWV
         NTdetail( r.format() )
         return self.ensemble
     #end def
@@ -1756,6 +1765,8 @@ Return an Molecule instance or None on error
         When no models are present return NaN.
         """
 
+        NTdebug("Now in calculateRMSDs")
+
         if self.modelCount == 0:
             NTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
             return NaN
@@ -1766,7 +1777,8 @@ Return an Molecule instance or None on error
 
 
         selectedResidues = self.getResiduesFromRanges( ranges )
-        selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
+#        selectedResiduesList = list2asci( selectedResidues.zap('resNum')) # JFD notes that this is already done in self.getResiduesFromRanges
+        selectedResiduesList = self.selectedResiduesList
         selectedModels   = self.models2list( models )
 
         NTdetail("Calculating rmsd's (residues: %s, models: %s)", selectedResiduesList, models)

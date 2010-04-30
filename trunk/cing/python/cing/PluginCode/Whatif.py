@@ -388,10 +388,19 @@ fullstop y
             valueStringList  = line.dollar[2].strip().split()
 #            NTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
-                NTerror("Failed to get valueStringList from line: [%s]"%line)
+                NTerror("Failed to get valueStringList for check [%s] from line: [%s]" % (checkId, line))
                 return True
-            value = float(valueStringList[0])
 
+            # Very rarely it happens that the end-message of whatif gets intermingled with the values parsed here:
+#  Side chain planarity           : STOP Normal end of WHAT IF.
+#  0.324 (tight)
+            # So wrap this parse in a try.
+            try:
+                value = float(valueStringList[0])
+            except:
+                NTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None" % (
+                    checkId,line,valueStringList[0]))
+                value = None
 #            NTdebug('modelIdx: %d' % modelIdx)
             if modelIdx < 0:
                 NTerror('Failed to have increased model idx at least once')

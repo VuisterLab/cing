@@ -8,6 +8,7 @@ from cing import verbosityDebug
 from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensusId
@@ -21,12 +22,11 @@ from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
-from cing.core.constants import VALUE_LIST_STR
+from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
-import cing
 import os
 import sys
 
@@ -99,6 +99,11 @@ def main(casd_id, *extraArgList):
     else:
         NTdebug("No original entry present yet.")
 
+    ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
+    if ranges == None:
+        NTerror("Failed to get the ranges")
+
+    NTdebug("ranges: %s" % `ranges`)
     chainList = molecule.allChains()
     is_multimeric = False
     if len(chainList) > 1:
@@ -152,6 +157,7 @@ def main(casd_id, *extraArgList):
         name=casd_id,
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,
+        ranges=ranges,
         res_count=molecule.residueCount,
         model_count=molecule.modelCount,
         distance_count=distance_count,
@@ -372,6 +378,7 @@ def main(casd_id, *extraArgList):
             # end if atom
         # end for residue
     # end for chain
+    project.close(save=False)
 
     # Needed for the above hasn't been autocommitted.
     NTdebug("Committing changes")

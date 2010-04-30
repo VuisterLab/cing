@@ -6,14 +6,16 @@ from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import gunzip
+from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
+from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
+from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
-from cing.Libs.disk import copy
 import os
 import shutil
 import sys
@@ -41,7 +43,7 @@ def main(entryId, *extraArgList):
     """
 
     fastestTest = True # default: False
-    ranges=AUTO_STR # default is None
+#    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -50,7 +52,7 @@ def main(entryId, *extraArgList):
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     modelCount = None # default setting is None
     if fastestTest:
-        modelCount = 2
+        modelCount = 3
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -91,6 +93,16 @@ def main(entryId, *extraArgList):
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
 
+    targetId = getTargetForFullEntryName(entryId)
+    if not targetId:
+        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
+        return True
+    ranges = getRangesForTarget(targetId)
+    if not ranges:
+        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+        return True
+
+
     NTdebug("Using:")
     NTdebug("inputDir:             %s" % inputDir)
     NTdebug("outputDir:            %s" % outputDir)
@@ -99,6 +111,7 @@ def main(entryId, *extraArgList):
     NTdebug("archiveType:          %s" % archiveType)
     NTdebug("projectType:          %s" % projectType)
     NTdebug("modelCount:           %s" % modelCount)
+    NTdebug("ranges:               %s" % ranges)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -238,7 +251,9 @@ def main(entryId, *extraArgList):
 #        project.updateProject()
 #        project.molecule.rename( entryId )
 
-    project.save()
+#    project.save()
+#    project.molecule.ranges = ranges # JFD: this doesn't seem to be set there exactly.
+    project.molecule.superpose(ranges=ranges)
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doTalos=doTalos):
         NTerror("Failed to validate project read")

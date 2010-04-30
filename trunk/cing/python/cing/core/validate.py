@@ -89,6 +89,7 @@ import sys
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
+    NTdebug("Now in runCingChecks")
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints(toFile)
@@ -366,7 +367,7 @@ def _criticizeResidue( residue, valSets ):
 
             actualValue        = getDeepByKeys(residue, CHK_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
             if actualValue == None:
-                NTdebug("None available for >> %s,%s" % ( residue,key))
+#                NTdebug("None available for >> %s,%s" % ( residue,key))
                 continue
             if isinstance(actualValue, NTlist):
                 actualValue = actualValue.average()[0]
@@ -377,11 +378,11 @@ def _criticizeResidue( residue, valSets ):
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
-                NTdebug(comment)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
-                NTdebug(comment)
+#                NTdebug(comment)
                 residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
@@ -1494,7 +1495,7 @@ def validateDihedralCombinations(project):
     for residue in project.molecule.allResidues():
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-            NTerror("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
+#            NTdebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
@@ -1527,7 +1528,7 @@ def validateDihedralCombinations(project):
                 for i in tripletIdxList:
                     triplet.append( residue.sibling(i) )
                 if None in triplet:
-                    NTdebug( 'Skipping residue without triplet %s' % residue)
+#                    NTdebug( 'Skipping residue without triplet %s' % residue)
                     continue
                 resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]
 

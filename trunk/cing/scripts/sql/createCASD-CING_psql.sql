@@ -61,6 +61,7 @@ CREATE TABLE entry
     in_recoord                     BOOLEAN DEFAULT NULL,
     in_casd                        BOOLEAN DEFAULT NULL,
     in_dress                       BOOLEAN DEFAULT NULL,
+    ranges                         VARCHAR(512) DEFAULT NULL,
     res_count                      INT DEFAULT NULL,     -- number of residues
     model_count                    INT DEFAULT NULL,     --
     distance_count                 INT DEFAULT NULL,

@@ -24,6 +24,7 @@ from cing.core.constants import CYANA
 from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from glob import glob1
+from cing.Libs.NTutils import NTerror
 import cing
 import os
 import tarfile
@@ -178,6 +179,7 @@ def createTodoList(entryList, cityList, programHoH):
     writeEntryListToFile(entryListFileName, newEntryList)
 # end def
 
+
 dbms = getCASD_NMR_DBMS()
 sheetName = 'Overview1'
 participantTable = dbms.tables['%s-Participant' % sheetName]
@@ -187,10 +189,39 @@ labTable = dbms.tables['%s-LabAndCount' % sheetName]
 labList = labTable.columnOrder[0]
 cityList = participantTable.columnOrder[1:]
 entryList = targetTable.getColumnByIdx(0)
+rangesPsvsList = targetTable.getColumnByIdx(6)
 programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
 NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 #print labList
+
+def getRangesForTarget(target):
+    if target not in entryList:
+        NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
+        return None
+    index = entryList.index(target)
+    return rangesPsvsList[index]
+
+def getTargetForFullEntryName(fullEntryCode):
+    """
+    Split the full entry name on the last capital and return the
+    part before.
+    ET109AredOrg     ET109Ared
+    AR3436AFrankfurt AR3436A
+    """
+    idxLastCapital = -1
+    for idx,char in enumerate(fullEntryCode):
+        if char.isupper():
+            idxLastCapital = idx
+    if idxLastCapital < 0:
+        NTerror("Failed to find idxLastCapital in [%s]" % fullEntryCode)
+        return None
+    target = fullEntryCode[:idxLastCapital]
+    return target
+
+#print getRangesForTarget('ET109Ared')
+#print getTargetForFullEntryName('ET109AredOrg')
+#print getTargetForFullEntryName('AR3436AFrankfurt')
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
