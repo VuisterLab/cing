@@ -128,6 +128,8 @@ D1D2_CHK_STR = 'D1D2_CHK'
 
 AUTO_STR = 'auto'
 RMSD_STR = 'rmsd'
+RANGES_STR = 'ranges'
+RESNUM_STR = 'resNum'
 VALUE_STR = "value"
 BACKBONE_AVERAGE_STR = 'backboneAverage'
 HEAVY_ATOM_AVERAGE_STR = 'heavyAtomsAverage'

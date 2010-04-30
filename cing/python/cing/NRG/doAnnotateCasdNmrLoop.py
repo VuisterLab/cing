@@ -18,12 +18,12 @@ startDir = baseDir
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
 pythonScriptFileName = os.path.join(cingDirNRG, 'doAnnotateCasdNmr.py')
-if False:
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+if True:
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'CtR69ALyon'.split()
+    entryList = 'AtT13Lyon3'.split()
     writeEntryListToFile(entryListFileName, entryList)
 extraArgList = ()
 
@@ -32,7 +32,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     startDir,
                     processes_max = 2,
                     delay_between_submitting_jobs = 2,
-                    max_time_to_wait = 600,
+                    max_time_to_wait = 6000,
                     START_ENTRY_ID = 0,
                     MAX_ENTRIES_TODO = 100,
                     expectPdbEntryList = False,

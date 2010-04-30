@@ -21,7 +21,7 @@ if False:
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'AR3436ACheshire'.split()
+    entryList = 'AR3436AOrg'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDir = '.'
