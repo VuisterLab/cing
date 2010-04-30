@@ -845,12 +845,12 @@ def plotHistoDihedralWrapper():
 
 
 if __name__ == "__main__":
-    fn = 'fooprof'
     os.chdir(cingDirTmp)
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
     if False:
         if False:
+            fn = 'fooprof'
 #            profile.run('plotDihedral2DRamaWrapper()', fn)
             profile.run('plotHistoDihedralWrapper()', fn)
             p = pstats.Stats(fn)
@@ -870,7 +870,7 @@ if __name__ == "__main__":
         plotDihedralD1_1d()
     if False:
 #        doOnlyOverall = False
-        plotDihedralD1_2d(True)
+        plotDihedralD1_2d(False)
 #        plotDihedralD1_2d(False)
     if True:
         m = plotHistogramOverall()
