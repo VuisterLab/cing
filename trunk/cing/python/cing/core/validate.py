@@ -87,7 +87,7 @@ import sys
 #    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
 #dbase.close()
 
-def runCingChecks( project, toFile=True ):
+def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
     project.partitionRestraints()
     project.analyzeRestraints()
@@ -102,9 +102,9 @@ def runCingChecks( project, toFile=True ):
 
 #    project.checkForDisulfides(toFile=True)
 # GWV this is done in molecule.updateAll
-#    if project.molecule:
-#        project.molecule.calculateRMSDs( ranges=ranges)
-#        project.molecule.idDisulfides(toFile, applyBonds=False)
+    if project.molecule:
+        project.molecule.calculateRMSDs( ranges=ranges)
+        project.molecule.idDisulfides(toFile, applyBonds=False)
 
     project.criticize(toFile)
     project.summary(toFile)
@@ -134,7 +134,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
     if hasattr(plugins, NIH_STR) and plugins[ NIH_STR ].isInstalled:
         if doTalos:
             project.runTalosPlus(parseOnly=parseOnly)
-    project.runCingChecks(toFile=True)
+    project.runCingChecks(toFile=True, ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
     project.renderHtml()
@@ -1494,7 +1494,7 @@ def validateDihedralCombinations(project):
     for residue in project.molecule.allResidues():
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-            NTerror("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue to skip: %s" % (residue))
+            NTerror("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)

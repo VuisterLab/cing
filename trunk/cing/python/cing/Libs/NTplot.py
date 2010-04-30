@@ -13,7 +13,7 @@ from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqDssp import to3StateUpper
-from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
+#from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.PluginCode.required.reqWhatif import INOCHK_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
@@ -1249,7 +1249,8 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             secStruct = None
             if l:
                 l = to3StateUpper( l )
-                secStruct = l.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+#                secStruct = l.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+                secStruct = l.getConsensus(useLargest=True) # will set it if not present yet.
 
 #            NTdebug('getsecStructElementList res: %s %s %s', res, l, secStruct)
             if  secStruct != prevSecStruct:

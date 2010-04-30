@@ -5,7 +5,7 @@ For example:
     - swap checks/changes
 
 # Execute like e.g.:
-# python -u $CINGROOT/python/cing/Scripts/FC/massageCcpnProject.py ET109AredOrg ET109AredUtrecht
+# python -u $CINGROOT/python/cing/NRG/CasdNmrMassageCcpnProject.py ET109AredOrg ET109AredUtrecht
 if the input project is in cwd.
 
 Most functionality is hard-coded here so be careful reading the actual code.
@@ -31,8 +31,11 @@ import tarfile
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
-#baseDir = '/Users/jd/CASD-NMR-CING'
-baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
+try:
+    from localConstants import baseDir
+except:
+    #baseDir = '/Users/jd/CASD-NMR-CING'
+    baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
 
 #dataOrgDir = os.path.join(baseDir, 'data')
 dataDir = os.path.join(baseDir, 'data')

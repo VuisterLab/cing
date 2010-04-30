@@ -160,13 +160,13 @@ Sum                %s
         val2Str(self.sum(), fmt) )
         return text
 
-    def getConsensus(self, minFraction=1.):
-        return self.setConsensus(minFraction=minFraction)
+    def getConsensus(self, minFraction=1., useLargest=False):
+        return self.setConsensus(minFraction=minFraction, useLargest=useLargest)
 #        w = getattr(self, CONSENSUS_STR)
 #        print 'w: ', w
 #        return w
 
-    def setConsensus(self, minFraction=1.):
+    def setConsensus(self, minFraction=1., useLargest=False):
         """Where there are only the same values set the consensus to it
         otherwise set it to None.
         They don't all need to be the same, at least the given fraction
@@ -190,7 +190,10 @@ Sum                %s
                 setattr(self, CONSENSUS_STR, v)
 #                print 'returning v: ', v
                 return v
-        return False
+        if not useLargest:
+            return False
+        v = getKeyWithLargestCount(count) # could be inlined for speed of course.
+        return v
     #end def
 
     def append(self, *items):
@@ -4717,3 +4720,20 @@ def NTlist2dict(lst):
     for k in lst:
         dic[k] = None
     return dic
+
+def getKeyWithLargestCount(count):
+    """Return the key in the hashmap of count for which the value
+    is the largest.
+    Return None if count is empty.
+    """
+    countMax = -1
+    for v in count:
+        countV = count[v]
+#        NTdebug("Considering key/value %s/%s" % (v,countV))
+        if countV > countMax:
+            countMax = countV
+            vMax = v
+#            NTdebug("Set max key/value %s/%s" % (vMax,countMax))
+    if countMax < 0: # nothing found
+        return None
+    return vMax

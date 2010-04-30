@@ -17,12 +17,10 @@ from cing.core.validate import plotparams180
 from cing.core.validate import xGrid180
 from cing.core.validate import yGrid180
 from numpy.lib.twodim_base import histogram2d
+import cPickle
 import cing
 import csv
 import os
-import pickle
-import sys
-#import shelve
 
 """
 Takes a file with dihedral angles values and converts them to a python pickle file
@@ -104,7 +102,7 @@ def main():
 
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
-            hist2d, xedges, _yedges = histogram2d(
+            hist2d, _xedges, _yedges = histogram2d(
                 valuesBySsAndResType[ssType][resType]['psi'],
                 valuesBySsAndResType[ssType][resType]['phi'],
                 bins = binCount,
@@ -115,8 +113,8 @@ def main():
             cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
             (c_av, c_sd) = cTuple
             NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
-            NTdebug("xedges %s" % `xedges`)
-            sys.exit(1)
+#            NTdebug("xedges %s" % `xedges`)
+#            sys.exit(1)
             if c_sd == None:
                 NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                 continue
@@ -174,9 +172,13 @@ def main():
     dbase[ 'histRamaCombined' ]               = hist2d
     dbase[ 'histRamaBySsAndCombinedResType' ] = histRamaBySsAndCombinedResType
     dbase[ 'histRamaBySsAndResType' ]         = histRamaBySsAndResType
-    dbase[ 'histRamaCtupleBySsAndResType' ]         = histRamaCtupleBySsAndResType
+    dbase[ 'histRamaCtupleBySsAndResType' ]   = histRamaCtupleBySsAndResType
 #    pickle.dump(dbase, output, -1)
-    pickle.dump(dbase, output)
+#    pickle.dump(dbase, output)
+    cPickle.dump(dbase, output, -1) # now the same as the other 2 scripts.
+    # If the protocol parameter is omitted, protocol 0 is used.
+    # If protocol is specified as a negative value or HIGHEST_PROTOCOL, the highest protocol version will be used.
+
     output.close()
 #    dbase.close()
 

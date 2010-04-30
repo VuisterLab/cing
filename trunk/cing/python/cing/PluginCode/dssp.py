@@ -14,7 +14,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import sprintf
 from cing.PluginCode.required.reqDssp import DSSP_STR
-from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
+#from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.core.constants import IUPAC
 from cing.core.parameters import cingPaths
@@ -190,7 +190,8 @@ class Dssp:
         #end for
         for residue in self.molecule.allResidues():
             if residue.has_key(DSSP_STR):
-                residue[DSSP_STR].consensus = residue[DSSP_STR].secStruct.setConsensus(CONSENSUS_SEC_STRUCT_FRACTION)
+#                residue[DSSP_STR].consensus = residue[DSSP_STR].secStruct.setConsensus(CONSENSUS_SEC_STRUCT_FRACTION)
+                residue[DSSP_STR].consensus = residue[DSSP_STR].secStruct.setConsensus(useLargest=True)
                 residue[DSSP_STR].keysformat()
         #end for
         self.project.status.dssp.parsed = True
