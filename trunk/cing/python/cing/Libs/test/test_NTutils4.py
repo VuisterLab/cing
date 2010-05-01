@@ -118,6 +118,11 @@ b
         x = d.getDeepAvgByKeys('key')
         self.assertEquals( x, False)
 
+        # Should crash on None element
+        l.append(None)
+        x = d.getDeepAvgByKeys('key')
+        self.assertEquals( x, False)
+
         x = l.getConsensus(minFraction=0.5)
         self.assertEquals( x, 'abc')
 

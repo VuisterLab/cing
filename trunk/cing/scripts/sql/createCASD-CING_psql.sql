@@ -168,7 +168,9 @@ CREATE TABLE residue
     omega_dev_av_all               FLOAT DEFAULT NULL,
     cv_backbone                    FLOAT DEFAULT NULL,
     cv_sidechain                   FLOAT DEFAULT NULL,
-
+    chk_ramach                     FLOAT DEFAULT NULL,
+    chk_janin                      FLOAT DEFAULT NULL,
+    chk_d1d2                       FLOAT DEFAULT NULL,
     distance_count                 INT DEFAULT NULL,
     dihedral_count                 INT DEFAULT NULL,
     rdc_count                      INT DEFAULT NULL,

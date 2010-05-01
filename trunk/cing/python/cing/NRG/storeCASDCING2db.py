@@ -1,6 +1,6 @@
 # Execute like:
-# cd /Library/WebServer/Documents/CASD-NMR-CING/data/R3/AR3436ACheshire; \
-# python -u $CINGROOT/python/cing/NRG/storeNRGCING2db.py AR3436ACheshire .
+# cd /Library/WebServer/Documents/CASD-NMR-CING/data/R1/NeR103ALyon2; \
+# python -u $CINGROOT/python/cing/NRG/storeCASDCING2db.py NeR103ALyon2 .
 #
 # NB this script fails if the MySql backend is not installed.
 from cing import header
@@ -11,6 +11,8 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
+from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensusId
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqProcheck import gf_CHI12_STR
@@ -87,9 +89,19 @@ def main(casd_id, *extraArgList):
     # shortcuts
     p = project
     molecule = project.molecule
+
+    targetId = getTargetForFullEntryName(casd_id)
+    if not targetId:
+        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
+        return True
+    ranges = getRangesForTarget(targetId)
+    if not ranges:
+        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+        return True
+
 #    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
     if True: # TODO: enable when done testing overall strategy.
-        p.validate(parseOnly=True, htmlOnly=True)
+        p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
 
     # WATCH OUT WITH THE BELOW COMMANDS.
     # Use CASD_ID as a kind of unique key. Enforced in DB.
@@ -274,9 +286,13 @@ def main(casd_id, *extraArgList):
             r_pc_gf_phipsi = residue.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
 
             # Wattos
-            noe_compl4 = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
-
+            r_noe_compl4 = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+            # CING
+            r_chk_ramach = residue.getDeepAvgByKeys(CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR)
+            r_chk_janin = residue.getDeepAvgByKeys(CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
+            r_chk_d1d2 = residue.getDeepAvgByKeys(CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
             rogR = residue.rogScore.rogInt()
+
             result = csql.conn.execute(cresidue.insert().values(
                 entry_id=entry_id,
                 chain_id=chain_id,
@@ -302,7 +318,10 @@ def main(casd_id, *extraArgList):
         		pc_gf_chi12=r_pc_gf_chi12,
         		pc_gf_chi1=r_pc_gf_chi1,
         		pc_gf_phipsi=r_pc_gf_phipsi,
-                noe_compl4=noe_compl4,
+                noe_compl4=r_noe_compl4,
+                chk_ramach = r_chk_ramach,
+                chk_janin = r_chk_janin,
+                chk_d1d2 = r_chk_d1d2,
                 rog=rogR
                 )
             )
@@ -319,8 +338,8 @@ def main(casd_id, *extraArgList):
                 for atom in residue.allAtoms():
                     a_name = atom.name
                     # WI
-                    a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR)
-                    a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR)
+#                    a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR) # should have worked
+#                    a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR) # should have worked
                     a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
                     a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
                     a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
@@ -329,10 +348,10 @@ def main(casd_id, *extraArgList):
                     a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
                     a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
-                    # Store only atoms for which there is usefull info.
+                    # Store only atoms for which there is useful info.
                     useFullColumns = [
-                        a_wi_ba2lst,
-                        a_wi_bh2chk,
+#                        a_wi_ba2lst,
+#                        a_wi_bh2chk,
                         a_wi_chichk,
                         a_wi_dunchk,
                         a_wi_hndchk,
@@ -353,8 +372,8 @@ def main(casd_id, *extraArgList):
                         chain_id=chain_id,
                         residue_id=residue_id,
                         name=a_name,
-                        wi_ba2lst=a_wi_ba2lst,
-                        wi_bh2chk=a_wi_bh2chk,
+#                        wi_ba2lst=a_wi_ba2lst,
+#                        wi_bh2chk=a_wi_bh2chk,
                         wi_chichk=a_wi_chichk,
                         wi_dunchk=a_wi_dunchk,
                         wi_hndchk=a_wi_hndchk,

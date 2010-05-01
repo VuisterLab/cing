@@ -25,6 +25,7 @@ from cing.core.constants import PDB
 from cing.core.constants import XPLOR
 from glob import glob1
 from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
 import cing
 import os
 import tarfile
@@ -179,22 +180,6 @@ def createTodoList(entryList, cityList, programHoH):
     writeEntryListToFile(entryListFileName, newEntryList)
 # end def
 
-
-dbms = getCASD_NMR_DBMS()
-sheetName = 'Overview1'
-participantTable = dbms.tables['%s-Participant' % sheetName]
-participationTable = dbms.tables['%s-Participation' % sheetName]
-targetTable = dbms.tables['%s-Target' % sheetName]
-labTable = dbms.tables['%s-LabAndCount' % sheetName]
-labList = labTable.columnOrder[0]
-cityList = participantTable.columnOrder[1:]
-entryList = targetTable.getColumnByIdx(0)
-rangesPsvsList = targetTable.getColumnByIdx(6)
-programHoH = convertToProgram(participationTable)
-mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
-NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
-#print labList
-
 def getRangesForTarget(target):
     if target not in entryList:
         NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
@@ -219,9 +204,45 @@ def getTargetForFullEntryName(fullEntryCode):
     target = fullEntryCode[:idxLastCapital]
     return target
 
+def printCingUrls(programHoH):
+    targetList = programHoH.keys()
+    targetList.sort()
+    print targetList
+    for target in targetList:
+        mapByLab = programHoH[target]
+        labList = mapByLab.keys()
+        labList += ['Org']
+        labList.sort()
+        for labId in labList:
+            program = getDeepByKeysOrAttributes(mapByLab, labId )
+            if labId != 'Org':
+                if not program:
+                    continue
+            entryCode = target + labId
+            ch23 = entryCode[1:3]
+            print "http://nmr.cmbi.ru.nl/CASD-NMR-CING/data/%s/%s/%s.cing" % (
+                    ch23, entryCode, entryCode                )
+
+dbms = getCASD_NMR_DBMS()
+sheetName = 'Overview1'
+participantTable = dbms.tables['%s-Participant' % sheetName]
+participationTable = dbms.tables['%s-Participation' % sheetName]
+targetTable = dbms.tables['%s-Target' % sheetName]
+labTable = dbms.tables['%s-LabAndCount' % sheetName]
+labList = labTable.columnOrder[0]
+cityList = participantTable.columnOrder[1:]
+entryList = targetTable.getColumnByIdx(0)
+rangesPsvsList = targetTable.getColumnByIdx(6)
+programHoH = convertToProgram(participationTable)
+mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
+NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+#print labList
+#print programHoH
 #print getRangesForTarget('ET109Ared')
 #print getTargetForFullEntryName('ET109AredOrg')
 #print getTargetForFullEntryName('AR3436AFrankfurt')
+
+#printCingUrls(programHoH)
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
