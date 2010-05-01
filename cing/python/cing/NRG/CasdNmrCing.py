@@ -198,43 +198,45 @@ class casdNmrCing(Lister):
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
                     continue
+                logFileValidate = 'log_validateEntryForCasd'
+                for logFile in ( logFileValidate, 'log_storeCASDCING2db' ):
+                    # Look for last log file
+                    logList = glob(entrySubDir + '/%s/*.log' % logFile)
+                    if not logList:
+                        NTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
+                        continue
+                    # .cing directory and .log file present so it was tried to start but might not have finished
+    #                self.entry_anno_list_tried.append(entry_code)
+                    if logFile == logFileValidate:
+                        entry_list_tried.append(entry_code)
+                    logLastFile = logList[-1]
 
-                # Look for last log file
-                logList = glob(entrySubDir + '/log_validateEntryForCasd/*.log')
-                if not logList:
-                    NTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
-                    continue
-                # .cing directory and .log file present so it was tried to start but might not have finished
-#                self.entry_anno_list_tried.append(entry_code)
-                entry_list_tried.append(entry_code)
-                logLastFile = logList[-1]
-
-                entryCrashed = False
-                entryWithErrorMessage = False
-                for r in AwkLike(logLastFile):
-                    line = r.dollar[0]
-                    if line.startswith('CING took       :'):
-#                        NTdebug("Matched line: %s" % line)
-                        timeTakenStr = r.dollar[r.NF - 1]
-                        self.timeTakenDict[entry_code] = float(timeTakenStr)
-#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
-                    if line.startswith('Traceback (most recent call last)'):
-#                        NTdebug("Matched line: %s" % line)
-                        if entry_code in entry_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
-                        else:
-                            entry_list_crashed.append(entry_code)
+                    entryCrashed = False
+                    entryWithErrorMessage = False
+                    for r in AwkLike(logLastFile):
+                        line = r.dollar[0]
+                        if line.startswith('CING took       :'):
+    #                        NTdebug("Matched line: %s" % line)
+                            timeTakenStr = r.dollar[r.NF - 1]
+                            self.timeTakenDict[entry_code] = float(timeTakenStr)
+    #                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+                        if line.startswith('Traceback (most recent call last)'):
+    #                        NTdebug("Matched line: %s" % line)
+                            if entry_code in entry_list_crashed:
+                                NTwarning("%s was already found before; not adding again." % entry_code)
+                            else:
+                                entry_list_crashed.append(entry_code)
+                                entryCrashed = True
+                        if line.count('ERROR:'):
+                            NTerror("Matched line: %s" % line)
+                            entryWithErrorMessage = True
+                        if line.count('Aborting'):
+                            NTdebug("Matched line: %s" % line)
                             entryCrashed = True
-                    if line.count('ERROR:'):
-                        NTerror("Matched line: %s" % line)
-                        entryWithErrorMessage = True
-                    if line.count('Aborting'):
-                        NTdebug("Matched line: %s" % line)
-                        entryCrashed = True
-                        if entry_code in entry_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
-                        else:
-                            entry_list_crashed.append(entry_code)
+                            if entry_code in entry_list_crashed:
+                                NTwarning("%s was already found before; not adding again." % entry_code)
+                            else:
+                                entry_list_crashed.append(entry_code)
                 if entryWithErrorMessage:
                     NTerror("Above for entry: %s" % entry_code)
                 if entryCrashed:

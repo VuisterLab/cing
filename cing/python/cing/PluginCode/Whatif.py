@@ -1047,7 +1047,7 @@ def runWhatif( project, parseOnly=False ):
 
         project.whatifStatus.completed = True
     else:
-        NTdebug("Skipping actual whatif execution")
+#        NTdebug("Skipping actual whatif execution")
         whatifExitCode = 0
     #end if
 

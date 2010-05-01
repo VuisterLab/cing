@@ -39,7 +39,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
 class cgenericSql(NTdict):
     "Class for connecting to any MySql database."
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nobody@noaddress.no', passwd='', unix_socket='/tmp/mysql.sock', db="", echo=False):
-        NTdebug("Initializing cgenericSql")
+        NTdebug("Initializing cgenericSql with user/db: %s/%s" % (user,db))
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -119,8 +119,8 @@ class cgenericSql(NTdict):
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nrgcing1', passwd='4I4KMS', unix_socket='/tmp/mysql.sock', db="nrgcing", echo=False):
+        NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
         cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, echo=echo)
-        NTdebug("Initialized csqlAlchemy")
         # be explicit here to take advantage of code analysis.
         self.tableNameList = ['entry', 'chain', 'residue', 'atom']
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
