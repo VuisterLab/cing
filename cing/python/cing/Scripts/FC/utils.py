@@ -31,8 +31,8 @@ def printSequenceFromCcpnProject(ccpnProject):
           code1Letter = defaultPrintChainCode
 
         fastaString += code1Letter
-        NTmessageNoEOL('%s%s' % (res.ccpCode, res.seqCode))
-        if not (res.seqCode % 50):
+        NTmessageNoEOL('%s%s ' % (res.ccpCode, res.seqCode))
+        if not (res.seqCode % 10):
             NTmessage('')
     NTmessage('')
     NTmessage("Sequence from CCPN project:")
@@ -48,7 +48,7 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
         NTerror("Failed to find single structureEnsemble; instead found: %d" % len(structureEnsembleList) )
     structureEnsemble = ccpnProject.findFirstStructureEnsemble()
     if structureEnsemble:
-        NTmessage("Removing first found structureEnsemble")
+        NTmessage("In importPseudoPdb, removing first found structureEnsemble")
         structureEnsemble.delete()
     else:
         NTwarning("No structureEnsemble found; can't remove it.")
@@ -77,7 +77,7 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
         return True
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_COORDINATES, KEYWORDS)
-#    NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+    NTdebug("In importPseudoPdb: from getDeepByKeysOrDefault keywds: %s" % `keywds`)
     reportDifference(ccpnProject, fileList[0])
 
     status = formatPseudoPdb.readCoordinates(fileList, strucGen=structureGeneration, linkAtoms=0, swapFirstNumberAtom=1,

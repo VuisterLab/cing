@@ -18,12 +18,12 @@ startDir = baseDir
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
 pythonScriptFileName = os.path.join(cingDirNRG, 'doAnnotateCasdNmr.py')
-if True:
+if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'AtT13Lyon3'.split()
+    entryList = 'VpR247Cheshire'.split()
     writeEntryListToFile(entryListFileName, entryList)
 extraArgList = ()
 

@@ -31,6 +31,7 @@ import sys
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 
 def convert(projectName, inputDir, projectNameNew):
+    "Testing doc strings"
     # Adjust the parameters below!
     removeOriginalStructureEnsemble = True
     addStructureEnsemble = True # From all *.pdb files in inputDir.
@@ -45,7 +46,7 @@ def convert(projectName, inputDir, projectNameNew):
     if removeOriginalStructureEnsemble:
         structureEnsemble = ccpnProject.findFirstStructureEnsemble()
         if structureEnsemble:
-            NTmessage("Removing first found structureEnsemble")
+            NTmessage("Removing first found structureEnsemble -A-")
             structureEnsemble.delete()
         else:
             NTwarning("No structureEnsemble found; can't remove it.")
