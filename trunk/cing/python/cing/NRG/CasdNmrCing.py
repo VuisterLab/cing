@@ -253,6 +253,10 @@ class casdNmrCing(Lister):
         Checks the completeness and errors from annotation.
         """
 
+        MAX_LINK_ERRORS = 20 # VpR247Cheshire had 16 terminii etc. problems that can be ignored.
+        MAX_CHAIN_MAPPING_ERRORS = 1
+        MAX_ANY_ERRORS = MAX_LINK_ERRORS + MAX_CHAIN_MAPPING_ERRORS
+
         NTmessage("Get the entries tried, todo, crashed, and stopped from file system.")
 
         self.entry_anno_list_obsolete = NTlist()
@@ -265,6 +269,7 @@ class casdNmrCing(Lister):
         cwdCache = os.getcwd()
         os.chdir(baseDir)
         subDirList = os.listdir('data')
+        subDirList.sort()
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != ".DS_Store":
@@ -308,6 +313,10 @@ class casdNmrCing(Lister):
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
                 entryCrashed = False
+
+                linkErrorList = []
+                chainMappingErrorList = []
+                anyErrorList = []
                 for r in AwkLike(logLastFile):
                     line = r.dollar[0]
                     if line.startswith('CING took       :'):
@@ -324,6 +333,20 @@ class casdNmrCing(Lister):
                             entryCrashed = True
                     if line.count('ERROR:'):
                         NTerror("Matched line: %s" % line)
+
+                    hasPseudoErrorListed = line.count(" .Q") # ignore the errors for pseudos e.g. in CGR26ALyon Hopefully this is unique enough; tested well.
+                    if line.count("Error: Not linking atom"):
+                        if not hasPseudoErrorListed:
+                            linkErrorList.append(line)
+                    if line.count("Error: no chain mapping"):
+                        chainMappingErrorList.append(line)
+                    lineLower = line.lower()
+
+                    hasApiErrorListed =  line.count('ApiError: ccp.nmr.NmrConstraint.DistanceConstraintItem.__init__:')
+                    if lineLower.count("error"):
+                        if not (hasPseudoErrorListed or hasApiErrorListed):
+                            anyErrorList.append(line)
+
                     if line.count('Aborting'):
                         NTdebug("Matched line: %s" % line)
                         entryCrashed = True
@@ -334,7 +357,22 @@ class casdNmrCing(Lister):
                 if entryCrashed:
                     continue # don't mark it as stopped anymore.
 
-                # end for AwkLike
+                linkErrorListCount = len(linkErrorList)
+                if linkErrorListCount > MAX_LINK_ERRORS:
+                    NTerror("%-25s has more than %s link errors;          %s" % (entry_code,MAX_LINK_ERRORS,linkErrorListCount))
+                    entryCrashed = True
+                chainMappingListCount = len(chainMappingErrorList)
+                if chainMappingListCount > MAX_CHAIN_MAPPING_ERRORS:
+                    NTerror("%-25s has more than %s chain mapping errors; %s" % (entry_code,MAX_CHAIN_MAPPING_ERRORS,chainMappingListCount))
+                    entryCrashed = True
+                anyErrorListCount = len(anyErrorList)
+                if anyErrorListCount > MAX_ANY_ERRORS:
+                    NTerror("%-25s has more than %s any errors;           %s" % (entry_code,MAX_ANY_ERRORS,anyErrorListCount))
+                    entryCrashed = True
+
+                if entryCrashed:
+                    continue # don't mark it as stopped anymore.
+
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
                     NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)

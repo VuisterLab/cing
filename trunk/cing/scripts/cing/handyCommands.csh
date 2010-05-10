@@ -37,10 +37,16 @@ grep ERROR */*/log_validateEntry/*.log
 
 # Clean the CS Rosetta 'PDB files'. E.g. AtT13Utrecht
 grep -v complete atc_pdb_org | grep -v '\-\-\-' > atc.pdb
-
+# and then do the below.
+	
+	
 # Insert model records.
 cat PGR122A_total_pdb_org | gawk 'BEGIN{i=1;;printf "MODEL       %2d\n", i}\
 {print}/^END/ {i = i + 1;printf "MODEL       %2d\n", i}' | grep -v REMARK > PGR122A_total.pdb
+#and by hand remove the last
+# Or based on a TER record:
+cat top10_CTR69A.tmp | gawk 'BEGIN{i=1;;printf "MODEL       %2d\n", i}\
+{print}/^TER/ {i = i + 1;printf "MODEL       %2d\n", i}' | grep -v REMARK > top10_CTR69A.pdb
 #and by hand remove the last
 
 # Copy from development to production

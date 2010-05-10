@@ -20,10 +20,10 @@ pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasd.py')
 if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
-#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'AtT13Lyon3'.split()
+    entryList = 'HR5537AUtrecht2'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
