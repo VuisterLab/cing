@@ -463,7 +463,7 @@ if __name__ == '__main__':
         parametersDict['povrayPath'] = strip(povrayPath)
 
     talosPath,err  = _NTgetoutput('which talos+')
-    if not povrayPath:
+    if not talosPath:
         _NTmessage("Could not find 'talos'")
         parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
