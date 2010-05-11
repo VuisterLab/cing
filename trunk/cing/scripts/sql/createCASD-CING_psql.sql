@@ -180,6 +180,11 @@ CREATE TABLE residue
     cs13C_count                    INT DEFAULT NULL,
     cs15N_count                    INT DEFAULT NULL,
 
+    qcs_all                        FLOAT DEFAULT NULL,
+    qcs_bb                         FLOAT DEFAULT NULL,
+    qcs_hvy                        FLOAT DEFAULT NULL,
+    qcs_prt                        FLOAT DEFAULT NULL,
+
     dis_max_all                    FLOAT DEFAULT NULL,
     dis_rms_all                    FLOAT DEFAULT NULL,
     dis_av_all                     FLOAT DEFAULT NULL,

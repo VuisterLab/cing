@@ -10,6 +10,14 @@ As a cron job this will:
     - create a todo list
     - run entries todo
     - create new lists and write them to file.
+
+Time taken by CING by statistics
+Count                  5644
+Average             880.767
+Standard deviation  727.007
+Minimum              28.148
+Maximum            18593.635
+Sum                4971048.908
 """
 
 from cing import cingDirScripts
@@ -55,7 +63,7 @@ import urllib
 def run():
     """Return True on error"""
     max_entries_todo = 20    # was 500 (could be as many as u like)
-    max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
+    max_time_to_wait = 60 * 60 * 12 # 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
     processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = True
     updateIndices = True
