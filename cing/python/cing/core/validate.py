@@ -563,8 +563,8 @@ def summary( project, toFile = True ):
     if wattosSummary:
         msg += "\n%s Wattos Summary %s\n" % (dots, dots )
         msg += '\n' + addPreTagLines(wattosSummary)
-    else:
-        incompleteItems.append( WATTOS_STR )
+#    else:
+#        incompleteItems.append( WATTOS_STR )
 
 #    skippedShiftx = False
     # don't mark nucleic acid only entries at all.

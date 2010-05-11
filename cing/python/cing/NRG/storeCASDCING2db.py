@@ -287,6 +287,14 @@ def main(casd_id, *extraArgList):
 
             # Wattos
             r_noe_compl4 = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+
+            # Talos+
+            r_qcs_all = residue.getDeepAvgByKeys(QSHIFT_STR, ALL_ATOMS_STR, VALUE_LIST_STR)
+            r_qcs_bb = residue.getDeepAvgByKeys(QSHIFT_STR, BACKBONE_STR, VALUE_LIST_STR)
+            r_qcs_hvy = residue.getDeepAvgByKeys(QSHIFT_STR, HEAVY_ATOMS_STR, VALUE_LIST_STR)
+            r_qcs_prt = residue.getDeepAvgByKeys(QSHIFT_STR, PROTONS_STR, VALUE_LIST_STR)
+
+
             # CING
             r_chk_ramach = residue.getDeepAvgByKeys(CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR)
             r_chk_janin = residue.getDeepAvgByKeys(CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
@@ -322,6 +330,10 @@ def main(casd_id, *extraArgList):
                 chk_ramach = r_chk_ramach,
                 chk_janin = r_chk_janin,
                 chk_d1d2 = r_chk_d1d2,
+                qcs_all = r_qcs_all,
+                qcs_bb  = r_qcs_bb,
+                qcs_hvy = r_qcs_hvy,
+                qcs_prt = r_qcs_prt,
                 rog=rogR
                 )
             )

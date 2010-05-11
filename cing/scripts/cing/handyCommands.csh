@@ -10,8 +10,10 @@ end
 
 # Sync ALL to production
 cd /Users/jd/CASD-NMR-CING
-tar -cvf dataTgz.tar data/*/*/*.tgz
-scp -P 39676 dataTgz.tar localhost-nmr:/Users/jd/CASD-NMR-CING
+tar -cvf dataTgz.tar      data/*/*/*.tgz
+tar -cvzf dataAnnoLog.tgz data/*/*/log_doAnnotateCasdNmr/*.log
+scp -P 39676 dataAnnoLog.tgz localhost-nmr:/Users/jd/CASD-NMR-CING
+scp -P 39676 dataTgz.tar     localhost-nmr:/Users/jd/CASD-NMR-CING
 
 cd /Users/jd/CASD-NMR-CING/data
 \ls -1l */*/log_doAnn*/*.log
@@ -38,8 +40,8 @@ grep ERROR */*/log_validateEntry/*.log
 # Clean the CS Rosetta 'PDB files'. E.g. AtT13Utrecht
 grep -v complete atc_pdb_org | grep -v '\-\-\-' > atc.pdb
 # and then do the below.
-	
-	
+
+
 # Insert model records.
 cat PGR122A_total_pdb_org | gawk 'BEGIN{i=1;;printf "MODEL       %2d\n", i}\
 {print}/^END/ {i = i + 1;printf "MODEL       %2d\n", i}' | grep -v REMARK > PGR122A_total.pdb

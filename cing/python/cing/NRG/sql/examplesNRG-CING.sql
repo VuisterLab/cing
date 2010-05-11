@@ -45,4 +45,7 @@ e.name = 'AR3436APiscataway2'
 
 SELECT count(*) FROM entry e;
 
-
+SELECT * FROM atom a where a.rog != 0;
+SELECT * FROM residue r where r.rog = 2;
+SELECT * FROM chain c where c.rog = 2;
+SELECT * FROM entry e where e.rog = 2;
