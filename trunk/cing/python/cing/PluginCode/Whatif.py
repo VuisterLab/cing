@@ -5,28 +5,11 @@ First version: gv June 3, 2007
 # Fix these strings so we can get some automated code checking by pydev extensions.
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
-from cing import issueListUrl
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import YLABEL_STR
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTaverage2
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTprogressIndicator
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTzap
-from cing.Libs.NTutils import NoneObject
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
@@ -34,7 +17,6 @@ from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
-import os
 import time
 
 if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
@@ -666,8 +648,8 @@ RMS Z-scores, should be close to 1.0:
 #        NTmessage("  for self.checks: " + `self.checks`)
 #        NTdebug("  for self.checks count: " + `len(self.checks)`)
 
-        msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
-        msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
+#        msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
+#        msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
 
         for check in self.checks:
             if LEVEL_STR not in check:

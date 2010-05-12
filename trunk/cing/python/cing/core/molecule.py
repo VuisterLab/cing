@@ -390,10 +390,15 @@ class Molecule( NTtree, ResidueList ):
             name = self.getChainIdForChainCount()
         if name in self:
             NTwarning( 'Molecule.addChain: chain "%s" already present' % name )
+            name = None
+        if not isValidChainId( name ): # Catch ccpn ' ' etc.
+            name = None
+
+        if name==None:
             newName = self.getNextAvailableChainId()
             if not newName:
                 NTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
-            return None
+                return None # Note the bug that this statement was leftshifted before revision 778.
             NTwarning( 'Molecule.addChain: got next available one: %s' % newName)
             name = newName
 

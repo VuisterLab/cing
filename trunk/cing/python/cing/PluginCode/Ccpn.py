@@ -1,47 +1,23 @@
-from cing.Libs.NTutils import MsgHoL
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlimitSingleValue
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import removeRecursivelyAttribute
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
+from cing import issueListUrl
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
-from cing.Libs.fpconst import NaN
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
 from cing.core.classes import Project
 from cing.core.classes import RDCRestraint
-from cing.core.constants import AC_LEVEL
-from cing.core.constants import CCPN
-from cing.core.constants import DR_LEVEL
-from cing.core.constants import HBR_LEVEL
-from cing.core.constants import INTERNAL
-from cing.core.constants import IUPAC
-from cing.core.constants import RDC_LEVEL
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
-from cing.core.molecule import ensureValidChainId
 from cing.core.molecule import unmatchedAtomByResDictToString
-from cing.core.sml import NTlist
 from shutil import move
 from shutil import rmtree
-from cing.Libs.fpconst import isNaN
-import cing
-import os
-import re
 import shutil
 import string
 import tarfile
 
+
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    from cing.Libs.NTutils import ImportWarning
-    from cing.Libs.NTutils import NTmessage
-    from cing.Libs.NTutils import switchOutput
     from cing.PluginCode.required.reqCcpn import CCPN_STR
     switchOutput(False)
     try:
@@ -524,11 +500,11 @@ class Ccpn:
 
         # Set all the chains for this ccpnMolSystem
         for ccpnChain in ccpnMolSys.sortedChains():
-
-            pdbOneLetterCode = ensureValidChainId(ccpnChain.pdbOneLetterCode)
+            pdbOneLetterCode = ccpnChain.pdbOneLetterCode
+#            pdbOneLetterCode = ensureValidChainId(ccpnChain.pdbOneLetterCode)
 #            NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
-            if pdbOneLetterCode != ccpnChain.pdbOneLetterCode:
-                NTmessage("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
+#            if pdbOneLetterCode != ccpnChain.pdbOneLetterCode:
+#                NTmessage("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
 #                NTdebug("Find out if this leads to inconsistencies in CING")
                 # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
@@ -575,8 +551,13 @@ class Ccpn:
     #       21 water                5 $water                U . . yes yes . . . 1 1
     #    stop_
 
-            chain = self.molecule.addChain(pdbOneLetterCode)
-
+            chain = self.molecule.addChain(pdbOneLetterCode) # updated to catch invalid code such as a ' '.
+            if chain == None:
+                NTerror("Failed to molecule.addChain(pdbOneLetterCode) for pdbOneLetterCode [%s]" % pdbOneLetterCode)
+                msg = "See also %s%s" % (issueListUrl,244)
+                msg += "\n or %s%s" % (issueListUrl,223)
+                NTwarning(msg)
+                return
             # Make mutual linkages between Ccpn and Cing instances
             chain.ccpn = ccpnChain
             ccpnChain.cing = chain
