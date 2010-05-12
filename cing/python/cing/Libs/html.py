@@ -902,6 +902,7 @@ def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName =
             imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight ):
     """
     Make a table with links to residues in html.main of obj
+
     If the pictureBaseName is not None then insert it from it's residue directory
     if it's present.
 
@@ -947,12 +948,14 @@ def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName =
         # add residue to table
         main('td', closeTag=False, **kwds)
 
+        html.insertHtmlLink(main, obj, res, text=res.name)
         if pictureBaseName:
             # file:///Users/jd/tmp/cingTmp/1brv.cing/1brv/HTML/Dihedrals/Ramachandran.html#_top
             tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  pictureBaseName + ".png" )
             relLink = os.path.join('../', tailLink)
             absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
 #            print tailLink, relLink, absLink
+            main('br')
             if os.path.exists(absLink):
 #            if True:
                 main('a',   "",         href = relLink, closeTag=False )
@@ -960,9 +963,7 @@ def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName =
                 main('a',   "",         openTag=False )
             else:
                 main('a', "n/a")
-            main('br')
         # end if
-        html.insertHtmlLink(main, obj, res, text=res.name)
         main('td', openTag=False)
         prevRes = res
     #end for over res in residues
