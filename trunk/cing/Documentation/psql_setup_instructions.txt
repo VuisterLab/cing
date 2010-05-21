@@ -1,10 +1,7 @@
 Follow pdbj_README.txt in this directory from:
 
 ftp://ftp.pdbj.org/mine/00README.txt
-See in directory pdbj_mine parallel to this file.
-
-For some reason on stella it was fine to set the max_locks_per_transaction to 256 whereas on nmr
-it was an error and prevented the server to start up.
+See ./pdbj_Mine/00README.txt
 
 Read: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 
@@ -23,6 +20,9 @@ Configuration at:
 $PGDATA/postgresql.conf
 e.g. shows default port to be 5432
 
+Log:\
+sudo tail -f $PGDATA/logfile
+
 -- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 on: "The solution to the /dev/null error:"
 
@@ -32,7 +32,7 @@ sudo dscl . -create /Users/postgres UserShell /bin/tcsh
 sudo dscl . -create /Users/postgres NFSHomeDirectory /Users/postgres
 
 --  2 -- Fix problem with getline. described here:
-http://www.stereoplex.com/2008/feb/5/error-compiling-postgresql-83-on-leopard-rl_comple/
+http://www.stereoplex.com/2008/feb/select5/error-compiling-postgresql-83-on-leopard-rl_comple/
 stella:
 ./configure --prefix=/Users/jd/opt --with-python --with-libxml --with-libxslt --with-libedit-preferred
 nmr:
@@ -71,6 +71,10 @@ Connect as jd unix user:
 - Create file /etc/sysctl.conf with 1G (100 Mb now) and reboot:
 NOTE THIS BELOW CRASHED TOMCAT JAVA ENVIRONMENT. SWITCHED BACK TO DEFAULT SETTINGS.
 From: http://serverfault.com/questions/10226/how-to-set-the-shmmax-parameter-on-mac-os-x
+
+stack overflow/biostar.stackexchange.com 'ns kijken.
+
+
 kern.sysv.shmmax=524288000
 kern.sysv.shmmin=1
 kern.sysv.shmmni=64
@@ -80,23 +84,38 @@ kern.sysv.shmall=131072000
 kern.sysv.maxproc=2048
 kern.maxprocperuid=512
 
-on nmr using (fink recommends):
+On Stella and nmr using (fink recommends):
 kern.sysv.shmmax=8388608
 kern.sysv.shmmin=1
 kern.sysv.shmmni=64
 kern.sysv.shmseg=8
 kern.sysv.shmall=32768
 
+# Recommendations from psql for mac osx is:
+kern.sysv.shmmax=4194304
+kern.sysv.shmmin=1
+kern.sysv.shmmni=32
+kern.sysv.shmseg=8
+kern.sysv.shmall=1024 # SHMALL is measured in 4 kB pages on this platform.
+# In all OS X versions, you'll need to reboot to make changes in the shared memory parameters take effect.
+
 or for all shared memory related settings:
 sysctl -a | grep shm
 Or do on line but settings will not persist.
 jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=104857600 DID THIS WORK?
 
-
-
 It failed to reload the weekly run with setting of 256 as suggested so increased to:
 max_locks_per_transaction = 1024
-This was running 93 Mb (675 Mb uncompressed SQL)
+This was running 93 Mb (675 Mb uncompressed SQL).
+Tuning is related to setting the kernel resources:
+http://www.postgresql.org/docs/8.4/static/kernel-resources.html#SYSVIPC
+There must be something wrong in my settings as the postgres program only shows 2 Mb Real memory and 30 Mb Virtual.
+Way too small to be useful.
+Ok documentation found at:
+http://www.postgresql.org/docs/current/static/runtime-config-resource.html
+Looks like it really needs to be adjusted:
+
+shared_buffers
 
 Set a password:
 http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html
