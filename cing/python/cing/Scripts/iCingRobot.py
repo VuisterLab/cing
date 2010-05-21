@@ -51,10 +51,8 @@ def getRandomKey(size=6):
     # Suggesting something from what Tim took:
     ALPHANUMERIC = [chr(x) for x in range(48,58)+range(65,91)+range(97,123)]
     random.shuffle(ALPHANUMERIC)
-
     n = len(ALPHANUMERIC)-1
     random.seed(time.time()*time.time())
-
     return ''.join([ALPHANUMERIC[random.randint(0,n)] for x in range(size)])
 
 def getResultUrls(credentials, entryId, url=None):

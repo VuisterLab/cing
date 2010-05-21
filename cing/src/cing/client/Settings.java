@@ -19,6 +19,14 @@ public interface Settings {
     public static final String REVISION = "765";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
+    /** URL base for all secure work; really no different from regular IP but security added. */
+    public static final String DEFAULT_URL = "https://nmr.cmbi.ru.nl";
+//    public static final String DEFAULT_URL = "http://nmr.cmbi.ru.nl";
+    /** Remote procedure call port */
+//    public static final String DEFAULT_RPC_PORT = ":8080"; // unused
+    /** URL base for secure iCing */
+    public static final String DEFAULT_URL_PATH = "icing";
+//	#DEFAULT_URL_PATH = 'cing.iCing' # use for gwt embedded tomcat
     /** URL for NRG-CING. */
     public static final String NRG_CING_URL = "http://nmr.cmbi.ru.nl/NRG-CING";
     /** Local install location of CING */

@@ -1,6 +1,5 @@
 #!/bin/csh
 # Author: Jurgen F. Doreleijers
-# Fri Jun  2 14:37:52 CDT 2006
 
 set tmp_dir = /Users/jd/tmpPdbj
 ###################################################################
@@ -40,4 +39,4 @@ foreach d ( $today $yesterday )
 	endif
 end
 
-gunzip < $fn | psql pdbmlplus pdbj
+#gunzip < $fn | psql pdbmlplus pdbj

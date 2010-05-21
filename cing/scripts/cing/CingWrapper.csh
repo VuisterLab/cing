@@ -33,10 +33,12 @@ set script = CingWrapper.csh
 ##No changes required below this line
 ###############################################################################
 
-# Requirements below:
-limit cputime   24000   # Maximum number of seconds the CPU can spend
+# Requirements below (kept in sync manually with nrgCing.csh etc.)
+#limit cputime   24000  # Maximum number of seconds the CPU can spend
                         # on any single process spawned. 100 minutes seems to be top.
                         # Nop, Entry 2vda (Haddock 1,000 aa) was not even halfway with 100 minutes.
+limit cputime   176000  # Maximum number of seconds the CPU can spend; needed to be upped for 2ku1 which took over 8 hrs clocktime. 24 hrs.
+
 limit filesize   500m   # Maximum size of any one file
 limit datasize  1000m   # Maximum size of data (including stack)
 limit coredumpsize 0    # Maximum size of core dump file
