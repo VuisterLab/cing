@@ -1,26 +1,10 @@
-from cing.Libs.NTutils import NTlistOfLists
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTvector
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import list2asci
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printf
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.core.molecule import Ensemble
-from cing.Libs.fpconst import NaN #@UnusedImport not really but pydev flags it because of pylab wild imports
-from cing.Libs.fpconst import isNaN #@UnusedImport not really but pydev flags it because of pylab wild imports
-from cing.Libs.disk import copydir
 from cing import Project
-
-import math
-import sys
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import copydir
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import Ensemble
+from numpy import linalg as LA
+import numpy as np
 
 """
 Routines to compare different Project instances
@@ -272,7 +256,7 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
             #print '>>', i,j
             r = models[i].calculateRMSD( models[j] )
             if r == None:
-                NTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], model[j])
+                NTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], models[j])
                 return None, None, None, None
             else:
                 result[i][j] = r
@@ -684,7 +668,7 @@ def ROGmacro( projects ):
             if res in selectedResidues:
                 pass
             else:
-                cmd = fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
+                cmd = fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel]) #@UnusedVariable
     #end for
     fprintf(stream, 'Console on\n')
 #end def
@@ -764,7 +748,7 @@ def generatePDBfiles( projects ):
 
     for m in closestToMean[1:]:
         #print m.format()
-        r = m.superpose(closestToMean[0])
+        r = m.superpose(closestToMean[0]) #@UnusedVariable
         #print '>', m.format()
         #print '>', r
     # Export
@@ -820,8 +804,6 @@ def getRanges( projects, cutoff = 1.7 ):
     return list2asci(resList1), list2asci(resList2)
 #end def
 
-import numpy as np
-from numpy import linalg as LA
 
 def radiusOfGiration( molecule, model=0 ):
     """

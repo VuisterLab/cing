@@ -2878,6 +2878,17 @@ Residue class: Defines residue properties
         return True
     #end def
 
+    def hasCoordinates(self):
+        """
+        Returns False if all atoms have no coordinates.
+        Returns True if any atom has a coordinate.
+        """
+        for atom in self.allAtoms():
+            if atom.hasCoordinates():
+                return True
+        return False
+    #end def
+
     def residuesWithProperties(self, *properties ):
         """
         Return a NTlist instance with self if it has properties.

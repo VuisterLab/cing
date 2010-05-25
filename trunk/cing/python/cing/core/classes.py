@@ -173,7 +173,7 @@ Project: Top level Cing project class
                            rdcListNames = NTlist(), # list to store rdclist names for save and restore
                            coplanarListNames = NTlist(), # list to store  names for save and restore
                            dihedralByProjectListNames = NTlist(), # list to store  names for save and restore
-
+                           dihedralByResidue = None, # set in DihedralByResidueHTMLfile.__init__
                            reports = NTlist(), # list with validation reports names
 
                            history = History(),
@@ -238,6 +238,9 @@ Project: Top level Cing project class
                                          basePath = directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
                                        )
 
+        self.dihedralByResidue = None
+
+
         # store reference to self
         #self[name] = self
         self.objectPath = self.path(cingPaths.project)
@@ -252,7 +255,7 @@ Project: Top level Cing project class
         self.saveXML('version',
                       'name', 'created',
                       'moleculeNames',
-                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 'coplanarListNames', 'dihedralByProjectListNames',
+                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
                       'storedInCcpnFormat',
                       'reports',
                       'history',
