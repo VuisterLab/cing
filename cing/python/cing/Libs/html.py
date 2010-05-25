@@ -97,7 +97,7 @@ NO_CHAIN_TO_GO_TO = 'no chain to go to'
 
 image2DdihedralWidth  = 500
 image2Ddihedralheight = 500
-imageSmall2DdihedralWidth  = 300
+#imageSmall2DdihedralWidth  = 300 # Scale only the height so no extra coding is needed to distinguish the 1D & 2D varying sizes.
 imageSmall2Ddihedralheight = 300
 
 cingPlotList = []
@@ -678,7 +678,7 @@ def generateHtml( project, htmlOnly=False ):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
 
-    NTmessage("Html for overall dihedrals")
+    NTmessage("Html for dihedrals by Project and Residue")
     project.dihedralByProjectList.html.generateHtml(htmlOnly=htmlOnly)
 
     NTmessage("Html for atoms and models")
@@ -898,8 +898,9 @@ class MakeHtmlTable:
 #end class
 
 
-def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName = None,
-            imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight ):
+def _makeDihedralByProjectTableHtml( obj, residues, text=None, ncols=10, pictureBaseName = None,
+#            imageWidth = imageSmall2DdihedralWidth,
+            imageHeight = imageSmall2Ddihedralheight ):
     """
     Make a table with links to residues in html.main of obj
 
@@ -959,7 +960,7 @@ def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName =
             if os.path.exists(absLink):
 #            if True:
                 main('a',   "",         href = relLink, closeTag=False )
-                main('img', "",         src=relLink, height=imageHeight, width=imageWidth )
+                main('img', "",         src=relLink, height=imageHeight)#, width=imageWidth )
                 main('a',   "",         openTag=False )
             else:
                 main('a', "n/a")
@@ -972,6 +973,117 @@ def _makeResidueTableHtml( obj, residues, text=None, ncols=10, pictureBaseName =
     main('table', openTag=False)
 #end def
 
+def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictureBaseName = None,
+#            imageWidth = imageSmall2DdihedralWidth,
+            imageHeight = imageSmall2Ddihedralheight ):
+    """
+    Make a table with aligned dihedral angle plots of one row per residue.
+
+    Per chain it will check if a dihedral is present at all for any residue and not bother to show it
+    if it's absent for all. This does involve some queries to filesystem twice but this is assumed not
+    to be an insignificant slowdown. It is clever enough to scan only the dihedrals expected for it
+    being protein or nucleic acid. Mixed chains (containing AA and NA) will be shown well.
+
+    Return True on error.
+    """
+
+    dihedralListAA = """    Ramachandran Janin D1D2
+                            PHI PSI OMEGA
+                            CHI1 CHI2 CHI3 CHI4 CHI5 CHI6
+                            CHI32 CHI42
+                      """.split()
+
+    dihedralListNA = """    ALPHA BETA GAMMA DELTA EPSILON ZETA
+                            NU0 NU1 NU2 NU3 NU4 CHI
+                    """.split()
+
+    width = '6.0em' # reserve some space per residue in chain table
+    kwds = { 'style': "width: %s" % width }
+    kwds['align'] = 'right'
+
+    html = obj.html
+    main = html.main
+#    if text:
+#        main('h1',text)
+    if not residues:
+        NTerror("Failed to _makeAllDihedralTableHtml because there are no residues given.")
+        return True
+
+    project = obj.html.project
+    dihedralColumnNameHash = {} # use hash for speed.
+    for res in residues:
+        if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
+            NTdebug("Skipping non-standard residue")
+            continue
+        if res.hasProperties('protein'):
+            dihedralList = dihedralListAA
+        if res.hasProperties('nucleic'):
+            dihedralList = dihedralListNA
+        for dihedralName in dihedralList:
+            if dihedralColumnNameHash.has_key(dihedralName):
+                continue
+            tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  dihedralName + ".png" )
+            absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
+#            NTdebug( "tailLink, absLink %s %s" %(tailLink, absLink))
+            if os.path.exists(absLink):
+                NTdebug("Adding %s" % dihedralName)
+                dihedralColumnNameHash[dihedralName] = None
+#            else:
+#                dihedralColumnNameHash[dihedralName] = None # TODO: Disable when done debugging.
+
+    dihedralColumnNameList = []
+    dihedralListAny = dihedralListAA + dihedralListNA
+    for dihedralName in dihedralListAny:
+        if not dihedralColumnNameHash.has_key(dihedralName):
+            continue
+        dihedralColumnNameList.append(dihedralName)
+
+    if not dihedralColumnNameList:
+        NTdebug("Failed to find any dihedral plot on file")
+        main('h2', "No plots available")
+        return
+
+    main('table', closeTag=False)
+    main('td', "Residue")
+    for dihedralName in dihedralColumnNameList:
+        main('td', closeTag=False, **kwds)
+        relLink = dihedralName + '.html'
+        main('a',   dihedralName,      href = relLink, id=dihedralName, closeTag=False )
+        main('a',  openTag=False )
+        main('td', openTag=False)
+    #end for
+
+    for res in residues:
+        if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
+            NTdebug("Skipping non-standard residue such as water.")
+            continue
+        if not res.hasCoordinates():
+            NTdebug("Skipping residue without any coordinates for any of it's atoms.")
+            continue
+
+        # Start to writ the residue on one row.
+        main('tr', closeTag=False, **kwds)
+        main('td', closeTag=False, **kwds)
+        html.insertHtmlLink(main, obj, res, text=res.name)
+        for dihedralName in dihedralColumnNameList:
+            main('td', closeTag=False, **kwds)
+            tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  dihedralName + ".png" )
+            relLink = os.path.join('../', tailLink)
+            absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
+#            NTdebug( "tailLink, relLink, absLink %s %s %s" %(tailLink, relLink, absLink))
+            if os.path.exists(absLink): # enable check when done debuging.
+#            if True:
+                main('a',   "",         href = relLink, closeTag=False )
+                main('img', "",         src=relLink, height=imageHeight)#, width=imageWidth )
+                main('a',   "",         openTag=False )
+            else:
+                main('a', "n/a")
+            main('td', openTag=False)
+        #end for over res in residues
+
+    main('tr', openTag=False)
+    main('table', openTag=False)
+#end def
 
 # A list of all htmlobject for rendering purposes
 htmlObjects = NTlist()
@@ -1700,9 +1812,9 @@ class ProjectHTMLfile( HTMLfile ):
 
         if hasattr(self.project.molecule, 'atomList'):
             self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
-#        if self.project.dihedralByProjectList:
-#        print "TEST: ", self.project.dihedralByProjectList
+
         self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.dihedralByProjectList, text='Dihedrals' )
+        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.dihedralByResidue, text='Dihedrals by Residue' )
 
         htmlMain('ul', openTag=False)
 
@@ -1769,7 +1881,7 @@ class DihedralByProjectHTMLfile( HTMLfile ):
         fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByProject.name + '.html' )
         dihedralByProject.htmlLocation = ( fileName, HTMLfile.top )
 #        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
-        HTMLfile.__init__(self, fileName, title='Dihedral ' + dihedralByProject.name, project=project)
+        HTMLfile.__init__(self, fileName, title='Dihedral by Project' , project=project)
         if hasattr(dihedralByProject, 'html'):
             del(dihedralByProject.html)
         dihedralByProject.html = self
@@ -1785,18 +1897,59 @@ class DihedralByProjectHTMLfile( HTMLfile ):
         self._resetCingContent()
         self.header('h1', 'Dihedral '+self.dihedralByProject.name)
         self.insertMinimalHeader(self.dihedralByProject)
-        self.insertHtmlLink( self.header, self.dihedralByProject, self.project.dihedralByProjectList, text = 'All dihedrals')
+        self.insertHtmlLink( self.header, self.dihedralByProject, self.project.dihedralByProjectList, text = 'Dihedrals by project')
 
 #        self.main('h1','Residue-based analysis')
         mol = self.project.molecule
         for chain in mol.allChains():
 #            print '>>',mol, chain
             self.insertHtmlLinkInTag( 'h1', self.main, mol, chain, text='Chain %s' % chain.name )
-            _makeResidueTableHtml( self.dihedralByProject, residues=chain.allResidues(), ncols=self.ncols,
+            _makeDihedralByProjectTableHtml( self.dihedralByProject, residues=chain.allResidues(), ncols=self.ncols,
                     pictureBaseName = self.dihedralByProject.name,
-                    imageWidth = imageSmall2DdihedralWidth, imageHeight = imageSmall2Ddihedralheight)
+#                    imageWidth = imageSmall2DdihedralWidth)#,
+                    imageHeight = imageSmall2Ddihedralheight)
 #            alternativeMain = self.main,
         #end for
+        self.render()
+    #end def
+#end class
+
+class DihedralByResidueHTMLfile( HTMLfile ):
+    """
+    Class to generate HTML files for all dihedrals in one page.
+    Dihedral by Residue
+    """
+    def __init__(self, project, dihedralByResidue ):
+        # Create the HTML directory for this dihedral
+        fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByResidue.name + '.html' )
+        dihedralByResidue.htmlLocation = ( fileName, HTMLfile.top )
+        NTdebug("dihedralByResidue.htmlLocation[0]: %s" % dihedralByResidue.htmlLocation[0])
+        HTMLfile.__init__(self, fileName, title="Dihedral plots by Residue", project=project)
+        if hasattr(dihedralByResidue, 'html'):
+            del(dihedralByResidue.html)
+        dihedralByResidue.html = self
+        project.dihedralByResidue = dihedralByResidue
+        self.dihedralByResidue = dihedralByResidue
+    #end def
+
+    def generateHtml(self, htmlOnly=False):
+        """
+        Generate the HTML code and/or Figs depending htmlOnly
+        """
+        # Reset CING content
+        self._resetCingContent()
+        self.header('h1', self.dihedralByResidue.name)
+        self.insertMinimalHeader(self.dihedralByResidue)
+        self.insertHtmlLink( self.header, self.dihedralByResidue, self.project.dihedralByProjectList, text = 'Dihedrals by Project')
+
+        self.main('h3', "Dihedral plots by Residue")
+
+        mol = self.project.molecule
+        for chain in mol.allChains():
+            self.insertHtmlLinkInTag( 'h1', self.main, mol, chain, text='Chain %s' % chain.name )
+            _makeDihedralByResidueTableHtml( self.dihedralByResidue, residues=chain.allResidues(),
+#                    imageWidth = imageSmall2DdihedralWidth,
+                    imageHeight = imageSmall2Ddihedralheight)
         self.render()
     #end def
 #end class
@@ -1835,8 +1988,6 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         self.header('h1', self.title)
         self.insertMinimalHeader(self.dihedralByProjectList)
 
-#        _navigateHtml( self.dihedralByProjectList )
-
         ncols = 6 # Needs to be 6 or adjust the formatting below in dihedralList with BOGUS inserted.
 
         main = self.main
@@ -1860,6 +2011,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
                                 LB  BOGUS BOGUS BOGUS BOGUS BOGUS
                         """.split()
 
+
         dihedralPresentMap = {}
         moleculeDir = os.path.join(self.project.moleculePath(), moleculeDirectories.html, htmlDirectories.molecule)
         for residue in molecule.allResidues():
@@ -1876,8 +2028,20 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
                     dihedralPresentMap[ dihed ] = None
 
         dihList = dihedralPresentMap.keys()
-        main('h1','Dihedrals combined')
+
+        dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR )
+        dihedralAllHTMLfile = DihedralByResidueHTMLfile(self.project, dihedralByResidue)
+        dihedralAllHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
+        self.insertHtmlLink( self.header, self.dihedralByProjectList, self.project.dihedralByResidue, text = 'Dihedrals by Residue') # only now available.
+        self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
+
+
+        main('h1','Dihedrals by Project')
+#        main('h1','Dihedrals by Project',  closeTag=False)
+
         if dihList:
+#            self.insertHtmlLink(main, dihedralAllHTMLfile, dihedralByResidue, text='('+dihedralByResidue.name+')')
+#            main('h1', openTag=False)
             main('table',  closeTag=False)
             plotCount = 0 # The number of actual plots shown in the table
             for dihed in dihedralList:
@@ -1902,6 +2066,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
                 main('tr',  openTag=False)
             main('table',  openTag=False) # close table
         else:
+#            main('h1', openTag=False) # Close the main header even if there are no dihedrals.
             main('h2', "No plots available")
 
         self.render()
@@ -2268,7 +2433,7 @@ class MoleculeHTMLfile( HTMLfile ):
             self.insertHtmlLinkInTag( 'h1', self.main, self.molecule, chain,
                                        text='Chain %s' % chain.name
                                      )
-            _makeResidueTableHtml( self.molecule, chain.allResidues(), None )
+            _makeDihedralByProjectTableHtml( self.molecule, chain.allResidues(), None )
         #end for
 
         if hasattr(self.molecule, 'ensemble'):
@@ -2323,7 +2488,7 @@ class ChainHTMLfile( HTMLfile ):
         self._resetCingContent()
         self._generateHeader()
 
-        _makeResidueTableHtml( self.chain, self.chain.allResidues(), 'Residues' )
+        _makeDihedralByProjectTableHtml( self.chain, self.chain.allResidues(), 'Residues' )
 
         #footer code is inserted upon rendering
         # render

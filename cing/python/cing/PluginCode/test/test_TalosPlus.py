@@ -4,21 +4,15 @@ python $CINGROOT/python/cing/PluginCode/test/test_TalosPlus.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.fpconst import NaN
-from cing.Libs.fpconst import isNaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 
 keyList = 'phi.value       psi.value      S2        Q_H'.split()
-valueKnownList = [
+valueKnownList = [ # testing on 1brv CS.
 
 [ NaN     , NaN    , NaN     , 0.333 ],
 [ -84.373 , -0.613 , 0.437   , 0.065 ],

@@ -95,6 +95,7 @@ COPLANAR_LEVEL = 'Coplanar'
 COPLANARL_LEVEL = 'CoplanarList'
 DIHEDRAL_BY_PROJECT_LEVEL = 'DihedralByProject'
 DIHEDRALL_BY_PROJECT_LEVEL = 'DihedralByProjectList' # unused?
+DIHEDRAL_BY_RESIDUE_STR = 'DihedralByResidue'
 
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
