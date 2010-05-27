@@ -1026,10 +1026,10 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
             absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
 #            NTdebug( "tailLink, absLink %s %s" %(tailLink, absLink))
             if os.path.exists(absLink):
-                NTdebug("Adding %s" % dihedralName)
+#                NTdebug("Adding %s" % dihedralName)
                 dihedralColumnNameHash[dihedralName] = None
 #            else:
-#                dihedralColumnNameHash[dihedralName] = None # TODO: Disable when done debugging.
+#                dihedralColumnNameHash[dihedralName] = None # Disable when done debugging.
 
     dihedralColumnNameList = []
     dihedralListAny = dihedralListAA + dihedralListNA
@@ -1058,7 +1058,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
             NTdebug("Skipping non-standard residue such as water.")
             continue
         if not res.hasCoordinates():
-            NTdebug("Skipping residue without any coordinates for any of it's atoms.")
+#            NTdebug("Skipping residue without any coordinates for any of it's atoms.")
             continue
 
         # Start to writ the residue on one row.
@@ -1923,12 +1923,12 @@ class DihedralByResidueHTMLfile( HTMLfile ):
         # Create the HTML directory for this dihedral
         fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByResidue.name + '.html' )
         dihedralByResidue.htmlLocation = ( fileName, HTMLfile.top )
-        NTdebug("dihedralByResidue.htmlLocation[0]: %s" % dihedralByResidue.htmlLocation[0])
+#        NTdebug("dihedralByResidue.htmlLocation[0]: %s" % dihedralByResidue.htmlLocation[0])
         HTMLfile.__init__(self, fileName, title="Dihedral plots by Residue", project=project)
         if hasattr(dihedralByResidue, 'html'):
             del(dihedralByResidue.html)
         dihedralByResidue.html = self
-        project.dihedralByResidue = dihedralByResidue
+#        project.dihedralByResidue = dihedralByResidue # done in Project.__init__
         self.dihedralByResidue = dihedralByResidue
     #end def
 
@@ -1977,6 +1977,8 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         self.title=title
         self.molecule = project.molecule
 #        NTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
+        self.dihedralByResidueHTMLfile = DihedralByResidueHTMLfile(self.project, self.project.dihedralByResidue)
+
     #end def
 
     def generateHtml(self, htmlOnly=False):
@@ -1993,8 +1995,8 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         main = self.main
         molecule = self.molecule
 
-        if not htmlOnly:
-            NTmessage("Creating dihedrals combined for all residues html")
+#        if not htmlOnly:
+#            NTmessage("Creating dihedrals combined for all residues html")
 #                if project.createHtmlWhatif():
 #                    NTerror('Failed to createHtmlWhatif')
 #                    return True
@@ -2029,9 +2031,8 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
 
         dihList = dihedralPresentMap.keys()
 
-        dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR )
-        dihedralAllHTMLfile = DihedralByResidueHTMLfile(self.project, dihedralByResidue)
-        dihedralAllHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
+
+        self.dihedralByResidueHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
         self.insertHtmlLink( self.header, self.dihedralByProjectList, self.project.dihedralByResidue, text = 'Dihedrals by Residue') # only now available.
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
 
@@ -2040,7 +2041,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
 #        main('h1','Dihedrals by Project',  closeTag=False)
 
         if dihList:
-#            self.insertHtmlLink(main, dihedralAllHTMLfile, dihedralByResidue, text='('+dihedralByResidue.name+')')
+#            self.insertHtmlLink(main, dihedralByResidueHTMLfile, dihedralByResidue, text='('+dihedralByResidue.name+')')
 #            main('h1', openTag=False)
             main('table',  closeTag=False)
             plotCount = 0 # The number of actual plots shown in the table

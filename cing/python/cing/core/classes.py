@@ -21,6 +21,7 @@ from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import NTtoXML
+from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTvalue
 from cing.Libs.NTutils import NTwarning
 from cing.Libs.NTutils import XML2obj
@@ -173,7 +174,7 @@ Project: Top level Cing project class
                            rdcListNames = NTlist(), # list to store rdclist names for save and restore
                            coplanarListNames = NTlist(), # list to store  names for save and restore
                            dihedralByProjectListNames = NTlist(), # list to store  names for save and restore
-                           dihedralByResidue = None, # set in DihedralByResidueHTMLfile.__init__
+                           dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ), # Used to be set in DihedralByResidueHTMLfile.__init__ but that's too late.
                            reports = NTlist(), # list with validation reports names
 
                            history = History(),
@@ -238,8 +239,7 @@ Project: Top level Cing project class
                                          basePath = directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
                                        )
 
-        self.dihedralByResidue = None
-
+#        self.dihedralByResidue = None # done above.
 
         # store reference to self
         #self[name] = self
