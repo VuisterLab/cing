@@ -41,6 +41,12 @@ parser.add_option("-c", "--convention",
                   help="Set convention: CYANA,CYANA2 (default=CYANA2).",
                   metavar="CONVENTION"
                  )
+parser.add_option("--coordinateConvention",
+                  dest="coordinateConvention",
+                  default="CYANA2",
+                  help="Set convention: CYANA,CYANA2,XPLOR (default=CYANA2).",
+                  metavar="COORDINATE_CONVENTION"
+                 )
 parser.add_option("--seqFile",
                   dest="seqFile",
                   help="Define seqFile (no .seq extension).",
@@ -157,6 +163,7 @@ if not project:
 
 project.cyana2cing( args[0],
                     convention   = options.convention,
+                    coordinateConvention = options.coordinateConvention,
                     seqFile      = options.seqFile,
                     protFile     = options.protFile,
                     stereoFile   = options.stereoFile,

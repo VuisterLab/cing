@@ -158,10 +158,10 @@ public class iCingRobot {
 		// The log will show what the server is doing at any one time.
 		boolean doSave = true; // Upload to iCing and show derived urls
 		boolean doRun = false; // Start the run in Nijmegen. Use the other items first please.
-		boolean doStatus = true; // Find out if the run finished
-		boolean doLog = true; // Get the next piece of log file (may be empty)
-		boolean doPname = true; // Get the project name back. This is the entryId below.
-		boolean doPurge = true; // Remove data from server again.
+		boolean doStatus = false; // Find out if the run finished
+		boolean doLog = false; // Get the next piece of log file (may be empty)
+		boolean doPname = false; // Get the project name back. This is the entryId below.
+		boolean doPurge = false; // Remove data from server again.
 
 		// User id should be a short id (<without any special chars.)
 		// user_id = os.getenv("USER", "UnknownUser")

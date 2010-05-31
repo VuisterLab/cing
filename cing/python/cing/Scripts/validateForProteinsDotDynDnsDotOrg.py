@@ -1,7 +1,14 @@
 """
 Execute like
 python $CINGROOT/python/cing/Scripts/validateForProteinsDotDynDnsDotOrg.py
+
+NB this script differs from validateForExercises.py in that this one starts from CYANA.
+
+After execution copy the data over to the right spot.
+\cp -rvf $D/tmp/proteinsDotDynDnsDotOrg/data/* $D/ValidationExercises/data
+No need to update the indices unless changing the entries.
 """
+
 from cing import cingDirScripts
 from cing import cingDirTestsData
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList

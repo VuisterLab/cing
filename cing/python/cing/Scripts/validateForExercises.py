@@ -3,6 +3,9 @@ Execute like
 python $CINGROOT/python/cing/Scripts/validateForExercises.py
 
 The data is included for testing in the CING distribution now.
+NB this script differs from validateForProteinsDotDynDnsDotOrg.py in that this one starts from CING.
+    LAST TIME 2010-05-27 the other script was used.
+    DO NOT UES!
 """
 from cing import cingDirScripts
 from cing import cingDirTestsData
@@ -16,7 +19,8 @@ cing.verbosity = cing.verbosityDebug
 
 startDir = '/Library/WebServer/Documents/ValidationExercises'
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
-entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
+#entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
+entryListFileName     = os.path.join(cingDirScripts, 'data', 'entryCodeListProteinsSite1')
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'

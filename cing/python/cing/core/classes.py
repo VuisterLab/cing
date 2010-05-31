@@ -1678,7 +1678,7 @@ class DistanceRestraint(Restraint):
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
         """
-        # GV says; order needs to stay: is beeing used for easier
+        # GV says; order needs to stay: is being used for easier
         # (manual) analysis.
 
 
@@ -1687,17 +1687,22 @@ class DistanceRestraint(Restraint):
             return
         #end if
 
+        missesId = False
         for atom in pair:
-            if not hasattr(atom, 'id'): # happens for 1f8h
-                NTerror('DistanceRestraint.appendPair: invalid pair %s for atom: %s' % (str(pair), str(atom)))
-                return
+            if not hasattr(atom, 'id'): # happens for 1f8h and LdCof (imported from CYANA data).
+                NTwarning('DistanceRestraint.appendPair: invalid pair %s for atom: %s' % (str(pair), str(atom)))
+                missesId = True
+#                return
         #end if
 
-        # gv 24 Jul: just use atoms id, they are unique and ordered
-        if pair[0].id < pair[1].id:
+        if missesId:
             self.atomPairs.append((pair[0], pair[1]))
         else:
-            self.atomPairs.append((pair[1], pair[0]))
+            # gv 24 Jul: just use atoms id, they are unique and ordered
+            if pair[0].id < pair[1].id:
+                self.atomPairs.append((pair[0], pair[1]))
+            else:
+                self.atomPairs.append((pair[1], pair[0]))
     #end def
 
     def classify(self):

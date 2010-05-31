@@ -968,6 +968,7 @@ class Ccpn:
             peakList.ccpn = ccpnPeakList
             ccpnPeakList.cing = peakList
 
+            msgHol = MsgHoL()
             for ccpnPeak in ccpnPeakList.peaks:
 
                 # Get frequency peak dimensions
@@ -996,7 +997,8 @@ class Ccpn:
                     hValue = NaN
 
                 if isNaN(vValue) and isNaN(hValue):
-                    NTwarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
+#                    NTwarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
+                    msgHol.appendWarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
 
                 resonances = []
                 for peakDim in ccpnPeakDims:
@@ -1026,6 +1028,9 @@ class Ccpn:
                 ccpnPeak.cing = peak
 
                 peakList.append(peak)
+            # end for peak
+            msgHol.showMessage(MAX_WARNINGS=2)
+
             NTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
         return True
 

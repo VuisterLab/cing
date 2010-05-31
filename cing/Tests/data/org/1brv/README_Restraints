@@ -9,7 +9,7 @@ $R voor /usr/ruuci2/people/jurgen/B_course/Restraints
 
 
 PIEK VOLUMINA FROM REGINE_4
-	- uit buildup spectra nb3 (noesie 750mhz van 100ms)
+	- uit buildup spectra nb3 (noesy 750mhz van 100ms)
 	- gechecked op assignement met peak check
 	- sommeren van de data punten zonder offset
 	- gebruik de patronen/cluster files: brsvg.clu brsvg.pat

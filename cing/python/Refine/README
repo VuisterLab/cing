@@ -7,22 +7,61 @@ To setup: in cing directory:
 > ./setup.py
 Generates cing.csh to source in your .cshrc file
 Adjust if needed.
-Uses 'which xplor' to determine initial xplor executable; make sure it is in your 
+Uses 'which xplor' to determine initial xplor executable; make sure it is in your
 path when you run setup.
 
-#------------------------------------------------------------------------------
-To get help:
-> refine.py -h
 
+#Refinement setup
 
-usage: refine.py [options]
+-----------------------------------------------------------------------------------------------------------------------------------------
+   Import into cing
+-----------------------------------------------------------------------------------------------------------------------------------------
+Usage: cyana2cing.py [options] cyanaDirectory Use -h or --help for full options.
 
-options:
+Options:
+  -h, --help            show this help message and exit
+  -o, --overwrite       Overwrite existing cing output directory (default: no-
+                        overwrite).
+  -c CONVENTION, --convention=CONVENTION
+                        Set convention: CYANA,CYANA2 (default=CYANA2).
+  --seqFile=SEQFILE     Define seqFile (no .seq extension).
+  --protFile=PROTFILE   Define protFile (no .prot extention).
+  --stereoFile=STEREOFILE
+                        Define stereoFile (no .cya extention).
+  --pdbFile=PDBFILE     Define pdbFile (no .pdb extention).
+  --nmodels=NMODELS     Define number of models to extract from PDBFILE
+                        (default=20).
+  --peakFiles=PEAKFILES
+                        Define peakFiles (no .peaks extention; separate by
+                        comma's:e.g. c13,n15).
+  --uplFiles=UPLFILES   Define uplFiles (no .upl extention; separate by
+                        comma's:e.g. final,manual).
+  --acoFiles=ACOFILES   Define acoFiles (no .aco extention; separate by
+                        comma's:e.g. talos,hnha).
+  --export              Export to different formats (default: no-export).
+  -v VERBOSITY, --verbosity=VERBOSITY
+                        verbosity: [0(nothing)-9(debug)] no/less messages to
+                        stdout/stderr (default: 3)
+
+# Create a new project from a CYANA directory (called LdCof) with all required files in.
+set x = LdCof
+cyana2cing -v 9 --pdbFile $x --peakFiles $x"n15",$x"c13" --uplFiles $x --acoFiles $x --seqFile $x --protFile $x -o $x
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  setup for refine
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+Usage: refine.py [options]
+
+Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
   --doc                 print extended documentation to stdout
-  -n NAME, --name=NAME  NAME of the refinement run (required)
-  -s, --setup           Generate directory structure and parameter file
+  --project=PROJECT     Cing project name (required); data will be in
+                        PROJECT.cing/Refine/NAME
+  --name=NAME           NAME of the refinement run (required)
+  -s, --setup           Generate directory structure, parameter file, export
+                        project data
   -f, --psf             Generate PSF file (default: no PSF)
   -a, --analyze         Initial analysis (default: no analysis)
   -r, --refine          Refine the structures (default: no refine)
@@ -31,22 +70,78 @@ options:
   --parse               Parse the output of the refine run (default: no parse)
   --sort=SORTFIELD      sort field for parse option
   --best=BESTMODELS     Number of best models for parse option
-  
-#------------------------------------------------------------------------------
-to get more help:
-> refine.py -doc
-
- refine.py
- 
- GWV 23 February/March 2005: waterrefinement
- GWV March 2007: Adapted for usage with cing
- - Model indices [0,Nmodels>
- - General directory structure using --setup
- - Inclusion of parsing of refine result using --parse
-
-#------------------------------------------------------------------------------
+  --import              Import the refined structures of the refine run
+                        (default: no import)
+  --superpose=SUPERPOSE
+                        superpose ranges; e.g. 503-547,550-598,800,801
+  -v VERBOSITY, --verbosity=VERBOSITY
+                        verbosity: [0(nothing)-9(debug)] no/less messages to
+                        stdout/stderr (default: 3)
 
 
-#------------------------------------------------------------------------------
-Files and Directories:
+refine --project H2_3Ca_47 --name refine1 --setup --superpose 502-598,630-647
+
+==> Generated setup under "./H2_3Ca_47.cing/Refine/refine1"
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Edit parameters.py file
+-----------------------------------------------------------------------------------------------------------------------------------------
+Edit "./H2_3Ca_47.cing/Refine/refine1/parameters.py" before continuing
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Manually edit the Ca.tbl file to the following format
+-----------------------------------------------------------------------------------------------------------------------------------------
+XPLOR: d dminus dplus
+assi (resid 516 and name OE1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 578 and name OD1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 648 and name OE1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 580 and name O)         (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 552 and name OD2)       (resid 850 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 578 and name OD2)       (resid 850 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 646 and name O)         (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 649 and name OG)        (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  PSF file
+-----------------------------------------------------------------------------------------------------------------------------------------
+Manually copy the appropriate .psf file to the PROJECT.cing/NAME/PSF subdirectory
+Be sure to have the right name in parameter.py for the psfFile field
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Analyze
+-----------------------------------------------------------------------------------------------------------------------------------------
+refine --project H2_3Ca_47 --name refine1 --analyze
+
+Examine at least one log file in the Jobs directory for errors.
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Refine
+-----------------------------------------------------------------------------------------------------------------------------------------
+refine --project H2_3Ca_47 --name refine1 --refine
+
+or to start two jobs (if you have 20 models):
+
+refine --project H2_3Ca_47 --name refine1 --refine --models 0-9 >& job1.log &
+refine --project H2_3Ca_47 --name refine1 --refine --models 10-19 >& job2.log &
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Parse result, select 10? best, based on Enoe
+-----------------------------------------------------------------------------------------------------------------------------------------
+refine --project H2_3Ca_47 --name refine1 --parse --best 10 --sort Enoe
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Import into project
+-----------------------------------------------------------------------------------------------------------------------------------------
+refine --project $x --name refine1 --import
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+  Open in CING
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+cing --project H2_3Ca_47 --ipython --nosave
+
+
+
+
+
 

@@ -4,7 +4,7 @@
 
  refine.py
 
- GWV 23 February/March 2005: waterrefinement
+ GWV 23 February/March 2005: water refinement
  GWV March 2007: Adapted for usage with cing
  - Model indices [0,Nmodels>
  - General directory structure using --setup
@@ -595,7 +595,7 @@ if __name__ == '__main__':
     #end if
 
     #------------------------------------------------------------------------------
-    # Overwrrite selection
+    # Overwrite selection
     #------------------------------------------------------------------------------
     if options.overwrite:
         parameters.overwrite = options.overwrite
