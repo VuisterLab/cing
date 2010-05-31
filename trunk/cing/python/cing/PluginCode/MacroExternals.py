@@ -3,6 +3,7 @@ Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
 from cing import header
+from cing.Libs.NTutils import MsgHoL
 from cing.Libs.NTutils import NTerror
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTwarning
@@ -341,21 +342,33 @@ SelectBond 'prev_sel'
 
 #end def
 
-def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme):
+def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=None):
     """Map from min to middle; blue to red and
            from middle to max; red to yellow
            TODO: implement reverseColorScheme
            """
     if minValue > maxValue:
-        NTerror("mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue))
+        msg = "mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue)
+        if msgHol == None:
+            NTwarning(msg)
+        else:
+            msgHol.appendWarning(msg)
         swapMemory = minValue
         minValue = maxValue
         maxValue = swapMemory
     if value > maxValue:
-        NTwarning("mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue))
+        msg = "mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue)
+        if msgHol == None:
+            NTwarning(msg)
+        else:
+            msgHol.appendWarning(msg)
         value = maxValue
     if value < minValue:
-        NTwarning("mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue))
+        msg = "mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue)
+        if msgHol == None:
+            NTwarning(msg)
+        else:
+            msgHol.appendWarning(msg)
         value = minValue
 
 
@@ -398,13 +411,14 @@ DefPropBond 'prev_sel' 'selected'
 
 """ % molmolMacroFileHeader
 
+    msgHol = MsgHoL()
     for res in project.molecule.allResidues():
         value = getDeepByKeysOrAttributes(res, *keys)
 #            value = random() * 4. - 3
 #        if testing:
 #        if res.has_key(property) and res[property] != None and not isNaN(res[property]):
         if value != None and not isNaN(value):
-            molmolColor = mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme)
+            molmolColor = mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=msgHol)
             macroTxt += \
     """
 SelectAtom ':%d'
@@ -412,7 +426,8 @@ SelectBond 'atom2.selected'
 ColorAtom %s
 ColorBond %s
 """ % (res.resNum, molmolColor, molmolColor)
-        #end for
+    #end for
+    msgHol.showMessage(MAX_WARNINGS=1)
 
     macroTxt += """
 SelectAtom 'prev_sel'

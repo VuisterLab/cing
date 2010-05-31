@@ -5,6 +5,7 @@ python $CINGROOT/python/cing/PluginCode/test/test_Analysis.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import verbosityDebug
+from cing.Libs.NTutils import switchOutput
 from cing.PluginCode.Analysis import Analysis #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
@@ -48,13 +49,20 @@ class AllChecks(TestCase):
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
 
             analysis = Analysis(project)
+            if cing.verbosity <= cing.verbosityNothing:
+                    switchOutput(False)
+
             self.assertTrue(analysis.runRpf(doAlised=False,
                 distThreshold=DEFAULT_DISTANCE_THRESHOLD,
                 prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
                 diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT))
 
+            if cing.verbosity <= cing.verbosityNothing:
+                    switchOutput(True)
+
             self.assertTrue(project.save())
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
+#    cing.verbosity = verbosityNothing
     unittest.main()

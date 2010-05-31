@@ -1,10 +1,5 @@
 from cing import __author__
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTexception
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import switchOutput
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqAnalysis import ANALYSIS_STR
 from traceback import format_exc
 
@@ -72,6 +67,11 @@ class Analysis:
         if not ensembles:
             NTwarning("No ensemble found; skipping runRpf")
             return
+
+        for ensemble in ensembles:
+            NTdebug("Using ensemble: %s " % str(ensemble))
+            ensemble.rpfUse = True # set the selection automatically.
+        # end for
 
         tolerances = []
         for peakList in peakLists:

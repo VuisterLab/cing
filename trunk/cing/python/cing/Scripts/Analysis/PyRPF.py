@@ -10,25 +10,7 @@
 
 # Isotope labeling schemes
 
-from math import sqrt
-
-import time
-
-from memops.gui.BasePopup import BasePopup
-from memops.gui.ButtonList import UtilityButtonList, ButtonList
-from memops.gui.CheckButton import CheckButton
-from memops.gui.FloatEntry import FloatEntry
-from memops.gui.Frame import Frame
-from memops.gui.LabelDivider import LabelDivider #@UnusedImport
-from memops.gui.Label import Label
-from memops.gui.MessageReporter import showOkCancel
-from memops.gui.PartitionedSelector import PartitionedSelector
-from memops.gui.ProgressBar import ProgressBar
-from memops.gui.PulldownList import PulldownList
-from memops.gui.ScrolledGraph import ScrolledGraph
-from memops.gui.ScrolledMatrix import ScrolledMatrix
-from memops.gui.TabbedFrame import TabbedFrame
-
+from ccp.util.Software import getMethodStore
 from ccpnmr.analysis.core.AssignmentBasic import findMatchingPeakDimShifts, makeResonanceGuiName, getBoundResonances
 from ccpnmr.analysis.core.ConstraintBasic import getPeakDimTolerance
 from ccpnmr.analysis.core.ExperimentBasic import getOnebondDataDims, getDataDimIsotopes, findSpectrumDimsByIsotope
@@ -38,11 +20,29 @@ from ccpnmr.analysis.core.MoleculeBasic import getNumConnectingBonds, areResonan
 from ccpnmr.analysis.core.StructureBasic import getAtomSetsDistance
 from ccpnmr.analysis.core.Util import getAnalysisDataDim
 from ccpnmr.analysis.core.WindowBasic import getDataDimAxisMapping, getWindowPaneName
+from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
+from math import sqrt
+from memops.gui.BasePopup import BasePopup
+from memops.gui.ButtonList import UtilityButtonList, ButtonList
+from memops.gui.CheckButton import CheckButton
+from memops.gui.FloatEntry import FloatEntry
+from memops.gui.Frame import Frame
+from memops.gui.Label import Label
+from memops.gui.LabelDivider import LabelDivider #@UnusedImport
+from memops.gui.MessageReporter import showOkCancel
+from memops.gui.PartitionedSelector import PartitionedSelector
+from memops.gui.ProgressBar import ProgressBar
+from memops.gui.PulldownList import PulldownList
+from memops.gui.ScrolledGraph import ScrolledGraph
+from memops.gui.ScrolledMatrix import ScrolledMatrix
+from memops.gui.TabbedFrame import TabbedFrame
+import time
 
-from ccp.util.Software import getMethodStore
+
+
+
 
 # This is the table for missing peaks with built-in functionalities
-from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
 
 
 # Colours for graphs

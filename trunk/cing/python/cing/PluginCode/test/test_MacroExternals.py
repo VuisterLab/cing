@@ -3,6 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_MacroExternals.py
 """
 from cing import verbosityDebug
+from cing.Libs.NTutils import MsgHoL
 from cing.PluginCode.MacroExternals import mapValueToMolmolColor
 from unittest import TestCase
 import cing
@@ -34,6 +35,13 @@ class AllChecks(TestCase):
 #            NTdebug("i,v: %s %s" % (i,v))
             r = mapValueToMolmolColor(v, 0, 1, True)
             self.assertEquals( r, molmolColorExpectedList[i] )
+
+        # test outlier messaging.
+        msgHol = MsgHoL()
+        valueList = [ 9., 99., 999. ]
+        for i,v in enumerate(valueList):
+            r = mapValueToMolmolColor(v, 0, 1, False, msgHol=msgHol)
+        msgHol.showMessage(MAX_WARNINGS=1)
 
     def testPyMolIntegration(self):
         pass
