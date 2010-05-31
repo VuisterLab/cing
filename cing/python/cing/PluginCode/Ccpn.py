@@ -1814,9 +1814,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 resNameCcpnList = resNameCcpnFull.split(' ')
 #                NTdebug("resNameCcpnList %s" % resNameCcpnList)
                 if len(resNameCcpnList) != 3:
-                    NTwarning("JFD tought the full ccpn residue name is always of length 3; found: %d %s" % (
+                    NTwarning("JFD thought the full ccpn residue name is always of length 3; found: %d %s" % (
                      len(resNameCcpnList), resNameCcpnList))
-                    NTwarning("JFD tought the full ccpn residue name always included a moltype, 3-letter name, and a descriptor even if it's just 'neutral'")
+                    NTwarning("JFD thought the full ccpn residue name always included a moltype, 3-letter name, and a descriptor even if it's just 'neutral'")
                     resSkippedList.append(res)
                     continue
                 resNameCcpn = resNameCcpnList[1]
