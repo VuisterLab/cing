@@ -73,10 +73,10 @@ cc = ('C','C')
 
 CN_DIM_CONTEXT_DICT = {(0,0):(cc, cn, nc, nn),
                        (1,0):(cc, cn, nc),
-		       (0,1):(cn, nc, nn),
-		       (1,1):(cn, nc),
-	               (2,0):(cc,),
-	               (0,2):(nn,),}
+                       (0,1):(cn, nc, nn),
+                       (1,1):(cn, nc),
+                       (2,0):(cc,),
+                       (0,2):(nn,),}
 
 # Colour scheme for missing peaks, according to distance
 
@@ -96,6 +96,11 @@ SHIFT_VALID = 'NmrMeasurementValidation'
 UNEXPLAINED = 'Unexplained_Peak'
 RESIDUE_VALID = 'ResidueValidation'
 MISSING_PEAK = 'Shift_Missing_Peak'
+
+DEFAULT_DISTANCE_THRESHOLD = 4.8 # Angstrom units default to runRPF was 5.0 before.
+DEFAULT_PROCHIRAL_EXCLUSION_SHIFT = 0.04 # PPM units
+DEFAULT_DIAGONAL_EXCLUSION_SHIFT = 0.3 # PPM units default to runRPF was 0.1 before.
+RPF_USE = "rpfUse"
 
 def pyRpfMacro(argServer):
 
@@ -145,7 +150,7 @@ class PyRpfPopup(BasePopup):
 
     label = Label(frame, text='Diagonal Exclusion (PPM):')
     label.grid(row=0,column=0, sticky='w')
-    self.diagonalEntry = FloatEntry(frame, text=0.3, width=8)
+    self.diagonalEntry = FloatEntry(frame, text=str(DEFAULT_DIAGONAL_EXCLUSION_SHIFT), width=8)
     self.diagonalEntry.grid(row=0,column=1, sticky='w')
 
     label = Label(frame, text='Consider Aliased Positions?')
@@ -155,7 +160,7 @@ class PyRpfPopup(BasePopup):
 
     label = Label(frame, text='Prochiral Exclusion (PPM):')
     label.grid(row=0,column=4, sticky='w')
-    self.prochiralEntry = FloatEntry(frame, text=0.04, width=8)
+    self.prochiralEntry = FloatEntry(frame, text=str(DEFAULT_PROCHIRAL_EXCLUSION_SHIFT), width=8)
     self.prochiralEntry.grid(row=0,column=5, sticky='w')
 
     headingList = ['Spectrum','Peak List','Use?','Num Peaks']
@@ -182,7 +187,7 @@ class PyRpfPopup(BasePopup):
 
     label = Label(frame, text=u'Distance Threshold (\u00C5)')
     label.grid(row=0,column=0, sticky='w')
-    self.distanceEntry = FloatEntry(frame, text=4.8, width=8)
+    self.distanceEntry = FloatEntry(frame, text=str(DEFAULT_DISTANCE_THRESHOLD), width=8)
     self.distanceEntry.grid(row=0,column=1, sticky='w')
 
     editGetCallbacks = [None, None, self.toggleEnsemble, None]
@@ -340,7 +345,7 @@ class PyRpfPopup(BasePopup):
     namesR = []
     resultSetsR = []
 
-    for ensemble in self.getEnsembles():
+    for ensemble in getEnsembles(self.project):
 
       if hasattr(ensemble, 'rpfUse') and not ensemble.rpfUse:
         continue
@@ -598,21 +603,21 @@ class PyRpfPopup(BasePopup):
     self.validPeakList = peakList
 
 
-  def getNoeTolerances(self, peakList):
-
-    dimTolerances = []
-    spectrum = peakList.dataSource
-
-    for dataDim in spectrum.sortedDataDims():
-
-      analysisDataDim = getAnalysisDataDim(dataDim)
-
-      #tol = getAnalysisDataDim(dataDim).noeTolerance or \
-      tol = analysisDataDim.assignTolerance
-
-      dimTolerances.append([dataDim, tol, 1, tol])
-
-    return dimTolerances
+#  def getNoeTolerances(self, peakList):
+#
+#    dimTolerances = []
+#    spectrum = peakList.dataSource
+#
+#    for dataDim in spectrum.sortedDataDims():
+#
+#      analysisDataDim = getAnalysisDataDim(dataDim)
+#
+#      #tol = getAnalysisDataDim(dataDim).noeTolerance or \
+#      tol = analysisDataDim.assignTolerance
+#
+#      dimTolerances.append([dataDim, tol, 1, tol])
+#
+#    return dimTolerances
 
   def runRpf(self):
 
@@ -623,7 +628,7 @@ class PyRpfPopup(BasePopup):
     diagonalExclusion = self.diagonalEntry.get() or 0.0
     doAlised = self.aliasedSelect.get()
     prochiralExclusion = self.prochiralEntry.get() or 0.0
-    distThreshold = self.distanceEntry.get() or 5.0
+    distThreshold = self.distanceEntry.get() or DEFAULT_DISTANCE_THRESHOLD
 
     validResultStores = [] #@UnusedVariable
 
@@ -631,7 +636,7 @@ class PyRpfPopup(BasePopup):
       tolerances = []
 
       for peakList in peakLists:
-        tolerances.append(self.getNoeTolerances(peakList))
+        tolerances.append(getNoeTolerances(peakList))
 
       validResultStores = calcRPF(ensembles, peakLists, tolerances, #@UnusedVariable
                                   distThreshold, prochiralExclusion,
@@ -760,7 +765,7 @@ class PyRpfPopup(BasePopup):
     textMatrixAppend = textMatrix.append
     objectListAppend = objectList.append
 
-    ensembles = self.getEnsembles()
+    ensembles = getEnsembles(self.project)
     for ensemble in ensembles:
 
       if hasattr(ensemble, 'rpfUse') and not ensemble.rpfUse:
@@ -932,21 +937,21 @@ class PyRpfPopup(BasePopup):
                               objectList=peakLists,
                               colorMatrix=colorList)
 
-  def getEnsembles(self):
-
-    ensembles = []
-
-    for molSystem in self.project.molSystems:
-      for ensemble in molSystem.structureEnsembles:
-        ensembles.append((molSystem.code, ensemble.ensembleId, ensemble))
-
-    ensembles.sort()
-
-    return [x[2] for x in ensembles]
+#  def getEnsembles(self):
+#
+#    ensembles = []
+#
+#    for molSystem in self.project.molSystems:
+#      for ensemble in molSystem.structureEnsembles:
+#        ensembles.append((molSystem.code, ensemble.ensembleId, ensemble))
+#
+#    ensembles.sort()
+#
+#    return [x[2] for x in ensembles]
 
   def updateEnsembles(self):
 
-    ensembles = self.getEnsembles()
+    ensembles = getEnsembles(self.project)
 
     textMatrix = []
     colorList = []
@@ -976,20 +981,20 @@ class PyRpfPopup(BasePopup):
                               colorMatrix=colorList)
 
 
-def calcRPF(ensembles, peakLists, tolerances, distThreshold=5.0, prochiralTolerance=0.04,
-            diagonalTolerance=0.1, aliasing=True, progressBar=None,):
+def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THRESHOLD, prochiralTolerance=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+            diagonalTolerance=DEFAULT_DIAGONAL_EXCLUSION_SHIFT, aliasing=True, progressBar=None,):
   """Descrn: Function to calculate recall, precision and F-Measure
              for the comparison between close 1H distances in
-	     structures and the possible ambiguous assignments in NOESY
-	     peakLists. Currently only the first float in the tolerance
-	     sub-list is used. If peak positions are within 1H prochiral
+             structures and the possible ambiguous assignments in NOESY
+             peakLists. Currently only the first float in the tolerance
+             sub-list is used. If peak positions are within 1H prochiral
              threshold then only one crosspeak is expected.
              Boooleans to set whether diagonal peaks are considered and
              whether aliased resonance positions should be considered (slow)
              Optional progress bar is for graphical display.
      Inputs: List of MolStructure.StructureEnsembles, List of Nmr.PeakLists,
              List of 4-List of (Nmr.DataDim, Float (Tolerance), Float, Float),
-	     Float (Angstrom), Float (PPM), Float (PPM), Boolean,
+             Float (Angstrom), Float (PPM), Float (PPM), Boolean,
              memops.gui.ProgressBar
      Output: Dict of Resonance:[Dict of Resonance:Float]
              - i.e. dict[resonance1][resonance2] = dist
@@ -1025,7 +1030,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=5.0, prochiralTolera
 
       if '13C' in isotopes:
         if '15N' not in isotopes: # Not mixed N/C axis
-	  carbonDims += 1
+          carbonDims += 1
 
     # Get the heteroatom contexts from the global dict
     contexts = CN_DIM_CONTEXT_DICT.get((carbonDims,nitrogenDims))
@@ -1970,11 +1975,11 @@ def storePeakListRpfValidation(validStore, peakList, recall, precision, fMeasure
   return peakListRecall, peakListPrecision, peakListFmeasure, peakListDpScore
 
 
-def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=5.0,
+def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTANCE_THRESHOLD,
                        progressBar=None):
   """Descrn: Function to get a dictionary of H-H distances, keyed
              by resonances, with filtering of available hetero atom
-	     types. Optional progreessbar for graphical display.
+             types. Optional progreessbar for graphical display.
      Inputs: MolStructure.StructureEnsemble,
              Set of 2-Tuples of ChemAtom.elementSymbols
              memops.gui.ProgressBar
@@ -2028,15 +2033,15 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=5.0,
 
         # Check if atom is hydrogen
         if atom.elementSymbol != 'H':
-	  continue
+          continue
 
         # Check we have a link to molSystem atom
         msAtom = atom.atom
         if not msAtom:
-	  continue
+          continue
 
-	# Skip invisble fast exchangeable atoms
-	if msAtom.chemAtom.waterExchangeable:
+        # Skip invisble fast exchangeable atoms
+        if msAtom.chemAtom.waterExchangeable:
           continue
 
         # Check we have an NMR atom set
@@ -2049,9 +2054,9 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=5.0,
         if not resonanceSets:
           continue
 
-	# Get the bound heteroatom type
-	boundAtom = getBoundAtoms(msAtom)[0]
-	boundType = boundAtom.chemAtom.elementSymbol
+        # Get the bound heteroatom type
+        boundAtom = getBoundAtoms(msAtom)[0]
+        boundType = boundAtom.chemAtom.elementSymbol
 
         # Get resonance and equivalent atom sets
         # atomSets could be multiple if ambif prochiral
@@ -2067,8 +2072,8 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=5.0,
             break
 
           else:
-	    # Trick to map ambigous prochiral atomSets to resonance
-	    index = min(len(resonances)-1, list(atomSets).index(atomSet))
+            # Trick to map ambigous prochiral atomSets to resonance
+            index = min(len(resonances)-1, list(atomSets).index(atomSet))
             resonance = resonances[index]
 
         # Add to hydrogens: atom sets, resonance and heteroatom type
@@ -2108,118 +2113,18 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=5.0,
 
   return resonanceDistances
 
-  """
-
-  # Get list of Ca atomSets from dict keys
-  cAlphas = residueHydrogens.keys()
-
-  c = len(cAlphas)
-
-  # Store close resonance distances as dict
-  resonanceDistances = {}
-
-  if progressBar:
-    progressBar.total = c
-
-  # Fetach different ensemble models to find coods sets for
-  models = ensemble.models
-  nModels = float(len(models))
-
-  # Loop through residues, filtering by Ca - Ca distances
-  caDist = {}
-  for i in range(c):
-
-    # Get atom set from list index
-    ca1 = cAlphas[i]
-    getCoord1 = ca1.findFirstCoord
-
-    # Get max bun Ca to 1H bonds
-    maxBonds1 = maxResBonds[ca1]
-
-    # Get protons
-    hydrogens1 = residueHydrogens[ca1]
-
-    print 'Residue', i+1, len(hydrogens1)
-
-    # Compare residue's atoms with itself and remaining others
-    for j in range(i,c):
-      ca2 = cAlphas[j]
-      getCoord2 = ca2.findFirstCoord
-      maxBonds2 = maxResBonds[ca2]
-
-      # Get Ca-Ca distance
-      dist = 0.0
-      for model in models:
-        coordI = getCoord1(model=model)
-        coordJ = getCoord2(model=model)
-
-        dx = coordI.x-coordJ.x
-        dy = coordI.y-coordJ.y
-        dz = coordI.z-coordJ.z
-        dist += sqrt(dx*dx+dy*dy+dz*dz)
-
-      dist /= nModels
-
-      # Calc max allowable Ca-Ca dist for residues to be in contact
-      maxCaDist = MAX_BOND_LEN*(maxBonds1+maxBonds2) + distThreshold
-
-      # If the residues are far apart then we needn't go any further
-      if dist > maxCaDist:
-        continue
-
-      hydrogens2 = residueHydrogens[ca2]
-
-      # Loop through H-H pairs in these residues
-      for atomSets1, resonance1, heteroType1 in hydrogens1:
-
-        seq1 = list(atomSets1)[0].findFirstAtom().residue.seqCode
-  	# Set up sub-dictionaries for resonance if it has
-  	# not been seen before
-  	if not resonanceDistances.has_key(resonance1):
-  	  resonanceDistances[resonance1] = {}
-
-  	for atomSets2, resonance2, heteroType2 in hydrogens2:
-
-          seq2 = list(atomSets2)[0].findFirstAtom().residue.seqCode
-
-  	  context = (heteroType1, heteroType2)
-
-  	  # Check that the heteroatoms fit the spectrum types
-  	  if not contextDict.get(context):
-  	    continue
-
-  	  # Set up sub-dictionaries for resonance if it has
-  	  # not been seen before
-  	  if not resonanceDistances.has_key(resonance2):
-  	    resonanceDistances[resonance2] = {}
-
-  	  # Get equiv NOE distance between atom sets in ensemble
-  	  noeDist = getAtomSetsDistance(atomSets1, atomSets2,
-  					ensemble, method='noe')
-
-  	  # Store resonance distances, in a reciprocal way
-  	  # so query order is unimportant
-  	  resonanceDistances[resonance1][resonance2] = noeDist
-  	  resonanceDistances[resonance2][resonance1] = noeDist
-
-    if progressBar:
-      progressBar.increment()
-  """
-
-  return resonanceDistances
-
 
 
 def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
                     aliasing=False, progressBar=None):
   """ Descrn:Function to get the ambiguous resonance connectivity
              for peaklists by comparing resonance shifts to peak positions
-	     within tolerances. Currently only the first float in the tolerance
-	     sub-list is used. Tolerance to ignore matching to diagonal peaks.
+             within tolerances. Currently only the first float in the tolerance
+             sub-list is used. Tolerance to ignore matching to diagonal peaks.
              Optional progress bar can be passed in for graphival display.
      Inputs: List of Nmr.PeakLists,
              List of 4-List of (Nmr.DataDim, Float (Tolerance), Float, Float),
-	     Float, memops.gui.ProgressBar
+             Float, memops.gui.ProgressBar
      Output: Dict of Resonance:[Dict of Resonance:Peak],
              Dict of Peak:2-Tuple(Resonance, Resonance)
   """
@@ -2377,7 +2282,7 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
             resonance = shift.resonance
 
             for shift2 in shifts2:
-	      resonance2 = shift2.resonance
+              resonance2 = shift2.resonance
 
               # Accept a chemical shift match only if the resonances
               # are known to be bound together, otherwise they cannot
@@ -2410,7 +2315,7 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
 
             # Double check resonances not same: i.e. diagonal
             if diagonalTolerance:
-	      if resonance1 is resonance0:
+              if resonance1 is resonance0:
                 continue
 
             if resonanceConnectivity.get(resonance0) is None:
@@ -2454,3 +2359,20 @@ def getSoftware(project):
     software = methodStore.newSoftware(name=name, version=version)
 
   return software
+
+def getNoeTolerances(peakList):
+    dimTolerances = []
+    spectrum = peakList.dataSource
+    for dataDim in spectrum.sortedDataDims():
+      analysisDataDim = getAnalysisDataDim(dataDim)
+      tol = analysisDataDim.assignTolerance
+      dimTolerances.append([dataDim, tol, 1, tol])
+    return dimTolerances
+
+def getEnsembles(project):
+  ensembles = []
+  for molSystem in project.molSystems:
+      for ensemble in molSystem.structureEnsembles:
+          ensembles.append((molSystem.code, ensemble.ensembleId, ensemble))
+  ensembles.sort()
+  return [x[2] for x in ensembles]

@@ -1,0 +1,2 @@
+ANALYSIS_STR = "Analysis"
+ANALYSIS_LOWERCASE_STR = 'analysis'

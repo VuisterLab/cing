@@ -52,7 +52,7 @@ class Xeasy( NTdict ):
         self.seq = {}
         resNum = 1
         self.resCount = 0
-        for f in AwkLike( seqFile ):
+        for f in AwkLike( seqFile, commentString='#' ):
             #print '>>', f.dollar[0]
             if (not f.isEmpty() and not f.isComment( '#')):
                 if ( f.dollar[1] in CYANA_NON_RESIDUES         # skip the bloody CYANA non-residue stuff
@@ -84,23 +84,21 @@ class Xeasy( NTdict ):
         self.prot = {}
         self.protCount = 0
         self.error = 0
-        for f in  AwkLike( protFile ):
+        for f in  AwkLike( protFile, commentString='#' ):
             if f.NF == 5:
                 # Xeasy/Cyana atom index
                 index = f.int( 1 )
                 atomName  = f.dollar[4]
                 resNum    = f.int( 5 )
                 if resNum not in self.seq:
-                    NTwarning( 'Xeasy: undefined residue number %d in "%s:%d" (%s)',
-                             resNum, protFile, f.NR, f.dollar[0]
-                           )
+                    NTwarning( 'Xeasy: undefined residue number %d in "%s:%d" (%s)' % (
+                             resNum, protFile, f.NR, f.dollar[0]))
                     self.error = 1
                 else:
                     resName   = self.seq[resNum]
                     if not NTdb.isValidAtomName( resName, atomName, convention):
-                        NTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d',
-                                   protFile, f.NR,  atomName, resName, resNum
-                                )
+                        NTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d' %(
+                                   protFile, f.NR,  atomName, resName, resNum))
                         self.error = 1
                     else:
                         p = NTdict(index     = index,
