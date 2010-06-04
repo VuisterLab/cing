@@ -10,6 +10,12 @@ nb3 is original FT spectrum.
 brsvg_sparky.ucsf is spectrum in UCSF SPARKY format. Can be read by FC in Analysis
 En de orginele meta data staan in:
 http://code.google.com/p/cing/source/browse/trunk/cing/Tests/data/org/1brv/brsvg.clu
+See the end of this file.
+Reading the sparky file into CCPN I see the following parameters working:
+
+Global scale 1.0
+Positive levels:		32530, 45542, 63759, 89262, 124967
+
 SPEC         2     26   1024
   FILE nb3
   NAME nb3
@@ -40,5 +46,13 @@ SPEC         2     26   1024
   PMHI       10.00000      10.00000
 ENDSPC
 
-The peaks were reformatted using 2D example from 2joc and cing's xeasy code.
+The peaks were reformatted using 2D example from cing's xeasy code.
 
+Calibration is done on peak that's top left in publication for amide-alpha of Glu 177
+VAL171 became 14 so offset is 157.
+GLU177 was    20.
+From brsvg.pkr the peak coordinates are 9.049,3.942
+In the spectrum when referenced on middle channel (water) at: 4.5 ppm the same peak is at: 8.602, 3.497
+In [2]: ((9.049 - 8.602) + ( 3.942 -3.497) )/2
+Out[2]: 0.44599999999999973
+So instead of 4.5 for water I'll take: 4.946 and read the prot/peaks again

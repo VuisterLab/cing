@@ -28,30 +28,8 @@ Atom:
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
 from cing.Libs.Geometry import violationAngle
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlimit
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import appendDeepByKeys
-from cing.Libs.NTutils import formatList
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
-from cing.Libs.NTutils import setDeepByKeys
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
-from cing.Libs.fpconst import NaN
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.Libs.html import removePreTagLines
@@ -74,18 +52,7 @@ from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
-from copy import deepcopy
-from numpy.lib.index_tricks import ogrid
-from numpy.lib.twodim_base import histogram2d
-import math
-import sys
-
-#dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-#dbase = shelve.open( dbaseFileName )
-#        histCombined               = dbase[ 'histCombined' ]
-#histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
-#    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-#dbase.close()
+from matplotlib.pylab import * #@UnusedWildImport for most imports
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
@@ -1491,17 +1458,17 @@ def validateDihedralCombinations(project):
         [D1D2_CHK_STR, DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2']
        ]
 
-    tripletIdxList = [-1,0,1]
     for residue in project.molecule.allResidues():
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-#            NTdebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
+            NTdebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
         if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
             resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
-        for checkIdx in range(len(plotDihedral2dLoL)):
+        for checkIdx in range(len(plotDihedral2dLoL)): #TODO: debug
+#        for checkIdx in [2]:
             checkId = plotDihedral2dLoL[checkIdx][0]
 #            NTdebug('Looking at %s %s' % (residue, checkId) )
             dihedralName1 = plotDihedral2dLoL[checkIdx][1]
@@ -1525,12 +1492,15 @@ def validateDihedralCombinations(project):
                 histCtupleBySsAndResType   = hPlot.histd1CtupleBySsAndResTypes
                 doingNewD1D2plot = True
                 triplet = NTlist()
+#                tripletIdxList = [-1,0,1]
+                tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010.
                 for i in tripletIdxList:
                     triplet.append( residue.sibling(i) )
                 if None in triplet:
 #                    NTdebug( 'Skipping residue without triplet %s' % residue)
                     continue
-                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]
+#                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]  # Note that this was a major bug before today June 3, 2010.
+                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in range(3)]
 
             else:
                 NTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
@@ -1573,25 +1543,55 @@ def validateDihedralCombinations(project):
             keyList = [ ssType ]
             keyList += resTypeList
             Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
+#            NTdebug("keyList: %s" % str(keyList))
             if not Ctuple:
                 NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
                 continue
-            c_av, c_sd = Ctuple
+            (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+            keyListQueryStr = str(keyList)
+            if keyListStr != keyListQueryStr:
+                NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
+                continue
+
             if myHist == None:
                 NTerror("Got None for hist for %s" % residue)
                 continue
 
-            myHistP = circularlizeMatrix(myHist) # TODO: cache if this is too slow.
+            myHistP = circularlizeMatrix(myHist) # consider caching if this is too slow.
             for modelIdx in range(modelCountNew):
                 a1 = d1[modelIdx]
                 a2 = d2[modelIdx]
                 # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
                 ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
                 zk = ( ck - c_av ) / c_sd
-#                NTdebug("For ssType %s residue %s model %d with a2 %8.2f a1 %8.2f c_av %8.2f c_sd %8.2f found ck %8.2f zk %8.2f " % (
-#                            ssType,residue,modelIdx,a2, a1,c_av, c_sd,ck,zk))
+                if True: # costly checks to be disabled later.
+#                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
+                    minHist = amin( myHist )
+                    maxHist = amax( myHist )
+#                            sumHist = sum( hist )
+                    zMin = (minHist - c_av) / c_sd
+                    zMax = (maxHist - c_av) / c_sd
+                    msg = "chk %d ssType %s res %20s mdl %d a2 %8.2f a1 %8.2f c_av %8.0f c_sd %8.0f ck %8.0f zk %8.2f h- %8.0f h+ %8.0f z- %8.2f z+ %8.2f" % (
+                                checkIdx,
+                                ssType,residue,modelIdx,a2, a1,
+                                c_av, c_sd,ck,zk,
+                                minHist, maxHist, zMin, zMax)
+                    if maxHist < c_av:
+                        NTerror(msg + " maxHist < c_av")
+                    elif maxHist < ck:
+                        NTerror(msg + " maxHist < ck")
+                    elif minHist > 110.: # was found in GLY ASN LEU
+                        NTwarning(msg + " minHist > 110")
+                    elif hisMin != minHist:
+                        NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
+                    elif hisMax != maxHist:
+                        NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                    else:
+                        NTdebug(msg)
                 ensembleValueList[modelIdx] = zk
-
+            # end for modelIdx
+        # end for checkIdx
+    # end for residue
 #end def
 
 
@@ -1704,7 +1704,7 @@ def getRescaling(valuesByEntrySsAndResType):
                 if his == None:
                     NTdebug('when testing not all residues are present in smaller sets.')
                     continue
-                (c_av, c_sd) = getEnsembleAverageAndSigmaFromHistogram( his )
+                (c_av, c_sd, hisMin, hisMax) = getEnsembleAverageAndSigmaFromHistogram( his )
 #                NTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
                 if c_sd == None:
                     NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
@@ -1712,6 +1712,18 @@ def getRescaling(valuesByEntrySsAndResType):
                 if c_sd == 0.:
                     NTdebug('%s Got zero c_sd, ignoring histogram. This should only occur in smaller sets.' % entryId)
                     continue
+                if True: # disable when done debugging.
+                    keyList = [ ssType, resType ]
+                    Ctuple = getDeepByKeysOrAttributes( hPlot.histRamaCtupleBySsAndResType, *keyList)
+                    if not Ctuple:
+                        NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
+                        continue
+                    (c_av_stored, c_sd_stored, minHist, maxHist, keyListStr) = Ctuple #@UnusedVariable
+                    if hisMin != minHist:
+                        NTerror(" hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
+                    elif hisMax != maxHist:
+                        NTerror(" hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                    # TODO: extend checks to stored; then when debugged rewrite the code to use only the stored.
                 for k in range(len(angleList0)):
                     ck = getValueFromHistogramUsingInterpolation(
                         histRamaBySsAndResTypeExcludingEntry[ssType][resType],

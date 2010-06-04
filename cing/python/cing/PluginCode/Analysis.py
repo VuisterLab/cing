@@ -110,7 +110,6 @@ def runRpf(project):
         return None
     return project
 
-
 # register the function
 methods = [ (runRpf, None),
            ]

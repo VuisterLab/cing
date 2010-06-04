@@ -26,6 +26,7 @@ import os
 import pydoc
 import re
 import sys
+from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
 
 CONSENSUS_STR = 'consensus'
 
@@ -2199,7 +2200,9 @@ class NTvalue(NTdict):
     Simple arithmic: +, -, *, /, ==, !=, >, >=, <, <=,
     fmt2 will be used when value exists but error does not.
     """
-    def __init__(self, value, error=0.0, fmt='%s (+- %s)', fmt2='%s', **kwds):
+    # JFD notes that the error should not be zero by default; checking for trouble because of change.
+    # GWV Please check; will this matter that you know?
+    def __init__(self, value, error=NaN, fmt='%s (+- %s)', fmt2='%s', **kwds):
         kwds.setdefault('__CLASS__', 'NTvalue')
         NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
         # always map av and sd as alternatives for value and error, set default n
@@ -4389,7 +4392,9 @@ Rob might have caught this by requiring c_av be at least 2.0.
 #    NTdebug("sumsdsq: %8.3f" % sumsdsq)
     c_sd = sumsdsq / (sum-1)
     c_sd = math.sqrt(c_sd)
-    return (c_av, c_sd)
+    hisMin = amin(his)
+    hisMax = amax(his)
+    return (c_av, c_sd, hisMin, hisMax)
 
 def floatFormat(v, format):
     ''' Just check for nans.'''

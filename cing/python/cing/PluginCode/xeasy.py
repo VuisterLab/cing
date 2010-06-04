@@ -405,8 +405,16 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
         #end if
         fprintf( fout, '%1d U         ', color )
 
-        fprintf( fout, '%10.3e %9.2e ', peak.height.value, peak.height.error )
-        fprintf( fout, '-   0 ' )
+        # a zero or nan in xeasy will prevent FC from reading the actual height.
+        error = peak.height.error
+        if isNaN( error ):
+            error = 1.0
+        fprintf( fout, '%10.3e %9.2e ', peak.height.value, error )
+        # the dash character indicates the peaks are not integrated which prevents FC from
+        # reading the height. An a stands for automatic
+        # see: ccp.format.xeasy.peaksIO#read
+#        fprintf( fout, '-   0 ' )
+        fprintf( fout, 'a   0 ' )
         for i in range (X_AXIS, dimension):
             if peak.isAssigned( i ):
                 fprintf( fout, '%4d ', peak.resonances[i].atom.xeasyIndex )

@@ -14,6 +14,7 @@ Format input:
  20,5,20,1
 """
 from cing.Libs.NTutils import Lister
+from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import readTextFromFile
@@ -86,18 +87,18 @@ class Regine(Lister):
             # work on line 5 for peak volume
             i += 3
             line = splitLineList[i]
-#            NTdebug("Working on volume line 5 (%d) : [%s]" % (i,line))
             wordList = line.split(',')
-            wordList = line.split(',')
-            volume = float(wordList[ - 1])
+            volume = float(wordList[ -1])
+#            NTdebug("Working on volume [%s] from line 5 (%d) : [%s]" % (volume, i,line))
 
             peak = Peak(self.dimension,
                   positions = positions,
+                  height = volume, # this is a work around the fact that later on xeasy only uses height and misses volume.
                   volume = volume,
                   resonances = resonances)
 
             # Use the Lister class for a string representation.
-#            NTdebug("Found peak: %r" % peak)
+            NTdebug("Found peak: %r" % peak)
             peakList.append( peak )
             # skip to next line 1
             i += 2

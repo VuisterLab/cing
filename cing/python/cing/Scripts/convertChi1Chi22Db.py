@@ -35,22 +35,22 @@ Kleywegt et al. Databases in protein crystallography. Acta Crystallogr D Biol
 Crystallogr (1998) vol. 54 (Pt 6 Pt 1) pp. 1119-31
 """
 
-file_name_base  = 'chi1chi2_wi_db'
+file_name_base = 'chi1chi2_wi_db'
 # .gz extension is appended in the code.
-cvs_file_name   = file_name_base + '.csv'
+cvs_file_name = file_name_base + '.csv'
 dbase_file_name = file_name_base + '.dat'
-dir_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf' )
-cvs_file_abs_name   = os.path.join( dir_name, cvs_file_name )
-dbase_file_abs_name = os.path.join( dir_name, dbase_file_name )
+dir_name = os.path.join(cingDirData, 'PluginCode', 'WhatIf')
+cvs_file_abs_name = os.path.join(dir_name, cvs_file_name)
+dbase_file_abs_name = os.path.join(dir_name, dbase_file_name)
 
-dihedralName1= "CHI1"
-dihedralName2= "CHI2"
+dihedralName1 = "CHI1"
+dihedralName2 = "CHI2"
 plotparams1 = plotparams360
 plotparams2 = plotparams360
 xRange = (plotparams1.min, plotparams1.max)
 yRange = (plotparams2.min, plotparams2.max)
-isRange360=True
-xGrid,yGrid = xGrid360,yGrid360
+isRange360 = True
+xGrid, yGrid = xGrid360, yGrid360
 bins = bins360
 
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
@@ -59,14 +59,14 @@ os.chdir(cingDirTmp)
 
 def main():
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
-    gunzip( cvs_file_abs_name_gz )
+    gunzip(cvs_file_abs_name_gz)
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
-    valuesBySsAndResType       = {}
-    histJaninBySsAndResType         = {}
+    valuesBySsAndResType = {}
+    histJaninBySsAndResType = {}
     histJaninBySsAndCombinedResType = {}
 #    histByCombinedSsAndResType = {}
     histJaninCtupleBySsAndResType = {}
-    valuesByEntrySsAndResType       = {}
+    valuesByEntrySsAndResType = {}
     hrange = (xRange, yRange)
 
     rowCount = 0
@@ -90,15 +90,15 @@ def main():
         if not inRange(chi2):
             NTerror("chi2 not in range for row: %s" % `row`)
             return
-        if not common20AADict.has_key( resType):
+        if not common20AADict.has_key(resType):
             NTdebug("Residue not in common 20 for row: %s" % `row`)
             rowCount -= 1
             continue
 
-        appendDeepByKeys(valuesBySsAndResType,      chi1,          ssType,resType,'chi1' )
-        appendDeepByKeys(valuesByEntrySsAndResType, chi1, entryId, ssType,resType,'chi1' )
-        appendDeepByKeys(valuesBySsAndResType,      chi2,          ssType,resType,'chi2' )
-        appendDeepByKeys(valuesByEntrySsAndResType, chi2, entryId, ssType,resType,'chi2' )
+        appendDeepByKeys(valuesBySsAndResType, chi1, ssType, resType, 'chi1')
+        appendDeepByKeys(valuesByEntrySsAndResType, chi1, entryId, ssType, resType, 'chi1')
+        appendDeepByKeys(valuesBySsAndResType, chi2, ssType, resType, 'chi2')
+        appendDeepByKeys(valuesByEntrySsAndResType, chi2, entryId, ssType, resType, 'chi2')
 #        NTdebug('resType,ssType,chi1: %4s %1s %s' % (resType,ssType,floatFormat(chi1, "%6.1f")))
 #        NTdebug('resType,ssType,chi2: %4s %1s %s' % (resType,ssType,floatFormat(chi2, "%6.1f")))
     del(reader) # closes the file handles
@@ -111,19 +111,20 @@ def main():
             if chi1 and chi2:
                 hist2d, _xedges, _yedges = histogram2d(
                     chi2, chi1,
-                    bins = binCount,
-                    range= hrange)
-                setDeepByKeys( histJaninBySsAndResType, hist2d, ssType, resType )
-                cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
-                (c_av, c_sd) = cTuple
-                NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
+                    bins=binCount,
+                    range=hrange)
+                setDeepByKeys(histJaninBySsAndResType, hist2d, ssType, resType)
+                cTuple = getEnsembleAverageAndSigmaFromHistogram(hist2d)
+                (c_av, c_sd, hisMin, hisMax) = cTuple
+                cTuple += tuple([str([ssType, resType])]) # append the hash keys as a way of id.
+                NTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, c_av, c_sd, hisMin, hisMax))
                 if c_sd == None:
                     NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                     continue
                 if c_sd == 0.:
                     NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                     continue
-                setDeepByKeys( histJaninCtupleBySsAndResType, cTuple, ssType, resType)
+                setDeepByKeys(histJaninCtupleBySsAndResType, cTuple, ssType, resType)
 
     for ssType in valuesBySsAndResType.keys():
         chi1 = []
@@ -137,10 +138,10 @@ def main():
             hist2d, _xedges, _yedges = histogram2d(
                 chi2, # Note that the x is the chi2 for some stupid reason,
                 chi1, # otherwise the imagery but also the [row][column] notation is screwed.
-                bins = binCount,
-                range= hrange)
+                bins=binCount,
+                range=hrange)
     #        hist2d = zscaleHist( hist2d, Cav, Csd )
-            setDeepByKeys( histJaninBySsAndCombinedResType, hist2d, ssType )
+            setDeepByKeys(histJaninBySsAndCombinedResType, hist2d, ssType)
 
     # Throws a verbose error message on python 2.6.3 as per issue http://code.google.com/p/cing/issues/detail?id=211
     # Using Pickle instead
@@ -152,10 +153,10 @@ def main():
     output = open(dbase_file_abs_name, 'wb')
     dbase = {}
     dbase[ 'histJaninBySsAndCombinedResType' ] = histJaninBySsAndCombinedResType
-    dbase[ 'histJaninBySsAndResType' ]         = histJaninBySsAndResType
-    dbase[ 'histJaninCtupleBySsAndResType' ]   = histJaninCtupleBySsAndResType
+    dbase[ 'histJaninBySsAndResType' ] = histJaninBySsAndResType
+    dbase[ 'histJaninCtupleBySsAndResType' ] = histJaninCtupleBySsAndResType
     histJaninCtupleBySsAndResType
-    cPickle.dump(dbase, output, -1)
+    cPickle.dump(dbase, output, 2)
     output.close()
 
 
