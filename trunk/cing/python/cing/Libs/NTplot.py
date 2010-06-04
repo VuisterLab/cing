@@ -1,28 +1,16 @@
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NThistogram
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import isAlmostEqual
-from cing.Libs.NTutils import limitToRange
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
 from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqDssp import to3StateUpper
-#from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.PluginCode.required.reqWhatif import INOCHK_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.core.constants import SCALE_BY_MAX
-from cing.core.constants import SCALE_BY_SUM
-from cing.core.constants import VALUE_LIST_STR
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
-from copy import deepcopy
 from matplotlib import pyplot
 from matplotlib.patches import Ellipse
 from matplotlib.patches import Patch
@@ -890,12 +878,15 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
 
-    def dihedralComboPlot(self, histList, minPercentage =  2.0, maxPercentage = 20.0, scaleBy = SCALE_BY_MAX ):
+    def dihedralComboPlot(self, histList,
+            minPercentage =  MIN_PERCENTAGE_RAMA, maxPercentage = MAX_PERCENTAGE_RAMA, scaleBy = SCALE_BY_MAX ):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
         Return True on error.
 
-        Input histogram should be the bare counts using floats.
+        Input histogram list should be the bare counts using floats.
+        The order of this list should be:  [' ', 'H', 'S'] for 'green',   'blue',   'yellow'
+        So sheet (yellow) will be plotted on top.
         This routine used to calculate the c_dbav, s_dbav but no more.
 
         scaleBy can be Max, or Sum

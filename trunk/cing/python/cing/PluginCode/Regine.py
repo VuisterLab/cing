@@ -14,7 +14,6 @@ Format input:
  20,5,20,1
 """
 from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
 from cing.Libs.NTutils import NTmessage
 from cing.Libs.NTutils import NTpath
 from cing.Libs.NTutils import readTextFromFile
@@ -98,7 +97,7 @@ class Regine(Lister):
                   resonances = resonances)
 
             # Use the Lister class for a string representation.
-            NTdebug("Found peak: %r" % peak)
+#            NTdebug("Found peak: %r" % peak)
             peakList.append( peak )
             # skip to next line 1
             i += 2

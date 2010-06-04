@@ -1501,7 +1501,6 @@ def validateDihedralCombinations(project):
                     continue
 #                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]  # Note that this was a major bug before today June 3, 2010.
                 resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in range(3)]
-
             else:
                 NTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
                 return None
@@ -1556,6 +1555,11 @@ def validateDihedralCombinations(project):
             if myHist == None:
                 NTerror("Got None for hist for %s" % residue)
                 continue
+            if True: # costly checks to be disabled later.
+                minHist = amin( myHist )
+                maxHist = amax( myHist )
+                zMin = (minHist - c_av) / c_sd
+                zMax = (maxHist - c_av) / c_sd
 
             myHistP = circularlizeMatrix(myHist) # consider caching if this is too slow.
             for modelIdx in range(modelCountNew):
@@ -1565,12 +1569,8 @@ def validateDihedralCombinations(project):
                 ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
                 zk = ( ck - c_av ) / c_sd
                 if True: # costly checks to be disabled later.
+#                if checkIdx == 2: # costly checks to be disabled later.
 #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
-                    minHist = amin( myHist )
-                    maxHist = amax( myHist )
-#                            sumHist = sum( hist )
-                    zMin = (minHist - c_av) / c_sd
-                    zMax = (maxHist - c_av) / c_sd
                     msg = "chk %d ssType %s res %20s mdl %d a2 %8.2f a1 %8.2f c_av %8.0f c_sd %8.0f ck %8.0f zk %8.2f h- %8.0f h+ %8.0f z- %8.2f z+ %8.2f" % (
                                 checkIdx,
                                 ssType,residue,modelIdx,a2, a1,

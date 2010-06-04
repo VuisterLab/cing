@@ -3001,7 +3001,7 @@ Residue class: Defines residue properties
                 continue
         #end for
         if missingCoordinates:
-            NTdebug( 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self)           
+            NTdebug( 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self)
             return
 
 
@@ -3032,16 +3032,23 @@ Residue class: Defines residue properties
         """
 
         triplet = NTlist()
-        for i in [-1,0,1]:
+        tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010. Matches the one in
+        # cing.core.validate#validateDihedralCombinations
+
+#        for i in [-1,0,1]:
+        for i in tripletIdxList:
             triplet.append( self.sibling(i) )
 
         if None in triplet:
 #            NTdebug( 'Skipping residue without triplet %s' % self)
             return []
 
-        resTypePrev = getDeepByKeys(triplet[-1].db.nameDict, IUPAC)
+#        resTypePrev = getDeepByKeys(triplet[-1].db.nameDict, IUPAC) # bug 4 fixed on June 4, 2010
+#        resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
+#        resTypeNext = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
+        resTypePrev = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
         resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
-        resTypeNext = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
+        resTypeNext = getDeepByKeys(triplet[ 2].db.nameDict, IUPAC)
 
         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
 #        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
@@ -3077,7 +3084,7 @@ Residue class: Defines residue properties
                     continue
 
 #                NTdebug("Processing ssType: %s" % ssType)
-                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # y-axis
+                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
                 hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
                 if hist1 == None:
 #                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))

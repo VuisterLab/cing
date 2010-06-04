@@ -1,6 +1,6 @@
 """
 Unit test
-python $CINGROOT/python/cing/PluginCode/test/test_validate.py
+python $CINGROOT/python/cing/core/test/test_validate.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -32,7 +32,7 @@ class AllChecks(TestCase):
             doProcheck = False
             doWattos = False
             doTalos = False
-            nmodels = 2
+            nmodels = 1
         pdbConvention = CYANA
         restraintsConvention = CYANA
         doValidate = True

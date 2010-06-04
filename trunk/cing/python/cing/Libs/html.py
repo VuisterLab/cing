@@ -435,7 +435,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         # depending on doOnlyOverall it will actually return an array of myHist.
         myHist = residue.getTripletHistogramList( doOnlyOverall = False )
         if myHist == None:
-            NTerror("Encountered an error getting the hist for %s" % residue)
+            NTdebug("Failed to get the d1d2 hist for %s" % residue)
             return None
         if len(myHist) == 0:
 #            NTdebug("Found no histogram for %s" % residue)
@@ -448,7 +448,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             else:
                 myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
             if myHist == None:
-                NTerror("Encountered an error getting the hist for %s" % residue)
+                NTdebug("Failed to get the non-d1d2 hist for %s" % residue)
                 return None
         #            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(myHist)
