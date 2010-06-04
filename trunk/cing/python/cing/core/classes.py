@@ -241,6 +241,7 @@ Project: Top level Cing project class
 
 #        self.dihedralByResidue = None # done above.
 
+
         # store reference to self
         #self[name] = self
         self.objectPath = self.path(cingPaths.project)
@@ -494,7 +495,7 @@ Project: Top level Cing project class
 #                    NTdebug("extracted: " + itar.name)
                 tar.close()
                 if not os.path.exists(possibleProjectDir):
-                    NTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"\n', name)
+                    NTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
                     return None
             else:
                 if not os.path.exists(possibleTgz):
@@ -506,19 +507,19 @@ Project: Top level Cing project class
             if not root:
                 return None
             if not os.path.exists(root):
-                NTerror('Project.open: unable to open Project "%s"\n', name)
+                NTerror('Project.open: unable to open Project "%s"', name)
                 return None
             #end if
 
             # Restore Project info from xml-file
             pfile = os.path.join(root, cingPaths.project)
             if not os.path.exists(pfile):
-                NTerror('Project.open: missing Project file "%s"\n', pfile)
+                NTerror('Project.open: missing Project file "%s"', pfile)
                 return None
             #end if
             pr = XML2obj(pfile)
             if pr == None:
-                NTerror('Project.open: error parsing Project file "%s"\n', pfile)
+                NTerror('Project.open: error parsing Project file "%s"', pfile)
                 return None
             #end if
             # This allows renaming/relative addressing at the shell level
@@ -592,7 +593,7 @@ Project: Top level Cing project class
             NTmessage('Opened old project %s', pr)
 
         else:
-            NTerror('ERROR Project.open: invalid status option "%s"\n', status)
+            NTerror('ERROR Project.open: invalid status option "%s"', status)
             return None
         #end if
 
@@ -1698,7 +1699,7 @@ class DistanceRestraint(Restraint):
         if missesId:
             self.atomPairs.append((pair[0], pair[1]))
         else:
-            # gv 24 Jul: just use atoms id, they are unique and ordered
+        	# gv 24 Jul: just use atoms id, they are unique and ordered
             if pair[0].id < pair[1].id:
                 self.atomPairs.append((pair[0], pair[1]))
             else:
