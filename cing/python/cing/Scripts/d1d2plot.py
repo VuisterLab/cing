@@ -405,12 +405,12 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
     for resType in common20AAList:
         for resTypePrev in common20AAList:
             for resTypeNext in common20AAList:
-                if resType != 'TYR':
+                if resType != 'GLY':
                     continue
-                if resTypePrev != 'LEU':
-                    continue
-#                if resTypeNext != 'GLY':
+#                if resTypePrev != 'LEU':
 #                    continue
+                if resTypeNext != 'ASN':
+                    continue
 
 
                 # Plot a density background
@@ -431,9 +431,9 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                 plotparams1 = plotParameters.getdefault(dihedralName1, 'dihedralDefault')
                 plotparams2 = plotParameters.getdefault(dihedralName2, 'dihedralDefault')
 
-                # e.g. ALA-VAL-THR
-                hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # VAL,ALA
-                hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType) # THR VAL
+                # e.g. GLU-GLY-ASN like in 1brv around Gly178
+                hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # 
+                hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType) #L
                 if hist1 == None:
                     NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
                     continue
@@ -453,14 +453,17 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                     titleStr += '\n'
                     ssTypeList = hPlot.histd1BySsAndResTypes.keys() #@UndefinedVariable
                     ssTypeList.sort() # in place sort to: space, H, S
+                    # Code looks very similar to that in cing.core.molecule.Residue#getTripletHistogramList
+                    # but here there is no molecule present.
                     for ssType in ssTypeList:
-                        hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
-                        hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypeNext)
+                        hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
+#                        hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypeNext) # this was bug 3 before June 4, 2010
+                        hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType) # y-axis
                         if hist1 == None:
-                            NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
+                            NTdebug('skipping for x-axis hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
                             continue
                         if hist2 == None:
-                            NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+                            NTdebug('skipping for y-axis hist2 is empty for [%s] [%s] [%s]' % (ssType, resTypeNext, resType ))
                             continue
 
                         sumh1 = sum(hist1)
@@ -473,38 +476,40 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                         m2 = mat(hist2, dtype=float)
                         m2 = m2.transpose()
                         hist = multiply(m1,m2)
-                        if doPrintAvgOnly:
-                            keyList = [ ssType, resType, resTypePrev, resTypeNext]
-                            Ctuple = getDeepByKeysOrAttributes( hPlot.histd1CtupleBySsAndResTypes, *keyList)
-                            if not Ctuple:
-                                NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
-                                continue
-                            (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
 
-                            minHist = amin( hist )
-                            maxHist = amax( hist )
+                        keyList = [ ssType, resType, resTypePrev, resTypeNext]
+                        Ctuple = getDeepByKeysOrAttributes( hPlot.histd1CtupleBySsAndResTypes, *keyList)
+                        if not Ctuple:
+                            NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
+                            continue
+                        (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+
+                        minHist = amin( hist )
+                        maxHist = amax( hist )
 #                            sumHist = sum( hist )
-                            zMin = (minHist - c_av) / c_sd
-                            zMax = (maxHist - c_av) / c_sd
+                        zMin = (minHist - c_av) / c_sd
+                        zMax = (maxHist - c_av) / c_sd
 
-                            keyListQueryStr = str(keyList)
-                            if keyListStr != keyListQueryStr:
-                                NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
-                                continue
-
-                            msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % (ssType, resTypePrev, resType, resTypeNext,
-                                c_av, c_sd, minHist, maxHist, zMin, zMax )
-                            if maxHist < c_av:
-                                NTerror(msg + " maxHist < c_av")
-                            elif hisMin != minHist:
-                                NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
-                            elif hisMax != maxHist:
-                                NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
-                            else:
-                                NTmessage("       " + msg)
+                        keyListQueryStr = str(keyList)
+                        if keyListStr != keyListQueryStr:
+                            NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
                             continue
 
+                        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % (ssType, resTypePrev, resType, resTypeNext,
+                            c_av, c_sd, minHist, maxHist, zMin, zMax )
+                        if maxHist < c_av:
+                            NTerror(msg + " maxHist < c_av")
+                        elif hisMin != minHist:
+                            NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
+                        elif hisMax != maxHist:
+                            NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                        else:
+                            NTmessage("       " + msg)
+
                         histList.append(hist)
+
+                if doPrintAvgOnly: # skip plot generation.
+                    continue
 
                 ps = NTplotSet() # closes any previous plots
                 ps.hardcopySize = (500, 500)
@@ -883,7 +888,7 @@ if __name__ == "__main__":
         plotDihedralD1_1d()
     if True:
 #        doOnlyOverall = False
-        plotDihedralD1_2d(False,  doPrintAvgOnly = True)
+        plotDihedralD1_2d(False,  doPrintAvgOnly = False)
 #        plotDihedralD1_2d(False)
     if False:
         m = plotHistogramOverall()
