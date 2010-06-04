@@ -111,7 +111,7 @@ def main():
         n = len(lineListSorted)
         bad_count = int(round((n * DEFAULT_BFACTOR_PERCENTAGE_FILTER) / 100.))
         to_remove_count = n-bad_count
-        NTmessage("Removing at least %d from %d residues" % (bad_count,n))
+#        NTmessage("Removing at least %d from %d residues" % (bad_count,n))
         badIdxList = [lineItem[IDX_COLUMN] for lineItem in lineListSorted[to_remove_count:n]]
         iList = range(n)
         iList.reverse()
@@ -119,15 +119,15 @@ def main():
             lineItem = lineList[i]
             max_bfactor = float(lineItem[BFACTOR_COLUMN])
             if max_bfactor > DEFAULT_MAX_BFACTOR:
-                NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
+#                NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
                 del lineList[i] # TODO: check if indexing is still right or we shoot in the foot.
                 continue
             if i in badIdxList:
-                NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
+#                NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
                 del lineList[i]
                 continue
         removed_count = n - len(lineList)
-        NTdebug("Reduced list by %d" % removed_count)
+#        NTdebug("Reduced list by %d" % removed_count)
         if removed_count < bad_count:
             NTwarning("Failed to remove at least %d residues" % bad_count)
 
@@ -151,7 +151,7 @@ def main():
             d1 = d1.strip()
             d1 = floatParse(d1)
             if isNaN(d1):
-                NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
+#                NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
                 continue
             if not inRange(d1):
                 NTerror("d1 not in range for row: %s" % `row`)
@@ -190,7 +190,7 @@ def main():
         keyListSorted2 = valueBySsAndResTypes[ssType].keys();
         keyListSorted2.sort()
         for resType in keyListSorted2:
-            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+#            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
             keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
             keyListSorted3.sort()
             for prevResType in keyListSorted3:
@@ -204,13 +204,13 @@ def main():
                 setDeepByKeys(histd1BySsAndResTypes, hist1d, ssType, resType, prevResType)
         # Now that they are all in we can redo this.
         for resType in keyListSorted2:
-            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+#            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
             keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
             keyListSorted3.sort()
             for resTypePrev in keyListSorted3:
                 keyListSorted4 = keyListSorted3[:] # take a copy
                 for resTypeNext in keyListSorted4:
-                    hist1 = getDeepByKeys(histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                    hist1 = getDeepByKeys(histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
                     hist2 = getDeepByKeys(histd1BySsAndResTypes, ssType, resTypeNext, resType)
                     if hist1 == None:
                         NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
@@ -224,8 +224,9 @@ def main():
                     hist2d = multiply(m1,m2)
 
                     cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
-                    (c_av, c_sd) = cTuple
-                    NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
+                    (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
+                    cTuple += tuple([str([ssType, resType, resTypePrev, resTypeNext])]) # append the hash keys as a way of id.
+#                    NTdebug("For ssType %s residue types %s %s %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, resTypePrev, resTypeNext, c_av, c_sd, hisMin, hisMax))
                     if c_sd == None:
                         NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                         continue
@@ -262,7 +263,7 @@ def main():
     dbase[ 'histd1BySs' ] = histd1BySs # 4 kb
     dbase[ 'histd1' ] = histd1 #  4 kb
 
-    cPickle.dump(dbase, output, -1)
+    cPickle.dump(dbase, output, 2)
     output.close()
 
 

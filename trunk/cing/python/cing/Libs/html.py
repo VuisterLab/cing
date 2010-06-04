@@ -2,7 +2,6 @@
 Adds html generation methods
 """
 
-from cing import NaNstring
 from cing import authorList
 from cing import cingDirData
 from cing import cingRevision
@@ -25,28 +24,8 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTmkdir
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTprogressIndicator
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTzap
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys #@UnresolvedImport
-from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import list2asci #@UnusedImport
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
-from cing.Libs.find import find
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.find import find #@Reimport Important to overwrite the one imported via NTutils otherwise from string  import find
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqNih import NUMBER_OF_SD_TALOS
 from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
@@ -61,7 +40,6 @@ from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
 import cPickle
-import os
 import shutil
 
 
@@ -291,21 +269,21 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
         self.histRamaCtupleBySsAndResType    = None
         self.histRamaBySsAndCombinedResType  = None
         self.histJaninBySsAndResType         = None
-        self.histJaninCtupleBySsAndResType         = None
+        self.histJaninCtupleBySsAndResType   = None
         self.histJaninBySsAndCombinedResType = None
-        self.histd1BySsAndResTypes          = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
+        self.histd1BySsAndResTypes           = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
         # NB hasing is: ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
         #               3        20        20        20 = 2400 tuples of 2 floats precalculated.
-        self.histd1CtupleBySsAndResTypes          = None
-        self.histd1ByResTypes  = None
-        self.histd1BySs  = None
-        self.histd1  = None
+        self.histd1CtupleBySsAndResTypes    = None
+        self.histd1ByResTypes               = None
+        self.histd1BySs                     = None
+        self.histd1                         = None
 
         self.histDir = os.path.join( cingDirData, 'PluginCode', 'WhatIf')
-#        self.initHist()
 
     def initHist(self):
         if True:
+#            NTdebug("Loading Ramachandran histograms")
             dbase_file_abs_name =  os.path.join( self.histDir, 'phipsi_wi_db.dat' )
             #dbaseTemp = shelve.open( dbase_file_abs_name )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
@@ -324,6 +302,7 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
 #            NTdebug("Rama [H][HIS] sum: %d" % sumHist)
 
         if True:
+#            NTdebug("Loading Janin histograms")
             dbase_file_abs_name = os.path.join( self.histDir, 'chi1chi2_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
@@ -335,6 +314,7 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
 #            NTdebug("Janin [H][HIS] sum: %d" % sumHist)
 
         if True:
+#            NTdebug("Loading D1D2 histograms")
             dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)

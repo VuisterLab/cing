@@ -6,17 +6,11 @@ make sure the projects to run are already in the tmpdir.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import solidLine
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import hPlot
 from cing.Libs.html import makeDihedralPlot
 from cing.Libs.matplotlibExt import blue_inv
@@ -34,7 +28,6 @@ from cing.core.molecule import common20AAList
 from cing.core.parameters import plotParameters
 from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
-import os
 import profile
 import pstats
 
@@ -393,7 +386,7 @@ def plotDihedralD1_1d():
             ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
 
-def plotDihedralD1_2d(doOnlyOverall = True):
+def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
     dihedralName1 = 'Cb4N'
     dihedralName2 = 'Cb4C'
     graphicsFormat = "png"
@@ -412,19 +405,19 @@ def plotDihedralD1_2d(doOnlyOverall = True):
     for resType in common20AAList:
         for resTypePrev in common20AAList:
             for resTypeNext in common20AAList:
-#                if resType != 'GLY':
+                if resType != 'TYR':
+                    continue
+                if resTypePrev != 'LEU':
+                    continue
+#                if resTypeNext != 'GLY':
 #                    continue
-                if resTypePrev != 'ALA':
-                    continue
-                if resTypeNext != 'ARG':
-                    continue
 
 
                 # Plot a density background
                 histList = []
 
                 titleStr = 'd1d2 %s-%s-%s' % (resTypePrev, resType, resTypeNext)
-                NTmessage("plotting: %s" % titleStr)
+#                NTmessage("plotting: %s" % titleStr)
 
 #                ps = NTplotSet() # closes any previous plots
 #                ps.hardcopySize = (500, 500)
@@ -438,17 +431,6 @@ def plotDihedralD1_2d(doOnlyOverall = True):
                 plotparams1 = plotParameters.getdefault(dihedralName1, 'dihedralDefault')
                 plotparams2 = plotParameters.getdefault(dihedralName2, 'dihedralDefault')
 
-#                x.limit(plotparams1.min, plotparams1.max)
-#                y.limit(plotparams2.min, plotparams2.max)
-
-#                plot = NTplot(title=titleStr,
-#                  xRange=(plotparams1.min, plotparams1.max),
-#                  xTicks=range(int(plotparams1.min), int(plotparams1.max + 1), plotparams1.ticksize),
-#                  xLabel=dihedralName1,
-#                  yRange=(plotparams2.min, plotparams2.max),
-#                  yTicks=range(int(plotparams2.min), int(plotparams2.max + 1), plotparams2.ticksize),
-#                  yLabel=dihedralName2)
-#                ps.addPlot(plot)
                 # e.g. ALA-VAL-THR
                 hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # VAL,ALA
                 hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType) # THR VAL
@@ -491,6 +473,37 @@ def plotDihedralD1_2d(doOnlyOverall = True):
                         m2 = mat(hist2, dtype=float)
                         m2 = m2.transpose()
                         hist = multiply(m1,m2)
+                        if doPrintAvgOnly:
+                            keyList = [ ssType, resType, resTypePrev, resTypeNext]
+                            Ctuple = getDeepByKeysOrAttributes( hPlot.histd1CtupleBySsAndResTypes, *keyList)
+                            if not Ctuple:
+                                NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
+                                continue
+                            (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+
+                            minHist = amin( hist )
+                            maxHist = amax( hist )
+#                            sumHist = sum( hist )
+                            zMin = (minHist - c_av) / c_sd
+                            zMax = (maxHist - c_av) / c_sd
+
+                            keyListQueryStr = str(keyList)
+                            if keyListStr != keyListQueryStr:
+                                NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
+                                continue
+
+                            msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % (ssType, resTypePrev, resType, resTypeNext,
+                                c_av, c_sd, minHist, maxHist, zMin, zMax )
+                            if maxHist < c_av:
+                                NTerror(msg + " maxHist < c_av")
+                            elif hisMin != minHist:
+                                NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
+                            elif hisMax != maxHist:
+                                NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                            else:
+                                NTmessage("       " + msg)
+                            continue
+
                         histList.append(hist)
 
                 ps = NTplotSet() # closes any previous plots
@@ -868,9 +881,11 @@ if __name__ == "__main__":
             plotForEntry(entryId)
     if False:
         plotDihedralD1_1d()
-    if False:
-#        doOnlyOverall = False
-        plotDihedralD1_2d(False)
-#        plotDihedralD1_2d(False)
     if True:
+#        doOnlyOverall = False
+        plotDihedralD1_2d(False,  doPrintAvgOnly = True)
+#        plotDihedralD1_2d(False)
+    if False:
         m = plotHistogramOverall()
+    if False:
+        plotDihedralD1D2()

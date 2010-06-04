@@ -34,22 +34,22 @@ Hooft et al. Objectively judging the quality of a protein structure from a
 Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
 """
 
-file_name_base  = 'phipsi_wi_db'
+file_name_base = 'phipsi_wi_db'
 # .gz extension is appended in the code.
-cvs_file_name   = file_name_base + '.csv'
+cvs_file_name = file_name_base + '.csv'
 dbase_file_name = file_name_base + '.dat'
-dir_name = os.path.join( cingDirData, 'PluginCode', 'WhatIf' )
-cvs_file_abs_name   = os.path.join( dir_name, cvs_file_name )
-dbase_file_abs_name = os.path.join( dir_name, dbase_file_name )
+dir_name = os.path.join(cingDirData, 'PluginCode', 'WhatIf')
+cvs_file_abs_name = os.path.join(dir_name, cvs_file_name)
+dbase_file_abs_name = os.path.join(dir_name, dbase_file_name)
 
-dihedralName1= "PHI"
-dihedralName2= "PSI"
+dihedralName1 = "PHI"
+dihedralName2 = "PSI"
 plotparams1 = plotparams180
 plotparams2 = plotparams180
 xRange = (plotparams1.min, plotparams1.max)
 yRange = (plotparams2.min, plotparams2.max)
-isRange360=False
-xGrid,yGrid = xGrid180,yGrid180
+isRange360 = False
+xGrid, yGrid = xGrid180, yGrid180
 bins = bins180
 
 #pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
@@ -58,14 +58,14 @@ os.chdir(cingDirTmp)
 
 def main():
     cvs_file_abs_name_gz = cvs_file_abs_name + '.gz'
-    gunzip( cvs_file_abs_name_gz )
+    gunzip(cvs_file_abs_name_gz)
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
-    valuesBySsAndResType       = {}
-    histRamaBySsAndResType         = {}
+    valuesBySsAndResType = {}
+    histRamaBySsAndResType = {}
     histRamaBySsAndCombinedResType = {}
 #    histByCombinedSsAndResType = {}
     histRamaCtupleBySsAndResType = {}
-    valuesByEntrySsAndResType       = {}
+    valuesByEntrySsAndResType = {}
     hrange = (xRange, yRange)
 
     rowCount = 0
@@ -82,22 +82,22 @@ def main():
         if not (inRange(phi, isRange360=isRange360) and inRange(psi, isRange360=isRange360)):
             NTerror("phi and/or psi not in range for row: %s" % `row`)
             return
-        if not common20AADict.has_key( resType):
+        if not common20AADict.has_key(resType):
             NTdebug("Residue not in common 20 for row: %s" % `row`)
             rowCount -= 1
             continue
 
-        appendDeepByKeys(valuesBySsAndResType, phi, ssType,resType,'phi' )
-        appendDeepByKeys(valuesBySsAndResType, psi, ssType,resType,'psi' )
+        appendDeepByKeys(valuesBySsAndResType, phi, ssType, resType, 'phi')
+        appendDeepByKeys(valuesBySsAndResType, psi, ssType, resType, 'psi')
 #        NTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
-        appendDeepByKeys(valuesByEntrySsAndResType, phi, entryId, ssType,resType,'phi' )
-        appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType,resType,'psi' )
+        appendDeepByKeys(valuesByEntrySsAndResType, phi, entryId, ssType, resType, 'phi')
+        appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType, resType, 'psi')
     del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
     NTdebug('Total number of included residues including PRO/GLY: %d' % rowCount)
 #    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
 #    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
-    (Cav, Csd ) = ( 1.0, 1.0 )
+    (Cav, Csd) = (1.0, 1.0)
     NTdebug("Overall found av,sd,n: " + `(Cav, Csd)`)
 
     for ssType in valuesBySsAndResType.keys():
@@ -105,14 +105,15 @@ def main():
             hist2d, _xedges, _yedges = histogram2d(
                 valuesBySsAndResType[ssType][resType]['psi'],
                 valuesBySsAndResType[ssType][resType]['phi'],
-                bins = binCount,
-                range= hrange)
+                bins=binCount,
+                range=hrange)
 #            hist2d = zscaleHist( hist2d, Cav, Csd )
-            setDeepByKeys( histRamaBySsAndResType, hist2d, ssType, resType )
+            setDeepByKeys(histRamaBySsAndResType, hist2d, ssType, resType)
 #            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
-            cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
-            (c_av, c_sd) = cTuple
-            NTdebug("For ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(ssType,resType,c_av,`c_sd`))
+            cTuple = getEnsembleAverageAndSigmaFromHistogram(hist2d)
+            (c_av, c_sd, hisMin, hisMax) = cTuple
+            cTuple += tuple([str([ssType, resType])]) # append the hash keys as a way of id.
+            NTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, c_av, c_sd, hisMin, hisMax))
 #            NTdebug("xedges %s" % `xedges`)
 #            sys.exit(1)
             if c_sd == None:
@@ -121,7 +122,7 @@ def main():
             if c_sd == 0.:
                 NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                 continue
-            setDeepByKeys( histRamaCtupleBySsAndResType, cTuple, ssType, resType)
+            setDeepByKeys(histRamaCtupleBySsAndResType, cTuple, ssType, resType)
 
     for ssType in valuesBySsAndResType.keys():
         phi = []
@@ -134,10 +135,10 @@ def main():
         hist2d, _xedges, _yedges = histogram2d(
             psi, # Note that the x is the psi for some stupid reason,
             phi, # otherwise the imagery but also the [row][column] notation is screwed.
-            bins = binCount,
-            range= hrange)
+            bins=binCount,
+            range=hrange)
 #        hist2d = zscaleHist( hist2d, Cav, Csd )
-        setDeepByKeys( histRamaBySsAndCombinedResType, hist2d, ssType )
+        setDeepByKeys(histRamaBySsAndCombinedResType, hist2d, ssType)
 
     phi = []
     psi = []
@@ -152,8 +153,8 @@ def main():
     hist2d, _xedges, _yedges = histogram2d(
         psi, # Note that the x is the psi for some stupid reason,
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
-        bins = binCount,
-        range= hrange)
+        bins=binCount,
+        range=hrange)
 #    sumHistCombined = sum( hist2d )
 #    sumsumHistCombined = sum( sumHistCombined )
     NTdebug('hist2d         : \n%s' % hist2d)
@@ -169,13 +170,14 @@ def main():
 #    dbase = {'bar':'milky'}
     dbase = {}
     # Pickle the list using the highest protocol available.
-    dbase[ 'histRamaCombined' ]               = hist2d
+    dbase[ 'histRamaCombined' ] = hist2d
     dbase[ 'histRamaBySsAndCombinedResType' ] = histRamaBySsAndCombinedResType
-    dbase[ 'histRamaBySsAndResType' ]         = histRamaBySsAndResType
-    dbase[ 'histRamaCtupleBySsAndResType' ]   = histRamaCtupleBySsAndResType
+    dbase[ 'histRamaBySsAndResType' ] = histRamaBySsAndResType
+    dbase[ 'histRamaCtupleBySsAndResType' ] = histRamaCtupleBySsAndResType
 #    pickle.dump(dbase, output, -1)
 #    pickle.dump(dbase, output)
-    cPickle.dump(dbase, output, -1) # now the same as the other 2 scripts.
+    cPickle.dump(dbase, output, 2) # Was -1 for the most recent version but this caused an issue 239
+    # NB 2 is the highest listed protocol too but behind the scenes cPickle will probably write something higher still.
     # If the protocol parameter is omitted, protocol 0 is used.
     # If protocol is specified as a negative value or HIGHEST_PROTOCOL, the highest protocol version will be used.
 

@@ -2955,7 +2955,7 @@ Residue class: Defines residue properties
 
         if None in doublet:
             if not self.isNterminal():
-                NTdebug( 'Molecule.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
+                NTdebug( 'Residue.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
             return
         CA_atms = doublet.zap('CA')
         CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
@@ -2980,7 +2980,7 @@ Residue class: Defines residue properties
             else:
                 CB_atm = doubletResidue.getAtom('CB',IUPAC)
             if not CB_atm:
-                NTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+                NTerror( 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
                 continue
 
             CB_atms.append(CB_atm)
@@ -2996,12 +2996,12 @@ Residue class: Defines residue properties
 
         missingCoordinates = False
         for a in d1.atoms:
-
             if len(a.coordinates) != self.chain.molecule.modelCount:
                 missingCoordinates = True
                 continue
         #end for
         if missingCoordinates:
+            NTdebug( 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self)           
             return
 
 
@@ -3043,8 +3043,9 @@ Residue class: Defines residue properties
         resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
         resTypeNext = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
 
-        hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
-        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext)
+        hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
+#        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
+        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
         if hist1 == None:
 #            NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
             return []
@@ -3076,7 +3077,7 @@ Residue class: Defines residue properties
                     continue
 
 #                NTdebug("Processing ssType: %s" % ssType)
-                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # y-axis
                 hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
                 if hist1 == None:
 #                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))

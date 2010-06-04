@@ -7,35 +7,9 @@ from cing import cingRoot
 from cing import cingVersion
 from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTaverage
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTindent
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTtoXML
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import XMLhandler
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import matchString
-from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import removedir
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
-from cing.Libs.fpconst import NaN
-from cing.Libs.fpconst import isNaN
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -72,9 +46,6 @@ from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
 from shutil import rmtree
-import math
-import os
-import sys
 import tarfile
 import time
 __version__ = cing.__version__
@@ -1264,7 +1235,7 @@ class Peak(NTdict, Lister):
     def getAssignment(self, axis):
         """Return atom instances in case of an assignment or None
         """
-        if (self.isAssigned(axis)):
+        if self.isAssigned(axis):
             return self.resonances[axis].atom
         #end if
         return None
