@@ -3,8 +3,10 @@
 
 == Linux version ==
 
-Consider taking the latest Ubuntu release which was 9.10 at the time of writing. The 8.x series has a matplotlib version that is too old. Patching can be done manually of matplotlib but hasn't been tried. JFD tested the 32 and 64 bit version of 9.10 both but we'll show the 64 bit for conciseness.
+Consider taking the latest Ubuntu release which was 10.04 LTS at the time of writing. The 9.10 series works fine except for issue 239 and the 8.x series has a matplotlib version that is too old. Patching can be done manually of matplotlib but hasn't been tried. JFD tested the 32 and 64 bit version of 9.10 both but we'll show the 64 bit for conciseness.
 {{{
+XXX
+In the 9.10 series this was:
 Linux version 2.6.27-14-server (buildd@rothera) (gcc version 4.3.2 (Ubuntu 4.3.2-1ubuntu12) ) #1 SMP Mon Aug 31 13:57:10 UTC 2009
 }}}
 
@@ -30,7 +32,7 @@ in a directory that might already be created:
 python-matplotlib
 python-dev
 cython
-ipython
+ipython (only needed when doing interactive work)
 imagemagick
 
 # Optional (but you might have them any way)
