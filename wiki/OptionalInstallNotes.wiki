@@ -27,9 +27,12 @@ From http://code.google.com/p/faquad/
 
 = pyMol =
 {{{
-fink install pymol-py25
+sudo port install pymol
 }}}
-Not available from macports at the time of writing.
+used to be done with:
+{{{
+fink install pymol-py2
+}}}
 
 = Molmol =
 Google it. Or get a copy from JFD which runs fine headless.
