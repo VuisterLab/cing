@@ -31,7 +31,8 @@ from numpy.ma.core import masked_where
 import profile
 import pstats
 
-hPlot.initHist()
+if hPlot.histRamaBySsAndCombinedResType == None:
+    hPlot.initHist()
 set_printoptions(linewidth=100000)
 
 # important to switch to temp space before starting to generate files for the project.
@@ -405,11 +406,11 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
     for resType in common20AAList:
         for resTypePrev in common20AAList:
             for resTypeNext in common20AAList:
-                if resType != 'GLY':
+                if resType != 'ALA':
                     continue
 #                if resTypePrev != 'LEU':
 #                    continue
-                if resTypeNext != 'ASN':
+                if resTypeNext != 'PHE':
                     continue
 
 
@@ -432,7 +433,7 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                 plotparams2 = plotParameters.getdefault(dihedralName2, 'dihedralDefault')
 
                 # e.g. GLU-GLY-ASN like in 1brv around Gly178
-                hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # 
+                hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) #
                 hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType) #L
                 if hist1 == None:
                     NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
@@ -888,7 +889,7 @@ if __name__ == "__main__":
         plotDihedralD1_1d()
     if True:
 #        doOnlyOverall = False
-        plotDihedralD1_2d(False,  doPrintAvgOnly = False)
+        plotDihedralD1_2d(True,  doPrintAvgOnly = False)
 #        plotDihedralD1_2d(False)
     if False:
         m = plotHistogramOverall()

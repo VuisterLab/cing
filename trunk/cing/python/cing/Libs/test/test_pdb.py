@@ -20,6 +20,7 @@ class AllChecks(TestCase):
             "Failed to change to directory for temporary test files: "+cingDirTmp)
 
         entryId = "1brv" # Small much studied PDB NMR entry
+#        entryId = "tightTurn_IIb"
 #        entryId = "1hy8" # small, single model, very low scoring entry
 
         pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)
@@ -33,13 +34,14 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
-        
+
         m = project.molecule
         m.toPDBfile('m001.pdb',model=0, convention='XPLOR')
         m.initCoordinates()
         m.importFromPDB('m001.pdb',convention='XPLOR')
-        
+
         self.assertFalse(project.mkMacros())
+#       self.assertFalse(project.validate(htmlOnly=False, doWhatif = False, doProcheck = False))
 
     def testPrintSequenceFromPdbFile(self):
         entryId = "1brv" # Small much studied PDB NMR entry

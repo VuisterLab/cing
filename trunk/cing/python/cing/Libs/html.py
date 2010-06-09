@@ -282,6 +282,9 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
         self.histDir = os.path.join( cingDirData, 'PluginCode', 'WhatIf')
 
     def initHist(self):
+        if hPlot.histRamaBySsAndCombinedResType != None:
+            NTdebug("Doing HistogramsForPlotting#initHist even though it was done before.")
+
         if True:
 #            NTdebug("Loading Ramachandran histograms")
             dbase_file_abs_name =  os.path.join( self.histDir, 'phipsi_wi_db.dat' )

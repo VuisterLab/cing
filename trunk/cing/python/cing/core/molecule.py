@@ -1,33 +1,7 @@
 from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import NTcVarianceAverage
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTlist2dict
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTset
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NoneObject
-from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import angle3Dopt
-from cing.Libs.NTutils import asci2list
-from cing.Libs.NTutils import cross3Dopt
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import length3Dopt
-from cing.Libs.NTutils import list2asci
-from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
@@ -35,8 +9,6 @@ from cing.Libs.cython.superpose import NTcMatrix #@UnresolvedImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
 from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
-from cing.Libs.fpconst import NaN #@UnusedImport not really but pydev flags it because of pylab wild imports
-from cing.Libs.fpconst import isNaN
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
@@ -47,9 +19,8 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from database import NTdb
 from math import acos
-from parameters   import plotParameters
+from parameters import plotParameters
 from pylab import * #@UnusedWildImport # otherwise use this line.
-import os
 #from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
 
 #==============================================================================
@@ -1456,8 +1427,12 @@ class Molecule( NTtree, ResidueList ):
            Define the topological connections
            Calculate the rmsd's
         """
+
+        msgHol = MsgHoL()
         for res in self.allResidues():
-            res.addDihedralsAll()
+            res.addDihedralsAll(msgHol=msgHol)
+        msgHol.showMessage(MAX_MESSAGES=2)
+
         if self.modelCount > 0:
             self.syncModels()
             self.updateDihedrals()
@@ -2743,7 +2718,7 @@ Residue class: Defines residue properties
         #end if
     #end def
 
-    def addDihedralsAll(self):
+    def addDihedralsAll(self,msgHol=None):
         """Add all dihedrals according to definition database plus
         the new D1.
         """
@@ -2783,7 +2758,7 @@ Residue class: Defines residue properties
                 #end if
             #end for
         #end if
-        self.addDihedralD1()
+        self.addDihedralD1(msgHol=msgHol)
     #end def
 
     def translate( self, convention ):
@@ -2938,7 +2913,7 @@ Residue class: Defines residue properties
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
         self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )
 
-    def addDihedralD1(self):
+    def addDihedralD1(self,msgHol=None):
         """Calculates and adds the Cb4N dihedral to this residue and the same dihedral as
         Cb4C to the previous residue.
 
@@ -2955,7 +2930,11 @@ Residue class: Defines residue properties
 
         if None in doublet:
             if not self.isNterminal():
-                NTdebug( 'Residue.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbour but not N-terminal)' % self)
+                msg = 'Residue.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbor but not N-terminal)' % self
+                if msgHol == None:
+                    NTdebug(msg)
+                else:
+                    msgHol.appendDebug(msg)
             return
         CA_atms = doublet.zap('CA')
         CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
@@ -2980,7 +2959,11 @@ Residue class: Defines residue properties
             else:
                 CB_atm = doubletResidue.getAtom('CB',IUPAC)
             if not CB_atm:
-                NTerror( 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet )
+                if msgHol == None:
+                    NTerror(msg)
+                else:
+                    msgHol.appendError(msg)
                 continue
 
             CB_atms.append(CB_atm)
@@ -3001,7 +2984,12 @@ Residue class: Defines residue properties
                 continue
         #end for
         if missingCoordinates:
-            NTdebug( 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self)
+            msg = 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self
+            # wrap this call so that not all get printed; very common in X-ray structures like 2uva
+            if msgHol == None:
+                NTdebug(msg)
+            else:
+                msgHol.appendDebug(msg)
             return
 
 
