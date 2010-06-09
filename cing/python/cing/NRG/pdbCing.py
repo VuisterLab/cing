@@ -11,17 +11,7 @@ from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import is_pdb_code
-from cing.Libs.NTutils import symlink
-from cing.Libs.NTutils import toCsv
-from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG.PDBEntryLists import getPdbEntries
@@ -33,14 +23,15 @@ from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from glob import glob
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import PROJECT_TYPE_PDB
-import cing
 import csv
-import os
 import shutil
 import string
 import time
 import urllib
 
+skipList = NTlist(
+#            '2uva' # Issue xxx
+)
 
 def run():
     """Return True on error"""
@@ -51,10 +42,8 @@ def run():
     updateIndices = True
     isProduction = False
     getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-#    new_hits_entry_list = ['1cjg'] # define empty for checking new ones.
-#    new_hits_entry_list = []
-#    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
-    new_hits_entry_list         = string.split("3ejo 2e7r 2d6p")
+#    new_hits_entry_list = [] # define empty for checking new ones.
+    new_hits_entry_list         = string.split("2uva")
 
     ## Initialize the project
     m = pdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
@@ -75,6 +64,13 @@ def run():
         if m.getCingEntryInfo():
             NTerror("Failed to getCingEntryInfo (first time).")
             return True
+
+    NTmessage("Entries to skip if requested: %s" % str(skipList))
+    lengthOrg = len(m.entry_list_todo)
+    m.entry_list_todo = m.entry_list_todo.difference(skipList)
+    lengthNew = len(m.entry_list_todo)
+    if lengthOrg != lengthNew:
+        NTwarning("Skipping: number of entries: %d" % (lengthOrg-lengthNew))
 
     if m.entry_list_todo:
         if m.runCing():

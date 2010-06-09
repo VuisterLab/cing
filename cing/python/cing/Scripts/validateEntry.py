@@ -69,7 +69,7 @@ def main(entryId, *extraArgList):
 #    modelCount=2
     modelCount = None # default setting is None
     if fastestTest:
-        modelCount = 2
+        modelCount = 1 # if this is more and there is only one model present it leads to an error message.
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -258,7 +258,7 @@ def main(entryId, *extraArgList):
 #        project.molecule.rename( entryId )
 
     project.save()
-    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif, 
+    if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doTalos=doTalos):
         NTerror("Failed to validate project read")
         return True

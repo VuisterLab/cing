@@ -915,23 +915,25 @@ class NTplot( NTdict ):
             if myHist.dtype != 'float64':
                 NTerror("expected a histogram matrix with float values but found type: %s" % myHist.dtype)
                 return True
+
+            myHistScaled = deepcopy(myHist) #scaling done in place. Fixes issue 248.
             if scaleBy == SCALE_BY_MAX:
                 maxHist = amax( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
 #                minHist = amin( myHist )
 #                NTdebug("maxHist: %s" % maxHist)
 #                NTdebug("minHist: %s" % minHist)
                 factor = 100./maxHist
-                myHist *= factor
+                myHistScaled *= factor
             elif scaleBy == SCALE_BY_SUM:
                 sumHist = sum( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
 #                NTdebug("sumHist: %s" % sumHist)
                 factor = 100./sumHist
-                myHist *= factor
+                myHistScaled *= factor
             else:
                 NTerror("parameter invalid in dihedralComboPlot")
                 return True
             # Just make a copy...
-            myHist = ma.masked_where(myHist <= minPercentage, myHist, copy=1)
+            myHistScaledAndMasked = ma.masked_where(myHistScaled <= minPercentage, myHistScaled, copy=1)
             # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
             # the above is a workaround in order to use the 'bad' utility of the api.
             # The problem is that it doesn't do nice alpha mixing so disabled again to find solution.
@@ -963,7 +965,7 @@ class NTplot( NTdict ):
 #            NTdebug("over : %s" % str(palette._rgba_over))
 #            NTdebug("bad  : %s" % str(palette._rgba_bad))
 
-            imshow( myHist,
+            imshow( myHistScaledAndMasked,
                     interpolation='bicubic',
 #                    interpolation = 'nearest', # bare data.
                     origin='lower',

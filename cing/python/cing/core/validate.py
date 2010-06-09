@@ -804,24 +804,22 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         for res2 in residues2:
             #print '>>', res1, res2
             s = validateSaltbridge(res1,res2)
-            if s and s.result: # no s.result for entry 1f96 issue 197
-                if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
-                    pass
-                else:
-                    if toFile:
-                        fprintf(fp, '%s\n', s.format() )
+            if not (s and s.result): # no s.result for entry 1f96 issue 197
+                continue
+            if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
+                continue
+
+            if toFile:
+                fprintf(fp, '%s\n', s.format() )
 #                    NTdebug(    '%s\n', s.format() )
-                    res1.saltbridges.append( s )
-                    res2.saltbridges.append( s )
-                    result.append( s )
-                #end if
-            #end if
+            res1.saltbridges.append( s )
+            res2.saltbridges.append( s )
+            result.append( s )
         #end for
     #end for
 
-    if s:
-        if toFile:
-            fprintf( fp, '%s\n', s.comment )
+    if s and toFile:
+        fprintf( fp, '%s\n', s.comment )
         #NTdebug(     '%s\n', s.comment )
     #end if
 
@@ -1580,8 +1578,8 @@ def validateDihedralCombinations(project):
                         NTerror(msg + " maxHist < c_av")
                     elif maxHist < ck:
                         NTerror(msg + " maxHist < ck")
-                    elif minHist > 110.: # was found in GLY ASN LEU
-                        NTwarning(msg + " minHist > 110")
+                    elif minHist > 1000.: # was found in GLY ASN LEU
+                        NTwarning(msg + " minHist > 1000") # ' ' GLY GLY GLY
                     elif hisMin != minHist:
                         NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
                     elif hisMax != maxHist:
