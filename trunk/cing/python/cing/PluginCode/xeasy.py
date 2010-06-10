@@ -452,7 +452,9 @@ def importXeasy( project, seqFile, protFile, convention ):
         project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
 
         if project.xeasy.error:
-            NTmessage( '==> importXeasy: error(s) appending resonances from "%s"', protFile )
+            # GWV please check. Did you mean to show an error here?
+            # I just kept it to the message level and changed the token error to problem.
+            NTmessage( '==> importXeasy: problem(s) appending resonances from "%s"', protFile )
         else:
             NTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
         #end if

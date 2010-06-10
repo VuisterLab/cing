@@ -53,7 +53,7 @@ class AllChecks(TestCase):
         aStringToBe = 123
         NTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
-        NTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
+#        NTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
         NTdebug("testing messaging system: "+`aStringToBe`)
         NTdebug("testing messaging system: %s", aStringToBe)
 

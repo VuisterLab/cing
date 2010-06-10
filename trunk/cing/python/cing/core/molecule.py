@@ -370,7 +370,7 @@ class Molecule( NTtree, ResidueList ):
             if not newName:
                 NTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
                 return None # Note the bug that this statement was leftshifted before revision 778.
-            NTwarning( 'Molecule.addChain: got next available one: %s' % newName)
+            NTdebug( 'Molecule.addChain: got next available one: %s' % newName)
             name = newName
 
 #            return None
@@ -3019,79 +3019,28 @@ Residue class: Defines residue properties
             or empty array when it could not be constructed.
         """
 
-        triplet = NTlist()
-        tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010. Matches the one in
-        # cing.core.validate#validateDihedralCombinations
+        if True: # just a checking block.
+            triplet = NTlist()
+            tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010. Matches the one in
+            # cing.core.validate#validateDihedralCombinations
 
-#        for i in [-1,0,1]:
-        for i in tripletIdxList:
-            triplet.append( self.sibling(i) )
+    #        for i in [-1,0,1]:
+            for i in tripletIdxList:
+                triplet.append( self.sibling(i) )
 
-        if None in triplet:
-#            NTdebug( 'Skipping residue without triplet %s' % self)
-            return []
+            if None in triplet:
+    #            NTdebug( 'Skipping residue without triplet %s' % self)
+                return []
 
 #        resTypePrev = getDeepByKeys(triplet[-1].db.nameDict, IUPAC) # bug 4 fixed on June 4, 2010
 #        resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
 #        resTypeNext = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
-        resTypePrev = getDeepByKeys(triplet[ 1].db.nameDict, IUPAC)
-        resType     = getDeepByKeys(triplet[ 0].db.nameDict, IUPAC)
-        resTypeNext = getDeepByKeys(triplet[ 2].db.nameDict, IUPAC)
+        resTypePrev = getDeepByKeys(self.sibling(-1).db.nameDict, IUPAC)
+        resType     = getDeepByKeys(            self.db.nameDict, IUPAC)
+        resTypeNext = getDeepByKeys(self.sibling (1).db.nameDict, IUPAC)
+        resTypeListBySequenceOrder = ( resTypePrev, resType, resTypeNext)
+        return getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = ssTypeRequested )
 
-        hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
-#        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
-        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
-        if hist1 == None:
-#            NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
-            return []
-        if hist2 == None:
-#            NTdebug('skipping for hist2 is empty for [%s] [%s]' % (resType, resTypeNext))
-            return []
-#        sumh1 = sum(hist1)
-#        sumh2 = sum(hist2)
-
-        # Plot a density background
-        histList = []
-
-        if doOnlyOverall:
-#            hist1 = 100.0 * hist1 / sumh1
-#            hist2 = 100.0 * hist2 / sumh2
-            m1 = mat(hist1,dtype='float')
-            m2 = mat(hist2,dtype='float')
-            m2 = m2.transpose()
-            hist = multiply(m1,m2)
-            histList.append(hist)
-        else:
-#            print hPlot.histd1BySsAndResTypes
-            ssTypeList = hPlot.histd1BySsAndResTypes.keys()
-            ssTypeList.sort() # in place sort to: space, H, S
-#            NTdebug("ssTypeList: %s" % ssTypeList)
-            for ssType in ssTypeList:
-                if ssTypeRequested and ssType != ssTypeRequested:
-#                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
-                    continue
-
-#                NTdebug("Processing ssType: %s" % ssType)
-                hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
-                hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
-                if hist1 == None:
-#                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
-                    continue
-                if hist2 == None:
-#                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
-                    continue
-#                sumh1 = sum(hist1)
-#                sumh2 = sum(hist2)
-#                hist1 = 100.0 * hist1 / sumh1
-#                hist2 = 100.0 * hist2 / sumh2
-                m1 = mat(hist1,dtype='float')
-                m2 = mat(hist2,dtype='float')
-                m2 = m2.transpose()
-                hist = multiply(m1,m2)
-                histList.append(hist)
-            # end for
-        # end if
-        return histList
 
     def toSML(self, stream=sys.stdout ):
         if hasattr(Residue,'SMLhandler'):
@@ -4744,5 +4693,70 @@ def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
         if resName != resNameList[-1]:
             msg += '\n'
     return msg
+
+def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None):
+    """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
+    an empty array when it could not be constructed.
+
+    If doOnlyOverall it will be a list with a single element. If not then
+    it will be a list of three elements one each for every sstype.
+
+    If ssTypeRequested is None then all types will be returned otherwise just the
+    type requested.
+
+    resTypeListBySequenceOrder is a list of three residue type names in sequence order.
+    E.g. VAL171, PRO172, ILE173.
+
+    Return None on error.
+        or empty array when it could not be constructed.
+    """
+
+    if not resTypeListBySequenceOrder:
+        NTerror( 'getTripletHistogramList has a None or empty sequence: %s' % str(resTypeListBySequenceOrder))
+        return None
+
+    if None in resTypeListBySequenceOrder:
+        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
+        return None
+
+
+    resTypePrev, resType, resTypeNext = resTypeListBySequenceOrder
+    histListTuple = []
+    if doOnlyOverall:
+        hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
+    #        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
+        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
+        histListTuple.append((hist1,hist2))
+    else:
+        ssTypeList = hPlot.histd1BySsAndResTypes.keys()
+        ssTypeList.sort() # in place sort to: space, H, S
+#            NTdebug("ssTypeList: %s" % ssTypeList)
+        for ssType in ssTypeList:
+            if ssTypeRequested and ssType != ssTypeRequested:
+#                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
+                continue
+#                NTdebug("Processing ssType: %s" % ssType)
+            hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
+            hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
+            histListTuple.append((hist1,hist2))
+        # end for
+    # end if
+
+    histList = []
+    for histTuple in histListTuple:
+        hist1, hist2 = histTuple
+        if hist1 == None:
+#                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
+            continue
+        if hist2 == None:
+#                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+            continue
+        m1 = mat(hist1,dtype='float')
+        m2 = mat(hist2,dtype='float')
+        m2 = m2.transpose()
+        hist = multiply(m1,m2)
+        histList.append(hist)
+
+    return histList
 
 

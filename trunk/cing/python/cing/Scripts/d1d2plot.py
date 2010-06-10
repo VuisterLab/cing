@@ -25,11 +25,21 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Dihedral
 from cing.core.molecule import common20AAList
+from cing.core.molecule import getTripletHistogramList
 from cing.core.parameters import plotParameters
 from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
+import locale
+import numpy
 import profile
 import pstats
+
+dihedralName1 = 'Cb4N'
+dihedralName2 = 'Cb4C'
+
+rootDir = '/Users/jd/workspace/d1d2project'
+reportsDir = os.path.join(rootDir, 'reports')
+plotHistogramBySsTypeResidueTypesDir = os.path.join(rootDir, 'plotHistogramBySsTypeResidueTypes')
 
 if hPlot.histRamaBySsAndCombinedResType == None:
     hPlot.initHist()
@@ -70,8 +80,8 @@ def plotForEntry(entryId):
 #            NTmessage('Skipping without BBCCHK values (please run What If): %s' % res)
 #            continue
 
-        d1 = getDeepByKeys( res, DIHEDRAL_NAME_Cb4N)
-        d2 = getDeepByKeys( res, DIHEDRAL_NAME_Cb4C)
+        d1 = getDeepByKeys(res, DIHEDRAL_NAME_Cb4N)
+        d2 = getDeepByKeys(res, DIHEDRAL_NAME_Cb4C)
 
         if d1 == None or d2 == None:
             NTmessage("Skipping residue without both dihedrals expected")
@@ -80,7 +90,7 @@ def plotForEntry(entryId):
         if d1.cv == None or d2.cv == None:
             NTmessage("Skipping unstructured residue: %s" % res)
             continue
-        if not ( d1.cv < CV_CUTOFF and d2.cv < CV_CUTOFF):
+        if not (d1.cv < CV_CUTOFF and d2.cv < CV_CUTOFF):
             NTmessage("Skipping unstructured residue (cvs %f %f): %s" % (d1.cv, d2.cv, res))
             continue
 
@@ -101,11 +111,11 @@ def plotForEntry(entryId):
                 fprintf(fpGood, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
             #end if
         #end for models
-        fn = "d1d2_%03d_%s." % ( res.resNum, res.resName) + graphicsFormat
+        fn = "d1d2_%03d_%s." % (res.resNum, res.resName) + graphicsFormat
 #        residueHTMLfile = ResidueHTMLfile(project, res)
-        ps = makeDihedralPlot( project, [res], dihedralName1, dihedralName2,
+        ps = makeDihedralPlot(project, [res], dihedralName1, dihedralName2,
 #                          plotTitle = titleStr,
-                          plotCav=False,htmlOnly=False )
+                          plotCav=False, htmlOnly=False)
         if ps:
             ps.hardcopy(fn, graphicsFormat)
     #        plot.show()
@@ -210,7 +220,7 @@ def plotDihedral2DRama():
         if True:
             fn = fnBase + '.png'
         else:
-            i=0
+            i = 0
             fn = None
             while not fn or os.path.exists(fn):
                 i += 1
@@ -323,7 +333,7 @@ def plotDihedralD1_1d():
     graphicsFormat = "png"
 
     subDir = 'doublets'
-    os.chdir(os.path.join(cingDirTmp,subDir))
+    os.chdir(os.path.join(cingDirTmp, subDir))
 
 #    interestingResTypeList = [ 'GLY' ]
     interestingResTypeList = common20AAList
@@ -364,7 +374,7 @@ def plotDihedralD1_1d():
             x = range(5, 360, 10)
             y = 100.0 * h / sumh # mod inplace
             points = zip(x, y)
-            lAttr = solidLine(color='black' )
+            lAttr = solidLine(color='black')
             plot.lines(points, attributes=lAttr)
             ssTypeList = hPlot.histd1BySs.keys() #@UndefinedVariable
             ssTypeList.sort() # in place sort to: space, H, S
@@ -373,7 +383,7 @@ def plotDihedralD1_1d():
             for i, ssType in enumerate(ssTypeList):
                 h = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
                 sumh = sum(h)
-                plot.title += ' %s: %d' % (ssType,sumh)
+                plot.title += ' %s: %d' % (ssType, sumh)
                 if h == None:
                     continue
 #                NTdebug('appending [%s]' % ssType)
@@ -387,20 +397,18 @@ def plotDihedralD1_1d():
             ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
 
-def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
-    dihedralName1 = 'Cb4N'
-    dihedralName2 = 'Cb4C'
+def plotDihedralD1_2d(doOnlyOverall=True, doPrintAvgOnly=False):
     graphicsFormat = "png"
 
     if doOnlyOverall:
         subDir = 'triplets_ov'
     else:
         subDir = 'triplets'
-    os.chdir(os.path.join(cingDirTmp,subDir))
+    os.chdir(os.path.join(cingDirTmp, subDir))
 
 #                minPercentage =  0.08
 #                maxPercentage = .2
-    minPercentage =  MIN_PERCENTAGE_D1D2
+    minPercentage = MIN_PERCENTAGE_D1D2
     maxPercentage = MAX_PERCENTAGE_D1D2
 
     for resType in common20AAList:
@@ -443,12 +451,12 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                     continue
                 sumh1 = sum(hist1)
                 sumh2 = sum(hist2)
-                titleStr += ' %d-%d' % (sumh1,sumh2)
+                titleStr += ' %d-%d' % (sumh1, sumh2)
                 if doOnlyOverall:
                     m1 = mat(hist1, dtype=float)
                     m2 = mat(hist2, dtype=float)
                     m2 = m2.transpose()
-                    hist = multiply(m1,m2)
+                    hist = multiply(m1, m2)
                     histList.append(hist)
                 else:
                     titleStr += '\n'
@@ -464,29 +472,29 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                             NTdebug('skipping for x-axis hist1 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypePrev))
                             continue
                         if hist2 == None:
-                            NTdebug('skipping for y-axis hist2 is empty for [%s] [%s] [%s]' % (ssType, resTypeNext, resType ))
+                            NTdebug('skipping for y-axis hist2 is empty for [%s] [%s] [%s]' % (ssType, resTypeNext, resType))
                             continue
 
                         sumh1 = sum(hist1)
                         sumh2 = sum(hist2)
-                        titleStr += " '%s' %d-%d" % (ssType, sumh1,sumh2)
+                        titleStr += " '%s' %d-%d" % (ssType, sumh1, sumh2)
 
 #                        hist1 = 100.0 * hist1 / sumh1
 #                        hist2 = 100.0 * hist2 / sumh2
                         m1 = mat(hist1, dtype=float)
                         m2 = mat(hist2, dtype=float)
                         m2 = m2.transpose()
-                        hist = multiply(m1,m2)
+                        hist = multiply(m1, m2)
 
                         keyList = [ ssType, resType, resTypePrev, resTypeNext]
-                        Ctuple = getDeepByKeysOrAttributes( hPlot.histd1CtupleBySsAndResTypes, *keyList)
+                        Ctuple = getDeepByKeysOrAttributes(hPlot.histd1CtupleBySsAndResTypes, *keyList)
                         if not Ctuple:
                             NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
                             continue
                         (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
 
-                        minHist = amin( hist )
-                        maxHist = amax( hist )
+                        minHist = amin(hist)
+                        maxHist = amax(hist)
 #                            sumHist = sum( hist )
                         zMin = (minHist - c_av) / c_sd
                         zMax = (maxHist - c_av) / c_sd
@@ -497,7 +505,7 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                             continue
 
                         msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % (ssType, resTypePrev, resType, resTypeNext,
-                            c_av, c_sd, minHist, maxHist, zMin, zMax )
+                            c_av, c_sd, minHist, maxHist, zMin, zMax)
                         if maxHist < c_av:
                             NTerror(msg + " maxHist < c_av")
                         elif hisMin != minHist:
@@ -525,7 +533,7 @@ def plotDihedralD1_2d(doOnlyOverall = True, doPrintAvgOnly = False):
                 ps.addPlot(myplot)
 
                 if True:
-                    myplot.dihedralComboPlot(histList, minPercentage =  minPercentage, maxPercentage = maxPercentage, scaleBy = SCALE_BY_SUM )
+                    myplot.dihedralComboPlot(histList, minPercentage=minPercentage, maxPercentage=maxPercentage, scaleBy=SCALE_BY_SUM)
 
 
                 fn = 'd1d2_%s-%s-%s' % (resTypePrev, resType, resTypeNext)
@@ -541,9 +549,9 @@ def plotHistogramOverall():
     alpha = 0.8 # was 0.8; looks awful with alpha = 1
     n = 20
 #    d = 3 # number of ss types.
-    extent = ( 0, n ) + ( 0, n )
-    cmapList= [   green_inv, blue_inv, yellow_inv ]
-    colorList= [ 'green',   'blue',   'yellow']
+    extent = (0, n) + (0, n)
+    cmapList = [   green_inv, blue_inv, yellow_inv ]
+    colorList = [ 'green', 'blue', 'yellow']
     i = 1 # decides on color picked.
 
     # If set it will do a single ssType otherwise the overall.
@@ -555,13 +563,13 @@ def plotHistogramOverall():
             ssTypeList = [' ', 'S', 'H']
 
         for ssType in ssTypeList:
-            m = zeros((n*n), dtype=int).reshape(n,n)
+            m = zeros((n * n), dtype=int).reshape(n, n)
         #    mBySs = zeros((n,n,d), dtype=int).reshape(n,n,d)
-            tickList = [ NTdb.getResidueDefByName( resType ).shortName for resType in common20AAList]
+            tickList = [ NTdb.getResidueDefByName(resType).shortName for resType in common20AAList]
     #        tickListRev = tickList[:]
     #        tickListRev.reverse()
-            for r,resTypePrev in enumerate(common20AAList):
-                for c,resType in enumerate(common20AAList):
+            for r, resTypePrev in enumerate(common20AAList):
+                for c, resType in enumerate(common20AAList):
                     if doOverall:
                         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
                     else:
@@ -569,18 +577,18 @@ def plotHistogramOverall():
                     if hist1 == None:
                         NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
                         continue
-                    m[r,c] = sum(hist1)
+                    m[r, c] = sum(hist1)
 
             clf()
 
 #            axes([.1, .1, .8, .8 ] )
             xlabel('resType')
             ylabel('resTypePrev')
-            xlim( (0, n) )
-            ylim( (0, n) )
+            xlim((0, n))
+            ylim((0, n))
             offset = 0.5
-            xticks( arange(offset, n), tickList )
-            yticks( arange(offset, n), tickList )
+            xticks(arange(offset, n), tickList)
+            yticks(arange(offset, n), tickList)
 #            print 'just before call to set_ticks_position'
     #        axis.xaxis.set_ticks_position('top')
     #        axis.xaxis.set_label_position('top')
@@ -589,18 +597,18 @@ def plotHistogramOverall():
             grid(True)
             strTitle = "ssType: [%s]" % ssType
             title(strTitle)
-            plot([0,n], [0,n], 'b-', linewidth=1)
-            minCount =  300.
+            plot([0, n], [0, n], 'b-', linewidth=1)
+            minCount = 300.
             maxCount = 1000.
             if False:
-                minCount =  0.
-                maxCount =  1.
+                minCount = 0.
+                maxCount = 1.
             if ssType:
                 minCount /= 3.
                 maxCount /= 3.
-            maxHist = amax( m )
-            minHist = amin( m )
-            sumHist = sum( m )
+            maxHist = amax(m)
+            minHist = amin(m)
+            sumHist = sum(m)
             NTmessage('ssType: %s' % ssType)
             NTmessage('maxHist: %s' % maxHist) # 9165 of total of ~ 1 M.
             NTmessage('minHist: %s' % minHist) # 210
@@ -610,38 +618,127 @@ def plotHistogramOverall():
             his = masked_where(m <= minCount, m, copy=1)
 
             palette = cmapList[i]
-            palette.set_under(color = 'red', alpha = 1.0 ) # alpha is 0.0
-            palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
-            palette.set_bad(color = 'red', alpha = 1.0 )
+            palette.set_under(color='red', alpha=1.0) # alpha is 0.0
+            palette.set_over(color=colorList[i], alpha=1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
+            palette.set_bad(color='red', alpha=1.0)
 
 
-            norm = Normalize(vmin = minCount, vmax = maxCount, clip = True) # clip is False
-            imshow( his,
+            norm = Normalize(vmin=minCount, vmax=maxCount, clip=True) # clip is False
+            imshow(his,
                     interpolation='nearest',
         #            interpolation='bicubic',
                     origin='lower',
                     extent=extent,
                     alpha=alpha,
                     cmap=palette,
-                    norm = norm )
+                    norm=norm)
 #            mr = m[::-1] # reverses the rows, nice!
 #            NTmessage('mr: %s' % mr)
 
-            fn = "plotHistogram_%s_d1d2.%s" % ( ssType, graphicsFormat )
+            fn = "plotHistogram_%s_d1d2.%s" % (ssType, graphicsFormat)
             savefig(fn)
 
             clf()
-            l = m.reshape(n*n)
-            hist(l,20)
+            l = m.reshape(n * n)
+            hist(l, 20)
             xlabel('pair count')
             ylabel('number of occurrences')
             title(strTitle)
-            fn = "plotHistOfHist_%s_d1d2.%s" % ( ssType, graphicsFormat )
+            fn = "plotHistOfHist_%s_d1d2.%s" % (ssType, graphicsFormat)
             savefig(fn)
 
         # end loop over ssType
     # end over ssType overall
     return m
+
+
+def plotHistogramBySsTypeResidueTypes():
+    graphicsFormat = "png"
+
+    # If set it will do a single ssType otherwise the overall.
+    for doOverall in [ False, True ]:
+#    for doOverall in [ True ]:
+        if doOverall:
+            ssTypeList = [ None ]
+        else:
+            ssTypeList = [' ', 'S', 'H']
+        for ssType in ssTypeList:
+
+            for _i, resType in enumerate(common20AAList):
+                if resType != 'GLY':
+                    continue
+                for _j, resTypePrev in enumerate(common20AAList):
+#                    if resTypePrev != 'ALA':
+#                        continue
+                    for _k, resTypeNext in enumerate(common20AAList):
+#                        if resTypeNext != 'ALA':
+#                            continue
+                        resTypeListBySequenceOrder = (resTypePrev, resType , resTypeNext)
+                        myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOverall, ssTypeRequested=ssType)
+                        if myHistList == None:
+                            NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % str(resTypeListBySequenceOrder))
+                            continue
+                        if len(myHistList) != 1:
+                            NTdebug("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList), str(resTypeListBySequenceOrder)))
+                            continue
+                        myHist = deepcopy(myHistList[0])
+#                        NTdebug("myHist: %s" % str(myHist))
+
+                        l = numpy.asarray(myHist).flatten()
+                        maxl = numpy.max(l)
+                        sdl = numpy.std(l)
+                        avl = numpy.average(l)
+                        suml = numpy.sum(l)
+                        n = 36
+                        suml2 = avl * n * n
+                        if math.fabs(suml2 - suml) > 1:
+                            NTerror("Math is off for suml != suml2: %s != $s" % (suml, suml2))
+                        if maxl > suml:
+                            NTerror("Math is off for maxl > suml: %s != $s" % (maxl, suml))
+
+                        locale.setlocale(locale.LC_ALL, "")
+                        vL = []
+                        for value in  (avl, sdl, maxl, suml):
+                            vL.append( locale.format('%12.0f', value, True))
+                        strTitle = "av: %s sd: %s\nmax: %s sum: %s" % (vL[0],vL[1],vL[2],vL[3])
+                        NTdebug("myHist: %s" % strTitle)
+
+                        if True: # plot distribution itself too?
+                            clf()
+                            ps = NTplotSet() # closes any previous plots
+                            ps.hardcopySize = (500, 500)
+                            plotparams1 = plotParameters.getdefault(dihedralName1, 'dihedralDefault')
+                            plotparams2 = plotParameters.getdefault(dihedralName2, 'dihedralDefault')
+
+                            myplot = NTplot(title=strTitle,
+                              xRange=(plotparams1.min, plotparams1.max),
+                              xTicks=range(int(plotparams1.min), int(plotparams1.max + 1), plotparams1.ticksize),
+                              xLabel=dihedralName1,
+                              yRange=(plotparams2.min, plotparams2.max),
+                              yTicks=range(int(plotparams2.min), int(plotparams2.max + 1), plotparams2.ticksize),
+                              yLabel=dihedralName2)
+                            ps.addPlot(myplot)
+
+                            myplot.dihedralComboPlot([myHist], minPercentage=MIN_PERCENTAGE_D1D2, maxPercentage=MAX_PERCENTAGE_D1D2, scaleBy=SCALE_BY_SUM)
+
+                            fn = 'd1d2_%s_%s-%s-%s' % (ssType, resTypePrev, resType, resTypeNext)
+                            if doOverall:
+                                fn += '_ov_'
+                            fn += "." + graphicsFormat
+                            ps.hardcopy(fn, graphicsFormat)
+
+                        if True:
+                            clf()
+                            hist(l, 40)
+                            xlabel('triplet count')
+                            ylabel('number of occurrences')
+                            title(strTitle)
+                            fn = "plotHistOfHist_%s_%s_d1d2.%s" % (ssType, str('-'.join(resTypeListBySequenceOrder)), graphicsFormat)
+                            savefig(fn)
+
+        # end loop over ssType
+    # end over ssType overall
+    return
 
 def plotDihedralD1D2():
     dihedralName1 = 'Cb4N'
@@ -887,11 +984,16 @@ if __name__ == "__main__":
             plotForEntry(entryId)
     if False:
         plotDihedralD1_1d()
-    if True:
+    if False:
 #        doOnlyOverall = False
-        plotDihedralD1_2d(True,  doPrintAvgOnly = False)
+        plotDihedralD1_2d(True, doPrintAvgOnly=False)
 #        plotDihedralD1_2d(False)
     if False:
         m = plotHistogramOverall()
+
     if False:
         plotDihedralD1D2()
+
+    if True:
+        os.chdir(plotHistogramBySsTypeResidueTypesDir)
+        plotHistogramBySsTypeResidueTypes()

@@ -14,6 +14,7 @@ Execute like: ....
 # E.g. from relibase: [DOI: 10.1002/prot.22185]
 # http://relibase.ccdc.cam.ac.uk/documentation/relibase/relibase.1.51.html#339516
 from cing.Scripts.PyMol.CreateSecondaryStructures import createPeptide
+from cing.Scripts.d1d2plot import reportsDir
 from pymol import cmd
 import os
 import pymol #@UnusedImport
@@ -35,8 +36,6 @@ turnTypes = [
 #['IVb' ,  131.7 ,115.5 ,  -9.7 , -57.9 ,  173.1, 'ALA', 'ALA', 'ALA' ],
  ]
 
-rootDir = '/Users/jd/workspace/d1d2project'
-reportsDir = os.path.join(rootDir,'reports')
 os.chdir(reportsDir)
 
 def createTightTurns():

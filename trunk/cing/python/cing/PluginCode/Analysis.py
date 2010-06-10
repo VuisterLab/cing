@@ -37,6 +37,8 @@ class Analysis:
         """
         Return None on error.
         It's not an error to have no peak list.
+
+        If pyRpf crashes the exception will be propagated up from here.
         """
 
         NTmessage("Starting cing.PluginCode.Analysis#runRpf")
@@ -72,7 +74,14 @@ class Analysis:
 
         tolerances = []
         for peakList in peakLists:
-            tolerance = getNoeTolerances(peakList)
+            try:
+                tolerance = getNoeTolerances(peakList)
+            except:
+                NTexception(format_exc())
+                NTerror("Analysis: Crashed on getNoeTolerances and unknown how to be taking default tolerances.")
+                return
+
+
             tolerances.append(tolerance)
             NTdebug("Using peakList.dataSource.name: %s with tolerance: %s" % (peakList.dataSource.name,str(tolerance)))
 #            peakList[RPF_USE] = True # set the selection automatically.
@@ -80,20 +89,15 @@ class Analysis:
         # end for
 
         #Instead of polluting the RPF code simply prevent it from crashing CING by wrapping the functionality in a try block.
-        validResultStores = None
-        try:
-            validResultStores = calcRPF(ensembles, peakLists,
-                                      tolerances,
-                                      distThreshold,
-                                      prochiralExclusion,
-                                      diagonalExclusion,
-                                      doAlised,
-                                      verbose=cing.verbosity==cing.verbosityDebug)
+        validResultStores = calcRPF(ensembles, peakLists,
+                                  tolerances,
+                                  distThreshold,
+                                  prochiralExclusion,
+                                  diagonalExclusion,
+                                  doAlised,
+                                  verbose=cing.verbosity==cing.verbosityDebug)
 #            self.updateResultsTable()
-            NTdebug("validResultStores: %s" % str(validResultStores))
-        except:
-            NTexception(format_exc())
-        # end try
+        NTdebug("validResultStores: %s" % str(validResultStores))
         return validResultStores
     # end def
 # end class
@@ -104,17 +108,23 @@ def runRpf(project,
                prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
                diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
            ):
-    '''Descrn:
+    '''Descrn: Will run pyRpf without allowing it to crash CING.
        Inputs:
+       If pyRpf crashes this routine will catch and show the exception.
     '''
     analysis = Analysis(project=project)
-    if not analysis.runRpf(
-               doAlised=doAlised,
-               distThreshold=distThreshold,
-               prochiralExclusion=prochiralExclusion,
-               diagonalExclusion=diagonalExclusion
-                           ):
-        NTerror("Analysis: Failed runRpf")
+    try:
+        if not analysis.runRpf(
+                   doAlised=doAlised,
+                   distThreshold=distThreshold,
+                   prochiralExclusion=prochiralExclusion,
+                   diagonalExclusion=diagonalExclusion
+                               ):
+            NTerror("Analysis: Failed runRpf")
+            return None
+    except:
+        NTexception(format_exc())
+        NTerror("Analysis: Crashed on runRpf")
         return None
     return project
 
