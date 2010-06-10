@@ -1456,10 +1456,13 @@ def validateDihedralCombinations(project):
         [D1D2_CHK_STR, DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2']
        ]
 
+    msgHol = MsgHoL()
     for residue in project.molecule.allResidues():
+        if residue.hasProperties('water'): # important speed opt. for waters in X-ray.
+            continue
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-            NTdebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
+            msgHol.appendDebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
@@ -1590,6 +1593,7 @@ def validateDihedralCombinations(project):
             # end for modelIdx
         # end for checkIdx
     # end for residue
+    msgHol.showMessage(MAX_MESSAGES=10, MAX_DEBUGS = 10)
 #end def
 
 

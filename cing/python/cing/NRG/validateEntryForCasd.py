@@ -250,15 +250,18 @@ def main(entryId, *extraArgList):
 #    project.save()
 #    project.molecule.ranges = ranges # JFD: this doesn't seem to be set there exactly.
     project.molecule.superpose(ranges=ranges)
-    if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
-            doWattos=doWattos, doTalos=doTalos):
-        NTerror("Failed to validate project read")
-        return True
-    project.runRpf(
-       doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
-       distThreshold=DEFAULT_DISTANCE_THRESHOLD,
-       prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
-       diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+    if False:
+        if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
+                doWattos=doWattos, doTalos=doTalos):
+            NTerror("Failed to validate project read")
+            return True
+
+    if True:
+        project.runRpf(
+           doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
+           distThreshold=DEFAULT_DISTANCE_THRESHOLD,
+           prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+           diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
     )
 
     project.save()

@@ -23,6 +23,11 @@ class AllChecks(TestCase):
         molecule = Molecule(name='moleculeName')
         molecule.ensemble = Ensemble(molecule) # Needed for html.
         project.appendMolecule(molecule) # Needed for html.
+        c = molecule.addChain('A')
+        r1 = c.addResidue('ALA', 1, Nterminal = True)
+        if r1:
+            r1.addAllAtoms()
+
         molecule.updateAll()
         project.setupHtml() # Needed for creating the sub dirs.
         return project

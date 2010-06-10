@@ -35,8 +35,11 @@ class AllChecks(TestCase):
     def test_EnsureValidChainId(self):
         self.assertEquals( ensureValidChainId('A'), 'A')
         self.assertEquals( ensureValidChainId('a'), 'a')
+        v = cing.verbosity
+        cing.verbosity = cing.verbosityNothing # temp disable error msg.
         self.assertEquals( ensureValidChainId('ABCD'), 'A')
         self.assertEquals( ensureValidChainId('BCDE'), 'B')
+        cing.verbosity = v
         self.assertEquals( ensureValidChainId('1'), '1')
         self.assertEquals( ensureValidChainId('$'), Chain.defaultChainId)
         self.assertEquals( ensureValidChainId('-'), Chain.defaultChainId)

@@ -63,7 +63,8 @@ class AllChecks(TestCase):
         self.assertEqual(distanceRestraint.simplifySpecificallyForFcFeature(), DistanceRestraint.STATUS_SIMPLIFIED)
 #        NTdebug("dr after 3: %s" % formatall(distanceRestraint))
         self.assertEqual(distanceRestraint.simplifySpecificallyForFcFeature(), DistanceRestraint.STATUS_NOT_SIMPLIFIED)
-        NTdebug("dr after 4: %s" % formatall(distanceRestraint))
+#        NTdebug("dr after 4: %s" % formatall(distanceRestraint)) # don't print as it contains error token.
+        _x = "dr after 4: %s" % formatall(distanceRestraint)
 
     def ttttest_simplifySpecificallyForFcFeature_2(self):
         self.creatSimpleFastProject()

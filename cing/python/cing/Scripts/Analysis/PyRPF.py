@@ -1089,7 +1089,7 @@ def calcRPF(ensembles, peakLists, tolerances,
     peakPossibilities[peakList] = peakData
     unexplainedPeaksDict[peakList] = unexplained
 
-    print 'unexplained: %s' % unexplained
+#    print 'unexplained: %s' % unexplained
 
   print "  Time taken:", time.time() - t0
 

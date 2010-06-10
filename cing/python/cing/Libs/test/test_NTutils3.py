@@ -7,6 +7,7 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
+from random import random
 from unittest import TestCase
 import unittest
 
@@ -22,6 +23,20 @@ class AllChecks(TestCase):
         molecule = Molecule(name='moleculeName')
         molecule.ensemble = Ensemble(molecule) # Needed for html.
         project.appendMolecule(molecule) # Needed for html.
+
+        # Add some crud to prevent warnings/errors later.
+        molecule.addChain('top')
+        top = molecule.allChains()[0]
+        # Disable warnings temporarily
+        v = cing.verbosity
+        cing.verbosity = verbosityNothing
+        for i in range( 1*10):
+            res = top.addResidue( `random()`,i )
+            for j in range( 5):
+                _atom = res.addAtom( `random()`,j )
+        cing.verbosity = v
+
+
         molecule.updateAll()
         project.setupHtml() # Needed for creating the sub dirs.
 
