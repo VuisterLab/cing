@@ -4,24 +4,22 @@ python $CINGROOT/python/cing/PluginCode/test/test_Analysis.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import switchOutput
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Analysis import Analysis #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
 from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
 from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
 from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
 
     entryList = "1brv_cs_pk_2mdl".split()
 
-    def tttestAnalysisRpf(self):
+    def testAnalysisRpf(self):
         'Skip until project has been improved; looks like peaks without CS are found.'
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True
@@ -52,10 +50,12 @@ class AllChecks(TestCase):
             if cing.verbosity <= cing.verbosityNothing:
                     switchOutput(False)
 
-            self.assertTrue(analysis.runRpf(doAlised=False,
+            self.assertTrue(analysis.runRpf(
+                doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
                 distThreshold=DEFAULT_DISTANCE_THRESHOLD,
                 prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
-                diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT))
+                diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+                ))
 
             if cing.verbosity <= cing.verbosityNothing:
                     switchOutput(True)

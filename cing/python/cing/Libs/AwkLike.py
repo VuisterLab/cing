@@ -1,7 +1,4 @@
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-import sys
-#from cing.Libs.NTutils import printDebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 class AwkLike:
     """

@@ -3,17 +3,12 @@ See doc in convertXplor2Ccpn.py
 """
 
 from ccpnmr.format.converters.CyanaFormat import CyanaFormat
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.Scripts.FC.utils import importPseudoPdb
 from glob import glob
 from memops.api import Implementation
 import Tkinter
-import cing
-import os
 import shutil
 
 __author__ = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"

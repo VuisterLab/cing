@@ -7,17 +7,8 @@ python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTzap
-from cing.Libs.NTutils import floatFormat
-from cing.Libs.NTutils import getDeepByKeysOrDefault
-from cing.Libs.NTutils import gunzip
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
-from cing.Libs.fpconst import NaN
 from cing.PluginCode.dssp import DSSP_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import Janin
@@ -27,15 +18,10 @@ from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo # once executed all 
 from cing.Scripts.getPhiPsiWrapper import subdir
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
-from cing.core.molecule import DIHEDRAL_NAME_Cb4C
-from cing.core.molecule import DIHEDRAL_NAME_Cb4N
 from cing.core.molecule import commonAAList
 from matplotlib.cbook import flatten
-import cing
-import os
-import sys
 
 # Keep a copy of the CING project.
 doSave = False

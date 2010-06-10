@@ -1,24 +1,20 @@
 from cing import header
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import gunzip
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
 from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
+from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
+from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
+from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
-import os
 import shutil
-import sys
 import urllib
 
 
@@ -258,6 +254,13 @@ def main(entryId, *extraArgList):
             doWattos=doWattos, doTalos=doTalos):
         NTerror("Failed to validate project read")
         return True
+    project.runRpf(
+       doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
+       distThreshold=DEFAULT_DISTANCE_THRESHOLD,
+       prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+       diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+    )
+
     project.save()
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'

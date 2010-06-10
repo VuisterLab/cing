@@ -3,25 +3,14 @@ Runs and retrieves DSSP
 Add's runDssp method to project class
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import DSSP_STR
-#from cing.PluginCode.required.reqProcheck import CONSENSUS_SEC_STRUCT_FRACTION
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from cing.setup import time
 from glob import glob
-import os
 
 if True: # block
     useModule = True

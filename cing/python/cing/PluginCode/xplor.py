@@ -36,23 +36,15 @@ Atom, Molecule and Project classes.
 !!NEED to Check periodicity in dihedrals
 
 """
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
 from cing.core.classes import Project
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Molecule
-import math
-import os
 
 #==============================================================================
 # XPLOR stuff

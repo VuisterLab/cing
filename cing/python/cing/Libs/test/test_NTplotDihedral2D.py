@@ -3,12 +3,9 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTplotDihedral2D.py
 """
 
-from cing import verbosityDebug
-from cing import verbosityError
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from pylab import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

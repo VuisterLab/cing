@@ -1,9 +1,7 @@
 from cing import cingDirTmp
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import SetupError
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Whatif import runWhatif
 from cing.core.classes import Project
-import os
 
 """
 Usage: define the set of files below and the atom nomenclature of the input
@@ -11,7 +9,7 @@ then run as: "python WhatIfSeries.py"
 Paths have to be relative to cingDirTmp
 """
 
-fileSet = [ 
+fileSet = [
 #            "NCX_pdb_files/after/H2_AD_Ca_28.pdb",
 #            "NCX_pdb_files/after/H2_AD_EDTA_37.pdb",
 #            "NCX_pdb_files/after/H2_BD_35.pdb",

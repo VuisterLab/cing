@@ -4,11 +4,7 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
 from cing import cingPythonDir
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import toCsv
-from cing.Libs.NTutils import writeTextToFile
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
 import urllib
 import urllib2
 

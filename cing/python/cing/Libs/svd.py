@@ -19,12 +19,10 @@ svd = SVDfitPoly( xs, sigma=None, order=2)
 p = svd.fit(ys)
 print p
 """
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from numpy import zeros #@UnresolvedImport
 from numpy.linalg import svd
 import copy #@UnusedImport
-import math
 
 class SVDfit:
     """Class to do SVD fitting

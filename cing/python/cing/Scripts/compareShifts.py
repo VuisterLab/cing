@@ -3,11 +3,9 @@
 #
 #  compare shifts of two projects
 #
-from cing.Libs.NTutils import printf
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import mapMolecules
-import math
 
 #------------------------------------------------------------------------------------
 # PARAMETERS ed.

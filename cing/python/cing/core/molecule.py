@@ -1431,7 +1431,7 @@ class Molecule( NTtree, ResidueList ):
         msgHol = MsgHoL()
         for res in self.allResidues():
             res.addDihedralsAll(msgHol=msgHol)
-        msgHol.showMessage(MAX_MESSAGES=2)
+        msgHol.showMessage(MAX_MESSAGES=2, MAX_DEBUGS = 2)
 
         if self.modelCount > 0:
             self.syncModels()

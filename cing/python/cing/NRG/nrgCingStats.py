@@ -5,12 +5,9 @@ python $CINGROOT/python/cing/NRG/nrgCingStats.py
 
 Fails if MySql backend is absent.
 """
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from unittest import TestCase
-import cing
-import sys
 
 class NrgCingStats(TestCase):
 

@@ -4,15 +4,13 @@ python $CINGROOT/python/cing/Libs/test/test_sqlAlchemy.py
 
 Fails if MySql backends are absent.
 """
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relation
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, String
 from unittest import TestCase
-import cing
 import unittest
 """
 Unit test execute as:

@@ -7,9 +7,8 @@ from cing import cingDirTmp
 from cing import verbosityDebug
 from cing.Scripts.utils import printSequenceFromPdbFile
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import os
 import unittest
 

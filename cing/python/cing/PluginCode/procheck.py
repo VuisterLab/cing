@@ -20,29 +20,17 @@ from cing import cingPythonCingDir
 from cing.Libs import disk
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.PluginCode.required.reqProcheck import MAX_PROCHECK_NMR_MODELS
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.PluginCode.required.reqProcheck import gf_LIST_STR
 from cing.PluginCode.required.reqProcheck import to3StateUpper
-from cing.core.constants import AQUA
-from cing.core.molecule import dots
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
-import os
 
 
 if True: # block

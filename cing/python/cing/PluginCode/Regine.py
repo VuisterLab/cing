@@ -13,13 +13,10 @@ Format input:
  0.0000E+00,8.0715E+06
  20,5,20,1
 """
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import readTextFromFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 
 class Regine(Lister):
 

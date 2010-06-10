@@ -4,14 +4,10 @@ python $CINGROOT/python/cing/core/test/test_validate.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import os
 import unittest
 
 class AllChecks(TestCase):

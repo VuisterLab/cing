@@ -1,13 +1,6 @@
 from cing import cingDirData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityOutput
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import appendDeepByKeys
-from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
-from cing.Libs.NTutils import gunzip
-from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import to3StateUpper
 from cing.core.molecule import common20AADict
 from cing.core.validate import binCount
@@ -18,9 +11,7 @@ from cing.core.validate import xGrid180
 from cing.core.validate import yGrid180
 from numpy.lib.twodim_base import histogram2d
 import cPickle
-import cing
 import csv
-import os
 
 """
 Takes a file with dihedral angles values and converts them to a python pickle file

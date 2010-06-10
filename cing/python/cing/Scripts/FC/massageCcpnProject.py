@@ -12,11 +12,7 @@ Most functionality is hard-coded here so be careful reading the actual code.
 """
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import readLinesFromFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.core.classes import Project
 from glob import glob
@@ -24,9 +20,6 @@ from matplotlib.cbook import mkdirs
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
 import Tkinter
-import cing
-import os
-import sys
 
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 

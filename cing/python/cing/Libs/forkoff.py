@@ -6,15 +6,8 @@ supporting os.fork() call; Unix.
 
 Author: Jurgen F. Doreleijers, BMRB, September 2001
 """
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from subprocess import Popen
-from subprocess import PIPE
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
 import signal
-import sys
 import time
 import types
 

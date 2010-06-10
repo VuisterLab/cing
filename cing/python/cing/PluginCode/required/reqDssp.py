@@ -1,5 +1,5 @@
-from cing.Libs.NTutils import NTlist
-from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 
 DSSP_STR = "dssp" # key to the entities (atoms, residues, etc under which the results will be stored
 

@@ -24,17 +24,7 @@ from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import is_pdb_code
-from cing.Libs.NTutils import symlink
-from cing.Libs.NTutils import toCsv
-from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
@@ -51,9 +41,7 @@ from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from glob import glob
-import cing
 import csv
-import os
 import shutil
 import string
 import time

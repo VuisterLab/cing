@@ -1,20 +1,7 @@
 from cing import cingPythonCingDir
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdict # Used by obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) ) @UnusedImport
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import obj2XML
-from cing.core.constants import INTERNAL
-from cing.core.constants import INTERNAL_0
-from cing.core.constants import INTERNAL_1
-from cing.core.constants import LOOSE
-import os
-import sys
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
 #     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
@@ -1212,7 +1199,6 @@ NTdb = MolDef( name = 'NTdb') # Database instance; to be filled later,otherwise 
 patch=False
 if patch:
     # Patch N- and C-termini
-    from cing import IUPAC,CCPN,XPLOR
     protein = NTdb.residuesWithProperties('protein')
     for res in protein[:-1]:
 

@@ -1,8 +1,7 @@
 """
 Just a few utilities that can be of more general use.
 """
-from cing.Libs.NTutils import NTerror
-import re
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 __author__    = "$Author$"
 ___revision__ = "$Revision$"

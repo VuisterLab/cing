@@ -14,22 +14,16 @@ Residue
 #@PydevCodeAnalysisIgnore
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.NTutils import NTfill, NTlist, printf, fprintf, sprintf, getDeepByKeys
-from cing.Libs.fpconst import NaN, isNaN
 from cing.Libs.svd import SVDfit
+from cing.PluginCode.required.reqWhatif import *
+from cing.core.molecule import dots
+from cing.core.parameters import cingPaths
+from math import cos, sin, pi, sqrt
+from random import random
 try:
     from cing.PluginCode.Whatif import Whatif # JFD: this statement causes this plugin to be skipped on systems without Whatif.
 except:
     pass
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
-from cing.core.molecule import dots
-from cing.core.parameters import cingPaths
-from math import cos, sin, pi
-from math import sqrt
-from random import random
-import cing #@Reimport
-
-import os #@Reimport
 
 
 class PseudoRotation( SVDfit ):
@@ -676,7 +670,7 @@ Development of a Software Pipeline. Accepted by Proteins (2004).
 #     Output: StructureValidation.ResidueValidation
 #  """
 #
-#  # Define data model call to find exting result
+#  # Define data model call to find existing result
 #  findValidation = residue.findFirstResidueValidation
 #
 #  validObj = findValidation(structureValidationStore=validStore,
@@ -689,7 +683,7 @@ Development of a Software Pipeline. Accepted by Proteins (2004).
 #  """Descrn: Store the per-residue scores for a an ensemble within
 #             CCPN validation objects.
 #             *NOTE* This function may be quicker than using the generic
-#             replaceValidationObjects() because it is class specifc
+#             replaceValidationObjects() because it is class specific
 #     Inputs: StructureValidation.StructureValidationStore,
 #             List of MolStructure.Residues, List if Floats
 #     Output: List of StructureValidation.ResidueValidations

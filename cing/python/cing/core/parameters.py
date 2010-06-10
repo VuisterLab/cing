@@ -1,10 +1,8 @@
 from cing import OS_TYPE_LINUX
 from cing import osType
-from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing import OS_TYPE_MAC
 import platform
-import cing
-import os
 
 #-----------------------------------------------------------------------------
 # Global program parameters (non-user)

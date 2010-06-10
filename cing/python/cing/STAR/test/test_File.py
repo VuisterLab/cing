@@ -3,19 +3,10 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/STAR/test/test_File.py
 """
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR import Utils
 from cing.STAR.File import File
 from unittest import TestCase
-import cing
-import os
 import unittest
 import urllib
 import zipfile
@@ -83,8 +74,8 @@ def testEntry(entry):
     # Freely available on the web so not included in package.
     stage = "2-parsed"
 #    stage = "3-converted-DOCR"
-    urlLocation = ("http://www.bmrb.wisc.edu/NRG/MRGridServlet?" + 
-    "block_text_type=%s&file_detail=%s&pdb_id=%s" + 
+    urlLocation = ("http://www.bmrb.wisc.edu/NRG/MRGridServlet?" +
+    "block_text_type=%s&file_detail=%s&pdb_id=%s" +
     "&program=STAR&request_type=archive&subtype=full&type=entry") % (stage, stage, entry)
     fnamezip = entry + ".zip"
 #    print "DEBUG: downloading url:", urlLocation
@@ -146,7 +137,7 @@ def testEntry(entry):
     os.system(cmd)
     if not os.path.exists(diffOrgWattosWattosFile):
         NTwarning("failed to diff file: ", orgWattosWrittenFile + ", " + wattosWrittenFile)
-    
+
     try:
         os.unlink(entry + ".zip")
         os.unlink(orgWattosWrittenFile)

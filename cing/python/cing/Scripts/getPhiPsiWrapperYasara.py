@@ -6,10 +6,8 @@ Use below to find the entries done and todo:
 """
 from cing import cingDirScripts
 from cing import cingDirTmp
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.getPhiPsi import doYasaraAddHydrogens
-import cing
-import os
 
 Ramachandran = 'Ramachandran'
 Janin = 'Janin'

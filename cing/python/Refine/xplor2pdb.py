@@ -9,19 +9,13 @@
 #=======================================================================
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import OptionParser
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import MODEL
 from cing.Libs.PyMMLib import PDBFile
 from cing.Libs.PyMMLib import REMARK
 from cing.Libs.PyMMLib import TER
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
-#from cing import NTdb
-#from cing.core.dictionaries import NTdbGetAtom
-import sys
 
 version = "%prog 1.1 alpha"
 usage   = "usage: %prog [options] [xplor-files]"

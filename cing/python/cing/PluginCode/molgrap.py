@@ -8,22 +8,14 @@ from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import issueListUrl
 from cing.Libs import disk
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.TypeChecking import check_string
 from cing.Libs.TypeChecking import check_type
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from glob import glob
-import os
 
 if True: # block
     useModule = True

@@ -6,16 +6,11 @@ Open the ???.r3d files in pymol or so; they're nice.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
-from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
 from cing.PluginCode.x3dna import createHtmlX3dna
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 

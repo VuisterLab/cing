@@ -5,14 +5,9 @@ Adds methods:
 
 Unit testing is done thru procheck.
 """
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import fprintf
-from cing.core.constants import AQUA
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
-from cing.Libs.NTutils import val2Str
-from cing.Libs.NTutils import NTcodeerror
 import time
 #-----------------------------------------------------------------------------
 def exportAtom2aqua(atom):

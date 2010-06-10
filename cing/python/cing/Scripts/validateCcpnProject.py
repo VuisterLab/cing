@@ -1,17 +1,9 @@
 """
 python -u $CINGROOT/python/cing/Scripts/validateCcpnProject.py ccpnProjectDir
 """
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTexit
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import stripExtension
-from cing.Libs.NTutils import stripExtensions
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from glob import glob
-import cing
-import os
-import sys
 
 class ValidateCcpnProject():
 

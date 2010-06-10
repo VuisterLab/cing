@@ -42,14 +42,6 @@ from cing.core.parameters import plugins
 import cPickle
 import shutil
 
-
-#dbaseFileName = os.path.join( cingPythonCingDir,'PluginCode','data', 'phipsi_wi_db.dat' )
-#dbase = shelve.open( dbaseFileName )
-#        histCombined               = dbase[ 'histCombined' ]
-#histRamaBySsAndResType         = dbase[ 'histRamaBySsAndResType' ]
-#    histBySsAndCombinedResType = dbase[ 'histBySsAndCombinedResType' ]
-#dbase.close()
-
 HTML_TAG_PRE = "<PRE>"
 HTML_TAG_PRE2 = "</PRE>"
 

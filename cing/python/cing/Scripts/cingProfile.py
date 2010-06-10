@@ -2,14 +2,12 @@
 Unit test execute as:
 python $CINGROOT/python/cing/Scripts/cingProfile.py
 """
+from cing.Libs.NTutils import * #@UnusedWildImport
 import cProfile
 import pstats
 
 def run():
     print "hello"
-    import cing
-    from cing.Libs.NTutils import NTdebug
-    from cing import verbosityDebug
     cing.verbosity = verbosityDebug
     NTdebug( "hello again" )
 

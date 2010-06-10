@@ -2,13 +2,9 @@
 # the above just reminds to the fact that the properties files are all utf-8 encoded.
 # Note that eclipse stores the utf-8 nature of resources in:
 # .settings/org.eclipse.core.resources.prefs
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 from glob import glob
-import cing
 import codecs
-import os
-import sys
 
 
 class lostInTranslation():

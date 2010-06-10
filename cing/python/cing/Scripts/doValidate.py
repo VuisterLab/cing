@@ -1,5 +1,4 @@
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 # Run and parse/Only parse the results
 parseOnly = False

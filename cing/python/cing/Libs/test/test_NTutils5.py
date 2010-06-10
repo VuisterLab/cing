@@ -3,10 +3,8 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTutils5.py
 """
 
-from cing.Libs.NTutils import NTcVarianceAverage
-from cing.core.sml import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

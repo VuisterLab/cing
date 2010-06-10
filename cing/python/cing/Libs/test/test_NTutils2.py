@@ -1,17 +1,7 @@
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import appendDeepByKeys
-from cing.Libs.NTutils import getTextBetween
-from cing.Libs.fpconst import NaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.molecule import Molecule
 from random import random
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

@@ -4,8 +4,6 @@ python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
 from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
@@ -15,18 +13,14 @@ from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
 from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import ResPlot
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from random import random
 from unittest import TestCase
-import os #@Reimport
 import unittest
-#from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):

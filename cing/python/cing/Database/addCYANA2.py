@@ -1,6 +1,5 @@
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
-from cing.core.constants import CYANA2
-from cing.core.constants import CYANA
 
 for res in NTdb:
     res.nameDict[CYANA2] = res.nameDict[CYANA]

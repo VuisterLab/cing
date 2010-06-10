@@ -5,17 +5,12 @@
 # execute:
 # %run -i /Users/jd/workspace35/cing/python/cing/Scripts/testCb2.py
 """
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Dihedral
 
 project = p #@UndefinedVariable
-
-
-
 
 fpGood = open(project.name + '.testCb2Good.out', 'w')
 fpBad = open(project.name + '.testCb2Bad.out', 'w')

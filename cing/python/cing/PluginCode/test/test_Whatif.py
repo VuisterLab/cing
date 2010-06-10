@@ -4,22 +4,14 @@ python $CINGROOT/python/cing/PluginCode/test/test_Whatif.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import VALUE_LIST_STR
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
-#from cing.PluginCode.required.reqWhatif import histRamaBySsAndResType
-#from numpy.core.arrayprint import array2string
-#from numpy.core.arrayprint import set_printoptions
-#import sys
 
 class AllChecks(TestCase):
 

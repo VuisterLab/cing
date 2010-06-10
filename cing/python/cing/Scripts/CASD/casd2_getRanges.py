@@ -2,16 +2,8 @@
 
 from cing import cingVersion
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import OptionParser
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode import compareProjects
-import cing
-import os
-import sys
 
 cp = compareProjects
 

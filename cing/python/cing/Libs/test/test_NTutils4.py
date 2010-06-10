@@ -3,15 +3,8 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTutils4.py
 """
 
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import setDeepByKeys
-from cing.Libs.NTutils import switchOutput
-from cing.Libs.NTutils import toPoundedComment
-from cing.core.sml import NTdict
+from cing.Libs.NTutils import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

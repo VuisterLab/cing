@@ -3,19 +3,9 @@ Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
 from cing import header
-from cing.Libs.NTutils import MsgHoL
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import toPoundedComment
-from cing.Libs.NTutils import writeTextToFile
-from cing.Libs.fpconst import isNaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.main import getStartMessage
 from random import random
-import sys
 
 try:
     import yasaramodule as yasara #@UnresolvedImport

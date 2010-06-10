@@ -4,17 +4,12 @@ python $CINGROOT/python/cing/Libs/test/test_Imagery.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.Imagery import joinPdfPagesByGhostScript
 from cing.Libs.Imagery import montage
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 if not cingPaths.convert: # Requirement for test.

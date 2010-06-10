@@ -4,16 +4,11 @@ python $CINGROOT/python/cing/PluginCode/test/test_Molgrap.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.molgrap import Molgrap #@UnusedImport Keep to indicate dep and proper handeling.
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import IUPAC
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 

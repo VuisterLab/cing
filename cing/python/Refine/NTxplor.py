@@ -1,13 +1,5 @@
-#
-#
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import removedir
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
 import random
-import sys
 import time
 
 todo = """

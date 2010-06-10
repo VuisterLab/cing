@@ -1,8 +1,7 @@
 #import matplotlib # to pop-up a xwindow with command 'show()'
 #matplotlib.use('GTKAgg') # enable this line and above.
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import hPlot
 from cing.Libs.numpyInterpolation import circularlizeMatrix
 from cing.Libs.numpyInterpolation import interp2_linear
@@ -14,9 +13,7 @@ from numpy.core.arrayprint import set_printoptions
 from numpy.core.numeric import nan
 from numpy.lib.index_tricks import ogrid
 from unittest import TestCase
-import cing
 import numpy
-import os
 import unittest
 
 class AllChecks(TestCase):

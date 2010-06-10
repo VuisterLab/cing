@@ -4,12 +4,11 @@ Adds init/import of BMRB format
 Methods:
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.core.constants import IUPAC
-from cing.core.molecule import Molecule
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
-from cing.Libs.fpconst import NaN
+from cing.core.molecule import Molecule
+#from cing.Libs.fpconst import NaN
 
 
 class NMRrestraintsGrid:

@@ -1,7 +1,5 @@
-from cing.core.constants import AQUA
-from cing.core.constants import IUPAC
-#from cing.core.database import NTdb
 from cing import NTdb
+from cing.core.constants import * #@UnusedWildImport
 
 """Copy BMRB to Aqua with mods.
 """

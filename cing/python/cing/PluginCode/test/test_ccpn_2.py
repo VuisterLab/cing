@@ -2,19 +2,14 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
-from cing import verbosityDebug
-from cing import verbosityDefault
-from cing.Libs.NTutils import MsgHoL
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.Ccpn import getProjectNameInFileName
 from cing.PluginCode.Ccpn import getRestraintBoundList
 from cing.PluginCode.Ccpn import isRootDirectory
-from cing.PluginCode.Ccpn import patchCcpnResDescriptor
-from cing.core.sml import NTdict
-from unittest import TestCase
 from cing.PluginCode.Ccpn import modifyResidueDescriptorForTerminii
-import cing
+from cing.PluginCode.Ccpn import patchCcpnResDescriptor
+from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):

@@ -1,4 +1,3 @@
-from cing import NaNstring
 from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
@@ -6,32 +5,13 @@ from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
 from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getTextBetween
-from cing.Libs.NTutils import setDeepByKeys
-from cing.Libs.NTutils import sprintf
-from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.NmrStar import NmrStar
-from cing.PluginCode.required.reqWattos import COMPLCHK_STR
-from cing.PluginCode.required.reqWattos import EXP_COUNT_STR
-from cing.PluginCode.required.reqWattos import MAT_COUNT_STR
-from cing.PluginCode.required.reqWattos import OBS_ATOM_COUNT_STR
-from cing.PluginCode.required.reqWattos import OBS_COUNT_STR
-from cing.PluginCode.required.reqWattos import WATTOS_STR
-from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
-from cing.PluginCode.required.reqWattos import wattosPlotList
+from cing.PluginCode.required.reqWattos import *
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.STAR.File import File
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-import os
 import time
 
 if True: # block
@@ -49,9 +29,6 @@ if True: # block
 
 #    NTmessage('Using Wattos')
 #if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-#    from cing.Libs.NTutils import ImportWarning
-#    from cing.Libs.NTutils import NTmessage
-#    from cing.Libs.NTutils import switchOutput
 #    from cing.PluginCode.required.reqCcpn import CCPN_STR
 #    switchOutput(False)
 #    try:

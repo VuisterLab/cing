@@ -1,13 +1,8 @@
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from unittest import TestCase
-import cing
-import os
 import time
 import types
 import unittest

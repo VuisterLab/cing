@@ -1,55 +1,26 @@
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import printf
-from cing.Libs.NTutils import sprintf
-
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTdebug #@UnusedImport
-from cing.Libs.NTutils import NTwarning
-
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTdict
-# do not remove these two: they are needed during parsing of the sml files
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTvalue
-from cing.core.molecule import Coordinate #@UnusedImport
-
-from cing.core.molecule import Molecule
-from cing.core.molecule import Chain
-from cing.core.molecule import Residue
-from cing.core.molecule import Atom
-from cing.core.molecule import Resonance
-
-from cing.core.classes import Peak
-from cing.core.classes import PeakList
-
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
-
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport ? need for restoring the project ?
+from cing.core.classes import Coplanar
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
-
-from cing.core.constants import AC_LEVEL
-from cing.core.constants import DR_LEVEL
-from cing.core.constants import RDC_LEVEL
-
-
+from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
+from cing.core.classes import Peak
+from cing.core.classes import PeakList
 from cing.core.classes import RDCRestraint
 from cing.core.classes import RDCRestraintList
-
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from cing.core.database import DihedralDef
 from cing.core.database import MolDef
 from cing.core.database import ResidueDef
-
-from cing.core.constants import INTERNAL
-
-#The following imports we need for restoring the project
-from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport
-from cing.core.constants import COPLANAR_LEVEL
-from cing.core.classes import Coplanar
-
-import os
-import sys
+from cing.core.molecule import Atom
+from cing.core.molecule import Chain
+from cing.core.molecule import Coordinate #@UnusedImport
+from cing.core.molecule import Molecule
+from cing.core.molecule import Residue
+from cing.core.molecule import Resonance
+#from cing.Libs.fpconst import NaN as nan not used anymore.
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}

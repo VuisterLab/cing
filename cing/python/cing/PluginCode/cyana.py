@@ -27,23 +27,14 @@ Methods:
 
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
-from cing.core.constants import CYANA
-from cing.core.constants import CYANA2
-from cing.core.molecule import translateTopology #@UnresolvedImport
-import os
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import translateTopology
 import shutil
-#from cing.Libs.NTutils import printWarning
-#import sys
 
 #==============================================================================
 # CYANA stuff

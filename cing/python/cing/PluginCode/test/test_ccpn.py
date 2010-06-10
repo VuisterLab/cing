@@ -4,22 +4,12 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityNothing
-from cing import verbosityOutput
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.Scripts.FC.utils import printSequenceFromCcpnProject
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import IUPAC
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 

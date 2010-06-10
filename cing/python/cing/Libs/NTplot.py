@@ -2,12 +2,9 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.matplotlibExt import blue_inv
 from cing.Libs.matplotlibExt import green_inv
 from cing.Libs.matplotlibExt import yellow_inv
-from cing.PluginCode.required.reqDssp import DSSP_STR
-from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
-from cing.PluginCode.required.reqDssp import to3StateUpper
-from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
-from cing.PluginCode.required.reqWhatif import INOCHK_STR
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb

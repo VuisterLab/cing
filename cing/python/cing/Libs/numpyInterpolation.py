@@ -1,4 +1,4 @@
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from numpy.core.fromnumeric import clip, searchsorted, prod
 from numpy.core.numeric import asarray, empty
 from numpy.lib.index_tricks import ndindex
