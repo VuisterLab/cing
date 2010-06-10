@@ -4,14 +4,10 @@ python $CINGROOT/python/cing/PluginCode/test/test_pdb.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
@@ -35,13 +31,13 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-        
+
         # Compare with molmol on 1brv's 48 models:
 #        mean global bb    RMSD:  0.98 +/-  0.40 A  ( 0.10.. 2.19 A)
 #        mean global heavy RMSD:  1.75 +/-  0.51 A  ( 0.54.. 3.33 A)
         # Note that in molmol the backbone protein atoms are defined: N, CA, C
         # CING used to include the carbonyl atom
-        
+
         # using default parameters.
         ens = project.molecule.superpose(backboneOnly=True, includeProtons = False, iterations=2)
         NTdebug( 'ens %s' % ens)
@@ -62,7 +58,7 @@ if __name__ == "__main__":
     cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
     unittest.main()
-    
+
 #        1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48
 #  1       1.53 1.84 1.66 0.49 1.56 1.79 0.76 1.18 1.69 1.12 1.16 1.66 1.21 0.96 0.69 0.81 1.40 0.41 1.36 1.29 1.24 1.70 1.08 0.58 0.95 0.30 1.07 1.29 0.66 0.87 0.76 0.42 1.15 1.05 1.48 1.05 1.21 1.41 0.85 1.66 0.29 0.97 0.48 0.59 1.97 0.67 0.62
 #  2  1.99      0.71 0.74 1.72 0.31 0.57 1.00 1.45 1.37 0.71 0.84 0.67 1.13 1.25 1.44 1.50 0.42 1.37 1.22 0.47 1.16 0.74 0.75 1.23 1.44 1.41 0.72 0.44 1.14 1.38 1.35 1.50 1.52 0.66 1.09 0.72 0.80 1.04 0.90 1.01 1.40 1.11 1.26 1.19 0.83 1.79 1.14
@@ -111,7 +107,7 @@ if __name__ == "__main__":
 # 45  0.89 1.76 2.38 2.60 1.12 1.87 2.25 1.44 1.88 2.73 1.52 1.94 2.11 2.43 1.84 1.81 2.07 1.91 0.83 2.09 1.47 1.45 2.38 1.30 0.58 1.53 0.78 1.10 1.46 0.97 1.87 1.80 1.55 1.96 1.11 2.40 1.49 1.87 2.15 1.10 2.48 1.38 1.12 1.03      1.59 0.73 0.49
 # 46  2.90 1.95 0.76 1.13 2.64 1.90 1.58 2.33 2.84 2.30 2.20 1.97 1.71 1.98 2.55 2.32 2.47 1.98 2.65 1.38 2.14 2.17 0.85 2.15 2.54 2.61 2.72 2.05 2.23 2.57 2.50 2.09 2.72 2.95 2.11 1.55 2.25 1.39 1.82 2.39 1.33 2.87 2.44 2.76 2.67      2.19 1.48
 # 47  1.26 2.28 3.17 3.02 1.60 2.43 2.76 2.14 1.99 2.83 2.17 2.34 2.40 2.77 2.12 2.36 2.19 2.24 1.50 2.76 1.86 1.93 2.95 2.15 1.34 1.89 1.37 1.90 2.05 1.39 1.93 2.34 1.71 1.95 1.96 2.83 2.20 2.62 2.29 1.63 2.95 1.53 1.91 1.53 1.39 3.33      1.06
-# 48  1.20 1.63 2.28 2.17 1.37 1.70 1.78 0.90 2.18 2.55 1.22 1.48 1.77 1.73 2.04 1.34 1.56 1.48 1.12 1.87 1.40 1.05 2.13 0.98 1.08 0.99 1.11 0.98 1.39 1.00 1.11 1.34 1.21 2.06 1.20 1.80 1.11 1.75 1.83 1.05 2.17 0.93 1.01 0.64 1.20 2.52 1.71     
+# 48  1.20 1.63 2.28 2.17 1.37 1.70 1.78 0.90 2.18 2.55 1.22 1.48 1.77 1.73 2.04 1.34 1.56 1.48 1.12 1.87 1.40 1.05 2.13 0.98 1.08 0.99 1.11 0.98 1.39 1.00 1.11 1.34 1.21 2.06 1.20 1.80 1.11 1.75 1.83 1.05 2.17 0.93 1.01 0.64 1.20 2.52 1.71
 #
 #mean global bb    RMSD:  0.98 +/-  0.40 A  ( 0.10.. 2.19 A)
 #mean global heavy RMSD:  1.75 +/-  0.51 A  ( 0.54.. 3.33 A)

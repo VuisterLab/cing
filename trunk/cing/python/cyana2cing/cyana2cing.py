@@ -11,16 +11,9 @@
 
 """
 
-import cing
 from cing import cingVersion
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-
-from cing.Libs.NTutils import OptionParser
-import os
-import sys
 
 header = """
 ======================================================================================================

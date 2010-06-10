@@ -12,12 +12,7 @@ from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import pointAttributes
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.fpconst import isNaN
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 KEY_LIST_STR = 'keyList'
 KEY_LIST2_STR = 'keyList2'

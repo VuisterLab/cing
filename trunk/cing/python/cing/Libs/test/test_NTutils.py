@@ -3,24 +3,10 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTutils.py
 """
 
-from cing import NaNstring
 from cing import cingDirTmp
 from cing import cingPythonDir
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTcVarianceAverage
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import findFiles
-from cing.Libs.NTutils import removeRecursivelyAttribute
-from cing.Libs.NTutils import switchOutput
-from cing.Libs.NTutils import val2Str
-from cing.Libs.fpconst import isNaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

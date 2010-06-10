@@ -3,13 +3,8 @@
 # There is a unit test at: cing.Scripts.test.testiCingRobot
 
 from cing import cingDirTestsData
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-import cing
+from cing.Libs.NTutils import * #@UnusedWildImport
 import mimetools
-import os
 import random
 import time
 import urllib2

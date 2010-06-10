@@ -12,30 +12,16 @@
 # file:///Users/jd/wattosTestingPlatform/pdb/data/structures/divided/pdb /Library/WebServer/Documents/PDB-CING . . BY_CH23 PDB
 
 from cing import header
-from cing import verbosityDebug
-from cing import verbosityNothing
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import gunzip
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.core.classes import Project
-from cing.core.constants import CCPN
-from cing.core.constants import CING
-from cing.core.constants import CYANA
-from cing.core.constants import IUPAC
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
-from cing.Libs.disk import copy
-import cing
-import os
 import shutil
-import sys
 import urllib
 
 

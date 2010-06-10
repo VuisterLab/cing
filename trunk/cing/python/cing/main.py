@@ -121,24 +121,13 @@ from cing import cingPythonDir
 from cing import cingVersion
 from cing import header
 from cing import starttime
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import OptionParser
-from cing.Libs.NTutils import findFiles
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import osType
 from cing.core.parameters import plugins
-from string import join
-import cing
-import os
 import platform
-import sys
 import time
 import unittest
 
@@ -573,7 +562,6 @@ def main():
     #end if
 
     if options.pydoc:
-        import pydoc
         import webbrowser
         NTmessage('==> Serving documentation at http://localhost:9999')
         NTmessage('    Type <control-c> to quit')

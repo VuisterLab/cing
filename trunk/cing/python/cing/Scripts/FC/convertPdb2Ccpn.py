@@ -4,14 +4,11 @@ Used for eNMR workshop Frankfurt data sets.
 """
 
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from glob import glob
 from memops.api import Implementation
 import Tkinter
-import cing
-import os
 import shutil
 
 __author__     = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"

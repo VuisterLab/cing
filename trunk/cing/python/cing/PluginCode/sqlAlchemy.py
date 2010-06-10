@@ -1,11 +1,7 @@
-from cing import verbosityDebug
-from cing import verbosityWarning
-from cing.Libs.NTutils import NTdebug, NTdict, NTerror, NTmessage
-from cing.Libs.NTutils import NTexception
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
-from cing.PluginCode.required.reqOther import SQL_STR
-import cing
+from cing.PluginCode.required.reqOther import *
 import warnings
 
 DB_TYPE_MYSQL = 'mysql'
@@ -13,8 +9,6 @@ DB_TYPE_PSQL = 'postgres'
 DB_TYPE_DEFAULT = DB_TYPE_PSQL
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    from cing.Libs.NTutils import ImportWarning
-    from cing.Libs.NTutils import switchOutput
 #    switchOutput(False)
     try:
         # All sql imports here and not above.

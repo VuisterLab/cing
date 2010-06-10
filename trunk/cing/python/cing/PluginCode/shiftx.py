@@ -3,30 +3,13 @@ Adds shiftx method to predict chemical shifts. The shiftx program is included as
 Linux in the bin directory.
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTprogressIndicator
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import obj2XML
-from cing.Libs.NTutils import sprintf
-from cing.Libs.fpconst import NaN
-from cing.core.constants import IUPAC
-from cing.core.molecule import dots
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
 from glob import glob
 from math import sqrt
-import cing
-import os
-import platform #@UnusedImport
+
 
 
 if True: # block

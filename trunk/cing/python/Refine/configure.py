@@ -6,11 +6,9 @@
 # *   Adapted as configure.py by GWV Feb 2005/March 2007   *
 # **********************************************************
 #
-# This configuration file contains all necessary information 
+# This configuration file contains all necessary information
 # for the refine.py script.
-from cing.Libs.NTutils import NTdict
-
-import os
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 refinePath = os.path.join(os.getenv('CINGROOT','.'), 'python','Refine')
 xplorPath  = os.getenv('xplorPath','.')
@@ -19,14 +17,14 @@ xplorPath  = os.getenv('xplorPath','.')
 # editing below here should generally not be necessary
 # **********************************************************
 # Relabelled from config to refineConfig for apparent clashes with other config.
-config = NTdict(  
+config = NTdict(
 
     XPLOR            =  xplorPath,
 
 # (waterrefine) xplor stuff, directories, etc.
     refinePath       = refinePath,
-    topparPath       = os.path.join(refinePath,'toppar'), 
-    protocolsPath    = os.path.join(refinePath,'explicit_solvent'), 
+    topparPath       = os.path.join(refinePath,'toppar'),
+    protocolsPath    = os.path.join(refinePath,'explicit_solvent'),
 
     parameterFiles   = [ 'parallhdg5.3-merge.pro',
                          'parallhdg5.3.sol',
@@ -41,9 +39,9 @@ config = NTdict(
     directories      = NTdict(
         converted    = 'Converted',
         analyzed     = 'Analyzed',
-        refined      = 'Refined', 
+        refined      = 'Refined',
         tables       = 'Tables',
-        jobs         = 'Jobs', 
+        jobs         = 'Jobs',
         psf          = 'PSF',
 	toppar	     = 'Toppar'
     )

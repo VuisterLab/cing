@@ -4,8 +4,6 @@ python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlotCorrelation.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
 from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
@@ -13,9 +11,7 @@ from cing.Libs.NTmoleculePlot import USE_ROG_FOR_COLOR_STR
 from cing.Libs.NTmoleculePlot import XLABEL_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import ResPlot
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Whatif import ANGCHK_STR
 from cing.PluginCode.Whatif import BBCCHK_STR
 from cing.PluginCode.Whatif import BNDCHK_STR

@@ -1,6 +1,7 @@
 from cing import __author__
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqAnalysis import ANALYSIS_STR
+from cing.PluginCode.required.reqAnalysis import * #@UnusedWildImport
+from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
 from traceback import format_exc
 
 __author__ += 'Tim Stevens '
@@ -9,14 +10,10 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     switchOutput(False)
     try:
         from ccpnmr.analysis.Version import version #@UnusedImport
-        from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists
-        from cing.Scripts.Analysis.PyRPF import calcRPF
-        from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
-        from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
-        from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
-        from cing.Scripts.Analysis.PyRPF import getEnsembles
-        from cing.Scripts.Analysis.PyRPF import getNoeTolerances
-        from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
+        from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists #@UnusedImport IS used.
+        # The defs below are not moved into this module so that Analysis and CING both have access to them.
+        # Analysis can't import any cing code.
+        from cing.Scripts.Analysis.PyRPF import * #@UnusedWildImport
     except:
         switchOutput(True)
         raise ImportWarning(ANALYSIS_STR)
@@ -32,7 +29,7 @@ class Analysis:
         self.project = project
 
     def runRpf(self,
-               doAlised=False,
+               doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
                distThreshold=DEFAULT_DISTANCE_THRESHOLD,
                prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
                diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
@@ -90,7 +87,8 @@ class Analysis:
                                       distThreshold,
                                       prochiralExclusion,
                                       diagonalExclusion,
-                                      doAlised)
+                                      doAlised,
+                                      verbose=cing.verbosity==cing.verbosityDebug)
 #            self.updateResultsTable()
             NTdebug("validResultStores: %s" % str(validResultStores))
         except:
@@ -100,12 +98,22 @@ class Analysis:
     # end def
 # end class
 
-def runRpf(project):
+def runRpf(project,
+               doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
+               distThreshold=DEFAULT_DISTANCE_THRESHOLD,
+               prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+               diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+           ):
     '''Descrn:
        Inputs:
     '''
     analysis = Analysis(project=project)
-    if not analysis.runRpf():
+    if not analysis.runRpf(
+               doAlised=doAlised,
+               distThreshold=distThreshold,
+               prochiralExclusion=prochiralExclusion,
+               diagonalExclusion=diagonalExclusion
+                           ):
         NTerror("Analysis: Failed runRpf")
         return None
     return project

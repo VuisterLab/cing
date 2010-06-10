@@ -2,14 +2,10 @@
 Run script on set of entries given their input/output locations
 and a file with a list of their names.
 """
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import getDateTimeStampForFileName
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from random import shuffle
-import os
 
 """
 NB

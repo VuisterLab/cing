@@ -25,30 +25,11 @@ from Refine.NTxplor    import refineNoeParameters
 from Refine.NTxplor    import refineParameters #@UnusedImport
 from Refine.configure  import config
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTaverage
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdict #@UnusedImport just nice to have.
-from cing.Libs.NTutils import OptionParser
-from cing.Libs.NTutils import asci2list
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import obj2XML #@UnusedImport
-from cing.Libs.NTutils import removedir
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk    import copy
-from cing.core.constants import XPLOR
 from cing.core.classes import Project
-from cing.core.molecule import dots
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import mapMolecules #@UnusedImport
-from string import find
-from cing.Libs.NTutils import printf
-from fnmatch import fnmatch
-import os
-import sys
-import cing #@UnusedImport
-
-
 
 def importFromRefine( config, params, project ):
     """

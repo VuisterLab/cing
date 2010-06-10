@@ -1,9 +1,5 @@
 from cing import header
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import dataDir
@@ -15,20 +11,14 @@ from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoordinatesAndRestraint
 from cing.Scripts.FC.utils import importPseudoPdb
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
-#from pdbe.adatah.Constraints import ConstraintsHandler
 from shutil import copytree
 from shutil import rmtree
 import Tkinter
-import cing
-import os
-import sys
 import tarfile
 
 

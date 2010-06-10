@@ -1,11 +1,8 @@
 from cing import __author__
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
-from cing.Libs.NTutils import NTmessage
-import os
 
-__author__ += 'Wim Vranken '
+__author__ += 'Tim Stevens '
 
 class RPF():
     def __init__(self, project):

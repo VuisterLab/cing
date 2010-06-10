@@ -5,13 +5,7 @@ gv 21 March 2006
 
 """
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import sprintf
-import sys
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 class nmrPipeTabRow( NTdict ):
 

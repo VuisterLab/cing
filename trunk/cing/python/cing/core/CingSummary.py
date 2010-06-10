@@ -1,16 +1,6 @@
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import XML2obj
-from cing.Libs.NTutils import XMLhandler
-from cing.Libs.NTutils import obj2XML
-from cing.Libs.fpconst import NaN
-from cing.PluginCode.required.reqWhatif import WHATIF_STR
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.parameters import plugins
-from cing.Libs.NTutils import NTmessage
-import cing
-import os
 
 class CingSummary( NTdict ):
     """

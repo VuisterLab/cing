@@ -7,13 +7,10 @@ cing --test
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import profile
 import pstats
 import unittest

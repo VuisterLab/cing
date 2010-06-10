@@ -1,22 +1,13 @@
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import MsgHoL
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import bytesToFormattedString
-from cing.Libs.NTutils import getDateTimeStampForFileName
-from cing.Libs.NTutils import toCsv
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.html import HTMLfile
 from cing.core.classes import Project
 from cing.core.classes import ROGscore
-from cing.core.constants import COLOR_ORANGE
-from cing.core.constants import COLOR_RED
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from unittest import TestCase
-from cing.Libs.html import HTMLfile
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

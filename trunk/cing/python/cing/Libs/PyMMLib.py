@@ -5,11 +5,7 @@
 
 ## Adjusted by gv for specific purpose of NTmol
 
-from cing.Libs.NTutils import NTdebug #@UnusedImport
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from types import ListType
 from types import StringType
 from types import TupleType
@@ -1736,8 +1732,6 @@ class RecordProcessor(object):
 
 ### <testing>
 if __name__ == "__main__":
-    import sys
-
     try:
         path = sys.argv[1]
     except IndexError:

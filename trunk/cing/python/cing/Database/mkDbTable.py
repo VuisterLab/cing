@@ -1,5 +1,5 @@
 #@PydevCodeAnalysisIgnore
-from cing.Libs.NTutils import fprintf
+from cing.Libs.NTutils import *
 from cing.core.database import ResidueDef
 from cing import NTdb
 import cing

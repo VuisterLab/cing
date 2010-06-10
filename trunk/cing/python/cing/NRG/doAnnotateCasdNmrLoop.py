@@ -1,15 +1,12 @@
 # python -u $CINGROOT/python/cing/NRG/doAnnotateCasdNmrLoop.py
 
 from cing import cingPythonDir
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.CasdNmrMassageCcpnProject import baseDir
 from cing.NRG.CasdNmrMassageCcpnProject import programHoH
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.NRG.doAnnotateCasdNmr import annotateEntry
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-import cing
-import os
 
 cing.verbosity = cing.verbosityDebug
 

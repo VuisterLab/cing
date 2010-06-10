@@ -1,4 +1,4 @@
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
 SECSTRUCT_STR      = 'secStruct'

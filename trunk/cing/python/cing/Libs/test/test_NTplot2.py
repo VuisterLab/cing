@@ -1,6 +1,4 @@
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
 from cing.Libs.NTmoleculePlot import selectPointsFromRange
 from cing.Libs.NTplot import HelixIconList
 from cing.Libs.NTplot import NTplot
@@ -8,9 +6,7 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import triangularList
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.peirceTest import peirceTest
 from cing.core.classes import Project
 from matplotlib.pylab import figure
@@ -19,9 +15,6 @@ from matplotlib.pylab import plot
 from matplotlib.pylab import text
 from numpy.core.numeric import arange
 from unittest import TestCase
-import cing
-import os
-import sys
 import unittest
 #from numpy.ma.core import arange
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport

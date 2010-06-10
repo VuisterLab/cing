@@ -1,8 +1,5 @@
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-import re
-import os
 
 def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.convert:

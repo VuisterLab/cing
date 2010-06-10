@@ -24,9 +24,7 @@
 #Boolean      : true
 #Comment      : No R-free set in experimental data
 #//
-from cing.Libs.NTutils import writeTextToFile
-from cing.Libs.NTutils import NTdebug
-import cing
+from cing.Libs.NTutils import * #@UnusedWildImport
 
 booleanStrTrue = 'true'
 booleanStrFalse = 'false'
@@ -45,11 +43,11 @@ class WhyNotEntry:
         self.entryId = entryId
         self.exists = exists
         self.comment = comment
-                
+
 class WhyNot(dict):
 #    def __init__(self, *args, **kwds):
 #        dict.__init__(self, *args, **kwds)
-        
+
     def __str__(self):
         result = ''
         keyList = self.keys()
@@ -66,10 +64,10 @@ Property     : Exists
 Boolean      : %s
 Comment      : %s
 //
-""" % (whyNotEntry.entryId, boolStr, whyNotEntry.comment,) 
+""" % (whyNotEntry.entryId, boolStr, whyNotEntry.comment,)
             result += entryText
         return result
-            
+
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     whyNot = WhyNot()
@@ -84,5 +82,4 @@ if __name__ == '__main__':
     whyNotStr = '%s' % whyNot
     NTdebug("whyNotStr: ["+ whyNotStr +"]")
     writeTextToFile("NRG-CING.txt", whyNotStr)
-    
-                
+

@@ -6,21 +6,13 @@ Used for eNMR/weNMR workshop data sets.
 from ccpnmr.format.converters.CnsFormat import CnsFormat
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
-from cing.Scripts.FC.constants import KEYWORDS
-from cing.Scripts.FC.constants import LINK_RESONANCES
+from cing.Scripts.FC.constants import * #@UnusedWildImport
 from cing.Scripts.FC.utils import importPseudoPdb
 from glob import glob
 from memops.api import Implementation
 import Tkinter
-import cing
-import os
 import shutil
 
 

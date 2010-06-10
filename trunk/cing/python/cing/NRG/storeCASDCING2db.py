@@ -4,23 +4,14 @@
 #
 # NB this script fails if the MySql backend is not installed.
 from cing import header
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
 from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
 from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
-from cing.PluginCode.required.reqDssp import getDsspSecStructConsensusId
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
-from cing.PluginCode.required.reqProcheck import gf_CHI12_STR
-from cing.PluginCode.required.reqProcheck import gf_CHI1_STR
-from cing.PluginCode.required.reqProcheck import gf_PHIPSI_STR
-from cing.PluginCode.required.reqProcheck import gf_STR
-from cing.PluginCode.required.reqWattos import COMPLCHK_STR
-from cing.PluginCode.required.reqWattos import WATTOS_STR
+from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
@@ -29,9 +20,6 @@ from cing.main import getStartMessage
 from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
-import os
-import sys
-
 
 def main(casd_id, *extraArgList):
     """inputDir may be a directory or a url.

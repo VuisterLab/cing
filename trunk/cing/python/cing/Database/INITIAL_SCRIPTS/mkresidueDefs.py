@@ -1,8 +1,8 @@
 from cing.core.database import MolDef
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import fprintf
-import sys
+from cing.Libs.NTutils import * #@UnusedWildImport
+
 cyanaLib = """
 # RESIDUE resName Number_of_dihedral_defs number_of_atom_defs start_atom_of_residue stop_atom_of_residue
 # gv: connected pseudo's of Protein residues to carbon, but not carbon to pseudo as this is done indirectly

@@ -3,13 +3,10 @@ Created on Apr 6, 2010
 
 @author: jd
 '''
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import defaultPrintChainCode
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
-import cing
+from cing.core.constants import * #@UnusedWildImport
 
 def printSequenceFromPdbFile(fn):
     verbosityOriginal = cing.verbosity

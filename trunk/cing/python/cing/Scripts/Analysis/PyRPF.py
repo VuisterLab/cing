@@ -17,6 +17,7 @@ from ccpnmr.analysis.core.ExperimentBasic import getOnebondDataDims, getDataDimI
 from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists, getDataDimRefFullRange, getPrimaryDataDimRef
 from ccpnmr.analysis.core.MarkBasic import createNonPeakMark
 from ccpnmr.analysis.core.MoleculeBasic import getNumConnectingBonds, areResonancesBound, getBoundAtoms
+from ccpnmr.analysis.core.StructureBasic import getAtomSetCoords
 from ccpnmr.analysis.core.StructureBasic import getAtomSetsDistance
 from ccpnmr.analysis.core.Util import getAnalysisDataDim
 from ccpnmr.analysis.core.WindowBasic import getDataDimAxisMapping, getWindowPaneName
@@ -100,6 +101,7 @@ MISSING_PEAK = 'Shift_Missing_Peak'
 DEFAULT_DISTANCE_THRESHOLD = 4.8 # Angstrom units default to runRPF was 5.0 before.
 DEFAULT_PROCHIRAL_EXCLUSION_SHIFT = 0.04 # PPM units
 DEFAULT_DIAGONAL_EXCLUSION_SHIFT = 0.3 # PPM units default to runRPF was 0.1 before.
+DEFAULT_CONSIDER_ALIASED_POSITIONS = True
 RPF_USE = "rpfUse"
 
 def pyRpfMacro(argServer):
@@ -155,7 +157,7 @@ class PyRpfPopup(BasePopup):
 
     label = Label(frame, text='Consider Aliased Positions?')
     label.grid(row=0,column=2, sticky='w')
-    self.aliasedSelect = CheckButton(frame, selected=True)
+    self.aliasedSelect = CheckButton(frame, selected=DEFAULT_CONSIDER_ALIASED_POSITIONS)
     self.aliasedSelect.grid(row=0,column=3, sticky='w')
 
     label = Label(frame, text='Prochiral Exclusion (PPM):')
@@ -506,9 +508,10 @@ class PyRpfPopup(BasePopup):
 
       dimMapping = getDataDimAxisMapping(spectrum, self.window)
       boundDims  = getOnebondDataDims(spectrum)
-
+      print "boundDims: %s" % boundDims
       shiftPairs = []
       for shift in shifts:
+        print "looking at shift: %s" % shift
         bound = getBoundResonances(shift.resonance) or []
 
         shiftX = None
@@ -528,6 +531,8 @@ class PyRpfPopup(BasePopup):
 
       # Map bound shifts to bound dataDims
       for dataDim1, dataDim2 in boundDims:
+        print "looking at dataDim1: %s" % dataDim1
+        print "looking at dataDim2: %s" % dataDim2
         dataDimRef1 = getPrimaryDataDimRef(dataDim1)
         dataDimRef2 = getPrimaryDataDimRef(dataDim2)
 
@@ -981,8 +986,13 @@ class PyRpfPopup(BasePopup):
                               colorMatrix=colorList)
 
 
-def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THRESHOLD, prochiralTolerance=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
-            diagonalTolerance=DEFAULT_DIAGONAL_EXCLUSION_SHIFT, aliasing=True, progressBar=None,):
+def calcRPF(ensembles, peakLists, tolerances,
+            distThreshold=DEFAULT_DISTANCE_THRESHOLD,
+            prochiralTolerance=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+            diagonalTolerance=DEFAULT_DIAGONAL_EXCLUSION_SHIFT,
+            aliasing=DEFAULT_CONSIDER_ALIASED_POSITIONS,
+            progressBar=None,
+            verbose=False):
   """Descrn: Function to calculate recall, precision and F-Measure
              for the comparison between close 1H distances in
              structures and the possible ambiguous assignments in NOESY
@@ -1003,6 +1013,8 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
   # First work out which heteroatoms are required to be connected
   heteroAtomContexts = set()
   peakListHeteroAtomContexts = {}
+  badDist = distThreshold+1.0
+  badNoe = badDist**-6.0
 
   # Loop through input peak lists
   for peakList in peakLists:
@@ -1077,7 +1089,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
     peakPossibilities[peakList] = peakData
     unexplainedPeaksDict[peakList] = unexplained
 
-    print unexplained
+    print 'unexplained: %s' % unexplained
 
   print "  Time taken:", time.time() - t0
 
@@ -1108,7 +1120,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
   print  "Calculating scores and making CCPN validation objects"
 
   # List for CCPN validation objects
-  validataionResults = []
+  validationResults = []
 
   # Loop through each ensemble
   for ensemble in ensembles:
@@ -1122,7 +1134,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
     # List for false neg result peaks
     unexplainedPeaks = set()
 
-    # The list of working resonances is simpley
+    # The list of working resonances is simply
     # the list of objects used as keys in the dictionary
     # of structurally close resonances
     resonances = rDists.keys()
@@ -1131,8 +1143,8 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
     # Find or make an object to store the results in the CCPN model
     validStore = getEnsembleValidationStore(ensemble)
 
-    # Store validation obbject for output
-    validataionResults.append(validStore)
+    # Store validation object for output
+    validationResults.append(validStore)
 
     # Initialise all-peakList counters
     # Note triples are used to store the full,
@@ -1172,7 +1184,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
       # Get peak list's spectrum (dataSource)
       spectrum = peakList.dataSource
 
-      # Derermine which dimensions are bound
+      # Determine which dimensions are bound
       boundDims  = {}
       for dataDim1, dataDim2 in getOnebondDataDims(spectrum):
         boundDims[dataDim1] = dataDim2
@@ -1216,7 +1228,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
       falseNeg = [0,0,0]
 
       # Dictionary to check if we've seen a pair of potentially
-      # ambiguiuous prochiral resonances before
+      # ambiguous prochiral resonances before
       prochiralCheck = {}
 
       # Pairs of close chemical shifts which
@@ -1361,10 +1373,10 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
             continue
 
           # Get resonance distances
-          dist = rDists[resonance1].get(resonance2, distThreshold+1.0)
-
           # Get equiv NOE
-          noe = dist**-6.0
+          dist, noe = rDists[resonance1].get(resonance2, (badDist, badNoe))
+
+          #noe = dist**-6.0
 
           # Number of connecting bonds
           nBonds = getNumConnectingBonds(atom1, atom2, limit=10) or 0
@@ -1449,7 +1461,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
                 if not rDists.get(resonance3):
                   continue
 
-                dist2 = rDists[resonance3].get(resonance4, distThreshold+1.0)
+                dist2, _noe2 = rDists[resonance3].get(resonance4, (badDist, badNoe))
 
                 if dist2 < distThreshold:
                   # Found another close resonance pair
@@ -1626,7 +1638,7 @@ def calcRPF(ensembles, peakLists, tolerances, distThreshold=DEFAULT_DISTANCE_THR
 
   print "  Time taken:", time.time() - t0
 
-  return validataionResults
+  return validationResults
 
 def countsToRpf(truePos, falseNeg, truePosNoe, falsePosNoe, verbose=False):
   """Descrn: Calculate recall, precision & F-measure from
@@ -1772,7 +1784,7 @@ def getEnsembleValidationStore(ensemble):
 
 def storeResidueRpfValidation(validStore, residue, recall,
                               precision, fMeasure, dpScore):
-  """Descrn: Store the RPF results for a an ensemble, over all peak lists
+  """Descrn: Store the RPF results for an ensemble, over all peak lists
              in CCPN validation objects.
      Inputs: Validation.ValidationStore,
              MolStructure.Residue, Float, Float, Float, Float
@@ -1816,7 +1828,7 @@ def getResidueRpfValidation(validStore, residue):
      Inputs: Validation.ValidationStore, MolStructure.Residue
      Output: 3-Tuple of Validation.PeakListValidation
   """
-  # Define data model call to find exting result
+  # Define data model call to find existing result
   findValidation = residue.findFirstResidueValidation
 
   residueRecall = findValidation(validationStore=validStore,
@@ -1895,7 +1907,7 @@ def getOverallRpfValidation(validStore):
      Inputs: Validation.ValidationStore
      Output: 3-Tuple of Validation.PeakListValidation
   """
-  # Define data model call to find exting result
+  # Define data model call to find existing result
   findValidation = validStore.findFirstValidationResult
 
   allRecall = findValidation(className=PKLIST_VALID, context=PROG, keyword=RECALL_ALL)
@@ -1987,6 +1999,7 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
              - i.e. dict[resonance1][resonance2] = dist
   """
 
+  badDist = distThreshold+2.5
 
   # Store resonances by linking them to a Ca atom
   residueHydrogens = {} #@UnusedVariable
@@ -2092,24 +2105,107 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
   if progressBar:
     progressBar.total = len(hydrogens)-1
 
-  for i, (atomSets1, resonance1, boundType1) in enumerate(hydrogens[:-1]):
-    for _j, (atomSets2, resonance2, boundType2) in enumerate(hydrogens[i+1:]): # JFD modded.
+  models = ensemble.models
+  ensembleCoords = []
+  ensembleCoordsAppend = ensembleCoords.append
+
+  for i, (atomSets, resonance, boundType) in enumerate(hydrogens):
+
+    coordList1 = []
+    coordList1Append = coordList1.append
+    xl = []
+    yl = [] #@UnusedVariable
+    zl = [] #@UnusedVariable
+    for model in models:
+
+      xa = 0.0
+      nc = 0.0
+      coords = []
+      for atomSet in atomSets:
+        for coord in getAtomSetCoords(atomSet, ensemble, model):
+          x = coord.x
+          y = coord.y
+          z = coord.z
+          coords.append((x,y,z))
+          xa += x
+          nc += 1.0
+
+      xl.append(xa/nc)
+      coordList1Append(coords)
+
+    if coordList1:
+      ensembleCoordsAppend((xl, i, coordList1))
+
+  nModels = float(len(models))
+  nHydrogens = len(ensembleCoords) #@UnusedVariable
+  ensembleCoords.sort()
+
+  for k, (x1, i, coordList1) in enumerate(ensembleCoords[:-1]):
+    if progressBar:
+      progressBar.increment()
+
+    (atomSets1, resonance1, boundType1) = hydrogens[i]
+
+    for x2, j, coordList2 in ensembleCoords[k:]:
+
+      (atomSets2, resonance2, boundType2) = hydrogens[j]
+
       context = (boundType1, boundType2)
       # Check that the heteroatoms fit the spectrum types
       if not contextDict.get(context):
         continue
 
-      # Get equiv NOE distance between atom sets in ensemble
-      noeDist = getAtomSetsDistance(atomSets1, atomSets2,
+      for a, x1a in enumerate(x1):
+        if (x2[a]-x1a) < badDist:
+          break
+      else:
+        break
+
+      if atomSets1 == atomSets2:
+        if len(atomSets1) == 2:
+          atomSets0 = list(atomSets1)
+          for resonanceSet in atomSets0[0].resonanceSets:
+            if resonanceSet in atomSets0[1].resonanceSets: # Prochiral
+              atomSetsA = [atomSets0[0],]
+              atomSetsB = [atomSets0[1],]
+              noeDist = getAtomSetsDistance(atomSetsA, atomSetsB,
                                     ensemble, method='noe')
+              noe = noeDist**-6.0
+              resonanceDistances[resonance1][resonance2] = noeDist, noe
+              resonanceDistances[resonance2][resonance1] = noeDist, noe
+              break
 
-      # Store resonance distances, in a reciprocal way
-      # so query order is unimportant
-      resonanceDistances[resonance1][resonance2] = noeDist
-      resonanceDistances[resonance2][resonance1] = noeDist
+        if atomSets1 == atomSets2: # Not prochiral
+          continue
 
-    if progressBar:
-      progressBar.increment()
+      else:
+
+        noeEnsemble = 0.0
+
+        for m, model in enumerate(models):
+          coords2 = coordList2[m]
+          coords1 = coordList1[m]
+
+          noeSum = 0.0
+
+          for xa,ya,za in coords1:
+            for xb,yb,zb in coords2:
+              dx = xa - xb
+              dy = ya - yb
+              dz = za - zb
+              dist2 = (dx*dx) + (dy*dy) + (dz*dz)
+
+              if dist2 > 0:
+                noeSum += dist2 ** -3.0
+
+          noeEnsemble += noeSum
+
+        noeEnsemble /= nModels
+
+        if noeEnsemble:
+          noeDist = noeEnsemble ** (-1/6.0)
+          resonanceDistances[resonance1][resonance2] = noeDist, noeEnsemble
+          resonanceDistances[resonance2][resonance1] = noeDist, noeEnsemble
 
   return resonanceDistances
 
@@ -2181,6 +2277,10 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
         # Get 1H ppm values
         ppm1 = peakDim1.value
         ppm2 = peakDim2.value
+
+        if peakDim1.value is None:
+          print "peak %s is not having a peakDim1.value" % peak
+          continue
 
         # Check if ppm values similar
         delta = abs(ppm1-ppm2)

@@ -3,13 +3,12 @@ Created on Jun 7, 2010
 
 @author: jd
 '''
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import initPDB
 from cing.Scripts.PyMol.createProtein import reportsDir
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 import glob
-import os
-import cing
 
 cing.verbosity = cing.verbosityDebug
 

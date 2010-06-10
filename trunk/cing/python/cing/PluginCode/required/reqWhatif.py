@@ -1,5 +1,4 @@
-from cing.core.constants import ATOM_LEVEL
-from cing.core.constants import RES_LEVEL
+from cing.core.constants import * #@UnusedWildImport
 
 WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
 

@@ -1,6 +1,6 @@
 # Obtained thru Tim Stevens.
 
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 import mimetools
 import mimetypes
 import random

@@ -1,5 +1,4 @@
 from cing import cingDirTmp
-from cing import verbosityError
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import boxAttributes
@@ -7,11 +6,9 @@ from cing.Libs.NTplot import circlePoint
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTplot import greenLine
 from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTutils import NTfill
-from unittest import TestCase
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.procheck import to3StateUpper
-import cing
-import os #@Reimport
+from unittest import TestCase
 import unittest
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 

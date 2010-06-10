@@ -1,9 +1,7 @@
 """
 Classes for dealing with STAR syntax
 """
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR.Text import isStarNan
 from cing.STAR.Text import pattern_quoted
 from cing.STAR.Text import pattern_quotes_needed
@@ -19,7 +17,6 @@ from cing.STAR.Text import quotes_add
 from cing.STAR.Text import tag_value_parse
 from cing.STAR.Text import tag_value_quoted_parse
 from cing.STAR.Utils import transpose
-import re
 import types
 
 

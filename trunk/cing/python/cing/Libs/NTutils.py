@@ -1,6 +1,7 @@
 from cing import NaNstring
 from cing import verbosityDebug
 from cing import verbosityDetail
+from cing import verbosityDefault #@UnusedImport
 from cing import verbosityError
 from cing import verbosityNothing
 from cing import verbosityOutput
@@ -3658,7 +3659,10 @@ def NTmkdir(path):
     return normpath(path)
 #end def
 
-def show(NTobject=None):
+def showNTobject(NTobject=None):
+    '''Used to conflict with matplotlib show so renamed.
+    Haven't seen a usage for this in the CING api.
+    '''
     if NTobject != None and hasattr(NTobject, 'format'):
         NTmessage("%s", NTobject.format())
     else:

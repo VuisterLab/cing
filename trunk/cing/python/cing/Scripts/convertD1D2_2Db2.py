@@ -13,20 +13,7 @@ python $CINGROOT/python/cing/Scripts/convertD1D2_2Db2.py
 
 from cing import cingDirData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityOutput
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import appendDeepByKeys
-from cing.Libs.NTutils import floatParse
-from cing.Libs.NTutils import getDeepByKeys
-from cing.Libs.NTutils import getEnsembleAverageAndSigmaFromHistogram
-from cing.Libs.NTutils import gunzip
-from cing.Libs.NTutils import setDeepByKeys
-from cing.Libs.fpconst import isNaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import to3StateUpper
 from cing.Scripts.getPhiPsiWrapper import BFACTOR_COLUMN
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_BFACTOR_PERCENTAGE_FILTER
@@ -43,9 +30,7 @@ from matplotlib.pyplot import hist
 from numpy.ma.core import multiply
 from numpy.matrixlib.defmatrix import mat
 import cPickle
-import cing
 import csv
-import os
 
 
 

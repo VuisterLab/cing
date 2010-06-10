@@ -1,10 +1,6 @@
 from cing import __author__
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTcodeerror
-import os
 
 __author__ += 'Wim Vranken '
 

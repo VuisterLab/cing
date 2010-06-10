@@ -4,15 +4,12 @@ python $CINGROOT/python/cing/NRG/test/test_PDBEntryLists.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import isInternetConnected
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
 from cing.NRG.PDBEntryLists import getPdbEntries
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

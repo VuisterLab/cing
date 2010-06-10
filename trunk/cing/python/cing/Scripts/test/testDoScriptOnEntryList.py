@@ -5,16 +5,12 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 from cing import cingDirScripts
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import toCsv
-from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_FLAT #@UnusedImport
 from cing.Scripts.validateEntry import PROJECT_TYPE_PDB
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

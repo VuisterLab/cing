@@ -28,24 +28,13 @@ Methods:
 Speed check: 103.609s for pdbParser.importCoordinates: <Molecule "pdb2k0e" (C:1,R:152,A:2647,M:160)>
 """
 from cing.Libs import PyMMLib
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTtree
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import sprintf
-from cing.core.constants import CYANA
-from cing.core.constants import CYANA_NON_RESIDUES
-from cing.core.constants import INTERNAL
-from cing.core.constants import IUPAC
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import getNextAvailableChainId
 from cing.core.molecule import isValidChainId
 from cing.core.molecule import unmatchedAtomByResDictToString
-import os
 
 defaultPrintChainCode = '.'
 

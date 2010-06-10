@@ -2,11 +2,9 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_MacroExternals.py
 """
-from cing import verbosityDebug
-from cing.Libs.NTutils import MsgHoL
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.MacroExternals import mapValueToMolmolColor
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

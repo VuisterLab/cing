@@ -4,18 +4,14 @@ python $CINGROOT/python/cing/PluginCode/test/test_TalosPlus.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.fpconst import * #@UnusedWildImport
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
+#from cing.Libs.fpconst import * #@UnusedWildImport
 
 keyList = 'phi.value       psi.value      S2        Q_H'.split()
 valueKnownList = [

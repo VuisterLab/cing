@@ -1,14 +1,14 @@
 # ADD QUEEN SOURCE TO SYSTEM PATH
-import sys,os
+from qn import * #@UnusedWildImport
+import sys,os #@Reimport
 
 sys.path += [os.path.join(sys.path[0])]
-from qn import * #@UnusedWildImport
 
 # CING IMPORTS
 try:
-  from cing import * #@UnusedWildImport
   from cing.core.parameters import directories
-  from cing.Libs.NTutils import removedir
+  from cing.Libs.NTutils import * #@UnusedWildImport
+  from cing.core.classes import Project
 except ImportError:
   error("""You do not seem to have the CING API installed""")
   exit(1)

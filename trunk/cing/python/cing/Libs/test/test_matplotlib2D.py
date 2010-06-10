@@ -1,9 +1,7 @@
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.matplotlibExt import gray_inv
 from pylab import * #@UnusedWildImport
 from unittest import TestCase
-import cing
 import unittest
 
 class AllChecks(TestCase):

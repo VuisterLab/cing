@@ -2,15 +2,9 @@
 
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentSwapCheck
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import defaultPrintChainCode
-from cing.Scripts.FC.constants import KEYWORDS
-from cing.Scripts.FC.constants import READ_COORDINATES
+from cing.Scripts.FC.constants import * #@UnusedWildImport
 from cing.Scripts.utils import printSequenceFromPdbFile
 from glob import glob
 

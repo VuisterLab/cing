@@ -4,15 +4,10 @@ python $CINGROOT/python/cing/Scripts/test/test_cyana2cing.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
-import sys
 import unittest
 
 class AllChecks(TestCase):

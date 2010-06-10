@@ -7,21 +7,17 @@ if False:
     from matplotlib import use #@UnusedImport
     use('TkAgg') # Instead of agg
     interactive(True)
+
 # block to start interactive plotting. Do not alter the sequence of the blocked commands!
-from cing import verbosityDebug
 from cing.Libs.NTplot import NTplotAttributes
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import fontAttributes
 from cing.Libs.NTplot import fontVerticalAttributes
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
-from cing.core.sml import NTdict
 from matplotlib import is_interactive
 from sqlalchemy.sql.expression import func
 from sqlalchemy.sql.expression import select #@Reimport
-import cing
 
 def createScatterPlotGreenVersusRed():
     cing.verbosity = verbosityDebug

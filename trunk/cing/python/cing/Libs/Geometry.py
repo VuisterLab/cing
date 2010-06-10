@@ -1,5 +1,4 @@
-from cing.Libs.NTutils import NTwarning
-import math
+from cing.Libs.NTutils import * #@UnusedWildImport
 TWO_PI = 2. * math.pi
 
 #A small angle (in degrees/rads) that is used to determine real differences. */
@@ -32,7 +31,7 @@ def violationAngle(value, lowerBound, upperBound):
             return
         lowerBound -= .0 # only one needed because see below.
 #        upperBound -= .0
-        
+
         upperBound -= lowerBound
         value      -= lowerBound
         upperBound = to_0_360(upperBound)
@@ -58,14 +57,13 @@ def to_0_2pi( a ):
         a -= TWO_PI
     while a < 0.:
         a += TWO_PI
-    return a  
+    return a
 
 def to_0_360( a ):
     while a >= 360.:
         a -= 360.
     while a < 0.:
         a += 360.
-    return a  
+    return a
 
 
-    

@@ -24,16 +24,12 @@ screenDump(project.name+'.png')
 #Hit ^D four times to leave Yasara and CING shells.
 """
 
-from cing import * #@UnusedWildImport
-from cing.Libs.NTutils import ImportWarning #@Reimport
-from cing.Libs.fpconst import NaN #@Reimport @UnusedImport
-from cing.Libs.fpconst import isNaN #@Reimport
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqYasara import YASARA_STR
-from cing.main import format #@UnusedImport
-from cing.main import formatall #@UnusedImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import Atom
 from cing.main import pformat
-import shutil #@UnusedImport
 
 try:
 #    import yasara

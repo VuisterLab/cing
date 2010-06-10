@@ -1,10 +1,7 @@
 """
 Classes for dealing with STAR syntax
 """
-from cing.Libs.NTutils import Lister
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTwarning
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR import Utils
 from cing.STAR.SaveFrame import SaveFrame
 from cing.STAR.TagTable import TagTable
@@ -18,11 +15,6 @@ from cing.STAR.Text import pattern_tag_name_nws
 from cing.STAR.Text import pattern_tagtable_loop
 from cing.STAR.Text import pattern_tagtable_loop_nws
 from cing.STAR.Text import semicolon_block_collapse
-from subprocess import Popen
-from subprocess import PIPE
-import os
-import re
-#import profile
 
 __author__    = "$Author$"
 ___revision__ = "$Revision$"

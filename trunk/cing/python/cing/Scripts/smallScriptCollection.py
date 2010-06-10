@@ -15,11 +15,7 @@ Usually however execution from within Eclipse is still easiest.
 #import cing #@UnusedImport
 from cing import cingDirScripts
 from cing import cingDirTmp
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import readLinesFromFile
-from cing.Libs.NTutils import toCsv
-from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode import Whatif
 from cing.PluginCode import dssp
 from cing.PluginCode import molgrap
@@ -32,8 +28,6 @@ from cing.Scripts.getPhiPsiWrapper import d1d2
 from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo
 from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
-import cing
-import os
 
 if dihedralComboTodo == Ramachandran:
     subdir = 'phipsi_wi_db'

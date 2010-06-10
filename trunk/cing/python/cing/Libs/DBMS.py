@@ -5,9 +5,8 @@ This class thinks of a bunch of CSV files (such as created by Mac Numbers in iWo
 much like the code in Wattos.Database.DBMS.
 @author: jd
 '''
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 import csv
-import os
 import urllib
 
 DEFAULT_COLUMN_LABEL = 'COLUMN_' # a number will be added.

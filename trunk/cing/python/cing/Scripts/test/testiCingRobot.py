@@ -4,30 +4,9 @@ python -u $CINGROOT/python/cing/Scripts/test/testiCingRobot.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.network import getRandomKey
-from cing.Scripts.iCingRobot import DEFAULT_RPC_PORT
-from cing.Scripts.iCingRobot import DEFAULT_URL
-from cing.Scripts.iCingRobot import DEFAULT_URL_PATH
-from cing.Scripts.iCingRobot import FORM_ACCESS_KEY
-from cing.Scripts.iCingRobot import FORM_ACTION
-from cing.Scripts.iCingRobot import FORM_ACTION_LOG
-from cing.Scripts.iCingRobot import FORM_ACTION_PROJECT_NAME
-from cing.Scripts.iCingRobot import FORM_ACTION_PURGE
-from cing.Scripts.iCingRobot import FORM_ACTION_RUN
-from cing.Scripts.iCingRobot import FORM_ACTION_SAVE
-from cing.Scripts.iCingRobot import FORM_ACTION_STATUS
-from cing.Scripts.iCingRobot import FORM_UPLOAD_FILE_BASE
-from cing.Scripts.iCingRobot import FORM_USER_ID
-from cing.Scripts.iCingRobot import getResultUrls
-from cing.Scripts.iCingRobot import sendRequest
-from cing.Scripts.validateEntry import ARCHIVE_TYPE_FLAT #@UnusedImport
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Scripts.iCingRobot import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

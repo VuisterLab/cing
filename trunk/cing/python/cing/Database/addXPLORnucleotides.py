@@ -1,7 +1,5 @@
-from cing.core.constants import XPLOR
 from cing import NTdb
-#from cing.core.database import NTdb
-from cing.core.constants import CYANA
+from cing.core.constants import * #@UnusedWildImport
 
 """Use the CYANA names as a basis and then do some subs.
 """

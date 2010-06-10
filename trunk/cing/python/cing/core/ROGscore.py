@@ -1,10 +1,4 @@
-from cing.Libs.NTutils import NTaverage2
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTsort
-from cing.Libs.NTutils import XMLhandler
-from cing.Libs.NTutils import sprintf
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 rogScoreStr = 'rogScore'

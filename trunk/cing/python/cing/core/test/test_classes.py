@@ -1,20 +1,14 @@
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import removedir
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import HTMLfile
 from cing.core.classes import Project
-from cing.core.constants import IUPAC
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

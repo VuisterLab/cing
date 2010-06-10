@@ -11,15 +11,12 @@
 # Tells you this entry has been running for 15 minutes 23 seconds.
 
 from cing import cingDirScripts
-from cing.Libs.NTutils import NTerror
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY # watch out for NRG-CING validateEntry.py needs to have a couple of lines commented out.
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
-import cing
-import os
-import sys
 
 cing.verbosity = cing.verbosityDebug
 #cing.verbosity = cing.verbosityDefault

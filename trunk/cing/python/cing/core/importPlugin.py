@@ -1,16 +1,10 @@
 from cing import cingPythonCingDir
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTexception
-from cing.Libs.NTutils import NTpath
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 from traceback import format_exc
 import glob
-import os
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
 #     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py

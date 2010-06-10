@@ -10,21 +10,7 @@ Methods:
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
-from cing.Libs.NTutils import ExecuteProgram
-from cing.Libs.NTutils import ImportWarning
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTfile
-from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import fprintf
-from cing.Libs.NTutils import getDeepByKeysOrAttributes
-from cing.Libs.NTutils import sprintf
-from cing.Libs.fpconst import NaN
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.classes import DihedralRestraint
@@ -35,9 +21,6 @@ from cing.core.sml import SML2obj
 from cing.core.sml import SMLhandler
 from cing.core.sml import SMLsaveFormat
 from cing.core.sml import obj2SML
-import array
-import os
-import sys
 
 if True: # block
     useModule = True

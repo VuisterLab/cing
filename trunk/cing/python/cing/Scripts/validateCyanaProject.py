@@ -1,20 +1,10 @@
 """
 python -u $CINGROOT/python/cing/Scripts/validateCyanaProject.py cyanaProjectDir
 """
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTexit
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTpath
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import stripExtension
-from cing.Libs.NTutils import stripExtensions
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import CYANA2
+from cing.core.constants import * #@UnusedWildImport
 from glob import glob
-import cing
-import os
-import sys
 
 class ValidateCyanaProject():
     def __init__(self, cyanaProjectDir, htmlOnly=False, doWhatif=True, doProcheck=True,

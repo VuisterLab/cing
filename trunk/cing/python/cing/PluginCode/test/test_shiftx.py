@@ -2,19 +2,11 @@
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
-from cing import verbosityNothing
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.shiftx import runShiftx #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
-from cing.core.constants import CYANA
-from cing.core.constants import CYANA2
-from cing.core.constants import IUPAC
-from cing.core.constants import PDB
-from cing.core.constants import XPLOR
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):

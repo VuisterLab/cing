@@ -3,21 +3,15 @@
 """
 Commands that are more like a loose script utilizing/testing the CING api.
 """
-
-from cing import verbosityDebug
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTfill
-from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
 from cing.NRG.CasdNmrMassageCcpnProject import colorByLab
 from cing.NRG.CasdNmrMassageCcpnProject import labList
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
-from cing.core.sml import NTdict
 from pylab import * #@UnusedWildImport # imports plt too now.
 from sqlalchemy.sql.expression import func
 from sqlalchemy.sql.expression import select #@Reimport
-import cing
 
 cing.verbosity = verbosityDebug
 
