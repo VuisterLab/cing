@@ -8,14 +8,14 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotSet
+from cing.Libs.NTplot import blue_inv
+from cing.Libs.NTplot import green_inv
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTplot import solidLine
+from cing.Libs.NTplot import yellow_inv
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import hPlot
 from cing.Libs.html import makeDihedralPlot
-from cing.Libs.matplotlibExt import blue_inv
-from cing.Libs.matplotlibExt import green_inv
-from cing.Libs.matplotlibExt import yellow_inv
 from cing.Libs.test.test_NTplot2 import plotTestHistoDihedral
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
@@ -139,7 +139,7 @@ def plotDihedral2DRama():
 #            ssTypeForFileName = ssType.replace(' ', '_')
     ssTypeFixed = 'H'
     for resType in hPlot.histRamaBySsAndResType[ssTypeFixed].keys():
-        if resType != 'HIS': # for testing enable filtering.
+        if resType != 'ALA': # for testing enable filtering.
             continue
 
 #                titleStr = ssType + ' ' + resType
@@ -965,17 +965,17 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
     if False:
-        if False:
-            fn = 'fooprof'
+        fn = 'fooprof'
 #            profile.run('plotDihedral2DRamaWrapper()', fn)
-            profile.run('plotHistoDihedralWrapper()', fn)
-            p = pstats.Stats(fn)
-        #     enable a line or two below for useful profiling info
-            p.sort_stats('time').print_stats(100)
-            p.sort_stats('cumulative').print_stats(100)
-        else:
+        profile.run('plotHistoDihedralWrapper()', fn)
+        p = pstats.Stats(fn)
+    #     enable a line or two below for useful profiling info
+        p.sort_stats('time').print_stats(100)
+        p.sort_stats('cumulative').print_stats(100)
+    if True:
+            plotDihedral2DRama()
 #            plotDihedral2DRamaWrapper()
-            plotHistoDihedralWrapper()
+#            plotHistoDihedralWrapper()
     if False:
 #        entryList = "1y4o".split()
     #    entryList = "1tgq 1y4o".split()
@@ -994,6 +994,6 @@ if __name__ == "__main__":
     if False:
         plotDihedralD1D2()
 
-    if True:
+    if False:
         os.chdir(plotHistogramBySsTypeResidueTypesDir)
         plotHistogramBySsTypeResidueTypes()
