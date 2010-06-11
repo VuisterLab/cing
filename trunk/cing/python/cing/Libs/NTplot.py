@@ -1,7 +1,4 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.matplotlibExt import blue_inv
-from cing.Libs.matplotlibExt import green_inv
-from cing.Libs.matplotlibExt import yellow_inv
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
@@ -9,6 +6,7 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
 from matplotlib import pyplot
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Ellipse
 from matplotlib.patches import Patch
 from matplotlib.path import Path
@@ -27,6 +25,47 @@ dpi=72.27 # Latex definition
 inches_per_pt = 1./dpi
 golden_mean = (math.sqrt(5.)-1.)/2.     # Aesthetic ratio where possible.
 DEFAULT_FONT_SIZE = 12
+
+# From matplotlib 0.99.1.1 this could be used but fails to set the alpha still.
+#blue_inv   = LinearSegmentedColormap.from_list('inv_blue', ('white', 'blue'))
+#green_inv  = LinearSegmentedColormap.from_list('inv_green', ('white', 'green'))
+#yellow_inv = LinearSegmentedColormap.from_list('inv_yellow', ('white', 'yellow'))
+from matplotlib.cm import LUTSIZE
+from matplotlib.cm import datad
+
+# See documentation LinearSegmentedColormap
+_gray_inv_data =  {
+               'red':   ((0., 1, 1), (1., 0, 0)),
+               'green': ((0., 1, 1), (1., 0, 0)),
+               'blue':  ((0., 1, 1), (1., 0, 0))}
+_red_inv_data =  {
+               'red':   ((0., 1, 1), (1., 1, 1)),
+               'green': ((0., 1, 1), (1., 0, 0)),
+               'blue':  ((0., 1, 1), (1., 0, 0))}
+_green_inv_data =  {
+               'red':   ((0., 1, 1), (1., 0, 0)),
+               'green': ((0., 1, 1), (1., 1, 1)),
+               'blue':  ((0., 1, 1), (1., 0, 0))}
+_blue_inv_data =  {
+               'red':   ((0., 1, 1), (1., 0, 0)),
+               'green': ((0., 1, 1), (1., 0, 0)),
+               'blue':  ((0., 1, 1), (1., 1, 1))}
+_yellow_inv_data =  {
+               'red':   ((0., 1, 1), (1., 1, 1)),
+               'green': ((0., 1, 1), (1., 1, 1)),
+               'blue':  ((0., 1, 1), (1., 0, 0))}
+
+gray_inv   = LinearSegmentedColormap('gray_inv',  _gray_inv_data, LUTSIZE)
+red_inv    = LinearSegmentedColormap('red_inv',   _red_inv_data, LUTSIZE)
+green_inv  = LinearSegmentedColormap('green_inv', _green_inv_data, LUTSIZE)
+blue_inv   = LinearSegmentedColormap('blue_inv',  _blue_inv_data, LUTSIZE)
+yellow_inv = LinearSegmentedColormap('yellow_inv',_yellow_inv_data, LUTSIZE)
+
+datad[ 'gray_inv' ]   = _gray_inv_data
+datad[ 'red_inv' ]    = _red_inv_data
+datad[ 'green_inv' ]  = _green_inv_data
+datad[ 'blue_inv' ]   = _blue_inv_data
+datad[ 'yellow_inv' ] = _yellow_inv_data
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -889,26 +928,27 @@ class NTplot( NTdict ):
         scaleBy can be Max, or Sum
         """
 
-        alpha = 0.8 # was 0.8; looks awful with alpha = 1
-        extent = self.xRange + self.yRange
         # make sure helix and sheet are plotted over coil
+        minAlpha = 0.5 # for blending between normalized [0,1]
+        maxAlpha = 1.0
 
-        # When matplotlib 0.99.1.1 is the default this can obsolete matplotlibExt.py in CING.
-#        blue_inv   = colors.LinearSegmentedColormap.from_list('inv_blue', ('white', 'blue'))
-#        green_inv  = colors.LinearSegmentedColormap.from_list('inv_green', ('white', 'green'))
-#        yellow_inv = colors.LinearSegmentedColormap.from_list('inv_yellow', ('white', 'yellow'))
+        extent = self.xRange + self.yRange
 
         cmapList= [   green_inv, blue_inv, yellow_inv ]
-        colorList= [ 'green',   'blue',   'yellow']
-#        i = 0
-        i = 0
+#        colorList= [ 'green',   'blue',   'yellow']
+
         if len(histList) > len(cmapList):
             NTerror("Found length of histList:%d larger than cmapList's:%d" % ( len(histList),len(cmapList)))
             return True
+
+        # chessboard on 60 degree grid to see the blending better
+        if False:
+            Z1 = array(([0,1]*3 + [1,0]*3)*3)
+            Z1.shape = 6,6
+            imshow(Z1, cmap=cm.gray, interpolation='nearest', extent=extent)
+
         for i,myHist in enumerate(histList):
-#        for myHist in [ histList[i] ]:
-#            NTmessage('myHist: %s' % myHist)
-#            print myHist
+#        for i,myHist in enumerate(histList[0:1]):
             if myHist.dtype != 'float64':
                 NTerror("expected a histogram matrix with float values but found type: %s" % myHist.dtype)
                 return True
@@ -929,49 +969,18 @@ class NTplot( NTdict ):
             else:
                 NTerror("parameter invalid in dihedralComboPlot")
                 return True
-            # Just make a copy...
-            myHistScaledAndMasked = ma.masked_where(myHistScaled <= minPercentage, myHistScaled, copy=1)
-            # JFD: there might be a bug in my code or in matplotlib that prevents me from using the under
-            # the above is a workaround in order to use the 'bad' utility of the api.
-            # The problem is that it doesn't do nice alpha mixing so disabled again to find solution.
-#            NTmessage('myHist (scaled/masked): %s' % myHist)
 
-            if True:
-                palette = cmapList[i]
-                palette.set_under(color = 'w', alpha = 0.0 ) # alpha is 0.0
-                palette.set_over( color = colorList[i], alpha = 1.0) # alpha is 1.0 Important to make it a hard alpha; last plotted will rule.
-                palette.set_bad(color = 'w', alpha = 0.0 )
-#            else:
-#                # Set up a colormap for debugging
-#                palette = cm.gray # failed for JFD after switching to Eclipse 35. Probably not related.
-#                palette.set_over('r', 1.0)
-#                palette.set_under('g', 1.0)
-#                palette.set_bad('b', 1.0)
-                # Alternatively, we could use
-                # palette.set_bad(alpha = 0.0)
-                # to make the bad region transparent.  This is the default.
-                # If you comment out all the palette.set* lines, you will see
-                # all the defaults; under and over will be colored with the
-                # first and last colors in the palette, respectively.
+            norm = Normalize(vmin = minPercentage, vmax = maxPercentage)
+            myHistNormalized = norm(myHistScaled) # alpha in range and above is still all 1.
+#            NTdebug("i %s color %s"% (i,colorList[i]))
+            palette = cmapList[i]
+            myHistColored = cmapWithAlphaGlidingScale(myHistNormalized,palette,
+                minAlpha=minAlpha, maxAlpha=maxAlpha, underAlpha=0., overAlpha=maxAlpha)
 
-#            palette._set_extremes()
-
-            norm = Normalize(vmin = minPercentage,
-                                    vmax = maxPercentage, clip = True) # clip is False
-#            NTdebug("under: %s" % str(palette._rgba_under))
-#            NTdebug("over : %s" % str(palette._rgba_over))
-#            NTdebug("bad  : %s" % str(palette._rgba_bad))
-
-            imshow( myHistScaledAndMasked,
+            imshow( myHistColored,
                     interpolation='bicubic',
-#                    interpolation = 'nearest', # bare data.
                     origin='lower',
-                    extent=extent,
-                    alpha=alpha,
-                    cmap=palette,
-                    norm = norm
-                     )
-#            NTdebug('plotted %d %s' % (i, cmapList[i].name))
+                    extent=extent )
         # end for
 
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2, fill=True, fillColor=None):
@@ -2068,3 +2077,22 @@ def integerNumberOnly(x,_dummy):
     if remainder > 0.001:
         return ''
     return '%.0f' % x
+
+def cmapWithAlphaGlidingScale(Z,palette,minAlpha=.5, maxAlpha=1., underAlpha=0., overAlpha=1.):
+    """Scales the alpha from the given min to max value based on input from 0 to 1."""
+
+    diffAlpha = maxAlpha - minAlpha
+    tmp = palette(Z)
+    for i in xrange(Z.shape[0]):
+        for j in xrange(Z.shape[1]):
+            # Generate the transparency (alpha mixing)
+            v = Z[i,j]
+            if v < 0.:
+                alpha = underAlpha
+            elif v > 1.:
+                alpha = overAlpha
+            else:
+                alpha = minAlpha + v * diffAlpha
+            tmp[i,j][3] = alpha
+#            NTdebug('v: %5.2f alpha %5.2f' % (v,alpha))
+    return tmp
