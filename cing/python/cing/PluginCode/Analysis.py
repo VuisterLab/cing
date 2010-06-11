@@ -11,6 +11,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     try:
         from ccpnmr.analysis.Version import version #@UnusedImport
         from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists #@UnusedImport IS used.
+        from ccpnmr.analysis.Analysis import Analysis as AnalysisApp
         # The defs below are not moved into this module so that Analysis and CING both have access to them.
         # Analysis can't import any cing code.
         from cing.Scripts.Analysis.PyRPF import * #@UnusedWildImport
@@ -26,6 +27,8 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
 
 class Analysis:
     def __init__(self, project):
+        app = AnalysisApp(64) # app is non-gui Analysis version, number is an aritrary cache size 
+        app.initProject(project)
         self.project = project
 
     def runRpf(self,
