@@ -1,17 +1,19 @@
 
-# TBD
-
-# Find peak in peak selection table without clicking button
-
-# Notifiers, in on valid objects, peak Lists, ensembles,
-# -  Forget peaks -> this means recalculating anyhow
+# TBD Later
+# Notifiers, in on valid objects, peak Lists, ensembles
 
 # What about atoms we don't have a chemical shift for?
 
-# Isotope labeling schemes
+# Isotope labelling schemes
+
+# Possible:
+
+# [Separate Unexplained Peak List]
+# Are you sure wyou want to move these peaks to a separate list?
 
 from ccp.util.Software import getMethodStore
 from ccpnmr.analysis.core.AssignmentBasic import findMatchingPeakDimShifts, makeResonanceGuiName, getBoundResonances
+from ccpnmr.analysis.core.AssignmentBasic import clearPeakDim, assignResToDim
 from ccpnmr.analysis.core.ConstraintBasic import getPeakDimTolerance
 from ccpnmr.analysis.core.ExperimentBasic import getOnebondDataDims, getDataDimIsotopes, findSpectrumDimsByIsotope
 from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists, getDataDimRefFullRange, getPrimaryDataDimRef
@@ -19,17 +21,20 @@ from ccpnmr.analysis.core.MarkBasic import createNonPeakMark
 from ccpnmr.analysis.core.MoleculeBasic import getNumConnectingBonds, areResonancesBound, getBoundAtoms
 from ccpnmr.analysis.core.StructureBasic import getAtomSetCoords
 from ccpnmr.analysis.core.StructureBasic import getAtomSetsDistance
-from ccpnmr.analysis.core.Util import getAnalysisDataDim
+from ccpnmr.analysis.core.Util import getAnalysisDataDim, getDataDimAssignmentTolerance
+from ccpnmr.analysis.core.Util import getAnalysisPeakList
 from ccpnmr.analysis.core.WindowBasic import getDataDimAxisMapping, getWindowPaneName
+from ccpnmr.analysis.core.PeakBasic import pickPeak, setupPeak
 from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
 from math import sqrt
-from memops.gui.BasePopup import BasePopup
+
+from memops.editor.BasePopup import BasePopup
+from memops.gui.Button import Button
 from memops.gui.ButtonList import UtilityButtonList, ButtonList
 from memops.gui.CheckButton import CheckButton
 from memops.gui.FloatEntry import FloatEntry
 from memops.gui.Frame import Frame
 from memops.gui.Label import Label
-from memops.gui.LabelDivider import LabelDivider #@UnusedImport
 from memops.gui.MessageReporter import showOkCancel
 from memops.gui.PartitionedSelector import PartitionedSelector
 from memops.gui.ProgressBar import ProgressBar
@@ -44,6 +49,7 @@ import time
 
 
 # This is the table for missing peaks with built-in functionalities
+from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
 
 
 # Colours for graphs
@@ -81,7 +87,10 @@ CN_DIM_CONTEXT_DICT = {(0,0):(cc, cn, nc, nn),
 
 # Colour scheme for missing peaks, according to distance
 
-DISTANCE_COLORS = {0:'#FF8080',1:'#FFA080',2:'#FFC080',3:'#FFE080',4:'#FFFF80'}
+DISTANCE_COLORS = {0:'#FF8080',1:'#FFA080',
+                   2:'#FFC080',3:'#FFE080',
+                   4:'#FFFF80',5:'#C0FF80',
+                   6:'#80FF80',7:'#80FF80'}
 
 PROG = 'RPF'
 RECALL  = 'Recall'
@@ -97,6 +106,7 @@ SHIFT_VALID = 'NmrMeasurementValidation'
 UNEXPLAINED = 'Unexplained_Peak'
 RESIDUE_VALID = 'ResidueValidation'
 MISSING_PEAK = 'Shift_Missing_Peak'
+MISSING_PEAK_LIST_TAG = 'RPF Missing Peaks'
 
 DEFAULT_DISTANCE_THRESHOLD = 4.8 # Angstrom units default to runRPF was 5.0 before.
 DEFAULT_PROCHIRAL_EXCLUSION_SHIFT = 0.04 # PPM units
@@ -106,7 +116,7 @@ RPF_USE = "rpfUse"
 
 def pyRpfMacro(argServer):
 
-  popup = PyRpfPopup(argServer.parent, argServer.getProject()) #@UnusedVariable
+  popup = PyRpfPopup(argServer.parent, argServer.getProject())
 
 class PyRpfPopup(BasePopup):
 
@@ -120,7 +130,6 @@ class PyRpfPopup(BasePopup):
     self.ensemble = None
     self.validStore = None
     self.validPeakList = None
-    self.window = None
     self.mark = None
 
     BasePopup.__init__(self, parent, title='PyRPF')
@@ -235,7 +244,7 @@ class PyRpfPopup(BasePopup):
     # Unexplained peaks
     #
 
-    frameD.grid_columnconfigure(1, weight=1)
+    frameD.grid_columnconfigure(2, weight=1)
     frameD.grid_rowconfigure(1, weight=1)
 
     label = Label(frameD, text='Result Set:')
@@ -243,14 +252,19 @@ class PyRpfPopup(BasePopup):
     self.resultPulldownA = PulldownList(frameD, self.changeResultSet)
     self.resultPulldownA.grid(row=0,column=1, sticky='w')
 
-    self.peakTableFrame = PeakTableFrame(frameD, self.parent)
-    self.peakTableFrame.grid(row=1, column=0, columnspan=2, sticky='nsew')
+    texts = ['Next Location','Prev Location']
+    commands = [self.nextUnexplainedPeak, self.prevUnexplainedPeak]
+    self.unexplainedPeakButtons = ButtonList(frameD, texts=texts, commands=commands)
+    self.unexplainedPeakButtons.grid(row=0, column=3,  sticky='w')
+
+    self.unexplainedPeakTable = RpfPeakTable(frameD, self.parent, self)
+    self.unexplainedPeakTable.grid(row=1, column=0, columnspan=4, sticky='nsew')
 
     #
     # Missing peaks
     #
 
-    frameE.grid_columnconfigure(3, weight=1)
+    frameE.grid_columnconfigure(2, weight=1)
     frameE.grid_rowconfigure(1, weight=1)
 
     label = Label(frameE, text='Result Set:')
@@ -258,21 +272,13 @@ class PyRpfPopup(BasePopup):
     self.resultPulldownB = PulldownList(frameE, self.changeResultSet)
     self.resultPulldownB.grid(row=0,column=1, sticky='w')
 
-    label = Label(frameE, text='Navigation Window:')
-    label.grid(row=0,column=2, sticky='w')
-    self.windowPulldown = PulldownList(frameE, self.changeWindow)
-    self.windowPulldown.grid(row=0,column=3, sticky='w')
-
-    headingList = ['Atoms 1','Atoms 2','PPM 1','PPM 2','Distance']
-    self.missingPeakTable = ScrolledMatrix(frameE, headingList=headingList,
-                                           multiSelect=True,
-                                           callback=self.selectShifts)
-    self.missingPeakTable.grid(row=1, column=0, columnspan=4, sticky='nsew')
-
     texts = ['Next Location','Prev Location']
     commands = [self.nextMissingPeak, self.prevMissingPeak]
     self.missingPeakButtons = ButtonList(frameE, texts=texts, commands=commands)
-    self.missingPeakButtons.grid(row=2, column=0, columnspan=4, sticky='ew')
+    self.missingPeakButtons.grid(row=0, column=3,  sticky='w')
+
+    self.missingPeakTable = RpfPeakTable(frameE, self.parent, self)
+    self.missingPeakTable.grid(row=1, column=0, columnspan=4, sticky='nsew')
 
     #
     # Graph
@@ -310,8 +316,8 @@ class PyRpfPopup(BasePopup):
 
     self.updatePeakLists()
     self.updateEnsembles()
-    self.updateWindows()
     self.updateResultPulldowns()
+    self.administerNotifiers(self.registerNotify)
 
   def open(self):
 
@@ -322,11 +328,40 @@ class PyRpfPopup(BasePopup):
 
     BasePopup.open(self)
 
+  def destroy(self):
+
+    self.administerNotifiers(self.unregisterNotify)
+    BasePopup.destroy(self)
+
+  def administerNotifiers(self, notifyFunc):
+
+    # Peak Tables
+
+    for func in ('__init__', 'delete'):
+      for clazz in ('ccp.nmr.Nmr.PeakDimContrib',):
+        notifyFunc(self.unexplainedPeakTable.contribUpdateAfter, clazz, func)
+        notifyFunc(self.missingPeakTable.contribUpdateAfter, clazz, func)
+
+    for func in ('__init__', 'delete','setName'):
+      notifyFunc(self.unexplainedPeakTable.updateWindowListsAfter, 'ccpnmr.Analysis.SpectrumWindow', func)
+      notifyFunc(self.missingPeakTable.updateWindowListsAfter, 'ccpnmr.Analysis.SpectrumWindow', func)
+
+    for func in ('__init__', 'delete','setAnnotation','setDetails','setFigOfMerit'):
+      notifyFunc(self.unexplainedPeakTable.updatePeaksAfter, 'ccp.nmr.Nmr.Peak', func)
+      notifyFunc(self.missingPeakTable.updatePeaksAfter, 'ccp.nmr.Nmr.Peak', func)
+
+    for func in ('setAnnotation','setPosition','setNumAliasing','setLineWidth'):
+      notifyFunc(self.unexplainedPeakTable.peakDimUpdateAfter, 'ccp.nmr.Nmr.PeakDim', func)
+      notifyFunc(self.missingPeakTable.peakDimUpdateAfter, 'ccp.nmr.Nmr.PeakDim', func)
+
+    for func in ('__init__', 'delete', 'setValue'):
+      notifyFunc(self.unexplainedPeakTable.intensityUpdateAfter, 'ccp.nmr.Nmr.PeakIntensity', func)
+      notifyFunc(self.missingPeakTable.intensityUpdateAfter, 'ccp.nmr.Nmr.PeakIntensity', func)
+
   def changeResultSet(self, result):
 
     if result and (result != (self.validStore, self.validPeakList)):
       self.validStore, self.validPeakList = result
-      self.updateWindows()
       # Only need to update the selected panel
       self.selectTab(self.tabbedFrame.selected)
 
@@ -354,7 +389,7 @@ class PyRpfPopup(BasePopup):
 
       validStore = getEnsembleValidationStore(ensemble)
       rpfdu = getOverallRpfValidation(validStore)
-      recall, precision, fMeasure, dpScore, unexplained = rpfdu #@UnusedVariable
+      recall, precision, fMeasure, dpScore, unexplained, missing = rpfdu
 
       ensembleText = 'Ensemble %s:%d' % (ensemble.molSystem.code, ensemble.ensembleId)
 
@@ -414,88 +449,86 @@ class PyRpfPopup(BasePopup):
     self.resultPulldownB.setup(namesP, resultSetsP, indexP)
     self.resultPulldownC.setup(namesR, resultSetsR, indexR)
 
-
+    
   def nextMissingPeak(self):
 
-    obj = self.missingPeakTable.currentObject
+    table = self.missingPeakTable.scrolledMatrix
+    objectList = table.objectList
 
-    if obj:
-      objectList = self.missingPeakTable.objectList
-      index = objectList.index(obj)
-      index += 1
+    if objectList:
+      obj = table.currentObject
+      if obj:
+        index = objectList.index(obj)
+        index += 1
 
-      if index >= len(objectList):
+        if index >= len(objectList):
+          index = 0
+
+      else:
         index = 0
 
-      self.missingPeakTable.selectNthObject(index)
+      table.selectNthObject(index)
+      self.missingPeakTable.findPeak()
 
   def prevMissingPeak(self):
 
+    table = self.missingPeakTable.scrolledMatrix
+    objectList = table.objectList
 
-    obj = self.missingPeakTable.currentObject
+    if objectList:
 
-    if obj:
-      objectList = self.missingPeakTable.objectList
-      index = objectList.index(obj)
-      index -= 1
-      if index < 0:
-        index = len(objectList)-1
+      obj = table.currentObject
+      if obj:
+        index = objectList.index(obj)
+        index -= 1
+        if index < 0:
+          index = len(objectList)-1
 
-      self.missingPeakTable.selectNthObject(index)
+      else:
+        index = 0
 
+      table.selectNthObject(index)
+      self.missingPeakTable.findPeak()
 
-  def getWindows(self):
+  def nextUnexplainedPeak(self):
 
-    windows = []
-    for window in self.analysisProject.spectrumWindows:
-      for windowPane in window.spectrumWindowPanes:
+    table = self.unexplainedPeakTable.scrolledMatrix
+    objectList = table.objectList
 
-        if self.validPeakList:
-          analysisSpectrum = self.validPeakList.dataSource.analysisSpectrum
-          view = windowPane.findFirstSpectrumWindowView(analysisSpectrum=analysisSpectrum)
-          if not view:
-            continue
+    if objectList:
+      obj = table.currentObject
+      if obj:
+        index = objectList.index(obj)
+        index += 1
 
-        numHaxes = 0
+        if index >= len(objectList):
+          index = 0
 
-        for axisPanel in windowPane.axisPanels:
-          axisType = axisPanel.axisType
+      else:
+        index = 0
 
-          if axisType and ('1H' in axisType.isotopeCodes):
-            numHaxes += 1
+      table.selectNthObject(index)
+      self.unexplainedPeakTable.findPeak()
 
-        if numHaxes == 2:
-          name = getWindowPaneName(windowPane)
-          windows.append([name, windowPane])
+  def prevUnexplainedPeak(self):
 
-    windows.sort()
+    table = self.unexplainedPeakTable.scrolledMatrix
+    objectList = table.objectList
 
-    return [x[1] for x in windows]
+    if objectList:
 
-  def changeWindow(self, window):
+      obj = table.currentObject
+      if obj:
+        index = objectList.index(obj)
+        index -= 1
+        if index < 0:
+          index = len(objectList)-1
 
-    if window is not self.window:
-      self.window = window
+      else:
+        index = 0
 
-  def updateWindows(self, *window):
-
-    windows = self.getWindows()
-    index   = 0
-    names   = []
-    window  = self.window
-
-    if windows:
-      names  = [getWindowPaneName(w) for w in windows]
-
-      if window not in windows:
-        window = windows[0]
-
-      index = windows.index(window)
-
-    if window is not self.window:
-      self.window = window
-
-    self.windowPulldown.setup(names, windows, index)
+      table.selectNthObject(index)
+      self.unexplainedPeakTable.findPeak()
 
   def selectShifts(self, shifts, row, col):
 
@@ -504,7 +537,6 @@ class PyRpfPopup(BasePopup):
       peakList = self.validPeakList
       spectrum = peakList.dataSource
 
-      shiftsAll = [] #@UnusedVariable
 
       dimMapping = getDataDimAxisMapping(spectrum, self.window)
       boundDims  = getOnebondDataDims(spectrum)
@@ -578,9 +610,11 @@ class PyRpfPopup(BasePopup):
         for shift, shiftX in shiftPairs:
           if shift.resonance.isotopeCode in isotopes:
              position[axisDict[dataDim]] = shift.value
+             shiftPairs.remove((shift, shiftX))
              break
           elif shiftX and (shiftX.resonance.isotopeCode in isotopes):
              position[axisDict[dataDim]] = shift.value
+             shiftPairs.remove((shift, shiftX))
              break
 
       # Navigate in window frame
@@ -635,7 +669,7 @@ class PyRpfPopup(BasePopup):
     prochiralExclusion = self.prochiralEntry.get() or 0.0
     distThreshold = self.distanceEntry.get() or DEFAULT_DISTANCE_THRESHOLD
 
-    validResultStores = [] #@UnusedVariable
+    validResultStores = []
 
     if peakLists and ensembles:
       tolerances = []
@@ -643,7 +677,7 @@ class PyRpfPopup(BasePopup):
       for peakList in peakLists:
         tolerances.append(getNoeTolerances(peakList))
 
-      validResultStores = calcRPF(ensembles, peakLists, tolerances, #@UnusedVariable
+      validResultStores = calcRPF(ensembles, peakLists, tolerances,
                                   distThreshold, prochiralExclusion,
                                   diagonalExclusion, doAlised,
                                   progressBar=progressBar)
@@ -653,6 +687,8 @@ class PyRpfPopup(BasePopup):
     self.updateResultsTable()
 
     self.tabbedFrame.select(2)
+
+    return validResultStores
 
   def selectTab(self, index):
 
@@ -669,42 +705,21 @@ class PyRpfPopup(BasePopup):
 
   def updateMissingPeaks(self):
 
-    textMatrix = []
-    objectList = []
-    colorMatrix = []
+    if self.validStore:
+      validObj = getOverallRpfValidation(self.validStore)[5]
 
+      if self.validPeakList:
+        synthetic = getSyntheticMissingPeaksList(self.validPeakList)
+        peaks = [p for p in validObj.sortedPeaks() if p.peakList is synthetic]
+      else:
+        peaks = validObj.sortedPeaks()
 
-    if self.validStore and self.validPeakList:
-      validObjs = getShiftsMissingPeaksValidation(self.validStore, self.validPeakList)
+    else:
+      peaks = []
 
-      for validObj in validObjs:
-        shifts = validObj.nmrMeasurements
+    self.missingPeakTable.peaks = peaks
+    self.missingPeakTable.updatePeaksAfter()
 
-        if not shifts:
-          continue
-
-        dist = validObj.floatValue
-        shift1, shift2 = shifts
-
-        resonance1 = shift1.resonance
-        resonance2 = shift2.resonance
-
-        atomSetText1 = makeResonanceGuiName(resonance1)
-        atomSetText2 = makeResonanceGuiName(resonance2)
-
-        datum = [atomSetText1, atomSetText2,
-                 shift1.value, shift2.value,
-                 dist]
-
-        color = DISTANCE_COLORS.get(int(dist))
-
-        textMatrix.append(datum)
-        objectList.append(shifts)
-        colorMatrix.append([color]*5)
-
-    self.missingPeakTable.update(textMatrix=textMatrix,
-                                 objectList=objectList,
-                                 colorMatrix=colorMatrix)
 
   def updateUnexplainedPeaks(self):
 
@@ -720,8 +735,8 @@ class PyRpfPopup(BasePopup):
     else:
       peaks = []
 
-    self.peakTableFrame.peaks = peaks
-    self.peakTableFrame.updatePeaksAfter()
+    self.unexplainedPeakTable.peaks = peaks
+    self.unexplainedPeakTable.updatePeaksAfter()
 
 
   def showUnexplainedPeaks(self):
@@ -781,7 +796,7 @@ class PyRpfPopup(BasePopup):
       ensembleText = '%s:%d' % (ensemble.molSystem.code, ensemble.ensembleId)
 
       rpfdu = getOverallRpfValidation(validStore)
-      recall, precision, fMeasure, dpScore, unexplained = rpfdu
+      recall, precision, fMeasure, dpScore, unexplained, missing = rpfdu
 
       if dpScore is None:
         continue
@@ -789,7 +804,7 @@ class PyRpfPopup(BasePopup):
       datum = [ensembleText, '<All>',
                recall.floatValue, precision.floatValue,
                fMeasure.floatValue, dpScore.floatValue,
-               len(unexplained.peaks), None]
+               len(unexplained.peaks), len(missing.peaks)]
 
       textMatrix.append(datum)
       objectList.append((validStore, None))
@@ -797,29 +812,33 @@ class PyRpfPopup(BasePopup):
       peakLists = recall.peakLists
 
       numUnexplained = {}
+      numMissing = {}
       for peakList in peakLists:
         numUnexplained[peakList] = 0
+        syntheticPeakList = getSyntheticMissingPeaksList(peakList)
+        numMissing[syntheticPeakList] = 0
 
       for peak in unexplained.peaks:
         numUnexplained[peak.peakList] += 1
+
+      for peak in missing.peaks:
+        numMissing[peak.peakList] += 1
 
       for peakList in peakLists:
         spectrum = peakList.dataSource
         peakListData = (spectrum.experiment.name, spectrum.name, peakList.serial)
         peakListText = '%s:%s:%d' % peakListData
-
-        missing = getShiftsMissingPeaksValidation(validStore, peakList)
-
+        syntheticPeakList = getSyntheticMissingPeaksList(peakList)
         recall, precision, fMeasure, dpScore = getPeakListRpfValidation(validStore, peakList)
 
         datum = [ensembleText, peakListText,
                  recall.floatValue, precision.floatValue,
                  fMeasure.floatValue, dpScore.floatValue,
-                 numUnexplained[peakList], len(missing)]
+                 numUnexplained[peakList],
+                 numMissing[syntheticPeakList]]
 
         textMatrixAppend(datum)
         objectListAppend((validStore, peakList))
-
 
     self.resultsTable.update(textMatrix=textMatrix, objectList=objectList)
 
@@ -900,6 +919,9 @@ class PyRpfPopup(BasePopup):
     peakLists = []
 
     for peakList in getThroughSpacePeakLists(self.project):
+      if not peakList.peaks:
+        continue
+
       if hasattr(peakList, 'rpfUse') and (peakList.rpfUse is True):
         peakLists.append(peakList)
 
@@ -912,8 +934,15 @@ class PyRpfPopup(BasePopup):
 
     textMatrix = []
     colorList = []
+    objectList = []
 
     for peakList in peakLists:
+      if not peakList.peaks:
+        continue
+
+      if peakList.isSimulated:
+        continue
+
       spectrum = peakList.dataSource
       experiment = spectrum.experiment
 
@@ -935,11 +964,12 @@ class PyRpfPopup(BasePopup):
                useText,
                len(peakList.peaks),]
 
+      objectList.append(peakList)
       textMatrix.append(datum)
       colorList.append(colors)
 
     self.peakListTable.update(textMatrix=textMatrix,
-                              objectList=peakLists,
+                              objectList=objectList,
                               colorMatrix=colorList)
 
 #  def getEnsembles(self):
@@ -985,6 +1015,145 @@ class PyRpfPopup(BasePopup):
                               objectList=ensembles,
                               colorMatrix=colorList)
 
+class RpfPeakTable(PeakTableFrame):
+
+  def __init__(self, parent, analysis, rpf, nmrProject=None, peakList=None,
+               peaks=None, simplified=True, *args, **kw):
+
+    self.rpf = rpf
+    PeakTableFrame.__init__(self, parent, analysis, nmrProject, peakList,
+                            peaks, simplified, *args, **kw)
+  def updateButtons(self):
+
+    buttons = list(self.bottomButtons1.buttons)
+    buttons += self.bottomButtons2.buttons
+    n = len(buttons)
+
+    if self.peak:
+      for i in range(1,n):
+        buttons[i].enable()
+
+      self.windowLabel.config(fg = 'black')
+      #self.windowPulldown.activate()
+
+    else:
+      for i in range(1,n):
+        buttons[i].disable()
+
+    
+  def getHeadings(self, n):
+
+    dataList, tipTexts = PeakTableFrame.getHeadings(self, n)
+
+    dataList.insert(n+3, 'Dist.')
+    tipTexts.insert(n+3, 'Structure distance between hydrogens')  
+    return dataList, tipTexts
+
+  def getPeakData(self, peak, n, simplified=True):
+
+    data = PeakTableFrame.getPeakData(self, peak, n, simplified)
+    validStore = self.rpf.validStore
+    colors = [None] * 14
+
+    if validStore:
+      ensemble = validStore.structureEnsemble
+      distDims = self.getDistanceDimensions(peak.peakList.dataSource)
+      atomSets = []
+      peakDims = peak.sortedPeakDims()
+      peakDimA = peakDims[distDims[0]]
+      peakDimB = peakDims[distDims[1]]      
+      for peakDim in (peakDimA, peakDimB):
+        assignedSets = []
+
+        for contrib in peakDim.peakDimContribs:
+          resonanceSet = contrib.resonance.resonanceSet
+
+          if resonanceSet:
+            assignedSets.extend( list(resonanceSet.atomSets) )
+
+        atomSets.append( assignedSets )
+
+      if atomSets and atomSets[0] and atomSets[1]:
+        dist = getAtomSetsDistance(atomSets[0], atomSets[1],
+                                   ensemble, method='min')
+
+        colors[n+3] = DISTANCE_COLORS.get(int(dist))
+
+      else:
+        dist = None
+
+    else:
+      dist = None
+
+    data.insert(n+3, dist)
+
+    return data, colors
+
+  def showStructConnections(self):
+
+    validStore = self.rpf.validStore
+    if validStore:
+      ensemble = validStore.structureEnsemble
+
+      peaks = list(self.scrolledMatrix.currentObjects)
+      if peaks:
+        self.analysisApp.viewStructure(ensemble)
+        popup = self.analysisApp.popups['view_structure']
+        popup.clearConnections()
+
+        for peak in peaks:
+          popup.showPeakConnection(peak)
+
+  def getEditData(self, n):
+
+    editWidgets, editGetCallbacks, editSetCallbacks = PeakTableFrame. getEditData(self, n)
+
+    editWidgets.insert(n+3, None)
+    editGetCallbacks.insert(n+3, None)
+    editSetCallbacks.insert(n+3, None)
+
+    return editWidgets, editGetCallbacks, editSetCallbacks
+
+  def updatePeaksFromSelection(self):
+
+    self.peaks = [pk for pk in self.peaks if not pk.isDeleted]
+
+    textMatrix = []
+    peaks = self.peaks
+
+    n = 0
+    for peak in peaks:
+      m = peak.peakList.dataSource.numDim
+      if m > n:
+        n = m
+
+    simplified = self.simplified
+    getPeakData = self.getPeakData
+    textMatrix = []
+    colorMatrix = []
+    for peak in peaks:
+      datum, colors = getPeakData(peak,n, simplified)
+      textMatrix.append(datum)
+      colorMatrix.append(colors)
+
+    (editWidgets,editGetCallbacks,editSetCallbacks) = self.getEditData(n)
+
+    headingList, tipTexts = self.getHeadings(n)
+    self.scrolledMatrix.update(objectList=peaks,
+                               textMatrix=textMatrix,
+                               colorMatrix=colorMatrix,
+                               editWidgets=editWidgets,
+                               editGetCallbacks=editGetCallbacks,
+                               editSetCallbacks=editSetCallbacks,
+                               tipTexts=tipTexts,
+                               headingList=headingList)
+
+    self.scrolledMatrix.refreshScrollbars()
+
+    if len(peaks) == 1:
+      self.scrolledMatrix.selectObject(peaks[0])
+
+    self.waiting = False
 
 def calcRPF(ensembles, peakLists, tolerances,
             distThreshold=DEFAULT_DISTANCE_THRESHOLD,
@@ -1089,8 +1258,6 @@ def calcRPF(ensembles, peakLists, tolerances,
     peakPossibilities[peakList] = peakData
     unexplainedPeaksDict[peakList] = unexplained
 
-#    print 'unexplained: %s' % unexplained
-
   print "  Time taken:", time.time() - t0
 
   print "Getting resonance-resonance NOE distances"
@@ -1134,6 +1301,9 @@ def calcRPF(ensembles, peakLists, tolerances,
     # List for false neg result peaks
     unexplainedPeaks = set()
 
+    # List for false pos result shift intersections
+    missingPeaks = set()
+
     # The list of working resonances is simply
     # the list of objects used as keys in the dictionary
     # of structurally close resonances
@@ -1176,9 +1346,6 @@ def calcRPF(ensembles, peakLists, tolerances,
 
          # Link from molSystem residue to ensemble residue for later
          ensembleResidueDict[residue.residue] = residue
-
-    # Dictionary to store shift intersections with no peak
-    missingIntersection = {} #@UnusedVariable
 
     for peakList in peakLists:
       # Get peak list's spectrum (dataSource)
@@ -1376,7 +1543,6 @@ def calcRPF(ensembles, peakLists, tolerances,
           # Get equiv NOE
           dist, noe = rDists[resonance1].get(resonance2, (badDist, badNoe))
 
-          #noe = dist**-6.0
 
           # Number of connecting bonds
           nBonds = getNumConnectingBonds(atom1, atom2, limit=10) or 0
@@ -1446,9 +1612,10 @@ def calcRPF(ensembles, peakLists, tolerances,
               falsePosNoeR[residue1][1] += noe
               if residue1 is not residue2:
                 falsePosNoeR[residue2][1] += noe
+
             # Store close chemical shifts without peaks
             shifts = frozenset([shift1, shift2])
-            shiftsMissingPeaks.append((shifts, dist))
+            shiftsMissingPeaks.append((dist, shifts))
 
           elif (not close) and peak and (peak.peakList is peakList):
 
@@ -1587,19 +1754,20 @@ def calcRPF(ensembles, peakLists, tolerances,
       # Values for only for this ensemble and one peak list
       recall, precision, fMeasure = countsToRpf(truePos[0], falseNeg[0],
                                                 truePosNoe[0], falsePosNoe[0])
-      print peakList.dataSource.name
       dpScore = calcDpScore(fMeasure, truePos, falseNeg,
                             truePosNoe, falsePosNoe)
+
+      if progressBar:
+        progressBar.close()
+
+      # Predict missing peak locations
+      #print peakList.dataSource.name
+      peakListM = predictMissingPeaks(peakList, shiftsMissingPeaks, progressBar)
+      missingPeaks.update(peakListM.peaks)
 
       # Store results in CCPN objects
       storePeakListRpfValidation(validStore, peakList, recall,
                                  precision, fMeasure, dpScore)
-
-      # Store validation object for peaks that need looking at
-      storeShiftsMissingPeaksValidation(validStore, peakList, shiftsMissingPeaks)
-
-      if progressBar:
-        progressBar.close()
 
     # Overall values for ensemble
     for peakList in peakLists:
@@ -1613,7 +1781,8 @@ def calcRPF(ensembles, peakLists, tolerances,
                           truePosNoeA, falsePosNoeA)
 
     # Update CCPN objects to store overall results
-    storeOverallRpfValidation(validStore, peakLists, unexplainedPeaks,
+    storeOverallRpfValidation(validStore, peakLists,
+                              unexplainedPeaks, missingPeaks,
                               recall, precision, fMeasure, dpScore)
 
 
@@ -1692,7 +1861,7 @@ def calcDpScore(fMeasure, truePos, falseNeg, truePosNoe, falsePosNoe, verbose=Fa
     return 0.0
 
   rFree, pFree, fFree = countsToRpf(truePos[2], falseNeg[2], truePosNoe[2], falsePosNoe[2])
-  rIdeal, pIdeal, fIdeal = countsToRpf(truePos[1], falseNeg[1], truePosNoe[1], falsePosNoe[1]) #  JFD: why do if reset below? @UnusedVariable
+  #rIdeal, pIdeal, fIdeal = countsToRpf(truePos[1], falseNeg[1], truePosNoe[1], falsePosNoe[1])
   rQuery, pQuery, fQuery = countsToRpf(truePos[0], falseNeg[0], truePosNoe[0], falsePosNoe[0])
 
   pIdeal = truePosNoe[1]/ (truePosNoe[1] + falsePosNoe[1])
@@ -1715,43 +1884,180 @@ def calcDpScore(fMeasure, truePos, falseNeg, truePosNoe, falsePosNoe, verbose=Fa
   # due to low counts
   return min(1.0, max(0.0, dpScore))
 
+def getSyntheticMissingPeaksList(peakList):
+  """Descrn: For a regular peak list fetch any existing, or make a new
+             sister peak list (same spectrum) that can hold predictions
+             for missing NOE peaks.
+     Inputs: Nmr.PeakList
+     Output: Nmr.PeakList
+  """
 
-def storeShiftsMissingPeaksValidation(validStore, peakList, shiftPairs):
-  """Descrn: Store chemical shift intersections that are missing peaks
-             in a given peak list using  CCPN validation objects.
-             This overwrites all previous records of such information
-             in the validation store object.
-     Inputs: Validation.ValidationStore,
-             Nmr.PeakList,  List of 2-Tuples of (2-Set of Nmr.Shifts, Float)
+  dataSource = peakList.dataSource
+
+  syntheticPeakList = dataSource.findFirstPeakList(name=MISSING_PEAK_LIST_TAG,
+                                                 isSimulated=True)
+  if not syntheticPeakList:
+    syntheticPeakList = dataSource.newPeakList(name=MISSING_PEAK_LIST_TAG,
+                          details='Missing peaks expected from structure',
+                          isSimulated=True)
+
+  analysisPeakList = getAnalysisPeakList(syntheticPeakList)
+
+  color = '#FF0000'
+  analysisPeakList.symbolStyle = '+'
+  analysisPeakList.symbolColor = color
+  analysisPeakList.textColor = color
+
+  return syntheticPeakList
+
+def predictMissingPeaks(peakList, shiftPairs, progressBar=None):
+  """Descrn: Store chemical shift intersections as synthetic 'missing'
+             peaks. 
+     Inputs: Nmr.PeakList,  List of 2-Tuples of (2-Set of Nmr.Shifts, Float)
+             memops.gui.ProgressBar
      Output: None
   """
 
+  spectrum = peakList.dataSource
+  unit = spectrum.experiment.shiftList.unit
+  dataDims = spectrum.sortedDataDims()
+  boundDims = getOnebondDataDims(spectrum)
+  nDim = len(dataDims)
 
-  peakListId = ','.join([str(x) for x in peakList.getExpandedKey()])
+  syntheticPeakList = getSyntheticMissingPeaksList(peakList)
 
-  for validObj in getShiftsMissingPeaksValidation(validStore, peakList):
-    validObj.delete()
+  dataDimDict = {}
+  for dataDim in dataDims:
+    dataDimRef = getPrimaryDataDimRef(dataDim)
+    ppmMin, ppmMax = getDataDimRefFullRange(dataDimRef)
+    isotopes = getDataDimIsotopes(dataDim)
+    dataDimDict[dataDim] = (dataDimRef, ppmMin, ppmMax, isotopes)
 
-  newValidation = validStore.newNmrMeasurementValidation
+  peakDict = {}
+  peaks = syntheticPeakList.sortedPeaks()
+  for j, peak in enumerate(peaks):
+    peakDict[j] = peak
 
-  for shifts, dist in shiftPairs:
-    validObj = newValidation(context=PROG, keyword=MISSING_PEAK,
-                             nmrMeasurements=shifts,
-                             floatValue=dist, textValue=peakListId)
+  nShifts = len(shiftPairs)
+  shiftPairs.sort()
 
-def getShiftsMissingPeaksValidation(validStore, peakList):
-  """Descrn: Find chemical shift intersection validation objects for
-             peaks missing from a peak list.
-     Inputs: Validation.ValidationStore, Nmr.PeakList
-     Output: List of Validation.NmrMeasurementValidation
-  """
+  if progressBar:
+    sName = spectrum.name
+    eName = spectrum.experiment.name
+    progressBar.text = 'Making synthetic "missing" peaks\nfor %s:%s' % (eName, sName)
+    progressBar.total = nShifts
+    progressBar.open()
+    progressBar.set(0)
+    progressBar.update()
 
-  peakListId = ','.join([str(x) for x in peakList.getExpandedKey()])
+  for i, (dist, shifts) in enumerate(shiftPairs):
+    shiftPairs = []
 
-  return validStore.findAllValidationResults(context=PROG,
-                                             keyword=MISSING_PEAK,
-                                             className=SHIFT_VALID,
-                                             textValue=peakListId)
+    for shift in shifts:
+      bound = getBoundResonances(shift.resonance) or []
+
+      shiftX = None
+      if len(bound) == 1:
+        resonanceX = bound[0]
+        shiftX = resonanceX.findFirstShift(parentList=shift.parentList)
+
+      shiftPairs.append((shift, shiftX))
+
+    position = [None] * nDim
+    assignment = [None] * nDim
+
+    for dataDim1, dataDim2 in boundDims:
+      dataDimRef1, ppmMin1, ppmMax1, isotopes1 = dataDimDict[dataDim1]
+      dataDimRef2, ppmMin2, ppmMax2, isotopes2 = dataDimDict[dataDim2]
+      dim1 = dataDim1.dim-1
+      dim2 = dataDim2.dim-1
+
+      for shift, shiftX in shiftPairs:
+
+        if not shiftX:
+          continue
+
+        if not (ppmMin1 < shift.value < ppmMax1):
+          continue
+
+        if not (ppmMin2 < shiftX.value < ppmMax2):
+          continue
+
+        resonanceA = shift.resonance
+        resonanceB = shiftX.resonance
+
+        isotopeA = resonanceA.isotopeCode
+        isotopeB = resonanceB.isotopeCode
+
+        if (isotopeA in isotopes1) and (isotopeB in isotopes2):
+          position[dim1] = shift.value
+          position[dim2] = shiftX.value
+          assignment[dim1] = resonanceA
+          assignment[dim2] = resonanceB
+          shiftPairs.remove((shift, shiftX))
+          break
+        elif (isotopeB in isotopes1) and (isotopeA in isotopes2):
+          position[dim2] = shift.value
+          position[dim1] = shiftX.value
+          assignment[dim2] = resonanceA
+          assignment[dim1] = resonanceB
+          shiftPairs.remove((shift, shiftX))
+          break
+
+    # Map remaining dims by isotope
+    for dataDim in dataDims:
+      dim = dataDim.dim - 1
+
+      if position[dim] is not None:
+        continue
+
+      dataDimRef, ppmMin, ppmMax, isotopes = dataDimDict[dataDim]
+
+      for shift, shiftX in shiftPairs:
+        resonance = shift.resonance
+
+        if resonance.isotopeCode in isotopes:
+           position[dim] = shift.value
+           assignment[dim] = resonance
+           shiftPairs.remove((shift, shiftX))
+           break
+        elif shiftX and (shiftX.resonance.isotopeCode in isotopes):
+           position[dim] = shiftX.value
+           assignment[dim] = shiftX.resonance
+           shiftPairs.remove((shift, shiftX))
+           break
+
+    if None in position:
+      continue
+
+    peak = peakDict.get(i)
+    if peak:
+      peakDims = peak.sortedPeakDims()
+      for k, peakDim in enumerate(peakDims):
+        peakDim.value = position[k]
+        clearPeakDim(peakDim)
+
+      setupPeak(peak, doFit=False)
+
+    else:
+      peak = pickPeak(syntheticPeakList, position, unit, doFit=False)
+      peakDims = peak.sortedPeakDims()
+
+    for k, peakDim in enumerate(peakDims):
+      assignResToDim(peakDim, assignment[k])
+
+    if progressBar:
+      progressBar.increment()
+
+  nOrig = len(peaks)
+  if nOrig > nShifts:
+    for peak in peaks[nShifts+1:]:
+      peak.delete()
+
+  if progressBar:
+    progressBar.close()
+
+  return syntheticPeakList
 
 def getEnsembleValidationStore(ensemble):
   """Descrn: Get a CCPN object to store validation results for an ensemble
@@ -1847,8 +2153,8 @@ def getResidueRpfValidation(validStore, residue):
 
 
 
-def storeOverallRpfValidation(validStore, peakLists, peaks, recall,
-                              precision, fMeasure, dpScore):
+def storeOverallRpfValidation(validStore, peakLists, peaksU, peaksM,
+                              recall, precision, fMeasure, dpScore):
   """Descrn: Store the RPF results for a an ensemble, over all peak lists
              in CCPN validation objects.
      Inputs: Validation.ValidationStore,
@@ -1859,7 +2165,8 @@ def storeOverallRpfValidation(validStore, peakLists, peaks, recall,
 
   # Get any existing RPF all-peaklist results
   validObjs = getOverallRpfValidation(validStore)
-  allRecall, allPrecision, allFmeasure, allDpScore, unexplainedPeaks = validObjs
+  allRecall, allPrecision, allFmeasure, allDpScore = validObjs[:4]
+  unexplainedPeaks, missingPeaks = validObjs[4:]
 
   # define data model call for new result
   newValidation = validStore.newPeakListValidation
@@ -1884,6 +2191,10 @@ def storeOverallRpfValidation(validStore, peakLists, peaks, recall,
   if not unexplainedPeaks:
     unexplainedPeaks = validStore.newPeakValidation(context=PROG, keyword=UNEXPLAINED)
 
+  # Check or make validation result for missing peaks
+  if not missingPeaks:
+    missingPeaks = validStore.newPeakValidation(context=PROG, keyword=MISSING_PEAK)
+
   # Refresh peakLists
   allRecall.peakLists = peakLists
   allPrecision.peakLists = peakLists
@@ -1891,7 +2202,8 @@ def storeOverallRpfValidation(validStore, peakLists, peaks, recall,
   allDpScore.peakLists = peakLists
 
   # Refresh peaks
-  unexplainedPeaks.peaks = peaks
+  unexplainedPeaks.peaks = peaksU
+  missingPeaks.peaks = peaksM
 
   # Store the actual values
   allRecall.floatValue = recall
@@ -1915,8 +2227,9 @@ def getOverallRpfValidation(validStore):
   allFmeasure = findValidation(className=PKLIST_VALID, context=PROG, keyword=F_MEASURE_ALL)
   allDpScore = findValidation(className=PKLIST_VALID, context=PROG, keyword=DP_SCORE)
   unexplainedPeaks = findValidation(className=PEAK_VALID, context=PROG, keyword=UNEXPLAINED)
+  missingPeaks = findValidation(className=PEAK_VALID, context=PROG, keyword=MISSING_PEAK)
 
-  return allRecall, allPrecision, allFmeasure, allDpScore, unexplainedPeaks
+  return allRecall, allPrecision, allFmeasure, allDpScore, unexplainedPeaks, missingPeaks
 
 
 def getPeakListRpfValidation(validStore, peakList):
@@ -2001,12 +2314,6 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
 
   badDist = distThreshold+2.5
 
-  # Store resonances by linking them to a Ca atom
-  residueHydrogens = {} #@UnusedVariable
-
-  # Store max num bonds from Ca for each residue
-  # allows for filtering distant residues to save time
-  maxResBonds = {} #@UnusedVariable
 
   # Convert available heteroatom contexts
   # to dict for quick lookup
@@ -2026,7 +2333,6 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
       # Get Ca atomSet so we can exclude whole distal residues
       # Default to none, just in case we have a strange residue
       caAtomSet = None
-      msResidue = residue.residue #@UnusedVariable
 
       # residue.residue because we go from the
       # ensmble residue to mol system residue
@@ -2082,7 +2388,6 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
 
           if len(atomSets) == 1:
             resonance = resonances[0]
-            break
 
           else:
             # Trick to map ambigous prochiral atomSets to resonance
@@ -2114,8 +2419,6 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
     coordList1 = []
     coordList1Append = coordList1.append
     xl = []
-    yl = [] #@UnusedVariable
-    zl = [] #@UnusedVariable
     for model in models:
 
       xa = 0.0
@@ -2137,7 +2440,6 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
       ensembleCoordsAppend((xl, i, coordList1))
 
   nModels = float(len(models))
-  nHydrogens = len(ensembleCoords) #@UnusedVariable
   ensembleCoords.sort()
 
   for k, (x1, i, coordList1) in enumerate(ensembleCoords[:-1]):
@@ -2169,7 +2471,7 @@ def getProtonDistsConn(ensemble, heteroAtomContexts, distThreshold=DEFAULT_DISTA
               atomSetsA = [atomSets0[0],]
               atomSetsB = [atomSets0[1],]
               noeDist = getAtomSetsDistance(atomSetsA, atomSetsB,
-                                    ensemble, method='noe')
+                                            ensemble, method='noe')
               noe = noeDist**-6.0
               resonanceDistances[resonance1][resonance2] = noeDist, noe
               resonanceDistances[resonance2][resonance1] = noeDist, noe
@@ -2238,7 +2540,6 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
 
     # Navigate up model to get spectrum & experiment
     spectrum     = peakList.dataSource
-    experiment   = spectrum.experiment #@UnusedVariable
 
     # Find 1H spectrum dimension numbers
     hydrogenDims = findSpectrumDimsByIsotope(spectrum, '1H')
@@ -2279,7 +2580,7 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
         ppm2 = peakDim2.value
 
         if peakDim1.value is None:
-          print "peak %s is not having a peakDim1.value" % peak
+          print "Peak %s does not have a peakDim1.value" % peak
           continue
 
         # Check if ppm values similar
@@ -2330,7 +2631,6 @@ def getAmbigNoeConn(peakLists, toleranceList, diagonalTolerance=0.1,
       # Get peak dimension objects in order
       peakDims = peak.sortedPeakDims()
 
-      #
       peakResonances = []
 
       # For each 1H dimension find matching chemical shifts
@@ -2476,3 +2776,33 @@ def getEnsembles(project):
           ensembles.append((molSystem.code, ensemble.ensembleId, ensemble))
   ensembles.sort()
   return [x[2] for x in ensembles]
+
+def pyRpfApp(ensembles, peakLists, tolerances, distThreshold=5.0,
+             prochiralTolerance=0.04, diagonalTolerance=0.3, aliasing=True):
+
+  calcRPF(ensembles, peakLists, tolerances, distThreshold,
+          prochiralTolerance, diagonalTolerance, aliasing)
+
+if __name__ == '__main__':
+
+  from memops.general.Io import loadProject
+
+  from ccpnmr.analysis.Analysis import Analysis
+
+  #projectDirectory = '/home/tjs23/nmr/montelione/rpf/1brv_cs_pk_2mdl/'
+  projectDirectory = '/home/tjs23/nmr/montelione/rpf/AtT13Org/'
+
+  rootProject = loadProject(projectDirectory)
+
+  app = Analysis(64)
+
+  app.initProject(rootProject)
+
+  peakLists = getThroughSpacePeakLists(rootProject)
+
+  ensembles = getEnsembles(rootProject)
+
+  tolerances = [getNoeTolerances(pl) for pl in peakLists]
+
+  pyRpfApp(ensembles, peakLists, tolerances, distThreshold=5.0,
+           prochiralTolerance=0.04, diagonalTolerance=0.3, aliasing=True,)
