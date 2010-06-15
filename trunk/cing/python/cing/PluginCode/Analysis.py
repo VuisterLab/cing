@@ -27,9 +27,23 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
 
 class Analysis:
     def __init__(self, project):
-        app = AnalysisApp(64) # app is non-gui Analysis version, number is an aritrary cache size 
-        app.initProject(project)
         self.project = project
+        self.app = None # Do explicit initAnalysis
+
+    def initAnalysis(self):
+        """Required to execute this routine
+        Returns True on failure.
+        """
+        try:
+            self.app = AnalysisApp(64) # Number is an arbitrary cache size
+            if not self.app:
+                NTerror("Analysis failed to start the non-GUI version.")
+                return True
+            self.app.initProject(self.project)
+        except:
+            NTexception(format_exc())
+            NTerror("Analysis crashed when starting the non-GUI version")
+            return
 
     def runRpf(self,
                doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,

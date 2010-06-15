@@ -24,12 +24,13 @@ from Refine.NTxplor    import refineDihedralParameters
 from Refine.NTxplor    import refineNoeParameters
 from Refine.NTxplor    import refineParameters #@UnusedImport
 from Refine.configure  import config
+from cing import cingRevision
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk    import copy
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from cing.core.molecule import mapMolecules #@UnusedImport
+#from cing.core.molecule import mapMolecules #@UnusedImport
 
 def importFromRefine( config, params, project ):
     """
@@ -143,6 +144,14 @@ def doSetup( config, project, basePath, options ):
         xplor.patchHISE.append( res.resNum )
     for res in project.molecule.residuesWithProperties('cPRO'):
         xplor.patchCISP.append( res.resNum )
+    disulfide_bridges = []
+    for res in project.molecule.residuesWithProperties('CYSS'):
+        if res in disulfide_bridges:
+            continue
+#        TODO
+    for (res1,res2) in disulfide_bridges:
+        xplor.patchDISN.append( (res1.resNum,res2.resNum) )
+
 
     # save the parameterfile
     parfile = xplor.joinPath( 'parameters.py' )
@@ -155,20 +164,16 @@ def doSetup( config, project, basePath, options ):
 
 
 def generatePSF( config, params, doPrint = 0 ):
-
-    # PSF generation
+    '''PSF generation'''
+    NTmessage("Generating .psf file for xplor")
     models = asci2list(params.models)
     psfJob = GeneratePSF(
-                         config,
-                         params,
-
+         config,
+         params,
 #                         inPath     = config.directories.converted,
-                         pdbFile    = params.baseName%models[0],
-
-                         jobName    = 'generatePSF',
-
-                        )
-
+         pdbFile    = params.baseName%models[0],
+         jobName    = 'generatePSF'
+    )
     psfJob.createScript()
     if doPrint:
         psfJob.printScript()
@@ -178,6 +183,10 @@ def generatePSF( config, params, doPrint = 0 ):
 
 
 def analyze( config, params, doPrint = 0 ):
+    '''Analyze a run
+    Returns True on failure.
+    '''
+    NTmessage("Analyzing a run")
 
     # first create the jobs, run later
     analyzeJobs = []
@@ -185,20 +194,16 @@ def analyze( config, params, doPrint = 0 ):
         job = Analyze(
                         config,
                         params,
-
                         fileNum    = i,
-
                         molecules  = [
                                       NTdict(
                                                 psfFile        = params.psfFile,
                                                 pdbFile        = params.baseName%i,
                                                 selectionCode  = '(not resn TIP3 and not resn ANI)'
-                                              ),
-                                     ],
-
+                                  ),
+                         ],
 #                         inPath     = config.directories.converted,
 #                         outPath    = config.directories.analyzed,
-
                         jobName    = 'analyze_%d'%i,
                      )
 
@@ -207,7 +212,9 @@ def analyze( config, params, doPrint = 0 ):
 
 
     for job in analyzeJobs:
-        job.createScript()
+        if job.createScript():
+            NTerror("In refine#analyze failed to create at least one job's script.")
+            return True
         if doPrint:
             job.printScript()
         #end if
@@ -225,9 +232,7 @@ def refine( config, params, doPrint = 0 ):
             WaterRefine(
                    config,
                    params,
-
                    fileNum    = i,
-
                    molecules  = [
                                  NTdict(
                                     psfFile        = params.psfFile,
@@ -237,7 +242,6 @@ def refine( config, params, doPrint = 0 ):
                                 ],
 #                   inPath     = config.directories.analyzed,
 #                   outPath    = config.directories.refined,
-
                    jobName    = 'refine_%d'%i,
             )
         )
@@ -502,6 +506,11 @@ if __name__ == '__main__':
                       dest="verbosity", action='store',
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
+    parser.add_option("--ipython",
+                      action="store_true",
+                      dest="ipython",
+                      help="Start ipython interpreter"
+                     )
 
     (options, args) = parser.parse_args()
 
@@ -528,8 +537,11 @@ if __name__ == '__main__':
     parser.check_required('--project')
 
     NTmessage(dots*10+"\n")
-    NTmessage("     Refine version %s\n", version)
-    NTmessage(dots*10+"\n")
+    versionStr = "     Refine version %s" % version
+    if cingRevision:
+        versionStr += " (r%d)" % cingRevision
+    NTmessage(versionStr)
+    NTmessage("\n"+dots*10+"\n")
 
     #------------------------------------------------------------------------------
     # Project
@@ -601,6 +613,18 @@ if __name__ == '__main__':
         mol = importFromRefine( config, parameters, project )
     else:
         NTerror('refine.py, invalid option\n')
+
+    #end if
+    #------------------------------------------------------------------------------------
+    # ipython
+    #------------------------------------------------------------------------------------
+    if options.ipython:
+        from IPython.Shell import IPShellEmbed
+        ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
+                                banner='--------Dropping to IPython--------',
+                                exit_msg='--------Leaving IPython--------'
+                              )
+        ipshell()
     #end if
 
 

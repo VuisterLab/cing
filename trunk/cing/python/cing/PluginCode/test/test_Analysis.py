@@ -47,7 +47,14 @@ class AllChecks(TestCase):
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
 
             analysis = Analysis(project)
+            if analysis.initAnalysis():
+                self.fail("%s Failed to analysis.initAnalysis()" % entryId)
+                continue
+
+            # If unit testing without output then Analysis needs to be silenced separately.
             if cing.verbosity <= cing.verbosityNothing:
+                
+                
                     switchOutput(False)
 
             self.assertTrue(analysis.runRpf(
@@ -61,6 +68,8 @@ class AllChecks(TestCase):
                     switchOutput(True)
 
             self.assertTrue(project.save())
+            del project
+            del analysis # Calls quit?
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
