@@ -1,17 +1,7 @@
-#------------------------------------------------------------------------------
- refine.py
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-To setup: in cing directory:
-> ./setup.py
-Generates cing.csh to source in your .cshrc file
-Adjust if needed.
-Uses 'which xplor' to determine initial xplor executable; make sure it is in your
-path when you run setup.
-
-
 #Refinement setup
+
+set x = LdCof_jfd_ref
+set ranges = '6-23,26-57,63-141'
 
 -----------------------------------------------------------------------------------------------------------------------------------------
    Import into cing
@@ -44,7 +34,6 @@ Options:
                         stdout/stderr (default: 3)
 
 # Create a new project from a CYANA directory (called LdCof) with all required files in.
-set x = LdCof
 cyana2cing -v 9 --pdbFile $x --peakFiles $x"n15",$x"c13" --uplFiles $x --acoFiles $x --seqFile $x --protFile $x -o $x
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -78,14 +67,13 @@ Options:
                         verbosity: [0(nothing)-9(debug)] no/less messages to
                         stdout/stderr (default: 3)
 
+refine --project $x --name $stage --setup --superpose $ranges
 
-refine --project H2_3Ca_47 --name refine1 --setup --superpose 502-598,630-647
-
-==> Generated setup under "./H2_3Ca_47.cing/Refine/refine1"
+==> Generated setup under "./$x.cing/Refine/$stage"
 -----------------------------------------------------------------------------------------------------------------------------------------
   Edit parameters.py file
 -----------------------------------------------------------------------------------------------------------------------------------------
-Edit "./H2_3Ca_47.cing/Refine/refine1/parameters.py" before continuing
+Edit "./$x.cing/Refine/$stage/parameters.py" before continuing
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -101,44 +89,55 @@ assi (resid 578 and name OD2)       (resid 850 and name * and not segid WAT1)   
 assi (resid 646 and name O)         (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
 assi (resid 649 and name OG)        (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
 
+# Then repeat without --setup to create the psf etc.
+refine --project $x --name $stage --superpose $ranges --psf --ipython
+
 -----------------------------------------------------------------------------------------------------------------------------------------
   PSF file
 -----------------------------------------------------------------------------------------------------------------------------------------
-Manually copy the appropriate .psf file to the PROJECT.cing/NAME/PSF subdirectory
+Manually copy the appropriate .psf file to the $x.cing/Refine/$stage/PSF subdirectory
 Be sure to have the right name in parameter.py for the psfFile field
+PERHAPS: edit the generatePSF.inp to include better topology description:
+patch DISN
+	reference=1=( resid 173 )  reference=2=( resid 186 )
+end
+patch DISN
+	reference=1=( resid 176 )  reference=2=( resid 182 )
+end
+and run again:
+$x.cing/Refine/$stage/Jobs/generatePSF.csh
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   Analyze
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project H2_3Ca_47 --name refine1 --analyze
+refine --project $x --name $stage --analyze --ipython
 
 Examine at least one log file in the Jobs directory for errors.
+JFD: - fixed bug with too long file name: @@1brv_cs_pk_2mdl.cing/Refine/refine1/Tables/dihedral_constraint_list.tbl
+		The same for the other files. Easiest fix is to rename the lists to be no more than 10 chars.
 
------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------1----------------------------------------------------------------------------------------------------------
   Refine
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project H2_3Ca_47 --name refine1 --refine
+refine --project $x --name $stage --refine
 
-or to start two jobs (if you have 20 models):
-
-refine --project H2_3Ca_47 --name refine1 --refine --models 0-9 >& job1.log &
-refine --project H2_3Ca_47 --name refine1 --refine --models 10-19 >& job2.log &
+or to start multiple jobs consider multipleRefineJobs.csh
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   Parse result, select 10? best, based on Enoe
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project H2_3Ca_47 --name refine1 --parse --best 10 --sort Enoe
+refine --project $x --name $stage --parse --best 1 --sort Enoe
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   Import into project
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project $x --name refine1 --import
+refine --project $x --name $stage --import
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   Open in CING
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-cing --project H2_3Ca_47 --ipython --nosave
+cing --project $x --ipython --nosave
 
 
 

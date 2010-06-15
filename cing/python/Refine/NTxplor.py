@@ -16,11 +16,11 @@ todo = """
 on result
 
 - clean xplor script for variables that can be 'implemented" in python
-use dictionaries with setups for  non-bond etc??
+use dictionaries with setups for non-bond etc??
 
 Path issues: all relative, defs include '/'? or use path.join (cleaner but less
 readable
--Why use enviromental variables directories script/xplor, rather then full paths?
+-Why use environmental variables directories script/xplor, rather then full paths?
 
 Cluster issues
 """
@@ -43,6 +43,7 @@ class refineParameters( NTdict ):
       patchHISD         = [],                   # HISD patches are needed for CYANA->XPLOR compatibility.
       patchHISE         = [],                   # HISE patches are needed for CYANA->XPLOR compatibility.
       patchCISP         = [],                   # Cis prolines
+      patchDISN         = [],                   # Disulfide pairs
 
       # initial analysis
       minimizeProtons   = False,
@@ -88,7 +89,7 @@ class refineParameters( NTdict ):
 parameters = refineParameters(
       baseName          = "%(baseName)s",
 
-      # ascilist to select the model(s) to refine; e.g 0-19
+      # ascii list to select the model(s) to refine; e.g 0-19
       # can also be modified as command-line argument
       models            = '%(models)s',
 
@@ -105,8 +106,10 @@ parameters = refineParameters(
       patchHISD         = %(patchHISD)s,
       # HISE patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
       patchHISE         = %(patchHISE)s,
-      # Cis-roline patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
+      # Cis-proline patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
       patchCISP         = %(patchCISP)s,
+      # Disulfide pairs
+      patchDISN         = %(patchDISN)s,
 
       # initial analysis
       minimizeProtons   = %(minimizeProtons)s,
@@ -273,7 +276,7 @@ class Xplor( refineParameters ):
 
     #------------------------------------------------------------------------
     def checkPath( self, *args):
-        """Check existance of path relative to basePath
+        """Check existence of path relative to basePath
            Returns joined path on success
         """
         path = self.joinPath( *args )
@@ -286,7 +289,7 @@ class Xplor( refineParameters ):
 
     #------------------------------------------------------------------------
     def newPath( self, *args):
-        """Check existance of joined path, relative to basePath,
+        """Check existence of joined path, relative to basePath,
            remove if exists and overwrite
            Return joined path or do a system exit.
         """
@@ -422,7 +425,9 @@ end
 
     #------------------------------------------------------------------------
     def restraintsAnalysisCode( self ):
-        """Return code for restraint analysis"""
+        """Return code for restraint analysis.
+        Returns False on error. Needs to be False (not None).
+        """
         code = """
 {*==========================================================================*}
 {*======================= CHECK RESTRAINT VIOLATIONS =======================*}
@@ -450,6 +455,10 @@ evaluate ( $rms.noe = $result )
 # ACCEPTANCE CRITERIA POSSIBLE. THIS IS A WORKAROUND
 # XPLOR CANNOT DO IT DIRECTLY
             for noe in self.noeRestraints:
+                maxlength = 20 - len('viol.noe.')
+                if len(noe.name) > maxlength:
+                    NTerror("NOE list name is over 11 chars and xplor wouldn't be able to handle it: [%s]" % noe.name)
+                    return False
                 noe.setdefault( 'averaging', 'sum' )
                 noe.setdefault( 'scale',      50 )
                 noe.setdefault( 'sqconstant', 1.0 )
@@ -477,6 +486,10 @@ evaluate ( $viol.noe.total = $violations + $viol.noe.total )
 """
 # DO ALL THE CDIH CLASSES SEPARATELY:
         for dihed in self.dihedralRestraints:
+            maxlength = 20 - len('viol.cdih.')
+            if len(dihed.name) > maxlength:
+                NTerror("Dihedral angle list name is over 10 chars and xplor wouldn't be able to handle it: [%s]" % dihed.name)
+                return False
             code = code + """
 restraints dihedral reset
   nassign = """ + str( self.dihedralMaxRestraints ) + """
@@ -583,7 +596,16 @@ class WaterRefine( Xplor ):
 
     #------------------------------------------------------------------------
     def createScript( self ):
-        """ Create script"""
+        """ Create script.
+        Return True on error.
+        """
+
+
+        restraintsAnalysisCode = self.restraintsAnalysisCode()
+        if None in [ restraintsAnalysisCode ]:
+            NTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
+            return True
+
 
         self.script = """
 {*==========================================================================*}
@@ -831,7 +853,7 @@ end
 energy end
 
 """  + \
-self.restraintsAnalysisCode() + """
+restraintsAnalysisCode + """
 
 if ($accept = 0 ) then
   exit main
@@ -874,6 +896,11 @@ class Analyze( Xplor ):
     #------------------------------------------------------------------------
     def createScript( self ):
         """ Create script"""
+
+        restraintsAnalysisCode = self.restraintsAnalysisCode()
+        if False in [ restraintsAnalysisCode ]:
+            NTerror("In Analyze#createScript: Failed to generate code for at least one part.")
+            return True
 
         self.script = """
 {*==========================================================================*}
@@ -968,7 +995,7 @@ end
 energy end
 
 """ + \
-self.restraintsAnalysisCode() + \
+restraintsAnalysisCode + \
 self.writeMolCode() + """
 
 stop
