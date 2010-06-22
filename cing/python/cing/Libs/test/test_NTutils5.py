@@ -5,6 +5,7 @@ python -u $CINGROOT/python/cing/Libs/test/test_NTutils5.py
 
 from cing.Libs.NTutils import * #@UnusedWildImport
 from unittest import TestCase
+from numpy import * #@UnusedWildImport
 import unittest
 
 class AllChecks(TestCase):
@@ -42,6 +43,28 @@ class AllChecks(TestCase):
             angleList.append(cv2)
             circularVariance = NTcVarianceAverage(angleList)
             self.assertAlmostEqual(circularVariance, cav, places = 3)
+
+    def testGetEnsembleAverageAndSigmaFromHistogram(self):
+        n = 6
+        x = 10.
+        nn = n * n
+        m = zeros(nn).reshape(n,n)
+#        m[4,4] = x
+        m[5,3] = x
+#[[ 0.,  0.,  0.,  0.,  0.,  0.],
+# [ 0.,  0.,  0.,  0.,  0.,  0.],
+# [ 0.,  0.,  0.,  0.,  0.,  0.],
+# [ 0.,  0.,  0.,  0.,  1.,  0.],
+# [ 0.,  0.,  0.,  0.,  0.,  0.],
+# [ 0.,  0.,  1.,  0.,  0.,  0.]]
+        c_av, c_sd, hisMin, hisMax = getEnsembleAverageAndSigmaFromHistogram(m) #@UnusedVariable
+        self.assertEqual( c_av, x) # weird average
+
+        c_av, c_sd, hisMin, hisMax = getArithmeticAverageAndSigmaFromHistogram(m) #@UnusedVariable
+        self.assertEqual( c_av, x/nn) # huge difference.
+
+
+
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

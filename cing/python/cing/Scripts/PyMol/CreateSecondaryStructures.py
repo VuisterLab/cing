@@ -12,10 +12,10 @@
 
 # Next line is a pymol directive
 #python #@UndefinedVariable
-from pymol import cmd
-from pymol import editor
+from pymol import cmd #@UnresolvedImport
+from pymol import editor #@UnresolvedImport
 import os
-import pymol #@UnusedImport
+import pymol #@UnusedImport @UnresolvedImport
 import string
 import urllib
 

@@ -67,7 +67,6 @@ axis: 'N'
 # imports
 #===========================================================================
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.molecule import dots
 from cing.core.molecule import translateTopology
 
 #===========================================================================

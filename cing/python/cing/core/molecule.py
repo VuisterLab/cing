@@ -2984,12 +2984,13 @@ Residue class: Defines residue properties
                 continue
         #end for
         if missingCoordinates:
-            msg = 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self
-            # wrap this call so that not all get printed; very common in X-ray structures like 2uva
-            if msgHol == None:
-                NTdebug(msg)
-            else:
-                msgHol.appendDebug(msg)
+            if False:
+                msg = 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self
+                # wrap this call so that not all get printed; very common in X-ray structures like 2uva
+                if msgHol == None:
+                    NTdebug(msg)
+                else:
+                    msgHol.appendDebug(msg)
             return
 
 
@@ -3005,16 +3006,11 @@ Residue class: Defines residue properties
         return d1_value_list
     #end def
 
-    def getTripletHistogramList(self, doOnlyOverall = False, ssTypeRequested = None ):
+    def getTripletHistogramList(self, doOnlyOverall = False, ssTypeRequested = None, normalizeBeforeCombining = False ):
         """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
         an empty array when it could not be constructed.
 
-        If doOnlyOverall it will be a list with a single element. If not then
-        it will be a list of three elements one each for every sstype.
-
-        If ssTypeRequested is None then all types will be returned otherwise just the
-        type requested.
-
+        See namesake method in this module's name space for complete documentation on parameters.
         Return None on error.
             or empty array when it could not be constructed.
         """
@@ -3039,7 +3035,8 @@ Residue class: Defines residue properties
         resType     = getDeepByKeys(            self.db.nameDict, IUPAC)
         resTypeNext = getDeepByKeys(self.sibling (1).db.nameDict, IUPAC)
         resTypeListBySequenceOrder = ( resTypePrev, resType, resTypeNext)
-        return getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = ssTypeRequested )
+        return getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = ssTypeRequested,
+                                       normalizeBeforeCombining = normalizeBeforeCombining )
 
 
     def toSML(self, stream=sys.stdout ):
@@ -3655,7 +3652,7 @@ coordinates: %s"""  , dots, self, dots
 
     def getSterospecificallyRelatedlPartner( self ):
         """
-        Return proChiral partner Atom instance of self or
+        Return prochiral partner Atom instance of self or
         another Atom instance that is related by another stereospecific relation.
         E.g. Phe HD1 will return HD2,
              Asn HD1 too
@@ -3673,7 +3670,7 @@ coordinates: %s"""  , dots, self, dots
 
         realAtomList = pseudoAtom.realAtoms()
         if len(realAtomList) > 2:
-            NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code")
+#            NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code") # happens in AtT13Paris for I guess isopropyl groups or alike.
             return None
         if len(realAtomList) < 2:
             NTwarning("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
@@ -4694,7 +4691,7 @@ def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
             msg += '\n'
     return msg
 
-def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None):
+def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None, normalizeBeforeCombining = False):
     """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
     an empty array when it could not be constructed.
 
@@ -4704,6 +4701,9 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     If ssTypeRequested is None then all types will be returned otherwise just the
     type requested.
 
+    If normalizeBeforeCombining = True then the 3 histograms for each ssType are normalized to have an integral of 100/3 % before they
+    are added to have an integral of 100 %. The result will therefor be one histogram and not the usual 3.
+
     resTypeListBySequenceOrder is a list of three residue type names in sequence order.
     E.g. VAL171, PRO172, ILE173.
 
@@ -4712,17 +4712,17 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     """
 
     if not resTypeListBySequenceOrder:
-        NTerror( 'getTripletHistogramList has a None or empty sequence: %s' % str(resTypeListBySequenceOrder))
+        NTerror( 'getTripletHistogramList was given an empty sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
     if None in resTypeListBySequenceOrder:
-        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
+#        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
 
     resTypePrev, resType, resTypeNext = resTypeListBySequenceOrder
     histListTuple = []
-    if doOnlyOverall:
+    if doOnlyOverall and not normalizeBeforeCombining:
         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
     #        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
         hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
@@ -4730,7 +4730,7 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     else:
         ssTypeList = hPlot.histd1BySsAndResTypes.keys()
         ssTypeList.sort() # in place sort to: space, H, S
-#            NTdebug("ssTypeList: %s" % ssTypeList)
+#        NTdebug("ssTypeList: %s" % ssTypeList)
         for ssType in ssTypeList:
             if ssTypeRequested and ssType != ssTypeRequested:
 #                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
@@ -4757,6 +4757,23 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         hist = multiply(m1,m2)
         histList.append(hist)
 
+    if normalizeBeforeCombining:
+        if len(histListTuple) != 3:
+            NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
+            return None
+        for hist in histList:
+            histSum = sum(hist)
+            factor = 3 * histSum / 100.0
+            hist /= factor # normalize the new sum to be 33.
+            histSumNew = sum(hist)
+#            NTdebug("Normalized histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 and found %10.3f" % (
+#                histSum, factor, histSumNew))
+            if math.fabs( 33.333 - histSumNew) > 0.1:
+                NTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
+                    histSum, factor, histSumNew))
+                return None
+        histResult = histList[0] + histList[1] + histList[2]
+        histList = [ histResult ]
     return histList
 
 

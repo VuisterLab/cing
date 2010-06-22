@@ -9,9 +9,9 @@ __author__ += 'Tim Stevens '
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     switchOutput(False)
     try:
-        from ccpnmr.analysis.Version import version #@UnusedImport
-        from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists #@UnusedImport IS used.
-        from ccpnmr.analysis.Analysis import Analysis as AnalysisApp
+        from ccpnmr.analysis.Version import version #@UnusedImport @UnresolvedImport
+        from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists #@UnusedImport IS used. @UnresolvedImport
+        from ccpnmr.analysis.Analysis import Analysis as AnalysisApp #@UnresolvedImport
         # The defs below are not moved into this module so that Analysis and CING both have access to them.
         # Analysis can't import any cing code.
         from cing.Scripts.Analysis.PyRPF import * #@UnusedWildImport
@@ -43,7 +43,7 @@ class Analysis:
         except:
             NTexception(format_exc())
             NTerror("Analysis crashed when starting the non-GUI version")
-            return
+            return True
 
     def runRpf(self,
                doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,

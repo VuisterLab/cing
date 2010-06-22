@@ -6037,7 +6037,7 @@ END_RESIDUE
 RESIDUE	PHE      F
 #=======================================================================
     nameDict = {'BMRBd': 'PHE', 'IUPAC': 'PHE', 'AQUA': 'PHE', 'INTERNAL_0': 'PHE', 'INTERNAL_1': 'PHE', 'CYANA': 'PHE', 'CYANA2': 'PHE', 'PDB': 'PHE', 'XPLOR': 'PHE'}
-    comment = 'Regular Asn residue'
+    comment = 'Regular Phe residue'
     properties = ['protein', 'aromatic', 'large', 'neutral']
     #---------------------------------------------------------------
     DIHEDRAL PHI
@@ -6214,7 +6214,7 @@ RESIDUE	PHE      F
     #---------------------------------------------------------------
         topology = [(0, 'CD1'), (0, 'CE1'), (0, 'CE2'), (0, 'CD2')]
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isAromatic', 'aromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-        nameDict = {'BMRBd': None, 'IUPAC': 'QR', 'AQUA': 'QR', 'INTERNAL_0': 'QR', 'INTERNAL_1': 'QR', 'CYANA': 'QR', 'CYANA2': 'QR', 'PDB': None, 'XPLOR': None}
+        nameDict = {'BMRBd': None, 'IUPAC': 'QR', 'AQUA': 'QR', 'INTERNAL_0': 'QR', 'INTERNAL_1': 'QR', 'CYANA': 'QR', 'CYANA2': 'QR', 'PDB': None, 'XPLOR': 'H*'}
         aliases = []
         pseudo = None
         real = ['HD1', 'HD2', 'HE1', 'HE2', 'HZ']
@@ -8000,7 +8000,7 @@ RESIDUE	TYR      Y
     #---------------------------------------------------------------
         topology = [(0, 'CD1'), (0, 'CE1'), (0, 'CE2'), (0, 'CD2')]
         properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isAromatic', 'aromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
-        nameDict = {'BMRBd': None, 'IUPAC': 'QR', 'AQUA': 'QR', 'INTERNAL_0': 'QR', 'INTERNAL_1': 'QR', 'CYANA': 'QR', 'CYANA2': 'QR', 'PDB': None, 'XPLOR': None}
+        nameDict = {'BMRBd': None, 'IUPAC': 'QR', 'AQUA': 'QR', 'INTERNAL_0': 'QR', 'INTERNAL_1': 'QR', 'CYANA': 'QR', 'CYANA2': 'QR', 'PDB': None, 'XPLOR': 'H*'}
         aliases = []
         pseudo = None
         real = ['HD1', 'HD2', 'HE1', 'HE2']

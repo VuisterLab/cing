@@ -1431,11 +1431,9 @@ def validateDihedrals(self):
 
 def validateDihedralCombinations(project):
     """Validate the dihedral angle combinations such as the Ramachandran phi/psi
-    wrt databased derived preferences.
+    wrt database derived preferences.
     The routine (re-)sets properties such as:
     res.CHK.RAMACHANDRAN_CHK.VALUE_LIST
-
-    TODO: improve to lookup best Z-score from all 3 histograms?
     """
 
     if not project.molecule:
@@ -1481,6 +1479,7 @@ def validateDihedralCombinations(project):
             doingNewD1D2plot = False
             bins = bins360P # most common. (chis & ds)
             resTypeList = None # used for lookup of C tuple
+            normalizeBeforeCombining = False
             if dihedralName1==PHI_STR and dihedralName2==PSI_STR:
                 histBySsAndResType         = hPlot.histRamaBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histRamaCtupleBySsAndResType
@@ -1492,6 +1491,8 @@ def validateDihedralCombinations(project):
                 histBySsAndResType         = hPlot.histd1BySsAndResTypes
                 histCtupleBySsAndResType   = hPlot.histd1CtupleBySsAndResTypes
                 doingNewD1D2plot = True
+                normalizeBeforeCombining = True
+                ssType = None # use all now for scoring.
                 triplet = NTlist()
 #                tripletIdxList = [-1,0,1]
                 tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010.
@@ -1508,12 +1509,13 @@ def validateDihedralCombinations(project):
 
             if doingNewD1D2plot:
                 # depending on doOnlyOverall it will actually return an array of myHist.
-                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType  )
+#                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType  )
+                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, normalizeBeforeCombining=normalizeBeforeCombining  )
                 if myHistList == None:
                     NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % residue)
                     continue
                 if len(myHistList) != 1:
-                    NTdebug("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList),residue))
+                    NTerror("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList),residue))
                     continue
                 myHist = myHistList[0]
             else:
@@ -1542,16 +1544,21 @@ def validateDihedralCombinations(project):
                 resTypeList = [ resName ]
             keyList = [ ssType ]
             keyList += resTypeList
-            Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
-#            NTdebug("keyList: %s" % str(keyList))
-            if not Ctuple:
-                NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
-                continue
-            (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
-            keyListQueryStr = str(keyList)
-            if keyListStr != keyListQueryStr:
-                NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
-                continue
+            if normalizeBeforeCombining: # can't use predefined ones. Of course the debug checking below makes no sense with this.
+#                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
+                (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
+            else:
+                Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
+    #            NTdebug("keyList: %s" % str(keyList))
+                if not Ctuple:
+                    NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
+                    continue
+                (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+                keyListQueryStr = str(keyList)
+                if keyListStr != keyListQueryStr:
+                    NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
+                    continue
 
             if myHist == None:
                 NTerror("Got None for hist for %s" % residue)
@@ -1572,7 +1579,7 @@ def validateDihedralCombinations(project):
                 if True: # costly checks to be disabled later.
 #                if checkIdx == 2: # costly checks to be disabled later.
 #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
-                    msg = "chk %d ssType %s res %20s mdl %d a2 %8.2f a1 %8.2f c_av %8.0f c_sd %8.0f ck %8.0f zk %8.2f h- %8.0f h+ %8.0f z- %8.2f z+ %8.2f" % (
+                    msg = "chk %d ssType %4s res %20s mdl %d a2 %8.2f a1 %8.2f c_av %8.3f c_sd %8.3f ck %8.3f zk %8.2f h- %8.3f h+ %8.3f z- %8.2f z+ %8.2f" % (
                                 checkIdx,
                                 ssType,residue,modelIdx,a2, a1,
                                 c_av, c_sd,ck,zk,
@@ -1588,7 +1595,10 @@ def validateDihedralCombinations(project):
                     elif hisMax != maxHist:
                         NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
                     else:
-                        NTdebug(msg)
+                        if doingNewD1D2plot:
+                            NTdebug(msg)
+                    # end if on checks
+                # end if on True
                 ensembleValueList[modelIdx] = zk
             # end for modelIdx
         # end for checkIdx

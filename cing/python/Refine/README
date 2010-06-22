@@ -1,6 +1,7 @@
 #Refinement setup
 
-set x = LdCof_jfd_ref
+set x = LdCof_jfd_ref4
+set stage = r4
 set ranges = '6-23,26-57,63-141'
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -15,19 +16,19 @@ Options:
   -c CONVENTION, --convention=CONVENTION
                         Set convention: CYANA,CYANA2 (default=CYANA2).
   --seqFile=SEQFILE     Define seqFile (no .seq extension).
-  --protFile=PROTFILE   Define protFile (no .prot extention).
+  --protFile=PROTFILE   Define protFile (no .prot extension).
   --stereoFile=STEREOFILE
-                        Define stereoFile (no .cya extention).
-  --pdbFile=PDBFILE     Define pdbFile (no .pdb extention).
+                        Define stereoFile (no .cya extension).
+  --pdbFile=PDBFILE     Define pdbFile (no .pdb extension).
   --nmodels=NMODELS     Define number of models to extract from PDBFILE
                         (default=20).
   --peakFiles=PEAKFILES
-                        Define peakFiles (no .peaks extention; separate by
+                        Define peakFiles (no .peaks extension; separate by
                         comma's:e.g. c13,n15).
-  --uplFiles=UPLFILES   Define uplFiles (no .upl extention; separate by
+  --uplFiles=UPLFILES   Define uplFiles (no .upl extension; separate by
                         comma's:e.g. final,manual).
-  --acoFiles=ACOFILES   Define acoFiles (no .aco extention; separate by
-                        comma's:e.g. talos,hnha).
+  --acoFiles=ACOFILES   Define acoFiles (no .aco extension; separate by
+                        comma's:e.g. talos, hnha).
   --export              Export to different formats (default: no-export).
   -v VERBOSITY, --verbosity=VERBOSITY
                         verbosity: [0(nothing)-9(debug)] no/less messages to
@@ -67,7 +68,7 @@ Options:
                         verbosity: [0(nothing)-9(debug)] no/less messages to
                         stdout/stderr (default: 3)
 
-refine --project $x --name $stage --setup --superpose $ranges
+refine --project $x --name $stage --setup --overwrite --superpose $ranges
 
 ==> Generated setup under "./$x.cing/Refine/$stage"
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ assi (resid 578 and name OD2)       (resid 850 and name * and not segid WAT1)   
 assi (resid 646 and name O)         (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
 assi (resid 649 and name OG)        (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
 
-# Then repeat without --setup to create the psf etc.
+# Then create the psf etc.
 refine --project $x --name $stage --superpose $ranges --psf --ipython
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ $x.cing/Refine/$stage/Jobs/generatePSF.csh
 -----------------------------------------------------------------------------------------------------------------------------------------
   Analyze
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project $x --name $stage --analyze --ipython
+refine --project $x --name $stage --analyze --overwrite --ipython
 
 Examine at least one log file in the Jobs directory for errors.
 JFD: - fixed bug with too long file name: @@1brv_cs_pk_2mdl.cing/Refine/refine1/Tables/dihedral_constraint_list.tbl
@@ -126,10 +127,11 @@ or to start multiple jobs consider multipleRefineJobs.csh
 -----------------------------------------------------------------------------------------------------------------------------------------
   Parse result, select 10? best, based on Enoe
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project $x --name $stage --parse --best 1 --sort Enoe
+refine --project $x --name $stage --parse --best 10 --sort Enoe
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-  Import into project
+  Import into project using $stage as the name for the new molecule
+  JFD: consider renaming the stage at this point?
 -----------------------------------------------------------------------------------------------------------------------------------------
 refine --project $x --name $stage --import
 

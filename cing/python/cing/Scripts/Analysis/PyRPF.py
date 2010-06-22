@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore
 
 # TBD Later
 # Notifiers, in on valid objects, peak Lists, ensembles
@@ -9,27 +10,26 @@
 # Possible:
 
 # [Separate Unexplained Peak List]
-# Are you sure wyou want to move these peaks to a separate list?
+# Are you sure you want to move these peaks to a separate list?
+# JFD: if it was a question to me then I would answer yes.
 
 from ccp.util.Software import getMethodStore
-from ccpnmr.analysis.core.AssignmentBasic import findMatchingPeakDimShifts, makeResonanceGuiName, getBoundResonances
 from ccpnmr.analysis.core.AssignmentBasic import clearPeakDim, assignResToDim
+from ccpnmr.analysis.core.AssignmentBasic import findMatchingPeakDimShifts, getBoundResonances
 from ccpnmr.analysis.core.ConstraintBasic import getPeakDimTolerance
 from ccpnmr.analysis.core.ExperimentBasic import getOnebondDataDims, getDataDimIsotopes, findSpectrumDimsByIsotope
 from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists, getDataDimRefFullRange, getPrimaryDataDimRef
 from ccpnmr.analysis.core.MarkBasic import createNonPeakMark
 from ccpnmr.analysis.core.MoleculeBasic import getNumConnectingBonds, areResonancesBound, getBoundAtoms
+from ccpnmr.analysis.core.PeakBasic import pickPeak, setupPeak
 from ccpnmr.analysis.core.StructureBasic import getAtomSetCoords
 from ccpnmr.analysis.core.StructureBasic import getAtomSetsDistance
-from ccpnmr.analysis.core.Util import getAnalysisDataDim, getDataDimAssignmentTolerance
+from ccpnmr.analysis.core.Util import getAnalysisDataDim
 from ccpnmr.analysis.core.Util import getAnalysisPeakList
-from ccpnmr.analysis.core.WindowBasic import getDataDimAxisMapping, getWindowPaneName
-from ccpnmr.analysis.core.PeakBasic import pickPeak, setupPeak
-from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
+from ccpnmr.analysis.core.WindowBasic import getDataDimAxisMapping
+from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame # This is the table for missing peaks with built-in functionalities
 from math import sqrt
-
 from memops.editor.BasePopup import BasePopup
-from memops.gui.Button import Button
 from memops.gui.ButtonList import UtilityButtonList, ButtonList
 from memops.gui.CheckButton import CheckButton
 from memops.gui.FloatEntry import FloatEntry
@@ -43,13 +43,18 @@ from memops.gui.ScrolledGraph import ScrolledGraph
 from memops.gui.ScrolledMatrix import ScrolledMatrix
 from memops.gui.TabbedFrame import TabbedFrame
 import time
+#from ccpnmr.analysis.core.WindowBasic import getWindowPaneName #@UnusedImport
+#from memops.gui.Button import Button #@UnusedImport
+#from ccpnmr.analysis.core.AssignmentBasic import makeResonanceGuiName #@UnusedImport
+#from ccpnmr.analysis.core.Util import getDataDimAssignmentTolerance #@UnusedImport
+#from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame #@UnusedImport
 
 
 
 
 
-# This is the table for missing peaks with built-in functionalities
-from ccpnmr.analysis.frames.PeakTableFrame import PeakTableFrame
+
+
 
 
 # Colours for graphs
@@ -116,7 +121,7 @@ RPF_USE = "rpfUse"
 
 def pyRpfMacro(argServer):
 
-  popup = PyRpfPopup(argServer.parent, argServer.getProject())
+  popup = PyRpfPopup(argServer.parent, argServer.getProject()) #@UnusedVariable
 
 class PyRpfPopup(BasePopup):
 
@@ -389,7 +394,7 @@ class PyRpfPopup(BasePopup):
 
       validStore = getEnsembleValidationStore(ensemble)
       rpfdu = getOverallRpfValidation(validStore)
-      recall, precision, fMeasure, dpScore, unexplained, missing = rpfdu
+      recall, _precision, _fMeasure, dpScore, _unexplained, _missing = rpfdu
 
       ensembleText = 'Ensemble %s:%d' % (ensemble.molSystem.code, ensemble.ensembleId)
 
@@ -449,7 +454,7 @@ class PyRpfPopup(BasePopup):
     self.resultPulldownB.setup(namesP, resultSetsP, indexP)
     self.resultPulldownC.setup(namesR, resultSetsR, indexR)
 
-    
+
   def nextMissingPeak(self):
 
     table = self.missingPeakTable.scrolledMatrix
@@ -1040,13 +1045,13 @@ class RpfPeakTable(PeakTableFrame):
       for i in range(1,n):
         buttons[i].disable()
 
-    
+
   def getHeadings(self, n):
 
     dataList, tipTexts = PeakTableFrame.getHeadings(self, n)
 
     dataList.insert(n+3, 'Dist.')
-    tipTexts.insert(n+3, 'Structure distance between hydrogens')  
+    tipTexts.insert(n+3, 'Structure distance between hydrogens')
     return dataList, tipTexts
 
   def getPeakData(self, peak, n, simplified=True):
@@ -1061,7 +1066,7 @@ class RpfPeakTable(PeakTableFrame):
       atomSets = []
       peakDims = peak.sortedPeakDims()
       peakDimA = peakDims[distDims[0]]
-      peakDimB = peakDims[distDims[1]]      
+      peakDimB = peakDims[distDims[1]]
       for peakDim in (peakDimA, peakDimB):
         assignedSets = []
 
@@ -1118,7 +1123,7 @@ class RpfPeakTable(PeakTableFrame):
 
     self.peaks = [pk for pk in self.peaks if not pk.isDeleted]
 
-    textMatrix = []
+#    textMatrix = []
     peaks = self.peaks
 
     n = 0
@@ -1912,7 +1917,7 @@ def getSyntheticMissingPeaksList(peakList):
 
 def predictMissingPeaks(peakList, shiftPairs, progressBar=None):
   """Descrn: Store chemical shift intersections as synthetic 'missing'
-             peaks. 
+             peaks.
      Inputs: Nmr.PeakList,  List of 2-Tuples of (2-Set of Nmr.Shifts, Float)
              memops.gui.ProgressBar
      Output: None
@@ -1950,7 +1955,7 @@ def predictMissingPeaks(peakList, shiftPairs, progressBar=None):
     progressBar.set(0)
     progressBar.update()
 
-  for i, (dist, shifts) in enumerate(shiftPairs):
+  for i, (_dist, shifts) in enumerate(shiftPairs):
     shiftPairs = []
 
     for shift in shifts:
@@ -1967,8 +1972,8 @@ def predictMissingPeaks(peakList, shiftPairs, progressBar=None):
     assignment = [None] * nDim
 
     for dataDim1, dataDim2 in boundDims:
-      dataDimRef1, ppmMin1, ppmMax1, isotopes1 = dataDimDict[dataDim1]
-      dataDimRef2, ppmMin2, ppmMax2, isotopes2 = dataDimDict[dataDim2]
+      _dataDimRef1, ppmMin1, ppmMax1, isotopes1 = dataDimDict[dataDim1]
+      _dataDimRef2, ppmMin2, ppmMax2, isotopes2 = dataDimDict[dataDim2]
       dim1 = dataDim1.dim-1
       dim2 = dataDim2.dim-1
 
@@ -2790,7 +2795,8 @@ if __name__ == '__main__':
   from ccpnmr.analysis.Analysis import Analysis
 
   #projectDirectory = '/home/tjs23/nmr/montelione/rpf/1brv_cs_pk_2mdl/'
-  projectDirectory = '/home/tjs23/nmr/montelione/rpf/AtT13Org/'
+#  projectDirectory = '/home/tjs23/nmr/montelione/rpf/AtT13Org/'
+  projectDirectory = '/Users/jd/tmp/cingTmp/1brv_cs_pk_2mdl/'
 
   rootProject = loadProject(projectDirectory)
 

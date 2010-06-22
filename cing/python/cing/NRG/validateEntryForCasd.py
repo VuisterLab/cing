@@ -5,10 +5,10 @@ from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
 from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
-from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
-from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
-from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
-from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
+#from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
+#from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+#from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
+#from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
@@ -38,7 +38,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = True # default: False
+    fastestTest = False # default: False
 #    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
@@ -250,19 +250,19 @@ def main(entryId, *extraArgList):
 #    project.save()
 #    project.molecule.ranges = ranges # JFD: this doesn't seem to be set there exactly.
     project.molecule.superpose(ranges=ranges)
-    if False:
+    if True:
         if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
                 doWattos=doWattos, doTalos=doTalos):
             NTerror("Failed to validate project read")
             return True
 
-    if True:
-        project.runRpf(
-           doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
-           distThreshold=DEFAULT_DISTANCE_THRESHOLD,
-           prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
-           diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
-    )
+#    if True:
+#        project.runRpf(
+#           doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
+#           distThreshold=DEFAULT_DISTANCE_THRESHOLD,
+#           prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
+#           diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
+#    )
 
     project.save()
     if projectType == PROJECT_TYPE_CCPN:

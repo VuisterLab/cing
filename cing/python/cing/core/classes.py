@@ -174,37 +174,37 @@ Project: Top level Cing project class
         # These Project lists are dynamic and will be filled  on restoring a project
         # They also maintain some internal settings
         # new( name ), append( instance), save(), restore() and path( name ) and names() comprise core functionality
-        self.molecules = _ProjectList(project = self,
+        self.molecules = ProjectList(project = self,
                                          classDef = Molecule,
                                          nameListKey = 'moleculeNames',
                                          basePath = directories.molecules + '/%s.molecule'
                                        )
-        self.peaks = _ProjectList(project = self,
+        self.peaks = ProjectList(project = self,
                                          classDef = PeakList,
                                          nameListKey = 'peakListNames',
                                          basePath = directories.peaklists + '/%s.peaks'
                                        )
-        self.distances = _ProjectList(project = self,
+        self.distances = ProjectList(project = self,
                                          classDef = DistanceRestraintList,
                                          nameListKey = 'distanceListNames',
                                          basePath = directories.restraints + '/%s.distances'
                                        )
-        self.dihedrals = _ProjectList(project = self,
+        self.dihedrals = ProjectList(project = self,
                                          classDef = DihedralRestraintList,
                                          nameListKey = 'dihedralListNames',
                                          basePath = directories.restraints + '/%s.dihedrals'
                                        )
-        self.rdcs = _ProjectList(project = self,
+        self.rdcs = ProjectList(project = self,
                                          classDef = RDCRestraintList,
                                          nameListKey = 'rdcListNames',
                                          basePath = directories.restraints + '/%s.rdcs'
                                        )
-        self.coplanars = _ProjectList(project = self,
+        self.coplanars = ProjectList(project = self,
                                          classDef = CoplanarList,
                                          nameListKey = 'coplanarListNames',
                                          basePath = directories.restraints + '/%s.coPlanars'
                                        )
-        self.dihedralByProjectList = _ProjectList(project = self,
+        self.dihedralByProjectList = ProjectList(project = self,
                                          classDef = DihedralByProjectList,
                                          nameListKey = 'dihedralByProjectListNames',
                                          basePath = directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
@@ -1001,9 +1001,8 @@ class XMLProjectHandler(XMLhandler):
 projecthandler = XMLProjectHandler()
 
 
-class _ProjectList(NTlist):
+class ProjectList(NTlist):
     """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
-       only to be used internally
        Creates classDef instance when calling the new() method
     """
     def __init__(self, project, classDef, nameListKey, basePath):
@@ -1119,11 +1118,11 @@ class _ProjectList(NTlist):
         return the listitem of None on error
         """
         if not oldName in self.names():
-            NTerror('_ProjectList.rename: old name "%s" not found', oldName)
+            NTerror('ProjectList.rename: old name "%s" not found', oldName)
             return None
         #end if
         if newName in self.project:
-            NTerror('_ProjectList.rename: new name "%s" aleady exists in %s', oldName, self.project)
+            NTerror('ProjectList.rename: new name "%s" already exists in %s', oldName, self.project)
             return None
         #end if
         l = self.project[oldName]
@@ -1140,7 +1139,7 @@ class _ProjectList(NTlist):
         return the listitem of None on error
         """
         if not name in self.names():
-            NTerror('_ProjectList.delete: name "%s" not found', name)
+            NTerror('ProjectList.delete: name "%s" not found', name)
             return None
         #end if
 
@@ -1436,6 +1435,8 @@ class DistanceRestraint(Restraint):
     """
     STATUS_SIMPLIFIED = 'simplified'
     STATUS_NOT_SIMPLIFIED = 'not simplified'
+    STATUS_DEASSIGNED = 'deassigned'
+    STATUS_NOT_DEASSIGNED = 'not deassigned'
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__(self, atomPairs = NTlist(), lower = None, upper = None, **kwds):
@@ -1559,6 +1560,41 @@ class DistanceRestraint(Restraint):
                 NTerror("Encountered an error simplifying restraint %s" % self)
                 return True
 
+
+    def deassignStereospecificity(self):
+        """If the restraint involves a stereo specifically assignable atom then expand the list to include all
+        getSterospecificallyRelatedlPartner's. Of course if the restraint is between partners then the restraint
+        becomes useless but will be generated. E.g. Gly HA2 to HA3 will become Gly QA to QA.
+
+        LEU MD1 -> QD
+        PHE QD  -> QR (which is a problem for the xplor conversion as of yet.)
+        Return None on error.
+        STATUS_DEASSIGNED = 'deassigned'
+        STATUS_NOT_DEASSIGNED = 'not deassigned'
+        """
+
+        NTdebug('Starting 123 deassignStereospecificity for %s' % ( self ) )
+        isDeassigned = False
+
+        for atomPairIdx in range(len(self.atomPairs)):
+            atomPair = self.atomPairs[atomPairIdx]
+            for atomIdx in range(2):
+                atomOrg = atomPair[atomIdx]
+                pseudoAtom = atomOrg.pseudoAtom()
+                if not pseudoAtom:
+                    continue
+                # Deal with immutable tuples.
+                if atomIdx == 0:
+                    newTuple = ( pseudoAtom, atomPair[1])
+                else:
+                    newTuple = ( atomPair[0], pseudoAtom )
+                atomPair = newTuple
+                self.atomPairs[atomPairIdx] = atomPair
+                isDeassigned = True
+                NTdebug('Replaced %s by %s' % ( atomOrg, atomPair[atomIdx] ) )
+        if isDeassigned:
+            return self.STATUS_DEASSIGNED
+        return self.STATUS_NOT_DEASSIGNED
 
     def simplifySpecificallyForFcFeature(self):
         """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint
@@ -2045,6 +2081,16 @@ class DistanceRestraintList(RestraintList):
         """Look at Wattos code for a full set of code that does any simplification"""
         for dr in self:
             dr.simplify()
+
+    def deassignStereospecificity(self, MAX_MESSAGES=100):
+        """Deassign all"""
+        msgHol = MsgHoL()
+        for dr in self:
+            strDrAtomPairs = str(dr.atomPairs)
+            status = dr.deassignStereospecificity()
+            if status == DistanceRestraint.STATUS_DEASSIGNED:
+                msgHol.appendMessage("%s deassigned to:%s" % (strDrAtomPairs,str(dr.atomPairs)))
+        msgHol.showMessage(MAX_MESSAGES=MAX_MESSAGES)
 
     def analyze(self):
         """
