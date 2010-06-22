@@ -668,11 +668,11 @@ def plotHistogramBySsTypeResidueTypes():
                 if resType != 'GLY':
                     continue
                 for _j, resTypePrev in enumerate(common20AAList):
-#                    if resTypePrev != 'ALA':
-#                        continue
+                    if resTypePrev != 'ALA':
+                        continue
                     for _k, resTypeNext in enumerate(common20AAList):
-#                        if resTypeNext != 'ALA':
-#                            continue
+                        if resTypeNext != 'ALA':
+                            continue
                         resTypeListBySequenceOrder = (resTypePrev, resType , resTypeNext)
                         myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOverall, ssTypeRequested=ssType)
                         if myHistList == None:
@@ -972,7 +972,7 @@ if __name__ == "__main__":
     #     enable a line or two below for useful profiling info
         p.sort_stats('time').print_stats(100)
         p.sort_stats('cumulative').print_stats(100)
-    if True:
+    if False:
             plotDihedral2DRama()
 #            plotDihedral2DRamaWrapper()
 #            plotHistoDihedralWrapper()
@@ -994,6 +994,6 @@ if __name__ == "__main__":
     if False:
         plotDihedralD1D2()
 
-    if False:
+    if True:
         os.chdir(plotHistogramBySsTypeResidueTypesDir)
         plotHistogramBySsTypeResidueTypes()

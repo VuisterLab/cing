@@ -13,8 +13,8 @@ MASS   HT     1.00800! TIPS3P water hydrogen
 MASS   OT    15.99940 ! TIPS3P water oxygen
 MASS   OM    15.99940 ! oxygen in O2 and CO
 MASS   CM    12.01100 ! carbon in CO
-MASS   CH2E  14.02700!   
-MASS   CH3E  15.03500!   
+MASS   CH2E  14.02700!
+MASS   CH3E  15.03500!
 MASS   OH1   15.99940! hydroxy oxygen
 MASS   H      1.00800! hydrogen which can h-bond to neutral atom
 MASS   CDMS  15.03500! DMSO methyl group
@@ -23,8 +23,8 @@ MASS   SDMS  32.06000! DMSO sulfur
 
 
 
-AUTOGENERATE ANGLES=TRUE END   
- 
+AUTOGENERATE ANGLES=TRUE END
+
 !------------------------------------------------------------------
 
 RESIdue TIP3       { TIPS3P WATER MODEL }
@@ -51,13 +51,13 @@ RESIdue O2  {* oxygen *}
 END {* O2 *}
 
 !-------------------------------------------------------------------
-
-RESIdue CO  {* carbon monoxide *}
- GROUp
-  ATOM C  TYPE=CM  CHARGE=0.021   END
-  ATOM O  TYPE=OM  CHARGE=-0.021  END
- BOND C  O
-END {* CO *}
+! JFD mod 2010-06-21 to prevent clash with Cobalt defined in ion.top
+!RESIdue CO  {* carbon monoxide *}
+! GROUp
+!  ATOM C  TYPE=CM  CHARGE=0.021   END
+!  ATOM O  TYPE=OM  CHARGE=-0.021  END
+! BOND C  O
+!END {* CO *}
 
 !-------------------------------------------------------------------
 
@@ -98,9 +98,9 @@ END  {* COH *}
 RESIdue DMS  {* DMSO *} ! Added Jan. 2002 Alexandre Bonvin
  GROUp
   ATOM SD   TYPE=SDMS    CHARge= 0.139 END
-  ATOM CD1  TYPE=CDMS    CHARge= 0.16  END 
-  ATOM OD   TYPE=ODMS    CHARge=-0.459 END 
-  ATOM CD2  TYPE=CDMS    CHARge= 0.16  END 
+  ATOM CD1  TYPE=CDMS    CHARge= 0.16  END
+  ATOM OD   TYPE=ODMS    CHARge=-0.459 END
+  ATOM CD2  TYPE=CDMS    CHARge= 0.16  END
 
  BOND CD1   SD
  BOND CD2   SD

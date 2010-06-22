@@ -23,7 +23,7 @@ if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'AtT13Org'.split()
+    entryList = 'AtT13Paris'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME

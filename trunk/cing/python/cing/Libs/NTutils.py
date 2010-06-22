@@ -1,16 +1,20 @@
 from cing import NaNstring
 from cing import verbosityDebug
+from cing import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
 from cing import verbosityDetail
-from cing import verbosityDefault #@UnusedImport
 from cing import verbosityError
 from cing import verbosityNothing
 from cing import verbosityOutput
 from cing import verbosityWarning
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
+from cing.core.constants import * #@UnusedWildImport
 from copy import deepcopy
 from fnmatch import fnmatch
 from gzip import GzipFile
+from numpy.core import fromnumeric
+from numpy.core.fromnumeric import amax
+from numpy.core.fromnumeric import amin
 from string  import find
 from string import join
 from subprocess import PIPE
@@ -18,7 +22,6 @@ from subprocess import Popen
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 import array
-import cing
 import datetime
 import inspect
 import math
@@ -27,7 +30,7 @@ import os
 import pydoc
 import re
 import sys
-from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
+#from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
 
 CONSENSUS_STR = 'consensus'
 
@@ -4396,6 +4399,21 @@ Rob might have caught this by requiring c_av be at least 2.0.
 #    NTdebug("sumsdsq: %8.3f" % sumsdsq)
     c_sd = sumsdsq / (sum-1)
     c_sd = math.sqrt(c_sd)
+    hisMin = amin(his)
+    hisMax = amax(his)
+    return (c_av, c_sd, hisMin, hisMax)
+
+def getArithmeticAverageAndSigmaFromHistogram(his):
+    """Straight up arithmetic average and sd as if linear."""
+    if his == None:
+        NTerror("Failed getArithmeticAverageAndSigmaFromHistogram for his is None")
+        return None
+    if his.size == 0: # check for preventing division by zero
+        NTerror("Failed getArithmeticAverageAndSigmaFromHistogram for his size is 0")
+        return None
+    c_sd = fromnumeric.std(his)
+    hisSum = fromnumeric.sum(his)
+    c_av = float(hisSum) / his.size
     hisMin = amin(his)
     hisMax = amax(his)
     return (c_av, c_sd, hisMin, hisMax)

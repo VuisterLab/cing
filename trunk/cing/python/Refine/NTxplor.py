@@ -45,8 +45,9 @@ class refineParameters( NTdict ):
       patchCISP         = [],                   # Cis prolines
       patchDISN         = [],                   # Disulfide pairs
 
-      # initial analysis
-      minimizeProtons   = False,
+      # initial analysis, The advantage of doing this is that missing protons will not cause a bombed out xplor
+      # Disadvantage is that violations might differ if SSA is incompatible with IUPAC.
+      minimizeProtons   = True,
 
       # NOE restraints
       noeMaxRestraints  = 30000,
@@ -866,6 +867,8 @@ end loop main
 """ + \
 self.writeMolCode() + """
 
+set message on echo on end
+
 stop
 """
 
@@ -998,6 +1001,8 @@ energy end
 restraintsAnalysisCode + \
 self.writeMolCode() + """
 
+set message on echo on end
+
 stop
 """
 
@@ -1065,6 +1070,8 @@ end
 
         self.script = self.script + """
 write psf output=""" + self.psfFile  + """ end
+
+set message on echo on end
 
 stop
 """

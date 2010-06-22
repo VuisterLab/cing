@@ -44,6 +44,7 @@ def export2aqua(project, tmp=None):
     typeId = -1
     extensionList = [ 'noe', 'tor' ]
     restraintTypeList = [ 'distance', 'dihedral angle' ]
+    msgHol = MsgHoL() # Used for messages per restraint not per restraint list.
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
@@ -65,19 +66,15 @@ def export2aqua(project, tmp=None):
         countActual = 0
         restraintListText = []
 #        warningCountMax = 10 # DEFAULT
-        warningCountMax = 10000 # TESTING
-        warningCount = 0
+#        warningCountMax = 10000 # TESTING
+#        warningCount = 0
         ambiDistanceCount = 0
         skippedDihedralCount = 0
         for drl in drLoL:
             for dr in drl:
                 if not dr.isValidForAquaExport():
-                    if warningCount == warningCountMax + 1:
-                        NTwarning("And so on")
-                    elif warningCount <= warningCountMax:
-                        NTwarning("Restraint is not valid for export to Aqua (perhaps missing assignment? As in issue 224)\n%s" % dr)
+                    msgHol.appendWarning("Restraint is not valid for export to Aqua (perhaps missing assignment? As in issue 224)\n%s" % dr)
                     ambiDistanceCount += 1
-                    warningCount += 1
                     continue
                 if typeId == 0:
 #                   Distance conversions
@@ -107,20 +104,15 @@ def export2aqua(project, tmp=None):
 #                    NTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
-                        if warningCount == warningCountMax + 1:
-                            NTwarning("And so on")
-                        elif warningCount <= warningCountMax:
-                            NTwarning("Ambiguous restraint exported as unambiguous for Aqua  [" + `ambiDistanceCount` + "]")
+                        msgHol.appendWarning("Ambiguous restraint exported as unambiguous for Aqua  [" + `ambiDistanceCount` + "]")
                         ambiDistanceCount += 1
-                        warningCount += 1
-
                     for atomPair in dr.atomPairs[1:]:
                         result += ('\n#       %s %s AMBI not read by Aqua' % (
                                  atomPair[0].export2aqua(),
                                  atomPair[1].export2aqua()))
                     # end for
                 else:
-                    # Dihderal
+                    # Dihedral
                     """Return string with restraint in Aqua format
                         ANGLE  [CHAIN id]  residue_name  residue_number  [INSERT code]
                         ...angle_name  bound_high  bound_low
@@ -129,14 +121,12 @@ def export2aqua(project, tmp=None):
                     # (<Residue>, angleName, <AngleDef>) tuple
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()
                     if not angleName:
-                        if skippedDihedralCount == warningCountMax + 1:
-                            NTwarning("And so on")
-                        elif skippedDihedralCount <= warningCountMax:
-                            strResidue = "Unknown"
-                            if hasattr(dr, 'residue'):
-                                strResidue = '%s' % dr.residue
-                            NTwarning("Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved.",
-                                      dr.id, strResidue)
+                        strResidue = "Unknown"
+                        if hasattr(dr, 'residue'):
+                            strResidue = '%s' % dr.residue
+                        msg = "Skipping dihedral angle restraint '%s' (%s) because angle name could not be retrieved." % (
+                                  dr.id, strResidue)
+                        msgHol.appendWarning(msg)
                         skippedDihedralCount += 1
                     else:
                         atom = dr.atoms[1] # this is true except for Omega? TODO correct!
@@ -154,14 +144,12 @@ def export2aqua(project, tmp=None):
                                               dr.upper)
                         except:
                             result = None
-                            if skippedDihedralCount == warningCountMax + 1:
-                                NTwarning("And so on")
-                            elif skippedDihedralCount <= warningCountMax:
-                                strResidue = "Unknown"
-                                if hasattr(dr, 'residue'):
-                                    strResidue = '%s' % dr.residue
-                                NTwarning("Skipping dihedral angle restraint '%s' (%s) because conversion of data to string failed.",
-                                          dr.id, strResidue)
+                            strResidue = "Unknown"
+                            if hasattr(dr, 'residue'):
+                                strResidue = '%s' % dr.residue
+                            msg = "Skipping dihedral angle restraint '%s' (%s) because conversion of data to string failed." % (
+                                      dr.id, strResidue)
+                            msgHol.appendWarning(msg)
                             skippedDihedralCount += 1
                     # end else
                 # end else
@@ -169,7 +157,7 @@ def export2aqua(project, tmp=None):
                     countActual += 1
                     restraintListText.append(result)
                 else:
-                    NTwarning("Skipped restraint")
+                    msgHol.appendWarning("Skipped restraint")
         if ambiDistanceCount:
             NTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: [%s]" % ambiDistanceCount)
         if skippedDihedralCount:
@@ -183,7 +171,12 @@ def export2aqua(project, tmp=None):
             fp.close()
         else:
             NTwarning("Failed to convert a single restraint of this type: " + restraintTypeList[typeId])
-            return True
+            encounteredError = True
+
+    msgHol.showMessage()
+    if encounteredError:
+        return True
+    return None
 #-----------------------------------------------------------------------------
 # register the functions in the project class
 methods = [

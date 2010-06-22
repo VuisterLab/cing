@@ -337,7 +337,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
        be created for all together were the appropriate background histograms
        will be picked.
 
-       plotCav determines if the circular varience average is plotted.
+       plotCav determines if the circular variance average is plotted.
 
        Return None on error or ps on success.
     '''
@@ -443,7 +443,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             else:
                 myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
             if myHist == None:
-                NTdebug("Failed to get the non-d1d2 hist for %s" % residue)
+#                NTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
                 return None
         #            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(myHist)
@@ -502,8 +502,10 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         d1 = res[dihedralName1]
         d2 = res[dihedralName2]
 
-        if not (len(d1) and len(d2)):
-#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 )
+        if not len(d1):
+#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 ) # happens in 1bus for cPro13.
+            return None
+        if not len(d2):
 #            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
         d1cav = d1.cav
@@ -520,11 +522,12 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
 
-        if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
+#        if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
+#        if doingNewD1D2plot:
             # Plot individually.
 #            bbList = getDeepByKeys(res, WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
-            myPoint.pointColor='blue'
-            for i,d1Element in enumerate(d1):
+#            myPoint.pointColor='blue'
+#            for i,d1Element in enumerate(d1):
 #                if not bbList:
 #                    myPoint.pointColor='blue'
 #                else:
@@ -534,9 +537,9 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #                        myPoint.pointColor='red'
 #                    else:
 #                        myPoint.pointColor='green'
-                plot.point( (d1Element, d2[i]), attributes=myPoint )
-        else: # plot all at once.
-            plot.points( zip( d1, d2 ), attributes=myPoint )
+#                plot.point( (d1Element, d2[i]), attributes=myPoint )
+#        else: # plot all at once.
+        plot.points( zip( d1, d2 ), attributes=myPoint )
 
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot and plotCav:

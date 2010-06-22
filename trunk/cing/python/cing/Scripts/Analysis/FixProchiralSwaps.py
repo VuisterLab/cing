@@ -1,4 +1,4 @@
-from ccpnmr.analysis.core.AssignmentBasic import assignResToDim
+from ccpnmr.analysis.core.AssignmentBasic import assignResToDim #@UnresolvedImport
 
 def fixProchiralSwapsMacro(argServer):
 

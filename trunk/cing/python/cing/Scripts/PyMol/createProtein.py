@@ -15,9 +15,9 @@ Execute like: ....
 # http://relibase.ccdc.cam.ac.uk/documentation/relibase/relibase.1.51.html#339516
 from cing.Scripts.PyMol.CreateSecondaryStructures import createPeptide
 from cing.Scripts.d1d2plot import reportsDir
-from pymol import cmd
+from pymol import cmd #@UnresolvedImport
 import os
-import pymol #@UnusedImport
+import pymol #@UnusedImport @UnresolvedImport
 
 phiHelix, psiHelix = -60., -45.
 phiSheet, psiSheet = -120., 150. # strand

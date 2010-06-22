@@ -1777,6 +1777,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         ccpnMolSystem.cing = molecule
         molecule.ccpn = ccpnMolSystem
 
+        msgHol = MsgHoL()
         self.molecule = molecule # Needed in this class even if it's temp. JFD: don't think it's needed now.
         for chain in molecule.chains:
             residues = chain.residues
@@ -1912,15 +1913,16 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 if chemCompVarNew:
                     ccpnAtomList = []
                     chemAtomList = chemCompVarNew.sortedChemAtoms()
+                    NTmessageNoEOL("DEBUG: %-80s  " % ccpnResidue )
                     for chemAtom in chemAtomList:
                         if chemAtom.name.startswith('prev_') or chemAtom.name.startswith('next_'):
                             continue
-                        NTmessageNoEOL("%s  " % chemAtom.name )
+                        NTmessageNoEOL("%-4s  " % chemAtom.name )
 #                        if chemAtom.name == 'HE2':
 #                            NTdebug('at breakpoint')
                         ccpnAtom = ccpnResidue.findFirstAtom( name = chemAtom.name )
                         if not ccpnAtom:
-                            NTerror("Failed to find %s in %s; skipping atom" % (chemAtom.name, ccpnResidue))
+                            msgHol.appendError("Failed to find %-4s in %-80s; skipping atom" % (chemAtom.name, ccpnResidue))
                             continue
                         ccpnAtomList.append(ccpnAtom)
                     NTmessage('')
@@ -1930,7 +1932,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
 #                NTdebug("Setting info for ccpn atoms: %s " % ccpnAtomList)
                 for ccpnAtom in ccpnAtomList:
-                    NTmessageNoEOL("%s " % ccpnAtom.name )
+#                    NTmessageNoEOL("%s " % ccpnAtom.name )
                     atom = None # cing atom
 
                     ccpnAtomName = ccpnAtom.getName()
@@ -1964,14 +1966,14 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                                 atmList.append(ccpnAtomName)
                             if resNum not in resNumList:
                                 resNumList.append(resNum)
-                            NTerror('No atom found in CING for tuple %s. Skipping creating non-standard atoms' % str(nameTuple))
+                            msgHol.appendError('No atom found in CING for tuple %s. Skipping creating non-standard atoms' % str(nameTuple))
                         # end if
                         continue
                     # end if
                     atom.ccpn = ccpnAtom
                     ccpnAtom.cing = atom
                 # end for loop over atom
-                NTmessage('')
+#                NTmessage('')
             # end for loop over residue
             try:
                 ccpnMolecule.checkAllValid(complete=True)
@@ -1986,6 +1988,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             msg += " added:\n"
         else:
             msg += " skipped:\n"
+        msgHol.showMessage()
 
         if unmatchedAtomByResDict:
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
@@ -2086,8 +2089,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         ccpnConstraintStore = self.ccpnProject.newNmrConstraintStore(nmrProject = self.ccpnNmrProject)
 
         for distanceRestraintList in self.project.distances:
-            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name =
-                                                        distanceRestraintList.name)
+            ccpnDistanceList = ccpnConstraintStore.newDistanceConstraintList(name = distanceRestraintList.name)
             for distanceRestraint in distanceRestraintList:
                 upper = distanceRestraint.lower
                 lower = distanceRestraint.upper
@@ -2285,19 +2287,22 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
        Output: Ccpn Project or None on error.
     '''
 
-    if not project.has_key('ccpn'):
+    if project.has_key('ccpn'):
+        ccpnProject = project.ccpn
+        NTmessage('saveCcpn: Saving any changes to original CCPN project')
+    else:
         NTmessage('saveCcpn: Creating new CCPN project')
         # work horse class.
         ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
         if not ccpn.createCcpn():
             NTerror("Failed ccpn.createCcpn")
             return None
-    else:
-        NTmessage('saveCcpn: Saving any changes to original CCPN project')
+        ccpnProject = ccpn.ccpnProject
     # end if
 
     switchOutput(False)
-    if ccpn.ccpnProject.saveModified():
+    status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
+    if status:
         NTerror("Failed ccpnProject.saveModified in " + saveCcpn.func_name)
         return None
     switchOutput(True)
@@ -2311,7 +2316,7 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
             return None
         NTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
     # end if
-    return ccpn.ccpnProject
+    return ccpnProject
 # end def
 
 def exportValidation2ccpn(project):
