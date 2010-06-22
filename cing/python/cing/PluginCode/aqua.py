@@ -45,6 +45,7 @@ def export2aqua(project, tmp=None):
     extensionList = [ 'noe', 'tor' ]
     restraintTypeList = [ 'distance', 'dihedral angle' ]
     msgHol = MsgHoL() # Used for messages per restraint not per restraint list.
+    encounteredError = False
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
