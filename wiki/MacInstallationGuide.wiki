@@ -32,6 +32,7 @@ ln -s python2.6 python
 
 {{{
 port install py26-mysql
+port install py26-sqlalchemy
 }}}
 
 From here you should follow the generalized [SetupCING]
