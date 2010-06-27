@@ -1148,6 +1148,9 @@ MISSING_ASSIGNMENT              = 'MISSING_ASSIGNMENT'
 EXPECTED_ASSIGNMENT             = 'EXPECTED_ASSIGNMENT'
 INVALID_STEREO_ASSIGNMENT       = 'STEREO_ASSIGNMENT'
 SHIFT                           = 'SHIFT'
+# To use the below?
+CIS_PRO_MISSED                  = 'CIS_PRO_MISSED'
+TRANS_PRO_MISSED                = 'TRANS_PRO_MISSED'
 
 def moleculeValidateAssignments( molecule  ):
     """
@@ -1157,7 +1160,7 @@ def moleculeValidateAssignments( molecule  ):
 
     New: skipping issuing a warning MISSING_ASSIGNMENT when no chemical shifts are present of that nucleii.
 
-    return a NTlist of atoms with errors.
+    return an NTlist of atoms with errors.
 
     return None on code error.
 
@@ -1184,165 +1187,174 @@ def moleculeValidateAssignments( molecule  ):
     for atm in molecule.allAtoms():
         atm.rogScore.reset()
         atm.validateAssignment = NTlist()
-        if atm.isAssigned():
 
-            shift = atm.shift()
-            pseudo = atm.pseudoAtom()
+    for res in molecule.allResidues():
+#        Routine below needs to be called after  atm.validateAssignment is initialized.
+        if res.hasProperties('PRO') or res.hasProperties('cPRO'):
+            if res.validateChemicalShiftProPeptide(result):
+                NTerror("Failed to _validateChemicalShiftProPeptide for %s" % res)
+        for atm in res.allAtoms():
+            if atm.isAssigned():
+                shift = atm.shift()
+                pseudo = atm.pseudoAtom()
 
-            # Check the shift against the database
-            if atm.db.shift:
-                av = atm.db.shift.average
-                sd = atm.db.shift.sd
-            elif pseudo and pseudo.db.shift:
-                av = pseudo.db.shift.average
-                sd = pseudo.db.shift.sd
-            else:
-#                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
-                av = None
-                sd = None
-            #end if
-
-            if av and sd:
-                delta = math.fabs(shift - av) / sd
-                if delta > 3.0:
-                    string = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
-                    result.append( atm )
-                    atm.validateAssignment.append(string)
-                #end if
-            #end if
-
-            # Check if not both realAtom and pseudoAtom are assigned
-            if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
-                string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
-#                NTmessage('%-20s %s', atm, string)
-                result.append( atm )
-                atm.validateAssignment.append(string)
-            #end if
-
-            # Check if not pseudoAtom and realAtom are assigned
-            if atm.isPseudoAtom():
-                for a in atm.realAtoms():
-                    if a.isAssigned():
-                        string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
-#                        NTmessage('%-20s %s', atm, string)
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
-                    #end if
-                #end for
-            #end if
-
-            # Check if all realAtoms are assigned in case there is a pseudo atom
-            if atm.hasPseudoAtom():
-                for a in atm.pseudoAtom().realAtoms():
-                    if a.isMethylProtonButNotPseudo():
-                        continue
-                    if not a.isAssigned():
-                        string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
-#                        NTmessage('%-20s %s', atm, string )
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
-                    #end if
-                #end for
-            #end if
-
-            # Check for protons with unassigned heavy atoms
-            if atm.isProton():
-                heavyAtm = atm.heavyAtom()
-                if not heavyAtm.isAssigned():
-                    spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
-                    if spinType:
-                        # Only complain if type has at least one assignment.
-                        if getDeepByKeys( hasAssignment, spinType):
-                            string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
-        #                    NTmessage('%-20s %s', atm, string )
-                            result.append( atm )
-                            atm.validateAssignment.append(string)
-                #end if
-            #end if atm.isProton()
-
-            # stereo assignments checks
-            if atm.isStereoAssigned():
-                if not atm.isProChiral():
-                    string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
-                    result.append( atm )
-                    atm.validateAssignment.append(string)
+                # Check the shift against the database
+                if atm.db.shift:
+                    av = atm.db.shift.average
+                    sd = atm.db.shift.sd
+                elif pseudo and pseudo.db.shift:
+                    av = pseudo.db.shift.average
+                    sd = pseudo.db.shift.sd
                 else:
-                    # Check prochiral partner assignments
-                    partner = atm.proChiralPartner()
-                    if partner:
-                        if not partner.isAssigned():
-                            string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
+    #                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
+                    av = None
+                    sd = None
+                #end if
+
+                if av and sd:
+                    delta = math.fabs(shift - av) / sd
+                    if delta > 3.0:
+                        string = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
+                        result.append( atm )
+                        atm.validateAssignment.append(string)
+                    #end if
+                #end if
+
+                # Check if not both realAtom and pseudoAtom are assigned
+                if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
+                    string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
+    #                NTmessage('%-20s %s', atm, string)
+                    result.append( atm )
+                    atm.validateAssignment.append(string)
+                #end if
+
+                # Check if not pseudoAtom and realAtom are assigned
+                if atm.isPseudoAtom():
+                    for a in atm.realAtoms():
+                        if a.isAssigned():
+                            string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
+    #                        NTmessage('%-20s %s', atm, string)
                             result.append( atm )
                             atm.validateAssignment.append(string)
-                        else:
-                            if not partner.isStereoAssigned():
-                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                        #end if
+                    #end for
+                #end if
+
+                # Check if all realAtoms are assigned in case there is a pseudo atom
+                if atm.hasPseudoAtom():
+                    for a in atm.pseudoAtom().realAtoms():
+                        if a.isMethylProtonButNotPseudo():
+                            continue
+                        if not a.isAssigned():
+                            string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
+    #                        NTmessage('%-20s %s', atm, string )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
+                        #end if
+                    #end for
+                #end if
+
+                # Check for protons with unassigned heavy atoms
+                if atm.isProton():
+                    heavyAtm = atm.heavyAtom()
+                    if not heavyAtm.isAssigned():
+                        spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
+                        if spinType:
+                            # Only complain if type has at least one assignment.
+                            if getDeepByKeys( hasAssignment, spinType):
+                                string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
+            #                    NTmessage('%-20s %s', atm, string )
                                 result.append( atm )
                                 atm.validateAssignment.append(string)
+                    #end if
+                #end if atm.isProton()
+
+                # stereo assignments checks
+                if atm.isStereoAssigned():
+                    if not atm.isProChiral():
+                        string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
+                        result.append( atm )
+                        atm.validateAssignment.append(string)
+                    else:
+                        # Check prochiral partner assignments
+                        partner = atm.proChiralPartner()
+                        if partner:
+                            if not partner.isAssigned():
+                                string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
+                                result.append( atm )
+                                atm.validateAssignment.append(string)
+                            else:
+                                if not partner.isStereoAssigned():
+                                    string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                                    result.append( atm )
+                                    atm.validateAssignment.append(string)
+                                #end if
                             #end if
                         #end if
                     #end if
                 #end if
-            #end if
 
-            # check stereo methyl protons
-            if atm.isMethylProton():
-                heavy = atm.heavyAtom()
-                if heavy and heavy.isAssigned():
-                    if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
-                    #end if
-                    if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
-                    #end if
-                #end if
-            #end if
-
-            # check stereo methyl carbon
-            if atm.isMethyl() and atm.isCarbon():
-                pseudo = atm.attachedProtons(includePseudo=True).last()
-                if pseudo and pseudo.isAssigned():
-                    if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                        string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
-                    #end if
-                    if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                        string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                        result.append( atm )
-                        atm.validateAssignment.append(string)
+                # check stereo methyl protons
+                if atm.isMethylProton():
+                    heavy = atm.heavyAtom()
+                    if heavy and heavy.isAssigned():
+                        if atm.isStereoAssigned() and not heavy.isStereoAssigned():
+                            string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
+                        #end if
+                        if not atm.isStereoAssigned() and heavy.isStereoAssigned():
+                            string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
+                        #end if
                     #end if
                 #end if
-            #end if
 
-        else:
-            # Atm is not assigned but stereo assignment is set
-            if atm.isStereoAssigned():
-                string = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
-                result.append( atm )
-                atm.validateAssignment.append(string)
-            #end if
+                # check stereo methyl carbon
+                if atm.isMethyl() and atm.isCarbon():
+                    pseudo = atm.attachedProtons(includePseudo=True).last()
+                    if pseudo and pseudo.isAssigned():
+                        if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
+                            string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
+                        #end if
+                        if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
+                            string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                            result.append( atm )
+                            atm.validateAssignment.append(string)
+                        #end if
+                    #end if
+                #end if
 
-            if atm.isProChiral():
-                partner = atm.proChiralPartner()
-                if partner and partner.isAssigned() and partner.isStereoAssigned():
-                    string = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+            else:
+                # Atm is not assigned but stereo assignment is set
+                if atm.isStereoAssigned():
+                    string = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
                     result.append( atm )
                     atm.validateAssignment.append(string)
+                #end if
+
+                if atm.isProChiral():
+                    partner = atm.proChiralPartner()
+                    if partner and partner.isAssigned() and partner.isStereoAssigned():
+                        string = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                        result.append( atm )
+                        atm.validateAssignment.append(string)
+                #end if
+
+            #end if atm.isAssigned():
+
+            if atm.validateAssignment:
+                atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
+                if hasattr(molecule, 'atomList'):
+                    molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
             #end if
+        #end for atoms
+    #end for residues
 
-        #end if atm.isAssigned():
 
-        if atm.validateAssignment:
-            atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
-            if hasattr(molecule, 'atomList'):
-                molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
-        #end if
-    #end for
     return result
 #end def
 #Patch the Molecule class
@@ -1545,8 +1557,8 @@ def validateDihedralCombinations(project):
             keyList = [ ssType ]
             keyList += resTypeList
             if normalizeBeforeCombining: # can't use predefined ones. Of course the debug checking below makes no sense with this.
-#                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
-                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
+                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+#                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
                 (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
             else:
                 Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
@@ -1579,7 +1591,7 @@ def validateDihedralCombinations(project):
                 if True: # costly checks to be disabled later.
 #                if checkIdx == 2: # costly checks to be disabled later.
 #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
-                    msg = "chk %d ssType %4s res %20s mdl %d a2 %8.2f a1 %8.2f c_av %8.3f c_sd %8.3f ck %8.3f zk %8.2f h- %8.3f h+ %8.3f z- %8.2f z+ %8.2f" % (
+                    msg = "chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f" % (
                                 checkIdx,
                                 ssType,residue,modelIdx,a2, a1,
                                 c_av, c_sd,ck,zk,

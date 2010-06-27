@@ -3046,6 +3046,72 @@ Residue class: Defines residue properties
             NTerror('Residue.toSML: no SMLhandler defined')
         #end if
     #end def
+    def validateChemicalShiftProPeptide( self, resultList ):
+        """Returns True on error.
+        Append to result list if validation found a problem.
+
+        Uses the data in:
+        Schubert et al. A software tool for the prediction of Xaa-Pro peptide bond conformation in proteins based on 13C chemical shift statistics. J Biomol NMR (2002) vol. 24 (2) pp. 149-54
+        From their text:
+        100% certainty  trans    [0.0,  4.8]
+                        cis      [9.15,14.4]
+        Conflicts will be marked as bad.
+
+        For a poor mark the cutoffs are shrunk by 1.2 ppm (1 sd) to:
+                        trans    [0.0,  6.0]
+                        cis      [7.95,14.4]
+
+        The first model in the ensemble is used for determining if the cis or trans nature. I.e. no provision for
+        dynamics on this is provided.
+        """
+
+        if not ( self.hasProperties('PRO') or self.hasProperties('cPRO')):
+            NTerror("Can not validateChemicalShiftProPeptide for non Pro: %s" % self)
+            return True
+        atomCb = self.CB
+        atomCg = self.CG
+        cbShift = atomCb.shift()
+        cgShift = atomCg.shift()
+
+        if isNaN( cbShift ) or isNaN( cgShift ):
+            NTdebug("CS unavailabe for CB and/or CG for %s" % self)
+            return
+
+        shiftDifference = cbShift - cgShift
+        if shiftDifference < 0.:
+            str = sprintf('For %s the difference of cb %8.3f minus cg  %8.3f: was not expected to be negative but is %8.3f.' % (self, cbShift,cgShift,shiftDifference))
+            NTdebug(str)
+            resultList.append( atomCb ) # Just do this once.
+            atomCb.validateAssignment.append(str)
+            return
+
+        isTrans = self.OMEGA.isWithinLimits(90.,270.,checkMore=True)
+        if isTrans == None: # in case of absent coordinates.
+            NTdebug("Failed to find peptide configuration for %s" % self)
+            return
+
+        color = COLOR_GREEN
+        if shiftDifference < 4.8 and not isTrans:
+            str = "CS CB-CG %8.3f (<4.8) contradicted a trans state with great certainty." % shiftDifference
+            color = COLOR_RED
+        elif shiftDifference > 9.15 and isTrans:
+            str = "CS CB-CG %8.3f (>9.15) contradicted a cis state with great certainty."  % shiftDifference
+            color = COLOR_RED
+        if shiftDifference < 6.0 and not isTrans:
+            str = "CS CB-CG %8.3f (<6.0) contradicted a trans state."  % shiftDifference
+            color = COLOR_ORANGE
+        elif shiftDifference > 7.95 and isTrans:
+            str = "CS CB-CG %8.3f (>7.95) contradicted a cis state."  % shiftDifference
+            color = COLOR_ORANGE
+
+        if color == COLOR_GREEN:
+            return
+
+        resultList.append( atomCb ) # Just do this for one atom of the residue..
+        atomCb.validateAssignment.append(str)
+        NTdebug("For %s found %s" % (self, str))
+        if color == COLOR_RED:
+            atomCb.rogScore.setMaxColor( COLOR_RED, atomCb.validateAssignment )
 #end class
 
 class Dihedral( NTlist ):
@@ -3083,10 +3149,16 @@ class Dihedral( NTlist ):
         #end if
     #end def
 
-    def isWithinLimits(self, lower, upper):
+    def isWithinLimits(self, lower, upper, checkMore = False):
         """
-        Check id cav is within [lower,upper] taking periodicity into account
+        Check id cav is within [lower,upper] taking periodicity into account.
+        When checkMore is set then the presence of a self.cav will be checked rather then assumed.
+        The signal for absence of self.cav will be a return value of None.
         """
+        if checkMore:
+            if isNaN(self.cav):
+                return None
+
         tmp = NTlist(self.cav).limit(lower,lower+360.0) # Rescale cav to the range lower, lower+360.0
         if tmp[0] >= lower and tmp[0] <= upper:
             return True
@@ -4702,7 +4774,8 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     type requested.
 
     If normalizeBeforeCombining = True then the 3 histograms for each ssType are normalized to have an integral of 100/3 % before they
-    are added to have an integral of 100 %. The result will therefor be one histogram and not the usual 3.
+    are added to have an integral of 100 %. The result will therefor be one histogram and not the usual 3. The value of ssTypeRequested will be
+    checked to be None. It's a code bug if it differs.
 
     resTypeListBySequenceOrder is a list of three residue type names in sequence order.
     E.g. VAL171, PRO172, ILE173.
@@ -4719,6 +4792,10 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
 #        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
+    if normalizeBeforeCombining:
+        if ssTypeRequested != None:
+            NTerror( 'getTripletHistogramList was called with normalizing for specific ssType [%s] which is not possible.' % ssTypeRequested)
+            return
 
     resTypePrev, resType, resTypeNext = resTypeListBySequenceOrder
     histListTuple = []
@@ -4758,7 +4835,7 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         histList.append(hist)
 
     if normalizeBeforeCombining:
-        if len(histListTuple) != 3:
+        if len(histList) != 3:
             NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
             return None
         for hist in histList:

@@ -33,17 +33,24 @@ skipList = NTlist(
 #            '2uva' # Issue xxx
 )
 
+isProduction = False
+try:
+    from cing.NRG.localConstants import isProduction
+except:
+    pass
+
 def run():
     """Return True on error"""
-    max_entries_todo = 1    # was 500 (could be as many as u like)
+    max_entries_todo = 10    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
     processes_max = 2    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = False
     updateIndices = True
-    isProduction = False
+#    isProduction = True
     getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
 #    new_hits_entry_list = [] # define empty for checking new ones.
-    new_hits_entry_list         = string.split("2uva")
+    new_hits_entry_list         = string.split("3kff 3a34 2xdy 3mcd 1brv 1hkt")
+#    new_hits_entry_list         = string.split("1hkt")
 
     ## Initialize the project
     m = pdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
@@ -91,9 +98,9 @@ def run():
         return True
 
     # Retrieve the linkages between BMRB and PDB entries.
-    if m.getBmrbLinks():
-        NTerror("Failed to get BMRB-PDB links")
-        return True
+#    if m.getBmrbLinks():
+#        NTerror("Failed to get BMRB-PDB links")
+#        return True
 
     if m.updateIndexFiles():
         NTerror("Failed to update index files.")
@@ -279,13 +286,15 @@ class pdbCing(Lister):
                 entryCrashed = False
                 for r in AwkLike(logLastFile):
                     line = r.dollar[0]
+                    if entryCrashed:
+                        NTdebug(line)
                     if line.startswith('CING took       :'):
 #                        NTdebug("Matched line: %s" % line)
                         timeTakenStr = r.dollar[r.NF - 1]
                         self.timeTakenDict[entry_code] = float(timeTakenStr)
 #                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                     if line.startswith('Traceback (most recent call last)'):
-#                        NTdebug("Matched line: %s" % line)
+                        NTdebug("%s Matched line: %s" % (entry_code, line))
                         if entry_code in self.entry_list_crashed:
                             NTwarning("%s was already found before; not adding again." % entry_code)
                         else:
