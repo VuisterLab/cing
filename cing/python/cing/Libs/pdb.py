@@ -359,7 +359,7 @@ class pdbParser:
             NTerror('pdbParser.importCoordinates: requesting %d models; only %d present', nmodels, self.modelCount)
             return True
         #end if
-
+        msgHol = MsgHoL()
         model = self.molecule.modelCount # set current model from models already present
         foundModel = False
         for record in self.pdbRecords:
@@ -390,10 +390,11 @@ class pdbParser:
                 if len(atom.coordinates) <= model:
                     atom.addCoordinate(record.x, record.y, record.z, Bfac = record.tempFactor, occupancy = record.occupancy)
                 else:
-                    NTmessage('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
+                    msgHol.appendMessage('pdbParser.importCoordinates: Skipping duplicate coordinate within same record (%s)' % record)
                 #end if
             #end if
         #end for
+        msgHol.showMessage(MAX_MESSAGES=20)
         if not foundModel: # X-rays do not have MODEL record
             self.molecule.modelCount += 1
         else:

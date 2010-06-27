@@ -991,7 +991,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
     dihedralColumnNameHash = {} # use hash for speed.
     for res in residues:
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-            NTdebug("Skipping non-standard residue")
+#            NTdebug("Skipping non-standard residue")
             continue
         if res.hasProperties('protein'):
             dihedralList = dihedralListAA
@@ -1033,7 +1033,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
 
     for res in residues:
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-            NTdebug("Skipping non-standard residue such as water.")
+#            NTdebug("Skipping non-standard residue such as water.")
             continue
         if not res.hasCoordinates():
 #            NTdebug("Skipping residue without any coordinates for any of it's atoms.")

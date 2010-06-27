@@ -105,7 +105,7 @@ class ROGscore(NTdict):
 
     def setMaxColor(self, colorLabel, comment=None):
         """priority: red, orange, green. The so called ROG score.
-        The comment is optional and will only be appended when the color lable is
+        The comment is optional and will only be appended when the color label is
         at least as severe as the current one. The less severe levels of comments
         used to be wiped out but not any more; see issue 153.
         Only ORANGE and RED levels can add comments.

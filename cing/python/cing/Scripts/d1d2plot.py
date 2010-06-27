@@ -39,6 +39,7 @@ dihedralName2 = 'Cb4C'
 
 rootDir = '/Users/jd/workspace/d1d2project'
 reportsDir = os.path.join(rootDir, 'reports')
+#plotHistogramBySsTypeResidueTypesDir = os.path.join(rootDir, 'plotHistogramBySsTypeResidueTypesNoNormalizing')
 plotHistogramBySsTypeResidueTypesDir = os.path.join(rootDir, 'plotHistogramBySsTypeResidueTypes')
 
 if hPlot.histRamaBySsAndCombinedResType == None:
@@ -656,25 +657,25 @@ def plotHistogramBySsTypeResidueTypes():
     graphicsFormat = "png"
 
     # If set it will do a single ssType otherwise the overall.
-    for doOverall in [ False, True ]:
-#    for doOverall in [ True ]:
+#    for doOverall in [ False, True ]:
+    for doOverall in [ True ]:
         if doOverall:
             ssTypeList = [ None ]
         else:
             ssTypeList = [' ', 'S', 'H']
         for ssType in ssTypeList:
-
+#met-asp-leu
             for _i, resType in enumerate(common20AAList):
-                if resType != 'GLY':
+                if resType != 'PHE':
                     continue
                 for _j, resTypePrev in enumerate(common20AAList):
-                    if resTypePrev != 'ALA':
+                    if resTypePrev != 'SER':
                         continue
                     for _k, resTypeNext in enumerate(common20AAList):
-                        if resTypeNext != 'ALA':
+                        if resTypeNext != 'VAL':
                             continue
                         resTypeListBySequenceOrder = (resTypePrev, resType , resTypeNext)
-                        myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOverall, ssTypeRequested=ssType)
+                        myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOverall, ssTypeRequested=ssType, normalizeBeforeCombining = True)
                         if myHistList == None:
                             NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % str(resTypeListBySequenceOrder))
                             continue
@@ -699,7 +700,7 @@ def plotHistogramBySsTypeResidueTypes():
                         locale.setlocale(locale.LC_ALL, "")
                         vL = []
                         for value in  (avl, sdl, maxl, suml):
-                            vL.append( locale.format('%12.0f', value, True))
+                            vL.append( locale.format('%12.3f', value, True))
                         strTitle = "av: %s sd: %s\nmax: %s sum: %s" % (vL[0],vL[1],vL[2],vL[3])
                         NTdebug("myHist: %s" % strTitle)
 
@@ -718,7 +719,8 @@ def plotHistogramBySsTypeResidueTypes():
                               yTicks=range(int(plotparams2.min), int(plotparams2.max + 1), plotparams2.ticksize),
                               yLabel=dihedralName2)
                             ps.addPlot(myplot)
-
+                            MIN_PERCENTAGE_D1D2 = 0.08/3. # This is a percentage of the SUM
+                            MAX_PERCENTAGE_D1D2 = 0.2/3. # was 0.2
                             myplot.dihedralComboPlot([myHist], minPercentage=MIN_PERCENTAGE_D1D2, maxPercentage=MAX_PERCENTAGE_D1D2, scaleBy=SCALE_BY_SUM)
 
                             fn = 'd1d2_%s_%s-%s-%s' % (ssType, resTypePrev, resType, resTypeNext)
