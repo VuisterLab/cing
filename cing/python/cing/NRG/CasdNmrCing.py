@@ -189,7 +189,7 @@ class casdNmrCing(Lister):
                 if not os.path.exists(cingDirEntry):
                     continue
                 logFileValidate = 'log_validateEntryForCasd'
-                for logFile in ( logFileValidate, 'log_storeCASDCING2db' ):
+                for logFile in ( logFileValidate, 'log_storeCING2db' ):
                     # Look for last log file
                     logList = glob(entrySubDir + '/%s/*.log' % logFile)
                     if not logList:

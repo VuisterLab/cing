@@ -1,14 +1,17 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Libs/test/test_sqlAlchemy.py
+python $CINGROOT/python/cing/PluginCode/test/test_sqlAlchemy.py
 
 Fails if MySql backends are absent.
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref, relation
-from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import Column
+from sqlalchemy.schema import ForeignKey
+from sqlalchemy.sql.expression import select
 from sqlalchemy.types import Integer, String
 from unittest import TestCase
 import unittest
@@ -54,6 +57,41 @@ class Address(Base):
         return "<Address('%s')>" % self.email_address
 
 class AllChecks(TestCase):
+
+    def tttest_SqlAlchemyWithNrgCing(self):
+        pdb_id = '1brv'
+
+        csql = csqlAlchemy()
+        if csql.connect():
+            NTerror("Failed to connect to DB")
+            return True
+        csql.autoload()
+
+        execute = csql.conn.execute
+        centry = csql.entry
+
+        # WATCH OUT WITH THE BELOW COMMANDS.
+        #result = csql.conn.execute(centry.delete())
+        result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
+        if result.rowcount:
+            NTdebug("Removed original entries numbering: %s" % result.rowcount)
+        else:
+            NTdebug("No original entry present yet.")
+
+        result = csql.conn.execute(centry.insert().values(
+            pdb_id=pdb_id,
+            name=pdb_id,
+            is_multimeric=False))
+
+#        entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
+#        entry_id_list = result.inserted_primary_key() # wait for this new feature
+#        NTdebug( "Last row id: " + str(result.lastrowid) ) # Always one
+        entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
+        self.assertNotEqual(entry_id_list,None,"Failed to get the id of the inserted entry but got: %s" % entry_id_list)
+        self.assertEqual(len( entry_id_list ), 1,"Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
+        entry_id = entry_id_list[0][0]
+        NTdebug("Inserted entry id %s" % entry_id)
+
 
     def tttest_SqlAlchemy(self):
         csql = csqlAlchemy()
