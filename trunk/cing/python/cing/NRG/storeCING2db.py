@@ -1,12 +1,14 @@
 # Execute like:
-# cd /Library/WebServer/Documents/CASD-NMR-CING/data/R1/NeR103ALyon2; \
-# python -u $CINGROOT/python/cing/NRG/storeCASDCING2db.py NeR103ALyon2 .
+# cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ALyon2; \
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD .
 #
-# NB this script fails if the MySql backend is not installed.
+# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG .
+#
+# NB this script fails if the Postgresql backend is not installed.
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG import CASD_DB_NAME
-from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG import * #@UnusedWildImport
 from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
 from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
@@ -21,7 +23,8 @@ from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
 
-def main(casd_id, *extraArgList):
+
+def main( entry_code, archive_id, *extraArgList):
     """inputDir may be a directory or a url.
     Returns True on error.
     """
@@ -29,11 +32,35 @@ def main(casd_id, *extraArgList):
     NTmessage(header)
     NTmessage(getStartMessage())
 
+    pdb_id = None
+    casd_id = None
+    archive_user = NRG_DB_USER_NAME
+    archive_db = NRG_DB_NAME
+    if archive_id == ARCHIVE_NRG_ID or  archive_id == ARCHIVE_PDB_ID:
+        pdb_id = entry_code
+        if pdb_id == None:
+            NTerror("Expected pdb_id argument")
+            return True
+        if not is_pdb_code(pdb_id):
+            NTerror("Expected pdb_id argument")
+            return True
+    elif archive_id == ARCHIVE_CASD_ID:
+        casd_id = entry_code
+        if casd_id == None:
+            NTerror("Expected casd_id argument")
+            return True
+        archive_user = CASD_DB_USER_NAME
+        archive_db = CASD_DB_NAME
+        entry_code = casd_id
+    else:
+        NTerror("Expected valid archive_id argument but got: %s" % archive_id)
+        return True
+
     expectedArgumentList = [ 'inputDir']
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of arguments: %d got %d" % (
+        NTerror("Got extra arguments: " + `extraArgList`)
+        NTerror("Failed to get expected number of extra arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         NTerror("Expected arguments: %s" % expectedArgumentList)
         return True
@@ -43,10 +70,13 @@ def main(casd_id, *extraArgList):
 #    projectType = extraArgList[2]
 
     NTdebug("Using:")
-    NTdebug("casd_id:              " + casd_id)
-    NTdebug("inputDir:             " + inputDir)
+    NTdebug("entry_code:           %s" % entry_code)
+    NTdebug("inputDir:             %s" % inputDir)
+    NTdebug("archive_id:           %s" % archive_id)
+    NTdebug("archive_user:         %s" % archive_user)
+    NTdebug("archive_db:           %s" % archive_db)
 
-    csql = csqlAlchemy(user=CASD_DB_USER_NAME, db=CASD_DB_NAME, echo=False)
+    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
     if csql.connect():
         NTerror("Failed to connect to DB")
         return True
@@ -59,9 +89,9 @@ def main(casd_id, *extraArgList):
     catom = csql.atom
 
     # presume the directory still needs to be created.
-    cingEntryDir = casd_id + ".cing"
+    cingEntryDir = entry_code + ".cing"
 
-    NTmessage("Now in %s" % os.path.curdir)
+#    NTmessage("Now in %s" % os.path.curdir)
 
     if not os.path.isdir(cingEntryDir):
         NTerror("Failed to find input directory: %s" % cingEntryDir)
@@ -69,7 +99,7 @@ def main(casd_id, *extraArgList):
     # end if.
 
     # Needs to be copied because the open method doesn't take a directory argument..
-    project = Project.open(casd_id, status='old')
+    project = Project.open(entry_code, status='old')
     if not project:
         NTerror("Failed to init old project")
         return True
@@ -78,36 +108,38 @@ def main(casd_id, *extraArgList):
     p = project
     molecule = project.molecule
 
-    targetId = getTargetForFullEntryName(casd_id)
-    if not targetId:
-        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
-        return True
-    ranges = getRangesForTarget(targetId)
-    if not ranges:
-        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-        return True
+    ranges = None
+    if archive_id == ARCHIVE_CASD_ID:
+        targetId = getTargetForFullEntryName(casd_id)
+        if not targetId:
+            NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
+            return True
+        ranges = getRangesForTarget(targetId)
+        if not ranges:
+            NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+            return True
 
 #    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
-    if True: # TODO: enable when done testing overall strategy.
+    if False: # TODO: enable when done testing overall strategy.
         p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
 
-    # WATCH OUT WITH THE BELOW COMMANDS.
-    # Use CASD_ID as a kind of unique key. Enforced in DB.
-    result = execute(centry.delete().where(centry.c.casd_id == casd_id))
+    if archive_id != ARCHIVE_CASD_ID:
+        result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
+    else:
+        result = execute(centry.delete().where(centry.c.casd_id == casd_id))
     if result.rowcount:
         NTdebug("Removed original entries numbering: %s" % result.rowcount)
     else:
         NTdebug("No original entry present yet.")
 
-    ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
-    if ranges == None:
-        NTerror("Failed to get the ranges")
+    rangesInProject = getDeepByKeysOrAttributes(molecule,RANGES_STR)
+    if rangesInProject != None:
+        ranges = rangesInProject
+#        NTerror("Failed to get the ranges")
 
     NTdebug("ranges: %s" % `ranges`)
     chainList = molecule.allChains()
-    is_multimeric = False
-    if len(chainList) > 1:
-        is_multimeric = True
+    is_multimeric = len(chainList) > 1
 
     chothia_class = molecule.cothiaClassInt()
 
@@ -153,8 +185,9 @@ def main(casd_id, *extraArgList):
     rogC = molecule.rogScore.rogInt()
 
     result = csql.conn.execute(centry.insert().values(
+        pdb_id=pdb_id,
         casd_id=casd_id,
-        name=casd_id,
+        name=entry_code,
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,
         ranges=ranges,
@@ -194,14 +227,17 @@ def main(casd_id, *extraArgList):
     )
 #    entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
 #    entry_id_list = result.inserted_primary_key() # wait for this new feature
-    entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()
+    if archive_id != ARCHIVE_CASD_ID:
+        entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
+    else:
+        entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()
     if not entry_id_list:
         NTerror("Failed to get the id of the inserted entry but got: %s" % entry_id_list)
         return True
     if len( entry_id_list ) != 1:
         NTerror("Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
         return True
-    entry_id = entry_id_list[0][0]
+    entry_id = entry_id_list[0][0] # NB this is an integer and different from entry_code which is a string.
     NTdebug("Inserted entry id %s" % entry_id)
 
 
@@ -222,13 +258,11 @@ def main(casd_id, *extraArgList):
             rog=rogC,
             )
         )
-#        chain_id = result.last_inserted_ids()[0]
-    #    chain_id = result.inserted_primary_key() # wait for this new feature TODO:
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
         NTdebug("Inserted chain id %s" % chain_id)
         for residue in chain.allResidues():
-#            NTmessage("Residue: %s" % residue)
+            NTmessage("Residue: %s" % residue)
 
             # CING
     #        print m.C.ASN46.distanceRestraints
@@ -410,6 +444,6 @@ if __name__ == "__main__":
     try:
         status = main(*sys.argv[1:])
         if status:
-            NTerror("Failed script: storeNRGCING2db.py")
+            NTerror("Failed script: storeCING2db.py")
     finally:
         NTmessage(getStopMessage())

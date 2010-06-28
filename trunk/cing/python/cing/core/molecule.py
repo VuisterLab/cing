@@ -3074,7 +3074,7 @@ Residue class: Defines residue properties
         cgShift = atomCg.shift()
 
         if isNaN( cbShift ) or isNaN( cgShift ):
-            NTdebug("CS unavailabe for CB and/or CG for %s" % self)
+#            NTdebug("CS unavailabe for CB and/or CG for %s" % self)
             return
 
         shiftDifference = cbShift - cgShift

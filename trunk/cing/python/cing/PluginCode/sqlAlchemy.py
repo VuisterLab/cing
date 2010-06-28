@@ -70,7 +70,7 @@ class cgenericSql(NTdict):
                 self.conn = self.engine.connect()
             except:
                 if cing.verbosity >= verbosityWarning:
-                    NTexception("Failed to connect to MySql engine")
+                    NTexception("Failed to connect to engine")
                     pass
                 return True
         if not self.conn:
@@ -98,15 +98,16 @@ class cgenericSql(NTdict):
         for tableName in self.tableNameList:
             NTdebug("Loading table %s" % tableName)
             self[tableName] = Table(tableName, self.metadata, autoload=True)
-            table = self[tableName]
-            columnNameList = [c.name for c in table.columns]
-            NTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
+#            table = self[tableName]
+#            columnNameList = [c.name for c in table.columns]
+#            NTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
         #The MetaData object supports some handy methods, such as getting a list of Tables in the order (or reverse) of their dependency:
 #        with warnings.catch_warnings(): # can't use the python 2.5 feature since it's not always enabled. Update when no longer supporting 2.5
         if True:
             warnings.simplefilter("ignore")
-            for t in self.metadata.table_iterator(reverse=False):
-                NTdebug("Table: %s" % t.name)
+            for _t in self.metadata.table_iterator(reverse=False):
+                pass
+#                NTdebug("Table: %s" % t.name)
             warnings.simplefilter("default") # reset to default warning behaviour.
 #            warnings.warn("deprecated 123", DeprecationWarning)
 

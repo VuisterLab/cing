@@ -533,6 +533,11 @@ def isStarNan(starValue):
         return True
     return False
 
+def translateStarNanToNone(starValue):
+    if isStarNan(starValue):
+        return None
+    return starValue
+
 #def comments_stripOld( text ):
 #    # split for profiling
 #    text = _comments_strip1(text)
