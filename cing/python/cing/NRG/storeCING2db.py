@@ -44,6 +44,10 @@ def main( entry_code, archive_id, *extraArgList):
         if not is_pdb_code(pdb_id):
             NTerror("Expected pdb_id argument")
             return True
+        if archive_id == ARCHIVE_PDB_ID:
+            archive_user = PDB_DB_USER_NAME
+            archive_db = PDB_DB_NAME
+
     elif archive_id == ARCHIVE_CASD_ID:
         casd_id = entry_code
         if casd_id == None:
@@ -262,7 +266,11 @@ def main( entry_code, archive_id, *extraArgList):
         chain_id = execute(s).fetchall()[0][0]
         NTdebug("Inserted chain id %s" % chain_id)
         for residue in chain.allResidues():
-            NTmessage("Residue: %s" % residue)
+
+            if residue.hasProperties('water'):
+                continue
+
+#            NTmessage("Residue: %s" % residue)
 
             # CING
     #        print m.C.ASN46.distanceRestraints
@@ -367,7 +375,7 @@ def main( entry_code, archive_id, *extraArgList):
                   cresidue.c.number == numberR
                   ))
             residue_id = execute(s).fetchall()[0][0]
-            NTdebug("Inserted residue %s" % residue_id)
+#            NTdebug("Inserted residue %s" % residue_id)
             if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name
@@ -425,8 +433,8 @@ def main( entry_code, archive_id, *extraArgList):
                           catom.c.residue_id == residue_id,
                           catom.c.name == a_name
                           ))
-                    atom_id = execute(s).fetchall()[0][0]
-                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
+#                    atom_id = execute(s).fetchall()[0][0]
+#                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
                 # end for atom
             # end if atom
         # end for residue

@@ -112,6 +112,7 @@ PHI_STR = 'PHI'
 PSI_STR = 'PSI'
 CHI1_STR = 'CHI1'
 CHI2_STR = 'CHI2'
+OMEGA_STR = 'OMEGA'
 CV_STR = 'cv'
 S2_STR = 'S2' # used in TalosPlus
 
@@ -142,12 +143,15 @@ PROTONS_STR = 'protons'
 
 SCALE_BY_MAX = 'SCALE_BY_MAX' # Ramachandran
 SCALE_BY_SUM = 'SCALE_BY_SUM' # D1D2
-#SCALE_BY_SIGMA = 'SCALE_BY_SIGMA' # D1D2
+SCALE_BY_Z = 'SCALE_BY_Z' # D1D2 new
+SCALE_BY_ONE = 'SCALE_BY_ONE' # NO scaling that is.
 SCALE_BY_DEFAULT = SCALE_BY_MAX
 
 MIN_PERCENTAGE_RAMA = 2.0  # This is a percentage of the MAX
 MAX_PERCENTAGE_RAMA = 20.0
 MIN_PERCENTAGE_D1D2 = 0.08 # This is a percentage of the SUM
 MAX_PERCENTAGE_D1D2 = 0.2
+MIN_Z_D1D2 = -1.0 # This is an absolute value of number of sigma's from average. NB, this is not a percentage
+MAX_Z_D1D2 = 0.0
 
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

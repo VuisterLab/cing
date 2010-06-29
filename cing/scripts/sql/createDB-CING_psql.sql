@@ -10,20 +10,26 @@
 -- * Setup commands are specific for database type: PostgreSQL
 -- * Run by command like:
 -- * psql --quiet casdcing casdcing1 < $CINGROOT/scripts/sql/createCASD-CING_psql.sql
+-- * psql --quiet pdbcing pdbcing1 < $CINGROOT/scripts/sql/createCASD-CING_psql.sql
 -- no output means no errors.
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
+CREATE OR REPLACE FUNCTION createDb(schemaName varchar)
+RETURNS varchar AS $$
+DECLARE
+    result ALIAS FOR $0;
+BEGIN
+    result := schemaName;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select add_three_values( 1, 2, 3);
+
 -- Remove previous copies in bottom up order.
 -- This will automatically drop the index created too.
---DROP TABLE IF EXISTS casdcing.atom;
---DROP TABLE IF EXISTS casdcing.residue;
---DROP TABLE IF EXISTS casdcing.chain;
---DROP TABLE IF EXISTS casdcing.entry;
---DROP TABLE IF EXISTS nrgcing.atom;
---DROP TABLE IF EXISTS nrgcing.residue;
---DROP TABLE IF EXISTS nrgcing.chain;
---DROP TABLE IF EXISTS nrgcing.entry;
 DROP TABLE IF EXISTS atom;
 DROP TABLE IF EXISTS residue;
 DROP TABLE IF EXISTS chain;

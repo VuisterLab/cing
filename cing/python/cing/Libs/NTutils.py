@@ -4389,7 +4389,8 @@ Rob might have caught this by requiring c_av be at least 2.0.
             sumsq += v*v
     c_av = sumsq / sum # this is not a regular average as far as I can tell.
     if sum <= 1.: # possible for small sets.
-        return (c_av, None)
+        NTerror("In getEnsembleAverageAndSigmaFromHistogram expected the sum of the histogram to be above one. Returning without s.d. and min/max")
+        return (c_av, None, None, None)
     sumsdsq = 0.
     for r in range(nr):
         for c in range(nc):
@@ -4397,7 +4398,7 @@ Rob might have caught this by requiring c_av be at least 2.0.
             v2 = v - c_av # convenience variable
             sumsdsq += v * v2*v2
 #    NTdebug("sumsdsq: %8.3f" % sumsdsq)
-    c_sd = sumsdsq / (sum-1)
+    c_sd = sumsdsq / (sum-1.)
     c_sd = math.sqrt(c_sd)
     hisMin = amin(his)
     hisMax = amax(his)

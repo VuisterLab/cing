@@ -1,6 +1,7 @@
 from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
@@ -3006,7 +3007,7 @@ Residue class: Defines residue properties
         return d1_value_list
     #end def
 
-    def getTripletHistogramList(self, doOnlyOverall = False, ssTypeRequested = None, normalizeBeforeCombining = False ):
+    def getTripletHistogramList(self, doOnlyOverall = False, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False ):
         """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
         an empty array when it could not be constructed.
 
@@ -3036,7 +3037,7 @@ Residue class: Defines residue properties
         resTypeNext = getDeepByKeys(self.sibling (1).db.nameDict, IUPAC)
         resTypeListBySequenceOrder = ( resTypePrev, resType, resTypeNext)
         return getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = ssTypeRequested,
-                                       normalizeBeforeCombining = normalizeBeforeCombining )
+                                       doNormalize = doNormalize, normalizeSeparatelyToZ = normalizeSeparatelyToZ )
 
 
     def toSML(self, stream=sys.stdout ):
@@ -3085,7 +3086,13 @@ Residue class: Defines residue properties
             atomCb.validateAssignment.append(str)
             return
 
-        isTrans = self.OMEGA.isWithinLimits(90.,270.,checkMore=True)
+        omega = getDeepByKeysOrAttributes( self, OMEGA_STR)
+        if omega == None:
+            # Happens for CGR26AUtrecht2
+            NTwarning("Failed to find the omega dihedral angle for: %s" % self)
+            return
+
+        isTrans = omega.isWithinLimits(90.,270.,checkMore=True)
         if isTrans == None: # in case of absent coordinates.
             NTdebug("Failed to find peptide configuration for %s" % self)
             return
@@ -4763,7 +4770,7 @@ def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
             msg += '\n'
     return msg
 
-def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None, normalizeBeforeCombining = False):
+def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False):
     """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
     an empty array when it could not be constructed.
 
@@ -4773,12 +4780,15 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     If ssTypeRequested is None then all types will be returned otherwise just the
     type requested.
 
-    If normalizeBeforeCombining = True then the 3 histograms for each ssType are normalized to have an integral of 100/3 % before they
+    If doNormalize = True then the 3 histograms for each ssType are normalized to have an integral of 100/3 % before they
     are added to have an integral of 100 %. The result will therefor be one histogram and not the usual 3. The value of ssTypeRequested will be
     checked to be None. It's a code bug if it differs.
 
     resTypeListBySequenceOrder is a list of three residue type names in sequence order.
     E.g. VAL171, PRO172, ILE173.
+
+    If normalizeSeparatelyToZ then the 3 histograms will be individually scaled to a Z-score based of the overall histogram. This is pretty wild
+    statistics.
 
     Return None on error.
         or empty array when it could not be constructed.
@@ -4792,14 +4802,14 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
 #        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
-    if normalizeBeforeCombining:
+    if doNormalize or normalizeSeparatelyToZ:
         if ssTypeRequested != None:
-            NTerror( 'getTripletHistogramList was called with normalizing for specific ssType [%s] which is not possible.' % ssTypeRequested)
+            NTerror( 'getTripletHistogramList was called with normalizing for specific ssType [%s] or with normalizeSeparately which is impossible.' % ssTypeRequested)
             return
 
     resTypePrev, resType, resTypeNext = resTypeListBySequenceOrder
     histListTuple = []
-    if doOnlyOverall and not normalizeBeforeCombining:
+    if doOnlyOverall and not doNormalize:
         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev) # x-axis
     #        hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypeNext) # bug fixed on June 3rd, 2010
         hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
@@ -4834,7 +4844,7 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         hist = multiply(m1,m2)
         histList.append(hist)
 
-    if normalizeBeforeCombining:
+    if doNormalize:
         if len(histList) != 3:
             NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
             return None
@@ -4849,8 +4859,59 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
                 NTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
                     histSum, factor, histSumNew))
                 return None
-        histResult = histList[0] + histList[1] + histList[2]
-        histList = [ histResult ]
+
+        histOverall = histList[0] + histList[1] + histList[2]
+
+        if not normalizeSeparatelyToZ:
+            histList = [ histOverall ]
+            return histList
+
+        # NB this is now in percentage as they have been normalized.
+        Ctuple = getEnsembleAverageAndSigmaFromHistogram( histOverall )
+        (c_av, c_sd, hisMin, hisMax) = Ctuple
+        zMin = (hisMin - c_av) / c_sd
+        zMax = (hisMax - c_av) / c_sd
+
+        NTmessage("       SS R1  R2  R3         c_av         c_sd       hisMin       hisMax         zMin         zMax")
+        # A for all
+        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
+            c_av, c_sd, hisMin, hisMax, zMin, zMax)
+        if hisMax < c_av:
+            NTerror(msg + " maxHist < c_av")
+        else:
+            NTmessage("       " + msg)
+
+#        histOverall *= 3.    # to get it's sum back to 100%
+        histOverall -= c_av
+        histOverall /= c_sd
+        CtupleA = getArithmeticAverageAndSigmaFromHistogram(histOverall)
+        (c_avA, c_sdA, hisMinA, hisMaxA) = CtupleA
+        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
+            c_avA, c_sdA, hisMinA, hisMaxA)
+        if hisMaxA < c_avA:
+            NTerror(msg + " maxHistA < c_avA")
+        else:
+            NTmessage("       " + msg)
+
+        for i,hist in enumerate(histList):
+            hist *= 3.    # to get it's sum back to 100%
+            hist -= c_av
+            hist /= c_sd
+#            CtupleSS = getEnsembleAverageAndSigmaFromHistogram( hist )
+            CtupleSS = getArithmeticAverageAndSigmaFromHistogram(hist)
+#            NTdebug("CtupleSS: [%s]" % str(CtupleSS))
+            (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = CtupleSS
+            mySsType = ssIdxToType(i)
+            msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % (mySsType, resTypePrev, resType, resTypeNext,
+                c_avSS, c_sdSS, hisMinSS, hisMaxSS)
+            if hisMaxSS < c_avSS:
+                NTerror(msg + " maxHistSS < c_avSS")
+            else:
+                NTmessage("       " + msg)
+        return histList
+
+
+
     return histList
 
 

@@ -54,13 +54,14 @@ if __name__ == '__main__':
     #cing.verbosity = cing.verbosityDefault
     archive_id = ARCHIVE_NRG_ID
     entryList = '1brv'.split()
-    if True:
+    if False:
         archive_id = ARCHIVE_CASD_ID
         entryList = None
-#        entryList = 'NeR103ALyon2'.split()
-    if False:
+        entryList = 'CGR26AParis CGR26AUtrecht2 VpR247Seattle2'.split()
+    if True:
         archive_id = ARCHIVE_PDB_ID
-        entryList = '3kffffff'.split()
+        entryList = '1brv'.split()
+        entryList = '3kff 3a34 2xdy 3mcd 1brv 1hkt'.split()
 
 #    entryList = None
     storeCING2dbLoop(archive_id, entryList=entryList)

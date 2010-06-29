@@ -1521,8 +1521,8 @@ def validateDihedralCombinations(project):
 
             if doingNewD1D2plot:
                 # depending on doOnlyOverall it will actually return an array of myHist.
-#                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType  )
-                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, normalizeBeforeCombining=normalizeBeforeCombining  )
+                doNormalize = True
+                myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, doNormalize=doNormalize  )
                 if myHistList == None:
                     NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % residue)
                     continue
