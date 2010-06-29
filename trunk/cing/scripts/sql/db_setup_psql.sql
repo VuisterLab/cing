@@ -17,14 +17,17 @@
 
 -- create it
 create database nrgcing;
+create database pdbcing;
 create database pdbmlplus;
 
 -- now from command line:
 createlang plpgsql nrgcing
+createlang plpgsql pdbcing
 createlang plpgsql pdbmlplus
 
 -- creating the account
 create role nrgcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
+create role pdbcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
 
 create role nrgcing_reader LOGIN PASSWORD '4I4KMS';
 grant select to nrgcing_reader

@@ -409,9 +409,14 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         histBySsAndResType         = hPlot.histJaninBySsAndResType
     elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
         histBySsAndResType         = hPlot.histd1BySsAndResTypes
-        minPercentage =  MIN_PERCENTAGE_D1D2
-        maxPercentage = MAX_PERCENTAGE_D1D2
-        scaleBy = SCALE_BY_SUM
+        if True:
+            minPercentage =  MIN_PERCENTAGE_D1D2
+            maxPercentage = MAX_PERCENTAGE_D1D2
+            scaleBy = SCALE_BY_SUM
+        else:
+            minPercentage =  MIN_Z_D1D2
+            maxPercentage = MAX_Z_D1D2
+            scaleBy = SCALE_BY_Z
         doingNewD1D2plot = True
     else:
         NTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
@@ -428,14 +433,14 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
     if doingNewD1D2plot:
         # depending on doOnlyOverall it will actually return an array of myHist.
-        myHist = residue.getTripletHistogramList( doOnlyOverall = False )
-        if myHist == None:
+        myHistList = residue.getTripletHistogramList( doOnlyOverall = False, doNormalize = False )
+        if myHistList == None:
             NTdebug("Failed to get the d1d2 hist for %s" % residue)
             return None
-        if len(myHist) == 0:
+        if len(myHistList) == 0:
 #            NTdebug("Found no histogram for %s" % residue)
             return None
-        histList += myHist # extend the list.
+        histList += myHistList # extend the list.
     else:
         for ssType in ssTypeList:
             if isSingleResiduePlot:

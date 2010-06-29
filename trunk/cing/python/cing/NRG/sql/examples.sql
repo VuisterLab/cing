@@ -7,6 +7,11 @@ from pdbj.brief_summary
 group by exptl_method
 order by count(*) desc;
 
+SELECT S.PDBID, P.VAL AS "resolution"
+  FROM
+       "pdbj".BRIEF_SUMMARY AS S JOIN "pdbj"."//refine/ls_d_res_high" AS P ON S.DOCID = P.DOCID
+  WHERE P.VAL <= 1.0
+
 
 SELECT table_name FROM information_schema.tables
 where table_schema = 'pdbj' AND table_name like '%exp%data%'

@@ -914,7 +914,7 @@ class NTplot( NTdict ):
                         extent=extent,
                         origin='lower')
 
-    def dihedralComboPlot(self, histList,
+    def dihedralComboPlot(self, histList, ssType = None,
             minPercentage =  MIN_PERCENTAGE_RAMA, maxPercentage = MAX_PERCENTAGE_RAMA, scaleBy = SCALE_BY_MAX ):
         """Image histogram as in Ramachandran plot for coil, helix, sheet.
 
@@ -925,7 +925,10 @@ class NTplot( NTdict ):
         So sheet (yellow) will be plotted on top.
         This routine used to calculate the c_dbav, s_dbav but no more.
 
-        scaleBy can be Max, or Sum
+        If ssType is given then the corresponding color will be used. If it is None then
+        the serie will be interpreted as described above.
+
+        scaleBy can be Max, Sum, or Z-score or one (for no scaling)
         """
 
         # make sure helix and sheet are plotted over coil
@@ -966,14 +969,28 @@ class NTplot( NTdict ):
 #                NTdebug("sumHist: %s" % sumHist)
                 factor = 100./sumHist
                 myHistScaled *= factor
+            elif scaleBy == SCALE_BY_Z:
+                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+                (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
+                # Scaled into Z-space.
+                myHistScaled -= c_av
+                myHistScaled /= c_sd
+            elif scaleBy == SCALE_BY_ONE:
+                pass
             else:
-                NTerror("parameter invalid in dihedralComboPlot")
+                NTerror("Parameter for scaleBy [%s] is invalid in dihedralComboPlot" % scaleBy)
                 return True
 
             norm = Normalize(vmin = minPercentage, vmax = maxPercentage)
             myHistNormalized = norm(myHistScaled) # alpha in range and above is still all 1.
 #            NTdebug("i %s color %s"% (i,colorList[i]))
             palette = cmapList[i]
+            if ssType:
+                idx = ssTypeToIdx(ssType)
+                if idx == None:
+                    NTcodeerror("Found unknown ssType : [%s]" % ssType)
+                    return True
+                palette = cmapList[idx]
             myHistColored = cmapWithAlphaGlidingScale(myHistNormalized,palette,
                 minAlpha=minAlpha, maxAlpha=maxAlpha, underAlpha=0., overAlpha=maxAlpha)
 
@@ -981,6 +998,8 @@ class NTplot( NTdict ):
                     interpolation='bicubic',
                     origin='lower',
                     extent=extent )
+#            if i == 0:
+#                colorbar()
         # end for
 
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2, fill=True, fillColor=None):
@@ -2096,3 +2115,19 @@ def cmapWithAlphaGlidingScale(Z,palette,minAlpha=.5, maxAlpha=1., underAlpha=0.,
             tmp[i,j][3] = alpha
 #            NTdebug('v: %5.2f alpha %5.2f' % (v,alpha))
     return tmp
+
+def ssTypeToIdx(ssType):
+    """Note that this is not the same as mapDssp2Int in reqDssp.py
+    This one's keyed to the colormaps which are alphabetically.
+    """
+    typeMap = {' ': 0, 'H': 1, 'S': 2}
+    idx = getDeepByKeysOrAttributes(typeMap, ssType)
+    return idx
+
+def ssIdxToType(idxType):
+    """Note that this is not the same as mapDssp2Int in reqDssp.py
+    This one's keyed to the colormaps.
+    """
+    typeMapRev = {0: ' ',1: 'H',2: 'S'} # could have used an array.
+    ssType = getDeepByKeysOrAttributes(typeMapRev, idxType)
+    return ssType
