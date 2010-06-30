@@ -1,39 +1,29 @@
 --
--- Protein Biophysics Analysis of the NRG-CING results
--- SQL Definitions for creating tables
---     written: Wed Nov 11 14:14:07 CET 2009
--- Copyright 2009
+-- SQL Definitions for creating tables.
 --     Jurgen F. Doreleijers
 --     Protein Biophysics, Radboud University Nijmegen, the Netherlands.
+--     written: Wed Jun 30 12:27:14 CEST 2010
 --
 -- Notes:
 -- * Setup commands are specific for database type: PostgreSQL
 -- * Run by command like:
--- * psql --quiet casdcing casdcing1 < $CINGROOT/scripts/sql/createCASD-CING_psql.sql
--- * psql --quiet pdbcing pdbcing1 < $CINGROOT/scripts/sql/createCASD-CING_psql.sql
--- no output means no errors.
+-- * psql --quiet casdcing casdcing1 < $CINGROOT/scripts/sql/createDB-CING_psql.sql
+-- * psql --quiet pdbmlplus pdbj < $CINGROOT/scripts/sql/createDB-CING_psql.sql
+-- Or from  cing.NRG.createDB_CING.py
+
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
-CREATE OR REPLACE FUNCTION createDb(schemaName varchar)
-RETURNS varchar AS $$
-DECLARE
-    result ALIAS FOR $0;
-BEGIN
-    result := schemaName;
-    RETURN result;
-END;
-$$ LANGUAGE plpgsql;
-
-
-select add_three_values( 1, 2, 3);
-
 -- Remove previous copies in bottom up order.
 -- This will automatically drop the index created too.
-DROP TABLE IF EXISTS atom;
-DROP TABLE IF EXISTS residue;
-DROP TABLE IF EXISTS chain;
-DROP TABLE IF EXISTS entry;
+DROP TABLE IF EXISTS casdcing.cingatom;
+DROP TABLE IF EXISTS casdcing.cingresidue;
+DROP TABLE IF EXISTS casdcing.cingchain;
+DROP TABLE IF EXISTS casdcing.cingentry;
+
+-- Only now that the tables have been removed can the schema be removed.
+DROP SCHEMA IF EXISTS casdcing;
+CREATE SCHEMA casdcing AUTHORIZATION casdcing1;
 
 --CREATE TABLE entry
 --(
@@ -42,7 +32,7 @@ DROP TABLE IF EXISTS entry;
 --)
 
 -- entry
-CREATE TABLE entry
+CREATE TABLE casdcing.cingentry
 (
     entry_id                       SERIAL UNIQUE,
     name                           VARCHAR(255),
@@ -107,8 +97,9 @@ CREATE TABLE entry
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
     rog                            INT DEFAULT NULL
 );
-CREATE INDEX entry_001 ON entry (bmrb_id);
-CREATE INDEX entry_002 ON entry (pdb_id);
+
+CREATE INDEX entry_001 ON casdcing.cingentry (bmrb_id);
+CREATE INDEX entry_002 ON casdcing.cingentry (pdb_id);
 
 -- mrfile
 -- MySQL doesn't accept the SYSDATE default for date_modified so always present date on insert.
@@ -119,20 +110,20 @@ CREATE INDEX entry_002 ON entry (pdb_id);
 
 
 --    mol_type
-CREATE TABLE chain
+CREATE TABLE casdcing.cingchain
 (
     chain_id                        SERIAL UNIQUE,
     entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
     chothia_class                   INT DEFAULT NULL,
     rog                             INT DEFAULT NULL,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );
 -- Some common queries are helped by these indexes..
-CREATE INDEX chain_001 ON chain (entry_id);
+CREATE INDEX chain_001 ON casdcing.cingchain (entry_id);
 
 -- residue
-CREATE TABLE residue
+CREATE TABLE casdcing.cingresidue
 (
     residue_id                     SERIAL UNIQUE,
     chain_id                       INT              NOT NULL,
@@ -207,19 +198,19 @@ CREATE TABLE residue
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
 
-    FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (chain_id)          REFERENCES casdcing.cingchain (chain_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );
-CREATE INDEX residue_001 ON residue (chain_id);
-CREATE INDEX residue_002 ON residue (entry_id);
-CREATE INDEX residue_003 ON residue (number);
-CREATE INDEX residue_004 ON residue (dssp_id);
-CREATE INDEX residue_005 ON residue (rog);
-CREATE INDEX residue_006 ON residue (dis_c5_viol);
+CREATE INDEX residue_001 ON casdcing.cingresidue (chain_id);
+CREATE INDEX residue_002 ON casdcing.cingresidue (entry_id);
+CREATE INDEX residue_003 ON casdcing.cingresidue (number);
+CREATE INDEX residue_004 ON casdcing.cingresidue (dssp_id);
+CREATE INDEX residue_005 ON casdcing.cingresidue (rog);
+CREATE INDEX residue_006 ON casdcing.cingresidue (dis_c5_viol);
 
 
 -- atom
-CREATE TABLE atom
+CREATE TABLE casdcing.cingatom
 (
     atom_id                        SERIAL UNIQUE,
     residue_id                     INT              NOT NULL,
@@ -238,12 +229,12 @@ CREATE TABLE atom
     wi_wgtchk                      FLOAT DEFAULT NULL,
 --   cing
     rog                            INT DEFAULT NULL,
-    FOREIGN KEY (residue_id)        REFERENCES residue (residue_id) ON DELETE CASCADE,
-    FOREIGN KEY (chain_id)          REFERENCES chain (chain_id) ON DELETE CASCADE,
-    FOREIGN KEY (entry_id)          REFERENCES entry (entry_id) ON DELETE CASCADE
+    FOREIGN KEY (residue_id)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,
+    FOREIGN KEY (chain_id)          REFERENCES casdcing.cingchain (chain_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );
-CREATE INDEX atom_001 ON atom (residue_id);
-CREATE INDEX atom_002 ON atom (chain_id);
-CREATE INDEX atom_003 ON atom (entry_id);
-CREATE INDEX atom_004 ON atom (name);
+CREATE INDEX atom_001 ON casdcing.cingatom (residue_id);
+CREATE INDEX atom_002 ON casdcing.cingatom (chain_id);
+CREATE INDEX atom_003 ON casdcing.cingatom (entry_id);
+CREATE INDEX atom_004 ON casdcing.cingatom (name);
 

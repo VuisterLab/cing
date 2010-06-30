@@ -1,6 +1,8 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG import PDBJ_DB_NAME
+from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.required.reqOther import *
 import warnings
 
@@ -32,13 +34,14 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
 
 class cgenericSql(NTdict):
     "Class for connecting to any MySql database."
-    def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nobody@noaddress.no', passwd='', unix_socket='/tmp/mysql.sock', db="", echo=False):
+    def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nobody@noaddress.no', passwd='', unix_socket='/tmp/mysql.sock', db="", schema=None, echo=False):
         NTdebug("Initializing cgenericSql with user/db: %s/%s" % (user,db))
         self.host = host
         self.user = user
         self.passwd = passwd
         self.unix_socket = unix_socket
         self.db = db
+        self.schema = schema
         self.db_type = db_type
         self.engine = None
         "Connection object to database if connected it is None"
@@ -97,7 +100,7 @@ class cgenericSql(NTdict):
         """Return True on error"""
         for tableName in self.tableNameList:
             NTdebug("Loading table %s" % tableName)
-            self[tableName] = Table(tableName, self.metadata, autoload=True)
+            self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
 #            table = self[tableName]
 #            columnNameList = [c.name for c in table.columns]
 #            NTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
@@ -113,18 +116,17 @@ class cgenericSql(NTdict):
 
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
-    def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nrgcing1', passwd='4I4KMS', unix_socket='/tmp/mysql.sock', db="nrgcing", echo=False):
+    def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nrgcing1', passwd='4I4KMS', unix_socket='/tmp/mysql.sock', db="nrgcing", schema=None, echo=False):
         NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
-        cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, echo=echo)
+        cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
-        self.tableNameList = ['entry', 'chain', 'residue', 'atom']
+        self.tableNameList = ['cingentry', 'cingchain', 'cingresidue', 'cingatom']
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
-        self.entry = None
-        self.chain = None
-        self.residue = None
-        self.atom = None
-        self.author = None
-        self.author_list = None
+#        self.entry = None
+        self.cingentry = None
+        self.cingchain = None
+        self.cingresidue = None
+        self.cingatom = None
 
         self.levelIdResidue = "residue"  # mirrors WI setup.
         self.levelIdAtom = "atom"
@@ -132,13 +134,20 @@ class csqlAlchemy(cgenericSql):
     def autoload(self):
         """Return True on error"""
         cgenericSql.autoload(self)
-        if not self.entry:
-            NTerror("Failed to retrieve the entry table")
+        if not self.cingentry:
+            NTerror("Failed to retrieve the cingentry table")
             return True
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
+    if True: # default: True
+        db_name = PDBJ_DB_NAME
+        user_name = PDBJ_DB_USER_NAME
+        schema = CASD_DB_NAME
+    else:
+        db_name = CASD_DB_NAME
+        user_name = CASD_DB_USER_NAME
 
-    csql = csqlAlchemy(user=CASD_DB_USER_NAME, db=CASD_DB_NAME)
+    csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
     csql.connect()
     csql.autoload()

@@ -28,6 +28,7 @@ Atom:
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
 from cing.Libs.Geometry import violationAngle
+from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.html import addPreTagLines
@@ -1447,7 +1448,9 @@ def validateDihedralCombinations(project):
     The routine (re-)sets properties such as:
     res.CHK.RAMACHANDRAN_CHK.VALUE_LIST
     """
-
+#TODO: check the sec.struct of the both pairs in
+#Xxx-Yyy
+#    Yyy-Zzz
     if not project.molecule:
         return True
     if not project.molecule.modelCount:
@@ -1478,7 +1481,7 @@ def validateDihedralCombinations(project):
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
         if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
             resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
-        for checkIdx in range(len(plotDihedral2dLoL)): #TODO: debug
+        for checkIdx in range(len(plotDihedral2dLoL)):
 #        for checkIdx in [2]:
             checkId = plotDihedral2dLoL[checkIdx][0]
 #            NTdebug('Looking at %s %s' % (residue, checkId) )
@@ -1487,6 +1490,7 @@ def validateDihedralCombinations(project):
 
             residue[CHK_STR][checkId] = CingResult( checkId, level=RES_LEVEL, modelCount = modelCount)
             ensembleValueList = getDeepByKeysOrAttributes( residue, CHK_STR, checkId, VALUE_LIST_STR )
+            ensembleValueLoL = []
 
             doingNewD1D2plot = False
             bins = bins360P # most common. (chis & ds)
@@ -1500,10 +1504,12 @@ def validateDihedralCombinations(project):
                 histBySsAndResType         = hPlot.histJaninBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histJaninCtupleBySsAndResType
             elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
-                histBySsAndResType         = hPlot.histd1BySsAndResTypes
+#                histBySsAndResType         = hPlot.histd1BySsAndResTypes
+                histBySsAndResType         = None
                 histCtupleBySsAndResType   = hPlot.histd1CtupleBySsAndResTypes
                 doingNewD1D2plot = True
-                normalizeBeforeCombining = True
+                doNormalize = False
+                normalizeBeforeCombining = False
                 ssType = None # use all now for scoring.
                 triplet = NTlist()
 #                tripletIdxList = [-1,0,1]
@@ -1521,20 +1527,20 @@ def validateDihedralCombinations(project):
 
             if doingNewD1D2plot:
                 # depending on doOnlyOverall it will actually return an array of myHist.
-                doNormalize = True
                 myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, doNormalize=doNormalize  )
                 if myHistList == None:
-                    NTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % residue)
+                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was the neighbor?" % residue)
                     continue
-                if len(myHistList) != 1:
-                    NTerror("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList),residue))
+                if len(myHistList) != 3:
+                    NTerror("Expected exactly one but found %s histogram for %s; skipping" % (len(myHistList),residue))
                     continue
-                myHist = myHistList[0]
+#                myHist = myHistList[0]
             else:
                 myHist = getDeepByKeysOrAttributes(histBySsAndResType,ssType,resName)
                 if myHist == None:
 #                    NTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
                     continue
+                myHistList = [ myHist ]
 
             d1 = getDeepByKeysOrAttributes(residue, dihedralName1)
             d2 = getDeepByKeysOrAttributes(residue, dihedralName2)
@@ -1554,65 +1560,83 @@ def validateDihedralCombinations(project):
                 NTwarning("Will use %d models instead of %d expected" %(modelCountNew, modelCount))
             if not resTypeList:
                 resTypeList = [ resName ]
-            keyList = [ ssType ]
-            keyList += resTypeList
-            if normalizeBeforeCombining: # can't use predefined ones. Of course the debug checking below makes no sense with this.
-                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
-#                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
-                (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
-            else:
-                Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
-    #            NTdebug("keyList: %s" % str(keyList))
-                if not Ctuple:
-                    NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
-                    continue
-                (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
-                keyListQueryStr = str(keyList)
-                if keyListStr != keyListQueryStr:
-                    NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
-                    continue
 
-            if myHist == None:
-                NTerror("Got None for hist for %s" % residue)
-                continue
-            if True: # costly checks to be disabled later.
-                minHist = amin( myHist )
-                maxHist = amax( myHist )
-                zMin = (minHist - c_av) / c_sd
-                zMax = (maxHist - c_av) / c_sd
+            zkList = []
+            for i, myHist in enumerate(myHistList):
+                if doingNewD1D2plot:
+                    ssType = ssIdxToType(i)
+                keyList = [ ssType ]
+                keyList += resTypeList
+#                NTdebug("Checking with keyList [%s]" % str(keyList))
+                if normalizeBeforeCombining: # can't use predefined ones. Of course the debug checking below makes no sense with this.
+                    Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+    #                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
+                    (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
+                else:
+                    Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
+        #            NTdebug("keyList: %s" % str(keyList))
+                    if not Ctuple:
+                        NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
+                        continue
+                    (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+                    keyListQueryStr = str(keyList)
+                    if keyListStr != keyListQueryStr:
+                        NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
+                        continue
 
-            myHistP = circularlizeMatrix(myHist) # consider caching if this is too slow.
-            for modelIdx in range(modelCountNew):
-                a1 = d1[modelIdx]
-                a2 = d2[modelIdx]
-                # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
-                ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
-                zk = ( ck - c_av ) / c_sd
+                if myHist == None:
+                    NTerror("Got None for hist for %s" % residue)
+                    continue
                 if True: # costly checks to be disabled later.
-#                if checkIdx == 2: # costly checks to be disabled later.
-#                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
-                    msg = "chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f" % (
-                                checkIdx,
-                                ssType,residue,modelIdx,a2, a1,
-                                c_av, c_sd,ck,zk,
-                                minHist, maxHist, zMin, zMax)
-                    if maxHist < c_av:
-                        NTerror(msg + " maxHist < c_av")
-                    elif maxHist < ck:
-                        NTerror(msg + " maxHist < ck")
-                    elif minHist > 1000.: # was found in GLY ASN LEU
-                        NTwarning(msg + " minHist > 1000") # ' ' GLY GLY GLY
-                    elif hisMin != minHist:
-                        NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
-                    elif hisMax != maxHist:
-                        NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                    minHist = amin( myHist )
+                    maxHist = amax( myHist )
+                    zMin = (minHist - c_av) / c_sd
+                    zMax = (maxHist - c_av) / c_sd
+
+                myHistP = circularlizeMatrix(myHist) # consider caching if this is too slow.
+                for modelIdx in range(modelCountNew):
+                    if len(ensembleValueLoL) <= modelIdx:
+                        ensembleValueLoL.append( NTlist())
+                    a1 = d1[modelIdx]
+                    a2 = d2[modelIdx]
+                    # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
+                    ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
+                    zk = ( ck - c_av ) / c_sd
+                    zkList.append(zk)
+                    if modelIdx == 0: # costly checks to be disabled later.
+    #                if checkIdx == 2: # costly checks to be disabled later.
+    #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
+                        msg = "chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f" % (
+                                    checkIdx,
+                                    ssType,residue,modelIdx,a2, a1,
+                                    c_av, c_sd,ck,zk,
+                                    minHist, maxHist, zMin, zMax)
+                        if maxHist < c_av:
+                            NTerror(msg + " maxHist < c_av")
+                        elif maxHist < ck:
+                            NTerror(msg + " maxHist < ck")
+                        elif minHist > 1000.: # was found in GLY ASN LEU
+                            NTwarning(msg + " minHist > 1000") # ' ' GLY GLY GLY
+                        elif hisMin != minHist:
+                            NTerror(msg + " hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
+                        elif hisMax != maxHist:
+                            NTerror(msg + " hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
+                        else:
+                            if doingNewD1D2plot:
+                                NTdebug(msg)
+                        # end if on checks
+                    # end if on True
+                    if not doingNewD1D2plot:
+                        ensembleValueList[modelIdx] = zk
                     else:
-                        if doingNewD1D2plot:
-                            NTdebug(msg)
-                    # end if on checks
-                # end if on True
-                ensembleValueList[modelIdx] = zk
-            # end for modelIdx
+                        ensembleValueLoL[modelIdx].append(zk)
+                # end for modelIdx
+            # end for SS
+            if doingNewD1D2plot:
+                for modelIdx in range(modelCountNew):
+                    ensembleValueList[modelIdx] = max(ensembleValueLoL[modelIdx])
+                    if modelIdx == 0:
+                        NTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]), ensembleValueList[modelIdx] ))
         # end for checkIdx
     # end for residue
     msgHol.showMessage(MAX_MESSAGES=10, MAX_DEBUGS = 10)

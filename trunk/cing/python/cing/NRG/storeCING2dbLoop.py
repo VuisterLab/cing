@@ -60,8 +60,8 @@ if __name__ == '__main__':
         entryList = 'CGR26AParis CGR26AUtrecht2 VpR247Seattle2'.split()
     if True:
         archive_id = ARCHIVE_PDB_ID
-        entryList = '1brv'.split()
-        entryList = '3kff 3a34 2xdy 3mcd 1brv 1hkt'.split()
+#        entryList = '1brv'.split()
+        entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
 
 #    entryList = None
     storeCING2dbLoop(archive_id, entryList=entryList)

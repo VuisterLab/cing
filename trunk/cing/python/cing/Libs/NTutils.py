@@ -19,6 +19,7 @@ from string  import find
 from string import join
 from subprocess import PIPE
 from subprocess import Popen
+from traceback import format_exc
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 import array
@@ -4600,10 +4601,15 @@ def readTextFromFile(fileName):
     return content
 
 def writeTextToFile(fileName, txt):
+    """Returns True on error"""
 #    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
-    fp = open(fileName, 'w')
-    fprintf(fp, txt)
-    fp.close()
+    try:
+        fp = open(fileName, 'w')
+        fprintf(fp, txt)
+        fp.close()
+    except:
+        NTtracebackError()
+        return True
 
 def toCsv(input):
     result = ''
@@ -4628,6 +4634,10 @@ NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = 'DEBUG: ')
 
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
+
+def NTtracebackError():
+    traceBackString = format_exc()
+    NTerror(traceBackString)
 
 _outOutputStreamContainerList = [ NTmessageNoEOL, NTdebug, NTdetail, NTmessage, NTwarning ]
 _errOutputStreamContainerList = [ NTerror, NTcodeerror, NTexception ]

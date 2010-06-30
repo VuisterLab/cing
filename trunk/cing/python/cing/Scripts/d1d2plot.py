@@ -42,6 +42,7 @@ reportsDir = os.path.join(rootDir, 'reports')
 #plotHistogramBySsTypeResidueTypesDir = os.path.join(rootDir, 'plotHistogramBySsTypeResidueTypesNoNormalizing')
 plotHistogramBySsTypeResidueTypesDir = os.path.join(rootDir, 'plotHistogramBySsTypeResidueTypesNew')
 tripletsOvDir = os.path.join(rootDir, 'triplets_ov')
+doubletsDir = os.path.join(rootDir, 'doublets')
 
 if hPlot.histRamaBySsAndCombinedResType == None:
     hPlot.initHist()
@@ -334,23 +335,22 @@ def plotDihedralD1_1d():
     dihedralName = 'Cb4N'
     graphicsFormat = "png"
 
-    subDir = 'doublets'
-    os.chdir(os.path.join(cingDirTmp, subDir))
-
+    NTmessage("Starting plotDihedralD1_1d")
 #    interestingResTypeList = [ 'GLY' ]
     interestingResTypeList = common20AAList
 #    interestingResTypeList = [ 'GLY', 'ALA' ]
 #    interestingResTypeList = [ 'CYS', 'PRO' ]
     for resType in common20AAList:
         for resTypePrev in common20AAList:
+#                NTmessage("Looking at %s %s" % ( resType, resTypePrev))
             if resType not in interestingResTypeList:
                 continue
             if resTypePrev not in interestingResTypeList:
                 continue
-#            if resType != 'GLY':
-#                continue
-#            if resTypePrev != 'ALA':
-#                continue
+            if resType != 'GLY':
+                continue
+#                if resTypePrev != 'ALA':
+#                    continue
 
             titleStr = 'd1 %s(i-1) %s(i)' % (resTypePrev, resType)
             NTmessage("plotting: %s" % titleStr)
@@ -378,21 +378,29 @@ def plotDihedralD1_1d():
             points = zip(x, y)
             lAttr = solidLine(color='black')
             plot.lines(points, attributes=lAttr)
-            ssTypeList = hPlot.histd1BySs.keys() #@UndefinedVariable
+            ssTypeList = hPlot.histd1BySs0.keys()
             ssTypeList.sort() # in place sort to: space, H, S
             colorList = [ 'green', 'blue', 'yellow']
 
-            for i, ssType in enumerate(ssTypeList):
-                h = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
-                sumh = sum(h)
-                plot.title += ' %s: %d' % (ssType, sumh)
-                if h == None:
-                    continue
-#                NTdebug('appending [%s]' % ssType)
-                y = 100.0 * h / sumh
-                points = zip(x, y)
-                lAttr = solidLine(color=colorList[i])
-                plot.lines(points, attributes=lAttr)
+            for isI in (1, 0):
+                if isI:
+#                    histd1BySs = hPlot.histd1BySs0
+                    histd1BySsAndResTypes = hPlot.histd1BySs0AndResTypes
+                else:
+#                    histd1BySs = hPlot.histd1BySs1
+                    histd1BySsAndResTypes = hPlot.histd1BySs1AndResTypes
+
+                for i, ssType in enumerate(ssTypeList):
+                    h = getDeepByKeys(histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                    sumh = sum(h)
+                    plot.title += ' %s: %d' % (ssType, sumh)
+                    if h == None:
+                        continue
+    #                NTdebug('appending [%s]' % ssType)
+                    y = 100.0 * h / sumh
+                    points = zip(x, y)
+                    lAttr = solidLine(color=colorList[i])
+                    plot.lines(points, attributes=lAttr)
 
             fn = "d1 %s %s_d1d2." % (resTypePrev, resType)
             fn += graphicsFormat
@@ -401,10 +409,12 @@ def plotDihedralD1_1d():
 
 def plotDihedralD1_2d(doOnlyOverall=True):
     graphicsFormat = "png"
-#                minPercentage =  0.08
-#                maxPercentage = .2
-    minPercentage = MIN_Z_D1D2
-    maxPercentage = MAX_Z_D1D2
+#    minPercentage = MIN_Z_D1D2
+#    maxPercentage = MAX_Z_D1D2
+#                scaleBy = SCALE_BY_Z
+    minPercentage = MIN_PERCENTAGE_D1D2
+    maxPercentage = MAX_PERCENTAGE_D1D2
+    scaleBy = SCALE_BY_SUM
 
     for resType in common20AAList:
         for resTypePrev in common20AAList:
@@ -438,13 +448,13 @@ def plotDihedralD1_2d(doOnlyOverall=True):
                 sumh1 = sum(hist1)
                 sumh2 = sum(hist2)
                 titleStr += ' %d-%d' % (sumh1, sumh2)
-                if doOnlyOverall:
-                    histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False)
-                    scaleBy = SCALE_BY_Z
-                else:
-                    titleStr += '\n'
-                    histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = True, normalizeSeparatelyToZ = True)
-                    scaleBy = SCALE_BY_ONE
+#                if doOnlyOverall:
+                histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False)
+
+#                else:
+#                    titleStr += '\n'
+#                    histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = True, normalizeSeparatelyToZ = True)
+#                    scaleBy = SCALE_BY_ONE
 
 
                 ps = NTplotSet() # closes any previous plots
@@ -498,7 +508,7 @@ def plotHistogramOverall():
                     if doOverall:
                         hist1 = getDeepByKeys(hPlot.histd1ByResTypes, resType, resTypePrev)
                     else:
-                        hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev)
+                        hist1 = getDeepByKeys(hPlot.histd1BySs0AndResTypes, ssType, resType, resTypePrev)
                     if hist1 == None:
                         NTdebug('skipping for hist1 is empty for [%s] [%s]' % (resType, resTypePrev))
                         continue
@@ -909,6 +919,7 @@ if __name__ == "__main__":
         for entryId in entryList:
             plotForEntry(entryId)
     if False:
+        os.chdir(doubletsDir)
         plotDihedralD1_1d()
     if True:
         os.chdir(tripletsOvDir)

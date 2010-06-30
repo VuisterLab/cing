@@ -23,6 +23,12 @@ from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
 
+if True: # default: True
+    db_name = PDBJ_DB_NAME
+    user_name = PDBJ_DB_USER_NAME
+else:
+    db_name = CASD_DB_NAME
+    user_name = CASD_DB_USER_NAME
 
 def main( entry_code, archive_id, *extraArgList):
     """inputDir may be a directory or a url.
@@ -34,9 +40,8 @@ def main( entry_code, archive_id, *extraArgList):
 
     pdb_id = None
     casd_id = None
-    archive_user = NRG_DB_USER_NAME
-    archive_db = NRG_DB_NAME
-    if archive_id == ARCHIVE_NRG_ID or  archive_id == ARCHIVE_PDB_ID:
+    schema = PDB_DB_NAME
+    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_PDB_ID:
         pdb_id = entry_code
         if pdb_id == None:
             NTerror("Expected pdb_id argument")
@@ -44,20 +49,17 @@ def main( entry_code, archive_id, *extraArgList):
         if not is_pdb_code(pdb_id):
             NTerror("Expected pdb_id argument")
             return True
-        if archive_id == ARCHIVE_PDB_ID:
-            archive_user = PDB_DB_USER_NAME
-            archive_db = PDB_DB_NAME
-
+        if archive_id == ARCHIVE_NRG_ID:
+            schema = NRG_DB_NAME
     elif archive_id == ARCHIVE_CASD_ID:
         casd_id = entry_code
         if casd_id == None:
             NTerror("Expected casd_id argument")
             return True
-        archive_user = CASD_DB_USER_NAME
-        archive_db = CASD_DB_NAME
         entry_code = casd_id
+        schema = CASD_DB_NAME
     else:
-        NTerror("Expected valid archive_id argument but got: %s" % archive_id)
+        NTerror("Expected valid schema argument but got: %s" % archive_id)
         return True
 
     expectedArgumentList = [ 'inputDir']
@@ -76,21 +78,23 @@ def main( entry_code, archive_id, *extraArgList):
     NTdebug("Using:")
     NTdebug("entry_code:           %s" % entry_code)
     NTdebug("inputDir:             %s" % inputDir)
-    NTdebug("archive_id:           %s" % archive_id)
-    NTdebug("archive_user:         %s" % archive_user)
-    NTdebug("archive_db:           %s" % archive_db)
+    NTdebug("user_name:            %s" % user_name)
+    NTdebug("db_name:              %s" % db_name)
+    NTdebug("schema:               %s" % schema)
 
-    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
+#    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
+    csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
+
     if csql.connect():
         NTerror("Failed to connect to DB")
         return True
     csql.autoload()
 
     execute = csql.conn.execute
-    centry = csql.entry
-    cchain = csql.chain
-    cresidue = csql.residue
-    catom = csql.atom
+    centry = csql.cingentry
+    cchain = csql.cingchain
+    cresidue = csql.cingresidue
+    catom = csql.cingatom
 
     # presume the directory still needs to be created.
     cingEntryDir = entry_code + ".cing"
@@ -113,7 +117,7 @@ def main( entry_code, archive_id, *extraArgList):
     molecule = project.molecule
 
     ranges = None
-    if archive_id == ARCHIVE_CASD_ID:
+    if schema == ARCHIVE_CASD_ID:
         targetId = getTargetForFullEntryName(casd_id)
         if not targetId:
             NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
@@ -127,7 +131,7 @@ def main( entry_code, archive_id, *extraArgList):
     if False: # TODO: enable when done testing overall strategy.
         p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
 
-    if archive_id != ARCHIVE_CASD_ID:
+    if schema != ARCHIVE_CASD_ID:
         result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
     else:
         result = execute(centry.delete().where(centry.c.casd_id == casd_id))
@@ -188,7 +192,7 @@ def main( entry_code, archive_id, *extraArgList):
     # Overall rog
     rogC = molecule.rogScore.rogInt()
 
-    result = csql.conn.execute(centry.insert().values(
+    result = execute(centry.insert().values(
         pdb_id=pdb_id,
         casd_id=casd_id,
         name=entry_code,
@@ -231,7 +235,7 @@ def main( entry_code, archive_id, *extraArgList):
     )
 #    entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
 #    entry_id_list = result.inserted_primary_key() # wait for this new feature
-    if archive_id != ARCHIVE_CASD_ID:
+    if schema != ARCHIVE_CASD_ID:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
     else:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()
@@ -250,12 +254,14 @@ def main( entry_code, archive_id, *extraArgList):
 #
 #    for instance in csql.session.query(centry):
 #        NTdebug( "Retrieved entry instance: %s" % instance.entry_id )
-
+    chainCommittedCount = 0
+    residueCommittedCount = 0
+    atomCommittedCount = 0
     for chain in project.molecule.allChains():
         nameC = chain.name
         chothia_class = molecule.cothiaClassInt()
         rogC = chain.rogScore.rogInt()
-        result = csql.conn.execute(cchain.insert().values(
+        result = execute(cchain.insert().values(
             entry_id=entry_id,
             name=nameC,
             chothia_class=chothia_class,
@@ -265,6 +271,7 @@ def main( entry_code, archive_id, *extraArgList):
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
         NTdebug("Inserted chain id %s" % chain_id)
+        chainCommittedCount += 1
         for residue in chain.allResidues():
 
             if residue.hasProperties('water'):
@@ -331,7 +338,7 @@ def main( entry_code, archive_id, *extraArgList):
             r_chk_d1d2 = residue.getDeepAvgByKeys(CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
             rogR = residue.rogScore.rogInt()
 
-            result = csql.conn.execute(cresidue.insert().values(
+            result = execute(cresidue.insert().values(
                 entry_id=entry_id,
                 chain_id=chain_id,
                 name=nameR,
@@ -375,6 +382,7 @@ def main( entry_code, archive_id, *extraArgList):
                   cresidue.c.number == numberR
                   ))
             residue_id = execute(s).fetchall()[0][0]
+            residueCommittedCount += 1
 #            NTdebug("Inserted residue %s" % residue_id)
             if True:
                 for atom in residue.allAtoms():
@@ -409,7 +417,7 @@ def main( entry_code, archive_id, *extraArgList):
                     if not hasUsefullColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
-                    result = csql.conn.execute(catom.insert().values(
+                    result = execute(catom.insert().values(
                         entry_id=entry_id,
                         chain_id=chain_id,
                         residue_id=residue_id,
@@ -435,13 +443,15 @@ def main( entry_code, archive_id, *extraArgList):
                           ))
 #                    atom_id = execute(s).fetchall()[0][0]
 #                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
+                    atomCommittedCount += 1
                 # end for atom
             # end if atom
         # end for residue
     # end for chain
+    NTdebug("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
     project.close(save=False)
 
-    # Needed for the above hasn't been autocommitted.
+    # Needed for the above hasn't been auto-committed.
     NTdebug("Committing changes")
     csql.session.commit()
 # end def

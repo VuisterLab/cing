@@ -45,7 +45,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = False # default: False
+    fastestTest = True # default: False
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
