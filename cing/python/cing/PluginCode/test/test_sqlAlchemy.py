@@ -5,6 +5,10 @@ python $CINGROOT/python/cing/PluginCode/test/test_sqlAlchemy.py
 Fails if MySql backends are absent.
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG import CASD_DB_NAME
+from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG import PDBJ_DB_NAME
+from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
@@ -58,17 +62,26 @@ class Address(Base):
 
 class AllChecks(TestCase):
 
-    def tttest_SqlAlchemyWithNrgCing(self):
+    def test_SqlAlchemyWithPdbjCing(self):
         pdb_id = '1brv'
 
-        csql = csqlAlchemy()
+        if True: # default: True
+            db_name = PDBJ_DB_NAME
+            user_name = PDBJ_DB_USER_NAME
+            schema = CASD_DB_NAME
+        else:
+            db_name = CASD_DB_NAME
+            user_name = CASD_DB_USER_NAME
+
+        csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
+
         if csql.connect():
             NTerror("Failed to connect to DB")
             return True
         csql.autoload()
 
         execute = csql.conn.execute
-        centry = csql.entry
+        centry = csql.cingentry
 
         # WATCH OUT WITH THE BELOW COMMANDS.
         #result = csql.conn.execute(centry.delete())
@@ -94,7 +107,16 @@ class AllChecks(TestCase):
 
 
     def tttest_SqlAlchemy(self):
-        csql = csqlAlchemy()
+
+        if True: # default: True
+            db_name = PDBJ_DB_NAME
+            user_name = PDBJ_DB_USER_NAME
+            schema = CASD_DB_NAME
+        else:
+            db_name = CASD_DB_NAME
+            user_name = CASD_DB_USER_NAME
+
+        csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
         self.assertFalse(csql.connect())
 #        users_table = Table('users', csql.metadata,
 #            Column('id', Integer, primary_key = True),

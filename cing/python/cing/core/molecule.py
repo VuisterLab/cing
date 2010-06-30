@@ -4815,7 +4815,7 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         hist2 = getDeepByKeys(hPlot.histd1ByResTypes, resTypeNext, resType)
         histListTuple.append((hist1,hist2))
     else:
-        ssTypeList = hPlot.histd1BySsAndResTypes.keys()
+        ssTypeList = hPlot.histd1BySs0AndResTypes.keys()
         ssTypeList.sort() # in place sort to: space, H, S
 #        NTdebug("ssTypeList: %s" % ssTypeList)
         for ssType in ssTypeList:
@@ -4823,8 +4823,8 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
 #                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
                 continue
 #                NTdebug("Processing ssType: %s" % ssType)
-            hist1 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
-            hist2 = getDeepByKeys(hPlot.histd1BySsAndResTypes, ssType, resTypeNext, resType)
+            hist1 = getDeepByKeys(hPlot.histd1BySs0AndResTypes, ssType, resType, resTypePrev) # x-axis
+            hist2 = getDeepByKeys(hPlot.histd1BySs1AndResTypes, ssType, resTypeNext, resType) # y-axis; this was a bug see convertD1D2_2Db2.py
             histListTuple.append((hist1,hist2))
         # end for
     # end if
@@ -4844,74 +4844,73 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         hist = multiply(m1,m2)
         histList.append(hist)
 
-    if doNormalize:
-        if len(histList) != 3:
-            NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
-            return None
-        for hist in histList:
-            histSum = sum(hist)
-            factor = 3 * histSum / 100.0
-            hist /= factor # normalize the new sum to be 33.
-            histSumNew = sum(hist)
-#            NTdebug("Normalized histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 and found %10.3f" % (
-#                histSum, factor, histSumNew))
-            if math.fabs( 33.333 - histSumNew) > 0.1:
-                NTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
-                    histSum, factor, histSumNew))
-                return None
 
-        histOverall = histList[0] + histList[1] + histList[2]
-
-        if not normalizeSeparatelyToZ:
-            histList = [ histOverall ]
-            return histList
-
-        # NB this is now in percentage as they have been normalized.
-        Ctuple = getEnsembleAverageAndSigmaFromHistogram( histOverall )
-        (c_av, c_sd, hisMin, hisMax) = Ctuple
-        zMin = (hisMin - c_av) / c_sd
-        zMax = (hisMax - c_av) / c_sd
-
-        NTmessage("       SS R1  R2  R3         c_av         c_sd       hisMin       hisMax         zMin         zMax")
-        # A for all
-        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
-            c_av, c_sd, hisMin, hisMax, zMin, zMax)
-        if hisMax < c_av:
-            NTerror(msg + " maxHist < c_av")
-        else:
-            NTmessage("       " + msg)
-
-#        histOverall *= 3.    # to get it's sum back to 100%
-        histOverall -= c_av
-        histOverall /= c_sd
-        CtupleA = getArithmeticAverageAndSigmaFromHistogram(histOverall)
-        (c_avA, c_sdA, hisMinA, hisMaxA) = CtupleA
-        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
-            c_avA, c_sdA, hisMinA, hisMaxA)
-        if hisMaxA < c_avA:
-            NTerror(msg + " maxHistA < c_avA")
-        else:
-            NTmessage("       " + msg)
-
-        for i,hist in enumerate(histList):
-            hist *= 3.    # to get it's sum back to 100%
-            hist -= c_av
-            hist /= c_sd
-#            CtupleSS = getEnsembleAverageAndSigmaFromHistogram( hist )
-            CtupleSS = getArithmeticAverageAndSigmaFromHistogram(hist)
-#            NTdebug("CtupleSS: [%s]" % str(CtupleSS))
-            (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = CtupleSS
-            mySsType = ssIdxToType(i)
-            msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % (mySsType, resTypePrev, resType, resTypeNext,
-                c_avSS, c_sdSS, hisMinSS, hisMaxSS)
-            if hisMaxSS < c_avSS:
-                NTerror(msg + " maxHistSS < c_avSS")
-            else:
-                NTmessage("       " + msg)
+    if not doNormalize:
         return histList
 
+    if len(histList) != 3:
+        NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
+        return None
 
+    for hist in histList:
+        histSum = sum(hist)
+        factor = 3 * histSum / 100.0
+        hist /= factor # normalize the new sum to be 33.
+        histSumNew = sum(hist)
+#            NTdebug("Normalized histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 and found %10.3f" % (
+#                histSum, factor, histSumNew))
+        if math.fabs( 33.333 - histSumNew) > 0.1:
+            NTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
+                histSum, factor, histSumNew))
+            return None
 
+    histOverall = histList[0] + histList[1] + histList[2]
+
+    if not normalizeSeparatelyToZ:
+        histList = [ histOverall ]
+        return histList
+
+    # NB this is now in percentage as they have been normalized.
+    Ctuple = getEnsembleAverageAndSigmaFromHistogram( histOverall )
+    (c_av, c_sd, hisMin, hisMax) = Ctuple
+    zMin = (hisMin - c_av) / c_sd
+    zMax = (hisMax - c_av) / c_sd
+
+    NTmessage("       SS R1  R2  R3         c_av         c_sd       hisMin       hisMax         zMin         zMax")
+    # A for all
+    msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
+        c_av, c_sd, hisMin, hisMax, zMin, zMax)
+    if hisMax < c_av:
+        NTerror(msg + " maxHist < c_av")
+    else:
+        NTmessage("       " + msg)
+
+#        histOverall *= 3.    # to get it's sum back to 100%
+    histOverall -= c_av
+    histOverall /= c_sd
+    CtupleA = getArithmeticAverageAndSigmaFromHistogram(histOverall)
+    (c_avA, c_sdA, hisMinA, hisMaxA) = CtupleA
+    msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
+        c_avA, c_sdA, hisMinA, hisMaxA)
+    if hisMaxA < c_avA:
+        NTerror(msg + " maxHistA < c_avA")
+    else:
+        NTmessage("       " + msg)
+
+    for i,hist in enumerate(histList):
+        hist *= 3.    # to get it's sum back to 100%
+        hist -= c_av
+        hist /= c_sd
+#            CtupleSS = getEnsembleAverageAndSigmaFromHistogram( hist )
+        CtupleSS = getArithmeticAverageAndSigmaFromHistogram(hist)
+#            NTdebug("CtupleSS: [%s]" % str(CtupleSS))
+        (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = CtupleSS
+        mySsType = ssIdxToType(i)
+        msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % (mySsType, resTypePrev, resType, resTypeNext,
+            c_avSS, c_sdSS, hisMinSS, hisMaxSS)
+        if hisMaxSS < c_avSS:
+            NTerror(msg + " maxHistSS < c_avSS")
+        else:
+            NTmessage("       " + msg)
     return histList
-
-
+# end def

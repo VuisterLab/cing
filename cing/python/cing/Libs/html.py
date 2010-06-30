@@ -263,12 +263,14 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
         self.histJaninBySsAndResType         = None
         self.histJaninCtupleBySsAndResType   = None
         self.histJaninBySsAndCombinedResType = None
-        self.histd1BySsAndResTypes           = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
+        self.histd1BySs0AndResTypes           = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
+        self.histd1BySs1AndResTypes           = None # This one is hashed by the Ss of the preceding residue type.
         # NB hasing is: ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
         #               3        20        20        20 = 2400 tuples of 2 floats precalculated.
         self.histd1CtupleBySsAndResTypes    = None
         self.histd1ByResTypes               = None
-        self.histd1BySs                     = None
+        self.histd1BySs0                    = None
+        self.histd1BySs1                    = None
         self.histd1                         = None
 
         self.histDir = os.path.join( cingDirData, 'PluginCode', 'WhatIf')
@@ -313,10 +315,12 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
             dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
-            self.histd1BySsAndResTypes              = dbaseTemp[ 'histd1BySsAndResTypes' ]
+            self.histd1BySs0AndResTypes             = dbaseTemp[ 'histd1BySs0AndResTypes' ]
+            self.histd1BySs1AndResTypes             = dbaseTemp[ 'histd1BySs1AndResTypes' ]
             self.histd1CtupleBySsAndResTypes        = dbaseTemp[ 'histd1CtupleBySsAndResTypes' ]
             self.histd1ByResTypes                   = dbaseTemp[ 'histd1ByResTypes' ]
-            self.histd1BySs                         = dbaseTemp[ 'histd1BySs' ]
+            self.histd1BySs0                        = dbaseTemp[ 'histd1BySs0' ]
+            self.histd1BySs1                        = dbaseTemp[ 'histd1BySs1' ]
             self.histd1                             = dbaseTemp[ 'histd1' ]
             dbase_file.close()
 #            sumHist = core.sum(self.histd1)
@@ -408,7 +412,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         histBySsAndCombinedResType = hPlot.histJaninBySsAndCombinedResType
         histBySsAndResType         = hPlot.histJaninBySsAndResType
     elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
-        histBySsAndResType         = hPlot.histd1BySsAndResTypes
+#        histBySsAndResType         = hPlot.histd1BySsAndResTypes
+        histBySsAndResType         = None
         if True:
             minPercentage =  MIN_PERCENTAGE_D1D2
             maxPercentage = MAX_PERCENTAGE_D1D2

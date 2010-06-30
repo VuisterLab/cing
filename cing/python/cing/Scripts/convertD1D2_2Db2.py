@@ -60,15 +60,19 @@ def main():
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
     gunzip(cvs_file_abs_name_gz)
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
-    valueBySsAndResTypes = {}
+    valueBySs0AndResTypes = {} # keys are SSi,   RTi, RTi-1
+    valueBySs1AndResTypes = {} # keys are SSi-1, RTi, RTi-1
     valueByResTypes = {}
-    valueBySs = {}
+    valueBySs0 = {} # keys are SSi
+    valueBySs1 = {} # keys are SSi-1
     histd1CtupleBySsAndResTypes = {}
     value = [] # NB is an array without being keyed.
 
-    histd1BySsAndResTypes = {}
+    histd1BySs0AndResTypes = {} # keys are SSi,   RTi, RTi-1
+    histd1BySs1AndResTypes = {} # keys are SSi-1, RTi, RTi-1
     histd1ByResTypes = {}
-    histd1BySs = {}
+    histd1BySs0 = {}
+    histd1BySs1 = {}
 
 
     linesByEntry = {}
@@ -120,7 +124,8 @@ def main():
         prevChainId = None
         prevResType = None
         prevResNum = None
-        for row in linesByEntry[ entryId2 ]:
+        prevSsType = None
+        for _r, row in enumerate(linesByEntry[ entryId2 ]):
     #1zzk,A,GLN ,  17,E, 205.2, 193.6
     #1zzk,A,VAL ,  18,E, 193.6, 223.2
     #1zzk,A,THR ,  19,E, 223.2, 190.1
@@ -147,56 +152,80 @@ def main():
                 if not ( resType in skippedResTypes):
                     skippedResTypes.append( resType )
                 continue
+
             if isSibling(chainId, resNum, prevChainId, prevResNum):
-                appendDeepByKeys(valueBySsAndResTypes, d1, ssType, resType, prevResType)
+                appendDeepByKeys(valueBySs0AndResTypes, d1, ssType,     resType, prevResType)
+                appendDeepByKeys(valueBySs1AndResTypes, d1, prevSsType, resType, prevResType)
                 appendDeepByKeys(valueByResTypes, d1, resType, prevResType)
-                appendDeepByKeys(valueBySs, d1, ssType)
+                appendDeepByKeys(valueBySs0, d1, ssType)
+                appendDeepByKeys(valueBySs1, d1, prevSsType)
                 value.append( d1 )
             prevResType = resType
             prevResNum = resNum
             prevChainId = chainId
+            prevSsType = ssType
 
     os.unlink(cvs_file_abs_name)
     NTmessage("Skipped skippedResTypes: %r" % skippedResTypes )
     NTmessage("Got count of values: %r" % len(value) )
     # fill FOUR types of hist.
     # TODO: filter differently for pro/gly
-    keyListSorted1 = valueBySsAndResTypes.keys();
+    keyListSorted1 = valueBySs0AndResTypes.keys();
     keyListSorted1.sort()
-    for ssType in keyListSorted1:
-        d1List = valueBySs[ssType]
-        if not d1List:
-            NTerror("Expected d1List from valueBySs[%s]" % (ssType))
-            continue
-        hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
-        NTmessage("Count %6d in valueBySs[%s]" % (sum(hist1d), ssType))
-        setDeepByKeys(histd1BySs, hist1d, ssType)
+    for isI in (True, False):
+        if isI:
+            valueBySs = valueBySs0
+            valueBySsAndResTypes = valueBySs0AndResTypes
+            histd1BySs = histd1BySs0
+            histd1BySsAndResTypes = histd1BySs0AndResTypes
+        else:
+            valueBySs = valueBySs1
+            valueBySsAndResTypes = valueBySs1AndResTypes
+            histd1BySs = histd1BySs1
+            histd1BySsAndResTypes = histd1BySs1AndResTypes
+        for ssType in keyListSorted1:
+#            keyListSorted1b = deepcopy(keyListSorted1)
+    #        for ssTypePrev in keyListSorted1b:
+            d1List = valueBySs[ssType]
+            if not d1List:
+                NTerror("Expected d1List from valueBySs[%s]" % (ssType))
+                continue
+            hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
+            NTmessage("Count %6d in valueBySs[%s]" % (sum(hist1d), ssType))
+            setDeepByKeys(histd1BySs, hist1d, ssType)
 
-        keyListSorted2 = valueBySsAndResTypes[ssType].keys();
-        keyListSorted2.sort()
+            keyListSorted2 = valueBySsAndResTypes[ssType].keys();
+            keyListSorted2.sort()
+            for resType in keyListSorted2:
+    #            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+                keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
+                keyListSorted3.sort()
+                for prevResType in keyListSorted3:
+    #                NTmessage("Working on valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
+                    d1List = valueBySsAndResTypes[ssType][resType][prevResType]
+                    if not d1List:
+                        NTerror("Expected d1List from valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
+                        continue
+                    hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
+    #                NTmessage("Count %6d in valueBySsAndResTypes[%s][%s][%s]" % (sum(hist1d), ssType, resType, prevResType))
+                    setDeepByKeys(histd1BySsAndResTypes, hist1d, ssType, resType, prevResType)
+            # Now that they are all in we can redo this.
+    # Delete the reference -not- the object.
+    valueBySs = None
+    valueBySsAndResTypes = None
+    histd1BySs = None
+    histd1BySsAndResTypes = None
+
+    for ssType in keyListSorted1:
         for resType in keyListSorted2:
 #            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
-            keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
-            keyListSorted3.sort()
-            for prevResType in keyListSorted3:
-#                NTmessage("Working on valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
-                d1List = valueBySsAndResTypes[ssType][resType][prevResType]
-                if not d1List:
-                    NTerror("Expected d1List from valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
-                    continue
-                hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
-#                NTmessage("Count %6d in valueBySsAndResTypes[%s][%s][%s]" % (sum(hist1d), ssType, resType, prevResType))
-                setDeepByKeys(histd1BySsAndResTypes, hist1d, ssType, resType, prevResType)
-        # Now that they are all in we can redo this.
-        for resType in keyListSorted2:
-#            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
-            keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
+            keyListSorted3 = valueBySs0AndResTypes[ssType][resType].keys();
             keyListSorted3.sort()
             for resTypePrev in keyListSorted3:
                 keyListSorted4 = keyListSorted3[:] # take a copy
                 for resTypeNext in keyListSorted4:
-                    hist1 = getDeepByKeys(histd1BySsAndResTypes, ssType, resType, resTypePrev) # x-axis
-                    hist2 = getDeepByKeys(histd1BySsAndResTypes, ssType, resTypeNext, resType)
+                    hist1 = getDeepByKeys(histd1BySs0AndResTypes, ssType, resType, resTypePrev) # x-axis
+                    hist2 = getDeepByKeys(histd1BySs1AndResTypes, ssType, resTypeNext, resType) # This was bug! It needs to be hashed on the ssType of resType -not- on resTypeNext
                     if hist1 == None:
                         NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
                         continue
@@ -219,6 +248,7 @@ def main():
                         NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                         continue
                     setDeepByKeys( histd1CtupleBySsAndResTypes, cTuple, ssType, resType, resTypePrev, resTypeNext)
+    # end for isI
 
     keyListSorted1 = valueByResTypes.keys();
     keyListSorted1.sort()
@@ -242,10 +272,12 @@ def main():
         os.unlink(dbase_file_abs_name)
     output = open(dbase_file_abs_name, 'wb')
     dbase = {}
-    dbase[ 'histd1BySsAndResTypes' ] = histd1BySsAndResTypes # 92 kb uncompressed in the case of ~1000 lines only
+    dbase[ 'histd1BySs0AndResTypes' ] = histd1BySs0AndResTypes # 92 kb uncompressed in the case of ~1000 lines only
+    dbase[ 'histd1BySs1AndResTypes' ] = histd1BySs1AndResTypes
     dbase[ 'histd1CtupleBySsAndResTypes' ] = histd1CtupleBySsAndResTypes
     dbase[ 'histd1ByResTypes' ] = histd1ByResTypes # 56 kb
-    dbase[ 'histd1BySs' ] = histd1BySs # 4 kb
+    dbase[ 'histd1BySs0' ] = histd1BySs0 # 4 kb
+    dbase[ 'histd1BySs1' ] = histd1BySs1
     dbase[ 'histd1' ] = histd1 #  4 kb
 
     cPickle.dump(dbase, output, 2)

@@ -49,7 +49,7 @@ def run():
 #    isProduction = True
     getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
 #    new_hits_entry_list = [] # define empty for checking new ones.
-    new_hits_entry_list         = string.split("3kff 3a34 2xdy 3mcd 1brv 1hkt")
+    new_hits_entry_list         = string.split("3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt")
 #    new_hits_entry_list         = string.split("1hkt")
 
     ## Initialize the project
