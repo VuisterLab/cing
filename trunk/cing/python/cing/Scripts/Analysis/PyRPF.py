@@ -12,6 +12,9 @@
 # [Separate Unexplained Peak List]
 # Are you sure you want to move these peaks to a separate list?
 # JFD: if it was a question to me then I would answer yes.
+#
+# Run like:
+# python -u $CINGROOT/python/cing/Scripts/Analysis/PyRPF.py
 
 from ccp.util.Software import getMethodStore
 from ccpnmr.analysis.core.AssignmentBasic import clearPeakDim, assignResToDim

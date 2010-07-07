@@ -16,3 +16,5 @@ PDBJ_DB_NAME = 'pdbmlplus'
 
 CASD_NMR_BASE_NAME = 'CASD-NMR-CING'
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' + CASD_NMR_BASE_NAME
+
+schemaIdList = [ CASD_DB_NAME, PDB_DB_NAME, NRG_DB_NAME ]

@@ -19,6 +19,7 @@ setenv PGBIN /usr/local/pgsql/bin
 Configuration at:
 $PGDATA/postgresql.conf
 e.g. shows default port to be 5432
+max_locks_per_transaction set to 5120 before I could drop pdbj schema; needed to restart.
 
 Log:\
 sudo tail -f $PGDATA/logfile
@@ -74,7 +75,7 @@ From: http://serverfault.com/questions/10226/how-to-set-the-shmmax-parameter-on-
 
 stack overflow/biostar.stackexchange.com 'ns kijken.
 
-
+# This one is working on Stella
 kern.sysv.shmmax=524288000
 kern.sysv.shmmin=1
 kern.sysv.shmmni=64
@@ -84,7 +85,7 @@ kern.sysv.shmall=131072000
 kern.sysv.maxproc=2048
 kern.maxprocperuid=512
 
-On Stella and nmr using (fink recommends):
+On nmr using (fink recommends):
 kern.sysv.shmmax=8388608
 kern.sysv.shmmin=1
 kern.sysv.shmmni=64

@@ -1,6 +1,12 @@
 -- * Run by command like:
--- * psql --quiet casdcing casdcing1 < $CINGROOT/python/cing/NRG/sql/dumpNRG-CING.sql
-COPY (SELECT * FROM entry) TO '/Users/jd/CASD-NMR-CING/pgsql/entry.csv' WITH CSV HEADER;
-COPY (SELECT * FROM chain) TO '/Users/jd/CASD-NMR-CING/pgsql/chain.csv' WITH CSV HEADER;
-COPY (SELECT * FROM residue) TO '/Users/jd/CASD-NMR-CING/pgsql/residue.csv' WITH CSV HEADER;
-COPY (SELECT * FROM atom) TO '/Users/jd/CASD-NMR-CING/pgsql/atom.csv' WITH CSV HEADER;
+-- * psql --quiet pdbmlplus pdbj < $CINGROOT/python/cing/NRG/sql/dumpNRG-CING.sql
+-- Then follow up by doing from Stella:
+-- scp -r -P 39676 localhost-nmr:/Users/jd/NRG-CING/pgsql .
+
+COPY (SELECT * FROM nrgcing.cingentry) 				TO '/Users/jd/NRG-CING/pgsql/nrgcing.cingentry.csv' WITH CSV HEADER;
+COPY (SELECT * FROM nrgcing.cingchain) 				TO '/Users/jd/NRG-CING/pgsql/nrgcing.cingchain.csv' WITH CSV HEADER;
+COPY (SELECT * FROM nrgcing.cingresidue) 			TO '/Users/jd/NRG-CING/pgsql/nrgcing.cingresidue.csv' WITH CSV HEADER;
+COPY (SELECT * FROM nrgcing.cingatom) 				TO '/Users/jd/NRG-CING/pgsql/nrgcing.cingatom.csv' WITH CSV HEADER;
+-- derived tables
+COPY (SELECT * FROM nrgcing.cingsummary) 			TO '/Users/jd/NRG-CING/pgsql/nrgcing.cingsummary.csv' WITH CSV HEADER;
+COPY (SELECT * FROM nrgcing.entry_list_selection) 	TO '/Users/jd/NRG-CING/pgsql/nrgcing.entry_list_selection.csv' WITH CSV HEADER;

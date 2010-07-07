@@ -9,7 +9,14 @@ gf_PHIPSI_STR = 'gfPHIPSI'
 gf_CHI12_STR = 'gfCHI12'
 gf_CHI1_STR = 'gfCHI1'
 
+pc_rama_core_STR = 'pc_rama_core'
+pc_rama_allow_STR = 'pc_rama_allow'
+pc_rama_gener_STR = 'pc_rama_gener'
+pc_rama_disall_STR = 'pc_rama_disall'
+
 gf_LIST_STR = [ gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR]
+pc_rama_LIST_STR = [ pc_rama_core_STR, pc_rama_allow_STR, pc_rama_gener_STR, pc_rama_disall_STR]
+
 #MXMODL Maximum number of models
 #left at 60 in   viol2pdb because the same as MXFILE
 MAX_PROCHECK_NMR_MODELS = 60

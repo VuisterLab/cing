@@ -20,7 +20,7 @@ pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasd.py')
 if False:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
-    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
+#    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
     entryList = 'AtT13Paris'.split()

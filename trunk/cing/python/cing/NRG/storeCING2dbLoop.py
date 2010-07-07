@@ -54,11 +54,13 @@ if __name__ == '__main__':
     #cing.verbosity = cing.verbosityDefault
     archive_id = ARCHIVE_NRG_ID
     entryList = '1brv'.split()
+#    entryList = None
+
     if False:
         archive_id = ARCHIVE_CASD_ID
-        entryList = None
+        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
         entryList = 'CGR26AParis CGR26AUtrecht2 VpR247Seattle2'.split()
-    if True:
+    if False:
         archive_id = ARCHIVE_PDB_ID
 #        entryList = '1brv'.split()
         entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()

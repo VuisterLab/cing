@@ -1,38 +1,44 @@
 This directory contains database dumps for PDBj Mine, the back-end relational
 database for Protein Data Bank Japan.
 
-The database dump files are only for the use with PostgreSQL 
-(version 8.4 or above) with some customization 
+The database dump files are only for the use with PostgreSQL
+(version 8.4 or above) with some customization
 (see below "2. INSTALLING PostgreSQL").
 
 ***** 0. PREREQUISITES *****
 - A customized installation of PostgreSQL (see below).
-- More than 150 GB of hard disk space (as of January, 2010) prepared for PostgreSQL. The required disk space will soon exceed 300GB or more as the number of PDB entries increases rapidly.
+- More than 150 GB of hard disk space (as of January, 2010) prepared
+  for PostgreSQL. The required disk space will soon exceed 300GB or
+  more as the number of PDB entries increases rapidly.
 
 ***** 1. DOWNLOADING THE DUMP FILES *****
 The dump files are available at the FTP site:
 ftp://ftp.pdbj.org/mine
 The contents are the following:
--  pdbmlplus.dump 
+-  pdbmlplus.dump
 	The dump file of the whole PDBj Mine database.
--  split/pdbmlplus_split.{aa,ab,..} 
+-  split/pdbmlplus_split.{aa,ab,..}
 	The "pdbmlplus.dump" file split into 100MB chunks.
--  weekly/pdbmlplus_weekly.latest.gz
-	The latest weekly update (a symbolic link).
 -  weekly/pdbmlplus_weekly.yyyy-mm-dd.gz
 	The weekly update of the week of yyyy-mm-dd (e.g., 2010-01-19).
 
-All files are updated weekly.
+- sql-scripts/ (directory)
+	SQL scripts used for defining the PDBj Mine database. These files are
+	not necessarily required for the casual user. But interested users can
+	study the structure of the database by looking into these files.
 
-When loaded, the database will require approximately 150 GB (gigabytes) of disk space (as of January, 2010).
+All files are updated weekly (except for those under the sql directory).
+
+When loaded, the database will require approximately 150 GB (gigabytes)
+of disk space (as of January, 2010).
 
 ***** 2. INSTALLING PostgreSQL *****
 *** 2-1. General instructions ***
 To use the dump files, you need to install PostgreSQL (version 8.4 or above).
 http://www.postgresql.org/
 
-When installing PostgreSQL, you need to modify a line in the header file 
-src/include/pg_config_manual.h under the PostgreSQL source file directory. 
+When installing PostgreSQL, you need to modify a line in the header file
+src/include/pg_config_manual.h under the PostgreSQL source file directory.
 That is, change the line
 
 #define NAMEDATALEN 64
@@ -49,8 +55,8 @@ This can be done as
 when you configure PostgreSQL.
 
 Then, follow the PostgreSQL manual for installation and server configuration.
-After installation, edit the configuration file of PostgreSQL 
-(${PGDATA}/postgresql.conf) appropriately. 
+After installation, edit the configuration file of PostgreSQL
+(${PGDATA}/postgresql.conf) appropriately.
 In particular, you might need to increase the parameter
 "max_locks_per_transaction" to a large value (say, 256).
 
@@ -86,9 +92,9 @@ It is assumed that you have already populated the database from scratch
 following the above prescription (POPULATING THE DATABASE FROM SCRATCH).
 Use the psql command for updating the entries.
 
-% gunzip < pdbmlplus_weekly.yyyy-mm-dd.gz | psql pdbmlplus pdbj 
+% gunzip < pdbmlplus_weekly.yyyy-mm-dd.gz | psql pdbmlplus pdbj
 
-This dump file (an SQL script) only contains the data of updated and new 
+This dump file (an SQL script) only contains the data of updated and new
 entries of the week.  It also deletes obsolete entries.
 
 If you have any problems or questions, please ask us using the form at

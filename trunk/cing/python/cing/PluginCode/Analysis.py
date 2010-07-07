@@ -2,7 +2,6 @@ from cing import __author__
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqAnalysis import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
-from traceback import format_exc
 
 __author__ += 'Tim Stevens '
 
