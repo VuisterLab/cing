@@ -3,7 +3,6 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-from traceback import format_exc
 import glob
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.

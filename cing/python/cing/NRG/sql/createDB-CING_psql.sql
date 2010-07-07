@@ -91,6 +91,10 @@ CREATE TABLE casdcing.cingentry
     pc_gf_phipsi                    FLOAT DEFAULT NULL,
     pc_gf_chi12                     FLOAT DEFAULT NULL,
     pc_gf_chi1                      FLOAT DEFAULT NULL,
+    pc_rama_core                    FLOAT DEFAULT NULL,
+    pc_rama_allow                   FLOAT DEFAULT NULL,
+    pc_rama_gener                   FLOAT DEFAULT NULL,
+    pc_rama_disall                  FLOAT DEFAULT NULL,
 --   wattos
     noe_compl4                     FLOAT DEFAULT NULL,
 

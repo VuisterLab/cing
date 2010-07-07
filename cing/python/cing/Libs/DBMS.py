@@ -13,13 +13,18 @@ DEFAULT_COLUMN_LABEL = 'COLUMN_' # a number will be added.
 
 class Relation():
 
-    def __init__(self, name, dbms):
+    def __init__(self, name, dbms, columnList=None):
         # Name for the column. Only place where order of columns is defined and matters.*/
         self.columnOrder = []
         self.name = name
         # Other objects that should all be native arrays with using parallel indices as the above.
         self.attr = {}
         self.dbms = dbms
+        self.dbms.tables[self.name] = self
+        if columnList:
+            for col in columnList:
+                self.insertColumn(label=col)
+
 
     def insertColumn(self, index=-1, label=None, foreignKeyConstr=None):
         """Insert a column for a certain variable type; before the given position.
@@ -55,6 +60,12 @@ class Relation():
 
     def getColumnByIdx(self, idx):
         label = self.columnOrder[idx]
+        return self.attr[label]
+
+    def getColumn(self, label):
+        if label not in self.columnOrder:
+            NTerror("Requested column label is absent in table: %s" % self.name)
+            return None
         return self.attr[label]
 
     def readCsvFile(self, file_name, containsHeaderRow, dtd_file_name=None):
@@ -100,8 +111,44 @@ class Relation():
         # Never know when the connection is finally empty.
         except IOError:
             pass
-#        NTdebug("Read number of rows: %d" % self.sizeRows())
-        self.dbms.tables[self.name] = self
+        NTdebug("Read %8d rows %2d cols to %s" % (self.sizeRows(), self.sizeColumns(), self.name))
+
+
+    def writeCsvFile(self, file_name=None, doHeader=True):
+        """Returns True on error.
+        File name will be derived from table name if omitted.
+        """
+
+        txt = ''
+        if doHeader:
+            txt += ','.join(self.columnOrder)
+            txt += '\n'
+        firstColumn = self.getColumnByIdx(0)
+        nrows = len(firstColumn)
+        ncols = len(self.columnOrder)
+        dataAsMatrix = []
+        for c in range(ncols):
+            dataAsMatrix.append(self.getColumnByIdx(c))
+
+        rowStrList = []
+        for r in range(nrows):
+            colStrList = []
+            for c in range(ncols):
+                colStrList.append( str(dataAsMatrix[c][r]) )
+            # end for c
+            rowStr = ','.join(colStrList)
+#            NTdebug("Adding rowStr: %s" % rowStr)
+            rowStrList.append( rowStr )
+        # end for r
+        resultStr = txt + '\n'.join(rowStrList)
+
+        if not file_name:
+            file_name = self.name + '.csv'
+        NTmessage("Will write %s nrows and %s ncols to %s" % (nrows,ncols,file_name))
+        if writeTextToFile(file_name, resultStr):
+            NTerror("Failed to write string to file: %s" % file_name)
+            return True
+
 
 class DBMS():
     def __init__(self):

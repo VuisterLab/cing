@@ -4,6 +4,8 @@ from cing.NRG import CASD_DB_USER_NAME
 from cing.NRG import PDBJ_DB_NAME
 from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.required.reqOther import *
+import gc
+import time
 import warnings
 
 DB_TYPE_MYSQL = 'mysql'
@@ -41,9 +43,13 @@ class cgenericSql(NTdict):
         self.passwd = passwd
         self.unix_socket = unix_socket
         self.db = db
+        self.conn = None # set in connect()
         self.schema = schema
         self.db_type = db_type
         self.engine = None
+        self.session = None
+        self.Session = None
+
         "Connection object to database if connected it is None"
         self.version = None
         self.cursor = None
@@ -51,6 +57,19 @@ class cgenericSql(NTdict):
         self.echo = echo
         self.metadata = MetaData()
         self.tableNameList = []
+
+    def close(self, wait_time=1.0, force_gc = True):
+        # close the connection
+        self.session.close()
+        self.Session.close_all()
+        self.engine.dispose()
+        del self.session
+        del self.Session
+        del self.engine
+        if wait_time:
+            time.sleep(wait_time)
+        if force_gc:
+            gc.collect()
 
     def connect(self):
         "Return True on error"
@@ -95,6 +114,11 @@ class cgenericSql(NTdict):
             if dBversionFloat < 5.1:
                 NTerror("Need to have at least version 5.1.x of MySql installed")
                 return True
+
+    def loadTable(self, tableName):
+        NTdebug("Loading table %s" % tableName)
+        self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
+        return self[tableName]
 
     def autoload(self):
         """Return True on error"""

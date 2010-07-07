@@ -214,7 +214,7 @@ class nrgCing(Lister):
                 for row in reader:
                     bmrb_code = row[0]
                     pdb_code = row[1]
-                    if (url_links == url_many2one):
+                    if url_links == url_many2one:
                         self.matches_many2one[ pdb_code ] = bmrb_code
                     else:
                         self.matches_one2many[     bmrb_code ] = pdb_code
@@ -710,6 +710,7 @@ class nrgCing(Lister):
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
         inputDir = 'file://' + self.results_dir + '/recoordSync'
+#        inputDir = 'file://' + self.results_dir + '/nrgMerge'
         outputDir = self.results_dir
         extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
 

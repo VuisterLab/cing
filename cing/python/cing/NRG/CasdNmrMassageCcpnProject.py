@@ -243,3 +243,6 @@ if __name__ == '__main__':
 #    copyFromCasdNmr2CcpnArchive()
 #    annotateLoop()
 #    redoLayOutArchiveWim()
+    NTmessage("labTable: %s" % str(labList))
+    NTmessage("labList: %s" % str(labList))
+

@@ -71,6 +71,8 @@ def countDsspSecStructConsensus(resList):
     countB = 0
     countC = 0
     for res in resList:
+        if not res.hasProperties(PROTEIN_STR): # absense of this check was a bug.
+            continue
         r = getDsspSecStructConsensus( res )
         if r == DSSP_H:
             countA += 1

@@ -4752,12 +4752,16 @@ def toPoundedComment(str):
     return resultStr
 
 def NTlist2dict(lst):
-    """Takes a list of keys and turns it into a dict where the values are None."""
+    """Takes a list of keys and turns it into a dict where the values are counts of how many times the key ocurred."""
 
     dic = {}
     for k in lst:
-        dic[k] = None
+        if dic.has_key(k):
+            dic[k] = dic[k] + 1
+        else:
+            dic[k] = 1
     return dic
+list2dict = NTlist2dict
 
 def getKeyWithLargestCount(count):
     """Return the key in the hashmap of count for which the value

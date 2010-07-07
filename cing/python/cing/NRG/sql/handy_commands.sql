@@ -19,13 +19,24 @@ UPDATE entry,tmpTable  SET entry.pdbx_SG_project_XXXinitial_of_center = tmpTable
 
 insert entry(pdb_id) values ('1brv'),('1sjg');
 
-SELECT e.pdb_id, AVG(R.CHK_D1D2), STDDEV(R.CHK_D1D2), count(*) as N, MIN(R.CHK_D1D2), MAX(R.CHK_D1D2)
-  FROM pdbcing.cingRESIDUE AS R, pdbcing.cingENTRY AS E
+SELECT e.casd_id, AVG(R.CHK_D1D2), STDDEV(R.CHK_D1D2), count(*) as N, MIN(R.CHK_D1D2), MAX(R.CHK_D1D2)
+  FROM casdcing.cingRESIDUE AS R, casdcing.cingENTRY AS E
   WHERE R.ENTRY_ID = E.ENTRY_ID
- AND R.CHK_D1D2 <> 'NaN' -- Yes, stupid but needs to be excluded manually.
+  AND R.CHK_D1D2 <> 'NaN' -- Yes, stupid but needs to be excluded manually.
+  AND R.CHK_D1D2 < -0.8
+  GROUP BY e.casd_id
+  order by N asc;
+
+  order by AVG(R.CHK_D1D2) desc;
+  AND R.CHK_D1D2 < -0.5
+  and (e.pdb_id = '3i40' or e.pdb_id = '2xdy')
+
+SELECT e.pdb_id, AVG(R.CHK_D1D2), STDDEV(R.CHK_D1D2), count(*) as N, MIN(R.CHK_D1D2), MAX(R.CHK_D1D2)
+  FROM nrgcing.cingRESIDUE AS R, nrgcing.cingENTRY AS E
+  WHERE R.ENTRY_ID = E.ENTRY_ID
+  AND R.CHK_D1D2 <> 'NaN' -- Yes, stupid but needs to be excluded manually.
   GROUP BY e.pdb_id
   order by AVG(R.CHK_D1D2) desc;
-
 
 SELECT e.casd_id, R.CHK_D1D2
   FROM RESIDUE AS R, ENTRY AS E
@@ -62,3 +73,84 @@ FROM brief_summary b
 JOIN entity e ON e.docid = b.docid
 JOIN slen s ON s.docid = e.docid AND s.entity_id = e.id
 GROUP BY b.pdbid
+
+drop table if exists pdbcing.cingsummary;
+CREATE VIEW pdbcing.cingsummary AS
+SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
+FROM brief_summary s
+JOIN "E://entity" e ON e.docid = s.docid
+JOIN "//entity/type" p1
+        ON p1.docid = e.docid AND p1.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/pdbx_number_of_molecules" p2
+        ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/formula_weight" p3
+        ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
+WHERE p1.val = 'polymer'
+GROUP BY s.pdbid
+;
+
+drop table if exists nrgcing.entry_list_selection;
+CREATE VIEW nrgcing.entry_list_selection AS
+SELECT e.pdb_id
+  FROM "nrgcing".CINGENTRY E,  brief_summary s, pdbcing.cingsummary cingsummary
+  WHERE e.pdb_id = S.pdbid
+  AND e.pdb_id = cingsummary.pdb_id
+  AND E.MODEL_COUNT > 9
+  and cingsummary.weight > 3500.0 -- about 30 residues
+  AND '{2}' <@ S.chain_type -- contains at least one protein chain.
+  order by e.model_count;
+
+select count() from nrgcing.cingentry;
+
+into nrgcing.entry_list_selection(pdb_id)
+
+SELECT e.pdb_id, e.model_count, S.chain_type
+  FROM "nrgcing".CINGENTRY E,  brief_summary s, nrgcing.cingsummary cingsummary
+  WHERE e.pdb_id = S.pdbid
+  AND e.pdb_id = cingsummary.pdb_id
+  AND E.MODEL_COUNT > 9
+  and cingsummary.weight > 3500.0 -- about 30 residues
+  AND '{2}' <@ S.chain_type -- contains at least one protein chain.
+  order by e.model_count;
+
+
+-- Selects a,b,a/b,a+b protein classes
+select e.pdb_id, e.wi_bbcchk
+from nrgcing.entry_list_selection es, nrgcing.cingentry e
+where es.pdb_id = e.pdb_id
+order by e.wi_bbcchk asc
+limit 10
+;
+
+select count(*) from nrgcing.cingentry;
+select count(*) from nrgcing.cingsummary;
+select count(*) from nrgcing.entry_list_selection;
+select * from nrgcing.cingentry where pdb_id='1brv';
+
+
+drop table if exists nrgcing.cingsummary cascade;
+CREATE table nrgcing.cingsummary AS
+SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
+FROM brief_summary s
+JOIN "E://entity" e ON e.docid = s.docid
+JOIN "//entity/type" p1
+        ON p1.docid = e.docid AND p1.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/pdbx_number_of_molecules" p2
+        ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/formula_weight" p3
+        ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
+WHERE p1.val = 'polymer'
+GROUP BY s.pdbid;
+
+drop table if exists nrgcing.entry_list_selection cascade;
+CREATE table nrgcing.entry_list_selection AS
+SELECT e.pdb_id
+  FROM nrgcing.CINGENTRY E,  brief_summary s, nrgcing.cingsummary cingsummary
+  WHERE e.pdb_id = S.pdbid
+  AND e.pdb_id = cingsummary.pdb_id
+  AND E.MODEL_COUNT > 9
+  and cingsummary.weight > 3500.0 -- about 30 residues
+  AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
+
+
+

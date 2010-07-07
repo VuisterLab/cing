@@ -59,7 +59,7 @@ def main( entry_code, archive_id, *extraArgList):
         entry_code = casd_id
         schema = CASD_DB_NAME
     else:
-        NTerror("Expected valid schema argument but got: %s" % archive_id)
+        NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
 
     expectedArgumentList = [ 'inputDir']
@@ -78,6 +78,7 @@ def main( entry_code, archive_id, *extraArgList):
     NTdebug("Using:")
     NTdebug("entry_code:           %s" % entry_code)
     NTdebug("inputDir:             %s" % inputDir)
+    NTdebug("archive_id:           %s" % archive_id)
     NTdebug("user_name:            %s" % user_name)
     NTdebug("db_name:              %s" % db_name)
     NTdebug("schema:               %s" % schema)
@@ -117,7 +118,7 @@ def main( entry_code, archive_id, *extraArgList):
     molecule = project.molecule
 
     ranges = None
-    if schema == ARCHIVE_CASD_ID:
+    if archive_id == ARCHIVE_CASD_ID:
         targetId = getTargetForFullEntryName(casd_id)
         if not targetId:
             NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
@@ -131,12 +132,15 @@ def main( entry_code, archive_id, *extraArgList):
     if False: # TODO: enable when done testing overall strategy.
         p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
 
-    if schema != ARCHIVE_CASD_ID:
+    if archive_id != ARCHIVE_CASD_ID:
         result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
     else:
         result = execute(centry.delete().where(centry.c.casd_id == casd_id))
     if result.rowcount:
         NTdebug("Removed original entries numbering: %s" % result.rowcount)
+        if result.rowcount > 1:
+            NTerror("Removed more than the expected ONE entry; this could be serious.")
+            return True
     else:
         NTdebug("No original entry present yet.")
 
@@ -185,6 +189,10 @@ def main( entry_code, archive_id, *extraArgList):
     p_pc_gf_chi12 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI12_STR)
     p_pc_gf_chi1 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI1_STR)
     p_pc_gf_phipsi = molecule.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
+    p_pc_rama_core = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_core_STR)
+    p_pc_rama_allow = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_allow_STR)
+    p_pc_rama_gener = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_gener_STR)
+    p_pc_rama_disall = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_disall_STR)
 
     # Wattos
     noe_compl4 = molecule.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
@@ -229,13 +237,17 @@ def main( entry_code, archive_id, *extraArgList):
     	pc_gf_chi12=p_pc_gf_chi12,
     	pc_gf_chi1=p_pc_gf_chi1,
     	pc_gf_phipsi=p_pc_gf_phipsi,
+        pc_rama_core                    =p_pc_rama_core,
+        pc_rama_allow                   =p_pc_rama_allow,
+        pc_rama_gener                   =p_pc_rama_gener,
+        pc_rama_disall                  =p_pc_rama_disall,
         noe_compl4=noe_compl4,
         rog=rogC
         )
     )
 #    entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
 #    entry_id_list = result.inserted_primary_key() # wait for this new feature
-    if schema != ARCHIVE_CASD_ID:
+    if archive_id != ARCHIVE_CASD_ID:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
     else:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()

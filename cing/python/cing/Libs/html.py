@@ -412,8 +412,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         histBySsAndCombinedResType = hPlot.histJaninBySsAndCombinedResType
         histBySsAndResType         = hPlot.histJaninBySsAndResType
     elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
-#        histBySsAndResType         = hPlot.histd1BySsAndResTypes
-        histBySsAndResType         = None
+        histBySsAndResType         = hPlot.histd1BySs0AndResTypes
+#        histBySsAndResType         = None
         if True:
             minPercentage =  MIN_PERCENTAGE_D1D2
             maxPercentage = MAX_PERCENTAGE_D1D2
