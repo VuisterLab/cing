@@ -1603,7 +1603,8 @@ def validateDihedralCombinations(project):
                     ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
                     zk = ( ck - c_av ) / c_sd
                     zkList.append(zk)
-                    if modelIdx == 0: # costly checks to be disabled later.
+#                    if modelIdx == 0: # costly checks to be disabled later.
+                    if False:
     #                if checkIdx == 2: # costly checks to be disabled later.
     #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
                         msg = "chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f" % (
@@ -1635,7 +1636,8 @@ def validateDihedralCombinations(project):
             if doingNewD1D2plot:
                 for modelIdx in range(modelCountNew):
                     ensembleValueList[modelIdx] = max(ensembleValueLoL[modelIdx])
-                    if modelIdx == 0:
+#                    if modelIdx == 0:
+                    if False:
                         NTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]), ensembleValueList[modelIdx] ))
         # end for checkIdx
     # end for residue

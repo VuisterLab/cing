@@ -149,6 +149,42 @@ class Relation():
             NTerror("Failed to write string to file: %s" % file_name)
             return True
 
+    def getHash(self, keyColumnLabel = None, ignoreDuplicateKeyWithoutWarning = False):
+        """Takes a DMBS table and turns it into a hash on the keyColumnLabel with
+        values a list of all columns.
+        If the keyColumnLabel is None then the first column will be used.
+        One warning will be issued if the column contains multiple keys. The code
+        will skip consecutive occurrences.
+
+        Returns False on error.
+        """
+
+        dic = {}
+
+        if keyColumnLabel == None:
+            keyColumn = self.getColumnByIdx(0)
+        else:
+            keyColumn = self.getColumn(keyColumnLabel)
+        if keyColumn == None:
+            return
+        columnList = [ self.getColumnByIdx(i) for i in range(self.sizeColumns())]
+
+        duplicateKeyFound = False
+        for idx, k in enumerate(keyColumn):
+            if dic.has_key(k):
+                duplicateKeyFound = 'Last duplicate key found was for row idx: %s with key: %s' % ( idx, k )
+                continue
+            columnValues = [ columnList[i][idx] for i in range(self.sizeColumns())]
+            dic[k] = columnValues
+
+        if duplicateKeyFound:
+            if ignoreDuplicateKeyWithoutWarning:
+                NTdebug(duplicateKeyFound)
+            else:
+                NTwarning(duplicateKeyFound)
+        return dic
+
+
 
 class DBMS():
     def __init__(self):
