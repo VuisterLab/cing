@@ -58,9 +58,9 @@ commonResidueList = commonAAList + commonNAList
 
 common20AADict = NTlist2dict(common20AAList)
 
-def cothiaClassInt(cothiaClass):
+def chothiaClassInt(chothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
-    return mapChothia_class2Int[ cothiaClass ]
+    return mapChothia_class2Int[ chothiaClass ]
 
 def countDsspSecStructConsensus(resList):
     """Determine if molecule has at least one of alpha or beta protein regions.
@@ -82,10 +82,12 @@ def countDsspSecStructConsensus(resList):
             countC += 1
     return countA, countB, countC
 
-def cothiaClass(resList):
+def chothiaClass(resList):
     """Determine if molecule has at least one of alpha or beta protein regions.
     Molecule may contain other types of macromolecules than protein.
     Return None if DSSP wasn't run or no amino acids are present.
+    Chothia's original paper distinguished between alpha and/plus beta which
+    is beyond this function's scop.
     """
     countA, countB, countC = countDsspSecStructConsensus(resList)
     if countA:
@@ -105,10 +107,10 @@ def cothiaClass(resList):
 class ResidueList():
     def countDsspSecStructConsensus(self):
         return countDsspSecStructConsensus(self.allResidues())
-    def cothiaClass(self):
-        return cothiaClass(self.allResidues())
-    def cothiaClassInt(self):
-        return cothiaClassInt(cothiaClass(self.allResidues()))
+    def chothiaClass(self):
+        return chothiaClass(self.allResidues())
+    def chothiaClassInt(self):
+        return chothiaClassInt(chothiaClass(self.allResidues()))
 
 #==============================================================================
 class Molecule( NTtree, ResidueList ):

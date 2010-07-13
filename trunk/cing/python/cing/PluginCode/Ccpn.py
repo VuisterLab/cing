@@ -797,6 +797,9 @@ class Ccpn:
 
 #        NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
+        if not len(shiftMapping):
+            NTmessage("Skipping empty CS list.")
+            return True
         self.molecule.newResonances()
 
         knownTroubleResidues = {} # To avoid repeating the same messages over
@@ -1074,7 +1077,7 @@ class Ccpn:
         ccpnShiftMappingResult = {}
 
         if not len(ccpnShiftList.measurements):
-            NTwarning("Ccpn Shift List has no members; is empty")
+            NTwarning("Ccpn Shift List has no members; it is empty")
             return ccpnShiftMappingResult
 
         for ccpnShift in ccpnShiftList.measurements:

@@ -153,7 +153,7 @@ def main( entry_code, archive_id, *extraArgList):
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
 
-    chothia_class = molecule.cothiaClassInt()
+    chothia_class = molecule.chothiaClassInt()
 
     distance_count = project.distances.lenRecursive()
     dihedral_count = project.dihedrals.lenRecursive()
@@ -271,7 +271,7 @@ def main( entry_code, archive_id, *extraArgList):
     atomCommittedCount = 0
     for chain in project.molecule.allChains():
         nameC = chain.name
-        chothia_class = molecule.cothiaClassInt()
+        chothia_class = molecule.chothiaClassInt()
         rogC = chain.rogScore.rogInt()
         result = execute(cchain.insert().values(
             entry_id=entry_id,

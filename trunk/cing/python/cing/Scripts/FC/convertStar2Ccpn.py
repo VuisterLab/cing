@@ -4,8 +4,6 @@ Used for eNMR/weNMR workshop data sets.
 """
 
 from ccpnmr.format.converters.NmrStarFormat import NmrStarFormat
-from cing import cingDirTestsData
-from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.Scripts.FC.constants import * #@UnusedWildImport
@@ -39,6 +37,8 @@ def convertStar2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
 
     The in and out paths are relative to the rootDir.
             """
+
+    NTerror("This routine is untested and shouldn't be used without.")
     inputDir = os.path.join(rootDir, inputDir)
     outputDir = os.path.join(rootDir, outputDir)
 
@@ -63,6 +63,57 @@ def convertStar2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     cmd = "tar -czf %s %s" % (tgzFileName, projectName)
     do_cmd(cmd)
     guiRoot.destroy()
+
+def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.', guiRoot=None, allowPopups=0, minimalPrompts=1, verbose=1):
+    '''Returns a full CCPN project rooted in inputDir/projectName that will be created and saved.
+    Input will be from inputDir/starFileName
+
+    Returns False for error.
+    '''
+
+    if not os.path.exists(inputDir):
+        NTerror("Failed to find inputDir: %s" % inputDir)
+        return False
+    starFileNameFull = os.path.join(inputDir, starFileName)
+    if not os.path.exists(starFileNameFull):
+        NTerror("Failed to find starFileNameFull: %s" % starFileNameFull)
+        return False
+    if not os.path.exists(outputDir):
+        os.mkdir(outputDir)
+    os.chdir(outputDir)
+
+    ccpnProjectPath = os.path.join(outputDir, projectName)
+    if os.path.exists(ccpnProjectPath):
+        shutil.rmtree(ccpnProjectPath)
+
+    ccpnProject = Implementation.MemopsRoot(name=projectName)
+
+#    'linkAtoms':                (True,False,'If set to False (off), unrecognized coordinate atoms will not be linked.'),
+    keywds = {'minimalPrompts': minimalPrompts, 'allowPopups': allowPopups, 'linkAtoms':0}
+    formatNmrStarFormat = NmrStarFormat(ccpnProject, guiRoot, verbose=verbose, **keywds)
+    formatNmrStarFormat.version = '3.1'
+    entryTitle = 'Project from NMR-STAR for %s' % projectName
+    entryDetails = "Created by Wim Vranken's FormatConverter embedded in CING"
+    formatNmrStarFormat.getFullProject( starFileNameFull, title = entryTitle, details = entryDetails, **keywds)
+#    nmrConstraintStore = shiftList.nmrConstraintStore
+#    structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
+#    formatNmrStarFormat.linkResonances(
+#                  forceDefaultChainMapping=1, # may be overwritten by using forceChainMappings.
+#                  globalStereoAssign=1,
+#                  setSingleProchiral=1,
+#                  setSinglePossEquiv=1,
+##                  strucGen=structureGeneration,
+#                  allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **keywds)
+    ccpnProject.saveModified()
+
+    if not os.path.exists(ccpnProjectPath):
+        NTerror("Failed to find new CCPN project directory: %s" % ccpnProjectPath)
+        return False
+    tgzFileName = projectName + ".tgz"
+    cmd = "tar -czf %s %s" % (tgzFileName, projectName)
+    do_cmd(cmd)
+
+    return ccpnProject
 
 
 def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
@@ -114,30 +165,15 @@ def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, mini
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
+    starFileName, projectName, inputDir = sys.argv[1:]
+    status = True
+    try:
+        status = not importFullStarProjects(starFileName, projectName, inputDir)
+    except:
+        NTtracebackError()
+        status = True
 
-#    xplorDir = os.path.join(cingDirTestsData, "xplor")
-    xplorDir = os.path.join(cingDirTestsData, "eNMR")
-#    projectName = sys.argv[0]
-#    done: BASPLyon CuTTHAcisLyon
-#    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
-#    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
-#    projectList = """gb1""".split()
-#    projectList = """1tgq""".split()
-    projectList = [ "HR5537AUtrecht" ]
-    # failed for
-    # BASPLyon
+    if status:
+        NTerror("Failed to importFullStarProjects")
+        sys.exit(1)
 
-    for projectName in projectList:
-#        testDataEntry = os.path.join(xplorDir, projectName)
-        testDataEntry = os.path.join(xplorDir, projectName, 'Authors')
-        rootDir = os.path.join(cingDirTmp, projectName)
-        inputDirRel = "XPLOR"
-        inputDir = os.path.join(rootDir, inputDirRel)
-        if os.path.exists(rootDir):
-            NTmessage("Removing original rootDir: %s" % rootDir)
-            shutil.rmtree(rootDir)
-        os.mkdir(rootDir)
-
-        NTmessage("Copying input from %s to %s" % (testDataEntry, inputDir))
-        shutil.copytree(testDataEntry, inputDir)
-        convertStar2Ccpn(projectName, rootDir)

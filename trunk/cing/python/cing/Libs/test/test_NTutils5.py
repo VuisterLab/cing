@@ -64,6 +64,15 @@ class AllChecks(TestCase):
         self.assertEqual( c_av, x/nn) # huge difference.
 
 
+    def testGrep(self):
+        fn = 'toGrepFile.txt'
+        writeTextToFile(fn, 'Hello world\nThis is a special line\nAnd this isnot')
+        resultList = []
+        status = grep(fn, 'mismatch', resultList=resultList, doQuiet=True)
+        self.assertEquals( status, 1 )
+        resultList = []
+        status = grep(fn, 'special', resultList=resultList, doQuiet=True)
+        self.assertEquals( status, 0 )
 
 
 if __name__ == "__main__":

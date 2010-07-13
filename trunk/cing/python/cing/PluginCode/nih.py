@@ -1000,7 +1000,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
 def exportShifts2TalosPlus( project, fileName=None):
     """Export shifts to TalosPlus format
 
-    Return True on error.
+    Return True on error including situation where no shifts were added to the file.
 
 ---------------------------------------------------
 
@@ -1143,6 +1143,8 @@ DATA ATOMNAMES HA CA CB C N HN
         fileName = molecule.name + '.tab'
     if not table.writeFile(fileName):
         NTmessage( '==> exportShifts2TalosPlus:  %-4d shifts   written to "%s"', atmCount, fileName )
+    if atmCount == 0:
+        return True
 #end def
 
 def _importTableFile( tabFile, molecule ):
@@ -1364,6 +1366,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
 
         if project.molecule.resonanceCount == 0:
             NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
+            # JFD: This doesn't catch all cases.
             return True
 
         project.status.talosPlus = talosDefaults()
@@ -1377,7 +1380,9 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
 
         # Exporting the shifts
         fileName = os.path.join(path, talosDefs.tableFile )
-        exportShifts2TalosPlus(  project, fileName=fileName )
+        if exportShifts2TalosPlus(  project, fileName=fileName ):
+            NTwarning("Failed to exportShifts2TalosPlus; this is normal for empty CS list.")
+            return False
 
         # running TalosPlus
         talosProgram = ExecuteProgram( cingPaths.talos, rootPath = path,

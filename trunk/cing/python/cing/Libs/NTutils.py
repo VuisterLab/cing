@@ -4779,3 +4779,24 @@ def getKeyWithLargestCount(count):
     if countMax < 0: # nothing found
         return None
     return vMax
+
+def grep(fileName, txt, resultList = None, doQuiet=False):
+    """From mac osx Normally, exit status is 0 if selected lines are found and 1 otherwise.
+    But the exit status is 2 if an error occurred, unless the -q or --quiet or --silent option is used and a selected line is found.
+    Instead of printing a resultList will be filled if provided.
+    """
+    if not os.path.exists(fileName):
+        return 2
+
+    matchedLine = False
+    for line in open(fileName):
+        if txt in line:
+            if doQuiet:
+                # important for not scanning whole file.
+                return 0
+            if resultList != None:
+                resultList.append(line)
+            matchedLine = True
+    if matchedLine:
+        return 0
+    return 1
