@@ -5,6 +5,7 @@ First version: gv June 3, 2007
 # Fix these strings so we can get some automated code checking by pydev extensions.
 # Also, we want to put these defs on top before the imports to prevent cycle in
 # look up.
+from cing import issueListUrl
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
@@ -17,7 +18,6 @@ from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
 from string import upper
-import time
 
 if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
 #    NTdebug("No whatif installed.")
@@ -367,6 +367,14 @@ fullstop y
                 if cingId != checkId:
                     self.molecule[WHATIF_STR][cingId] = self.molecule[WHATIF_STR][checkId]
 
+            # Happens for entry 2kqu line:
+            #   Bond angles           STOP Normal end of WHAT IF.
+            if len(line.dollar) < 3:
+                NTerror("Failed to find at least two elements after splitting the line on a colon;  ")
+                NTmessage("See also issue: %s%d" % (issueListUrl, 242))
+                return True
+
+
             valueStringList  = line.dollar[2].strip().split()
 #            NTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
@@ -382,6 +390,7 @@ fullstop y
             except:
                 NTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None" % (
                     checkId,line,valueStringList[0]))
+                NTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 value = None
 #            NTdebug('modelIdx: %d' % modelIdx)
             if modelIdx < 0:

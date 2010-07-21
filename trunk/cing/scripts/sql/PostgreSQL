@@ -7,11 +7,10 @@
 
 pgsqlHost=(`hostname|/opt/local/bin/gawk -F'[.]' '{print tolower($1)}'| sed -e 's/[-0-9]//g'`)
 
+export PGDATA=/pgdata
 if [ $pgsqlHost = 'stella' ]; then
-	export PGDATA=/Users/jd/opt/postgresql84/defaultdb
 	export PGBIN=/Users/jd/opt/bin
 else
-	export PGDATA=/pgdata
 	export PGBIN=/usr/local/pgsql/bin
 fi
 

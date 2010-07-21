@@ -4,7 +4,6 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 import mimetools
 import mimetypes
 import random
-import time
 import urllib2
 
 def getRandomKey(size=6):

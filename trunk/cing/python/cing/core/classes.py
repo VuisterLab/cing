@@ -47,7 +47,6 @@ from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
 from shutil import rmtree
 import tarfile
-import time
 __version__ = cing.__version__
 __date__ = cing.__date__
 __author__ = cing.__author__

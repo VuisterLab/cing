@@ -31,6 +31,7 @@ import os
 import pydoc
 import re
 import sys
+import time
 #from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
 
 CONSENSUS_STR = 'consensus'
@@ -3484,11 +3485,16 @@ class PrintWrap:
                        autoFlush = True,
                        verbose=verbosityOutput,
                        noEOL=False,
+                       useDate=False,
+                       useProcessId=False,
                        prefix = ''
                 ):
         self.autoFlush = autoFlush
         self.verbose   = verbose
         self.noEOL     = noEOL
+        self.useDate        = useDate
+        self.useProcessId   = useProcessId
+
         if self.verbose > verbosityError:
             self.stream = sys.stdout
         else:
@@ -3496,20 +3502,19 @@ class PrintWrap:
         if stream: # Allow override.
             self.stream = stream
         self.prefix = prefix
-#        if self.verbose == verbosityError:
-#            self.prefix = prefixError
-#        elif self.verbose == verbosityWarning:
-#            self.prefix = prefixWarning
-#        elif self.verbose == verbosityDetail:
-#            self.prefix = prefixDetail
-#        elif self.verbose == verbosityDebug:
-#            self.prefix = prefixDebug
 
     def __call__(self, format, *args):
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
         if self.prefix:
             format = self.prefix + format
+        if self.useDate:
+            at = time.asctime()
+            dateStr = str(at)
+            format = dateStr + ' ' + format
+        if self.useProcessId:
+            processId = "[%s] " % os.getpid()
+            format = processId + format
         if not self.noEOL:
             format += '\n'
         fprintf(self.stream, format, *args)
@@ -3787,6 +3792,7 @@ class ExecuteProgram(NTdict):
             cmd = sprintf('%s > %s 2>&1', cmd, self.redirectOutputToFile)
             self.jobcount += 1
 #        NTdebug('==> Executing ('+cmd+') ... ')
+#        NTdebug("Executing command: [%s]" % cmd)
         code = os.system(cmd)
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
@@ -4623,17 +4629,22 @@ def toCsv(input):
             result += "%s,%s\n" % ( key, str(input[key]) )
     return result
 
+prefixError     = 'ERROR: '
+prefixCodeError = 'ERROR IN CODE: '
+prefixException = 'EXCEPTION CAUGHT: '
+prefixWarning   = 'WARNING: '
+prefixDebug     = 'DEBUG: '
 
 NTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
-NTerror   = PrintWrap(verbose=verbosityError, prefix = 'ERROR: ')
-NTcodeerror=PrintWrap(verbose=verbosityError, prefix = 'ERROR IN CODE: ')
-NTexception=PrintWrap(verbose=verbosityError, prefix = 'EXCEPTION CAUGHT: ')
-NTwarning = PrintWrap(verbose=verbosityWarning, prefix = 'WARNING: ')
+NTerror   = PrintWrap(verbose=verbosityError, prefix = prefixError)
+NTcodeerror=PrintWrap(verbose=verbosityError, prefix = prefixCodeError)
+NTexception=PrintWrap(verbose=verbosityError, prefix = prefixException)
+NTwarning = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning)
 NTmessage = PrintWrap(verbose=verbosityOutput)
 NTdetail  = PrintWrap(verbose=verbosityDetail)
-NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = 'DEBUG: ')
-
+NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug)
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
+
 
 def NTtracebackError():
     traceBackString = format_exc()

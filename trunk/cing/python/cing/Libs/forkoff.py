@@ -8,7 +8,6 @@ Author: Jurgen F. Doreleijers, BMRB, September 2001
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
 import signal
-import time
 import types
 
 __author__    = "$Author$"
