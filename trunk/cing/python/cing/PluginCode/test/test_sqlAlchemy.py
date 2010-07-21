@@ -62,7 +62,7 @@ class Address(Base):
 
 class AllChecks(TestCase):
 
-    def test_SqlAlchemyWithPdbjCing(self):
+    def tttest_SqlAlchemyWithPdbjCing(self):
         pdb_id = '1brv'
 
         if True: # default: True
