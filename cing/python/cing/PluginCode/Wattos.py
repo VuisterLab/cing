@@ -12,7 +12,6 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.STAR.File import File
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-import time
 
 if True: # block
     # TODO: use more advanced tests.

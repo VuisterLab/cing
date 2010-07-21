@@ -44,7 +44,6 @@ from glob import glob
 import csv
 import shutil
 import string
-import time
 import urllib
 
 

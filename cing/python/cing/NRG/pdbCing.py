@@ -26,7 +26,6 @@ from cing.Scripts.validateEntry import PROJECT_TYPE_PDB
 import csv
 import shutil
 import string
-import time
 import urllib
 
 skipList = NTlist(

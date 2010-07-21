@@ -6,7 +6,6 @@ from cing import cingDirTestsData
 from cing.Libs.NTutils import * #@UnusedWildImport
 import mimetools
 import random
-import time
 import urllib2
 
 FORM_ACCESS_KEY = "AccessKey"

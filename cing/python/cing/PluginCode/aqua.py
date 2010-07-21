@@ -8,7 +8,6 @@ Unit testing is done thru procheck.
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
-import time
 #-----------------------------------------------------------------------------
 def exportAtom2aqua(atom):
     """

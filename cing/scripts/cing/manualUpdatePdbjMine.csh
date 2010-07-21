@@ -1,20 +1,38 @@
 #!/bin/csh
 # Author: Jurgen F. Doreleijers
 # Execute like:
-# $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >& manualUpdatePdbjMine.log &
+# $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >>& ~/Library/Logs/weeklyUpdateUpdatePdbjMine.log
 # tail -f manualUpdatePdbjMine.log &
+# Takes about 6 hours for restore and about one hour per small sized weekly.
+# the 1.1G Jul  7 16:11 pdbmlplus_weekly.2010-02-09.gz is unknown for duration.
+# Source data comes from: ftp://ftp.pdbj.org/mine
 set tmp_dir = /Users/jd/tmpPdbj
 ###################################################################
 
 cd $tmp_dir
 
-set list = ( pdbmlplus_weekly.2010-03-09.gz pdbmlplus_weekly.2010-03-16.gz pdbmlplus_weekly.2010-03-23.gz pdbmlplus_weekly.2010-03-31.gz pdbmlplus_weekly.2010-04-07.gz pdbmlplus_weekly.2010-04-14.gz pdbmlplus_weekly.2010-04-21.gz pdbmlplus_weekly.2010-04-28.gz pdbmlplus_weekly.2010-05-05.gz pdbmlplus_weekly.2010-05-12.gz pdbmlplus_weekly.2010-05-19.gz pdbmlplus_weekly.2010-05-26.gz pdbmlplus_weekly.2010-06-02.gz pdbmlplus_weekly.2010-06-09.gz pdbmlplus_weekly.2010-06-16.gz pdbmlplus_weekly.2010-06-23.gz pdbmlplus_weekly.2010-06-30.gz pdbmlplus_weekly.2010-07-07.gz )
+set list = ( pdbmlplus_weekly.2010-07-21.gz )
 
-pg_restore -d pdbmlplus pdbmlplus.dump
+# Takes about 77 Gb and 3 hrs.
+if ( 1 ) then
+    date
+    echo "Starting initial restore"
+    pg_restore -d pdbmlplus pdbmlplus.dump
+    date
+    echo "Finished initial restore"
+endif
 
-foreach fn ( $list )
-        echo 'loading from $fn'
+if ( 0 ) then
+    date
+    echo "Starting weekly updates"
+    foreach fn ( $list )
+        date
+        echo "loading from $fn"
         gunzip < $fn | psql pdbmlplus pdbj
-end
+    end
+    date
+    echo "Ending weekly updates"
+endif
 
+date
 echo 'DONE'

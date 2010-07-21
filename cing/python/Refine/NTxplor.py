@@ -1,6 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 import random
-import time
 
 todo = """
 

@@ -1,5 +1,6 @@
 Follow pdbj_README.txt in this directory from:
 
+ftp://ftp.pdbj.org/mine
 ftp://ftp.pdbj.org/mine/00README.txt
 See ./pdbj_Mine/00README.txt
 
@@ -8,20 +9,20 @@ Read: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopar
 sudo SystemStarter stop PostgreSQL
 sudo SystemStarter start PostgreSQL
 
+setenv PGDATA /pgdata
 # stella
-setenv PGDATA /Users/jd/opt/postgresql84/defaultdb
 setenv PGBIN /Users/jd/opt/bin
 # nmr
-setenv PGDATA /pgdata
 setenv PGBIN /usr/local/pgsql/bin
 
 
 Configuration at:
 $PGDATA/postgresql.conf
+Can be confirmed by sql query: SHOW config_file;
 e.g. shows default port to be 5432
-max_locks_per_transaction set to 5120 before I could drop pdbj schema; needed to restart.
+max_locks_per_transaction set to 5120 before I could drop pdbj schema; needed to restart PostgreSQL.
 
-Log:\
+Log:
 sudo tail -f $PGDATA/logfile
 
 -- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
@@ -43,39 +44,27 @@ To create a database instance, after install do
  sudo mkdir -p $PGDATA
  sudo chown postgres:postgres $PGDATA
  sudo su postgres -c 'initdb -D $PGDATA'
-
-To tweak your DBMS, consider increasing kern.sysv.shmmax by adding an increased kern.sysv.shmmax .. to /etc/sysctl.conf
+ sudo su postgres -c 'cp ~jd/postgresql.conf $PGDATA'
 
 Connect as postgres unix user:
-	psql
-	create role akinjo LOGIN CREATEDB SUPERUSER;
-	create role nrgcing1 LOGIN CREATEDB SUPERUSER;
-	create database nrgcing;
-	alter database nrgcing owner to nrgcing1;
-
-	create role casdcing1 LOGIN CREATEDB SUPERUSER;
-	create database casdcing;
-	alter database casdcing owner to casdcing1;
-
-Connect as jd unix user:
-	createdb nrgcing
-	psql -l
+  psql
+  create role jd LOGIN CREATEDB SUPERUSER;
+  create role pdbj LOGIN CREATEDB SUPERUSER;
+  create role akinjo LOGIN CREATEDB SUPERUSER;
+  create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+  create role casdcing1 LOGIN CREATEDB SUPERUSER;
 
 
 -- Getting started help:
 \? from the psql monitor
 \l list db
-\dt' list tables
-\d atom list a table called atom.
-
+\dn list schemas
+\dt list tables
+\d nrgcing.cingatom        list a table called cingatom.
 
 - add PGDATA to exclusion list of spotlight and TM.
-- Create file /etc/sysctl.conf with 1G (100 Mb now) and reboot:
-NOTE THIS BELOW CRASHED TOMCAT JAVA ENVIRONMENT. SWITCHED BACK TO DEFAULT SETTINGS.
-From: http://serverfault.com/questions/10226/how-to-set-the-shmmax-parameter-on-mac-os-x
-
-stack overflow/biostar.stackexchange.com 'ns kijken.
-
+- To tweak your DBMS
+  + Create file /etc/sysctl.conf with .5 Gb and reboot:
 # This one is working on Stella
 kern.sysv.shmmax=524288000
 kern.sysv.shmmin=1
@@ -86,25 +75,16 @@ kern.sysv.shmall=131072000
 kern.sysv.maxproc=2048
 kern.maxprocperuid=512
 
-On nmr using (fink recommends):
-kern.sysv.shmmax=8388608
-kern.sysv.shmmin=1
-kern.sysv.shmmni=64
-kern.sysv.shmseg=8
-kern.sysv.shmall=32768
-
-# Recommendations from psql for mac osx is:
-kern.sysv.shmmax=4194304
-kern.sysv.shmmin=1
-kern.sysv.shmmni=32
-kern.sysv.shmseg=8
-kern.sysv.shmall=1024 # SHMALL is measured in 4 kB pages on this platform.
-# In all OS X versions, you'll need to reboot to make changes in the shared memory parameters take effect.
-
-or for all shared memory related settings:
+For all shared memory related settings:
 sysctl -a | grep shm
 Or do on line but settings will not persist.
-jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=104857600 DID THIS WORK?
+jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=524288000
+
+Good resource:
+http://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server
+
+- For querying e.g. performance parameters live see $CINGROOT/python/cing/NRG/sql/handy_commands.sql
+  + E.g.: select name, setting, unit  from pg_settings where category like 'Resource%';
 
 It failed to reload the weekly run with setting of 256 as suggested so increased to:
 max_locks_per_transaction = 1024
@@ -117,14 +97,52 @@ Ok documentation found at:
 http://www.postgresql.org/docs/current/static/runtime-config-resource.html
 Looks like it really needs to be adjusted:
 
-shared_buffers
+***** Allow access from non local clients:
+Add a line to: $PGDATA/pg_hba.conf
+# will allow access from 131.174.146.x ip's
+host    all         all         131.174.146.0/24      trust
 
-Set a password:
+***** Set a password:
 http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html
 
-For automatic start/stop follow instructions at:
+***** For automatic start/stop follow instructions at:
 http://ripary.com/postgresql.html
 using:
-$CINGROOT/scripts/sql/PostgreSQL copied to:
-/Library/StartupItems/PostgreSQL/PostgreSQL
+sudo cp $CINGROOT/scripts/sql/PostgreSQL /Library/StartupItems/PostgreSQL/PostgreSQL
+
 '''You can disable automatic startup at any time by editing /etc/hostconfig.'''
+
+-- Creating a backup every month is really nice so not too many updates are needed.
+
+See doc at: http://www.postgresql.org/docs/8.4/interactive/backup-dump.html (end of page)
+# for custom (binary;compressed)
+# Replace nrgcing with pdbj.
+
+pg_dump --format=c --schema=nrgcing pdbmlplus > nrgcing.dump
+
+
+
+## REPEAT AFTER ME: e.g. after nilling PGDATA and restarting.
+# Indentation to left means logout of previous shell.
+
+sudo mkdir -p $PGDATA
+sudo chown postgres:postgres $PGDATA
+sudo su postgres
+   initdb -D $PGDATA
+sudo cp ~jd/postgresql.conf $PGDATA
+sudo cp ~jd/pg_hba.conf     $PGDATA
+sudo tail -f $PGDATA/logfile &
+sudo SystemStarter stop PostgreSQL
+sudo SystemStarter start PostgreSQL
+sudo su postgres
+  createdb pdbmlplus
+  createlang plpgsql pdbmlplus
+  psql
+    create role pdbj LOGIN CREATEDB SUPERUSER;
+    create role jd LOGIN CREATEDB SUPERUSER;
+    create role akinjo LOGIN CREATEDB SUPERUSER;
+    create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+    create role casdcing1 LOGIN CREATEDB SUPERUSER;
+# after downloading from pdbj & setting options in script:
+$CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >& ~/manualUpdatePdbjMine_2.log &
+# takes 77 Gb

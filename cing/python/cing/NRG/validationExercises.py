@@ -13,7 +13,6 @@ from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 import csv
 import shutil
 import string
-import time
 import urllib
 
 class MyDict(Lister):

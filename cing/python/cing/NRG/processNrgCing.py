@@ -9,7 +9,6 @@ from cing.Libs.disk import mkdirs
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.convertStar2Ccpn import importFullStarProjects
 from shutil import rmtree
-import time
 
 doReadMmCif         = 1
 doStar2Ccpn         = 0 # Actually linking by FC.

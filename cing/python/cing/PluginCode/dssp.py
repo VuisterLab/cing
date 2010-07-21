@@ -9,7 +9,6 @@ from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
-from cing.setup import time
 from glob import glob
 
 if True: # block

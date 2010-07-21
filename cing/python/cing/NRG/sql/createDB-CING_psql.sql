@@ -14,15 +14,8 @@
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
--- Remove previous copies in bottom up order.
--- This will automatically drop the index created too.
-DROP TABLE IF EXISTS casdcing.cingatom;
-DROP TABLE IF EXISTS casdcing.cingresidue;
-DROP TABLE IF EXISTS casdcing.cingchain;
-DROP TABLE IF EXISTS casdcing.cingentry;
-
 -- Only now that the tables have been removed can the schema be removed.
-DROP SCHEMA IF EXISTS casdcing;
+DROP SCHEMA IF EXISTS casdcing CASCADE;
 CREATE SCHEMA casdcing AUTHORIZATION casdcing1;
 
 --CREATE TABLE entry

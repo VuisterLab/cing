@@ -190,7 +190,7 @@ class DBMS():
     def __init__(self):
         self.tables = {}
 
-    def readCsvRelationList(self, relationNames, csvFileDir,
+    def readCsvRelationList(self, relationNames, csvFileDir='.',
             csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True):
         csvFilesRead = len(relationNames)
         for i in range(csvFilesRead):

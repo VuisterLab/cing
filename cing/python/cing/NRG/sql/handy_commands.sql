@@ -6,7 +6,7 @@ select * from pg_settings where name like 'autovacuum';
 select * from pg_settings where category like 'Autovacuum';
 
 -- max_locks_per_transaction needs to be 256 min by pdbj recommendations
-select * from pg_settings where category like 'Resource%';
+select name, setting, unit  from pg_settings where category like 'Resource%';
 
 set pg_settings.extra_float_digits = -10
 

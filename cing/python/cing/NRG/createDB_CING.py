@@ -42,8 +42,8 @@ def runSqlForSchema(sqlFile = createDB_FileName, schemaId = CASD_DB_NAME):
 
 if __name__ == '__main__':
     schemaId = NRG_DB_NAME
-#    sqlFile = createDB_FileName
-    sqlFile = loadDB_FileName
+    sqlFile = createDB_FileName
+#    sqlFile = loadDB_FileName
     if runSqlForSchema(sqlFile, schemaId):
         NTerror('Failed to createDb for schema: %s' % schemaId)
         sys.exit(1)

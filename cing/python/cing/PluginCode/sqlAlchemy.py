@@ -5,7 +5,6 @@ from cing.NRG import PDBJ_DB_NAME
 from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.required.reqOther import *
 import gc
-import time
 import warnings
 
 DB_TYPE_MYSQL = 'mysql'

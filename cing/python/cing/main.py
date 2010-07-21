@@ -128,7 +128,6 @@ from cing.core.parameters import cingPaths
 from cing.core.parameters import osType
 from cing.core.parameters import plugins
 import platform
-import time
 import unittest
 
 
