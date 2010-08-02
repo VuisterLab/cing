@@ -5,7 +5,7 @@ This script will put some output in the persisting log file ~/Library/Logs/weekl
 
 Execute from cron like:
 05 15 * * wed  (/opt/local/bin/python /Users/jd/workspace35/cingStable/python/cing/NRG/weeklyUpdatePdbjMine.py 2>&1)|mail -s weeklyUpdatePdbjMine.log jd
-python $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
+/Users/jd/workspace35/cing/scripts/cing/CingWrapper.csh  --noProject --script /Users/jd/workspace35/cing/python/cing/NRG/weeklyUpdatePdbjMine.py
 
 @author: jd
 '''

@@ -25,7 +25,7 @@ setenv HOME               /Library/WebServer/Documents/servlet-cing-home
 
 # Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.
-set verbosityDebug = 0
+set verbosityDebug = 1
 
 
 set script = CingWrapper.csh
@@ -47,13 +47,13 @@ umask 2                 # The files created will be having special permissions.
 # PYTHONPATH  will be completely set by cing.csh.
 unsetenv PYTHONPATH
 
-# fink or macports
-set useFink = 0
-if ( $useFink ) then
-    source /sw/bin/init.csh
-else
-    set path = ( /opt/local/bin /opt/local/sbin $path )
-endif
+# The  /usr/local/pgsql/bin OR /Users/jd/opt/bin is just for psql dep.
+set path = ( \
+/opt/local/bin \
+/opt/local/sbin \
+/usr/local/pgsql/bin \
+/Users/jd/opt/bin \
+$path )
 
 if ( $verbosityDebug) then
     echo "DEBUG: Wrap for HOME / user           $HOME / $user"

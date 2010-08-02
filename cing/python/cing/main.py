@@ -14,9 +14,9 @@ Options:
   --docdoc              Print full documentation to stdout
   --pydoc               start pydoc server and browse documentation
   -n PROJECTNAME, --name=PROJECTNAME, --project=PROJECTNAME
-                        NAME of the project (required)
+                        NAME of the project (required; unless --noProject presented)
   --new                 Start new project PROJECTNAME (overwrite if already
-                        present)
+                        present).
   --old                 Open a old project PROJECTNAME (error if not present)
   --init=SEQUENCEFILE[,CONVENTION]
                         Initialize new project PROJECTNAME and new molecule
@@ -48,6 +48,7 @@ Options:
                         503-547,550-598,800,801
   --superpose           Do superposition; optionally uses RANGES
   --nosave              Don't save on exit (default: save)
+  --noProject           Start full CING environment without a project. Useful eg. with --script.
   --export              Export before exit (default: noexport)
   -v VERBOSITY, --verbosity=VERBOSITY
                         verbosity: [0(nothing)-9(debug)] no/less messages to
@@ -87,6 +88,9 @@ cing --test --verbose 0
 
 - To test CING on many data sets including CCPN, PDB, etc.
 cing --test2 --verbose 0
+
+- Do a weekly update of PDBj database
+cing --noProject --script $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
 
 --------------------------------------------------------------------------------
 Some simple script examples:
@@ -484,11 +488,20 @@ def getParser():
                       dest="superpose",
                       help="Do superposition; optionally uses RANGES"
                      )
+    """Next option enables us to reuse CING wrapper code like in CingWrapper.csh for using scripts
+    like: cing/NRG/weeklyUpdatePdbjMine.py
+    """
     parser.add_option("--nosave",
                       action="store_true",
                       dest="nosave",
                       help="Don't save on exit (default: save)"
                      )
+    parser.add_option("--noProject",
+                      action="store_true",
+                      dest="noProject",
+                      help="Start without opening a project (default: with project)"
+                     )
+
     parser.add_option("--export", default=False,
                       action="store_true",
                       dest="export",
@@ -502,7 +515,7 @@ def getParser():
     return parser
 #end def
 
-project = None # after running main it will be filled.
+project = None # after running main it will be filled (unless options.noProject was set)
 
 def yasara( project ):
     from cing.PluginCode.yasaraPlugin import yasaraShell
@@ -615,7 +628,8 @@ def main():
 #    #end if
 
     #check for the required name option
-    parser.check_required('-n')
+    if not options.noProject:
+        parser.check_required('-n')
 
 #    args = []
     _kwds = {}
@@ -624,132 +638,134 @@ def main():
     #------------------------------------------------------------------------------------
     # open project
     #------------------------------------------------------------------------------------
-    if options.new:
-        project = Project.open(options.name, status='new')
-    elif options.old:
-        project = Project.open(options.name, status='old')
-    elif options.init:
-        init = options.init.split(',')
-        if (len(init) == 2):
+    if not options.noProject:
+        if options.new:
             project = Project.open(options.name, status='new')
-            project.newMolecule(options.name, sequenceFile=init[0], convention=init[1])
+        elif options.old:
+            project = Project.open(options.name, status='old')
+        elif options.init:
+            init = options.init.split(',')
+            if (len(init) == 2):
+                project = Project.open(options.name, status='new')
+                project.newMolecule(options.name, sequenceFile=init[0], convention=init[1])
+            else:
+                project = Project.open(options.name, status='new')
+                project.newMolecule(options.name, sequenceFile=init[0])
+            #end if
+        elif options.initPDB:
+            init = options.initPDB.split(',')
+            if (len(init) == 2):
+                project = Project.open(options.name, status='new')
+                project.initPDB(pdbFile=init[0], convention=init[1])
+            else:
+                project = Project.open(options.name, status='new')
+                project.initPDB(pdbFile=init[0])
+        elif options.initBMRB:
+            project = Project.open(options.name, status='new')
+            project.initBMRB(bmrbFile=options.initBMRB, moleculeName=project.name)
+        elif options.initCcpn:
+            project = Project.open(options.name, status='new')
+            project.initCcpn(ccpnFolder=options.initCcpn)
+    #    elif options.loadCcpn:
+    #        project = Project.open(options.name, status='create', restore=False)
+    #        project.initCcpn(ccpnFolder=options.loadCcpn)
         else:
-            project = Project.open(options.name, status='new')
-            project.newMolecule(options.name, sequenceFile=init[0])
+            project = Project.open(options.name, status='create')
+
+        if not project:
+            NTdebug("Doing a hard system exit")
+            sys.exit(2)
         #end if
-    elif options.initPDB:
-        init = options.initPDB.split(',')
-        if (len(init) == 2):
-            project = Project.open(options.name, status='new')
-            project.initPDB(pdbFile=init[0], convention=init[1])
-        else:
-            project = Project.open(options.name, status='new')
-            project.initPDB(pdbFile=init[0])
-    elif options.initBMRB:
-        project = Project.open(options.name, status='new')
-        project.initBMRB(bmrbFile=options.initBMRB, moleculeName=project.name)
-    elif options.initCcpn:
-        project = Project.open(options.name, status='new')
-        project.initCcpn(ccpnFolder=options.initCcpn)
-#    elif options.loadCcpn:
-#        project = Project.open(options.name, status='create', restore=False)
-#        project.initCcpn(ccpnFolder=options.loadCcpn)
-    else:
-        project = Project.open(options.name, status='create')
 
-    if not project:
-        NTdebug("Doing a hard system exit")
-        sys.exit(2)
-    #end if
-
-    #------------------------------------------------------------------------------------
-    # check for alternative molecule
-    #------------------------------------------------------------------------------------
-    if options.moleculeName:
-        if options.moleculeName in project:
-            project.molecule = project[options.moleculeName]
-        else:
-            project.restoreMolecule(options.moleculeName)
+        #------------------------------------------------------------------------------------
+        # check for alternative molecule
+        #------------------------------------------------------------------------------------
+        if options.moleculeName:
+            if options.moleculeName in project:
+                project.molecule = project[options.moleculeName]
+            else:
+                project.restoreMolecule(options.moleculeName)
+            #end if
         #end if
-    #end if
 
-    NTmessage(project.format())
+        NTmessage(project.format())
 
-    # shortcuts
-    p = project
-    mol = project.molecule #@UnusedVariable
-    m = project.molecule #@UnusedVariable
+        # shortcuts
+        p = project
+        mol = project.molecule #@UnusedVariable
+        m = project.molecule #@UnusedVariable
 
- #   pr = print
-    f = pformat #@UnusedVariable
-    fa = pformatall #@UnusedVariable
+     #   pr = print
+        f = pformat #@UnusedVariable
+        fa = pformatall #@UnusedVariable
 
-    if options.ensemble:
-#        NTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
-        mol.keepSelectedModels( options.ensemble )
-#    else:
-#        NTdebug( "ensemble option was not found." )
+        if options.ensemble:
+    #        NTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
+            mol.keepSelectedModels( options.ensemble )
+    #    else:
+    #        NTdebug( "ensemble option was not found." )
 
-    #------------------------------------------------------------------------------------
-    # Import xeasy protFile
-    #------------------------------------------------------------------------------------
-    if options.xeasy:
-        xeasy = options.xeasy.split(',')
-        if (len(xeasy) != 3):
-            NTerror("--xeasy=SEQFILE,PROTFILE,CONVENTION arguments required")
-        else:
-            project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
+        #------------------------------------------------------------------------------------
+        # Import xeasy protFile
+        #------------------------------------------------------------------------------------
+        if options.xeasy:
+            xeasy = options.xeasy.split(',')
+            if (len(xeasy) != 3):
+                NTerror("--xeasy=SEQFILE,PROTFILE,CONVENTION arguments required")
+            else:
+                project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
 
-    #------------------------------------------------------------------------------------
-    # Import xeasy peakFile
-    #------------------------------------------------------------------------------------
-    if options.xeasyPeaks:
-        xeasy = options.xeasyPeaks.split(',')
-        if len(xeasy) != 4:
-            NTerror("--xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
-        else:
-            project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2], convention=xeasy[3])
+        #------------------------------------------------------------------------------------
+        # Import xeasy peakFile
+        #------------------------------------------------------------------------------------
+        if options.xeasyPeaks:
+            xeasy = options.xeasyPeaks.split(',')
+            if len(xeasy) != 4:
+                NTerror("--xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
+            else:
+                project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2], convention=xeasy[3])
 
-    #------------------------------------------------------------------------------------
-    # Merge resonances
-    #------------------------------------------------------------------------------------
-    if options.merge:
-        project.mergeResonances()
-    #end if
-
-    #------------------------------------------------------------------------------------
-    # Generate peaks
-    #------------------------------------------------------------------------------------
-    if options.generatePeaks:
-        gp = options.generatePeaks.split(',')
-        if len(gp) != 2:
-            NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
-        else:
-            peaks = project.generatePeaks(experimentName=gp[0], axisOrder=gp[1]) #@UnusedVariable
+        #------------------------------------------------------------------------------------
+        # Merge resonances
+        #------------------------------------------------------------------------------------
+        if options.merge:
+            project.mergeResonances()
         #end if
-    #end if
 
-    #------------------------------------------------------------------------------------
-    # Shiftx
-    #------------------------------------------------------------------------------------
-    if options.shiftx:
-        project.runShiftx()
+        #------------------------------------------------------------------------------------
+        # Generate peaks
+        #------------------------------------------------------------------------------------
+        if options.generatePeaks:
+            gp = options.generatePeaks.split(',')
+            if len(gp) != 2:
+                NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
+            else:
+                peaks = project.generatePeaks(experimentName=gp[0], axisOrder=gp[1]) #@UnusedVariable
+            #end if
+        #end if
 
-    #------------------------------------------------------------------------------------
-    # Superpose
-    #------------------------------------------------------------------------------------
-    if options.superpose:
-        project.superpose(ranges=options.ranges)
+        #------------------------------------------------------------------------------------
+        # Shiftx
+        #------------------------------------------------------------------------------------
+        if options.shiftx:
+            project.runShiftx()
 
-    #------------------------------------------------------------------------------------
-    # Validate; just run doValidate script
-    #------------------------------------------------------------------------------------
-    if options.validate:
-        path = scriptPath('doValidate.py')
-        if path:
-            NTmessage('==> Executing script "%s"', path)
-            execfile(path)
-    #end if
+        #------------------------------------------------------------------------------------
+        # Superpose
+        #------------------------------------------------------------------------------------
+        if options.superpose:
+            project.superpose(ranges=options.ranges)
+
+        #------------------------------------------------------------------------------------
+        # Validate; just run doValidate script
+        #------------------------------------------------------------------------------------
+        if options.validate:
+            path = scriptPath('doValidate.py')
+            if path:
+                NTmessage('==> Executing script "%s"', path)
+                execfile(path)
+        #end if
+    # end if noProject
 
     #------------------------------------------------------------------------------------
     # Script
@@ -777,9 +793,10 @@ def main():
     #------------------------------------------------------------------------------------
     # yasara ipython
     #------------------------------------------------------------------------------------
-    if options.yasara:
-        yasara(project)
-    #end if
+    if project:
+        if options.yasara:
+            yasara(project)
+        #end if
 
     #------------------------------------------------------------------------------------
     # Optionally export project
