@@ -1,16 +1,13 @@
 """
 Execute like:
-python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    $D/NRG-CING/pgsql
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadBmrbPdbMatch.sql    $CINGROOT/data/NRG/bmrbPdbMatch
 """
 
-from cing import cingDirTmp
-from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 
 schemaIdOrg = CASD_DB_NAME
-sqlDir = os.path.join(cingPythonCingDir,'NRG', 'sql')
-
 if True: # default: True
     db_name = PDBJ_DB_NAME
     user_name = PDBJ_DB_USER_NAME
@@ -18,19 +15,23 @@ else:
     db_name = CASD_DB_NAME
     user_name = CASD_DB_USER_NAME
 
-def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME):
-    os.chdir(cingDirTmp)
+
+def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME, rootPath=None):
+    if rootPath:
+        os.chdir(rootPath)
     txt = readTextFromFile(sqlFile)
     old = schemaIdOrg
     new = schemaId
     if old != new:
         txt = txt.replace(old, new)
+
+    txt = txt.replace('$cwd', rootPath)
     sqlFileRoot = NTpath(sqlFile)[1]
     fn = 'tmpRunSqlForSchema_%s_%s.sql' % (sqlFileRoot, schemaId)
     if writeTextToFile(fn,txt):
         NTerror('Failed to write new sql file.')
         return True
-    psqlProgram = ExecuteProgram( pathToProgram = 'psql', rootPath = cingDirTmp,
+    psqlProgram = ExecuteProgram( pathToProgram = 'psql', rootPath = rootPath,
                                    redirectOutput = False,
                                    redirectInputFromFile = fn
                                  )
@@ -41,15 +42,19 @@ def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
+    if len(args) != 3:
+        NTerror("Failed to find expected 3 arguments")
+        sys.exit(1)
     schemaId = args[0]
+    sqlFile = args[1]
+    rootPath = args[2]
     if schemaId not in schemaIdList:
         NTerror("Need to be called with valid schema id from %s but got: [%s]" % (str(schemaIdList), schemaId))
         sys.exit(1)
-
-#    sqlFile = os.path.join(sqlDir, 'createDB-CING_psql.sql')
-#    sqlFile = os.path.join(sqlDir, 'loadDB-CING_psql.sql')
-    sqlFile = os.path.join(sqlDir, 'createDepTables.sql')
-    if runSqlForSchema(sqlFile, schemaId=schemaId):
-        NTerror('Failed to createDb for schema: %s' % schemaId)
+    if not os.path.exists(rootPath):
+        NTerror("rootPath does not exist")
         sys.exit(1)
 
+    if runSqlForSchema(sqlFile, schemaId=schemaId, rootPath=rootPath):
+        NTerror('Failed to createDb for schema: %s' % schemaId)
+        sys.exit(1)

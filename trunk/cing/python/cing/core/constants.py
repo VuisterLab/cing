@@ -155,4 +155,8 @@ MAX_PERCENTAGE_D1D2 = 0.2
 MIN_Z_D1D2 = -1.0 # This is an absolute value of number of sigma's from average. NB, this is not a percentage
 MAX_Z_D1D2 = 0.0
 
+QshiftMinValue = 0.0
+QshiftMaxValue = 0.05
+QshiftReverseColorScheme = False
+
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

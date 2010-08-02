@@ -196,6 +196,28 @@ def getTargetForFullEntryName(fullEntryCode):
     target = fullEntryCode[:idxLastCapital]
     return target
 
+def getFullEntryNameListForTarget(target, programHoH):
+    """
+    Query the participation table for who all predicted the target.
+    Does not include the Org.
+    """
+    targetList = programHoH.keys()
+    targetList.sort()
+    print targetList
+    if target not in targetList:
+        NTerror("Failed to find target %s in list %s" % (target, str(targetList)))
+        return None
+
+    mapByLab = programHoH[target]
+    labList = mapByLab.keys()
+    labList.sort()
+    result = []
+    for labId in labList:
+        if not getDeepByKeysOrAttributes(mapByLab, labId ):
+            continue
+        result.append(target+labId)
+    return result
+
 def printCingUrls(programHoH):
     targetList = programHoH.keys()
     targetList.sort()
@@ -243,6 +265,8 @@ if __name__ == '__main__':
 #    copyFromCasdNmr2CcpnArchive()
 #    annotateLoop()
 #    redoLayOutArchiveWim()
-    NTmessage("labTable: %s" % str(labList))
-    NTmessage("labList: %s" % str(labList))
+#    NTmessage("entryList: %s" % str(entryList))
+    target = 'CGR26A'
+    result = getFullEntryNameListForTarget(target, programHoH)
+    NTmessage("result: %s" % str(result))
 

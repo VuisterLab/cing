@@ -1,11 +1,16 @@
-#!/bin/csh
+#!/bin/tcsh
+
+echo "tejst"
+exit 1
+
 # Author: Jurgen F. Doreleijers
 # Execute like:
-# $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >>& ~/Library/Logs/weeklyUpdateUpdatePdbjMine.log
+# $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >>& ~/Library/Logs/weeklyUpdatePdbjMine.log
 # tail -f manualUpdatePdbjMine.log &
 # Takes about 6 hours for restore and about one hour per small sized weekly.
 # the 1.1G Jul  7 16:11 pdbmlplus_weekly.2010-02-09.gz is unknown for duration.
 # Source data comes from: ftp://ftp.pdbj.org/mine
+
 set tmp_dir = /Users/jd/tmpPdbj
 ###################################################################
 

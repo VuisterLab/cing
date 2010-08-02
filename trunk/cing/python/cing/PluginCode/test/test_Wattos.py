@@ -19,7 +19,9 @@ import unittest
 class AllChecks(TestCase):
 
     "Enable again when issue 193 with NMR-STAR format has been alleviated; "
-    def testWattos(self):
+    def tttestWattos(self):
+        "Disabled by JFD for now as I'm the only one checking this."
+
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
         entryList = "1brv".split()

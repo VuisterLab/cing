@@ -19,7 +19,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testNmrStar(self):
+    def tttestNmrStar(self):
+        "Disabled by JFD for now as I'm the only one checking this."
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
 #        entryList = "1brv".split()

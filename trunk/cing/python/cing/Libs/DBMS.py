@@ -5,11 +5,14 @@ This class thinks of a bunch of CSV files (such as created by Mac Numbers in iWo
 much like the code in Wattos.Database.DBMS.
 @author: jd
 '''
+from StringIO import StringIO
 from cing.Libs.NTutils import * #@UnusedWildImport
 import csv
 import urllib
 
 DEFAULT_COLUMN_LABEL = 'COLUMN_' # a number will be added.
+ROW_WITHOUT_COLUMNS_STRING   = "No columns present"
+NULL_STRING = '' # may be modified
 
 class Relation():
 
@@ -85,6 +88,7 @@ class Relation():
             resource = urllib.urlopen(url_links)
             reader = csv.reader(resource)
         except IOError:
+            NTtracebackError()
             NTerror("Couldn't open url for reader: " + url_links)
             return True
 
@@ -111,7 +115,7 @@ class Relation():
         # Never know when the connection is finally empty.
         except IOError:
             pass
-        NTdebug("Read %8d rows %2d cols to %s" % (self.sizeRows(), self.sizeColumns(), self.name))
+        NTdebug("Read %8d rows %2d cols to relation %s" % (self.sizeRows(), self.sizeColumns(), self.name))
 
 
     def writeCsvFile(self, file_name=None, doHeader=True):
@@ -184,6 +188,177 @@ class Relation():
                 NTwarning(duplicateKeyFound)
         return dic
 
+    def isValidColumnIdx( self, columnIdx ):
+        'Just checking'
+        if ( ( columnIdx < 0 ) or ( columnIdx > (self.sizeColumns()-1))):
+            return False
+        return True
+
+    def getColumnLabel( self, index ):
+        'Return False on error'
+        if not self.isValidColumnIdx(index):
+            NTerror("in getColumnLabel: given index is not valid for columns: %s" % index);
+            return
+        label = self.columnOrder[index]
+        return label
+
+    def __str__( self, show_header = True,
+#         show_data_types= True,
+#         show_fkcs= True,
+#         show_indices= True,
+         show_rows= True):
+        """
+        This will create a string representation. The code in here should not
+        need to be optimized because it is never intended to use this for millions of
+        rows in an efficient way.
+        Returns None in case of error.
+        """
+
+        sizeColumns = self.sizeColumns()
+        sizeRows = self.sizeRows()
+        if sizeColumns < 1:
+            return    "---  Relation        : " + self.name + " has NO columns ---\n"
+
+        file_str = StringIO()
+#        // Header
+        if show_header:
+#            boolean containsForeignKeyConstraints = false;
+#            boolean containsindices               = false;
+            file_str.write("---  Relation        : " + self.name + " ---\n");
+            file_str.write("---  Column Labels   : ");
+            for i in range(sizeColumns):
+                label = self.getColumnLabel(i);
+                file_str.write( label );
+#                ForeignKeyConstr fkc = dbms.foreignKeyConstrSet.getForeignKeyConstrFrom(name,label);
+#                if ( fkc != null ) {
+#                    containsForeignKeyConstraints = true;
+#                }
+#                if ( indices.containsKey( label ) ) {
+#                    containsindices = true;
+#                }
+                if i < ( sizeColumns - 1 ):
+                    file_str.write(",")
+                else:
+                    file_str.write(" ---\n");
+
+#            // Datatypes
+#            if (show_data_types) {
+#                file_str.write("---  Data Types      : ");
+#                for (int i=0;i<sizeColumns;i++) {
+#                    String label = getColumnLabel(i);
+#                    int dataType = getColumnDataType(label);
+#                    file_str.write(dataTypeList[dataType]);
+#                    //file_str.write("("+dataType+")");
+#                    if ( i < ( sizeColumns - 1 ) )
+#                        file_str.write(",");
+#                    else
+#                        file_str.write(" ---\n");
+#                }
+#            }
+#            // Foreign Key Constraints
+#            if ( containsForeignKeyConstraints && show_fkcs ) {
+#                file_str.write("---  Foreign Key Constraints   :\n");
+#                for (int i=0;i<sizeColumns;i++) {
+#                    String label = getColumnLabel(i);
+#                    ForeignKeyConstr fkc = dbms.foreignKeyConstrSet.getForeignKeyConstrFrom(name,label);
+#                    if ( fkc != null ) {
+#                        file_str.write( "\t" );
+#                        file_str.write( fkc.toString() );
+#                        file_str.write( General.eol );
+#                    }
+#                }
+#            }
+#            // indices
+#            if ( containsindices && show_indices ) {
+#                file_str.write("---  indices                   :\n");
+#                for (int i=0;i<sizeColumns;i++) {
+#                    String label = getColumnLabel(i);
+#                    if ( indices.containsKey( label )) {
+#                        // Check all elements in array to see if there is such an index
+#                        Index[] al = (Index[]) indices.get( label );
+#                        for (int j=0;j<Index.INDEX_TYPE_COUNT;j++) {
+#                            Index index = al[j];
+#                            if ( index == null ) { // will skip zero-th element
+#                                continue;
+#                            }
+#                            file_str.write( "\tColumn " );
+#                            file_str.write( label );
+#                            file_str.write( " has index. " );
+#                            file_str.write( index.toString() );
+#                            file_str.write( General.eol );
+#                        }
+#                    }
+#                }
+#            }
+#        }
+
+        if show_rows:
+            if sizeRows < 1 :
+                file_str.write("---  Empty Relation (%s columns but no rows) ---\n" % sizeColumns);
+                return file_str.getvalue()
+            for r in range(sizeRows):
+                rowString = self.toStringRow( r )
+                if rowString == None:
+                    NTerror("Failed to get row as a string for row %s from relation %s" % (r,self.name))
+                    return None
+                file_str.write( rowString ) # Get the row representation.
+                file_str.write('\n')
+
+        return file_str.getvalue()
+
+
+    def toStringRow(self, row, showColumnLabels=False):
+        """Still need to program correct quote styles for csv format if that becomes important.
+         Returns ROW_WITHOUT_COLUMNS_STRING
+         if there are no columns in the table.
+         Return None on error.
+         """
+        if self.sizeColumns() == 0:
+            return ROW_WITHOUT_COLUMNS_STRING
+
+        file_str = StringIO()
+        sizeColumns = self.sizeColumns()
+        sizeColumnsMinusOne = sizeColumns - 1
+        if showColumnLabels:
+            file_str.write( "[Header] " )
+            for c in range(sizeColumns):
+                file_str.write( self.getColumnLabel(c) )
+                if c < sizeColumnsMinusOne:
+                    file_str.write(',')
+            file_str.write('\n')
+        file_str.write( "[%s] " % row )
+        for c in range(sizeColumns):
+            valueString = self.getValueString(row,c)
+            if valueString == None:
+                NTerror("Failed to get value as a string for row %s, column %s from relation %s" % (row,c,self.name))
+                return None
+            file_str.write( self.getValueString(row,c) )
+            if c < sizeColumnsMinusOne:
+                file_str.write(',')
+        return file_str.getvalue()
+
+    def getValueString( self, row, column):
+        """
+        Returns None on error.
+        Returns module variable NULL_STRING for None values. Modify if needed.
+        """
+        label = self.getColumnLabel(column);
+#        // Sanity checks
+        if label == False:
+            NTerror("Failed to Relation.getValueString for column idx %s. Existing column labels:" % (
+                column, str(self.columnOrder)))
+            return None
+        column = self.getColumnByIdx(column)
+        sizeRows = self.sizeRows()
+        if row < 0 or row >= self.sizeRows():
+            NTerror("Failed to Relation.getValueString for row idx %s is not in range of (0,%s) for column %s." % (
+                row, label, sizeRows))
+            return None
+
+        value = column[row]
+        if value == None:
+            return NULL_STRING
+        return str(value)
 
 
 class DBMS():
@@ -196,6 +371,7 @@ class DBMS():
         for i in range(csvFilesRead):
             relation = Relation(relationNames[i], self)
 #            NTmessage("Reading relation : " + relation.name)
+            csvFileDir = os.path.abspath(csvFileDir)
             csv_fileName = os.path.join(csvFileDir, relation.name + ".csv")
             if relation.readCsvFile(csv_fileName, containsHeaderRow):
                 NTerror("Failed to read csv file: " + csv_fileName)

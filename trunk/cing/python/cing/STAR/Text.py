@@ -22,6 +22,8 @@ Produces: 'RuntimeError: maximum recursion limit exceeded'
 ## this string prepended to each line.
 prepending_string   = '[raw] '
 
+NULL_STRING_DOT ='.'
+
 FREE = 0
 SINGLE = 1
 DOUBLE = 2
@@ -525,7 +527,7 @@ def _comments_strip_line( line ):
     return line
 
 def isStarNan(starValue):
-    if '.' == starValue:
+    if NULL_STRING_DOT == starValue:
         return True
 #    if '?' == starValue:
 #        return True

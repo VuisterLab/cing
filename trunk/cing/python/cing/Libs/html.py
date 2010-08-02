@@ -25,7 +25,7 @@ from cing.Libs.NTplot import boxAttributes
 from cing.Libs.NTplot import lineAttributes
 from cing.Libs.NTplot import plusPoint
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.find import find #@Reimport Important to overwrite the one imported via NTutils otherwise from string  import find
+from cing.Libs.find import find2 # Important to differ from NTutil's otherwise from string import find
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqNih import NUMBER_OF_SD_TALOS
 from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
@@ -74,6 +74,7 @@ cingPlotList = []
 cingPlotList.append( ('_01_cv_rms','cv/rms') )
 cingPlotList.append( ('_02_Qfactor_cs','Q-factor CS') )
 cingPlotList.append( ('_03_Cb4N_Cb4C','D1D2') )
+cingPlotList.append( ('_04_bb','Backbone dihedrals') )
 
 def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
     '''
@@ -175,7 +176,6 @@ def createHtmlCing(project, ranges=None):
     # Level 2: against main or alternative y-axis
     # Level 3: plot parameters dictionary (extendable).
     keyLoLoL = []
-
     plotAttributesRowMain = NTdict()
     plotAttributesRowAlte = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ PHI_STR, CV_STR ]
@@ -249,6 +249,43 @@ def createHtmlCing(project, ranges=None):
     printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[2][0] + ".pdf" )
     moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
     moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+
+
+#    keyLoLoL = []
+#    plotAttributesRowMain = NTdict()
+#    plotAttributesRowAlte = NTdict()
+#    plotAttributesRowMain[ KEY_LIST_STR] = [ PHI_STR, CV_STR ]
+#    plotAttributesRowMain[ KEY_LIST2_STR] = [ PSI_STR, CV_STR ]
+#    plotAttributesRowAlte[ KEY_LIST_STR] = [ 'cv_backbone' ]
+#    plotAttributesRowMain[ YLABEL_STR] = 'cv phi/psi'
+#    plotAttributesRowAlte[ YLABEL_STR] = 'cv backbone'
+#    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+#    plotAttributesRowMain[ USE_MAX_VALUE_STR] = 1.0
+#    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+#
+#    plotAttributesRowMain = NTdict()
+#    plotAttributesRowAlte = NTdict()
+#    plotAttributesRowMain[ KEY_LIST_STR] = [ CHI1_STR, CV_STR ]
+#    plotAttributesRowMain[ KEY_LIST2_STR] = [ CHI2_STR, CV_STR ]
+#    plotAttributesRowAlte[ KEY_LIST_STR] = [ 'cv_sidechain' ]
+#    plotAttributesRowMain[ YLABEL_STR] = 'cv chi1/2'
+#    plotAttributesRowAlte[ YLABEL_STR] = 'cv sidechain'
+#    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+#    plotAttributesRowMain[ USE_MAX_VALUE_STR]   = 1.0
+#    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+#
+#    plotAttributesRowMain = NTdict()
+#    plotAttributesRowAlte = NTdict()
+#    plotAttributesRowMain[ KEY_LIST_STR] = [ RMSD_STR, BACKBONE_AVERAGE_STR, VALUE_STR ]
+#    plotAttributesRowAlte[ KEY_LIST_STR] = [ RMSD_STR, HEAVY_ATOM_AVERAGE_STR, VALUE_STR ]
+#    plotAttributesRowMain[ YLABEL_STR] = BACKBONE_AVERAGE_STR
+#    plotAttributesRowAlte[ YLABEL_STR] = HEAVY_ATOM_AVERAGE_STR
+#    plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR] = True
+#    keyLoLoL.append([ [plotAttributesRowMain], [plotAttributesRowAlte] ])
+#    printLink = project.moleculePath( 'analysis', project.molecule.name + cingPlotList[0][0] + ".pdf" )
+#    moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
+#    moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
+
 #end def
 
 class HistogramsForPlotting():
@@ -1657,7 +1694,7 @@ class ProjectHTMLfile( HTMLfile ):
                     shutil.rmtree(dst)
                 shutil.copytree(htmlFile,  dst )
                 # TODO: exclude .svn items within subdir
-                svnDirectoryList = find(".svn", startdir=dst) # don't use the one from pylab.
+                svnDirectoryList = find2(".svn", startdir=dst) # don't use the one from pylab.
                 for f2 in svnDirectoryList:
 #                    NTdebug("Considering removing directory: %s" % (f2))
                     if os.path.exists(f2):

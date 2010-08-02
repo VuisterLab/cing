@@ -3487,6 +3487,7 @@ class PrintWrap:
                        noEOL=False,
                        useDate=False,
                        useProcessId=False,
+                       doubleToStandardStreams=False,
                        prefix = ''
                 ):
         self.autoFlush = autoFlush
@@ -3494,6 +3495,7 @@ class PrintWrap:
         self.noEOL     = noEOL
         self.useDate        = useDate
         self.useProcessId   = useProcessId
+        self.doubleToStandardStreams = doubleToStandardStreams
 
         if self.verbose > verbosityError:
             self.stream = sys.stdout
@@ -3508,6 +3510,11 @@ class PrintWrap:
             return
         if self.prefix:
             format = self.prefix + format
+        if self.doubleToStandardStreams:
+            fmt = format
+            if not self.noEOL:
+                fmt += '\n'
+            fprintf(sys.stdout, fmt, *args)
         if self.useDate:
             at = time.asctime()
             dateStr = str(at)
@@ -4645,6 +4652,46 @@ NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug)
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
 
+
+kwds = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
+NTnothingT              = PrintWrap(verbose=verbosityNothing                            , **kwds)
+NTerrorT                = PrintWrap(verbose=verbosityError, prefix = prefixError        , **kwds)
+NTcodeerrorT            = PrintWrap(verbose=verbosityError, prefix = prefixCodeError    , **kwds)
+NTexceptionT            = PrintWrap(verbose=verbosityError, prefix = prefixException    , **kwds)
+NTwarningT              = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning    , **kwds)
+NTmessageT              = PrintWrap(verbose=verbosityOutput                             , **kwds)
+NTdetailT               = PrintWrap(verbose=verbosityDetail                             , **kwds)
+NTdebugT                = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug        , **kwds)
+NTmessageNoEOLT         = PrintWrap(verbose=verbosityOutput, noEOL=True                 , **kwds)
+
+def teeToFile(logFile):
+    '''Starts to tee the different verbosity messages to a possibly existing file
+    Return True on failure.
+    '''
+#    logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
+    stream = None
+    try:
+        stream = open(logFile, 'a')
+    except:
+        NTtracebackError()
+        return True
+    NTnothingT.stream = stream
+    NTerrorT.stream = stream
+    NTcodeerrorT.stream = stream
+    NTexceptionT.stream = stream
+    NTwarningT.stream = stream
+    NTmessageT.stream = stream
+    NTdetailT.stream = stream
+    NTdebugT.stream = stream
+    NTmessageNoEOLT.stream = stream
+    NTnothingT.stream = stream
+
+
+#class NTmessage2(PrintWrap):
+#    def __init__(self):
+#        PrintWrap.__init__(self, stream, autoFlush, verbose, noEOL, useDate, useProcessId, doubleToStandardStreams, prefix)
+#    def __call__(self):
+#
 
 def NTtracebackError():
     traceBackString = format_exc()

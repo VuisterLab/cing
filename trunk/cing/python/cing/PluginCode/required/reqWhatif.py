@@ -1,3 +1,4 @@
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
@@ -104,8 +105,32 @@ nameDefs =[
             (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing')
 ]
 
+cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
+nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
+shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
+cingNameDict.keysformat()
+nameDict.keysformat()
+shortNameDict.keysformat()
+
 wiPlotList = []
 # GV: moved to outer level to not always call createHtmlWhatif
 wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
 wiPlotList.append( ('_02_bond_angle','BND/ANG/NQA/PLNCHK') )
 wiPlotList.append( ('_03_steric_acc_flip','BMP/ACC/FLP/CHI') )
+
+
+# Whatif id's for summary; will be keys in molecule[WHATIF_STR] dict
+# Make them available to 'outside world through the Whatif class
+summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
+                       BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  # second part.
+                     ]
+
+
+def cingCheckId( checkId ):
+    """Static method to return a cingId if exists. Returns checkId otherwise.
+    """
+    if cingNameDict.has_key(checkId) and cingNameDict[checkId] != None:
+        return cingNameDict[checkId]
+    return checkId
+#end def
+#cingCheckId = staticmethod( cingCheckId )
