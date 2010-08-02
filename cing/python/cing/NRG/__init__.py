@@ -13,6 +13,7 @@ PDB_DB_NAME = 'pdbcing'
 
 PDBJ_DB_USER_NAME = 'pdbj'
 PDBJ_DB_NAME = 'pdbmlplus'
+PDBJ_DB_HOST = 'localhost'
 
 CASD_NMR_BASE_NAME = 'CASD-NMR-CING'
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' + CASD_NMR_BASE_NAME

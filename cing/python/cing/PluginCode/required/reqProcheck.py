@@ -22,6 +22,10 @@ pc_rama_LIST_STR = [ pc_rama_core_STR, pc_rama_allow_STR, pc_rama_gener_STR, pc_
 MAX_PROCHECK_NMR_MODELS = 60
 #MAX_PROCHECK_NMR_MODELS = 2
 
+PCgFactorMinValue = - 3.0
+PCgFactorMaxValue = 1.0
+PCgFactorReverseColorScheme = True
+
 def to3StateUpper( strNTList ):
     """Exactly the same as Procheck postscript plots was attempted.
 

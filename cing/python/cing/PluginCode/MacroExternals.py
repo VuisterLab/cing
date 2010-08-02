@@ -4,6 +4,7 @@ can read to work on CING data.
 """
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.main import getStartMessage
 from random import random
 
@@ -14,15 +15,6 @@ except:
 #    NTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
 
 MolmolColorDict = dict(green = '0 1 0', orange = '1 0.647 0', red = '1 0 0')
-
-QshiftMinValue = 0.0
-QshiftMaxValue = 0.05
-QshiftReverseColorScheme = False
-
-PCgFactorMinValue = - 3.0
-PCgFactorMaxValue = 1.0
-PCgFactorReverseColorScheme = True
-
 
 loadTestingFile = True
 

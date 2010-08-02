@@ -88,8 +88,8 @@ def allDoYasaraRewritePdb():
 
 
 def removeTempFiles():
-#    entryCode = '1brv'
-    entryCode = '1cjg'
+    entryCode = '1brv'
+#    entryCode = '1cjg'
     ch23 = entryCode[1:3]
     D = '/Library/WebServer/Documents'
 #    D = '/Volumes/tera4'

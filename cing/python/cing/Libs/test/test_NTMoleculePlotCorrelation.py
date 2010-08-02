@@ -12,17 +12,8 @@ from cing.Libs.NTmoleculePlot import XLABEL_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.Whatif import ANGCHK_STR
-from cing.PluginCode.Whatif import BBCCHK_STR
-from cing.PluginCode.Whatif import BNDCHK_STR
-from cing.PluginCode.Whatif import C12CHK_STR
-from cing.PluginCode.Whatif import INOCHK_STR
-from cing.PluginCode.Whatif import QUACHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import ROTCHK_STR
-from cing.PluginCode.Whatif import WHATIF_STR
-from cing.PluginCode.Whatif import Whatif
-from cing.PluginCode.procheck import PROCHECK_STR
+from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from random import random
@@ -153,16 +144,16 @@ class AllChecks(TestCase):
         # KEY_LIST_STR3, KEY_LIST4_STR etc.
         plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR, QUACHK_STR, VALUE_LIST_STR ]
         plotAttributesRowMain[ KEY_LIST2_STR] = [ WHATIF_STR, RAMCHK_STR, VALUE_LIST_STR ]
-        plotAttributesRowMain[ XLABEL_STR] = Whatif.shortNameDict[  QUACHK_STR ]
-        plotAttributesRowMain[ YLABEL_STR] = Whatif.shortNameDict[  RAMCHK_STR ]
+        plotAttributesRowMain[ XLABEL_STR] = shortNameDict[  QUACHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR] = shortNameDict[  RAMCHK_STR ]
         plotAttributesRowMain[ USE_ROG_FOR_COLOR_STR] = True
         keyLoLoL.append([ [plotAttributesRowMain] ])
         #keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] ) future extension.
         plotAttributesRowMain = NTdict()
         plotAttributesRowMain[ KEY_LIST_STR] =  [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ]
         plotAttributesRowMain[ KEY_LIST2_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
-        plotAttributesRowMain[ XLABEL_STR]   = Whatif.shortNameDict[  QUACHK_STR ]
-        plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  C12CHK_STR ]
+        plotAttributesRowMain[ XLABEL_STR]   = shortNameDict[  QUACHK_STR ]
+        plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  C12CHK_STR ]
         plotAttributesRowMain[ USE_ROG_FOR_COLOR_STR] = True
         keyLoLoL.append( [ [plotAttributesRowMain] ] )
 

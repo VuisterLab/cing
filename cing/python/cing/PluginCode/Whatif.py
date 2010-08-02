@@ -38,8 +38,8 @@ class WhatifResult( NTdict ):
                          comment = Whatif.explain(checkID),
                        )
 #        # Initialize the lists
-        if Whatif.cingNameDict.has_key(checkID):
-            self.alternate = Whatif.cingNameDict[checkID]
+        if cingNameDict.has_key(checkID):
+            self.alternate = cingNameDict[checkID]
         for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
             self[c] = NTfill( None, modelCount)
 
@@ -109,18 +109,6 @@ class Whatif( NTdict ):
     NUMBER_RESIDUES_PER_SECONDS = 7 # Was 13 before.
 
     debugCheck = 'BNDCHK'
-    cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
-    nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
-    shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
-    cingNameDict.keysformat()
-    nameDict.keysformat()
-    shortNameDict.keysformat()
-
-    # Whatif id's for summary; will be keys in molecule[WHATIF_STR] dict
-    # Make them available to 'outside world through the Whatif class
-    summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
-                           BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  # second part.
-                         ]
 
     recordKeyWordsToIgnore = { # Using a dictionary for fast key checks below.
                               "Bad":None,
@@ -363,7 +351,7 @@ fullstop y
             if not self.molecule[WHATIF_STR].has_key(checkId):
                 self.molecule[WHATIF_STR][checkId] = WhatifResult( checkId, level='MOLECULE', modelCount = self.molecule.modelCount)
                 # optionally add reference to alternate Cing name
-                cingId = Whatif.cingCheckId( checkId )
+                cingId = cingCheckId( checkId )
                 if cingId != checkId:
                     self.molecule[WHATIF_STR][cingId] = self.molecule[WHATIF_STR][checkId]
 
@@ -414,7 +402,7 @@ fullstop y
         summaryCheckIdMandatoryList = [ BNDCHK_STR, ANGCHK_STR ]
         valueList = [ ]
         qualList  = [ ]
-        for checkId in Whatif.summaryCheckIdList:
+        for checkId in summaryCheckIdList:
             ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR)
             if not ensembleValueList:
                 msg = "empty ensembleValueList for checkId %s" % checkId
@@ -542,7 +530,7 @@ RMS Z-scores, should be close to 1.0:
                 curCheck = None
                 checkID = value # local var within this 'if' statement.
 #                NTdebug("found check ID: " + checkID)
-                if not self.nameDict.has_key( checkID ):
+                if not nameDict.has_key( checkID ):
                     NTwarning("Whatif._parseCheckdb: Skipping an unknown CheckID: "+checkID)
                     continue
 #                if self.debugCheck != checkID:
@@ -776,23 +764,13 @@ Name   :    0 ; A    ;   40 ; THR  ; _    ; HG21 ; _
         Returns None if no such explanation exists
         """
         if checkID == None:
-            return Whatif.nameDict.format()
-        elif checkID!=None and Whatif.nameDict.has_key(checkID):
-            return Whatif.nameDict[checkID]
+            return nameDict.format()
+        elif checkID!=None and nameDict.has_key(checkID):
+            return nameDict[checkID]
         else:
             return None
     #end def
     explain = staticmethod(explain)
-
-
-    def cingCheckId( checkId ):
-        """Static method to return a cingId if exists. Returns checkId otherwise.
-        """
-        if Whatif.cingNameDict.has_key(checkId) and Whatif.cingNameDict[checkId] != None:
-            return Whatif.cingNameDict[checkId]
-        return checkId
-    #end def
-    cingCheckId = staticmethod( cingCheckId )
 #end Class
 
 
@@ -808,25 +786,25 @@ def createHtmlWhatif(project, ranges=None):
     keyLoLoL = []
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          QUACHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  QUACHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  QUACHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          RAMCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  RAMCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  RAMCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BBCCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BBCCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  BBCCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowAlte = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          C12CHK_STR,         VALUE_LIST_STR ]
     plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          ROTCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  C12CHK_STR ]
-    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  ROTCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  C12CHK_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = shortNameDict[  ROTCHK_STR ]
 #        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
     keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
 
@@ -846,31 +824,31 @@ def createHtmlWhatif(project, ranges=None):
     keyLoLoL = []
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BNDCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BNDCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  BNDCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          ANGCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  ANGCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  ANGCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          NQACHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  NQACHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  NQACHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowAlte = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          PLNCHK_STR,         VALUE_LIST_STR ]
     plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          PL2CHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  PLNCHK_STR ]
-    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  PL2CHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  PLNCHK_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = shortNameDict[  PL2CHK_STR ]
 #        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
     keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          PL3CHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  PL3CHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  PL3CHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
 #    printLink = os.path.join(
@@ -889,26 +867,26 @@ def createHtmlWhatif(project, ranges=None):
     keyLoLoL = []
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          BMPCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  BMPCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  BMPCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowAlte = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          ACCLST_STR,         VALUE_LIST_STR ]
     plotAttributesRowAlte[ KEY_LIST_STR] = [ WHATIF_STR,          INOCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  ACCLST_STR ]
-    plotAttributesRowAlte[ YLABEL_STR]   = Whatif.shortNameDict[  INOCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  ACCLST_STR ]
+    plotAttributesRowAlte[ YLABEL_STR]   = shortNameDict[  INOCHK_STR ]
 #        plotAttributesRowMain[ USE_ZERO_FOR_MIN_VALUE_STR]   = True
     keyLoLoL.append( [ [plotAttributesRowMain], [plotAttributesRowAlte] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          FLPCHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  FLPCHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  FLPCHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
     plotAttributesRowMain = NTdict()
     plotAttributesRowMain[ KEY_LIST_STR] = [ WHATIF_STR,          CHICHK_STR,         VALUE_LIST_STR ]
-    plotAttributesRowMain[ YLABEL_STR]   = Whatif.shortNameDict[  CHICHK_STR ]
+    plotAttributesRowMain[ YLABEL_STR]   = shortNameDict[  CHICHK_STR ]
     keyLoLoL.append( [ [plotAttributesRowMain] ] )
 
 
@@ -1103,7 +1081,7 @@ def runWhatif( project, parseOnly=False ):
         else:
             # check and initiate altenative cingId names
             for checkId, item in res[WHATIF_STR].items():
-                cingId = Whatif.cingCheckId( checkId )
+                cingId = cingCheckId( checkId )
                 if cingId != checkId:
                     res[WHATIF_STR][cingId] = item
 #            for key1, key2 in [('RAMCHK', 'ramanchandran'),

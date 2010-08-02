@@ -20,9 +20,9 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from database import NTdb
 from math import acos
+from numpy import linalg as LA
 from parameters import plotParameters
 from pylab import * #@UnusedWildImport # otherwise use this line.
-#from numpy.matrixlib.defmatrix import mat # backwards compatible; this changed in going to matplotlib 0.99.1.2_0 dep ?
 
 #==============================================================================
 # Global variables
@@ -1942,6 +1942,53 @@ Return an Molecule instance or None on error
             NTerror('Molecule.toSML: no SMLhandler defined')
         #end if
     #end def
+
+
+    def radiusOfGyration( self, model=0 ):
+        """
+        Return radius of gyration of model.
+        Uses CA coordinates
+        Following
+        HAVEL and WUTHRICH. AN EVALUATION OF THE COMBINED USE OF NUCLEAR MAGNETIC-RESONANCE AND DISTANCE GEOMETRY
+        FOR THE DETERMINATION OF PROTEIN CONFORMATIONS IN SOLUTION.
+        Journal of Molecular Biology (1985) vol. 182 (2) pp. 281-294
+
+        Algorithm: pp. 284
+        """
+        xx  = 0.0
+        yy  = 0.0
+        zz  = 0.0
+        xy  = 0.0
+        xz  = 0.0
+        yz  = 0.0
+        n = 0
+        for res in self.allResidues():
+            if res.hasProperties('protein') and res.CA.hasCoordinates() and model < len(res.CA.coordinates):
+                x = res.CA.coordinates[model].x
+                y = res.CA.coordinates[model].y
+                z = res.CA.coordinates[model].z
+                xx  += x*x
+                yy  += y*y
+                zz  += z*z
+                xy  += x*y
+                xz  += x*z
+                yz  += y*z
+                n += 1
+            #end if
+        #end for
+
+        a = np.array([
+                      [yy+zz,      -xy,      -xz],
+                      [  -xy,    xx+zz,      -yz],
+                      [  -xz,      -xy,    xx+yy]
+                     ])
+        a = a*(3.0/n)
+
+        w, v = LA.eig(a)
+        print w,v
+        return NTlist(*map(math.sqrt, w))
+    #end def
+
 #end class
 
 

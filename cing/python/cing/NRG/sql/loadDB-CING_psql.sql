@@ -1,74 +1,11 @@
 -- * Run by command like:
---   Change to correct sql file in python executable and then:
--- * python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py casdcing
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    $D/NRG-CING/pgsql
 
 delete from casdcing.cingentry;
 
-COPY casdcing.cingentry 	FROM '/Users/jd/CASD-NMR-CING/pgsql/casdcing.cingentry.csv' CSV HEADER;
-COPY casdcing.cingchain 	FROM '/Users/jd/CASD-NMR-CING/pgsql/casdcing.cingchain.csv' CSV HEADER;
-COPY casdcing.cingresidue 	FROM '/Users/jd/CASD-NMR-CING/pgsql/casdcing.cingresidue.csv' CSV HEADER;
-COPY casdcing.cingatom 		FROM '/Users/jd/CASD-NMR-CING/pgsql/casdcing.cingatom.csv' CSV HEADER;
----- derived tables from createDepTables.sql
-
--- Should be from db but right now hacked in with:
--- cat ~/pc.grep | gawk '{print substr($0,9,4), $4, $6, $8, $10}' | sed -e 's/%//g' | sed -e 's/ /,/g' >\
---   $D/NRG-CING/pgsql/nrgcing.tmppc.csv
--- Plus the header:
--- pdb_id,pc_rama_core,pc_rama_allow,pc_rama_gener,pc_rama_disall
-
-CREATE TABLE nrgcing.tmppc
-(
-    pdb_id                         VARCHAR(255) UNIQUE,
-    pc_rama_core                      FLOAT DEFAULT NULL,
-    pc_rama_allow                      FLOAT DEFAULT NULL,
-    pc_rama_gener                      FLOAT DEFAULT NULL,
-    pc_rama_disall                      FLOAT DEFAULT NULL
-);
-
-COPY nrgcing.tmppc 		FROM '/Library/WebServer/Documents/NRG-CING/pgsql/nrgcing.tmppc.csv' CSV HEADER;
-
-DROP TABLE IF EXISTS nrgcing.matchbmrb;
-CREATE TABLE nrgcing.matchbmrb
-(
-    bmrb_id                        INT,
-    pdb_id                         VARCHAR(255) UNIQUE,
-    overall_score                  INT DEFAULT NULL
-);
-COPY nrgcing.matchbmrb 		FROM '/Users/jd/workspace35/cing/data/NRG/score_many2one_new.csv' CSV HEADER;
-
-DROP TABLE IF EXISTS nrgcing.matchbmrbadit;
-CREATE TABLE nrgcing.matchbmrbadit
-(
-    bmrb_id                        INT UNIQUE,
-    pdb_id                         VARCHAR(255)
-);
-COPY nrgcing.matchbmrbadit 		FROM '/Users/jd/workspace35/cing/data/NRG/adit_nmr_matched_pdb_bmrb_entry_ids.csv' CSV HEADER;
-
-
-DROP TABLE IF EXISTS nrgcing.bmrb;
-CREATE TABLE nrgcing.bmrb
-(
-    bmrb_id                        INT UNIQUE
-);
-COPY nrgcing.bmrb 		FROM '/Users/jd/workspace35/cing/data/NRG/bmrb.csv' CSV HEADER;
-
-select pdb_id from nrgcing.matchbmrb
-where pdb_id not in (select pdbid from pdbj.brief_summary)
-order by pdb_id
-;
-
-select bmrb_id from nrgcing.matchbmrb
-where bmrb_id not in (select bmrb_id from nrgcing.bmrb)
-order by bmrb_id
-;
-
-
-select bmrb_id from nrgcing.matchbmrbadit
-where bmrb_id not in (select bmrb_id from nrgcing.bmrb)
-order by bmrb_id
-;
-select distinct pdb_id from nrgcing.matchbmrbadit
-where pdb_id not in (select pdbid from pdbj.brief_summary)
-order by pdb_id
-;
-
+-- $cwd is replace by absolute path.
+COPY casdcing.cingentry ( entry_id,name,bmrb_id,casd_id,pdb_id,is_solid,is_paramagnetic,is_membrane,is_multimeric,chothia_class,protein_count,dna_count,rna_count,dna_rna_hybrid_count,is_minimized,software_collection,software_processing,software_analysis,software_struct_solution,software_refinement,in_recoord,in_casd,in_dress,ranges,res_count,model_count,distance_count,dihedral_count,rdc_count,peak_count,cs_count,cs1h_count,cs13c_count,cs15n_count,wi_angchk,wi_bbcchk,wi_bmpchk,wi_bndchk,wi_c12chk,wi_chichk,wi_flpchk,wi_hndchk,wi_inochk,wi_nqachk,wi_omechk,wi_pl2chk,wi_pl3chk,wi_plnchk,wi_quachk,wi_ramchk,wi_rotchk,pc_gf,pc_gf_phipsi,pc_gf_chi12,pc_gf_chi1,noe_compl4,rog )
+FROM '$cwd/casdcing.cingentry.csv' 	CSV HEADER;
+COPY casdcing.cingchain 	FROM '$cwd/casdcing.cingchain.csv' 	 CSV HEADER;
+COPY casdcing.cingresidue 	FROM '$cwd/casdcing.cingresidue.csv' CSV HEADER;
+COPY casdcing.cingatom 		FROM '$cwd/casdcing.cingatom.csv' 	 CSV HEADER;

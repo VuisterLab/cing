@@ -50,11 +50,11 @@ class CingSummary( NTdict ):
 
                     )
         if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-            from cing.PluginCode.Whatif import Whatif # JFD: This breaks the plugin concept somewhat.
+#            from cing.PluginCode.Whatif import Whatif # JFD: This breaks the plugin concept somewhat.
             # Add all Whatif summary check Id's
             # The below causes an exception when called on a system that has no Whatif.
-            for checkId in Whatif.summaryCheckIdList:
-                key = 'WI_' + Whatif.cingCheckId(checkId)
+            for checkId in summaryCheckIdList:
+                key = 'WI_' + cingCheckId(checkId)
                 self[key] = None
         #end if
 
@@ -108,11 +108,10 @@ class CingSummary( NTdict ):
 
         # Whatif
         if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-            from cing.PluginCode.Whatif import Whatif # JFD mentions bad practise to do here. Move to the top.
             if self.proteinResidueCount > 0 and project.whatifStatus.completed and project.whatifStatus.parsed:
-                for checkId in Whatif.summaryCheckIdList:
+                for checkId in summaryCheckIdList:
                     if project.molecule[WHATIF_STR].has_key(checkId):
-                        key = 'WI_' + Whatif.cingCheckId(checkId)
+                        key = 'WI_' + cingCheckId(checkId)
                         self[key] = project.molecule[WHATIF_STR][checkId].average(fmt='%6.3f +/- %5.3f')
             #end if
         #end if

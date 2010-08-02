@@ -10,7 +10,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def creatSimpleFastProject(self):
+    def createSimpleFastProject(self):
         entryId = 'test'
 
         os.chdir(cingDirTmp)
@@ -38,7 +38,7 @@ class AllChecks(TestCase):
 #        NTmessage( mol.format() )
 
     def test_simplifySpecificallyForFcFeature(self):
-        self.creatSimpleFastProject()
+        self.createSimpleFastProject()
         self.distanceRestraintList = self.project.distances.new(DR_LEVEL, status = 'keep')
         atomPairs = NTlist()
         r1 = self.r1
@@ -112,6 +112,33 @@ class AllChecks(TestCase):
             i += 1
             firstAtom = atomList[0]
             self.assertEqual( firstAtom.getRepresentativePseudoAtom(atomList), pseudoListResultExpected[i])
+
+    def testCreateProjects(self):
+        entryId = 'test'
+
+        os.chdir(cingDirTmp)
+        self.project = Project( entryId )
+        self.project.removeFromDisk()
+        self.project = Project.open( entryId, status='new' )
+
+
+        mol = Molecule('test')
+        self.project.appendMolecule(mol)
+        c = mol.addChain('A')
+        r1 = c.addResidue('VAL', 1, Nterminal = True)
+        if r1:
+            r1.addAllAtoms()
+        r2 = c.addResidue('VAL', 2)
+        if r2:
+            r2.addAllAtoms()
+        r3 = c.addResidue('GLU', 3, Cterminal = True)
+        if r3:
+            r3.addAllAtoms()
+        self.r1 = r1
+        self.r2 = r2
+        self.r3 = r3
+        mol.updateAll()
+#        NTmessage( mol.format() )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

@@ -4,13 +4,11 @@ python $CINGROOT/python/cing/Libs/test/test_DBMS.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
+from cing.Libs.NTutils import * #@UnusedWildImport
 from glob import glob
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
@@ -35,6 +33,7 @@ class AllChecks(TestCase):
         mTableHash = mTable.getHash()
         rowList = mTableHash['2rop']
         self.assertEqual(11041,rowList[1])
+        NTdebug('\n'+str(mTable))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

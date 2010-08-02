@@ -1,115 +1,137 @@
 '''
 Created on Jul 20, 2010
 
-Should put all output in log file and not on sys.stdout/err.
+This script will put some output in the persisting log file ~/Library/Logs/weeklyUpdatePdbjMine.log
 
 Execute from cron like:
-05 15 * * wed  (/opt/local/bin/python /Users/jd/workspace35/cingStable/python/cing/NRG/weeklyUpdatePdbjMine.py 2>&1)|mail -s rsyncPDB.log jd
+05 15 * * wed  (/opt/local/bin/python /Users/jd/workspace35/cingStable/python/cing/NRG/weeklyUpdatePdbjMine.py 2>&1)|mail -s weeklyUpdatePdbjMine.log jd
 python $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
 
 @author: jd
 '''
 from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG import * #@UnusedWildImport
 
-tmp_dir = '/Users/jd/tmpPdbj'
-
-logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
-psqlLogFile = 'psqlUpdate.latest.log'
-psqlTmpCsvFile = 'psqlCmd.csv'
-stream = open(logFile, 'a')
-kwds = {'stream':stream, 'useDate':True, 'useProcessId':True}
-log_message = PrintWrap(verbose=verbosityOutput, **kwds)
-log_error = PrintWrap(verbose=verbosityError, prefix=prefixError, **kwds)
-log_debug = PrintWrap(verbose=verbosityDebug, prefix=prefixDebug, **kwds)
-log_message('Hello msg')
-log_error('Hello error')
-log_debug('Hello buggie')
-NTmessage("Message to mail")
-NTerror("Message to mail")
-sys.exit(0)
+#stream = open(logFile, 'a')
+#kwds = {'stream':stream, 'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
+#log_message = PrintWrap(verbose=verbosityOutput, **kwds)
+#log_error = PrintWrap(verbose=verbosityError, prefix=prefixError, **kwds)
+#log_debug = PrintWrap(verbose=verbosityDebug, prefix=prefixDebug, **kwds)
+#cing.verbosity = cing.verbosityDebug
+#NTerrorT('Hello error')
+#NTdebugT('Hello buggie')
+#NTmessageT("Hello new teed message")
+#sys.exit(0)
 
 
 def run():
     '''returns True on error'''
 
+    tmp_dir = '/Users/jd/tmpPdbj'
+    psqlLogFile = 'psqlUpdate.latest.log'
+    psqlTmpCsvFile = 'psqlCmd.csv'
+
     os.chdir(tmp_dir)
+    logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
+    if teeToFile(logFile):
+        NTerror("Failed to start tea party to: %s" % logFile)
+        sys.exit(1)
+
+    NTmessageT("Starting $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py")
 
     fn = os.path.join('pdbmlplus_weekly.latest.gz')
     if False:
         if os.path.exists(fn):
-            log_message('Removing previous copy of %s' % fn)
+            NTmessageT('Removing previous copy of %s' % fn)
             os.unlink(fn)
-        fnUrl = os.path.join('ftp://ftp.pdbj.org/mine/weekly', fn)
-    if False:
-        log_message("Starting downloading weekly update")
+        NTmessageT("Starting downloading weekly update")
 #        wgetProgram = ExecuteProgram('wget --no-verbose %s' % fnUrl, redirectOutput=False)
-        wgetProgram = ExecuteProgram('wget %s' % fnUrl, redirectOutput=False)
+        fnUrl = os.path.join('ftp://ftp.pdbj.org/mine/weekly', fn)
+        # if this is still too verbose try: --quiet
+        wgetProgram = ExecuteProgram('wget --no-verbose %s' % fnUrl, redirectOutput=False)
         exitCode = wgetProgram()
         if exitCode:
-            log_error("Failed to download file %s" % fnUrl)
+            NTerrorT("Failed to download file %s" % fnUrl)
             return True
 
         if not os.path.exists(fn):
-            log_error('Downloaded file %s not found' % fn)
+            NTerrorT('Downloaded file %s not found' % fn)
             return True
 
         if not os.path.getsize(fn):
-            log_error('Downloaded empty file %s' % fn)
+            NTerrorT('Downloaded empty file %s' % fn)
             return True
-        log_message("Downloaded %s" % fn)
+        NTmessage("Downloaded %s" % fn)
 
     if False:
-        log_message("Starting weekly update")
+        # Absolutely needed to redirect to separate log file as these get very verbose when there are errors..
         command = 'gunzip < %s | psql pdbmlplus pdbj' % fn
+        NTmessageT("Starting weekly update with [%s] and logging to: %s" % ( command, psqlLogFile ))
         psqlProgram = ExecuteProgram(command, redirectOutputToFile=psqlLogFile)
         exitCode = psqlProgram()
         if exitCode:
-            log_error("Failed to run psql program with command: [%s]" % command)
+            NTerrorT("Failed to run psql program with command: [%s]" % command)
             return True
     if True:
-        log_message("Getting overall number of entry count")
+        NTmessage("Getting overall number of entry count")
+
         if os.path.exists(psqlTmpCsvFile):
-            log_debug('Removing previous copy of %s' % psqlTmpCsvFile)
-            os.unlink(fn)
+            NTdebug('Removing previous copy of %s' % psqlTmpCsvFile)
+            os.unlink(psqlTmpCsvFile)
 
         # without semi-colon
         sqlSelectCmd = "select count(*) from pdbj.brief_summary"
         # without semi-colon
-        sqlCopyCmd = "COPY (%s) TO STDOUT WITH CSV" % sqlSelectCmd
-        command = "psql -h nmr --command='%s' pdbmlplus pdbj" % sqlCopyCmd
-        log_debug("command: [%s]" % command)
+        sqlCopyCmd = "COPY (%s) TO STDOUT WITH CSV HEADER" % sqlSelectCmd
+        command = "psql -h %s --command='%s' pdbmlplus pdbj" % ( PDBJ_DB_HOST, sqlCopyCmd)
+        NTdebug("command: [%s]" % command)
         psqlProgram = ExecuteProgram(command, redirectOutputToFile=psqlTmpCsvFile)
         exitCode = psqlProgram()
         if exitCode:
-            log_error("Failed to run psql program with command: [%s]" % command)
+            NTerrorT("Failed to run psql program with command: [%s]" % command)
             return True
         if not os.path.exists( psqlTmpCsvFile ):
-            log_error('Csv file %s not found' % psqlTmpCsvFile)
+            NTerror('Csv file %s not found' % psqlTmpCsvFile)
             return True
         if not os.path.getsize(psqlTmpCsvFile):
-            log_error('Csv file %s is empty' % psqlTmpCsvFile)
+            NTerror('Csv file %s is empty' % psqlTmpCsvFile)
             return True
         relationNames = [ psqlTmpCsvFile ]
-        # Truncate the extensions
+        # Truncate the .csv extensions
         relationNames = [ relationName[:-4] for relationName in relationNames]
         dbms = DBMS()
         if dbms.readCsvRelationList(relationNames):
-            log_error("Failed to read relation: %s" % str(relationNames))
+            NTerror("Failed to read relation: %s" % str(relationNames))
             return True
         entryCountTable = dbms.tables[relationNames[0]]
-        entryCountList = entryCountTable.columnOrder[0]
+#        NTdebug('\n'+str(entryCountTable))
+        entryCountColumnName = entryCountTable.columnOrder[0]
+        if entryCountColumnName != 'count':
+            NTerrorT("Failed to find count column name from DB")
+            return True
+        entryCountList = entryCountTable.getColumnByIdx(0)
         entryCount = entryCountList[0]
         NTmessage("Currently found %s number of entries in pdbmlplus" % entryCount)
 
-
-
-
-
-
-    log_message("Ending weekly updates")
-
 if __name__ == '__main__':
+#    cing.verbosity = cing.verbosityDebug
     if run():
-        log_error("Failed to run weeklyUpdatePdbjMine")
+        NTerrorT("Failed to run weeklyUpdatePdbjMine")
         sys.exit(1)
+    NTmessageT("Ending weeklyUpdatePdbjMine")
+
+#sys.exit(1)
+#from cing.Libs.DBMS import DBMS
+#from cing.Libs.NTutils import * #@UnusedWildImport
+#from cing.NRG import * #@UnusedWildImport
+#cing.verbosity = cing.verbosityDebug
+#
+#tmp_dir = '/Users/jd/tmpPdbj'
+#psqlTmpCsvFile = 'psqlCmd.csv'
+#
+#os.chdir(tmp_dir)
+#
+#dbms = DBMS()
+#relationNames = [ psqlTmpCsvFile ]
+#relationNames = [ relationName[:-4] for relationName in relationNames]

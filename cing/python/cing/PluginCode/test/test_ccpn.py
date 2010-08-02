@@ -25,7 +25,7 @@ class AllChecks(TestCase):
         fastestTest = True
 
         modelCount=99
-        redoFromCingProject = True
+        redoFromCingProject = False
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
