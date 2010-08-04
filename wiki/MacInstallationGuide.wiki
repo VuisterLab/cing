@@ -19,6 +19,7 @@ port install povray
 port install imagemagick
 port install ghostscript
 port install py26-pil
+port install py26-scipy
 }}}
 Make sure the matplotlib version is at least 0.99.1.1.
 
