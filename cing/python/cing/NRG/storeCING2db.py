@@ -1,11 +1,12 @@
 # Execute like:
 # cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ALyon2; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD .
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD
 #
 # cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG .
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 #
-# NB this script fails if the Postgresql backend is not installed.
+# NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
+
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -30,13 +31,15 @@ else:
     db_name = CASD_DB_NAME
     user_name = CASD_DB_USER_NAME
 
-def main( entry_code, archive_id, *extraArgList):
-    """inputDir may be a directory or a url.
+def doStoreCING2db( entry_code, archive_id, project = None):
+    """Cwd should be where the project is located.
     Returns True on error.
-    """
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    If project is given then use that instead of loading a different one.
+    """
+    doReadProject = True
+    if project:
+        doReadProject = False
 
     pdb_id = None
     casd_id = None
@@ -47,7 +50,7 @@ def main( entry_code, archive_id, *extraArgList):
             NTerror("Expected pdb_id argument")
             return True
         if not is_pdb_code(pdb_id):
-            NTerror("Expected pdb_id argument")
+            NTerror("Expected pdb_id argument and [%s] isn't recognized as such." % pdb_id)
             return True
         if archive_id == ARCHIVE_NRG_ID:
             schema = NRG_DB_NAME
@@ -62,26 +65,28 @@ def main( entry_code, archive_id, *extraArgList):
         NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
 
-    expectedArgumentList = [ 'inputDir']
-    expectedNumberOfArguments = len(expectedArgumentList)
-    if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got extra arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of extra arguments: %d got %d" % (
-            expectedNumberOfArguments, len(extraArgList)))
-        NTerror("Expected arguments: %s" % expectedArgumentList)
-        return True
-
-    inputDir = extraArgList[0]
+#    expectedArgumentList = [ 'inputDir']
+#    expectedNumberOfArguments = len(expectedArgumentList)
+#    if len(extraArgList) != expectedNumberOfArguments:
+#        NTerror("Got extra arguments: " + `extraArgList`)
+#        NTerror("Failed to get expected number of extra arguments: %d got %d" % (
+#            expectedNumberOfArguments, len(extraArgList)))
+#        NTerror("Expected arguments: %s" % expectedArgumentList)
+#        return True
+#
+#    inputDir = extraArgList[0]
 #    archiveType = extraArgList[1]
 #    projectType = extraArgList[2]
 
-    NTdebug("Using:")
+    NTdebug("Starting doStoreCING2db using:")
     NTdebug("entry_code:           %s" % entry_code)
-    NTdebug("inputDir:             %s" % inputDir)
+#    NTdebug("inputDir:             %s" % inputDir)
     NTdebug("archive_id:           %s" % archive_id)
     NTdebug("user_name:            %s" % user_name)
     NTdebug("db_name:              %s" % db_name)
     NTdebug("schema:               %s" % schema)
+    NTdebug("doReadProject:        %s" % doReadProject)
+
 
 #    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
     csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
@@ -97,21 +102,24 @@ def main( entry_code, archive_id, *extraArgList):
     cresidue = csql.cingresidue
     catom = csql.cingatom
 
-    # presume the directory still needs to be created.
-    cingEntryDir = entry_code + ".cing"
+    if doReadProject:
+        # presume the directory still needs to be created.
+        cingEntryDir = entry_code + ".cing"
 
-#    NTmessage("Now in %s" % os.path.curdir)
+    #    NTmessage("Now in %s" % os.path.curdir)
 
-    if not os.path.isdir(cingEntryDir):
-        NTerror("Failed to find input directory: %s" % cingEntryDir)
-        return
-    # end if.
+        if not os.path.isdir(cingEntryDir):
+            NTerror("Failed to find input directory: %s" % cingEntryDir)
+            return
+        # end if.
 
-    # Needs to be copied because the open method doesn't take a directory argument..
-    project = Project.open(entry_code, status='old')
-    if not project:
-        NTerror("Failed to init old project")
-        return True
+        # Needs to be copied because the open method doesn't take a directory argument..
+        project = Project.open(entry_code, status='old')
+        if not project:
+            NTerror("Failed to init old project")
+            return True
+        # end if.
+    # end if project
 
     # shortcuts
     p = project
@@ -168,7 +176,7 @@ def main( entry_code, archive_id, *extraArgList):
 
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
-    p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR)
+    p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR) # not used
     p_wi_bndchk = molecule.getDeepAvgByKeys(WHATIF_STR, BNDCHK_STR, VALUE_LIST_STR)
     p_wi_c12chk = molecule.getDeepAvgByKeys(WHATIF_STR, C12CHK_STR, VALUE_LIST_STR)
     p_wi_chichk = molecule.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
@@ -233,10 +241,10 @@ def main( entry_code, archive_id, *extraArgList):
         wi_quachk=p_wi_quachk,
         wi_ramchk=p_wi_ramchk,
         wi_rotchk=p_wi_rotchk,
-    	pc_gf=p_pc_gf,
-    	pc_gf_chi12=p_pc_gf_chi12,
-    	pc_gf_chi1=p_pc_gf_chi1,
-    	pc_gf_phipsi=p_pc_gf_phipsi,
+        pc_gf=p_pc_gf,
+        pc_gf_chi12=p_pc_gf_chi12,
+        pc_gf_chi1=p_pc_gf_chi1,
+        pc_gf_phipsi=p_pc_gf_phipsi,
         pc_rama_core                    =p_pc_rama_core,
         pc_rama_allow                   =p_pc_rama_allow,
         pc_rama_gener                   =p_pc_rama_gener,
@@ -371,10 +379,10 @@ def main( entry_code, archive_id, *extraArgList):
                 wi_quachk=r_wi_quachk,
                 wi_ramchk=r_wi_ramchk,
                 wi_rotchk=r_wi_rotchk,
-        		pc_gf=r_pc_gf,
-        		pc_gf_chi12=r_pc_gf_chi12,
-        		pc_gf_chi1=r_pc_gf_chi1,
-        		pc_gf_phipsi=r_pc_gf_phipsi,
+                pc_gf=r_pc_gf,
+                pc_gf_chi12=r_pc_gf_chi12,
+                pc_gf_chi1=r_pc_gf_chi1,
+                pc_gf_phipsi=r_pc_gf_phipsi,
                 noe_compl4=r_noe_compl4,
                 chk_ramach = r_chk_ramach,
                 chk_janin = r_chk_janin,
@@ -460,7 +468,7 @@ def main( entry_code, archive_id, *extraArgList):
             # end if atom
         # end for residue
     # end for chain
-    NTdebug("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
+    NTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
     project.close(save=False)
 
     # Needed for the above hasn't been auto-committed.
@@ -471,8 +479,11 @@ def main( entry_code, archive_id, *extraArgList):
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
+    # Assume CING didn't already printed this.
+    NTmessage(header)
+    NTmessage(getStartMessage())
     try:
-        status = main(*sys.argv[1:])
+        status = doStoreCING2db(*sys.argv[1:])
         if status:
             NTerror("Failed script: storeCING2db.py")
     finally:

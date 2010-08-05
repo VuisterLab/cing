@@ -102,7 +102,40 @@ nameDefs =[
             (RES_LEVEL, 'TO2CHK',  None,          'Missing C-terminal groups',                                 'Missing C-terminal groups'),
             (RES_LEVEL, 'TOPPOS',  None,          'Ligand without know topology',                              'Ligand without know topology'),
             (RES_LEVEL, 'TORCHK',  None,          'Unknown check',                                             'Unknown check'),
-            (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing')
+            (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing'),
+
+            (PROJECT_LEVEL, 'BBCCHK', 'bbNormality',  'Backbone normality Z-score',                                'Backbone normality' ),
+            (PROJECT_LEVEL, 'BNDCHK', 'bondLengths',  'Bond lengths',                                              'Bond lengths'),
+#            (RES_LEVEL, 'BVALST',  None,          'B-Factors',                                                 'B-Factors'),
+#            (RES_LEVEL, 'C12CHK', 'janin',        'Janin',                                                     'Janin Z'),
+#            (RES_LEVEL, 'CCOCHK',  None,          'Inter-chain connection check',                              'Inter-chain connection check'),
+#            (RES_LEVEL, 'EXTO2',   None,          'Test for extra OXTs',                                       'Test for extra OXTs'),
+#            (RES_LEVEL, 'FATAL',   None,          'Fatal errors',                                              'Unknown check'), # new in Version  : 8.0 (20091126-0948)
+#            (RES_LEVEL, 'FLPCHK',  None,          'Peptide flip',                                              'Peptide flip'),
+#            (RES_LEVEL, 'H2OCHK',  None,          'Water check',                                               'Water check'),
+#            (RES_LEVEL, 'H2OHBO',  None,          'Water Hydrogen bond',                                       'Water Hydrogen bond'),
+#            (RES_LEVEL, 'HNQCHK',  None,          'Flip HIS GLN ASN hydrogen-bonds',                           'Flip HIS GLN ASN hydrogen-bonds'),
+#            (RES_LEVEL, 'Hand',    None,          '(Pro-)chirality or handness check',                         'Handness'),
+#            (RES_LEVEL, 'INOCHK', 'accessibilities','Accessibility',                                             'Accessibility Z.'),
+#            (RES_LEVEL, 'NAMCHK',  None,          'Atom names',                                                'Atom names'),
+#            (RES_LEVEL, 'NOCAAA',  None,          'Non-canonical residue',                                     'Non-canonical residue'),
+#            (RES_LEVEL, 'NQACHK', 'packingQuality2','2nd generation packing quality',                          'New quality'),
+#            (RES_LEVEL, 'NTCHK',   None,          'Acid group conformation check',                             'COOH check'),
+#            (RES_LEVEL, 'OMECHK', 'omegas',       'Omega angle restraints',                                    'Omega check'),
+#            (RES_LEVEL, 'PC2CHK',  None,          'Proline puckers',                                           'Proline puckers'),
+#            (RES_LEVEL, 'PDBLST',  None,          'List of residues',                                          'List of residues'),
+#            (RES_LEVEL, 'PL3CHK',  None,          'Side chain planarity with hydrogens attached',              'NA planarity'),
+#            (RES_LEVEL, 'PLNCHK', 'planarities',  'Protein side chain planarities',                            'Protein SC planarity'),
+#            (RES_LEVEL, 'PRECHK',  None,          'Missing backbone atoms.',                                   'Missing backbone atoms.'),
+#            (RES_LEVEL, 'PUCCHK',  None,          'Ring puckering in Prolines',                                'Ring puckering in Prolines'),
+#            (RES_LEVEL, 'QUACHK', 'packingQuality1','Directional Atomic Contact Analysis, aka 1st generation packing quality', 'Packing quality'),
+#            (RES_LEVEL, 'RAMCHK', 'ramachandran', 'Ramachandran Z-score',                                      'Ramachandr.' ),
+#            (RES_LEVEL, 'ROTCHK', 'rotamer',      'Rotamers',                                                  'Rotamer normality'),
+#            (RES_LEVEL, 'SCOLST',  None,          'List of symmetry contacts',                                 'List of symmetry contacts'),
+#            (RES_LEVEL, 'TO2CHK',  None,          'Missing C-terminal groups',                                 'Missing C-terminal groups'),
+#            (RES_LEVEL, 'TOPPOS',  None,          'Ligand without know topology',                              'Ligand without know topology'),
+#            (RES_LEVEL, 'TORCHK',  None,          'Unknown check',                                             'Unknown check'),
+#            (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing')
 ]
 
 cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )

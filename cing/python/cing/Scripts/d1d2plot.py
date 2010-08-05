@@ -29,7 +29,6 @@ from cing.core.molecule import getTripletHistogramList
 from cing.core.parameters import plotParameters
 from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
-import locale
 import numpy
 import profile
 import pstats
@@ -632,7 +631,6 @@ def plotHistogramBySsTypeResidueTypes():
                         if maxl > suml:
                             NTerror("Math is off for maxl > suml: %s != $s" % (maxl, suml))
 
-                        locale.setlocale(locale.LC_ALL, "")
                         vL = []
                         for value in  (avl, sdl, maxl, suml):
                             vL.append( locale.format('%12.3f', value, True))

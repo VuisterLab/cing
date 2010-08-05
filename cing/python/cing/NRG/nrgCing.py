@@ -711,7 +711,8 @@ class nrgCing(Lister):
         inputDir = 'file://' + self.results_dir + '/recoordSync'
 #        inputDir = 'file://' + self.results_dir + '/nrgMerge'
         outputDir = self.results_dir
-        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`)
+        storeCING2db = "1" # All arguments need to be strings.
+        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`, storeCING2db)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,

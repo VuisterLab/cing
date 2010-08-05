@@ -27,6 +27,7 @@ results_dir     = os.path.join('/Library/WebServer/Documents', results_base)
 big_dir         = results_dir                           # NRG data large in size.
 dir_star        = os.path.join(big_dir,'star')
 dir_link        = os.path.join(big_dir,'link')
+dir_plot        = os.path.join(big_dir,'plot')
 # Postgres install but are they needed?
 #PGBIN           = '/usr/local/pgsql/bin'
 #PGDATA          = '/pgdata'

@@ -75,6 +75,17 @@ class AllChecks(TestCase):
         self.assertEquals( status, 0 )
 
 
+    def testAppendFromTable(self):
+        myTable = [ (1,'a'), (2, 'b') ]
+        myDict = NTdict()
+#        myDictExpected = NTdict(1='a')        not allowed to have an integer as the key in this specification.
+        myDictExpected = NTdict()
+        myDictExpected[1] = 'a'
+        myDictExpected[2] = 'b'
+        myDict.appendFromTable( myTable, 0, 1)
+        self.assertTrue( myDict.isEquivalent( myDictExpected ))
+
+
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     unittest.main()

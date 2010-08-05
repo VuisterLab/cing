@@ -49,3 +49,13 @@ SELECT * FROM atom a where a.rog != 0;
 SELECT * FROM residue r where r.rog = 2;
 SELECT * FROM chain c where c.rog = 2;
 SELECT * FROM entry e where e.rog = 2;
+
+SELECT e1.entry_id, e1.pdb_id, e1.distance_count 
+FROM nrgcing.cingentry AS e1 
+WHERE e1.distance_count IS NOT NULL AND e1.distance_count != 0.0
+AND e1.pdb_id = '2vda'
+ORDER BY e1.distance_count DESC
+LIMIT 10
+
+
+
