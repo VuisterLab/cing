@@ -21,6 +21,7 @@ I do create a soft link for the python2.6 executable as root:
 {{{
 cd /opt/local/bin
 ln -s python2.6 python
+ln -s ipython-2.6 ipython
 }}}
 
 == Install optional packages NOT NEEDED ==
