@@ -13,13 +13,7 @@ From http://www.macports.org/
 
 As root do:
 {{{
-port install py26-matplotlib
-port install py26-ipython
-port install povray
-port install imagemagick
-port install ghostscript
-port install py26-pil
-port install py26-scipy
+port install py26-matplotlib py26-ipython py26-pil py26-scipy povray imagemagick ghostscript 
 }}}
 Make sure the matplotlib version is at least 0.99.1.1.
 
