@@ -5,8 +5,8 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG import ARCHIVE_NRG_ID
-from cing.NRG.storeCING2db import doStoreCING2db
+#from cing.NRG import ARCHIVE_NRG_ID
+#from cing.NRG.storeCING2db import doStoreCING2db
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.Scripts.FC.utils import printSequenceFromCcpnProject
 from cing.core.classes import Project
@@ -100,11 +100,11 @@ class AllChecks(TestCase):
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
 #            if os.path.exists(entryId):
 #                self.assertFalse(shutil.rmtree(entryId))
-            if False:
-                # Does require:
-                #from cing.PluginCode.sqlAlchemy import csqlAlchemy
-                if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
-                    NTerror("Failed to store CING project's data to DB but continuing.")
+#            if False:
+#                # Does require:
+#                #from cing.PluginCode.sqlAlchemy import csqlAlchemy
+#                if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+#                    NTerror("Failed to store CING project's data to DB but continuing.")
 
             if True:
                 self.assertTrue(project.saveCcpn(entryId))
