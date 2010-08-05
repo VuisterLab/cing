@@ -35,6 +35,7 @@ port install py26-mysql
 {{{
 port install py26-sqlalchemy py26-psycopg2
 }}}
-The last module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build.
+The last module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build. JFD forgot how he got: /opt/local/share/java/postgresql.jar but is Eclipse needs it.
+
 
 From here you should follow the generalized [SetupCING]
