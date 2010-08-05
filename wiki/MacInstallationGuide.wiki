@@ -32,8 +32,7 @@ port install py26-mysql
 
 === Postgres ===
 {{{
-port install py26-sqlalchemy
-port install py26-psycopg2
+port install py26-sqlalchemy py26-psycopg2
 }}}
 The last module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build.
 
