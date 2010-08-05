@@ -3,9 +3,11 @@ Created on Jul 20, 2010
 
 This script will put some output in the persisting log file ~/Library/Logs/weeklyUpdatePdbjMine.log
 
-Execute from cron like:
-05 15 * * wed  (/opt/local/bin/python /Users/jd/workspace35/cingStable/python/cing/NRG/weeklyUpdatePdbjMine.py 2>&1)|mail -s weeklyUpdatePdbjMine.log jd
-/Users/jd/workspace35/cing/scripts/cing/CingWrapper.csh  --noProject --script /Users/jd/workspace35/cing/python/cing/NRG/weeklyUpdatePdbjMine.py
+Execute from cron like (pay attention to correct CINGROOT translation on nmr it is cingStable when testing):
+05 15 * * wed  (/Users/jd/workspace35/cing/scripts/cing/CingWrapper.csh  --noProject --script /Users/jd/workspace35/cing/python/cing/NRG/weeklyUpdatePdbjMine.py 2>&1)|mail -s weeklyUpdatePdbjMine.log jd
+
+Or from command line like:
+$CINGROOT/scripts/cing/CingWrapper.csh  --noProject --script $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
 
 @author: jd
 '''

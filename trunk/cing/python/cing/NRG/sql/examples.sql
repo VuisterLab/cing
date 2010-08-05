@@ -106,6 +106,16 @@ AND b.release_date >= '1-1-2009'
 order by l desc
 limit 10;
 
+-- E.g. //entity/formula_weight is documented at:
+-- http://mmcif.pdb.org/dictionaries/mmcif_pdbx.dic/Items/_entity.formula_weight.html
+SELECT p2.val AS number_of_molecules,p3.val AS formula_weight, p1.val as type
+FROM brief_summary s
+JOIN "E://entity" e                         ON e.docid = s.docid
+JOIN "//entity/type" p1                     ON p1.docid = e.docid AND p1.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/pdbx_number_of_molecules" p2 ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/formula_weight" p3           ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
+WHERE s.pdbid = '1ai0'
+
 
 
 

@@ -4,6 +4,7 @@ from cing.NRG import CASD_DB_USER_NAME
 from cing.NRG import PDBJ_DB_NAME
 from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.required.reqOther import *
+from sqlalchemy.exc import SAWarning
 import gc
 import warnings
 
@@ -116,6 +117,9 @@ class cgenericSql(NTdict):
 
     def loadTable(self, tableName):
         NTdebug("Loading table %s" % tableName)
+        warnings.simplefilter('ignore', category=SAWarning)
+        #warnings.filters.insert(0, ('ignore', None, SAWarning, None, 0))
+
         self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
         return self[tableName]
 
@@ -134,8 +138,8 @@ class cgenericSql(NTdict):
             for _t in self.metadata.table_iterator(reverse=False):
                 pass
 #                NTdebug("Table: %s" % t.name)
-            warnings.simplefilter("default") # reset to default warning behaviour.
-#            warnings.warn("deprecated 123", DeprecationWarning)
+            warnings.simplefilter("default") # reset to default warning behavior.
+#            warnings.warn("depreciated 123", DeprecationWarning)
 
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
@@ -160,6 +164,14 @@ class csqlAlchemy(cgenericSql):
         if not self.cingentry:
             NTerror("Failed to retrieve the cingentry table")
             return True
+
+
+
+def printResult(result):
+    if result.rowcount < 1:
+        return
+    for row in result:
+        NTmessage(str(row))
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug

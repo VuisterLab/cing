@@ -35,8 +35,9 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
     #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
     #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 
-    inputDir = '.'
-    extraArgList = (archive_id, inputDir)
+#    inputDir = '.'
+#    extraArgList = (archive_id, inputDir)
+    extraArgList = (archive_id)
 
     doScriptOnEntryList(pythonScriptFileName,
                         entryListFileName,

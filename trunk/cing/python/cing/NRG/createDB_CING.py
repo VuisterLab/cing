@@ -7,6 +7,8 @@ from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
+from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
+from matplotlib.pylab import * #@UnusedWildImport for most imports
 
 schemaIdOrg = CASD_DB_NAME
 sqlDir = os.path.join(cingPythonCingDir,'NRG', 'sql')

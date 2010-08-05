@@ -16,6 +16,8 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
+from cing.NRG import ARCHIVE_NRG_ID
+from cing.NRG.storeCING2db import doStoreCING2db
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
@@ -45,7 +47,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = False # default: False
+    fastestTest = True # default: False
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -68,11 +70,12 @@ def main(entryId, *extraArgList):
     NTmessage(header)
     NTmessage(getStartMessage())
 
+    # Note that for NRG-CING an additional argument may be given.
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
     expectedNumberOfArguments = len(expectedArgumentList)
-    if len(extraArgList) != expectedNumberOfArguments:
+    if len(extraArgList) < expectedNumberOfArguments:
         NTerror("Got arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of arguments: %d got %d" % (
+        NTerror("Failed to get at least the expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         NTerror("Expected arguments: %s" % expectedArgumentList)
         return True
@@ -85,6 +88,9 @@ def main(entryId, *extraArgList):
     restraintsConvention = extraArgList[3]
     archiveType = extraArgList[4]
     projectType = extraArgList[5]
+    storeCING2db = False
+    if len(extraArgList) >= expectedNumberOfArguments:
+        storeCING2db = extraArgList[6]
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass
@@ -104,6 +110,7 @@ def main(entryId, *extraArgList):
     NTdebug("archiveType:          %s" % archiveType)
     NTdebug("projectType:          %s" % projectType)
     NTdebug("modelCount:           %s" % modelCount)
+    NTdebug("storeCING2db:         %s" % storeCING2db)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -249,6 +256,13 @@ def main(entryId, *extraArgList):
         NTerror("Failed to validate project read")
         return True
     project.save()
+
+    if storeCING2db:
+        # Does require:
+        #from cing.PluginCode.sqlAlchemy import csqlAlchemy
+        if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+            NTerror("Failed to store CING project's data to DB but continuing.")
+
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz

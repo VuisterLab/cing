@@ -32,6 +32,10 @@ import pydoc
 import re
 import sys
 import time
+import locale
+
+# For plotting with thousand seperators.
+locale.setlocale(locale.LC_ALL, "")
 #from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
 
 CONSENSUS_STR = 'consensus'
@@ -1309,6 +1313,18 @@ class NTdict(dict):
             return False
         return self['__OBJECTID__'] == other['__OBJECTID__']
 
+    def isEquivalent(self, other):
+        if other == None:
+            return False
+        if not isinstance(other, NTdict): # eg when comparing with tuple.
+            return False
+        for key in self:
+            if not (other.has_key(key) or hasattr(other, key)):
+                return False
+            if self[key] != other[key]:
+                return False
+        return True
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -1500,6 +1516,13 @@ class NTdict(dict):
 
         reducedKeyList = keyList[1:]
         return deeper.setDeepByKeys(value, *reducedKeyList)
+
+    def appendFromTable(self, myTable, idxColumnKey, idxColumnValue):
+#        n = len(self)
+        for row in myTable:
+            self[ row[idxColumnKey] ] = row[idxColumnValue]
+#        m = len(self)
+#        NTdebug("NTdict grew from %d to %d items" % ( n, m))
 
     def appendDeepByKeys(self, value, *keyList):
         """Append value to arbitrary deep list.
@@ -3937,6 +3960,11 @@ def val2Str(value, fmt, count=None, useNanString=True):
             return NaNstring
         return ("%"+`count`+"s") % NaNstring
     return fmt % value
+
+def str2float(str ):
+    'Consider this routine.'
+    pass
+
 
 def limitToRange(v, low, hi):
     """Return a value in range [low,hi}

@@ -40,7 +40,7 @@ LOOSE      = 'LOOSE'
 
 CCPN       = 'CCPN'
 CING       = 'CING'
-
+CING_STR   = CING
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 
@@ -102,6 +102,23 @@ AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
 VIOL1_STR = 'violCount1'
 VIOL3_STR = 'violCount3'
 VIOL5_STR = 'violCount5'
+
+# SQL stuff
+PDB_ID_STR    = 'pdb_id'
+ENTRY_ID_STR    = 'entry_id'
+CHAIN_ID_STR    = 'chain_id'
+RESIDUE_ID_STR  = 'residue_id'
+ATOM_ID_STR     = 'atom_id'
+RES_COUNT_STR   = 'res_count'
+
+DISTANCE_COUNT_STR    = 'distance_count'
+DIHEDRAL_COUNT_STR    = 'dihedral_count'
+RDC_COUNT_STR         = 'rdc_count'
+PEAK_COUNT_STR        = 'peak_count'
+CS_COUNT_STR          = 'cs_count'
+CS1H_COUNT_STR        = 'cs1H_count'
+CS13C_COUNT_STR       = 'cs13C_count'
+CS15N_COUNT_STR       = 'cs15N_count'
 
 POOR_PROP = 'POOR'
 BAD_PROP  = 'BAD'
