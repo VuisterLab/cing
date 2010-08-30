@@ -91,6 +91,22 @@ CREATE TABLE casdcing.cingentry
 --   wattos
     noe_compl4                     FLOAT DEFAULT NULL,
 
+    dis_max_all                    FLOAT DEFAULT NULL,
+    dis_rms_all                    FLOAT DEFAULT NULL,
+    dis_av_all                     FLOAT DEFAULT NULL,
+    dis_av_viol                    FLOAT DEFAULT NULL,
+    dis_c1_viol                    INT DEFAULT NULL,
+    dis_c3_viol                    INT DEFAULT NULL,
+    dis_c5_viol                    INT DEFAULT NULL,
+
+    dih_max_all                    FLOAT DEFAULT NULL,
+    dih_rms_all                    FLOAT DEFAULT NULL,
+    dih_av_all                     FLOAT DEFAULT NULL,
+    dih_av_viol                    FLOAT DEFAULT NULL,
+    dih_c1_viol                    INT DEFAULT NULL,
+    dih_c3_viol                    INT DEFAULT NULL,
+    dih_c5_viol                    INT DEFAULT NULL,
+
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
     rog                            INT DEFAULT NULL
 );

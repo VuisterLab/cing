@@ -14,7 +14,9 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import dir_plot
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import cgenericSql
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
@@ -47,8 +49,6 @@ ENTRY_SET_ID = 'entrySetId'
 'Used to filter for different sets of selected entries.'
 ONLY_NON_ZERO = 'onlyNonZero'
 'Filter out entities that have a zero float/int value'
-
-cing.verbosity = verbosityDebug
 
 #db_name = PDBJ_DB_NAME
 #user_name = PDBJ_DB_USER_NAME
@@ -252,7 +252,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 NTdebug("Unexpected None found at pdb_id %s" % pdb_id)
                 continue
             if isNaN(v): # this -DOES- happen; e.g. PROJECT.Whatif.BNDCHK
-                NTdebug("Unexpected nan instead of None found at pdb_id %s" % pdb_id)
+#                NTdebug("Unexpected nan instead of None found at pdb_id %s" % pdb_id)
                 continue
             if doDivideByResidueCount:
                 resCount = resCountDict[entry_id]
@@ -276,23 +276,42 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
 
     def createPlots(self):
-        '''         USE_ZERO_FOR_MIN_VALUE_STR: True,
-                    USE_MAX_VALUE_STR: 11111,
-                    PLOT_REGRESSION_LINE: REGRESSION_LINEAR
-                    DIVIDE_BY_RESIDUE_COUNT
-                    ONLY_PROTEIN
-                    }]'''
+        ''' The code below can use settings in the form of a dictionary that influences the
+        plotting.'''
         m = self
         graphicsFormat = "png"
-#        dictDivideByResidueCount = {DIVIDE_BY_RESIDUE_COUNT:1}
-#        dictDivideByResidueCount_OnlyProtein = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1}
-#        dictDivideByResidueCount_OnlyProtein_OnlySelection = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1, ONLY_SELECTION:1}
+        dictDivideByResidueCount = {DIVIDE_BY_RESIDUE_COUNT:1}
+        dictDivideByResidueCount_OnlyProtein = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1}
+        dictDivideByResidueCount_OnlyProtein_OnlySelection = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1, ONLY_SELECTION:1}
         dictDivideByResidueCount_OnlySelection_OnlyNonZero = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1, ONLY_SELECTION:1, ONLY_NON_ZERO:1}
-#        dict1 = dictDivideByResidueCount
-#        dict2 = dictDivideByResidueCount_OnlyProtein
-#        dict3 = dictDivideByResidueCount_OnlyProtein_OnlySelection
-        dict4 = dictDivideByResidueCount_OnlySelection_OnlyNonZero
+        dict_OnlyNonZero = {ONLY_NON_ZERO:1}
+        dict1 = dictDivideByResidueCount #@UnusedVariable
+        dict2 = dictDivideByResidueCount_OnlyProtein #@UnusedVariable
+        dict3 = dictDivideByResidueCount_OnlyProtein_OnlySelection #@UnusedVariable
+        dict4 = dictDivideByResidueCount_OnlySelection_OnlyNonZero #@UnusedVariable
+        d5 = dict_OnlyNonZero #@UnusedVariable
+        # NB The level of project is equivalent to the entry level in the database.
+        # Sorted by project, program.
         plotList = [
+#            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, CING_STR, RDC_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, CING_STR, PEAK_COUNT_STR,dict3 ], # These will come later.
+#            [ PROJECT_LEVEL, CING_STR, CS_COUNT_STR,dict3 ],
+#            [ PROJECT_LEVEL, CING_STR, CS1H_COUNT_STR,dict3 ],
+#            [ PROJECT_LEVEL, CING_STR, CS13C_COUNT_STR,dict3 ],
+#            [ PROJECT_LEVEL, CING_STR, CS15N_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, CING_STR, RES_COUNT_STR,{} ],
+#            [ PROJECT_LEVEL, CING_STR, MODEL_COUNT_STR,{} ],
+#            [ PROJECT_LEVEL, CING_STR, ROG_STR,{} ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_MAX_ALL_STR, d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_RMS_ALL_STR, d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_AV_ALL_STR , d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_AV_VIOL_STR, d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_C1_VIOL_STR, d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_C3_VIOL_STR, d5 ],
+#            [ PROJECT_LEVEL, CING_STR, DIS_C5_VIOL_STR, d5 ],
+
 #            [ PROJECT_LEVEL, WHATIF_STR, BBCCHK_STR,{} ],
 #            [ PROJECT_LEVEL, WHATIF_STR, BNDCHK_STR,{} ],
 #            [ PROJECT_LEVEL, WHATIF_STR, HNDCHK_STR,{} ],
@@ -303,39 +322,96 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #            [ PROJECT_LEVEL, WHATIF_STR, QUACHK_STR,{} ],
 #            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR,{} ],
 #            [ PROJECT_LEVEL, WHATIF_STR, ROTCHK_STR,{} ],
-#            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, RDC_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, PEAK_COUNT_STR,dict3 ], # These will come later.
-#            [ PROJECT_LEVEL, CING_STR, CS_COUNT_STR,dict3 ],
-#            [ PROJECT_LEVEL, CING_STR, CS1H_COUNT_STR,dict3 ],
-#            [ PROJECT_LEVEL, CING_STR, CS13C_COUNT_STR,dict3 ],
-            [ PROJECT_LEVEL, CING_STR, CS15N_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, PC_STR, pc_gf_STR       ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_gf_PHIPSI_STR,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_gf_CHI12_STR ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_gf_CHI1_STR  ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_rama_core_STR   ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_rama_allow_STR   ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_rama_gener_STR   ,{} ],
+#            [ PROJECT_LEVEL, PC_STR, pc_rama_disall_STR  ,{} ],
+#            [ PROJECT_LEVEL, WATTOS_STR, NOE_COMPL4_STR  ,{} ],
+#            [ RES_LEVEL, CING_STR, ROG_STR,{} ],
+#            [ RES_LEVEL, CING_STR, DISTANCE_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, RDC_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, PEAK_COUNT_STR,d5 ], # These will come later.
+#            [ RES_LEVEL, CING_STR, CS_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, CS1H_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, CS13C_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, CS15N_COUNT_STR,d5 ],
+#            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ], # TODO: code?
+#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR,{} ], # TODO: run coded already.
+#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR,{} ],
+#            [ RES_LEVEL, CING_STR, CHK_RAMACH_STR,{} ],
+#            [ RES_LEVEL, CING_STR, CHK_JANIN_STR,{} ],
+#            [ RES_LEVEL, CING_STR, CHK_D1D2_STR,{} ],
+#            [ RES_LEVEL, CING_STR, DIS_MAX_ALL_STR, d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_RMS_ALL_STR, d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_AV_ALL_STR , d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_AV_VIOL_STR, d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_C1_VIOL_STR, d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_C3_VIOL_STR, d5 ],
+#            [ RES_LEVEL, CING_STR, DIS_C5_VIOL_STR, d5 ],
+
+
+#            [ RES_LEVEL, DSSP_STR, DSSP_ID_STR,{} ],
+#            [ RES_LEVEL, PC_STR, pc_gf_STR       ,{} ],
+#            [ RES_LEVEL, PC_STR, pc_gf_PHIPSI_STR,{} ],
+#            [ RES_LEVEL, PC_STR, pc_gf_CHI12_STR ,{} ],
+#            [ RES_LEVEL, PC_STR, pc_gf_CHI1_STR  ,{} ],
+#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL4_STR  ,{} ],
+#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_OBS_STR  ,{} ],
+#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_EXP_STR  ,{} ],
+#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_MAT_STR  ,{} ],
+#            [ RES_LEVEL, WHATIF_STR, ACCLST_STR,{} ],
 #            [ RES_LEVEL, WHATIF_STR, ANGCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, BBCCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, BMPCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, BNDCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, C12CHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, FLPCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, INOCHK_STR,{} ],
+##            [ RES_LEVEL, WHATIF_STR, OMECHK_STR,{} ], # ABSENT
+##            [ RES_LEVEL, WHATIF_STR, PL2CHK_STR,{} ], # ABSENT
+#            [ RES_LEVEL, WHATIF_STR, PL3CHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, PLNCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, QUACHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, RAMCHK_STR,{} ],
+#            [ RES_LEVEL, WHATIF_STR, ROTCHK_STR,{} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_ALL_STR,{} ], # use when CS data comes thru.
+#            [ RES_LEVEL, QSHIFT_STR, QCS_BB_STR,{} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_HVY_STR,{} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_PRT_STR,{} ],
+
+#            [ ATOM_LEVEL, WHATIF_STR, CHICHK_STR,{} ],
+#            [ ATOM_LEVEL, WHATIF_STR, HNDCHK_STR,{} ],
 #            [ ATOM_LEVEL, WHATIF_STR, PL2CHK_STR,{} ],
         ]
         for p in plotList:
             level, progId, chk_id, plotDict = p
             chk_id_unique = '.'.join([level,progId,chk_id])
             floatValueList = m.getFloatListFromDb(level, progId, chk_id, **plotDict)
-            if False: # Default is False. Block used for checking procedures.
+            if False: # DEFAULT False. Block used for checking procedures.
                 mu = 100.
                 sigma = sqrt(5)
                 floatValueList = [gauss(mu, sigma) for i in range(100000)]
 
             if len(floatValueList) == 0:
-    #            NTwa("Get empty float list from db for: %s" % str([level, progId, chk_id]))
+                NTmessage("Got empty float list from db for: %s skipping plot" % chk_id_unique)
                 continue
             if not floatValueList:
-                NTerror("Encountered and error while getting float list from db for: %s" % str([level, progId, chk_id]))
+                NTerror("Encountered and error while getting float list from db for: %s skipping plot" % chk_id_unique)
                 continue
             floatNTlist = NTlist(*floatValueList)
             av, sd, n = floatNTlist.average()
             minValue = floatNTlist.min()
             maxValue = floatNTlist.max()
 
-            if minValue == maxValue:
-                continue
+            if False: # DEFAULT: True. Disable when testing.
+                if minValue == maxValue:
+                    NTwarning("Skipping plot were the min = max value.")
+                    continue
 
             titleStr = "av/sd/n %.3f %.3f %d min/max %.3f %.3f" % (av, sd, n, minValue, maxValue )
             if plotDict:
@@ -349,7 +425,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             if getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO):
                 titleStr += ' only!zero'
 
-            NTmessage("Plotting level/program/check: %10s %10s %10s with options: %s %s" % (level,progId,chk_id,titleStr,plotDict))
+            NTmessage("Plotting level/program/check: %10s %10s %15s with options: %s %s" % (level,progId,chk_id,titleStr,plotDict))
             if True:
                 clf()
                 # Histogram the data
@@ -634,6 +710,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 ps.hardcopy(fn)
 
 if __name__ == '__main__':
+#    cing.verbosity = verbosityDebug
     m = nrgCingPlot()
     if False:
         m.perEntryRog = NTdict()

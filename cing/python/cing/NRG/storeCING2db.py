@@ -18,11 +18,11 @@ from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
+from cing.core.molecule import getAssignmentCountMapForResList
 
 if True: # default: True
     db_name = PDBJ_DB_NAME
@@ -65,6 +65,17 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
 
+    ranges = None
+    if archive_id == ARCHIVE_CASD_ID:
+        targetId = getTargetForFullEntryName(casd_id)
+        if not targetId:
+            NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
+            return True
+        ranges = getRangesForTarget(targetId)
+        if not ranges:
+            NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+            return True
+
 #    expectedArgumentList = [ 'inputDir']
 #    expectedNumberOfArguments = len(expectedArgumentList)
 #    if len(extraArgList) != expectedNumberOfArguments:
@@ -80,6 +91,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     NTdebug("Starting doStoreCING2db using:")
     NTdebug("entry_code:           %s" % entry_code)
+    NTdebug("ranges:               %s" % ranges)
 #    NTdebug("inputDir:             %s" % inputDir)
     NTdebug("archive_id:           %s" % archive_id)
     NTdebug("user_name:            %s" % user_name)
@@ -125,17 +137,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p = project
     molecule = project.molecule
 
-    ranges = None
-    if archive_id == ARCHIVE_CASD_ID:
-        targetId = getTargetForFullEntryName(casd_id)
-        if not targetId:
-            NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
-            return True
-        ranges = getRangesForTarget(targetId)
-        if not ranges:
-            NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-            return True
-
 #    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
     if False: # TODO: enable when done testing overall strategy.
         p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
@@ -163,16 +164,36 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     chothia_class = molecule.chothiaClassInt()
 
-    distance_count = project.distances.lenRecursive()
-    dihedral_count = project.dihedrals.lenRecursive()
-    rdc_count = project.rdcs.lenRecursive()
-    peak_count = project.peaks.lenRecursive()
+    p_distance_count = project.distances.lenRecursive()
+    p_dihedral_count = project.dihedrals.lenRecursive()
+    p_rdc_count = project.rdcs.lenRecursive()
+    p_peak_count = project.peaks.lenRecursive()
+
+    rL = project.distanceRestraintNTlist
+    # None may exist.
+    p_dis_max_all = getDeepByKeysOrAttributes(rL,VIOLMAXALL_STR)
+    p_dis_rms_all = getDeepByKeysOrAttributes(rL,RMSD_STR      )
+    p_dis_av_viol = getDeepByKeysOrAttributes(rL,VIOLAV_STR    )
+    p_dis_av_all  = getDeepByKeysOrAttributes(rL,VIOLAVALL_STR )
+    p_dis_c1_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT1_STR)
+    p_dis_c3_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT3_STR)
+    p_dis_c5_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT5_STR)
+    rL = project.dihedralRestraintNTlist
+    p_dih_max_all = getDeepByKeysOrAttributes(rL,VIOLMAXALL_STR)
+    p_dih_rms_all = getDeepByKeysOrAttributes(rL,RMSD_STR      )
+    p_dih_av_viol = getDeepByKeysOrAttributes(rL,VIOLAV_STR    )
+    p_dih_av_all  = getDeepByKeysOrAttributes(rL,VIOLAVALL_STR )
+    p_dih_c1_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT1_STR)
+    p_dih_c3_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT3_STR)
+    p_dih_c5_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT5_STR)
+
+
     # TODO: test
     assignmentCountMap = project.molecule.getAssignmentCountMap()
-    cs_count = assignmentCountMap['overall']
-    cs1H_count = assignmentCountMap['1H']
-    cs13C_count = assignmentCountMap['13C']
-    cs15N_count = assignmentCountMap['15N']
+    p_cs_count = assignmentCountMap['overall']
+    p_cs1H_count = assignmentCountMap['1H']
+    p_cs13C_count = assignmentCountMap['13C']
+    p_cs15N_count = assignmentCountMap['15N']
 
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
@@ -217,14 +238,31 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         ranges=ranges,
         res_count=molecule.residueCount,
         model_count=molecule.modelCount,
-        distance_count=distance_count,
-        dihedral_count=dihedral_count,
-        rdc_count=rdc_count,
-        peak_count=peak_count,
-        cs_count=cs_count,
-        cs1H_count=cs1H_count,
-        cs13C_count=cs13C_count,
-        cs15N_count=cs15N_count,
+        distance_count=p_distance_count,
+        dihedral_count=p_dihedral_count,
+        rdc_count=p_rdc_count,
+        peak_count=p_peak_count,
+        cs_count=p_cs_count,
+        cs1h_count=p_cs1H_count,
+        cs13c_count=p_cs13C_count,
+        cs15n_count=p_cs15N_count,
+
+        dis_max_all = p_dis_max_all,
+        dis_rms_all = p_dis_rms_all,
+        dis_av_all  = p_dis_av_all,
+        dis_av_viol = p_dis_av_viol,
+        dis_c1_viol = p_dis_c1_viol,
+        dis_c3_viol = p_dis_c3_viol,
+        dis_c5_viol = p_dis_c5_viol,
+
+        dih_max_all = p_dih_max_all,
+        dih_rms_all = p_dih_rms_all,
+        dih_av_all  = p_dih_av_all,
+        dih_av_viol = p_dih_av_viol,
+        dih_c1_viol = p_dih_c1_viol,
+        dih_c3_viol = p_dih_c3_viol,
+        dih_c5_viol = p_dih_c5_viol,
+
         wi_bbcchk=p_wi_bbcchk,
         wi_bmpchk=p_wi_bmpchk,
         wi_bndchk=p_wi_bndchk,
@@ -319,6 +357,36 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             numberR = residue.resNum
             dssp_id = getDsspSecStructConsensusId(residue)
 
+            r_distance_count = residue.distanceRestraints.lenRecursive() # filled by filled in partition restraints
+            r_dihedral_count = residue.dihedralRestraints.lenRecursive()
+            r_rdc_count = residue.rdcRestraints.lenRecursive()
+
+            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
+            # TODO: test with cs present
+            assignmentCountMap = getAssignmentCountMapForResList([residue])
+            r_cs_count = assignmentCountMap['overall']
+            r_cs1H_count = assignmentCountMap['1H']
+            r_cs13C_count = assignmentCountMap['13C']
+            r_cs15N_count = assignmentCountMap['15N']
+
+            rL = residue.distanceRestraints
+            # None may exist.
+            r_dis_max_all = getDeepByKeysOrAttributes(rL,VIOLMAXALL_STR)
+            r_dis_rms_all = getDeepByKeysOrAttributes(rL,RMSD_STR      )
+            r_dis_av_viol = getDeepByKeysOrAttributes(rL,VIOLAV_STR    )
+            r_dis_av_all  = getDeepByKeysOrAttributes(rL,VIOLAVALL_STR )
+            r_dis_c1_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT1_STR)
+            r_dis_c3_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT3_STR)
+            r_dis_c5_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT5_STR)
+            rL = residue.dihedralRestraints
+            r_dih_max_all = getDeepByKeysOrAttributes(rL,VIOLMAXALL_STR)
+            r_dih_rms_all = getDeepByKeysOrAttributes(rL,RMSD_STR      )
+            r_dih_av_viol = getDeepByKeysOrAttributes(rL,VIOLAV_STR    )
+            r_dih_av_all  = getDeepByKeysOrAttributes(rL,VIOLAVALL_STR )
+            r_dih_c1_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT1_STR)
+            r_dih_c3_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT3_STR)
+            r_dih_c5_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT5_STR)
+
             # WI
             r_wi_acclst = residue.getDeepAvgByKeys(WHATIF_STR, ACCLST_STR, VALUE_LIST_STR)
             r_wi_angchk = residue.getDeepAvgByKeys(WHATIF_STR, ANGCHK_STR, VALUE_LIST_STR)
@@ -356,6 +424,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_chk_ramach = residue.getDeepAvgByKeys(CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR)
             r_chk_janin = residue.getDeepAvgByKeys(CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
             r_chk_d1d2 = residue.getDeepAvgByKeys(CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
+#            r_omega_dev_av_all = residue.getDeepAvgByKeys(CHK_STR, XXX_CHK_STR, VALUE_LIST_STR)
+            r_cv_backbone = residue.getDeepAvgByKeys(CHK_STR, CV_BACKBONE_STR, VALUE_LIST_STR)
+            r_cv_sidechain = residue.getDeepAvgByKeys(CHK_STR, CV_SIDECHAIN_STR, VALUE_LIST_STR)
+
             rogR = residue.rogScore.rogInt()
 
             result = execute(cresidue.insert().values(
@@ -384,13 +456,43 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 pc_gf_chi1=r_pc_gf_chi1,
                 pc_gf_phipsi=r_pc_gf_phipsi,
                 noe_compl4=r_noe_compl4,
-                chk_ramach = r_chk_ramach,
-                chk_janin = r_chk_janin,
-                chk_d1d2 = r_chk_d1d2,
-                qcs_all = r_qcs_all,
-                qcs_bb  = r_qcs_bb,
-                qcs_hvy = r_qcs_hvy,
-                qcs_prt = r_qcs_prt,
+
+                distance_count  = r_distance_count,
+                dihedral_count  = r_dihedral_count,
+                rdc_count       = r_rdc_count,
+                cs_count        = r_cs_count,
+                cs1h_count      = r_cs1H_count,
+                cs13c_count     = r_cs13C_count,
+                cs15n_count     = r_cs15N_count,
+
+                dis_max_all = r_dis_max_all,
+                dis_rms_all = r_dis_rms_all,
+                dis_av_all  = r_dis_av_all,
+                dis_av_viol = r_dis_av_viol,
+                dis_c1_viol = r_dis_c1_viol,
+                dis_c3_viol = r_dis_c3_viol,
+                dis_c5_viol = r_dis_c5_viol,
+
+                dih_max_all = r_dih_max_all,
+                dih_rms_all = r_dih_rms_all,
+                dih_av_all  = r_dih_av_all,
+                dih_av_viol = r_dih_av_viol,
+                dih_c1_viol = r_dih_c1_viol,
+                dih_c3_viol = r_dih_c3_viol,
+                dih_c5_viol = r_dih_c5_viol,
+
+#                omega_dev_av_all= r_omega_dev_av_all,
+                cv_backbone     = r_cv_backbone,
+                cv_sidechain    = r_cv_sidechain,
+
+                chk_ramach      = r_chk_ramach,
+                chk_janin       = r_chk_janin,
+                chk_d1d2        = r_chk_d1d2,
+
+                qcs_all         = r_qcs_all,
+                qcs_bb          = r_qcs_bb,
+                qcs_hvy         = r_qcs_hvy,
+                qcs_prt         = r_qcs_prt,
                 rog=rogR
                 )
             )
@@ -403,7 +505,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                   ))
             residue_id = execute(s).fetchall()[0][0]
             residueCommittedCount += 1
-#            NTdebug("Inserted residue %s" % residue_id)
+            NTdebug("Inserted residue %s" % residue_id)
             if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name

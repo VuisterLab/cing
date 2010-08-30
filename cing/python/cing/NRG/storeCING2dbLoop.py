@@ -4,10 +4,9 @@ from cing import cingPythonDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import writeEntryListToFile
+from cing.NRG.settings import dDir
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 
-
-dDir = '/Library/WebServer/Documents'
 
 def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
 
@@ -37,7 +36,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
 
 #    inputDir = '.'
 #    extraArgList = (archive_id, inputDir)
-    extraArgList = (archive_id)
+    extraArgList = (archive_id,) # note that for length one tuples the comma is required.
 
     doScriptOnEntryList(pythonScriptFileName,
                         entryListFileName,
@@ -46,7 +45,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
                         delay_between_submitting_jobs = 1,
                         max_time_to_wait = 60 * 6,
                         START_ENTRY_ID = 0,
-                        MAX_ENTRIES_TODO = 200,
+                        MAX_ENTRIES_TODO = 2,
                         expectPdbEntryList = expectPdbEntryList,
                         extraArgList = extraArgList)
 
@@ -54,8 +53,8 @@ if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     #cing.verbosity = cing.verbosityDefault
     archive_id = ARCHIVE_NRG_ID
-    entryList = '1brv'.split()
-#    entryList = None
+#    entryList = '1brv'.split()
+    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
 
     if False:
         archive_id = ARCHIVE_CASD_ID

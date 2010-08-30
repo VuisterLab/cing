@@ -4313,6 +4313,9 @@ def getDeepByKeysOrAttributes(c, *keyList):
     Hacked for attributes too, in case key does not exist
 
     """
+    if c == None:
+        return None
+
     lk  = len(keyList)
     key = keyList[0]
 #    NTdebug("Found keyList: "+`keyList`)
@@ -4886,3 +4889,26 @@ def grep(fileName, txt, resultList = None, doQuiet=False):
     if matchedLine:
         return 0
     return 1
+
+def timedelta2HoursMinutesAndSeconds( s ):
+    'Returns integer numbers for number of minutes and seconds of given float of seconds; may be negative'
+    result = [0, 0, 0]
+    t = s
+    result[0] = int(t / 3600)
+    t -= 3600 * result[0]
+    result[1] = int(t / 60)
+    t -= 60 * result[1]
+    result[2] = int(t)
+    return tuple(result)
+
+def lenNonZero(l, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
+    'Counts the non zero eelements when compared to epsilon'
+    if l == None:
+        return 0
+#    if len(l) == 0:
+#        return 0
+    n = 0
+    for item in l:
+        if math.fabs(item) > eps:
+            n += 1
+    return n

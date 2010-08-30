@@ -4,15 +4,11 @@ python -u $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.Wattos import runWattos
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 
@@ -20,7 +16,7 @@ class AllChecks(TestCase):
 
     "Enable again when issue 193 with NMR-STAR format has been alleviated; "
     def tttestWattos(self):
-        "Disabled by JFD for now as I'm the only one checking this."
+        "Testing wattos reading and working on a star file that first gets created by Wim's FC."
 
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
 #        entryList = "1kr8".split()
@@ -59,8 +55,6 @@ class AllChecks(TestCase):
                 self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityDetail
-    cing.verbosity = verbosityOutput
     cing.verbosity = verbosityDebug
     unittest.main()
 

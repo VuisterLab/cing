@@ -96,6 +96,7 @@ b
         y.append(200)
         y.append(300)
         self.assertEquals( x.lenRecursive(), 3)
+
     def testGetDeepAvgByKeys(self):
         d=NTdict()
         l = NTlist()

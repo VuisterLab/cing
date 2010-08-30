@@ -23,7 +23,8 @@ CIFZ2           = os.path.join(divDir,'mmCIF')
 PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 
 results_base    = 'NRG-CING'
-results_dir     = os.path.join('/Library/WebServer/Documents', results_base)
+dDir            = '/Library/WebServer/Documents'
+results_dir     = os.path.join(dDir, results_base)
 big_dir         = results_dir                           # NRG data large in size.
 dir_star        = os.path.join(big_dir,'star')
 dir_link        = os.path.join(big_dir,'link')

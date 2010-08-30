@@ -5,10 +5,10 @@
 Original from Wim Vranken.
 """
 from memops.general.Io import loadProject
-from msd.nmrStar.IO import NmrStarExport
+from pdbe.nmrStar.IO.NmrStarExport import NmrStarExport # valid for use with python from API
 import os
 import sys
-#from pdbe.nmrStar.IO.NmrStarExport import NmrStarExport
+#from msd.nmrStar.IO import NmrStarExport # valid for use with python from Analysis
 #from ccpnmr.eci import NmrStarExport
 
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"

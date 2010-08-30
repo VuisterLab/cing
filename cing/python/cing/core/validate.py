@@ -46,6 +46,7 @@ from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.ROGscore import CingResult
+from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
@@ -579,9 +580,9 @@ def partitionRestraints( project, tmp=None ):
 
     # distances and dihedrals
     for res in project.molecule.allResidues():
-        res.distanceRestraints = NTlist()
-        res.dihedralRestraints = NTlist()
-        res.rdcRestraints      = NTlist()
+        res.distanceRestraints = RestraintList('distanceRestraints')
+        res.dihedralRestraints = RestraintList('dihedralRestraints')
+        res.rdcRestraints      = RestraintList('rdcRestraints')
     #end for
 
     for drl in project.distances:
@@ -626,11 +627,12 @@ def validateRestraints( project, toFile = True)   :
 
 #    # distances and dihedrals
 #    for res in project.molecule.allResidues():
-#        res.distanceRestraints = NTlist()
-#        res.dihedralRestraints = NTlist()
+#        res.distanceRestraints = RestraintList()
+#        res.dihedralRestraints = RestraintList()
 #    #end for
 
     # distances
+    rL = project.distanceRestraintNTlist = RestraintList('distanceRestraintNTlist') # used for DB as a list of all restraints combined.
     for drl in project.distances:
 #        drl.analyze()
         msg += sprintf( '%s\n', drl.format())
@@ -644,17 +646,12 @@ def validateRestraints( project, toFile = True)   :
         theList = drl[0:min(len(drl),30)]
 #        NTdebug("Found list: " + `theList`)
         msg += sprintf( '%s\n', formatList( theList ) )
-
-        # Sort restraints on a per-residue basis # now in partitionRestrainst
-#        for restraint in drl:
-#            for atm1,atm2 in restraint.atomPairs:
-#                atm1.residue.distanceRestraints.add( restraint ) #AWSS
-#                atm2.residue.distanceRestraints.add( restraint ) #AWSS
-#            #end for
-#        #end for
+        rL.addList(drl)
     #end for
+    getStatsRestraintNTlist(rL)
 
     # dihedrals
+    rL = project.dihedralRestraintNTlist = RestraintList('dihedralRestraintNTlist')
     for drl in project.dihedrals:
 #        drl.analyze()
         msg += sprintf( '%s\n', drl.format())
@@ -665,81 +662,48 @@ def validateRestraints( project, toFile = True)   :
         drl.sort('violCount3').reverse()
         msg += sprintf( '%s Sorted on Violations > 3 degree %s\n', dots, dots)
         msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
-
-        # sort the restraint on a per residue basis
-#        for restraint in drl:
-#            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS
-#        #end for
+        rL.addList(drl)
     #end for
+    getStatsRestraintNTlist(rL)
 
     # Process the per residue restraints data
     msg += sprintf( '%s Per residue scores %s\n', dots, dots )
-    count = 0
-    for res in project.molecule.allResidues():
+    for restraintListAtribute in ( 'distanceRestraints', 'dihedralRestraints'):
+        count = 0
+        for res in project.molecule.allResidues():
+            rL = res[ restraintListAtribute ]
+            getStatsRestraintNTlist(rL, res)
 
-        if len(res.distanceRestraints):
-            # Sort on violation count
-            NTsort(res.distanceRestraints, 'violCount3', inplace=True )
-            res.distanceRestraints.reverse()
-
-            # Calculate sum, rmsd and sum_of_average_deviation of restraints per residue
-            sum   = 0.0
-            sumsq = 0.0
-            n = 0
-            for d in res.distanceRestraints:
-                if d.violations == None: # Happens for ParvulustatParis
-                    continue
-                sum   = d.violations.sum( sum )
-                sumsq = d.violations.sumsq( sumsq )
-                n += len(d.violations)
-            #end for
-            if n == 0:
-                NTmessage('Only DRs without values so no rmsd for residue: %s' % res)
+            # print every 10 lines
+            if not count % 30:
+                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
+            #end if
+            if res.has_key('PHI'):
+                phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
             else:
-                res.distanceRestraints.rmsd = math.sqrt(sumsq/n)
-                res.distanceRestraints.sum = sum
-
-            res.distanceRestraints.violAv     = res.distanceRestraints.zap('violAv').sum()
-            res.distanceRestraints.violCount1 = res.distanceRestraints.zap('violCount1').sum()
-            res.distanceRestraints.violCount3 = res.distanceRestraints.zap('violCount3').sum()
-            res.distanceRestraints.violCount5 = res.distanceRestraints.zap('violCount5').sum()
-        else:
-            res.distanceRestraints.rmsd       = 0.0
-            res.distanceRestraints.sum        = 0.0
-            res.distanceRestraints.violAv     = 0.0
-            res.distanceRestraints.violCount1 = 0
-            res.distanceRestraints.violCount3 = 0
-            res.distanceRestraints.violCount5 = 0
-        #end if
-
-        # print every 10 lines
-        if not count % 30:
-            msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv --')
-        #end if
-        if res.has_key('PHI'):
-            phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
-        else:
-            phi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
-        #end if
-        if res.has_key('PSI'):
-            psi = NTvalue( res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
-        else:
-            psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
-        #end if
-        try:
-            msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f\n',
-                 res, phi, psi,
-                 len(res.distanceRestraints),
-                 res.distanceRestraints.violCount1,
-                 res.distanceRestraints.violCount3,
-                 res.distanceRestraints.violCount5,
-                 res.distanceRestraints.rmsd,
-                 res.distanceRestraints.violAv
-                   )
-        except:
-            pass
-#            NTerror("validateRestraints: No Phi,Psi result for residue %s", res)
-        count += 1
+                phi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
+            #end if
+            if res.has_key('PSI'):
+                psi = NTvalue( res.PSI.cav, res.PSI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
+            else:
+                psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
+            #end if
+            try:
+                msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
+                     res, phi, psi,
+                     len(rL),
+                     rL.violCount1,
+                     rL.violCount3,
+                     rL.violCount5,
+                     rL.rmsd,
+                     rL.violAv,
+                     rL.violMaxAll
+                       )
+            except:
+#                NTdebug("Still giving misfits here in validateRestraints?") # yes
+                pass
+            count += 1
+        #end for
     #end for
 #    NTdebug(msg)
     if toFile:
@@ -1475,7 +1439,7 @@ def validateDihedralCombinations(project):
             continue
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-            msgHol.appendDebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
+#            msgHol.appendDebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
@@ -1834,3 +1798,64 @@ def inRange(a, isRange360=True):
         return False
     return True
 
+def getStatsRestraintNTlist(rL, residue=None):
+    """
+    residue attribute may be None, e.g. when the list is over all residues as in a project or other list.
+    Routine will add stats to rL NTlist object.
+    Routine should be adjusted for any type of restraint other than distance / dihedral.
+    rL stands for restraint list.
+    """
+
+#    NTdebug("Looking at rL: %s" % rL)
+    rL.rmsd       = None
+    rL.violAv     = None
+    rL.violAvAll  = None
+    rL.violMaxAll = None
+    rL.violSum    = None
+    rL.violCount1 = 0
+    rL.violCount3 = 0
+    rL.violCount5 = 0
+
+    if not rL: # Test for at least one member.
+        return
+    modelCount = rL.getModelCount()
+    if not modelCount:
+        return
+
+
+    # Sort on violation count
+    NTsort(rL, 'violCount3', inplace=True )
+    rL.reverse()
+
+    # Calculate sum, rmsd and sum_of_average_deviation of restraints per list
+    # s is sum
+    s = 0.0
+    sumsq = 0.0
+    n = 0 # This counts the total number of violations for each restraint and violated model.
+
+    restraintCount = len(rL)
+    for d in rL:
+        if d.violations == None: # Happens for ParvulustatParis
+            continue
+        s = d.violations.sum( s )
+        sumsq = d.violations.sumsq( sumsq )
+        n += lenNonZero(d.violations)
+    #end for
+    rL.violSum    = s
+    rL.violMaxAll = rL.zap('violMax').max() # note it is not any average. Hence the 'All' postfixed.
+    rL.violCount1 = rL.zap('violCount1').sum()
+    rL.violCount3 = rL.zap('violCount3').sum()
+    rL.violCount5 = rL.zap('violCount5').sum()
+
+#        if residue:
+#            NTmessage('Only restraints without values so no rmsd for residue: %s' % residue)
+    m = modelCount * restraintCount
+    rL.violAvAll = rL.violSum / m
+    rL.rmsd = math.sqrt(sumsq/m)
+
+    rL.violAv = 0.0
+    if n:
+        rL.violAv = rL.violSum / n
+
+#    NTdebug("Found restraintCount,n: %s %s" % (restraintCount,n))
+# end def

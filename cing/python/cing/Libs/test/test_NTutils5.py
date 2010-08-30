@@ -85,6 +85,11 @@ class AllChecks(TestCase):
         myDict.appendFromTable( myTable, 0, 1)
         self.assertTrue( myDict.isEquivalent( myDictExpected ))
 
+    def testTimedelta2HoursMinutesAndSeconds(self):
+        tList = [ 0, 601.1, 136741.0 ]
+        tExpected = [ (0,0,0), (0,10,1), (37,59,1) ]
+        for i,t in enumerate(tList):
+            self.assertEquals(timedelta2HoursMinutesAndSeconds(t), tExpected[i])
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

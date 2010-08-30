@@ -105,6 +105,11 @@ alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
 alias cython%(equals)s'$CYTHON/bin/cython'
 
 '''
+# make the addition conditional to presence like for tcsh.
+#if ( $PYMOL_PATH != 'PLEASE_ADD_EXECUTABLE_HERE' ) then
+#    setenv  CING_VARS ${CING_VARS}:$PYMOL_PATH/modules
+#endif
+
 #------------------------------------------------------------------------------------
 
 ######################################################################################################

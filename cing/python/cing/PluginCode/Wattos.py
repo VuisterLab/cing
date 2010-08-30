@@ -7,11 +7,12 @@ from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.NmrStar import NmrStar
-from cing.PluginCode.required.reqWattos import *
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.STAR.File import File
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
+#from cing.PluginCode.required.reqWattos import *
 
 if True: # block
     # TODO: use more advanced tests.
@@ -347,8 +348,9 @@ def runWattos(project, tmp = None, parseOnly=False):
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
         timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
-        timeRunEstimatedInSecondsStr = sprintf("%4.0f", timeRunEstimated * 60)
-        NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): ' + timeRunEstimatedInSecondsStr + " seconds; please wait")
+        timeRunEstimated *= 60
+        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimated)
+        NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
         scriptFileName = "wattos.script"
         scriptFullFileName = os.path.join(wattosDir, scriptFileName)
         open(scriptFullFileName, "w").write(scriptComplete)

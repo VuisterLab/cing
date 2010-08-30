@@ -58,6 +58,7 @@ COLOR_RED    = 'red'
 COLOR_GREEN  = 'green'
 COLOR_ORANGE = 'orange'
 
+EPSILON_RESTRAINT_VALUE_FLOAT = 1.e-5
 
 # For criteria implementation.
 OPERATION_EQUALS                 = '=='
@@ -104,12 +105,21 @@ VIOL3_STR = 'violCount3'
 VIOL5_STR = 'violCount5'
 
 # SQL stuff
-PDB_ID_STR    = 'pdb_id'
+PDB_ID_STR      = 'pdb_id'
 ENTRY_ID_STR    = 'entry_id'
 CHAIN_ID_STR    = 'chain_id'
 RESIDUE_ID_STR  = 'residue_id'
 ATOM_ID_STR     = 'atom_id'
 RES_COUNT_STR   = 'res_count'
+MODEL_COUNT_STR = 'model_count'
+ROG_STR         = 'rog'
+
+OMEGA_DEV_AV_ALL_STR    = 'omega_dev_av_all'
+CV_BACKBONE_STR         = 'cv_backbone'
+CV_SIDECHAIN_STR        = 'cv_sidechain'
+CHK_RAMACH_STR          = 'chk_ramach'
+CHK_JANIN_STR           = 'chk_janin'
+CHK_D1D2_STR            = 'chk_d1d2'
 
 DISTANCE_COUNT_STR    = 'distance_count'
 DIHEDRAL_COUNT_STR    = 'dihedral_count'
@@ -158,6 +168,37 @@ ALL_ATOMS_STR = 'allAtoms'
 BACKBONE_STR = 'backbone'
 HEAVY_ATOMS_STR = 'heavyAtoms'
 PROTONS_STR = 'protons'
+
+DIS_MAX_ALL_STR = 'dis_max_all'
+DIS_RMS_ALL_STR = 'dis_rms_all'
+DIS_AV_ALL_STR  = 'dis_av_all'
+DIS_AV_VIOL_STR = 'dis_av_viol'
+DIS_C1_VIOL_STR = 'dis_c1_viol'
+DIS_C3_VIOL_STR = 'dis_c3_viol'
+DIS_C5_VIOL_STR = 'dis_c5_viol'
+
+DIH_MAX_ALL_STR = 'dih_max_all'
+DIH_RMS_ALL_STR = 'dih_rms_all'
+DIH_AV_ALL_STR  = 'dih_av_all'
+DIH_AV_VIOL_STR = 'dih_av_viol'
+DIH_C1_VIOL_STR = 'dih_c1_viol'
+DIH_C3_VIOL_STR = 'dih_c3_viol'
+DIH_C5_VIOL_STR = 'dih_c5_viol'
+
+# in CING
+VIOLMAXALL_STR = 'violMaxAll'
+RMSD_STR       = 'rmsd' # see above.
+VIOLAV_STR     = 'violAv'
+VIOLAVALL_STR  = 'violAvAll'
+VIOLCOUNT1_STR = 'violCount1'
+VIOLCOUNT3_STR = 'violCount3'
+VIOLCOUNT5_STR = 'violCount5'
+
+# DB
+QCS_ALL_STR = 'qcs_all'
+QCS_BB_STR = 'qcs_bb'
+QCS_HVY_STR = 'qcs_hvy'
+QCS_PRT_STR = 'qcs_prt'
 
 SCALE_BY_MAX = 'SCALE_BY_MAX' # Ramachandran
 SCALE_BY_SUM = 'SCALE_BY_SUM' # D1D2
