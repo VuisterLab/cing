@@ -1,6 +1,7 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
+PC_STR             = "pc" # key to the entities (atoms, residues, etc under which the results will be stored
 SECSTRUCT_STR      = 'secStruct'
 #CONSENSUS_SEC_STRUCT_FRACTION = 0.6 # not used anymore; just taking the most common one.
 
@@ -8,6 +9,12 @@ gf_STR = 'gf'
 gf_PHIPSI_STR = 'gfPHIPSI'
 gf_CHI12_STR = 'gfCHI12'
 gf_CHI1_STR = 'gfCHI1'
+
+# Used in RDB
+pc_gf_STR           = 'pc_gf_PHIPSI'
+pc_gf_PHIPSI_STR    = 'pc_gf_PHIPSI'
+pc_gf_CHI12_STR     = 'pc_gf_CHI12'
+pc_gf_CHI1_STR      = 'pc_gf_CHI1'
 
 pc_rama_core_STR = 'pc_rama_core'
 pc_rama_allow_STR = 'pc_rama_allow'

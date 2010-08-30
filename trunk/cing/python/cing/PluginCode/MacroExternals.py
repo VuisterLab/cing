@@ -330,27 +330,27 @@ def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=
            TODO: implement reverseColorScheme
            """
     if minValue > maxValue:
-        msg = "mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue)
-        if msgHol == None:
-            NTwarning(msg)
-        else:
-            msgHol.appendWarning(msg)
+#        msg = "mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue)
+#        if msgHol == None:
+#            NTwarning(msg)
+#        else:
+#            msgHol.appendWarning(msg)
         swapMemory = minValue
         minValue = maxValue
         maxValue = swapMemory
     if value > maxValue:
-        msg = "mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue)
-        if msgHol == None:
-            NTwarning(msg)
-        else:
-            msgHol.appendWarning(msg)
+#        msg = "mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue)
+#        if msgHol == None:
+#            NTwarning(msg)
+#        else:
+#            msgHol.appendWarning(msg)
         value = maxValue
     if value < minValue:
-        msg = "mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue)
-        if msgHol == None:
-            NTwarning(msg)
-        else:
-            msgHol.appendWarning(msg)
+#        msg = "mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue)
+#        if msgHol == None:
+#            NTwarning(msg)
+#        else:
+#            msgHol.appendWarning(msg)
         value = minValue
 
 

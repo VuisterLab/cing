@@ -16,3 +16,4 @@ COPY casdcing.cingatom 		FROM '$cwd/casdcing.cingatom.csv' 	 CSV HEADER;
 SELECT setval('casdcing.cingentry_entry_id_seq',     max(entry_id))      FROM casdcing.cingentry;
 SELECT setval('casdcing.cingchain_chain_id_seq',     max(chain_id))      FROM casdcing.cingchain;
 SELECT setval('casdcing.cingresidue_residue_id_seq', max(residue_id))    FROM casdcing.cingresidue;
+SELECT setval('casdcing.cingatom_atom_id_seq',       max(atom_id))       FROM casdcing.cingatom;

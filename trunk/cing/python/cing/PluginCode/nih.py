@@ -1355,19 +1355,19 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
 
     #tmp: to be entered in setup
 #    cingPaths.talosPlus = 'talos+'
+    if project.molecule == None:
+        NTerror("RunTalosPlus: No molecule defined")
+        return True
+
+    if project.molecule.resonanceCount == 0:
+        NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
+        # JFD: This doesn't catch all cases.
+        return True
+
     if not parseOnly:
         if cingPaths.talos == None or cingPaths.talos == 'PLEASE_ADD_EXECUTABLE_HERE':
             NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
             return False
-
-        if project.molecule == None:
-            NTerror("RunTalosPlus: No molecule defined")
-            return True
-
-        if project.molecule.resonanceCount == 0:
-            NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
-            # JFD: This doesn't catch all cases.
-            return True
 
         project.status.talosPlus = talosDefaults()
         project.status.talosPlus.molecule = project.molecule.nameTuple()
@@ -1572,7 +1572,7 @@ def export2nih( project, tmp=None ):
     """
 
     for mol in project.molecules:
-    	project.status.setdefault('talosPlus',talosDefaults())
+        project.status.setdefault('talosPlus',talosDefaults())
         talosDefs = project.status.talosPlus
         fileName = project.path( project.directories.nih, mol.name+'.'+talosDefs.tableFile )
         exportShifts2TalosPlus(  project, fileName=fileName )

@@ -33,7 +33,7 @@ class NmrStar():
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
         if not self.ccpnProject:
-#            NTmessage("Failed to find ccpn project. This is normal if CING project didn't contain one previously generated.")
+            NTmessage("Failed to find ccpn project. This is normal if CING project didn't contain one previously generated.")
             return
 
         ccpnFolder = self.project.ccpnFolder

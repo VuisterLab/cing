@@ -16,6 +16,7 @@ from cing.PluginCode.required.reqDssp import DSSP_H
 from cing.PluginCode.required.reqDssp import DSSP_S
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.core.ROGscore import ROGscore
+from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from database import NTdb
@@ -104,6 +105,23 @@ def chothiaClass(resList):
 
     return None
 
+def getAssignmentCountMapForResList(resList):
+    """Returns dictionary by isotope and overall keys with boolean values."""
+    assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, 'overall': 0}
+    atmList = NTlist()
+    for res in resList:
+        atmList.addList( res.allAtoms() )
+    for atm in atmList:
+#        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
+        if atm.isAssigned():
+            # spintype is not available for pseudos etc. perhaps
+            spinType = getDeepByKeys(atm, 'db', 'spinType')
+#            NTdebug("spinType: %s" % spinType)
+            if spinType:
+                assignmentCountMap[spinType] += 1
+                assignmentCountMap['overall'] += 1
+    return assignmentCountMap
+
 class ResidueList():
     def countDsspSecStructConsensus(self):
         return countDsspSecStructConsensus(self.allResidues())
@@ -111,6 +129,9 @@ class ResidueList():
         return chothiaClass(self.allResidues())
     def chothiaClassInt(self):
         return chothiaClassInt(chothiaClass(self.allResidues()))
+    def getAssignmentCountMap(self):
+        return getAssignmentCountMapForResList(self.allResidues())
+
 
 #==============================================================================
 class Molecule( NTtree, ResidueList ):
@@ -236,20 +257,6 @@ class Molecule( NTtree, ResidueList ):
     def __repr__(self):
         return sprintf('<Molecule %s>', self._Cname(-1))
     #end def
-
-    def getAssignmentCountMap(self):
-        """Returns dictionary by isotope and overall keys with boolean values."""
-        assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, 'overall': 0}
-        for atm in self.allAtoms():
-    #        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
-            if atm.isAssigned():
-                # spintype is not available for pseudos etc. perhaps
-                spinType = getDeepByKeys(atm, 'db', 'spinType')
-    #            NTdebug("spinType: %s" % spinType)
-                if spinType:
-                    assignmentCountMap[spinType] += 1
-                    assignmentCountMap['overall'] += 1
-        return assignmentCountMap
 
     def setAllChildrenByKey(self, key, value):
         "Set chain,res, and atom children's keys to value"
@@ -2546,14 +2553,14 @@ Residue class: Defines residue properties
         self.atomCount = 0
         self.chain     = self._parent
 
-        self.dihedrals = NTlist()
+        self.dihedrals = NTlist()            
 
-        # restraints associated with this residue; filled in partion restraints
-        self.distanceRestraints = NTlist()
-        self.dihedralRestraints = NTlist()
-        self.rdcRestraints      = NTlist()
+        # restraints associated with this residue; filled in partition restraints
+        self.distanceRestraints = RestraintList('distanceRestraints')
+        self.dihedralRestraints = RestraintList('dihedralRestraints')
+        self.rdcRestraints      = RestraintList('rdcRestraints')
 
-        self.cv_backbone = None # filled by self.setCvBackboneSidechain
+        self.cv_backbone = None # filled by self.setCvBackboneSidechain. Needs to be matched by cing.core.constants#CV_BACKBONE_STR
         self.cv_sidechain = None
         self.rmsd = None # will be filled by molecule.calculateRMSDs.
         self.rogScore = ROGscore()

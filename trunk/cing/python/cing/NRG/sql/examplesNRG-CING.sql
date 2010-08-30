@@ -1,3 +1,6 @@
+-- login by:
+-- psql pdbmlplus pdbj
+
 -- Entry count 62635 on Thu Jan 21 10:41:06 CET 2010
 SELECT count(*) FROM entry;
 
@@ -50,12 +53,47 @@ SELECT * FROM residue r where r.rog = 2;
 SELECT * FROM chain c where c.rog = 2;
 SELECT * FROM entry e where e.rog = 2;
 
-SELECT e1.entry_id, e1.pdb_id, e1.distance_count 
-FROM nrgcing.cingentry AS e1 
+SELECT e1.entry_id, e1.pdb_id, e1.distance_count
+FROM nrgcing.cingentry AS e1
 WHERE e1.distance_count IS NOT NULL AND e1.distance_count != 0.0
 AND e1.pdb_id = '2vda'
 ORDER BY e1.distance_count DESC
 LIMIT 10
 
+SELECT * FROM "nrgcing"."cingentry" where pdb_id='1brv';
 
+SELECT r.*
+FROM nrgcing.cingresidue r, nrgcing.cingentry e
+where
+-- r.wi_bmpchk > 30.0
+r.entry_id = e.entry_id
+AND e.pdb_id='1brv';
 
+SELECT a.*
+FROM nrgcing.cingatom a, nrgcing.cingentry e
+where
+-- r.wi_bmpchk > 30.0
+a.entry_id = e.entry_id
+AND e.pdb_id='1brv';
+
+-- Now the sequences need to be initialized too.
+SELECT setval('nrgcing.cingentry_entry_id_seq',     max(entry_id))      FROM nrgcing.cingentry;
+SELECT setval('nrgcing.cingchain_chain_id_seq',     max(chain_id))      FROM nrgcing.cingchain;
+SELECT setval('nrgcing.cingresidue_residue_id_seq', max(residue_id))    FROM nrgcing.cingresidue;
+SELECT setval('nrgcing.cingatom_atom_id_seq',       max(atom_id))       FROM nrgcing.cingatom;
+
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_max_all FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_rms_all FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_av_all  FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_av_viol FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_c1_viol INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_c3_viol INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dis_c5_viol INT   DEFAULT NULL;
+
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_max_all FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_rms_all FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_av_all  FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_av_viol FLOAT DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c1_viol INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c3_viol INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c5_viol INT   DEFAULT NULL;

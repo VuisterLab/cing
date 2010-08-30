@@ -47,7 +47,7 @@ def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = True # default: False
+    fastestTest = False # default: False
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -57,7 +57,7 @@ def main(entryId, *extraArgList):
 #    modelCount=2
     modelCount = None # default setting is None
     if fastestTest:
-        modelCount = 1 # if this is more and there is only one model present it leads to an error message.
+        modelCount = 2 # if this is more and there is only one model present it leads to an error message.
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -260,9 +260,13 @@ def main(entryId, *extraArgList):
     if storeCING2db:
         # Does require:
         #from cing.PluginCode.sqlAlchemy import csqlAlchemy
-        if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
-            NTerror("Failed to store CING project's data to DB but continuing.")
-
+        # and should never crash  run.
+        try:
+            if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+                NTerror("Failed to store CING project's data to DB but continuing.")
+        except:
+            NTtracebackError()
+            NTerror("Failed to store CING project's data due to above traceback error.")
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz

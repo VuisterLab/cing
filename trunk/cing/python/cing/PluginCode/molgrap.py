@@ -216,7 +216,7 @@ class Molgrap(NTdict):
         if program(""):
             NTerror("Failed shell command: " + script_file_name)
             NTerror("Suggestion 1: Have you installed povray-includes or similar?")
-            NTerror("For some Linuxes 'colors.inc' doesn't come with povray")
+            NTerror("              For some Linuxes the file 'colors.inc' doesn't come with povray")
             NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough?")
             NTerror("Suggestion 3: Complex X-ray topology then consider looking at %s%s" % (issueListUrl,233))
             return True
