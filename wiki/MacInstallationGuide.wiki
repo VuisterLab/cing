@@ -11,7 +11,7 @@ From http://www.macports.org/
 
 == Install mandatory deps ==
 
-As root do:
+As root do (takes several hours if gcc needs to be compiled):
 {{{
 port install py26-matplotlib py26-ipython py26-pil py26-scipy povray imagemagick ghostscript 
 }}}
