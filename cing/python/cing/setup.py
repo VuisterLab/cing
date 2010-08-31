@@ -322,6 +322,9 @@ def _writeCingShellFile(isTcsh):
     print ' There is another dependency; cython. Please install it and run:'
     print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
     print ' After installing cython; rerun setup.py or manually update the settings file.'
+    print ' We have included the Cython distribution needed so add to your PYTHONPATH for now:'
+    print ' $CINGROOT/dist/Cython (later it will be added by the cing.[c]sh created.'
+    
 #end def
 #------------------------------------------------------------------------------------
 
