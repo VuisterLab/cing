@@ -124,7 +124,7 @@ def processEntry(pdb_id):
             # end if
         else:
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile = log_file)
-            NTmessage("    Running Wim Vranken's FormatConverter from script %s" % fcScript )
+            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript )
             exitCode = convertProgram("%s %s %s" % (inputStarFile, pdb_id, star_entry_dir))
             if exitCode:
                 NTerror("Failed convertProgram with exit code: %s" % str(exitCode))

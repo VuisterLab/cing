@@ -11,7 +11,7 @@ from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import fontAttributes
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.NTutils import * #@UnusedWildImport
+
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import dir_plot
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
@@ -54,7 +54,7 @@ ONLY_NON_ZERO = 'onlyNonZero'
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
 #schemaJ = PDBJ_DB_SCHEMA
-#host = 'nmr'
+#HOST = 'nmr'
 HOST = 'localhost'
 
 
@@ -280,117 +280,21 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         plotting.'''
         m = self
         graphicsFormat = "png"
-        dictDivideByResidueCount = {DIVIDE_BY_RESIDUE_COUNT:1}
-        dictDivideByResidueCount_OnlyProtein = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1}
-        dictDivideByResidueCount_OnlyProtein_OnlySelection = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1, ONLY_SELECTION:1}
-        dictDivideByResidueCount_OnlySelection_OnlyNonZero = {DIVIDE_BY_RESIDUE_COUNT:1, ONLY_PROTEIN:1, ONLY_SELECTION:1, ONLY_NON_ZERO:1}
-        dict_OnlyNonZero = {ONLY_NON_ZERO:1}
-        dict1 = dictDivideByResidueCount #@UnusedVariable
-        dict2 = dictDivideByResidueCount_OnlyProtein #@UnusedVariable
-        dict3 = dictDivideByResidueCount_OnlyProtein_OnlySelection #@UnusedVariable
-        dict4 = dictDivideByResidueCount_OnlySelection_OnlyNonZero #@UnusedVariable
-        d5 = dict_OnlyNonZero #@UnusedVariable
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
-        plotList = [
+
+        try:
+            from localPlotList import plotList
+        except:
+            plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, RDC_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, PEAK_COUNT_STR,dict3 ], # These will come later.
-#            [ PROJECT_LEVEL, CING_STR, CS_COUNT_STR,dict3 ],
-#            [ PROJECT_LEVEL, CING_STR, CS1H_COUNT_STR,dict3 ],
-#            [ PROJECT_LEVEL, CING_STR, CS13C_COUNT_STR,dict3 ],
-#            [ PROJECT_LEVEL, CING_STR, CS15N_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, CING_STR, RES_COUNT_STR,{} ],
-#            [ PROJECT_LEVEL, CING_STR, MODEL_COUNT_STR,{} ],
-#            [ PROJECT_LEVEL, CING_STR, ROG_STR,{} ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_MAX_ALL_STR, d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_RMS_ALL_STR, d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_AV_ALL_STR , d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_AV_VIOL_STR, d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_C1_VIOL_STR, d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_C3_VIOL_STR, d5 ],
-#            [ PROJECT_LEVEL, CING_STR, DIS_C5_VIOL_STR, d5 ],
+            [ PROJECT_LEVEL, CING_STR, DIS_MAX_ALL_STR, {} ],
+            ]
 
-#            [ PROJECT_LEVEL, WHATIF_STR, BBCCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, BNDCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, HNDCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, INOCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, NQACHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, OMECHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, PLNCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, QUACHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR,{} ],
-#            [ PROJECT_LEVEL, WHATIF_STR, ROTCHK_STR,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_gf_STR       ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_gf_PHIPSI_STR,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_gf_CHI12_STR ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_gf_CHI1_STR  ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_rama_core_STR   ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_rama_allow_STR   ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_rama_gener_STR   ,{} ],
-#            [ PROJECT_LEVEL, PC_STR, pc_rama_disall_STR  ,{} ],
-#            [ PROJECT_LEVEL, WATTOS_STR, NOE_COMPL4_STR  ,{} ],
-#            [ RES_LEVEL, CING_STR, ROG_STR,{} ],
-#            [ RES_LEVEL, CING_STR, DISTANCE_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, RDC_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, PEAK_COUNT_STR,d5 ], # These will come later.
-#            [ RES_LEVEL, CING_STR, CS_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, CS1H_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, CS13C_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, CS15N_COUNT_STR,d5 ],
-#            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ], # TODO: code?
-#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR,{} ], # TODO: run coded already.
-#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR,{} ],
-#            [ RES_LEVEL, CING_STR, CHK_RAMACH_STR,{} ],
-#            [ RES_LEVEL, CING_STR, CHK_JANIN_STR,{} ],
-#            [ RES_LEVEL, CING_STR, CHK_D1D2_STR,{} ],
-#            [ RES_LEVEL, CING_STR, DIS_MAX_ALL_STR, d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_RMS_ALL_STR, d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_AV_ALL_STR , d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_AV_VIOL_STR, d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_C1_VIOL_STR, d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_C3_VIOL_STR, d5 ],
-#            [ RES_LEVEL, CING_STR, DIS_C5_VIOL_STR, d5 ],
-
-
-#            [ RES_LEVEL, DSSP_STR, DSSP_ID_STR,{} ],
-#            [ RES_LEVEL, PC_STR, pc_gf_STR       ,{} ],
-#            [ RES_LEVEL, PC_STR, pc_gf_PHIPSI_STR,{} ],
-#            [ RES_LEVEL, PC_STR, pc_gf_CHI12_STR ,{} ],
-#            [ RES_LEVEL, PC_STR, pc_gf_CHI1_STR  ,{} ],
-#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL4_STR  ,{} ],
-#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_OBS_STR  ,{} ],
-#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_EXP_STR  ,{} ],
-#            [ RES_LEVEL, WATTOS_STR, NOE_COMPL_MAT_STR  ,{} ],
-#            [ RES_LEVEL, WHATIF_STR, ACCLST_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, ANGCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, BBCCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, BMPCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, BNDCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, C12CHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, FLPCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, INOCHK_STR,{} ],
-##            [ RES_LEVEL, WHATIF_STR, OMECHK_STR,{} ], # ABSENT
-##            [ RES_LEVEL, WHATIF_STR, PL2CHK_STR,{} ], # ABSENT
-#            [ RES_LEVEL, WHATIF_STR, PL3CHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, PLNCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, QUACHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, RAMCHK_STR,{} ],
-#            [ RES_LEVEL, WHATIF_STR, ROTCHK_STR,{} ],
-#            [ RES_LEVEL, QSHIFT_STR, QCS_ALL_STR,{} ], # use when CS data comes thru.
-#            [ RES_LEVEL, QSHIFT_STR, QCS_BB_STR,{} ],
-#            [ RES_LEVEL, QSHIFT_STR, QCS_HVY_STR,{} ],
-#            [ RES_LEVEL, QSHIFT_STR, QCS_PRT_STR,{} ],
-
-#            [ ATOM_LEVEL, WHATIF_STR, CHICHK_STR,{} ],
-#            [ ATOM_LEVEL, WHATIF_STR, HNDCHK_STR,{} ],
-#            [ ATOM_LEVEL, WHATIF_STR, PL2CHK_STR,{} ],
-        ]
         for p in plotList:
             level, progId, chk_id, plotDict = p
             chk_id_unique = '.'.join([level,progId,chk_id])
+            NTdebug("Starting with: %s" % chk_id_unique)
             floatValueList = m.getFloatListFromDb(level, progId, chk_id, **plotDict)
             if False: # DEFAULT False. Block used for checking procedures.
                 mu = 100.
@@ -721,3 +625,4 @@ if __name__ == '__main__':
         m.createScatterPlotGreenVersusRed()
     if True:
         m.createPlots()
+    NTmessage("done with makeNRGCINGplots")

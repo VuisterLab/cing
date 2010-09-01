@@ -158,6 +158,7 @@ Project: Top level Cing project class
                            procheckStatus = NTdict(completed = False, parsed = False, ranges = None),
 #                           dsspStatus = NTdict(completed = False, parsed = False),
                            whatifStatus = NTdict(completed = False, parsed = False),
+                           wattosStatus = NTdict(completed = False, parsed = False),
                            shiftxStatus = NTdict(completed = False, parsed = False),
                            x3dnaStatus  = NTdict(completed = False, parsed = False),
 
@@ -237,7 +238,7 @@ Project: Top level Cing project class
                       'storedInCcpnFormat',
                       'reports',
                       'history',
-                      'procheckStatus', 'whatifStatus', 'shiftxStatus', 'status'
+                      'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
                     )
     #end def
 
@@ -566,9 +567,7 @@ Project: Top level Cing project class
             if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
-
-            NTmessage('Opened old project %s', pr)
-
+            NTmessage('Finished restoring project %s', pr)
         else:
             NTerror('ERROR Project.open: invalid status option "%s"', status)
             return None
@@ -700,8 +699,9 @@ Project: Top level Cing project class
 
         # this is also done in runCingChecks, but should be here to assure restraint
         # partitioning and analysis for the external routines.
-        self.partitionRestraints()
-        self.analyzeRestraints()
+        # JFD TODO: why? the above is unclear to me now.
+#        self.partitionRestraints()
+#        self.analyzeRestraints()
 #            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
@@ -714,9 +714,7 @@ Project: Top level Cing project class
         #end for
 
         self.runCingChecks(toFile=False)
-
         self.contentIsRestored = True
-
         self.updateProject()
     #end def
 

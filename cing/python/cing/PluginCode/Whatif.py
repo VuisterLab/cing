@@ -11,6 +11,7 @@ from cing.Libs.NTmoleculePlot import KEY_LIST_STR
 from cing.Libs.NTmoleculePlot import MoleculePlotSet
 from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import removeEmptyFiles
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
@@ -947,21 +948,22 @@ def runWhatif( project, parseOnly=False ):
     whatifPath       = os.path.dirname(cingPaths.whatif)
     whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
     whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
+    whatifStatus = project.whatifStatus
 
     if not parseOnly:
-        project.whatifStatus.nonStandardResidues = NTlist()
-        project.whatifStatus.path                = path
-        project.whatifStatus.models              = models
-        project.whatifStatus.completed           = False
-        project.whatifStatus.parsed              = False
-        project.whatifStatus.time                = None
-        project.whatifStatus.exitCode            = None
+        whatifStatus.nonStandardResidues = NTlist()
+        whatifStatus.path                = path
+        whatifStatus.models              = models
+        whatifStatus.completed           = False
+        whatifStatus.parsed              = False
+        whatifStatus.time                = None
+        whatifStatus.exitCode            = None
 
         for res in project.molecule.allResidues():
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
                 if not res.hasProperties('HOH'): # don't report waters
                     NTwarning('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
-                project.whatifStatus.nonStandardResidues.append(repr(res))
+                whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 
         copy(whatifTopology, os.path.join(whatifDir,"TOPOLOGY.FIL"))
@@ -988,9 +990,11 @@ def runWhatif( project, parseOnly=False ):
         # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
         totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
         timeRunEstimatedInSeconds    = totalNumberOfResidues / Whatif.NUMBER_RESIDUES_PER_SECONDS
-        timeRunEstimatedInSecondsStr = sprintf("%.0f",timeRunEstimatedInSeconds)
+
+        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
         NTmessage('==> Running What If checks on '+`totalNumberOfResidues`+
-                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`+" residues/s): "+timeRunEstimatedInSecondsStr+" seconds; please wait")
+                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`+" residues/s): "+
+                     '%s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
         if totalNumberOfResidues < 100:
             NTmessage("It takes much longer per residue for a small molecule/ensemble")
 
@@ -1002,10 +1006,11 @@ def runWhatif( project, parseOnly=False ):
         # thinking it's running interactively.
         now = time.time()
         whatifExitCode = whatifProgram("script", scriptFileName )
-        project.whatifStatus.exitCode  = whatifExitCode
-        project.whatifStatus.time      = sprintf("%.1f", time.time() - now)
-#        NTdebug('runWhatif: exitCode %s,  time: %s', project.whatifStatus.exitCode, project.whatifStatus.time)
-        project.whatifStatus.keysformat()
+#        NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+        whatifStatus.exitCode  = whatifExitCode
+        whatifStatus.time      = sprintf("%.1f", time.time() - now)
+#        NTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
+        whatifStatus.keysformat()
 
         if whatifExitCode:
             NTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
@@ -1014,7 +1019,7 @@ def runWhatif( project, parseOnly=False ):
         if False:
             removeTempFiles(whatifDir)
 
-        project.whatifStatus.completed = True
+        whatifStatus.completed = True
     else:
 #        NTdebug("Skipping actual whatif execution")
         whatifExitCode = 0
@@ -1036,8 +1041,9 @@ def runWhatif( project, parseOnly=False ):
         if atm.has_key(WHATIF_STR):
             del(atm[WHATIF_STR])
 
-    project.whatifStatus.parsed = False
-    for model in NTprogressIndicator(models):
+    whatifStatus.parsed = False
+#    for model in NTprogressIndicator(models):
+    for model in models:
         modelNumberString = sprintf('%03d', model)
 #        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
 #        os.unlink( fullname )
@@ -1048,7 +1054,7 @@ def runWhatif( project, parseOnly=False ):
         if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
             NTerror("\nrunWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
-    	#end if
+        #end if
     #end for
 
     if whatif._processCheckdb():
@@ -1106,13 +1112,14 @@ def runWhatif( project, parseOnly=False ):
     # set formats on the whatif data structure
     whatif.keysformat()
 
-    project.whatifStatus.parsed = True
-    project.whatifStatus.keysformat()
+    whatifStatus.parsed = True
+    whatifStatus.keysformat()
 
 #end def
 
 
 def removeTempFiles( whatifDir ):
+    removeEmptyFiles( whatifDir )
 #    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
     NTdebug("Removing temporary files generated by What If")
     try:
@@ -1122,7 +1129,7 @@ def removeTempFiles( whatifDir ):
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
 
-        for extension in [ "*.eps", "*.pdb", "*.LOG", "*.DAT", "*.SCC", "*.sty", "*.FIG", "*.ATM", "DAVADRUG.*", "PRODRUG.*" ]:
+        for extension in '*.eps *.pdb *.OUT *.LOG *.DAT *.SCC *.sty *.FIG *.ATM DAVADRUG.* PRODRUG.*'.split():
             for fn in glob(os.path.join(whatifDir,extension)):
                 removeList.append(fn)
         for fn in removeList:
@@ -1142,7 +1149,7 @@ def restoreWhatif( project, tmp=None ):
     Optionally restore whatif results
     """
     if project.whatifStatus.completed:
-        NTmessage('==> restoring whatif results')
+        NTmessage('==> Restoring whatif results')
         project.runWhatif(parseOnly=True)
 #end def
 

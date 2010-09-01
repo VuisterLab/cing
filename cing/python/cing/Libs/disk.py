@@ -1,6 +1,7 @@
 # YASARA BioTools
 # Visit www.yasara.org for more...
 # Copyright by Elmar Krieger
+from glob import glob
 from glob import glob1
 from optparse import OptionParser
 from string import digits
@@ -685,3 +686,8 @@ def mkdirs(dst):
         if e.errno != EEXIST:
             raise
 
+def removeEmptyFiles( theDir ):
+    for fn in glob(theDir):
+        if os.path.getsize(fn) == 0:
+            print "Removing empty file."
+            os.unlink(fn)

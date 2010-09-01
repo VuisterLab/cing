@@ -218,10 +218,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_pc_gf_chi12 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI12_STR)
     p_pc_gf_chi1 = molecule.getDeepByKeys(PROCHECK_STR, gf_CHI1_STR)
     p_pc_gf_phipsi = molecule.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
-    p_pc_rama_core = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_core_STR)
-    p_pc_rama_allow = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_allow_STR)
-    p_pc_rama_gener = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_gener_STR)
-    p_pc_rama_disall = molecule.getDeepByKeys(PROCHECK_STR, pc_rama_disall_STR)
+    pc_summary = molecule.getDeepByKeys(PROCHECK_STR, SUMMARY_STR)
+    p_pc_rama_core = getDeepByKeysOrAttributes(pc_summary,  core_STR)
+    p_pc_rama_allow = getDeepByKeysOrAttributes(pc_summary, allowed_STR)
+    p_pc_rama_gener = getDeepByKeysOrAttributes(pc_summary, generous_STR)
+    p_pc_rama_disall = getDeepByKeysOrAttributes(pc_summary,disallowed_STR)
 
     # Wattos
     noe_compl4 = molecule.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
@@ -361,7 +362,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_dihedral_count = residue.dihedralRestraints.lenRecursive()
             r_rdc_count = residue.rdcRestraints.lenRecursive()
 
-            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
+#            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
             # TODO: test with cs present
             assignmentCountMap = getAssignmentCountMapForResList([residue])
             r_cs_count = assignmentCountMap['overall']
@@ -505,7 +506,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                   ))
             residue_id = execute(s).fetchall()[0][0]
             residueCommittedCount += 1
-            NTdebug("Inserted residue %s" % residue_id)
+#            NTdebug("Inserted residue %s" % residue_id)
             if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name

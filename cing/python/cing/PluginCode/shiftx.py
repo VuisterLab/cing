@@ -419,7 +419,7 @@ def calcQshift( project, tmp=None ):
         NTmessage('calcQshift: no molecule defined')
         return None
     #end if
-    NTdetail('==> calculating Q-factors for chemical shift')
+    NTdetail('==> Calculating Q-factors for chemical shift')
     for res in project.molecule.allResidues():
         atms = res.allAtoms()
         bb = NTlist()

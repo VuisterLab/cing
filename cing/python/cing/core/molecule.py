@@ -1348,13 +1348,14 @@ class Molecule( NTtree, ResidueList ):
                         cyssDict2Pair[c1] = pair
                         cyssDict2Pair[c2] = pair
         # end for
-        if pairList:
-            NTmessage( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
-#            for pair in pairList:
-#                NTdebug( '%s %s' % (pair[0], pair[1] ))
-        else:
-            NTdetail( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
-        # end if
+        if False: # debug info really.
+            if pairList:
+                NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
+    #            for pair in pairList:
+    #                NTdebug( '%s %s' % (pair[0], pair[1] ))
+            else:
+                NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
+            # end if
 
         if toFile:
             path = self.project.moleculePath('analysis','disulfides.txt')
@@ -1773,7 +1774,7 @@ Return an Molecule instance or None on error
         selectedResiduesList = self.selectedResiduesList
         selectedModels   = self.models2list( models )
 
-        NTdetail("Calculating rmsd's (residues: %s, models: %s)", selectedResiduesList, models)
+        NTdetail("==> Calculating rmsd's (residues: %s, models: %s)", selectedResiduesList, models)
 
         self.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + selectedResiduesList )
         for res in self.allResidues():

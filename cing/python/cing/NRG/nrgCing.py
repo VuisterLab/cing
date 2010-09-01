@@ -46,7 +46,6 @@ import shutil
 import string
 import urllib
 
-
 def run():
     """Return True on error"""
     max_entries_todo = 20    # was 500 (could be as many as u like)
@@ -247,14 +246,14 @@ class nrgCing(Lister):
         subDirList = os.listdir('data')
         for subDir in subDirList:
             if len(subDir) != 2:
-                if subDir != ".DS_Store":
+                if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join('data', subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
-                    if entry_code != ".DS_Store":
+                    if entry_code != DS_STORE_STR:
                         NTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
 #                NTdebug("Working on: " + entry_code)

@@ -178,13 +178,13 @@ class validationExercises(Lister):
         subDirList = os.listdir('data')
         for subDir in subDirList:
             if len(subDir) != 2:
-                if subDir != ".DS_Store":
+                if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join('data',subDir))
             for entryDir in entryList:
                 entry_code = entryDir
-                if entry_code == ".DS_Store":
+                if entry_code == DS_STORE_STR:
                     continue
 
                 cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")

@@ -299,8 +299,9 @@ def restoreDssp(project, tmp = None):
         NTerror("restoreDssp: Failed to get dssp instance of project")
         return True
 
+    NTmessage('==> Restoring DSSP results')
     dcheck.parseResult()
-    NTdetail('==> Restored dssp results')
+#    NTdetail('==> Restored dssp results')
     project.molecule.dssp = dcheck
 #end def
 
