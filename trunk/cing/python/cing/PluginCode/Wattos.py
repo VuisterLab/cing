@@ -8,10 +8,11 @@ from cing.Libs.NTmoleculePlot import YLABEL_STR
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.NmrStar import NmrStar
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
-from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
+from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
 from cing.STAR.File import File
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
+#from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 #from cing.PluginCode.required.reqWattos import *
 
 if True: # block
@@ -316,7 +317,14 @@ def runWattos(project, tmp = None, parseOnly=False):
 
     wattosDir = project.mkdir(molecule.name, project.moleculeDirectories.wattos)
 
+    wattosStatus = project.wattosStatus
+
     if not parseOnly:
+        wattosStatus.completed           = False
+        wattosStatus.parsed              = False
+        wattosStatus.time                = None
+        wattosStatus.exitCode            = None
+
         fileName = 'project.str'
         fullname = os.path.join(os.path.curdir, wattosDir, fileName)
         fullname = os.path.abspath(fullname)
@@ -347,9 +355,9 @@ def runWattos(project, tmp = None, parseOnly=False):
 
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
-        timeRunEstimated = 0.025 * molecule.modelCount * len(molecule.allResidues())
-        timeRunEstimated *= 60
-        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimated)
+        timeRunEstimatedInSeconds = 0.025 * molecule.modelCount * len(molecule.allResidues())
+        timeRunEstimatedInSeconds *= 60
+        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
         NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
         scriptFileName = "wattos.script"
         scriptFullFileName = os.path.join(wattosDir, scriptFileName)
@@ -365,10 +373,17 @@ def runWattos(project, tmp = None, parseOnly=False):
         now = time.time()
         wattosExitCode = wattosProgram()
 
-        NTmessage("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+#        NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+
+        wattosStatus.exitCode  = wattosExitCode
+        wattosStatus.time      = sprintf("%.1f", time.time() - now)
+        wattosStatus.keysformat()
+
         if wattosExitCode:
             NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
             return None
+        wattosStatus.completed = True
+    # endif not parseOnly
 
     fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
     if not os.path.exists(fullname):
@@ -436,6 +451,9 @@ def runWattos(project, tmp = None, parseOnly=False):
         NTerror('Failed to set Wattos summary')
         return True
 
+    wattosStatus.parsed = True
+#    NTdebug("In runWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
+
     return wattos # Success
 #end def
 
@@ -472,8 +490,18 @@ def createHtmlWattos(project, ranges = None):
     moleculePlotSet.renderMoleculePlotSet(printLink, createPngCopyToo = True)
 #end def
 
+def restoreWattos( project, tmp=None ):
+    """
+    Optionally restore Wattos results
+    """
+    NTdebug("In restoreWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
+    if project.wattosStatus.completed:
+        NTmessage('==> Restoring Wattos results')
+        project.runWattos(parseOnly=True)
+#end def
 
 # register the functions
 methods = [(runWattos, None),
            (createHtmlWattos, None)
            ]
+restores = [(restoreWattos, None)]

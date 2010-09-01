@@ -54,7 +54,8 @@ if __name__ == '__main__':
     #cing.verbosity = cing.verbosityDefault
     archive_id = ARCHIVE_NRG_ID
 #    entryList = '1brv'.split()
-    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
+#    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
+    entryList = []
 
     if False:
         archive_id = ARCHIVE_CASD_ID

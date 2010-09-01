@@ -98,6 +98,8 @@ DIHEDRAL_BY_PROJECT_LEVEL = 'DihedralByProject'
 DIHEDRALL_BY_PROJECT_LEVEL = 'DihedralByProjectList' # unused?
 DIHEDRAL_BY_RESIDUE_STR = 'DihedralByResidue'
 
+SUMMARY_STR = 'summary'
+
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
 VIOL1_STR = 'violCount1'
@@ -216,5 +218,7 @@ MAX_Z_D1D2 = 0.0
 QshiftMinValue = 0.0
 QshiftMaxValue = 0.05
 QshiftReverseColorScheme = False
+
+DS_STORE_STR = ".DS_Store" # A mac OSX file that should be ignored by CING.
 
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

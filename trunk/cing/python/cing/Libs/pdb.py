@@ -246,7 +246,7 @@ class pdbParser:
 #                        NTwarning("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
                         continue
 
-        msg = "Non-standard (residues and their) atoms"
+        msg = "==> Non-standard (residues and their) atoms"
         if self.allowNonStandardResidue:
             msg += " to add:\n"
         else:

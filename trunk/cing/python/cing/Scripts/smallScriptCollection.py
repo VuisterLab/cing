@@ -86,7 +86,6 @@ def allDoYasaraRewritePdb():
 1y4o""".split():
         doYasaraRewritePdb(entry)
 
-
 def removeTempFiles():
     entryCode = '1brv'
 #    entryCode = '1cjg'

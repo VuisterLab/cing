@@ -88,7 +88,7 @@ CREATE TABLE casdcing.cingentry
     pc_rama_allow                   FLOAT DEFAULT NULL,
     pc_rama_gener                   FLOAT DEFAULT NULL,
     pc_rama_disall                  FLOAT DEFAULT NULL,
---   wattos
+--   wattos (there are other parameters at residue level but not filled in now).
     noe_compl4                     FLOAT DEFAULT NULL,
 
     dis_max_all                    FLOAT DEFAULT NULL,

@@ -491,7 +491,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         """
         modelCount = self.molecule.modelCount
-        NTdetail("==> Parsing procheck results")
+#        NTdebug("==> Parsing procheck results")
 
         if modelCount > MAX_PROCHECK_NMR_MODELS:
             NTwarning("Limiting number of models analyzed from %d to %d" % (modelCount, MAX_PROCHECK_NMR_MODELS))
@@ -683,7 +683,7 @@ def restoreProcheck( project, tmp=None ):
     Optionally restore procheck results
     """
     if project.procheckStatus.completed:
-        NTmessage('==> restoring procheck results')
+        NTmessage('==> Restoring procheck results')
         project.runProcheck(parseOnly=True, ranges = project.procheckStatus.ranges)
 #end def
 

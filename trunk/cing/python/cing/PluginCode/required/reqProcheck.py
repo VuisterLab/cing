@@ -21,6 +21,11 @@ pc_rama_allow_STR = 'pc_rama_allow'
 pc_rama_gener_STR = 'pc_rama_gener'
 pc_rama_disall_STR = 'pc_rama_disall'
 
+core_STR = 'core'
+allowed_STR = 'allowed'
+generous_STR = 'generous'
+disallowed_STR = 'disallowed'
+
 gf_LIST_STR = [ gf_STR, gf_PHIPSI_STR, gf_CHI12_STR, gf_CHI1_STR]
 pc_rama_LIST_STR = [ pc_rama_core_STR, pc_rama_allow_STR, pc_rama_gener_STR, pc_rama_disall_STR]
 

@@ -1360,7 +1360,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         return True
 
     if project.molecule.resonanceCount == 0:
-        NTmessage("RunTalosPlus: No resonances defined so no sense in running.")
+        NTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
         # JFD: This doesn't catch all cases.
         return True
 
