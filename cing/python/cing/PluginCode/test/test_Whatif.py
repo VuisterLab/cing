@@ -5,6 +5,7 @@ python $CINGROOT/python/cing/PluginCode/test/test_Whatif.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.Ccpn import Ccpn #@UnusedImport Added to raise import warning and causing the check to be skipped while testing.
 from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project

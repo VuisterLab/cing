@@ -4,7 +4,6 @@ from cing.NRG import CASD_DB_USER_NAME
 from cing.NRG import PDBJ_DB_NAME
 from cing.NRG import PDBJ_DB_USER_NAME
 from cing.PluginCode.required.reqOther import *
-from sqlalchemy.exc import SAWarning
 import gc
 import warnings
 
@@ -22,6 +21,8 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from sqlalchemy.schema import MetaData
         from sqlalchemy.schema import Table
         from sqlalchemy.sql.expression import func
+        from sqlalchemy.exc import SAWarning
+
         versionTuple = sqlalchemy.__version__.split('.')
         if not (versionTuple[0] > '0' or versionTuple[1] >= '5'):
             switchOutput(True)
