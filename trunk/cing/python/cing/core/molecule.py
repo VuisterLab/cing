@@ -1965,9 +1965,9 @@ Return an Molecule instance or None on error
         """
 
         if ranges==None:
-            residues = molecule.allResidues()
+            residues = self.allResidues()
         else:
-            residues = molecule.getResiduesFromRanges(ranges)
+            residues = self.getResiduesFromRanges(ranges)
         #end if
 
         xx  = 0.0

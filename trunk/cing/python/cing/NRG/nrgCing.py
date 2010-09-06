@@ -48,20 +48,25 @@ import urllib
 
 def run():
     """Return True on error"""
-    max_entries_todo = 20    # was 500 (could be as many as u like)
+    max_entries_todo = 9999    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 24 # 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
     processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
     writeWhyNot = True
     updateIndices = True
     isProduction = True
     getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-#    new_hits_entry_list = ['1brv'] # define empty for checking new ones.
-    new_hits_entry_list = []
+    new_hits_entry_list = ['1ato'] # define empty for checking new ones.
+#    new_hits_entry_list = []
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
     m = nrgCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
                 updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
+
+    if False: # Default False; use for reprocessing a batch.
+        entryListFileName = os.path.join(m.results_dir, 'entry_list_todo_all.csv')
+        new_hits_entry_list = readLinesFromFile(entryListFileName)
+        new_hits_entry_list = new_hits_entry_list[100:110]
 
     NTdebug("Publish results at directory    : " + m.results_dir)
     NTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
@@ -241,6 +246,7 @@ class nrgCing(Lister):
         self.entry_list_stopped = NTlist() # mutely exclusive from entry_list_crashed
         self.entry_list_done = NTlist()
         self.entry_list_todo = NTlist()
+        self.entry_list_updated = NTlist()
 
 
         subDirList = os.listdir('data')
@@ -304,6 +310,36 @@ class nrgCing(Lister):
                 if entryCrashed:
                     continue # don't mark it as stopped anymore.
 
+                # NRG-CING/data/br/1brv/log_validateEntry/1brv_2010-09-01_15-51-22.log
+                _root, name, _ext = NTpath(logLastFile)
+                dtLastValidation = None
+                dtLastInputModification = None
+                try:
+                    dateStrListLastFile = name.split('_')
+                    if len(dateStrListLastFile) != 3:
+                        NTerror("Failed to find date from logLastFile %s with name %s" % (logLastFile, name))
+                    else:
+                        yearMonthDayList = [int(x) for x in dateStrListLastFile[1].split('-')]
+                        if len(yearMonthDayList) != 3:
+                            NTerror("Failed to find date from dateStrListLastFile %s" % dateStrListLastFile)
+                        else:
+                            dtLastValidation = datetime.datetime(yearMonthDayList[0],yearMonthDayList[1],yearMonthDayList[2])
+                    ccpnTgzFile = os.path.join('recoordSync', entry_code, '%s.tgz' % entry_code)
+                    f = os.path.getmtime(ccpnTgzFile)
+                    oldtimetuple = time.localtime(f)
+                    dtLastInputModification = datetime.datetime(oldtimetuple.tm_year, oldtimetuple.tm_mon, oldtimetuple.tm_mday)
+                except:
+                    NTtracebackError()
+
+                if dtLastValidation and dtLastInputModification:
+                    if dtLastValidation < dtLastInputModification: # an old date is smaller than a young date (really just an epoch compare I guess).
+                        self.entry_list_updated.append(entry_code)
+                else:
+                    NTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
+
+
+
+
                 # end for AwkLike
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
@@ -351,6 +387,7 @@ class nrgCing(Lister):
         NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
         NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
         NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+        NTmessage("Found %s entries in NRG-CING updated." % len(self.entry_list_updated))
     # end def
 
     def searchPdbEntries(self):
@@ -415,6 +452,8 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_crashed.csv", toCsv(self.entry_list_crashed))
         writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
         writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
+        writeTextToFile("entry_list_updated.csv", toCsv(self.entry_list_updated))
+
 
 
     def doWriteWhyNot(self):
