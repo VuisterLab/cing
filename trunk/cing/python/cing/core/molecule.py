@@ -1952,7 +1952,7 @@ Return an Molecule instance or None on error
     #end def
 
 
-    def radiusOfGyration( self, model=0 ):
+    def radiusOfGyration( self, ranges=None, model=0 ):
         """
         Return radius of gyration of model.
         Uses CA coordinates
@@ -1963,6 +1963,13 @@ Return an Molecule instance or None on error
 
         Algorithm: pp. 284
         """
+
+        if ranges==None:
+            residues = molecule.allResidues()
+        else:
+            residues = molecule.getResiduesFromRanges(ranges)
+        #end if
+
         xx  = 0.0
         yy  = 0.0
         zz  = 0.0
@@ -1970,7 +1977,7 @@ Return an Molecule instance or None on error
         xz  = 0.0
         yz  = 0.0
         n = 0
-        for res in self.allResidues():
+        for res in residues:
             if res.hasProperties('protein') and res.CA.hasCoordinates() and model < len(res.CA.coordinates):
                 x = res.CA.coordinates[model].x
                 y = res.CA.coordinates[model].y
