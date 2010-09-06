@@ -381,10 +381,13 @@ fullstop y
                     checkId,line,valueStringList[0]))
                 NTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 value = None
+
 #            NTdebug('modelIdx: %d' % modelIdx)
             if modelIdx < 0:
-                NTerror('Failed to have increased model idx at least once')
-                return True
+                # This is expected for when What If wasn't offered any protein residues.
+#TODO: only report useful info.
+#                NTmessage('Failed to have increased model idx at least once for checkId %s' % checkId)
+                continue
 
             ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )
             ensembleValueList[modelIdx] = value

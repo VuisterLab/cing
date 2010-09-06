@@ -97,6 +97,10 @@ def writeEntryListToFile(fileName, entryList):
         return True
     writeTextToFile(fileName, csvText)
 
+def readEntryListFromFile(fileName):
+    "Throws exception on failure"
+    return readLinesFromFile(fileName)
+
 def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySolidState = False):
     """Includes solution and solid state NMR if onlyNMR is chosen
     """

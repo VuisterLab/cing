@@ -62,6 +62,9 @@ LIMIT 10
 
 SELECT * FROM "nrgcing"."cingentry" where pdb_id='1brv';
 
+SELECT * FROM "nrgcing"."cingentry" where
+noe_compl4>0.0;
+
 SELECT r.*
 FROM nrgcing.cingresidue r, nrgcing.cingentry e
 where

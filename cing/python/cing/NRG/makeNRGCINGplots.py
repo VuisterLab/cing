@@ -54,8 +54,8 @@ ONLY_NON_ZERO = 'onlyNonZero'
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
 #schemaJ = PDBJ_DB_SCHEMA
-#HOST = 'nmr'
-HOST = 'localhost'
+HOST = 'nmr'
+#HOST = 'localhost'
 
 
 def getDbColumnName( level, progId, chk_id ):

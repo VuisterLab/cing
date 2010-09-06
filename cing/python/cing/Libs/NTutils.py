@@ -4658,6 +4658,7 @@ def getDateTimeStampForFileName():
 
 
 def readLinesFromFile(fileName, doStrip=True):
+    "Throws exception on failure"
 #    NTdebug("Reading from file %s" % ( fileName))
     if doStrip:
         lineList = [ line.strip() for line in open(fileName).readlines() ]
