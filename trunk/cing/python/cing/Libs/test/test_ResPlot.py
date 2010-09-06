@@ -18,6 +18,7 @@ from cing.PluginCode.Whatif import QUACHK_STR
 from cing.PluginCode.Whatif import RAMCHK_STR
 from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import runWhatif
+from cing.PluginCode.dssp import runDssp #@UnusedImport Added to trigger import error when module is absent. Needed for when whatif is but dssp isn't installed.
 from cing.PluginCode.procheck import PROCHECK_STR
 from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.core.classes import Project
