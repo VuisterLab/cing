@@ -20,9 +20,9 @@ from glob import glob
 from shutil import copy
 from string import upper
 
-if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
+#if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
 #    NTdebug("No whatif installed.")
-    raise ImportWarning(WHATIF_STR)
+#    raise ImportWarning(WHATIF_STR)
 #NTmessage('Using Whatif')
 
 scriptFileName = "whatif.script"
@@ -945,12 +945,15 @@ def runWhatif( project, parseOnly=False ):
     models = NTlist(*range( project.molecule.modelCount ))
 
     whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-    whatifPath       = os.path.dirname(cingPaths.whatif)
-    whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
-    whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
     whatifStatus = project.whatifStatus
-
+    
     if not parseOnly:
+
+        whatifPath       = os.path.dirname(cingPaths.whatif)
+        whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
+        whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
+		
+
         whatifStatus.nonStandardResidues = NTlist()
         whatifStatus.path                = path
         whatifStatus.models              = models

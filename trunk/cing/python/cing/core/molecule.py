@@ -22,7 +22,7 @@ from cing.core.database import AtomDef
 from database import NTdb
 from math import acos
 from numpy import linalg as LA
-from parameters import plotParameters
+from parameters   import plotParameters
 from pylab import * #@UnusedWildImport # otherwise use this line.
 
 #==============================================================================
@@ -1350,12 +1350,12 @@ class Molecule( NTtree, ResidueList ):
         # end for
         if False: # debug info really.
             if pairList:
-                NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
+                    NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
     #            for pair in pairList:
     #                NTdebug( '%s %s' % (pair[0], pair[1] ))
             else:
-                NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
-            # end if
+                    NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
+        # end if
 
         if toFile:
             path = self.project.moleculePath('analysis','disulfides.txt')
@@ -1996,9 +1996,7 @@ Return an Molecule instance or None on error
         print w,v
         return NTlist(*map(math.sqrt, w))
     #end def
-
 #end class
-
 
 
 class Ensemble( NTlist ):
@@ -2213,11 +2211,11 @@ class RmsdResult( NTdict ):
                          __CLASS__       = 'RmsdResult',
                          backbone        = NTfill(0.0, len(modelList)),
                          backboneCount   = 0,
-                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)', fmt2='%4.2f' ),
+                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f' ),
 
                          heavyAtoms      = NTfill(0.0, len(modelList)),
                          heavyAtomsCount = 0,
-                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f (+- %4.2f)', fmt2='%4.2f'  ),
+                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f'  ),
 
                          models          = modelList,
                          closestToMean   = -1,    #indicates undefined
@@ -2554,7 +2552,7 @@ Residue class: Defines residue properties
         self.atomCount = 0
         self.chain     = self._parent
 
-        self.dihedrals = NTlist()            
+        self.dihedrals = NTlist()
 
         # restraints associated with this residue; filled in partition restraints
         self.distanceRestraints = RestraintList('distanceRestraints')
@@ -3106,6 +3104,7 @@ Residue class: Defines residue properties
             NTerror('Residue.toSML: no SMLhandler defined')
         #end if
     #end def
+
     def validateChemicalShiftProPeptide( self, resultList ):
         """Returns True on error.
         Append to result list if validation found a problem.
@@ -3595,7 +3594,7 @@ coordinates: %s"""  , dots, self, dots
     #end def
 
     def calculateMeanCoordinate( self ):
-        """"
+        """
         Calculate mean of coordinates of self
         Return mean Coordinate instance, or NoneObject on error.
 
@@ -4002,7 +4001,7 @@ coordinates: %s"""  , dots, self, dots
 
     def isPseudoAtom( self ):
         """Return True if atom is pseudoAtom"""
-        return ( len(self.db.real) > 0 )
+        return ( len(self.db.real) > 0 or self.hasProperties('isPseudoAtom') ) # additional check: eq. CYANA Pseudoatoms of Calcium
     #end def
 
     def hasPseudoAtom( self ):

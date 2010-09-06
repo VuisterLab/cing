@@ -79,6 +79,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
     project.criticize(toFile)
     project.summary(toFile)
     project.mkMacros()
+    project.getCingSummaryDict()
 #end def
 
 """Stolen from doValidate.py in Script directory. Need this here so the
@@ -676,7 +677,7 @@ def validateRestraints( project, toFile = True)   :
 
             # print every 10 lines
             if not count % 30:
-                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
+                    msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
             #end if
             if res.has_key('PHI'):
                 phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
@@ -689,18 +690,18 @@ def validateRestraints( project, toFile = True)   :
                 psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
             #end if
             try:
-                msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
+                    msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
                      res, phi, psi,
-                     len(rL),
-                     rL.violCount1,
-                     rL.violCount3,
-                     rL.violCount5,
-                     rL.rmsd,
-                     rL.violAv,
-                     rL.violMaxAll
+                         len(rL),
+                         rL.violCount1,
+                         rL.violCount3,
+                         rL.violCount5,
+                         rL.rmsd,
+                         rL.violAv,
+                         rL.violMaxAll
                        )
             except:
-#                NTdebug("Still giving misfits here in validateRestraints?") # yes
+    #                NTdebug("Still giving misfits here in validateRestraints?") # yes
                 pass
             count += 1
         #end for
@@ -776,7 +777,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
 
             if toFile:
                 fprintf(fp, '%s\n', s.format() )
-#                    NTdebug(    '%s\n', s.format() )
+#               NTdebug(    '%s\n', s.format() )
             res1.saltbridges.append( s )
             res2.saltbridges.append( s )
             result.append( s )
