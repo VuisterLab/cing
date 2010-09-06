@@ -19,6 +19,10 @@ class CingSummary( NTdict ):
                          proteinResidueCount = 0,
                          nucleicResidueCount = 0,
 
+                         # rmsd's
+                         rmsdToMean_backboneAverage   = None,
+                         rmsdToMean_heavyAtomsAverage = None,
+
                          # CING scores in %
                          CING_red            = NaN,
                          CING_orange         = NaN,
@@ -74,6 +78,12 @@ class CingSummary( NTdict ):
         self.proteinResidueCount = len( proteinResidues )
         nucleicResidues = project.molecule.residuesWithProperties('nucleic' )
         self.nucleicResidueCount = len( nucleicResidues )
+
+        # rmsds
+        if project.molecule and project.molecule.has_key('rmsd'):
+            self.rmsdToMean_backboneAverage = project.molecule.rmsd.backboneAverage
+            self.rmsdToMean_heavyAtomsAverage = project.molecule.rmsd.heavyAtomsAverage
+        #end if
 
         # ROG scores
         rog = NTlist( 0, 0, 0 ) # Counts for red, orange, green.

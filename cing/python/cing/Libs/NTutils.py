@@ -691,6 +691,20 @@ class NTlistOfLists(NTlist):
         return result
     #end def
 
+    def getDiagonal(self):
+        """Get the diagonal of a square NTlistOfLists
+        return NTlist instance or None on error
+        """
+        if self.rowSize != self.colSize:
+            NTerror('NTlistOflists.getDiagonal: unequal number of rows (%d) and collumns (%d)', self.rowSize, self.colSize)
+            return None
+        result = NTlist()
+        for i in range(self.rowSize):
+            result.append(self[i][i])
+        #end for
+        return result
+    #end def
+
     def format( self, fmt = '%s' ):
         result = ''
         for i in range(self.rowSize):
@@ -2231,9 +2245,23 @@ class NTvalue(NTdict):
     """
     # JFD notes that the error should not be zero by default; checking for trouble because of change.
     # GWV Please check; will this matter that you know?
-    def __init__(self, value, error=NaN, fmt='%s (+- %s)', fmt2='%s', **kwds):
+    defaultFormat  = '%s (+- %s)'
+    defaultFormat2 = '%s'
+
+    def __init__(self, value, error=NaN, fmt=None, fmt2=None, **kwds):
         kwds.setdefault('__CLASS__', 'NTvalue')
-        NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
+        # hack to get default values from NTvalues defs
+        if fmt == None:
+            kwds.setdefault('fmt', NTvalue.defaultFormat)
+        else:
+            kwds.setdefault('fmt', fmt)
+        if fmt2 == None:
+            kwds.setdefault('fmt2', NTvalue.defaultFormat2)
+        else:
+            kwds.setdefault('fmt2', fmt2)
+
+        NTdict.__init__(self, value=value, error=error, **kwds)
+#        NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
         # always map av and sd as alternatives for value and error, set default n
         self.av = self.value
         self.sd = self.error
@@ -4900,7 +4928,6 @@ def timedelta2HoursMinutesAndSeconds( s ):
     t -= 60 * result[1]
     result[2] = int(t)
     return tuple(result)
-
 def lenNonZero(l, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
     'Counts the non zero eelements when compared to epsilon'
     if l == None:
