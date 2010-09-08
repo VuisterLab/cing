@@ -4,6 +4,11 @@ of arguments when the process might hang or crash and leave zombies around.
 Convenient clean up provided. See test code for examples. Only runs on systems
 supporting os.fork() call; Unix.
 
+kill -2 PID (sending a INT (interrupt) to this parent python process)
+will signal the parent to not start any more subprocesses but finish nicely
+otherwise.
+
+
 Author: Jurgen F. Doreleijers, BMRB, September 2001
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -300,7 +305,7 @@ class Process:
             verbosity                   = 2
             ):
 
-        ## Maximume number of seconds to wait after killing a subprocesses
+        ## Maximum number of seconds to wait after killing a subprocesses
         self.max_time_to_wait_kill  = max_time_to_wait_kill
 
         ## See ForkOff class
