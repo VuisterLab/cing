@@ -7,14 +7,18 @@ from subprocess import Popen
 import os
 import sys
 import time
-#from cing.Libs.disk import chmod #AWSS, importing cing stuff here is not fine.
+#import warnings
+
+# disabling some output that can safely be ignored
+#warnings.simplefilter('ignore', category=UserWarning)
+# fixed problem instead now.
 
 """
 python YOUR_CING_PATH_HERE/python/cing/setup.py
 E.g.:
 python /Users/jd/workspace/cing/python/cing/setup.py
 
-Generates either cing.csh or cing .sh to source in your .cshrc or .bashrc
+Generates either cing.csh or cing.sh to source in your .cshrc or .bashrc
 (or equivalent) respective file
 
 Adjust if needed.
@@ -324,7 +328,7 @@ def _writeCingShellFile(isTcsh):
     print ' After installing cython; rerun setup.py or manually update the settings file.'
     print ' We have included the Cython distribution needed so add to your PYTHONPATH for now:'
     print ' $CINGROOT/dist/Cython (later it will be added by the cing.[c]sh created.'
-    
+
 #end def
 #------------------------------------------------------------------------------------
 
@@ -358,7 +362,7 @@ if __name__ == '__main__':
 
     xplorPath,err  = _NTgetoutput('which xplor')
     if not xplorPath:
-        _NTmessage("Could not find 'xplor'")
+        _NTmessage("Could not find 'xplor'  (optional)")
         parametersDict['xplorPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'xplor'")
@@ -370,13 +374,13 @@ if __name__ == '__main__':
         if not os.path.exists(procheckPath):
             _NTwarning("Found the system variable prodir but the script below was not found")
             _NTwarning( procheckPath )
-            _NTwarning("Could not find 'procheck_nmr'")
+            _NTwarning("Could not find 'procheck_nmr'  (optional)")
             parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
             _NTmessage("........ Found 'procheck_nmr'")
             parametersDict['procheckPath'] = procheckPath
     else:
-        _NTmessage("Could not find 'procheck_nmr'")
+        _NTmessage("Could not find 'procheck_nmr'  (optional)")
         parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
 
 #    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
@@ -385,7 +389,7 @@ if __name__ == '__main__':
         if not os.path.exists(aqpcPath):
             _NTwarning("Found the system variable aquaroot but the script below wasn't found")
             _NTwarning( aqpcPath )
-            _NTwarning("Could not find 'aqua'")
+            _NTwarning("Could not find 'aqua'  (optional)")
             parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
             _NTmessage("........ Found 'aqua'")
@@ -402,7 +406,7 @@ if __name__ == '__main__':
         if os.path.exists(defaultWhatifPath):
             whatifPath = defaultWhatifPath
     if not whatifPath:
-        _NTmessage("Could not find 'what if'")
+        _NTmessage("Could not find 'what if'  (optional)")
     else:
         _NTmessage("........ Found 'what if'")
         whatifPath = strip(whatifPath)
@@ -425,7 +429,7 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        _NTmessage("Could not find 'Wattos'")
+        _NTmessage("Could not find 'Wattos'  (optional)")
 #        _NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
         _NTmessage("........ Found 'wattos'")
@@ -456,7 +460,7 @@ if __name__ == '__main__':
 
     molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
-        _NTmessage("Could not find 'molmol'")
+        _NTmessage("Could not find 'molmol'  (optional)")
         parametersDict['molmolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'molmol'")
@@ -464,7 +468,7 @@ if __name__ == '__main__':
 
     povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
-        _NTmessage("Could not find 'povray'")
+        _NTmessage("Could not find 'povray'  (optional)")
         parametersDict['povrayPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'povray'")
@@ -472,21 +476,27 @@ if __name__ == '__main__':
 
     talosPath,err  = _NTgetoutput('which talos+')
     if not talosPath:
-        _NTmessage("Could not find 'talos'")
+        _NTmessage("Could not find 'talos'  (optional)")
         parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'talos'")
         parametersDict['talosPath'] = strip(talosPath)
 
-    # TODO: enable real location finder. This just works for JFD but shouldn't bother
-    # others.
-    pyMolPath,err  = ('/sw/lib/pymol-py25', None)
-    if not os.path.exists(pyMolPath):
-        pyMolPath = '/sw/lib/pymol-py26' # for AWSS
-        if not os.path.exists(pyMolPath):
-            pyMolPath = None
+    # TODO: enable real location finder. This just works for some cases but we shouldn't bother
+    # others. The integration code is actually not finished.
+    pyMolPathList  = ('/sw/lib/pymol-py26', # mac's fink
+                      '/opt/local/lib/pymol/modules/pymol', # mac port
+                      '/usr/lib/pymodules/python2.6/pymol', # Ubuntu 9.10
+                      )
+    pyMolPath = None
+    for pyMolPathToTest in pyMolPathList:
+        if  os.path.exists(pyMolPathToTest):
+            pyMolPath = pyMolPathToTest
+            break
+
     if not pyMolPath:
-        _NTmessage("Could not find 'pymol' code (optional)")
+        if False: # DEFAULT: False TODO: enable when done.
+            _NTmessage("Could not find 'pymol' code (optional)")
         parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'pymol' code")
