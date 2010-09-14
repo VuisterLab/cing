@@ -20,16 +20,16 @@ from glob import glob
 if True: # block
     useModule = True
     if not cingPaths.convert:
-        NTmessage("Missing convert which is a dep for Molgrap")
+        NTdebug("Missing convert which is a dep for Molgrap")
         useModule = False
     if not cingPaths.ghostscript:
-        NTmessage("Missing ghostscript which is a dep for Molgrap")
+        NTdebug("Missing ghostscript which is a dep for Molgrap")
         useModule = False
     if not cingPaths.molmol:
-        NTmessage("Missing molmol which is a dep for Molgrap")
+        NTdebug("Missing molmol which is a dep for Molgrap")
         useModule = False
     if not cingPaths.povray:
-        NTmessage("Missing povray which is a dep for Molgrap")
+        NTdebug("Missing povray which is a dep for Molgrap")
         useModule = False
 
     if not useModule:
