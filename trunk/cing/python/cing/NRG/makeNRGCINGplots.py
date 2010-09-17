@@ -5,13 +5,14 @@
 Create plots like the GreenVersusRed scatter by entry.
 """
 
+from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
+from cing.Libs.NTmoleculePlot import USE_MIN_VALUE_STR
 from cing.Libs.NTplot import NTplot
 from cing.Libs.NTplot import NTplotAttributes
 from cing.Libs.NTplot import NTplotSet
 from cing.Libs.NTplot import fontAttributes
 from cing.Libs.NTplot import fontVerticalAttributes
 from cing.Libs.NTutils import * #@UnusedWildImport
-
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import dir_plot
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
@@ -31,6 +32,7 @@ from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import func
 from sqlalchemy.sql.expression import select #@Reimport @UnusedImport
 import numpy
+
 
 if False:
     from matplotlib import use #@UnusedImport
@@ -54,8 +56,8 @@ ONLY_NON_ZERO = 'onlyNonZero'
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
 #schemaJ = PDBJ_DB_SCHEMA
-HOST = 'nmr'
-#HOST = 'localhost'
+#HOST = 'nmr'
+HOST = 'localhost'
 
 
 def getDbColumnName( level, progId, chk_id ):
@@ -284,7 +286,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         # Sorted by project, program.
 
         try:
-            from localPlotList import plotList
+            from localPlotList2 import plotList
         except:
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
@@ -328,6 +330,13 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 titleStr += ' onlySel'
             if getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO):
                 titleStr += ' only!zero'
+            xmin = None
+            xmax = None
+            if getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR) and \
+               getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR):
+                xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
+                xmax = getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR)
+                titleStr += ' [%.3f,%.3f]' % (xmin,xmax)
 
             NTmessage("Plotting level/program/check: %10s %10s %15s with options: %s %s" % (level,progId,chk_id,titleStr,plotDict))
             if True:
@@ -336,7 +345,13 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 normed = 0 # Default zero
                 num_bins = 50
                 num_points_line = num_bins * 10
-                n, bins, _patches = hist(floatValueList, num_bins, normed=normed, facecolor='green', alpha=0.75)
+
+                bins_input = num_bins
+                if xmax != None and xmin != None:
+#                    NTdebug("Creating the non-standard x-range.")
+                    bins_input = linspace(xmin,xmax,num_bins,endpoint=True)
+
+                n, bins, _patches = hist(floatValueList, bins_input, normed=normed, facecolor='green', alpha=0.75)
                 # Draw a line to fit.
                 if normed:
                     y = mlab.normpdf( bins, av, sd) # would loose the y-axis count by a varying scale factor. Not desirable.
@@ -380,7 +395,6 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 xlabel(chk_id_unique)
                 ylabel('Frequency')
                 title(titleStr)
-                grid(True)
                 fn = "plotHist_%s.%s" % (chk_id_unique, graphicsFormat)
                 savefig(fn)
 

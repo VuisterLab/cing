@@ -977,7 +977,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
             return True
         self.write( file )
         file.close()
-        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
+#        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
         return False
     #end def
 
