@@ -1,0 +1,42 @@
+#summary Using CING as a virtual appliance
+
+= *JUST FOR INTERNAL USE FOR NOW, SORRY* =
+
+= Introduction =
+
+Installing CING with can be a hassle because it can use a lot of components. 
+Using VirtualCing (VC) you get all required -and many optional- plugins in one go.
+
+= Installation =
+
+  * Install VMware 3.1 (or later) (VMware Fusion on Mac, or the free VMware Player for Windows or Linux). 
+Your computer (host) must be pretty high end, specifically your processor must support virtualization of VirtualCing (guest)
+  * Ask Geerten or Jurgen for the local download URL. Probably something like http://nmr.cmbi.ru.nl/xxx/yyy/VC.tgz 
+  * Unzip the archive. 
+  * Open VC with VMware.
+  * In VirtualCing (inside VMware) you will be logged in as super user 'i'. You shouldn't need the password: 'ilovevc'. Yes, you are a super user and it's your machine now!
+  * The desktop will contain an open browser to this Wiki for your reference.
+  * Open Konsole by clicking on the icon that looks like an old CRT screen showing a greater than sign.
+  * If you like to run all of CING's unit tests you can type in that terminal: {{{cing --test -v 0}}}. The results are in /tmp/cing. There is a link to that directory on your desktop. It should now contain all kind of files including images like: /tmp/cing/test_NTMoleculePlot.png.
+
+= Batteries included =
+  * Ubuntu 9.10 32 bit server with:
+    * convert
+    * ghostscript
+    * ps2pdf
+    * povray  
+  * Python 2.6 with packages:
+    * pymol
+    * matplotlib    
+    * cython
+  * Optional plugins:
+|| aqua  || molmol           || wattos  ||
+|| ccpn  || procheck_nmr     || xplor   ||
+|| dssp  || talos            ||         ||
+
+= Excluded =
+  * what if (work in progress)
+  
+= Notes =
+ * Have a look at CING's wiki pages LinuxInstallationGuide and VirtualCingTheMakingOf to see the fun you missed ;-)
+ 
