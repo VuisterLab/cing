@@ -18,7 +18,7 @@ sudo apt-get install \
     libxt-dev libxaw7-dev \
     openssh-server \
     apt-file \ # nice for looking up dependencies
-    eclipse-csv ?
+    eclipse-csv eclipse-pde
    }}}        
  * Install VMware tools inside guest OS.
 
@@ -29,4 +29,3 @@ sudo apt-get install \
    * add a def for AR: ar rcs 
    * sudo apt-get install libxt-dev libxaw-headers or the suggested
    * Install the above libs.
-
