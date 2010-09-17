@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/tcsh -f
 
 # USE: molmol_image.csh pdb_file tmp_dir pdb_id
 # make a pov ray file in a temporary directory as these files can become
