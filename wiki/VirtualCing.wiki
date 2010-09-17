@@ -16,8 +16,9 @@ Your computer (host) must be pretty high end, specifically your processor must s
   * Open VC with VMware.
   * In VirtualCing (inside VMware) you will be logged in as super user 'i'. You shouldn't need the password: 'ilovevc'. Yes, you are a super user and it's your machine now!
   * The desktop will contain an open browser to this Wiki for your reference.
-  * Open Konsole by clicking on the icon that looks like an old CRT screen showing a greater than sign.
-  * If you like to run all of CING's unit tests you can type in that terminal: {{{cing --test -v 0}}}. The results are in /tmp/cing. There is a link to that directory on your desktop. It should now contain all kind of files including images like: /tmp/cing/test_NTMoleculePlot.png.
+  * A terminal program called Konsole is also open. It's icon looks like an old CRT screen showing a greater than sign.
+  * If you like to run all of CING's unit tests you can type in that terminal: {{{cing --test -v 0}}}. The results are in /home/i/tmp/cingTmp. There is a link to that directory on your desktop. It should now contain all kind of files including images like: test_NTMoleculePlot.png.
+  * It is recommended to store your data on a shared folder on your host OS so that you will not loose it when you loose VC. Inside VC the shared folder will be in /mnt/hgfs.
 
 = Batteries included =
   * Ubuntu 9.10 32 bit server with:
