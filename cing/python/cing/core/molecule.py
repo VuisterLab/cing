@@ -2579,9 +2579,15 @@ Residue class: Defines residue properties
                            self.footer( dots )
     #end def
 
-#    def __repr__(self):
+    def __repr__(self):
 #        return sprintf('<Residue %s>', self._Cname(-1))
-#    #end def
+        return self.__str__()
+    #end def
+
+    def __str__(self):
+#        return sprintf('<Residue %s>', self._Cname(-1))
+        return sprintf('<Residue %s>', self.toString())
+    #end def
 
     def toString(self, showChainId=True, showResidueType=True):
         """A unique compact string identifier.e.g B.LYS282"""

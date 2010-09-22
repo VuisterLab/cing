@@ -2743,7 +2743,8 @@ class DistanceRestraint(Restraint):
         """
         s = ''
         for p in self.atomPairs:
-            s = s + sprintf('(%-11s - %11s)   ', p[0]._Cname(1), p[1]._Cname(1))
+#            s = s + sprintf('(%-11s - %11s)   ', p[0]._Cname(1), p[1]._Cname(1))
+            s = s + sprintf('(%-13s - %13s)   ', p[0]._Cname(2), p[1]._Cname(2)) # include chain id.
         #end for
         return s.strip()
     #end def
