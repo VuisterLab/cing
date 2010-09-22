@@ -58,7 +58,7 @@ from matplotlib.pylab import * #@UnusedWildImport for most imports
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
-#    NTdebug("Now in runCingChecks")
+#    NTdebug("Now in validate.runCingChecks with toFile:%s and ranges: %s" % (toFile,ranges))
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints(toFile)
@@ -68,7 +68,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
 #    project.validateAssignments() in criticize now
     # project.mergeResonances() GWV says: don't do this
 
-    project.checkForSaltbridges(toFile)
+    project.checkForSaltbridges(toFile=toFile)
 
 #    project.checkForDisulfides(toFile=True)
 # GWV this is done in molecule.updateAll
@@ -87,8 +87,7 @@ code can be tested. I.e. returns a meaningful status if needed.
 """
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True, doWattos=True, doTalos=True ):
-# KEEP THIS BLOCK SYNC-ED or unify WITH THE FOLLOWING FILES:
-# python/cing/Scripts/doValidateiCing.py
+#    NTdebug('Starting validate#validate with toFile True')
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
     if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
@@ -729,7 +728,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
     Optionally print output to file in analysis directory of project.
     """
 
-    NTdebug("Starting checkForSaltbridges")
+#    NTdebug("Starting checkForSaltbridges with toFile:%s" % toFile)
     if not project.molecule:
         NTerror('checkForSaltbridges: no molecule defined')
         return None
@@ -749,6 +748,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         NTmessage( '==> checkSaltbridges, output to %s', fname)
     else:
         fp = None
+#        NTdebug( '==> checkSaltbridges, no output requested')
     #end if
 
     if toFile:
@@ -795,7 +795,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         fp.close()
     sys.stdout.flush()
     #end if
-    NTdebug("Ending checkForSaltbridges")
+#    NTdebug("Ending checkForSaltbridges")
 
     return result
 #end def
