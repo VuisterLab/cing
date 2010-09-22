@@ -2692,7 +2692,7 @@ Residue class: Defines residue properties
             return None
         #end if
 
-        NTdetail('==> Mutating %s to %s', self._Cname(-1), resName )
+#        NTdetail('==> Mutating %s to %s', self._Cname(-1), resName )
 
         # remove old name references
         del( self._parent[self.name] )

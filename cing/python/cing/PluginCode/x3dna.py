@@ -3,19 +3,15 @@ Adds x3dna method to analyze DNA structures. The x3dna program is included as bi
 """
 from cing import OS_TYPE_MAC
 from cing import osType
-from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import YLABEL_STR
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import moleculeToPDBfile
+from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
 from cing.core.classes import Coplanar
 from cing.core.classes import CoplanarList
 from cing.core.parameters import cingPaths
+from cing.core.parameters import plugins
 from cing.core.parameters import validationSubDirectories
 
 useModule = True
@@ -605,6 +601,11 @@ class X3dna(NTdict):
 
 def createHtmlX3dna(project, ranges = None):
     """ Read out wiPlotList to see what get's created. """
+
+    if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+        return
+    from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
     # The following object will be responsible for creating a (png/pdf) file with
     # possibly multiple pages

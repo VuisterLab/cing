@@ -10,22 +10,10 @@ from cing import cingRoot
 from cing import cingVersion
 from cing import programName
 from cing.Libs.Imagery import convert2Web
-from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import YLABEL_STR
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import boxAttributes
-from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTplot import plusPoint
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.find import find2 # Important to differ from NTutil's otherwise from string import find
+from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqNih import NUMBER_OF_SD_TALOS
 from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
@@ -75,99 +63,13 @@ cingPlotList.append( ('_02_Qfactor_cs','Q-factor CS') )
 cingPlotList.append( ('_03_Cb4N_Cb4C','D1D2') )
 cingPlotList.append( ('_04_bb','Backbone dihedrals') )
 
-def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, htmlOnly=False ):
-    '''
-    Return NTplot instance with histogram of dihedralName
-    or None on error.
-    Return True if it could be created if htmlOnly is not set.
-    '''
-    if project == None:
-        return None
-    if dihedralName not in residue:
-        return None
-    if residue[dihedralName] == None:
-        return None
-
-    if htmlOnly:
-        return True
-
-    bins       = 360/binsize
-    plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
-#    NTdebug( 'residue: '+`residue`)
-    angle = residue[dihedralName] # A NTlist
-#    NTdebug( 'angle: ' + `angle`)
-    ps = NTplotSet() # closes any previous plots
-    ps.hardcopySize = (600,369)
-    plot = NTplot( title  = residue._Cname(2),
-      xRange = (plotparams.min, plotparams.max),
-      xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
-      xLabel = dihedralName,
-      yLabel = 'Occurence')
-    ps.addPlot(plot)
-
-#    Note that the good and outliers come from:
-#    d.good, d.outliers = peirceTest( d )
-    if not angle.__dict__.has_key('good'):
-        NTcodeerror("No angle.good plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
-                    residue, dihedralName))
-        return None
-#    NTdebug( 'angle.good: ' + `angle.good`)
-    plot.histogram( angle.good.zap(1),
-                    plotparams.min, plotparams.max, bins,
-                    attributes = boxAttributes( fillColor=plotparams.color ))
-    if not angle.__dict__.has_key('outliers'):
-        NTcodeerror("No angle.outliers plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
-                    residue, dihedralName))
-        return None
-#    NTdebug( 'angle.outliers: ' + `angle.outliers`)
-    plot.histogram( angle.outliers.zap(1),
-                plotparams.min, plotparams.max, bins,
-                attributes = boxAttributes( fillColor=plotparams.outlier )
-                  )
-    ylim = plot.get_ylim()
-    ylimMax = 5.0 # Just assume.
-    if ylim is not None:
-        ylimMax = ylim[1]
-
-    # AWSS
-    # Let's check if for this 'angle' there is a dihedral restraint
-    aAv  = angle.cav
-    width = 4.0
-    dr = _matchDihedrals(residue, dihedralName)
-    alpha=0.3
-    if dr:
-#        NTdebug("dr: " + dr.format())
-        bounds = NTlist(dr.lower, dr.upper)
-        bounds.limit(plotparams.min, plotparams.max)
-        hasBounds = True
-        for i in range(2):
-            if bounds[i] == None: # fails for entry 1bn0
-                NTerror("No bound [%d] found for restraint: %s" % (i,dr) )
-                hasBounds = False
-        if hasBounds:
-            if bounds[0] < bounds[1]: # single box
-                point = (bounds[0], 0) # lower left corner of only box.
-                sizes = (bounds[1]-bounds[0],ylimMax)
-                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-            else: # two boxes
-                # right box
-                point = (bounds[0], 0) # lower left corner of first box.
-                sizes = (plotparams.max-bounds[0],ylimMax)
-                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-                point = (plotparams.min, 0) # lower left corner of second box.
-                sizes = (bounds[1]-plotparams.min,ylimMax)
-                plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
-        # end if
-
-    # Always plot the cav line
-    plot.line( (aAv, 0), (aAv, ylimMax),
-               lineAttributes(color=plotparams.average, width=width) )
-    return ps
-#end def
-
-
 def createHtmlCing(project, ranges=None):
     """ Read out cingPlotList to see what get's created. """
+
+    if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+        NTdebug('Skipping createHtmlCing because no matplib installed.')
+        return
+    from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
     # The following object will be responsible for creating a (png/pdf) file with
     # possibly multiple pages
@@ -388,6 +290,13 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     if not residueList:
         NTerror( 'makeDihedralPlot called without residues in list' )
         return None
+
+    if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+        NTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
+        return None
+
+    from cing.PluginCode.matplib import NTplot #@UnresolvedImport
+    from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
 
     if hPlot.histRamaBySsAndCombinedResType == None:
         hPlot.initHist()
@@ -2593,30 +2502,36 @@ class ResidueHTMLfile( HTMLfile ):
 #        if not htmlOnly:
 #            NTdebug("Residue %s: generating dihedral plots", self.residue )
 
-        for plotDihedralName1,plotDihedralName2,plotDihedralComboName,_keyLoL in plotDihedral2dList:
-#                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
-            ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
-            if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
-                plottedList.append(plotDihedralComboName)
-                if isinstance(ps, NTplotSet): # actually created.
-                    tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
-                    ps.hardcopy( fileName = tmpPath )
-        #end for
+        if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+            NTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
+        else:
+            from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
+            from cing.PluginCode.matplib import makeDihedralHistogramPlot #@UnresolvedImport
 
-        # Dihedral plots
-        for dihed in residue.db.dihedrals.zap('name'):
-            if dihed in residue and residue[dihed]:
-                d = residue[dihed] # List of values with outliers etc attached.
-#                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
-                ps = makeDihedralHistogramPlot( project, residue, dihed, htmlOnly=htmlOnly )
-                tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
-                if ps:
-                    plottedList.append(dihed)
+            for plotDihedralName1,plotDihedralName2,plotDihedralComboName,_keyLoL in plotDihedral2dList:
+    #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
+                ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
+                if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
+                    plottedList.append(plotDihedralComboName)
                     if isinstance(ps, NTplotSet): # actually created.
+                        tmpPath = os.path.join(resdir, plotDihedralComboName + '.' + graphicsFormatExtension)
                         ps.hardcopy( fileName = tmpPath )
-                #end if
-        #end for
-        #end if htmlOnly:
+            #end for
+
+            # Dihedral plots
+            for dihed in residue.db.dihedrals.zap('name'):
+                if dihed in residue and residue[dihed]:
+                    d = residue[dihed] # List of values with outliers etc attached.
+    #                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
+                    ps = makeDihedralHistogramPlot( project, residue, dihed, htmlOnly=htmlOnly )
+                    tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
+                    if ps:
+                        plottedList.append(dihed)
+                        if isinstance(ps, NTplotSet): # actually created.
+                            ps.hardcopy( fileName = tmpPath )
+                    #end if
+            #end for
+        #end if matplib
 
         # Generate HTML
         self._generateHeader(plottedList)
@@ -3790,29 +3705,35 @@ class EnsembleHTMLfile( HTMLfile ):
             self.main('br', l )
         self.main('h3',openTag=False)
 
+        if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+            NTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
+        else:
+            from cing.PluginCode.matplib import NTplot #@UnresolvedImport
+            from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
 
-        plotFile = self.project.htmlPath(htmlDirectories.models,'outliers')
-        graphicsOutputFormat = 'png'
-        if not htmlOnly:
-            ps = NTplotSet() # closes any previous plots
-            ps.hardcopySize = (600,369)
-            plot = NTplot( xLabel = 'Model', yLabel = 'Outliers',
-                           xRange = (0, self.project.molecule.modelCount+1)
-                         )
-            ps.addPlot(plot)
-    #        self.project.models[i] holds the number of outliers for model i.
-    #        models is a NTdict containing per model a list of outliers.
-            outliers = [self.project.models[i] for i in range(len(self.ensemble))]
-#            NTdebug( '>> Number of outliers per model: ' + `outliers`)
-            plot.barChart( self.project.models.items(), 0.05, 0.95,
-                           attributes = boxAttributes( fillColor='green' )
-                         )
+            plotFile = self.project.htmlPath(htmlDirectories.models,'outliers')
+            graphicsOutputFormat = 'png'
+            if not htmlOnly:
+                ps = NTplotSet() # closes any previous plots
+                ps.hardcopySize = (600,369)
+                plot = NTplot( xLabel = 'Model', yLabel = 'Outliers',
+                               xRange = (0, self.project.molecule.modelCount+1)
+                             )
+                ps.addPlot(plot)
+        #        self.project.models[i] holds the number of outliers for model i.
+        #        models is a NTdict containing per model a list of outliers.
+                outliers = [self.project.models[i] for i in range(len(self.ensemble))]
+    #            NTdebug( '>> Number of outliers per model: ' + `outliers`)
+                plot.barChart( self.project.models.items(), 0.05, 0.95,
+                               attributes = boxAttributes( fillColor='green' )
+                             )
 
-            plot.autoScaleYByValueList(outliers, startAtZero=True,
-                                       useIntegerTickLabels=True )
-            ps.hardcopy( plotFile )
-        #end if
-        self.main('img', src = 'outliers.'+graphicsOutputFormat)
+                plot.autoScaleYByValueList(outliers, startAtZero=True,
+                                           useIntegerTickLabels=True )
+                ps.hardcopy( plotFile )
+            #end if
+            self.main('img', src = 'outliers.'+graphicsOutputFormat)
+        # end if matplib present
         self.render()
     #end def
 #end class

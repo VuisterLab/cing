@@ -1,33 +1,14 @@
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing.Libs.Imagery import joinPdfPages
-from cing.Libs.NTmoleculePlot import convertPointsToPlotRange
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import ResPlot
-from cing.Libs.NTplot import circlePoint
-from cing.Libs.NTplot import fontVerticalAttributes
-from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTplot import pointAttributes
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.Whatif import ANGCHK_STR
-from cing.PluginCode.Whatif import BBCCHK_STR
-from cing.PluginCode.Whatif import BNDCHK_STR
-from cing.PluginCode.Whatif import C12CHK_STR
-from cing.PluginCode.Whatif import INOCHK_STR
-from cing.PluginCode.Whatif import QUACHK_STR
-from cing.PluginCode.Whatif import RAMCHK_STR
-from cing.PluginCode.Whatif import WHATIF_STR
 from cing.PluginCode.Whatif import runWhatif
 from cing.PluginCode.dssp import runDssp #@UnusedImport Added to trigger import error when module is absent. Needed for when whatif is but dssp isn't installed.
-from cing.PluginCode.procheck import PROCHECK_STR
-from cing.PluginCode.procheck import SECSTRUCT_STR
+from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from random import random
 from unittest import TestCase
 import os #@Reimport
 import unittest
-#from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 class AllChecks(TestCase):
 

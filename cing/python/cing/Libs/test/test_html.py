@@ -4,14 +4,10 @@ python $CINGROOT/python/cing/PluginCode/test/test_html.py
 """
 from cing import cingDirTmp
 from cing import verbosityDebug
-from cing.Libs import NTplot
-from cing.Libs.NTplot import NTplotSet
 from cing.Libs.html import HTML_TAG_PRE
 from cing.Libs.html import HTML_TAG_PRE2
 from cing.Libs.html import HTMLfile
 from cing.Libs.html import MakeHtmlTable
-from cing.Libs.html import image2DdihedralWidth
-from cing.Libs.html import image2Ddihedralheight
 from cing.Libs.html import removePreTagLines
 from cing.core.classes import Project
 from cing.core.molecule import Ensemble
@@ -72,26 +68,6 @@ class AllChecks(TestCase):
         #end for
         h.render()
 
-    def ttttestDihedralComboPlot(self):
-        ps = NTplotSet() # closes any previous plots
-        ps.hardcopySize = (image2DdihedralWidth, image2Ddihedralheight)
-        dihedralName1 = 'PHI'
-        dihedralName2 = 'PSI'
-        projectName = 'testDihedralComboPlot'
-        project     = Project(projectName)
-        plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
-        plotparams2 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
-
-        plot = NTplot(title=projectName,
-          xRange=(plotparams1.min, plotparams1.max),
-          xTicks=range(int(plotparams1.min), int(plotparams1.max + 1), plotparams1.ticksize),
-          xLabel=dihedralName1,
-          yRange=(plotparams2.min, plotparams2.max),
-          yTicks=range(int(plotparams2.min), int(plotparams2.max + 1), plotparams2.ticksize),
-          yLabel=dihedralName2)
-
-        ps.addPlot(plot)
-        ps.hardcopy(projectName, 'png')
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
