@@ -728,6 +728,8 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
 
     Optionally print output to file in analysis directory of project.
     """
+
+    NTdebug("Starting checkForSaltbridges")
     if not project.molecule:
         NTerror('checkForSaltbridges: no molecule defined')
         return None
@@ -793,6 +795,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         fp.close()
     sys.stdout.flush()
     #end if
+    NTdebug("Ending checkForSaltbridges")
 
     return result
 #end def
