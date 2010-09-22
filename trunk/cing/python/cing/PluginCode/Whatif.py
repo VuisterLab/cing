@@ -7,14 +7,14 @@ First version: gv June 3, 2007
 # look up.
 from cing import issueListUrl
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import YLABEL_STR
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import removeEmptyFiles
+from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
+from cing.core.parameters import plugins
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 from shutil import copy
@@ -781,6 +781,11 @@ Name   :    0 ; A    ;   40 ; THR  ; _    ; HG21 ; _
 def createHtmlWhatif(project, ranges=None):
     """ Read out wiPlotList to see what get's created. """
 
+    if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+        return
+    from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
+
 #    wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
     # The following object will be responsible for creating a (png/pdf) file with
     # possibly multiple pages
@@ -949,13 +954,13 @@ def runWhatif( project, parseOnly=False ):
 
     whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
     whatifStatus = project.whatifStatus
-    
+
     if not parseOnly:
 
         whatifPath       = os.path.dirname(cingPaths.whatif)
         whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
         whatifExecutable = os.path.join(whatifPath, "DO_WHATIF.COM")
-		
+
 
         whatifStatus.nonStandardResidues = NTlist()
         whatifStatus.path                = path

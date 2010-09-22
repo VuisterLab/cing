@@ -2,8 +2,8 @@
 Unit test execute as:
 python $CINGROOT/python/cing/Libs/test/test_matplotlib2D.py
 """
-from cing.Libs.NTplot import gray_inv
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.matplib import gray_inv
 from unittest import TestCase
 import unittest
 

@@ -4,21 +4,13 @@ python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST4_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import YLABEL_STR
-from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.Libs.html import image2DdihedralWidth
+from cing.Libs.html import image2Ddihedralheight
+from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from random import random
 from unittest import TestCase
 import unittest
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
@@ -234,6 +226,27 @@ class AllChecks(TestCase):
         moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL)
         moleculePlotSet.renderMoleculePlotSet('test_NTMoleculePlot.pdf',
             createPngCopyToo=True)
+
+    def ttttestDihedralComboPlot(self):
+        ps = NTplotSet() # closes any previous plots
+        ps.hardcopySize = (image2DdihedralWidth, image2Ddihedralheight)
+        dihedralName1 = 'PHI'
+        dihedralName2 = 'PSI'
+        projectName = 'testDihedralComboPlot'
+        project     = Project(projectName)
+        plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
+        plotparams2 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
+
+        plot = NTplot(title=projectName,
+          xRange=(plotparams1.min, plotparams1.max),
+          xTicks=range(int(plotparams1.min), int(plotparams1.max + 1), plotparams1.ticksize),
+          xLabel=dihedralName1,
+          yRange=(plotparams2.min, plotparams2.max),
+          yTicks=range(int(plotparams2.min), int(plotparams2.max + 1), plotparams2.ticksize),
+          yLabel=dihedralName2)
+
+        ps.addPlot(plot)
+        ps.hardcopy(projectName, 'png')
 
 if __name__ == "__main__":
     cing.verbosity = verbosityError

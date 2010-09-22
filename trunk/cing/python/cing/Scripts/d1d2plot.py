@@ -6,17 +6,12 @@ make sure the projects to run are already in the tmpdir.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import blue_inv
-from cing.Libs.NTplot import green_inv
-from cing.Libs.NTplot import plusPoint
-from cing.Libs.NTplot import solidLine
-from cing.Libs.NTplot import yellow_inv
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import hPlot
 from cing.Libs.html import makeDihedralPlot
 from cing.Libs.test.test_NTplot2 import plotTestHistoDihedral
+from cing.PluginCode.matplib import * #@UnresolvedImport @UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.Scripts.d1d2plotConstants import BBCCHK_CUTOFF
 from cing.Scripts.d1d2plotConstants import CV_CUTOFF
@@ -26,12 +21,12 @@ from cing.core.database import NTdb
 from cing.core.molecule import Dihedral
 from cing.core.molecule import common20AAList
 from cing.core.molecule import getTripletHistogramList
-from cing.core.parameters import plotParameters
 from matplotlib.pylab import * #@UnusedWildImport for most imports
 from numpy.ma.core import masked_where
 import numpy
 import profile
 import pstats
+
 
 dihedralName1 = 'Cb4N'
 dihedralName2 = 'Cb4C'

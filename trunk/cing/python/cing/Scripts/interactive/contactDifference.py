@@ -6,13 +6,13 @@ run -i '/Users/jd/workspace35/cing/python/cing/Scripts/interactive/contactDiffer
 @author: jd
 For Sanne Nabuurs.
 '''
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
+from cing.Libs import NTplot
+from cing.PluginCode.matplib import NTplotSet
 from cing.core.classes import Project
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import NTdistanceOpt
 from matplotlib.pyplot import * #@UnusedWildImport
 from numpy import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
 name = 'cbd12'
 pdbFile = 'cbd12.pdb'
 

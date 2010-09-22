@@ -1,19 +1,8 @@
 from cing import cingDirTmp
-from cing.Libs.NTmoleculePlot import selectPointsFromRange
-from cing.Libs.NTplot import HelixIconList
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import boxAttributes
-from cing.Libs.NTplot import lineAttributes
-from cing.Libs.NTplot import triangularList
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.peirceTest import peirceTest
+from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.core.classes import Project
-from matplotlib.pylab import figure
-from matplotlib.pylab import gca
-from matplotlib.pylab import plot
-from matplotlib.pylab import text
-from numpy.core.numeric import arange
 from unittest import TestCase
 import unittest
 #from numpy.ma.core import arange

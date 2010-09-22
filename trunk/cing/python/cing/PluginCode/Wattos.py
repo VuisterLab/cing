@@ -1,17 +1,12 @@
-from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST3_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_ZERO_FOR_MIN_VALUE_STR
-from cing.Libs.NTmoleculePlot import YLABEL_STR
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.NmrStar import NmrStar
+from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
-from cing.PluginCode.required.reqWhatif import QUAL_LIST_STR
 from cing.STAR.File import File
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
+from cing.core.parameters import plugins
 #from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 #from cing.PluginCode.required.reqWattos import *
 
@@ -459,6 +454,11 @@ def runWattos(project, tmp = None, parseOnly=False):
 
 def createHtmlWattos(project, ranges = None):
     """ Read out wiPlotList to see what get's created. """
+
+    if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
+        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+        return
+    from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
 #    wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
     # The following object will be responsible for creating a (png/pdf) file with

@@ -34,9 +34,8 @@ import sys
 import time
 import locale
 
-# For plotting with thousand seperators.
+# For plotting with thousand separators.
 locale.setlocale(locale.LC_ALL, "")
-#from matplotlib.pylab import amin, amax # package contains conflicting defs with the ones above so can't do a wild import.
 
 CONSENSUS_STR = 'consensus'
 

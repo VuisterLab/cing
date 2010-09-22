@@ -4,20 +4,12 @@ python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlotCorrelation.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing.Libs.NTmoleculePlot import KEY_LIST2_STR
-from cing.Libs.NTmoleculePlot import KEY_LIST_STR
-from cing.Libs.NTmoleculePlot import MoleculePlotSet
-from cing.Libs.NTmoleculePlot import USE_ROG_FOR_COLOR_STR
-from cing.Libs.NTmoleculePlot import XLABEL_STR
-from cing.Libs.NTmoleculePlot import YLABEL_STR
-from cing.Libs.NTplot import ResPlot
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
+from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from random import random
 from unittest import TestCase
 import os #@Reimport
 import shutil

@@ -5,16 +5,12 @@
 Create plots like the GreenVersusRed scatter by entry.
 """
 
-from cing.Libs.NTmoleculePlot import USE_MAX_VALUE_STR
-from cing.Libs.NTmoleculePlot import USE_MIN_VALUE_STR
-from cing.Libs.NTplot import NTplot
-from cing.Libs.NTplot import NTplotAttributes
-from cing.Libs.NTplot import NTplotSet
-from cing.Libs.NTplot import fontAttributes
-from cing.Libs.NTplot import fontVerticalAttributes
+from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import dir_plot
+from cing.PluginCode.matplib import NTplot
+from cing.PluginCode.matplib import NTplotSet
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport

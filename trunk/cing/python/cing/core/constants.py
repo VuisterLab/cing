@@ -44,6 +44,9 @@ CING_STR   = CING
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 
+# PLUGINS
+IS_INSTALLED_STR = 'isInstalled'
+
 dots = '-----------'
 
 X_AXIS = 0
