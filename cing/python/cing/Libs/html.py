@@ -1534,7 +1534,7 @@ class HTMLfile:
         # Normalize path, eliminating double slashes, etc.
         sourcePath = os.path.normpath(     source.htmlLocation[0])
         destPath   = os.path.normpath(destination.htmlLocation[0])
-        # Get default id.
+        # Get default id. It may be None.
         destId     = destination.htmlLocation[1]
         # Or override.
         if id:
@@ -1580,6 +1580,8 @@ class HTMLfile:
         locationList += listDestPathNew
         loc = os.path.join( *locationList )
         loc = os.path.normpath(loc) # I don't think it's needed anymore but can't hurt either.
+        if destId == None:
+            return loc
         return loc + destId
 
     def insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):
@@ -1813,12 +1815,14 @@ class ProjectHTMLfile( HTMLfile ):
 
         #Use a dummy object for referencing the text-files for now
         flatFiles = NTdict()
-        flatFiles.htmlLocation = (self.project.moleculePath('analysis'), HTMLfile.top )
+#        flatFiles.htmlLocation = (self.project.moleculePath('analysis'), HTMLfile.top )
+        flatFiles.htmlLocation = (self.project.moleculePath('analysis'), None )
         self.insertHtmlLinkInTag('li',self.main, self.project, flatFiles, text="Details (flat)")
 
         #Use a dummy object for referencing the text-files for now
         progFiles = NTdict()
-        progFiles.htmlLocation = (self.project.moleculePath(), HTMLfile.top )
+#        progFiles.htmlLocation = (self.project.moleculePath(), HTMLfile.top )
+        progFiles.htmlLocation = (self.project.moleculePath(), None )
         self.insertHtmlLinkInTag('li',self.main, self.project, progFiles, text="Programs (flat)")
 
         if hasattr(self, 'history'):
