@@ -172,7 +172,8 @@ def runShiftx( project, parseOnly=False, model=None   ):
     project.shiftxStatus.keysformat()
 
 
-    for model in NTprogressIndicator(models):
+#    for model in NTprogressIndicator(models): takes no time so keeping verbosity down.
+    for model in models:
         # set filenames
         rootname =  sprintf( baseName, model)
         model_base_name =  os.path.join( root, rootname )

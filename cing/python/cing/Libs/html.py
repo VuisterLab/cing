@@ -1063,7 +1063,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
         dihedralColumnNameList.append(dihedralName)
 
     if not dihedralColumnNameList:
-        NTdebug("Failed to find any dihedral plot on file")
+#        NTdebug("Failed to find any dihedral plot on file")
         main('h2', "No plots available")
         return
 

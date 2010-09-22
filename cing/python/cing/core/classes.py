@@ -712,7 +712,7 @@ Project: Top level Cing project class
                 #end for
             #end if
         #end for
-
+        #NTdebug("In classes#restore() doing runCingChecks without output generation.")
         self.runCingChecks(toFile=False)
         self.contentIsRestored = True
         self.updateProject()
