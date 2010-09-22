@@ -1283,12 +1283,12 @@ class Molecule( NTtree, ResidueList ):
             return
         #end if
 
-#        NTdebug('Identify the disulfide bonds.')
-        cys=self.residuesWithProperties('CYS')
-        cyssTmp=self.residuesWithProperties('CYSS') # It might actually have been read correctly.
+        cys=self.residuesWithProperties('CYS') # Called cysteine if thiol sidechain is not oxidized.
+        cyssTmp=self.residuesWithProperties('CYSS') # It might actually have been read correctly as a cystine (lacks an 'e' in the name and an 'H' in the structure as it is reduced.
         for c in cyssTmp:
             if c not in cys:
                 cys.append(c)
+#        NTdebug('Identify the disulfide bonds between cysteines/cystines: %s' % cys)
 
         iList = range(len(cys))
         iList.reverse()
@@ -1302,7 +1302,6 @@ class Molecule( NTtree, ResidueList ):
             elif not len(coordinatesRetrieved): # model count see entry 1abt and issue 137
 #                NTdebug("No coordinates for CA, skipping residue: %s" % c)
                 del( cys[i] )
-#                needs testing.
         pairList = []
         disulfides = [] # same as pairList but with scoreList.
         cyssDict2Pair = {}
@@ -1313,9 +1312,9 @@ class Molecule( NTtree, ResidueList ):
                 c2 = cys[j]
                 scoreList = disulfideScore( c1, c2)
                 if not scoreList:
+                    NTdebug("Failed to get disulfideScore")
                     continue
 
-#                if cing.verbosity >= cing.verbosityDebug:
                 if False:
                     da = c1.CA.distance( c2.CA )
                     db = c1.CB.distance( c2.CB )
@@ -1350,11 +1349,11 @@ class Molecule( NTtree, ResidueList ):
         # end for
         if False: # debug info really.
             if pairList:
-                    NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
+                NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
     #            for pair in pairList:
     #                NTdebug( '%s %s' % (pair[0], pair[1] ))
             else:
-                    NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
+                NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
         # end if
 
         if toFile:
@@ -1371,9 +1370,12 @@ class Molecule( NTtree, ResidueList ):
                     fprintf(f,'\n')
             #end for
             NTmessage('==> Disulfide analysis, output to %s', path)
+#        else:
+#            NTmessage('==> Disulfide analysis, no output requested to file')
         #end if
 
         if applyBonds:
+#            NTdebug('Applying %d disulfide bonds' % len(disulfides))
             for c1,c2,scoreList in disulfides:
 #                NTdebug('%s %s: scores dCa, dCb, S-S dihedral: %s ' %( c1,c2,scoreList))
                 if scoreList[3] < CUTOFF_SCORE:
@@ -1384,10 +1386,7 @@ class Molecule( NTtree, ResidueList ):
 #                        NTdebug("Skipping %s that is already a CYSS" % c)
                         continue
                     c.mutate('CYSS') # this looses connections to ccpn in residue and atom objects.
-
-
-
-    #end if
+        #end if
 
     # end def
 
@@ -4755,8 +4754,9 @@ def disulfideScore( cys1, cys2 ):
         for atomName in [ 'CA', 'CB', 'SG' ]:
             atom = cysResidue[atomName]
             if not len(atom.coordinates):
-                NTmessage("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
-        return None
+                NTdebug("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
+                return None # The white space on this line was screwed up with Eclipse svn finding a diff. It has been in for over a year.
+
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )

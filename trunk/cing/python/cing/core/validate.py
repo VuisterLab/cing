@@ -70,11 +70,10 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
     project.checkForSaltbridges(toFile=toFile)
 
-#    project.checkForDisulfides(toFile=True)
 # GWV this is done in molecule.updateAll
     if project.molecule:
         project.molecule.calculateRMSDs( ranges=ranges)
-        project.molecule.idDisulfides(toFile, applyBonds=False)
+        project.molecule.idDisulfides(toFile=toFile, applyBonds=False)
 
     project.criticize(toFile)
     project.summary(toFile)
