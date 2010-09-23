@@ -3,44 +3,15 @@
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import hPlot
-from cing.Libs.numpyInterpolation import circularlizeMatrix
-from cing.Libs.numpyInterpolation import interp2_linear
-from cing.Libs.numpyInterpolation import interpn_linear
-from cing.Libs.numpyInterpolation import interpn_nearest
-from matplotlib.pylab import subplot, title, imshow, show
-from numpy import sin #@UnresolvedImport
-from numpy.core.arrayprint import set_printoptions
-from numpy.core.numeric import nan
-from numpy.lib.index_tricks import ogrid
+from cing.Libs.numpyInterpolation import * #@UnusedWildImport
+from numpy import * #@UnusedWildImport
 from unittest import TestCase
-import numpy
 import unittest
 
 class AllChecks(TestCase):
 
     os.chdir(cingDirTmp)
 
-    def tttestNumpyInterpolation(self):
-        x,y = ogrid[ -1:1:10j, -1:1:10j ]
-        z = sin( x**2 + y**2 )
-        vmin = -1.
-        vmax =  1.
-        binx = (x,y)
-        tx = ogrid[ -1:1:10j, -1:1:10j ]
-
-        subplot(221)
-        title('original')
-        imshow(z, vmin=vmin, vmax=vmax)
-        subplot(223)
-        title('interpn_nearest')
-        imshow( interpn_nearest( z, tx, binx ), vmin=vmin, vmax=vmax )
-        subplot(222)
-        title('interpn_linear')
-        imshow( interpn_linear( z, tx, binx ), vmin=vmin, vmax=vmax )
-        subplot(224)
-        title('interp2_linear')
-        imshow( interp2_linear( z, tx[0],tx[1], x.ravel(),y.ravel() ), vmin=vmin, vmax=vmax )
-        show()
 
     def tttest_jfd_1(self):
         r,c = ogrid[ 0:10:5j, 0:1:5j ]

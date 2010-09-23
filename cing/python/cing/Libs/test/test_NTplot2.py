@@ -5,8 +5,6 @@ from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.core.classes import Project
 from unittest import TestCase
 import unittest
-#from numpy.ma.core import arange
-#from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
 
 def plotTestHistoDihedral():
     NTdebug("Starting plotTestHistoDihedral")
