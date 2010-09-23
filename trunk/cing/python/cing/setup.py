@@ -141,45 +141,35 @@ def check_python():
         _NTerror("Python 2.4 in the package managers such as yum, fink, port, and apt come with a 'mat plot lib' version that doesn't work with CING.")
         hasDep = False
     if hasDep:
-        _NTmessage("........ Found 'Python'")
+        _NTmessage("........ Found 'python'")
     else:
         _NTwarning('Failed to find good python.')
 
 def check_matplotlib():
-    hasDep = True
     try:
         from matplotlib.axis import XAxis
     except:
-        hasDep = False
-        _NTerror('Failed to find matplotlib. Absolutely required for CING')
+        _NTmessage("Could not find 'matplotlib' (optional)")
+        return
 
-    if hasDep:
-        try:
-            from matplotlib.pylab import axes
-            xaxis = XAxis(axes([.1, .1, .8, .8 ]))
-            if not hasattr(xaxis, 'convert_units'):
-                hasDep = False
-                _NTerror('Failed to find good matplotlib. Absolutely required for CING. Look for version 0.98.3-1 or higher. Developed with 0.98.5-1')
-        except:
-            hasDep = False
+    msg = 'Failed to find good matplotlib (optional). Look for version 0.98.3-1 or higher. Developed with 0.98.5-1'
+    try:
+        from matplotlib.pylab import axes
+        xaxis = XAxis(axes([.1, .1, .8, .8 ]))
+        if not hasattr(xaxis, 'convert_units'):
+            _NTmessage('0 ' + msg)
+            return
+    except:
+        _NTmessage('1 ' + msg)
+        return
 
-    if hasDep:
-        _NTmessage("........ Found 'matplotlib'")
-
-
-
-def check_pylab():
-#    print 'Matplotlib module  ',
-    result = 0
     try:
         import matplotlib.pylab #@UnusedImport
-#        print 'ok.'
-        result = 1
     except:
-        _NTwarning('Failed to find Matplotlib.')
-    if result:
-        _NTmessage("........ Found 'Matplotlib.pylab'")
-    return result
+        _NTmessage('Could not find matplotlib (b) (optional)')
+        return
+    _NTmessage("........ Found 'matplotlib'")
+
 
 def check_ccpn():
 #    print '\nCCPN distribution:',
@@ -208,9 +198,9 @@ def check_ccpn():
 #        missing.append('ccpnmr.analysis')
 
     if gotRequiredCcpnModules:
-        _NTmessage("........ Found 'CCPN'")
+        _NTmessage("........ Found 'ccpn'")
     else:
-        _NTmessage("Could not find 'CCPN' (optional)")
+        _NTmessage("Could not find 'ccpn' (optional)")
 
 #    if missing:
 #        _NTmessage( 'Missing (optional) packages: ' + ', '.join(missing))
@@ -268,9 +258,9 @@ def check_cython():
         pass
 
     if not result:
-        _NTwarning('Failed to find Cython')
+        _NTerror('Failed to find cython')
     else:
-        _NTmessage("........ Found 'Cython'")
+        _NTmessage("........ Found 'cython'")
 
     return result
 
@@ -339,9 +329,6 @@ if __name__ == '__main__':
     check_python()
     check_matplotlib()
     check_ccpn()
-    check_pylab()
-#    check_numpy()
-#    check_numarray()
     check_cython()
 
     if not cingRoot:
@@ -429,7 +416,7 @@ if __name__ == '__main__':
         pass
 #    NTdebug("time: " + `time`)
     if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
-        _NTmessage("Could not find 'Wattos'  (optional)")
+        _NTmessage("Could not find 'wattos'  (optional)")
 #        _NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
         _NTmessage("........ Found 'wattos'")
@@ -476,10 +463,10 @@ if __name__ == '__main__':
 
     talosPath,err  = _NTgetoutput('which talos+')
     if not talosPath:
-        _NTmessage("Could not find 'talos'  (optional)")
+        _NTmessage("Could not find 'talos+'  (optional)")
         parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'talos'")
+        _NTmessage("........ Found 'talos+'")
         parametersDict['talosPath'] = strip(talosPath)
 
     # TODO: enable real location finder. This just works for some cases but we shouldn't bother
@@ -507,10 +494,10 @@ if __name__ == '__main__':
 #    yasaraBasePath,err  = ('/Applications/YASARA-dynamics 8.2.3.app', None)
     yasaraBasePath,err  = ('/Applications/YASARA.app', None)
     if not os.path.exists(yasaraBasePath):
-        _NTmessage("Could not find 'Yasara' code (optional)")
+        _NTmessage("Could not find 'yasara' code (optional)")
         parametersDict['yasaraPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'Yasara' code")
+        _NTmessage("........ Found 'yasara'")
         parametersDict['yasaraPath'] = strip(yasaraBasePath)
 
     # Just to get a message to user; not important.
@@ -520,7 +507,7 @@ if __name__ == '__main__':
         if not os.path.exists(pyMolBinPath):
             pyMolBinPath = None
     if not pyMolBinPath:
-        _NTmessage("Could not find 'pymol' binary (optional)")
+        _NTmessage("Could not find 'pymol' (optional)")
 #        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _NTmessage("........ Found 'pymol' binary")

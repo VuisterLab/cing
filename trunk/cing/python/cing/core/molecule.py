@@ -22,8 +22,10 @@ from cing.core.database import AtomDef
 from database import NTdb
 from math import acos
 from numpy import linalg as LA
+from numpy.ma.core import multiply
+from numpy.matrixlib.defmatrix import mat
 from parameters   import plotParameters
-from pylab import * #@UnusedWildImport # otherwise use this line.
+import numpy
 
 #==============================================================================
 # Global variables
@@ -1991,7 +1993,7 @@ Return an Molecule instance or None on error
             #end if
         #end for
 
-        a = np.array([
+        a = numpy.array([
                       [yy+zz,      -xy,      -xz],
                       [  -xy,    xx+zz,      -yz],
                       [  -xz,      -xy,    xx+yy]
