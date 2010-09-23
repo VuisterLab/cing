@@ -56,7 +56,6 @@ from cing.core.parameters import plotParameters
 from cing.core.parameters import plugins
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
-#from matplotlib.pylab import * #@UnusedWildImport for most imports
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""

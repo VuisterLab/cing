@@ -1,8 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
-from numpy.core.fromnumeric import clip, searchsorted, prod
-from numpy.core.numeric import asarray, empty
-from numpy.lib.index_tricks import ndindex
-from numpy.lib.index_tricks import ogrid
+from numpy import * #@UnusedWildImport
 import numpy
 
 """ Absorbed from: http://www.scipy.org/PauGargallo/Interpolation

@@ -21,9 +21,8 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 from database import NTdb
 from math import acos
+from numpy import * #@UnusedWildImport
 from numpy import linalg as LA
-from numpy.ma.core import multiply
-from numpy.matrixlib.defmatrix import mat
 from parameters   import plotParameters
 import numpy
 
