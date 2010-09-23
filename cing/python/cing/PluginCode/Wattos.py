@@ -456,7 +456,7 @@ def createHtmlWattos(project, ranges = None):
     """ Read out wiPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+#        NTdebug('Skipping createHtmlWattos because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 

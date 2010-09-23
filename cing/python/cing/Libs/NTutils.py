@@ -3804,7 +3804,7 @@ class ExecuteProgram(NTdict):
             raise SetupError("No program given for arguments: "+`args`)
 
         if self.rootPath:
-            cmd = sprintf('cd %s; %s %s', self.rootPath, self.pathToProgram, " ".join(args))
+            cmd = sprintf('cd "%s"; %s %s', self.rootPath, self.pathToProgram, " ".join(args))
         else:
             cmd = sprintf('%s %s', self.pathToProgram, " ".join(args))
         #end if
