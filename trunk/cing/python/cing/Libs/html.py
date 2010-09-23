@@ -67,7 +67,7 @@ def createHtmlCing(project, ranges=None):
     """ Read out cingPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-        NTdebug('Skipping createHtmlCing because no matplib installed.')
+#        NTdebug('Skipping createHtmlCing because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
@@ -2503,7 +2503,8 @@ class ResidueHTMLfile( HTMLfile ):
 #            NTdebug("Residue %s: generating dihedral plots", self.residue )
 
         if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-            NTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
+#            NTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
+            pass
         else:
             from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
             from cing.PluginCode.matplib import makeDihedralHistogramPlot #@UnresolvedImport
