@@ -10,13 +10,6 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import _matchDihedrals
 from cing.core.parameters import plotParameters
 from colorsys import hsv_to_rgb
-from matplotlib import pyplot
-from matplotlib.cm import LUTSIZE
-from matplotlib.cm import datad
-from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import Ellipse
-from matplotlib.patches import Patch
-from matplotlib.path import Path
 
 try:
     import Image
@@ -29,6 +22,13 @@ except ImportError:
 
 try:
     from matplotlib.pylab import * #@UnusedWildImport for such functions as amax, arange, multiply, mat, etc...
+    from matplotlib import pyplot
+    from matplotlib.cm import LUTSIZE
+    from matplotlib.cm import datad
+    from matplotlib.colors import LinearSegmentedColormap
+    from matplotlib.patches import Ellipse
+    from matplotlib.patches import Patch
+    from matplotlib.path import Path
 except ImportError:
     raise ImportWarning('matplib')
 #end try

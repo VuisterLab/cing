@@ -25,7 +25,7 @@ from cing.core.sml import obj2SML
 if True: # block
     useModule = True
     if cingPaths.talos == None or cingPaths.talos == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("Missing talos which is a dep for nih plugin")
+#        NTmessage("Missing talos which is a dep for nih plugin")
         useModule = False
     if not useModule:
         raise ImportWarning(NIH_STR)
