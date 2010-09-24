@@ -286,12 +286,12 @@ jQuery(document).ready(function() {
           { "sType": "html", "sClass": "right" }, // 0 #
           { "sType": "html", "sClass": "left" }, 	 // 1 at1
           { "sType": "html", "sClass": "left" }, 	 // 2 at2
-          {"sClass": "right"},   // 3       lower.
-          {"sClass": "right"},  //  4      upper
-          {"sClass": "right"},   // 5       actual
-          {"sClass": "right"},   // 6       violations
-          {"sClass": "right"},   // 7       max
-          {"sClass": "center"},   //8       >threshold
+          { "sType": "numeric", "sClass": "right"},   // 3       lower.
+          { "sType": "numeric", "sClass": "right"},  //  4      upper
+          { "sClass": "right"},   // 5       actual
+          { "sClass": "right"},   // 6       violations
+          { "sType": "numeric", "sClass": "right"},   // 7       max
+          { "sType": "numeric", "sClass": "center"},   //8       >threshold
           { "sType": "html", "sClass": "left" } // criteria is html too (list)
       ]
     } );
@@ -307,14 +307,14 @@ jQuery(document).ready(function() {
 /*          { "sType": "numeric", "sClass": "right", "bVisible": false, "sWidth": "30em"  }, */
           { "sType": "html", "sClass": "right" }, //0 # id
           {"sClass": "left" }, 	 //1 	name
-          {"sClass": "right"},   //2        lower.
-          {"sClass": "right"},  //3        upper
-          {"sClass": "right"},   //4        actual
-          {"sClass": "right"},   //5        cv
-          {"sClass": "right"},   //6        vAv
-          {"sClass": "right"},   //7        vSd
-          {"sClass": "right"},   //8        max
-          {"sClass": "center"},   //9        >threshold
+          {"sType": "numeric", "sClass": "right"},   //2        lower.
+          {"sType": "numeric", "sClass": "right"},   //3        upper
+          {"sType": "numeric", "sClass": "right"},   //4        actual
+          {"sType": "numeric", "sClass": "right"},   //5        cv
+          {"sType": "numeric", "sClass": "right"},   //6        vAv
+          {"sType": "numeric", "sClass": "right"},   //7        vSd
+          {"sType": "numeric", "sClass": "right"},   //8        max
+          {"sType": "numeric", "sClass": "center"},  //9        >threshold
           { "sType": "html", "sClass": "left" } //10 criteria is html too (list)
       ]
     } );
