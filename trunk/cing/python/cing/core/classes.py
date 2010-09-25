@@ -2410,7 +2410,7 @@ class DistanceRestraint(Restraint):
 
     def deassignStereospecificity(self):
         """If the restraint involves a stereo specifically assignable atom then expand the list to include all
-        getSterospecificallyRelatedlPartner's. Of course if the restraint is between partners then the restraint
+        getSterospecificallyRelatedPartner's. Of course if the restraint is between partners then the restraint
         becomes useless but will be generated. E.g. Gly HA2 to HA3 will become Gly QA to QA.
 
         LEU MD1 -> QD
@@ -2501,7 +2501,7 @@ class DistanceRestraint(Restraint):
                 atomItoMerge = atomPairI[atomItoMergeIdx]
                 atomJtoMerge = atomPairJ[atomJtoMergeIdx]
 
-                if atomItoMerge.getSterospecificallyRelatedlPartner() != atomJtoMerge:
+                if atomItoMerge.getSterospecificallyRelatedPartner() != atomJtoMerge:
 #                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all' % ( atomItoMerge, atomJtoMerge) )
                     continue
 
@@ -3152,34 +3152,55 @@ class DihedralRestraint(Restraint):
                     self.rogScore.setMaxColor(COLOR_RED, msg)
     #end def
 
+    def isChi2TyrOrPhe(self):
+        lastAtom = self.atoms[3]
+        atomName = getDeepByKeysOrAttributes(lastAtom,'name')
+        if atomName != 'CD1':
+            return False
+        lastAtomRes = lastAtom._parent
+        lastAtomResType = getDeepByKeysOrAttributes(lastAtomRes, 'db', 'name')
+        if lastAtomResType in ['TYR', 'PHE']:
+            return True
+        return False
+
     def calculateAverage(self):
         """Calculate the values and violations for each model
         return cav and cv tuple or (None, None) tuple on error
         """
-
+        errorExit = (None, None)
         if len(self.atoms) != 4 or (None in self.atoms):
             NTerror('DihedralRestraint: invalid dihedral definition %s', self.atoms)
-            return (None, None)
+            return errorExit
         #end if
 
         if None in self.atoms.zap('meanCoordinate'):
             NTerror('DihedralRestraint: atom(s) without coordinates %s', self.atoms)
-            return (None, None)
+            return errorExit
         #end if
+
+#        coorList = self.atoms.zap('coordinates')
+#        if len( coorList ) == 0:
+#            NTerror('DihedralRestraint: atom(s) without any coordinates %s', self.atoms)
+#            return (None, None)
+#        #end if
 
         modelCount = self.getModelCount()
         if modelCount == 0:
             NTerror('DihedralRestraint: no structure models')
-            return (None, None)
+            return errorExit
         #end if
+#        lenCoorListExpected = 4 * modelCount
+#        if len( coorList ) != lenCoorListExpected:
+#            NTerror('DihedralRestraint: atom(s) without all coordinates %s', self.atoms)
+#            return (None, None)
+#        #end if
 
 
         #set the default values (JFD: this needs to be fully done in initializer in case code fails as for issue 222)
         self.dihedrals = NTlist() # list with dihedral values for each model
         self.cav = None      # Average dihedral value
         self.cv = None      # cv on dihedral
-#        self.min        = 0.0      # Minimum dihedral
-#        self.max        = 0.0      # Max dihedral
+
         self.violations = NTlist() # list with violations for each model
         self.violCount1 = 0        # Number of violations over 1 degree
         self.violCount3 = 0        # Number of violations over 3 degrees
@@ -3188,45 +3209,85 @@ class DihedralRestraint(Restraint):
         self.violAv = 0.0      # Average violation
         self.violSd = 0.0      # Sd of violations
 
+        #find the range to store these dihedral values
+        plotpars = plotParameters.getdefault(self.retrieveDefinition()[1], 'dihedralDefault')
+        considerSymmetry = self.isChi2TyrOrPhe() # Hack for Phe/Tyr CHI2
+        lastAtom = self.atoms[3]
+        ssaPartner = None
+        if considerSymmetry:
+#            ssaPartner = lastAtom.getSterospecificallyRelatedPartner()
+            try:
+                ssaPartner = lastAtom._parent.CD2
+            except:
+                pass
+#            NTdebug("ssaPartner: %s" % ssaPartner)
+            if ssaPartner != None:
+                considerSymmetry = True
+            else:
+                NTwarning("DihedralRestraint: no lastAtom's ssa for %s so ignoring symmetry on violation." % self)
+                considerSymmetry = False
+
+        if considerSymmetry:
+            jLoopList = [ lastAtom, ssaPartner ]
+        else:
+            jLoopList = [ lastAtom ]
+
         try:
+            # For each model we'll use the atom HD1 or HD2 that has the smallest violation or HD1 if neither one
+            # is violated.
             for i in range(modelCount):
-                d = NTdihedralOpt(
-                                self.atoms[0].coordinates[i],
-                                self.atoms[1].coordinates[i],
-                                self.atoms[2].coordinates[i],
-                                self.atoms[3].coordinates[i]
-                              )
-                self.dihedrals.append(d)
-            #end for
+                dList = []
+                vList = []
+                for _j1, lastAtom2 in enumerate(jLoopList):
+#                    NTdebug('i, _j1, lastAtom2, considerSymmetry: %s %s %s %s' % (i,_j1,lastAtom2, considerSymmetry))
+                    atomList = [self.atoms[k] for k in range(3)]
+                    atomList.append( lastAtom2 )
+                    coorList = [ atom.coordinates[i] for atom in atomList]
+                    d = NTdihedralOpt( *coorList )
+                    if d == None:
+#                        NTdebug("Failed to calculate an angle; which can happen if a coordinate is missing.")
+                        continue
+                    dList.append( d )
+                # end for _j1
+                NTlimit(dList, plotpars.min, plotpars.max)
+                for _j2 in range(len(dList)):
+                    v = violationAngle(value = dList[_j2], lowerBound = self.lower, upperBound = self.upper)
+                    if v == None:
+                        NTerror("Failed to calculate a violation angle.")
+                        return errorExit
+                    vList.append( v )
+                # end for _j2
+                jSelected = 0
+                if considerSymmetry:
+                    fvList = [ math.fabs(x) for x in vList]
+                    if len(fvList) == 2:
+                        if fvList[1] < fvList[0]:
+                            jSelected = 1
+#                    NTdebug("Comparing fviolations for %s %s" % ( self, fvList))
+                # end if
+#                NTdebug("Comparing distances for %s %s" % ( self, dList))
+#                NTdebug("Comparing violations for %s %s" % ( self, vList))
+#                NTdebug("jSelected %s" % jSelected)
+                self.dihedrals.append(dList[jSelected])
+                self.violations.append(vList[jSelected])
+#                NTdebug("self.dihedrals %s" % self.dihedrals)
+#                NTdebug("self.violations %s" % self.violations)
+
+                fv = math.fabs(vList[jSelected])
+                if fv > 1.0: self.violCount1 += 1
+                if fv > 3.0: self.violCount3 += 1
+                if fv > 5.0: self.violCount5 += 1
+                if fv > self.violMax:
+                    self.violMax = fv
+                #end if
+            #end for all models
         except:
+#            NTtracebackError() # DEFAULT this is disabled.
+#            NTdebug("Ignoring violations for %s" % self.format() )
             pass # ignore missing coordinates. They're reported by criticize()
 
-        #find the range to store these dihedral values
-        #limit = 0.0
-        #if limit > self.lower: limit = -180.0
-        #self.dihedrals.limit(limit, limit+360.0)
-
-        plotpars = plotParameters.getdefault(self.retrieveDefinition()[1],
-                                             'dihedralDefault')
-
-        self.dihedrals.limit(plotpars.min, plotpars.max)
-
-        # Analyze violations, account for periodicity
-        for d in self.dihedrals:
-            v = violationAngle(value = d, lowerBound = self.lower, upperBound = self.upper)
-            if v == None: # already send a message
-                continue
-            fv = math.fabs(v)
-            self.violations.append(v)
-            if fv > 1.0: self.violCount1 += 1
-            if fv > 3.0: self.violCount3 += 1
-            if fv > 5.0: self.violCount5 += 1
-            if fv > self.violMax:
-                self.violMax = fv
-            #end if
-        #end for
         self.violAv, self.violSd, _n = self.violations.average()
-
+        # The CV is hard to calculate for the symmetry case detailed above. TODO:
         self.cav, self.cv, _n = self.dihedrals.cAverage(plotpars.min, plotpars.max)
         return(self.cav, self.cv)
     #end def
@@ -3331,18 +3392,18 @@ class DihedralRestraintList(RestraintList):
         Return <rmsd>, sd and total violations over 1, 3, and 5 degrees as tuple
         or (None, None, None, None, None) on error
         """
-
+        errorResult = (None, None, None, None, None)
 #        NTdebug('DihedralRestraintList.analyze: %s', self)
 
         if not len(self):
             NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name)
-            return (None, None, None, None, None)
+            return errorResult
         #end if
 
         modelCount = self.getModelCount()
         if not modelCount:
             NTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name)
-            return (None, None, None, None, None)
+            return errorResult
         #end if
 
         self.rmsd = NTfill(0.0, modelCount)
@@ -3358,7 +3419,13 @@ class DihedralRestraintList(RestraintList):
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
             self.violCount5 += dr.violCount5
-            for i in range(len(dr.violations)): # happened in entry 1bn0 that violations were not defined.
+
+            countDrViolations = len(dr.violations)
+            if countDrViolations > modelCount:
+                NTcodeerror("Found more violations (%s) for this restraint (%s) than models (%s)" % ( countDrViolations, dr, modelCount))
+                return errorResult
+
+            for i in range(countDrViolations): # happened in entry 1bn0 that violations were not defined.
 #            for i in range(0, modelCount):
                 v = dr.violations[i]
                 self.rmsd[i] += v * v

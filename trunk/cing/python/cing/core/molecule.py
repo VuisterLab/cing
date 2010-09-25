@@ -3800,7 +3800,7 @@ coordinates: %s"""  , dots, self, dots
         return None
     #end def
 
-    def getSterospecificallyRelatedlPartner( self ):
+    def getSterospecificallyRelatedPartner( self ):
         """
         Return prochiral partner Atom instance of self or
         another Atom instance that is related by another stereospecific relation.
