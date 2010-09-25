@@ -5,15 +5,21 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import do_cmd
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.Scripts.FC.utils import printSequenceFromCcpnProject
+from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
+from memops.general.Io import loadProject
+from memops.general.Io import saveProject
+from shutil import rmtree
 from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
 
     entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
+#    entryList = "2kwb".split()
 #    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
 #    entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "1y4o".split()
@@ -34,8 +40,9 @@ class AllChecks(TestCase):
         doTalos = True
         useNrgArchive = False
         ranges = None
+        doSwapCheck = False
         if fastestTest:
-            modelCount=1
+            modelCount=2
             redoFromCingProject = False
             htmlOnly = True
             doWhatif = False
@@ -73,6 +80,35 @@ class AllChecks(TestCase):
                     if not os.path.exists(ccpnFile):
                         self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
+                if doSwapCheck: # Need to start with ccpn without loading into CING api yet.
+                    if os.path.exists(entryId):
+                        NTmessage("Removing previous directory: %s" % entryId)
+                        rmtree(entryId)
+                    do_cmd("tar -xzf " + ccpnFile) # will extract to local dir.
+                    if os.path.exists('linkNmrStarData'):
+                        NTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entryId)
+                        os.rename('linkNmrStarData', entryId)
+
+                    ccpnProject = loadProject(entryId)
+                    if not ccpnProject:
+                        self.fail("Failed to read project: %s" % entryId)
+            #        constraintsHandler = ConstraintsHandler()
+                    nmrConstraintStore = ccpnProject.findFirstNmrConstraintStore()
+                    structureEnsemble = ccpnProject.findFirstStructureEnsemble()
+                    numSwapCheckRuns = 2
+                    if nmrConstraintStore:
+                        if structureEnsemble:
+                            swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
+                        else:
+                            NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+                    else:
+                        NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
+            #        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
+                    NTmessage('Saving to new path')
+            #        checkValid=True,
+                    saveProject(ccpnProject, newPath=entryId, removeExisting=True)
+                    ccpnFile = entryId # set to local dir now.
+                # end if doSwapCheck
                 self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
                 self.assertTrue(project.save())
 
@@ -86,6 +122,7 @@ class AllChecks(TestCase):
             if False:
                 ccpnProject = project.ccpn
                 printSequenceFromCcpnProject(ccpnProject)
+
             if True:
                 self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               ranges=ranges,

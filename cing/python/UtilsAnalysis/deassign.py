@@ -1,5 +1,4 @@
 """
-Hi
 Execute in Analysis as:
 CINGROOT = os.getenv('CINGROOT')
 execfile('%s/python/UtilsAnalysis/deassign.py' % CINGROOT)
