@@ -19,6 +19,7 @@ sudo apt-get install \
     openssh-server \
     apt-file \ # nice for looking up dependencies
     eclipse-csv eclipse-pde
+    postgresql \ #for a default user (postgres) and for user i
    }}}        
  * Install VMware tools inside guest OS.
 
