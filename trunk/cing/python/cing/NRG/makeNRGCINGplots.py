@@ -366,7 +366,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     # Otherwise the fits will be on centered around the largest small bin.
                     # For now, not using the fitted parameters but when non-analytical functions need to be modeled we should use a fit.
                     # Below code inspired by: http://www.scipy.org/Cookbook/FittingData
-                    fitfunc = lambda p, x: p[0] * numpy.exp(-(x-p[1])**2/(2*p[2]))
+                    fitfunc = lambda p, x: p[0] * numpy.exp(-(x-p[1])**2/(2*p[2])) # exp is numpy.exp @UndefinedVariable
                     errfunc = lambda p, x, y: fitfunc(p, x) - y # Distance to the target function
                     variance = sd**2 # variance
                     maxValueHist = max(y)

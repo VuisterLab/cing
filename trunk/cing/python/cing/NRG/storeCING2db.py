@@ -2,6 +2,9 @@
 # cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ALyon2; \
 # python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD
 #
+# cd /Library/WebServer/Documents/CASP-NMR-CING/data/05/T0538Org; \
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py T0538Org ARCHIVE_CASP
+#
 # cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
 # python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 #
@@ -54,13 +57,15 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             return True
         if archive_id == ARCHIVE_NRG_ID:
             schema = NRG_DB_NAME
-    elif archive_id == ARCHIVE_CASD_ID:
+    elif archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         casd_id = entry_code
         if casd_id == None:
             NTerror("Expected casd_id argument")
             return True
         entry_code = casd_id
         schema = CASD_DB_NAME
+        if archive_id == ARCHIVE_CASP_ID:
+            schema = CASP_DB_NAME
     else:
         NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True

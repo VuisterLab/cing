@@ -16,7 +16,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import globMultiplePatterns
 from cing.Libs.disk import mkdirs
-from cing.NRG import CASD_NMR_BASE_NAME
+from cing.NRG import CASP_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.core.constants import * #@UnusedWildImport
 from glob import glob1
@@ -26,14 +26,13 @@ __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
 try:
-    from localConstants import baseDir
+    from localConstants import baseCaspDir as baseDir
 except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
-    baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
+    baseDir = '/Volumes/UserHome/geerten/Data/CASP-NMR-CING'
 
-#dataOrgDir = os.path.join(baseDir, 'data')
-dataDir = os.path.join(baseDir, 'data')
-startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
+startDir = '/Library/WebServer/Documents/' + CASP_NMR_BASE_NAME
+dataDir = os.path.join(startDir, 'data')
 
 colorByLab = {
     'Cheshire': 'green',
@@ -44,74 +43,36 @@ colorByLab = {
     'Seattle': 'gold',
     'Utrecht': 'darkgreen'
 }
-def convertToProgram(t):
-    """check if there is an x for each and creates a string Hash by row and Hash by column"""
-
-    # Assumes first column has the row labels. This is called a header column in Numbers.
-    rowLabelList = t.getColumnByIdx(0)
-    rowSize = t.sizeRows()
-    result = {}
-    for r in range(rowSize):
-        rowLabel = rowLabelList[r]
-        result[rowLabel] = {}
-        resultRow = result[rowLabel]
-        for c, columnLabel in enumerate(t.columnOrder):
-            if c == 0:
-                continue
-            column = t.attr[columnLabel]
-            value = column[r].lower()
-
-            valueEnumerated = None
-            if value == 'c':
-                valueEnumerated = CYANA
-            if value == 'x':
-                valueEnumerated = XPLOR
-            if value == 'p':
-                valueEnumerated = PDB
-
-            resultRow[columnLabel] = valueEnumerated
-    return result
 
 
-def getCASD_NMR_DBMS():
+def getCASP_NMR_DBMS():
     csvFileDir = os.path.join(baseDir, 'Overview')
     relationNames = glob1(csvFileDir, "*.csv")
     relationNames = [ relationName[:-4] for relationName in relationNames]
-    if not relationNames:
-        NTerror('Failed to read any relation from %s' % baseDir)
     dbms = DBMS()
     dbms.readCsvRelationList(relationNames, csvFileDir)
     return dbms
 
 def createLayOutArchive():
-    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
+    inputDir = '/Users/jd/CASP-NMR-CING/caspNmrDbDivided'
     os.chdir(inputDir)
     for entryCode in entryList[:]:
 #    for entryCode in entryList[0:1]:
         ch23 = entryCode[1:3]
-        for city in cityList:
+        for city in predList:
             entryCodeNew = entryCode + city
             entryDir = os.path.join(ch23, entryCodeNew)
             mkdirs(entryDir)
 
-def copyFromCasdNmr2CcpnArchive():
-    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
-    programHoH = convertToProgram(participationTable)
+def copyFromCasp2CcpnArchive():
+    inputDir = '/Users/jd/CASP-NMR-CING/caspNmrDbDivided'
     os.chdir(inputDir)
     for entryCode in entryList:
 #    for entryCode in entryList[0:1]:
         ch23 = entryCode[1:3]
-        for city in cityList:
+        for city in predList:
 #        for city in cityList[0:1]:
             entryCodeNew = entryCode + city
-            programId = getDeepByKeys(programHoH, entryCode, city)
-            if not (city == 'Test' or programId):
-#                NTdebug("Skipping %s" % entryCodeNew)
-                continue
-#            else:
-#                NTdebug("Looking at %s" % entryCodeNew)
-#                continue # TODO disable premature stop.
-
             NTmessage("Working on: %s" % entryCodeNew)
 
             inputEntryDir = os.path.join(inputDir, ch23, entryCodeNew)
@@ -136,7 +97,7 @@ def copyFromCasdNmr2CcpnArchive():
 
 
 def redoLayOutArchiveWim():
-    inputDir = '/Users/jd/Downloads/casdNmrCcpn'
+    inputDir = '/Users/jd/Downloads/caspNmrCcpn'
     os.chdir(inputDir)
     for entryCode in entryList[:]:
 #    for entryCode in entryList[0:1]:
@@ -174,12 +135,12 @@ def createTodoList(entryList, cityList, programHoH):
     writeEntryListToFile(entryListFileName, newEntryList)
 # end def
 
-def getRangesForTarget(target):
-    if target not in entryList:
-        NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
-        return None
-    index = entryList.index(target)
-    return rangesPsvsList[index]
+#def getRangesForTarget(target):
+#    if target not in entryList:
+#        NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
+#        return None
+#    index = entryList.index(target)
+#    return rangesPsvsList[index]
 
 def getTargetForFullEntryName(fullEntryCode):
     """
@@ -236,22 +197,33 @@ def printCingUrls(programHoH):
                     continue
             entryCode = target + labId
             ch23 = entryCode[1:3]
-            print "http://nmr.cmbi.ru.nl/CASD-NMR-CING/data/%s/%s/%s.cing" % (
+            print "http://nmr.cmbi.ru.nl/CASP-NMR-CING/data/%s/%s/%s.cing" % (
                     ch23, entryCode, entryCode                )
 
-dbms = getCASD_NMR_DBMS()
-sheetName = 'Overview1'
-participantTable = dbms.tables['%s-Participant' % sheetName]
-participationTable = dbms.tables['%s-Participation' % sheetName]
-targetTable = dbms.tables['%s-Target' % sheetName]
-labTable = dbms.tables['%s-LabAndCount' % sheetName]
-labList = labTable.columnOrder[0]
-cityList = participantTable.columnOrder[1:]
-entryList = targetTable.getColumnByIdx(0)
-rangesPsvsList = targetTable.getColumnByIdx(6)
-programHoH = convertToProgram(participationTable)
-mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
-NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+predList = """
+TS001 TS002 TS014 TS018 TS026 TS028 TS037 TS039 TS047 TS055 TS056 TS063 TS077
+TS080 TS086 TS088 TS094 TS102 TS103 TS104 TS113 TS114 TS117 TS119 TS127 TS129
+TS140 TS142 TS152 TS165 TS166 TS170 TS171 TS173 TS174 TS207 TS208 TS213 TS214
+TS215 TS218 TS220 TS228 TS229 TS236 TS244 TS245 TS248 TS250 TS253 TS257 TS264
+TS269 TS273 TS275 TS276 TS286 TS289 TS291 TS296 TS302 TS304 TS307 TS314 TS319
+TS321 TS322 TS328 TS331 TS345 TS346 TS350 TS361 TS366 TS380 TS391 TS395 TS407
+TS409 TS419 TS420 TS428 TS429 TS433 TS435 TS436 TS444 TS447 TS449 TS452 TS453
+TS457 TS470 TS471 TS476 TS481 TS490
+""".split()
+entryList = [ '%s%s' % ('T0538',x) for x in predList]
+entryListAll = [ 'T0538Org' ] + entryList
+#dbms = getCASP_NMR_DBMS()
+#sheetName = 'Overview1'
+#participantTable = dbms.tables['%s-Participant' % sheetName]
+#participationTable = dbms.tables['%s-Participation' % sheetName]
+#targetTable = dbms.tables['%s-Target' % sheetName]
+#labTable = dbms.tables['%s-LabAndCount' % sheetName]
+#labList = labTable.columnOrder[0]
+#cityList = participantTable.columnOrder[1:]
+#entryList = targetTable.getColumnByIdx(0)
+#rangesPsvsList = targetTable.getColumnByIdx(6)
+#mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
+#NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 #print labList
 #print programHoH
 #print getRangesForTarget('ET109Ared')
@@ -268,7 +240,4 @@ if __name__ == '__main__':
 #    annotateLoop()
 #    redoLayOutArchiveWim()
 #    NTmessage("entryList: %s" % str(entryList))
-    target = 'CGR26A'
-    result = getFullEntryNameListForTarget(target, programHoH)
-    NTmessage("result: %s" % str(result))
 

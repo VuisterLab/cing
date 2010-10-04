@@ -8,7 +8,6 @@ from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from matplotlib.pylab import * #@UnusedWildImport for most imports
 
 schemaIdOrg = CASD_DB_NAME
 sqlDir = os.path.join(cingPythonCingDir,'NRG', 'sql')
@@ -43,7 +42,7 @@ def runSqlForSchema(sqlFile = createDB_FileName, schemaId = CASD_DB_NAME):
     NTmessage('Done!')
 
 if __name__ == '__main__':
-    schemaId = NRG_DB_NAME
+    schemaId = CASP_DB_NAME
     sqlFile = createDB_FileName
 #    sqlFile = loadDB_FileName
     if runSqlForSchema(sqlFile, schemaId):

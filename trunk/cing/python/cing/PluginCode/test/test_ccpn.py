@@ -18,8 +18,8 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
-#    entryList = "2kwb".split()
+#    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
+    entryList = "2knr".split()
 #    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
 #    entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "1y4o".split()

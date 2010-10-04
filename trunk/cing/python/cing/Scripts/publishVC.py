@@ -22,18 +22,28 @@ How to copy the VC to nmr (production machine):
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.settings import dDir
+from cing.Libs.forkoff import do_cmd
 cing.verbosity = cing.verbosityDebug
 
-localDir = '/Users/jd/Documents/Virtual Machines.localized'
+workLocally = True
+
+localDir = '/Users/jd/Documents/Virtual Machines'
+destBaseDir = '/Volumes/tera1'
+if workLocally:
+    destBaseDir = '/'
 remoteDirBase = os.path.join('/Volumes/tera1', dDir[1:])
 
-vmName = 'Ubuntu_10_4_32_bit'
-#vmName = 'VC_32bit'
-#vmName = 'test'
+#vmName = 'Ubuntu_10_4_32_bit'
+vmName = 'VC'
+vmName = 'test'
 
 doSend = True
-doSsh = True
+doLink = True
 
+
+#=======================================================================================
+# NO CHANGES NEEDED BELOW THIS LINE
+#=======================================================================================
 os.chdir(localDir)
 VCsecret = os.getenv('VCsecret')
 if not VCsecret:
@@ -67,17 +77,19 @@ if doSend:
         NTerror("Failed to run tar with options: " + tar_cmd)
         sys.exit(1)
 
-#NTerror("TODO: finish on next time's use.")
-#sys.exit(1)
-
-if doSsh:
-    sshing = ExecuteProgram('ssh', redirectOutput = False)
-    ssh_todo = "'cd %s/%s; ln -f %s %s'" % ( dDir, VCsecret, fileName, dstFile )
-    ssh_cmd = ' jd@nmr.cmbi.umcn.nl %s' % ssh_todo
-    NTmessage("Running ssh with options: %s" % ssh_cmd)
-    if sshing( ssh_cmd ):
-        NTerror("Failed to run ssh with options: " + ssh_cmd)
-        sys.exit(1)
+if doLink:
+    local_cmd = "'cd %s/%s; ln -f %s %s'" % ( dDir, VCsecret, fileName, dstFile )
+    if workLocally:
+        if do_cmd(local_cmd):
+            NTerror("Failed to link locally: " + local_cmd)
+            sys.exit(1)
+    else:
+        sshing = ExecuteProgram('ssh', redirectOutput = False)
+        ssh_cmd = ' jd@nmr.cmbi.umcn.nl %s' % local_cmd
+        NTmessage("Running ssh with options: %s" % ssh_cmd)
+        if sshing( ssh_cmd ):
+            NTerror("Failed to run ssh with options: " + ssh_cmd)
+            sys.exit(1)
 
 
 
