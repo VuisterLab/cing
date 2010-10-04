@@ -6,7 +6,13 @@ from cing.core.molecule import Ensemble
 from numpy import linalg as LA
 import numpy as np
 
+#print \
 """
+==================================================================================================================
+USE THE CLASS IN cing.core.classes.ProjectTree INSTEAD OF THIS ONE!!!
+==================================================================================================================
+
+TOBE REMOVED
 Routines to compare different Project instances
 """
 
