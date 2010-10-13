@@ -146,10 +146,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if False: # TODO: enable when done testing overall strategy.
         p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
 
-    if archive_id != ARCHIVE_CASD_ID:
-        result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
-    else:
+    if archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         result = execute(centry.delete().where(centry.c.casd_id == casd_id))
+    else:
+        result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
+
     if result.rowcount:
         NTdebug("Removed original entries numbering: %s" % result.rowcount)
         if result.rowcount > 1:
@@ -299,10 +300,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     )
 #    entry_id_list = result.last_inserted_ids() # fails for postgres version I have.
 #    entry_id_list = result.inserted_primary_key() # wait for this new feature
-    if archive_id != ARCHIVE_CASD_ID:
-        entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
-    else:
+    if archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.casd_id==casd_id)).fetchall()
+    else:
+        entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
     if not entry_id_list:
         NTerror("Failed to get the id of the inserted entry but got: %s" % entry_id_list)
         return True

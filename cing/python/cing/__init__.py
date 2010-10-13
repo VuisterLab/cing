@@ -64,6 +64,7 @@ header = \
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
 
 # Verbosity settings: How much text is printed to stdout/stderr streams
+# Follows exact same int codes as Wattos.
 # Reference to it as cing.verbosity if you want to see non-default behavior
 verbosityNothing  = 0 # Even errors will be suppressed
 verbosityError    = 1 # show only errors

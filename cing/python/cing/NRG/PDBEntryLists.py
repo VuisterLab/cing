@@ -34,12 +34,11 @@ def getEntryListFromCsvFile(urlLocation):
         result.append(pdbCode)
   return result
 
-
 def getBmrbNmrGridEntries():
   result = []
   urlLocation = urlDB2 + "/entry.txt"
-##4583	\N	108d	\N	\N
-##4584	\N	149d	\N	\N
+##4583    \N    108d    \N    \N
+##4584    \N    149d    \N    \N
   r1 = urllib.urlopen(urlLocation)
   data = r1.read()
   r1.close()

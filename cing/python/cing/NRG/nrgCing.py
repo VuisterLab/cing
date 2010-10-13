@@ -4,11 +4,11 @@ indices that live on top of them.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py
+python -u $CINGROOT/python/cing/NRG/nrgCing.py [prepareInput??]
 
 As a cron job this will:
     - create a todo list
-    - run entries todo
+    - prepare/run entries todo
     - create new lists and write them to file.
 
 Time taken by CING by statistics
@@ -24,19 +24,14 @@ from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs.AwkLike import AwkLike
+from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRDone
 from cing.NRG.PDBEntryLists import getPdbEntries
-from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
-from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
-from cing.NRG.WhyNot import NOT_NMR_ENTRY
-from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
-from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
-from cing.NRG.WhyNot import WhyNot
-from cing.NRG.WhyNot import WhyNotEntry
+from cing.NRG.WhyNot import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
@@ -44,13 +39,12 @@ from glob import glob
 import csv
 import shutil
 import string
-import urllib
 
 def run():
     """Return True on error"""
-    max_entries_todo = 9999    # was 500 (could be as many as u like)
+    max_entries_todo = 0    # was 500 (could be as many as u like)
     max_time_to_wait = 60 * 60 * 24 # 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
-    processes_max = 8    # was 1 may be set to a 100 when just running through to regenerate pickle
+    processes_max = 8    # number of cpus.
     writeWhyNot = True
     updateIndices = True
     isProduction = True
@@ -71,6 +65,11 @@ def run():
     NTdebug("Publish results at directory    : " + m.results_dir)
     NTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
 
+    # Retrieve the linkages between BMRB and PDB entries.
+    if m.getBmrbLinks():
+        NTerror("Failed to get BMRB-PDB links")
+        return True
+
     # Get the PDB info to see which entries can/should be done.
     if m.searchPdbEntries():
         NTerror("Failed to searchPdbEntries")
@@ -80,8 +79,8 @@ def run():
         m.entry_list_todo.addList(new_hits_entry_list)
     elif getTodoList:
         # Get todo list and some others.
-        if m.getCingEntryInfo():
-            NTerror("Failed to getCingEntryInfo (first time).")
+        if m.getEntryInfo():
+            NTerror("Failed to getEntryInfo (first time).")
             return True
 
     if m.entry_list_todo:
@@ -90,8 +89,8 @@ def run():
             return True
 
     # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
-    if m.getCingEntryInfo():
-        NTerror("Failed to getCingEntryInfo")
+    if m.getEntryInfo():
+        NTerror("Failed to getEntryInfo")
         return True
 
     if m.doWriteEntryLoL():
@@ -102,11 +101,6 @@ def run():
         NTerror("Failed to doWriteWhyNot")
         return True
 
-    # Retrieve the linkages between BMRB and PDB entries.
-    if m.getBmrbLinks():
-        NTerror("Failed to get BMRB-PDB links")
-        return True
-
     if m.updateIndexFiles():
         NTerror("Failed to update index files.")
         return True
@@ -114,11 +108,12 @@ def run():
 
 
 class nrgCing(Lister):
-    """Main class for running CING reports on NRG and maintaining the statistics."""
+    """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
     def __init__(self,
                  max_entries_todo = 1,
                  max_time_to_wait = 20,
                  processes_max = 2,
+                 prepareInput = False,
                  writeWhyNot = False,
                  writeTheManyFiles = False,
                  updateIndices = False,
@@ -136,6 +131,8 @@ class nrgCing(Lister):
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
 
+        self.matchBmrbPdbDataDir = "data/NRG/bmrbPdbMatch" # wrt $CINGROOT
+        self.matchBmrbPdbTable = 'newMany2OneTable'
         self.results_base = 'NRG-CING'
         self.results_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.data_dir = os.path.join(self.results_dir, 'data')
@@ -162,7 +159,7 @@ class nrgCing(Lister):
         ## are indeed to be done. This is set later on and perhaps adjusted
         ## when the user interrupts the process by ctrl-c.
         self.url_redirecter = self.results_url + '/redirect.php'
-        self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
+#        self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
         ## Dictionary with matches pdb to bmrb
         self.matches_many2one = {}
         ## Dictionary with matches bmrb to pdb
@@ -187,6 +184,20 @@ class nrgCing(Lister):
         self.entry_list_nrg = NTlist()          # should be the same as self.entry_list_nmr_exp
         self.entry_list_nrg_docr = NTlist()
 
+        # Stages are cumulative in that e.g. R always includes all from C. This simplifies this setup hopefully.
+                      # id #name         #code
+        self.phaseList = [
+                     [ 0, 'Coordinate',  'C'],
+                     [ 1, 'Restraint',   'R'],
+                     [ 2, 'Shift',       'S'],
+                     [ 3, 'Filter',      'F'],
+                      ]
+        self.entry_list_prep_stage_C = NTlist()   # NMR entries prepared from mmCIF coordinates (NRG-DOCR entries will overrule these any time).
+        self.entry_list_prep_stage_R = NTlist()   # Should include entry_list_nrg_docr if all came over from NRG-DOCR.
+        self.entry_list_prep_stage_S = NTlist()   # Adds chemical shifts if available.
+        self.entry_list_prep_stage_F = NTlist()   # Might be filtered otherwise simply stage S.
+        self.phaseList = [self.entry_list_prep_stage_C,self.entry_list_prep_stage_R,self.entry_list_prep_stage_S,self.entry_list_prep_stage_F]
+
         # From disk.
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
         self.entry_list_crashed = NTlist()    # has a stack trace
@@ -200,45 +211,23 @@ class nrgCing(Lister):
 
     def getBmrbLinks(self):
         """ Returns True for failure"""
-        url_many2one = self.url_csv_file_link_base + "/score_many2one.csv"
-        url_one2many = self.url_csv_file_link_base + "/score_one2many.csv"
 
-        for url_links in (url_many2one, url_one2many):
-            try:
-                resource = urllib.urlopen(url_links)
-                reader = csv.reader(resource)
-            except IOError:
-                NTerror("couldn't open url for reader: " + url_links)
-                return True
-
-            try:
-                _header_read = reader.next()
-#                NTdebug("read header: %s" % header_read)
-                for row in reader:
-                    bmrb_code = row[0]
-                    pdb_code = row[1]
-                    if url_links == url_many2one:
-                        self.matches_many2one[ pdb_code ] = bmrb_code
-                    else:
-                        self.matches_one2many[     bmrb_code ] = pdb_code
-                        self.matches_one2many_inv[ pdb_code  ] = bmrb_code
-            # Never know when the connection is finally empty.
-            except IOError:
-                pass
-
-            if url_links == url_many2one:
-                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
-            else:
-                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
+        dbms = DBMS()
+        matchBmrbPdbDataDirLocal = os.path.join(cingRoot, self.matchBmrbPdbDataDir) # Needs to change to live resource as well.
+        dbms.readCsvRelationList([ self.matchBmrbPdbTable ], matchBmrbPdbDataDirLocal)
+        mTable = dbms.tables[self.matchBmrbPdbTable]
+        self.matches_many2one = mTable.getHash() # hashes by first column to the next by default already.
+        NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
 
 
-    def getCingEntryInfo(self):
+    def getEntryInfo(self):
         """Returns True for error
         Will remove entry directories if they do not occur in NRG up to a maximum number as not to whip out
         every one in a single blow by accident.
         """
 
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
+
 
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
@@ -401,41 +390,42 @@ class nrgCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for entries from the PDB and BMRB databases.")
+        NTdebug("Looking for entries from the PDB and NRG databases.")
 
         self.entry_list_pdb.addList(getPdbEntries())
         if not self.entry_list_pdb:
             NTerror("No PDB entries found")
             return True
-        NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
+        NTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
 
         self.entry_list_nmr.addList(getPdbEntries(onlyNmr = True))
         if not self.entry_list_nmr:
             NTerror("No NMR entries found")
             return True
-        NTmessage("Found %s NMR entries." % len(self.entry_list_nmr))
+        NTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))
 
         self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr = True, mustHaveExperimentalNmrData = True))
         if not self.entry_list_nmr_exp:
             NTerror("No NMR with experimental data entries found")
             return True
-        NTmessage("Found %s NMR with experimental data entries." % len(self.entry_list_nmr_exp))
+        NTmessage("Found %5d NMR with experimental data entries." % len(self.entry_list_nmr_exp))
 
         self.entry_list_nrg.addList(getBmrbNmrGridEntries())
         if not self.entry_list_nrg:
             NTerror("No NRG entries found")
             return True
-        NTmessage("Found %s PDB entries in NRG." % len(self.entry_list_nrg))
+        NTmessage("Found %5d PDB entries in NRG." % len(self.entry_list_nrg))
 
         ## The list of all entry_codes for which tgz files have been found
         self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
         if not self.entry_list_nrg_docr:
             NTerror("No NRG DOCR entries found")
             return True
-        NTmessage("Found %s NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
+        NTmessage("Found %5d NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
         if len(self.entry_list_nrg_docr) < 3000:
             NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
             return True
+
 
 
 
@@ -446,6 +436,8 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
         writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
+        writeTextToFile("entry_list_mmcif.csv", toCsv(self.entry_list_mmcif))
+        writeTextToFile("entry_list_prepared.csv", toCsv(self.entry_list_prepared))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
         writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))

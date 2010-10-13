@@ -15,10 +15,10 @@ if False:
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(baseDir, 'list', 'entry_list_single.csv')
-    entryList = 'T0538Org T0538TS001 T0538TS039'.split()
+#    entryList = 'T0538Org T0538TS001 T0538TS039'.split()
 #    entryList = 'T0538Org'.split()
 #    entryList = 'T0538TS001 T0538TS002 T0538TS257'.split()
-    entryList = 'T0538TS257'.split()
+    entryList = 'T0538TS328'.split()
     writeEntryListToFile(entryListFileName, entryList)
 extraArgList = ()
 
