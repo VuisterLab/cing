@@ -3,7 +3,6 @@ Settings for the processNrgCing script
 """
 
 import os
-baseDir = '/Users/jd/CASD-NMR-CING' #@UnusedVariable
 
 # If on production machine then
 # -1- the urls will differ from localhost to nmr.cmbi.ru.nl or so.
@@ -29,6 +28,13 @@ big_dir         = results_dir                           # NRG data large in size
 dir_star        = os.path.join(big_dir,'star')
 dir_link        = os.path.join(big_dir,'link')
 dir_plot        = os.path.join(big_dir,'plot')
+
+
+dir_prep        = os.path.join(big_dir, 'prep')
+dir_C           = os.path.join(dir_prep, 'C')
+dir_R           = os.path.join(dir_prep, 'R')
+dir_S           = os.path.join(dir_prep, 'S')
+dir_F           = os.path.join(dir_prep, 'F')
 # Postgres install but are they needed?
 #PGBIN           = '/usr/local/pgsql/bin'
 #PGDATA          = '/pgdata'

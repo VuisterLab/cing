@@ -432,8 +432,8 @@ class caspNmrCing(Lister):
         NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
 
         self.entry_list_all.addList( self.entry_anno_list_all )
-        for entry in entryList:
-            self.entry_list_all.append( entry + 'Org' )
+#        for entry in entryList:
+#            self.entry_list_all.append( entry + 'Org' )
 
         self.entry_list_todo.addList(self.entry_list_all)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
@@ -641,7 +641,7 @@ class caspNmrCing(Lister):
                         x = output.split('/')[1] # ./Molecularsystem/HTML/mol.gif
                     except:
 #                        TODO: enable again for this is a valid check it just ruins my output on development.
-                        NTwarning("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
+                        NTwarning("Failed to find molecular system name for %s from output listing of mol image: [%s]" % (pdb_entry_code,output))
                         x = 'Molecularsystem' # but not always.
 #                NTdebug("found molecular system name: %s" % x)
 

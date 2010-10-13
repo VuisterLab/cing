@@ -26,12 +26,13 @@ from cing import cingRoot
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG import nrgCing
 from cing.NRG.PDBEntryLists import getPdbEntries
 from glob import glob
 
 cing.verbosity = cing.verbosityDebug
-
-csvFileDir = os.path.join(cingRoot, "data/NRG/bmrbPdbMatch")
+n = nrgCing()
+csvFileDir = os.path.join(cingRoot, n.matchBmrbPdbDataDir)
 os.chdir(csvFileDir)
 relationNames = glob("*.csv")
 relationNames = [ relationName[:-4] for relationName in relationNames]

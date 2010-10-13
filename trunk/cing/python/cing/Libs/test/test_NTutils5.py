@@ -90,6 +90,11 @@ class AllChecks(TestCase):
         tExpected = [ (0,0,0), (0,10,1), (37,59,1) ]
         for i,t in enumerate(tList):
             self.assertEquals(timedelta2HoursMinutesAndSeconds(t), tExpected[i])
+    def testNTlist(self):
+        ntList = NTlist([7,8,9])
+        NTdebug("ntList: " + str(ntList) +"  length: " + len(ntList))
+        ntList.clear()
+        NTdebug("ntList: " + str(ntList) +"  length: " + len(ntList))
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

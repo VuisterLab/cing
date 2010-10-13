@@ -115,18 +115,21 @@ class nrgCingPlot():
             self.engine = self.jsql.engine
             self.brief_summary = self.jsql.brief_summary
             self.bs = self.brief_summary.alias()
-        if True:
-            self.showCounts()
 
     def showCounts(self):
         m = self
-        if True:
+        if False:
             tableList = [m.centry, m.cchain, m.cresidue, m.catom, m.brief_summary]
-            countList = [m.query(table).count() for table in tableList]
+#            countList = [m.query(table).count() for table in tableList]
+
+            countList = []
+            for table in tableList:
+                countList.append( m.query(table).count())
+
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
             NTmessage(NRG_DB_SCHEMA + " schema contains: %s entries %s chains %s residues %s atoms\npdbj schema contains %s entries." % countStrTuple)
 
-        if True:
+        if False:
             tableList = [m.csummary, m.centry_list_selection]
             countList = [m.query(table).count() for table in tableList]
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
@@ -282,8 +285,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         # Sorted by project, program.
 
         try:
-            from localPlotList2 import plotList
+            djaflsjlfjalskdjf #@UndefinedVariable
+            from localPlotList import plotList
         except:
+            NTtracebackError()
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
             [ PROJECT_LEVEL, CING_STR, DIS_MAX_ALL_STR, {} ],
@@ -345,7 +350,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 bins_input = num_bins
                 if xmax != None and xmin != None:
 #                    NTdebug("Creating the non-standard x-range.")
-                    bins_input = linspace(xmin,xmax,num_bins,endpoint=True)
+                    bins_input = numpy.linspace(xmin,xmax,num_bins,endpoint=True)
 
                 n, bins, _patches = hist(floatValueList, bins_input, normed=normed, facecolor='green', alpha=0.75)
                 # Draw a line to fit.
@@ -354,7 +359,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     plot(bins, y, 'r--', linewidth=1)
                 else:
                     halve_bin_size = (bins[1] - bins[0])/2.
-                    x = linspace(min(bins)+halve_bin_size, max(bins)-halve_bin_size, num_bins)
+                    x = numpy.linspace(min(bins)+halve_bin_size, max(bins)-halve_bin_size, num_bins)
                     y = array(n)
 #                    NTdebug("x:    %s %s" % (len(x), x))
 #                    NTdebug("y:    %s %s" % (len(y), y))
@@ -379,7 +384,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                         NTmessage("Success: %s" % success)
                         msg = "Fit with maxValueHist, mu, variance             : %8.3f %8.3f %8.3f" % tuple(p1)
                         NTmessage(msg)
-                    t = linspace(min(bins), max(bins), num_points_line)
+                    t = numpy.linspace(min(bins), max(bins), num_points_line)
                     if False:
                         NTdebug("Plotting fit")
                         q = p1
@@ -635,4 +640,7 @@ if __name__ == '__main__':
         m.createScatterPlotGreenVersusRed()
     if True:
         m.createPlots()
+    if False:
+        m.showCounts()
+
     NTmessage("done with makeNRGCINGplots")

@@ -82,4 +82,3 @@ if __name__ == '__main__':
     whyNotStr = '%s' % whyNot
     NTdebug("whyNotStr: ["+ whyNotStr +"]")
     writeTextToFile("NRG-CING.txt", whyNotStr)
-

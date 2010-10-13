@@ -105,6 +105,8 @@ class NTlist(list, Lister):
         self.n = 0
 
     #end def
+    def clear(self):
+        self.__init__()
 
     def __call__(self, index=-1):
         if index < 0:

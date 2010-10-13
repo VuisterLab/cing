@@ -1,7 +1,6 @@
 # python -u $CINGROOT/python/cing/NRG/validateForCASP_NMR.py
 from cing import cingPythonDir
 from cing.NRG import CASP_NMR_BASE_NAME
-from cing.NRG.CaspNmrMassageCcpnProject import baseDir
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
@@ -19,11 +18,11 @@ pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasp.py')
 #pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
 if True:
-    entryListFileName = os.path.join(baseDir, 'list', 'entry_list_all.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
-    entryListFileName = os.path.join(baseDir, 'list', 'entry_list_single.csv')
+    entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
 #    entryList = 'T0538Org T0538TS001 T0538TS039'.split()
     entryList = 'T0538Org T0538TS001'.split()
 #    entryList = 'T0538Org'.split()
