@@ -28,6 +28,7 @@ big_dir         = results_dir                           # NRG data large in size
 dir_star        = os.path.join(big_dir,'star')
 dir_link        = os.path.join(big_dir,'link')
 dir_plot        = os.path.join(big_dir,'plot')
+dir_plotTrending= os.path.join(big_dir,'plotTrend')
 
 
 dir_prep        = os.path.join(big_dir, 'prep')
