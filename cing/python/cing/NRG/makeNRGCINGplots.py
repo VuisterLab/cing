@@ -8,7 +8,7 @@ Create plots like the GreenVersusRed scatter by entry.
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
-from cing.NRG.settings import dir_plot
+from cing.NRG.settings import * #@UnusedWildImport
 from cing.PluginCode.matplib import NTplot
 from cing.PluginCode.matplib import NTplotSet
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
@@ -30,6 +30,7 @@ from sqlalchemy.sql.expression import select #@Reimport @UnusedImport
 import numpy
 
 
+
 if False:
     from matplotlib import use #@UnusedImport
     use('TkAgg') # Instead of agg
@@ -43,11 +44,13 @@ DIVIDE_BY_RESIDUE_COUNT = 'divideByResiduecount'
 ONLY_PROTEIN = 'onlyProtein'
 'Only protein means that no other polymer types than xxx may be present; ligands are fine.'
 ONLY_SELECTION = 'onlySelection'
+DO_TRENDING = 'doTrending'
 ENTRY_SET_ID = 'entrySetId'
 'Used to filter for different sets of selected entries.'
 ONLY_NON_ZERO = 'onlyNonZero'
 'Filter out entities that have a zero float/int value'
-
+PDBJ_ENTRY_ID_STR = 'pdbid'
+DEPOSITION_DATE_STR = 'deposition_date'
 #db_name = PDBJ_DB_NAME
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
@@ -67,6 +70,33 @@ def getDbColumnName( level, progId, chk_id ):
     return columnName
 
 
+def fitDatefuncD2 (p, xDate):
+    return p[0] * date2num(xDate) + p[1]
+
+def fitDatefuncD1 (p, xDate):
+    return p[0]
+
+def bin_by(x, y, nbins=None, ymin=None, ymax=None):
+    """
+    Bin x by y.
+    Returns the binned "x",'y' values and the left edges of the bins
+    """
+    if nbins == None:
+        nbins = 6
+    if ymin == None:
+        ymin = y.min()
+    if ymax == None:
+        ymax = y.max()
+    bins = np.linspace(ymin, ymax, nbins + 1)
+    # To avoid extra bin for the max value
+    bins[-1] += 1
+    indicies = np.digitize(y, bins)
+    output = []
+    for i in xrange(1, len(bins)):
+        output.append(x[indicies == i])
+    # Just return the left edges of the bins
+    bins = bins[:-1]
+    return output, bins
 
 class nrgCingPlot():
     def __init__(self):
@@ -129,7 +159,7 @@ class nrgCingPlot():
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
             NTmessage(NRG_DB_SCHEMA + " schema contains: %s entries %s chains %s residues %s atoms\npdbj schema contains %s entries." % countStrTuple)
 
-        if False:
+        if True:
             tableList = [m.csummary, m.centry_list_selection]
             countList = [m.query(table).count() for table in tableList]
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
@@ -139,7 +169,7 @@ class nrgCingPlot():
     def createDepTables(self):
         NTmessage("creating temporary tables")
         stmt1 = 'drop table if exists nrgcing.cingsummary cascade'
-        # The full molecular weight; not just the polymers
+        # The full molecular weight > 3.5 kDa,; not just the polymers
         stmt2 = """
 CREATE table nrgcing.cingsummary AS
 SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
@@ -175,7 +205,12 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             table = m.a1
         return table
 
-    def getFloatListFromDb(self, level, progId, chk_id, **plotDict):
+    def getFloatLoLFromDb(self, level, progId, chk_id, **plotDict):
+        '''Returns a LoL with the
+        first element being a tuple with elements (entry_id, chain_id, res_num, atom_num) and
+        second element being a float
+        third optional element being the deposition date needed for trending.
+        '''
         m = self
         columnName = getDbColumnName( level, progId, chk_id )
     #    NTdebug("Found column: %s for level, progId, chk_id: %s" % (columnName,str([level, progId, chk_id])))
@@ -185,6 +220,20 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         _filterForProtein = getDeepByKeysOrAttributes( plotDict, ONLY_PROTEIN)
         filterForSelection = getDeepByKeysOrAttributes( plotDict, ONLY_SELECTION)
         filterZero = getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO)
+        doTrending = getDeepByKeysOrAttributes( plotDict, DO_TRENDING)
+
+        if doTrending: # optimalization is to ignore the 'pure' X-ray,
+            # First get the entry pdb_id info
+            try:
+                s = select([m.bs.c[PDBJ_ENTRY_ID_STR], m.bs.c[DEPOSITION_DATE_STR]])
+        #        NTdebug("SQL: %s" % s)
+                pdbIdDateResultTable = m.execute(s).fetchall()
+            except:
+                NTtracebackError()
+                return
+            pdbIdDateResultDict = NTdict() # hash by entry id
+            pdbIdDateResultDict.appendFromTable(pdbIdDateResultTable, 0, 1)
+        # end trending.
 
         # First get the entry pdb_id info
         try:
@@ -246,6 +295,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #    NTdebug("checkResultTable: %s" % str(checkResultTable))
         result = []
         for i,element in enumerate(checkResultTable):
+
             entry_id = element[0]
             v = float(element[1])
             pdb_id = entryIdPdbIdResultDict[entry_id]
@@ -269,51 +319,73 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 if v == 0.0:
                     NTdebug("Unexpected zero value for %s %s" % (entry_id, pdb_id))
                     continue
-            result.append(v)
+#            resultIdTuple = ( pdb_id, chain_id, res_num, atom_id)
+            resultIdTuple = ( pdb_id, )
+            resultRecord = [ resultIdTuple, v ]
+            if doTrending:
+                dateObject = getDeepByKeysOrAttributes( pdbIdDateResultDict, pdb_id)
+                if dateObject == None: # obsoleted entries
+#                    NTmessage("Skipping obsoleted entry: %s" % pdb_id)
+                    continue
+                # end if date
+                resultRecord.append( dateObject )
+            # end trending
+            result.append(resultRecord)
     #    NTdebug("len(y): %s" % len(y))
     #    result = [float(y[i]) for i in range(len(x))]
-    #    NTdebug("result: %s" % str(y))
+#        NTdebug("result: %s" % str(result))
         return result
 
 
-    def createPlots(self):
+    def createPlots(self, doTrending = False):
         ''' The code below can use settings in the form of a dictionary that influences the
-        plotting.'''
+        plotting.
+        doTrending shows history on x-axis.
+        '''
         m = self
-        graphicsFormat = "png"
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
 
+        if doTrending:
+            os.chdir(dir_plotTrending)
         try:
             djaflsjlfjalskdjf #@UndefinedVariable
             from localPlotList import plotList
         except:
-            NTtracebackError()
+#            NTtracebackError()
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-            [ PROJECT_LEVEL, CING_STR, DIS_MAX_ALL_STR, {} ],
+            [ PROJECT_LEVEL, WHATIF_STR, NQACHK_STR, {ONLY_SELECTION:1} ],
             ]
+
 
         for p in plotList:
             level, progId, chk_id, plotDict = p
+            if doTrending:
+                plotDict[DO_TRENDING] = 1
             chk_id_unique = '.'.join([level,progId,chk_id])
             NTdebug("Starting with: %s" % chk_id_unique)
-            floatValueList = m.getFloatListFromDb(level, progId, chk_id, **plotDict)
+            floatValueLoL = m.getFloatLoLFromDb(level, progId, chk_id, **plotDict)
+
             if False: # DEFAULT False. Block used for checking procedures.
                 mu = 100.
                 sigma = sqrt(5)
-                floatValueList = [gauss(mu, sigma) for i in range(100000)]
+                floatValueLoL = [[None, gauss(mu, sigma)] for i in range(100000)]
 
-            if len(floatValueList) == 0:
-                NTmessage("Got empty float list from db for: %s skipping plot" % chk_id_unique)
+            if len(floatValueLoL) == 0:
+                NTmessage("Got empty float LoL from db for: %s skipping plot" % chk_id_unique)
                 continue
-            if not floatValueList:
-                NTerror("Encountered and error while getting float list from db for: %s skipping plot" % chk_id_unique)
+            if not floatValueLoL:
+                NTerror("Encountered and error while getting float LoL from db for: %s skipping plot" % chk_id_unique)
                 continue
-            floatNTlist = NTlist(*floatValueList)
+
+            floatNTlist = NTlist()
+            for i in range(len(floatValueLoL)):
+                floatNTlist.append(floatValueLoL[i][1])
             av, sd, n = floatNTlist.average()
             minValue = floatNTlist.min()
             maxValue = floatNTlist.max()
+
 
             if False: # DEFAULT: True. Disable when testing.
                 if minValue == maxValue:
@@ -331,6 +403,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 titleStr += ' onlySel'
             if getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO):
                 titleStr += ' only!zero'
+
+
             xmin = None
             xmax = None
             if getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR) and \
@@ -340,8 +414,70 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 titleStr += ' [%.3f,%.3f]' % (xmin,xmax)
 
             NTmessage("Plotting level/program/check: %10s %10s %15s with options: %s %s" % (level,progId,chk_id,titleStr,plotDict))
-            if True:
-                clf()
+            clf()
+
+            if doTrending:
+                num_points_line = 100
+                y = floatNTlist
+                x = NTlist()
+                xDate = NTlist()
+                for i in range(len(floatNTlist)):
+                    dateObject = floatValueLoL[i][2]
+                    x.append(date2num(dateObject))
+                    xDate.append(dateObject)
+                # end list creation.
+#                scatter(xDate, y, s=0.1) # Plot of the data and the fit
+                p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial
+                NTmessage("Fit with terms             : %s" % p)
+                titleStr += ' trending %s per year' % (p[0]*365.)
+
+                t = [min(xDate), max(xDate)] # Only need 2 points for straight line!
+                plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
+                # Now bin
+                yearMin = 1990 # inclusive start
+                yearMax = 2012 # exclusive end
+                yearBinSize = 2
+                nbins = 11 # should match above. last bin will start at 2010
+                dateMin = datetime.date(yearMin, 1, 1)
+                dateMax = datetime.date(yearMax, 1, 1)
+                dateNumMin = date2num(dateMin)
+                dateNumMax = date2num(dateMax)
+#                dateNumSpan = dateNumMax - dateNumMin
+                halfBinSize = datetime.timedelta(365*yearBinSize/2.)
+                NTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
+                if False: # test positions
+                    testX = [dateMin,dateMax]
+                    testY = [-10.,0.]
+                    plot(testX, testY)
+
+#                nr = 100 # number of records
+#                x = np.random.random(nr) * dateNumSpan + dateNumMin
+                x = np.array(x)
+#                y = np.random.random(nr) * 10
+                y = np.array(y)
+                print "x: %s" % x
+                print "y: %s" % y
+                binned_valueList, numBins = bin_by(y, x, nbins=nbins, ymin=dateNumMin, ymax=dateNumMax)
+                bins = []
+                widths = []
+                dataAll = []
+                for i,bin in enumerate(numBins):
+                    bins.append(num2date(bin) + halfBinSize )
+                    widths.append(datetime.timedelta(365)) # 1 year width for box
+                    spread = binned_valueList[i]
+                    spread.sort()
+                    aspread = asarray(spread)
+                    dataAll.append(spread)
+                    NTdebug("aspread: %s" % aspread)
+                # end for
+                NTdebug("numBins: %s" % numBins)
+#                sym = '' # no symbols
+                sym = 'k.'
+                wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
+#                scatter(x, y, s=0.1) # Plot of the data and the fit
+                print 'wiskLoL: %s' % wiskLoL
+                xlim(xmin=dateMin, xmax=dateMax)
+            else:
                 # Histogram the data
                 normed = 0 # Default zero
                 num_bins = 50
@@ -352,7 +488,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #                    NTdebug("Creating the non-standard x-range.")
                     bins_input = numpy.linspace(xmin,xmax,num_bins,endpoint=True)
 
-                n, bins, _patches = hist(floatValueList, bins_input, normed=normed, facecolor='green', alpha=0.75)
+                n, bins, _patches = hist(floatValueLoL, bins_input, normed=normed, facecolor='green', alpha=0.75)
                 # Draw a line to fit.
                 if normed:
                     y = mlab.normpdf( bins, av, sd) # would loose the y-axis count by a varying scale factor. Not desirable.
@@ -392,12 +528,20 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                         NTdebug("Plotting analytically parameterized function.")
                         q = p0
                     plot(t, fitfunc(q, t), "r--", linewidth=1) # Plot of the data and the fit
+                    ylabel('Frequency')
+                # end else normed
                 grid(True)
-                xlabel(chk_id_unique)
-                ylabel('Frequency')
-                title(titleStr)
-                fn = "plotHist_%s.%s" % (chk_id_unique, graphicsFormat)
+            # end else trending
+
+            xlabel(chk_id_unique)
+            title(titleStr)
+            for fmt in ['png', 'eps']:
+                fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
+                NTdebug("Writing " + fn)
                 savefig(fn)
+#~
+        # end for plot
+    # end def
 
 
     def createScatterPlotGreenVersusRed(self):
@@ -624,13 +768,18 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 xlabel(elementNameList[elementIdx])
                 ylabel('perc. residues %s' % colorNameList[colorIdx])
 
-                fn = strTitle + '.png'
-                NTdebug("Writing " + fn)
-                ps.hardcopy(fn)
+                for fmt in ['.png', '.eps']:
+                    fn = strTitle + fmt
+                    NTdebug("Writing " + fn)
+                    ps.hardcopy(fn)
 
 if __name__ == '__main__':
-#    cing.verbosity = verbosityDebug
+    cing.verbosity = verbosityDebug
     m = nrgCingPlot()
+
+    if True:
+        m.createPlots(doTrending = True)
+
     if False:
         m.perEntryRog = NTdict()
         m.plotQualityVsColor()
@@ -638,8 +787,6 @@ if __name__ == '__main__':
         m.getAndPlotColorVsColor(doPlot = True)
     if False:
         m.createScatterPlotGreenVersusRed()
-    if True:
-        m.createPlots()
     if False:
         m.showCounts()
 
