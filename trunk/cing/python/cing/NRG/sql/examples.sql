@@ -117,5 +117,10 @@ JOIN "//entity/formula_weight" p3           ON p3.docid = e.docid AND p3.pos BET
 WHERE s.pdbid = '1ai0'
 
 
+SELECT e.pdb_id, bs.deposition_date FROM "nrgcing"."cingentry" as e, brief_summary bs
+where e.wi_ramchk > 4.0 AND
+e.pdb_id = bs.pdbid;
+
+
 
 
