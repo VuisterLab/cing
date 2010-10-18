@@ -3706,11 +3706,11 @@ coordinates: %s"""  , dots, self, dots
     #end def
 
     def topology( self ):
-        """return list of Atom instances defining the topology"""
+        """return list of Atom instances defining the topology. Returns None on error"""
         if self._topology != None:
             return self._topology
-        else: #old style#
-            return translateTopology( self._parent, self.db.topology )
+        #old style#
+        return translateTopology( self._parent, self.db.topology )
     #end def
 
     def isAssigned( self ):
@@ -3859,6 +3859,13 @@ coordinates: %s"""  , dots, self, dots
         None otherwise
         """
         if not self.isProton():
+            return None
+        topology = self.topology()
+        if topology == None:
+            NTerror("Failed to get topology for heavy atom routine: %s" % self)
+            return None
+        if len(topology) < 1:
+            NTerror("Failed to get any atom in topology for heavy atom routine: %s" % self)
             return None
         return self.topology()[0]
     #end def

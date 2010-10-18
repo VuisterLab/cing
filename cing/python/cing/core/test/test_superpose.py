@@ -20,9 +20,10 @@ class AllChecks(TestCase):
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
 
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
+        pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)
+        pdbFileName = "pdb" + entryId + ".ent"
+        pdbFilePath = os.path.join( pdbDirectory, pdbFileName)
+        self.failIf( not os.path.exists(pdbFilePath), msg= "Failed to find file: "+pdbFilePath)
 
         self.failIf( os.chdir(cingDirTmp), msg=
             "Failed to change to directory for temporary test files: "+cingDirTmp)
@@ -42,13 +43,13 @@ class AllChecks(TestCase):
         ens = project.molecule.superpose(backboneOnly=True, includeProtons = False, iterations=2)
         NTdebug( 'ens %s' % ens)
         NTdebug( 'ens.averageModel %s' % ens.averageModel)
-        self.assertAlmostEquals( 0.69790510166584319, ens.averageModel.rmsd, 3 )
+        self.assertAlmostEquals( 0.7643199324863148, ens.averageModel.rmsd, 3 )
         # Confirmed to be the 'averaage RMSD to mean: 0.698' in molmol using command
         #    Fit 'to_mean'.
         ens = project.molecule.superpose(backboneOnly=False, includeProtons = False,
                                          iterations=3) # no improvement to do 3 over the default 2 but left in for speed checking.
         NTdebug( 'ens.averageModel %s' % ens.averageModel)
-        self.assertAlmostEquals( 1.2384756312693235, ens.averageModel.rmsd, 3 )
+        self.assertAlmostEquals( 0.99383582432002637, ens.averageModel.rmsd, 3 )
         # Confirmed to be the 'averaage RMSD to mean: 1.238' in molmol using command
         #    Fit 'to_mean'. Using 'heavy' atom selection. CING got there much faster.
         # because algorithm in molmol probably does a full list of iterations (47 or so)
