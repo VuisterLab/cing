@@ -1,3 +1,5 @@
+# python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer3.py
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from pylab import * #@UnusedWildImport
 

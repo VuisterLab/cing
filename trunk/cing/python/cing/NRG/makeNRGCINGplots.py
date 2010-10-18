@@ -76,24 +76,25 @@ def fitDatefuncD2 (p, xDate):
 def fitDatefuncD1 (p, xDate):
     return p[0]
 
-def bin_by(x, y, nbins=None, ymin=None, ymax=None):
+def bin_by(y, x, nbins=None, ymin=None, ymax=None):
     """
-    Bin x by y.
-    Returns the binned "x",'y' values and the left edges of the bins
+    Bin y by x.
+
+    Returns the binned "y",'x' values and the left edges of the bins
     """
     if nbins == None:
         nbins = 6
     if ymin == None:
-        ymin = y.min()
+        ymin = x.min()
     if ymax == None:
-        ymax = y.max()
+        ymax = x.max()
     bins = np.linspace(ymin, ymax, nbins + 1)
     # To avoid extra bin for the max value
     bins[-1] += 1
-    indicies = np.digitize(y, bins)
+    indicies = np.digitize(x, bins)
     output = []
     for i in xrange(1, len(bins)):
-        output.append(x[indicies == i])
+        output.append(y[indicies == i])
     # Just return the left edges of the bins
     bins = bins[:-1]
     return output, bins
@@ -355,7 +356,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #            NTtracebackError()
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-            [ PROJECT_LEVEL, WHATIF_STR, NQACHK_STR, {ONLY_SELECTION:1} ],
+            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
             ]
 
 
@@ -426,10 +427,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     x.append(date2num(dateObject))
                     xDate.append(dateObject)
                 # end list creation.
-#                scatter(xDate, y, s=0.1) # Plot of the data and the fit
+                scatter(xDate, y, s=0.1) # Plot of the data and the fit
                 p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial
                 NTmessage("Fit with terms             : %s" % p)
-                titleStr += ' trending %s per year' % (p[0]*365.)
+                titleStr += ' trending %s per year' % (p[0]*365.25)
 
                 t = [min(xDate), max(xDate)] # Only need 2 points for straight line!
                 plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
@@ -437,7 +438,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 yearMin = 1990 # inclusive start
                 yearMax = 2012 # exclusive end
                 yearBinSize = 2
-                nbins = 11 # should match above. last bin will start at 2010
+                nbins = ( yearMax - yearMin ) / yearBinSize  # should match above. last bin will start at 2010
                 dateMin = datetime.date(yearMin, 1, 1)
                 dateMax = datetime.date(yearMax, 1, 1)
                 dateNumMin = date2num(dateMin)
@@ -466,12 +467,12 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     widths.append(datetime.timedelta(365)) # 1 year width for box
                     spread = binned_valueList[i]
                     spread.sort()
-                    aspread = asarray(spread)
+#                    aspread = asarray(spread)
                     dataAll.append(spread)
-                    NTdebug("aspread: %s" % aspread)
+                    NTdebug("spread: %s" % spread)
                 # end for
                 NTdebug("numBins: %s" % numBins)
-#                sym = '' # no symbols
+                sym = '' # no symbols
                 sym = 'k.'
                 wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
 #                scatter(x, y, s=0.1) # Plot of the data and the fit

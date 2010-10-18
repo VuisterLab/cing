@@ -1226,7 +1226,9 @@ def moleculeValidateAssignments( molecule  ):
                 # Check for protons with unassigned heavy atoms
                 if atm.isProton():
                     heavyAtm = atm.heavyAtom()
-                    if not heavyAtm.isAssigned():
+                    if heavyAtm == None:
+                        NTerror("Failed to get heavy for atm: %s" % atm)
+                    elif not heavyAtm.isAssigned():
                         spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
                         if spinType:
                             # Only complain if type has at least one assignment.

@@ -25,13 +25,12 @@ class AllChecks(TestCase):
         actuallyRunWhatif = False
         showValues = False
 
-        modelNum = 2 # Only used when simulating data
+        modelNum = 1 # Only used when simulating data
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
 #        entryId = "2hgh_1model"
-#        entryId = "1brv_1model"
-        entryId = "1brv"
+        entryId = "1brv_1model"
 
         pdbConvention = CYANA
         restraintsConvention = CYANA
