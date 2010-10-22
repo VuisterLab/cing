@@ -6,7 +6,7 @@ import unittest
 
 
 
-class AllChecks(TestCase):
+class AllChecks(TestCase, Lister):
 
     os.chdir(cingDirTmp)
 
@@ -17,9 +17,9 @@ class AllChecks(TestCase):
         self.assertTrue(m1t==m2)
     def testLister(self):
         self.dummy = "dumb"
-        NTdebug( "%r", self )
+        NTdebug( "Self is: %r", self )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    cing.verbosity = verbosityError
+#    cing.verbosity = verbosityError
     unittest.main()

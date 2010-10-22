@@ -3751,26 +3751,6 @@ def formatList(theList, fmt = '%s\n'):
     return ''.join(result)
 #end def
 
-######################################################################################################
-# This code is repeated in cing/setup.py and cing/Libs/NTutils.py please keep it sync-ed
-######################################################################################################
-def NTgetoutput(cmd):
-    """Return output from command as (stdout,sterr) tuple"""
-#    inp, out, err = os.popen3(cmd)
-    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
-    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
-
-    output = ''
-    for line in out.readlines(): output += line
-    errors = ''
-    for line in err.readlines(): errors += line
-    inp.close()
-    out.close()
-    err.close()
-    return (output, errors)
-#end def
-
-
 class ExecuteProgram(NTdict):
     """
     Base Class for executing external programs on Unix like systems.
