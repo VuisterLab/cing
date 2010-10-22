@@ -9,7 +9,7 @@ source $0:h/settings.csh
 
 set doSvnUpdate = 1
 set doTest      = 0
-set doRun       = 1
+set doRun       = 0
 
 ##No changes required below this line
 ###############################################################################
@@ -41,10 +41,10 @@ if ( $isProduction ) then
 endif
 
 if ( $doSvnUpdate ) then
-    # I wonder if svn updating this file will corrupt my fine little system here by biting it's own tail?
+    # When svn updating this file will corrupt my fine little system here by biting it's own tail. Manual step needed.
     cd $CINGROOT
     echo "Doing svn update." | & tee -a $log_file
-    svn --force update --non-interactive . | & tee -a $log_file
+    svn --force --non-interactive --accept theirs-full update . | & tee -a $log_file
     cd
 endif
 scp -q $log_file $TARGET_SDIR
