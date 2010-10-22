@@ -135,7 +135,7 @@ class ForkOff:
     of jobs) that were done AND done successfully.
     Empty lists will be returned if nothing gets done successfully
     """
-    def forkoff_start( self, job_list, delay_between_submitting_jobs ):
+    def forkoff_start( self, job_list, delay_between_submitting_jobs=5 ):
 
         ## Check job list for variable type errors
         for job in job_list:
@@ -186,8 +186,9 @@ class ForkOff:
             self.do_jobs( job_list, delay_between_submitting_jobs )
         except KeyboardInterrupt:
             if self.verbosity:
-                NTwarning("Again caught interrupt in parent.")
-                NTwarning("Can't finish if you don't let me.")
+                NTwarning("Again caught interrupt in parent. Will start to kill running jobs.")
+                if self.hard_kill_started_jobs():
+                    NTerror("Failed hard killing running jobs")
             raise KeyboardInterrupt
 
         ## Any subprocesses left
@@ -217,12 +218,32 @@ class ForkOff:
         ## List of job numbers that were done.
         return self.done_jobs_list
 
+    def hard_kill_started_jobs( self ):
+        """
+        Kill kill kill
+        """
+        keys = self.process_t.keys()
+        NTmessage("Killing jobs: %s" % str(keys))
+        ## Check to see if time's done for any
+        for pid in keys:
+            ## Pop pid/args from dictionary
+            fid = self.process_d[ pid ]
+            del self.process_d[ pid ]
+            del self.process_t[ pid ]
+            self.processes_open     -= 1
+            self.processes_finished += 1
+            if self.verbosity:
+                NTwarning("Process pid [%s] and fid [%s] will be killed" % (pid, fid))
+                NTwarning("Process is not considered done")
+            _exit_pid, _exit_status = self.p.process_kill( pid )
+        # end for
+    # end def
 
-    """
-    Starting independent processes given a list of function with
-    list of arguments
-    """
     def do_jobs( self, job_list, delay_between_submitting_jobs ):
+        """
+        Starting independent processes given a list of function with
+        list of arguments
+        """
 
         while ( self.processes_started  < self.processes_todo or
                 self.processes_open     > 0 ):
@@ -236,6 +257,8 @@ class ForkOff:
                 self.processes_open     += 1
                 self.processes_started  += 1
                 pid = self.p.process_fork( func, args )
+#                NTmessage("Process with pid [%s] exited with status [%s]" % \
+
                 ## Push pid/fid onto dictionary of things running
                 self.process_d[ pid ] = self.processes_started - 1
                 self.process_t[ pid ] = time.time()
@@ -278,8 +301,7 @@ class ForkOff:
                     self.processes_open     -= 1
                     self.processes_finished += 1
                     if self.verbosity:
-                        NTwarning("Process with fid [%s] was not done within time limits" \
-                              % fid)
+                        NTwarning("Process with fid [%s] was not done within time limits" % fid)
                         NTwarning("Process is not considered done")
                     _exit_pid, _exit_status = self.p.process_kill( pid )
                     ## If a process needed to be killed then
@@ -292,10 +314,10 @@ class ForkOff:
 
 
 
-"""
-Class for process oriented functions used by ForkOff.
-"""
 class Process:
+    """
+    Class for process oriented functions used by ForkOff.
+    """
 
     def __init__( self,
             ## After sending a killing signal how long do we wait for it to die (and perhaps

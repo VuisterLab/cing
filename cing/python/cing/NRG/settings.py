@@ -36,6 +36,8 @@ dir_C           = os.path.join(dir_prep, 'C')
 dir_R           = os.path.join(dir_prep, 'R')
 dir_S           = os.path.join(dir_prep, 'S')
 dir_F           = os.path.join(dir_prep, 'F')
+dir_vCing       = os.path.join(dir_prep, 'vCing')
+
 # Postgres install but are they needed?
 #PGBIN           = '/usr/local/pgsql/bin'
 #PGDATA          = '/pgdata'

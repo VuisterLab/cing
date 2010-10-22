@@ -4,8 +4,8 @@
 
 from cing import cingDirTestsData
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.network import getRandomKey
 import mimetools
-import random
 import urllib2
 
 FORM_ACCESS_KEY = "AccessKey"
@@ -39,15 +39,6 @@ rpcUrl=DEFAULT_URL+"/icing/serv/iCingServlet"
 #    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/iCingServlet"
 
 NTmessage("rpcUrl: " + rpcUrl)
-
-def getRandomKey(size=6):
-    """Get a random alphanumeric string of a given size"""
-    # Suggesting something from what Tim took:
-    ALPHANUMERIC = [chr(x) for x in range(48,58)+range(65,91)+range(97,123)]
-    random.shuffle(ALPHANUMERIC)
-    n = len(ALPHANUMERIC)-1
-    random.seed(time.time()*time.time())
-    return ''.join([ALPHANUMERIC[random.randint(0,n)] for x in range(size)])
 
 def getResultUrls(credentials, entryId, url=None):
 
