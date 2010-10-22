@@ -72,7 +72,7 @@ class vCing(Lister):
 
         self.DEFAULT_URL = 'http://nmr.cmbi.ru.nl/NRG-CING/recoordSync'
         self.MASTER_SSH_URL = master_ssh_url
-        self.MASTER_D = '/Library/WebServer/Documents'
+        self.MASTER_D = '/Library/WebServer/Documents' # This is a mac but can be adjusted.
         self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
         self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
@@ -113,8 +113,10 @@ class vCing(Lister):
         return status
     # end def
 
-    def keepLockFresh(self, lockname, lockTimeOut):
+    def keepLockFresh(self, lockname, lockTimeOut, maxSleapingTime = max_time_to_wait_per_job):
+        maxSleapingTime += 100 # process will be killed outside first so we give it some extra time here for it to be reaped.
         sleepTime = lockTimeOut / 2 + 1
+        sleptTime = 0
         while True:
             NTdebug("keepLockFresh doing a refreshLock")
             status = self.refreshLock(lockname, lockTimeOut)
@@ -124,6 +126,10 @@ class vCing(Lister):
                 break
             NTdebug("refreshLock will now sleep for: %s" % sleepTime)
             time.sleep(sleepTime)
+            sleptTime += sleepTime
+            if sleptTime > maxSleapingTime:
+                NTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
+                break
             # end if
         # end while
     # end def
@@ -341,7 +347,7 @@ class vCing(Lister):
 
         job_list = []
         ncpus = detectCPUs()
-        if True: # DEFAULT: False
+        if False: # DEFAULT: False
             ncpus = 4
         for i in range(ncpus):
             date_stamp = getDateTimeStampForFileName()
