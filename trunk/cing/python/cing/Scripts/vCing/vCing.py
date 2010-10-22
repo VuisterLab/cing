@@ -118,15 +118,15 @@ class vCing(Lister):
         sleepTime = lockTimeOut / 2 + 1
         sleptTime = 0
         while True:
+            NTdebug("refreshLock will now sleep for: %s" % sleepTime)
+            time.sleep(sleepTime)
+            sleptTime += sleepTime
             NTdebug("keepLockFresh doing a refreshLock")
             status = self.refreshLock(lockname, lockTimeOut)
 #            NTdebug("In keepLockFresh got status: %s and result (if any) [%s]" % (status, result))
             if status:
                 NTmessage("In keepLockFresh got status: %s. This indicates that the token process finished." % status)
                 break
-            NTdebug("refreshLock will now sleep for: %s" % sleepTime)
-            time.sleep(sleepTime)
-            sleptTime += sleepTime
             if sleptTime > maxSleapingTime:
                 NTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
                 break
@@ -149,7 +149,10 @@ class vCing(Lister):
     # end def
 
     def getToken(self, token):
-        "Returns None for on error"
+        """"
+        Returns None for on error and tokenContent on success.
+        I don't understand why the topos getToken call fails every now and then but when retried it seems to work fine.
+        """
         cmdTopos = ' '.join([self.toposProg, 'getToken', self.toposPool, token])
         ntries = 3
         sleepTime = 10
@@ -160,9 +163,9 @@ class vCing(Lister):
             NTdebug("In getToken doing [%s]" % cmdTopos)
             status, tokenContent = commands.getstatusoutput(cmdTopos)
             if not status:
+                NTdebug("Got token content on try: %d: [%s]" % (i, tokenContent))
                 return tokenContent
-            else:
-                NTwarning("Failed to get token on try: %d with output message: [%s]" % (i, tokenContent))
+            NTwarning("Failed to get token on try: %d with output message: [%s]" % (i, tokenContent))
             # end if
             NTdebug("In getToken sleeping %s" % sleepTime)
             time.sleep(sleepTime)
@@ -267,7 +270,7 @@ class vCing(Lister):
             NTdebug("Created a background process [%s] keeping the lock" % pid)
             time.sleep(2)
             tokenContent = self.getToken(token)
-            if not tokenContent:
+            if tokenContent == None:
                 tokenContent = self.NO_TOKEN_CONTENT_STR
                 msg = "Failed to get token content. Deleting token."
                 NTerror(msg)
