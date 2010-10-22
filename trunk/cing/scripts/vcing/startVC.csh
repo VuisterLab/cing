@@ -9,7 +9,7 @@ source $0:h/settings.csh
 
 set doSvnUpdate = 1
 set doTest      = 0
-set doRun       = 0
+set doRun       = 1
 
 ##No changes required below this line
 ###############################################################################
