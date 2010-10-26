@@ -18,7 +18,14 @@ Your computer (host) must be pretty high end, specifically your processor must s
   * The desktop will contain an open browser to this Wiki for your reference.
   * A terminal program called Konsole is also open. It's icon looks like an old CRT screen showing a greater than sign.
   * If you like to run all of CING's unit tests you can type in that terminal: {{{cing --test -v 0}}}. The results are in /home/i/tmp/cingTmp. There is a link to that directory on your desktop. It should now contain all kind of files including images like: test_NTMoleculePlot.png.
-  * It is recommended to store your data on a shared folder on your host OS so that you will not loose it when you loose VC. Inside VC the shared folder will be in /mnt/hgfs.
+  * It is recommended to store your data on a shared folder on your host OS so that you will not loose it when you loose VC. You can mount the drive using e.g. MacFusion over ssh because in VC a ssh daemon is active. 
+  * For access inside VC to the host you will need to enable a shared folder in /mnt/hgfs by editing the network settings in VMware for VC. Reboot the VM to activate.
+  * In order to update to the latest version of cing type (acknowledge questions with tf i.e. theirs-fully):
+{{{
+cd $CINGROOT/
+svn update .
+}}}
+  * VC can run with as little as 1 Gb but is really happy with 2. Make sure you leave your host OS plenty of memory. Our experience is to run on 2 but preferably 4 Gb. Adjust the memory in the VMware settings for VC.
 
 = Batteries included =
   * Ubuntu 9.10 32 bit server with:
@@ -32,11 +39,12 @@ Your computer (host) must be pretty high end, specifically your processor must s
     * cython
   * Optional plugins:
 || aqua  || molmol           || wattos  ||
-|| ccpn  || procheck_nmr     || xplor   ||
-|| dssp  || talos            ||         ||
+|| ccpn  || procheck_nmr     || what if   ||
+|| dssp  || talos            || xplor        ||
 
-= Excluded =
-  * what if (work in progress)
+= To add =
+  * pyRoseta (in progress)
+  * Mars
   
 = Notes =
  * Have a look at CING's wiki pages LinuxInstallationGuide and VirtualCingTheMakingOf to see the fun you missed ;-)
