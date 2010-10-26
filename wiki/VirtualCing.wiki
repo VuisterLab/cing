@@ -26,7 +26,8 @@ cd $CINGROOT/
 svn update .
 }}}
   * VC can run with as little as 1 Gb but is really happy with 2. Make sure you leave your host OS plenty of memory. Our experience is to run on 2 but preferably 4 Gb. Adjust the memory in the VMware settings for VC.
-
+  * You may want to reset the password from 'ilovevc' to something like 'melovevc' for security reasons. The machine will really be available on your local network so be aware of the usual security issues. Changing the user name is really involved as a lot of customization was done. Adding a user is trivial.
+ 
 = Batteries included =
   * Ubuntu 9.10 32 bit server with:
     * convert
