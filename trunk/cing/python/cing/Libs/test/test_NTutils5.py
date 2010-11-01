@@ -96,6 +96,15 @@ class AllChecks(TestCase):
         ntList.clear()
         NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
 
+    def testTruth(self):
+        inputList = """t True  y yes 1 2 -1
+                       f False n no  0 0  0
+                    """.split()
+        resultList = [1,1,1,1,1,1,1,
+                      0,0,0,0,0,0,0]
+        for i, inputStr in enumerate(inputList):
+            NTdebug("Test: %d" % i)
+            self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     unittest.main()

@@ -44,6 +44,6 @@ echo "Starting nrgCing.csh with [$$] and [$0]" >>& $log_file
 # TODO: Remove next line when done.
 #exit 1
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py >>& $log_file
+python -u $CINGROOT/python/cing/NRG/nrgCing.py updateWeekly >>& $log_file
 
 echo "Finished" >>& $log_file

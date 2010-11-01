@@ -90,7 +90,7 @@ def main(entryId, *extraArgList):
     projectType = extraArgList[5]
     storeCING2db = False
     if len(extraArgList) >= expectedNumberOfArguments:
-        storeCING2db = extraArgList[6]
+        storeCING2db = stringMeansBooleanTrue( extraArgList[6] )
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass

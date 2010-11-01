@@ -153,9 +153,11 @@ class Relation():
             NTerror("Failed to write string to file: %s" % file_name)
             return True
 
-    def getHash(self, keyColumnLabel = None, ignoreDuplicateKeyWithoutWarning = False):
+    def getHash(self, keyColumnLabel = None, ignoreDuplicateKeyWithoutWarning = False, useSingleValueOfColumn = -1):
         """Takes a DMBS table and turns it into a hash on the keyColumnLabel with
-        values a list of all columns.
+        values a list of all columns. If return useSingleValueOfColumn is set to a columnId >= 0 then the value will
+        not be all columns as an array but simply a single value.
+
         If the keyColumnLabel is None then the first column will be used.
         One warning will be issued if the column contains multiple keys. The code
         will skip consecutive occurrences.
@@ -178,8 +180,11 @@ class Relation():
             if dic.has_key(k):
                 duplicateKeyFound = 'Last duplicate key found was for row idx: %s with key: %s' % ( idx, k )
                 continue
-            columnValues = [ columnList[i][idx] for i in range(self.sizeColumns())]
-            dic[k] = columnValues
+            if useSingleValueOfColumn >= 0:
+                dic[k] = columnList[useSingleValueOfColumn][idx]
+            else:
+                columnValues = [ columnList[i][idx] for i in range(self.sizeColumns())]
+                dic[k] = columnValues
 
         if duplicateKeyFound:
             if ignoreDuplicateKeyWithoutWarning:
@@ -296,6 +301,7 @@ class Relation():
             if sizeRows < 1 :
                 file_str.write("---  Empty Relation (%s columns but no rows) ---\n" % sizeColumns);
                 return file_str.getvalue()
+            # end if
             for r in range(sizeRows):
                 rowString = self.toStringRow( r )
                 if rowString == None:
@@ -303,6 +309,11 @@ class Relation():
                     return None
                 file_str.write( rowString ) # Get the row representation.
                 file_str.write('\n')
+            # end
+        else:
+            file_str.write("---  Relation contains %s rows ---\n" % sizeRows);
+        # end if
+
 
         return file_str.getvalue()
 
