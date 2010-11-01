@@ -1,6 +1,6 @@
 """
 This script will use NRG files to generate the CING reports as well as the
-indices that live on top of them.
+indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
@@ -22,102 +22,52 @@ Sum                4971048.908
 
 from cing import cingDirScripts
 from cing import cingPythonCingDir
-from cing import cingRoot
+from cing import header
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import mkdirs
 from cing.Libs.disk import rmdir
+from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRDone
-from cing.NRG.PDBEntryLists import getPdbEntries
+from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from cing.NRG.WhyNot import * #@UnusedWildImport
+from cing.NRG.settings import * #@UnusedWildImport
+from cing.Scripts.FC.convertStar2Ccpn import importFullStarProjects
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.vCing.vCing import vCing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from glob import glob
+from shutil import rmtree
 import csv
 import shutil
 import string
 
-def run():
-    """Return True on error"""
-    max_entries_todo = 0    # was 500 (could be as many as u like)
-    max_time_to_wait = 60 * 60 * 24 # 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
-    processes_max = 8    # number of cpus.
-    writeWhyNot = True
-    updateIndices = True
-    isProduction = True
-    getTodoList = True # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-    new_hits_entry_list = ['1ato'] # define empty for checking new ones.
-#    new_hits_entry_list = []
-#    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
+try:
+    from cing.Scripts.vCing.localConstants import pool_postfix
+except:
+    NTtracebackError() # code below is nonsense.
+#    pool_postfix = 'invalidPostFix'
 
-    ## Initialize the project
-    m = nrgCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
-                updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
-
-    if False: # Default False; use for reprocessing a batch.
-        entryListFileName = os.path.join(m.results_dir, 'entry_list_todo_all.csv')
-        new_hits_entry_list = readLinesFromFile(entryListFileName)
-        new_hits_entry_list = new_hits_entry_list[100:110]
-
-    NTdebug("Publish results at directory    : " + m.results_dir)
-    NTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
-
-    # Retrieve the linkages between BMRB and PDB entries.
-    if m.getBmrbLinks():
-        NTerror("Failed to get BMRB-PDB links")
-        return True
-
-    # Get the PDB info to see which entries can/should be done.
-    if m.searchPdbEntries():
-        NTerror("Failed to searchPdbEntries")
-        return True
-
-    if new_hits_entry_list:
-        m.entry_list_todo.addList(new_hits_entry_list)
-    elif getTodoList:
-        # Get todo list and some others.
-        if m.getEntryInfo():
-            NTerror("Failed to getEntryInfo (first time).")
-            return True
-
-    if m.entry_list_todo:
-        if m.runCing():
-            NTerror("Failed to runCing")
-            return True
-
-    # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
-    if m.getEntryInfo():
-        NTerror("Failed to getEntryInfo")
-        return True
-
-    if m.doWriteEntryLoL():
-        NTerror("Failed to doWriteEntryLoL")
-        return True
-
-    if m.doWriteWhyNot():
-        NTerror("Failed to doWriteWhyNot")
-        return True
-
-    if m.updateIndexFiles():
-        NTerror("Failed to update index files.")
-        return True
-# end def run
 
 
 class nrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
     def __init__(self,
-                 max_entries_todo = 1,
-                 max_time_to_wait = 20,
-                 processes_max = 2,
-                 prepareInput = False,
-                 writeWhyNot = False,
-                 writeTheManyFiles = False,
-                 updateIndices = False,
-                 isProduction = False
+                 new_hits_entry_list=None,
+                 useTopos=False,
+                 getTodoList=True,
+                 max_entries_todo=1,
+                 max_time_to_wait=86400, # one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
+                 processes_max=None,
+                 prepareInput=False,
+                 writeWhyNot=True,
+                 writeTheManyFiles=False,
+                 updateIndices=True,
+                 isProduction=True
                 ):
 
         self.writeWhyNot = writeWhyNot
@@ -131,8 +81,6 @@ class nrgCing(Lister):
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
 
-        self.matchBmrbPdbDataDir = "data/NRG/bmrbPdbMatch" # wrt $CINGROOT
-        self.matchBmrbPdbTable = 'newMany2OneTable'
         self.results_base = 'NRG-CING'
         self.results_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.data_dir = os.path.join(self.results_dir, 'data')
@@ -150,7 +98,10 @@ class nrgCing(Lister):
 
         self.max_entries_todo = max_entries_todo
         self.max_time_to_wait = max_time_to_wait
-        self.processes_max = processes_max
+        self.processes_max = detectCPUs()
+        if processes_max:
+            self.processes_max = processes_max
+#        self.processes_max = 2 # DEFAULT: commented out.
 
         ## How long to wait between submitting individual jobs when on the cluster.
         ##self.delay_between_submitting_jobs = 5
@@ -178,6 +129,10 @@ class nrgCing(Lister):
 
         ## List of 'new' entries for which hits were found
         self.new_hits_entry_list = NTlist()
+        if new_hits_entry_list:
+            self.new_hits_entry_list = new_hits_entry_list
+        self.useTopos = useTopos
+        self.getTodoList = getTodoList
         self.entry_list_pdb = NTlist()
         self.entry_list_nmr = NTlist()
         self.entry_list_nmr_exp = NTlist()
@@ -186,17 +141,17 @@ class nrgCing(Lister):
 
         # Stages are cumulative in that e.g. R always includes all from C. This simplifies this setup hopefully.
                       # id #name         #code
-        self.phaseList = [
-                     [ 0, 'Coordinate',  'C'],
-                     [ 1, 'Restraint',   'R'],
-                     [ 2, 'Shift',       'S'],
-                     [ 3, 'Filter',      'F'],
+        self.phaseDataList = [
+                     [ 'Coordinate', 'C'],
+                     [ 'Restraint', 'R'],
+                     [ 'Shift', 'S'],
+                     [ 'Filter', 'F'],
                       ]
         self.entry_list_prep_stage_C = NTlist()   # NMR entries prepared from mmCIF coordinates (NRG-DOCR entries will overrule these any time).
         self.entry_list_prep_stage_R = NTlist()   # Should include entry_list_nrg_docr if all came over from NRG-DOCR.
         self.entry_list_prep_stage_S = NTlist()   # Adds chemical shifts if available.
         self.entry_list_prep_stage_F = NTlist()   # Might be filtered otherwise simply stage S.
-        self.phaseList = [self.entry_list_prep_stage_C,self.entry_list_prep_stage_R,self.entry_list_prep_stage_S,self.entry_list_prep_stage_F]
+        self.phaseList = [self.entry_list_prep_stage_C, self.entry_list_prep_stage_R, self.entry_list_prep_stage_S, self.entry_list_prep_stage_F]
 
         # From disk.
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
@@ -207,18 +162,68 @@ class nrgCing(Lister):
         self.timeTakenDict = NTdict()
         self.entry_list_obsolete = NTlist()
         self.ENTRY_DELETED_COUNT_MAX = 2
+        self.wattosVerbosity = cing.verbosity
+        self.wattosProg = "java -Djava.awt.headless=true -Xmx1500m Wattos.CloneWars.UserInterface -at -verbosity %s" % self.wattosVerbosity
 
 
-    def getBmrbLinks(self):
-        """ Returns True for failure"""
+    def updateWeekly(self):
+        self.writeWhyNot = True     # DEFAULT: True.
+        self.updateIndices = True   # DEFAULT: True.
+        self.getTodoList = True     # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
+        self.max_entries_todo = 40  # DEFAULT: 40
 
-        dbms = DBMS()
-        matchBmrbPdbDataDirLocal = os.path.join(cingRoot, self.matchBmrbPdbDataDir) # Needs to change to live resource as well.
-        dbms.readCsvRelationList([ self.matchBmrbPdbTable ], matchBmrbPdbDataDirLocal)
-        mTable = dbms.tables[self.matchBmrbPdbTable]
-        self.matches_many2one = mTable.getHash() # hashes by first column to the next by default already.
-        NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
+#        self.new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
+    #    self.new_hits_entry_list = ['1brv']
+    #    self.new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
+        if False: # DEFAULT False; use for processing a specific batch.
+            entryListFileName = os.path.join(self.results_dir, 'entry_list_todo_all.csv')
+            self.new_hits_entry_list = readLinesFromFile(entryListFileName)
+            self.new_hits_entry_list = self.new_hits_entry_list[100:110]
+
+        NTmessage("In updateWeekly starting with:\n%r" % self)
+
+        # Retrieve the linkages between BMRB and PDB entries.
+        self.matches_many2one = getBmrbLinks()
+        if not self.matches_many2one:
+            NTerror("Failed to get BMRB-PDB links")
+            return True
+
+        # Get the PDB info to see which entries can/should be done.
+        if self.searchPdbEntries():
+            NTerror("Failed to searchPdbEntries")
+            return True
+
+        if self.new_hits_entry_list:
+            self.entry_list_todo.addList(self.new_hits_entry_list)
+        elif self.getTodoList:
+            # Get todo list and some others.
+            if self.getEntryInfo():
+                NTerror("Failed to getEntryInfo (first time).")
+                return True
+
+        if self.entry_list_todo:
+            if self.runCing():
+                NTerror("Failed to runCing")
+                return True
+
+        # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
+        if self.getEntryInfo():
+            NTerror("Failed to getEntryInfo")
+            return True
+
+        if self.doWriteEntryLoL():
+            NTerror("Failed to doWriteEntryLoL")
+            return True
+
+        if self.doWriteWhyNot():
+            NTerror("Failed to doWriteWhyNot")
+            return True
+
+        if self.updateIndexFiles():
+            NTerror("Failed to update index files.")
+            return True
+    # end def run
 
     def getEntryInfo(self):
         """Returns True for error
@@ -312,7 +317,7 @@ class nrgCing(Lister):
                         if len(yearMonthDayList) != 3:
                             NTerror("Failed to find date from dateStrListLastFile %s" % dateStrListLastFile)
                         else:
-                            dtLastValidation = datetime.datetime(yearMonthDayList[0],yearMonthDayList[1],yearMonthDayList[2])
+                            dtLastValidation = datetime.datetime(yearMonthDayList[0], yearMonthDayList[1], yearMonthDayList[2])
                     ccpnTgzFile = os.path.join('recoordSync', entry_code, '%s.tgz' % entry_code)
                     f = os.path.getmtime(ccpnTgzFile)
                     oldtimetuple = time.localtime(f)
@@ -349,11 +354,12 @@ class nrgCing(Lister):
                     self.entry_list_stopped.append(entry_code)
                     continue
 
-                molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
-                if not os.path.exists(molGifFile):
-                    NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
-                    self.entry_list_stopped.append(entry_code)
-                    continue
+                if False: # DEFAULT: True but disabled for testing.
+                    molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
+                    if not os.path.exists(molGifFile):
+                        NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                        self.entry_list_stopped.append(entry_code)
+                        continue
 
                 self.entry_list_done.append(entry_code)
             # end for entryDir
@@ -389,8 +395,15 @@ class nrgCing(Lister):
 #        modification_time = os.path.getmtime("/Users/jd/.cshrc")
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
+        NTmessage("Looking for entries in the different preparation stages.")
+        for i, phaseData in enumerate(self.phaseDataList):
+            entryList = self.phaseList[i]
+            phaseName, _phaseId = phaseData
+            l = len(entryList)
+            NTmessage("Found %d entries in stage %s" % (l, phaseName))
+
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for entries from the PDB and NRG databases.")
+        NTmessage("Looking for entries from the PDB and NRG databases.")
 
         self.entry_list_pdb.addList(getPdbEntries())
         if not self.entry_list_pdb:
@@ -398,13 +411,13 @@ class nrgCing(Lister):
             return True
         NTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
 
-        self.entry_list_nmr.addList(getPdbEntries(onlyNmr = True))
+        self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
         if not self.entry_list_nmr:
             NTerror("No NMR entries found")
             return True
         NTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))
 
-        self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr = True, mustHaveExperimentalNmrData = True))
+        self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData=True))
         if not self.entry_list_nmr_exp:
             NTerror("No NMR with experimental data entries found")
             return True
@@ -436,8 +449,8 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
         writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
-        writeTextToFile("entry_list_mmcif.csv", toCsv(self.entry_list_mmcif))
-        writeTextToFile("entry_list_prepared.csv", toCsv(self.entry_list_prepared))
+#        writeTextToFile("entry_list_mmcif.csv", toCsv(self.entry_list_mmcif))
+#        writeTextToFile("entry_list_prepared.csv", toCsv(self.entry_list_prepared))
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
         writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
@@ -445,6 +458,13 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
         writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
         writeTextToFile("entry_list_updated.csv", toCsv(self.entry_list_updated))
+
+        for i, phaseData in enumerate(self.phaseDataList):
+            entryList = self.phaseList[i]
+            _phaseName, phaseId = phaseData
+            fn = 'entry_list_prep_stage_%s.csv' % phaseId
+            writeTextToFile(fn, toCsv(entryList))
+
 
 
 
@@ -575,11 +595,10 @@ class nrgCing(Lister):
         for x_entry_code in self.entry_list_done + [ None ]:
             if x_entry_code:
                 pdb_entry_code = x_entry_code
+                bmrb_entry_code = ""
                 if self.matches_many2one.has_key(pdb_entry_code):
                     bmrb_entry_code = self.matches_many2one[pdb_entry_code]
-                    bmrb_entry_code = bmrb_entry_code
-                else:
-                    bmrb_entry_code = ""
+#                    bmrb_entry_code = bmrb_entry_code
 
             ## Finish this index file
             ## The last index file will only be written once...
@@ -729,11 +748,155 @@ class nrgCing(Lister):
         shutil.copy(cssFile, indexDir)
         shutil.copy(headerBgFile, indexDir)
 
+    # end def
+    def processEntry(self, pdb_id,
+                     doInteractive=0,
+                     convertMmCifCoor=1,
+                     convertMrRestraints=0,
+                     convertStarCS=0,
+                     filterCcpnAll=0,
+                     ):
+
+        "Return True on error."
+        NTmessage("interactive            interactive run is fast use zero for production                              %s" % doInteractive)
+        NTmessage("convertMmCifCoor       Converts PDB mmCIF to NMR-STAR with Wattos        -> C/XXXX_C_FC.xml         %s" % convertMmCifCoor)
+        NTmessage("convertMrRestraints    Adds STAR restraints to Ccpn with XXXX            -> R/XXXX_R_FC.xml         %s" % convertMrRestraints)
+        NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    -> S/XXXX_S_FC.xml         %s" % convertStarCS)
+        NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
+
+        NTmessage("Doing              %s" % pdb_id)
+        entryCodeChar2and3 = pdb_id[1:3]
+
+        C_sub_entry_dir = os.path.join(dir_C, entryCodeChar2and3)
+        C_entry_dir = os.path.join(C_sub_entry_dir, pdb_id)
+        link_sub_entry_dir = os.path.join(dir_link, entryCodeChar2and3)
+        link_entry_dir = os.path.join(link_sub_entry_dir, pdb_id)
+
+        if convertMmCifCoor:
+            NTmessage("  mmCIF")
+            convertStarCoor = 0 # DEFAULT 1: TODO: code.
+
+            script_file = '%s/ReadMmCifWriteNmrStar.wcf' % wcf_dir
+            inputMmCifFile = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % pdb_id)
+            outputStarFile = "%s_C_Wattos.str" % pdb_id
+            script_file_new = "%s.wcf" % pdb_id
+            log_file = "%s.log" % pdb_id
+
+            if not os.path.exists(C_entry_dir):
+                mkdirs(dir_C)
+            if not os.path.exists(C_sub_entry_dir):
+                mkdirs(C_sub_entry_dir)
+            os.chdir(C_sub_entry_dir)
+            if os.path.exists(pdb_id):
+                rmtree(pdb_id)
+            os.mkdir(pdb_id)
+            os.chdir(pdb_id)
+
+            if not os.path.exists(inputMmCifFile):
+                NTerror("%s No input mmCIF file: %s" % (pdb_id, inputMmCifFile))
+                return True
+
+            maxModels = '999'
+            if doInteractive:
+                maxModels = '1'
+
+            script_str = readTextFromFile(script_file)
+            script_str = script_str.replace('WATTOS_VERBOSITY', str(self.wattosVerbosity))
+            script_str = script_str.replace('INPUT_MMCIF_FILE', inputMmCifFile)
+            script_str = script_str.replace('MAX_MODELS', maxModels)
+            script_str = script_str.replace('OUTPUT_STAR_FILE', outputStarFile)
+
+            writeTextToFile(script_file_new, script_str)
+
+
+    #        wattos < $script_file_new >& $log_file
+    #        wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+    #        logFileName = "wattos_compl.log"
+            wattosProgram = ExecuteProgram(self.wattosProg, #rootPath = wattosDir,
+                                     redirectOutputToFile=log_file,
+                                     redirectInputFromFile=script_file_new)
+            # The last argument becomes a necessary redirection into fouling Wattos into
+            # thinking it's running interactively.
+            now = time.time()
+            wattosExitCode = wattosProgram()
+            difTime = time.time() - now
+            NTdebug("Took number of seconds: %8.1f" % difTime)
+            if wattosExitCode:
+                NTerror("%s Failed wattos script %s with exit code: " % (pdb_id, script_file_new, str(wattosExitCode)))
+                return True
+
+            resultList = []
+            status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True)
+            if status == 0:
+                NTerror("%s found errors in log file; aborting." % pdb_id)
+                NTmessage('\n'.join(resultList))
+                return True
+
+            os.unlink(script_file_new)
+
+            if not os.path.exists(outputStarFile):
+                NTerror("%s found no output star file %s" % (pdb_id, outputStarFile))
+                return True
+            # end if
+
+            if convertStarCoor:
+                NTmessage("  star2Ccpn")
+                log_file = "%s_star2Ccpn.log" % pdb_id
+                inputStarFile = "%s_wattos.str" % pdb_id
+                inputStarFileFull = os.path.join(C_entry_dir, inputStarFile)
+                fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
+                doConversionDirectly = False
+
+                if not os.path.exists(link_entry_dir):
+                    mkdirs(dir_link)
+                os.chdir(C_sub_entry_dir)
+                if os.path.exists(pdb_id):
+                    rmtree(pdb_id)
+                os.mkdir(pdb_id)
+                os.chdir(pdb_id)
+
+                if not os.path.exists(inputStarFileFull):
+                    NTerror("%s previous step produced no star file." % pdb_id)
+                    return True
+
+                # Will save a copy to disk as well.
+                if doConversionDirectly:
+                    ccpnProject = importFullStarProjects(inputStarFile, projectName=pdb_id, inputDir=C_entry_dir)
+                    if not ccpnProject:
+                        NTerror("%s failed importFullStarProjects" % pdb_id)
+                        return True
+                    # end if
+                else:
+                    convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
+                    NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+                    exitCode = convertProgram("%s %s %s" % (inputStarFile, pdb_id, C_entry_dir))
+                    if exitCode:
+                        NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                        return True
+                    resultList = []
+                    status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, doCaseSensitive=False)
+                    if status == 0:
+                        NTerror("%s found errors in log file; aborting." % pdb_id)
+                        NTmessage('\n'.join(resultList))
+                        return True
+            # end if convertStarCoor
+            NTmessage("Done with %s" % pdb_id)
+        # end if convertMmCifCoor
+
 
     def runCing(self):
         """On self.entry_list_todo.
         Return True on error.
         """
+
+        NTmessage("Starting runCing")
+#        return True
+
+        if self.useTopos:
+            vc = vCing(toposPool='vCingNrg' + pool_postfix, max_time_to_wait_per_job=self.max_time_to_wait)
+            NTmessage("Starting with %r" % vc) # check secret pool specific for NRG. TODO:
+            return
+
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
@@ -741,24 +904,55 @@ class nrgCing(Lister):
         inputDir = 'file://' + self.results_dir + '/recoordSync'
 #        inputDir = 'file://' + self.results_dir + '/nrgMerge'
         outputDir = self.results_dir
-        storeCING2db = "1" # All arguments need to be strings.
+        storeCING2db = "0" # DEFAULT: 1 All arguments need to be strings.
         extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`, storeCING2db)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
                             self.results_dir,
-                            processes_max = self.processes_max,
-                            delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
-                            max_time_to_wait = self.max_time_to_wait,
+                            processes_max=self.processes_max,
+                            delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
+                            max_time_to_wait=self.max_time_to_wait,
                             # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
-                            START_ENTRY_ID = 0, # default.
-                            MAX_ENTRIES_TODO = self.max_entries_todo,
-                            extraArgList = extraArgList):
+                            START_ENTRY_ID=0, # default.
+                            MAX_ENTRIES_TODO=self.max_entries_todo,
+                            extraArgList=extraArgList):
             NTerror("Failed to doScriptOnEntryList")
             return True
+        # end if
     # end def runCing.
+
+    def prepare(self):
+        NTerror("Todo: code prepare")
+# end class.
 
 
 if __name__ == '__main__':
-    cing.verbosity = cing.verbosityDebug
-    run()
+    """
+Additional modes I see:
+        batchUpdate        Run validation checks to NRG-CING web site.
+        prepare            Only moves the entries through prep stages.
+    """
+    cing.verbosity = verbosityDebug
+    isProduction = False   # DEFAULT: True.
+
+    NTmessage(header)
+    NTmessage(getStartMessage())
+    ## Initialize the project
+    m = nrgCing(isProduction=isProduction)
+    destination = sys.argv[1]
+    NTmessage('\nGoing to destination: %s' % destination)
+    try:
+        if destination == 'updateWeekly':
+            if m.updateWeekly():
+                NTerror("Failed to updateWeekly")
+        elif destination == 'prepare':
+            if m.prepare():
+                NTerror("Failed to prepare")
+        else:
+            NTerror("Unknown destination: %s" % destination)
+        # end if
+    except:
+        NTtracebackError()
+    finally:
+        NTmessage(getStopMessage())

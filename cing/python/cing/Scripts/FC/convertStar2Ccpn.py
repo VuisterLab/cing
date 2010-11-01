@@ -9,9 +9,15 @@ from cing.Libs.forkoff import do_cmd
 from cing.Scripts.FC.constants import * #@UnusedWildImport
 from glob import glob
 from memops.api import Implementation
-import Tkinter
 import shutil
 
+try:
+    import Tkinter
+except:
+    if cing.verbosity == cing.verbosityDebug:
+        if False:
+            NTtracebackError()
+# end try
 
 __author__ = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
 

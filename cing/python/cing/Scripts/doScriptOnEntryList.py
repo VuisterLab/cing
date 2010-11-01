@@ -125,11 +125,11 @@ def doScriptOnEntryList(pythonScriptFileName,
             chain_code,
             date_stamp
              )
+#        NTdebug("Will schedule job cmd: %s" % cmd)
         job = ( do_cmd, (cmd,) )
         job_list.append( job )
 
-    f = ForkOff( processes_max       = processes_max,
-            max_time_to_wait    = max_time_to_wait)
+    f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
     done_entry_list = f.forkoff_start( job_list, delay_between_submitting_jobs )
     done_entry_list.sort()
     not_done_entry_list = range(len(job_list))
@@ -137,10 +137,10 @@ def doScriptOnEntryList(pythonScriptFileName,
         idx = not_done_entry_list.index(id)
         if idx >= 0:
             del(not_done_entry_list[idx])
-    NTmessage("Finished list  : %s" % done_entry_list)
-    NTmessage("Unfinished list: %s" % not_done_entry_list)
+    NTmessage("In doScriptOnEntryList Finished list  : %s" % done_entry_list)
+    NTmessage("In doScriptOnEntryList Unfinished list: %s" % not_done_entry_list)
     for id in not_done_entry_list:
         job = job_list[id]
         _do_cmd, cmdTuple = job
         cmd = cmdTuple[0]
-        NTerror("Failed forked: %s" % cmd)
+        NTerror("In doScriptOnEntryList failed forked: %s" % cmd)

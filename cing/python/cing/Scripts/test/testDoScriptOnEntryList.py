@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
+python $CINGROOT/python/cing/Scripts/test/testDoScriptOnEntryList.py
 """
 from cing import cingDirScripts
 from cing import cingDirTestsData #@UnusedImport
@@ -15,7 +15,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRetrieveTgzFromUrl(self):
+    def testDoScriptOnEntryList(self):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         entryListFileName = "entry_list_todo.csv"
@@ -31,7 +31,7 @@ class AllChecks(TestCase):
                             '.',
                             processes_max = 8,
                             delay_between_submitting_jobs = 5,
-                            max_time_to_wait = 2,
+                            max_time_to_wait = 5,
                             START_ENTRY_ID = 0,
                             MAX_ENTRIES_TODO = 1,
                             extraArgList = extraArgList,

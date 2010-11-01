@@ -26,7 +26,6 @@ from cing.main import getStopMessage
 import commands
 from cing.Libs.disk import rmdir
 
-#    inputDir = os.path.join(cingDirTestsData, "ccpn")
 try:
     from localConstants import pool_postfix, master_ssh_url
 except:
@@ -56,15 +55,12 @@ class vCing(Lister):
     MASTER_TARGET_LOG2 = 'log2' # For slave's log (just a one or two lines
     MASTER_TARGET_RESULT = 'result' # Payload result
 
-    max_time_to_wait = 365 * 24 * 60 * 60       # a year in seconds
-    max_time_to_wait_per_job = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
-    time_sleep_when_no_token = 5 * 60           # 5 minutes
-    lockTimeOut = 5 * 60                        # 5 minutes
-
-    def __init__(self, master_ssh_url, cmdDict=''):
+    def __init__(self, master_ssh_url, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
         self.toposDir = os.path.join(cingRoot, "scripts", "vcing", "topos")
         self.toposRealm = 'https://topos.grid.sara.nl/4.1/'
         self.toposPool = 'vCing' + pool_postfix
+        if toposPool:
+            self.toposPool = toposPool
          # Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
 #        self.toposCmd = toposcmd(realm=self.toposRealm, pool=self.toposPool)
         self.toposProg = os.path.join(self.toposDir, "topos")
@@ -76,6 +72,10 @@ class vCing(Lister):
         self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
         self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
+        self.max_time_to_wait = 365 * 24 * 60 * 60                    # a year in seconds
+        self.max_time_to_wait_per_job = max_time_to_wait_per_job      # 2p80 took the longest: 5.2 hours.
+        self.time_sleep_when_no_token = 5 * 60                        # 5 minutes
+        self.lockTimeOut = 5 * 60                                     # 5 minutes
 
     def prepareMaster(self):
         logDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG)
@@ -113,8 +113,8 @@ class vCing(Lister):
         return status
     # end def
 
-    def keepLockFresh(self, lockname, lockTimeOut, maxSleapingTime = max_time_to_wait_per_job):
-        maxSleapingTime += 100 # process will be killed outside first so we give it some extra time here for it to be reaped.
+    def keepLockFresh(self, lockname, lockTimeOut):
+        maxSleapingTime = self.max_time_to_wait_per_job + 100 # process will be killed outside first so we give it some extra time here for it to be reaped.
         sleepTime = lockTimeOut / 2 + 1
         sleptTime = 0
         while True:
@@ -361,24 +361,23 @@ class vCing(Lister):
             job = (do_cmd, (cmd,))
             job_list.append(job)
 
-        processes_max = ncpus
         delay_between_submitting_jobs = 10
-        f = ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
+        f = ForkOff(processes_max=ncpus, max_time_to_wait=self.max_time_to_wait)
         done_entry_list = f.forkoff_start(job_list, delay_between_submitting_jobs)
-        NTdebug("Should never get here in runSlave.")
+        NTdebug("In runSlave Should never get here in runSlave.")
         done_entry_list.sort()
         not_done_entry_list = range(len(job_list))
         for id in done_entry_list:
             idx = not_done_entry_list.index(id)
             if idx >= 0:
                 del(not_done_entry_list[idx])
-        NTmessage("Finished list  : %s" % done_entry_list)
-        NTmessage("Unfinished list: %s" % not_done_entry_list)
+        NTmessage("In runSlave Finished list  : %s" % done_entry_list)
+        NTmessage("In runSlave Unfinished list: %s" % not_done_entry_list)
         for id in not_done_entry_list:
             job = job_list[id]
             _do_cmd, cmdTuple = job
             cmd = cmdTuple[0]
-            NTerror("Failed forked: %s" % cmd)
+            NTerror("In runSlave Failed forked: %s" % cmd)
     # end def
 
 if __name__ == "__main__":

@@ -4910,6 +4910,7 @@ def timedelta2HoursMinutesAndSeconds( s ):
     t -= 60 * result[1]
     result[2] = int(t)
     return tuple(result)
+
 def lenNonZero(l, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
     'Counts the non zero eelements when compared to epsilon'
     if l == None:
@@ -4921,3 +4922,38 @@ def lenNonZero(l, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
         if math.fabs(item) > eps:
             n += 1
     return n
+
+def stringMeansBooleanTrue(inputStr):
+    """
+    Returns True if it's a string that is either 1 (any non-zero), True, etc.
+    Optimized for speed. See unit test.
+    """
+    if not isinstance(inputStr, str):
+        return False
+    inputStrlower = inputStr.lower()
+    if inputStrlower == 'true':
+        return True
+    if inputStrlower == 'false':
+        return False
+    if inputStrlower == 't':
+        return True
+    if inputStrlower == 'f':
+        return False
+    if inputStrlower == 'y':
+        return True
+    if inputStrlower == 'n':
+        return False
+    if inputStrlower == 'yes':
+        return True
+    if inputStrlower == 'no':
+        return False
+
+    try:
+        inputInt = int(inputStr)
+    except:
+        NTwarning("Failed to get integer after testing string possibilities")
+        inputInt = 0
+
+    if inputInt:
+        return True
+    return False

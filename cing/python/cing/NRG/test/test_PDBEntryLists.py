@@ -6,9 +6,7 @@ from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import isInternetConnected
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
-from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRfREDDone
-from cing.NRG.PDBEntryLists import getPdbEntries
+from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from unittest import TestCase
 import unittest
 
@@ -63,12 +61,20 @@ class AllChecks(TestCase):
             self.assertTrue(len(pdbList) >= 61248)
             NTdebug("getPdbEntries ALL: %d" % (len(pdbList)))
 
-        if True:
+        if False:
             pdbList = getPdbEntries(mustHaveExperimentalNmrData = True)
             self.assertTrue(pdbList)
             self.assertTrue(len(pdbList) >= 1)
             NTdebug("getPdbEntries exp: %d" % (len(pdbList)))
 #            NTdebug("%s" % pdbList)
+
+        if True:
+            matches_many2one = getBmrbLinks()
+            self.assertTrue(matches_many2one)
+            inputPdbId = '1brv'
+            bmrb_id = matches_many2one[inputPdbId]
+#            self.assertEqual(pdb_id,inputPdbId)
+            self.assertEqual(bmrb_id, '4020')
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

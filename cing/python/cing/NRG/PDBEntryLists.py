@@ -4,6 +4,8 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
 from cing import cingPythonDir
+from cing import cingRoot
+from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
 import urllib
 import urllib2
@@ -20,6 +22,9 @@ if testingLocally:
     urlDB2 = "http://localhost/servlet_data/viavia/mr_mysql_backup/" # For fastest develop.
     ocaUrl = "http://localhost/oca" # For fastest develop.
 
+matchBmrbPdbDataDir = "data/NRG/bmrbPdbMatch" # wrt $CINGROOT
+matchBmrbPdbTable = 'newMany2OneTable'
+
 def getEntryListFromCsvFile(urlLocation):
   result = []
 ##108d
@@ -33,6 +38,19 @@ def getEntryListFromCsvFile(urlLocation):
         (pdbCode,) = dataLine.split()
         result.append(pdbCode)
   return result
+
+def getBmrbLinks():
+    """ Returns None for failure
+    Returns matches_many2one hash.
+    """
+    dbms = DBMS()
+    matchBmrbPdbDataDirLocal = os.path.join(cingRoot, matchBmrbPdbDataDir) # Needs to change to live resource as well.
+    dbms.readCsvRelationList([ matchBmrbPdbTable ], matchBmrbPdbDataDirLocal)
+    mTable = dbms.tables[matchBmrbPdbTable]
+#    NTmessage("mTable:\n%s" % mTable.__str__(show_rows=False))
+    matches_many2one = mTable.getHash(useSingleValueOfColumn=1) # hashes by first column to the next by default already.
+    NTmessage("Found %s matches from PDB to BMRB" % len(matches_many2one))
+    return matches_many2one
 
 def getBmrbNmrGridEntries():
   result = []

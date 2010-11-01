@@ -133,9 +133,13 @@ class ForkOff:
     E.g. [( my_sleep, (990.1,) ), ( my_sleep, (990.1,) )]
     Returns a list of ids of processes (id is the index of the job in the list
     of jobs) that were done AND done successfully.
-    Empty lists will be returned if nothing gets done successfully
+    Empty lists will be returned if nothing gets done successfully or an error occurs.
     """
     def forkoff_start( self, job_list, delay_between_submitting_jobs=5 ):
+
+        if self.processes_max == None or self.processes_max < 1: # double but just to be clear.
+            NTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
+            return []
 
         ## Check job list for variable type errors
         for job in job_list:
@@ -161,7 +165,7 @@ class ForkOff:
             return []
 
         if self.verbosity > 1:
-            NTmessage("Doing %s new processes" % self.processes_todo)
+            NTmessage("Doing %s new process(es)" % self.processes_todo)
 
         ## Keep making processes until an uncaught Exception occurs
         ## That would be a ctrl-c or so. The ctrl-c is also caught by
@@ -177,7 +181,7 @@ class ForkOff:
         except KeyboardInterrupt:
             if self.verbosity:
                 NTwarning("Caught interrupt in parent.")
-                NTwarning("Trying to finish up by waiting for subprocesses")
+                NTwarning("Trying to finish up by waiting for subprocess(es)")
 
         ## Finish waiting for subprocesses
         ## Don't make any new!
@@ -242,8 +246,14 @@ class ForkOff:
     def do_jobs( self, job_list, delay_between_submitting_jobs ):
         """
         Starting independent processes given a list of function with
-        list of arguments
+        list of arguments.
+
+        Return True on error.
         """
+
+        if self.processes_max == None or self.processes_max < 1: # double but just to be clear.
+            NTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
+            return True
 
         while ( self.processes_started  < self.processes_todo or
                 self.processes_open     > 0 ):
