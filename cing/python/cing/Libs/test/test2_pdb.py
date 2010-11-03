@@ -26,7 +26,8 @@ class AllChecks(TestCase):
 #        entryList = "1kr8".split()
 #        entryList = "1otz".split() # 61 chains of which one is ' '
 #        entryList = "1v0e".split()
-        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 1otz 2hgh 2k0e".split()
+#        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 1otz 2hgh 2k0e".split()
+        entryList = "1a4d 1ai0 1brv 1bus 1hue 1iv6 1kr8".split()
         for entryId in entryList:
 
             pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)

@@ -1,26 +1,31 @@
 #!/usr/bin/env python
-# Execute like:
-# $CINGROOT/python/cing/Scripts/vCing/test/cingByVCtest.py a b TODO:
 
+"""
+Execute like:
+$CINGROOT/python/cing/NRG/validateEntryForNrgByVC.py 1brv \
+http://nmr.cmbi.ru.nl/NRG-CING/prep/C \
+jd@localhost:/tmp \
+. . BY_CH23_BY_ENTRY CCPN
+
+Retrieves from http://nmr.cmbi.ru.nl/NRG-CING/prep/C/br/1brv/1brv.tgz
+Scps to                 :     jd@localhost:/tmp/data/br/1brv/1brv.cing.tgz
+
+For topos replace the first command by validateEntryNrg:
+validateEntryNrg 1brv http://nmr.cmbi.ru.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
+"""
+
+from cing import cingDirTmp
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
-from cing.Libs.forkoff import do_cmd
-from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
-from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
+from cing.Scripts.validateEntry import retrieveTgzFromUrl
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
+import commands
 import shutil
-import urllib
-
 
 ARCHIVE_TYPE_FLAT = 'FLAT'
 ARCHIVE_TYPE_BY_ENTRY = 'BY_ENTRY'
@@ -34,15 +39,12 @@ PROJECT_TYPE_PDB = PDB
 #PROJECT_TYPE_XPLOR = 3 # Not done yet.
 PROJECT_TYPE_DEFAULT = PROJECT_TYPE_CING
 
-def usage():
-    NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
-
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = True # default: False
+    fastestTest = False # default: False
 #    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
@@ -50,7 +52,10 @@ def main(entryId, *extraArgList):
     doWattos = True
     doTalos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
+                    # NB leave this set to True or modify code below.
     modelCount = None # default setting is None
+    ranges = None
+
     if fastestTest:
         modelCount = 2
         htmlOnly = True
@@ -93,15 +98,10 @@ def main(entryId, *extraArgList):
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
 
-    targetId = getTargetForFullEntryName(entryId)
-    if not targetId:
-        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
-        return True
-    ranges = getRangesForTarget(targetId)
-    if not ranges:
-        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-        return True
-
+    isRemoteOutputDir = False
+    if '@' in outputDir:
+        isRemoteOutputDir = True
+#    vc = vCing('.') # argument is a fake master_ssh_url not needed here.
 
     NTdebug("Using:")
     NTdebug("inputDir:             %s" % inputDir)
@@ -112,6 +112,7 @@ def main(entryId, *extraArgList):
     NTdebug("projectType:          %s" % projectType)
     NTdebug("modelCount:           %s" % modelCount)
     NTdebug("ranges:               %s" % ranges)
+    NTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -130,7 +131,10 @@ def main(entryId, *extraArgList):
         # end if.
     # end if.
 
-    os.chdir(outputDir)
+    if isRemoteOutputDir:
+        os.chdir(cingDirTmp)
+    else:
+        os.chdir(outputDir)
 
     project = Project(entryId)
     if project.removeFromDisk():
@@ -280,65 +284,32 @@ def main(entryId, *extraArgList):
         if os.path.exists(tgzFileNameCing):
             NTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
-        do_cmd(cmd)
-
-
-def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileName='%s.tgz'):
-    """Retrieves tgz file from url to current working dir assuming the
-    source is named:      $url/$x/$x.tgz
-    Will skip the download if it's already present.
-
-    Returns True on failure or None on success.
-    """
-#    fileNameTgz = entryId + extension
-    fileNameTgz = formatFileName % entryId
-    if os.path.exists(fileNameTgz):
-        NTmessage("Tgz already present, skipping download")
-        return
-
-    pathInsert = ''
-    # TODO: check
-    # Commented out the next lines for NRG-CING but not certain this will work for all uses of this script.
-#    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
-#        pathInsert = '/%s' % entryId
-#    if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
-##        entryCodeChar2and3 = entryId[1:3]
-#        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
-
-    if url.startswith('file:/'):
-        pathSource = url.replace('file:/', '')
-        fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz)
-        NTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
-        if not os.path.exists(fullPathSource):
-            NTerror("%s does not exist." % (fullPathSource))
+        NTdebug("cmd: %s" % cmd)
+#        do_cmd(cmd)
+        status, result = commands.getstatusoutput(cmd)
+        if status:
+            NTerror("Failed to tar status: %s with result %s" % (status, result))
             return True
-        if not os.path.isfile(fullPathSource):
-            NTerror("%s is not a file" % (fullPathSource))
-            return True
-        if os.path.exists(fileNameTgz):
-            NTmessage('Removing old copy: %s' % fileNameTgz)
-            os.unlink(fileNameTgz)
-#        os.symlink(fullPathSource, fileNameTgz)
-#        cwd = os.getcwd()
-#        print "fullPathSource:",fullPathSource
-#        print "fileNameTgz:",fileNameTgz
-#        print "cwd:",cwd
-
-        copy(fullPathSource, fileNameTgz)
-
-    elif url.startswith('http:/'):
-        urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
-        NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
-        urllib.urlretrieve(urlNameTgz, fileNameTgz)
-    else:
-        NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
-        return True
-
-    if os.path.exists(fileNameTgz):
-        return
-
-    NTerror("Failed to download: " + urlNameTgz)
-    return True
+        if isRemoteOutputDir:
+            cmdScp = 'scp %s %s' % (tgzFileNameCing, outputDir)
+            NTdebug("cmdScp: %s" % cmdScp)
+            status, result = commands.getstatusoutput(cmdScp)
+            if status:
+                NTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
+                return True
+#            if vc.sendFileByScp( tgzFileNameCing, outputDir):
+#                NTerror("Failed to sendFileByScp")
+#                return True
+            # end if
+            NTmessage("Removing tgz result: %s" % tgzFileNameCing)
+            os.remove(tgzFileNameCing)
+            NTmessage("Removing cing dir itself: %s" % directoryNameCing)
+            rmdir(directoryNameCing)
+        else: # do NOT remove local copy
+            pass
+        # end if/else
+    # end if tgzCing
+# end def
 
 
 if __name__ == "__main__":

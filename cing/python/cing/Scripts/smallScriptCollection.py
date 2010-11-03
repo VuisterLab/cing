@@ -86,12 +86,19 @@ def allDoYasaraRewritePdb():
 1y4o""".split():
         doYasaraRewritePdb(entry)
 
-def removeTempFiles():
-    entryCode = '1brv'
-#    entryCode = '1cjg'
+def removeTempFilesAllEntries():
+    entry_list_done = readLinesFromFile(os.path.join('/Volumes/tera4/NRG-CING', 'entry_list_done.csv'))
+    for entryCode in entry_list_done:
+        NTmessage(entryCode)
+        removeTempFiles(entryCode)
+    # tcsh one-liners:
+    # find . -depth 3 -name "*.cing.tgz" -delete -print
+
+def removeTempFiles(entryCode):
+#    entryCode = '1brv'
     ch23 = entryCode[1:3]
-    D = '/Library/WebServer/Documents'
-#    D = '/Volumes/tera4'
+#    D = '/Library/WebServer/Documents'
+    D = '/Volumes/tera4'
     projectDir = D + '/NRG-CING/data/%s/%s/%s.cing' % (ch23, entryCode, entryCode)
     molDir = projectDir + '/' + entryCode
     Whatif.removeTempFiles(os.path.join( molDir, moleculeDirectories.whatif ))
@@ -100,6 +107,9 @@ def removeTempFiles():
     shiftx.removeTempFiles(os.path.join(molDir, moleculeDirectories.shiftx))
     molgrap.removeTempFiles(os.path.join(projectDir, directories.tmp))
 
+
+
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
-    removeTempFiles()
+#    removeTempFilesAllEntries()
+

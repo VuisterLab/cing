@@ -5,6 +5,7 @@ Read PDB files for their dihedrals; not just phi psi anymore..
 cd /Users/jd/tmp/cingTmp
 python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
+from IPython.genutils import flatten
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -21,7 +22,6 @@ from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
 from cing.core.molecule import commonAAList
-from matplotlib.cbook import flatten
 
 # Keep a copy of the CING project.
 doSave = False

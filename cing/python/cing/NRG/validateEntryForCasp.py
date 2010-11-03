@@ -1,17 +1,16 @@
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
 from cing.NRG import ARCHIVE_CASP_ID
 from cing.NRG.storeCING2db import doStoreCING2db
+from cing.Scripts.validateEntry import retrieveTgzFromUrl
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
 import shutil
-import urllib
 #from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
 #from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
 #from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
@@ -287,64 +286,6 @@ def main(entryId, *extraArgList):
             NTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
         do_cmd(cmd)
-
-
-def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileName='%s.tgz'):
-    """Retrieves tgz file from url to current working dir assuming the
-    source is named:      $url/$x/$x.tgz
-    Will skip the download if it's already present.
-
-    Returns True on failure or None on success.
-    """
-#    fileNameTgz = entryId + extension
-    fileNameTgz = formatFileName % entryId
-    if os.path.exists(fileNameTgz):
-        NTmessage("Tgz already present, skipping download")
-        return
-
-    pathInsert = ''
-    # TODO: check
-    # Commented out the next lines for NRG-CING but not certain this will work for all uses of this script.
-#    if archiveType == ARCHIVE_TYPE_BY_ENTRY:
-#        pathInsert = '/%s' % entryId
-#    if archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
-##        entryCodeChar2and3 = entryId[1:3]
-#        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
-
-    if url.startswith('file:/'):
-        pathSource = url.replace('file:/', '')
-        fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz)
-        NTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
-        if not os.path.exists(fullPathSource):
-            NTerror("%s does not exist." % (fullPathSource))
-            return True
-        if not os.path.isfile(fullPathSource):
-            NTerror("%s is not a file" % (fullPathSource))
-            return True
-        if os.path.exists(fileNameTgz):
-            NTmessage('Removing old copy: %s' % fileNameTgz)
-            os.unlink(fileNameTgz)
-#        os.symlink(fullPathSource, fileNameTgz)
-#        cwd = os.getcwd()
-#        print "fullPathSource:",fullPathSource
-#        print "fileNameTgz:",fileNameTgz
-#        print "cwd:",cwd
-
-        copy(fullPathSource, fileNameTgz)
-
-    elif url.startswith('http:/'):
-        urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
-        NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
-        urllib.urlretrieve(urlNameTgz, fileNameTgz)
-    else:
-        NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
-        return True
-
-    if os.path.exists(fileNameTgz):
-        return
-
-    NTerror("Failed to download: " + urlNameTgz)
-    return True
 
 
 if __name__ == "__main__":
