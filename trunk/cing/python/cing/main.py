@@ -8,6 +8,7 @@ Usage: cing [options]       use -h or --help for listing
 Options:
   -h, --help            show this help message and exit
   --test                Run set of test routines to verify installation.
+  --testQ               Same as --test and just grepping for any errors.
   --test2               Run extensive tests on large data sets checking code
                         after fundamental changes.
   --doc                 Print more documentation to stdout
@@ -120,6 +121,7 @@ from cing import __copyright__ #@UnusedImport
 from cing import __credits__ #@UnusedImport
 from cing import __date__ #@UnusedImport
 from cing import __version__ #@UnusedImport
+from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
@@ -132,6 +134,7 @@ from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import osType
 from cing.core.parameters import plugins
+import commands
 import platform
 import unittest
 
@@ -297,6 +300,38 @@ def script(scriptFile, *a, **k):
 #end def
 
 
+def testQuiet():
+    cing.verbosity = cing.verbosityOutput
+    fn = 'cingTest.log'
+    NTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
+    os.chdir(cingDirTmp)
+    cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -v 0 > %s 2>&1' % ( fn )
+#    NTmessage("In cing.main doing [%s]" % cmdCingTest)
+    status, content = commands.getstatusoutput(cmdCingTest)
+    if status:
+        NTerror("Failed to finish CING test")
+    else:
+        NTmessage("Finished CING test\n")
+    if content:
+        NTerror("Unexpected output: [%s]" % content)
+    resultList = []
+    status = grep(fn, 'error', resultList=resultList, caseSensitive=False)
+    if status == 0:
+        NTerror("Found %d errors, please check the errors below and full log %s" % ( len(resultList), os.path.join(cingDirTmp,fn)))
+        NTerror("Errors:\n%s" % '\n'.join(resultList))
+    else:
+        NTmessage("No problems were found")
+    resultTestFileList = []
+    status = grep(fn, 'tests in', resultList=resultTestFileList)
+    NTmessage("Ran %d test files" % len(resultTestFileList))
+    resultList = []
+    status = grep(fn, '... ok', resultList=resultList)
+    if status == 0:
+        NTmessage("Ran %d tests ok\n" % len(resultList))
+    else:
+        NTerror("Failed to do a single test ok")
+#end def
+
 def testOverall(namepattern):
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
@@ -316,7 +351,7 @@ def testOverall(namepattern):
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py'
 #                ]
-    NTmessage('will unit check: ' + `nameList`)
+    NTdebug('Will unit check: ' + `nameList`)
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
@@ -358,6 +393,11 @@ def getParser():
                       action="store_true",
                       dest="test",
                       help="Run set of test routines to verify installations"
+                     )
+    parser.add_option("--testQ",
+                      action="store_true",
+                      dest="testQ",
+                      help="Same as --test and simply grepping for any errors."
                      )
     parser.add_option("--test2",
                       action="store_true",
@@ -564,9 +604,14 @@ def main():
 
     if options.test:
         testOverall(namepattern="test_*.py")
+#        testOverall(namepattern="test_NTutils*.py")
         sys.exit(0)
     if options.test2:
         testOverall(namepattern="test2_*.py")
+        sys.exit(0)
+
+    if options.testQ:
+        testQuiet()
         sys.exit(0)
 
     #------------------------------------------------------------------------------------

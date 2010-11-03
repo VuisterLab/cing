@@ -73,6 +73,9 @@ class AllChecks(TestCase):
         resultList = []
         status = grep(fn, 'special', resultList=resultList, doQuiet=True)
         self.assertEquals( status, 0 )
+        resultList = []
+        status = grep(fn, 'SPECIAL', resultList=resultList, doQuiet=True, caseSensitive=False)
+        self.assertEquals( status, 0 )
 
 
     def testAppendFromTable(self):
@@ -103,7 +106,7 @@ class AllChecks(TestCase):
         resultList = [1,1,1,1,1,1,1,
                       0,0,0,0,0,0,0]
         for i, inputStr in enumerate(inputList):
-            NTdebug("Test: %d" % i)
+#            NTdebug("Test: %d" % i)
             self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

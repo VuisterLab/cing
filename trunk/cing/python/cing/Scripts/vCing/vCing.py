@@ -27,17 +27,19 @@ import commands
 from cing.Libs.disk import rmdir
 
 try:
-    from localConstants import pool_postfix, master_ssh_url
+    from localConstants import pool_postfix_local, master_ssh_url_local
 except:
     NTtracebackError() # codes below are nonsense.
-    pool_postfix = 'invalidPostFix'
-    master_ssh_url = 'i@vc'
+#    pool_postfix = 'invalidPostFix'
+#    master_ssh_url = 'i@vc'
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
 cingDirVC = os.path.join(cingPythonDir, 'cing', 'Scripts', 'vCing')
 
+VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
+
 # Possible targets are keyed from token to provide some security and brevity.
-cmdDict = { 'validateEntryNrg': os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
+cmdDict = { VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
             'testCing': os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
             }
 
@@ -55,10 +57,10 @@ class vCing(Lister):
     MASTER_TARGET_LOG2 = 'log2' # For slave's log (just a one or two lines
     MASTER_TARGET_RESULT = 'result' # Payload result
 
-    def __init__(self, master_ssh_url, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
+    def __init__(self, master_ssh_url=None, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
         self.toposDir = os.path.join(cingRoot, "scripts", "vcing", "topos")
         self.toposRealm = 'https://topos.grid.sara.nl/4.1/'
-        self.toposPool = 'vCing' + pool_postfix
+        self.toposPool = 'vCing' + pool_postfix_local
         if toposPool:
             self.toposPool = toposPool
          # Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
@@ -67,7 +69,9 @@ class vCing(Lister):
         self.toposProgCreateTokens = os.path.join(self.toposDir, "createTokens")
 
         self.DEFAULT_URL = 'http://nmr.cmbi.ru.nl/NRG-CING/recoordSync'
-        self.MASTER_SSH_URL = master_ssh_url
+        self.MASTER_SSH_URL = master_ssh_url_local
+        if master_ssh_url:
+            self.MASTER_SSH_URL = master_ssh_url
         self.MASTER_D = '/Library/WebServer/Documents' # This is a mac but can be adjusted.
         self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
         self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
@@ -83,6 +87,7 @@ class vCing(Lister):
         resultDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_RESULT)
         for d in (logDir, log2Dir, resultDir, cingDirTmp):
             mkdirs(d)
+
         # now manually fill pool with something like this:
 #        $CINGROOT/scripts/vcing/topos/topos createTokensFromLinesInFile vCingXXXXXX ~/toposTestTokens.txt
         # or use interface at:
@@ -97,11 +102,18 @@ class vCing(Lister):
         for d in (logDir, log2Dir, resultDir, cingDirTmp):
             rmdir(d)
             mkdirs(d)
-        # now manually fill pool with something like this:
-#        $CINGROOT/scripts/vcing/topos/topos createTokensFromLinesInFile vCingXXXXXX ~/toposTestTokens.txt
-        # or use interface at:
-        # https://topos.grid.sara.nl/4.1/pools/vCingXXXXXX/tokens/
-        # replacing XXXXXX of course.
+
+    def addTokenListToTopos(self, fileName):
+        cmdTopos = ' '.join([self.toposProg, 'createTokensFromLinesInFile', self.toposPool, fileName])
+        NTdebug("In addTokenListToTopos doing [%s]" % cmdTopos)
+        status, result = commands.getstatusoutput(cmdTopos)
+        NTdebug("In addTokenListToTopos got status: %s and result (if any) [%s]" % (status, result))
+        return status
+
+    def startMaster(self, tokenListFileName):
+        if self.addTokenListToTopos(tokenListFileName):
+            NTerror("In startMaster failed addTokenListToTopos")
+            return True
     # end def
 
 
@@ -223,19 +235,19 @@ class vCing(Lister):
         prefix = self.getPrefixForLevel(level_id)
 
         writeTextToFile(logFile, prefix + msg)
-        if self.sendLogFile(logFile, self.MASTER_TARGET_LOG2):
-            NTerror("Failed to sendLogFile with status: %s" % status)
+        if self.sendFileByScp(logFile, self.MASTER_TARGET_LOG2):
+            NTerror("Failed to sendFileByScp with status: %s" % status)
             return True
 
 
-    def sendLogFile(self, logFile, directory):
+    def sendFileByScp(self, logFile, directory):
         "Returns True for on error"
         targetUrl = '/'.join([self.MASTER_TARGET_URL, directory])
         cmdScp = 'scp %s %s' % (logFile, targetUrl)
         NTdebug("cmdScp: %s" % cmdScp)
         status, result = commands.getstatusoutput(cmdScp)
         if status:
-            NTerror("Failed to sendLogFile status: %s with result %s" % (status, result))
+            NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
         return status
     # end def
 
@@ -303,8 +315,8 @@ class vCing(Lister):
 
             fs = os.path.getsize(log_file_name)
             NTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
-            if self.sendLogFile(log_file_name, self.MASTER_TARGET_LOG):
-                NTerror("In runSlaveThread failed sendLogFile")
+            if self.sendFileByScp(log_file_name, self.MASTER_TARGET_LOG):
+                NTerror("In runSlaveThread failed sendFileByScp")
             if cmdExitCode:
                 NTerror("Failed payload")
                 if self.deleteLock(tokenLock):
@@ -386,7 +398,7 @@ if __name__ == "__main__":
     NTmessage(header)
     NTmessage(getStartMessage())
 
-    vc = vCing(master_ssh_url=master_ssh_url, cmdDict=cmdDict)
+    vc = vCing(cmdDict=cmdDict)
     NTmessage("Starting with %r" % vc)
 
     destination = sys.argv[1]
@@ -404,6 +416,9 @@ if __name__ == "__main__":
         elif destination == 'cleanMaster':
             if vc.cleanMaster():
                 NTerror("Failed to cleanMaster")
+        elif destination == 'startMaster':
+            if vc.startMaster():
+                NTerror("Failed to startMaster")
         else:
             NTerror("Unknown destination: %s" % destination)
         # end if
