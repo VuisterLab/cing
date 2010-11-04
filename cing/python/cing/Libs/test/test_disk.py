@@ -31,6 +31,11 @@ class AllChecks(TestCase):
         self.assertEquals(d, cingRoot)
         self.assertEquals(extension, '.txt')
 
+        globPattern = os.path.join(cingRoot, '*.xyz')
+        lastFile = globLast(globPattern)
+        NTdebug('lastFile 2: %s' % lastFile)
+        self.assertFalse(lastFile)
+
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()
