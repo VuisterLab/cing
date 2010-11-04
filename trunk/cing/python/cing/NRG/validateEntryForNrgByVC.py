@@ -11,7 +11,7 @@ Retrieves from http://nmr.cmbi.ru.nl/NRG-CING/prep/C/br/1brv/1brv.tgz
 Scps to                 :     jd@localhost:/tmp/data/br/1brv/1brv.cing.tgz
 
 For topos replace the first command by validateEntryNrg:
-validateEntryNrg 1brv http://nmr.cmbi.ru.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
+validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
 """
 
 from cing import cingDirTmp
@@ -275,7 +275,7 @@ def main(entryId, *extraArgList):
     project.save()
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
-#        os.unlink(fileNameTgz) # temporary ccpn tgz
+        os.unlink(fileNameTgz) # temporary ccpn tgz
         rmdir(entryId) # temporary ccpn dir
 
     if tgzCing:

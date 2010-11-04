@@ -13,8 +13,6 @@
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
-from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
-from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
@@ -72,14 +70,20 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     ranges = None
     if archive_id == ARCHIVE_CASD_ID:
-        targetId = getTargetForFullEntryName(casd_id)
-        if not targetId:
-            NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
-            return True
-        ranges = getRangesForTarget(targetId)
-        if not ranges:
-            NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-            return True
+        try:
+            from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
+            from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
+            targetId = getTargetForFullEntryName(casd_id)
+            if not targetId:
+                NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
+                return True
+            ranges = getRangesForTarget(targetId)
+            if not ranges:
+                NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+                return True
+        except:
+            NTtracebackError("Failed to import from cing.NRG.CasdNmrMassageCcpnProject; skipping setting the ranges")
+
 
 #    expectedArgumentList = [ 'inputDir']
 #    expectedNumberOfArguments = len(expectedArgumentList)

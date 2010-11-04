@@ -3,9 +3,11 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTutils5.py
 """
 
+from cing import cingRoot
 from cing.Libs.NTutils import * #@UnusedWildImport
-from unittest import TestCase
+from cing.Libs.disk import globLast
 from numpy import * #@UnusedWildImport
+from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
@@ -108,6 +110,34 @@ class AllChecks(TestCase):
         for i, inputStr in enumerate(inputList):
 #            NTdebug("Test: %d" % i)
             self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
+
+    def testAsci2list(self):
+        # Still fails to do -3 - -1 to represent.
+        inputList = """1-3
+                      -3-1
+                      1,2,5-8,11,20-22
+                    """.split()
+        resultLoL = [
+                      '[1, 2, 3]',
+                      '[-3, -2, -1, 0, 1]',
+                      '[1, 2, 5, 6, 7, 8, 11, 20, 21, 22]',
+                     ]
+        for i, inputStr in enumerate(inputList):
+            NTdebug("testAsci2list: %d" % i)
+            resultStr = str(asci2list(inputStr))
+            self.assertEquals( resultStr, resultLoL[i])
+
+    def testGetDateTimeStampForFileName(self):
+        globPattern = os.path.join(cingRoot, '*.txt')
+        lastFile = globLast(globPattern)
+        dateTimeObject = getDateTimeFromFileName(lastFile)
+        dateTimeString = getDateTimeStampForFileName(lastFile)
+        NTdebug('lastFile: %s dateTimeObject %s' % (lastFile, dateTimeObject))
+        NTdebug('lastFile: %s dateTimeString %s' % (lastFile, dateTimeString))
+        self.assertTrue(dateTimeObject)
+        self.assertTrue(dateTimeObject.year >= 2009)
+#        self.assertEquals(extension, '.txt')
+
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     unittest.main()
