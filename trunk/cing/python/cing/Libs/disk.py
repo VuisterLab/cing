@@ -728,9 +728,9 @@ def getNewestFileFromList( fnList ):
 def globLast( pattern ):
     """
     Tries to return the newest file by creation date.
-    Returns True on error
+    Returns False on error
     """
     fnList = glob(pattern)
     if not fnList:
-        return True
+        return False
     return getNewestFileFromList( fnList )

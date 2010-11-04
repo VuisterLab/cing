@@ -202,15 +202,14 @@ class nrgCing(Lister):
                 NTerror("Failed to getEntryInfo (first time).")
                 return True
 
-        if self.entry_list_todo:
+        if self.entry_list_todo and self.max_entries_todo:
             if self.runCing():
                 NTerror("Failed to runCing")
                 return True
-
-        # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
-        if self.getEntryInfo():
-            NTerror("Failed to getEntryInfo")
-            return True
+            # Do or redo the retrieval of the info from the filesystem on the doneness of NRG-CING.
+            if self.getEntryInfo():
+                NTerror("Failed to getEntryInfo")
+                return True
 
         if self.doWriteEntryLoL():
             NTerror("Failed to doWriteEntryLoL")
@@ -271,7 +270,7 @@ class nrgCing(Lister):
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
-                    NTdebug("Skipping entry because no(t yet a) directory: %s" % cingDirEntry)
+#                    NTdebug("Skipping entry because no(t yet a) directory: %s" % cingDirEntry)
                     continue
 
                 # Look for last log file
@@ -324,19 +323,22 @@ class nrgCing(Lister):
                         else:
                             dtLastValidation = datetime.datetime(yearMonthDayList[0], yearMonthDayList[1], yearMonthDayList[2])
                     ccpnTgzFile = os.path.join('recoordSync', entry_code, '%s.tgz' % entry_code)
-                    f = os.path.getmtime(ccpnTgzFile)
-                    oldtimetuple = time.localtime(f)
-                    dtLastInputModification = datetime.datetime(oldtimetuple.tm_year, oldtimetuple.tm_mon, oldtimetuple.tm_mday)
+                    if not os.path.exists(ccpnTgzFile):
+                        pass
+#                        NTdebug("No ccpn file which may be normal now: %s" % ccpnTgzFile)
+                    else:
+                        f = os.path.getmtime(ccpnTgzFile)
+                        oldtimetuple = time.localtime(f)
+                        dtLastInputModification = datetime.datetime(oldtimetuple.tm_year, oldtimetuple.tm_mon, oldtimetuple.tm_mday)
                 except:
-                    NTtracebackError()
+                    pass
+#                    NTtracebackError()
 
                 if dtLastValidation and dtLastInputModification:
                     if dtLastValidation < dtLastInputModification: # an old date is smaller than a young date (really just an epoch compare I guess).
                         self.entry_list_updated.append(entry_code)
                 else:
                     NTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
-
-
 
 
                 # end for AwkLike
@@ -359,7 +361,7 @@ class nrgCing(Lister):
                     self.entry_list_stopped.append(entry_code)
                     continue
 
-                if False: # DEFAULT: True but disabled for testing.
+                if isProduction: # DEFAULT: True but disabled for testing.
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
                         NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
@@ -405,7 +407,7 @@ class nrgCing(Lister):
             entryList = self.phaseList[i]
             phaseName, _phaseId = phaseData
             l = len(entryList)
-            NTmessage("Found %d entries in stage %s" % (l, phaseName))
+            NTmessage("Found %d entries in prep stage %s" % (l, phaseName))
 
         ## following statement is equivalent to a unix command like:
         NTmessage("Looking for entries from the PDB and NRG databases.")
@@ -476,7 +478,7 @@ class nrgCing(Lister):
     def doWriteWhyNot(self):
         "Write the WHYNOT files"
         if self.writeWhyNot:
-            NTdebug("Create WHY_NOT list")
+            NTmessage("Create WHY_NOT list")
         else:
             NTmessage("Skipping create WHY_NOT list")
             return
@@ -519,7 +521,7 @@ class nrgCing(Lister):
         writeTextToFile("NRG-CING.txt", whyNotStr)
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
-        NTdebug("Copying to: " + why_not_db_comments_file)
+#        NTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy("NRG-CING.txt", why_not_db_comments_file)
         if self.writeTheManyFiles:
             for entryId in self.entry_list_done:
@@ -766,6 +768,8 @@ class nrgCing(Lister):
         NTmessage("Doing postProcessEntryAfterVc on  %s" % pdb_id)
 
         doRemoves = 0 # DEFAULT 1 disable for testing.
+        doLog = 1 # DEFAULT 1 disable for testing.
+        doTgz = 1 # DEFAULT 1 disable for testing.
 
         entryCodeChar2and3 = pdb_id[1:3]
         entryDir = os.path.join( self.data_dir , entryCodeChar2and3, pdb_id )
@@ -773,48 +777,53 @@ class nrgCing(Lister):
             NTerror("Skipping %s because dir %s was not found." % ( pdb_id, entryDir))
             return True
         os.chdir(entryDir)
-        tgzFileNameCing = pdb_id + ".cing.tgz"
-        if not os.path.exists(tgzFileNameCing):
-            NTerror("Skipping %s because tgz not found: " + tgzFileNameCing)
-            return True
-        cmd = "tar -xzf %s" % tgzFileNameCing
-        NTdebug("cmd: %s" % cmd)
-        status, result = commands.getstatusoutput(cmd)
-        if status:
-            NTerror("Failed to untar status: %s with result %s" % (status, result))
-            return True
 
-        if not self.vc:
-            self.initVc()
-        master_target_log_dir = self.vc.MASTER_TARGET_LOG
-        if not os.path.exists(master_target_log_dir):
-            NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (pdb_id, master_target_log_dir))
-            return True
-        logScriptFileNameRoot = 'validateEntryNRG'
-        logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot,pdb_id)
-        logLastFile = globLast(master_target_log_dir + logFilePattern)
-        if not logLastFile:
-            NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (pdb_id, master_target_log_dir, logFilePattern ))
-            return True
+        if doLog:
+            if not self.vc:
+                self.initVc()
+            master_target_log_dir = os.path.join( self.vc.MASTER_TARGET_DIR, self.vc.MASTER_TARGET_LOG)
+            if not os.path.exists(master_target_log_dir):
+                NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (pdb_id, master_target_log_dir))
+                return True
+            logScriptFileNameRoot = 'validateEntryNrg'
+            logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot,pdb_id)
+            logLastFile = globLast(master_target_log_dir + logFilePattern)
+            if not logLastFile:
+                NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (pdb_id, master_target_log_dir, logFilePattern ))
+                return True
 
-        date_stamp = getDateTimeStampForFileName(logLastFile)
-        if not date_stamp:
-            NTerror("Skipping %s because failed to find date for log file: %s by pattern %s" % (pdb_id, logLastFile ))
-            return True
+            date_stamp = getDateTimeStampForFileName(logLastFile)
+            if not date_stamp:
+                NTerror("Skipping %s because failed to find date for log file: %s" % (pdb_id, logLastFile ))
+                return True
 
-        logScriptFileNameRootNew = 'validateEntry' # stick them in next to the locally derived logs.
-        newLogDir = 'log_' + logScriptFileNameRootNew
-        if not os.path.exists( newLogDir ):
-            os.mkdir(newLogDir)
-        logLastFileNew = '%s_%s.log' % (pdb_id, date_stamp)
-        logLastFileNewFull = os.path.join(newLogDir, logLastFileNew )
-        NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
-        copyfile(logLastFile, logLastFileNewFull)
+            logScriptFileNameRootNew = 'validateEntry' # stick them in next to the locally derived logs.
+            newLogDir = 'log_' + logScriptFileNameRootNew
+            if not os.path.exists( newLogDir ):
+                os.mkdir(newLogDir)
+            logLastFileNew = '%s_%s.log' % (pdb_id, date_stamp)
+            logLastFileNewFull = os.path.join(newLogDir, logLastFileNew )
+            NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
+            copyfile(logLastFile, logLastFileNewFull)
+            if doRemoves:
+                os.remove(logLastFile)
+        # end if doLog
 
-        if not doRemoves:
-            return
-        os.remove(tgzFileNameCing)
-        os.remove(logLastFile)
+        if doTgz:
+            tgzFileNameCing = pdb_id + ".cing.tgz"
+            if not os.path.exists(tgzFileNameCing):
+                NTerror("Skipping %s because tgz %s not found in: %s" %( pdb_id, tgzFileNameCing, os.getcwd()))
+                return True
+            cmd = "tar -xzf %s" % tgzFileNameCing
+            NTdebug("cmd: %s" % cmd)
+            status, result = commands.getstatusoutput(cmd)
+            if status:
+                NTerror("Failed to untar status: %s with result %s" % (status, result))
+                return True
+            if doRemoves:
+                os.remove(tgzFileNameCing)
+            # end if
+        # end if doTgz
     # end def
 
     def processEntry(self, pdb_id,
@@ -982,6 +991,29 @@ class nrgCing(Lister):
         # end if
     # end def runCing.
 
+    def postProcessAfterVc(self):
+        """Return True on error.
+        TODO: embed.
+        """
+
+        NTmessage("Starting postProcessAfterVc")
+        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
+        self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
+        self.entry_list_todo = NTlist()
+        self.entry_list_todo.addList(self.entry_list_nmr)
+        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+
+        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
+        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
+        NTmessage("Found entries in NRG-CING todo: %d" %  len(self.entry_list_todo))
+
+        for pdb_id in self.entry_list_todo:
+            self.postProcessEntryAfterVc( pdb_id )
+        NTmessage("Done")
+    # end def
+
+
+
     def createToposTokens(self):
         """Return True on error.
         TODO: embed.
@@ -1065,7 +1097,7 @@ Additional modes I see:
     """
     cing.verbosity = verbosityDebug
     isProduction = 1       # DEFAULT: 1.
-    max_entries_todo = 40  # DEFAULT: 40
+    max_entries_todo = 0  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)
@@ -1075,6 +1107,7 @@ Additional modes I see:
 
     destination = sys.argv[1]
     hasPdbId = False
+    pdb_id = '.'
     if is_pdb_code(destination): # needs to be first argument if this main is to be used by doScriptOnEntryList.
         pdb_id = destination
         hasPdbId = True
@@ -1086,7 +1119,7 @@ Additional modes I see:
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    NTmessage('\nGoing to destination: %s with(out) arguments %s' % (destination, str(argListOther)))
+    NTmessage('\nGoing to destination: %s with(out) on pdb_id %s with extra arguments %s' % (destination, pdb_id, str(argListOther)))
 
     try:
         if destination == 'updateWeekly':
@@ -1098,6 +1131,12 @@ Additional modes I see:
         elif destination == 'processEntry':
             if m.processEntry(pdb_id):
                 NTerror("Failed to processEntry")
+        elif destination == 'postProcessAfterVc':
+            if m.postProcessAfterVc():
+                NTerror("Failed to postProcessAfterVc")
+        elif destination == 'postProcessEntryAfterVc':
+            if m.postProcessEntryAfterVc(pdb_id):
+                NTerror("Failed to postProcessEntryAfterVc")
         elif destination == 'createToposTokens':
             if m.createToposTokens():
                 NTerror("Failed to createToposTokens")
