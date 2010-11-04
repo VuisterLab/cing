@@ -31,7 +31,7 @@ set log_file = "startVC_$time_string.log"
 cd
 
 # first time write to log do not append.
-echo "Startup script for VC at: $time_string on host: $HOST" |& tee $log_file
+echo "Startup script version 1.0 for VC at: $time_string on host: $HOST" |& tee $log_file
 # update log file on target of course this bits itself but it seems to be fine.
 scp -q $log_file $TARGET_SDIR
 

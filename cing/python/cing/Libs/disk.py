@@ -691,3 +691,46 @@ def removeEmptyFiles( theDir ):
         if os.path.getsize(fn) == 0:
             print "Removing empty file."
             os.unlink(fn)
+
+def getNewestFileFromList( fnList ):
+    """
+    Return empty list if input is empty
+    Return None on error
+    """
+    # thanks to http://www.daniweb.com/code/snippet216688.html for the example.
+    if not fnList:
+        print "WARNING: In getNewestFileFromList got no valid input: %s" % fnList
+        return []
+
+    date_file_list = []
+    for file in fnList:
+        if not os.path.exists(file):
+            print "WARNING: Skipping missing file %s" % file
+            continue
+        # retrieves the stats for the current file as a tuple
+        # (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime)
+        # the tuple element mtime at index 8 is the last-modified-date
+        stats = os.stat(file)
+        # create tuple (year yyyy, month(1-12), day(1-31), hour(0-23), minute(0-59), second(0-59),
+        # weekday(0-6, 0 is monday), Julian day(1-366), daylight flag(-1,0 or 1)) from seconds since epoch
+        # note:  this tuple can be sorted properly by date and time
+        lastmod_date = time.localtime(stats[8])
+        #print image_file, lastmod_date   # test
+        # create list of tuples ready for sorting by date
+        date_file_tuple = lastmod_date, file
+        date_file_list.append(date_file_tuple)
+    #print date_file_list  # test
+
+    date_file_list.sort()
+#    date_file_list.reverse()  # newest mod date now first
+    return date_file_list[-1][1]
+
+def globLast( pattern ):
+    """
+    Tries to return the newest file by creation date.
+    Returns True on error
+    """
+    fnList = glob(pattern)
+    if not fnList:
+        return True
+    return getNewestFileFromList( fnList )

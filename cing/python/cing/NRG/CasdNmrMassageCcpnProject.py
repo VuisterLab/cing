@@ -239,6 +239,8 @@ def printCingUrls(programHoH):
             print "http://nmr.cmbi.ru.nl/CASD-NMR-CING/data/%s/%s/%s.cing" % (
                     ch23, entryCode, entryCode                )
 
+
+# NB TODO: reorganize this data into a class so it can be properly imported from the many other scripts.
 dbms = getCASD_NMR_DBMS()
 sheetName = 'Overview1'
 participantTable = dbms.tables['%s-Participant' % sheetName]

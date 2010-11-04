@@ -402,7 +402,11 @@ if __name__ == "__main__":
     NTmessage("Starting with %r" % vc)
 
     destination = sys.argv[1]
-    NTmessage('Going to destination: %s' % destination)
+    startArgListOther = 2
+    argListOther = []
+    if len(sys.argv) > startArgListOther:
+        argListOther = sys.argv[startArgListOther:]
+    NTmessage('\nGoing to destination: %s with(out) arguments %s' % (destination, str(argListOther)))
     try:
         if destination == 'runSlaveThread':
             if vc.runSlaveThread():
@@ -417,7 +421,7 @@ if __name__ == "__main__":
             if vc.cleanMaster():
                 NTerror("Failed to cleanMaster")
         elif destination == 'startMaster':
-            if vc.startMaster():
+            if vc.startMaster(argListOther[0]):
                 NTerror("Failed to startMaster")
         else:
             NTerror("Unknown destination: %s" % destination)

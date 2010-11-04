@@ -25,6 +25,7 @@ from xml.sax import saxutils
 import array
 import datetime
 import inspect
+import locale
 import math
 import optparse
 import os
@@ -32,7 +33,6 @@ import pydoc
 import re
 import sys
 import time
-import locale
 
 # For plotting with thousand separators.
 locale.setlocale(locale.LC_ALL, "")
@@ -3311,27 +3311,52 @@ def quote(inputString):
     return '"' + inputString + '"'
 #end def
 
-
-def asci2list(string):
+def asci2list(inputStr):
     """ Convert a string with "," and "-" to a list of integers
     eg. 1,2,5-8,11,20-40
-    returns empty list on empty string
+    returns empty list on empty inputStr
+
+    NB: - returns empty list when an invalid construct is entered.
+        - boundaries are inclusive at both ends.
+
+    TODO: allow specification of an all negative range such as [-2, -1]
+            See unit test.
     """
     result = NTlist()
-    if string == None:
+    if inputStr == None:
         return result
-    elif len(string) == 0:
+    if len(inputStr) == 0:
         return result
 
-    for elm in string.split(','):
-        tmp = elm.split('-')
+
+    for elm in inputStr.split(','):
+        elmStripped = elm.strip()
+        if len(elmStripped) == 0:
+            continue
+
+        firstElementIsPositive = True
+        if elmStripped[0] == '-':
+            firstElementIsPositive = False
+            elmStripped = elmStripped[1:]
+
+        tmp = elmStripped.split('-')
+        intList = []
+        try:
+            intList = [ int(x) for x in tmp ]
+        except:
+            NTerror('asci2list: failed to convert to int for construct "%s"' % inputStr)
+            return result
+
+        if not firstElementIsPositive:
+            intList[0] = -intList[0]
+
         if len(tmp) == 1:
-            result.append(int(tmp[0]))
+            result.append(intList[0])
         elif len(tmp) == 2:
-            for i in range(int(tmp[0]), int(tmp[1])+1):
+            for i in range(intList[0], intList[1]+1):
                 result.append(i)
         else:
-            NTerror('asci2list: invalid construct "%s"\n', string)
+            NTerror('asci2list: invalid construct "%s"' % inputStr)
         #end if
     #end for
 
@@ -4631,8 +4656,37 @@ def symlink( file_1, file_2 ):
 #    NTdebug( "Running cmd: " + cmd )
     os.system(cmd)
 
-def getDateTimeStampForFileName():
-    date_stamp = datetime.datetime.now().isoformat('_')
+def getDateTimeFromFileName(fn):
+    """
+    Return False on error
+    """
+    if not os.path.exists(fn):
+        NTerror("File: %s does not exist" % fn)
+        return
+    timeStamp = os.path.getmtime(fn)
+    dateTimeObj = datetime.datetime.fromtimestamp(timeStamp)
+    return dateTimeObj
+
+def getDateTimeStampForFileName(nadaDateOrFilename=None):
+    """
+    Return False on error
+    """
+    if not nadaDateOrFilename:
+        specDate = datetime.datetime.now()
+    elif isinstance(nadaDateOrFilename, datetime.datetime):
+        pass
+    elif isinstance(nadaDateOrFilename, str):
+        if not os.path.exists(nadaDateOrFilename):
+            NTerror("Assumed file name argument: %s is not an existing file" % nadaDateOrFilename)
+            return
+        specDate = getDateTimeFromFileName(nadaDateOrFilename)
+        if not specDate:
+            NTerror("File: %s gave no datetime" % nadaDateOrFilename)
+            return
+    else:
+        NTerror("Failed to get input that is either nothing, a datetime object or a file name.")
+        return
+    date_stamp = specDate.isoformat('_')
     date_stamp = re.sub( '[:]', '-', date_stamp )
     date_stamp = re.sub( '\.[0-9]+', '', date_stamp )
     return date_stamp

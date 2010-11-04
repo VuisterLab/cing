@@ -26,6 +26,7 @@ from cing import header
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import globLast
 from cing.Libs.disk import mkdirs
 from cing.Libs.disk import rmdir
 from cing.Libs.helper import detectCPUs
@@ -43,9 +44,11 @@ from cing.main import getStartMessage
 from cing.main import getStopMessage
 from glob import glob
 from shutil import rmtree
+import commands
 import csv
 import shutil
 import string
+from shutil import copyfile
 
 class nrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
@@ -75,7 +78,8 @@ class nrgCing(Lister):
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
 
         self.results_base = 'NRG-CING'
-        self.results_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
+        self.D = '/Library/WebServer/Documents'
+        self.results_dir = os.path.join(self.D, self.results_base)
         self.data_dir = os.path.join(self.results_dir, 'data')
         self.results_host = 'localhost'
         if self.isProduction:
@@ -156,6 +160,12 @@ class nrgCing(Lister):
         self.wattosProg = "java -Djava.awt.headless=true -Xmx1500m Wattos.CloneWars.UserInterface -at -verbosity %s" % self.wattosVerbosity
         self.tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
 
+        self.vc = None
+
+    def initVc(self):
+        NTmessage("Setting up vCing")
+        self.vc = vCing(max_time_to_wait_per_job=self.max_time_to_wait)
+        NTmessage("Starting with %r" % self.vc)
 
     def updateWeekly(self):
         self.writeWhyNot = True     # DEFAULT: True.
@@ -744,6 +754,69 @@ class nrgCing(Lister):
         shutil.copy(headerBgFile, indexDir)
 
     # end def
+
+    def postProcessEntryAfterVc(self, pdb_id):
+        """
+        Unzips the tgz.
+        Copies the log
+        Removes both tgz & log.
+
+        Returns True on error.
+        """
+        NTmessage("Doing postProcessEntryAfterVc on  %s" % pdb_id)
+
+        doRemoves = 0 # DEFAULT 1 disable for testing.
+
+        entryCodeChar2and3 = pdb_id[1:3]
+        entryDir = os.path.join( self.data_dir , entryCodeChar2and3, pdb_id )
+        if not os.path.exists(entryDir):
+            NTerror("Skipping %s because dir %s was not found." % ( pdb_id, entryDir))
+            return True
+        os.chdir(entryDir)
+        tgzFileNameCing = pdb_id + ".cing.tgz"
+        if not os.path.exists(tgzFileNameCing):
+            NTerror("Skipping %s because tgz not found: " + tgzFileNameCing)
+            return True
+        cmd = "tar -xzf %s" % tgzFileNameCing
+        NTdebug("cmd: %s" % cmd)
+        status, result = commands.getstatusoutput(cmd)
+        if status:
+            NTerror("Failed to untar status: %s with result %s" % (status, result))
+            return True
+
+        if not self.vc:
+            self.initVc()
+        master_target_log_dir = self.vc.MASTER_TARGET_LOG
+        if not os.path.exists(master_target_log_dir):
+            NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (pdb_id, master_target_log_dir))
+            return True
+        logScriptFileNameRoot = 'validateEntryNRG'
+        logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot,pdb_id)
+        logLastFile = globLast(master_target_log_dir + logFilePattern)
+        if not logLastFile:
+            NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (pdb_id, master_target_log_dir, logFilePattern ))
+            return True
+
+        date_stamp = getDateTimeStampForFileName(logLastFile)
+        if not date_stamp:
+            NTerror("Skipping %s because failed to find date for log file: %s by pattern %s" % (pdb_id, logLastFile ))
+            return True
+
+        logScriptFileNameRootNew = 'validateEntry' # stick them in next to the locally derived logs.
+        newLogDir = 'log_' + logScriptFileNameRootNew
+        if not os.path.exists( newLogDir ):
+            os.mkdir(newLogDir)
+        logLastFileNew = '%s_%s.log' % (pdb_id, date_stamp)
+        logLastFileNewFull = os.path.join(newLogDir, logLastFileNew )
+        NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
+        copyfile(logLastFile, logLastFileNewFull)
+
+        if not doRemoves:
+            return
+        os.remove(tgzFileNameCing)
+        os.remove(logLastFile)
+    # end def
+
     def processEntry(self, pdb_id,
                      doInteractive=0,
                      convertMmCifCoor=1,
@@ -883,13 +956,6 @@ class nrgCing(Lister):
         NTmessage("Starting runCing")
 #        return True
 
-        if self.useTopos:
-            NTmessage("Setting up a master for using the cloud with topos and vCing")
-            vc = vCing(max_time_to_wait_per_job=self.max_time_to_wait)
-            NTmessage("Starting with %r" % vc)
-            NTerror("Stopping here until code done.")
-            return
-
         NTmessage("Not using topos")
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
@@ -920,7 +986,7 @@ class nrgCing(Lister):
         """Return True on error.
         TODO: embed.
         """
-        extraArgListStr = "http://nmr.cmbi.ru.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN"
+        extraArgListStr = "http://nmr.cmbi.umcn.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN"
 
         NTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
         self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
@@ -960,6 +1026,7 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+#        self.entry_list_todo = "2znf".split()
 
         NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
         NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))

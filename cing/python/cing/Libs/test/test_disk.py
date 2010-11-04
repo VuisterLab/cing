@@ -1,10 +1,9 @@
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityError
+from cing import cingRoot
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import globLast
 from cing.Libs.disk import tail
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
@@ -23,7 +22,15 @@ class AllChecks(TestCase):
         self.assertEquals( "Line 9", lastLine )
         self.assertEquals( "['Line 9']", `lastLineList` ) # not necessary a test.
 
+    def testGlobLast(self):
+        globPattern = os.path.join(cingRoot, '*.txt')
+        lastFile = globLast(globPattern)
+        NTdebug('lastFile: %s' % lastFile)
+        d, _basename, extension = NTpath(lastFile)
+        self.assertTrue(lastFile)
+        self.assertEquals(d, cingRoot)
+        self.assertEquals(extension, '.txt')
+
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()
