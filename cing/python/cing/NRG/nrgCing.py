@@ -23,8 +23,7 @@ Sum                4971048.908
 from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import header
-from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTgenUtils import analyzeCingLog
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
 from cing.Libs.disk import mkdirs
@@ -42,13 +41,12 @@ from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.main import getStartMessage
 from cing.main import getStopMessage
-from glob import glob
+from shutil import copyfile
 from shutil import rmtree
 import commands
 import csv
 import shutil
 import string
-from shutil import copyfile
 
 class nrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
@@ -154,6 +152,7 @@ class nrgCing(Lister):
         self.entry_list_done = NTlist()       # finished to completion of the cing run.
         self.entry_list_todo = NTlist()
         self.timeTakenDict = NTdict()
+        self.inputModifiedDict = NTdict()     # This is the most recent of mmCIF, NRG, BMRB CS.
         self.entry_list_obsolete = NTlist()
         self.ENTRY_DELETED_COUNT_MAX = 2
         self.wattosVerbosity = cing.verbosity
@@ -224,10 +223,62 @@ class nrgCing(Lister):
             return True
     # end def run
 
+    def addInputModificationTimesFromMmCif(self):
+        NTmessage("Looking at mmCIF input file modification times.")
+        for entryId in self.entry_list_nmr:
+            entryCodeChar2and3 = entryId[1:3]
+            fileName = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entryId)
+#            NTdebug("Looking at: " + fileName)
+            if not os.path.exists(fileName):
+                NTmessage("Failed to find: " + fileName)
+                continue
+            self.inputModifiedDict[ entryId ] = os.path.getmtime(fileName)
+        # end for
+    # end def
+
+    def addInputModificationTimesFromNrg(self):
+        NTmessage("Looking at NRG input file modification times.")
+        for entryId in self.entry_list_nrg_docr:
+            inputDir = os.path.join(self.results_dir + '/recoordSync', )
+            fileName = os.path.join(inputDir, entryId, '%s.tgz' % entryId)
+            if not os.path.exists(fileName):
+                NTdebug("Failed to find: " + fileName)
+                continue
+            nrgMod = os.path.getmtime(fileName)
+#            NTdebug("For %s found: %s" % ( fileName, nrgMod))
+            prevMod = getDeepByKeysOrAttributes( self.inputModifiedDict, entryId)
+
+            if prevMod:
+               if nrgMod > prevMod:
+                   self.inputModifiedDict[ entryId ] = nrgMod # nrg more recent
+               else:
+                   pass
+            else:
+               self.inputModifiedDict[ entryId ] = nrgMod # nrg more recent
+               NTwarning("Found no mmCIF file for %s" % entryId)
+            # end else
+        # end for
+    # end def
+
+    def getInputModificationTimes(self):
+        if self.addInputModificationTimesFromMmCif():
+            NTerror("Failed to addInputModificationTimesFromMmCif aborting")
+            return True
+        if self.addInputModificationTimesFromNrg():
+            NTerror("Failed to addInputModificationTimesFromNrg aborting")
+            return True
+#        self.addInputModificationTimesFromBmrb() # TODO:
+
+
     def getEntryInfo(self):
-        """Returns True for error
+        """Returns True for error.
+
+        This routine sets self.entry_list_todo
+
         Will remove entry directories if they do not occur in NRG up to a maximum number as not to whip out
         every one in a single blow by accident.
+
+        If an entry has restraint data but is not in DOCR, it will be done from mmCIF until it does occur in DOCR.
         """
 
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
@@ -241,7 +292,11 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_updated = NTlist()
 
+        if self.getInputModificationTimes():
+            NTerror("Failed to getInputModificationTimes aborting")
+            return True
 
+        NTmessage("Starting to scan CING report/log.")
         subDirList = os.listdir('data')
         for subDir in subDirList:
             if len(subDir) != 2:
@@ -274,69 +329,40 @@ class nrgCing(Lister):
                     continue
 
                 # Look for last log file
-                logList = glob(entrySubDir + '/log_validateEntry/*.log')
-                if not logList:
+#                logList = glob(entrySubDir + '/log_validateEntry/*.log')
+                logLastFile = globLast(entrySubDir + '/log_validateEntry/*.log')
+                if not logLastFile:
                     NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                     continue
                 # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_list_tried.append(entry_code)
-
-                logLastFile = logList[-1]
-#                NTdebug("Found logLastFile %s" % logLastFile)
-#                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
-#                text = readTextFromFile(logLastFile)
                 entryCrashed = False
 
-                # TODO: generalize the log file analyses further.
+                # TODO: generalize the log file analysis further.
 #                analysisResultList = analyzeLogFile(logLastFile, typeLogFile = )
-#                timeTaken, crashed, wasUpdated = analysisResultList
-
-                for r in AwkLike(logLastFile):
-                    line = r.dollar[0]
-                    if line.startswith('CING took       :'):
-#                        NTdebug("Matched line: %s" % line)
-                        timeTakenStr = r.dollar[r.NF - 1]
-                        self.timeTakenDict[entry_code] = float(timeTakenStr)
-#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
-                    if line.startswith('Traceback (most recent call last)'):
-#                        NTdebug("Matched line: %s" % line)
-                        if entry_code in self.entry_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
-                        else:
-                            self.entry_list_crashed.append(entry_code)
-                            entryCrashed = True
+                timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
+                NTdebug("In %s found %d/%d/%d/%d error,warning,message, and debug lines." % (logLastFile, nr_error, nr_warning, nr_message, nr_debug) )
                 if entryCrashed:
+                    self.entry_list_crashed.append(entry_code)
                     continue # don't mark it as stopped anymore.
+                # end if
+                if not timeTaken:
+                    NTerror("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken,logLastFile))
+                else:
+                    self.timeTakenDict[entry_code] = timeTaken
 
-                # NRG-CING/data/br/1brv/log_validateEntry/1brv_2010-09-01_15-51-22.log
-                _root, name, _ext = NTpath(logLastFile)
-                dtLastValidation = None
-                dtLastInputModification = None
-                try:
-                    dateStrListLastFile = name.split('_')
-                    if len(dateStrListLastFile) != 3:
-                        NTerror("Failed to find date from logLastFile %s with name %s" % (logLastFile, name))
-                    else:
-                        yearMonthDayList = [int(x) for x in dateStrListLastFile[1].split('-')]
-                        if len(yearMonthDayList) != 3:
-                            NTerror("Failed to find date from dateStrListLastFile %s" % dateStrListLastFile)
-                        else:
-                            dtLastValidation = datetime.datetime(yearMonthDayList[0], yearMonthDayList[1], yearMonthDayList[2])
-                    ccpnTgzFile = os.path.join('recoordSync', entry_code, '%s.tgz' % entry_code)
-                    if not os.path.exists(ccpnTgzFile):
-                        pass
-#                        NTdebug("No ccpn file which may be normal now: %s" % ccpnTgzFile)
-                    else:
-                        f = os.path.getmtime(ccpnTgzFile)
-                        oldtimetuple = time.localtime(f)
-                        dtLastInputModification = datetime.datetime(oldtimetuple.tm_year, oldtimetuple.tm_mon, oldtimetuple.tm_mday)
-                except:
-                    pass
-#                    NTtracebackError()
-
-                if dtLastValidation and dtLastInputModification:
-                    if dtLastValidation < dtLastInputModification: # an old date is smaller than a young date (really just an epoch compare I guess).
+                timeStampLastValidation = getTimeStampFromFileName(logLastFile)
+                if not timeStampLastValidation:
+                    NTdebug("Failed to retrieve timeStampLastValidation from %s" % logLastFile)
+                timeStampLastInputMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entry_code)
+#                if timeStampLastInputMod:
+#                    timeStampLastInputMod = datetime.datetime.fromtimestamp(timeStampLastInputMod)
+                # If the input has been updated then the entry should be redone so don't add it to the done list.
+                if timeStampLastValidation and timeStampLastInputMod:
+                    NTdebug("Comparing input to validation time stamps: %s to %s" % (timeStampLastInputMod, timeStampLastValidation))
+                    if timeStampLastValidation < timeStampLastInputMod:
                         self.entry_list_updated.append(entry_code)
+                        continue
                 else:
                     NTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
 
@@ -371,6 +397,10 @@ class nrgCing(Lister):
                 self.entry_list_done.append(entry_code)
             # end for entryDir
         # end for subDir
+
+        # Consider the entries updated as not done.
+        self.entry_list_done.difference(self.entry_list_updated)
+
         timeTakenList = NTlist() # local variable.
         timeTakenList.addList(self.timeTakenDict.values())
         NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
@@ -378,18 +408,19 @@ class nrgCing(Lister):
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
 
-        self.entry_list_todo.addList(self.entry_list_nrg_docr)
+        self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
+        NTmessage("Found %s entries by NMR (A)." % len(self.entry_list_nmr))
         NTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
         NTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
         NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_list_stopped))
-        if not self.entry_list_done:
-            NTerror("Failed to find entries that CING did.")
-        NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
+        NTmessage("Found %s entries that CING should update (U)." % len(self.entry_list_updated))
+        NTmessage("Found %s entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
         NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
         NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
-        NTmessage("Found %s entries in NRG-CING updated." % len(self.entry_list_updated))
+        if not self.entry_list_done:
+            NTwarning("Failed to find entries that CING did.")
     # end def
 
     def searchPdbEntries(self):

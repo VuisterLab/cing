@@ -1,5 +1,5 @@
 from cing.core.database import MolDef
-from cing.Libs.AwkLike import AwkLike
+from cing.Libs.AwkLike import AwkLike #@UnusedImport
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import * #@UnusedWildImport
 

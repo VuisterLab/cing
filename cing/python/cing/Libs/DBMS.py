@@ -115,7 +115,8 @@ class Relation():
         # Never know when the connection is finally empty.
         except IOError:
             pass
-        NTdebug("Read %8d rows %2d cols to relation %s" % (self.sizeRows(), self.sizeColumns(), self.name))
+#        NTdebug("Read %8d rows %2d cols to relation %s" % (self.sizeRows(), self.sizeColumns(), self.name))
+    # end def
 
 
     def writeCsvFile(self, file_name=None, doHeader=True):

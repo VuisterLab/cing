@@ -3,6 +3,7 @@ Unit test execute as:
 python -u $CINGROOT/python/cing/Libs/test/test_NTutils5.py
 """
 
+from cing import cingDirTmp
 from cing import cingRoot
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
@@ -11,7 +12,7 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-
+    os.chdir(cingDirTmp)
     def testGetKeyWithLargestCount(self):
 
         testList = [
