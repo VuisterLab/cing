@@ -2,6 +2,7 @@
 
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentSwapCheck
+from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import defaultPrintChainCode
 from cing.Scripts.FC.constants import * #@UnusedWildImport
@@ -107,3 +108,42 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns):
 
     print
     print
+
+
+def analyzeFcLog(logFile):
+    """
+    Returns [timeTaken, crashed, nr_error, nr_warning, nr_debug, nr_message]
+    Return None on error.
+
+    For a specific other log file type look at the example in:
+
+    """
+    NTerror("TODO: fix code in cing.Scripts.FC.utils")
+    return None
+
+    result = [ None, None, 0, 0, 0 ]
+    if not os.path.exists(logFile):
+        NTerror("logFile %s was not found." % logFile)
+        return None
+
+    for r in AwkLike(logFile):
+        line = r.dollar[0]
+        if line.startswith(prefixError):
+            result[2] += 1
+        elif line.startswith(prefixWarning):
+            result[3] += 1
+        elif line.startswith(prefixDebug):
+            result[4] += 1
+        else:
+            result[5] += 1
+            if line.startswith('CING took       :'):
+    #            NTdebug("Matched line: %s" % line)
+                timeTakenStr = r.dollar[r.NF - 1]
+                result[0] = float(timeTakenStr)
+    #            NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+            elif line.startswith('Traceback (most recent call last)'):
+    #            NTdebug("Matched line: %s" % line)
+                result[1] = True
+        # end else
+    return result
+# end def

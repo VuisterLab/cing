@@ -20,9 +20,9 @@ from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-from glob import glob
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import PROJECT_TYPE_PDB
+from glob import glob
 import csv
 import shutil
 import string

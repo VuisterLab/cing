@@ -4667,9 +4667,45 @@ def getDateTimeFromFileName(fn):
     dateTimeObj = datetime.datetime.fromtimestamp(timeStamp)
     return dateTimeObj
 
+def getDateTimeStampFromFileName(fn):
+    """
+    Return False on error. This algorithm needs to match it's reversal in
+    getDateTimeStampForFileName.
+
+    E.g. NRG-CING/data/br/1brv/log_validateEntry/1brv_2010-09-01_15-51-22.log
+
+    Make sure the time stamp is the last part of the file name and is preceded by an _
+    or the only string in the base name.
+    """
+
+    _root, name, _ext = NTpath(fn)
+    dtList = name.split('_')
+    if len(dtList) < 2:
+        NTerror("Failed to find date from fn %s with base name %s" % (fn, name))
+        return
+    dtList = dtList[-2:]
+    dtListStr = '-'.join(dtList)
+    dtList = dtListStr.split('-')
+    dtListInt = [int(x) for x in dtList]
+    if len(dtListInt) != 6:
+        NTerror("Failed to find date from fn %s with derived int list %s" % (fn, str(dtListInt)))
+        return
+    dt = datetime.datetime(*dtListInt)
+    return dt
+# end def
+
+def getTimeStampFromFileName(fn):
+    "Convenience method."
+    dt = getDateTimeStampFromFileName(fn)
+    if not dt:
+        return
+    t = time.mktime(dt.timetuple())
+    return t
+
 def getDateTimeStampForFileName(nadaDateOrFilename=None):
     """
-    Return False on error
+    Return False on error. This algorithm needs to match it's reversal in
+    getDateTimeStampFromFileName
     """
     if not nadaDateOrFilename:
         specDate = datetime.datetime.now()
@@ -5017,3 +5053,6 @@ def stringMeansBooleanTrue(inputStr):
     if inputInt:
         return True
     return False
+# end def
+
+
