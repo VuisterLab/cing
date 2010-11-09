@@ -42,7 +42,7 @@ isRange360 = True
 xGrid, yGrid = xGrid360, yGrid360
 bins = bins360
 
-#pluginDataDir = os.path.join( cingRoot,'PluginCode','data')
+#pluginDataDir = os.path.join( cingRoot,'PluginCode',DATA_STR)
 os.chdir(cingDirTmp)
 
 

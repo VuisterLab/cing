@@ -695,29 +695,29 @@ def removeEmptyFiles( theDir ):
 def getNewestFileFromList( fnList ):
     """
     Return empty list if input is empty
-    Return None on error
+    Return False on error
     """
     # thanks to http://www.daniweb.com/code/snippet216688.html for the example.
     if not fnList:
         print "WARNING: In getNewestFileFromList got no valid input: %s" % fnList
-        return []
+        return False
 
     date_file_list = []
-    for file in fnList:
-        if not os.path.exists(file):
-            print "WARNING: Skipping missing file %s" % file
+    for fileName in fnList:
+        if not os.path.exists(fileName):
+            print "WARNING: Skipping missing fileName %s" % fileName
             continue
-        # retrieves the stats for the current file as a tuple
+        # retrieves the stats for the current fileName as a tuple
         # (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime)
         # the tuple element mtime at index 8 is the last-modified-date
-        stats = os.stat(file)
+        stats = os.stat(fileName)
         # create tuple (year yyyy, month(1-12), day(1-31), hour(0-23), minute(0-59), second(0-59),
         # weekday(0-6, 0 is monday), Julian day(1-366), daylight flag(-1,0 or 1)) from seconds since epoch
         # note:  this tuple can be sorted properly by date and time
         lastmod_date = time.localtime(stats.st_mtime)
         #print image_file, lastmod_date   # test
         # create list of tuples ready for sorting by date
-        date_file_tuple = lastmod_date, file
+        date_file_tuple = lastmod_date, fileName
         date_file_list.append(date_file_tuple)
     #print date_file_list  # test
 

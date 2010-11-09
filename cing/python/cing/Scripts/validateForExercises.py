@@ -12,6 +12,7 @@ from cing import cingDirTestsData
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_FLAT
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
+from cing.core.constants import DATA_STR
 import cing
 import os
 
@@ -20,7 +21,7 @@ cing.verbosity = cing.verbosityDebug
 startDir = '/Library/WebServer/Documents/ValidationExercises'
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
-entryListFileName     = os.path.join(cingDirScripts, 'data', 'entryCodeListProteinsSite1')
+entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'entryCodeListProteinsSite1')
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'

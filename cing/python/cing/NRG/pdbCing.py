@@ -132,7 +132,7 @@ class pdbCing(Lister):
 
         self.results_base = 'PDB-CING'
         self.results_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
-        self.data_dir = os.path.join(self.results_dir, 'data')
+        self.data_dir = os.path.join(self.results_dir, DATA_STR)
         self.base_data_dir = os.path.join(self.base_dir, 'dataPdb')
         self.results_host = 'localhost'
         if self.isProduction:
@@ -239,13 +239,13 @@ class pdbCing(Lister):
         self.entry_list_todo = NTlist()
 
 
-        subDirList = os.listdir('data')
+        subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data', subDir))
+            entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
@@ -254,7 +254,7 @@ class pdbCing(Lister):
                     continue
 #                NTdebug("Working on: " + entry_code)
 
-                entrySubDir = os.path.join('data', subDir, entry_code)
+                entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_pdb:
                     NTwarning("Found entry %s in PDB-CING-CING but not in PDB. Will be obsoleted in PDB-CING too" % entry_code)
                     if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:

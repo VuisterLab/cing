@@ -16,7 +16,7 @@ from shutil import rmtree
 import Tkinter
 import tarfile
 
-dataDir = os.path.join(baseDir,'data')
+dataDir = os.path.join(baseDir,DATA_STR)
 
 def annotateEntry(entryCodeNew, *extraArgList):
     NTmessage(header)

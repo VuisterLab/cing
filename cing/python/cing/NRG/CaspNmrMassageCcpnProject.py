@@ -32,7 +32,7 @@ except:
     baseDir = '/Volumes/UserHome/geerten/Data/CASP-NMR-CING'
 
 startDir = '/Library/WebServer/Documents/' + CASP_NMR_BASE_NAME
-dataDir = os.path.join(startDir, 'data')
+dataDir = os.path.join(startDir, DATA_STR)
 
 colorByLab = {
     'Cheshire': 'green',

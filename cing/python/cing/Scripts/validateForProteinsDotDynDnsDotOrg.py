@@ -26,7 +26,7 @@ startDir              = '/Library/WebServer/Documents/tmp/proteinsDotDynDnsDotOr
 
 pythonScriptFileName  = os.path.join(cingDirScripts, 'validateEntry.py')
 #entryListFileName     = os.path.join('/Users/jd', 'entryCodeList.csv')
-entryListFileName     = os.path.join(cingDirScripts, 'data', 'entryCodeListProteinsSite1')
+entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'entryCodeListProteinsSite1')
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'

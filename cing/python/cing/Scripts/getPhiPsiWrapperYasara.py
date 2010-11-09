@@ -36,7 +36,7 @@ def main():
 
     # parameters for doScriptOnEntryList
     startDir              = os.path.join(cingDirTmp,     subdir)
-    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_todo.txt')
+    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_todo.txt')
 
     START_ENTRY_ID                 =0 # default 0
     MAX_ENTRIES_TODO               =20 # default a ridiculously large number like 999999

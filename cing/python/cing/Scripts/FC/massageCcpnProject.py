@@ -75,8 +75,8 @@ def replaceCoordinates():
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
     baseDir = '/Users/jd/CASD-NMR-CING'
-    dataOrgDir = os.path.join(baseDir,'data')
-    dataDividedDir = os.path.join(baseDir,'data')
+    dataOrgDir = os.path.join(baseDir,DATA_STR)
+    dataDividedDir = os.path.join(baseDir,DATA_STR)
     #        _scriptName = sys.argv[0]
     # parameters for doScriptOnEntryList
     startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME

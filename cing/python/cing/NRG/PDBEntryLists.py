@@ -124,7 +124,7 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
 #    if True: # Default False; used for not bothering sites.
 #        return ['1a4d', '2d6p', '2e7r', '3ejo']
 
-    dir_name = os.path.join(cingPythonDir, 'cing', 'NRG', 'data')
+    dir_name = os.path.join(cingPythonDir, 'cing', 'NRG', DATA_STR)
     if onlySolidState:
         inputFile = os.path.join(dir_name, 'RESTqueryPDB_NMR_solid.xml')
     elif onlyNmr:

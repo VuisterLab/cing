@@ -7,6 +7,7 @@ Use below to find the entries done and todo:
 from cing import cingDirScripts
 from cing import cingDirTmp
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.core.constants import DATA_STR
 import cing
 import os
 
@@ -40,10 +41,10 @@ def main():
     # parameters for doScriptOnEntryList
     startDir              = os.path.join(cingDirTmp,     subdir)
     pythonScriptFileName  = os.path.join(cingDirScripts, 'getPhiPsi.py')
-#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB.LIS')
-#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS')
-    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.19_Res1.3_2009-02-28_noObs.LIS')
-#    entryListFileName     = os.path.join(cingDirScripts, 'data', 'PDB_todo.txt')
+#    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB.LIS')
+#    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS')
+    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_WI_SELECT_Rfactor0.19_Res1.3_2009-02-28_noObs.LIS')
+#    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_todo.txt')
 
     START_ENTRY_ID                 =0 # default 0
     MAX_ENTRIES_TODO               =1 # default a ridiculously large number like 999999

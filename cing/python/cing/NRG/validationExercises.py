@@ -50,7 +50,7 @@ class validationExercises(Lister):
         self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.results_dir = self.results_base_dir
 
-        self.data_dir = os.path.join(self.results_base_dir, 'data')
+        self.data_dir = os.path.join(self.results_base_dir, DATA_STR)
 #        self.results_dir        = '/big/jurgen/molgrap/'        + run_id
         self.tmp_dir = self.results_dir + '/_tmp_'
         # all relative now.
@@ -163,7 +163,7 @@ class validationExercises(Lister):
     def is_complete_resource(self, entry_code):
         NTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
-        indexFileName = os.path.join (self.results_dir, 'data', sub_dir, entry_code, entry_code + ".cing", 'index.html')
+        indexFileName = os.path.join (self.results_dir, DATA_STR, sub_dir, entry_code, entry_code + ".cing", 'index.html')
         return os.path.isfile(indexFileName)
 
 
@@ -175,19 +175,19 @@ class validationExercises(Lister):
         entry_list_done = []
 
 
-        subDirList = os.listdir('data')
+        subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data',subDir))
+            entryList = os.listdir(os.path.join(DATA_STR,subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if entry_code == DS_STORE_STR:
                     continue
 
-                cingDirEntry = os.path.join('data',subDir, entry_code, entry_code + ".cing")
+                cingDirEntry = os.path.join(DATA_STR,subDir, entry_code, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
                     continue
 
