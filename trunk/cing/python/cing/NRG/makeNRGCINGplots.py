@@ -5,6 +5,7 @@
 Create plots like the GreenVersusRed scatter by entry.
 """
 
+from cing import cingDirTmp
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -55,8 +56,8 @@ DEPOSITION_DATE_STR = 'deposition_date'
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
 #schemaJ = PDBJ_DB_SCHEMA
-#HOST = 'nmr'
-HOST = 'localhost'
+HOST = 'nmr'
+#HOST = 'localhost'
 
 
 def getDbColumnName( level, progId, chk_id ):
@@ -132,6 +133,9 @@ class nrgCingPlot():
             self.r1 = self.cresidue.alias()
             self.r2 = self.cresidue.alias()
             self.a1 = self.catom.alias()
+
+            self.s1 = self.centry_list_selection.alias()
+            self.perEntryRog = NTdict()
 
         if True:
             self.jsql = cgenericSql(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
@@ -548,11 +552,12 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     def createScatterPlotGreenVersusRed(self):
         """This routine is a duplicate of the one developed afterwards/below.
         """
+        os.chdir(cingDirTmp)
         m = self
         perEntryRog = m.perEntryRog
         s = select([m.e1.c.pdb_id, m.r1.c.rog, 100.0 * func.count(m.r1.c.rog) / m.e1.c.res_count
                      ], from_obj=[m.e1.join(m.r1)]
-                     ).group_by(m.e1.c.pdb_id, m.r1.c.rog)
+                     ).group_by(m.e1.c.pdb_id, m.r1.c.rog, m.e1.c.res_count)
         NTdebug("SQL: %s" % s)
         result = m.execute(s).fetchall()
         #NTdebug("ROG percentage per entry: %s" % result)
@@ -599,7 +604,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         p.line([0,offset],[100 - offset, 100], attributes)
         attributes = NTplotAttributes(lineWidth=lineWidth, color='red')
         p.line([offset, 0], [100, 100 - offset], attributes)
-        fn = 'nrgcingPlot1.png'
+        fn = os.path.join(cingDirTmp, 'nrgcingPlot1.png')
         ps.hardcopySize = (900,900)
         if is_interactive():
             ps.show()
@@ -609,8 +614,9 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         NTdebug("Done plotting %s" % fn)
 
 
-    def getAndPlotColorVsColor(self, perEntryRog, doPlot = True):
+    def getAndPlotColorVsColor(self, doPlot = True):
         m = self
+        perEntryRog = m.perEntryRog
         # Plot the % red vs green for all in nrgcing
         s = select([m.e1.c.pdb_id, m.r1.c.rog, 100.0 * func.count(m.r1.c.rog) / m.e1.c.res_count
                      ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
@@ -778,15 +784,14 @@ if __name__ == '__main__':
     cing.verbosity = verbosityDebug
     m = nrgCingPlot()
 
-    if True:
+    if False:
         m.createPlots(doTrending = True)
 
     if False:
-        m.perEntryRog = NTdict()
-        m.plotQualityVsColor()
-        m.plotQualityPcVsColor()
+#        m.plotQualityVsColor()
+#        m.plotQualityPcVsColor()
         m.getAndPlotColorVsColor(doPlot = True)
-    if False:
+    if True:
         m.createScatterPlotGreenVersusRed()
     if False:
         m.showCounts()
