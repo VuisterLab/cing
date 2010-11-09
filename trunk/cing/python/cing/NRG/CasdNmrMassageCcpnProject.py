@@ -31,8 +31,8 @@ except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
     baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
 
-#dataOrgDir = os.path.join(baseDir, 'data')
-dataDir = os.path.join(baseDir, 'data')
+#dataOrgDir = os.path.join(baseDir, DATA_STR)
+dataDir = os.path.join(baseDir, DATA_STR)
 startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
 
 colorByLab = {

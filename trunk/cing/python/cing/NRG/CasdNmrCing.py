@@ -75,7 +75,7 @@ class casdNmrCing(Lister):
         self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
         self.results_dir = self.results_base_dir
 
-        self.data_dir = os.path.join(self.results_base_dir, 'data')
+        self.data_dir = os.path.join(self.results_base_dir, DATA_STR)
 #        self.results_dir        = '/big/jurgen/molgrap/'        + run_id
         self.tmp_dir = self.results_dir + '/_tmp_'
         # all relative now.
@@ -157,7 +157,7 @@ class casdNmrCing(Lister):
     def is_complete_resource(self, entry_code):
         NTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
-        indexFileName = os.path.join (self.results_dir, 'data', sub_dir, entry_code, entry_code + ".cing", 'index.html')
+        indexFileName = os.path.join (self.results_dir, DATA_STR, sub_dir, entry_code, entry_code + ".cing", 'index.html')
         return os.path.isfile(indexFileName)
 
 
@@ -170,19 +170,19 @@ class casdNmrCing(Lister):
         entry_list_crashed = []
 
         NTdebug("Now in: " + os.getcwd())
-        subDirList = os.listdir('data')
+        subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data',subDir))
+            entryList = os.listdir(os.path.join(DATA_STR,subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if entry_code == DS_STORE_STR:
                     continue
 
-                entrySubDir = os.path.join('data', subDir, entry_code)
+                entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
@@ -257,14 +257,14 @@ class casdNmrCing(Lister):
 
         cwdCache = os.getcwd()
         os.chdir(baseDir)
-        subDirList = os.listdir('data')
+        subDirList = os.listdir(DATA_STR)
         subDirList.sort()
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data', subDir))
+            entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if entry_code.startswith( "."):
@@ -273,7 +273,7 @@ class casdNmrCing(Lister):
                 if entry_code.endswith( "Org") or entry_code.endswith( "Test"):
 #                    NTdebug('Skipping original entry: [' + entry_code + ']')
                     continue
-                entrySubDir = os.path.join('data', subDir, entry_code)
+                entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
 #                if not entry_code in self.entry_list_nrg_docr:
 #                    NTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
 #                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:

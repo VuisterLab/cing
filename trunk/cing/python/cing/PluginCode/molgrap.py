@@ -266,7 +266,7 @@ def export2gif(molecule, path, project = None):
     m.run(molecule, path)
 #    if os.path.exists(path):
     if not os.path.exists(path):
-        src =  os.path.join( cingPythonCingDir, 'PluginCode', 'data', 'UnknownImage.gif' )
+        src =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
         NTmessage("copying default image from %s to %s" % (src, path))

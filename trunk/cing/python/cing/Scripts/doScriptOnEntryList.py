@@ -18,7 +18,7 @@ MAX_ENTRIES_TODO               = 999 # default a ridiculously large number like 
 def mkSubDirStructure(startDir, entryCodeList, pythonScriptFileNameRoot):
     for entry_code in entryCodeList:
         entryCodeChar2and3 = entry_code[1:3]
-        dataDir = os.path.join( startDir, 'data' )
+        dataDir = os.path.join( startDir, DATA_STR )
         if not os.path.exists(dataDir):
             NTmessage("Creating dir: " + dataDir)
             os.mkdir(dataDir)
@@ -111,7 +111,7 @@ def doScriptOnEntryList(pythonScriptFileName,
         chain_code = chainCodeList[i]
 
         entryCodeChar2and3 = entry_code[1:3]
-        entryDir = os.path.join( startDir, 'data', entryCodeChar2and3, entry_code )
+        entryDir = os.path.join( startDir, DATA_STR, entryCodeChar2and3, entry_code )
 
         date_stamp = getDateTimeStampForFileName()
         cmd = 'cd %s; python -u %s %s %s %s > %s/%s_%s%s.log 2>&1 ' % (

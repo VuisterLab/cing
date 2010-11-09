@@ -40,7 +40,7 @@ startDir = os.path.join(cingDirTmp, subdir)
 
 
 def truncatePdbList():
-    os.chdir(os.path.join(cingDirScripts, 'data'))
+    os.chdir(os.path.join(cingDirScripts, DATA_STR))
     obsEntriesList = readLinesFromFile('obsoleteSince2009-02-28.LIS')
     entriesList = readLinesFromFile('PDB_WI_SELECT_Rfactor_2.1_Res2.0_2009-02-28.LIS')
 
@@ -56,11 +56,11 @@ def truncatePdbList():
 
 
 def findMissingCsv():
-    d1d2Dir = os.path.join(startDir, 'data')
+    d1d2Dir = os.path.join(startDir, DATA_STR)
 
     os.chdir(d1d2Dir)
     NTmessage("Now in %s" % os.getcwd())
-    entriesList = readLinesFromFile(os.path.join(cingDirScripts, 'data', 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS'))
+    entriesList = readLinesFromFile(os.path.join(cingDirScripts, DATA_STR, 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS'))
 
     count = 0
     for code in entriesList:

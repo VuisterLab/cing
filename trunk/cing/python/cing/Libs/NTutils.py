@@ -3252,7 +3252,7 @@ def XML2obj(path=None, string=None):
 
 class Sorter:
     def _helper (self, data, aux, inplace):
-#        print 'data', data
+#        print DATA_STR, data
 #        print 'aux>', aux
         aux.sort()
 

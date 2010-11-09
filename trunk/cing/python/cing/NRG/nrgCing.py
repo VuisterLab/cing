@@ -4,7 +4,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py [pdb_id] [updateWeekly prepare processEntry createToposTokens ]
+python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry createToposTokens ]
 
 As a cron job this will:
     - create a todo list
@@ -24,6 +24,7 @@ from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import header
 from cing.Libs.NTgenUtils import analyzeCingLog
+from cing.Libs.NTgenUtils import analyzeFcLog
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
 from cing.Libs.disk import mkdirs
@@ -33,11 +34,10 @@ from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from cing.NRG.WhyNot import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
-from cing.Scripts.FC.convertStar2Ccpn import importFullStarProjects
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import vCing
-from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.main import getStartMessage
 from cing.main import getStopMessage
@@ -47,6 +47,14 @@ import commands
 import csv
 import shutil
 import string
+
+PHASE_C = 'C'
+PHASE_R = 'R'
+PHASE_S = 'S'
+PHASE_F = 'F'
+
+LOG_NRG_CING = 'log_nrgCing'
+#DATA_STR = 'log_nrgCing'
 
 class nrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
@@ -78,7 +86,7 @@ class nrgCing(Lister):
         self.results_base = 'NRG-CING'
         self.D = '/Library/WebServer/Documents'
         self.results_dir = os.path.join(self.D, self.results_base)
-        self.data_dir = os.path.join(self.results_dir, 'data')
+        self.data_dir = os.path.join(self.results_dir, DATA_STR)
         self.results_host = 'localhost'
         if self.isProduction:
             # Needed for php script.
@@ -133,12 +141,16 @@ class nrgCing(Lister):
 
         # Stages are cumulative in that e.g. R always includes all from C. This simplifies this setup hopefully.
                       # id #name         #code
+
+        self.phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_F]
         self.phaseDataList = [
                      [ 'Coordinate', 'C'],
                      [ 'Restraint', 'R'],
                      [ 'Shift', 'S'],
                      [ 'Filter', 'F'],
                       ]
+        self.recoordSyncDir = 'recoordSync'
+        self.inputDir = 'input'
         self.entry_list_prep_stage_C = NTlist()   # NMR entries prepared from mmCIF coordinates (NRG-DOCR entries will overrule these any time).
         self.entry_list_prep_stage_R = NTlist()   # Should include entry_list_nrg_docr if all came over from NRG-DOCR.
         self.entry_list_prep_stage_S = NTlist()   # Adds chemical shifts if available.
@@ -146,6 +158,10 @@ class nrgCing(Lister):
         self.phaseList = [self.entry_list_prep_stage_C, self.entry_list_prep_stage_R, self.entry_list_prep_stage_S, self.entry_list_prep_stage_F]
 
         # From disk.
+        self.entry_list_prep_tried = NTlist()
+        self.entry_list_prep_crashed = NTlist()
+        self.entry_list_prep_done = NTlist()
+
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
         self.entry_list_crashed = NTlist()    # has a stack trace
         self.entry_list_stopped = NTlist()    # was stopped by time out or by user or by system (any other type of stop but stack trace)
@@ -155,6 +171,8 @@ class nrgCing(Lister):
         self.inputModifiedDict = NTdict()     # This is the most recent of mmCIF, NRG, BMRB CS.
         self.entry_list_obsolete = NTlist()
         self.ENTRY_DELETED_COUNT_MAX = 2
+        self.MAX_ERROR_COUNT_CING_LOG = 10
+        self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
         self.wattosVerbosity = cing.verbosity
         self.wattosProg = "java -Djava.awt.headless=true -Xmx1500m Wattos.CloneWars.UserInterface -at -verbosity %s" % self.wattosVerbosity
         self.tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
@@ -171,7 +189,7 @@ class nrgCing(Lister):
         self.updateIndices = True   # DEFAULT: True.
         self.getTodoList = True     # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
 
-#        self.new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
+        self.new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
     #    self.new_hits_entry_list = ['1brv']
     #    self.new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
@@ -202,6 +220,13 @@ class nrgCing(Lister):
                 return True
 
         if self.entry_list_todo and self.max_entries_todo:
+            if self.prepare():
+                NTerror("Failed to prepare")
+                return True
+            if self.getEntryInfo(): # needed to see which preps failed; they are then excluded from todo list.
+                NTerror("Failed to getEntryInfo (second time in updateWeekly).")
+                return True
+            self.entry_list_todo.difference( self.entry_list_prep_crashed )
             if self.runCing():
                 NTerror("Failed to runCing")
                 return True
@@ -230,7 +255,8 @@ class nrgCing(Lister):
             fileName = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entryId)
 #            NTdebug("Looking at: " + fileName)
             if not os.path.exists(fileName):
-                NTmessage("Failed to find: " + fileName)
+                if self.isProduction:
+                    NTmessage("Failed to find: " + fileName)
                 continue
             self.inputModifiedDict[ entryId ] = os.path.getmtime(fileName)
         # end for
@@ -239,14 +265,15 @@ class nrgCing(Lister):
     def addInputModificationTimesFromNrg(self):
         NTmessage("Looking at NRG input file modification times.")
         for entryId in self.entry_list_nrg_docr:
-            inputDir = os.path.join(self.results_dir + '/recoordSync', )
+            inputDir = os.path.join(self.results_dir, self.recoordSyncDir)
             fileName = os.path.join(inputDir, entryId, '%s.tgz' % entryId)
             if not os.path.exists(fileName):
-                NTdebug("Failed to find: " + fileName)
+                if self.isProduction:
+                    NTdebug("Failed to find: " + fileName)
                 continue
             nrgMod = os.path.getmtime(fileName)
 #            NTdebug("For %s found: %s" % ( fileName, nrgMod))
-            prevMod = getDeepByKeysOrAttributes( self.inputModifiedDict, entryId)
+            prevMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entryId)
 
             if prevMod:
                if nrgMod > prevMod:
@@ -255,7 +282,8 @@ class nrgCing(Lister):
                    pass
             else:
                self.inputModifiedDict[ entryId ] = nrgMod # nrg more recent
-               NTwarning("Found no mmCIF file for %s" % entryId)
+               if self.isProduction:
+                   NTwarning("Found no mmCIF file for %s" % entryId)
             # end else
         # end for
     # end def
@@ -284,6 +312,11 @@ class nrgCing(Lister):
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
 
 
+        self.entry_list_prep_tried = NTlist()
+        self.entry_list_prep_crashed = NTlist()
+        self.entry_list_prep_todo = NTlist()
+        self.entry_list_prep_done = NTlist()
+
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
         self.entry_list_crashed = NTlist()
@@ -296,14 +329,48 @@ class nrgCing(Lister):
             NTerror("Failed to getInputModificationTimes aborting")
             return True
 
+        # TODO: loop this over different prep stages.
+        NTmessage("Scanning the prep logs.")
+        for entry_code in self.entry_list_nmr:
+            entryCodeChar2and3 = entry_code[1:3]
+            logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_NRG_CING )
+#            NTdebug("Looking in log dir: %s" % logDir)
+            logLastFile = globLast(logDir + '/*.log')
+#            NTdebug("logLastFile: %s" % logLastFile)
+            if not logLastFile:
+                if self.isProduction and 0: # DEFAULT: 1 when assumed all are done.
+                    NTmessage("Failed to find any prep log file in directory: %s" % logDir)
+                continue
+            self.entry_list_prep_tried.append(entry_code)
+            analysisResultTuple = analyzeCingLog(logLastFile)
+            if not analysisResultTuple:
+                NTmessage("Failed to analyze log file: %s" % logLastFile)
+                self.entry_list_prep_crashed.append(entry_code)
+                continue
+            timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+            NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+            if nr_error > 0:
+                NTerror("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
+                continue
+            # end if
+            if not timeTaken:
+                NTerror("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
+                self.entry_list_prep_crashed.append(entry_code)
+                continue # don't mark it as stopped anymore.
+            # end if
+            self.entry_list_prep_done.append(entry_code)
+        # end for
+        self.entry_list_prep_todo += self.entry_list_nmr
+        self.entry_list_prep_todo.difference(self.entry_list_prep_done)
+
         NTmessage("Starting to scan CING report/log.")
-        subDirList = os.listdir('data')
+        subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
                     NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
-            entryList = os.listdir(os.path.join('data', subDir))
+            entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
@@ -312,7 +379,7 @@ class nrgCing(Lister):
                     continue
 #                NTdebug("Working on: " + entry_code)
 
-                entrySubDir = os.path.join('data', subDir, entry_code)
+                entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_nmr:
                     NTwarning("Found entry %s in NRG-CING but not in PDB-NMR. Will be obsoleted in NRG-CING too" % entry_code)
                     if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
@@ -329,7 +396,6 @@ class nrgCing(Lister):
                     continue
 
                 # Look for last log file
-#                logList = glob(entrySubDir + '/log_validateEntry/*.log')
                 logLastFile = globLast(entrySubDir + '/log_validateEntry/*.log')
                 if not logLastFile:
                     NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
@@ -337,37 +403,34 @@ class nrgCing(Lister):
                 # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_list_tried.append(entry_code)
                 entryCrashed = False
-
-                # TODO: generalize the log file analysis further.
-#                analysisResultList = analyzeLogFile(logLastFile, typeLogFile = )
                 timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
-                NTdebug("In %s found %d/%d/%d/%d error,warning,message, and debug lines." % (logLastFile, nr_error, nr_warning, nr_message, nr_debug) )
+                NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
+                    NTerror("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
+
                 if entryCrashed:
                     self.entry_list_crashed.append(entry_code)
                     continue # don't mark it as stopped anymore.
                 # end if
-                if not timeTaken:
-                    NTerror("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken,logLastFile))
-                else:
+                if timeTaken:
                     self.timeTakenDict[entry_code] = timeTaken
+                else:
+                    NTerror("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
 
                 timeStampLastValidation = getTimeStampFromFileName(logLastFile)
                 if not timeStampLastValidation:
                     NTdebug("Failed to retrieve timeStampLastValidation from %s" % logLastFile)
                 timeStampLastInputMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entry_code)
-#                if timeStampLastInputMod:
-#                    timeStampLastInputMod = datetime.datetime.fromtimestamp(timeStampLastInputMod)
                 # If the input has been updated then the entry should be redone so don't add it to the done list.
                 if timeStampLastValidation and timeStampLastInputMod:
-                    NTdebug("Comparing input to validation time stamps: %s to %s" % (timeStampLastInputMod, timeStampLastValidation))
+#                    NTdebug("Comparing input to validation time stamps: %s to %s" % (timeStampLastInputMod, timeStampLastValidation))
                     if timeStampLastValidation < timeStampLastInputMod:
                         self.entry_list_updated.append(entry_code)
                         continue
                 else:
                     NTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
+                # end if
 
-
-                # end for AwkLike
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
                     NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
@@ -411,14 +474,20 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
-        NTmessage("Found %s entries by NMR (A)." % len(self.entry_list_nmr))
-        NTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
-        NTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
-        NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_list_stopped))
-        NTmessage("Found %s entries that CING should update (U)." % len(self.entry_list_updated))
-        NTmessage("Found %s entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
-        NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
-        NTmessage("Found %s entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+        NTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
+
+        NTmessage("Found %4d entries that CING prep tried." % len(self.entry_list_prep_tried))
+        NTmessage("Found %4d entries that CING prep crashed." % len(self.entry_list_prep_crashed))
+        NTmessage("Found %4d entries that CING prep todo." % len(self.entry_list_prep_todo))
+        NTmessage("Found %4d entries that CING prep done." % len(self.entry_list_prep_done))
+
+        NTmessage("Found %4d entries that CING tried (T)." % len(self.entry_list_tried))
+        NTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
+        NTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
+        NTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
+        NTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
+        NTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
+        NTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
         if not self.entry_list_done:
             NTwarning("Failed to find entries that CING did.")
     # end def
@@ -433,26 +502,31 @@ class nrgCing(Lister):
 #        modification_time = os.path.getmtime("/Users/jd/.cshrc")
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
-        NTmessage("Looking for entries in the different preparation stages.")
-        for i, phaseData in enumerate(self.phaseDataList):
-            entryList = self.phaseList[i]
-            phaseName, _phaseId = phaseData
-            l = len(entryList)
-            NTmessage("Found %d entries in prep stage %s" % (l, phaseName))
+#        NTmessage("Looking for entries in the different preparation stages.")
+#        for i, phaseData in enumerate(self.phaseDataList):
+#            entryList = self.phaseList[i]
+#            phaseName, _phaseId = phaseData
+#            l = len(entryList)
+#            NTmessage("Found %d entries in prep stage %s" % (l, phaseName))
 
         ## following statement is equivalent to a unix command like:
         NTmessage("Looking for entries from the PDB and NRG databases.")
+        if True: # DEFAULT ON Use switch to debug.
+            self.entry_list_pdb.addList(getPdbEntries())
+            if not self.entry_list_pdb:
+                NTerror("No PDB entries found")
+                return True
+            self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
+            if not self.entry_list_nmr:
+                NTerror("No NMR entries found")
+                return True
+        else:
+            self.entry_list_pdb += '1crn 1bus 1brv 1a4d'.split()
+            self.entry_list_nmr += '1bus 1brv'.split()
+            self.entry_list_nrg_docr += '1brv'.split()
 
-        self.entry_list_pdb.addList(getPdbEntries())
-        if not self.entry_list_pdb:
-            NTerror("No PDB entries found")
-            return True
+
         NTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
-
-        self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
-        if not self.entry_list_nmr:
-            NTerror("No NMR entries found")
-            return True
         NTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))
 
         self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData=True))
@@ -467,15 +541,16 @@ class nrgCing(Lister):
             return True
         NTmessage("Found %5d PDB entries in NRG." % len(self.entry_list_nrg))
 
-        ## The list of all entry_codes for which tgz files have been found
-        self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
-        if not self.entry_list_nrg_docr:
-            NTerror("No NRG DOCR entries found")
-            return True
+        if 1: # DEFAULT 1
+            ## The list of all entry_codes for which tgz files have been found
+            self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
+            if not self.entry_list_nrg_docr:
+                NTerror("No NRG DOCR entries found")
+                return True
+            if len(self.entry_list_nrg_docr) < 3000:
+                NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
+                return True
         NTmessage("Found %5d NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
-        if len(self.entry_list_nrg_docr) < 3000:
-            NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
-            return True
 
 
 
@@ -765,7 +840,7 @@ class nrgCing(Lister):
 #        symlink(index_file_first, index_file)
 
         NTmessage("Copy the adjusted php script")
-        org_file = os.path.join(self.base_dir, 'data', 'redirect.php')
+        org_file = os.path.join(self.base_dir, DATA_STR, 'redirect.php')
         new_file = os.path.join(self.results_dir, 'redirect.php')
         file_content = open(org_file, 'r').read()
         old_string = 'URL_BASE'
@@ -773,7 +848,7 @@ class nrgCing(Lister):
         open(new_file, 'w').write(file_content)
 
         NTmessage("Copy the adjusted html redirect")
-        org_file = os.path.join(self.base_dir, 'data', 'redirect.html')
+        org_file = os.path.join(self.base_dir, DATA_STR, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
 #        file_content = open(org_file, 'r').read()
 #        old_string = 'URL_BASE'
@@ -788,7 +863,7 @@ class nrgCing(Lister):
 
     # end def
 
-    def postProcessEntryAfterVc(self, pdb_id):
+    def postProcessEntryAfterVc(self, entry_code):
         """
         Unzips the tgz.
         Copies the log
@@ -796,44 +871,44 @@ class nrgCing(Lister):
 
         Returns True on error.
         """
-        NTmessage("Doing postProcessEntryAfterVc on  %s" % pdb_id)
+        NTmessage("Doing postProcessEntryAfterVc on  %s" % entry_code)
 
-        doRemoves = 0 # DEFAULT 1 disable for testing.
+        doRemoves = 1 # DEFAULT 1 disable for testing.
         doLog = 1 # DEFAULT 1 disable for testing.
         doTgz = 1 # DEFAULT 1 disable for testing.
 
-        entryCodeChar2and3 = pdb_id[1:3]
-        entryDir = os.path.join( self.data_dir , entryCodeChar2and3, pdb_id )
+        entryCodeChar2and3 = entry_code[1:3]
+        entryDir = os.path.join(self.data_dir , entryCodeChar2and3, entry_code)
         if not os.path.exists(entryDir):
-            NTerror("Skipping %s because dir %s was not found." % ( pdb_id, entryDir))
+            NTerror("Skipping %s because dir %s was not found." % (entry_code, entryDir))
             return True
         os.chdir(entryDir)
 
         if doLog:
             if not self.vc:
                 self.initVc()
-            master_target_log_dir = os.path.join( self.vc.MASTER_TARGET_DIR, self.vc.MASTER_TARGET_LOG)
+            master_target_log_dir = os.path.join(self.vc.MASTER_TARGET_DIR, self.vc.MASTER_TARGET_LOG)
             if not os.path.exists(master_target_log_dir):
-                NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (pdb_id, master_target_log_dir))
+                NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (entry_code, master_target_log_dir))
                 return True
             logScriptFileNameRoot = 'validateEntryNrg'
-            logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot,pdb_id)
+            logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot, entry_code)
             logLastFile = globLast(master_target_log_dir + logFilePattern)
             if not logLastFile:
-                NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (pdb_id, master_target_log_dir, logFilePattern ))
+                NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (entry_code, master_target_log_dir, logFilePattern))
                 return True
 
             date_stamp = getDateTimeStampForFileName(logLastFile)
             if not date_stamp:
-                NTerror("Skipping %s because failed to find date for log file: %s" % (pdb_id, logLastFile ))
+                NTerror("Skipping %s because failed to find date for log file: %s" % (entry_code, logLastFile))
                 return True
 
             logScriptFileNameRootNew = 'validateEntry' # stick them in next to the locally derived logs.
             newLogDir = 'log_' + logScriptFileNameRootNew
-            if not os.path.exists( newLogDir ):
+            if not os.path.exists(newLogDir):
                 os.mkdir(newLogDir)
-            logLastFileNew = '%s_%s.log' % (pdb_id, date_stamp)
-            logLastFileNewFull = os.path.join(newLogDir, logLastFileNew )
+            logLastFileNew = '%s_%s.log' % (entry_code, date_stamp)
+            logLastFileNewFull = os.path.join(newLogDir, logLastFileNew)
             NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
             copyfile(logLastFile, logLastFileNewFull)
             if doRemoves:
@@ -841,9 +916,9 @@ class nrgCing(Lister):
         # end if doLog
 
         if doTgz:
-            tgzFileNameCing = pdb_id + ".cing.tgz"
+            tgzFileNameCing = entry_code + ".cing.tgz"
             if not os.path.exists(tgzFileNameCing):
-                NTerror("Skipping %s because tgz %s not found in: %s" %( pdb_id, tgzFileNameCing, os.getcwd()))
+                NTerror("Skipping %s because tgz %s not found in: %s" % (entry_code, tgzFileNameCing, os.getcwd()))
                 return True
             cmd = "tar -xzf %s" % tgzFileNameCing
             NTdebug("cmd: %s" % cmd)
@@ -857,7 +932,7 @@ class nrgCing(Lister):
         # end if doTgz
     # end def
 
-    def processEntry(self, pdb_id,
+    def prepareEntry(self, entry_code,
                      doInteractive=0,
                      convertMmCifCoor=1,
                      convertMrRestraints=0,
@@ -865,45 +940,57 @@ class nrgCing(Lister):
                      filterCcpnAll=0):
         "Return True on error."
 
+        entryCodeChar2and3 = entry_code[1:3]
+        copyToInputDir = 1 # DEFAULT: 1
+        finalPhaseId = None # id to use for final move to input dir.
+        # Absolute paths with still be appending a entryCodeChar2and3
+        inputDirByPhase = {
+                           PHASE_C: os.path.join(dir_C, entryCodeChar2and3, entry_code),
+                           PHASE_R: os.path.join(self.recoordSyncDir, entry_code)
+                           }
+
         NTmessage("interactive            interactive run is fast use zero for production                              %s" % doInteractive)
         NTmessage("convertMmCifCoor       Converts PDB mmCIF to NMR-STAR with Wattos        -> C/XXXX_C_FC.xml         %s" % convertMmCifCoor)
         NTmessage("convertMrRestraints    Adds STAR restraints to Ccpn with XXXX            -> R/XXXX_R_FC.xml         %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    -> S/XXXX_S_FC.xml         %s" % convertStarCS)
         NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
-        NTmessage("Doing                                                                                               %s" % pdb_id)
-        entryCodeChar2and3 = pdb_id[1:3]
+        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
+        NTmessage("Doing                                                                                               %s" % entry_code)
 
-        C_sub_entry_dir = os.path.join(dir_C, entryCodeChar2and3)
-        C_entry_dir = os.path.join(C_sub_entry_dir, pdb_id)
-#        link_sub_entry_dir = os.path.join(dir_link, entryCodeChar2and3)
-#        link_entry_dir = os.path.join(link_sub_entry_dir, pdb_id)
+
+        if convertMmCifCoor == convertMrRestraints:
+            NTerror("One and one only needs to be True of convertMmCifCoor == convertMrRestraints")
+            return True
 
         if convertMmCifCoor:
             NTmessage("  mmCIF")
 #            convertStarCoor = 0 # DEFAULT 1: TODO: code.
 
+            C_sub_entry_dir = os.path.join(dir_C, entryCodeChar2and3)
+            C_entry_dir = os.path.join(C_sub_entry_dir, entry_code)
+
             script_file = '%s/ReadMmCifWriteNmrStar.wcf' % wcf_dir
-            inputMmCifFile = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % pdb_id)
-            outputStarFile = "%s_C_Wattos.str" % pdb_id
-            script_file_new = "%s.wcf" % pdb_id
-            log_file = "%s.log" % pdb_id
+            inputMmCifFile = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entry_code)
+            outputStarFile = "%s_C_Wattos.str" % entry_code
+            script_file_new = "%s.wcf" % entry_code
+            log_file = "%s.log" % entry_code
 
             if not os.path.exists(C_entry_dir):
                 mkdirs(dir_C)
             if not os.path.exists(C_sub_entry_dir):
                 mkdirs(C_sub_entry_dir)
             os.chdir(C_sub_entry_dir)
-            if os.path.exists(pdb_id):
-                if False: # DEFAULT: True
-                    rmtree(pdb_id)
+            if os.path.exists(entry_code):
+                if 1: # DEFAULT: 1
+                    rmtree(entry_code)
                 # end if False
             # end if
-            if not os.path.exists(pdb_id):
-                os.mkdir(pdb_id)
-            os.chdir(pdb_id)
+            if not os.path.exists(entry_code):
+                os.mkdir(entry_code)
+            os.chdir(entry_code)
 
             if not os.path.exists(inputMmCifFile):
-                NTerror("%s No input mmCIF file: %s" % (pdb_id, inputMmCifFile))
+                NTerror("%s No input mmCIF file: %s" % (entry_code, inputMmCifFile))
                 return True
 
             maxModels = '999'
@@ -917,74 +1004,95 @@ class nrgCing(Lister):
             script_str = script_str.replace('OUTPUT_STAR_FILE', outputStarFile)
 
             writeTextToFile(script_file_new, script_str)
-
-
-    #        wattos < $script_file_new >& $log_file
-    #        wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
-    #        logFileName = "wattos_compl.log"
             wattosProgram = ExecuteProgram(self.wattosProg, #rootPath = wattosDir,
                                      redirectOutputToFile=log_file,
                                      redirectInputFromFile=script_file_new)
-            # The last argument becomes a necessary redirection into fouling Wattos into
-            # thinking it's running interactively.
             now = time.time()
             wattosExitCode = wattosProgram()
             difTime = time.time() - now
             NTdebug("Took number of seconds: %8.1f" % difTime)
             if wattosExitCode:
-                NTerror("%s Failed wattos script %s with exit code: " % (pdb_id, script_file_new, str(wattosExitCode)))
+                NTerror("%s Failed wattos script %s with exit code: " % (entry_code, script_file_new, str(wattosExitCode)))
                 return True
 
-            resultList = []
+            resultList =[]
             status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True)
             if status == 0:
-                NTerror("%s found errors in log file; aborting." % pdb_id)
-                NTmessage('\n'.join(resultList))
+                NTerror("%s found %s errors in Wattos log file; aborting." % ( entry_code, len(resultList)))
+                NTerror('\n' +'\n'.join(resultList))
                 return True
-
             os.unlink(script_file_new)
-
             if not os.path.exists(outputStarFile):
-                NTerror("%s found no output star file %s" % (pdb_id, outputStarFile))
+                NTerror("%s found no output star file %s" % (entry_code, outputStarFile))
                 return True
             # end if
 
-            if True:
-                NTmessage("  star2Ccpn")
-                log_file = "%s_star2Ccpn.log" % pdb_id
-                inputStarFile = "%s_C_wattos.str" % pdb_id
-                inputStarFileFull = os.path.join(C_entry_dir, inputStarFile)
-                fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
-                doConversionDirectly = False
 
-                if not os.path.exists(inputStarFileFull):
-                    NTerror("%s previous step produced no star file." % pdb_id)
+            NTmessage("  star2Ccpn")
+            log_file = "%s_star2Ccpn.log" % entry_code
+            inputStarFile = "%s_C_wattos.str" % entry_code
+            inputStarFileFull = os.path.join(C_entry_dir, inputStarFile)
+            fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
+
+            if not os.path.exists(inputStarFileFull):
+                NTerror("%s previous step produced no star file." % entry_code)
+                return True
+
+            # Will save a copy to disk as well.
+            convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
+            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+            exitCode = convertProgram("%s %s %s" % (inputStarFile, entry_code, C_entry_dir))
+            if exitCode:
+                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                return True
+            analysisResultTuple = analyzeFcLog(log_file)
+            if not analysisResultTuple:
+                NTerror("Failed to analyze log file: %s" % log_file)
+                return True
+            timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+            NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+            if entryCrashed or nr_error > self.MAX_ERROR_COUNT_FC_LOG:
+                NTerror("Found %s errors in prep phase X please check: %s" % (nr_error, entry_code))
+                resultList = []
+                status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
+                if status == 0:
+                    NTerror("%s found errors in log file; aborting." % entry_code)
+                    NTmessage('\n'.join(resultList))
                     return True
-
-                # Will save a copy to disk as well.
-                if doConversionDirectly:
-                    ccpnProject = importFullStarProjects(inputStarFile, projectName=pdb_id, inputDir=C_entry_dir)
-                    if not ccpnProject:
-                        NTerror("%s failed importFullStarProjects" % pdb_id)
-                        return True
-                    # end if
-                else:
-                    convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
-                    NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
-                    exitCode = convertProgram("%s %s %s" % (inputStarFile, pdb_id, C_entry_dir))
-                    if exitCode:
-                        NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
-                        return True
-                    resultList = []
-                    status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
-                    if status == 0:
-                        NTerror("%s found errors in log file; aborting." % pdb_id)
-                        NTmessage('\n'.join(resultList))
-                        return True
-            # end if True
+            finalPhaseId = PHASE_C
         # end if convertMmCifCoor
 
-        NTmessage("Done with %s" % pdb_id)
+        if convertMrRestraints:
+                finalPhaseId = PHASE_R
+                # Nothing else needed really.
+        if copyToInputDir:
+            if not finalPhaseId:
+                NTerror("Failed to finish any prep stage.")
+                return True
+            if finalPhaseId not in self.phaseIdList:
+                NTerror("Failed to finish valid prep stage: [%s]" % finalPhaseId)
+                return True
+            finalInputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
+            if not finalInputDir:
+                NTerror("Failed to get prep stage dir: [%s]" % finalInputDir)
+                return True
+            fn = "%s.tgz" % entry_code
+            finalInputTgz = os.path.join(finalInputDir, fn)
+            if not os.path.exists(finalInputTgz):
+                NTerror("final input tgz missing: %s" % finalInputTgz)
+                return True
+            dst = os.path.join(self.results_dir, self.inputDir, entryCodeChar2and3)
+            if not os.path.exists(dst):
+                os.mkdir(dst)
+            fullDst = os.path.join(dst, fn)
+            if os.path.exists(fullDst):
+                os.remove(fullDst)
+            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
+            NTmessage("Copied input %s to: %s" % (finalInputTgz, dst))
+        else:
+            NTwarning("Did not copy input %s" % finalInputTgz)
+        # end else
+        NTmessage("Done with %s" % entry_code)
     # end def
 
 
@@ -1001,11 +1109,11 @@ class nrgCing(Lister):
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-        inputDir = 'file://' + self.results_dir + '/recoordSync'
-#        inputDir = 'file://' + self.results_dir + '/nrgMerge'
+#        inputDir = 'file://' + self.results_dir + '/' + self.recoordSyncDir
+        inputDir = 'file://' + self.results_dir + '/' + self.inputDir
         outputDir = self.results_dir
         storeCING2db = "1" # DEFAULT: 1 All arguments need to be strings.
-        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_ENTRY`, `PROJECT_TYPE_CCPN`, storeCING2db)
+        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_CH23`, `PROJECT_TYPE_CCPN`, storeCING2db)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
@@ -1034,12 +1142,12 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
-        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
-        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" %  len(self.entry_list_todo))
+        NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
+        NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
+        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
-        for pdb_id in self.entry_list_todo:
-            self.postProcessEntryAfterVc( pdb_id )
+        for entry_code in self.entry_list_todo:
+            self.postProcessEntryAfterVc(entry_code)
         NTmessage("Done")
     # end def
 
@@ -1058,17 +1166,17 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
-        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
-        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" %  len(self.entry_list_todo))
+        NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
+        NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
+        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
 #        NTdebug("Quitting for now.")
 #        return True
 
         tokenList = []
-        for pdb_id in self.entry_list_todo:
-            tokenStr = ' '.join( [VALIDATE_ENTRY_NRG_STR, pdb_id, extraArgListStr] )
-            tokenList.append( tokenStr )
+        for entry_code in self.entry_list_todo:
+            tokenStr = ' '.join([VALIDATE_ENTRY_NRG_STR, entry_code, extraArgListStr])
+            tokenList.append(tokenStr)
         tokenListStr = '\n'.join(tokenList)
         NTmessage("Writing tokens to: [%s]" % self.tokenListFileName)
         writeTextToFile(self.tokenListFileName, tokenListStr)
@@ -1076,47 +1184,74 @@ class nrgCing(Lister):
 
     def prepare(self):
         "Return True on error."
-        NTmessage("Starting prepare")
 
-#        pdb_id = '1brv'
-#        if self.processEntry(pdb_id):
-#            NTerror("In prepare failed processEntry")
-#            return True
-#        self.entry_list_todo = "1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e".split()
+        NTmessage("Starting prepare using self.entry_list_todo")
 
-        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
-        self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
-        self.entry_list_todo = NTlist()
-        self.entry_list_todo.addList(self.entry_list_nmr)
-        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
-#        self.entry_list_todo = "2znf".split()
+        if False: # DEFAULT: False
+            entry_code = '1brv'
+            if self.prepareEntry(entry_code, convertMmCifCoor=0, convertMrRestraints=1, convertStarCS=0):
+                NTerror("In prepare failed prepareEntry")
+                return True
+        if False: # DEFAULT: False
+            self.entry_list_todo = "1a4d 1brv 9bog".split()
+            self.entry_list_nmr = "1a4d 1a24 1afp ".split()
+            self.entry_list_nrg_docr = "1a4d 1a24 1afp".split()
 
-        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
-        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" %  len(self.entry_list_todo))
+#        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
+#        self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
+#        self.entry_list_todo = NTlist()
+#        self.entry_list_todo.addList(self.entry_list_nmr)
+#        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+##        self.entry_list_todo = "2znf".split()
+        permutationArgumentList = NTdict() # per permutation hold the entry list.
+        for entry_code in self.entry_list_todo:
+            convertMmCifCoor = 0
+            convertMrRestraints = 0
+            convertStarCS = 0
+            if entry_code in self.entry_list_nmr:
+                convertMmCifCoor = 1
+            if entry_code in self.entry_list_nrg_docr:
+                convertMrRestraints = 1
+            if convertMrRestraints:
+                convertMmCifCoor = 0
+            if not (convertMmCifCoor or convertMrRestraints):
+                NTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
+                continue
+            permutationKey = str([convertMmCifCoor, convertMrRestraints, convertStarCS])
+            if not getDeepByKeysOrAttributes(permutationArgumentList, permutationKey):
+                permutationArgumentList[permutationKey] = NTlist()
+            permutationArgumentList[permutationKey].append(entry_code)
+#
+#        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
+#        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
+        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
+        for permutationKey in permutationArgumentList.keys():
+            permutationKeyForFileName = permutationKey.replace(' ', '_')
+            extraArgList = permutationKey.split()
+            convertMmCifCoor, convertMrRestraints, convertStarCS = extraArgList
+            NTmessage("Keys: %s split to: %s %s %s with number of entries %d" % (permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, len(permutationArgumentList[permutationKey])))
 
-#        NTdebug("Quitting for now.")
-#        return True
+#            NTdebug("Quitting for now.")
+#            continue
 
-        entryListFileName = "entry_list_todo.csv"
-        writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
-        pythonScriptFileName = __file__
-        extraArgList = ['processEntry']
-        if doScriptOnEntryList(pythonScriptFileName,
-                            entryListFileName,
-                            self.results_dir,
-                            processes_max=self.processes_max,
-                            max_time_to_wait=600,
-                            extraArgList=extraArgList,
-                            START_ENTRY_ID=0, # DEFAULT: 0.
-                            MAX_ENTRIES_TODO=self.max_entries_todo,
-#                            MAX_ENTRIES_TODO=self.max_entries_todo # DEFAULT
-                            ):
-            NTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
-            return True
-        # end if
+            entryListFileName = "entry_list_todo_prep_perm_%s.csv" % permutationKeyForFileName
+            writeTextToFile(entryListFileName, toCsv(permutationArgumentList[permutationKey]))
+            pythonScriptFileName = __file__ # recursive call in fact.
+            extraArgList = ['prepareEntry' ] + extraArgList
+            if doScriptOnEntryList(pythonScriptFileName,
+                                entryListFileName,
+                                self.results_dir,
+                                processes_max=self.processes_max,
+                                max_time_to_wait=600,
+                                extraArgList=extraArgList,
+                                START_ENTRY_ID=0, # DEFAULT: 0.
+                                MAX_ENTRIES_TODO=self.max_entries_todo,
+    #                            MAX_ENTRIES_TODO=self.max_entries_todo # DEFAULT
+                                ):
+                NTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
+                return True
+            # end if
     # end def
-
 # end class.
 
 
@@ -1128,7 +1263,7 @@ Additional modes I see:
     """
     cing.verbosity = verbosityDebug
     isProduction = 1       # DEFAULT: 1.
-    max_entries_todo = 0  # DEFAULT: 40
+    max_entries_todo = 40  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)
@@ -1138,9 +1273,9 @@ Additional modes I see:
 
     destination = sys.argv[1]
     hasPdbId = False
-    pdb_id = '.'
+    entry_code = '.'
     if is_pdb_code(destination): # needs to be first argument if this main is to be used by doScriptOnEntryList.
-        pdb_id = destination
+        entry_code = destination
         hasPdbId = True
         destination = sys.argv[2]
     # end if
@@ -1150,7 +1285,7 @@ Additional modes I see:
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    NTmessage('\nGoing to destination: %s with(out) on pdb_id %s with extra arguments %s' % (destination, pdb_id, str(argListOther)))
+    NTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
 
     try:
         if destination == 'updateWeekly':
@@ -1159,14 +1294,14 @@ Additional modes I see:
         elif destination == 'prepare':
             if m.prepare():
                 NTerror("Failed to prepare")
-        elif destination == 'processEntry':
-            if m.processEntry(pdb_id):
-                NTerror("Failed to processEntry")
+        elif destination == 'prepareEntry':
+            if m.prepareEntry(entry_code):
+                NTerror("Failed to prepareEntry")
         elif destination == 'postProcessAfterVc':
             if m.postProcessAfterVc():
                 NTerror("Failed to postProcessAfterVc")
         elif destination == 'postProcessEntryAfterVc':
-            if m.postProcessEntryAfterVc(pdb_id):
+            if m.postProcessEntryAfterVc(entry_code):
                 NTerror("Failed to postProcessEntryAfterVc")
         elif destination == 'createToposTokens':
             if m.createToposTokens():
@@ -1178,3 +1313,4 @@ Additional modes I see:
         NTtracebackError()
     finally:
         NTmessage(getStopMessage())
+

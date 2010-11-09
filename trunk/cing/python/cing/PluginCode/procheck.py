@@ -358,7 +358,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         #end if
 
         #copy script
-        source = os.path.join(cingPythonCingDir, 'PluginCode', 'data', self.procheckScript)
+        source = os.path.join(cingPythonCingDir, 'PluginCode', DATA_STR, self.procheckScript)
         destination = os.path.join(self.rootPath, self.procheckScript)
         try:
             copy(source, destination)
@@ -371,7 +371,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if not createPlots:
             pcNmrParameterFileOrg = 'procheck_nmr_nada.prm'
 
-        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', 'data', pcNmrParameterFileOrg)
+        pcNmrParameterFile = os.path.join(cingPythonCingDir, 'PluginCode', DATA_STR, pcNmrParameterFileOrg)
         pcNmrParameterFileDestination = os.path.join(self.rootPath, 'procheck_nmr.prm')
         if os.path.exists(pcNmrParameterFileDestination):
 #            NTdebug("Removing existing pcNmrParameterFileDestination:"+ pcNmrParameterFileDestination)

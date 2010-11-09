@@ -1232,7 +1232,7 @@ for i,g in enumerate(groups):
 
         for group in self.groups:
             entryId = self.name + group
-            path = os.path.join('data', entryId[1:3],  entryId, entryId + '.cing')
+            path = os.path.join(DATA_STR, entryId[1:3],  entryId, entryId + '.cing')
             NTdebug('opening %s', path)
             p = self.openProject( path )
             if not p:

@@ -103,6 +103,8 @@ DIHEDRAL_BY_RESIDUE_STR = 'DihedralByResidue'
 
 SUMMARY_STR = 'summary'
 
+DATA_STR = 'data' # mostly for NRG.
+
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
 VIOL1_STR = 'violCount1'

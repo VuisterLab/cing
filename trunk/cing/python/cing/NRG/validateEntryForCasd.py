@@ -68,7 +68,7 @@ def main(entryId, *extraArgList):
     entryCodeChar2and3 = entryId[1:3]
 
     inputDir = extraArgList[0]
-    outputDir = os.path.join(extraArgList[1], 'data', entryCodeChar2and3, entryId)
+    outputDir = os.path.join(extraArgList[1], DATA_STR, entryCodeChar2and3, entryId)
     pdbConvention = extraArgList[2] #@UnusedVariable
     restraintsConvention = extraArgList[3]
     archiveType = extraArgList[4]
