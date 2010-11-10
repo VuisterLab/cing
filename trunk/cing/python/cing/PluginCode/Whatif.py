@@ -326,7 +326,7 @@ fullstop y
             if l.startswith( '  Ramachandran plot appearance'):
                 checkId = RAMCHK_STR
             if l.startswith( '  chi-1/chi-2 rotamer normality'):
-                checkId = ROTCHK_STR
+                checkId = C12CHK_STR
             if l.startswith( '  Backbone conformation'):
                 checkId = BBCCHK_STR
 # Second part.
@@ -1031,6 +1031,7 @@ def runWhatif( project, parseOnly=False ):
             removeTempFiles(whatifDir)
 
         whatifStatus.completed = True
+#        NTdebug("Setting what if status completed to %s" % whatifStatus.completed)
     else:
 #        NTdebug("Skipping actual whatif execution")
         whatifExitCode = 0
