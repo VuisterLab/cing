@@ -25,8 +25,11 @@ class AwkLike:
     def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
                  skipHeaderLines = 0, separator = None ):
         if filename:
-            self.f = open(filename,'r')
             self.FILENAME = filename
+            if not os.path.exists(filename):
+                NTerror("Failed to find: [%s]" % filename)
+            else:
+                self.f = open(filename,'r')
         else:
             self.f = sys.stdin
             self.FILENAME = 'stdin'
@@ -92,6 +95,9 @@ class AwkLike:
 
     def close( self ):
         """internal routine"""
+        if not self.f:
+            NTerror("Can't close the file because it was not present.")
+            return
         self.f.close()
         self.f = None
 

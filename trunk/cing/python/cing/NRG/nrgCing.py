@@ -4,7 +4,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry createToposTokens ]
+python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCingEntry createToposTokens ]
 
 As a cron job this will:
     - create a todo list
@@ -174,9 +174,11 @@ class nrgCing(Lister):
         self.MAX_ERROR_COUNT_CING_LOG = 10
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
         self.wattosVerbosity = cing.verbosity
-        self.wattosProg = "java -Djava.awt.headless=true -Xmx1500m Wattos.CloneWars.UserInterface -at -verbosity %s" % self.wattosVerbosity
+        self.wattosMemory = '4g'
+        if not self.isProduction:
+            self.wattosMemory = '2g' # development machine Stella only has 4g total and this is only important for largest entries like 2ku2
+        self.wattosProg = "java -Djava.awt.headless=true -Xmx%s Wattos.CloneWars.UserInterface -at -verbosity %s" % (self.wattosMemory, self.wattosVerbosity)
         self.tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
-
         self.vc = None
 
     def initVc(self):
@@ -348,8 +350,8 @@ class nrgCing(Lister):
                 self.entry_list_prep_crashed.append(entry_code)
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
-            NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
             if nr_error > 0:
+                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                 NTerror("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
@@ -404,8 +406,8 @@ class nrgCing(Lister):
                 self.entry_list_tried.append(entry_code)
                 entryCrashed = False
                 timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
-                NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                 if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
+                    NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                     NTerror("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
 
                 if entryCrashed:
@@ -954,8 +956,8 @@ class nrgCing(Lister):
         NTmessage("convertMrRestraints    Adds STAR restraints to Ccpn with XXXX            -> R/XXXX_R_FC.xml         %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    -> S/XXXX_S_FC.xml         %s" % convertStarCS)
         NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
-        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
-        NTmessage("Doing                                                                                               %s" % entry_code)
+        NTmessage("Doing                                                                                            %4s" % entry_code)
+#        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
 
         if convertMmCifCoor == convertMrRestraints:
@@ -1010,7 +1012,7 @@ class nrgCing(Lister):
             now = time.time()
             wattosExitCode = wattosProgram()
             difTime = time.time() - now
-            NTdebug("Took number of seconds: %8.1f" % difTime)
+            NTmessage("Wattos reading the mmCIF took %8.1f seconds" % difTime)
             if wattosExitCode:
                 NTerror("%s Failed wattos script %s with exit code: " % (entry_code, script_file_new, str(wattosExitCode)))
                 return True
@@ -1050,8 +1052,8 @@ class nrgCing(Lister):
                 NTerror("Failed to analyze log file: %s" % log_file)
                 return True
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
-            NTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-            if entryCrashed or nr_error > self.MAX_ERROR_COUNT_FC_LOG:
+            if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
+                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                 NTerror("Found %s errors in prep phase X please check: %s" % (nr_error, entry_code))
                 resultList = []
                 status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
@@ -1226,7 +1228,11 @@ class nrgCing(Lister):
 #        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
         for permutationKey in permutationArgumentList.keys():
-            permutationKeyForFileName = permutationKey.replace(' ', '_')
+            # TODO: use regexp.
+            permutationKeyForFileName = permutationKey.replace(' ', '')
+            permutationKeyForFileName = permutationKeyForFileName.replace('[', '')
+            permutationKeyForFileName = permutationKeyForFileName.replace(']', '')
+            permutationKeyForFileName = permutationKeyForFileName.replace(',', '')
             extraArgList = permutationKey.split()
             convertMmCifCoor, convertMrRestraints, convertStarCS = extraArgList
             NTmessage("Keys: %s split to: %s %s %s with number of entries %d" % (permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, len(permutationArgumentList[permutationKey])))
@@ -1295,8 +1301,14 @@ Additional modes I see:
             if m.prepare():
                 NTerror("Failed to prepare")
         elif destination == 'prepareEntry':
-            if m.prepareEntry(entry_code):
+            convertMmCifCoor = int(argListOther[0])
+            convertMrRestraints = int(argListOther[1])
+            if m.prepareEntry(entry_code, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints):
                 NTerror("Failed to prepareEntry")
+        elif destination == 'runCingEntry':
+            m.entry_list_todo = [ entry_code ]
+            if m.runCing():
+                NTerror("Failed to runCingEntry")
         elif destination == 'postProcessAfterVc':
             if m.postProcessAfterVc():
                 NTerror("Failed to postProcessAfterVc")

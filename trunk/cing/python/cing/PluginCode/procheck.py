@@ -453,7 +453,10 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     self.rootPath)
             return True
         if self.parseResult():
+            NTerror('Failed to procheck_nmr parseResult.')
             return False
+        # Remove temp files in case the run was successful and parsed ok.
+        removeTempFiles(self.rootPath)
 
         # Store in project file that we ran procheck succesfully
         self.project.procheckStatus.completed = True
@@ -629,8 +632,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         """
         result = NTlist()
         path = os.path.join(self.rootPath, 'postscriptFiles.lis')
-        for l in AwkLike(path, separator=':'):
-            result.append( (l.dollar[2][:-1].strip(), l.dollar[1][:-6].strip()) )
+        if os.path.exists(path):
+            for l in AwkLike(path, separator=':'):
+                result.append( (l.dollar[2][:-1].strip(), l.dollar[1][:-6].strip()) )
+        else:
+            NTerror("Failed to find %s in getPostscriptFileNames" % path)
         return result
     #end def
 #end class
@@ -708,7 +714,7 @@ def removeTempFiles( todoDir ):
         for fn in removeListLocal:
             removeList.append( os.path.join(todoDir, fn) )
 
-        for extension in [ "*.ave", "*.pdb", "*.new", "*.str", "*.noe", "*.nrc", "*.nrv", "*.rms", "*.lis" , "*.scr", "*.prm" ]:
+        for extension in [ "*.ave", "*.pdb", "*.new", "*.str", "*.noe", "*.nrc", "*.nrv", "*.rms", "*.scr", "*.prm" ]:
             for fn in glob(os.path.join(todoDir,extension)):
                 removeList.append(fn)
         for fn in removeList:
