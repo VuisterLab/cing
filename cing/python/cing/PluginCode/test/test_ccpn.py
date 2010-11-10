@@ -143,6 +143,7 @@ class AllChecks(TestCase):
 #                    NTerror("Failed to store CING project's data to DB but continuing.")
 
             if True:
+                self.assertTrue(project.save())
                 self.assertTrue(project.saveCcpn(entryId))
         # end for
     # end def test

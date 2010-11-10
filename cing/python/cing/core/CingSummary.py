@@ -1,4 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.parameters import plugins
 
@@ -104,14 +105,14 @@ class CingSummary( NTdict ):
         self.CING_green  = round(rog[2],1)
 
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
-        if (self.proteinResidueCount > 0 and project.molecule.has_key('procheck') and project.molecule.procheck and
-            project.molecule.procheck.has_key('summary') and project.molecule.procheck.summary):
-#            NTmessage("Going to add procheck results to summary.")
+        pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
+        if (self.proteinResidueCount > 0 and pcSummary):
+            NTdebug("Going to add procheck results to summary.")
 #            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
-            self.PC_core       = project.molecule.procheck.summary.core
-            self.PC_allowed    = project.molecule.procheck.summary.allowed
-            self.PC_generous   = project.molecule.procheck.summary.generous
-            self.PC_disallowed = project.molecule.procheck.summary.disallowed
+            self.PC_core       = pcSummary.core
+            self.PC_allowed    = pcSummary.allowed
+            self.PC_generous   = pcSummary.generous
+            self.PC_disallowed = pcSummary.disallowed
             self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
         else:
             NTmessage("Skipping adding procheck results since no results available or no protein residues or...")

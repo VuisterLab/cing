@@ -657,6 +657,7 @@ Project: Top level Cing project class
 #                NTdebug("Skipping save for disabled plugin: %s" % p)
             else:
                 for f, o in p.saves:
+#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,o))
                     f(self, o)
             #end for
         #end for
@@ -708,6 +709,7 @@ Project: Top level Cing project class
         for p in self.plugins.values():
             if p.isInstalled:
                 for f, o in p.restores:
+#                    NTdebug("Restoring object [%s] with function [%s]" % (f,o))
                     f(self, o)
                 #end for
             #end if
@@ -3253,7 +3255,7 @@ class DihedralRestraint(Restraint):
                 for _j2 in range(len(dList)):
                     v = violationAngle(value = dList[_j2], lowerBound = self.lower, upperBound = self.upper)
                     if v == None:
-                        NTerror("Failed to calculate a violation angle.")
+                        NTwarning("Failed to calculate a violation angle.")
                         return errorExit
                     vList.append( v )
                 # end for _j2

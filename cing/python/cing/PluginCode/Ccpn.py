@@ -1324,6 +1324,10 @@ class Ccpn:
                 distanceRestraintList.append(distanceRestraint)
             if distanceRestraintList.simplify():
                 NTerror("Failed to simplify the distanceRestraintList")
+            if len(distanceRestraintList) == 0:
+                NTdetail("Ccpn distance restraint list remained empty and will be removed")
+                self.project.distances.delete(ccpnDistanceListName)
+
         msgHoL.showMessage()
         return True
     # end def importFromCcpnDistanceRestraint
@@ -1381,7 +1385,10 @@ class Ccpn:
 
                 dihedralRestraint.ccpn = ccpnDihedralConstraint
                 ccpnDihedralConstraint.cing = dihedralRestraint
-            # end for
+            # end for ccpnDihedralConstraint
+            if len(dihedralRestraintList) == 0:
+                NTdetail("Ccpn dihedral restraint list remained empty and will be removed")
+                self.project.dihedrals.delete(ccpnDihedralListName)
         # end for
         msgHoL.showMessage()
         return True
@@ -1433,6 +1440,10 @@ class Ccpn:
 
                 rdcRestraintList.append(rdcRestraint)
             # end for
+            if len(rdcRestraintList) == 0:
+                NTdetail("Ccpn distance restraint list remained empty and will be removed")
+                self.project.rdcs.delete(ccpnRdcListName)
+
         # end for
         msgHoL.showMessage()
         return True
