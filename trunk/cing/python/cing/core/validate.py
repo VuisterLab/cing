@@ -973,10 +973,8 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
                          'theta: %(theta).1f\n' +\
                          'criteria: %(criterium1)s, %(criterium2)s\n'
         )
-
-
         result.append(data)
-    #end for
+    #end for over models
 
     summary.result = result
     r_resultNTList = result.zap('r') # cache for speed

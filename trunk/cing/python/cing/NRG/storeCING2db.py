@@ -19,11 +19,11 @@ from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
+from cing.core.molecule import getAssignmentCountMapForResList
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
-from cing.core.molecule import getAssignmentCountMapForResList
 
 if True: # default: True
     db_name = PDBJ_DB_NAME
@@ -439,6 +439,15 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_cv_backbone = residue.getDeepAvgByKeys(CHK_STR, CV_BACKBONE_STR, VALUE_LIST_STR)
             r_cv_sidechain = residue.getDeepAvgByKeys(CHK_STR, CV_SIDECHAIN_STR, VALUE_LIST_STR)
 
+            r_phi_avg = residue.getDeepByKeys(PHI_STR, CAV_STR)
+            r_phi_cv = residue.getDeepByKeys(PHI_STR, CV_STR)
+            r_psi_avg = residue.getDeepByKeys(PSI_STR, CAV_STR)
+            r_psi_cv = residue.getDeepByKeys(PSI_STR, CV_STR)
+            r_chi1_avg = residue.getDeepByKeys(CHI1_STR, CAV_STR)
+            r_chi1_cv = residue.getDeepByKeys(CHI1_STR, CV_STR)
+            r_chi2_avg = residue.getDeepByKeys(CHI2_STR, CAV_STR)
+            r_chi2_cv = residue.getDeepByKeys(CHI2_STR, CV_STR)
+
             rogR = residue.rogScore.rogInt()
 
             result = execute(cresidue.insert().values(
@@ -495,6 +504,15 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                omega_dev_av_all= r_omega_dev_av_all,
                 cv_backbone     = r_cv_backbone,
                 cv_sidechain    = r_cv_sidechain,
+
+                phi_avg =  r_phi_avg ,
+                phi_cv  =  r_phi_cv  ,
+                psi_avg =  r_psi_avg ,
+                psi_cv  =  r_psi_cv  ,
+                chi1_avg=  r_chi1_avg,
+                chi1_cv =  r_chi1_cv ,
+                chi2_avg=  r_chi2_avg,
+                chi2_cv =  r_chi2_cv ,
 
                 chk_ramach      = r_chk_ramach,
                 chk_janin       = r_chk_janin,

@@ -178,6 +178,16 @@ CREATE TABLE casdcing.cingresidue
     omega_dev_av_all               FLOAT DEFAULT NULL,
     cv_backbone                    FLOAT DEFAULT NULL,
     cv_sidechain                   FLOAT DEFAULT NULL,
+
+    phi_avg                    FLOAT DEFAULT NULL,
+    phi_cv                     FLOAT DEFAULT NULL,
+    psi_avg                    FLOAT DEFAULT NULL,
+    psi_cv                     FLOAT DEFAULT NULL,
+    chi1_avg                   FLOAT DEFAULT NULL,
+    chi1_cv                    FLOAT DEFAULT NULL,
+    chi2_avg                   FLOAT DEFAULT NULL,
+    chi2_cv                    FLOAT DEFAULT NULL,
+
     chk_ramach                     FLOAT DEFAULT NULL,
     chk_janin                      FLOAT DEFAULT NULL,
     chk_d1d2                       FLOAT DEFAULT NULL,
