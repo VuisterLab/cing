@@ -121,6 +121,20 @@ SELECT e.pdb_id, bs.deposition_date FROM "nrgcing"."cingentry" as e, brief_summa
 where e.wi_ramchk > 4.0 AND
 e.pdb_id = bs.pdbid;
 
+SELECT e.*, bs.deposition_date
+FROM "nrgcing"."cingentry" AS e, brief_summary bs 
+WHERE e.wi_ramchk > 4.0
+AND e.wi_ramchk <> 'NaN'
+AND e.pdb_id = bs.pdbid
+"AND e.pdb_id <> '1ee7'"
+
+SELECT r.*
+FROM "nrgcing"."cingresidue" AS r
+WHERE r.entry_id='15963'
+
+SELECT e.pdb_id, e.wi_c12chk FROM "nrgcing"."cingentry" as e
+WHERE e.wi_c12chk > 0
+
 
 
 
