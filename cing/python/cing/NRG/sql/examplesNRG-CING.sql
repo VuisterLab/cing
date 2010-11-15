@@ -100,3 +100,13 @@ ALTER TABLE nrgcing.cingentry ADD COLUMN dih_av_viol FLOAT DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c1_viol INT   DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c3_viol INT   DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c5_viol INT   DEFAULT NULL;
+
+ALTER TABLE nrgcing.cingresidue ADD COLUMN phi_avg  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN phi_cv   FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN psi_avg  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN psi_cv   FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN chi1_avg FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN chi1_cv  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN chi2_avg FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN chi2_cv  FLOAT  DEFAULT NULL;
+

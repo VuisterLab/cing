@@ -435,15 +435,19 @@ Sum                %s
             return None
         key = keyList[0]
 
-        if not isinstance(key, int):
-            NTwarning("no int key in NTlist.getDeepByKeys: " + `key`)
-            return None
+        if isinstance(key, int):
+            if key >= len(self):
+                NTwarning("int key in NTlist.getDeepByKeys too large for this NTlist: " + `key`)
+                return None
+            value = self[key]
+        else:
+            if not hasattr(self, key):
+                NTwarning("no int key/attribute in NTlist.getDeepByKeys: " + `key`)
+                return None
+            value = getattr(self, key)
+            # end if
+        # end else
 
-        if key >= len(self):
-            NTwarning("int key in NTlist.getDeepByKeys too large for this NTlist: " + `key`)
-            return None
-
-        value = self[key]
         if lk == 1:
 #            NTdebug("value : " + `value`)
             return value

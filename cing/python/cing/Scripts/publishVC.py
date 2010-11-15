@@ -35,7 +35,7 @@ remoteDirBase = os.path.join('/Volumes/tera1', dDir[1:])
 
 #vmName = 'Ubuntu_10_4_32_bit'
 vmName = 'VC'
-vmName = 'test'
+#vmName = 'test'
 
 doSend = True
 doLink = True
