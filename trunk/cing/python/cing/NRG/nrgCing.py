@@ -34,6 +34,7 @@ from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from cing.NRG.WhyNot import * #@UnusedWildImport
+from cing.NRG.nrgCingRdb import nrgCingRdb
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
@@ -55,6 +56,7 @@ PHASE_S = 'S'
 PHASE_F = 'F'
 
 LOG_NRG_CING = 'log_nrgCing'
+LOG_STORE_CING2DB = 'log_storeCING2db'
 #DATA_STR = 'log_nrgCing'
 
 class nrgCing(Lister):
@@ -163,6 +165,11 @@ class nrgCing(Lister):
         self.entry_list_prep_crashed = NTlist()
         self.entry_list_prep_failed = NTlist()
         self.entry_list_prep_done = NTlist()
+
+        self.entry_list_store_tried = NTlist()
+        self.entry_list_store_crashed = NTlist()
+        self.entry_list_store_failed = NTlist()
+        self.entry_list_store_done = NTlist()
 
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
         self.entry_list_crashed = NTlist()    # has a stack trace
@@ -322,6 +329,12 @@ class nrgCing(Lister):
         self.entry_list_prep_failed = NTlist()
         self.entry_list_prep_done = NTlist()
 
+        self.entry_list_store_tried = NTlist()
+        self.entry_list_store_crashed = NTlist()
+        self.entry_list_store_failed = NTlist()
+        self.entry_list_store_not_in_db = NTlist()
+        self.entry_list_store_done = NTlist()
+
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
         self.entry_list_crashed = NTlist()
@@ -353,16 +366,21 @@ class nrgCing(Lister):
                 self.entry_list_prep_crashed.append(entry_code)
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
-            if nr_error > 0:
-                self.entry_list_prep_failed.append(entry_code)
-                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTerror("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
-                continue
+            if entryCrashed:
+                NTerror("Detected a crash: %s" % entry_code, logLastFile)
+                self.entry_list_prep_crashed.append(entry_code)
+                continue # don't mark it as stopped anymore.
             # end if
             if not timeTaken:
                 NTerror("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
+            # end if
+            if nr_error > 0:
+                self.entry_list_prep_failed.append(entry_code)
+                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTerror("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
+                continue
             # end if
             self.entry_list_prep_done.append(entry_code)
         # end for
@@ -408,14 +426,14 @@ class nrgCing(Lister):
                 self.entry_list_tried.append(entry_code)
                 entryCrashed = False
                 timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
-                if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
-                    NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                    NTerror("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
-
                 if entryCrashed:
                     self.entry_list_crashed.append(entry_code)
                     continue # don't mark it as stopped anymore.
                 # end if
+                if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
+                    NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                    NTerror("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
+
                 if timeTaken:
                     self.timeTakenDict[entry_code] = timeTaken
                 else:
@@ -465,8 +483,51 @@ class nrgCing(Lister):
             # end for entryDir
         # end for subDir
 
+        m = nrgCingRdb()
+        self.entry_list_store_in_db = m.getPdbIdList()
+        if not  self.entry_list_store_in_db:
+            NTerror("Failed to get any entry from NRG-CING RDB")
+            self.entry_list_store_in_db = NTlist()
+        entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
+
+        NTmessage("Scanning the store logs of entries done.")
+        for entry_code in self.entry_list_done:
+            entryCodeChar2and3 = entry_code[1:3]
+            logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_STORE_CING2DB )
+            logLastFile = globLast(logDir + '/*.log')#            NTdebug("logLastFile: %s" % logLastFile)
+            if not logLastFile:
+                if self.isProduction and 0: # DEFAULT: 1 when assumed all are done.
+                    NTmessage("Failed to find any store log file in directory: %s" % logDir)
+                continue
+            self.entry_list_store_tried.append(entry_code)
+            analysisResultTuple = analyzeCingLog(logLastFile)
+            if not analysisResultTuple:
+                NTmessage("Failed to analyze log file: %s" % logLastFile)
+                self.entry_list_store_crashed.append(entry_code)
+                continue
+            timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+            if entryCrashed:
+                NTerror("Unexpected [%s] for time taken in CING store log file: %s assumed crashed." % (timeTaken, logLastFile))
+                self.entry_list_store_crashed.append(entry_code)
+                continue # don't mark it as stopped anymore.
+            # end if
+            if not entry_dict_store_in_db.has_key(entry_code):
+                NTerror("Failed to find [%s] in db." % entry_code)
+                self.entry_list_store_not_in_db.append(entry_code)
+                continue # don't mark it as stopped anymore.
+            # end if
+            if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
+                self.entry_list_store_failed.append(entry_code)
+                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTerror("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
+                continue
+            # end if
+            self.entry_list_store_done.append(entry_code)
+        # end for
+
         # Consider the entries updated as not done.
         self.entry_list_done.difference(self.entry_list_updated)
+        # Consider the entries updated as not done.
 
         timeTakenList = NTlist() # local variable.
         timeTakenList.addList(self.timeTakenDict.values())
@@ -492,8 +553,17 @@ class nrgCing(Lister):
         NTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
         NTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
         NTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+
+        NTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
+        NTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
+        NTmessage("Found %4d entries that CING store failed." % len(self.entry_list_store_failed))
+        NTmessage("Found %4d entries that CING store not in db." % len(self.entry_list_store_not_in_db))
+        NTmessage("Found %4d entries that CING store done." % len(self.entry_list_store_done))
+
+
         if not self.entry_list_done:
             NTwarning("Failed to find entries that CING did.")
+
     # end def
 
     def searchPdbEntries(self):
@@ -1274,8 +1344,8 @@ class nrgCing(Lister):
 #        self.searchPdbEntries()
 #        self.getEntryInfo()
 
-        if False: # DEFAULT: False
-            self.entry_list_done = '1brv'.split()
+        if True: # DEFAULT: False
+            self.entry_list_done = '2hyn 2kj3 2ku1'.split()
 
         if False: # DEFAULT: False
             self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
@@ -1296,9 +1366,9 @@ class nrgCing(Lister):
                             self.results_dir,
                             processes_max = self.processes_max,
                             delay_between_submitting_jobs = 1,
-                            max_time_to_wait = 60 * 6,
+                            max_time_to_wait = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
                             START_ENTRY_ID = 0,
-                            MAX_ENTRIES_TODO = 2,
+                            MAX_ENTRIES_TODO = self.max_entries_todo,
                             expectPdbEntryList = True,
                             extraArgList = extraArgList)
         NTmessage("Done with storeCING2db.")
@@ -1314,7 +1384,7 @@ Additional modes I see:
     """
     cing.verbosity = verbosityDebug
     isProduction = 1       # DEFAULT: 1.
-    max_entries_todo = 40  # DEFAULT: 40
+    max_entries_todo = 0  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)

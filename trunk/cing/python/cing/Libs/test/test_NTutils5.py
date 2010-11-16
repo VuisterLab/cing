@@ -13,6 +13,7 @@ import unittest
 
 class AllChecks(TestCase):
     os.chdir(cingDirTmp)
+
     def testGetKeyWithLargestCount(self):
 
         testList = [
@@ -98,9 +99,9 @@ class AllChecks(TestCase):
             self.assertEquals(timedelta2HoursMinutesAndSeconds(t), tExpected[i])
     def testNTlist(self):
         ntList = NTlist([7,8,9])
-        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
+#        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
         ntList.clear()
-        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
+#        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
 
     def testTruth(self):
         inputList = """t True  y yes 1 2 -1
@@ -114,14 +115,21 @@ class AllChecks(TestCase):
 
     def testAsci2list(self):
         # Still fails to do -3 - -1 to represent.
-        inputList = """1-3
-                      -3-1
+        inputList = """
+                      1
+                      1-3
+                      -3:1
+                      -3
                       1,2,5-8,11,20-22
+                      -20:-19,-2:-1,3:4
                     """.split()
         resultLoL = [
+                      '[1]',
                       '[1, 2, 3]',
                       '[-3, -2, -1, 0, 1]',
+                      '[-3]',
                       '[1, 2, 5, 6, 7, 8, 11, 20, 21, 22]',
+                      '[-20, -19, -2, -1, 3, 4]',
                      ]
         for i, inputStr in enumerate(inputList):
             NTdebug("testAsci2list: %d" % i)
@@ -132,9 +140,9 @@ class AllChecks(TestCase):
         globPattern = os.path.join(cingRoot, '*.txt')
         lastFile = globLast(globPattern)
         dateTimeObject = getDateTimeFromFileName(lastFile)
-        dateTimeString = getDateTimeStampForFileName(lastFile)
-        NTdebug('lastFile: %s dateTimeObject %s' % (lastFile, dateTimeObject))
-        NTdebug('lastFile: %s dateTimeString %s' % (lastFile, dateTimeString))
+#        dateTimeString = getDateTimeStampForFileName(lastFile)
+#        NTdebug('lastFile: %s dateTimeObject %s' % (lastFile, dateTimeObject))
+#        NTdebug('lastFile: %s dateTimeString %s' % (lastFile, dateTimeString))
         self.assertTrue(dateTimeObject)
         self.assertTrue(dateTimeObject.year >= 2009)
 #        self.assertEquals(extension, '.txt')
