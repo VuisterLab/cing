@@ -102,11 +102,19 @@ ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c3_viol INT   DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c5_viol INT   DEFAULT NULL;
 
 ALTER TABLE nrgcing.cingresidue ADD COLUMN phi_avg  FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN phi_cv   FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN psi_avg  FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN psi_cv   FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN chi1_avg FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN chi1_cv  FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN chi2_avg FLOAT  DEFAULT NULL;
-ALTER TABLE nrgcing.cingentry ADD COLUMN chi2_cv  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN phi_cv   FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN psi_avg  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN psi_cv   FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN chi1_avg FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN chi1_cv  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN chi2_avg FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN chi2_cv  FLOAT  DEFAULT NULL;
+
+SELECT distinct e.pdb_id FROM "nrgcing"."cingresidue" r,  "nrgcing"."cingentry" e where
+r.entry_id = e.entry_id AND
+r.number < 0
+order by e.pdb_id
+;
+
+SELECT count( FROM "nrgcing"."cingentry";
 

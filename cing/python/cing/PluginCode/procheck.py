@@ -636,7 +636,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             for l in AwkLike(path, separator=':'):
                 result.append( (l.dollar[2][:-1].strip(), l.dollar[1][:-6].strip()) )
         else:
-            NTerror("Failed to find %s in getPostscriptFileNames" % path)
+            NTwarning("Failed to find %s in getPostscriptFileNames" % path)
         return result
     #end def
 #end class

@@ -3316,56 +3316,68 @@ def quote(inputString):
 #end def
 
 def asci2list(inputStr):
-    """ Convert a string with "," and "-" to a list of integers
-    eg. 1,2,5-8,11,20-40
+    """ Convert a string with "," and "-" (or :) to a list of integers
+    eg. 1,2,5-8,11,20-40 or
+        -20:-19,-2:-1,3:4
+
     returns empty list on empty inputStr
 
     NB: - returns empty list when an invalid construct is entered.
-        - boundaries are inclusive at both ends.
+        - boundaries are inclusive at both ends unlike python array selections.
+        - Do not mix - and : either.
 
     TODO: allow specification of an all negative range such as [-2, -1]
             See unit test.
+
     """
     result = NTlist()
+
     if inputStr == None:
         return result
     if len(inputStr) == 0:
         return result
 
+    # Get rid of all whitespace
+    inputStrCollapsed = inputStr.replace(' ', '')
 
-    for elm in inputStr.split(','):
-        elmStripped = elm.strip()
-        if len(elmStripped) == 0:
-            continue
-
-        firstElementIsPositive = True
-        if elmStripped[0] == '-':
-            firstElementIsPositive = False
-            elmStripped = elmStripped[1:]
-
-        tmp = elmStripped.split('-')
-        intList = []
-        try:
-            intList = [ int(x) for x in tmp ]
-        except:
-            NTerror('asci2list: failed to convert to int for construct "%s"' % inputStr)
-            return result
-
-        if not firstElementIsPositive:
-            intList[0] = -intList[0]
-
-        if len(tmp) == 1:
-            result.append(intList[0])
-        elif len(tmp) == 2:
-            for i in range(intList[0], intList[1]+1):
-                result.append(i)
-        else:
-            NTerror('asci2list: invalid construct "%s"' % inputStr)
-        #end if
-    #end for
-
+    try:
+        for elm in inputStrCollapsed.split(','):
+#            NTdebug("Looking at elm: [%s]" % elm)
+            if elm.count(':'):
+                tmpList = elm.split(':')
+            else:
+                # allowed as a range indicator between two posiive numbers.
+                countElements = elm.count('-')
+                if countElements == 0:
+                    result.append(int(elm))
+                    continue
+                if countElements > 1:
+                    NTerror('asci2list: failed to convert to int list (A) for construct "%s"' % inputStr)
+                    return NTlist()
+                idxMinus = elm.index('-')
+                if idxMinus == 0:
+                   tmpList = [ elm ] # just a negative number by itself.
+                else:
+                   tmpList = elm.split('-') # fine when there is one or no dashes
+                # end else
+            # end else
+            intList = [ int(x) for x in tmpList ]
+            if len(tmpList) == 1:
+                result.append(intList[0])
+            elif len(tmpList) == 2:
+                for i in range(intList[0], intList[1]+1):
+                    result.append(i)
+            else:
+                NTerror('asci2list: invalid construct "%s"' % inputStr)
+            #end if
+        #end for
+    except:
+        NTtracebackError()
+        NTerror('asci2list: failed to convert to int for construct "%s"' % inputStr)
+    # end try
     return result
 #end def
+
 
 def list2asci(theList):
     """ Converts the numeric integer list theList to a string with "," and "-"
