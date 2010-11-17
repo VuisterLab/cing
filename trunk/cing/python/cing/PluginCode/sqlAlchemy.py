@@ -38,7 +38,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
 class cgenericSql(NTdict):
     "Class for connecting to any MySql database."
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nobody@noaddress.no', passwd='', unix_socket='/tmp/mysql.sock', db="", schema=None, echo=False):
-        NTdebug("Initializing cgenericSql with user/db: %s/%s" % (user,db))
+#        NTdebug("Initializing cgenericSql with user/db: %s/%s" % (user,db))
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -84,7 +84,7 @@ class cgenericSql(NTdict):
              self.host,
              self.db
         )
-        NTdebug("Using connectionString %s" % connectionString)
+#        NTdebug("Using connectionString %s" % connectionString)
         self.engine = create_engine(connectionString, echo=self.echo)
         if True:
             self.conn = self.engine.connect()
@@ -117,7 +117,7 @@ class cgenericSql(NTdict):
                 return True
 
     def loadTable(self, tableName):
-        NTdebug("Loading table %s" % tableName)
+#        NTdebug("Loading table %s" % tableName)
         warnings.simplefilter('ignore', category=SAWarning)
         #warnings.filters.insert(0, ('ignore', None, SAWarning, None, 0))
 
@@ -127,7 +127,7 @@ class cgenericSql(NTdict):
     def autoload(self):
         """Return True on error"""
         for tableName in self.tableNameList:
-            NTdebug("Loading table %s" % tableName)
+#            NTdebug("Loading table %s" % tableName)
             self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
 #            table = self[tableName]
 #            columnNameList = [c.name for c in table.columns]
@@ -145,7 +145,7 @@ class cgenericSql(NTdict):
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nrgcing1', passwd='4I4KMS', unix_socket='/tmp/mysql.sock', db="nrgcing", schema=None, echo=False):
-        NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
+#        NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
         cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
         self.tableNameList = ['cingentry', 'cingchain', 'cingresidue', 'cingatom']

@@ -14,6 +14,7 @@ PDB  BMRB  Notes
 1b4y  4400 DNA triple helix for testing x3dna code
 1brv  4020 smallest protein by JFD (1996). VAL H1 is only present in the second model and on.
 1bus    53 has ligand PCA.
+1c2n  1646 Negative residue numbers in protein sequence
 1cjg  4813 nucleic acid/protein complex
 1d3z  6457 interest of VvB
 1hkt  4046 Structure from GWV (1996)
@@ -28,7 +29,6 @@ PDB  BMRB  Notes
 2kib 20074 Fibril
 2kz0 16995 alpha/beta BolA protein from the Seattle Structural Genomics Center
 2rop 11041 separated 2 domains (2008)
-
 On the restraint side:
 **********************
 1a24 Hydrogen bonds

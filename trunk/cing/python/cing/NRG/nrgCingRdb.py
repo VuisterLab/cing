@@ -1,6 +1,6 @@
-# python -u $CINGROOT/python/cing/NRG/makeNRGCINGplots.py
-# reload cing.NRG.makeNRGCINGplots
-# from cing.NRG.makeNRGCINGplots import *
+# python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py
+# reload cing.NRG.nrgCingRdb
+# from cing.NRG.nrgCingRdb import *
 """
 Create plots like the GreenVersusRed scatter by entry.
 """
@@ -57,9 +57,9 @@ if False:
 
 
 class nrgCingRdb():
-    def __init__(self):
+    def __init__(self,host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
         if True: # block the NRG-CING stuff away from other schema
-            self.csql = csqlAlchemy(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA)
+            self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
             if False: # DEFAULT True but disable for quicker testing.
@@ -92,7 +92,7 @@ class nrgCingRdb():
             self.perEntryRog = NTdict()
 
         if True:
-            self.jsql = cgenericSql(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
+            self.jsql = cgenericSql(host=host, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
             self.jsql.connect()
             self.jsql.autoload()
 
@@ -130,13 +130,13 @@ class nrgCingRdb():
         columnName = PDB_ID_STR
 
         if not fromNrg:
-            table = m.bs.c
+            table = self.bs.c
             columnName =PDBJ_ENTRY_ID_STR
 
         try:
             s = select([table.c[columnName]])
     #        NTdebug("SQL: %s" % s)
-            pdbIdTable = m.execute(s).fetchall()
+            pdbIdTable = self.execute(s).fetchall()
         except:
             NTtracebackError()
             return
@@ -808,18 +808,20 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
-    m = nrgCingRdb()
+    m = nrgCingRdb(host='localhost')
 
-    if True:
+    if False:
         m.createPlots(doTrending = False)
-
     if False:
 #        m.plotQualityVsColor()
 #        m.plotQualityPcVsColor()
         m.getAndPlotColorVsColor(doPlot = True)
-    if True:
+    if False:
         m.createScatterPlotGreenVersusRed()
+    if True:
+        pdbIdList = m.getPdbIdList()
+
     if False:
         m.showCounts()
 
-    NTmessage("done with makeNRGCINGplots")
+    NTmessage("done with nrgCingRdb")

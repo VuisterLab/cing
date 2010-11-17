@@ -112,9 +112,11 @@ ALTER TABLE nrgcing.cingresidue ADD COLUMN chi2_cv  FLOAT  DEFAULT NULL;
 
 SELECT distinct e.pdb_id FROM "nrgcing"."cingresidue" r,  "nrgcing"."cingentry" e where
 r.entry_id = e.entry_id AND
-r.number < 0
-order by e.pdb_id
-;
+r.number < -10 AND
+e.res_count < 40 AND
+e.model_count <= 10 AND
+e.pc_gf > -99
+order by e.pdb_id;
 
 SELECT count( FROM "nrgcing"."cingentry";
 

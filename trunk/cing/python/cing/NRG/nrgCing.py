@@ -483,9 +483,13 @@ class nrgCing(Lister):
             # end for entryDir
         # end for subDir
 
-        m = nrgCingRdb()
+        if self.isProduction:
+            host = 'nmr'
+        else:
+            host = 'localhost'
+        m = nrgCingRdb(host=host)
         self.entry_list_store_in_db = m.getPdbIdList()
-        if not  self.entry_list_store_in_db:
+        if not self.entry_list_store_in_db:
             NTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
         entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
@@ -1267,7 +1271,8 @@ class nrgCing(Lister):
                 NTerror("In prepare failed prepareEntry")
                 return True
         if True: # DEFAULT: False
-            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
+#            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
+            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
             self.entry_list_nrg_docr = []
 
@@ -1384,7 +1389,7 @@ Additional modes I see:
     """
     cing.verbosity = verbosityDebug
     isProduction = 1       # DEFAULT: 1.
-    max_entries_todo = 0  # DEFAULT: 40
+    max_entries_todo = 40  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)
