@@ -247,7 +247,7 @@ CREATE TABLE casdcing.cingatom
     wi_dunchk                      FLOAT DEFAULT NULL,
     wi_hndchk                      FLOAT DEFAULT NULL,
     wi_mischk                      VARCHAR(255) DEFAULT NULL,
-    wi_mo2chk                      FLOAT DEFAULT NULL,
+    wi_mo2chk                      VARCHAR(255) DEFAULT NULL,
     wi_pl2chk                      FLOAT DEFAULT NULL,
     wi_wgtchk                      FLOAT DEFAULT NULL,
 --   cing

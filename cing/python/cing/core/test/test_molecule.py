@@ -99,7 +99,7 @@ if __name__ == "__main__":
     cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
-    if True:
+    if False:
         profile.run('unittest.main()', fn)
         p = pstats.Stats(fn)
     #     enable a line or two below for useful profiling info

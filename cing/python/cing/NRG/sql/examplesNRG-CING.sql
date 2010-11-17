@@ -120,3 +120,6 @@ order by e.pdb_id;
 
 SELECT count( FROM "nrgcing"."cingentry";
 
+-- Can't be done in one blow.
+ALTER TABLE nrgcing.cingatom ALTER COLUMN wi_mo2chk TYPE VARCHAR(255);
+ALTER TABLE nrgcing.cingatom ALTER COLUMN wi_mo2chk SET DEFAULT NULL;

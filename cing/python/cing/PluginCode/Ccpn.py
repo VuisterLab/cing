@@ -1307,7 +1307,7 @@ class Ccpn:
 
                 if not atomPairList:
                     # restraints that will not be imported
-                    msgHoL.appendMessage("%s without atom pairs" % (ccpnDistanceConstraint))
+                    msgHoL.appendMessage("%s without atom pairs will be skipped" % (ccpnDistanceConstraint))
                     continue
                 # end if
 

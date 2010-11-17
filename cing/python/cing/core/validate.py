@@ -588,21 +588,37 @@ def partitionRestraints( project, tmp=None ):
     for drl in project.distances:
         for restraint in drl:
             for atm1,atm2 in restraint.atomPairs:
+                if not (atm1 and atm2): # Not observed yet.
+                    NTerror("Found distance restraint without atom1 or 2. For restraint: %s" % restraint)
+                    continue
                 atm1.residue.distanceRestraints.add( restraint ) #AWSS
                 atm2.residue.distanceRestraints.add( restraint ) #AWSS
             #end for
         #end for
     #end for
+
     # dihedrals
     for drl in project.dihedrals:
         for restraint in drl:
-            restraint.atoms[2].residue.dihedralRestraints.add( restraint ) #AWSS and JFD will copy this logic to html class.
+            atom = restraint.atoms[2]
+            if not atom: # Failed for entry 8psh but in fact this shouldn't occur because the atoms should not exist then. NB this only happens after restoring.
+                NTerror("Found restraint without an atom at index 2. For restraint: %s" % restraint)
+                continue
+            residue = atom.residue
+            if not residue:
+                NTerror("Found restraint with an atom without residue. For restraint: %s" % restraint)
+                continue
+            residue.dihedralRestraints.add( restraint ) #AWSS and JFD will copy this logic to html class.
         #end for
     #end for
+
     #RDCs
     for drl in project.rdcs:
         for restraint in drl:
             for atm1,atm2 in restraint.atomPairs:
+                if not (atm1 and atm2): # Not observed yet.
+                    NTerror("Found rdc restraint without atom1 or 2. For restraint: %s" % restraint)
+                    continue
                 atm1.residue.rdcRestraints.add( restraint ) #AWSS
                 if atm2.residue != atm1.residue:
                     atm2.residue.rdcRestraints.add( restraint ) #AWSS
@@ -1358,8 +1374,14 @@ def restoreDihRestraintInfo(project):
                 dihRestraint.residue = residue
                 dihRestraint.angle = '%s_%i' % (angle, residue.resNum)
             else:
-                dihRestraint.residue = dihRestraint.atoms[2].residue #'Invalid'
-                dihRestraint.angle = 'Discarted'
+                dihRestraint.angle = 'Discarded'
+                atom = dihRestraint.atoms[2]
+                if not atom:
+                    NTerror("In restoreDihRestraintInfo failed to find atom for restraint: %s" % dihRestraint)
+                    dihRestraint.residue = None
+                    continue
+                dihRestraint.residue = atom.residue #'Invalid'
+
 # end def
 
 def validateDihedrals(self):

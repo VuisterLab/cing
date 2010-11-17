@@ -2608,7 +2608,7 @@ Residue class: Defines residue properties
         # find the database entry in NTdb (which is of type MolDef)
         db = NTdb.getResidueDefByName( resName, convention )
         if not db:
-            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
+#            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
             self.db = NTdb.appendResidueDef( name=resName, shortName = '_',
                                              nameDict = {INTERNAL:resName, convention:resName}
                                            )

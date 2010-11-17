@@ -169,6 +169,7 @@ class nrgCing(Lister):
         self.entry_list_store_tried = NTlist()
         self.entry_list_store_crashed = NTlist()
         self.entry_list_store_failed = NTlist()
+        self.entry_list_store_not_in_db = NTlist()
         self.entry_list_store_done = NTlist()
 
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
@@ -176,6 +177,7 @@ class nrgCing(Lister):
         self.entry_list_stopped = NTlist()    # was stopped by time out or by user or by system (any other type of stop but stack trace)
         self.entry_list_done = NTlist()       # finished to completion of the cing run.
         self.entry_list_todo = NTlist()
+        self.entry_list_updated = NTlist()
         self.timeTakenDict = NTdict()
         self.inputModifiedDict = NTdict()     # This is the most recent of mmCIF, NRG, BMRB CS.
         self.entry_list_obsolete = NTlist()
@@ -367,19 +369,19 @@ class nrgCing(Lister):
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTerror("Detected a crash: %s" % entry_code, logLastFile)
+                NTmessage("Detected a crash: %s" % entry_code, logLastFile)
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if not timeTaken:
-                NTerror("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
+                NTmessage("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if nr_error > 0:
                 self.entry_list_prep_failed.append(entry_code)
-                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTerror("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
+                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             self.entry_list_prep_done.append(entry_code)
@@ -431,13 +433,13 @@ class nrgCing(Lister):
                     continue # don't mark it as stopped anymore.
                 # end if
                 if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
-                    NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                    NTerror("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
+                    NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                    NTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
 
                 if timeTaken:
                     self.timeTakenDict[entry_code] = timeTaken
                 else:
-                    NTerror("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
+                    NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
 
                 timeStampLastValidation = getTimeStampFromFileName(logLastFile)
                 if not timeStampLastValidation:
@@ -511,19 +513,19 @@ class nrgCing(Lister):
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTerror("Unexpected [%s] for time taken in CING store log file: %s assumed crashed." % (timeTaken, logLastFile))
+                NTmessage("For CING store log file: %s assumed crashed." % (timeTaken, logLastFile))
                 self.entry_list_store_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if not entry_dict_store_in_db.has_key(entry_code):
-                NTerror("Failed to find [%s] in db." % entry_code)
+                NTmessage("Failed to find [%s] in db." % entry_code)
                 self.entry_list_store_not_in_db.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
                 self.entry_list_store_failed.append(entry_code)
-                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTerror("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
+                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             self.entry_list_store_done.append(entry_code)
@@ -640,8 +642,13 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
         writeTextToFile("entry_list_nrg.csv", toCsv(self.entry_list_nrg))
         writeTextToFile("entry_list_nrg_docr.csv", toCsv(self.entry_list_nrg_docr))
-#        writeTextToFile("entry_list_mmcif.csv", toCsv(self.entry_list_mmcif))
-#        writeTextToFile("entry_list_prepared.csv", toCsv(self.entry_list_prepared))
+
+
+        writeTextToFile("entry_list_prep_tried.csv", toCsv(self.entry_list_prep_tried))
+        writeTextToFile("entry_list_prep_crashed.csv", toCsv(self.entry_list_prep_crashed))
+        writeTextToFile("entry_list_prep_failed.csv", toCsv(self.entry_list_prep_failed))
+        writeTextToFile("entry_list_prep_done.csv", toCsv(self.entry_list_prep_done))
+
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
         writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
@@ -649,6 +656,13 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_stopped.csv", toCsv(self.entry_list_stopped))
         writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
         writeTextToFile("entry_list_updated.csv", toCsv(self.entry_list_updated))
+        writeTextToFile("entry_list_obsolete.csv", toCsv(self.entry_list_obsolete))
+
+        writeTextToFile("entry_list_store_tried.csv", toCsv(self.entry_list_store_tried))
+        writeTextToFile("entry_list_store_crashed.csv", toCsv(self.entry_list_store_crashed))
+        writeTextToFile("entry_list_store_failed.csv", toCsv(self.entry_list_store_failed))
+        writeTextToFile("entry_list_store_not_in_db.csv", toCsv(self.entry_list_store_not_in_db))
+        writeTextToFile("entry_list_store_done.csv", toCsv(self.entry_list_store_done))
 
 #        for i, phaseData in enumerate(self.phaseDataList):
 #            entryList = self.phaseList[i]
@@ -1129,8 +1143,8 @@ class nrgCing(Lister):
                 return True
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
-                NTerror("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTerror("Found %s errors in prep phase X please check: %s" % (nr_error, entry_code))
+                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTmessage("Found %s errors in prep phase X please check: %s" % (nr_error, entry_code))
                 resultList = []
                 status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
                 if status == 0:
@@ -1270,7 +1284,7 @@ class nrgCing(Lister):
             if self.prepareEntry(entry_code, convertMmCifCoor=0, convertMrRestraints=1, convertStarCS=0):
                 NTerror("In prepare failed prepareEntry")
                 return True
-        if True: # DEFAULT: False
+        if False: # DEFAULT: False
 #            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
             self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
