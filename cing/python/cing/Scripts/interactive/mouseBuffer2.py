@@ -1,7 +1,7 @@
 # python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer2.py
 
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG.makeNRGCINGplots import bin_by
+from cing.NRG.nrgCingRdb import bin_by
 from pylab import * #@UnusedWildImport
 
 cing.verbosity = 9

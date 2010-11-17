@@ -190,37 +190,3 @@ def getPdbEntriesOca(onlyNmr = False):
             result.append(pdbCode)
   result.sort()
   return result
-
-def getPdbEntriesNrgCing():
-  """Query the database"""
-  result = []
-  urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
-  if testingLocally:
-      urlLocation = ocaUrl + "/ocaidsPDB"
-  if onlyNmr:
-      urlLocation = ocaUrl + "?dat=dep&ex=nmr&m=du"
-      if testingLocally:
-          urlLocation = ocaUrl + "/ocaidsPDB-NMR"
-
-## OCA database search on: Wed Dec  3 10:18:07 2008
-## Query: ex=any&m=du
-## Hits: 55841 (search time 0 sec)
-#100D     Crystal The Highly Distorted Chimeric Deca... Ban                1.90
-#101D     Refinement Of Netropsin Bound To DNA: Bias... Goodsell           2.25
-  r1 = urllib.urlopen(urlLocation)
-  data = r1.read()
-  r1.close()
-
-  dataLines = data.split("\n")
-  for dataLine in dataLines:
-    if dataLine:
-        if not dataLine[0].isdigit():
-             # skipping html and header.
-            continue
-        items = dataLine.split()
-        if items:
-            pdbCode = items[0]
-            pdbCode = pdbCode.lower()
-            result.append(pdbCode)
-  result.sort()
-  return result
