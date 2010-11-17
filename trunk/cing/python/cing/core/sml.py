@@ -592,14 +592,28 @@ class SMLAtomHandler( SMLhandler ):
     def handle(self, line, fp, molecule=None):
         # The handle restores the attributes of atom
         # Needs a valid molecule
-        if molecule == None: return None
+        if molecule == None:
+            return None
 
         nameTuple = eval(' '.join(line[2:]))
         atm = molecule.decodeNameTuple(nameTuple)
-        if atm == None:
-            NTerror('SMLAtomHandler.handle: line %d, invalid nameTuple %s, ==> atom skipped', fp.NR, nameTuple)
-            self.jumpToEndTag(fp)
-            return None
+        if atm == None: # TODO: check this code it doesn't work well yet considering error messages from test_ccpn.py unit tests.
+            NTdebug('SMLAtomHandler.handle: line %d, invalid nameTuple %s', fp.NR, str(nameTuple))
+#            // Code from CCPN
+            atomName = nameTuple[3]
+            nameTuple = ( nameTuple[0],nameTuple[1], nameTuple[2], None)
+            NTdebug('Trying to create non-standard atom %s in (non-standard) residue %s' % ( atomName, str(nameTuple)))
+            res = molecule.decodeNameTuple(nameTuple)
+            if not res:
+                NTcodeerror('No residue found in SMLAtomHandler for tuple %s. Skipping creating non-standard atoms' % str(nameTuple))
+                self.jumpToEndTag(fp)
+                return None
+            atm = res.addAtom(atomName)
+            if not atm:
+                NTdebug('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
+                self.jumpToEndTag(fp)
+                return None
+            #end if
         #end if
         return self.dictHandler(atm, fp, molecule)
     #end def
@@ -827,7 +841,8 @@ class SMLDistanceRestraintHandler( SMLhandler ):
 
     def endHandler(self, dr, project):
         # Parse the atomPairs tuples, map to molecule
-        if project == None or project.molecule == None: return dr
+        if project == None or project.molecule == None:
+            return dr
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
@@ -835,10 +850,10 @@ class SMLDistanceRestraintHandler( SMLhandler ):
             p1 = project.decodeNameTuple(ap[1])
             if p0 and p1:
                 dr.appendPair( (p0, p1) )
-            else:
-                if not p0: NTerror('SMLDistanceRestraintHandler.endHandler: error decoding %s', ap[0])
-                if not p1: NTerror('SMLDistanceRestraintHandler.endHandler: error decoding %s', ap[1])
+                continue
             #end if
+            if not p0: NTerror('SMLDistanceRestraintHandler.endHandler: error p0 decoding %s', ap[0])
+            if not p1: NTerror('SMLDistanceRestraintHandler.endHandler: error p1 decoding %s', ap[1])
         #end for
         return dr
     #end def

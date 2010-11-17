@@ -568,33 +568,40 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     if not hasUsefullColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
-                    result = execute(catom.insert().values(
-                        entry_id=entry_id,
-                        chain_id=chain_id,
-                        residue_id=residue_id,
-                        name=a_name,
-#                        wi_ba2lst=a_wi_ba2lst,
-#                        wi_bh2chk=a_wi_bh2chk,
-                        wi_chichk=a_wi_chichk,
-                        wi_dunchk=a_wi_dunchk,
-                        wi_hndchk=a_wi_hndchk,
-                        wi_mischk=a_wi_mischk,
-                        wi_mo2chk=a_wi_mo2chk,
-                        wi_pl2chk=a_wi_pl2chk,
-                        wi_wgtchk=a_wi_wgtchk,
-                        rog=a_rog
+                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_mischk, a_wi_mo2chk, a_wi_pl2chk, a_wi_wgtchk,a_rog]
+                    NTdebug("Inserting atom: " + str(atomInfoList))
+                    try:
+                        result = execute(catom.insert().values(
+                            entry_id=entry_id,
+                            chain_id=chain_id,
+                            residue_id=residue_id,
+                            name=a_name,
+    #                        wi_ba2lst=a_wi_ba2lst,
+    #                        wi_bh2chk=a_wi_bh2chk,
+                            wi_chichk=a_wi_chichk,
+                            wi_dunchk=a_wi_dunchk,
+                            wi_hndchk=a_wi_hndchk,
+                            wi_mischk=a_wi_mischk,
+                            wi_mo2chk=a_wi_mo2chk,
+                            wi_pl2chk=a_wi_pl2chk,
+                            wi_wgtchk=a_wi_wgtchk,
+                            rog=a_rog
+                            )
                         )
-                    )
-#                    atom_id = result.last_inserted_ids()[0] # TODO: update to this again.
-                    s = select([catom.c.atom_id],and_(
-                          catom.c.entry_id == entry_id,
-                          catom.c.chain_id == chain_id,
-                          catom.c.residue_id == residue_id,
-                          catom.c.name == a_name
-                          ))
-#                    atom_id = execute(s).fetchall()[0][0]
-#                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
-                    atomCommittedCount += 1
+    #                    atom_id = result.last_inserted_ids()[0] # TODO: update to this again.
+                        s = select([catom.c.atom_id],and_(
+                              catom.c.entry_id == entry_id,
+                              catom.c.chain_id == chain_id,
+                              catom.c.residue_id == residue_id,
+                              catom.c.name == a_name
+                              ))
+    #                    atom_id = execute(s).fetchall()[0][0]
+    #                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
+                        atomCommittedCount += 1
+                    except:
+                        NTtracebackError()
+                        NTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
+                        continue
                 # end for atom
             # end if atom
         # end for residue
