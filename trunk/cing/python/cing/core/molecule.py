@@ -676,6 +676,50 @@ class Molecule( NTtree, ResidueList ):
         return selectedResidues
     #end def
 
+    def _rangesStr2list( self, ranges ):
+        """
+        Only convert a residue ranges string, e.g. 'A.-10--2,B3'
+        See unit test in test_molecule.py
+        """
+        if type(ranges) != str:
+            NTerror('Error Molecule._rangesStr2list: ranges type [%s] should have been a string' % type(ranges) )
+            return None
+
+        rangesCollapsed = ranges.replace(' ', '')
+        rangeStrList = rangesCollapsed.split(',')
+        result = NTlist()
+
+        # hashes by keys to use
+        resNumDict = NTdict()
+        for res in self.allResidues():
+            resNumDict.setdefault(res.resNum, [])
+            resNumDict[res.resNum].append(res)
+        NTdebug("Residue dict: %s" % resNumDict.items())
+
+        for rangeStr in rangeStrList:
+            rangeStrClean = rangeStr
+            chainId = None # indicates no chain id present
+            firstChar = rangeStr[0]
+            if not (firstChar.isdigit() or firstChar == '-'):
+                if rangeStr[1] != '.':
+                    return None
+                rangeStrClean = rangeStr[2:]
+                chainId = rangeStr[0]
+            NTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
+            rangeIntList = asci2list(rangeStrClean)
+            if not rangeIntList:
+                NTwarning("Failed to asci2list in Molecule._rangesStr2list for rangeStrClean: %s" % rangeStrClean)
+                continue
+            for resNum in rangeIntList:
+                if resNumDict.has_key(resNum):
+                    for r in resNumDict[resNum]:
+                        if (chainId == None) or (r.chain.name == chainId):
+                            NTdebug("r: [%s] chainId [%s]" % (r, chainId))
+                            result.append(r)
+        result.removeDuplicates() # also sorts
+        return result
+    # end def
+
     def ranges2list( self, ranges ):
         """
             Convert
@@ -690,38 +734,13 @@ class Molecule( NTtree, ResidueList ):
 
            Return the list or None upon error.
 
+           See unit test in test_molecule.py
         """
-        if ranges == None:
+        if ranges == None or len(ranges) == 0:
             return self.allResidues()
 
         if type(ranges) == str:
-            # self.allResidues() is a list of NTtree with residue instances
-            # .zap('resNum') returns the items collapsed by residue number
-            # if two residues in the same chain have the same residue number then
-            #  the resulting list will have the one of the 2 residues in there
-            #  twice; which is a bug JFD thinks. GWV: No, because resNum should be unique
-            #  to the chain
-            #resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
-            # But it will be an error because if two chains have identical residues numbers,
-            # only one will be added.
-            # Adding chain id's is alos an issue
-            resnumDict = NTdict()
-            for res in self.allResidues():
-                resnumDict.setdefault(res.resNum, [])
-                resnumDict[res.resNum].append(res)
-            #end for
-            #print '>>',self.name
-            #print resnumDict.items()
-            ranges =  asci2list(ranges)
-            ranges.sort()
-            result = NTlist()
-            for resNum in ranges:
-                if resnumDict.has_key(resNum):
-                    for r in resnumDict[resNum]:
-                        result.append(r)
-                else:
-                    NTerror('Molecule.ranges2list: invalid residue number [%d]', resNum )
-            return result
+            return self._rangesStr2list(ranges)
 
         if isinstance( ranges, list ):
             resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
@@ -731,7 +750,7 @@ class Molecule( NTtree, ResidueList ):
                     if resnumDict.has_key(item):
                         result.append(resnumDict[item])
                     else:
-                        NTerror('Error Molecule.ranges2list: invalid residue number [%d]\n', resNum )
+                        NTerror('Error Molecule.ranges2list: invalid residue number item [%d]\n', item )
                 elif isinstance( item, Residue ):
                     result.append( item )
                 else:
@@ -1439,6 +1458,8 @@ class Molecule( NTtree, ResidueList ):
            Generate an atomList
            Define the topological connections
            Calculate the rmsd's
+
+           Return True on error. Note that an empty atom list is not an error perse.
         """
 
         msgHol = MsgHoL()
@@ -1471,8 +1492,11 @@ class Molecule( NTtree, ResidueList ):
         #end if
         # Atom list is needed even when no coordinates are present.
         self.atomList = AtomList( self )
-        if not self.atomList:
+        if self.atomList == None:
             NTcodeerror("Failed to generate AtomList in molecule#updateAll")
+            return True
+        if len(self.atomList) == 0:
+            NTwarning("Empty AtomList in molecule#updateAll")
 
         self.updateTopology()
     #end def

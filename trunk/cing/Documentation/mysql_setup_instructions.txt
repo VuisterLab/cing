@@ -1,1 +1,237 @@
-SEE: $NRG/Documentation/mysql_setup_instructions.txt
+ALSO SEE: $NRG/scripts/sql/prepare_database_mysql.sql and handy_commands.sql
+            http://lists.macosforge.org/pipermail/macports-users/2008-April/009780.html but not fully accurate.
+            http://guide.macports.org/#reference.startupitems
+            http://www.jasonrowland.com/2009/10/install-mysql5-on-snow-leopard-using-macports/
+
+* New setup with mysql 5.1 from mac ports. Start a regular and a root user window then.
+    As jd:
+    - sudo port install mysql5-server
+    - set mysqldatadir=/opt/local/var/db/mysql5/
+    As root (bash):
+    - export mysqldatadir=/opt/local/var/db/mysql5/
+    - rm -rf $mysqldatadir
+    - chown -R mysql:_mysql /opt/local/var/db
+    As jd:
+    - sudo -u mysql mysql_install_db5
+    - sudo /opt/local/lib/mysql5/bin/mysqld_safe &
+    As root:
+    - cd $mysqldatadir;  tail -f *.err *.log &
+    As jd:
+    - /opt/local/lib/mysql5/bin/mysqladmin -u root password 4I4KMS
+    - mysql -u root -p'4I4KMS' mysql
+    - run db_setup.sql and the mentioned db_create.sql
+    - Start/stop: mysqlstart/mysqlstop
+
+
+
+
+* mysql on nmr OLD
+    * To start mysqld at boot time you have to copy
+support-files/mysql.server to the right place for your system
+
+If you set a password it might be more hard. Simpler to disable root password... at your own risk.
+PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !
+To do so, start the server, then issue the following commands:
+/sw/bin/mysqladmin -u root password 'new-password'
+/sw/bin/mysqladmin -u root -h nmr.cmbi.umcn.nl password 'new-password'
+See the manual for more instructions.
+
+You can test the MySQL daemon with mysql-test-run.pl
+cd mysql-test ; perl mysql-test-run.pl
+
+
+* mysql under fink on Mac (Currently 5.0.38-1005)
+    fink install mysql
+    daemonic enable mysql (only once). Tested fine. It installs:
+        /Library/StartupItems/daemonic-mysql/daemonic-mysql
+    Which benefits from an added stop command:
+          stop)\
+            ConsoleMessage "Stopping MySQL database server"
+            killall mysqld_safe mysqld
+            ;;
+    Defined datadir is:
+        set mysqldatadir = /sw/var/mysql
+        cd $mysqldatadir
+    Get the config file:
+        cp /sw/share/mysql/my-innodb-heavy-4G.cnf my.cnf
+    Remove the mysql data out of the way for inno to take it's new settings:
+        rm ibdata1 ib_logfile*
+
+    DON'T SET THE ROOT PASSWORD BECAUSE I DON'T KNWO HOW TO CONFIGURE ALL TO WORK THEN.
+    Seems like I can't login as root with mysql when I'm not logged in as root under the OS.
+
+    RESTART:
+        # Funny thing is that logging into mysql as root can only be done as Unix root user.
+            mysqladmin --user root -p'\!Ecj%Y&R' status
+            mysqladmin --user root -p'\!Ecj%Y&R' --shutdown_timeout=10 shutdown
+        or
+            /Library/StartupItems/daemonic-mysql/daemonic-mysql stop
+        Never use kill -9. Only regular kill or killall is safe.
+        Then:
+            /Library/StartupItems/daemonic-mysql/daemonic-mysql start
+    Connect:
+        mysql --user wattos1 -p4I4KMS wattos1
+        mysql --user root wattos1
+        mysqladmin --user root status
+    LOG:
+        tail -f $mysqldatadir/stella.err &
+        tail -f /var/log/system.log
+
+    CONFIG:
+        /sw/share/mysql/my-innodb-heavy-4G.cnf original to be copied to /sw
+    PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !
+    To do so, start the server, then issue the following commands:
+        /sw/bin/mysqladmin -u root password ''
+    or if it was misset before:
+        /sw/bin/mysqladmin -u root -p4I4KMS password '\!Ecj%Y&R'
+
+
+
+
+
+* mysql engine installed on Stella 5.1.20-beta MySQL Community Server (GPL)
+    * See http://dev.mysql.com/doc/refman/5.1/en/mac-os-x-installation.html
+    * datadir=/usr/local/mysql-5.1.20-beta-osx10.4-i686/data (changed from: /var/lib/mysql)
+        mysql       database internals and
+        wattos2     wattos database although since they are innodb
+                        typed tables most of the actual data is in the log and bin
+                        files in the datadir.
+
+* integration with Eclipse is thru: mysql-connector-java-5.0.3.jar
+    - Make sure the data tools are installed. Install thru:
+        Help->Software Install->new->Europa Discovery Site->data tools or something
+        Add the driver from Wattos/lib. Doesn't need to match exact version of db installed..
+            Test it with pinging until connection made.
+        Then in Eclipse still In Data Source Explorer, new connection profile.
+            select the driver and it's settings from previous steps.
+        Open an SQL file like from Wattos/scripts/sql
+        Connect it to db from above step.
+        Highlight a text and right click select 'Execute Selected Text'
+        Results will appear in tab for 'SQL Results'
+
+
+##################################################################
+* mysql engine 5.0.27 installed on tang Thu May 24 20:54:23 CDT 2007
+    * datadir=/big/jurgen/DB/mysql (changed from: /var/lib/mysql)
+        mysql       database internals and
+        wattos1     wattos database although since they are innodb
+                        typed tables most of the actual data is in the log and bin
+                        files in the datadir.
+        tang.bmrb.wisc.edu.err error log.
+    * installed among others:
+        /etc/my.cnf                 configurations put in by hand to get INNODB as default table type and other settings.
+                                    This file is backed up.
+        /usr/share/mysql            internationalizations.
+        /usr/sbin/mysqld            actual daemon
+        /usr/bin/mysqld_safe        daemon for safety?
+        /etc/logrotate.d/mysql      log rotator
+        /var/log/mysqld.log
+    * start up automated with: /etc/rc.d/init.d/mysqld start
+        The startup is automated (and tested) to start under run level 5
+        and killed on all levels (restart)
+        through invocation in /etc/rc.d:
+/etc/rc.d/init.d/mysqld thru /etc/rc.d/rc5.d/S64mysqld etc.
+    * Mysql starts before the tomcat daemon and stops after tomcat stops.
+    * backup sql commands updated by hand every so often are located in /share/wattos/mr_mysql_backup.
+        They can be used to regenerate the whole database. Note the overall size.
+    * To see the daemon alive ping it with: mysqladmin -u root -p ping
+    * Back up is done from:
+        /share/wattos/Wattos/scripts/backup_mysqldb.csh
+        to: /var/www/servlet_data/viavia/mr_mysql_backup
+    * Note that query caching needs to be enabled from within mysql:
+
+##################################################################
+
+
+
+* mysql engine 4.1.12 now installed on tang
+    * datadir=/big/jurgen/DB/mysql (changed from: /var/lib/mysql)
+        mysql       database internals and
+        wattos1     wattos database although since they are innodb
+                        typed tables most of the actual data is in the log and bin
+                        files in the datadir.
+        tang.bmrb.wisc.edu.err error log.
+    * removed all initial rpms from halfbeak that had refs to sql in them. Reinstalled:
+        MySQL-server-4.1.7-0
+        MySQL-client-4.1.7-0
+        MySQL-bench -4.1.7-0
+    * installed among others:
+        /etc/my.cnf                 configurations put in by hand to get INNODB as default table type and other settings.
+        /usr/share/mysql            internationalizations.
+        /usr/sbin/mysqld            actual daemon
+        /usr/bin/mysqld_safe        daemon for safety?
+        /etc/logrotate.d/mysql      log rotator
+    * start up automated with: /etc/init.d/mysqld start
+        The startup is automated (and tested) to start under run level 5
+        and killed on all levels (restart)
+        through invocation in /etc/rc.d:
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc0.d/K20mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc1.d/K20mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc5.d/S90mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc6.d/K20mysql -> ../init.d/mysql
+        Mysql starts before the tomcat daemon and stops after tomcat stops.
+    * backup sql commands updated by hand every so often are located in /share/wattos/mr_mysql_backup.
+        They can be used to regenerate the whole database. Note the overall size.
+    * To see the daemon alive ping it with: mysqladmin -u root -p ping
+    * Back up is done from:
+        /share/wattos/Wattos/scripts/backup_mysqldb.csh
+        to: /var/www/servlet_data/viavia/mr_mysql_backup
+##################################################################
+* mysql engine 4.1.7 now installed on halfbeak
+    * datadir=/opt/mysql (changed from: /var/lib/mysql)
+        mysql       database internals and
+        wattos1     wattos database although since they are innodb
+                        typed tables most of the actual data is in the log and bin
+                        files in the datadir.
+        halfbeak.bmrb.wisc.edu.err error log.
+    * removed all initial rpms from halfbeak that had refs to sql in them. Reinstalled:
+        MySQL-server-4.1.7-0
+        MySQL-client-4.1.7-0
+        MySQL-bench -4.1.7-0
+    * installed among others:
+        /etc/my.cnf                 configurations put in by hand to get INNODB as default table type and other settings.
+        /usr/share/mysql            internationalizations.
+        /usr/sbin/mysqld            actual daemon
+        /usr/bin/mysqld_safe        daemon for safety?
+        /etc/logrotate.d/mysql      log rotator
+    * start up automated with: /etc/init.d/mysql start
+        The startup is automated (and tested) to start under run level 2-5
+        and killed on levels 0,1 and 6 (restart)
+        through invocation in /etc/rc.d:
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc0.d/K20mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc1.d/K20mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc2.d/S90mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc3.d/S90mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc4.d/S90mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc5.d/S90mysql -> ../init.d/mysql
+        lrwxrwxrwx    1 root     root           15 Dec  1 16:06 /etc/rc.d/rc6.d/K20mysql -> ../init.d/mysql
+        Mysql starts before the tomcat daemon and stops after tomcat stops.
+    * backup sql commands updated by hand every so often are located in /share/wattos/mr_mysql_backup.
+        They can be used to regenerate the whole database. Note the overall size.
+    * To see the daemon alive ping it with: mysqladmin -u root -p ping
+    * Back up is done from:
+        /share/wattos/Wattos/scripts/backup_mysqldb.csh
+        to: /var/www/servlet_data/viavia/mr_mysql_backup
+##################################################################
+On windows machine (Whelk):
+    ## On windows use to start the service from the command line:
+    "C:\Program Files\MySQL\MySQL Server 4.1\bin\mysqladmin.exe" shutdown
+    "C:\Program Files\MySQL\MySQL Server 4.1\bin\mysqld" --install MySQL41 --defaults-file="C:\Program Files\MySQL\MySQL Server 4.1\my.ini"
+
+    and then
+    NET START MySQL41
+
+    ## Or completely by hand
+    "C:\Program Files\MySQL\MySQL Server 4.1\bin\mysqladmin.exe" shutdown
+    and then start up:
+    "C:\Program Files\MySQL\MySQL Server 4.1\bin\mysqld" --defaults-file="C:\Program Files\MySQL\MySQL Server 4.1\my.ini"
+
+
+In order to access the mysql db over ssh see:
+http://dev.mysql.com/doc/refman/5.0/en/windows-and-ssh.html
+worked by setting connection parameters to localhost:33061
+and tunnel with securecrt with in: 33061 and out tang:3306
+Then add a user localhost.localdomain
+
+
+

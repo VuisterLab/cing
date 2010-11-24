@@ -21,8 +21,8 @@ class AllChecks(TestCase):
 #    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
 #    entryList = "2knr".split()
 #    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
-#    entryList = "1brv_cs_pk_2mdl".split()
-    entryList = "8psh".split()
+    entryList = "1brv_cs_pk_2mdl".split()
+#    entryList = "8psh".split()
 #    entryList = "1y4o".split()
 
 #    entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()

@@ -17,12 +17,14 @@
                 <property name="home.web.port" value="${home.web.port.prod}" />
                 <property name="home.web.machine" value="${home.web.machine.prod}" />
                 <property name="home.web.machine.looped" value="${home.web.machine.looped.prod}" />
+                <property name="icing.webapp.dir" value="${icing.webapp.dir.prod}" />
             </then>
             <else>
                 <echo message="Now in CING environment for development." />
                 <property name="home.web.port" value="${home.web.port.dev}" />
                 <property name="home.web.machine" value="${home.web.machine.dev}" />
                 <property name="home.web.machine.looped" value="${home.web.machine.looped.dev}" />
+                <property name="icing.webapp.dir" value="${icing.webapp.dir.dev}" />
             </else>
         </if>
         <property name="home.web.url" value="${home.web.machine}/${ant.project.name}" />
@@ -76,7 +78,7 @@
         <echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" />
         <echo message="with port = ${home.web.port} and knownhosts=${home.web.knownhosts} passphrase=${home.web.passphrase} keyfile=${home.web.keyfile} " />
         <scp todir="${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}"
-        	keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
+            keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
             <fileset file="${icing.war.file}" />
         </scp>
     </target>

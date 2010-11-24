@@ -91,15 +91,100 @@ class AllChecks(TestCase):
 
         NTmessage( mol.format() )
 
+    def test_RangeSelection(self):
+        entryId = 'testEntry'
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status='new')
+        mol = Molecule('testMol')
+        project.appendMolecule(mol)
+        offset1 = -10
+        # homo dimer
+        chainList = ( 'A', 'B' )
+        sequence = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        seqL = len(sequence)
+        lastResidueI = seqL - 1
+        for cId in chainList:
+            c = mol.addChain(cId)
+            for i, rName in enumerate(sequence):
+                rNumber = i+offset1
+                Nterminal = False
+                Cterminal = False
+                if i == 0:
+                    Nterminal = True
+                if i == lastResidueI:
+                    Cterminal = True
+                r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
+                if r:
+#                    NTdebug("Adding atoms to residue: %s" % r)
+                    r.addAllAtoms()
+#                else:
+#                    NTdebug("Skipping atoms for residue: %s" % r)
+                # end if
+            # end for
+        # end for chain
+
+        # another homo dimer with renumbering.
+        chainList = ( 'C', 'D' )
+        offset2 = 100
+        for cId in chainList:
+            c = mol.addChain(cId)
+            for i, rName in enumerate(sequence):
+                rNumber = i+offset2
+                Nterminal = False
+                Cterminal = False
+                if i == 0:
+                    Nterminal = True
+                if i == lastResidueI:
+                    Cterminal = True
+                r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
+                if r:
+#                    NTdebug("Adding atoms to residue: %s" % r)
+                    r.addAllAtoms()
+#                else:
+#                    NTdebug("Skipping atoms for residue: %s" % r)
+                # end if
+            # end for
+        # end for chain
+        NTdebug("Done creating simple fake molecule")
+        self.assertFalse( mol.updateAll() )
+        NTmessage( mol.format() )
+
+        # Nada
+        selectedResidueList = mol.ranges2list('')
+        self.assertEquals( len(selectedResidueList), 2*len(chainList)*seqL)
+
+        # Single residue
+        selectedResidueList = mol.ranges2list('A.'+str(offset1))
+        self.assertEquals( len(selectedResidueList), 1)
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+
+        # Two residues
+        selectedResidueList = mol.ranges2list(str(offset1))
+        self.assertEquals( len(selectedResidueList), 2)
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+
+        # Four residues in ranges
+        selectedResidueList = mol.ranges2list('1-2')
+        self.assertEquals( len(selectedResidueList), 4)
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+
+        # Eight residues in negative crossing ranges
+        selectedResidueList = mol.ranges2list('-1-2')
+        self.assertEquals( len(selectedResidueList), 8)
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+
+        selectedResidueList = mol.ranges2list('A.-5--2')
+        self.assertEquals( len(selectedResidueList), 4)
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+
 
 if __name__ == "__main__":
-    fn = 'fooprof'
     os.chdir(cingDirTmp)
-#    os.path.join( cingDirTmp, fn)
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     # Commented out because profiling isn't part of unit testing.
     if False:
+        fn = 'fooprof'
         profile.run('unittest.main()', fn)
         p = pstats.Stats(fn)
     #     enable a line or two below for useful profiling info

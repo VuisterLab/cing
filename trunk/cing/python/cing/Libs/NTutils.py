@@ -3326,9 +3326,12 @@ def asci2list(inputStr):
         - boundaries are inclusive at both ends unlike python array selections.
         - Do not mix - and : either.
 
-    TODO: allow specification of an all negative range such as [-2, -1]
-            See unit test.
-
+    Possible 5 situations:
+    a      # 1 # positive int
+    -a     # 2 # single int
+    -a-b   # 3 #
+    -a--b  # 4 #
+    a-b    # 5 # most common
     """
     result = NTlist()
 
@@ -3346,33 +3349,50 @@ def asci2list(inputStr):
             if elm.count(':'):
                 tmpList = elm.split(':')
             else:
-                # allowed as a range indicator between two posiive numbers.
-                countElements = elm.count('-')
-                if countElements == 0:
+                countDash = elm.count('-')
+#                countDubbleDash = elm.count('--')
+
+                if countDash == 0:
+#                    NTdebug("State 1 elm: [%s]" % elm)
                     result.append(int(elm))
-                    continue
-                if countElements > 1:
-                    NTerror('asci2list: failed to convert to int list (A) for construct "%s"' % inputStr)
-                    return NTlist()
-                idxMinus = elm.index('-')
+                    continue # quicky
+                idxMinus = elm.index('-') # first occurance
                 if idxMinus == 0:
-                   tmpList = [ elm ] # just a negative number by itself.
-                else:
-                   tmpList = elm.split('-') # fine when there is one or no dashes
+                    if countDash == 1:
+#                        NTdebug("State 2 elm: [%s]" % elm)
+                        result.append(int(elm))
+                        continue # quicky
+
+#                NTdebug("State 3-5 elm: [%s]" % elm)
+                # Only states 3-5 left which are all ranges and thus contain an int separating dash
+                offset = 0
+                if idxMinus == 0:
+                    offset = 1
+
+                idxRangeDash = elm.index('-',offset) # The dash that separates the two ints,
+                start = elm[:idxRangeDash]
+                end = elm[idxRangeDash+1:]
+                tmpList = [ int(x) for x in [start,end ] ]
+                if tmpList[0] > tmpList[1]: # equality is still ok
+                    NTerror('asci2list: invalid construct "%s" with start %s and end %s skipping element: %s' % (inputStr, start, end, elm))
+                    continue
                 # end else
             # end else
+#            NTdebug("tmpList: [%s]" % str(tmpList))
             intList = [ int(x) for x in tmpList ]
-            if len(tmpList) == 1:
+#            NTdebug("intList: [%s]" % str(tmpList))
+            tmpListSize = len(tmpList)
+            if tmpListSize == 1:
                 result.append(intList[0])
-            elif len(tmpList) == 2:
+            elif tmpListSize == 2:
                 for i in range(intList[0], intList[1]+1):
                     result.append(i)
             else:
-                NTerror('asci2list: invalid construct "%s"' % inputStr)
+                NTerror('asci2list: invalid construct "%s" caused a tmpListSize of %s skipping element: %s' % (inputStr, tmpListSize, elm))
             #end if
         #end for
     except:
-        NTtracebackError()
+#        NTtracebackError() # disable this verbose messaging after done debugging.
         NTerror('asci2list: failed to convert to int for construct "%s"' % inputStr)
     # end try
     return result

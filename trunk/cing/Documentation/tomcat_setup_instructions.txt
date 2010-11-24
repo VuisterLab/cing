@@ -1,5 +1,3 @@
-THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
-
 * Note  http://www.malisphoto.com/tips/tomcatonosx.html
     Has most up to date instructions.
     Do what it says but add a -m32 flag to CFLAGS before doing your make to the file Makedefs
@@ -7,7 +5,38 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
     - Made many changes to Tomcat5.sh as suggested by tomcatonosx.html
 
 
-* On mac:
+
+* With macports:
+    -Using Tomcat/6.0.29_0
+    # runs under as root (TODO: run under tomcat user as this poses a security risk)
+    export CATALINA_HOME=/opt/local/share/java/tomcat6
+    setenv CATALINA_HOME /opt/local/share/java/tomcat6
+
+    You may set JAVA_JVM_VERSION in $CATALINA_HOME/bin/setenv.sh.
+
+    sudo $CATALINA_HOME/bin/catalina.sh start
+    sudo $CATALINA_HOME/bin/catalina.sh stop
+
+    FAILS: $CATALINA_HOME/bin/tomcatctl
+
+    Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
+    CATALINA_OPTS="-Xms1800m -Xmx1800m"
+
+    Test by url like:
+    https://nmr.cmbi.ru.nl/icing/serv/iCingServlet or:
+    http://localhost:8080/icing/icing/serv/iCingServlet
+    should give:
+    {"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
+
+    Add manager
+        sudo vi /opt/local/share/java/tomcat6/conf/tomcat-users.xml
+        <role rolename="manager"/>
+        <user username="tomcat" password="s3cret" roles="manager"/>
+
+- Logs:
+    tail -f $CATALINA_HOME/logs/*  &
+
+* On mac (outside mac ports):
     -Using mac installed version (Apache Tomcat/5.5.23):
     # runs under as root (TODO: run under tomcat user as this poses a security risk)
     export CATALINA_HOME=/Library/Tomcat
@@ -18,16 +47,16 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
     Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
     CATALINA_OPTS="-Xms1800m -Xmx1800m"
 
-	$CATALINA_HOME/bin/shutdown.sh (RETIRED)
-	$CATALINA_HOME/bin/startup.sh
+    $CATALINA_HOME/bin/shutdown.sh (RETIRED)
+    $CATALINA_HOME/bin/startup.sh
 
-	Test by url like: https://nmr.cmbi.ru.nl/icing/serv/iCingServlet should give:
-	{"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
+    Test by url like: https://nmr.cmbi.ru.nl/icing/serv/iCingServlet should give:
+    {"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
 
 - Logs:
-	tail -f $CATALINA_HOME/logs/catalina.out  &
+    tail -f $CATALINA_HOME/logs/catalina.out  &
 - Webapps:x
-	$CATALINA_HOME/webapps
+    $CATALINA_HOME/webapps
 
 
 - NOT DONE YET: add a proxy port in $CATALINA_HOME/conf/server.xml:
@@ -37,18 +66,18 @@ THIS DOCUMENT IS NOW MAINTAINED IN THE CING PACKAGE.
       proxyPort="80"
     >
     Add the proxyPort setting to the Connector tag in your server.xml.
-	And to the apache setup with proxies?
+    And to the apache setup with proxies?
 
 # Fink specific	(not using fink's with cing servlet)
     setenv CATALINA_HOME /sw/var/tomcat5
 - Status:
-	ps -a | grep TOMCAT5LAUNCH | grep -v grep
+    ps -a | grep TOMCAT5LAUNCH | grep -v grep
 
 
 - Use fink installed apache tomcat5
 
 - Restart:
-	/sw/bin/tomcat5 restart
+    /sw/bin/tomcat5 restart
 
 
     /sw/etc/tomcat5/tomcat.conf (just one file here)

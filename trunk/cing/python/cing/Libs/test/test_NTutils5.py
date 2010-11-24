@@ -114,27 +114,44 @@ class AllChecks(TestCase):
             self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
 
     def testAsci2list(self):
-        # Still fails to do -3 - -1 to represent.
+        """
+        Possible 5 situations:
+        a      # 1 # positive int
+        -a     # 2 # single int
+        -a-b   # 3 #
+        -a--b  # 4 #
+        a-b    # 5 # most common
+        """
         inputList = """
                       1
                       1-3
                       -3:1
+                      -2--1
+                      -2-1
                       -3
                       1,2,5-8,11,20-22
                       -20:-19,-2:-1,3:4
                     """.split()
         resultLoL = [
-                      '[1]',
-                      '[1, 2, 3]',
+                                     '[1]',
+                                     '[1, 2, 3]',
                       '[-3, -2, -1, 0, 1]',
+                          '[-2, -1]',
+                          '[-2, -1, 0, 1]',
                       '[-3]',
-                      '[1, 2, 5, 6, 7, 8, 11, 20, 21, 22]',
+                                     '[1, 2, 5, 6, 7, 8, 11, 20, 21, 22]',
                       '[-20, -19, -2, -1, 3, 4]',
                      ]
         for i, inputStr in enumerate(inputList):
             NTdebug("testAsci2list: %d" % i)
             resultStr = str(asci2list(inputStr))
             self.assertEquals( resultStr, resultLoL[i])
+        saveVerbosity = cing.verbosity
+        cing.verbosity = cing.verbosityNothing
+        result = asci2list('1--2') # will cause an error message and an empty return list.
+        cing.verbosity = saveVerbosity
+        self.assertEquals(len(result),0)
+
 
     def testGetDateTimeStampForFileName(self):
         globPattern = os.path.join(cingRoot, '*.txt')
