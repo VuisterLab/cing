@@ -39,6 +39,9 @@ monitor with:
         Sharing
             Turn on "Web Sharing" and check server in browser.
 
+in:
+sudo vi /private/etc/apache2/httpd.conf
+
 # For the gwt tomcat server NOTE HOW IMPORTANT THESE STUPID SLASHES ARE
 ProxyPass         /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
 ProxyPassReverse  /icing/serv/iCingServlet http://localhost:8080/icing/icing/serv/iCingServlet
@@ -47,6 +50,10 @@ ProxyPassReverse  /icing http://localhost:8080/icing/
 
 The tomcat server in eclipse works together with the apache configured here.
 
+# For the NRG tomcat web app.
+ProxyPass         /NRG http://localhost:8080/NRG
+ProxyPassReverse  /NRG http://localhost:8080/NRG
+OR:
 # For the NRG tomcat web app.
 ProxyPass         / http://localhost:8080/NRG/MRGridServlet
 ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet

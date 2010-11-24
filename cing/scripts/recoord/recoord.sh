@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PROGRAM=recoord.sh
-VERSION=0.1g 
+VERSION=0.1g
 AUTHOR="Tsjerk A. Wassenaar, PhD"
 YEAR="2008.xx"
 AFFILIATION="
@@ -28,7 +28,8 @@ keepwater=
 sel=""
 n1=100
 n2=50
-cnsExec=
+cnsExec=cns_solve
+#/Users/jd/progs/cns_solve/mac-intel-darwin/bin/cns_solve
 
 OPTIONS="
 \t# File options:\n
@@ -84,7 +85,7 @@ base=`basename $pdb .pdb`
 [[ $ambre ]]          && ambre="-a $ambre"
 [[ $dihre ]]          && dihre="-d $dihre"
 [[ $hbond ]]          && hbond="-b $hbond"
-[[ $sym == 1  ]]      && sym="--sym" 
+[[ $sym == 1  ]]      && sym="--sym"
 [[ $keepwater == 1 ]] && keepwater="--keepwater"
 
 restraints="$unare $ambre $dihre $hbond $sym"
