@@ -46,7 +46,8 @@ Options:
                         directory]
   --shiftx              Predict with shiftx
   --ranges=RANGES       Ranges for superpose, procheck, validate etc; e.g.
-                        503-547,550-598,800,801
+                        'A.503-547,A.550-598,B.800,B.802' or 'auto' for using
+                        the cv if available.
   --superpose           Do superposition; optionally uses RANGES
   --nosave              Don't save on exit (default: save)
   --noProject           Start full CING environment without a project. Useful eg. with --script.
@@ -520,7 +521,7 @@ def getParser():
                      )
     parser.add_option("--ranges",
                       dest="ranges", default=None,
-                      help="Ranges for superpose, procheck, validate etc; e.g. 503-547,550-598,800,801",
+                      help="Ranges for superpose, procheck, validate etc; e.g. A.503-547,A.550-598,B.800,B.802",
                       metavar="RANGES"
                      )
     parser.add_option("--ensemble",
@@ -738,6 +739,9 @@ def main():
             #end if
         #end if
 
+        if options.ranges:
+            project.molecule.setRanges(options.ranges)
+
         NTmessage(project.format())
 
         # shortcuts
@@ -745,6 +749,7 @@ def main():
         mol = project.molecule #@UnusedVariable
         m = project.molecule #@UnusedVariable
 
+        NTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
      #   pr = print
         f = pformat #@UnusedVariable
         fa = pformatall #@UnusedVariable
@@ -804,7 +809,7 @@ def main():
         # Superpose
         #------------------------------------------------------------------------------------
         if options.superpose:
-            project.superpose(ranges=options.ranges)
+            project.superpose() # will use the ranges set to molecule
 
         #------------------------------------------------------------------------------------
         # Validate; just run doValidate script

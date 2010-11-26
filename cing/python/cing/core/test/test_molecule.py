@@ -174,9 +174,41 @@ class AllChecks(TestCase):
         self.assertEquals( len(selectedResidueList), 8)
         NTdebug("Selected residues: %s" % str(selectedResidueList))
 
+
         selectedResidueList = mol.ranges2list('A.-5--2')
         self.assertEquals( len(selectedResidueList), 4)
         NTdebug("Selected residues: %s" % str(selectedResidueList))
+
+        selectedResidueList = mol.ranges2list('-999-999')
+        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        self.assertEquals( len(selectedResidueList), 2*len(chainList)*seqL)
+
+        residueList2StartStopList = mol.residueList2StartStopList('-999-999')
+        NTdebug('residueList2StartStopList: %s' % str(residueList2StartStopList))
+        self.assertEquals( len(residueList2StartStopList), 8 )
+
+        """
+        Possible 5 situations:
+        a      # 1 # positive int
+        -a     # 2 # single int
+        -a-b   # 3 #
+        -a--b  # 4 #
+        a-b    # 5 # most common
+        """
+        inputList = """
+                      A.1
+                      A.1-3
+                      A.-2--1
+                      A.-2-1
+                      A.-3
+                      A.1-2,A.5-8,A.11-13
+                    """.split()
+        for i, ranges in enumerate(inputList):
+            NTdebug("test_RangeSelection: %d %s" % (i, ranges))
+            residueList = mol.setResiduesFromRanges(ranges)
+            rangesRecycled = mol.residueList2Ranges(residueList)
+            NTdebug('rangesRecycled: [%s]' % rangesRecycled)
+            self.assertEquals( ranges, rangesRecycled )
 
 
 if __name__ == "__main__":

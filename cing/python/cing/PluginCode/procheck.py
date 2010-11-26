@@ -308,6 +308,31 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         self.ranges    = None
     #end def
 
+    def rangesForPlugin(self, ranges):
+        '''
+        Translate the ranges into plugin formatted string.
+        Return empty string for empty selection.
+        Return None on error.
+        Return string otherwise.
+
+        See Molecule#residueList2Ranges
+        '''
+        result = ''
+        if ranges != None:
+            return
+        startStopList = self.molecule.ranges2StartStopList(ranges)
+        NTdebug( 'In pc startStopList (just the inclusive boundaries): %s' % startStopList)
+        if startStopList == None:
+            return
+        for i in range(0, len(startStopList), 2):
+            result += 'RESIDUES'
+            for r in ( startStopList[i], startStopList[i+1]):
+                result += ' %3d %2s' % (r.resNum, r.chain.name)
+            result += '\n'
+        NTdebug( ">ranges: " + result)
+        return result
+    # end def
+
     def run(self, ranges=None, export = True, createPlots=True, runAqua=True):
         """
         Run procheck analysis.
@@ -328,33 +353,15 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         if ranges:
             self.ranges = ranges
+            NTdebug("pc.ranges: %s" % self.ranges)
             # Convert the ranges and translate into procheck format
-            selectedResidues = self.molecule.getResiduesFromRanges(ranges)
-#            NTdebug( '>selectedResidues: %s' % selectedResidues)
-
-            # Next line doesn't work when there are the same residue numbers in different chains.
-            # TODO: rewrite to account for chain differences too.
-    #        NTsort(selectedResidues, 'resNum', inplace=True)
-            # reduce this sorted list to pairs start, stop
-            rngs = selectedResidues[0:1]
-            for i in range(len(selectedResidues)-1):
-                if ((selectedResidues[i].resNum < selectedResidues[i+1].resNum - 1) or
-                    (selectedResidues[i].chain != selectedResidues[i+1].chain)
-                   ):
-                    rngs.append(selectedResidues[i])
-                    rngs.append(selectedResidues[i+1])
-
-            rngs.append(selectedResidues[-1])
-#            NTdebug( '>ranges (just the boundaries): %s' % rngs)
-            path = os.path.join(self.rootPath, self.rangesFileName)
-            fp = open(path, 'w')
-            for i in range(0, len(rngs), 2):
-                singleRange = 'RESIDUES %3d %2s  %3d %2s' % (
-                    rngs[i  ].resNum, rngs[i  ].chain.name,
-                    rngs[i+1].resNum, rngs[i+1].chain.name)
-                fprintf(fp, singleRange+"\n")
-#                NTdebug( ">range: " + singleRange)
-            fp.close()
+            selectedResidues = self.molecule.setResiduesFromRanges(ranges)
+            NTdebug( '>selectedResidues: %s' % selectedResidues)
+            rangesTxtPlugin = self.rangesForPlugin(ranges)
+            if rangesTxtPlugin == None:
+                NTerror('Procheck.run: Failed to get rangesTxtPlugin for ranges: [%s]' % ranges)
+                return True
+            writeTextToFile(os.path.join(self.rootPath, self.rangesFileName), rangesTxtPlugin)
         #end if
 
         #copy script
@@ -665,6 +672,9 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     if project.molecule.has_key(PROCHECK_STR):
         del(project.molecule[PROCHECK_STR])
     #end if
+
+    if ranges != None:
+        ranges = project.molecule.ranges
 
     pcheck = Procheck(project)
     if not pcheck:

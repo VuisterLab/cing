@@ -47,8 +47,8 @@ DEPOSITION_DATE_STR = 'deposition_date'
 #user_name = PDBJ_DB_USER_NAME
 #schema = NRG_DB_SCHEMA
 #schemaJ = PDBJ_DB_SCHEMA
-HOST = 'nmr'
-#HOST = 'localhost'
+#HOST = 'nmr'
+HOST = 'localhost'
 
 if False:
     from matplotlib import use #@UnusedImport
@@ -62,7 +62,7 @@ class nrgCingRdb():
             self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if False: # DEFAULT True but disable for quicker testing.
+            if True: # DEFAULT True but disable for quicker testing.
                 self.createDepTables()
             self.csql.autoload()
             #csql.close()

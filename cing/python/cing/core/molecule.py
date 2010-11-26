@@ -15,6 +15,7 @@ from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import DSSP_H
 from cing.PluginCode.required.reqDssp import DSSP_S
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
+from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.core.ROGscore import ROGscore
 from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
@@ -23,6 +24,7 @@ from database import NTdb
 from math import acos
 from numpy import * #@UnusedWildImport
 from numpy import linalg as LA
+from operator import attrgetter
 from parameters   import plotParameters
 import numpy
 
@@ -199,7 +201,7 @@ class Molecule( NTtree, ResidueList ):
 
         self.xeasy            = None         # reference to xeasy class, used in parsing
         self.rogScore         = ROGscore()
-        self.ranges           = None         # ranges used for superposition/rmsd calculations
+        self.ranges           = None         # ranges used for superposition/rmsd calculations. None means all. 'auto' will be converted.
 
 #        self.saveXML('chainCount','residueCount','atomCount')
 
@@ -211,11 +213,8 @@ class Molecule( NTtree, ResidueList ):
         self.content.keysformat()
 
         self.project = None # JFD: don't know where it gets set but it exists.
-#        NTdebug('Molecule.__init__: %s', self )
         self.rmsd = None
 
-        # NB the below types are confusing JFD.
-        self.selectedResiduesList = None # filled in by getResiduesFromRanges this is a string
         self.selectedResidues = None # this is a python array
 
     #end def
@@ -639,7 +638,20 @@ class Molecule( NTtree, ResidueList ):
         return atomDict
     #end def
 
-    def getResiduesFromRanges(self, ranges, autoLimit=0.7):
+    def setRanges(self, ranges):
+        """
+        Expand 'auto' to an actual list of residues and represent it again in the cing format string for residues.
+        """
+        if ranges == None:
+            return
+        self.ranges = ranges
+        residueList = self.setResiduesFromRanges()
+        rangesReset = self.residueList2Ranges(residueList)
+        if rangesReset != ranges:
+            NTmessage("Ranges reset from %s to %s" % ( ranges, rangesReset ))
+            self.ranges = rangesReset
+
+    def setResiduesFromRanges(self, ranges=None, autoLimit=0.7):
         """
         Convert
               either:
@@ -653,28 +665,123 @@ class Molecule( NTtree, ResidueList ):
 
         to a NTlist instance with residue objects.
 
-        Set the selectedResidues and selectedResiduesList attributes in Molecule instance
+        Set the selectedResidues attributes in Molecule instance
 
         Return the list or None upon error.
 
         Routine should replace ranges2list eventually
 
+        No longer sets the range so infinite recursion can be avoided.
         """
-        if ranges == 'auto':
+
+        if ranges != None:
+            ranges = self.ranges
+
+        NTdebug("In setResiduesFromRanges using ranges: %s" % ranges)
+
+
+        if ranges == CV_RANGE_STR:
+            rangesReset = self.rangesByCv()
+            if ranges != rangesReset:
+                NTdebug("In setResiduesFromRanges used cv to get ranges: %s" % rangesReset)
+                selectedResidues = self.ranges2list(rangesReset)
+        elif ranges == AUTO_RANGE_STR:
             selectedResidues = self._autoRanges( autoLimit )
-        elif ranges == 'all':
+        elif ranges == ALL_RANGE_STR:
             selectedResidues = self.allResidues()
+        elif ranges == EMPTY_RANGE_STR:
+            selectedResidues = NTlist()
         else:
             selectedResidues = self.ranges2list( ranges )
 
-        if not selectedResidues:
+        if selectedResidues == None:
+            NTerror("In setResiduesFromRanges failed to get selection of residues")
             return None
 
-        self.selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
         self.selectedResidues = selectedResidues
+#        self.range = self.residueList2Ranges(selectedResidues)
 
         return selectedResidues
     #end def
+
+
+    def residueList2Ranges(self, residueList):
+        '''
+        Translate residue list 2 a ranges string that cing can read itself.
+        Return empty string for empty selection.
+        Return None on error.
+        Return string otherwise.
+        An empty list is expressed as EMPTY_RANGE_STR which is a dot.
+        '''
+        result = ''
+        if residueList == None:
+            NTerror("In residueList2Ranges no input residueList.")
+            return None
+        if len(residueList) == 0:
+            NTdebug("In residueList2Ranges empty residueList.")
+            return EMPTY_RANGE_STR
+        startStopList = self.ranges2StartStopList(residueList)
+        NTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
+        if startStopList == None:
+            NTerror("In residueList2Ranges failed to find startStopList.")
+            return
+        if len(startStopList) == 0:
+            NTdebug("In residueList2Ranges found empty startStopList.")
+            return EMPTY_RANGE_STR
+        useChainIds = len(self.allChains()) > 1
+        for i in range(0, len(startStopList), 2):
+            start = startStopList[i]
+            stop = startStopList[i+1]
+            todoList = [start,stop]
+            strList = []
+            for j,r in enumerate(todoList):
+                rStr = str(r.resNum)
+                if useChainIds and j==0: # only the start will be labelled by chain id.
+                    rStr = r.chain.name + '.' + rStr
+                strList.append(rStr)
+            # end for
+            if i != 0:
+                result += ','
+            if start == stop: # keep it simple
+                result += strList[0]
+            else:
+                result += '-'.join(strList)
+        # end for
+        NTdebug( "In residueList2Ranges ranges: %s" % result)
+        return result
+    # end def
+
+    def ranges2StartStopList(self, ranges):
+        """
+        reduce this sorted list to pairs start, stop
+
+        Return None on error.
+        Return (empty) list otherwise.
+
+        An empty list is expressed as EMPTY_RANGE_STR which is a dot.
+        """
+
+        if ranges == None:
+            NTerror("In ranges2StartStopList input was None.")
+            return None
+        selectedResidues = self.setResiduesFromRanges(ranges)
+        NTdebug( 'In Molecule#ranges2StartStopList selectedResidues: %s' % selectedResidues)
+        if not selectedResidues:
+            NTwarning("In Molecule#ranges2StartStopList, no residues selected from ranges: %s" % ranges)
+            return
+
+        rangeResidueList = [ selectedResidues[0] ]
+        for i in range(len(selectedResidues)-1):
+            if ((selectedResidues[i].resNum != selectedResidues[i+1].resNum - 1) or
+                (selectedResidues[i].chain  != selectedResidues[i+1].chain)):
+                rangeResidueList.append(selectedResidues[i])
+                rangeResidueList.append(selectedResidues[i+1])
+            # end if
+        # end for
+        rangeResidueList.append(selectedResidues[-1])
+        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
+        return rangeResidueList
+
 
     def _rangesStr2list( self, ranges ):
         """
@@ -694,7 +801,7 @@ class Molecule( NTtree, ResidueList ):
         for res in self.allResidues():
             resNumDict.setdefault(res.resNum, [])
             resNumDict[res.resNum].append(res)
-        NTdebug("Residue dict: %s" % resNumDict.items())
+#        NTdebug("Residue dict: %s" % resNumDict.items())
 
         for rangeStr in rangeStrList:
             rangeStrClean = rangeStr
@@ -705,7 +812,7 @@ class Molecule( NTtree, ResidueList ):
                     return None
                 rangeStrClean = rangeStr[2:]
                 chainId = rangeStr[0]
-            NTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
+#            NTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
             rangeIntList = asci2list(rangeStrClean)
             if not rangeIntList:
                 NTwarning("Failed to asci2list in Molecule._rangesStr2list for rangeStrClean: %s" % rangeStrClean)
@@ -714,9 +821,13 @@ class Molecule( NTtree, ResidueList ):
                 if resNumDict.has_key(resNum):
                     for r in resNumDict[resNum]:
                         if (chainId == None) or (r.chain.name == chainId):
-                            NTdebug("r: [%s] chainId [%s]" % (r, chainId))
+#                            NTdebug("r: [%s] chainId [%s]" % (r, chainId))
                             result.append(r)
-        result.removeDuplicates() # also sorts
+        result.removeDuplicates()
+        # Actually I would have preferred to define the natural ordering of residues in the class as cmp but
+        resultSorted = sorted(result, key=attrgetter('chain.name', 'resNum'))
+        result.clear()
+        result.addList(resultSorted)
         return result
     # end def
 
@@ -736,6 +847,9 @@ class Molecule( NTtree, ResidueList ):
 
            See unit test in test_molecule.py
         """
+        if ranges == None:
+            ranges = self.ranges
+
         if ranges == None or len(ranges) == 0:
             return self.allResidues()
 
@@ -767,7 +881,7 @@ class Molecule( NTtree, ResidueList ):
         """
         selectedResidues = self.allResidues()
         if ranges:
-            selectedResidues = self.getResiduesFromRanges( ranges )
+            selectedResidues = self.setResiduesFromRanges( ranges )
         r = NTlist()
         result = []
         for res in selectedResidues:
@@ -1488,7 +1602,7 @@ class Molecule( NTtree, ResidueList ):
             self.idDisulfides()
 #            if not self.has_key('ranges'): # JFD: now in init.
 #                self.ranges = None
-            self.calculateRMSDs(ranges=self.ranges)
+            self.calculateRMSDs()
         #end if
         # Atom list is needed even when no coordinates are present.
         self.atomList = AtomList( self )
@@ -1659,14 +1773,16 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
-    def molTypeInt(self):
-        """Integer value for fast lookup in db"""
-        return self.mapColorString2Int[ self.colorLabel ]
+#    def molTypeInt(self):
+#        """Integer value for fast lookup in db"""
+#        return self.mapColorString2Int[ self.colorLabel ]
 
     def selectFitAtoms( self, fitResidues, backboneOnly=True, includeProtons = False ):
         """
         Select the atoms to be fitted from a list of fitResidues
         return NTlist instance or NoneObject on error
+
+        No longer changes self.ranges
         """
 
         if self.modelCount <= 0:
@@ -1679,7 +1795,8 @@ Return an Molecule instance or None on error
         fitted        = []
 #        fitResidues   = self.ranges2list( ranges )
         # store the ranges
-        self.ranges   = list2asci( fitResidues.zap('resNum'))
+#        self.ranges   = list2asci( fitResidues.zap('resNum'))
+#        self.ranges   = self.residueList2Ranges( fitResidues )
 
         for res in fitResidues:
             for a in res.allAtoms():
@@ -1702,7 +1819,9 @@ Return an Molecule instance or None on error
         Automatically define a set of ranges for superposition.
         Return a list of residues
         """
-        if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
+        if getDeepByKeysOrAttributes(self.project, 'status', TALOSPLUS_STR, 'completed'):
+            NTdebug("Deriving auto ranges from talos plus")
+#        if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
             # we will do two passes:
             # First: select all residues that have S2> autoLimit
             # Second: fill gaps of one for 0.5<S2<autoLimit
@@ -1729,15 +1848,52 @@ Return an Molecule instance or None on error
                         r.append(res)
                 #end if
             #end for
-            if len(r) == 0:
-                NTwarning(' Molecule._autoRanges: empty list, taking all residues')
-                r = self.allResidues()
-        else:
-            NTwarning(' Molecule._autoRanges: no talos+ data, taking all residues')
-            r = self.allResidues()
-        #end if
-        return r
+            if len(r) > 0:
+                return r
+            NTwarning(' Molecule._autoRanges: empty list by Talos. Considering other criteria.')
+        # end if
+        NTdebug(' Molecule._autoRanges: no talos+ data')
+        if self.modelCount > 1:
+            NTdebug(' Molecule._autoRanges: using cv to auto determine ranges')
+            return self.rangesByCv()
+        NTdebug(' Molecule._autoRanges: returning all residues')
+        return self.allResidues()
     #end def
+
+    def rangesByCv(self, cvCutoff=0.2, cvWindowSize=3):
+        """
+        Automatically define a set of ranges.
+        Return a ranges string.
+        Residues that do not have a backbone cv such as nucleic acid bases will
+        always be included.
+        """
+        residueList = NTlist()
+        for ch in self.chains:
+            proteinResidues = ch.residuesWithProperties('protein' )
+            if len(proteinResidues) == 0:
+                NTdebug("Adding all residues of non-protein chain: %s" % ch)
+                residueList.addList( ch.allResidues() )
+
+            resList = ch.allResidues()
+            n = len(resList)
+            if not n:
+                continue
+            cv = []
+            for r in resList:
+                cv.append( r.getDeepByKeysOrDefault(0.0,CV_BACKBONE_STR) )
+
+            NTdebug("Found cv list: %s" % str(cv))
+            cv_avg = cv
+            # Do window averaging by numpy
+            if n > 3 and n > cvWindowSize: # convolve will return a wrong sized array if cv is smaller
+                w=ones(cvWindowSize,'d')
+                cv_avg=convolve(w/w.sum(),cv,mode='same')
+            for i,r in enumerate(resList):
+                if cv_avg[i] <= cvCutoff:
+                    residueList.append(r)
+        # end for
+        ranges = self.residueList2Ranges(residueList)
+        return ranges
 
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.7 ):
         """
@@ -1749,26 +1905,22 @@ Return an Molecule instance or None on error
         if self.modelCount <= 0:
             return NoneObject
         #end if
-
-        selectedResidues = self.getResiduesFromRanges( ranges, autoLimit=autoLimit )
+        if ranges != None:
+            ranges = self.ranges
+        selectedResidues = self.setResiduesFromRanges( ranges, autoLimit=autoLimit )
 #        if ranges=='auto':
 #            ranges = self._autoRanges(autoLimit)
 
         fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
-#        selectedResidues = self.ranges2list( ranges )
-        selectedResiduesList = list2asci( selectedResidues.zap('resNum'))
         NTmessage("==> Superposing: fitted %s on %d atoms (residues=%s, backboneOnly=%s, includeProtons=%s)",
-                      self, len(fitted), selectedResiduesList, backboneOnly, includeProtons
+                      self, len(fitted), ranges, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
 #        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
 #                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
 #               )
         r = self.calculateRMSDs(ranges=ranges)
-#        NTerror("NB at this point only the molecule.ranges is set from superpose()")
-        self.ranges = self.selectedResiduesList # JFD: now it's set after superpose;
-        # JFD: please check GWV
         NTdetail( r.format() )
         return self.ensemble
     #end def
@@ -1793,14 +1945,23 @@ Return an Molecule instance or None on error
             models = sprintf('%s-%s', 0, self.modelCount-1)
 
 
-        selectedResidues = self.getResiduesFromRanges( ranges )
-#        selectedResiduesList = list2asci( selectedResidues.zap('resNum')) # JFD notes that this is already done in self.getResiduesFromRanges
-        selectedResiduesList = self.selectedResiduesList
+        if ranges != None:
+            ranges = self.ranges
+
+        selectedResidues = self.setResiduesFromRanges( ranges )
+        if selectedResidues == None:
+            NTwarning('Molecule.calculateRMSDs: error in getting selected residues for ranges %s' % ranges)
+            return NaN
+        if len(selectedResidues) == 0:
+            NTwarning('Molecule.calculateRMSDs: no selected residues for ranges %s' % ranges)
+            return NaN
+
         selectedModels   = self.models2list( models )
 
-        NTdetail("==> Calculating rmsd's (residues: %s, models: %s)", selectedResiduesList, models)
+        NTdetail("==> Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
-        self.rmsd = RmsdResult( selectedModels, selectedResidues, comment='Residues ' + selectedResiduesList )
+        comment = 'Ranges %s' % ranges
+        self.rmsd = RmsdResult( selectedModels, selectedResidues, comment=comment )
         for res in self.allResidues():
             res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
             res.rmsd.bbtemp = NTlist() # list of included bb-atms
@@ -1991,7 +2152,7 @@ Return an Molecule instance or None on error
         if ranges==None:
             residues = self.allResidues()
         else:
-            residues = self.getResiduesFromRanges(ranges)
+            residues = self.setResiduesFromRanges(ranges)
         #end if
 
         xx  = 0.0
@@ -2997,13 +3158,13 @@ Residue class: Defines residue properties
     def setCvBackboneSidechain(self):
         if not self.hasProperties('protein'):
             return
-        # CING doesn't use IUPAC nomenclature for chi beyond 1. E.g. the iupac Chi2,1 in Ile is simply named Chi2.
+        # CING doesn't use IUPAC nomenclature for chi beyond 1. E.g. the IUPAC Chi2,1 in Ile is simply named Chi2.
         # This is incorrect but does make the code very simple here.
         # Optimized for speed so no loop setups.
         cv1 = getDeepByKeysOrAttributes(self, PHI_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, PSI_STR, CV_STR)
         self.cv_backbone = NTcVarianceAverage( (cv1, cv2) )
-
+#        NTdebug('phi/psi/avg: %s %s %s' % (cv1,cv2,self.cv_backbone))
         cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
         self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )

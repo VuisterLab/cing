@@ -9,7 +9,9 @@
 -- * Run by command like:
 -- * psql --quiet casdcing casdcing1 < $CINGROOT/scripts/sql/createDB-CING_psql.sql
 -- * psql --quiet pdbmlplus pdbj < $CINGROOT/scripts/sql/createDB-CING_psql.sql
--- Or from  cing.NRG.createDB_CING.py
+--
+-- Or edit and execute:
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    $D/NRG-CING/pgsql
 
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
@@ -27,7 +29,7 @@ CREATE SCHEMA casdcing AUTHORIZATION casdcing1;
 -- entry
 CREATE TABLE casdcing.cingentry
 (
-    entry_id                       SERIAL UNIQUE,
+    entry_id                       SERIAL UNIQUE PRIMARY KEY,
     name                           VARCHAR(255),
     bmrb_id                        INT,
     casd_id                        VARCHAR(255) UNIQUE,
@@ -36,7 +38,7 @@ CREATE TABLE casdcing.cingentry
     is_paramagnetic                BOOLEAN DEFAULT NULL, -- paramagnetic.
     is_membrane                    BOOLEAN DEFAULT NULL, -- membrane
     is_multimeric                  BOOLEAN DEFAULT NULL, --
-    chothia_class                  INT DEFAULT NULL,     -- alpha, beta, of a/b, a+b, or coil
+    chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
     protein_count                  INT DEFAULT NULL,
     dna_count                      INT DEFAULT NULL,
     rna_count                      INT DEFAULT NULL,
@@ -46,17 +48,17 @@ CREATE TABLE casdcing.cingentry
     software_processing            VARCHAR(255) DEFAULT NULL,
     software_analysis              VARCHAR(255) DEFAULT NULL,
     software_struct_solution       VARCHAR(255) DEFAULT NULL,
-    software_refinement            VARCHAR(255) DEFAULT NULL,
+    software_refinement            VARCHAR(255) DEFAULT NULL, -- (20)
     in_recoord                     BOOLEAN DEFAULT NULL,
     in_casd                        BOOLEAN DEFAULT NULL,
     in_dress                       BOOLEAN DEFAULT NULL,
     ranges                         VARCHAR(512) DEFAULT NULL,
     res_count                      INT DEFAULT NULL,     -- number of residues
-    model_count                    INT DEFAULT NULL,     --
+    model_count                    INT DEFAULT NULL,     -- (Z)
     distance_count                 INT DEFAULT NULL,
     dihedral_count                 INT DEFAULT NULL,
     rdc_count                      INT DEFAULT NULL,
-    peak_count                     INT DEFAULT NULL,
+    peak_count                     INT DEFAULT NULL, -- (30)
     cs_count                       INT DEFAULT NULL,
     cs1H_count                     INT DEFAULT NULL,
     cs13C_count                    INT DEFAULT NULL,
@@ -67,7 +69,7 @@ CREATE TABLE casdcing.cingentry
     wi_bmpchk                      FLOAT DEFAULT NULL,
     wi_bndchk                      FLOAT DEFAULT NULL,
     wi_c12chk                      FLOAT DEFAULT NULL,
-    wi_chichk                      FLOAT DEFAULT NULL,
+    wi_chichk                      FLOAT DEFAULT NULL, -- (40)
     wi_flpchk                      FLOAT DEFAULT NULL,
     wi_hndchk                      FLOAT DEFAULT NULL,
     wi_inochk                      FLOAT DEFAULT NULL,
@@ -77,11 +79,11 @@ CREATE TABLE casdcing.cingentry
     wi_pl3chk                      FLOAT DEFAULT NULL,
     wi_plnchk                      FLOAT DEFAULT NULL,
     wi_quachk                      FLOAT DEFAULT NULL,
-    wi_ramchk                      FLOAT DEFAULT NULL,
+    wi_ramchk                      FLOAT DEFAULT NULL, -- (50)
     wi_rotchk                      FLOAT DEFAULT NULL,
 --   procheck_nmr
-    pc_gf                           FLOAT DEFAULT NULL,
-    pc_gf_phipsi                    FLOAT DEFAULT NULL,
+    pc_gf                           FLOAT DEFAULT NULL,-- (AZ)
+    pc_gf_phipsi                    FLOAT DEFAULT NULL,-- (BA)
     pc_gf_chi12                     FLOAT DEFAULT NULL,
     pc_gf_chi1                      FLOAT DEFAULT NULL,
     pc_rama_core                    FLOAT DEFAULT NULL,
@@ -89,26 +91,26 @@ CREATE TABLE casdcing.cingentry
     pc_rama_gener                   FLOAT DEFAULT NULL,
     pc_rama_disall                  FLOAT DEFAULT NULL,
 --   wattos (there are other parameters at residue level but not filled in now).
-    noe_compl4                     FLOAT DEFAULT NULL,
+    noe_compl4                     FLOAT DEFAULT NULL, -- (60) -- (BH)
 
     dis_max_all                    FLOAT DEFAULT NULL,
     dis_rms_all                    FLOAT DEFAULT NULL,
     dis_av_all                     FLOAT DEFAULT NULL,
     dis_av_viol                    FLOAT DEFAULT NULL,
-    dis_c1_viol                    INT DEFAULT NULL,
+    dis_c1_viol                    INT DEFAULT NULL, -- (65) -- (AZ)
     dis_c3_viol                    INT DEFAULT NULL,
     dis_c5_viol                    INT DEFAULT NULL,
 
     dih_max_all                    FLOAT DEFAULT NULL,
     dih_rms_all                    FLOAT DEFAULT NULL,
-    dih_av_all                     FLOAT DEFAULT NULL,
+    dih_av_all                     FLOAT DEFAULT NULL, -- (70)
     dih_av_viol                    FLOAT DEFAULT NULL,
     dih_c1_viol                    INT DEFAULT NULL,
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
 
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
-    rog                            INT DEFAULT NULL
+    rog                            INT DEFAULT NULL -- (B)
 );
 
 CREATE INDEX entry_001 ON casdcing.cingentry (bmrb_id);
@@ -125,7 +127,7 @@ CREATE INDEX entry_002 ON casdcing.cingentry (pdb_id);
 --    mol_type
 CREATE TABLE casdcing.cingchain
 (
-    chain_id                        SERIAL UNIQUE,
+    chain_id                        SERIAL UNIQUE PRIMARY KEY,
     entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
     chothia_class                   INT DEFAULT NULL,
@@ -138,7 +140,7 @@ CREATE INDEX chain_001 ON casdcing.cingchain (entry_id);
 -- residue
 CREATE TABLE casdcing.cingresidue
 (
-    residue_id                     SERIAL UNIQUE,
+    residue_id                     SERIAL UNIQUE PRIMARY KEY,
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     number                         INT              NOT NULL,
@@ -235,7 +237,7 @@ CREATE INDEX residue_006 ON casdcing.cingresidue (dis_c5_viol);
 -- atom
 CREATE TABLE casdcing.cingatom
 (
-    atom_id                        SERIAL UNIQUE,
+    atom_id                        SERIAL UNIQUE PRIMARY KEY,
     residue_id                     INT              NOT NULL,
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,

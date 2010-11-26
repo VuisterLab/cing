@@ -59,7 +59,12 @@ from numpy.lib.twodim_base import histogram2d
 
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
-#    NTdebug("Now in validate.runCingChecks with toFile:%s and ranges: %s" % (toFile,ranges))
+
+    if project.molecule:
+        if ranges != None:
+            ranges = project.molecule.ranges
+
+    NTdebug("Now in validate#runCingChecks with toFile:%s and ranges: %s" % (toFile,ranges))
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints(toFile)
@@ -82,11 +87,11 @@ def runCingChecks( project, toFile=True, ranges=None ):
     project.getCingSummaryDict()
 #end def
 
-"""Stolen from doValidate.py in Script directory. Need this here so the
-code can be tested. I.e. returns a meaningful status if needed.
-"""
+"Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True, doWattos=True, doTalos=True ):
+    if ranges != None:
+        ranges = project.molecule.ranges
 #    NTdebug('Starting validate#validate with toFile True')
     if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
         project.runShiftx(parseOnly=parseOnly)
@@ -469,7 +474,7 @@ Total    %3d  (%3.0f%%)""" % ( c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0 
 #end def
 
 
-def summary( project, toFile = True ):
+def summary( project, toFile = True, ranges=None ):
     """
     Generate a summary string and store to text file
     Return summary string or None on error.
@@ -481,6 +486,9 @@ def summary( project, toFile = True ):
     if not project.molecule:
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
+
+    if ranges != None:
+        ranges = project.molecule.ranges
 
     msg = ''
 #    msg += sprintf( '%s\n', project.molecule.format() )
@@ -505,10 +513,9 @@ def summary( project, toFile = True ):
 #        msg += sprintf( '\n%s\n', drl.format() )
 
     msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues(),allowHtml=True))
-    if project.molecule.ranges:
-        r = project.molecule.ranges
-        msg += "\n%s CING ROG analysis (residues %s) %s\n%s\n" % \
-               (dots, r, dots, _ROGsummary(project.molecule.getResiduesFromRanges(r), allowHtml=True))
+    if ranges:
+        msg += "\n%s CING ROG analysis (ranges %s) %s\n%s\n" % \
+               (dots, ranges, dots, _ROGsummary(project.molecule.setResiduesFromRanges(ranges), allowHtml=True))
 
     wiSummary = getDeepByKeys(project.molecule, WHATIF_STR, 'summary')
     if wiSummary:
@@ -519,8 +526,10 @@ def summary( project, toFile = True ):
 
     pc = getDeepByKeys(project.molecule, PROCHECK_STR)
     if pc:
-        if hasattr(pc, "summary"):
+        if hasattr(pc, SUMMARY_STR):
             msg += "\n%s Procheck Summary %s\n" % (dots, dots )
+            if ranges:
+                msg += '     (ranges %s)\n' + ranges
             msg += '\n' + addPreTagLines(pc.summary.format())
         else:
             NTerror("Failed to find the procheck summary attribute")

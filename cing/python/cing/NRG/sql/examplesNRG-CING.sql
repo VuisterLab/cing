@@ -123,3 +123,11 @@ SELECT count( FROM "nrgcing"."cingentry";
 -- Can't be done in one blow.
 ALTER TABLE nrgcing.cingatom ALTER COLUMN wi_mo2chk TYPE VARCHAR(255);
 ALTER TABLE nrgcing.cingatom ALTER COLUMN wi_mo2chk SET DEFAULT NULL;
+ALTER TABLE nrgcing.cingatom ALTER COLUMN atom_id  PRIMARY KEY;
+ALTER TABLE nrgcing.cingatom ADD PRIMARY KEY (atom_id);
+
+COPY nrgcing.cingentry     FROM 'nrgcing.cingentry.csv'   CSV HEADER;
+COPY nrgcing.cingentry ( entry_id,name,bmrb_id,casd_id,pdb_id,is_solid,is_paramagnetic,is_membrane,is_multimeric,chothia_class,protein_count,dna_count,rna_count,dna_rna_hybrid_count,is_minimized,software_collection,software_processing,software_analysis,software_struct_solution,software_refinement,in_recoord,in_casd,in_dress,ranges,res_count,model_count,distance_count,dihedral_count,rdc_count,peak_count,cs_count,cs1h_count,cs13c_count,cs15n_count,wi_angchk,wi_bbcchk,wi_bmpchk,wi_bndchk,wi_c12chk,wi_chichk,wi_flpchk,wi_hndchk,wi_inochk,wi_nqachk,wi_omechk,wi_pl2chk,wi_pl3chk,wi_plnchk,wi_quachk,wi_ramchk,wi_rotchk,pc_gf,pc_gf_phipsi,pc_gf_chi12,pc_gf_chi1,noe_compl4,rog )
+FROM '$cwd/casdcing.cingentry.csv'    CSV HEADER;
+
+entry_id,name,bmrb_id,casd_id,pdb_id,is_solid,is_paramagnetic,is_membrane,is_multimeric,chothia_class,protein_count,dna_count,rna_count,dna_rna_hybrid_count,is_minimized,software_collection,software_processing,software_analysis,software_struct_solution,software_refinement,in_recoord,in_casd,in_dress,ranges,res_count,model_count,distance_count,dihedral_count,rdc_count,peak_count,cs_count,cs1h_count,cs13c_count,cs15n_count,wi_angchk,wi_bbcchk,wi_bmpchk,wi_bndchk,wi_c12chk,wi_chichk,wi_flpchk,wi_hndchk,wi_inochk,wi_nqachk,wi_omechk,wi_pl2chk,wi_pl3chk,wi_plnchk,wi_quachk,wi_ramchk,wi_rotchk,pc_gf,pc_gf_phipsi,pc_gf_chi12,pc_gf_chi1,pc_rama_core,pc_rama_allow,pc_rama_gener,pc_rama_disall,noe_compl4,rog,dis_max_all,dis_rms_all,dis_av_all,dis_av_viol,dis_c1_viol,dis_c3_viol,dis_c5_viol,dih_max_all,dih_rms_all,dih_av_all,dih_av_viol,dih_c1_viol,dih_c3_viol,dih_c5_viol

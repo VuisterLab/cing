@@ -23,7 +23,8 @@ class AllChecks(TestCase):
 #    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
     entryList = "1brv_cs_pk_2mdl".split()
 #    entryList = "8psh".split()
-#    entryList = "1y4o".split()
+#    entryList = "1cjg".split()
+#    entryList = "1ai0".split()
 
 #    entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()
 # Set for creating ccpn projects from cyana pdbs.
@@ -41,7 +42,7 @@ class AllChecks(TestCase):
         doWattos = True
         doTalos = True
         useNrgArchive = False
-        ranges = None
+        ranges = 'auto'
         doSwapCheck = False
         doRestoreCheck = True
         if fastestTest:
@@ -52,6 +53,7 @@ class AllChecks(TestCase):
             doProcheck = False
             doWattos = False
             doTalos = False
+            doRestoreCheck = False
         if redoFromCingProject:
             useNrgArchive = False
             doWhatif = False
@@ -127,6 +129,11 @@ class AllChecks(TestCase):
                 printSequenceFromCcpnProject(ccpnProject)
 
             if True:
+                project.molecule.ranges = project.molecule.rangesByCv()
+                NTdebug('ranges: %s' % str(project.molecule.ranges))
+                self.assertTrue(project.molecule.ranges)
+
+            if True:
                 self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               ranges=ranges,
                                               doProcheck = doProcheck,
@@ -145,7 +152,7 @@ class AllChecks(TestCase):
 #                if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
 #                    NTerror("Failed to store CING project's data to DB but continuing.")
 
-            if True:
+            if False:
                 self.assertTrue(project.save())
                 self.assertTrue(project.saveCcpn(entryId))
 
