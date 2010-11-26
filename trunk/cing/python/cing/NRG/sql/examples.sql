@@ -140,3 +140,10 @@ SELECT count( distinct a.wi_mo2chk) FROM "nrgcing"."cingatom" as a;
 
 
 
+
+CREATE TABLE nrgcing.testtable
+(
+    entry_id                       SERIAL UNIQUE PRIMARY KEY,
+    name                           VARCHAR(255),
+    pdb_id                         VARCHAR(255)
+);

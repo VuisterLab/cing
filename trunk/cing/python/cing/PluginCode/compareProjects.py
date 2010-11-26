@@ -238,10 +238,10 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
     return result NTlistOfLists, pairwise1, pairwise2, pairwise12 tuple
     """
 
-    fitResidues1 = mol1.getResiduesFromRanges(ranges)
+    fitResidues1 = mol1.setResiduesFromRanges(ranges)
     models1 = PhiPsiLists( mol1, fitResidues1 )
 
-    fitResidues2 = mol2.getResiduesFromRanges(ranges)
+    fitResidues2 = mol2.setResiduesFromRanges(ranges)
     models2 = PhiPsiLists( mol2, fitResidues2 )
 
     #print '>', ranges, models1, models2
@@ -332,9 +332,9 @@ def calculatePairWiseRmsd( mol1, mol2, ranges=None ):
     """
 
     #Use ranges routines to define fitAtoms ed
-    fitResidues1 = mol1.getResiduesFromRanges(ranges)
+    fitResidues1 = mol1.setResiduesFromRanges(ranges)
     mol1.selectFitAtoms( fitResidues1, backboneOnly=True, includeProtons = False )
-    fitResidues2 = mol2.getResiduesFromRanges(ranges)
+    fitResidues2 = mol2.setResiduesFromRanges(ranges)
     mol2.selectFitAtoms( fitResidues2, backboneOnly=True, includeProtons = False )
 #    mol2.superpose( ranges )
 
@@ -564,7 +564,7 @@ def printResidueScores( projects ):
 
 def test( projects, stream=sys.stdout ):
     # A hack to get residue specifc results
-    selectedResidues = projects[0].molecule.getResiduesFromRanges('all')
+    selectedResidues = projects[0].molecule.setResiduesFromRanges('all')
 
     for res in selectedResidues:
         rmsds3 = calcPhiPsiRmsds( projects, ranges=[res.resNum] )
@@ -593,7 +593,7 @@ def test2(projects):
 
 
 def runningRmsds( projects ):
-    selectedResidues = projects[0].molecule.getResiduesFromRanges('all')
+    selectedResidues = projects[0].molecule.setResiduesFromRanges('all')
     for res in selectedResidues:
         prev = res.sibling(-1)
         next = res.sibling(1)
@@ -649,7 +649,7 @@ def colorPDBmacro( projects ):
     fprintf(fp, 'Console off\n')
     for p in projects.entries:
         #fprintf(fp, 'loadPDB %s\n', os.path.abspath(projects.path(p.name+'.pdb')))
-        selectedResidues = p.molecule.getResiduesFromRanges(projects.ranges)
+        selectedResidues = p.molecule.setResiduesFromRanges(projects.ranges)
         #print '>>', selectedResidues
         if p.has_key('color'):
             fprintf(fp, 'ColorObject %d, %d\n', p.id+1, p.color)
@@ -677,7 +677,7 @@ def ROGmacro( projects ):
     YasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
     for p in projects:
-        selectedResidues = p.molecule.getResiduesFromRanges(projects.ranges)
+        selectedResidues = p.molecule.setResiduesFromRanges(projects.ranges)
         for res in p.molecule.allResidues():
             if res in selectedResidues:
                 pass
@@ -834,7 +834,7 @@ def radiusOfGiration( molecule, ranges=None, model=0 ):
     if ranges==None:
         residues = molecule.allResidues()
     else:
-        residues = molecule.getResiduesFromRanges(ranges)
+        residues = molecule.setResiduesFromRanges(ranges)
     #end if
 
     xx  = 0.0

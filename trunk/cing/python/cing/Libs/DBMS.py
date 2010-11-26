@@ -62,8 +62,24 @@ class Relation():
         return len(firstColumn)
 
     def getColumnByIdx(self, idx):
+        'Return None on error'
+        if idx < 0:
+           NTerror("Found negative idx %s in getColumnByIdx" % idx)
+           return None
+        if idx >= self.sizeColumns():
+           NTerror("Found idx %s in getColumnByIdx which is equal or larger than self.sizeColumns(): %s" % (idx, self.sizeColumns()))
+           return None
         label = self.columnOrder[idx]
         return self.attr[label]
+
+    def setColumnToValue(self, idx, value):
+        'Return True on error'
+        column = self.getColumnByIdx(idx)
+        if column == None:
+           return True
+        for i in range(self.sizeRows()):
+            column[i] = value
+    # end def
 
     def getColumn(self, label):
         if label not in self.columnOrder:

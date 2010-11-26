@@ -1,7 +1,7 @@
 # Execute like:
 # cd /Library/WebServer/Documents/NRG-CING/data/br/1brv
 # python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py 1brv \
-# file:///Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN
+# file:///Library/WebServer/Documents/NRG-CING/recoordSync /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN True
 # or:
 # cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ACheshire
 # python -u /Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py NeR103ACheshire \

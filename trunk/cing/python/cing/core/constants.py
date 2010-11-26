@@ -43,7 +43,11 @@ CING       = 'CING'
 CING_STR   = CING
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
-
+NULL_STRING_DOT ='.'
+EMPTY_RANGE_STR = NULL_STRING_DOT
+CV_RANGE_STR = 'cv'
+AUTO_RANGE_STR = 'auto'
+ALL_RANGE_STR = 'all'
 # PLUGINS
 IS_INSTALLED_STR = 'isInstalled'
 

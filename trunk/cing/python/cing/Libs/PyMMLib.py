@@ -23,6 +23,7 @@ and written back out as PDB files.
 #except ImportError:
 OpenFile = open
 
+ignoreList = ['NUMMDL']
 
 class PDBError(Exception):
     """
@@ -1552,7 +1553,8 @@ class PDBFile(list):
             except KeyError:
                 if rname == 'FTNOTE':
                     continue
-                NTmessage("PDB parser: unknown record type: %s"%(rname))
+                if rname not in ignoreList:
+                    NTmessage("PDB parser: unknown record type: %s"%(rname))
                 continue
 
             ## create/add/parse the record

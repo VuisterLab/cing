@@ -32,8 +32,13 @@ class AllChecks(TestCase):
         if entryId.startswith("1brv"):
             pdbConvention = IUPAC
 
+        if entryId.startswith("1brv"):
+            ranges = "173-186"
+
+        if entryId.startswith("1ai0"):
+            ranges = "2-20"
+
         if entryId == "2hgh":
-            # Note that CING doesn't support chain ids in range selection for procheck. TODO
             # in the case of 2hgh this is not a problem because the residue numbering doesn't
             # overlap between the chain A protein and chain B RNA.
             ranges = "2-11,13-33,35-54"
@@ -61,6 +66,8 @@ class AllChecks(TestCase):
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
 
+        project.molecule.setRanges(ranges)
+
         NTdebug("Reading files from directory: " + cyanaDirectory)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]
@@ -81,7 +88,7 @@ class AllChecks(TestCase):
                         **kwds )
 
         project.save()
-        self.failIf(project.runProcheck(ranges = ranges, createPlots=True, runAqua=runAqua) is None)
+        self.failIf(project.runProcheck(createPlots=True, runAqua=runAqua) is None)
 
         if showProcheckResults:
             for res in project.molecule.allResidues():

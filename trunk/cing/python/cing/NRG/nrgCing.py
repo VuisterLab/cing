@@ -115,6 +115,7 @@ class nrgCing(Lister):
         ## Total number of child processes to be done if all scheduled to be done
         ## are indeed to be done. This is set later on and perhaps adjusted
         ## when the user interrupts the process by ctrl-c.
+        self.url_directer = self.results_url + '/direct.php'
         self.url_redirecter = self.results_url + '/redirect.php'
 #        self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
         ## Dictionary with matches pdb to bmrb
@@ -737,7 +738,8 @@ class nrgCing(Lister):
 
 
     def updateIndexFiles(self):
-        """Updating the index files.
+        """Updating the index files based on self.entry_list_done
+        Run other steps first.
         Return True on error."""
 
         if not self.updateIndices:
@@ -816,7 +818,7 @@ class nrgCing(Lister):
 #                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
-                jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
+                jump_form_start = '<FORM method="GET" action="%s">' % self.url_directer
                 result_string = jump_form_start + "PDB entries"
                 db_id = "PDB"
 
@@ -931,28 +933,22 @@ class nrgCing(Lister):
 #        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
-        NTmessage("Copy the adjusted php script")
-        org_file = os.path.join(self.base_dir, DATA_STR, 'redirect.php')
-        new_file = os.path.join(self.results_dir, 'redirect.php')
-        file_content = open(org_file, 'r').read()
-        old_string = 'URL_BASE'
-        file_content = string.replace(file_content, old_string, self.results_url)
-        open(new_file, 'w').write(file_content)
+        fileListToCopy = [ 'direct.php', 'redirect.php', 'pdb.php']
+        NTmessage("Copy the php scripts: %s" % fileListToCopy)
+        for fileNameToCopy in fileListToCopy:
+            org_file = os.path.join(self.base_dir, DATA_STR, fileNameToCopy)
+            shutil.copy(org_file, self.results_dir)
 
-        NTmessage("Copy the adjusted html redirect")
+        NTmessage("Copy the overall index")
         org_file = os.path.join(self.base_dir, DATA_STR, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
-#        file_content = open(org_file, 'r').read()
-#        old_string = 'URL_BASE'
-#        file_content = string.replace(file_content, old_string, self.results_url)
-#        open(new_file, 'w').write(file_content)
         shutil.copy(org_file, new_file)
 
-        cssFile = os.path.join(htmlDir, "cing.css")
-        headerBgFile = os.path.join(htmlDir, "header_bg.jpg")
-        shutil.copy(cssFile, indexDir)
-        shutil.copy(headerBgFile, indexDir)
-
+        fileListToCopy = [ 'cing.css', 'header_bg.jpg', ]
+        NTmessage("Copy the html files: %s" % fileListToCopy)
+        for fileNameToCopy in fileListToCopy:
+            org_file = os.path.join(htmlDir, fileNameToCopy)
+            shutil.copy(org_file, indexDir)
     # end def
 
     def postProcessEntryAfterVc(self, entry_code):

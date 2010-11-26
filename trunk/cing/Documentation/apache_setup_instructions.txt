@@ -14,7 +14,7 @@
         Redirect permanent /iCing /icing
 
 monitor with:
-	tail -f /private/var/log/apache2/*_log &
+    tail -f /private/var/log/apache2/*_log &
 
 - processing is done as _www:admin account.
     So don't use the suEXEC way.
@@ -31,9 +31,9 @@ monitor with:
     Processing config file: /private/etc/httpd/users/jd.conf
 
     Install /Library/WebServer/Documents/favicon.ico
-    	Create it with gimp; square it and reduce size to 16x16 and save as pnm. Then use:
-    	http://netpbm.sourceforge.net/doc//ppmtowinicon.html to
-    	ppmtowinicon -output favicon.ico favicon.pnm
+        Create it with gimp; square it and reduce size to 16x16 and save as pnm. Then use:
+        http://netpbm.sourceforge.net/doc//ppmtowinicon.html to
+        ppmtowinicon -output favicon.ico favicon.pnm
 
     In the System Preference of the Mac
         Sharing
@@ -57,4 +57,10 @@ OR:
 # For the NRG tomcat web app.
 ProxyPass         / http://localhost:8080/NRG/MRGridServlet
 ProxyPassReverse  / http://localhost:8080/NRG/MRGridServlet
+
+# For the NRG RDF web app.
+ProxyPass         /NRG-D2R http://localhost:2021/
+ProxyPassReverse  /NRG-D2R http://localhost:2021/
+ProxyPass         /NRG-CING-D2R http://localhost:2020/
+ProxyPassReverse  /NRG-CING-D2R http://localhost:2020/
 
