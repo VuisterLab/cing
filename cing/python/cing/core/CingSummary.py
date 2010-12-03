@@ -107,15 +107,15 @@ class CingSummary( NTdict ):
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
         pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
         if (self.proteinResidueCount > 0 and pcSummary):
-            NTdebug("Going to add procheck results to summary.")
+#            NTdebug("Going to add procheck results to summary.")
 #            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
             self.PC_core       = pcSummary.core
             self.PC_allowed    = pcSummary.allowed
             self.PC_generous   = pcSummary.generous
             self.PC_disallowed = pcSummary.disallowed
             self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
-        else:
-            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
+#        else:
+#            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
         #end if
 
         # Whatif

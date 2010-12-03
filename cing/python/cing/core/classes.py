@@ -1862,7 +1862,8 @@ ranges:  %s
         for p in self:
             cl = p.molecule.rmsd.closestToMean
             #print 'saving model>', p.molecule.ensemble[cl].format()
-            p.molecule.toPDBfile( self.path(p.name+'.pdb'), model=cl)
+#            p.molecule.toPDBfile( self.path(p.name+'.pdb'), model=cl)
+            p.molecule.toPDB( self.path(p.name+'.pdb'), model=cl)
 
         return closestToMean
     #end def

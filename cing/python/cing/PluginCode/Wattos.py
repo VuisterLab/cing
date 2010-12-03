@@ -4,11 +4,8 @@ from cing.PluginCode.NmrStar import NmrStar
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.STAR.File import File
-from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
-#from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-#from cing.PluginCode.required.reqWattos import *
 
 if True: # block
     # TODO: use more advanced tests.
@@ -59,13 +56,14 @@ class Wattos(NTdict):
         if len(row) >= 3:
             shortNameDict[n1] = row[2]
 
-    def __init__(self, rootPath = '.', molecule = None, **kwds):
+    def __init__(self, rootPath = '.', molecule = None, ranges = None, **kwds):
         NTdict.__init__(self, __CLASS__ = 'Wattos', **kwds)
         self.checks = None
         self.molecule = molecule
         self.rootPath = rootPath
         self.SURPLUS_CHECK_FILE_NAME_BASE = "wattos_surplus_chk"
         self.COMPLETENESS_CHECK_FILE_NAME = "wattos_completeness_chk.str"
+        self.ranges                = ranges
 
         self.scriptTemplate = """
 InitAll
@@ -97,6 +95,11 @@ y
 y
 y
 n
+y
+y
+
+SelectResiduesByRangesExp
+RANGES
 y
 y
 
@@ -225,9 +228,15 @@ Quit
 
         saveFrameCompl = sfList[0]
         tagTableComplHeader = saveFrameCompl.tagtables[0]
-        completenessMol = tagTableComplHeader.getFloatListByColumnName("_NOE_completeness_stats.Completeness_cumulative_pct")
-        if completenessMol:
-            completenessMol = completenessMol[0]
+        completenessMol = tagTableComplHeader.getFloat("_NOE_completeness_stats.Completeness_cumulative_pct", 0)
+        noe_compl_obs   = tagTableComplHeader.getInt("_NOE_completeness_stats.Constraint_observed_count", 0)
+        noe_compl_exp   = tagTableComplHeader.getInt("_NOE_completeness_stats.Constraint_expected_count", 0)
+        noe_compl_mat   = tagTableComplHeader.getInt("_NOE_completeness_stats.Constraint_matched_count", 0)
+
+        self.molecule.setDeepByKeys(completenessMol, WATTOS_STR, COMPLCHK_STR,  VALUE_LIST_STR)
+        self.molecule.setDeepByKeys(noe_compl_obs  , WATTOS_STR, OBS_COUNT_STR, VALUE_LIST_STR)
+        self.molecule.setDeepByKeys(noe_compl_exp  , WATTOS_STR, EXP_COUNT_STR, VALUE_LIST_STR)
+        self.molecule.setDeepByKeys(noe_compl_mat  , WATTOS_STR, MAT_COUNT_STR, VALUE_LIST_STR)
 
         tagTableComplBody = saveFrameCompl.tagtables[3]
 
@@ -271,12 +280,11 @@ Quit
             residueWattosDic.setDeepByKeys(obsCount, OBS_COUNT_STR, VALUE_LIST_STR)
             residueWattosDic.setDeepByKeys(expCount, EXP_COUNT_STR, VALUE_LIST_STR)
             residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR)
-
-        self.molecule.setDeepByKeys(completenessMol, WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+        # end for
 #        NTdebug('done with _processComplCheck')
     #end def
 
-def runWattos(project, tmp = None, parseOnly=False):
+def runWattos(project, ranges=None, tmp = None, parseOnly=False):
     """
         Run and import the wattos results per model.
         All models in the ensemble of the molecule will be checked.
@@ -284,33 +292,46 @@ def runWattos(project, tmp = None, parseOnly=False):
         or None if no wattos results exist
         returns 1 on success or None on any failure.
     """
-    molecule = project.molecule
-    if not molecule:
+
+    if not project.molecule:
+        NTerror("runWattos: no molecule defined")
+        return True
+
+    mol = project.molecule
+    if not mol:
         NTerror("No project molecule in runWattos")
         return None
+    if mol.modelCount == 0:
+        NTwarning('runWattos: no models for "%s"', mol)
+        return
 
 
-    path = project.path(molecule.name, project.moleculeDirectories.wattos)
+
+    path = project.path(mol.name, project.moleculeDirectories.wattos)
     if not os.path.exists(path):
-        molecule.wattos = None
-        for chain in molecule.allChains():
+        mol.wattos = None
+        for chain in mol.allChains():
             chain.wattos = None
-        for res in molecule.allResidues():
+        for res in mol.allResidues():
             res.wattos = None
-        for atm in molecule.allAtoms():
+        for atm in mol.allAtoms():
             atm.wattos = None
         return None
 
-    wattos = Wattos(rootPath = path, molecule = molecule)
-    if molecule == None:
-        NTerror('runWattos: no molecule defined')
+    if ranges == None:
+        ranges = mol.ranges
+    wattos = Wattos(rootPath = path, molecule = mol, ranges = ranges)
+    del ranges # only use whatif.ranges now.
+    useRanges = mol.useRanges(wattos.ranges)
+    if mol == None:
+        NTerror('runWattos: no mol defined')
         return None
 
-    if molecule.modelCount == 0:
-        NTwarning('runWattos: no models for "%s"', molecule)
+    if mol.modelCount == 0:
+        NTwarning('runWattos: no models for "%s"', mol)
         return None
 
-    wattosDir = project.mkdir(molecule.name, project.moleculeDirectories.wattos)
+    wattosDir = project.mkdir(mol.name, project.moleculeDirectories.wattos)
 
     wattosStatus = project.wattosStatus
 
@@ -347,10 +368,13 @@ def runWattos(project, tmp = None, parseOnly=False):
         scriptComplete = wattos.scriptTemplate
         scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
         scriptComplete = scriptComplete.replace("VERBOSITY", `cing.verbosity`)
-
+        rangesTxt = wattos.ranges
+        if not useRanges: # Wattos can't handle a None this way.
+            rangesTxt = ALL_RANGES_STR
+        scriptComplete = scriptComplete.replace("RANGES", rangesTxt)
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
-        timeRunEstimatedInSeconds = 0.025 * molecule.modelCount * len(molecule.allResidues())
+        timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
         timeRunEstimatedInSeconds *= 60
         timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
         NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
@@ -436,13 +460,13 @@ def runWattos(project, tmp = None, parseOnly=False):
 
 #    intro = '----------- Wattos summary -----------'
     completenessMolStr = NaNstring
-    completenessMol = molecule.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+    completenessMol = mol.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
     if completenessMol:
         completenessMolStr = val2Str(completenessMol, "%.2f")
     complStatement = 'Overall NOE completeness is %s percent\n' % completenessMolStr
 
     summary = '\n\n'.join([surplusSummary, complStatement])
-    if setDeepByKeys(molecule, summary, WATTOS_SUMMARY_STR):
+    if setDeepByKeys(mol, summary, WATTOS_SUMMARY_STR):
         NTerror('Failed to set Wattos summary')
         return True
 

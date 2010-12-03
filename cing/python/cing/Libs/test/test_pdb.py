@@ -4,12 +4,11 @@ python $CINGROOT/python/cing/Libs/test/test_pdb.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.utils import printSequenceFromPdbFile
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
-import os
 import unittest
 
 class AllChecks(TestCase):
@@ -35,14 +34,16 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
 
         m = project.molecule
-        m.toPDBfile('m001.pdb',model=0, convention='XPLOR')
+        ranges = 'A.173-178'
+        NTdebug("m: %s" % m)
+        self.assertTrue( m.toPDB('m001.pdb', model=0, ranges=ranges, convention='XPLOR'))
         m.initCoordinates()
         m.importFromPDB('m001.pdb',convention='XPLOR')
 
         self.assertFalse(project.mkMacros())
 #       self.assertFalse(project.validate(htmlOnly=False, doWhatif = False, doProcheck = False))
 
-    def testPrintSequenceFromPdbFile(self):
+    def tttestPrintSequenceFromPdbFile(self):
         entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "1hy8" # small, single model, very low scoring entry
 

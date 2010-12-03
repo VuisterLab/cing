@@ -5,7 +5,6 @@ from cing import OS_TYPE_MAC
 from cing import osType
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.pdb import moleculeToPDBfile
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
 from cing.core.classes import Coplanar
@@ -252,7 +251,7 @@ class X3dna(NTdict):
             NTmessage('Running X3DNA on modelNum %i of %s' % (modelNum, name))
             baseName = '%s_model_%i' % (name, modelNum)
             pdbFilePath = os.path.join(rootPath, baseName + '.pdb')
-            moleculeToPDBfile(self.project.molecule, pdbFilePath, model = modelNum)
+            self.project.molecule.toPDB(pdbFilePath, model = modelNum)
             status = x3dna(rootPath, baseName)
             if status:
                 NTerror("Failed to run x3dna for modelNum %d" % modelNum)

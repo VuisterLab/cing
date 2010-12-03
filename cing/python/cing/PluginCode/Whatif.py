@@ -170,7 +170,7 @@ fullstop y
 
 
 
-    def __init__( self, rootPath = '.', molecule=None, **kwds ):
+    def __init__( self, rootPath = '.', molecule=None, ranges = None, **kwds ):
         NTdict.__init__( self, __CLASS__ = 'Whatif', **kwds )
         self.checks                = None
         self.molSpecificChecks     = None
@@ -182,6 +182,7 @@ fullstop y
             NTerror('Whatif.__init__: no molecule defined')
         self.molecule              = molecule
         self.rootPath              = rootPath
+        self.ranges                = ranges
     #end def
 
     def path( self, *args ):
@@ -344,8 +345,10 @@ fullstop y
                 checkId = INOCHK_STR
 
             if not checkId:
-#                NTdebug("Failed to find any specific check, continueing to look")
+#                NTdebug("Failed to find any specific check, continuing to look")
                 continue
+
+#            NTdebug("Processing checkId %s" % checkId)
 
             # if needed add WhatifResult instance
             # Do not use setdefault() as it generate too much overhead this way
@@ -428,8 +431,13 @@ fullstop y
        # end for
         fmt = "%7.3f"
         spaceCount = 7
+        rangesStr = ', ranges "all"' # None is not nice to print.
+        if self.ranges:
+            residueCount = self.molecule.ranges2resCount(self.ranges)
+            rangesStr = ', ranges "%s" (%s residues)' % (self.ranges, residueCount)
+
         summary = """
-WHATIF summary report of molecule "%s"
+WHATIF summary report of molecule "%s"%s
 
 - This is an overall summary of the quality of the structure as
   compared with current reliable structures.
@@ -454,7 +462,7 @@ RMS Z-scores, should be close to 1.0:
     Side chain planarity           : %s +/- %s %s
     Improper dihedral distribution : %s +/- %s %s
     Inside/Outside distribution    : %s +/- %s %s
-"""         % (self.molecule.name,
+"""         % (self.molecule.name, rangesStr,
                val2Str(valueList[0].av,fmt, spaceCount),val2Str(valueList[0].sd,fmt, spaceCount), qualList[0],
                val2Str(valueList[1].av,fmt, spaceCount),val2Str(valueList[1].sd,fmt, spaceCount), qualList[1],
                val2Str(valueList[2].av,fmt, spaceCount),val2Str(valueList[2].sd,fmt, spaceCount), qualList[2],
@@ -786,6 +794,7 @@ def createHtmlWhatif(project, ranges=None):
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
+    mol = project.molecule
 #    wiPlotList.append( ('_01_backbone_chi','QUA/RAM/BBC/C12') )
     # The following object will be responsible for creating a (png/pdf) file with
     # possibly multiple pages
@@ -821,10 +830,10 @@ def createHtmlWhatif(project, ranges=None):
 #                project.rootPath( project.name )[0],
 #                project.molecule.name,
 #                project.moleculeDirectories.whatif,
-#                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+#                mol.name + wiPlotList[-1][0] + ".pdf" )
 
 #gv
-    printLink = project.moleculePath( 'whatif', project.molecule.name + wiPlotList[0][0] + ".pdf" )
+    printLink = project.moleculePath( 'whatif', mol.name + wiPlotList[0][0] + ".pdf" )
 
     moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
     moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
@@ -862,11 +871,11 @@ def createHtmlWhatif(project, ranges=None):
 
 #    printLink = os.path.join(
 #                project.rootPath( project.name )[0],
-#                project.molecule.name,
+#                mol.name,
 #                project.moleculeDirectories.whatif,
-#                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+#                mol.name + wiPlotList[-1][0] + ".pdf" )
 #gv
-    printLink = project.moleculePath( 'whatif', project.molecule.name + wiPlotList[1][0] + ".pdf" )
+    printLink = project.moleculePath( 'whatif', mol.name + wiPlotList[1][0] + ".pdf" )
 
     moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
     moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
@@ -901,18 +910,18 @@ def createHtmlWhatif(project, ranges=None):
 
 #    printLink = os.path.join(
 #                project.rootPath( project.name )[0],
-#                project.molecule.name,
+#                mol.name,
 #                project.moleculeDirectories.whatif,
-#                project.molecule.name + wiPlotList[-1][0] + ".pdf" )
+#                mol.name + wiPlotList[-1][0] + ".pdf" )
 #gv
-    printLink = project.moleculePath( 'whatif', project.molecule.name + wiPlotList[2][0] + ".pdf" )
+    printLink = project.moleculePath( 'whatif', mol.name + wiPlotList[2][0] + ".pdf" )
 
     moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL )
     moleculePlotSet.renderMoleculePlotSet( printLink, createPngCopyToo=True  )
 #end def
 
 
-def runWhatif( project, parseOnly=False ):
+def runWhatif( project, ranges=None, parseOnly=False ):
     """
         Run and import the whatif results per model.
 
@@ -930,9 +939,9 @@ def runWhatif( project, parseOnly=False ):
     if not project.molecule:
         NTerror("runWhatif: no molecule defined")
         return True
-
-    if project.molecule.modelCount == 0:
-        NTwarning('runWhatif: no models for "%s"', project.molecule)
+    mol = project.molecule
+    if mol.modelCount == 0:
+        NTwarning('runWhatif: no models for "%s"', mol)
         return
 
     path = project.moleculePath( 'whatif' )
@@ -946,13 +955,36 @@ def runWhatif( project, parseOnly=False ):
         NTerror('runWhatif: absolute path "%s" contains spaces. This will crash Whatif.', absPath)
         return True
 
+    if ranges == None:
+        ranges = mol.ranges
     # core Whatif object, allows running and parsing of whatif
-    whatif = Whatif( rootPath = path, molecule = project.molecule )
-    project.molecule.runWhatif = whatif
+    whatif = Whatif( rootPath = path, molecule = mol, ranges = ranges )
+    mol.runWhatif = whatif
+    del ranges # only use whatif.ranges now.
+    useRanges = mol.useRanges(whatif.ranges)
+#    NTdebug("In runWhatif ranges: %s useRanges %s" % (whatif.ranges, useRanges))
 
-    models = NTlist(*range( project.molecule.modelCount ))
+    residueList = mol.allResidues()
+    if useRanges:
+        residueList = mol.ranges2list(whatif.ranges)
+        if residueList == None:
+            NTerror("Failed ranges2list in Whatif")
+            return True
+        if not residueList:
+            NTerror("Empty list of residues in Whatif")
+            return True
+        whatif.ranges = mol.rangesToExpandedRanges(whatif.ranges)
+        if mol.rangesIsAll(whatif.ranges):
+            NTerror("Non fatal code error but ranges can't be all if they are to be 'used'; don't worry code will still function fine.")
 
-    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
+    numberOfResidues = len(residueList)
+    if numberOfResidues == 0:
+        NTerror("No residues to run Whatif on")
+        return True
+
+    models = NTlist(*range( mol.modelCount ))
+
+    whatifDir = project.mkdir( mol.name, project.moleculeDirectories.whatif  )
     whatifStatus = project.whatifStatus
 
     if not parseOnly:
@@ -970,10 +1002,11 @@ def runWhatif( project, parseOnly=False ):
         whatifStatus.time                = None
         whatifStatus.exitCode            = None
 
-        for res in project.molecule.allResidues():
+
+        for res in residueList:
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
                 if not res.hasProperties('HOH'): # don't report waters
-                    NTwarning('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
+                    NTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
                 whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 
@@ -983,11 +1016,10 @@ def runWhatif( project, parseOnly=False ):
             fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
             # WI prefers IUPAC like PDB now. In CING the closest is IUPAC?
 #            NTdebug('==> Materializing model '+`model`+" to disk" )
-            pdbFile = project.molecule.toPDB( model=model, convention = IUPAC )
+            pdbFile = mol.toPDB( fullname, model=model, ranges=whatif.ranges, convention = IUPAC )
             if not pdbFile:
                 NTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
                 return True
-            pdbFile.save( fullname   )
 
         scriptComplete = Whatif.scriptBegin
         for model in models:
@@ -999,13 +1031,15 @@ def runWhatif( project, parseOnly=False ):
         scriptComplete += Whatif.scriptQuit
         # Let's ask the user to be nice and not kill us
         # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
-        totalNumberOfResidues = project.molecule.modelCount * len(project.molecule.allResidues())
+        totalNumberOfResidues = mol.modelCount * numberOfResidues
         timeRunEstimatedInSeconds    = totalNumberOfResidues / Whatif.NUMBER_RESIDUES_PER_SECONDS
 
         timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
-        NTmessage('==> Running What If checks on '+`totalNumberOfResidues`+
-                     " residues for an estimated ("+`Whatif.NUMBER_RESIDUES_PER_SECONDS`+" residues/s): "+
-                     '%s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
+        # Uncorrected for discarded residues.
+        msg = '==> Running What If checks on %s residues, %s model(s) for an estimated (%s residues/s):' % (
+              numberOfResidues, mol.modelCount, Whatif.NUMBER_RESIDUES_PER_SECONDS)
+        msg += ' %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
+        NTmessage(msg)
         if totalNumberOfResidues < 100:
             NTmessage("It takes much longer per residue for a small molecule/ensemble")
 
@@ -1041,15 +1075,15 @@ def runWhatif( project, parseOnly=False ):
 #    NTdebug('Parsing whatif checks ')
 
     # clear the whatif data structure
-    if project.molecule.has_key(WHATIF_STR):
-        del(project.molecule[WHATIF_STR])
-    for chain in project.molecule.allChains():
+    if mol.has_key(WHATIF_STR):
+        del(mol[WHATIF_STR])
+    for chain in mol.allChains():
         if chain.has_key(WHATIF_STR):
             del(chain[WHATIF_STR])
-    for res in project.molecule.allResidues():
+    for res in mol.allResidues():
         if res.has_key(WHATIF_STR):
             del(res[WHATIF_STR])
-    for atm in project.molecule.allAtoms():
+    for atm in mol.allAtoms():
         if atm.has_key(WHATIF_STR):
             del(atm[WHATIF_STR])
 
@@ -1086,14 +1120,14 @@ def runWhatif( project, parseOnly=False ):
     whatif._makeSummary()
 
     # complete the whatif data structure with NoneObjects
-    if not project.molecule.has_key(WHATIF_STR):
-        project.molecule[WHATIF_STR] = NoneObject
-    for chain in project.molecule.allChains():
+    if not mol.has_key(WHATIF_STR):
+        mol[WHATIF_STR] = NoneObject
+    for chain in mol.allChains():
         if not chain.has_key(WHATIF_STR):
             chain[WHATIF_STR] = NoneObject
         else:
             chain[WHATIF_STR].keysformat()
-    for res in project.molecule.allResidues():
+    for res in mol.allResidues():
         if not res.has_key(WHATIF_STR):
             res[WHATIF_STR] = NoneObject
         else:
@@ -1115,7 +1149,7 @@ def runWhatif( project, parseOnly=False ):
             res[WHATIF_STR].keysformat()
         #end if
 
-    for atm in project.molecule.allAtoms():
+    for atm in mol.allAtoms():
         if not atm.has_key(WHATIF_STR):
             atm[WHATIF_STR] = NoneObject
         else:
@@ -1127,13 +1161,15 @@ def runWhatif( project, parseOnly=False ):
     whatifStatus.parsed = True
     whatifStatus.keysformat()
 
+    # Clean up junk.
+    removeTempFiles( whatifDir )
 #end def
 
 
 def removeTempFiles( whatifDir ):
     removeEmptyFiles( whatifDir )
-#    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-    NTdebug("Removing temporary files generated by What If")
+#    whatifDir        = project.mkdir( mol.name, molDirectories.whatif  )
+#    NTdebug("Removing temporary files generated by What If")
     try:
         # do NOT remove pdbout.txt.
         # Now pdbout.txt is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
@@ -1148,7 +1184,7 @@ def removeTempFiles( whatifDir ):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-                NTdebug("Whatif.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
+#                NTdebug("Whatif.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
 #            NTdebug("Removing: " + fn)
             os.unlink(fn)

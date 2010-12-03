@@ -101,7 +101,7 @@ class Molgrap(NTdict):
 #                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             # was CYANA
-            molecule.toPDBfile(pdb_first_file_name, convention = IUPAC, model = 0)
+            molecule.toPDB(pdb_first_file_name, convention = IUPAC, model = 0)
             # Restore the 'default' state
 #            for atm in skippedAtoms:
 #                atm.pdbSkipRecord = False
@@ -217,7 +217,7 @@ class Molgrap(NTdict):
             NTerror("Failed shell command: " + script_file_name)
             NTerror("Suggestion 1: Have you installed povray-includes or similar?")
             NTerror("              For some Linuxes the file 'colors.inc' doesn't come with povray")
-            NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough?")
+            NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough? See e.g. [File I/O Security] in ~/.povray/3.6/povray.conf")
             NTerror("Suggestion 3: Complex X-ray topology then consider looking at %s%s" % (issueListUrl,233))
             return True
 #        try:

@@ -7,20 +7,20 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.Wattos import runWattos
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.core.classes import Project
 from unittest import TestCase
-import shutil
 import unittest
 
 class AllChecks(TestCase):
 
     "Enable again when issue 193 with NMR-STAR format has been alleviated; "
-    def tttestWattos(self):
+    def testWattos(self):
         "Testing wattos reading and working on a star file that first gets created by Wim's FC."
 
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-#        entryList = "1kr8".split()
-        entryList = "1brv".split()
+        entryList = "1kr8".split()
+#        entryList = "1brv".split()
 #        entryList = "basp2".split()
 #        entryList = "taf3".split()
 #        entryList = "1a4d".split()
@@ -33,6 +33,8 @@ class AllChecks(TestCase):
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         useNrgArchive = False # Default is False
+        ranges='cv'
+#        ranges='16-29'
 
 
         self.failIf(os.chdir(cingDirTmp), msg =
@@ -49,11 +51,17 @@ class AllChecks(TestCase):
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile))
 #            self.assertTrue(project.save())
+            self.assertFalse(project.molecule.setRanges(ranges))
             self.assertTrue(runWattos(project))
-            # Do not leave the old CCPN directory laying around since it might get added to by another test.
-            if os.path.exists(entryId):
-                self.assertFalse(shutil.rmtree(entryId))
+            mol = project.molecule
+            completenessMol = mol.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+            NTdebug("completenessMol: %s" % completenessMol)
+            for res in mol.allResidues():
+                completenessRes = res.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+                NTdebug("%s: %s" % (res, completenessRes))
+            # end for
 
+            self.assertTrue(completenessMol)
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()

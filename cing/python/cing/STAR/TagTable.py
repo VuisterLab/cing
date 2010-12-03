@@ -167,6 +167,48 @@ class TagTable (Lister):
     def getIntListByColumnName(self, columnName):
         """Convenience function."""
         return self.getSpecificListByColumnName( columnName, int, "int")
+    def getInt(self, columnName, rowIdx):
+        """Convenience function."""
+        col = self.getSpecificListByColumnName( columnName, int, "int")
+        if col == None:
+            NTerror("Failed to TagTable.getInt for column %s and rowIdx %s" % (columnName, rowIdx) )
+            return None
+        n = len(col)
+        if rowIdx < 0 or rowIdx >= n:
+            NTerror("Failed to TagTable.getInt for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
+            return None
+        value = col[rowIdx]
+        result = None
+        try:
+            if value == NULL_STRING_DOT:
+                return None
+            result = int(value)
+        except:
+    #        NTtracebackError() # disable this verbose messaging after done debugging.
+            NTerror('getInt: failed to convert to int for construct "%s"' % value)
+        return result
+
+    def getFloat(self, columnName, rowIdx):
+        """Convenience function."""
+        col = self.getSpecificListByColumnName( columnName, float, "float")
+        if col == None:
+            NTerror("Failed to TagTable.getFloat for column %s and rowIdx %s" % (columnName, rowIdx) )
+            return None
+        n = len(col)
+        if rowIdx < 0 or rowIdx >= n:
+            NTerror("Failed to TagTable.getFloat for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
+            return None
+        value = col[rowIdx]
+        result = None
+        try:
+            if value == NULL_STRING_DOT:
+                return None
+            result = float(value)
+        except:
+    #        NTtracebackError() # disable this verbose messaging after done debugging.
+            NTerror('getFloat: failed to convert to float for construct "%s"' % value)
+        return result
+
     def getFloatListByColumnName(self, columnName):
         """Convenience function."""
         return self.getSpecificListByColumnName( columnName, float, "float")

@@ -769,7 +769,7 @@ def generatePDBfiles( projects ):
     for p in projects:
         cl = p.molecule.rmsd.closestToMean
         #print 'saving model>', p.molecule.ensemble[cl].format()
-        p.molecule.toPDBfile( projects.path(p.name+'.pdb'), model=cl)
+        p.molecule.toPDB( projects.path(p.name+'.pdb'), model=cl)
 
     return closestToMean
 #end def

@@ -187,7 +187,6 @@ class AllChecks(TestCase):
         NTdebug('residueList2StartStopList: %s' % str(residueList2StartStopList))
         self.assertEquals( len(residueList2StartStopList), 8 )
 
-#        TODO:
 #        """
 #        Possible 5 situations:
 #        a      # 1 # positive int
@@ -196,19 +195,20 @@ class AllChecks(TestCase):
 #        -a--b  # 4 #
 #        a-b    # 5 # most common
 #        """
-#        inputList = """
-#                      A.1
-#                      A.1-3
-#                      A.-2--1
-#                      A.-2-1
-#                      A.-3
-#                    """.split()
-#        for i, ranges in enumerate(inputList):
-#            NTdebug("test_RangeSelection: %d %s" % (i, ranges))
-#            residueList = mol.setResiduesFromRanges(ranges)
-#            rangesRecycled = mol.residueList2Ranges(residueList)
+        inputList = """
+                      A.1
+                      A.1-3
+                      A.-2--1
+                      A.-2-1
+                      A.-3
+                    """.split()
+        for i, ranges in enumerate(inputList):
+            NTdebug("test_RangeSelection: %d %s" % (i, ranges))
+            residueList = mol.setResiduesFromRanges(ranges)
+#            NTdebug('residueList: [%s]' % residueList)
+            rangesRecycled = mol.residueList2Ranges(residueList)
 #            NTdebug('rangesRecycled: [%s]' % rangesRecycled)
-#            self.assertEquals( ranges, rangesRecycled )
+            self.assertEquals( ranges, rangesRecycled )
 
 
 if __name__ == "__main__":

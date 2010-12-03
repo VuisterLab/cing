@@ -154,7 +154,7 @@ wiPlotList.append( ('_03_steric_acc_flip','BMP/ACC/FLP/CHI') )
 
 # Whatif id's for summary; will be keys in molecule[WHATIF_STR] dict
 # Make them available to 'outside world through the Whatif class
-summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, ROTCHK_STR, BBCCHK_STR, # First part
+summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, C12CHK_STR, BBCCHK_STR, # First part
                        BNDCHK_STR, ANGCHK_STR, OMECHK_STR, PLNCHK_STR, HNDCHK_STR, INOCHK_STR  # second part.
                      ]
 

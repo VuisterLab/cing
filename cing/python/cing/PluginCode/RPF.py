@@ -15,7 +15,7 @@ class RPF():
         NTmessage("starting toRPFFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
+            NTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]

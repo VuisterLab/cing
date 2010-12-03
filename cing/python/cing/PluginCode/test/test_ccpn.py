@@ -6,7 +6,10 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
+from cing.NRG import ARCHIVE_NRG_ID
+from cing.NRG.storeCING2db import doStoreCING2db
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.Scripts.FC.utils import printSequenceFromCcpnProject
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
@@ -18,10 +21,11 @@ import unittest
 
 class AllChecks(TestCase):
 
-#    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
+    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
 #    entryList = "2knr".split()
 #    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
-    entryList = "1brv_cs_pk_2mdl".split()
+#    entryList = "1brv_cs_pk_2mdl".split()
+#    entryList = "1bus".split()
 #    entryList = "8psh".split()
 #    entryList = "1cjg".split()
 #    entryList = "1ai0".split()
@@ -36,15 +40,19 @@ class AllChecks(TestCase):
 
         modelCount=99
         redoFromCingProject = False
-        htmlOnly = False # default is False but enable it for faster runs without some actual data.
+        htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
         doTalos = True
         useNrgArchive = False
-        ranges = 'auto'
+        ranges = 'cv'
+#        ranges='173-177'
+#        ranges='6-13,29-45' # 1bus
+
         doSwapCheck = False
-        doRestoreCheck = True
+        doRestoreCheck = False
+        doStoreCheck = False # DEFAULT: False Requires sqlAlchemy
         if fastestTest:
             modelCount=2
             redoFromCingProject = False
@@ -54,6 +62,7 @@ class AllChecks(TestCase):
             doWattos = False
             doTalos = False
             doRestoreCheck = False
+            doStoreCheck = False
         if redoFromCingProject:
             useNrgArchive = False
             doWhatif = False
@@ -129,9 +138,8 @@ class AllChecks(TestCase):
                 printSequenceFromCcpnProject(ccpnProject)
 
             if True:
-                project.molecule.ranges = project.molecule.rangesByCv()
-                NTdebug('ranges: %s' % str(project.molecule.ranges))
-                self.assertTrue(project.molecule.ranges)
+                self.assertFalse(project.molecule.setRanges(ranges))
+#                NTdebug('ranges: %s' % str(project.molecule.ranges))
 
             if True:
                 self.assertFalse(project.validate(htmlOnly = htmlOnly,
@@ -141,16 +149,19 @@ class AllChecks(TestCase):
                                               doWattos=doWattos,
                                               doTalos=doTalos
                                                ))
+                if doWattos:
+                    mol = project.molecule
+                    completenessMol = mol.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+                    NTdebug("completenessMol: %s" % completenessMol)
+                    for res in mol.allResidues():
+                        completenessRes = res.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+                        NTdebug("%s: %s" % (res, completenessRes))
+                    # end for
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
 #            if os.path.exists(entryId):
 #                self.assertFalse(shutil.rmtree(entryId))
-#            if False:
-#                # Does require:
-#                #from cing.PluginCode.sqlAlchemy import csqlAlchemy
-#                if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
-#                    NTerror("Failed to store CING project's data to DB but continuing.")
 
             if False:
                 self.assertTrue(project.save())
@@ -160,6 +171,11 @@ class AllChecks(TestCase):
                 del project
                 project = Project.open(entryId, status = 'old')
                 self.assertTrue(project, 'Failed reopening project: ' + entryId)
+            if doStoreCheck:
+#                # Does require:
+                from cing.PluginCode.sqlAlchemy import csqlAlchemy #@UnusedImport
+                if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+                    NTerror("Failed to store CING project's data to DB but continuing.")
         # end for
     # end def test
 

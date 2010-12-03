@@ -16,6 +16,9 @@
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
 
+-- ===== Registers ======
+-- Register 1 is reserved for ranges selection at the residue level only.
+
 -- Only now that the tables have been removed can the schema be removed.
 DROP SCHEMA IF EXISTS casdcing CASCADE;
 CREATE SCHEMA casdcing AUTHORIZATION casdcing1;
@@ -31,6 +34,11 @@ CREATE TABLE casdcing.cingentry
 (
     entry_id                       SERIAL UNIQUE PRIMARY KEY,
     name                           VARCHAR(255),
+    sel_1                     BOOLEAN DEFAULT NULL, -- registers used for selections see comment section above.
+    sel_2                     BOOLEAN DEFAULT NULL,
+    sel_3                     BOOLEAN DEFAULT NULL,
+    sel_4                     BOOLEAN DEFAULT NULL,
+    sel_5                     BOOLEAN DEFAULT NULL,
     bmrb_id                        INT,
     casd_id                        VARCHAR(255) UNIQUE,
     pdb_id                         VARCHAR(255),
@@ -92,6 +100,9 @@ CREATE TABLE casdcing.cingentry
     pc_rama_disall                  FLOAT DEFAULT NULL,
 --   wattos (there are other parameters at residue level but not filled in now).
     noe_compl4                     FLOAT DEFAULT NULL, -- (60) -- (BH)
+    noe_compl_obs                  INT DEFAULT NULL,
+    noe_compl_exp                  INT DEFAULT NULL,
+    noe_compl_mat                  INT DEFAULT NULL,
 
     dis_max_all                    FLOAT DEFAULT NULL,
     dis_rms_all                    FLOAT DEFAULT NULL,
@@ -115,6 +126,11 @@ CREATE TABLE casdcing.cingentry
 
 CREATE INDEX entry_001 ON casdcing.cingentry (bmrb_id);
 CREATE INDEX entry_002 ON casdcing.cingentry (pdb_id);
+CREATE INDEX entry_se1 ON casdcing.cingentry (sel_1);
+CREATE INDEX entry_se2 ON casdcing.cingentry (sel_2);
+CREATE INDEX entry_se3 ON casdcing.cingentry (sel_3);
+CREATE INDEX entry_se4 ON casdcing.cingentry (sel_4);
+CREATE INDEX entry_se5 ON casdcing.cingentry (sel_5);
 
 -- mrfile
 -- MySQL doesn't accept the SYSDATE default for date_modified so always present date on insert.
@@ -130,12 +146,22 @@ CREATE TABLE casdcing.cingchain
     chain_id                        SERIAL UNIQUE PRIMARY KEY,
     entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
+    sel_1                     BOOLEAN DEFAULT NULL,
+    sel_2                     BOOLEAN DEFAULT NULL,
+    sel_3                     BOOLEAN DEFAULT NULL,
+    sel_4                     BOOLEAN DEFAULT NULL,
+    sel_5                     BOOLEAN DEFAULT NULL,
     chothia_class                   INT DEFAULT NULL,
     rog                             INT DEFAULT NULL,
     FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );
 -- Some common queries are helped by these indexes..
 CREATE INDEX chain_001 ON casdcing.cingchain (entry_id);
+CREATE INDEX chain_se1 ON casdcing.cingchain (sel_1);
+CREATE INDEX chain_se2 ON casdcing.cingchain (sel_2);
+CREATE INDEX chain_se3 ON casdcing.cingchain (sel_3);
+CREATE INDEX chain_se4 ON casdcing.cingchain (sel_4);
+CREATE INDEX chain_se5 ON casdcing.cingchain (sel_5);
 
 -- residue
 CREATE TABLE casdcing.cingresidue
@@ -145,6 +171,11 @@ CREATE TABLE casdcing.cingresidue
     entry_id                       INT              NOT NULL,
     number                         INT              NOT NULL,
     name                           VARCHAR(255)     DEFAULT NULL,
+    sel_1                     BOOLEAN DEFAULT NULL,
+    sel_2                     BOOLEAN DEFAULT NULL,
+    sel_3                     BOOLEAN DEFAULT NULL,
+    sel_4                     BOOLEAN DEFAULT NULL,
+    sel_5                     BOOLEAN DEFAULT NULL,
     is_common                      BOOLEAN DEFAULT NULL,
     is_termin                      BOOLEAN DEFAULT NULL,
 --   whatif (averages over the ensemble of selected models)
@@ -232,6 +263,11 @@ CREATE INDEX residue_003 ON casdcing.cingresidue (number);
 CREATE INDEX residue_004 ON casdcing.cingresidue (dssp_id);
 CREATE INDEX residue_005 ON casdcing.cingresidue (rog);
 CREATE INDEX residue_006 ON casdcing.cingresidue (dis_c5_viol);
+CREATE INDEX residue_se1 ON casdcing.cingresidue (sel_1);
+CREATE INDEX residue_se2 ON casdcing.cingresidue (sel_2);
+CREATE INDEX residue_se3 ON casdcing.cingresidue (sel_3);
+CREATE INDEX residue_se4 ON casdcing.cingresidue (sel_4);
+CREATE INDEX residue_se5 ON casdcing.cingresidue (sel_5);
 
 
 -- atom
@@ -242,6 +278,11 @@ CREATE TABLE casdcing.cingatom
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     name                           VARCHAR(255)     DEFAULT NULL,
+    sel_1                     BOOLEAN DEFAULT NULL,
+    sel_2                     BOOLEAN DEFAULT NULL,
+    sel_3                     BOOLEAN DEFAULT NULL,
+    sel_4                     BOOLEAN DEFAULT NULL,
+    sel_5                     BOOLEAN DEFAULT NULL,
 --   whatif
     wi_ba2chk                      FLOAT DEFAULT NULL,
     wi_bh2chk                      VARCHAR(255) DEFAULT NULL,
@@ -262,4 +303,9 @@ CREATE INDEX atom_001 ON casdcing.cingatom (residue_id);
 CREATE INDEX atom_002 ON casdcing.cingatom (chain_id);
 CREATE INDEX atom_003 ON casdcing.cingatom (entry_id);
 CREATE INDEX atom_004 ON casdcing.cingatom (name);
+CREATE INDEX atom_se1 ON casdcing.cingatom (sel_1);
+CREATE INDEX atom_se2 ON casdcing.cingatom (sel_2);
+CREATE INDEX atom_se3 ON casdcing.cingatom (sel_3);
+CREATE INDEX atom_se4 ON casdcing.cingatom (sel_4);
+CREATE INDEX atom_se5 ON casdcing.cingatom (sel_5);
 
