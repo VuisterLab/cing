@@ -1536,10 +1536,17 @@ class NTdict(dict):
         reducedKeyList = keyList[1:]
         return deeper.setDeepByKeys(value, *reducedKeyList)
 
-    def appendFromTable(self, myTable, idxColumnKey, idxColumnValue):
+    def appendFromTable(self, myTable, idxColumnKey=0, idxColumnValue=0):
 #        n = len(self)
         for row in myTable:
             self[ row[idxColumnKey] ] = row[idxColumnValue]
+#        m = len(self)
+#        NTdebug("NTdict grew from %d to %d items" % ( n, m))
+
+    def appendFromList(self, myList): # simply hash
+#        n = len(self)
+        for value in myList:
+            self[ value ] = value
 #        m = len(self)
 #        NTdebug("NTdict grew from %d to %d items" % ( n, m))
 

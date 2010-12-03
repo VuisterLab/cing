@@ -8,12 +8,6 @@ Methods:
         convention eq PDB, CYANA, CYANA2 or XPLOR
         return molecule or None on error
 
-    Molecule.PDB2Molecule(pdbFile, moleculeName, convention, nmodels)   :
-        Initialize  from pdbFile
-        Return molecule instance
-        convention eq PDB, CYANA, CYANA2 or XPLOR
-        staticmethod
-
     Project.initPDB( pdbFile, convention ):
         initialize from pdbFile, import coordinates
         convention = PDB, CYANA, CYANA2 or XPLOR
@@ -623,180 +617,28 @@ def moveFirstDigitToEnd(a):
         a = a[1:] + a[0]
     return a
 
-def PDB2Molecule(pdbFile, moleculeName, convention = IUPAC, nmodels = None)   :
-    """Initialize  Molecule 'moleculeName' from pdbFile
-       convention eq PDB, CYANA, CYANA2 or XPLOR, IUPAC
-       optionally only include nmodels
-
-       Return molecule instance or None on error
-    """
-#    showMaxNumberOfWarnings = 100 # was 100
-#    shownWarnings = 0
-#
-#    if not os.path.exists(pdbFile):
-#        NTerror('PDB2Molecule: missing PDB-file "%s"', pdbFile)
-#        return None
-#
-#    NTdetail('==> Parsing pdbFile "%s" ... ', pdbFile )
-#
-#    pdb = PyMMLib.PDBFile( pdbFile )
-#    mol = Molecule( name=moleculeName )
-#
-##    mol.pdb = pdb
-#    mol.modelCount  = 0
-#    foundModel = False
-#
-#    for record in pdb:
-#        recordName = record._name.strip()
-#        if  recordName == 'REMARK':
-#            continue # JFD: this used to be a pass but that's weird.
-#
-#        if recordName == "MODEL":
-#            foundModel = True
-#            continue
-#        if recordName == "ENDMDL":
-#            mol.modelCount += 1
-#            if nmodels and (mol.modelCount >= nmodels):
-#                break
-#            continue
-#
-#        if recordName == "ATOM" or recordName == "HETATM":
-#            # Skip records with a
-#            # see if we can find a definition for this residue, atom name in the database
-#            a = record.name
-#            a = a.strip() # this improved reading 1y4o
-#            if convention == CYANA or convention == CYANA2:
-#                # the residue names are in Cyana1.x convention (i.e. for GLU-)
-#                # atm names of the Cyana1.x PDB files are in messed-up Cyana format
-#                # So: 1HD2 becomes HD21 where needed:
-#                a = moveFirstDigitToEnd(a)
-#            # strip is already done in function
-#            atm = NTdbGetAtom( record.resName, a, convention )
-#
-#
-#            # JFD adds to just hack these debilitating simple variations.
-#            if not atm: # some besides cyana have this too; just too easy to hack here
-##                print "Atom ["+a+"] was mismatched at first"
-#                a = moveFirstDigitToEnd(a)
-#                atm = NTdbGetAtom( record.resName, a, convention )
-#            if not atm:
-#                if a == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
-#                    a = 'HN'
-#                elif a == 'HN': # for future examples.
-#                    a = 'H'
-#                atm = NTdbGetAtom( record.resName, a, convention )
-#            if not atm:
-#                if shownWarnings <= showMaxNumberOfWarnings:
-#                    NTwarning('PDB2Molecule: %s format, model %d incompatible record (%s)' % (
-#                             convention, mol.modelCount+1, record))
-#                    if shownWarnings == showMaxNumberOfWarnings:
-#                        NTwarning('And so on.')
-#                    shownWarnings += 1
-#                continue
-#            if atm.residueDef.hasProperties('cyanaPseudoResidue'):
-#                # skip CYANA pseudo residues
-#                continue
-#
-#            # we did find a match in the database
-#            # Not all PDB files have chainID's !@%^&*
-#            # They do; if none returned then take the space that is always present!
-#            chainId = Chain.defaultChainId
-#            if record.has_key('chainID'):
-#                chainId = record.chainID.strip()
-#                chainId = ensureValidChainId(chainId)
-#
-#            resID    = record.resSeq
-#            resName  = atm.residueDef.name
-#            fullName = resName+str(resID)
-#            atmName  = atm.name
-#
-#            # check if this chain,fullName,atmName already exists in the molecule
-#            # if not, add chain or residue
-#            if not chainId in mol:
-#                mol.addChain( chainId )
-#            #end if
-#
-#            if not fullName in mol[chainId]:
-#                res = mol[chainId].addResidue( resName, resID )
-#                res.addAllAtoms()
-#            #end if
-#
-#            atom = mol[chainId][fullName][atmName]
-#
-#            # Check if the coordinate already exists for this model
-#            # This might happen when alternate locations are being
-#            # specified. Simplify to one coordinate per model.
-#            numCoorinates = len(atom.coordinates)
-#            numModels     = mol.modelCount + 1 # current model counts already
-#            if numCoorinates < numModels:
-#                atom.addCoordinate( record.x, record.y, record.z, Bfac=record.tempFactor )
-#            else:
-#                NTwarning('Skipping duplicate coordinate within same record (%s)' % record)
-#        #end if
-#    #end for
-#    if shownWarnings:
-#        NTwarning('Total number of warnings: ' + `shownWarnings`)
-#
-#    # Patch to get modelCount right for X-ray structures with only one model
-#    if not foundModel:
-#        mol.modelCount += 1
-#    NTdetail( '==> PDB2Molecule: new Molecule %s from %s', mol, pdbFile )
-#    # delete the PyMMlib pdbFile instance # JFD: why?
-#    del(pdb)
-    parser = pdbParser(pdbFile, convention = convention)
-    if not parser:
-        return None
-    mol = parser.initMolecule(moleculeName)
-    if not mol:
-        return None
-    parser.importCoordinates(nmodels = nmodels)
-    return mol
-#end def
-# Add as a staticmethod to Molecule class
-Molecule.PDB2Molecule = staticmethod(PDB2Molecule)
-
-
-def moleculeToPDBfile(molecule, path, model = None, convention = IUPAC, max_models = None):
-    """
-    Save a molecule instance to PDB file.
-    Convention eq PDB, CYANA, CYANA2, XPLOR.
-
-    For speedup reasons, this routine should be explicitly coded.
-    This routine should eventually replace toPDB.
-
-    NB model should be ZERO for the first model. Not one.
-    Returns True on error.
-    """
-#    NTdebug('MoleculeToPDBfile: %s, path=%s, model=%s, convention=%s',
-#             molecule, path, model, convention)
-    pdbFile = molecule.toPDB(model = model, convention = convention, max_models = None)
-    if not pdbFile:
-        return True
-    pdbFile.save(path)
-    del(pdbFile)
-#end def
-Molecule.toPDBfile = moleculeToPDBfile
 
 def initPDB(project, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
     """Initialize Molecule from pdbFile.
        convention eq. CYANA, CYANA2, XPLOR, IUPAC
 
        Optionally include only nmodels.
-       Optionally do not update dihedrals, mean-coordiates, .. (Be careful; only intended for conversion
+       Optionally do not update dihedrals, mean-coordinates, .. (Be careful; only intended for conversion
        purposes).
 
        returns molecule instance or None on error
     """
     if not os.path.exists(pdbFile):
         NTerror('Project.initPDB: missing PDB-file "%s"', pdbFile)
+        return None
 
 #    NTmessage('==> initializing from PDB file "%s"', pdbFile) # repeated in the parser.
 
     if not name:
         _path, name, _ext = NTpath(pdbFile)
-#    molecule = PDB2Molecule( pdbFile, name, convention = convention, nmodels=nmodels)
     parser = pdbParser(pdbFile, convention = convention, allowNonStandardResidue = allowNonStandardResidue)
     if not parser:
+        NTerror('No pdbParser found in initPDB.')
         return None
     molecule = parser.initMolecule(name)
     if not molecule:
@@ -839,8 +681,8 @@ def export2PDB(project, tmp = None):
         if mol.modelCount > 0:
             fname = project.path(project.directories.PDB, mol.name + '.pdb')
             NTdetail('==> Exporting to PDB file "%s"', fname)
-            pdbFile = mol.toPDB(convention = IUPAC)
-            pdbFile.save(fname)
+            pdbFile = mol.toPDB(fileName = fname, convention = IUPAC)
+#            pdbFile.save(fname)
             del(pdbFile)
             return fname
         #end if

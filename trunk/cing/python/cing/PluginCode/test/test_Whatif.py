@@ -44,6 +44,10 @@ class AllChecks(TestCase):
 #        pdbConvention = IUPAC
         parseOnly = False # normal is False
         showValues = True
+        ranges='cv'
+#        ranges='172-177'
+#        ranges='6-13,29-45'
+
 
         os.chdir(cingDirTmp)
         project = Project( entryId )
@@ -64,7 +68,7 @@ class AllChecks(TestCase):
                     self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=999))
-            self.assertFalse(runWhatif(project, parseOnly=False))
+            self.assertFalse(runWhatif(project, ranges=ranges, parseOnly=False))
         else:
             project = Project.open( entryId, status='old' )
 #        print project.cingPaths.format()

@@ -61,10 +61,10 @@ def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
 
     if project.molecule:
-        if ranges != None:
+        if ranges == None:
             ranges = project.molecule.ranges
 
-    NTdebug("Now in validate#runCingChecks with toFile:%s and ranges: %s" % (toFile,ranges))
+#    NTdebug("Now in validate#runCingChecks with toFile:%s and ranges: %s" % (toFile,ranges))
     project.partitionRestraints()
     project.analyzeRestraints()
     project.validateRestraints(toFile)
@@ -90,25 +90,21 @@ def runCingChecks( project, toFile=True, ranges=None ):
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = True, doWhatif=True, doWattos=True, doTalos=True ):
-    if ranges != None:
+    if ranges == None:
         ranges = project.molecule.ranges
 #    NTdebug('Starting validate#validate with toFile True')
-    if hasattr(plugins, SHIFTX_STR) and plugins[ SHIFTX_STR ].isInstalled:
+    if getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
-    if hasattr(plugins, DSSP_STR) and plugins[ DSSP_STR ].isInstalled:
+    if getDeepByKeysOrAttributes(plugins, DSSP_STR, IS_INSTALLED_STR):
         project.runDssp(parseOnly=parseOnly)
-    if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-        if doWhatif:
-            project.runWhatif(parseOnly=parseOnly)
-    if hasattr(plugins, PROCHECK_STR) and plugins[ PROCHECK_STR ].isInstalled:
-        if doProcheck:
-            project.runProcheck(ranges=ranges, parseOnly=parseOnly)
-    if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
-        if doWattos:
-            project.runWattos(parseOnly=parseOnly)
-    if hasattr(plugins, NIH_STR) and plugins[ NIH_STR ].isInstalled:
-        if doTalos:
-            project.runTalosPlus(parseOnly=parseOnly)
+    if doWhatif and getDeepByKeysOrAttributes(plugins, WHATIF_STR, IS_INSTALLED_STR):
+        project.runWhatif(ranges=ranges, parseOnly=parseOnly)
+    if doProcheck and getDeepByKeysOrAttributes(plugins, PROCHECK_STR, IS_INSTALLED_STR):
+        project.runProcheck(ranges=ranges, parseOnly=parseOnly)
+    if doWattos and getDeepByKeysOrAttributes(plugins, WATTOS_STR, IS_INSTALLED_STR):
+        project.runWattos(parseOnly=parseOnly)
+    if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
+        project.runTalosPlus(parseOnly=parseOnly)
     project.runCingChecks(toFile=True, ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
@@ -487,7 +483,7 @@ def summary( project, toFile = True, ranges=None ):
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
 
-    if ranges != None:
+    if ranges == None:
         ranges = project.molecule.ranges
 
     msg = ''
@@ -513,7 +509,10 @@ def summary( project, toFile = True, ranges=None ):
 #        msg += sprintf( '\n%s\n', drl.format() )
 
     msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues(),allowHtml=True))
-    if ranges:
+
+    useRanges = project.molecule.useRanges(ranges)
+
+    if useRanges:
         msg += "\n%s CING ROG analysis (ranges %s) %s\n%s\n" % \
                (dots, ranges, dots, _ROGsummary(project.molecule.setResiduesFromRanges(ranges), allowHtml=True))
 
@@ -528,8 +527,8 @@ def summary( project, toFile = True, ranges=None ):
     if pc:
         if hasattr(pc, SUMMARY_STR):
             msg += "\n%s Procheck Summary %s\n" % (dots, dots )
-            if ranges:
-                msg += '     (ranges %s)\n' + ranges
+            if project.molecule.useRanges(pc.ranges):
+                msg += '     (ranges %s)\n' + pc.ranges
             msg += '\n' + addPreTagLines(pc.summary.format())
         else:
             NTerror("Failed to find the procheck summary attribute")
@@ -1528,10 +1527,10 @@ def validateDihedralCombinations(project):
                 # depending on doOnlyOverall it will actually return an array of myHist.
                 myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, doNormalize=doNormalize  )
                 if myHistList == None:
-                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was the neighbor?" % residue)
+                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
                     continue
                 if len(myHistList) != 3:
-                    NTerror("Expected exactly one but found %s histogram for %s; skipping" % (len(myHistList),residue))
+                    NTerror("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (len(myHistList),residue, ssType))
                     continue
 #                myHist = myHistList[0]
             else:

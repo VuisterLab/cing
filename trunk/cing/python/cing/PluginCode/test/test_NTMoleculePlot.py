@@ -28,26 +28,29 @@ class AllChecks(TestCase):
         modelNum = 1 # Only used when simulating data
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
-#        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
+        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
 #        entryId = "2hgh_1model"
-        entryId = "1brv_1model"
+#        entryId = "1brv_1model"
 
         pdbConvention = CYANA
         restraintsConvention = CYANA
 
-        ranges = None
+#        ranges = None
+        ranges = 'cv'
         if entryId.startswith("2hgh"):
             pdbConvention = CYANA
             # Compile a NTlist instance with residue objects.
-#            ranges = "2-54,111-136,145-193"
+            ranges = "2-54,111-136,145-193"
             ranges = None
                 # 1 and 55 are 5' and 3' terminii which are a little looser.
                 # 12, and 34 are bases that are not basepaired.
                 # 191-193 are bound ZN ions.
         elif entryId.startswith("1brv"):
             # Truncate from Val171-Glu189 to:
-#            ranges = "175-188"
-            ranges = None
+            ranges = "175-188"
+#            ranges = None
+        elif entryId.startswith("1bus"):
+            ranges = "6-13,29-45"
 
         self.failIf(os.chdir(cingDirTmp), msg=
             "Failed to change to temp test directory for data: " + cingDirTmp)
@@ -81,20 +84,22 @@ class AllChecks(TestCase):
                 "Converter for cyana also needs a seq file before a prot file can be imported")
             kwds['protFile'] = entryId
             kwds['seqFile'] = entryId
-        project.cyana2cing(cyanaDirectory = cyanaDirectory,
+        self.assertTrue(project.cyana2cing(cyanaDirectory = cyanaDirectory,
                            convention = restraintsConvention,
                            coordinateConvention = pdbConvention,
                            copy2sources = True,
-                           **kwds)
+                           **kwds))
 
-        project.validate(parseOnly=False, htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False)
-#        project.runDssp()
+#        project.validate(parseOnly=False, htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False) # needed?
+
+        self.assertFalse( project.molecule.setRanges(ranges) )
+        project.runDssp()
         if actuallyRunWhatif:
             from cing.PluginCode.Whatif import runWhatif
             self.assertFalse(runWhatif(project))
         else:
             rangeList = project.molecule.getFixedRangeList(
-                max_length_range=ResPlot.MAX_WIDTH_IN_RESIDUES, ranges=ranges)
+                max_length_range=ResPlot.MAX_WIDTH_IN_RESIDUES)
             resNumb = 0
             for resList in rangeList:
                 for res in resList:
@@ -221,8 +226,8 @@ class AllChecks(TestCase):
 #HEAVY_ATOMS_STR = 'heavyAtoms'
 #PROTONS_STR = 'protons'
 
-
-        moleculePlotSet = MoleculePlotSet(project=project, ranges=ranges, keyLoLoL=keyLoLoL)
+        NTdebug("Instantiating moleculePlotSet")
+        moleculePlotSet = MoleculePlotSet(project=project, keyLoLoL=keyLoLoL)
         moleculePlotSet.renderMoleculePlotSet('test_NTMoleculePlot.pdf',
             createPngCopyToo=True)
 
@@ -248,6 +253,5 @@ class AllChecks(TestCase):
         ps.hardcopy(projectName, 'png')
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

@@ -1927,7 +1927,8 @@ class FormatResNumbersFormatter(Formatter):
 
 class MoleculePlotSet:
     """A set of ResPlotSet (pages)."""
-    def __init__(self, project, ranges, keyLoLoL, makeCorrelationPlot = False):
+    # TODO: test providing the ranges
+    def __init__(self, project, keyLoLoL=None, ranges=None, makeCorrelationPlot = False):
         self.project = project
         self.ranges = ranges
         self.keyLoLoL = keyLoLoL
@@ -1938,6 +1939,8 @@ class MoleculePlotSet:
         self.rangeList = self.project.molecule.getFixedRangeList(
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES,
             ranges = self.ranges)
+        if self.keyLoLoL == None:
+            NTcodeerror("keyLoLoL should not be None in MoleculePlotSet.__init__")
 
     def renderMoleculePlotSet(self, fileName, createPngCopyToo = True):
         """

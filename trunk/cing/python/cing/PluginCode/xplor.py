@@ -222,7 +222,6 @@ def newMoleculeFromXplor( project, path, name, models=None ):
         NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
     #end if
-#    molecule = Molecule.PDB2Molecule( xplorFile, name, convention = XPLOR)
 #    project.appendMolecule( molecule )
     molecule = project.initPDB( xplorFile, name=name, convention = XPLOR )
     if not molecule:

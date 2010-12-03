@@ -638,20 +638,22 @@ class Molecule( NTtree, ResidueList ):
         return atomDict
     #end def
 
-    def setRanges(self, ranges):
+    def setRanges(self, ranges=None):
         """
-        Expand 'auto' to an actual list of residues and represent it again in the cing format string for residues.
+        Expand 'auto', 'cv', 'all', None, and regular string to an actual list of residues and represent it again in the cing format string for residues.
+        Returns True on error or None on success.
         """
-        if ranges == None:
-            return
-        self.ranges = ranges
+        self.ranges = ranges # will be picked up by setResiduesFromRanges called next
         residueList = self.setResiduesFromRanges()
+        if residueList == None:
+            NTerror("In setRanges failed to setResiduesFromRanges from ranges: [%s]" % ranges)
+            return True
         rangesReset = self.residueList2Ranges(residueList)
         if rangesReset != ranges:
-            NTmessage("Ranges reset from %s to %s" % ( ranges, rangesReset ))
+            NTmessage("Ranges reset from: %s to %s" % ( ranges, rangesReset ))
             self.ranges = rangesReset
 
-    def setResiduesFromRanges(self, ranges=None, autoLimit=0.7):
+    def setResiduesFromRanges(self, ranges=None, autoLimit=LIMIT_RANGES):
         """
         Convert
               either:
@@ -674,33 +676,46 @@ class Molecule( NTtree, ResidueList ):
         No longer sets the range so infinite recursion can be avoided.
         """
 
-        if ranges != None:
+        if ranges == None:
             ranges = self.ranges
 
-        NTdebug("In setResiduesFromRanges using ranges: %s" % ranges)
+#        NTdebug("In setResiduesFromRanges using ranges: %s" % ranges)
 
 
-        if ranges == CV_RANGE_STR:
+        if ranges == CV_RANGES_STR:
             rangesReset = self.rangesByCv()
-            if ranges != rangesReset:
-                NTdebug("In setResiduesFromRanges used cv to get ranges: %s" % rangesReset)
-                selectedResidues = self.ranges2list(rangesReset)
-        elif ranges == AUTO_RANGE_STR:
+            if rangesReset == None:
+                NTerror("Failed rangesByCv in setResiduesFromRanges")
+                return None
+            NTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
+            selectedResidues = self.ranges2list(rangesReset)
+            if selectedResidues == None:
+                NTerror("Failed ranges2list (A) in setResiduesFromRanges")
+                return None
+        elif ranges == AUTO_RANGES_STR:
             selectedResidues = self._autoRanges( autoLimit )
-        elif ranges == ALL_RANGE_STR:
+            if selectedResidues == None:
+                NTerror("Failed _autoRanges in setResiduesFromRanges")
+                return None
+        elif ranges == ALL_RANGES_STR:
             selectedResidues = self.allResidues()
-        elif ranges == EMPTY_RANGE_STR:
+        elif ranges == EMPTY_RANGES_STR:
             selectedResidues = NTlist()
+        elif ranges == None:
+            selectedResidues = self.allResidues()
         else:
             selectedResidues = self.ranges2list( ranges )
+            if selectedResidues == None:
+                NTerror("Failed ranges2list (B) in setResiduesFromRanges")
+                return None
+            # end if
+        # end else
 
         if selectedResidues == None:
-            NTerror("In setResiduesFromRanges failed to get selection of residues")
+            NTerror("In setResiduesFromRanges failed to get selection of residues for ranges: [%s]" % ranges)
             return None
 
         self.selectedResidues = selectedResidues
-#        self.range = self.residueList2Ranges(selectedResidues)
-
         return selectedResidues
     #end def
 
@@ -711,23 +726,23 @@ class Molecule( NTtree, ResidueList ):
         Return empty string for empty selection.
         Return None on error.
         Return string otherwise.
-        An empty list is expressed as EMPTY_RANGE_STR which is a dot.
+        An empty list is expressed as EMPTY_RANGES_STR which is a dot.
         '''
         result = ''
         if residueList == None:
             NTerror("In residueList2Ranges no input residueList.")
             return None
         if len(residueList) == 0:
-            NTdebug("In residueList2Ranges empty residueList.")
-            return EMPTY_RANGE_STR
+#            NTdebug("In residueList2Ranges empty residueList.")
+            return EMPTY_RANGES_STR
         startStopList = self.ranges2StartStopList(residueList)
-        NTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
+#        NTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
         if startStopList == None:
             NTerror("In residueList2Ranges failed to find startStopList.")
             return
         if len(startStopList) == 0:
-            NTdebug("In residueList2Ranges found empty startStopList.")
-            return EMPTY_RANGE_STR
+#            NTdebug("In residueList2Ranges found empty startStopList.")
+            return EMPTY_RANGES_STR
         useChainIds = len(self.allChains()) > 1
         for i in range(0, len(startStopList), 2):
             start = startStopList[i]
@@ -747,25 +762,24 @@ class Molecule( NTtree, ResidueList ):
             else:
                 result += '-'.join(strList)
         # end for
-        NTdebug( "In residueList2Ranges ranges: %s" % result)
+#        NTdebug( "In residueList2Ranges ranges: %s" % result)
         return result
     # end def
 
-    def ranges2StartStopList(self, ranges):
+    def ranges2StartStopList(self, ranges=None):
         """
         reduce this sorted list to pairs start, stop
 
         Return None on error.
         Return (empty) list otherwise.
 
-        An empty list is expressed as EMPTY_RANGE_STR which is a dot.
+        An empty list is expressed as EMPTY_RANGES_STR which is a dot.
         """
 
         if ranges == None:
-            NTerror("In ranges2StartStopList input was None.")
-            return None
+            ranges = self.ranges
         selectedResidues = self.setResiduesFromRanges(ranges)
-        NTdebug( 'In Molecule#ranges2StartStopList selectedResidues: %s' % selectedResidues)
+#        NTdebug( 'In Molecule#ranges2StartStopList selectedResidues: %s' % selectedResidues)
         if not selectedResidues:
             NTwarning("In Molecule#ranges2StartStopList, no residues selected from ranges: %s" % ranges)
             return
@@ -779,9 +793,47 @@ class Molecule( NTtree, ResidueList ):
             # end if
         # end for
         rangeResidueList.append(selectedResidues[-1])
-        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
+#        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
         return rangeResidueList
 
+    def rangesIsAll( self, ranges ):
+        """
+        Return True if ranges are actually all residues
+        """
+        if ranges == ALL_RANGES_STR:
+            return True
+        residueList = self.ranges2list(ranges)
+        if residueList == None:
+            NTerror("Failed ranges2list in rangesIsAll for ranges: %s" % ranges)
+            return False
+        allResidueList = self.allResidues()
+        nAll = len(allResidueList)
+        nRanges = len(residueList)
+        result = (nAll == nRanges)
+#        NTdebug("In rangesIsAll nAll %s, nRanges %s so result: %s" % (nAll,nRanges, result))
+        return result
+
+    def useRanges(self, ranges=None):
+        """Checks to see if the ranges specify something different from all residues"""
+        if ranges == None:
+            ranges = self.ranges
+        return ranges and not self.rangesIsAll(ranges)
+
+    def rangesToExpandedRanges( self, ranges ):
+        """
+        Return None on error. Simply cycles so it expands selections like all, auto, cv etc.
+        """
+        residueList = self.ranges2list(ranges)
+        if residueList == None:
+            NTerror("Failed ranges2list in rangesToExpandedRanges for ranges: %s" % ranges)
+            return None
+        rangesNew = self.residueList2Ranges(residueList)
+        if rangesNew == None:
+            NTerror("Failed residueList2Ranges in rangesToExpandedRanges for ranges: %s" % ranges)
+            return None
+        if rangesNew != ranges:
+            NTdebug("Expanded ranges %s to %s" % (ranges,rangesNew))
+        return rangesNew
 
     def _rangesStr2list( self, ranges ):
         """
@@ -791,6 +843,18 @@ class Molecule( NTtree, ResidueList ):
         if type(ranges) != str:
             NTerror('Error Molecule._rangesStr2list: ranges type [%s] should have been a string' % type(ranges) )
             return None
+
+        if ranges == CV_RANGES_STR: # needs to be on top because it rewrites the ranges string to something like 'all' that might still need to be expanded.
+            ranges = self.rangesByCv()
+        if ranges == EMPTY_RANGES_STR:
+            return NTlist()
+        if ranges == ALL_RANGES_STR:
+            return self.allResidues()
+        if ranges == AUTO_RANGES_STR:
+            result = self._autoRanges()
+            if result == None:
+                NTerror('In _rangesStr2list failed _autoRanges')
+            return result
 
         rangesCollapsed = ranges.replace(' ', '')
         rangeStrList = rangesCollapsed.split(',')
@@ -830,6 +894,24 @@ class Molecule( NTtree, ResidueList ):
         result.addList(resultSorted)
         return result
     # end def
+
+    def ranges2resCount( self, ranges ):
+        "Return None on error"
+        residueList = self.ranges2list(ranges)
+        if residueList == None:
+            NTerror("Failed to ranges2list in ranges2resCount")
+            return None
+        return len(residueList)
+
+    def rangesContainsResidue( self, residue, ranges=None  ):
+        """Queries the self.selectedResidues in a slow way; scan.
+        If ranges != None the the query is even slower because if will use the range.
+        """
+        selectedResidues = self.selectedResidues
+        if ranges != None:
+            selectedResidues = self.ranges2list(ranges)
+        return residue in selectedResidues
+
 
     def ranges2list( self, ranges ):
         """
@@ -879,11 +961,17 @@ class Molecule( NTtree, ResidueList ):
         The NTlist contains only residues in the given ranges and is at most
         max_length_range long.
         """
-        selectedResidues = self.allResidues()
+
+        if ranges == None:
+            ranges = self.ranges
+
         if ranges:
-            selectedResidues = self.setResiduesFromRanges( ranges )
-        r = NTlist()
-        result = []
+            selectedResidues = self.ranges2list( ranges )
+        else:
+            selectedResidues = self.allResidues()
+        # end if
+        r = NTlist() # list of residues selected in
+        result = [] # list of ranges
         for res in selectedResidues:
             if len(r) == max_length_range:
                 result.append( r )
@@ -1383,16 +1471,18 @@ class Molecule( NTtree, ResidueList ):
         #end for
     #end def
 
-    def updateDihedrals( self)   :
+    def updateDihedrals( self, residueList = None)   :
         """Calculate the dihedral angles for all residues
         """
 #        NTdebug('Calculating dihedral angles')
-        for res in self.allResidues():
+        if residueList == None:
+            residueList = self.allResidues()
+        for res in residueList:
 #            res.addDihedralsAll()
             for d in res.dihedrals:
                 d.calculateValues()
             #end for
-            res.setCvBackboneSidechain() # will automatically skip amino acids.
+            res.setCvBackboneSidechain() # will automatically skip non-amino acids.
         #end for
     #end def
 
@@ -1585,15 +1675,19 @@ class Molecule( NTtree, ResidueList ):
             self.syncModels()
             self.updateDihedrals()
 
+            mutantList = []
             #check for cis Pro's
             for res in self.residuesWithProperties('PRO'):
                 if res.has_key('OMEGA') and res.OMEGA.isWithinLimits( -90.0, 90.0):
                     # Cis omega; change to cPRO
                     _tmp,new=res.mutate('cPRO')
-                    NTwarning('Molecule.updateAll: %s changed to %s', res.OMEGA, new )
+                    NTmessage('Mutated %s to %s', res.shortName, new.shortName )
+#                    res.addDihedralsAll(msgHol=msgHol) # Needed when testing with 1bus.A.cPRO13
+                    mutantList.append(res)
                 #end if
             #end for
-
+            if mutantList:
+                self.updateDihedrals(residueList = mutantList )
             self.updateMean()
             self.ensemble = Ensemble( self )
 #            self.atomList = AtomList( self )
@@ -1814,7 +1908,7 @@ Return an Molecule instance or None on error
         return fitted
     #end def
 
-    def _autoRanges(self, autoLimit):
+    def _autoRanges(self, autoLimit=LIMIT_RANGES):
         """
         Automatically define a set of ranges for superposition.
         Return a list of residues
@@ -1860,14 +1954,26 @@ Return an Molecule instance or None on error
         return self.allResidues()
     #end def
 
-    def rangesByCv(self, cvCutoff=0.2, cvWindowSize=3):
+    def rangesByCv(self, cvCutoff=0.2, cvWindowSize=3, minRange = 6):
         """
         Automatically define a set of ranges.
+
         Return a ranges string.
-        Residues that do not have a backbone cv such as nucleic acid bases will
+        Return None on error.
+
+        Residues that do not have a backbone cvList such as nucleic acid bases will
         always be included.
+        The minRange parameter will limit any one range to a minimum length thus
+        ensuring short fragments like single residues are kicked out.
+
+        TODO: optimze for selecting more rather than less.
         """
+        if self.modelCount < 2:
+            NTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % self.modelCount)
+            return ALL_RANGES_STR
+
         residueList = NTlist()
+        max_cv = 0.0
         for ch in self.chains:
             proteinResidues = ch.residuesWithProperties('protein' )
             if len(proteinResidues) == 0:
@@ -1878,20 +1984,53 @@ Return an Molecule instance or None on error
             n = len(resList)
             if not n:
                 continue
-            cv = []
+            cvList = NTlist()
             for r in resList:
-                cv.append( r.getDeepByKeysOrDefault(0.0,CV_BACKBONE_STR) )
+                cv = r.getDeepByKeysOrDefault(0.0,CV_BACKBONE_STR)
+                cvList.append( cv )
+                max_cv = max( max_cv, cv)
 
-            NTdebug("Found cv list: %s" % str(cv))
-            cv_avg = cv
+#            formattedList = [ "%5.2f" % x for x in cvList ]
+#            NTdebug("Found cvList list: %s" % ' '.join(formattedList))
+            cvListWindowAveraged = cvList
             # Do window averaging by numpy
-            if n > 3 and n > cvWindowSize: # convolve will return a wrong sized array if cv is smaller
+            if n > 3 and n > cvWindowSize: # convolve will return a wrong sized array if cvList is smaller
                 w=ones(cvWindowSize,'d')
-                cv_avg=convolve(w/w.sum(),cv,mode='same')
-            for i,r in enumerate(resList):
-                if cv_avg[i] <= cvCutoff:
+                cvListWindowAveraged=convolve(w/w.sum(),cvList,mode='same')
+            for i,r in enumerate(resList): # can be optimized by NTlist method
+                if cvListWindowAveraged[i] <= cvCutoff:
                     residueList.append(r)
-        # end for
+            # end for
+        if not residueList:
+            NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
+            return EMPTY_RANGES_STR
+        if max_cv < 0.2:
+            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+        NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
+
+        if minRange:
+            ranges = self.residueList2Ranges(residueList)
+            if ranges == None:
+                NTerror("Failed to get residueList2Ranges in rangesByCv for ranges: [%s] in rangesByCv" % ranges)
+                return None
+            rangeListNew = []
+            for range in ranges.split(','):
+                residueListSingleRange = self.ranges2list(range)
+                if residueListSingleRange == None:
+                    NTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % range)
+                    return None
+                if len(residueListSingleRange) < minRange:
+#                    NTdebug("Short fragment will be ignored in rangesByCv: [%s]" % range)
+                    continue
+                rangeListNew.append(range)
+            # end for
+            if not rangeListNew:
+                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after subselecting for minRange" % ranges)
+                return EMPTY_RANGES_STR
+            ranges = ','.join(rangeListNew)
+            return ranges # No need to construct this again. It wouldn't simplify the string.
+        # end if
+
         ranges = self.residueList2Ranges(residueList)
         return ranges
 
@@ -1905,11 +2044,9 @@ Return an Molecule instance or None on error
         if self.modelCount <= 0:
             return NoneObject
         #end if
-        if ranges != None:
+        if ranges == None:
             ranges = self.ranges
         selectedResidues = self.setResiduesFromRanges( ranges, autoLimit=autoLimit )
-#        if ranges=='auto':
-#            ranges = self._autoRanges(autoLimit)
 
         fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
@@ -1917,9 +2054,9 @@ Return an Molecule instance or None on error
                       self, len(fitted), ranges, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
-#        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
-#                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
-#               )
+        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
+               )
         r = self.calculateRMSDs(ranges=ranges)
         NTdetail( r.format() )
         return self.ensemble
@@ -1929,7 +2066,7 @@ Return an Molecule instance or None on error
     def calculateRMSDs( self, ranges=None, models = None   ):
         """
         Calculate the positional rmsd's. Store in rmsd attributes of molecule and residues
-        Optionally  select for ranges and models.
+        Optionally select for ranges and models.
         return rmsd result of molecule, or None on error
         When no models are present return NaN.
         """
@@ -1944,8 +2081,7 @@ Return an Molecule instance or None on error
         if models == None:
             models = sprintf('%s-%s', 0, self.modelCount-1)
 
-
-        if ranges != None:
+        if ranges == None:
             ranges = self.ranges
 
         selectedResidues = self.setResiduesFromRanges( ranges )
@@ -1956,7 +2092,7 @@ Return an Molecule instance or None on error
             NTwarning('Molecule.calculateRMSDs: no selected residues for ranges %s' % ranges)
             return NaN
 
-        selectedModels   = self.models2list( models )
+        selectedModels = self.models2list( models )
 
         NTdetail("==> Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
@@ -2046,13 +2182,14 @@ Return an Molecule instance or None on error
         return self.rmsd
     #end def
 
-    def toPDB(self, model=None, convention=IUPAC, max_models=None):
+    def toPDB(self, fileName = None, model=None, ranges=None, convention=IUPAC, max_models=None):
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
         Only export model if specified.
         Note that the first model is model numbered zero.
         Return None on error or pdbfile object on success.
+        If the fileName is set it will do an actual write.
         """
 
         if self.modelCount == 0:
@@ -2074,8 +2211,17 @@ Return an Molecule instance or None on error
             if len(models) > max_models:
                 models = models[0:max_models]
 
-#        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d) ... ",
-#                   convention, models[0], models.last()                 )
+        useRanges = ranges and not self.rangesIsAll(ranges)
+        rangesStr = '' #@UnusedVariable
+        resHashSelection = NTdict() # use for speed
+#        NTdebug("In toPDB ranges: %s useRanges %s" % (ranges, useRanges))
+        if useRanges:
+            rangesStr = ', ranges: %s' % ranges #@UnusedVariable
+            resListSelection = self.ranges2list(ranges)
+            resHashSelection.appendFromList(resListSelection)
+#        NTdebug("In toPDB resHashSelection.keys: %s" % str(resHashSelection.keys()))
+#        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d%s) ... ",
+#                   convention, models[0], models.last(), rangesStr                 )
 
         pdbFile = PDBFile()
 
@@ -2093,19 +2239,26 @@ Return an Molecule instance or None on error
             atmCount = 1
             for chain in self.allChains():
                 lastAtm = None
-                for atm in chain.allAtoms():
-                    atm.setdefault('pdbSkipRecord',False)
-                    if atm.pdbSkipRecord:
+                for res in chain.allResidues():
+                    inSelection = resHashSelection.has_key(res)
+#                    NTdebug("In toPDB inSelection %s for residue: %s" % (inSelection,res))
+                    if useRanges and not inSelection:
+#                        NTdebug("In toPDB skipping residue: %s" % res)
                         continue
-                    record = atm.toPDB( pdbIndex=atmCount, model=m, convention=convention )
-                    if not record:
-                        # this happens for all Q and even for like Cys HG which aren't always present in actual structure
-                        # but are defined in db.
-#                        NTwarning("Failed to get PDB atom record for atom: " + `atm`)
-                        continue
-                    pdbFile.append( record )
-                    atmCount += 1
-                    lastAtm = atm
+                    for atm in res.allAtoms():
+                        atm.setdefault('pdbSkipRecord',False)
+                        if atm.pdbSkipRecord:
+                            continue
+                        record = atm.atomToPDB( pdbIndex=atmCount, model=m, convention=convention )
+                        if not record:
+                            # this happens for all Q and even for like Cys HG which aren't always present in actual structure
+                            # but are defined in db.
+    #                        NTwarning("Failed to get PDB atom record for atom: " + `atm`)
+                            continue
+                        pdbFile.append( record )
+                        atmCount += 1
+                        lastAtm = atm
+                    #end for
                 #end for
                 if lastAtm and convention != XPLOR:
                     record = lastAtm.toPDBTER( pdbIndex=atmCount, convention=convention )
@@ -2125,6 +2278,17 @@ Return an Molecule instance or None on error
         #end for
         record = PyMMLib.END()
         pdbFile.append( record )
+
+        if fileName:
+            pdbFile.save(fileName)
+            # Can't test the above for success so let's try this:
+            if not os.path.exists(fileName):
+                NTerror("Failed to find pdb file %s or has zero size." % fileName)
+                return None
+            if os.path.getsize(fileName) == 0:
+                NTerror("Found pdb file %s with zero size." % fileName)
+                return None
+        # end if
         return pdbFile
     #end def
 
@@ -2148,6 +2312,10 @@ Return an Molecule instance or None on error
 
         Algorithm: pp. 284
         """
+
+
+        if ranges==None:
+            ranges = self.ranges
 
         if ranges==None:
             residues = self.allResidues()
@@ -3156,14 +3324,18 @@ Residue class: Defines residue properties
     #end def
 
     def setCvBackboneSidechain(self):
-        if not self.hasProperties('protein'):
-            return
+#        if not self.hasProperties('protein'):
+#            NTdebug("Skipping setCvBackboneSidechain for non-protein residue: %s" % self.name)
+#            return
         # CING doesn't use IUPAC nomenclature for chi beyond 1. E.g. the IUPAC Chi2,1 in Ile is simply named Chi2.
         # This is incorrect but does make the code very simple here.
         # Optimized for speed so no loop setups.
         cv1 = getDeepByKeysOrAttributes(self, PHI_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, PSI_STR, CV_STR)
         self.cv_backbone = NTcVarianceAverage( (cv1, cv2) )
+        # This still fails by issue
+#        if 'PRO' in self.resName:
+#            NTdebug("Pro cv phi,psi,avg %s %s %s %s" % (cv1, cv2, self.cv_backbone, self.name))
 #        NTdebug('phi/psi/avg: %s %s %s' % (cv1,cv2,self.cv_backbone))
         cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
@@ -4347,7 +4519,7 @@ coordinates: %s"""  , dots, self, dots
         return result
     #end def
 
-    def toPDB( self, pdbIndex, model, convention = IUPAC ):
+    def atomToPDB( self, pdbIndex, model, convention = IUPAC ):
         """Convert to PyMMLib ATOM record;
            use x,y,z values of model
            use convention nomenclature
@@ -4360,11 +4532,11 @@ coordinates: %s"""  , dots, self, dots
         if model >= len(self.coordinates):
             # this happens for all pseudos and atoms like Cys HG which aren't always present
             # but are defined in the db.
-#            NTdebug("Trying to Atom.toPDB for model: " + `model`)
+#            NTdebug("Trying to Atom.atomToPDB for model: " + `model`)
 #            NTdebug("but only found coordinates length: " + `len(self.coordinates)`)
             return None
         if model < 0:
-            NTcodeerror("In Atom.toPDB found model to be <0: " + `model`)
+            NTcodeerror("In Atom.atomToPDB found model to be <0: " + `model`)
             return None
 #        modelId = model - 1
 

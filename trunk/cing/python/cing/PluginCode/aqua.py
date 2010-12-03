@@ -48,7 +48,7 @@ def export2aqua(project, tmp=None):
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
-            NTmessage("No DR lists to export")
+            NTmessage("No %s list to export" % extensionList[typeId])
         count = 0
         for drl in drLoL:
             count += len(drl)

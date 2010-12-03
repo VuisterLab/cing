@@ -514,7 +514,7 @@ class nrgCing(Lister):
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTmessage("For CING store log file: %s assumed crashed." % (timeTaken, logLastFile))
+                NTmessage("For CING store log file: %s assumed crashed." % logLastFile)
                 self.entry_list_store_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
@@ -1359,7 +1359,7 @@ class nrgCing(Lister):
 #        self.searchPdbEntries()
 #        self.getEntryInfo()
 
-        if True: # DEFAULT: False
+        if False: # DEFAULT: False
             self.entry_list_done = '2hyn 2kj3 2ku1'.split()
 
         if False: # DEFAULT: False

@@ -21,7 +21,7 @@ class NmrStar():
 #        NTdebug("starting toNmrStarFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            NTmessage("Failed to find ccpn attribute project. Happens when no CCPN project was read first.")
+            NTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.")
 #            cwd = os.getcwd()
 #            ccpnFolder = os.path.join(cwd, self.project.name + '.tgz')
 #            if os.path.exists(ccpnFolder):

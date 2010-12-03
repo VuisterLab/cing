@@ -68,39 +68,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
 
-    ranges = None
-    if archive_id == ARCHIVE_CASD_ID:
-        try:
-            from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
-            from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
-            targetId = getTargetForFullEntryName(casd_id)
-            if not targetId:
-                NTerror("Failed to getTargetForFullEntryName for entryId: %s" % casd_id)
-                return True
-            ranges = getRangesForTarget(targetId)
-            if ranges != None:
-                NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-                return True
-        except:
-            NTtracebackError("Failed to import from cing.NRG.CasdNmrMassageCcpnProject; skipping setting the ranges")
-
-
-#    expectedArgumentList = [ 'inputDir']
-#    expectedNumberOfArguments = len(expectedArgumentList)
-#    if len(extraArgList) != expectedNumberOfArguments:
-#        NTerror("Got extra arguments: " + `extraArgList`)
-#        NTerror("Failed to get expected number of extra arguments: %d got %d" % (
-#            expectedNumberOfArguments, len(extraArgList)))
-#        NTerror("Expected arguments: %s" % expectedArgumentList)
-#        return True
-#
-#    inputDir = extraArgList[0]
-#    archiveType = extraArgList[1]
-#    projectType = extraArgList[2]
 
     NTdebug("Starting doStoreCING2db using:")
     NTdebug("entry_code:           %s" % entry_code)
-    NTdebug("ranges:               %s" % ranges)
 #    NTdebug("inputDir:             %s" % inputDir)
     NTdebug("archive_id:           %s" % archive_id)
     NTdebug("user_name:            %s" % user_name)
@@ -126,14 +96,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if doReadProject:
         # presume the directory still needs to be created.
         cingEntryDir = entry_code + ".cing"
-
-    #    NTmessage("Now in %s" % os.path.curdir)
-
         if not os.path.isdir(cingEntryDir):
             NTerror("Failed to find input directory: %s" % cingEntryDir)
             return
         # end if.
-
         # Needs to be copied because the open method doesn't take a directory argument..
         project = Project.open(entry_code, status='old')
         if not project:
@@ -148,7 +114,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
 #    p.runCingChecks() # need because otherwise the restraints aren't partitioned etc.
     if False: # TODO: enable when done testing overall strategy.
-        p.validate(parseOnly=True, ranges=ranges, htmlOnly=True)
+        p.validate(parseOnly=True, htmlOnly=True)
 
     if archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         result = execute(centry.delete().where(centry.c.casd_id == casd_id))
@@ -163,12 +129,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     else:
         NTdebug("No original entry present yet.")
 
-    rangesInProject = getDeepByKeysOrAttributes(molecule,RANGES_STR)
-    if rangesInProject != None:
-        ranges = rangesInProject
-#        NTerror("Failed to get the ranges")
+    ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
 
-    NTdebug("ranges: %s" % `ranges`)
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
 
@@ -235,7 +197,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_pc_rama_disall = getDeepByKeysOrAttributes(pc_summary,disallowed_STR)
 
     # Wattos
-    noe_compl4 = molecule.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+    p_noe_compl4    = molecule.getDeepByKeys(WATTOS_STR, COMPLCHK_STR,  VALUE_LIST_STR)
+    p_noe_compl_obs = molecule.getDeepByKeys(WATTOS_STR, OBS_COUNT_STR, VALUE_LIST_STR)
+    p_noe_compl_exp = molecule.getDeepByKeys(WATTOS_STR, EXP_COUNT_STR, VALUE_LIST_STR)
+    p_noe_compl_mat = molecule.getDeepByKeys(WATTOS_STR, MAT_COUNT_STR, VALUE_LIST_STR)
 
     # Overall rog
     rogC = molecule.rogScore.rogInt()
@@ -298,7 +263,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         pc_rama_allow                   =p_pc_rama_allow,
         pc_rama_gener                   =p_pc_rama_gener,
         pc_rama_disall                  =p_pc_rama_disall,
-        noe_compl4=noe_compl4,
+        noe_compl4   =p_noe_compl4   ,
+        noe_compl_obs=p_noe_compl_obs,
+        noe_compl_exp=p_noe_compl_exp,
+        noe_compl_mat=p_noe_compl_mat,
         rog=rogC
         )
     )
@@ -315,7 +283,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         NTerror("Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
         return True
     entry_id = entry_id_list[0][0] # NB this is an integer and different from entry_code which is a string.
-    NTdebug("Inserted entry id %s" % entry_id)
+#    NTdebug("Inserted entry id %s" % entry_id)
 
 
 #    for residue in csql.session.query(cresidue):
@@ -339,7 +307,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         )
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
-        NTdebug("Inserted chain id %s" % chain_id)
+#        NTdebug("Inserted chain id %s" % chain_id)
         chainCommittedCount += 1
         for residue in chain.allResidues():
 
@@ -366,6 +334,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
             nameR = residue.resName
             numberR = residue.resNum
+            sel_1R = molecule.rangesContainsResidue(residue)
             dssp_id = getDsspSecStructConsensusId(residue)
 
             r_distance_count = residue.distanceRestraints.lenRecursive() # filled by filled in partition restraints
@@ -422,7 +391,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_pc_gf_phipsi = residue.getDeepByKeys(PROCHECK_STR, gf_PHIPSI_STR)
 
             # Wattos
-            r_noe_compl4 = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
+            r_noe_compl4    = residue.getDeepByKeys(WATTOS_STR, COMPLCHK_STR,  VALUE_LIST_STR)
+            r_noe_compl_obs = residue.getDeepByKeys(WATTOS_STR, OBS_COUNT_STR, VALUE_LIST_STR)
+            r_noe_compl_exp = residue.getDeepByKeys(WATTOS_STR, EXP_COUNT_STR, VALUE_LIST_STR)
+            r_noe_compl_mat = residue.getDeepByKeys(WATTOS_STR, MAT_COUNT_STR, VALUE_LIST_STR)
 
             # Talos+
             r_qcs_all = residue.getDeepAvgByKeys(QSHIFT_STR, ALL_ATOMS_STR, VALUE_LIST_STR)
@@ -454,6 +426,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 entry_id=entry_id,
                 chain_id=chain_id,
                 name=nameR,
+                sel_1=sel_1R,
                 number=numberR,
                 dssp_id=dssp_id,
                 wi_acclst=r_wi_acclst,
@@ -475,7 +448,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 pc_gf_chi12=r_pc_gf_chi12,
                 pc_gf_chi1=r_pc_gf_chi1,
                 pc_gf_phipsi=r_pc_gf_phipsi,
-                noe_compl4=r_noe_compl4,
+
+                noe_compl4   =r_noe_compl4   ,
+                noe_compl_obs=r_noe_compl_obs,
+                noe_compl_exp=r_noe_compl_exp,
+                noe_compl_mat=r_noe_compl_mat,
 
                 distance_count  = r_distance_count,
                 dihedral_count  = r_dihedral_count,
@@ -607,10 +584,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         # end for residue
     # end for chain
     NTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
-    project.close(save=False)
+#    project.close(save=False) # needed ???
 
     # Needed for the above hasn't been auto-committed.
-    NTdebug("Committing changes")
+#    NTdebug("Committing changes")
     csql.session.commit()
 # end def
 

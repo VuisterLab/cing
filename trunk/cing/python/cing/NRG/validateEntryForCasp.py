@@ -99,7 +99,7 @@ def main(entryId, *extraArgList):
 #        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
 #        return True
 #    ranges = getRangesForTarget(targetId)
-#    if ranges != None:
+#    if ranges == None:
 #        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
 #        return True
 
