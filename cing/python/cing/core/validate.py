@@ -89,7 +89,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True ):
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doSuperpose = True ):
     if ranges == None:
         ranges = project.molecule.ranges
 #    NTdebug('Starting validate#validate with toFile True')
@@ -105,6 +105,8 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         project.runWattos(parseOnly=parseOnly)
     if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
+    if doSuperpose:
+        project.superpose(ranges=ranges)
     project.runCingChecks(toFile=True, ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)

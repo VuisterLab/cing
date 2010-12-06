@@ -687,7 +687,7 @@ class Molecule( NTtree, ResidueList ):
             if rangesReset == None:
                 NTerror("Failed rangesByCv in setResiduesFromRanges")
                 return None
-            NTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
+#            NTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
             selectedResidues = self.ranges2list(rangesReset)
             if selectedResidues == None:
                 NTerror("Failed ranges2list (A) in setResiduesFromRanges")
@@ -733,7 +733,7 @@ class Molecule( NTtree, ResidueList ):
             NTerror("In residueList2Ranges no input residueList.")
             return None
         if len(residueList) == 0:
-#            NTdebug("In residueList2Ranges empty residueList.")
+            NTdebug("In residueList2Ranges empty residueList.")
             return EMPTY_RANGES_STR
         startStopList = self.ranges2StartStopList(residueList)
 #        NTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
@@ -1966,7 +1966,7 @@ Return an Molecule instance or None on error
         The minRange parameter will limit any one range to a minimum length thus
         ensuring short fragments like single residues are kicked out.
 
-        TODO: optimze for selecting more rather than less.
+        TODO: optimize for selecting more rather than less.
         """
         if self.modelCount < 2:
             NTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % self.modelCount)
@@ -2004,9 +2004,9 @@ Return an Molecule instance or None on error
         if not residueList:
             NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
             return EMPTY_RANGES_STR
-        if max_cv < 0.2:
-            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
-        NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
+#        if max_cv < 0.2:
+#            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+#        NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
 
         if minRange:
             ranges = self.residueList2Ranges(residueList)
@@ -2054,9 +2054,9 @@ Return an Molecule instance or None on error
                       self, len(fitted), ranges, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
-        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
-                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
-               )
+#        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+#                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
+#               )
         r = self.calculateRMSDs(ranges=ranges)
         NTdetail( r.format() )
         return self.ensemble

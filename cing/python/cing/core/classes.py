@@ -622,6 +622,10 @@ Project: Top level Cing project class
             NTerror('Project.superpose: no coordinates for %s\n', self.molecule)
             return None
         #end if
+
+        if ranges == None: # not really needed here.
+            ranges = self.molecule.ranges
+
         self.molecule.superpose(ranges = ranges, backboneOnly = backboneOnly,
                                    includeProtons = includeProtons, iterations = iterations
                                   )
