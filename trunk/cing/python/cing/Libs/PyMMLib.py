@@ -1513,7 +1513,11 @@ class PDBFile(list):
     def load_file(self, fileName, update_cb = None ):
         """Loads a PDB file from File object fil.
         """
-        fil = OpenFile(fileName, "r")
+
+        if fileName.endswith('.gz'):
+            fil = GzipFile(fileName, 'rb');
+        else:
+            fil = OpenFile(fileName, "r")
 
         ## get file size for update callbacks
         line_number    = 0

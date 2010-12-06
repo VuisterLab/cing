@@ -42,8 +42,12 @@ Options:
                         Restore Molecule MOLECULENAME as active molecule
   --script=SCRIPTFILE   Run script from SCRIPTFILE
   --ipython             Start ipython interpreter
-  --validate            Run doValidate.py script [in current or cing
-                        directory]
+  --validate            Validate.
+  --validateFastest     Fastest possible checks by CING only and without imagery.
+                        Implies --validateCingOnly and --validateImageLess.
+  --validateCingOnly    Fast checks by CING only but with imagery unless disabled. Implies --validate.
+                        Note that a few fast external programs will be done anyway.
+  --validateImageLess   Disable creating the imagery when validating. Implies --validate.
   --shiftx              Predict with shiftx
   --ranges=RANGES       Ranges for superpose, procheck, validate etc; e.g.
                         'A.503-547,A.550-598,B.800,B.802' or 'auto' for using
@@ -94,6 +98,8 @@ cing --test2 --verbose 0
 - Do a weekly update of PDBj database
 cing --noProject --script $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
 
+- Validate a PDB entry within a minute and drop into iPython.
+cing -n $x --initPDB $PDB/pdb$x.ent.gz --ipython --validateFastest
 --------------------------------------------------------------------------------
 Some simple script examples:
 --------------------------------------------------------------------------------
@@ -514,6 +520,18 @@ def getParser():
                       action="store_true", dest="validate", default=False,
                       help="Run doValidate.py script [in current or cing directory]"
                      )
+    parser.add_option("--validateFastest",
+                      action="store_true", dest="validateFastest", default=False,
+                      help="Validate without external programs or imagery."
+                     )
+    parser.add_option("--validateCingOnly",
+                      action="store_true", dest="validateCingOnly", default=False,
+                      help="Validate without slower external programs."
+                     )
+    parser.add_option("--validateImageLess",
+                      action="store_true", dest="validateImageLess", default=False,
+                      help="Validate without imagery."
+                     )
     parser.add_option("--shiftx",
                       action="store_true", default=False,
                       dest="shiftx",
@@ -749,7 +767,7 @@ def main():
         mol = project.molecule #@UnusedVariable
         m = project.molecule #@UnusedVariable
 
-        NTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
+#        NTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
      #   pr = print
         f = pformat #@UnusedVariable
         fa = pformatall #@UnusedVariable
@@ -812,13 +830,26 @@ def main():
             project.superpose() # will use the ranges set to molecule
 
         #------------------------------------------------------------------------------------
-        # Validate; just run doValidate script
+        # Validate
         #------------------------------------------------------------------------------------
-        if options.validate:
-            path = scriptPath('doValidate.py')
-            if path:
-                NTmessage('==> Executing script "%s"', path)
-                execfile(path)
+        if options.validate or options.validateFastest or options.validateCingOnly or options.validateImageLess:
+#            modelCount=9999
+            htmlOnly = True # default is False but enable it for faster runs without some actual data.
+            doWhatif = True # disables whatif actual run
+            doProcheck = True
+            doWattos = True
+            doTalos = True
+            if options.validateFastest or options.validateCingOnly:
+                doWhatif = False
+                doProcheck = False
+                doWattos = False
+                doTalos = False
+#            if options.validateFastest:
+#                modelCount=2
+            if options.validateFastest or options.validateImageLess:
+                htmlOnly = True
+            project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif, doWattos=doWattos,
+                              doTalos=doTalos)
         #end if
     # end if noProject
 
