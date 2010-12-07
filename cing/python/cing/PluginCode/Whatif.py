@@ -1016,7 +1016,8 @@ def runWhatif( project, ranges=None, parseOnly=False ):
             fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
             # WI prefers IUPAC like PDB now. In CING the closest is IUPAC?
 #            NTdebug('==> Materializing model '+`model`+" to disk" )
-            pdbFile = mol.toPDB( fullname, model=model, ranges=whatif.ranges, convention = IUPAC )
+            pdbFile = mol.toPDB( fullname, model=model, ranges=whatif.ranges, convention = IUPAC)
+#                                 useRangesForLoweringOccupancy=useRanges )
             if not pdbFile:
                 NTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
                 return True

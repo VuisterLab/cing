@@ -796,6 +796,45 @@ class Molecule( NTtree, ResidueList ):
 #        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
         return rangeResidueList
 
+
+    def startStopList2ranges(self, startStopList):
+        """
+        Expand pairs start, stop to ranges
+
+        Return None on error.
+        Return (empty) list otherwise.
+        """
+
+        if startStopList == None:
+            NTerror("Input to startStopList2ranges is None")
+            return None
+
+        useChainIds = False
+        if self.allChains() > 1:
+            useChainIds = True
+
+#        NTdebug( 'startStopList2ranges working on startStopList: %s' % str(startStopList))
+
+        ranges = ''
+        for i in range(0, len(startStopList), 2):
+#            NTdebug( 'startStopList2ranges working on i: %s' % i)
+            resStrList = [None,None]
+            for j,r in enumerate( [startStopList[i], startStopList[i+1]] ):
+#                NTdebug( 'working on j: %s' % j)
+                if useChainIds and j == 0:
+                    resStrList[j] = '%s.%s' % (r.chain.name,r.resNum,)
+                else:
+                    resStrList[j] = str(r.resNum)
+            # end for
+            if i:
+                ranges += ','
+            ranges += '-'.join(resStrList)
+        # end for
+#        NTdebug( 'startStopList2ranges returning: %s' % ranges)
+        return ranges
+
+
+
     def rangesIsAll( self, ranges ):
         """
         Return True if ranges are actually all residues
@@ -1954,7 +1993,8 @@ Return an Molecule instance or None on error
         return self.allResidues()
     #end def
 
-    def rangesByCv(self, cvCutoff=0.2, cvWindowSize=3, minRange = 6):
+    def rangesByCv(self, cvCutoff=0.2, minRange = 4, includeSmallStreches = 4):
+        #cvWindowSize=3,
         """
         Automatically define a set of ranges.
 
@@ -1962,18 +2002,23 @@ Return an Molecule instance or None on error
         Return None on error.
 
         Residues that do not have a backbone cvList such as nucleic acid bases will
-        always be included.
-        The minRange parameter will limit any one range to a minimum length thus
+        be included if they meet the rest of the criteria.
+
+        The minRange parameter (DEFAULT: 4) will limit any one range to a minimum length thus
         ensuring short fragments like single residues are kicked out.
 
-        TODO: optimize for selecting more rather than less.
+        But first the includeSmallStreches (DEFAULT: 4) is used to reintroduce the fragments that
+        are at most 'includeSmallStreches' long. This prevents small gaps.
         """
+
         if self.modelCount < 2:
             NTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % self.modelCount)
             return ALL_RANGES_STR
 
         residueList = NTlist()
         max_cv = 0.0
+        cvWindowSize = 2
+#        coefficients = [ 0.25, 0.50, 0.25 ] # part of sample Savitzky-Golay coefficients from Numerical Recipes p 651.
         for ch in self.chains:
             proteinResidues = ch.residuesWithProperties('protein' )
             if len(proteinResidues) == 0:
@@ -1986,17 +2031,25 @@ Return an Molecule instance or None on error
                 continue
             cvList = NTlist()
             for r in resList:
-                cv = r.getDeepByKeysOrDefault(0.0,CV_BACKBONE_STR)
+                cv = r.getDeepByKeys(CV_BACKBONE_STR)
+                if cv == None:
+                    cv = 0.0
                 cvList.append( cv )
                 max_cv = max( max_cv, cv)
 
-#            formattedList = [ "%5.2f" % x for x in cvList ]
-#            NTdebug("Found cvList list: %s" % ' '.join(formattedList))
+            NTdebug("Found cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvList ]))
             cvListWindowAveraged = cvList
             # Do window averaging by numpy
-            if n > 3 and n > cvWindowSize: # convolve will return a wrong sized array if cvList is smaller
+            if False: # convolve will return a wrong sized array if cvList is smaller
+#            if n > 2 and n > cvWindowSize: # convolve will return a wrong sized array if cvList is smaller
                 w=ones(cvWindowSize,'d')
                 cvListWindowAveraged=convolve(w/w.sum(),cvList,mode='same')
+                NTdebug("data: %s" % str(cvList))
+                cvListWindowAveraged[0] = cvList[0] # Preserves up to the first derivative.
+                cvListWindowAveraged[n-1] = cvList[n-1]
+
+                # above works fine except for terminii.
+            NTdebug("Filtd cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvListWindowAveraged ]))
             for i,r in enumerate(resList): # can be optimized by NTlist method
                 if cvListWindowAveraged[i] <= cvCutoff:
                     residueList.append(r)
@@ -2004,9 +2057,52 @@ Return an Molecule instance or None on error
         if not residueList:
             NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
             return EMPTY_RANGES_STR
-#        if max_cv < 0.2:
-#            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
-#        NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
+        if max_cv < 0.2:
+            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+        NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
+
+        if includeSmallStreches:
+            ranges = self.residueList2Ranges(residueList)
+            if ranges == None:
+                NTerror("Failed to get residueList2Ranges in rangesByCv")
+                return None
+            NTdebug("Starting includeSmallStreches with ranges: %s" % ranges)
+            startStopList = self.ranges2StartStopList(ranges)
+            if startStopList == None:
+                NTerror("Failed to get ranges2StartStopList in rangesByCv")
+                return None
+            i = len(startStopList) - 2 # start of last segment
+            while i >= 2:
+                j = i/2
+                res1 = startStopList[i-1] # stop
+                res2 = startStopList[i] # start
+                resDifCount = residueNumberDifference( res1, res2 )
+                NTdebug("Trying to join 2 ranges [j=%s,i=%s] to a larger one by including residues between: %s %s diff %s" % (j,i, res1,res2, resDifCount))
+                if resDifCount == None:
+                    NTdebug("Failed to get residueNumberDifference in rangesByCv for residues[%s %s]" % (res1,res2))
+                    i -= 2
+                    continue
+                if (resDifCount == 1) or (includeSmallStreches <= (resDifCount-1)):
+                    NTdebug("Skipping gap between: %s %s diff %s includeSmallStreches %s" % (res1,res2, resDifCount, includeSmallStreches))
+                    i -= 2
+                    continue
+                # This routine can be use to join adjacent ranges. by virtue of condition "resDifCount == 1"
+                NTdebug("Joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
+                startStopList[i-1] = startStopList[i+1] # stop last segment
+                del startStopList[i+1] # delete stop in a way that deletes can't bite each other.
+                del startStopList[i] # delete start
+                NTdebug("Ranges modified to: %s" % self.startStopList2ranges(startStopList))
+                i -= 2
+            # end while
+            ranges = self.startStopList2ranges(startStopList)
+            if ranges == None:
+                NTerror("Failed to get startStopList2ranges in rangesByCv for startStopList %s" % str(startStopList))
+                return None
+            residueList = self.residueList2Ranges(ranges)
+            if residueList == None:
+                NTerror("Failed to get residueList2Ranges in rangesByCv for ranges %s" % str(ranges))
+                return None
+        # end if
 
         if minRange:
             ranges = self.residueList2Ranges(residueList)
@@ -2182,7 +2278,8 @@ Return an Molecule instance or None on error
         return self.rmsd
     #end def
 
-    def toPDB(self, fileName = None, model=None, ranges=None, convention=IUPAC, max_models=None):
+    def toPDB(self, fileName = None, model=None, ranges=None, convention=IUPAC, max_models=None,
+              useRangesForLoweringOccupancy=False):
         """
         Return a PyMMlib PDBfile instance or None on error
         Format names according to convention
@@ -2242,8 +2339,8 @@ Return an Molecule instance or None on error
                 for res in chain.allResidues():
                     inSelection = resHashSelection.has_key(res)
 #                    NTdebug("In toPDB inSelection %s for residue: %s" % (inSelection,res))
-                    if useRanges and not inSelection:
-#                        NTdebug("In toPDB skipping residue: %s" % res)
+                    if useRanges and (not inSelection) and (not useRangesForLoweringOccupancy):
+                        NTdebug("In toPDB skipping residue: %s" % res)
                         continue
                     for atm in res.allAtoms():
                         atm.setdefault('pdbSkipRecord',False)
@@ -2255,6 +2352,11 @@ Return an Molecule instance or None on error
                             # but are defined in db.
     #                        NTwarning("Failed to get PDB atom record for atom: " + `atm`)
                             continue
+                        if useRangesForLoweringOccupancy:
+                            if useRanges and (not inSelection) and atm.isBackbone() and (
+                                atm.name == 'CA' or atm.name == "C1'"):
+                                record.occupancy = 0.49 # special meaning in Whatif for ignoring the residue in Structure Z-scores.
+                                NTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
                         pdbFile.append( record )
                         atmCount += 1
                         lastAtm = atm
@@ -3336,7 +3438,9 @@ Residue class: Defines residue properties
         # This still fails by issue
 #        if 'PRO' in self.resName:
 #            NTdebug("Pro cv phi,psi,avg %s %s %s %s" % (cv1, cv2, self.cv_backbone, self.name))
-#        NTdebug('phi/psi/avg: %s %s %s' % (cv1,cv2,self.cv_backbone))
+        fmt = '%8.3f'
+        count = 8
+        NTdebug('%20s phi/psi/avg: %s %s %s' % (self,val2Str(cv1, fmt, count),val2Str(cv2, fmt, count),val2Str(self.cv_backbone, fmt, count)))
         cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
         self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )
@@ -5350,3 +5454,12 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
             NTmessage("       " + msg)
     return histList
 # end def
+
+def residueNumberDifference(res1, res2):
+    "Returns res2.resNum - res1.resNum. Ignoring gaps in sequence."
+    if res1._parent != res2._parent:
+        NTwarning("In Chain.residueCountDifference residues aren't in same chain so result is pointless; returning None")
+        return None
+    return res2.resNum - res1.resNum
+# end def
+
