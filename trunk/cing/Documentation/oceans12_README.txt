@@ -3,6 +3,7 @@ Why these (originally) test entries were special to JFD, CP, WV
 Current list excluding X-ray
 1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e
 
+Set of 97 - 5 obsoleted ( 1hwa 1hiu 1kst 1nbt 1trx )
 Molecular system:
 **********************
 PDB  BMRB  Notes
@@ -29,6 +30,8 @@ PDB  BMRB  Notes
 2kib 20074 Fibril
 2kz0 16995 alpha/beta BolA protein from the Seattle Structural Genomics Center
 2rop 11041 separated 2 domains (2008)
+
+
 On the restraint side:
 **********************
 1a24 Hydrogen bonds

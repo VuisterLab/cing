@@ -84,7 +84,9 @@ class AllChecks(TestCase):
                  [ 0.0, 0.0, 0.0], # extremes
                  [ 1.0, 1.0, 1.0], # extremes
                  [ 0.0, 1.0, 0.293], # doesn't really make sense to JFD but here it is.
+                 [ 0.0, 0.2, 0.0945], # same
                  [ None, 1.0, 1.0], # None for input is allowed.
+                 [ None, 0.0, 0.0], # None for input is allowed.
                  [ None, None, None], # Returns None if all input is None
                   ]
 

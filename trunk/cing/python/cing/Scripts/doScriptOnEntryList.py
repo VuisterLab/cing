@@ -100,7 +100,17 @@ def doScriptOnEntryList(pythonScriptFileName,
 #    NTmessage('Sliced    %05d chains:  %s' % (len(chainCodeList), chainCodeList ))
 
 
-    (_directory, pythonScriptFileNameRoot, _ext) = NTpath(pythonScriptFileName)
+    useAnyCmd = False
+    if pythonScriptFileName.endswith('.py'):
+        (_directory, pythonScriptFileNameRoot, _ext) = NTpath(pythonScriptFileName)
+    else:
+        useAnyCmd = True
+        pythonScriptFileNameRoot = pythonScriptFileName.split()[0] # get first word of eg.
+        if pythonScriptFileNameRoot.count('/'):
+            pythonScriptFileNameRoot = pythonScriptFileNameRoot.split('/')[-1]
+        if pythonScriptFileNameRoot.count('.'):
+            pythonScriptFileNameRoot = pythonScriptFileNameRoot.split('.')[0]
+        # 'cing -v 9 -n $x --initPDB $PDB/pdb$x.ent.gz --validateFastest --ranges cv')
     mkSubDirStructure( startDir, entryCodeList, pythonScriptFileNameRoot )
     logScriptFileNameRoot = 'log_'+pythonScriptFileNameRoot
     job_list = []
@@ -125,8 +135,22 @@ def doScriptOnEntryList(pythonScriptFileName,
             chain_code,
             date_stamp
              )
-#        NTdebug("Will schedule job cmd: %s" % cmd)
+        if useAnyCmd:
+            cmdBase = pythonScriptFileName
+            cmdBase = cmdBase.replace("$x", entry_code)
+            cmdBase = cmdBase.replace("$c", chain_code)
+            cmd = 'cd %s; %s %s %s > %s/%s_%s%s.log 2>&1 ' % (
+                entryDir,
+                cmdBase,
+                entry_code,
+                chain_code,
+                logScriptFileNameRoot,
+                entry_code,
+                chain_code,
+                date_stamp
+                 )
         job = ( do_cmd, (cmd,) )
+#        NTdebug("Will schedule job cmd: %s" % cmd)
         job_list.append( job )
 
     f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
@@ -144,3 +168,6 @@ def doScriptOnEntryList(pythonScriptFileName,
         _do_cmd, cmdTuple = job
         cmd = cmdTuple[0]
         NTerror("In doScriptOnEntryList failed forked: %s" % cmd)
+
+if __name__ == '__main__':
+    entryCodeList = '1brv 1bus'.split()

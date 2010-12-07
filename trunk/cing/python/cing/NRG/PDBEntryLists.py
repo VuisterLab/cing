@@ -114,9 +114,26 @@ def writeEntryListToFile(fileName, entryList):
         return True
     writeTextToFile(fileName, csvText)
 
-def readEntryListFromFile(fileName):
-    "Throws exception on failure"
-    return readLinesFromFile(fileName)
+def readEntryListFromFile(fileName, headerCount = 0):
+    """
+    Throws exception on failure or None on error
+    Will only use first column's values
+    """
+    txt = readTextFromFile(fileName)
+    if not txt:
+        NTerror("Failed to readLinesFromFile %s" % fileName)
+        return None
+    result = []
+    for line in txt.split('\n'):
+        val = line
+        if line.count(','):
+            val = line.split(',')[0]
+        elif line.count(' '):
+            val = line.split(' ')[0]
+        result.append(val)
+    if headerCount:
+        result = result[headerCount:]
+    return result
 
 def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySolidState = False):
     """Includes solution and solid state NMR if onlyNMR is chosen

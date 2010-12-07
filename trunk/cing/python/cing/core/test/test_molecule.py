@@ -8,6 +8,7 @@ from cing.core.molecule import NTangleOpt
 from cing.core.molecule import NTdihedralOpt
 from cing.core.molecule import NTdistanceOpt
 from cing.core.molecule import ensureValidChainId
+from cing.core.molecule import residueNumberDifference
 from cing.main import format
 from unittest import TestCase
 import profile
@@ -210,6 +211,19 @@ class AllChecks(TestCase):
 #            NTdebug('rangesRecycled: [%s]' % rangesRecycled)
             self.assertEquals( ranges, rangesRecycled )
 
+        res1, res2 = mol.ranges2list('A.1,A.3')
+        self.assertEquals( 2, residueNumberDifference(res1, res2))
+        res3, res4 = mol.ranges2list('A.5,A.8')
+        self.assertEquals( 3, residueNumberDifference(res3, res4))
+        res5, res6 = mol.ranges2list('B.9,B.10')
+        self.assertEquals( 1, residueNumberDifference(res5, res6))
+
+        ranges = mol.startStopList2ranges([res1, res2])
+        self.assertEquals( 'A.1-3', ranges)
+        ranges = mol.startStopList2ranges([res1, res2, res3, res4])
+        self.assertEquals( 'A.1-3,A.5-8', ranges)
+        ranges = mol.startStopList2ranges([res1, res2, res5, res6])
+        self.assertEquals( 'A.1-3,B.9-10', ranges)
 
 if __name__ == "__main__":
     os.chdir(cingDirTmp)

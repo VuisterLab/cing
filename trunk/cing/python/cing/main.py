@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 --------------------------------------------------------------------------------
 main.py: command line interface to the cing utilities:
