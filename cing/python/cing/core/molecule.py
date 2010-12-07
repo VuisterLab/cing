@@ -1993,10 +1993,10 @@ Return an Molecule instance or None on error
         return self.allResidues()
     #end def
 
-    def rangesByCv(self, cvCutoff=0.2, minRange = 4, includeSmallStreches = 4):
+    def rangesByCv(self, cvCutoff=0.2, includeGapSize = 4, excludeFragmentSize = 4 ):
         #cvWindowSize=3,
         """
-        Automatically define a set of ranges.
+        Automatically define a set of ranges on the basis of cv.
 
         Return a ranges string.
         Return None on error.
@@ -2004,11 +2004,11 @@ Return an Molecule instance or None on error
         Residues that do not have a backbone cvList such as nucleic acid bases will
         be included if they meet the rest of the criteria.
 
-        The minRange parameter (DEFAULT: 4) will limit any one range to a minimum length thus
-        ensuring short fragments like single residues are kicked out.
+        First the includeGapSize (DEFAULT: 4) is used to reintroduce the fragments that
+        are equal to or shorter than 'includeGapSize'. This prevents small gaps.
 
-        But first the includeSmallStreches (DEFAULT: 4) is used to reintroduce the fragments that
-        are at most 'includeSmallStreches' long. This prevents small gaps.
+        Second the excludeFragmentSize parameter (DEFAULT: 4) will remove a
+        short fragment (equal to or shorter than excludeFragmentSize).
         """
 
         if self.modelCount < 2:
@@ -2024,7 +2024,6 @@ Return an Molecule instance or None on error
             if len(proteinResidues) == 0:
                 NTdebug("Adding all residues of non-protein chain: %s" % ch)
                 residueList.addList( ch.allResidues() )
-
             resList = ch.allResidues()
             n = len(resList)
             if not n:
@@ -2061,12 +2060,13 @@ Return an Molecule instance or None on error
             NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
         NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
 
-        if includeSmallStreches:
-            ranges = self.residueList2Ranges(residueList)
-            if ranges == None:
-                NTerror("Failed to get residueList2Ranges in rangesByCv")
-                return None
-            NTdebug("Starting includeSmallStreches with ranges: %s" % ranges)
+        ranges = self.residueList2Ranges(residueList)
+        if ranges == None:
+            NTerror("Failed to get residueList2Ranges in rangesByCv")
+            return None
+
+        if includeGapSize:
+            NTdebug("Starting includeGapSize with ranges: %s" % ranges)
             startStopList = self.ranges2StartStopList(ranges)
             if startStopList == None:
                 NTerror("Failed to get ranges2StartStopList in rangesByCv")
@@ -2082,48 +2082,44 @@ Return an Molecule instance or None on error
                     NTdebug("Failed to get residueNumberDifference in rangesByCv for residues[%s %s]" % (res1,res2))
                     i -= 2
                     continue
-                if (resDifCount == 1) or (includeSmallStreches <= (resDifCount-1)):
-                    NTdebug("Skipping gap between: %s %s diff %s includeSmallStreches %s" % (res1,res2, resDifCount, includeSmallStreches))
+                if resDifCount > (includeGapSize+1):
+                    NTdebug("Skipping gap between: %s %s diff %s includeGapSize %s" % (res1,res2, resDifCount, includeGapSize))
                     i -= 2
                     continue
                 # This routine can be use to join adjacent ranges. by virtue of condition "resDifCount == 1"
-                NTdebug("Joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
+                NTdebug("By includeGapSize, joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
                 startStopList[i-1] = startStopList[i+1] # stop last segment
                 del startStopList[i+1] # delete stop in a way that deletes can't bite each other.
                 del startStopList[i] # delete start
-                NTdebug("Ranges modified to: %s" % self.startStopList2ranges(startStopList))
+                NTdebug("By includeGapSize, ranges modified to: %s" % self.startStopList2ranges(startStopList))
                 i -= 2
             # end while
             ranges = self.startStopList2ranges(startStopList)
             if ranges == None:
                 NTerror("Failed to get startStopList2ranges in rangesByCv for startStopList %s" % str(startStopList))
                 return None
-            residueList = self.residueList2Ranges(ranges)
-            if residueList == None:
-                NTerror("Failed to get residueList2Ranges in rangesByCv for ranges %s" % str(ranges))
-                return None
+            NTdebug("Finishing includeGapSize with ranges: %s" % ranges)
         # end if
 
-        if minRange:
-            ranges = self.residueList2Ranges(residueList)
-            if ranges == None:
-                NTerror("Failed to get residueList2Ranges in rangesByCv for ranges: [%s] in rangesByCv" % ranges)
-                return None
+        if excludeFragmentSize:
+            NTdebug("Starting excludeFragmentSize with ranges: %s" % ranges)
             rangeListNew = []
-            for range in ranges.split(','):
-                residueListSingleRange = self.ranges2list(range)
+            for rangeStr in ranges.split(','):
+                NTdebug("In excludeFragmentSize looking at range: %s" % rangeStr)
+                residueListSingleRange = self.ranges2list(rangeStr)
                 if residueListSingleRange == None:
-                    NTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % range)
+                    NTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % rangeStr)
                     return None
-                if len(residueListSingleRange) < minRange:
-#                    NTdebug("Short fragment will be ignored in rangesByCv: [%s]" % range)
+                if len(residueListSingleRange) <= excludeFragmentSize:
+                    NTdebug("Short fragment will be ignored in rangesByCv: [%s]" % rangeStr)
                     continue
-                rangeListNew.append(range)
+                rangeListNew.append(rangeStr)
             # end for
             if not rangeListNew:
-                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after subselecting for minRange" % ranges)
+                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize" % ranges)
                 return EMPTY_RANGES_STR
             ranges = ','.join(rangeListNew)
+            NTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)
             return ranges # No need to construct this again. It wouldn't simplify the string.
         # end if
 
@@ -3048,7 +3044,10 @@ Residue class: Defines residue properties
         """A unique compact string identifier.e.g B.LYS282"""
         if showChainId:
             chn = self._parent
-            result = chn.name + '.'
+            chnName = '?'
+            if chn != None: # Happens when debugging  functions that happen early in setting up a molecule.
+                chnName = chn.name
+            result = chnName + '.'
         else:
             result = ''
         if showResidueType:
@@ -3440,7 +3439,10 @@ Residue class: Defines residue properties
 #            NTdebug("Pro cv phi,psi,avg %s %s %s %s" % (cv1, cv2, self.cv_backbone, self.name))
         fmt = '%8.3f'
         count = 8
-        NTdebug('%20s phi/psi/avg: %s %s %s' % (self,val2Str(cv1, fmt, count),val2Str(cv2, fmt, count),val2Str(self.cv_backbone, fmt, count)))
+        NTdebug('%20s phi/psi/avg: %s %s %s' % (self,
+            val2Str(cv1, fmt, count),
+            val2Str(cv2, fmt, count),
+            val2Str(self.cv_backbone, fmt, count)))
         cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
         self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )

@@ -1,4 +1,4 @@
-# python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer3.py
+# python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer4.py
 from cing import cingDirData
 from cing import cingDirTmp
 from cing import cingPythonCingDir
@@ -26,8 +26,10 @@ if True:
     cing.verbosity = cing.verbosityDebug
     startDir = cingDirTmp
     entryListFileName = os.path.join(startDir, 'entry_list_batch.csv')
-#    entryList = '1bus'.split()
-    entryList = readEntryListFromFile(cingDirData+'/Varia/entry_list_92.csv', headerCount = 1)
+    if False:
+        entryList = '1bha 1bus 1cey 1cld 1ego 1egr 1erc 1maj 1mak 1mdj 1pba 1pdc 1tfs 1tnn 1tur 1tus 2aas 4trx 9pcy'.split()
+    else:
+        entryList = readEntryListFromFile(cingDirData+'/Varia/entry_list_92.csv', headerCount = 1)
     writeEntryListToFile(entryListFileName, entryList)
     pdbDir = pdbbase_dir + '/data/structures/all/pdb'
 
@@ -41,7 +43,7 @@ if True:
                         processes_max = 2,
                         delay_between_submitting_jobs = 2,
                         max_time_to_wait = 6000,
-                        START_ENTRY_ID = 2,
-                        MAX_ENTRIES_TODO = 2,
+                        START_ENTRY_ID = 0,
+                        MAX_ENTRIES_TODO = 299,
                         expectPdbEntryList = True,
                         extraArgList = extraArgList)
