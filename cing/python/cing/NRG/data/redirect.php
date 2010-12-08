@@ -1,18 +1,12 @@
 <?php
-
-#$url_base = 'http://www.bmrb.wisc.edu/servlet_data/molgrap';	
-$url_base = 'URL_BASE';	
-#echo "url base: $url_base\n";
-
 #################
 # GetPDBPage
 #################
 function GetPDBPage( $pdbID ) {
-    global $url_base;
     $indexNum = '-1';
     $pdbID = strtoupper( $pdbID );
-    
-    $url_full = $url_base . '/index/index_pdb.csv';
+
+    $url_full = './index/index_pdb.csv';
     $file_handle = fopen(  $url_full, 'r' );
     while( $fileString = fgets( $file_handle, 32 ) ) {
         $data = explode( ',', $fileString );
@@ -24,12 +18,12 @@ function GetPDBPage( $pdbID ) {
         }
     }
     fclose( $file_handle );
-    
+
     return $indexNum;
 }
 
 
-##### begin ####    
+##### begin ####
 $inputStr = $_SERVER['QUERY_STRING'];
 $variables = array();
 parse_str( $inputStr, $variables );
@@ -37,19 +31,19 @@ $newURL = 'sorry.html';
 
 if( $variables['database'] == 'pdb' ) {
     $indexNum = GetPDBPage( $variables['id'] );
-    $newURL = $url_base . "/index/index_{$indexNum}.html";
+    $newURL = "./index/index_{$indexNum}.html";
 }
 
 if( $indexNum > 0 ) {
     header( "Location:$newURL" );
     exit();
 }
-    
+
 ?>
 
-<HTML> <HEAD> <TITLE>Apology</TITLE> </HEAD> <BODY> 
-  <?php 
-    echo "<P>Either the parameters: '<B>$inputStr</B>' do not contain enough information or 
+<HTML> <HEAD> <TITLE>Apology</TITLE> </HEAD> <BODY>
+  <?php
+    echo "<P>Either the parameters: '<B>$inputStr</B>' do not contain enough information or
     the id was out of bounds</P>";
   ?>
 </BODY> </HTML>

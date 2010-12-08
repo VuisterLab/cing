@@ -74,7 +74,7 @@ class nrgCing(Lister):
                  updateIndices=True,
                  isProduction=True
                 ):
-
+        self.assumeAllAreDone = 0 # DEFAULT: 1 when assumed all are done.
         self.writeWhyNot = writeWhyNot
         "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
@@ -90,11 +90,11 @@ class nrgCing(Lister):
         self.D = '/Library/WebServer/Documents'
         self.results_dir = os.path.join(self.D, self.results_base)
         self.data_dir = os.path.join(self.results_dir, DATA_STR)
-        self.results_host = 'localhost'
-        if self.isProduction:
+#        self.results_host = 'localhost'
+#        if self.isProduction:
             # Needed for php script.
-            self.results_host = 'nmr.cmbi.ru.nl'
-        self.results_url = 'http://' + self.results_host + '/' + self.results_base # NEW without trailing slash.
+#            self.results_host = 'nmr.cmbi.ru.nl'
+#        self.results_url = 'http://' + self.results_host + '/' + self.results_base # NEW without trailing slash.
 
         # The csv file name for indexing pdb
         self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
@@ -115,8 +115,10 @@ class nrgCing(Lister):
         ## Total number of child processes to be done if all scheduled to be done
         ## are indeed to be done. This is set later on and perhaps adjusted
         ## when the user interrupts the process by ctrl-c.
-        self.url_directer = self.results_url + '/direct.php'
-        self.url_redirecter = self.results_url + '/redirect.php'
+#        self.url_directer = self.results_url + '/direct.php'
+#        self.url_redirecter = self.results_url + '/redirect.php'
+        self.url_directer = '../direct.php' # relative to index directory.
+        self.url_redirecter = '../redirect.php'
 #        self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
         ## Dictionary with matches pdb to bmrb
         self.matches_many2one = {}
@@ -127,7 +129,8 @@ class nrgCing(Lister):
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
-        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
+#        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = './data/%t/%s/%s.cing/%s/HTML/index.html'
 
         os.chdir(self.results_dir)
 
@@ -359,7 +362,7 @@ class nrgCing(Lister):
             logLastFile = globLast(logDir + '/*.log')
 #            NTdebug("logLastFile: %s" % logLastFile)
             if not logLastFile:
-                if self.isProduction and 0: # DEFAULT: 1 when assumed all are done.
+                if self.isProduction and self.assumeAllAreDone:
                     NTmessage("Failed to find any prep log file in directory: %s" % logDir)
                 continue
             self.entry_list_prep_tried.append(entry_code)
@@ -486,10 +489,9 @@ class nrgCing(Lister):
             # end for entryDir
         # end for subDir
 
+        host = 'localhost'
         if self.isProduction:
             host = 'nmr'
-        else:
-            host = 'localhost'
         m = nrgCingRdb(host=host)
         self.entry_list_store_in_db = m.getPdbIdList()
         if not self.entry_list_store_in_db:
@@ -818,7 +820,7 @@ class nrgCing(Lister):
 #                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
-                jump_form_start = '<FORM method="GET" action="%s">' % self.url_directer
+                jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
                 result_string = jump_form_start + "PDB entries"
                 db_id = "PDB"
 
@@ -1021,11 +1023,12 @@ class nrgCing(Lister):
     # end def
 
     def prepareEntry(self, entry_code,
-                     doInteractive=0,
+                     doInteractive=1,
                      convertMmCifCoor=1,
                      convertMrRestraints=0,
-                     convertStarCS=0,
-                     filterCcpnAll=0):
+                     convertStarCS=1
+#                     filterCcpnAll=0
+                     ):
         "Return True on error."
 
         entryCodeChar2and3 = entry_code[1:3]
@@ -1034,6 +1037,7 @@ class nrgCing(Lister):
         # Absolute paths with still be appending a entryCodeChar2and3
         inputDirByPhase = {
                            PHASE_C: os.path.join(dir_C, entryCodeChar2and3, entry_code),
+                           PHASE_S: os.path.join(dir_S, entryCodeChar2and3, entry_code),
                            PHASE_R: os.path.join(self.recoordSyncDir, entry_code)
                            }
 
@@ -1041,7 +1045,7 @@ class nrgCing(Lister):
         NTmessage("convertMmCifCoor       Converts PDB mmCIF to NMR-STAR with Wattos        -> C/XXXX_C_FC.xml         %s" % convertMmCifCoor)
         NTmessage("convertMrRestraints    Adds STAR restraints to Ccpn with XXXX            -> R/XXXX_R_FC.xml         %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    -> S/XXXX_S_FC.xml         %s" % convertStarCS)
-        NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
+#        NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
         NTmessage("Doing                                                                                            %4s" % entry_code)
 #        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
@@ -1120,6 +1124,7 @@ class nrgCing(Lister):
             log_file = "%s_star2Ccpn.log" % entry_code
             inputStarFile = "%s_C_wattos.str" % entry_code
             inputStarFileFull = os.path.join(C_entry_dir, inputStarFile)
+            outputCcpnFile = "%s.tgz" % entry_code
             fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
 
             if not os.path.exists(inputStarFileFull):
@@ -1147,12 +1152,54 @@ class nrgCing(Lister):
                     NTerror("%s found errors in log file; aborting." % entry_code)
                     NTmessage('\n'.join(resultList))
                     return True
+            if not os.path.exists(outputCcpnFile):
+                NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                return True
+
             finalPhaseId = PHASE_C
         # end if convertMmCifCoor
 
         if convertMrRestraints:
                 finalPhaseId = PHASE_R
                 # Nothing else needed really.
+
+        if convertStarCS:
+            NTwarning("  NMR-STAR chemical shifts TODO") # TODO: here
+
+            S_sub_entry_dir = os.path.join(dir_S, entryCodeChar2and3)
+            S_entry_dir = os.path.join(S_sub_entry_dir, entry_code)
+
+            inputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
+            if not inputDir:
+                NTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
+                return True
+            fn = "%s.tgz" % entry_code
+            inputCcpnFile = os.path.join(inputDir, fn)
+            outputCcpnFile = fn
+
+            if not os.path.exists(S_entry_dir):
+                mkdirs(dir_S)
+            if not os.path.exists(S_sub_entry_dir):
+                mkdirs(S_sub_entry_dir)
+            os.chdir(S_sub_entry_dir)
+            if os.path.exists(entry_code):
+                if 1: # DEFAULT: 1
+                    rmtree(entry_code)
+                # end if False
+            # end if
+            if not os.path.exists(entry_code):
+                os.mkdir(entry_code)
+            os.chdir(entry_code)
+
+
+            shutil.copy(inputCcpnFile, outputCcpnFile) # TODO: replace this by real action.
+
+            if not os.path.exists(outputCcpnFile):
+                NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                return True
+            finalPhaseId = PHASE_S
+
+
         if copyToInputDir:
             if not finalPhaseId:
                 NTerror("Failed to finish any prep stage.")
@@ -1433,11 +1480,12 @@ Additional modes I see:
         elif destination == 'prepareEntry':
             convertMmCifCoor = 1
             convertMrRestraints = 0
+            convertStarCS = 1
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
                 if len(argListOther) > 1:
                     convertMrRestraints = int(argListOther[1])
-            if m.prepareEntry(entry_code, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints):
+            if m.prepareEntry(entry_code, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCingEntry':
             m.entry_list_todo = [ entry_code ]

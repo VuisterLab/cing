@@ -485,20 +485,21 @@ def summary( project, toFile = True, ranges=None ):
         NTerror('Project.Summary: Strange, there was no molecule in this project')
         return None
 
+    mol = project.molecule
     if ranges == None:
-        ranges = project.molecule.ranges
+        ranges = mol.ranges
 
     msg = ''
-#    msg += sprintf( '%s\n', project.molecule.format() )
+#    msg += sprintf( '%s\n', mol.format() )
 
     skippedRmsd = False # keep logic simple.
-    if project.molecule.has_key( RMSD_STR ) and project.molecule.rmsd:
+    if mol.has_key( RMSD_STR ) and mol.rmsd:
         # Next msg isn't returning when no models are present in CING.
-        msgNext = project.molecule.rmsd.format(allowHtml=True)
+        msgNext = mol.rmsd.format(allowHtml=True)
         if msgNext:
             msg += msgNext
-#        msg += sprintf( '\n%s\n', project.molecule.rmsd.format() )
-        if not project.molecule.modelCount:
+#        msg += sprintf( '\n%s\n', mol.rmsd.format() )
+        if not mol.modelCount:
             # empty molecule can't have meaningfull rmsds and this might be an important factor to note here.
             skippedRmsd = True
     else:
@@ -509,27 +510,37 @@ def summary( project, toFile = True, ranges=None ):
     for drl in project.distances + project.dihedrals + project.rdcs:
         msg += drl.format(allowHtml=True) + '\n'
 #        msg += sprintf( '\n%s\n', drl.format() )
+    allResidues = mol.allResidues()
+    allResiduesWithCoord = mol.allResiduesWithCoordinates()
+    rangesStrAll = mol.residueList2Ranges(allResidues)
+    rangesStrAllWithCoord = mol.residueList2Ranges(allResiduesWithCoord)
+    NTdebug("rangesStrAll, rangesStrAllWithCoord: %s %s" % ( rangesStrAll, rangesStrAllWithCoord))
+    msgRanges = "all residues"
+    if rangesStrAll != rangesStrAllWithCoord:
+        msgRanges += " with coordinates: " + rangesStrAllWithCoord
+    msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % (dots, msgRanges, dots, _ROGsummary(allResiduesWithCoord,allowHtml=True))
 
-    msg += "\n%s CING ROG analysis (all residues) %s\n%s\n" % (dots, dots, _ROGsummary(project.molecule.allResidues(),allowHtml=True))
-
-    useRanges = project.molecule.useRanges(ranges)
-
+    useRanges = mol.useRanges(ranges)
     if useRanges:
-        msg += "\n%s CING ROG analysis (ranges %s) %s\n%s\n" % \
-               (dots, ranges, dots, _ROGsummary(project.molecule.setResiduesFromRanges(ranges), allowHtml=True))
+        rangeResidueList = mol.ranges2list(ranges)
+        rangeResidueListWithCoord = allResiduesWithCoord.intersection(rangeResidueList)
+        rangesStrRangeWithCoord = mol.residueList2Ranges(rangeResidueListWithCoord)
+        NTdebug("rangesStrAll, rangesStrRangeWithCoord: %s %s" % ( rangesStrAll, rangesStrRangeWithCoord))
+        msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % \
+               (dots, rangesStrRangeWithCoord, dots, _ROGsummary(rangeResidueListWithCoord, allowHtml=True))
 
-    wiSummary = getDeepByKeys(project.molecule, WHATIF_STR, 'summary')
+    wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')
     if wiSummary:
         msg += "\n%s WHAT IF Summary %s\n" % (dots, dots )
         msg += addPreTagLines(wiSummary)
     else:
         incompleteItems.append( WHATIF_STR )
 
-    pc = getDeepByKeys(project.molecule, PROCHECK_STR)
+    pc = getDeepByKeys(mol, PROCHECK_STR)
     if pc:
         if hasattr(pc, SUMMARY_STR):
             msg += "\n%s Procheck Summary %s\n" % (dots, dots )
-            if project.molecule.useRanges(pc.ranges):
+            if mol.useRanges(pc.ranges):
                 msg += '     (ranges %s)\n' + pc.ranges
             msg += '\n' + addPreTagLines(pc.summary.format())
         else:
@@ -538,7 +549,7 @@ def summary( project, toFile = True, ranges=None ):
         incompleteItems.append( PROCHECK_STR )
 
     # TODO: change this like shiftx setup with wattosStatus.
-    wattosSummary = getDeepByKeys(project.molecule, WATTOS_SUMMARY_STR)
+    wattosSummary = getDeepByKeys(mol, WATTOS_SUMMARY_STR)
     if wattosSummary:
         msg += "\n%s Wattos Summary %s\n" % (dots, dots )
         msg += '\n' + addPreTagLines(wattosSummary)
@@ -547,8 +558,8 @@ def summary( project, toFile = True, ranges=None ):
 
 #    skippedShiftx = False
     # don't mark nucleic acid only entries at all.
-    if project.molecule.hasAminoAcid():
-#        shiftx = getDeepByKeys(project.molecule, SHIFTX_STR) # modded by GWV in revision 624.
+    if mol.hasAminoAcid():
+#        shiftx = getDeepByKeys(mol, SHIFTX_STR) # modded by GWV in revision 624.
         shiftx = project.shiftxStatus.completed
         if not shiftx:
 #            NTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
@@ -566,7 +577,7 @@ def summary( project, toFile = True, ranges=None ):
     msg = topMsg + '\n' + msg
 
     if toFile:
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'summary.txt')
+        fname = project.path(mol.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         NTmessage( '==> summary, output to %s', fname)
 #        NTdebug(" msg: " + msg)
