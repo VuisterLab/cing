@@ -1,8 +1,4 @@
 <?php
-list ($id, $foo) = explode("/", substr($_SERVER['PATH_INFO'],1));
-?>
-
-<?php
 
 $inputStr = $_SERVER['QUERY_STRING'];
 $variables = array();

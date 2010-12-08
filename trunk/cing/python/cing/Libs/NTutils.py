@@ -371,16 +371,45 @@ Sum                %s
         If duplicates are present in this/self list then they might not all be removed (multiset semantics).
         """
         result = deepcopy(self)
+        hashedSelf = NTdict() # use in order to speed up operations.
+        hashedSelf.appendFromList(self)
+#        NTdebug("Created hash of self with elements: %s" % len(hashedSelf.keys()))
         for element in other:
-#            NTdebug("Trying element: %s" % element)
-            try:
-                idx = list.index(result, element)
-#                NTdebug("idx: %s" % idx)
-                if idx >= 0:
-#                    NTdebug("removed: %s" % element)
-                    del result[idx]
-            except ValueError:
-                pass
+#            NTdebug("difference: Trying element: %s" % element)
+            if hashedSelf.has_key(element):
+                idx = self.index(element)
+                del result[idx]
+        return result
+
+    def union(self, other):
+        """Returns a new set of self minus other
+        This is a common operation. Order in list will not be altered.
+        If duplicates are present in this/self list then they might not all be removed (multiset semantics).
+        """
+        result = deepcopy(self)
+        hashedSelf = NTdict() # use in order to speed up operations.
+        hashedSelf.appendFromList(self)
+#        NTdebug("Created hash of self with elements: %s" % len(hashedSelf.keys()))
+        for element in other:
+#            NTdebug("union: Trying element: %s" % element)
+            if not hashedSelf.has_key(element):
+                result.append(element)
+        return result
+
+    def intersection(self, other):
+        """Returns a new set of self minus other
+        This is a common operation. Order in list will not be altered.
+        Capitalization will not be altered.
+        If duplicates are present in this/self list then they might not all be removed (multiset semantics).
+        """
+        result = NTlist()
+        hashedOther = NTdict() # use in order to speed up operations.
+        hashedOther.appendFromList(other)
+#        NTdebug("Created hash of other with elements: %s" % len(hashedOther.keys()))
+        for element in self:
+#            NTdebug("intersection: Trying element: %s" % element)
+            if hashedOther.has_key(element):
+                result.append(element)
         return result
 
 

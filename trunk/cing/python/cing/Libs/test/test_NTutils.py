@@ -173,11 +173,15 @@ class AllChecks(TestCase):
         self.assertEquals(val2Str(None, "%03d", useNanString=False), '')
 
 
-    def testNTlistDifference(self):
+    def testNTlistDifferenceIntersection(self):
         xL = NTlist( 'a', 'b' )
-        yL = NTlist( 'b', 'c' )
+        yL = NTlist( 'b', 'c', 'c' )
         xLdiff = xL.difference(yL)
         self.assertEquals(xLdiff, ['a'])
+        xLyLintersection = xL.intersection(yL)
+        self.assertEquals(xLyLintersection, ['b'])
+        xLyLunion = xL.union(yL) # Uses multi set semantics
+        self.assertEquals(xLyLunion, ['a', 'b', 'c', 'c'])
 
     def tttestSwitchOutput( self):
         """Note that this fails but used to work.

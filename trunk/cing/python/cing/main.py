@@ -744,9 +744,12 @@ def main():
             project = Project.open(options.name, status='create')
 
         if not project:
-            NTdebug("Doing a hard system exit")
+            NTdebug("No project, doing a hard system exit")
             sys.exit(2)
         #end if
+        if not options.noProject and not project.molecule:
+            NTdebug("No project.molecule, doing a hard system exit")
+            sys.exit(2)
 
         #------------------------------------------------------------------------------------
         # check for alternative molecule
