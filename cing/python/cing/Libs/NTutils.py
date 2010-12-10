@@ -5102,6 +5102,8 @@ def stringMeansBooleanTrue(inputStr):
     Returns True if it's a string that is either 1 (any non-zero), True, etc.
     Optimized for speed. See unit test.
     """
+    if inputStr == None:
+        return False
     if not isinstance(inputStr, str):
         return False
     inputStrlower = inputStr.lower()

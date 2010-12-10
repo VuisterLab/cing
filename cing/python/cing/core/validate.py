@@ -524,7 +524,7 @@ def summary( project, toFile = True, ranges=None ):
     allResiduesWithCoord = mol.allResiduesWithCoordinates()
     rangesStrAll = mol.residueList2Ranges(allResidues)
     rangesStrAllWithCoord = mol.residueList2Ranges(allResiduesWithCoord)
-    NTdebug("rangesStrAll, rangesStrAllWithCoord: %s %s" % ( rangesStrAll, rangesStrAllWithCoord))
+#    NTdebug("rangesStrAll, rangesStrAllWithCoord: %s %s" % ( rangesStrAll, rangesStrAllWithCoord))
     msgRanges = "all residues"
     if rangesStrAll != rangesStrAllWithCoord:
         msgRanges += " with coordinates: " + rangesStrAllWithCoord
@@ -535,7 +535,7 @@ def summary( project, toFile = True, ranges=None ):
         rangeResidueList = mol.ranges2list(ranges)
         rangeResidueListWithCoord = allResiduesWithCoord.intersection(rangeResidueList)
         rangesStrRangeWithCoord = mol.residueList2Ranges(rangeResidueListWithCoord)
-        NTdebug("rangesStrAll, rangesStrRangeWithCoord: %s %s" % ( rangesStrAll, rangesStrRangeWithCoord))
+#        NTdebug("rangesStrAll, rangesStrRangeWithCoord: %s %s" % ( rangesStrAll, rangesStrRangeWithCoord))
         msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % \
                (dots, rangesStrRangeWithCoord, dots, _ROGsummary(rangeResidueListWithCoord, allowHtml=True))
 
@@ -1207,8 +1207,8 @@ def moleculeValidateAssignments( molecule  ):
         hasAssignment[key] = f > FRACTION_REQUIRED
 #        NTdebug("key, a, n, t, f, hasAssignment: %s" % str([key, a, n, t, f, hasAssignment]))
         msg += '   %s %s/%s/%.2f' % ( key, a, t, f)
-    NTmessage("Found assigned/overall/fraction for spins: " + msg)
-    NTmessage("Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))
+    NTmessage("==> Found assigned/overall/fraction for spins: " + msg)
+    NTmessage("==> Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))
 
     for atm in molecule.allAtoms():
         atm.rogScore.reset()
